@@ -1,4 +1,4 @@
-(ns ^:figwheel-always open-company-dashboard.core
+(ns ^:figwheel-always open-company-web.core
     (:require [om.core :as om :include-macros true]
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]))
