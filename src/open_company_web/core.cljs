@@ -7,6 +7,10 @@
 
 (println "Edits to this text should show up in your developer console.")
 
+;; Some utility functions
+
+(defn abs [n] (max n (- n)))
+
 ;; define your app data so that it doesn't get over-written on reload
 
 (defonce app-state (atom {
@@ -23,8 +27,6 @@
     :cash 173228
     :revenue 2767
     :costs 22184
-    :burn-rate -19417
-    :runway "9 months"
     :comment "This is another comment."
   }
   :compensation {
@@ -37,16 +39,18 @@
   }
 }))
 
-(defcomponent headcount-number-data [data owner]
+(defcomponent report-line [data owner]
   (will-mount [_]
     (om/set-state! owner {
       :number (:number data)
       :label (:label data)
+      :prefix (or (:prefix data) "")
       :plural-suffix (or (:plural-suffix data) "s")
     }))
-  (render-state [_ {:keys [number label plural-suffix]}]
+  (render-state [_ {:keys [number label prefix plural-suffix]}]
     (let [suffix (if (> number 0) plural-suffix)]
       (dom/span
+        (if-not (= (count prefix) 0) (dom/span {:class "label"} (str prefix)))
         (dom/span {:class "num"} (str number))
         (dom/span {:class "label"} (str " " label suffix))))))
 
@@ -62,28 +66,107 @@
   }
   owner]
   (will-mount [_]
-    (om/set-state! owner data)
-    )
+    (om/set-state! owner data))
   (render-state [_ {:keys [founders executives ft-employees ft-contractors pt-employees pt-contractors comment]}]
     (let [total-headcount (+ founders executives ft-employees ft-contractors pt-employees pt-contractors)
           full-time-equivalent (+ founders executives ft-employees ft-contractors (quot pt-employees 2) (quot pt-contractors 2))]
-      (dom/div {:style {:margin-left "10px"}}
+      (dom/div {:class "report-list headcount"}
         (dom/h3 "Headcount:")
         (dom/div
-          (om/build headcount-number-data {:number founders :label "founder"}))
+          (om/build report-line {:number founders :label "founder"}))
         (dom/div
-          (om/build headcount-number-data {:number executives :label "executive"}))
+          (om/build report-line {:number executives :label "executive"}))
         (dom/div
-          (om/build headcount-number-data {:number ft-employees :label "full time employee"}))
+          (om/build report-line {:number ft-employees :label "full time employee"}))
         (dom/div
-          (om/build headcount-number-data {:number ft-contractors :label "full time contractor"}))
+          (om/build report-line {:number ft-contractors :label "full time contractor"}))
         (dom/div
-          (om/build headcount-number-data {:number pt-employees :label "part time employee"}))
+          (om/build report-line {:number pt-employees :label "part time employee"}))
         (dom/div
-          (om/build headcount-number-data {:number pt-contractors :label "part time contractor"}))
+          (om/build report-line {:number pt-contractors :label "part time contractor"}))
         (dom/div
-          (om/build headcount-number-data {:number total-headcount :label "total headcount"})", "
-          (om/build headcount-number-data {:number full-time-equivalent :label "full time equivalent"}))
+          (om/build report-line {:number total-headcount :label "total headcount"})", "
+          (om/build report-line {:number full-time-equivalent :label "full time equivalent"}))
+        (dom/div {:class "comment"} (str "Comments: " comment))))))
+
+(defcomponent finances
+  [data :- {
+    :cache js/Number
+    :revenue js/Number
+    :costs js/Number
+    :comment js/String
+  }
+  owner]
+  (will-mount [_]
+    (om/set-state! owner data))
+  (render-state [_ {:keys [cash revenue costs comment]}]
+    (let [burn-rate (- revenue costs)
+          burn-rate-label (if (> burn-rate 0) "Growth rate: " "Burn rate: ")
+          burn-rate-classes (str "num " (if (> burn-rate 0) "green" "red"))
+          profitable (if (> burn-rate 0) "Yes" "No")
+          run-away (if (<= burn-rate 0) (quot cash burn-rate) "N/A")]
+      (dom/div {:class "report-list finances"}
+        (dom/h3 "Finances:")
+        (dom/div
+          (om/build report-line {:prefix "$" :number cash :label "cash on hand"}))
+        (dom/div
+          (om/build report-line {:prefix "$" :number revenue :label "revenue this month"}))
+        (dom/div
+          (om/build report-line {:prefix "$" :number costs :label "costs this month"}))
+        (dom/div
+          (dom/span {:class "label"} (str "Profitable this month? " profitable)))
+        (dom/div
+          (dom/span {:class "label"} burn-rate-label)
+          (dom/span {:class burn-rate-classes} (abs burn-rate)))
+        (if (<= burn-rate 0) (dom/div
+          (dom/span {:class "label"} "Runaway: " (abs run-away) " months")))
+        (dom/div {:class "comment"} (str "Comment: " comment))))))
+
+(defcomponent compensation
+  [data :- {
+    :dollars js/Boolean
+    :founders js/Number
+    :executives js/Number
+    :employee js/Number
+    :contractor js/Number
+    :comment js/String
+  }
+  owner]
+  (will-mount [_]
+    (om/set-state! owner data))
+  (render-state [_ {:keys [dollars founders executives employee contractor comment]}]
+    (let [prefix (if dollars "$" "%")
+          total-compensation (+ founders executives employee contractor)]
+      (dom/div {:class "report-list compensation"}
+        (dom/h3 "Compensation:")
+        (dom/div
+          (dom/span {:class "label"} "Report in: "
+            (dom/input {
+              :type "radio"
+              :name "report-type"
+              :value "$"
+              :id "report-type-$"
+              :checked dollars
+              :on-click #(om/set-state! owner :dollars true)})
+            (dom/label {:for "report-type-$"} " Dollars ")
+            (dom/input {
+              :type "radio"
+              :name "report-type"
+              :value "%"
+              :id "report-type-%"
+              :checked (not dollars)
+              :on-click #(om/set-state! owner :dollars false)})
+            (dom/label {:for "report-type-%"} " Percent ")))
+        (dom/div
+          (om/build report-line {:prefix prefix :number founders :label "founders compensation this month"}))
+        (dom/div
+          (om/build report-line {:prefix prefix :number executives :label "executives compensation this month"}))
+        (dom/div
+          (om/build report-line {:prefix prefix :number employee :label "employees compensation this month"}))
+        (dom/div
+          (om/build report-line {:prefix prefix :number contractor :label "contractors compensation this month"}))
+        (dom/div
+          (om/build report-line {:prefix prefix :number total-compensation :label "total compensation this month"}))
         (dom/div {:class "comment"} (str "Comment: " comment))))))
 
 (defcomponent page
@@ -99,7 +182,9 @@
   (render-state [owner data]
     (dom/div
       (dom/h2 "Dashboard")
-      (om/build headcount (:headcount (:data data))))))
+      (om/build headcount (:headcount (:data data)))
+      (om/build finances (:finances (:data data)))
+      (om/build compensation (:compensation (:data data))))))
 
 (om/root
   page
