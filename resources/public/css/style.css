@@ -1,11 +1,27 @@
 /* some style */
 
-span.num{
+div.report-list {
+  margin-left: 10px;
+}
+
+div.report-list span.num{
   color: blue;
   text-decoration: underline;
 }
 
-div.comment{
+div.report-list span.num.red{
+  color: red;
+}
+
+div.report-list span.num.green{
+  color: green;
+}
+
+div.report-list span.label{
+  color: black;
+}
+
+div.report-list div.comment{
   width: 200px;
   border: 1px solid black;
   padding: 5px;
