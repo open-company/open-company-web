@@ -5,8 +5,8 @@ div.report-list {
 }
 
 div.report-list span.num{
-  color: blue;
-  text-decoration: underline;
+  color: black;
+  font-weight: bold;
 }
 
 div.report-list span.num.red{
@@ -17,11 +17,30 @@ div.report-list span.num.green{
   color: green;
 }
 
-div.report-list span.label{
+div.report-list span.label, div.report-list label.label{
   color: black;
 }
 
-div.report-list div.comment{
+div.report-list label.comments-label{
+  margin: 10px 0px 0px;
+  padding: 0px;
+  color: black;
+}
+
+label.switch-vis{
+  margin: 0px 5px;
+}
+
+div.report-list input.editable-data, div.report-list input.editable-data:focus{
+  outline: 0;
+  border: 0px solid black;
+  border-bottom: 1px solid blue;
+  color: blue;
+  text-align: center;
+  width: 50px;
+}
+
+div.report-list textarea.comment{
   width: 200px;
   border: 1px solid black;
   padding: 5px;
