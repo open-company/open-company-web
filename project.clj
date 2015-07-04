@@ -6,6 +6,8 @@
     :url "http://www.mozilla.org/MPL/2.0/"
   }
 
+  :min-lein-version "2.5.1" ; highest version supported by Travis-CI as of 7/5/2015
+
   :dependencies [
     [org.clojure/clojure "1.7.0"] ; Lisp on the JVM http://clojure.org/documentation
     [org.clojure/clojurescript "0.0-3308"] ; ClojureScript compiler https://github.com/clojure/clojurescript
