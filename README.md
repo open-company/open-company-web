@@ -17,7 +17,7 @@ To get started, head to [OpenCompany.io](https://opencompany.io).
 
 ## Local Setup
 
-Users of the [OpenCompany.io](https://opencompany.io) platform should get started by going to [OpenCompany.io](https://opencompany.io). The following setup is for developers wanting to work on the platform's Web application software.
+Users of the [OpenCompany.io](https://opencompany.io) platform should get started by going to [OpenCompany.io](https://opencompany.io). The following local setup is for developers wanting to work on the platform's Web application software.
 
 Most of the dependencies are internal, meaning [Leiningen](https://github.com/technomancy/leiningen) will handle getting them for you. There are a few exceptions:
 
