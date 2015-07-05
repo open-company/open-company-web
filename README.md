@@ -2,8 +2,22 @@
 
 ## Overview
 
+Build your company in the open with transparency for your co-founders, your team of employees and contractors, and your investors. Or open up your company for everyone, your customers and the rest of the startup community.
+
+[OpenCompany.io](https://opencompany.io) is GitHub for the rest of your company:
+
+* Dashboard - An easy tool for founders to provide transparency to their teams and beyond.
+* Founders' Guide - Tools, best practices and insights from open company founders and their companies.
+* Open Company Directory - Founders sharing with their teams and beyond.
+* Community - Spread the word and knowledge and inspire more founders to open up.
+
+Like the open companies we promote and support, the [OpenCompany.io](https://opencompany.io) platform is completely transparent. The company supporting this effort, Transparency, LLC, is an open company. The platform is open source software, and open company data is [open data](https://en.wikipedia.org/wiki/Open_data) accessible through the [platform API](https://github.com/open-company/open-company-api).
+
+To get started, head to [OpenCompany.io](https://opencompany.io).
 
 ## Local Setup
+
+Users of the [OpenCompany.io](https://opencompany.io) platform should get started by going to [OpenCompany.io](https://opencompany.io). The following setup is for developers wanting to work on the platform's Web application software.
 
 Most of the dependencies are internal, meaning [Leiningen](https://github.com/technomancy/leiningen) will handle getting them for you. There are a few exceptions:
 
