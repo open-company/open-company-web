@@ -1,4 +1,4 @@
-# OpenCompany.io Web Application
+# [OpenCompany.io](https://opencompany.io) Web Application
 
 ## Overview
 
