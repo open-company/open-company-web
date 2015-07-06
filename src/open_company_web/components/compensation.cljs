@@ -3,13 +3,12 @@
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
               [open-company-web.components.report-line :refer [report-line report-editable-line]]
-              [open-company-web.utils :refer [thousands-separator handle-change]]))
+              [open-company-web.utils :refer [thousands-separator handle-change]]
+              [goog.string :as gstring]))
 
 (defn switch-values
   "Update all the values in the cursor with the values passed"
   [cursor last-values]
-  (println cursor)
-  (println last-values)
   (handle-change cursor (:founders last-values) :founders)
   (handle-change cursor (:executives last-values) :executives)
   (handle-change cursor (:employee last-values) :employee)
@@ -45,8 +44,8 @@
           contractor (:contractor data)
           comment (:comment data)
           prefix (if dollars "$" "%")
-          total-compensation (+ founders executives employee contractor)]
-      (println "+ " founders " " executives " " employee " " contractor " = " total-compensation)
+          total-compensation (gstring/format "%.2f" (+ founders executives employee contractor))]
+      (println total-compensation)
       (dom/div {:class "report-list compensation"}
         (dom/h3 "Compensation: ")
         (dom/div
