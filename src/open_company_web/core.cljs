@@ -4,8 +4,6 @@
               [om-tools.dom :as dom :include-macros true]
               [open-company-web.components.page :refer [page]]))
 
-(enable-console-print!)
-
 (defonce app-state (atom {
   :headcount {
     :founders 2
