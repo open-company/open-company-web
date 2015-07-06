@@ -6,7 +6,7 @@
               [open-company-web.components.finances :refer [finances]]
               [open-company-web.components.compensation :refer [compensation]]))
 
-(println "HERE!")
+(enable-console-print!)
 
 (defcomponent page [data owner]
   (render [owner]
