@@ -5,11 +5,12 @@
 (defn abs [n] (max n (- n)))
 
 (defn thousands-separator [number]
-  (let [integer (int number)
-        decimal (int (* (- number integer) 100))
-        integer-string (clojure.string/replace (str integer) #"\B(?=(\d{3})+(?!\d))" ",")]
-    (if (> decimal 0)
-      (str integer-string "." decimal)
+  (let [parts (clojure.string/split (str number) "." 1)
+        int-part (first parts)
+        dec-part (get parts 1)
+        integer-string (clojure.string/replace int-part #"\B(?=(\d{3})+(?!\d))" ",")]
+    (if-not (= dec-part nil)
+      (str integer-string "." dec-part)
       integer-string)))
 
 (defn thousands-separator-strip [number]
