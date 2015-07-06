@@ -37,7 +37,7 @@ div.report-list input.editable-data, div.report-list input.editable-data:focus{
   border-bottom: 1px solid blue;
   color: blue;
   text-align: center;
-  width: 50px;
+  width: 80px;
 }
 
 div.report-list textarea.comment{
