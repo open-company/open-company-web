@@ -5,8 +5,12 @@
 (defn abs [n] (max n (- n)))
 
 (defn thousands-separator [number]
-  (let [num-str (str number)]
-    (clojure.string/replace num-str #"\B(?=(\d{3})+(?!\d))" ",")))
+  (let [integer (int number)
+        decimal (int (* (- number integer) 100))
+        integer-string (clojure.string/replace (str integer) #"\B(?=(\d{3})+(?!\d))" ",")]
+    (if (> decimal 0)
+      (str integer-string "." decimal)
+      integer-string)))
 
 (defn thousands-separator-strip [number]
   (let [num-str (str number)]
@@ -15,5 +19,6 @@
 (defn handle-change [cursor value key]
   (om/transact! cursor key (fn [_] value)))
 
-(defn get-event-int-value [e]
-  (int (thousands-separator-strip (.. e -target -value))))
+(defn String->Number [str]
+  (let [n (js/parseFloat str)]
+    (if (= js/NaN n) 0 n)))
