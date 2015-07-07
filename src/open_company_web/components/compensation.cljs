@@ -16,7 +16,8 @@
 
 (defn calc-percentage
   [dollar total]
-  (* 0.01 (Math/round (* (/ dollar total) 10000))))
+  (let [perc (gstring/format "%.2f" (* (/ dollar total) 100))]
+    (js/parseFloat perc)))
 
 (defn dollars->percentage
   "Calculate the percentage given the compensation component cursor"
@@ -45,7 +46,6 @@
           comment (:comment data)
           prefix (if dollars "$" "%")
           total-compensation (gstring/format "%.2f" (+ founders executives employee contractor))]
-      (println total-compensation)
       (dom/div {:class "report-list compensation"}
         (dom/h3 "Compensation: ")
         (dom/div
