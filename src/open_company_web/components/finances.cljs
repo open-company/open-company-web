@@ -2,8 +2,9 @@
     (:require [om.core :as om :include-macros true]
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
-              [open-company-web.utils :refer [abs thousands-separator]]
-              [open-company-web.components.report-line :refer [report-editable-line]]))
+              [open-company-web.utils :refer [abs thousands-separator handle-change]]
+              [open-company-web.components.report-line :refer [report-editable-line]]
+              [open-company-web.components.comment :refer [comment-component]]))
 
 (defcomponent finances [data owner]
   (render [_]
@@ -28,4 +29,4 @@
           (dom/span {:class burn-rate-classes} (thousands-separator (abs burn-rate))))
         (dom/div
           (dom/span {:class "label"} "Runaway: " (if (<= burn-rate 0) (str (abs run-away) " months") "N/A")))
-        (dom/div {:class "comment"} (str "Comment: " comment))))))
+        (om/build comment-component {:value comment})))))

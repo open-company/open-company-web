@@ -3,7 +3,8 @@
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
               [open-company-web.utils :refer [thousands-separator handle-change]]
-              [open-company-web.components.report-line :refer [report-line report-editable-line]]))
+              [open-company-web.components.report-line :refer [report-line report-editable-line]]
+              [open-company-web.components.comment :refer [comment-component]]))
 
 (defcomponent headcount [data owner]
   (render [_]
@@ -27,10 +28,4 @@
         (dom/div
           (om/build report-line {:number (thousands-separator total-headcount) :label "total headcount"})", "
           (om/build report-line {:number (thousands-separator full-time-equivalent) :label "full-time equivalent"}))
-        (dom/label {:class "comments-label"} "Comments:")
-        (dom/br)
-        (dom/textarea {
-          :class "comment"
-          :value comment
-          :onChange #(handle-change data (.. % -target -value) :comment)
-        })))))
+        (om/build comment-component {:value comment})))))

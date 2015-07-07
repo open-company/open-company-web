@@ -4,6 +4,7 @@
               [om-tools.dom :as dom :include-macros true]
               [open-company-web.components.report-line :refer [report-line report-editable-line]]
               [open-company-web.utils :refer [thousands-separator handle-change]]
+              [open-company-web.components.comment :refer [comment-component]]
               [goog.string :as gstring]))
 
 (defn switch-values
@@ -102,4 +103,4 @@
             :prefix prefix
             :number (thousands-separator total-compensation)
             :label "total compensation this month"}))
-        (dom/div {:class "comment"} (str "Comment: " comment))))))
+        (om/build comment-component {:value comment})))))
