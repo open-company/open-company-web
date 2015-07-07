@@ -1,988 +1,1031 @@
 (ns open-company-web.iso4217.iso4217)
 
 (def iso4217 {
-	:AED {
-		:code "AED",
-		:number "784",
-		:decimals "2",
-		:name "United Arab Emirates dirham"
-	},
 	:AFN {
-		:code "AFN",
-		:number "971",
-		:decimals  "2",
-		:name "Afghan afghani"
-	},
-	:ALL {
-		:code "ALL",
-		:number "008",
-		:decimals "2",
-		:name "Albanian lek"
-	},
-	:AMD {
-		:code "AMD",
-		:number "051",
-		:decimals "2",
-		:name "Armenian dram"
-	},
-	:ANG {
-		:code "ANG",
-		:number "532",
-		:decimals "2",
-		:name "Netherlands Antillean guilder"
-	},
-	:AOA {
-		:code "AOA",
-		:number "973",
-		:decimals "2",
-		:name "Angolan kwanza"
-	},
-	:ARS {
-		:code "ARS",
-		:number "032",
-		:decimals "2",
-		:name "Argentine peso"
-	},
-	:AUD {
-		:code "AUD",
-		:number "036",
-		:decimals "2",
-		:name "Australian dollar"
-	},
-	:AWG {
-		:code "AWG",
-		:number "533",
-		:decimals "2",
-		:name "Aruban florin"
-	},
-	:AZN {
-		:code "AZN",
-		:number "944",
-		:decimals "2",
-		:name "Azerbaijani manat"
-	},
-	:BAM {
-		:code "BAM",
-		:number "977",
-		:decimals "2",
-		:name "Bosnia and Herzegovina convertible mark"
-	},
-	:BBD {
-		:code "BBD",
-		:number "052",
-		:decimals "2",
-		:name "Barbados dollar"
-	},
-	:BDT {
-		:code "BDT",
-		:number "050",
-		:decimals "2",
-		:name "Bangladeshi taka"
-	},
-	:BGN {
-		:code "BGN",
-		:number "975",
-		:decimals "2",
-		:name "Bulgarian lev"
-	},
-	:BHD {
-		:code "BHD",
-		:number "048",
-		:decimals "3",
-		:name "Bahraini dinar"
-	},
-	:BIF {
-		:code "BIF",
-		:number "108",
-		:decimals "0",
-		:name "Burundian franc"
-	},
-	:BMD {
-		:code "BMD",
-		:number "060",
-		:decimals "2",
-		:name "Bermudian dollar"
-	},
-	:BND {
-		:code "BND",
-		:number "096",
-		:decimals "2",
-		:name "Brunei dollar"
-	},
-	:BOB {
-		:code "BOB",
-		:number "068",
-		:decimals "2",
-		:name "Boliviano"
-	},
-	:BOV {
-		:code "BOV",
-		:number "984",
-		:decimals "2",
-		:name "Bolivian Mvdol"
-	},
-	:BRL {
-		:code "BRL",
-		:number "986",
-		:decimals "2",
-		:name "Brazilian real"
-	},
-	:BSD {
-		:code "BSD",
-		:number "044",
-		:decimals "2",
-		:name "Bahamian dollar"
-	},
-	:BTN {
-		:code "BTN",
-		:number "064",
-		:decimals "2",
-		:name "Bhutanese ngultrum"
-	},
-	:BWP {
-		:code "BWP",
-		:number "072",
-		:decimals "2",
-		:name "Botswana pula"
-	},
-	:BYR {
-		:code "BYR",
-		:number "974",
-		:decimals "0",
-		:name "Belarusian ruble"
-	},
-	:BZD {
-		:code "BZD",
-		:number "084",
-		:decimals "2",
-		:name "Belize dollar"
-	},
-	:CAD {
-		:code "CAD",
-		:number "124",
-		:decimals "2",
-		:name "Canadian dollar"
-	},
-	:CDF {
-		:code "CDF",
-		:number "976",
-		:decimals "2",
-		:name "Congolese franc"
-	},
-	:CHE {
-		:code "CHE",
-		:number "947",
-		:decimals "2",
-		:name "WIR Euro"
-	},
-	:CHF {
-		:code "CHF",
-		:number "756",
-		:decimals "2",
-		:name "Swiss franc"
-	},
-	:CHW {
-		:code "CHW",
-		:number "948",
-		:decimals "2",
-		:name "WIR Franc"
-	},
-	:CLF {
-		:code "CLF",
-		:number "990",
-		:decimals "0",
-		:name "Unidad de Fomento"
-	},
-	:CLP {
-		:code "CLP",
-		:number "152",
-		:decimals "0",
-		:name "Chilean peso"
-	},
-	:CNY {
-		:code "CNY",
-		:number "156",
-		:decimals "2",
-		:name "Chinese yuan"
-	},
-	:COP {
-		:code "COP",
-		:number "170",
-		:decimals "2",
-		:name "Colombian peso"
-	},
-	:COU {
-		:code "COU",
-		:number "970",
-		:decimals "2",
-		:name "Unidad de Valor Real"
-	},
-	:CRC {
-		:code "CRC",
-		:number "188",
-		:decimals "2",
-		:name "Costa Rican colon"
-	},
-	:CUC {
-		:code "CUC",
-		:number "931",
-		:decimals "2",
-		:name "Cuban convertible peso"
-	},
-	:CUP {
-		:code "CUP",
-		:number "192",
-		:decimals "2",
-		:name "Cuban peso"
-	},
-	:CVE {
-		:code "CVE",
-		:number "132",
-		:decimals "0",
-		:name "Cape Verde escudo"
-	},
-	:CZK {
-		:code "CZK",
-		:number "203",
-		:decimals "2",
-		:name "Czech koruna"
-	},
-	:DJF {
-		:code "DJF",
-		:number "262",
-		:decimals "0",
-		:name "Djiboutian franc"
-	},
-	:DKK {
-		:code "DKK",
-		:number "208",
-		:decimals "2",
-		:name "Danish krone"
-	},
-	:DOP {
-		:code "DOP",
-		:number "214",
-		:decimals "2",
-		:name "Dominican peso"
-	},
-	:DZD {
-		:code "DZD",
-		:number "012",
-		:decimals "2",
-		:name "Algerian dinar"
-	},
-	:EGP {
-		:code "EGP",
-		:number "818",
-		:decimals "2",
-		:name "Egyptian pound"
-	},
-	:ERN {
-		:code "ERN",
-		:number "232",
-		:decimals "2",
-		:name "Eritrean nakfa"
-	},
-	:ETB {
-		:code "ETB",
-		:number "230",
-		:decimals "2",
-		:name "Ethiopian birr"
-	},
+
+		:text "Afghani",
+		:fraction 2,
+		:symbol "؋",
+		:code "AF"
+	}
 	:EUR {
-		:code "EUR",
-		:number "978",
-		:decimals "2",
-		:name "Euro"
-	},
-	:FJD {
-		:code "FJD",
-		:number "242",
-		:decimals "2",
-		:name "Fiji dollar"
-	},
-	:FKP {
-		:code "FKP",
-		:number "238",
-		:decimals "2",
-		:name "Falkland Islands pound"
-	},
-	:GBP {
-		:code "GBP",
-		:number "826",
-		:decimals "2",
-		:name "Pound sterling"
-	},
-	:GEL {
-		:code "GEL",
-		:number "981",
-		:decimals "2",
-		:name "Georgian lari"
-	},
-	:GHS {
-		:code "GHS",
-		:number "936",
-		:decimals "2",
-		:name "Ghanaian cedi"
-	},
-	:GIP {
-		:code "GIP",
-		:number "292",
-		:decimals "2",
-		:name "Gibraltar pound"
-	},
-	:GMD {
-		:code "GMD",
-		:number "270",
-		:decimals "2",
-		:name "Gambian dalasi"
-	},
-	:GNF {
-		:code "GNF",
-		:number "324",
-		:decimals "0",
-		:name "Guinean franc"
-	},
-	:GTQ {
-		:code "GTQ",
-		:number "320",
-		:decimals "2",
-		:name "Guatemalan quetzal"
-	},
-	:GYD {
-		:code "GYD",
-		:number "328",
-		:decimals "2",
-		:name "Guyanese dollar"
-	},
-	:HKD {
-		:code "HKD",
-		:number "344",
-		:decimals "2",
-		:name "Hong Kong dollar"
-	},
-	:HNL {
-		:code "HNL",
-		:number "340",
-		:decimals "2",
-		:name "Honduran lempira"
-	},
-	:HRK {
-		:code "HRK",
-		:number "191",
-		:decimals "2",
-		:name "Croatian kuna"
-	},
-	:HTG {
-		:code "HTG",
-		:number "332",
-		:decimals "2",
-		:name "Haitian gourde"
-	},
-	:HUF {
-		:code "HUF",
-		:number "348",
-		:decimals "2",
-		:name "Hungarian forint"
-	},
-	:IDR {
-		:code "IDR",
-		:number "360",
-		:decimals "2",
-		:name "Indonesian rupiah"
-	},
-	:ILS {
-		:code "ILS",
-		:number "376",
-		:decimals "2",
-		:name "Israeli new shekel"
-	},
-	:INR {
-		:code "INR",
-		:number "356",
-		:decimals "2",
-		:name "Indian rupee"
-	},
-	:IQD {
-		:code "IQD",
-		:number "368",
-		:decimals "3",
-		:name "Iraqi dinar"
-	},
-	:IRR {
-		:code "IRR",
-		:number "364",
-		:decimals "0",
-		:name "Iranian rial"
-	},
-	:ISK {
-		:code "ISK",
-		:number "352",
-		:decimals "0",
-		:name "Icelandic króna"
-	},
-	:JMD {
-		:code "JMD",
-		:number "388",
-		:decimals "2",
-		:name "Jamaican dollar"
-	},
-	:JOD {
-		:code "JOD",
-		:number "400",
-		:decimals "3",
-		:name "Jordanian dinar"
-	},
-	:JPY {
-		:code "JPY",
-		:number "392",
-		:decimals "0",
-		:name "Japanese yen"
-	},
-	:KES {
-		:code "KES",
-		:number "404",
-		:decimals "2",
-		:name "Kenyan shilling"
-	},
-	:KGS {
-		:code "KGS",
-		:number "417",
-		:decimals "2",
-		:name "Kyrgyzstani som"
-	},
-	:KHR {
-		:code "KHR",
-		:number "116",
-		:decimals "2",
-		:name "Cambodian riel"
-	},
-	:KMF {
-		:code "KMF",
-		:number "174",
-		:decimals "0",
-		:name "Comoro franc"
-	},
-	:KPW {
-		:code "KPW",
-		:number "408",
-		:decimals "0",
-		:name "North Korean won"
-	},
-	:KRW {
-		:code "KRW",
-		:number "410",
-		:decimals "0",
-		:name "South Korean won"
-	},
-	:KWD {
-		:code "KWD",
-		:number "414",
-		:decimals "3",
-		:name "Kuwaiti dinar"
-	},
-	:KYD {
-		:code "KYD",
-		:number "136",
-		:decimals "2",
-		:name "Cayman Islands dollar"
-	},
-	:KZT {
-		:code "KZT",
-		:number "398",
-		:decimals "2",
-		:name "Kazakhstani tenge"
-	},
-	:LAK {
-		:code "LAK",
-		:number "418",
-		:decimals "0",
-		:name "Lao kip"
-	},
-	:LBP {
-		:code "LBP",
-		:number "422",
-		:decimals "0",
-		:name "Lebanese pound"
-	},
-	:LKR {
-		:code "LKR",
-		:number "144",
-		:decimals "2",
-		:name "Sri Lankan rupee"
-	},
-	:LRD {
-		:code "LRD",
-		:number "430",
-		:decimals "2",
-		:name "Liberian dollar"
-	},
-	:LSL {
-		:code "LSL",
-		:number "426",
-		:decimals "2",
-		:name "Lesotho loti"
-	},
-	:LTL {
-		:code "LTL",
-		:number "440",
-		:decimals "2",
-		:name "Lithuanian litas"
-	},
-	:LVL {
-		:code "LVL",
-		:number "428",
-		:decimals "2",
-		:name "Latvian lats"
-	},
-	:LYD {
-		:code "LYD",
-		:number "434",
-		:decimals "3",
-		:name "Libyan dinar"
-	},
-	:MAD {
-		:code "MAD",
-		:number "504",
-		:decimals "2",
-		:name "Moroccan dirham"
-	},
-	:MDL {
-		:code "MDL",
-		:number "498",
-		:decimals "2",
-		:name "Moldovan leu"
-	},
-	:MGA {
-		:code "MGA",
-		:number "969",
-		:decimals "0.7",
-		:name "Malagasy ariary"
-	},
-	:MKD {
-		:code "MKD",
-		:number "807",
-		:decimals "0",
-		:name "Macedonian denar"
-	},
-	:MMK {
-		:code "MMK",
-		:number "104",
-		:decimals "0",
-		:name "Myanma kyat"
-	},
-	:MNT {
-		:code "MNT",
-		:number "496",
-		:decimals "2",
-		:name "Mongolian tugrik"
-	},
-	:MOP {
-		:code "MOP",
-		:number "446",
-		:decimals "2",
-		:name "Macanese pataca"
-	},
-	:MRO {
-		:code "MRO",
-		:number "478",
-		:decimals "0.7",
-		:name "Mauritanian ouguiya"
-	},
-	:MUR {
-		:code "MUR",
-		:number "480",
-		:decimals "2",
-		:name "Mauritian rupee"
-	},
-	:MVR {
-		:code "MVR",
-		:number "462",
-		:decimals "2",
-		:name "Maldivian rufiyaa"
-	},
-	:MWK {
-		:code "MWK",
-		:number "454",
-		:decimals "2",
-		:name "Malawian kwacha"
-	},
-	:MXN {
-		:code "MXN",
-		:number "484",
-		:decimals "2",
-		:name "Mexican peso"
-	},
-	:MXV {
-		:code "MXV",
-		:number "979",
-		:decimals "2",
-		:name "Mexican Unidad de Inversion"
-	},
-	:MYR {
-		:code "MYR",
-		:number "458",
-		:decimals "2",
-		:name "Malaysian ringgit"
-	},
-	:MZN {
-		:code "MZN",
-		:number "943",
-		:decimals "2",
-		:name "Mozambican metical"
-	},
-	:NAD {
-		:code "NAD",
-		:number "516",
-		:decimals "2",
-		:name "Namibian dollar"
-	},
-	:NGN {
-		:code "NGN",
-		:number "566",
-		:decimals "2",
-		:name "Nigerian naira"
-	},
-	:NIO {
-		:code "NIO",
-		:number "558",
-		:decimals "2",
-		:name "Nicaraguan córdoba"
-	},
-	:NOK {
-		:code "NOK",
-		:number "578",
-		:decimals "2",
-		:name "Norwegian krone"
-	},
-	:NPR {
-		:code "NPR",
-		:number "524",
-		:decimals "2",
-		:name "Nepalese rupee"
-	},
-	:NZD {
-		:code "NZD",
-		:number "554",
-		:decimals "2",
-		:name "New Zealand dollar"
-	},
-	:OMR {
-		:code "OMR",
-		:number "512",
-		:decimals "3",
-		:name "Omani rial"
-	},
-	:PAB {
-		:code "PAB",
-		:number "590",
-		:decimals "2",
-		:name "Panamanian balboa"
-	},
-	:PEN {
-		:code "PEN",
-		:number "604",
-		:decimals "2",
-		:name "Peruvian nuevo sol"
-	},
-	:PGK {
-		:code "PGK",
-		:number "598",
-		:decimals "2",
-		:name "Papua New Guinean kina"
-	},
-	:PHP {
-		:code "PHP",
-		:number "608",
-		:decimals "2",
-		:name "Philippine peso"
-	},
-	:PKR {
-		:code "PKR",
-		:number "586",
-		:decimals "2",
-		:name "Pakistani rupee"
-	},
-	:PLN {
-		:code "PLN",
-		:number "985",
-		:decimals "2",
-		:name "Polish złoty"
-	},
-	:PYG {
-		:code "PYG",
-		:number "600",
-		:decimals "0",
-		:name "Paraguayan guaraní"
-	},
-	:QAR {
-		:code "QAR",
-		:number "634",
-		:decimals "2",
-		:name "Qatari riyal"
-	},
-	:RON {
-		:code "RON",
-		:number "946",
-		:decimals "2",
-		:name "Romanian new leu"
-	},
-	:RSD {
-		:code "RSD",
-		:number "941",
-		:decimals "2",
-		:name "Serbian dinar"
-	},
-	:RUB {
-		:code "RUB",
-		:number "643",
-		:decimals "2",
-		:name "Russian rouble"
-	},
-	:RWF {
-		:code "RWF",
-		:number "646",
-		:decimals "0",
-		:name "Rwandan franc"
-	},
-	:SAR {
-		:code "SAR",
-		:number "682",
-		:decimals "2",
-		:name "Saudi riyal"
-	},
-	:SBD {
-		:code "SBD",
-		:number "090",
-		:decimals "2",
-		:name "Solomon Islands dollar"
-	},
-	:SCR {
-		:code "SCR",
-		:number "690",
-		:decimals "2",
-		:name "Seychelles rupee"
-	},
-	:SDG {
-		:code "SDG",
-		:number "938",
-		:decimals "2",
-		:name "Sudanese pound"
-	},
-	:SEK {
-		:code "SEK",
-		:number "752",
-		:decimals "2",
-		:name "Swedish krona"
-	},
-	:SGD {
-		:code "SGD",
-		:number "702",
-		:decimals "2",
-		:name "Singapore dollar"
-	},
-	:SHP {
-		:code "SHP",
-		:number "654",
-		:decimals "2",
-		:name "Saint Helena pound"
-	},
-	:SLL {
-		:code "SLL",
-		:number "694",
-		:decimals "0",
-		:name "Sierra Leonean leone"
-	},
-	:SOS {
-		:code "SOS",
-		:number "706",
-		:decimals "2",
-		:name "Somali shilling"
-	},
-	:SRD {
-		:code "SRD",
-		:number "968",
-		:decimals "2",
-		:name "Surinamese dollar"
-	},
-	:SSP {
-		:code "SSP",
-		:number "728",
-		:decimals "2",
-		:name "South Sudanese pound"
-	},
-	:STD {
-		:code "STD",
-		:number "678",
-		:decimals "0",
-		:name "São Tomé and Príncipe dobra"
-	},
-	:SYP {
-		:code "SYP",
-		:number "760",
-		:decimals "2",
-		:name "Syrian pound"
-	},
-	:SZL {
-		:code "SZL",
-		:number "748",
-		:decimals "2",
-		:name "Swazi lilangeni"
-	},
-	:THB {
-		:code "THB",
-		:number "764",
-		:decimals "2",
-		:name "Thai baht"
-	},
-	:TJS {
-		:code "TJS",
-		:number "972",
-		:decimals "2",
-		:name "Tajikistani somoni"
-	},
-	:TMT {
-		:code "TMT",
-		:number "934",
-		:decimals "2",
-		:name "Turkmenistani manat"
-	},
-	:TND {
-		:code "TND",
-		:number "788",
-		:decimals "3",
-		:name "Tunisian dinar"
-	},
-	:TOP {
-		:code "TOP",
-		:number "776",
-		:decimals "2",
-		:name "Tongan paʻanga"
-	},
-	:TRY {
-		:code "TRY",
-		:number "949",
-		:decimals "2",
-		:name "Turkish lira"
-	},
-	:TTD {
-		:code "TTD",
-		:number "780",
-		:decimals "2",
-		:name "Trinidad and Tobago dollar"
-	},
-	:TWD {
-		:code "TWD",
-		:number "901",
-		:decimals "2",
-		:name "New Taiwan dollar"
-	},
-	:TZS {
-		:code "TZS",
-		:number "834",
-		:decimals "2",
-		:name "Tanzanian shilling"
-	},
-	:UAH {
-		:code "UAH",
-		:number "980",
-		:decimals "2",
-		:name "Ukrainian hryvnia"
-	},
-	:UGX {
-		:code "UGX",
-		:number "800",
-		:decimals "2",
-		:name "Ugandan shilling"
-	},
+
+		:text "Euro",
+		:fraction 2,
+		:symbol "€",
+		:code "EUR"},
+	:ALL {
+
+		:text "Lek",
+		:fraction 2,
+		:symbol "Lek",
+		:code "ALL"},
+	:DZD {
+
+		:text "Algerian Dinar",
+		:fraction 2,
+		:symbol false,
+		:code "DZD"},
 	:USD {
-		:code "USD",
-		:number "840",
-		:decimals "2",
-		:name "United States dollar"
-	},
-	:UYI {
-		:code "UYI",
-		:number "940",
-		:decimals "0",
-		:name "Uruguay Peso en Unidades Indexadas"
-	},
-	:UYU {
-		:code "UYU",
-		:number "858",
-		:decimals "2",
-		:name "Uruguayan peso"
-	},
-	:UZS {
-		:code "UZS",
-		:number "860",
-		:decimals "2",
-		:name "Uzbekistan som"
-	},
-	:VEF {
-		:code "VEF",
-		:number "937",
-		:decimals "2",
-		:name "Venezuelan bolívar fuerte"
-	},
-	:VND {
-		:code "VND",
-		:number "704",
-		:decimals "0",
-		:name "Vietnamese dong"
-	},
-	:VUV {
-		:code "VUV",
-		:number "548",
-		:decimals "0",
-		:name "Vanuatu vatu"
-	},
-	:WST {
-		:code "WST",
-		:number "882",
-		:decimals "2",
-		:name "Samoan tala"
-	},
-	:XAF {
-		:code "XAF",
-		:number "950",
-		:decimals "0",
-		:name "CFA franc BEAC"
-	},
+
+		:text "US Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "USD"},
+	:AOA {
+
+		:text "Kwanza",
+		:fraction 2,
+		:symbol false,
+		:code "AOA"},
 	:XCD {
-		:code "XCD",
-		:number "951",
-		:decimals "2",
-		:name "East Caribbean dollar"
-	},
+
+		:text "East Caribbean Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "XCD"},
+	:ARS {
+
+		:text "Argentine Peso",
+		:fraction 2,
+		:symbol "$",
+		:code "ARS"},
+	:AMD {
+
+		:text "Armenian Dram",
+		:fraction 2,
+		:symbol false,
+		:code "AMD"},
+	:AWG {
+
+		:text "Aruban Florin",
+		:fraction 2,
+		:symbol "ƒ",
+		:code "AWG"},
+	:AUD {
+
+		:text "Australian Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "AUD"},
+	:AZN {
+
+		:text "Azerbaijanian Manat",
+		:fraction 2,
+		:symbol "ман",
+		:code "AZ"
+	}
+	:BSD {
+
+		:text "Bahamian Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "BSD"},
+	:BHD {
+
+		:text "Bahraini Dinar",
+		:fraction 3,
+		:symbol false,
+		:code "BHD"},
+	:BDT {
+
+		:text "Taka",
+		:fraction 2,
+		:symbol false,
+		:code "BDT"},
+	:BBD {
+
+		:text "Barbados Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "BBD"},
+	:BYR {
+
+		:text "Belarussian Ruble",
+		:fraction 0,
+		:symbol "p.",
+		:code "BYR"},
+	:BZD {
+
+		:text "Belize Dollar",
+		:fraction 2,
+		:symbol "BZ$",
+		:code "BZD"},
 	:XOF {
-		:code "XOF",
-		:number "952",
-		:decimals "0",
-		:name "CFA franc BCEAO"
-	},
+
+		:text "CF Franc BCEAO",
+		:fraction 0,
+		:symbol false,
+		:code "XOF"},
+	:BMD {
+
+		:text "Bermudian Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "BMD"},
+	:BTN {
+
+		:text "Ngultrum",
+		:fraction 2,
+		:symbol false,
+		:code "BT"
+	}
+	:INR {
+
+		:text "Indian Rupee",
+		:fraction 2,
+		:symbol "",
+		:code "INR"},
+	:BOB {
+
+		:text "Boliviano",
+		:fraction 2,
+		:symbol "$b",
+		:code "BOB"},
+	:BOV {
+
+		:text "Mvdol",
+		:fraction 2,
+		:symbol false,
+		:code "BOV"},
+	:BAM {
+
+		:text "Convertible Mark",
+		:fraction 2,
+		:symbol "KM",
+		:code "BAM"},
+	:BWP {
+
+		:text "Pula",
+		:fraction 2,
+		:symbol "P",
+		:code "BWP"},
+	:NOK {
+
+		:text "Norwegian Krone",
+		:fraction 2,
+		:symbol "kr",
+		:code "NOK"},
+	:BRL {
+
+		:text "Brazilian Real",
+		:fraction 2,
+		:symbol "R$",
+		:code "BRL"},
+	:BND {
+
+		:text "Brunei Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "BND"},
+	:BGN {
+
+		:text "Bulgarian Lev",
+		:fraction 2,
+		:symbol "лв",
+		:code "BG"
+	}
+	:BIF {
+
+		:text "Burundi Franc",
+		:fraction 0,
+		:symbol false,
+		:code "BIF"},
+	:KHR {
+
+		:text "Riel",
+		:fraction 2,
+		:symbol "៛",
+		:code "KHR"},
+	:XAF {
+
+		:text "CF Franc BEAC",
+		:fraction 0,
+		:symbol false,
+		:code "XAF"},
+	:CAD {
+
+		:text "Canadian Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "CAD"},
+	:CVE {
+
+		:text "Cabo Verde Escudo",
+		:fraction 2,
+		:symbol false,
+		:code "CVE"},
+	:KYD {
+
+		:text "Cayman Islands Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "KYD"},
+	:CLF {
+
+		:text "Unidad de Fomento",
+		:fraction 4,
+		:symbol false,
+		:code "CLF"},
+	:CLP {
+
+		:text "Chilean Peso",
+		:fraction 0,
+		:symbol "$",
+		:code "CLP"},
+	:CNY {
+
+		:text "Yuan Renminbi",
+		:fraction 2,
+		:symbol "¥",
+		:code "CNY"},
+	:COP {
+
+		:text "Colombian Peso",
+		:fraction 2,
+		:symbol "$",
+		:code "COP"},
+	:COU {
+
+		:text "Unidad de Valor Real",
+		:fraction 2,
+		:symbol false,
+		:code "COU"},
+	:KMF {
+
+		:text "Comoro Franc",
+		:fraction 0,
+		:symbol false,
+		:code "KMF"},
+	:CDF {
+
+		:text "Congolese Franc",
+		:fraction 2,
+		:symbol false,
+		:code "CDF"},
+	:NZD {
+
+		:text "New Zealand Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "NZD"},
+	:CRC {
+
+		:text "Cost Rican Colon",
+		:fraction 2,
+		:symbol "₡",
+		:code "CRC"},
+	:HRK {
+
+		:text "Croatian Kuna",
+		:fraction 2,
+		:symbol "kn",
+		:code "HRK"},
+	:CUC {
+
+		:text "Peso Convertible",
+		:fraction 2,
+		:symbol false,
+		:code "CUC"},
+	:CUP {
+
+		:text "Cuban Peso",
+		:fraction 2,
+		:symbol "₱",
+		:code "CUP"},
+	:ANG {
+
+		:text "Netherlands Antillean Guilder",
+		:fraction 2,
+		:symbol "ƒ",
+		:code "ANG"},
+	:CZK {
+
+		:text "Czech Koruna",
+		:fraction 2,
+		:symbol "Kč",
+		:code "CZK"},
+	:DKK {
+
+		:text "Danish Krone",
+		:fraction 2,
+		:symbol "kr",
+		:code "DKK"},
+	:DJF {
+
+		:text "Djibouti Franc",
+		:fraction 0,
+		:symbol false,
+		:code "DJF"},
+	:DOP {
+
+		:text "Dominican Peso",
+		:fraction 2,
+		:symbol "RD$",
+		:code "DOP"},
+	:EGP {
+
+		:text "Egyptian Pound",
+		:fraction 2,
+		:symbol "£",
+		:code "EGP"},
+	:SVC {
+
+		:text "El Salvador Colon",
+		:fraction 2,
+		:symbol "$",
+		:code "SVC"},
+	:ERN {
+
+		:text "Nakfa",
+		:fraction 2,
+		:symbol false,
+		:code "ER"
+	}
+	:ETB {
+
+		:text "Ethiopian Birr",
+		:fraction 2,
+		:symbol false,
+		:code "ETB"},
+	:FKP {
+
+		:text "Falkland Islands Pound",
+		:fraction 2,
+		:symbol "£",
+		:code "FKP"},
+	:FJD {
+
+		:text "Fiji Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "FJD"},
 	:XPF {
-		:code "XPF",
-		:number "953",
-		:decimals "0",
-		:name "CFP franc"
-	},
-	:YER {
-		:code "YER",
-		:number "886",
-		:decimals "2",
-		:name "Yemeni rial"
-	},
+
+		:text "CFP Franc",
+		:fraction 0,
+		:symbol false,
+		:code "XPF"},
+	:GMD {
+
+		:text "Dalasi",
+		:fraction 2,
+		:symbol false,
+		:code "GMD"},
+	:GEL {
+
+		:text "Lari",
+		:fraction 2,
+		:symbol false,
+		:code "GEL"},
+	:GHS {
+
+		:text "Ghan Cedi",
+		:fraction 2,
+		:symbol false,
+		:code "GHS"},
+	:GIP {
+
+		:text "Gibraltar Pound",
+		:fraction 2,
+		:symbol "£",
+		:code "GIP"},
+	:GTQ {
+
+		:text "Quetzal",
+		:fraction 2,
+		:symbol "Q",
+		:code "GTQ"},
+	:GBP {
+
+		:text "Pound Sterling",
+		:fraction 2,
+		:symbol "£",
+		:code "GBP"},
+	:GNF {
+
+		:text "Guine Franc",
+		:fraction 0,
+		:symbol false,
+		:code "GNF"},
+	:GYD {
+
+		:text "Guyan Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "GYD"},
+	:HTG {
+
+		:text "Gourde",
+		:fraction 2,
+		:symbol false,
+		:code "HTG"},
+	:HNL {
+
+		:text "Lempira",
+		:fraction 2,
+		:symbol "L",
+		:code "HNL"},
+	:HKD {
+
+		:text "Hong Kong Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "HKD"},
+	:HUF {
+
+		:text "Forint",
+		:fraction 2,
+		:symbol "Ft",
+		:code "HUF"},
+	:ISK {
+
+		:text "Iceland Krona",
+		:fraction 0,
+		:symbol "kr",
+		:code "ISK"},
+	:IDR {
+
+		:text "Rupiah",
+		:fraction 2,
+		:symbol "Rp",
+		:code "IDR"},
+	:XDR {
+
+		:text "SDR (Special Drawing Right)",
+		:fraction 0,
+		:symbol false,
+		:code "XDR"},
+	:IRR {
+
+		:text "Iranian Rial",
+		:fraction 2,
+		:symbol "﷼",
+		:code "IRR"},
+	:IQD {
+
+		:text "Iraqi Dinar",
+		:fraction 3,
+		:symbol false,
+		:code "IQD"},
+	:ILS {
+
+		:text "New Israeli Sheqel",
+		:fraction 2,
+		:symbol "₪",
+		:code "ILS"},
+	:JMD {
+
+		:text "Jamaican Dollar",
+		:fraction 2,
+		:symbol "J$",
+		:code "JMD"},
+	:JPY {
+
+		:text "Yen",
+		:fraction 0,
+		:symbol "¥",
+		:code "JPY"},
+	:JOD {
+
+		:text "Jordanian Dinar",
+		:fraction 3,
+		:symbol false,
+		:code "JOD"},
+	:KZT {
+
+		:text "Tenge",
+		:fraction 2,
+		:symbol "лв",
+		:code "KZT"},
+	:KES {
+
+		:text "Kenyan Shilling",
+		:fraction 2,
+		:symbol false,
+		:code "KES"},
+	:KPW {
+
+		:text "North Korean Won",
+		:fraction 2,
+		:symbol "₩",
+		:code "KPW"},
+	:KRW {
+
+		:text "Won",
+		:fraction 0,
+		:symbol "₩",
+		:code "KRW"},
+	:KWD {
+
+		:text "Kuwaiti Dinar",
+		:fraction 3,
+		:symbol false,
+		:code "KWD"},
+	:KGS {
+
+		:text "Som",
+		:fraction 2,
+		:symbol "лв",
+		:code "KGS"},
+	:LAK {
+
+		:text "Kip",
+		:fraction 2,
+		:symbol "₭",
+		:code "LAK"},
+	:LBP {
+
+		:text "Lebanese Pound",
+		:fraction 2,
+		:symbol "£",
+		:code "LBP"},
+	:LSL {
+
+		:text "Loti",
+		:fraction 2,
+		:symbol false,
+		:code "LSL"},
 	:ZAR {
-		:code "ZAR",
-		:number "710",
-		:decimals "2",
-		:name "South African rand"
-	},
+
+		:text "Rand",
+		:fraction 2,
+		:symbol "R",
+		:code "ZAR"},
+	:LRD {
+
+		:text "Liberian Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "LRD"},
+	:LYD {
+
+		:text "Libyan Dinar",
+		:fraction 3,
+		:symbol false,
+		:code "LYD"},
+	:CHF {
+
+		:text "Swiss Franc",
+		:fraction 2,
+		:symbol "CHF",
+		:code "CHF"},
+	:LTL {
+
+		:text "Lithuanian Litas",
+		:fraction 2,
+		:symbol "Lt",
+		:code "LTL"},
+	:MOP {
+
+		:text "Pataca",
+		:fraction 2,
+		:symbol false,
+		:code "MOP"},
+	:MKD {
+
+		:text "Denar",
+		:fraction 2,
+		:symbol "ден",
+		:code "MKD"},
+	:MGA {
+
+		:text "Malagasy riary",
+		:fraction 2,
+		:symbol false,
+		:code "MGA"},
+	:MWK {
+
+		:text "Kwacha",
+		:fraction 2,
+		:symbol false,
+		:code "MWK"},
+	:MYR {
+
+		:text "Malaysian Ringgit",
+		:fraction 2,
+		:symbol "RM",
+		:code "MYR"},
+	:MVR {
+
+		:text "Rufiyaa",
+		:fraction 2,
+		:symbol false,
+		:code "MVR"},
+	:MRO {
+
+		:text "Ouguiya",
+		:fraction 2,
+		:symbol false,
+		:code "MRO"},
+	:MUR {
+
+		:text "Mauritius Rupee",
+		:fraction 2,
+		:symbol "₨",
+		:code "MUR"},
+	:XUA {
+
+		:text "ADB Unit of ccount",
+		:fraction 0,
+		:symbol false,
+		:code "XUA"},
+	:MXN {
+
+		:text "Mexican Peso",
+		:fraction 2,
+		:symbol "$",
+		:code "MX"
+	}
+	:MXV {
+
+		:text "Mexican Unidad de Inversion (UDI)",
+		:fraction 2,
+		:symbol false,
+		:code "MXV"},
+	:MDL {
+
+		:text "Moldovan Leu",
+		:fraction 2,
+		:symbol false,
+		:code "MDL"},
+	:MNT {
+
+		:text "Tugrik",
+		:fraction 2,
+		:symbol "₮",
+		:code "MNT"},
+	:MAD {
+
+		:text "Moroccan Dirham",
+		:fraction 2,
+		:symbol false,
+		:code "MAD"},
+	:MZN {
+
+		:text "Mozambique Metical",
+		:fraction 2,
+		:symbol "MT",
+		:code "MZ"
+	}
+	:MMK {
+
+		:text "Kyat",
+		:fraction 2,
+		:symbol false,
+		:code "MMK"},
+	:NAD {
+
+		:text "Namibi Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "NAD"},
+	:NPR {
+
+		:text "Nepalese Rupee",
+		:fraction 2,
+		:symbol "₨",
+		:code "NPR"},
+	:NIO {
+
+		:text "Cordob Oro",
+		:fraction 2,
+		:symbol "C$",
+		:code "NIO"},
+	:NGN {
+
+		:text "Naira",
+		:fraction 2,
+		:symbol "₦",
+		:code "NG"
+	}
+	:OMR {
+
+		:text "Rial Omani",
+		:fraction 3,
+		:symbol "﷼",
+		:code "OMR"},
+	:PKR {
+
+		:text "Pakistan Rupee",
+		:fraction 2,
+		:symbol "₨",
+		:code "PKR"},
+	:PAB {
+
+		:text "Balboa",
+		:fraction 2,
+		:symbol "B/.",
+		:code "PAB"},
+	:PGK {
+
+		:text "Kina",
+		:fraction 2,
+		:symbol false,
+		:code "PGK"},
+	:PYG {
+
+		:text "Guarani",
+		:fraction 0,
+		:symbol "Gs",
+		:code "PYG"},
+	:PEN {
+
+		:text "Nuevo Sol",
+		:fraction 2,
+		:symbol "S/.",
+		:code "PE"
+	}
+	:PHP {
+
+		:text "Philippine Peso",
+		:fraction 2,
+		:symbol "₱",
+		:code "PHP"},
+	:PLN {
+
+		:text "Zloty",
+		:fraction 2,
+		:symbol "zł",
+		:code "PL"
+	}
+	:QAR {
+
+		:text "Qatari Rial",
+		:fraction 2,
+		:symbol "﷼",
+		:code "QAR"},
+	:RON {
+
+		:text "New Romanian Leu",
+		:fraction 2,
+		:symbol "lei",
+		:code "RO"
+	}
+	:RUB {
+
+		:text "Russian Ruble",
+		:fraction 2,
+		:symbol "руб",
+		:code "RUB"},
+	:RWF {
+
+		:text "Rwand Franc",
+		:fraction 0,
+		:symbol false,
+		:code "RWF"},
+	:SHP {
+
+		:text "Saint Helen Pound",
+		:fraction 2,
+		:symbol "£",
+		:code "SHP"},
+	:WST {
+
+		:text "Tala",
+		:fraction 2,
+		:symbol false,
+		:code "WST"},
+	:STD {
+
+		:text "Dobra",
+		:fraction 2,
+		:symbol false,
+		:code "STD"},
+	:SAR {
+
+		:text "Saudi Riyal",
+		:fraction 2,
+		:symbol "﷼",
+		:code "SAR"},
+	:RSD {
+
+		:text "Serbian Dinar",
+		:fraction 2,
+		:symbol "Дин.",
+		:code "RSD"},
+	:SCR {
+
+		:text "Seychelles Rupee",
+		:fraction 2,
+		:symbol "₨",
+		:code "SCR"},
+	:SLL {
+
+		:text "Leone",
+		:fraction 2,
+		:symbol false,
+		:code "SLL"},
+	:SGD {
+
+		:text "Singapore Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "SGD"},
+	:XSU {
+
+		:text "Sucre",
+		:fraction 0,
+		:symbol false,
+		:code "XSU"},
+	:SBD {
+
+		:text "Solomon Islands Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "SBD"},
+	:SOS {
+
+		:text "Somali Shilling",
+		:fraction 2,
+		:symbol "S",
+		:code "SOS"},
+	:SSP {
+
+		:text "South Sudanese Pound",
+		:fraction 2,
+		:symbol false,
+		:code "SSP"},
+	:LKR {
+
+		:text "Sri Lank Rupee",
+		:fraction 2,
+		:symbol "₨",
+		:code "LKR"},
+	:SDG {
+
+		:text "Sudanese Pound",
+		:fraction 2,
+		:symbol false,
+		:code "SDG"},
+	:SRD {
+
+		:text "Surinam Dollar",
+		:fraction 2,
+		:symbol "$",
+		:code "SRD"},
+	:SZL {
+
+		:text "Lilangeni",
+		:fraction 2,
+		:symbol false,
+		:code "SZL"},
+	:SEK {
+
+		:text "Swedish Krona",
+		:fraction 2,
+		:symbol "kr",
+		:code "SEK"},
+	:CHE {
+
+		:text "WIR Euro",
+		:fraction 2,
+		:symbol false,
+		:code "CHE"},
+	:CHW {
+
+		:text "WIR Franc",
+		:fraction 2,
+		:symbol false,
+		:code "CHW"},
+	:SYP {
+
+		:text "Syrian Pound",
+		:fraction 2,
+		:symbol "£",
+		:code "SYP"},
+	:TWD {
+
+		:text "New Taiwan Dollar",
+		:fraction 2,
+		:symbol "NT$",
+		:code "TWD"},
+	:TJS {
+
+		:text "Somoni",
+		:fraction 2,
+		:symbol false,
+		:code "TJS"},
+	:TZS {
+
+		:text "Tanzanian Shilling",
+		:fraction 2,
+		:symbol false,
+		:code "TZS"},
+	:THB {
+
+		:text "Baht",
+		:fraction 2,
+		:symbol "฿",
+		:code "THB"},
+	:TOP {
+
+		:text "Pa’anga",
+		:fraction 2,
+		:symbol false,
+		:code "TOP"},
+	:TTD {
+
+		:text "Trinidad nd Tobago Dollar",
+		:fraction 2,
+		:symbol "TT$",
+		:code "TTD"},
+	:TND {
+
+		:text "Tunisian Dinar",
+		:fraction 3,
+		:symbol false,
+		:code "TND"},
+	:TRY {
+
+		:text "Turkish Lira",
+		:fraction 2,
+		:symbol "₺",
+		:code "TRY"},
+	:TMT {
+
+		:text "Turkmenistan New Manat",
+		:fraction 2,
+		:symbol false,
+		:code "TMT"},
+	:UGX {
+
+		:text "Ugand Shilling",
+		:fraction 0,
+		:symbol false,
+		:code "UGX"},
+	:UAH {
+
+		:text "Hryvnia",
+		:fraction 2,
+		:symbol "₴",
+		:code "UAH"},
+	:AED {
+
+		:text "UAE Dirham",
+		:fraction 2,
+		:symbol false,
+		:code "AED"},
+	:USN {
+
+		:text "US Dollar (Next day)",
+		:fraction 2,
+		:symbol false,
+		:code "US"
+	}
+	:UYI {
+
+		:text "Uruguay Peso en Unidades Indexadas (URUIURUI)",
+		:fraction 0,
+		:symbol false,
+		:code "UYI"},
+	:UYU {
+
+		:text "Peso Uruguayo",
+		:fraction 2,
+		:symbol "$U",
+		:code "UYU"},
+	:UZS {
+
+		:text "Uzbekistan Sum",
+		:fraction 2,
+		:symbol "лв",
+		:code "UZS"},
+	:VUV {
+
+		:text "Vatu",
+		:fraction 0,
+		:symbol false,
+		:code "VUV"},
+	:VEF {
+
+		:text "Bolivar",
+		:fraction 2,
+		:symbol "Bs",
+		:code "VEF"},
+	:VND {
+
+		:text "Dong",
+		:fraction 0,
+		:symbol "₫",
+		:code "VND"},
+	:YER {
+
+		:text "Yemeni Rial",
+		:fraction 2,
+		:symbol "﷼",
+		:code "YER"},
 	:ZMW {
-		:code "ZMW",
-		:number "967",
-		:decimals "2",
-		:name "Zambian kwacha"
-  }
+
+		:text "Zambian Kwacha",
+		:fraction 2,
+		:symbol false,
+		:code "ZMW"},
+	:ZWL {
+
+		:text "Zimbabwe Dollar",
+		:fraction 2,
+		:symbol false,
+		:code "ZWL"
+	}
 })
