@@ -8,10 +8,11 @@
 
 (defcomponent finances [data owner]
   (render [_]
-    (let [cash (:cash data)
-          revenue (:revenue data)
-          costs (:costs data)
-          comment (:comment data)
+    (let [cash (:cash (:finances data))
+          revenue (:revenue (:finances data))
+          costs (:costs (:finances data))
+          comment (:comment (:finances data))
+          currency (first (:currency data))
           burn-rate (- revenue costs)
           burn-rate-label (if (> burn-rate 0) "Growth rate: " "Burn rate: ")
           burn-rate-classes (str "num " (if (> burn-rate 0) "green" "red"))
@@ -19,9 +20,9 @@
           run-away (if (<= burn-rate 0) (quot cash burn-rate) "N/A")]
       (dom/div {:class "report-list finances"}
         (dom/h3 "Finances:")
-        (om/build report-editable-line {:cursor data :key :cash :prefix "$" :label "cash on hand" :pluralize false})
-        (om/build report-editable-line {:cursor data :key :revenue :prefix "$" :label "revenue this month" :pluralize false})
-        (om/build report-editable-line {:cursor data :key :costs :prefix "$" :label "costs this month" :pluralize false})
+        (om/build report-editable-line {:cursor (:finances data) :key :cash :prefix currency :label "cash on hand" :pluralize false})
+        (om/build report-editable-line {:cursor (:finances data) :key :revenue :prefix currency :label "revenue this month" :pluralize false})
+        (om/build report-editable-line {:cursor (:finances data) :key :costs :prefix currency :label "costs this month" :pluralize false})
         (dom/div
           (dom/span {:class "label"} (str "Profitable this month? " profitable)))
         (dom/div
