@@ -3,27 +3,30 @@
               [open-company-web.components.page :refer [page]]))
 
 (defonce app-state (atom {
+  :currency ["USD"]
   :headcount {
-    :founders 2
-    :executives 0
-    :ft-employees 3
-    :ft-contractors 0
-    :pt-employees 0
-    :pt-contractors 3
+    :founders 2,
+    :executives 0,
+    :ft-employees 3,
+    :ft-contractors 0,
+    :pt-employees 0,
+    :pt-contractors 2,
     :comment "This is a comment."
-  }
+  },
   :finances {
-    :cash 173228
-    :revenue 2767
-    :costs 22184
+    :cash 173228,
+    :revenue 2767,
+    :costs 22184,
+    :burn-rate -19417,
+    :runway "9 months",
     :comment "This is another comment."
-  }
+  },
   :compensation {
-    :dollars true
-    :founders 6357
-    :executives 0
-    :employee 5899
-    :contractor 2582
+    :percentage false,
+    :founders 6357,
+    :executives 0,
+    :employees 5899,
+    :contractors 2582,
     :comment "More comments for you."
   }
 }))
