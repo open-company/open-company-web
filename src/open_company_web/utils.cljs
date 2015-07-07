@@ -1,6 +1,7 @@
 (ns open-company-web.utils
     (:require [om.core :as om :include-macros true]
-              [clojure.string]))
+              [clojure.string]
+              [open-company-web.iso4217.iso4217 :refer [iso4217]]))
 
 (defn abs [n] (max n (- n)))
 
@@ -28,3 +29,10 @@
   (if show
     #js {}
     #js {:display "none"}))
+
+(defn get-symbols-for-currency-code
+  [code]
+  (let [keyword (keyword code)
+        symbol (:symbol (keyword iso4217))
+        ret (or symbol (:code (keyword iso4217)))]
+  ret))
