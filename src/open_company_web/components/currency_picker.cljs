@@ -8,9 +8,12 @@
 (defcomponent currency-option
   [data owner]
   (render [_]
-    (dom/option {
-      :value (:code data)
-    } (str (:code data)))))
+    (let [symbol (:symbol data)
+          display-symbol (or symbol (:code data))
+          label (str (:text data) " " display-symbol)]
+      (dom/option {
+        :value (:code data)
+        } label))))
 
 (defcomponent currency-picker
   "Show a select with all the possible currencies,

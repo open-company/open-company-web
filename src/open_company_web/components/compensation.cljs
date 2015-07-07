@@ -3,7 +3,7 @@
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
               [open-company-web.components.report-line :refer [report-line report-editable-line]]
-              [open-company-web.utils :refer [thousands-separator handle-change]]
+              [open-company-web.utils :refer [thousands-separator handle-change get-symbols-for-currency-code]]
               [open-company-web.components.comment :refer [comment-component]]
               [goog.string :as gstring]))
 
@@ -45,10 +45,11 @@
           executives (:executives comp-data)
           employees (:employees comp-data)
           contractors (:contractors comp-data)
-          comment (:comment comp-data)
+          total-compensation (gstring/format "%.2f" (+ founders executives employees contractors))
           currency (first (:currency data))
-          prefix (if percentage "%" currency)
-          total-compensation (gstring/format "%.2f" (+ founders executives employees contractors))]
+          currency-symbol (get-symbols-for-currency-code currency)
+          prefix (if percentage "%" currency-symbol)
+          comment (:comment comp-data)]
       (dom/div {:class "report-list compensation"}
         (dom/h3 "Compensation: ")
         (dom/div
@@ -61,7 +62,7 @@
               :checked (not percentage)
               :on-click (fn[e] (switch-values comp-data (:initial-values (om/get-state owner)))
                           (handle-change comp-data false :percentage))})
-            (dom/label {:class "switch-vis" :for "report-type-$"} (str " " currency "  "))
+            (dom/label {:class "switch-vis" :for "report-type-$"} (str " " currency-symbol "  "))
             (dom/input {
               :type "radio"
               :name "report-type"
