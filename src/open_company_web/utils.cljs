@@ -23,3 +23,8 @@
 (defn String->Number [str]
   (let [n (js/parseFloat str)]
     (if (= js/NaN n) 0 n)))
+
+(defn display [show]
+  (if show
+    #js {}
+    #js {:display "none"}))
