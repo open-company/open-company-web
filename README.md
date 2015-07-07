@@ -1,15 +1,18 @@
 # [OpenCompany.io](https://opencompany.io) Web Application
 
+[![MPL License](http://img.shields.io/badge/license-MPL-blue.svg?style=flat)](https://www.mozilla.org/MPL/2.0/)
+[![Roadmap on Trello](http://img.shields.io/badge/roadmap-trello-blue.svg?style=flat)](https://trello.com/b/3naVWHgZ/open-company-development)
+
 ## Overview
 
 Build your company in the open with transparency for your co-founders, your team of employees and contractors, and your investors. Or open up your company for everyone, your customers and the rest of the startup community.
 
 [OpenCompany.io](https://opencompany.io) is GitHub for the rest of your company:
 
-* Dashboard - An easy tool for founders to provide transparency to their teams and beyond.
-* Founders' Guide - Tools, best practices and insights from open company founders and their companies.
-* Open Company Directory - Founders sharing with their teams and beyond.
-* Community - Spread the word and knowledge and inspire more founders to open up.
+* **Dashboard** - An easy tool for founders to provide transparency to their teams and beyond.
+* **Founders' Guide** - Tools, best practices and insights from open company founders and their companies.
+* **Open Company Directory** - Founders sharing with their teams and beyond.
+* **Community** - Spread the word and knowledge and inspire more founders to open up.
 
 Like the open companies we promote and support, the [OpenCompany.io](https://opencompany.io) platform is completely transparent. The company supporting this effort, Transparency, LLC, is an open company. The platform is open source software, and open company data is [open data](https://en.wikipedia.org/wiki/Open_data) accessible through the [platform API](https://github.com/open-company/open-company-api).
 
