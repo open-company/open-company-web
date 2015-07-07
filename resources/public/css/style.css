@@ -38,6 +38,20 @@ div.report-list input.editable-data, div.report-list input.editable-data:focus{
   color: blue;
   text-align: center;
   width: 80px;
+  height: 23px;
+  margin: 0px 0px 5px 0px;
+  padding: 0px;
+}
+
+div.report-list label.editable-label{
+  width: 80px;
+  color: black;
+  border-bottom: 1px solid black;
+  text-align: center;
+  font-weight: normal;
+  height: 23px;
+  padding: 0px;
+  margin: 0px 0px 5px 0px;
 }
 
 div.report-list textarea.comment{
