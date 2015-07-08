@@ -14,7 +14,8 @@
           prefix (:prefix view-data)
           label (:label view-data)
           on-change (:on-change view-data)
-          suffix (if (and (:pluralize view-data) (= (key data) 1)) "" "s")]
+          pluralize (if (contains? view-data :pluralize) (:pluralize view-data) true)
+          suffix (if (and pluralize (not (= (key data) 1))) "s" "")]
       (dom/div
         (if (> (count prefix) 0) (dom/span {:class "label"} (str prefix)))
         (dom/label {
