@@ -4,6 +4,18 @@ div.report-list {
   margin-left: 10px;
 }
 
+div.report-list div.report-list-left{
+  width: 300px;
+  float: left;
+  display: block;
+}
+
+div.report-list div.chart-container{
+  margin-left: 300px;
+  width: 400px;
+  margin-top: 30px;
+}
+
 div.report-list span.num{
   color: black;
   font-weight: bold;
