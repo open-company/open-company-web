@@ -11,10 +11,10 @@
   { :columns [["string" "Job"] ["number" "Number"]]
     :values [["Founders" (:founders data)]
             ["Executives" (:executives data)]
-            ["Full time employees" (:ft-employees data)]
-            ["Full time contractors" (:ft-contractors data)]
-            ["Part time employees" (:pt-employees data)]
-            ["Part time contractors" (:pt-contractors data)]]})
+            ["Full-time employees" (:ft-employees data)]
+            ["Part-time employees" (:pt-employees data)]
+            ["Full-time contractors" (:ft-contractors data)]
+            ["Part-time contractors" (:pt-contractors data)]]})
 
 (defcomponent headcount [data owner]
   (render [_]
@@ -33,8 +33,8 @@
           (om/build report-editable-line {:cursor data :key :founders :label "founder"})
           (om/build report-editable-line {:cursor data :key :executives :label "executive"})
           (om/build report-editable-line {:cursor data :key :ft-employees :label "full-time employee"})
-          (om/build report-editable-line {:cursor data :key :ft-contractors :label "full-time contractor"})
           (om/build report-editable-line {:cursor data :key :pt-employees :label "part-time employee"})
+          (om/build report-editable-line {:cursor data :key :ft-contractors :label "full-time contractor"})
           (om/build report-editable-line {:cursor data :key :pt-contractors :label "part-time contractor"})
           (dom/div
             (om/build report-line {:number (thousands-separator total-headcount) :label "total headcount"})", "
