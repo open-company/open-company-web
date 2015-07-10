@@ -29,8 +29,8 @@
             (dom/span {:class "label"} (str "Profitable this month? " profitable)))
           (dom/div
             (dom/span {:class "label"} burn-rate-label)
-            (dom/span {:class burn-rate-classes} (thousands-separator (abs burn-rate)))
-            (dom/span {:class "label"} currency-symbol))
+            (dom/span {:class "label"} currency-symbol)
+            (dom/span {:class burn-rate-classes} (thousands-separator (abs burn-rate))))
           (dom/div
             (dom/span {:class "label"} "Runaway: " (if (<= burn-rate 0) (str (abs run-away) " months") "N/A")))
           (om/build comment-component {:value comment}))))))
