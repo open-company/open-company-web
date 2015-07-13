@@ -45,11 +45,20 @@
           executives (:executives comp-data)
           employees (:employees comp-data)
           contractors (:contractors comp-data)
-          total-compensation (gstring/format "%.2f" (+ founders executives employees contractors))
           currency (first (:currency data))
           currency-symbol (get-symbols-for-currency-code currency)
           prefix (if percentage "%" currency-symbol)
-          comment (:comment comp-data)]
+          comment (:comment comp-data)
+          show-founders (> (:founders (:headcount data)) 0)
+          show-executives (> (:executives (:headcount data)) 0)
+          show-employees (> (+ (:ft-employees (:headcount data)) (:pt-employees (:headcount data))) 0)
+          show-contrators (> (+ (:ft-contractors (:headcount data)) (:pt-contractors (:headcount data))) 0)
+          total-compensation 0
+          total-compensation (+ (if show-founders founders 0) total-compensation)
+          total-compensation (+ (if show-executives executives 0) total-compensation)
+          total-compensation (+ (if show-employees employees 0) total-compensation)
+          total-compensation (+ (if show-contrators contractors 0) total-compensation)
+          total-compensation (gstring/format "%.2f" total-compensation)]
       (dom/div {:class "report-list compensation"}
         (dom/h3 "Compensation: ")
         (dom/div
@@ -73,34 +82,38 @@
                                (copy-compensation-state owner comp-data)
                                (dollars->percentage comp-data))})
             (dom/label {:class "switch-vis" :for "report-type-%"} "  Percent ")))
-        (om/build report-editable-line {
-          :cursor comp-data
-          :key :founders
-          :prefix prefix
-          :label "founders compensation this month"
-          :pluralize false
-          :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))})
-        (om/build report-editable-line {
-          :cursor comp-data
-          :key :executives
-          :prefix prefix
-          :label "executives compensation this month"
-          :pluralize false
-          :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))})
-        (om/build report-editable-line {
-          :cursor comp-data
-          :key :employees
-          :prefix prefix
-          :label "employees compensation this month"
-          :pluralize false
-          :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))})
-        (om/build report-editable-line {
-          :cursor comp-data
-          :key :contractors
-          :prefix prefix
-          :label "contractors compensation this month"
-          :pluralize false
-          :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))})
+        (when show-founders
+          (om/build report-editable-line {
+            :cursor comp-data
+            :key :founders
+            :prefix prefix
+            :label "founders compensation this month"
+            :pluralize false
+            :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
+        (when show-executives
+          (om/build report-editable-line {
+            :cursor comp-data
+            :key :executives
+            :prefix prefix
+            :label "executives compensation this month"
+            :pluralize false
+            :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
+        (when show-employees
+          (om/build report-editable-line {
+            :cursor comp-data
+            :key :employees
+            :prefix prefix
+            :label "employees compensation this month"
+            :pluralize false
+            :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
+        (when show-contrators
+          (om/build report-editable-line {
+            :cursor comp-data
+            :key :contractors
+            :prefix prefix
+            :label "contractors compensation this month"
+            :pluralize false
+            :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
         (dom/div
           (om/build report-line {
             :prefix prefix
