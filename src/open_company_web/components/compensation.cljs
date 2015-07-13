@@ -8,8 +8,9 @@
               [open-company-web.components.pie-chart :refer [pie-chart]]
               [goog.string :as gstring]))
 
-(defn get-chart-data [data]
-  { :columns [["string" "Compensation"] ["number" "Amount"]]
+(defn get-chart-data [data symbol]
+  { :symbol symbol
+    :columns [["string" "Compensation"] ["number" "Amount"]]
     :values [["Founders" (:founders data)]
             ["Executives" (:executives data)]
             ["Employees" (:employees data)]
@@ -116,4 +117,4 @@
               :number (thousands-separator total-compensation)
               :label "total compensation this month"}))
           (om/build comment-component {:value comment}))
-        (om/build pie-chart (get-chart-data comp-data))))))
+        (om/build pie-chart (get-chart-data comp-data prefix))))))
