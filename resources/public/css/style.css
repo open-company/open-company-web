@@ -60,3 +60,8 @@ div.report-list textarea.comment{
   padding: 5px;
   margin-top: 10px;
 }
+
+span.label{
+  padding: 0;
+  margin: 0;
+}
