@@ -4,6 +4,8 @@
   (:import [goog.history Html5History EventType]
            [goog History]))
 
+(enable-console-print!)
+
 (defn get-token []
   (str js/window.location.pathname js/window.location.search))
 
@@ -15,6 +17,7 @@
     (.setUseFragment false)))
 
 (defn handle-url-change [e]
+  (println "handle-url-change " e)
   (println "handle-url-change Navigating: " (get-token))
   ;; we are checking if this event is due to user action,
   ;; such as click a link, a back button, etc.
@@ -29,10 +32,10 @@
 
 (defonce history
   (doto (make-history)
-     (goog.events/listen EventType.NAVIGATE
-       ;; wrap in a fn to allow live reloading
-       #(handle-url-change %))
-      (.setEnabled true)))
+    (goog.events/listen EventType.NAVIGATE
+      ;; wrap in a fn to allow live reloading
+      #(handle-url-change %))
+    (.setEnabled true)))
 
 (defn nav! [token]
   (.setToken history token))
