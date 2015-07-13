@@ -1,11 +1,13 @@
 (ns ^:figwheel-always open-company-web.core
-    (:require [om.core :as om :include-macros true]
-              [om-tools.dom :as dom :include-macros true]
-              [secretary.core :as secretary :include-macros true :refer-macros [defroute]]
-              [open-company-web.router]
-              [open-company-web.components.page :refer [page]]
-              [open-company-web.components.list-companies :refer [list-companies]]
-              [open-company-web.components.page-not-found :refer [page-not-found]]))
+  (:require [om.core :as om :include-macros true]
+            [om-tools.dom :as dom :include-macros true]
+            [secretary.core :as secretary :include-macros true :refer-macros [defroute]]
+            [open-company-web.router :refer [make-history handle-url-change]]
+            [open-company-web.components.page :refer [page]]
+            [open-company-web.components.list-companies :refer [list-companies]]
+            [open-company-web.components.page-not-found :refer [page-not-found]]
+            [goog.events :as events])
+  (:import [goog.history EventType]))
 
 (defonce app-state (atom {
   :open-company {
@@ -82,6 +84,13 @@
 (defroute default-route "*" []
   (om/root page-not-found app-state
     {:target (. js/document (getElementById "app"))}))
+
+(defonce history
+  (doto (make-history)
+    (goog.events/listen EventType.NAVIGATE
+      ;; wrap in a fn to allow live reloading
+      #(handle-url-change %))
+    (.setEnabled true)))
 
 (defn on-js-reload []
   ;; optionally touch your app-state to force rerendering depending on
