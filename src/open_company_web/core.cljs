@@ -1,13 +1,10 @@
 (ns ^:figwheel-always open-company-web.core
     (:require [om.core :as om :include-macros true]
-              [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
-              [open-company-web.components.page :refer [page]]
-              [open-company-web.components.link :refer [link]]
               [secretary.core :as secretary :include-macros true :refer-macros [defroute]]
-              [goog.events :as events]
-              [goog.history.EventType :as EventType])
-    (:import goog.History))
+              [open-company-web.components.page :refer [page]]
+              [open-company-web.components.list-companies :refer [list-companies]]
+              [open-company-web.components.page-not-found :refer [page-not-found]]))
 
 (defonce app-state (atom {
   :open-company {
@@ -72,52 +69,18 @@
   }
 }))
 
-; (secretary/set-config! :prefix "#")
-
-;;setup history API
-; (defn handle-history-change [e]
-;   (println "history change: " e)
-;   (-> e .-token secretary/dispatch!))
-
-;Initialize the event listener
-(let [history (History.)
-      navigation EventType/NAVIGATE]
-  (goog.events/listen history
-                     navigation
-                     (fn[e]
-                       (println "change: " e)
-                       (-> e .-token secretary/dispatch!)))
-  (doto history (.setEnabled true)))
-
-(defcomponent list-page-item [data owner]
-  (render [_]
-    (dom/li
-      (om/build link {:href (str "/edit/" (:id data)) :name (:name data)}))))
-
-(defcomponent list-page [data owner]
-  (render [_]
-    (dom/div
-      (dom/h1 "Companies:")
-      (dom/ul
-        (om/build-all list-page-item (vals data))))))
-
 ;;Routes
 (defroute editable-page-route "/edit/:id" {id :id}
   (om/root page ((keyword id) @app-state)
     {:target (. js/document (getElementById "app"))}))
 
 (defroute list-page-route "/" []
-  (om/root list-page app-state
+  (om/root list-companies app-state
     {:target (. js/document (getElementById "app"))}))
 
-;;initialization
-(defn main []
-  (println "MAIN")
-  (-> js/document
-      .-location
-      (set! "/")))
-
-(secretary/dispatch! "/")
+(defroute default-route "*" []
+  (om/root page-not-found app-state
+    {:target (. js/document (getElementById "app"))}))
 
 (defn on-js-reload []
   ;; optionally touch your app-state to force rerendering depending on
