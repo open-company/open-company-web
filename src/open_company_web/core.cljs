@@ -2,6 +2,7 @@
     (:require [om.core :as om :include-macros true]
               [om-tools.dom :as dom :include-macros true]
               [secretary.core :as secretary :include-macros true :refer-macros [defroute]]
+              [open-company-web.router]
               [open-company-web.components.page :refer [page]]
               [open-company-web.components.list-companies :refer [list-companies]]
               [open-company-web.components.page-not-found :refer [page-not-found]]))
