@@ -26,6 +26,6 @@
         (om/build report-editable-line {:cursor data :key :pt-employees :label "part-time employee"})
         (om/build report-editable-line {:cursor data :key :pt-contractors :label "part-time contractor"})
         (dom/div
-          (om/build report-line {:number (thousands-separator total-headcount) :label "total headcount"})", "
-          (om/build report-line {:number (thousands-separator full-time-equivalent) :label "full-time equivalent"}))
+          (om/build report-line {:number total-headcount :label "total headcount" :pluralize false})", "
+          (om/build report-line {:number full-time-equivalent :label "full-time equivalent"}))
         (om/build comment-component {:value comment})))))
