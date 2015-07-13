@@ -45,10 +45,11 @@
     (let [number (:number data)
           label (:label data)
           prefix (or (:prefix data) "")
+          pluralize (if (contains? data :pluralize) (:pluralize data) true)
           plural-suffix (or (:plural-suffix data) "s")
-          suffix (if (> number 0) plural-suffix)]
+          suffix (if (and pluralize (not (= number 1))) plural-suffix "")]
       (dom/span
         (if-not (= (count prefix) 0)
           (dom/span {:class "label"} (str prefix)))
-        (dom/span {:class "num"} (str number))
+        (dom/span {:class "num"} (thousands-separator number))
         (dom/span {:class "label"} (str " " label suffix))))))
