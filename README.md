@@ -5,7 +5,11 @@
 
 ## Overview
 
-Build your company in the open with transparency for your co-founders, your team of employees and contractors, and your investors. Or open up your company for everyone, your customers and the rest of the startup community.
+> Transparency, honesty, kindness, good stewardship, even humor, work in businesses at all times.
+
+> -- [John Gerzema](http://www.johngerzema.com/)
+
+Build your company in the open with transparency for your co-founders, your team, and your investors. Or share your company's journey with everyone, your customers and the rest of the startup community too.
 
 [OpenCompany.io](https://opencompany.io) is GitHub for the rest of your company:
 
