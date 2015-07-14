@@ -15,11 +15,12 @@
     [org.omcljs/om "0.9.0"] ; ClojureScript interface to React https://github.com/omcljs/om
     [prismatic/om-tools "0.3.11"] ; Tools for Om https://github.com/Prismatic/om-tools
     [sablono "0.3.4"] ; Hiccup templating for Om/React https://github.com/r0man/sablono
+    [secretary "1.2.3"] ; Secretary routing to defin app routes
   ]
 
   :plugins [
-    [lein-cljsbuild "1.0.5"] ; ClojureScript compiler https://github.com/emezeske/lein-cljsbuild
-    [lein-figwheel "0.3.5"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
+    [lein-cljsbuild "1.0.6"] ; ClojureScript compiler https://github.com/emezeske/lein-cljsbuild
+    [lein-figwheel "0.3.7"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
     [lein-ancient "0.6.7"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
   ]
 
@@ -75,5 +76,9 @@
 
    ;; to configure a different figwheel logfile path
    ;; :server-logfile "tmp/logs/figwheel-logfile.log"
+  }
+
+  :aliases {
+    "ancient" ["with-profile" "dev" "do" "ancient" ":allow-qualified," "ancient" ":plugins" ":allow-qualified"] ; check for out of date dependencies
   }
 )

@@ -5,7 +5,16 @@
               [open-company-web.components.report-line :refer [report-line report-editable-line]]
               [open-company-web.utils :refer [thousands-separator handle-change get-symbols-for-currency-code]]
               [open-company-web.components.comment :refer [comment-component]]
+              [open-company-web.components.pie-chart :refer [pie-chart]]
               [goog.string :as gstring]))
+
+(defn get-chart-data [data symbol]
+  { :symbol symbol
+    :columns [["string" "Compensation"] ["number" "Amount"]]
+    :values [["Founders" (:founders data)]
+            ["Executives" (:executives data)]
+            ["Employees" (:employees data)]
+            ["Contractors" (:contractors data)]]})
 
 (defn switch-values
   "Update all the values in the cursor with the values passed"
@@ -59,64 +68,72 @@
           total-compensation (+ (if show-employees employees 0) total-compensation)
           total-compensation (+ (if show-contrators contractors 0) total-compensation)
           total-compensation (gstring/format "%.2f" total-compensation)]
-      (dom/div {:class "report-list compensation"}
-        (dom/h3 "Compensation: ")
-        (dom/div
-          (dom/span {:class "label"} "Report in: "
-            (dom/input {
-              :type "radio"
-              :name "report-type"
-              :value currency
-              :id "report-type-$"
-              :checked (not percentage)
-              :on-click (fn[e] (switch-values comp-data (:initial-values (om/get-state owner)))
-                          (handle-change comp-data false :percentage))})
-            (dom/label {:class "switch-vis" :for "report-type-$"} (str " " currency-symbol "  "))
-            (dom/input {
-              :type "radio"
-              :name "report-type"
-              :value "%"
-              :id "report-type-%"
-              :checked percentage
-              :on-click (fn[e] (handle-change comp-data true :percentage)
-                               (copy-compensation-state owner comp-data)
-                               (dollars->percentage comp-data))})
-            (dom/label {:class "switch-vis" :for "report-type-%"} "  Percent ")))
-        (when show-founders
-          (om/build report-editable-line {
-            :cursor comp-data
-            :key :founders
-            :prefix prefix
-            :label "founders compensation this month"
-            :pluralize false
-            :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
-        (when show-executives
-          (om/build report-editable-line {
-            :cursor comp-data
-            :key :executives
-            :prefix prefix
-            :label "executives compensation this month"
-            :pluralize false
-            :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
-        (when show-employees
-          (om/build report-editable-line {
-            :cursor comp-data
-            :key :employees
-            :prefix prefix
-            :label "employees compensation this month"
-            :pluralize false
-            :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
-        (when show-contrators
-          (om/build report-editable-line {
-            :cursor comp-data
-            :key :contractors
-            :prefix prefix
-            :label "contractors compensation this month"
-            :pluralize false
-            :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
-        (dom/div
-          (om/build report-line {
-            :prefix prefix
-            :number (thousands-separator total-compensation)
-            :label "total compensation this month"}))
-        (om/build comment-component {:value comment})))))
+      (dom/div {:class "report-list compensation clearfix"}
+        (dom/div {:class "report-list-left"}
+          (dom/h3 "Compensation: ")
+          (dom/div
+            (dom/span {:class "label"} "Report in: "
+              (dom/input {
+                :type "radio"
+                :name "report-type"
+                :value currency
+                :id "report-type-$"
+                :checked (not percentage)
+                :on-click (fn[e] (switch-values comp-data (:initial-values (om/get-state owner)))
+                            (handle-change comp-data false :percentage))})
+              (dom/label {:class "switch-vis" :for "report-type-$"} (str " " currency-symbol "  "))
+              (dom/input {
+                :type "radio"
+                :name "report-type"
+                :value "%"
+                :id "report-type-%"
+                :checked percentage
+                :on-click (fn[e] (handle-change comp-data true :percentage)
+                                 (copy-compensation-state owner comp-data)
+                                 (dollars->percentage comp-data))})
+              (dom/label {:class "switch-vis" :for "report-type-%"} "  Percent ")))
+          (when show-founders
+            (om/build report-editable-line {
+              :cursor comp-data
+              :key :founders
+              :prefix prefix
+              :label "founders compensation this month"
+              :pluralize false
+              :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
+          (when show-executives
+            (om/build report-editable-line {
+              :cursor comp-data
+              :key :executives
+              :prefix prefix
+              :label "executives compensation this month"
+              :pluralize false
+              :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
+          (when show-employees
+            (om/build report-editable-line {
+              :cursor comp-data
+              :key :employees
+              :prefix prefix
+              :label "employees compensation this month"
+              :pluralize false
+              :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
+          (when show-contrators
+            (om/build report-editable-line {
+              :cursor comp-data
+              :key :contractors
+              :prefix prefix
+              :label "contractors compensation this month"
+              :pluralize false
+              :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
+          (dom/div
+            (om/build report-line {
+              :prefix prefix
+              :label "contractors compensation this month"
+              :pluralize false
+              :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))})
+            (dom/div
+              (om/build report-line {
+                :prefix prefix
+                :number (thousands-separator total-compensation)
+                :label "total compensation this month"}))
+            (om/build comment-component {:value comment})))
+        (om/build pie-chart (get-chart-data comp-data prefix))))))

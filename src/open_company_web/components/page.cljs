@@ -13,7 +13,7 @@
 (defcomponent page [data owner]
   (render [_]
     (dom/div
-      (dom/h2 "Dashboard")
+      (dom/h2 (str (:name data) " Dashboard"))
       (om/build currency-picker data)
       (om/build headcount (:headcount data))
       (om/build finances {:finances (:finances data) :currency (:currency data)})
