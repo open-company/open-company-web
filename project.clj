@@ -15,6 +15,7 @@
     [org.omcljs/om "0.9.0"] ; ClojureScript interface to React https://github.com/omcljs/om
     [prismatic/om-tools "0.3.11"] ; Tools for Om https://github.com/Prismatic/om-tools
     [sablono "0.3.4"] ; Hiccup templating for Om/React https://github.com/r0man/sablono
+    [secretary "1.2.3"] ; Secretary routing to defin app routes
   ]
 
   :plugins [
