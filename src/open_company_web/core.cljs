@@ -1,6 +1,7 @@
 (ns ^:figwheel-always open-company-web.core
     (:require [om.core :as om :include-macros true]
-              [open-company-web.components.page :refer [page]]))
+              [open-company-web.components.page :refer [page]]
+              [open-company-web.raven :refer [raven-setup]]))
 
 (defonce app-state (atom {
   :currency ["USD"]
@@ -34,6 +35,8 @@
 (om/root page app-state
   {:target (. js/document (getElementById "app"))})
 
+;; setup Sentry error reporting
+(raven-setup)
 
 (defn on-js-reload []
   ;; optionally touch your app-state to force rerendering depending on
