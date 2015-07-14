@@ -14,7 +14,8 @@
           prefix (:prefix view-data)
           label (:label view-data)
           on-change (:on-change view-data)
-          suffix (if (and (:pluralize view-data) (= (key data) 1)) "" "s")]
+          pluralize (if (contains? view-data :pluralize) (:pluralize view-data) true)
+          suffix (if (and pluralize (not (= (key data) 1))) "s" "")]
       (dom/div
         (if (> (count prefix) 0) (dom/span {:class "label"} (str prefix)))
         (dom/label {
@@ -27,14 +28,14 @@
           :class "editable-data"
           :value (key data)
           :onFocus #(om/set-state! owner :editing true)
-          :onKeyPress #(let [value (.. % -target -value)]
+          :onKeyPress #(let [value (String->Number (.. % -target -value))]
                         ; need data check!
                         (when (= (.-key %) "Enter")
                           (do
                             (handle-change data (String->Number value) key)
                             (if-not (= on-change nil) (on-change value))
                             (om/set-state! owner :editing false))))
-          :onChange #(let [value (.. % -target -value)]
+          :onChange #(let [value (String->Number (.. % -target -value))]
                       (handle-change data value key))
         })
         (dom/span {:class "label"} (str " " label suffix))))))
