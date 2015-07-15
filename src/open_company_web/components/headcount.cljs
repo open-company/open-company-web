@@ -37,8 +37,8 @@
           (om/build report-editable-line {:cursor data :key :pt-employees :label "full-time contractor"})
           (om/build report-editable-line {:cursor data :key :pt-contractors :label "part-time contractor"})
           (dom/div
-            (om/build report-line {:number total-headcount :label "total" :pluralize false})\
+            (om/build report-line {:number total-headcount :label "total" :pluralize false})
             (dom/span ", ")
-            (om/build report-line {:number full-time-equivalent :label "full-time equivalent" :pluralize false}))
+            (om/build report-line {:number full-time-equivalent :label "full-time equivalent"}))
           (om/build comment-component {:value comment}))
         (om/build pie-chart (get-chart-data data))))))
