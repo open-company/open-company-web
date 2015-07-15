@@ -100,7 +100,7 @@ lein test
 or use the extended form if you want to specify different params:
 
 ```console
-lein doo slimer test
+lein with-profile test doo slimer test
 ```
 
 For more info:
