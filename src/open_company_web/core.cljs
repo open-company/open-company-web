@@ -3,7 +3,7 @@
             [om-tools.dom :as dom :include-macros true]
             [secretary.core :as secretary :include-macros true :refer-macros [defroute]]
             [open-company-web.router :refer [make-history handle-url-change]]
-            [open-company-web.components.page :refer [page]]
+            [open-company-web.components.page :refer [company company-not-found]]
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
             [open-company-web.raven :refer [raven-setup]]
@@ -77,15 +77,18 @@
 }))
 
 ;;Routes
-(defroute editable-page-route "/edit/:id" {id :id}
-  (om/root page ((keyword id) @app-state)
-    {:target (. js/document (getElementById "app"))}))
-
 (defroute list-page-route "/" []
   (om/root list-companies app-state
     {:target (. js/document (getElementById "app"))}))
 
-(defroute default-route "*" []
+(defroute editable-page-route "/edit/:id" {id :id}
+  (if ((keyword id) @app-state)
+    (om/root company ((keyword id) @app-state)
+      {:target (. js/document (getElementById "app"))})
+    (om/root company-not-found {:id id}
+      {:target (. js/document (getElementById "app"))})))
+
+(defroute not-found-route "*" []
   (om/root page-not-found app-state
     {:target (. js/document (getElementById "app"))}))
 
