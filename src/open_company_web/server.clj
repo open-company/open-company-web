@@ -8,9 +8,12 @@
   (file-response "public/index.html" {:root "resources"}))
 
 (defroutes routes
-  (GET "/" [] (index))
-  (GET "/edit/:company" [] (index))
-  (route/files "/" {:root "resources/public"}))
+  ; serve the react app for all requests
+  (GET "*" [] (index))
+  ; remove the static paths
+  (route/files "/css/*" {:root "resources/public"})
+  (route/files "/js/*" {:root "resources/public"})
+  (route/files "/img/*" {:root "resources/public"}))
 
 (defn request-handler [handler]
  (fn [request]
