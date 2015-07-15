@@ -10,6 +10,9 @@
             [goog.events :as events])
   (:import [goog.history EventType]))
 
+;; setup Sentry error reporting
+(raven-setup)
+
 (defonce app-state (atom {
   :open-company {
     :name "Open company"
@@ -92,9 +95,6 @@
       ;; wrap in a fn to allow live reloading
       #(handle-url-change %))
     (.setEnabled true)))
-
-;; setup Sentry error reporting
-(raven-setup)
 
 (defn on-js-reload []
   ;; optionally touch your app-state to force rerendering depending on
