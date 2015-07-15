@@ -12,16 +12,19 @@
     [org.clojure/clojure "1.7.0"] ; Lisp on the JVM http://clojure.org/documentation
     [org.clojure/clojurescript "0.0-3308"] ; ClojureScript compiler https://github.com/clojure/clojurescript
     [org.clojure/core.async "0.1.346.0-17112a-alpha"] ; Async library https://github.com/clojure/core.async
-    [org.omcljs/om "0.9.0"] ; ClojureScript interface to React https://github.com/omcljs/om
+    [org.omcljs/om "0.9.0" :exclusions [cljsjs/react]] ; ClojureScript interface to React https://github.com/omcljs/om
     [prismatic/om-tools "0.3.11"] ; Tools for Om https://github.com/Prismatic/om-tools
-    [sablono "0.3.4"] ; Hiccup templating for Om/React https://github.com/r0man/sablono
+    [sablono "0.3.4" :exclusions [cljsjs/react]] ; Hiccup templating for Om/React https://github.com/r0man/sablono
     [secretary "1.2.3"] ; Secretary routing to defin app routes
+    [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; cljs react test utilities
+    [prismatic/dommy "1.0.0"] ; A ClojureScript DOM manipulation and event library.
   ]
 
   :plugins [
     [lein-cljsbuild "1.0.6"] ; ClojureScript compiler https://github.com/emezeske/lein-cljsbuild
     [lein-figwheel "0.3.7"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
     [lein-ancient "0.6.7"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
+    [lein-doo "0.1.2-SNAPSHOT"] ; A library and Leiningen plugin to run cljs.test in many JS environments.
   ]
 
   :source-paths ["src"]
@@ -29,22 +32,39 @@
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
   :cljsbuild {
-    :builds [{:id "dev"
-              :source-paths ["src"]
+    :builds {
+      :dev {
+        :id "dev"
+        :source-paths ["src"]
 
-              :figwheel { :on-jsload "open-company-web.core/on-js-reload" }
+        :figwheel { :on-jsload "open-company-web.core/on-js-reload" }
 
-              :compiler {:main open-company-web.core
-                         :asset-path "js/compiled/out"
-                         :output-to "resources/public/js/compiled/open_company.js"
-                         :output-dir "resources/public/js/compiled/out"
-                         :source-map-timestamp true }}
-             {:id "min"
-              :source-paths ["src"]
-              :compiler {:output-to "resources/public/js/compiled/open_company.js"
-                         :main open-company-web.core
-                         :optimizations :advanced
-                         :pretty-print false}}]}
+        :compiler {
+          :main open-company-web.core
+          :asset-path "js/compiled/out"
+          :output-to "resources/public/js/compiled/open_company.js"
+          :output-dir "resources/public/js/compiled/out"
+          :source-map-timestamp true }}
+
+      :min {
+        :id "min"
+        :source-paths ["src"]
+        :compiler {
+          :output-to "resources/public/js/compiled/open_company.js"
+          :main open-company-web.core
+          :optimizations :advanced
+          :pretty-print false}}
+
+      :test {
+        :id "test"
+        :source-paths ["src" "test"]
+        :compiler {
+          :main 'test.test-runner
+          :output-to "target/testable.js"
+          :source-map "target/testable.js.map"
+          :optimizations :whitespace
+          :cache-analysis false
+          :pretty-print true}}}}
 
   :figwheel {
    ;; :http-server-root "public" ;; default and assumes "resources"
@@ -80,5 +100,6 @@
 
   :aliases {
     "ancient" ["with-profile" "dev" "do" "ancient" ":allow-qualified," "ancient" ":plugins" ":allow-qualified"] ; check for out of date dependencies
+    "test"    ["with-profile" "test" "doo" "slimer" "test"]
   }
 )
