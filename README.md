@@ -87,7 +87,25 @@ lein cljsbuild once min
 ```
 
 Open your browser in `resources/public/index.html`. You will not
-get live reloading nor a REPL. 
+get live reloading nor a REPL.
+
+## Unit testing
+
+Simply run:
+```console
+
+lein test
+```
+
+or use the extended form if you want to specify different params:
+
+```console
+lein doo slimer test
+```
+
+For more info:
+- Plugin: [bensu/doo](https://github.com/bensu/doo)
+- React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/doo)
 
 ## License
 
