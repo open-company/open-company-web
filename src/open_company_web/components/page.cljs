@@ -6,11 +6,12 @@
               [open-company-web.components.headcount :refer [headcount]]
               [open-company-web.components.finances :refer [finances]]
               [open-company-web.components.compensation :refer [compensation]]
-              [open-company-web.components.currency-picker :refer [currency-picker]]))
+              [open-company-web.components.currency-picker :refer [currency-picker]]
+              [open-company-web.components.link :refer [link]]))
 
 (enable-console-print!)
 
-(defcomponent page [data owner]
+(defcomponent company [data owner]
   (render [_]
     (dom/div
       (dom/h2 (str (:name data) " Dashboard"))
@@ -18,3 +19,9 @@
       (om/build headcount (:headcount data))
       (om/build finances {:finances (:finances data) :currency (:currency data)})
       (om/build compensation {:compensation (:compensation data) :currency (:currency data)}))))
+
+(defcomponent company-not-found [data owner]
+  (render [_]
+    (dom/div
+      (dom/h2 (str (:id data) " not found"))
+      (om/build link {:href "/" :name "Back home"}))))
