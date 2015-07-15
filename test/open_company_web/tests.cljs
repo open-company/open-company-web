@@ -25,7 +25,7 @@
 
 (deftest name-component
   (testing "The initial state is displayed"
-    (let [app-state (atom {:name "Testami"})
+    (let [app-state (atom {:name "Arya"})
           _ (om/root test-component app-state {:target c})
           display-node (second (sel c [:p]))
           input-node (sel1 c [:input])]
