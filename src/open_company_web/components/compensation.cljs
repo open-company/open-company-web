@@ -56,12 +56,17 @@
           contractors (:contractors comp-data)
           currency (first (:currency data))
           currency-symbol (get-symbols-for-currency-code currency)
-          prefix (if percentage "%" currency-symbol)
+          prefix (str (if percentage "%" currency-symbol) " ")
           comment (:comment comp-data)
-          show-founders (> (:founders (:headcount data)) 0)
-          show-executives (> (:executives (:headcount data)) 0)
-          show-employees (> (+ (:ft-employees (:headcount data)) (:pt-employees (:headcount data))) 0)
-          show-contrators (> (+ (:ft-contractors (:headcount data)) (:pt-contractors (:headcount data))) 0)
+          head-data (:headcount data)
+          show-founders (> (:founders head-data) 0)
+          show-executives (> (:executives head-data) 0)
+          show-employees (> (+ (:ft-employees head-data) (:pt-employees head-data)) 0)
+          show-contrators (> (+ (:ft-contractors head-data) (:pt-contractors head-data)) 0)
+          founders-label (str "founder" (if (= (:founders head-data) 1) "" "s") " compensation this month")
+          executives-label (str "executive" (if (= (:executives head-data) 1) "" "s") " compensation this month")
+          employees-label (str "employee" (if (= (:employees head-data) 1) "" "s") " compensation this month")
+          contractors-label (str "contractor" (if (= (:contractors head-data) 1) "" "s") " compensation this month")
           total-compensation 0
           total-compensation (+ (if show-founders founders 0) total-compensation)
           total-compensation (+ (if show-executives executives 0) total-compensation)
@@ -97,7 +102,7 @@
               :cursor comp-data
               :key :founders
               :prefix prefix
-              :label "founders compensation this month"
+              :label founders-label
               :pluralize false
               :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
           (when show-executives
@@ -105,7 +110,7 @@
               :cursor comp-data
               :key :executives
               :prefix prefix
-              :label "executives compensation this month"
+              :label executives-label
               :pluralize false
               :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
           (when show-employees
@@ -113,7 +118,7 @@
               :cursor comp-data
               :key :employees
               :prefix prefix
-              :label "employees compensation this month"
+              :label employees-label
               :pluralize false
               :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
           (when show-contrators
@@ -121,19 +126,13 @@
               :cursor comp-data
               :key :contractors
               :prefix prefix
-              :label "contractors compensation this month"
+              :label contractors-label
               :pluralize false
               :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))}))
           (dom/div
             (om/build report-line {
               :prefix prefix
-              :label "contractors compensation this month"
-              :pluralize false
-              :on-change #(when (not percentage) (om/set-state! owner :initial-values comp-data))})
-            (dom/div
-              (om/build report-line {
-                :prefix prefix
-                :number (thousands-separator total-compensation)
-                :label "total compensation this month"}))
-            (om/build comment-component {:value comment})))
+              :number (thousands-separator total-compensation)
+              :label "total compensation this month"}))
+          (om/build comment-component {:value comment}))
         (om/build pie-chart (get-chart-data comp-data prefix))))))
