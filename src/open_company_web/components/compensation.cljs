@@ -8,13 +8,17 @@
               [open-company-web.components.pie-chart :refer [pie-chart]]
               [goog.string :as gstring]))
 
-(defn get-chart-data [data symbol]
-  { :symbol symbol
-    :columns [["string" "Compensation"] ["number" "Amount"]]
-    :values [["Founders" (:founders data)]
-            ["Executives" (:executives data)]
-            ["Employees" (:employees data)]
-            ["Contractors" (:contractors data)]]})
+(defn get-chart-data [data head-data symbol]
+  (let [show-founders (> (:founders head-data) 0)
+        show-executives (> (:executives head-data) 0)
+        show-employees (> (+ (:ft-employees head-data) (:pt-employees head-data)) 0)
+        show-contrators (> (+ (:ft-contractors head-data) (:pt-contractors head-data)) 0)]
+    { :symbol symbol
+      :columns [["string" "Compensation"] ["number" "Amount"]]
+      :values [["Founders" (if show-founders (:founders data) 0)]
+              ["Executives" (if show-executives (:executives data) 0)]
+              ["Employees" (if show-employees (:employees data) 0)]
+              ["Contractors" (if show-contrators (:contractors data) 0)]]}))
 
 (defn switch-values
   "Update all the values in the cursor with the values passed"
@@ -31,12 +35,20 @@
 
 (defn dollars->percentage
   "Calculate the percentage given the compensation component cursor"
-  [cursor]
-  (let [total (+ (:founders cursor) (:executives cursor) (:employees cursor) (:contractors cursor))]
-    (handle-change cursor (calc-percentage (:founders cursor) total) :founders)
-    (handle-change cursor (calc-percentage (:executives cursor) total) :executives)
-    (handle-change cursor (calc-percentage (:employees cursor) total) :employees)
-    (handle-change cursor (calc-percentage (:contractors cursor) total) :contractors)))
+  [comp-data head-data]
+  (let [show-founders (> (:founders head-data) 0)
+        show-executives (> (:executives head-data) 0)
+        show-employees (> (+ (:ft-employees head-data) (:pt-employees head-data)) 0)
+        show-contrators (> (+ (:ft-contractors head-data) (:pt-contractors head-data)) 0)
+        founders (if show-founders (:founders comp-data) 0)
+        executives (if show-executives (:executives comp-data) 0)
+        employees (if show-employees (:employees comp-data) 0)
+        contractors (if show-contrators (:contractors comp-data) 0)
+        total (+ founders executives employees contractors)]
+    (handle-change comp-data (calc-percentage founders total) :founders)
+    (handle-change comp-data (calc-percentage executives total) :executives)
+    (handle-change comp-data (calc-percentage employees total) :employees)
+    (handle-change comp-data (calc-percentage contractors total) :contractors)))
 
 (defn copy-compensation-state
   "Copy the compensation state into the component state"
@@ -48,21 +60,21 @@
   (will-mount [_]
     (copy-compensation-state owner (:compensation data)))
   (render [_]
-    (let [comp-data (:compensation data)
-          percentage (:percentage comp-data)
-          founders (:founders comp-data)
-          executives (:executives comp-data)
-          employees (:employees comp-data)
-          contractors (:contractors comp-data)
-          currency (first (:currency data))
-          currency-symbol (get-symbols-for-currency-code currency)
-          prefix (str (if percentage "%" currency-symbol) " ")
-          comment (:comment comp-data)
-          head-data (:headcount data)
+    (let [head-data (:headcount data)
           show-founders (> (:founders head-data) 0)
           show-executives (> (:executives head-data) 0)
           show-employees (> (+ (:ft-employees head-data) (:pt-employees head-data)) 0)
           show-contrators (> (+ (:ft-contractors head-data) (:pt-contractors head-data)) 0)
+          comp-data (:compensation data)
+          percentage (:percentage comp-data)
+          founders (if show-founders (:founders comp-data) 0)
+          executives (if show-executives (:executives comp-data) 0)
+          employees (if show-employees (:employees comp-data) 0)
+          contractors (if show-contrators (:contractors comp-data) 0)
+          currency (first (:currency data))
+          currency-symbol (get-symbols-for-currency-code currency)
+          prefix (str (if percentage "%" currency-symbol) " ")
+          comment (:comment comp-data)
           founders-label (str "founder" (if (= (:founders head-data) 1) "" "s") " compensation this month")
           executives-label (str "executive" (if (= (:executives head-data) 1) "" "s") " compensation this month")
           employees-label (str "employee" (if (= (:employees head-data) 1) "" "s") " compensation this month")
@@ -95,7 +107,7 @@
                 :checked percentage
                 :on-click (fn[e] (handle-change comp-data true :percentage)
                                  (copy-compensation-state owner comp-data)
-                                 (dollars->percentage comp-data))})
+                                 (dollars->percentage comp-data head-data))})
               (dom/label {:class "switch-vis" :for "report-type-%"} "  Percent ")))
           (when show-founders
             (om/build report-editable-line {
@@ -135,4 +147,4 @@
               :number (thousands-separator total-compensation)
               :label "total compensation this month"}))
           (om/build comment-component {:value comment}))
-        (om/build pie-chart (get-chart-data comp-data prefix))))))
+        (om/build pie-chart (get-chart-data comp-data head-data prefix))))))
