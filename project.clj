@@ -24,27 +24,38 @@
     [lein-ancient "0.6.7"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
   ]
 
+  :profiles {
+    :dev {
+      :dependencies [
+        [ring "1.4.0"]
+        [compojure "1.4.0"]]}}
+
   :source-paths ["src"]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
   :cljsbuild {
-    :builds [{:id "dev"
-              :source-paths ["src"]
+    :builds {
+      :dev {
+        :id "dev"
+        :source-paths ["src"]
 
-              :figwheel { :on-jsload "open-company-web.core/on-js-reload" }
+        :figwheel { :on-jsload "open-company-web.core/on-js-reload" }
 
-              :compiler {:main open-company-web.core
-                         :asset-path "js/compiled/out"
-                         :output-to "resources/public/js/compiled/open_company.js"
-                         :output-dir "resources/public/js/compiled/out"
-                         :source-map-timestamp true }}
-             {:id "min"
-              :source-paths ["src"]
-              :compiler {:output-to "resources/public/js/compiled/open_company.js"
-                         :main open-company-web.core
-                         :optimizations :advanced
-                         :pretty-print false}}]}
+        :compiler {
+          :main open-company-web.core
+          :asset-path "/js/compiled/out"
+          :output-to "resources/public/js/compiled/open_company.js"
+          :output-dir "resources/public/js/compiled/out"
+          :source-map-timestamp true }}
+      :min {
+        :id "min"
+        :source-paths ["src"]
+        :compiler {
+          :main open-company-web.core
+          :output-to "resources/public/js/compiled/open_company.js"
+          :optimizations :advanced
+          :pretty-print false}}}}
 
   :figwheel {
    ;; :http-server-root "public" ;; default and assumes "resources"
@@ -60,7 +71,7 @@
    ;; if you want to embed a ring handler into the figwheel http-kit
    ;; server, this is for simple ring servers, if this
    ;; doesn't work for you just run your own server :)
-   ;; :ring-handler hello_world.server/handler
+   :ring-handler open-company-web.server/handler
 
    ;; To be able to open files in your editor from the heads up display
    ;; you will need to put a script on your path.
