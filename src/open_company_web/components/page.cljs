@@ -23,5 +23,5 @@
 (defcomponent company-not-found [data owner]
   (render [_]
     (dom/div
-      (dom/h2 (str (:id data) " not found"))
+      (dom/h2 (str (:symbol data) " not found"))
       (om/build link {:href "/" :name "Back home"}))))

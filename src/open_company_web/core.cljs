@@ -14,9 +14,9 @@
 (raven-setup)
 
 (defonce app-state (atom {
-  :open-company {
-    :name "Open company"
-    :id "open-company"
+  :OPEN {
+    :name "Transparency, LLC"
+    :symbol "OPEN"
     :currency ["USD"]
     :headcount {
       :founders 2
@@ -25,7 +25,7 @@
       :ft-contractors 0
       :pt-employees 0
       :pt-contractors 2
-      :comment "Open company comment."
+      :comment "Transparency headcount comment."
     },
     :finances {
       :cash 173228
@@ -33,7 +33,7 @@
       :costs 22184
       :burn-rate -19417
       :runway "9 months"
-      :comment "Open company comment."
+      :comment "Transparency finances comment."
     },
     :compensation {
       :percentage false
@@ -41,12 +41,12 @@
       :executives 0
       :employees 5899
       :contractors 2582
-      :comment "Open company comment."
+      :comment "Transparency compensation comment."
     }
   }
-  :buffer {
+  :BUFFR {
     :name "Buffer"
-    :id "buffer"
+    :symbol "BUFFR"
     :currency ["USD"]
     :headcount {
       :founders 1
@@ -55,7 +55,7 @@
       :ft-contractors 2
       :pt-employees 1
       :pt-contractors 4
-      :comment "Buffer comment."
+      :comment "Buffer headcount comment."
     },
     :finances {
       :cash 323232
@@ -63,7 +63,7 @@
       :costs 11321
       :burn-rate -10000
       :runway "9 months"
-      :comment "Buffer comment."
+      :comment "Buffer finances comment."
     },
     :compensation {
       :percentage true
@@ -71,7 +71,7 @@
       :executives 40
       :employees 10
       :contractors 10
-      :comment "Buffer comment."
+      :comment "Buffer compensation comment."
     }
   }
 }))
@@ -81,11 +81,11 @@
   (om/root list-companies app-state
     {:target (. js/document (getElementById "app"))}))
 
-(defroute editable-page-route "/edit/:id" {id :id}
-  (if ((keyword id) @app-state)
-    (om/root company ((keyword id) @app-state)
+(defroute editable-page-route "/companies/:symbol" {ticker :symbol}
+  (if-let [company-state ((keyword ticker) @app-state)]
+    (om/root company company-state
       {:target (. js/document (getElementById "app"))})
-    (om/root company-not-found {:id id}
+    (om/root company-not-found {:symbol ticker}
       {:target (. js/document (getElementById "app"))})))
 
 (defroute not-found-route "*" []

@@ -28,7 +28,7 @@
     :dev {
       :dependencies [
         [ring "1.4.0"]
-        [compojure "1.3.4"]]}}
+        [compojure "1.4.0"]]}}
 
   :source-paths ["src"]
 
