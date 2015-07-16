@@ -99,6 +99,6 @@
 
   :aliases {
     "ancient" ["with-profile" "dev" "do" "ancient" ":allow-qualified," "ancient" ":plugins" ":allow-qualified"] ; check for out of date dependencies
-    "test!" ["doo" "slimer" "test" "once"]
+    "test!" ["doo" "phantom" "test" "once"]
   }
 )
