@@ -21,8 +21,8 @@
   (let [data-table (add-rows columns data symbol)
         options (clj->js {
                   :title  ""
-                  :width 500
-                  :height 150})]
+                  :width 600
+                  :height 250})]
     (when dom-node (.draw (js/google.visualization.PieChart. dom-node) data-table options))))
 
 (defcomponent pie-chart [chart-data owner]
