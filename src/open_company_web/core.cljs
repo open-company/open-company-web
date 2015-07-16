@@ -6,8 +6,12 @@
             [open-company-web.components.page :refer [page]]
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
+            [open-company-web.raven :refer [raven-setup]]
             [goog.events :as events])
   (:import [goog.history EventType]))
+
+;; setup Sentry error reporting
+(raven-setup)
 
 (defonce app-state (atom {
   :open-company {
