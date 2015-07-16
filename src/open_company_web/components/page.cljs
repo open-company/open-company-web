@@ -18,7 +18,7 @@
       (om/build currency-picker data)
       (om/build headcount (:headcount data))
       (om/build finances {:finances (:finances data) :currency (:currency data)})
-      (om/build compensation {:compensation (:compensation data) :currency (:currency data)}))))
+      (om/build compensation {:compensation (:compensation data) :headcount (:headcount data) :currency (:currency data)}))))
 
 (defcomponent company-not-found [data owner]
   (render [_]

@@ -33,11 +33,12 @@
           (om/build report-editable-line {:cursor data :key :founders :label "founder"})
           (om/build report-editable-line {:cursor data :key :executives :label "executive"})
           (om/build report-editable-line {:cursor data :key :ft-employees :label "full-time employee"})
-          (om/build report-editable-line {:cursor data :key :pt-employees :label "part-time employee"})
-          (om/build report-editable-line {:cursor data :key :ft-contractors :label "full-time contractor"})
+          (om/build report-editable-line {:cursor data :key :ft-contractors :label "part-time employee"})
+          (om/build report-editable-line {:cursor data :key :pt-employees :label "full-time contractor"})
           (om/build report-editable-line {:cursor data :key :pt-contractors :label "part-time contractor"})
           (dom/div
-            (om/build report-line {:number (thousands-separator total-headcount) :label "total headcount"})", "
-            (om/build report-line {:number (thousands-separator full-time-equivalent) :label "full-time equivalent"}))
+            (om/build report-line {:number total-headcount :label "total" :pluralize false})
+            (dom/span ", ")
+            (om/build report-line {:number full-time-equivalent :label "full-time equivalent"}))
           (om/build comment-component {:value comment}))
         (om/build pie-chart (get-chart-data data))))))
