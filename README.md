@@ -86,24 +86,31 @@ To create a production build run:
 lein cljsbuild once min
 ```
 
-Open your browser in `resources/public/index.html`. You will not
-get live reloading nor a REPL.
+Open your browser in `resources/public/index.html`. You will not get live reloading nor a REPL.
 
-## Unit testing
+## Tests
 
-Simply run:
+Install [SlimerJS](https://slimerjs.org/):
+
 ```console
+brew install slimerjs
+```
 
+Then run:
+
+```console
+export SLIMERJSLAUNCHER=/Applications/Firefox.app/Contents/MacOS/firefox
 lein test
 ```
 
-or use the extended form if you want to specify different params:
+Or use the extended form if you want to specify different params:
 
 ```console
+export SLIMERJSLAUNCHER=/Applications/Firefox.app/Contents/MacOS/firefox
 lein with-profile test doo slimer test
 ```
 
-For more info:
+For more info on testing:
 - Plugin: [bensu/doo](https://github.com/bensu/doo)
 - React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/doo)
 

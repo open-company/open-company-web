@@ -10,21 +10,21 @@
 
   :dependencies [
     [org.clojure/clojure "1.7.0"] ; Lisp on the JVM http://clojure.org/documentation
-    [org.clojure/clojurescript "0.0-3308"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    [org.clojure/clojurescript "0.0-3308"] ; Cljs compiler https://github.com/clojure/clojurescript
     [org.clojure/core.async "0.1.346.0-17112a-alpha"] ; Async library https://github.com/clojure/core.async
-    [org.omcljs/om "0.9.0" :exclusions [cljsjs/react]] ; ClojureScript interface to React https://github.com/omcljs/om
+    [org.omcljs/om "0.9.0" :exclusions [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
     [prismatic/om-tools "0.3.11"] ; Tools for Om https://github.com/Prismatic/om-tools
     [sablono "0.3.4" :exclusions [cljsjs/react]] ; Hiccup templating for Om/React https://github.com/r0man/sablono
-    [secretary "1.2.3"] ; Secretary routing to defin app routes
-    [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; cljs react test utilities
-    [prismatic/dommy "1.0.0"] ; A ClojureScript DOM manipulation and event library.
+    [secretary "1.2.3"] ; Client-side router https://github.com/gf3/secretary
+    [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; React test utilities https://github.com/bensu/cljs-react-test
+    [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
   ]
 
   :plugins [
     [lein-cljsbuild "1.0.6"] ; ClojureScript compiler https://github.com/emezeske/lein-cljsbuild
     [lein-figwheel "0.3.7"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
     [lein-ancient "0.6.7"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
-    [lein-doo "0.1.2-SNAPSHOT"] ; A library and Leiningen plugin to run cljs.test in many JS environments.
+    [lein-doo "0.1.2-SNAPSHOT"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
   ]
 
   :source-paths ["src"]
