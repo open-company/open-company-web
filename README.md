@@ -100,17 +100,11 @@ Then run:
 
 ```console
 export SLIMERJSLAUNCHER=/Applications/Firefox.app/Contents/MacOS/firefox
-lein test
-```
-
-Or use the extended form if you want to specify different params:
-
-```console
-export SLIMERJSLAUNCHER=/Applications/Firefox.app/Contents/MacOS/firefox
-lein with-profile test doo slimer test
+lein test!
 ```
 
 For more info on testing:
+
 - Plugin: [bensu/doo](https://github.com/bensu/doo)
 - React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/doo)
 

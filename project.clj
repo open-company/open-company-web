@@ -24,7 +24,7 @@
     [lein-cljsbuild "1.0.6"] ; ClojureScript compiler https://github.com/emezeske/lein-cljsbuild
     [lein-figwheel "0.3.7"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
     [lein-ancient "0.6.7"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
-    [lein-doo "0.1.2-SNAPSHOT"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
+    [lein-doo "0.1.3-SNAPSHOT"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
   ]
 
   :source-paths ["src"]
@@ -63,7 +63,6 @@
           :output-to "target/testable.js"
           :source-map "target/testable.js.map"
           :optimizations :whitespace
-          :cache-analysis false
           :pretty-print true}}}}
 
   :figwheel {
@@ -100,6 +99,6 @@
 
   :aliases {
     "ancient" ["with-profile" "dev" "do" "ancient" ":allow-qualified," "ancient" ":plugins" ":allow-qualified"] ; check for out of date dependencies
-    "test"    ["with-profile" "test" "doo" "slimer" "test"]
+    "test!" ["doo" "slimer" "test" "once"]
   }
 )
