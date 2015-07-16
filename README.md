@@ -90,7 +90,7 @@ Open your browser in `resources/public/index.html`. You will not get live reload
 
 ## Tests
 
-Install [PhantomJS](https://http://phantomjs.org/) downloading the last binary [here](https://github.com/eugene1g/phantomjs/releases), the one from their site is currently broken.
+Install [PhantomJS](https://http://phantomjs.org/) downloading the latest binary [here](https://github.com/eugene1g/phantomjs/releases), the one from their site is currently broken.
 Then move the binary somewhere reachable by your PATH so you can run:
 
 ```console
