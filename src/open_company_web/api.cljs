@@ -18,7 +18,6 @@
     (let [response (<! (method (str endpoint path)
                       {:with-credentials? false
                        :form-params params}))]
-      (println "got response: " (:status response))
       (on-complete response))))
 
 (def apiget (partial req http/get))
@@ -35,5 +34,4 @@
     (apiget (str "v1/companies/" symbol) {}
       (fn [response]
         (let [body (json->cljs (:body response))]
-          (println "Response: " (json->cljs (:body response)))
           (flux/dispatch dispatcher/company body))))))
