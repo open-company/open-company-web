@@ -13,15 +13,38 @@
 
 (defcomponent company [data owner]
   (render [_]
-    (dom/div
-      (dom/h2 (str (:name data) " Dashboard"))
-      (om/build currency-picker data)
-      (om/build headcount (:headcount data))
-      (om/build finances {:finances (:finances data) :currency (:currency data)})
-      (om/build compensation {:compensation (:compensation data) :headcount (:headcount data) :currency (:currency data)}))))
+    (println "render: " data)
+    (let [symbol (:ticker data)
+          company-data ((keyword symbol) data)]
+      (println "company render " company-data)
+      (dom/div
+        (dom/h2 (str (:name data) " Dashboard"))
+        (cond
+          (:loading company-data)
+            (dom/div
+              (dom/h4 "Loading data..."))
+          (contains? "symbol" company-data)
+            (dom/div
+              (om/build currency-picker company-data)
+              (om/build headcount (:headcount company-data))
+              (om/build finances {:finances (:finances company-data) :currency (:currency company-data)})
+              (om/build compensation {:compensation (:compensation company-data) :headcount (:headcount company-data) :currency (:currency company-data)}))
+          :else
+            (dom/div
+              (dom/h2 (str (:symbol data) " not found"))
+              (om/build link {:href "/" :name "Back home"})))))))
 
-(defcomponent company-not-found [data owner]
-  (render [_]
-    (dom/div
-      (dom/h2 (str (:symbol data) " not found"))
-      (om/build link {:href "/" :name "Back home"}))))
+; (defcomponent company [data owner]
+;   (render [_]
+;     (dom/div
+;       (dom/h2 (str (:name data) " Dashboard"))
+;       (om/build currency-picker data)
+;       (om/build headcount (:headcount data))
+;       (om/build finances {:finances (:finances data) :currency (:currency data)})
+;       (om/build compensation {:compensation (:compensation data) :headcount (:headcount data) :currency (:currency data)}))))
+;
+; (defcomponent company-not-found [data owner]
+;   (render [_]
+;     (dom/div
+;       (dom/h2 (str (:symbol data) " not found"))
+;       (om/build link {:href "/" :name "Back home"}))))
