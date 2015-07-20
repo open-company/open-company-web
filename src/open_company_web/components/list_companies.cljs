@@ -6,8 +6,9 @@
 
 (defcomponent list-page-item [data owner]
   (render [_]
+    (println "aaa: " data)
     (dom/li
-      (om/build link {:href (str "/companies/" (:symbol data)) :name (:name data)}))))
+      (om/build link {:href (str "/companies/" (get data "symbol")) :name (get data "name")}))))
 
 (defcomponent list-companies [data owner]
   (render [_]
