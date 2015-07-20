@@ -23,10 +23,9 @@
     {:target (. js/document (getElementById "app"))}))
 
 (defn render-company [ticker loading]
-  (println "render-company " loading)
   (swap! app-state assoc :ticker ticker)
   (when loading
-    (swap! app-state assoc (keyword ticker) true))
+    (swap! app-state assoc :loading true))
   (om/root company app-state
     {:target (. js/document (getElementById "app"))}))
 
@@ -34,7 +33,7 @@
   (do
     (if-not (contains? ticker (keyword ticker))
       (do
-        #(api/get-company ticker)
+        (api/get-company ticker)
         (render-company ticker true))
       (render-company ticker false))))
 
@@ -48,10 +47,6 @@
       ;; wrap in a fn to allow live reloading
       #(handle-url-change %))
     (.setEnabled true)))
-
-(js/setTimeout
-  #(api/get-company "BUFF")
-  1000)
 
 (defn on-js-reload []
   ;; optionally touch your app-state to force rerendering depending on
