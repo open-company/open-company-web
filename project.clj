@@ -12,10 +12,13 @@
     [org.clojure/clojure "1.7.0"] ; Lisp on the JVM http://clojure.org/documentation
     [org.clojure/clojurescript "0.0-3308"] ; ClojureScript compiler https://github.com/clojure/clojurescript
     [org.clojure/core.async "0.1.346.0-17112a-alpha"] ; Async library https://github.com/clojure/core.async
+    [cljs-http "0.1.35"] ; Http for cljs https://github.com/r0man/cljs-http
     [org.omcljs/om "0.9.0"] ; ClojureScript interface to React https://github.com/omcljs/om
     [prismatic/om-tools "0.3.11"] ; Tools for Om https://github.com/Prismatic/om-tools
     [sablono "0.3.4"] ; Hiccup templating for Om/React https://github.com/r0man/sablono
     [secretary "1.2.3"] ; Secretary routing to defin app routes
+    [cljs-flux "0.1.1"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
+    [com.cognitect/transit-cljs "0.8.220"] ; Cljs wrapper for javascript JSON https://github.com/cognitect/transit-cljs
   ]
 
   :plugins [
