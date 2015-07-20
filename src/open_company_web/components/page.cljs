@@ -13,38 +13,26 @@
 
 (defcomponent company [data owner]
   (render [_]
-    (println "render: " data)
     (let [symbol (:ticker data)
           company-data ((keyword symbol) data)]
-      (println "company render " company-data)
       (dom/div
-        (dom/h2 (str (:name data) " Dashboard"))
+        (dom/h2 (str (get company-data "name") " - Dashboard"))
         (cond
-          (:loading company-data)
+          (:loading data)
             (dom/div
               (dom/h4 "Loading data..."))
-          (contains? "symbol" company-data)
+          (contains? company-data "symbol")
             (dom/div
               (om/build currency-picker company-data)
-              (om/build headcount (:headcount company-data))
-              (om/build finances {:finances (:finances company-data) :currency (:currency company-data)})
-              (om/build compensation {:compensation (:compensation company-data) :headcount (:headcount company-data) :currency (:currency company-data)}))
+              (om/build headcount (company-data "headcount"))
+              (om/build finances {
+                "finances" (company-data "finances")
+                "currency" (company-data "currency")})
+              (om/build compensation {
+                "compensation" (company-data "compensation")
+                "headcount" (company-data "headcount")
+                "currency" (company-data "currency")}))
           :else
             (dom/div
-              (dom/h2 (str (:symbol data) " not found"))
+              (dom/h2 (str (:ticker data) " not found"))
               (om/build link {:href "/" :name "Back home"})))))))
-
-; (defcomponent company [data owner]
-;   (render [_]
-;     (dom/div
-;       (dom/h2 (str (:name data) " Dashboard"))
-;       (om/build currency-picker data)
-;       (om/build headcount (:headcount data))
-;       (om/build finances {:finances (:finances data) :currency (:currency data)})
-;       (om/build compensation {:compensation (:compensation data) :headcount (:headcount data) :currency (:currency data)}))))
-;
-; (defcomponent company-not-found [data owner]
-;   (render [_]
-;     (dom/div
-;       (dom/h2 (str (:symbol data) " not found"))
-;       (om/build link {:href "/" :name "Back home"}))))
