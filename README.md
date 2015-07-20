@@ -37,7 +37,7 @@ Chances are your system already has Java 8 installed. You can verify this with:
 java -version
 ```
 
-If you do not have Java 8 [download it]((http://www.oracle.com/technetwork/java/javase/downloads/index.html)) and follow the installation instructions.
+If you do not have Java 8 [download it](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and follow the installation instructions.
 
 Leiningen is easy to install:
 
