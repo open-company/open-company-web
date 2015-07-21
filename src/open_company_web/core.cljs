@@ -20,6 +20,7 @@
 
 ;;Routes
 (defroute list-page-route "/" []
+  (api/get-companies)
   (om/root list-companies app-state
     {:target (. js/document (getElementById "app"))}))
 
@@ -40,7 +41,6 @@
 
 (defroute report-route "/companies/:symbol/:year/:period" {ticker :symbol year :year period :period}
   (swap! app-state assoc :loading true)
-  (api/get-company ticker)
   (api/get-report ticker year period)
   (swap! app-state assoc :ticker ticker)
   (swap! app-state assoc :year year)
