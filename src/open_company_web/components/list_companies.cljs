@@ -7,11 +7,14 @@
 (defcomponent list-page-item [data owner]
   (render [_]
     (dom/li
-      (om/build link {:href (str "/companies/" (:symbol data)) :name (:name data)}))))
+      (om/build link {:href (str "/companies/" (get data "symbol")) :name (get data "name")}))))
 
 (defcomponent list-companies [data owner]
   (render [_]
-    (dom/div
-      (dom/h1 "Companies:")
-      (dom/ul
-        (om/build-all list-page-item (vals data))))))
+    (let [company-list (:companies data)]
+      (dom/div
+        (dom/h1 "Companies:")
+        (if (> (count company-list) 0)
+          (dom/ul
+            (om/build-all list-page-item company-list))
+          (dom/h2 "No companies found."))))))

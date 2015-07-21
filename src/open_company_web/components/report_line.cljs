@@ -32,7 +32,7 @@
 (defcomponent report-editable-line [view-data owner]
   (will-mount [_]
     (set-editing-state! owner false)
-    (om/set-state! owner :value ((:key view-data) (:cursor view-data))))
+    (om/set-state! owner :value (get (:cursor view-data) (:key view-data))))
   (render [_]
     (let [data (:cursor view-data)
           key (:key view-data)
@@ -40,18 +40,18 @@
           label (:label view-data)
           on-change (:on-change view-data)
           pluralize (if (contains? view-data :pluralize) (:pluralize view-data) true)
-          suffix (if (and pluralize (not (= (key data) 1))) "s" "")]
+          suffix (if (and pluralize (not (= (get data key) 1))) "s" "")]
       (dom/div
         (if (> (count prefix) 0) (dom/span {:class "label"} (str prefix)))
         (dom/label {
           :class "editable-label"
           :style (display (not (om/get-state owner :editing)))
           :onClick #(set-editing-state! owner true)
-          } (thousands-separator (key data)))
+          } (thousands-separator (get data key)))
         (dom/input #js {
           :style (display (om/get-state owner :editing))
           :className "editable-data"
-          :value (key data)
+          :value (get data key)
           :onFocus #(set-editing-state! owner true)
           :onKeyDown #(when (= (.-key %) "Enter")
                         (save-field % owner data key on-change))

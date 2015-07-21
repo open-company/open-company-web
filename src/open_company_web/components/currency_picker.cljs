@@ -18,13 +18,13 @@
 
 (defcomponent currency-picker
   "Show a select with all the possible currencies,
-  the one in (:currency data) is selected"
+  the one in (get data 'currency') is selected"
   [data owner]
   (render [_]
     (dom/div
       (dom/label "Currency:")
       (dom/select {
-        :value (first (:currency data))
-        :on-change #(handle-change data [(.. % -target -value)] :currency)
+        :value (get data "currency")
+        :on-change #(handle-change data (.. % -target -value) "currency")
       }
       (om/build-all currency-option (sorted-iso4217))))))

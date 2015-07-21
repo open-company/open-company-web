@@ -32,7 +32,8 @@
 
 (defn get-symbols-for-currency-code
   [code]
-  (let [keyword (keyword code)
-        symbol (:symbol (keyword iso4217))
-        ret (or symbol (:code (keyword iso4217)))]
+  (let [kw (keyword code)
+        dict (get iso4217 kw)
+        symbol (if (contains? dict :symbol) (:symbol dict) code)
+        ret (or symbol (:code dict))]
   ret))
