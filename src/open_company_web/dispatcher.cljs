@@ -69,6 +69,8 @@
 
 (def company (flux/dispatcher))
 
+(def report (flux/dispatcher))
+
 (def companies-list-dispatch
   (flux/register
     companies
@@ -85,29 +87,18 @@
         ; remove loading key
         (swap! app-state dissoc :loading)
         ; add the new values to the atom
-        (swap! app-state assoc (keyword (body "symbol")) body)
-        ; TODO: remove these ---------------------------------------------------
-        (swap! app-state assoc-in [(keyword (get body "symbol")) "headcount"] {
-          "founders" 1
-          "executives" 4
-          "ft-employees" 0
-          "pt-employees" 2
-          "ft-contractors" 1
-          "pt-contractors" 10
-          "comment" "Lot's of people"
-          })
-        (swap! app-state assoc-in [(keyword (get body "symbol")) "finances"] {
-          "cash" 112321
-          "revenue" 12342
-          "costs" 1000
-          "comment" "Lot's of money"
-          })
-        (swap! app-state assoc-in [(keyword (get body "symbol")) "compensation"] {
-          "percentage" true
-          "founders" 40
-          "executives" 40
-          "employees" 10
-          "contractors" 10
-          "comment" "Buffer compensation comment."})
-        ; ----------------------------------------------------------------------
-        ))))
+        (swap! app-state assoc (keyword (body "symbol")) body)))))
+
+(def report-dispatch
+  (flux/register
+    report
+    (fn [body]
+      (when body
+        ; remove loading key
+        (swap! app-state dissoc :loading)
+        ; add the new report data
+        (let [ticker (body "symbol")
+              year (body "year")
+              period (body "period")
+              report-key (str "report-" ticker "-" year "-" period)]
+          (swap! app-state assoc-in [(keyword ticker) report-key] body))))))
