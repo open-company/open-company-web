@@ -24,26 +24,34 @@
 (def apipost (partial req http/post))
 
 (defn get-companies []
-  (apiget "/v1/companies/OPEN" {}
+  (apiget "/v1/companies/" {}
     (fn [response]
-      (let [body (json->cljs (:body response))]
-        (flux/dispatch dispatcher/companies [body])))))
+      (let [body (if (:success response) (json->cljs (:body response)) {})]
+        (flux/dispatch dispatcher/companies body)))))
 
 (defn get-company [ticker]
   (when symbol
     (apiget (str "/v1/companies/" ticker) {}
       (fn [response]
-        (let [body (json->cljs (:body response))]
+        (let [body (if (:success response) (json->cljs (:body response)) {})]
           (flux/dispatch dispatcher/company body))))))
+
+(defn real-get-report [ticker year period]
+  (apiget (str "/v1/companies/" ticker "/" year "/" period) {}
+    (fn [response]
+      (let [body (if (:success response) (json->cljs (:body response)) {})]
+        (flux/dispatch dispatcher/report body)))))
 
 (defn get-report [ticker year period]
   (when (and ticker year period)
-    (flux/register
-      dispatcher/company
-      (fn [body]
-        ; load specific report
-        (apiget (str "/v1/companies/" ticker "/" year "/" period) {}
+    (if (contains? @dispatcher/app-state (keyword ticker))
+      ; load the report only
+      (real-get-report ticker year period)
+      ; load the company data before the report data
+      (do
+        (flux/register
+          dispatcher/company
           (fn [response]
-            (let [body (json->cljs (:body response))]
-              (flux/dispatch dispatcher/report body))))))
-    (get-company ticker)))
+            (real-get-report ticker year period)))
+        ; load company data
+        (get-company ticker)))))
