@@ -18,12 +18,12 @@
           report-key (str "report-" ticker "-" year "-" period)
           report-data (get company-data report-key)]
       (dom/div
-        (dom/h2 (get company-data "name") " Dashboard")
+        (dom/h2 (get company-data "name") " Report for " year " " period)
         (cond
           (:loading data)
           (dom/div nil "Loading")
 
-          (not (:loading data))
+          (and (contains? data (keyword ticker)) (contains? company-data report-key))
           (dom/div nil
             (om/build currency-picker report-data)
             (om/build headcount (get report-data "headcount"))
