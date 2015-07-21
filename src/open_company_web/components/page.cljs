@@ -20,7 +20,7 @@
           period (nth link-parts 5)]
       (dom/div
         (om/build link {
-          :href (str "/companies/" symbol "/2015/Q2")
+          :href (str "/companies/" symbol "/" year "/" period)
           :name (str year " - " period)})))))
 
 (defcomponent company [data owner]
@@ -32,15 +32,17 @@
         (dom/h2 (str (get company-data "name") " - Dashboard"))
         (cond
           (:loading data)
-            (dom/div
-              (dom/h4 "Loading data..."))
+          (dom/div
+            (dom/h4 "Loading data..."))
+
           (contains? company-data "symbol")
-            (dom/div
-              (for [report reports]
-                (om/build report-link {
-                  :report (report "href")
-                  :symbol symbol})))
+          (dom/div
+            (for [report reports]
+              (om/build report-link {
+                :report (report "href")
+                :symbol symbol})))
+
           :else
-            (dom/div
-              (dom/h2 (str (:ticker data) " not found"))
-              (om/build link {:href "/" :name "Back home"})))))))
+          (dom/div
+            (dom/h2 (str (:ticker data) " not found"))
+            (om/build link {:href "/" :name "Back home"})))))))
