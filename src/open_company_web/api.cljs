@@ -7,7 +7,7 @@
             [cljs-flux.dispatcher :as flux]
             [cognitect.transit :as t]))
 
-(def endpoint "http://localhost:3000/")
+(def endpoint "http://localhost:3000")
 
 (defn json->cljs [json]
   (let [reader (t/reader :json)]
@@ -24,14 +24,26 @@
 (def apipost (partial req http/post))
 
 (defn get-companies []
-  (apiget "v1/companies/OPEN" {}
+  (apiget "/v1/companies/OPEN" {}
     (fn [response]
       (let [body (json->cljs (:body response))]
         (flux/dispatch dispatcher/companies [body])))))
 
-(defn get-company [symbol]
+(defn get-company [ticker]
   (when symbol
-    (apiget (str "v1/companies/" symbol) {}
+    (apiget (str "/v1/companies/" ticker) {}
       (fn [response]
         (let [body (json->cljs (:body response))]
           (flux/dispatch dispatcher/company body))))))
+
+(defn get-report [ticker year period]
+  (when (and ticker year period)
+    (flux/register
+      dispatcher/company
+      (fn [body]
+        ; load specific report
+        (apiget (str "/v1/companies/" ticker "/" year "/" period) {}
+          (fn [response]
+            (let [body (json->cljs (:body response))]
+              (flux/dispatch dispatcher/report body))))))
+    (get-company ticker)))
