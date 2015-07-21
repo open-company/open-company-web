@@ -7,6 +7,7 @@
             [open-company-web.components.page :refer [company]]
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
+            [open-company-web.components.report :refer [report]]
             [open-company-web.raven :refer [raven-setup]]
             [open-company-web.dispatcher :as dispatcher :refer [app-state]]
             [open-company-web.api :as api]
@@ -15,7 +16,7 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
 
 ;; setup Sentry error reporting
-(raven-setup)
+(defonce raven (raven-setup))
 
 ;;Routes
 (defroute list-page-route "/" []
@@ -31,11 +32,21 @@
 
 (defroute editable-page-route "/companies/:symbol" {ticker :symbol}
   (do
-    (if-not (contains? ticker (keyword ticker))
+    (if-not (contains? app-state (keyword ticker))
       (do
         (api/get-company ticker)
         (render-company ticker true))
       (render-company ticker false))))
+
+(defroute report-route "/companies/:symbol/:year/:period" {ticker :symbol year :year period :period}
+  (swap! app-state assoc :loading true)
+  (api/get-company ticker)
+  (api/get-report ticker year period)
+  (swap! app-state assoc :ticker ticker)
+  (swap! app-state assoc :year year)
+  (swap! app-state assoc :period period)
+  (om/root report app-state
+    {:target (. js/document (getElementById "app"))}))
 
 (defroute not-found-route "*" []
   (om/root page-not-found app-state
