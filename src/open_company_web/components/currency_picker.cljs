@@ -24,7 +24,7 @@
     (dom/div
       (dom/label "Currency:")
       (dom/select {
-        :value (data "currency")
+        :value (get data "currency")
         :on-change #(handle-change data (.. % -target -value) "currency")
       }
       (om/build-all currency-option (sorted-iso4217))))))
