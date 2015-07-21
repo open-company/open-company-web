@@ -76,8 +76,7 @@
     companies
     (fn [body]
       (when body
-        (doseq [company body]
-          (swap! app-state  assoc (keyword (get company "symbol")) company))))))
+        (swap! app-state assoc :companies (get (get body "collection") "companies"))))))
 
 (def company-dispatch
   (flux/register
