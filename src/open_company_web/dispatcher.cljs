@@ -76,7 +76,7 @@
     companies
     (fn [body]
       (when body
-        (swap! app-state assoc :companies (get (get body "collection") "companies"))))))
+        (swap! app-state assoc :companies (:companies (:collection body)))))))
 
 (def company-dispatch
   (flux/register
@@ -86,7 +86,7 @@
         ; remove loading key
         (swap! app-state dissoc :loading)
         ; add the new values to the atom
-        (swap! app-state assoc (keyword (body "symbol")) body)))))
+        (swap! app-state assoc (keyword (:symbol body)) body)))))
 
 (def report-dispatch
   (flux/register
@@ -96,8 +96,8 @@
         ; remove loading key
         (swap! app-state dissoc :loading)
         ; add the new report data
-        (let [ticker (body "symbol")
-              year (body "year")
-              period (body "period")
-              report-key (str "report-" ticker "-" year "-" period)]
+        (let [ticker (:symbol body)
+              year (:year body)
+              period (:period body)
+              report-key (keyword (str "report-" ticker "-" year "-" period))]
           (swap! app-state assoc-in [(keyword ticker) report-key] body))))))
