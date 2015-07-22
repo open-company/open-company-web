@@ -20,6 +20,7 @@
     [cljs-flux "0.1.1"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     [com.cognitect/transit-cljs "0.8.220"] ; Cljs wrapper for javascript JSON https://github.com/cognitect/transit-cljs
     [racehub/om-bootstrap "0.5.0"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
+    [noencore "0.1.21"] ; Clojure & ClojureScript functions not in core. https://github.com/r0man/noencore
   ]
 
   :plugins [
