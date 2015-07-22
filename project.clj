@@ -19,6 +19,7 @@
     [secretary "1.2.3"] ; Secretary routing to defin app routes
     [cljs-flux "0.1.1"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     [com.cognitect/transit-cljs "0.8.220"] ; Cljs wrapper for javascript JSON https://github.com/cognitect/transit-cljs
+    [racehub/om-bootstrap "0.5.0"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
   ]
 
   :plugins [
@@ -50,7 +51,8 @@
           :asset-path "/js/compiled/out"
           :output-to "resources/public/js/compiled/open_company.js"
           :output-dir "resources/public/js/compiled/out"
-          :source-map-timestamp true }}
+          :source-map-timestamp true
+          :pretty-print true}}
       :min {
         :id "min"
         :source-paths ["src"]

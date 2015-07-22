@@ -2,8 +2,9 @@
     (:require [om.core :as om :include-macros true]
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
-              [open-company-web.utils :refer [handle-change]]
-              [open-company-web.iso4217.iso4217 :refer [sorted-iso4217]]))
+              [open-company-web.utils :refer [handle-change jquery]]
+              [open-company-web.iso4217.iso4217 :refer [iso4217 sorted-iso4217]]
+              [om-bootstrap.button :as b]))
 
 (defcomponent currency-option
   [data owner]
@@ -16,15 +17,29 @@
         :value (:code data)
         } label))))
 
+(defn get-currency-text [currency]
+  (let [symbol (:symbol currency)
+        display-symbol (or symbol (:code currency))
+        label (str (:text currency) " " display-symbol)]
+    label))
+
 (defcomponent currency-picker
   "Show a select with all the possible currencies,
   the one in (:currency data) is selected."
   [data owner]
   (render [_]
-    (dom/div
-      (dom/label "Currency:")
-      (dom/select {
-        :value (:currency data)
-        :on-change #(handle-change data (.. % -target -value) "currency")
-      }
-      (om/build-all currency-option (sorted-iso4217))))))
+    (let [current-curr ((keyword (:currency data)) iso4217)]
+      (dom/div
+        (dom/label "Currency:")
+        (b/dropdown {
+          :title (get-currency-text current-curr)
+          :id "currency-dropdown"}
+          (for [option (sorted-iso4217)]
+              (b/menu-item {
+                :key (:code option)
+                :on-click (fn[e]
+                            (.preventDefault e)
+                            (when (> (count (:code option)) 0)
+                              (.removeClass (.parent (jquery "#currency-dropdown")) "open")
+                              (handle-change data (:code option) :currency)))
+              } (get-currency-text option))))))))
