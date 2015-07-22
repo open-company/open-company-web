@@ -18,7 +18,7 @@
 
 (defcomponent currency-picker
   "Show a select with all the possible currencies,
-  the one in (get data 'currency') is selected"
+  the one in (:currency data) is selected."
   [data owner]
   (render [_]
     (dom/div
