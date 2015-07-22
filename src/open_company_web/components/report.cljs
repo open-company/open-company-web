@@ -14,11 +14,11 @@
     (let [ticker (:ticker data)
           year (:year data)
           period (:period data)
-          company-data (get data (keyword ticker))
-          report-key (str "report-" ticker "-" year "-" period)
-          report-data (get company-data report-key)]
+          company-data ((keyword ticker) data)
+          report-key (keyword (str "report-" ticker "-" year "-" period))
+          report-data (report-key company-data)]
       (dom/div
-        (dom/h2 (get company-data "name") " Report for " year " " period)
+        (dom/h2 (:name company-data) " Report for " year " " period)
         (cond
           (:loading data)
           (dom/div nil "Loading")
@@ -26,14 +26,14 @@
           (and (contains? data (keyword ticker)) (contains? company-data report-key))
           (dom/div nil
             (om/build currency-picker report-data)
-            (om/build headcount (get report-data "headcount"))
+            (om/build headcount (:headcount report-data))
             (om/build finances {
-              "finances" (get report-data "finances")
-              "currency" (get report-data "currency")})
+              :finances (:finances report-data)
+              :currency (:currency report-data)})
             (om/build compensation {
-              "compensation" (get report-data "compensation")
-              "headcount" (get report-data "headcount")
-              "currency" (get report-data "currency")}))
+              :compensation (:compensation report-data)
+              :headcount (:headcount report-data)
+              :currency (:currency report-data)}))
 
           :else
           (dom/div nil "Report not found"))))))

@@ -8,12 +8,13 @@
 
 (defcomponent finances [data owner]
   (render [_]
-    (let [finances (get data "finances")
-          cash (get finances "cash")
-          revenue (get finances "revenue")
-          costs (get finances "costs")
-          comment (get finances "comment")
-          currency (get data "currency")
+    (println "finances render " data)
+    (let [finances (:finances data)
+          cash (:cash finances)
+          revenue (:revenue finances)
+          costs (:costs finances)
+          comment (:comment finances)
+          currency (:currency data)
           burn-rate (- revenue costs)
           burn-rate-label (if (> burn-rate 0) "Growth rate: " "Burn rate: ")
           burn-rate-classes (str "num " (if (> burn-rate 0) "green" "red"))
@@ -24,20 +25,20 @@
         (dom/div {:class "report-list-left"}
           (dom/h3 "Finances:")
           (om/build report-editable-line {
-            :cursor (get data "finances")
-            :key "cash"
+            :cursor (:finances data)
+            :key :cash
             :prefix currency-symbol
             :label "cash on hand"
             :pluralize false})
           (om/build report-editable-line {
-            :cursor (get data "finances")
-            :key "revenue"
+            :cursor (:finances data)
+            :key :revenue
             :prefix currency-symbol
             :label "revenue this month"
             :pluralize false})
           (om/build report-editable-line {
-            :cursor (get data "finances")
-            :key "costs"
+            :cursor (:finances data)
+            :key :costs
             :prefix currency-symbol
             :label "costs this month"
             :pluralize false})

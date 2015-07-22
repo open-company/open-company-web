@@ -27,19 +27,20 @@
   (render [_]
     (let [symbol (:ticker data)
           company-data ((keyword symbol) data)
-          reports (filterv #(= (% "rel") "report") (get company-data "links"))]
+          reports (filterv #(= (:rel %) "report") (:links company-data))]
+      (println reports)
       (dom/div
-        (dom/h2 (str (get company-data "name") " - Dashboard"))
+        (dom/h2 (str (:name company-data) " - Dashboard"))
         (cond
           (:loading data)
           (dom/div
             (dom/h4 "Loading data..."))
 
-          (contains? company-data "symbol")
+          (contains? company-data :symbol)
           (dom/div
             (for [report reports]
               (om/build report-link {
-                :report (report "href")
+                :report (:href report)
                 :symbol symbol})))
 
           :else
