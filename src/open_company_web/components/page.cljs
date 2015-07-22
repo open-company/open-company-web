@@ -28,7 +28,6 @@
     (let [symbol (:ticker data)
           company-data ((keyword symbol) data)
           reports (filterv #(= (:rel %) "report") (:links company-data))]
-      (println reports)
       (dom/div
         (dom/h2 (str (:name company-data) " - Dashboard"))
         (cond

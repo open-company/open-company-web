@@ -33,8 +33,8 @@
           (om/build report-editable-line {:cursor data :key :founders :label "founder"})
           (om/build report-editable-line {:cursor data :key :executives :label "executive"})
           (om/build report-editable-line {:cursor data :key :ft-employees :label "full-time employee"})
-          (om/build report-editable-line {:cursor data :key :ft-contractors :label "part-time employee"})
-          (om/build report-editable-line {:cursor data :key :pt-employees :label "full-time contractor"})
+          (om/build report-editable-line {:cursor data :key :pt-employees :label "part-time employee"})
+          (om/build report-editable-line {:cursor data :key :ft-contractors :label "full-time contractor"})
           (om/build report-editable-line {:cursor data :key :pt-contractors :label "part-time contractor"})
           (dom/div
             (om/build report-line {:number total-headcount :label "total" :pluralize false})

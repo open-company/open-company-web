@@ -61,7 +61,6 @@
   (will-mount [_]
     (copy-compensation-state owner (:compensation data)))
   (render [_]
-    (println "compensation render" data)
     (let [head-data (:headcount data)
           show-founders (> (:founders head-data) 0)
           show-executives (> (:executives head-data) 0)
