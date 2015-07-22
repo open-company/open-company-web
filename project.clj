@@ -59,10 +59,11 @@
         :id "test"
         :source-paths ["src" "test"]
         :compiler {
-          :main 'test.test-runner
+          :main "test.test-runner"
           :output-to "target/testable.js"
           :source-map "target/testable.js.map"
           :optimizations :whitespace
+          :cache-analysis false
           :pretty-print true}}}}
 
   :figwheel {
