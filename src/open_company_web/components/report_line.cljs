@@ -24,10 +24,9 @@
 (defn save-field [e owner data key on-change]
   ; need data check!
   (let [value (String->Number (.. e -target -value))]
-    (do
-      (handle-change data (String->Number value) key)
-      (if-not (= on-change nil) (on-change value))
-      (set-editing-state! owner false))))
+    (handle-change data value key)
+    (if-not (= on-change nil) (on-change value))
+    (set-editing-state! owner false)))
 
 (defcomponent report-editable-line [view-data owner]
   (will-mount [_]
