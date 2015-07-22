@@ -6,7 +6,8 @@
               [open-company-web.utils :refer [thousands-separator handle-change get-symbols-for-currency-code]]
               [open-company-web.components.comment :refer [comment-component]]
               [open-company-web.components.pie-chart :refer [pie-chart]]
-              [goog.string :as gstring]))
+              [goog.string :as gstring]
+              [om-bootstrap.random :as r]))
 
 (defn get-chart-data [data head-data symbol]
   (let [show-founders (> (:founders head-data) 0)
@@ -27,7 +28,6 @@
 
 (defcomponent compensation [data owner]
   (render [_]
-    (println "compensation render" data)
     (let [head-data (:headcount data)
           show-founders (> (:founders head-data) 0)
           show-executives (> (:executives head-data) 0)
@@ -53,9 +53,8 @@
           total-compensation (+ (if show-employees employees 0) total-compensation)
           total-compensation (+ (if show-contrators contractors 0) total-compensation)
           total-compensation (gstring/format "%.2f" total-compensation)]
-      (dom/div {:class "report-list compensation clearfix"}
+      (r/well {:class "report-list compensation clearfix"}
         (dom/div {:class "report-list-left"}
-          (dom/h3 "Compensation: ")
           (dom/div
             (dom/span {:class "label"} "Show as: "
               (dom/input {
