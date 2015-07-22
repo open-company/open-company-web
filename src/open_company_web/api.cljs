@@ -5,13 +5,14 @@
             [clojure.string :refer [join]]
             [open-company-web.dispatcher :as dispatcher]
             [cljs-flux.dispatcher :as flux]
-            [cognitect.transit :as t]))
+            [cognitect.transit :as t]
+            [clojure.walk :refer [keywordize-keys]]))
 
 (def endpoint "http://localhost:3000")
 
 (defn json->cljs [json]
   (let [reader (t/reader :json)]
-    (t/read reader json)))
+    (keywordize-keys (t/read reader json))))
 
 (defn- req [method path params on-complete]
   (go
