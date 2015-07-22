@@ -8,7 +8,6 @@
 
 (defcomponent finances [data owner]
   (render [_]
-    (println "finances render " data)
     (let [finances (:finances data)
           cash (:cash finances)
           revenue (:revenue finances)
