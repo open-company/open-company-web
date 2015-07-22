@@ -5,8 +5,9 @@
 (def whitelistUrls {:whitelistUrls ["locahost" "127.0.0.1"]})
 
 (defn raven-setup []
-  (let [raven (.config js/Raven dsn whitelistUrls)]
-    (.install raven)))
+  (when js/Raven
+    (let [raven (.config js/Raven dsn whitelistUrls)]
+      (.install raven))))
 
 (defn test-raven []
   (js/setTimeout #(.captureMessage js/Raven "Message from clojure" 1000))
