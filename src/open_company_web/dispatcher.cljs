@@ -90,25 +90,9 @@
         (swap! app-state assoc (keyword (:symbol body)) body)))))
 
 (def empty-report {
-  :headcount {
-    :founders 0
-    :executives 0
-    :ft-employees 0
-    :pt-employees 0
-    :ft-contractors 0
-    :pt-contractors 0
-  }
-  :finances {
-    :cash 0
-    :revenue 0
-    :costs 0
-  }
-  :compensation {
-    :founders 0
-    :executives 0
-    :employees 0
-    :contractors 0
-  }
+  :headcount {}
+  :finances {}
+  :compensation {}
 })
 
 (def report-dispatch
@@ -118,8 +102,8 @@
       (when body
         ; remove loading key
         (swap! app-state dissoc :loading)
-        ; make sure the report contains all: :headcount :finances :compensation
-        (let [report-data (deep-merge empty-report body)]
+        ; make sure the report contains all the keys :headcount :finances :compensation
+        (let [report-data (merge empty-report body)]
           ; add the new report data
           (let [ticker (:symbol report-data)
                 year (:year report-data)
