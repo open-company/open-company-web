@@ -1,5 +1,6 @@
 (ns open-company-web.dispatcher
-  (:require [cljs-flux.dispatcher :as flux]))
+  (:require [cljs-flux.dispatcher :as flux]
+            [no.en.core :refer [deep-merge]]))
 
 (defonce app-state (atom {
   ; :OPEN {
@@ -88,6 +89,12 @@
         ; add the new values to the atom
         (swap! app-state assoc (keyword (:symbol body)) body)))))
 
+(def empty-report {
+  :headcount {}
+  :finances {}
+  :compensation {}
+})
+
 (def report-dispatch
   (flux/register
     report
@@ -95,9 +102,11 @@
       (when body
         ; remove loading key
         (swap! app-state dissoc :loading)
-        ; add the new report data
-        (let [ticker (:symbol body)
-              year (:year body)
-              period (:period body)
-              report-key (keyword (str "report-" ticker "-" year "-" period))]
-          (swap! app-state assoc-in [(keyword ticker) report-key] body))))))
+        ; make sure the report contains all the keys :headcount :finances :compensation
+        (let [report-data (merge empty-report body)]
+          ; add the new report data
+          (let [ticker (:symbol report-data)
+                year (:year report-data)
+                period (:period report-data)
+                report-key (keyword (str "report-" ticker "-" year "-" period))]
+            (swap! app-state assoc-in [(keyword ticker) report-key] report-data)))))))
