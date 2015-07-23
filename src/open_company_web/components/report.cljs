@@ -8,7 +8,8 @@
               [open-company-web.components.compensation :refer [compensation]]
               [open-company-web.components.currency-picker :refer [currency-picker]]
               [open-company-web.components.link :refer [link]]
-              [om-bootstrap.nav :as n]))
+              [om-bootstrap.nav :as n]
+              [open-company-web.api :refer [save-or-create-report]]))
 
 (defcomponent report [data owner]
   (will-mount [_]
@@ -29,6 +30,9 @@
           (and (contains? data (keyword ticker)) (contains? company-data report-key))
           (dom/div nil
             (om/build currency-picker report-data)
+            (dom/button {
+              :on-click #(save-or-create-report ticker year period report-data)
+              } "Save!")
             (n/nav {
               :class "tab-navigation"
               :bs-style "tabs"
