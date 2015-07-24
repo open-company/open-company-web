@@ -6,11 +6,14 @@
 
 (defcomponent comment-component [data owner]
   (render [_]
-    (dom/div
-      (dom/label {:class "comments-label"} "Comments:")
-      (dom/br)
-      (dom/textarea {
-        :class "comment"
-        :value (:value data)
-        :onChange #(handle-change data (.. % -target -value) :value)
-        }))))
+    (let [disabled (or (:disabled data) false)]
+      (dom/div
+        (dom/label {:class "comments-label"} "Comments:")
+        (dom/br)
+        (dom/textarea {
+          :class "comment"
+          :value ((:key data) (:cursor data))
+          :onChange #(when (not disabled)
+                      (handle-change (:cursor data) (.. % -target -value) (:key data)))
+          :disabled disabled
+          })))))

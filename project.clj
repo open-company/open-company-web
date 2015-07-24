@@ -16,10 +16,11 @@
     [org.omcljs/om "0.9.0"] ; ClojureScript interface to React https://github.com/omcljs/om
     [prismatic/om-tools "0.3.11"] ; Tools for Om https://github.com/Prismatic/om-tools
     [sablono "0.3.4"] ; Hiccup templating for Om/React https://github.com/r0man/sablono
-    [secretary "1.2.3"] ; Secretary routing to defin app routes
+    [secretary "1.2.3"] ; Secretary routing to define app routes https://github.com/gf3/secretary
     [cljs-flux "0.1.1"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     [com.cognitect/transit-cljs "0.8.220"] ; Cljs wrapper for javascript JSON https://github.com/cognitect/transit-cljs
-    [racehub/om-bootstrap "0.5.0"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
+    [racehub/om-bootstrap "0.5.3"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
+    [noencore "0.1.21"] ; Clojure & ClojureScript functions not in core. https://github.com/r0man/noencore
   ]
 
   :plugins [

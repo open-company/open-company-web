@@ -7,7 +7,7 @@
             [open-company-web.components.page :refer [company]]
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
-            [open-company-web.components.report :refer [report]]
+            [open-company-web.components.report :refer [report readonly-report]]
             [open-company-web.raven :refer [raven-setup]]
             [open-company-web.dispatcher :as dispatcher :refer [app-state]]
             [open-company-web.api :as api]
@@ -39,13 +39,22 @@
         (render-company ticker true))
       (render-company ticker false))))
 
-(defroute report-route "/companies/:symbol/:year/:period" {ticker :symbol year :year period :period}
+(defroute report-editable-route "/companies/edit/:symbol/:year/:period" {ticker :symbol year :year period :period}
   (swap! app-state assoc :loading true)
   (api/get-report ticker year period)
   (swap! app-state assoc :ticker ticker)
   (swap! app-state assoc :year year)
   (swap! app-state assoc :period period)
   (om/root report app-state
+    {:target (. js/document (getElementById "app"))}))
+
+(defroute report-route "/companies/:symbol/:year/:period" {ticker :symbol year :year period :period}
+  (swap! app-state assoc :loading true)
+  (api/get-report ticker year period)
+  (swap! app-state assoc :ticker ticker)
+  (swap! app-state assoc :year year)
+  (swap! app-state assoc :period period)
+  (om/root readonly-report app-state
     {:target (. js/document (getElementById "app"))}))
 
 (defroute not-found-route "*" []
