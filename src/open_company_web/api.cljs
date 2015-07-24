@@ -75,7 +75,7 @@
         (apiput
           (str ticker "/" year "/" period)
           { :json-params json-data
-            :custom-headers {
+            :alternative-headers {
               ; required by Chrome
               "Access-Control-Allow-Headers" "Content-Type"
               ; custom content type
