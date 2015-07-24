@@ -28,16 +28,16 @@ Users of the [OpenCompany.io](https://opencompany.io) platform should get starte
 
 Most of the dependencies are internal, meaning [Leiningen](https://github.com/technomancy/leiningen) will handle getting them for you. There are a few exceptions:
 
-* [Java 7/8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) - a Java 7 or 8 JRE is needed to run Clojure
+* [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) - a Java 8 JRE is needed to run Clojure
 * [Leiningen](https://github.com/technomancy/leiningen) - Clojure's build and dependency management tool
 
-Chances are your system already has Java 7 or 8 installed. You can verify this with:
+Chances are your system already has Java 8 installed. You can verify this with:
 
 ```console
 java -version
 ```
 
-If you do not have Java 7 or 8 [download it]((http://www.oracle.com/technetwork/java/javase/downloads/index.html)) and follow the installation instructions.
+If you do not have Java 8 [download it](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and follow the installation instructions.
 
 Leiningen is easy to install:
 

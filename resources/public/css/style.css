@@ -1,18 +1,30 @@
 /* some style */
 
+body {
+  margin: 10px;
+}
+
+nav.tab-navigation{
+  margin-top: 10px;
+}
+
 div.report-list {
-  margin-left: 10px;
+  margin: 0;
+  background-color: white;
+  border-top: 0px transparent;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
 }
 
 div.report-list div.report-list-left{
-  width: 300px;
+  width: 330px;
   float: left;
   display: block;
 }
 
 div.report-list div.chart-container{
   margin-left: 300px;
-  width: 500px;
+  width: 600px;
   margin-top: 30px;
 }
 
@@ -71,4 +83,9 @@ div.report-list textarea.comment{
   border: 1px solid black;
   padding: 5px;
   margin-top: 10px;
+}
+
+span.label{
+  padding: 0;
+  margin: 0;
 }

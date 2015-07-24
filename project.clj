@@ -18,6 +18,11 @@
     [secretary "1.2.3"] ; Client-side router https://github.com/gf3/secretary
     [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; React test utilities https://github.com/bensu/cljs-react-test
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
+    [cljs-http "0.1.35"] ; Http for cljs https://github.com/r0man/cljs-http
+    [cljs-flux "0.1.1"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
+    [com.cognitect/transit-cljs "0.8.220"] ; Cljs wrapper for javascript JSON https://github.com/cognitect/transit-cljs
+    [racehub/om-bootstrap "0.5.3"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
+    [noencore "0.1.21"] ; Clojure & ClojureScript functions not in core. https://github.com/r0man/noencore
   ]
 
   :plugins [
@@ -26,6 +31,12 @@
     [lein-ancient "0.6.7"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
     [lein-doo "0.1.3-SNAPSHOT"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
   ]
+
+  :profiles {
+    :dev {
+      :dependencies [
+        [ring "1.4.0"]
+        [compojure "1.4.0"]]}}
 
   :source-paths ["src"]
 
@@ -41,10 +52,11 @@
 
         :compiler {
           :main open-company-web.core
-          :asset-path "js/compiled/out"
+          :asset-path "/js/compiled/out"
           :output-to "resources/public/js/compiled/open_company.js"
           :output-dir "resources/public/js/compiled/out"
-          :source-map-timestamp true }}
+          :source-map-timestamp true
+          :pretty-print true}}
 
       :min {
         :id "min"
@@ -80,7 +92,7 @@
    ;; if you want to embed a ring handler into the figwheel http-kit
    ;; server, this is for simple ring servers, if this
    ;; doesn't work for you just run your own server :)
-   ;; :ring-handler hello_world.server/handler
+   :ring-handler open-company-web.server/handler
 
    ;; To be able to open files in your editor from the heads up display
    ;; you will need to put a script on your path.
