@@ -8,7 +8,14 @@
             [cognitect.transit :as t]
             [clojure.walk :refer [keywordize-keys stringify-keys]]))
 
-(def endpoint "http://localhost:3000")
+(def api-version "v1")
+
+(def company-endpoint "companies")
+
+(def endpoint (str "http://localhost:3000/" api-version "/" company-endpoint "/"))
+
+(defn- content-type [type]
+  (str "application/vnd.open-company." type "+json;version=1"))
 
 (defn- json->cljs [json]
   (let [reader (t/reader :json)]
@@ -18,12 +25,10 @@
   (let [stringified-coll (stringify-keys coll)]
     (clj->js stringified-coll)))
 
-(defn- req [method path params headers on-complete]
-  (println headers)
+(defn- req [method path params on-complete]
   (go
     (let [data {:with-credentials? false}
           data (when params (merge data params))
-          data (when headers (assoc data :heders headers))
           response (<! (method (str endpoint path) data))]
       (on-complete response))))
 
@@ -32,19 +37,19 @@
 (def apiput (partial req http/put))
 
 (defn get-companies []
-  (apiget "/v1/companies/" nil nil (fn [response]
+  (apiget "" nil (fn [response]
       (let [body (if (:success response) (json->cljs (:body response)) {})]
         (flux/dispatch dispatcher/companies body)))))
 
 (defn get-company [ticker]
   (when symbol
-    (apiget (str "/v1/companies/" ticker) nil nil
+    (apiget ticker nil
       (fn [response]
         (let [body (if (:success response) (json->cljs (:body response)) {})]
           (flux/dispatch dispatcher/company body))))))
 
 (defn real-get-report [ticker year period]
-  (apiget (str "/v1/companies/" ticker "/" year "/" period) nil nil
+  (apiget (str ticker "/" year "/" period) nil
     (fn [response]
       (let [body (if (:success response) (json->cljs (:body response)) {})]
         (flux/dispatch dispatcher/report body)))))
@@ -66,14 +71,16 @@
 (defn save-or-create-report [ticker year period data]
   (when (and ticker year period data)
     (when (or (:headcount data) (:finances data) (:compensation data))
-      (let [clean-data (stringify-keys (dissoc data :links))
-            json-data (cljs->json clean-data)]
-        (println clean-data)
-        (println "Going to save: " json-data)
+      (let [json-data (cljs->json (dissoc data :links))]
         (apiput
-          (str "/v1/companies/" ticker "/" year "/" period)
-          {:json-params json-data} {
-            "Access-Control-Allow-Headers" "Content-Type"
-            "Content-Type" "application/vnd.open-company.report+json;version=1"
-            "Accept-Charset" "utf-8"
-          } (fn [response] (println response)))))))
+          (str ticker "/" year "/" period)
+          { :json-params json-data
+            :custom-headers {
+              ; required by Chrome
+              "Access-Control-Allow-Headers" "Content-Type"
+              ; custom content type
+              "content-type" (content-type "report")
+            }}
+          (fn [response]
+            (let [body (if (:success response) (json->cljs (:body response)) {})]
+              (flux/dispatch dispatcher/report body))))))))
