@@ -37,5 +37,3 @@
         symbol (if (contains? dict :symbol) (:symbol dict) code)
         ret (or symbol (:code dict))]
   ret))
-
-(def jquery (js* "$"))
