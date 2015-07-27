@@ -65,7 +65,7 @@ lein install
 
 to install a local version of the package.
 
-Then run:
+Then go back to this repository folder and run:
 
 ```console
 lein figwheel
