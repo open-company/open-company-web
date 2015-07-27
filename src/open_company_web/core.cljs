@@ -16,7 +16,8 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
 
 ;; setup Sentry error reporting
-(defonce raven (raven-setup))
+(when (.-Raven js/window)
+  (defonce raven (raven-setup)))
 
 ;;Routes
 (defroute list-page-route "/" []
