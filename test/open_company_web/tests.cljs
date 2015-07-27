@@ -7,17 +7,19 @@
               [dommy.core :as dommy :refer-macros [sel1 sel]]
               [om.dom :as dom :include-macros true]))
 
+(enable-console-print!)
+
 ; dynamic mount point for components
 (def ^:dynamic c)
 
 (defn test-component [data owner]
   (om/component
-   (dom/div nil
-            (dom/p nil "Enter your name:")
-            (dom/input
-             #js {:onChange #(om/update! data :name (.. % -target -value))
-                  :value (:name data)})
-            (dom/p nil (str "Your name is: " (:name data))))))
+    (dom/div nil
+      (dom/p nil "Enter your name:")
+      (dom/input
+       #js {:onChange #(om/update! data :name (.. % -target -value))
+            :value (:name data)})
+      (dom/p nil (str "Your name is: " (:name data))))))
 
 (deftest name-component
   (testing "The initial state is displayed"
