@@ -5,7 +5,7 @@
 (def whitelistUrls {:whitelistUrls ["locahost" "127.0.0.1"]})
 
 (defn raven-setup []
-  (when js/Raven
+  (when (.-Raven js/window)
     (let [raven (.config js/Raven dsn whitelistUrls)]
       (.install raven))))
 
