@@ -9,6 +9,7 @@
   (render [_]
     (dom/a #js {
       :href (:href data)
+      :className (:class data)
       :onClick #(do
                 (-> % .preventDefault)
                 (router/nav! (:href data)))
