@@ -2,7 +2,8 @@
     (:require [om.core :as om :include-macros true]
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
-              [open-company-web.utils :refer [thousands-separator handle-change String->Number display]]))
+              [open-company-web.utils :refer [thousands-separator handle-change String->Number display get-channel]]
+              [cljs.core.async :refer [put!]]))
 
 (defn focus-and-move-cursor [owner]
   (let [ref (om/get-ref owner "field")]
@@ -23,10 +24,12 @@
 
 (defn save-field [e owner data key on-change]
   ; need data check!
-  (let [value (String->Number (.. e -target -value))]
+  (let [value (String->Number (.. e -target -value))
+        save-channel (get-channel "save-report")]
     (handle-change data value key)
     (if-not (= on-change nil) (on-change value))
-    (set-editing-state! owner false)))
+    ; send signal to save report
+    (put! save-channel 1)))
 
 (defcomponent report-editable-line [view-data owner]
   (will-mount [_]
@@ -53,7 +56,7 @@
           :value (get data key)
           :onFocus #(set-editing-state! owner true)
           :onKeyDown #(when (= (.-key %) "Enter")
-                        (save-field % owner data key on-change))
+                        (set-editing-state! owner false))
           :onBlur #(save-field % owner data key on-change)
           :onChange #(let [value (String->Number (.. % -target -value))]
                       (handle-change data value key))

@@ -39,3 +39,11 @@
   ret))
 
 (def jquery (js* "$"))
+
+(def channel-coll (atom {}))
+
+(defn add-channel [channel-name channel]
+  (swap! channel-coll assoc channel-name channel))
+
+(defn get-channel [channel-name]
+  (@channel-coll channel-name))
