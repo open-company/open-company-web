@@ -63,7 +63,7 @@ To get an interactive development environment, you need to install a customized 
 cd ..
 git clone https://github.com/bago2k4/cljs-http
 cd cljs-http
-git checkout alternative-headers
+git checkout alternative-headers-temp
 lein install
 ```
 
