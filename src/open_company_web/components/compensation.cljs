@@ -43,16 +43,22 @@
           currency-symbol (get-symbols-for-currency-code currency)
           prefix (str currency-symbol " ")
           comment (:comment comp-data)
-          founders-label (str "founder" (if (= (:founders head-data) 1) "" "s") " comp. this month")
-          executives-label (str "executive" (if (= (:executives head-data) 1) "" "s") " comp. this month")
-          employees-label (str "employee" (if (= (:employees head-data) 1) "" "s") " comp. this month")
-          contractors-label (str "contractor" (if (= (:contractors head-data) 1) "" "s") " comp. this month")
           total-compensation 0
           total-compensation (+ (if show-founders founders 0) total-compensation)
           total-compensation (+ (if show-executives executives 0) total-compensation)
           total-compensation (+ (if show-employees employees 0) total-compensation)
           total-compensation (+ (if show-contrators contractors 0) total-compensation)
-          total-compensation (gstring/format "%.2f" total-compensation)]
+          total-compensation (gstring/format "%.2f" total-compensation)
+          employees-count (+ (:ft-employees head-data) (:pt-employees head-data))
+          contractors-count (+ (:ft-contractors head-data) (:pt-contractors head-data))
+          founders-label (str "founder" (if (= (:founders head-data) 1) "" "s") " comp. this month")
+          founders-label (if founders (str founders-label " (" (calc-percentage founders total-compensation) "%)") founders-label)
+          executives-label (str "executive" (if (= (:executives head-data) 1) "" "s") " comp. this month")
+          executives-label (if executives (str executives-label " (" (calc-percentage executives total-compensation) "%)") executives-label)
+          employees-label (str "employee" (if (= employees-count 1) "" "s") " comp. this month")
+          employees-label (if employees (str employees-label " (" (calc-percentage employees total-compensation) "%)") employees-label)
+          contractors-label (str "contractor" (if (= contractors-count 1) "" "s") " comp. this month")
+          contractors-label (if contractors (str contractors-label " (" (calc-percentage contractors total-compensation) "%)") contractors-label)]
       (r/well {:class "report-list compensation clearfix"}
         (dom/div {:class "report-list-left"}
           (when show-founders
@@ -60,28 +66,28 @@
               :cursor comp-data
               :key :founders
               :prefix prefix
-              :label (str founders-label " ("(calc-percentage (:founders comp-data) total-compensation) "%)")
+              :label founders-label
               :pluralize false}))
           (when show-executives
             (om/build report-editable-line {
               :cursor comp-data
               :key :executives
               :prefix prefix
-              :label (str executives-label " ("(calc-percentage (:executives comp-data) total-compensation) "%)")
+              :label executives-label
               :pluralize false}))
           (when show-employees
             (om/build report-editable-line {
               :cursor comp-data
               :key :employees
               :prefix prefix
-              :label (str employees-label " ("(calc-percentage (:employees comp-data) total-compensation) "%)")
+              :label employees-label
               :pluralize false}))
           (when show-contrators
             (om/build report-editable-line {
               :cursor comp-data
               :key :contractors
               :prefix prefix
-              :label (str contractors-label " ("(calc-percentage (:contractors comp-data) total-compensation) "%)")
+              :label contractors-label
               :pluralize false}))
           (dom/div
             (om/build report-line {
