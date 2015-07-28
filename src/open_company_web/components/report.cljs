@@ -20,7 +20,7 @@
           company-data ((keyword ticker) data)
           report-key (keyword (str "report-" ticker "-" year "-" period))
           report-data (report-key company-data)]
-      (dom/div
+      (dom/div {:class "report-container"}
         (dom/h2 (:name company-data) " Report for " year " " period)
         (cond
           (:loading data)
