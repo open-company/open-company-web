@@ -13,12 +13,12 @@
     [org.clojure/clojurescript "0.0-3308"] ; Cljs compiler https://github.com/clojure/clojurescript
     [org.clojure/core.async "0.1.346.0-17112a-alpha"] ; Async library https://github.com/clojure/core.async
     [org.omcljs/om "0.9.0" :exclusions [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
+    [cljs-http "0.1.36-SNAPSHOT"] ; Http for cljs https://github.com/r0man/cljs-http
     [prismatic/om-tools "0.3.11"] ; Tools for Om https://github.com/Prismatic/om-tools
     [sablono "0.3.4" :exclusions [cljsjs/react]] ; Hiccup templating for Om/React https://github.com/r0man/sablono
     [secretary "1.2.3"] ; Client-side router https://github.com/gf3/secretary
     [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; React test utilities https://github.com/bensu/cljs-react-test
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
-    [cljs-http "0.1.35"] ; Http for cljs https://github.com/r0man/cljs-http
     [cljs-flux "0.1.1"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     [com.cognitect/transit-cljs "0.8.220"] ; Cljs wrapper for javascript JSON https://github.com/cognitect/transit-cljs
     [racehub/om-bootstrap "0.5.3"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap

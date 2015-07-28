@@ -57,9 +57,21 @@ lein deps
 
 ## Usage
 
-To get an interactive development environment run:
+To get an interactive development environment, you need to install a customized version of [cljs-http](https://github.com/bago2k4/cljs-http):
 
 ```console
+cd ..
+git clone https://github.com/bago2k4/cljs-http
+cd cljs-http
+git checkout alternative-headers
+lein install
+```
+
+Then go back to this repository folder and run:
+
+```console
+cd ../open-company-web
+lein clean
 lein figwheel
 ```
 
@@ -87,7 +99,8 @@ To create a production build run:
 lein cljsbuild once min
 ```
 
-Open your browser in `resources/public/index.html`. You will not get live reloading nor a REPL.
+Open your browser in `resources/public/index.html`. You will not
+get live reloading nor a REPL.
 
 ## Tests
 

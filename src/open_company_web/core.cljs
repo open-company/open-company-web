@@ -42,7 +42,7 @@
             (render-company ticker true {:target target}))
           (render-company ticker false {:target target}))))
 
-    (defroute report-editable-route "/companies/edit/:symbol/:year/:period" {ticker :symbol year :year period :period}
+    (defroute report-editable-route "/companies/:symbol/:year/:period/edit" {ticker :symbol year :year period :period}
       (swap! app-state assoc :loading true)
       (api/get-report ticker year period)
       (swap! app-state assoc :ticker ticker)

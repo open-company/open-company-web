@@ -37,3 +37,11 @@
         symbol (if (contains? dict :symbol) (:symbol dict) code)
         ret (or symbol (:code dict))]
   ret))
+
+(def channel-coll (atom {}))
+
+(defn add-channel [channel-name channel]
+  (swap! channel-coll assoc channel-name channel))
+
+(defn get-channel [channel-name]
+  (@channel-coll channel-name))
