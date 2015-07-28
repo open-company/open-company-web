@@ -10,6 +10,7 @@
               [open-company-web.components.navbar :refer [navbar]]
               [open-company-web.components.link :refer [link]]
               [open-company-web.components.sidebar :refer [sidebar]]
+              [open-company-web.components.profile :refer [profile]]
               [clojure.string :as str]))
 
 (enable-console-print!)
@@ -35,18 +36,18 @@
         (dom/div {:class "container-fluid"}
           (om/build sidebar {})
           (dom/div {:class "col-md-11 col-md-offset-1 main"}
-            (dom/h2 (str (:name company-data) " - Dashboard"))
             (cond
               (:loading data)
               (dom/div
                 (dom/h4 "Loading data..."))
 
               (contains? company-data :symbol)
-              (dom/div
-                (for [report reports]
-                  (om/build report-link {
-                    :report (:href report)
-                    :symbol symbol})))
+              (om/build profile company-data)
+              ; (dom/div
+              ;   (for [report reports]
+              ;     (om/build report-link {
+              ;       :report (:href report)
+              ;       :symbol symbol})))
 
               :else
               (dom/div
