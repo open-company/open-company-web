@@ -6,39 +6,50 @@
             [open-company-web.dispatcher :as dispatcher]
             [cljs-flux.dispatcher :as flux]
             [cognitect.transit :as t]
-            [clojure.walk :refer [keywordize-keys]]))
+            [clojure.walk :refer [keywordize-keys stringify-keys]]))
 
-(def endpoint "http://localhost:3000")
+(def api-version "v1")
 
-(defn json->cljs [json]
+(def company-endpoint "companies")
+
+(def endpoint (str "http://localhost:3000/" api-version "/" company-endpoint "/"))
+
+(defn- content-type [type]
+  (str "application/vnd.open-company." type "+json;version=1"))
+
+(defn- json->cljs [json]
   (let [reader (t/reader :json)]
     (keywordize-keys (t/read reader json))))
 
+(defn- cljs->json [coll]
+  (let [stringified-coll (stringify-keys coll)]
+    (clj->js stringified-coll)))
+
 (defn- req [method path params on-complete]
   (go
-    (let [response (<! (method (str endpoint path)
-                      {:with-credentials? false
-                       :form-params params}))]
+    (let [data {:with-credentials? false}
+          data (when params (merge data params))
+          response (<! (method (str endpoint path) data))]
       (on-complete response))))
 
 (def apiget (partial req http/get))
 (def apipost (partial req http/post))
+(def apiput (partial req http/put))
 
 (defn get-companies []
-  (apiget "/v1/companies/" {}
-    (fn [response]
+  (apiget "" nil (fn [response]
       (let [body (if (:success response) (json->cljs (:body response)) {})]
         (flux/dispatch dispatcher/companies body)))))
 
 (defn get-company [ticker]
   (when symbol
-    (apiget (str "/v1/companies/" ticker) {}
+    (apiget ticker nil
       (fn [response]
         (let [body (if (:success response) (json->cljs (:body response)) {})]
           (flux/dispatch dispatcher/company body))))))
 
 (defn real-get-report [ticker year period]
-  (apiget (str "/v1/companies/" ticker "/" year "/" period) {}
+  (apiget (str ticker "/" year "/" period) nil
     (fn [response]
       (let [body (if (:success response) (json->cljs (:body response)) {})]
         (flux/dispatch dispatcher/report body)))))
@@ -56,3 +67,20 @@
             (real-get-report ticker year period)))
         ; load company data
         (get-company ticker)))))
+
+(defn save-or-create-report [ticker year period data]
+  (when (and ticker year period data)
+    (when (or (:headcount data) (:finances data) (:compensation data))
+      (let [json-data (cljs->json (dissoc data :links))]
+        (apiput
+          (str ticker "/" year "/" period)
+          { :json-params json-data
+            :alternative-headers {
+              ; required by Chrome
+              "Access-Control-Allow-Headers" "Content-Type"
+              ; custom content type
+              "content-type" (content-type "report")
+            }}
+          (fn [response]
+            (let [body (if (:success response) (json->cljs (:body response)) {})]
+              (flux/dispatch dispatcher/report body))))))))
