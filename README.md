@@ -56,18 +56,21 @@ lein deps
 
 ## Usage
 
-To get an interactive development environment you need a local version of `cljs-http`, to do that clone [https://github.com/bago2k4/cljs-http](https://github.com/bago2k4/cljs-http) and checkout the `alternative-headers` branch.
-Then in the `cljs-http` directory run:
+To get an interactive development environment, you need to install a customized version of [cljs-http](https://github.com/bago2k4/cljs-http):
 
 ```console
+cd ..
+git clone https://github.com/bago2k4/cljs-http
+cd cljs-http
+git checkout alternative-headers
 lein install
 ```
-
-to install a local version of the package.
 
 Then go back to this repository folder and run:
 
 ```console
+cd ../open-company-web
+lein clean
 lein figwheel
 ```
 
