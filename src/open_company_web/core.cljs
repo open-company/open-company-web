@@ -19,7 +19,7 @@
 (defonce raven (raven-setup))
 
 ;;Routes
-(defroute list-page-route "/" []
+(defroute list-page-route "/companies" []
   (api/get-companies)
   (om/root list-companies app-state
     {:target (. js/document (getElementById "app"))}))
