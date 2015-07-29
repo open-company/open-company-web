@@ -31,7 +31,7 @@
   (om/root company app-state
     {:target (. js/document (getElementById "app"))}))
 
-(defroute editable-page-route "/companies/:symbol" {ticker :symbol}
+(defroute editable-page-route "/:symbol" {ticker :symbol}
   (do
     (if-not (contains? app-state (keyword ticker))
       (do
@@ -39,7 +39,7 @@
         (render-company ticker true))
       (render-company ticker false))))
 
-(defroute report-editable-route "/companies/:symbol/:year/:period/edit" {ticker :symbol year :year period :period}
+(defroute report-editable-route "/:symbol/:year/:period/edit" {ticker :symbol year :year period :period}
   (swap! app-state assoc :loading true)
   (api/get-report ticker year period)
   (swap! app-state assoc :ticker ticker)
