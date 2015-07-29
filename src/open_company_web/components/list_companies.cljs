@@ -8,13 +8,13 @@
 (defcomponent list-page-item [data owner]
   (render [_]
     (dom/li
-      (om/build link {:href (str "/companies/" (:symbol data)) :name (:name data)}))))
+      (om/build link {:href (str "/" (:symbol data)) :name (:name data)}))))
 
 (defcomponent list-companies [data owner]
   (render [_]
     (let [company-list (:companies data)]
       (dom/div {:class "row"}
-        (om/build navbar company-data)
+        (om/build navbar data)
         (dom/div {:class "container-fluid"}
           (dom/h1 "Companies:")
           (if (> (count company-list) 0)
