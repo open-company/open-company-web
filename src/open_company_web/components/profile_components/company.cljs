@@ -5,17 +5,26 @@
             [open-company-web.components.link :refer [link]]
             [om-bootstrap.panel :as p]
             [om-bootstrap.input :as i]
-            [open-company-web.lib.iso4217 :refer [iso4217 sorted-iso4217]]))
+            [open-company-web.lib.iso4217 :refer [iso4217 sorted-iso4217]]
+            [open-company-web.lib.utils :refer [handle-change get-channel]]
+            [cljs.core.async :refer [put!]]))
 
 (def months ["January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December"])
 (def years ["2015" "2014" "2013" "2012" "2011" "2010"])
 (def stages ["Idea" "Prototype" "Closed beta" "Open beta" "Launched" "Pivoting" "Exited" "Closed"])
 
+(defn change-value [cursor e key]
+  (handle-change cursor (.. e -target -value) key))
+
+(defn save-values []
+  (let [save-channel (get-channel "save-company")]
+    (put! save-channel 1)))
+
 (defcomponent option [data owner]
   (render [_]
     (dom/option {
       :value (or (:value data) (:text data))
-      :disabled (= (count (:value data)) 0)}
+      :disabled (and (contains? :value data) (= (count (:value data)) 0))}
       (:text data))))
 
 (defcomponent basics [data owner]
@@ -35,6 +44,8 @@
                   :id "symbol"
                   :class "form-control"
                   :maxLength 5
+                  :on-change #(change-value data % :symbol)
+                  :on-blur #(save-values)
                   :placeholder ""}))
               (dom/p {:class "help-block"} "1 to 5 alpha-numeric characters, eg. OPEN, BUFFR, 2XTR"))
 
@@ -46,6 +57,8 @@
                   :type "text"
                   :id "name"
                   :value (:name data)
+                  :on-change #(change-value data % :name)
+                  :on-blur #(save-values)
                   :class "form-control"}))
               (dom/p {:class "help-block"} "Casual company name (leave out Inc., LLC, etc.)"))
 
@@ -56,7 +69,8 @@
                 (dom/select {
                   :id "stage"
                   :value (:stage data)
-                  :class "form-control"}
+                  :class "form-control"
+                  :on-change #(change-value data % :stage)}
                   (for [stage stages]
                     (om/build option {:text stage}))))
                 (dom/p {:class "help-block"} "Which of the following best describes your progress?"))
@@ -108,6 +122,7 @@
                   :id "tagline"
                   :value (:tagline data)
                   :placeholder "optional"
+                  :on-change #(change-value data % :tagline)
                   :class "form-control"}))
               (dom/p {:class "help-block"} ""))
 
@@ -130,6 +145,7 @@
                   :type "file"
                   :id "currency"
                   :value (:currency data)
+                  :on-change #(change-value data % :currency)
                   :class "form-control"}
                     (for [currency (sorted-iso4217)]
                       (let [symbol (:symbol currency)
@@ -147,6 +163,7 @@
                   :id "location"
                   :value (:location data)
                   :class "form-control"
+                  :on-change #(change-value data % :location)
                   :placeholder "eg. Paris, France"})
                 (dom/a {:on-click #(.preventDefault %)}
                   (dom/i {:class "fa fa-plus"})
@@ -162,6 +179,7 @@
                   :id "tags"
                   :value (:tags data)
                   :class "form-control"
+                  :on-change #(change-value data % :tags)
                   :placeholder "eg. B2B, mobile, finance, internet of things, security, blockchain"}))
               (dom/p {:class "help-block"} ""))
 
@@ -174,6 +192,7 @@
                   :id "email"
                   :value (:email data)
                   :class "form-control"
+                  :on-change #(change-value data % :email)
                   :placeholder "eg. hello@startup.com"}))
               (dom/p {:class "help-block"} "Best way to contact the company (email, URL, phone number, etc.)"))))))))
 
@@ -194,6 +213,7 @@
                   :id "description"
                   :rows "5"
                   :value (:description data)
+                  :on-change #(change-value owner % :description)
                   :placeholder "Explain your business, what market do you serve, what problems do you solve, who are your customers, why do they like you, what is distinct about your approach?"})))
 
             ;; Mission
@@ -205,6 +225,7 @@
                   :id "mission"
                   :rows "5"
                   :value (:mission data)
+                  :on-change #(change-value data % :mission)
                   :placeholder "Why did you start this particular business? Why are you the best founding team to start it?"})))))))))
 
 (defcomponent on-the-web [data owner]
@@ -223,6 +244,7 @@
                   :class "form-control"
                   :id "company"
                   :value (:company (:web data))
+                  :on-change #(change-value data % [:web :company])
                   :placeholder "http://startup.com/"}))
               (dom/span {:class "help-block"} ""))
 
@@ -235,6 +257,7 @@
                   :class "form-control"
                   :id "about"
                   :value (:about (:web data))
+                  :on-change #(change-value data % [:web :about])
                   :placeholder "http://startup.com/about"}))
               (dom/p {:class "help-block"} "Optional"))
 
@@ -247,6 +270,7 @@
                   :type "text"
                   :class "form-control"
                   :id "twitter"
+                  :on-change #(change-value data % [:web :twitter])
                   :value (:twitter (:web data))}))
               (dom/p {:class "help-block"} "Optional"))
 
@@ -259,6 +283,7 @@
                   :type "text"
                   :class "form-control"
                   :id "facebook"
+                  :on-change #(change-value data % [:web :facebook])
                   :value (:facebook (:web data))}))
               (dom/p {:class "help-block"} "Optional"))
 
@@ -271,6 +296,7 @@
                   :type "text"
                   :class "form-control"
                   :id "linkedin"
+                  :on-change #(change-value data % [:web :linkedin])
                   :value (:linkedin (:web data))}))
               (dom/p {:class "help-block"} "Optional"))
 
@@ -283,6 +309,7 @@
                   :type "text"
                   :class "form-control"
                   :id "github"
+                  :on-change #(change-value data % [:web :github])
                   :value (:github (:web data))}))
               (dom/p {:class "help-block"} "Optional"))
 
@@ -295,6 +322,7 @@
                   :type "text"
                   :class "form-control"
                   :id "angellist"
+                  :on-change #(change-value data % [:web :angellist])
                   :value (:angellist (:web data))}))
               (dom/p {:class "help-block"} "Optional"))
 
