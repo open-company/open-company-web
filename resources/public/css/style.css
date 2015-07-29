@@ -90,6 +90,13 @@ span.num.red {
     margin-bottom: 25px;
 }
 
+/* Reset bootstrap 3.3.5 help block overflow */
+.input-group[class*=col-]{
+  float: left;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
 div#app{
   margin-top: 50px;
 }
