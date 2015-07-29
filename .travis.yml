@@ -2,7 +2,7 @@ language: clojure
 jdk:
   - oraclejdk8
 lein: lein2
-sudo: required
+sudo: false
 before_script: lein2 clean
 script: lein2 test!
 branches:
