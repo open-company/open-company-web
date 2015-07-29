@@ -102,7 +102,7 @@
                 :value currency
                 :id "report-type-$"
                 :checked (not percentage)
-                :on-click #(handle-change comp-data false "percentage")})
+                :on-click #(handle-change comp-data false :percentage)})
               (dom/label {:class "switch-vis" :for "report-type-$"} (str " " currency-symbol "  "))
               (dom/input {
                 :type "radio"
@@ -110,7 +110,7 @@
                 :value "%"
                 :id "report-type-%"
                 :checked percentage
-                :on-click #(handle-change comp-data true "percentage")})
+                :on-click #(handle-change comp-data true :percentage)})
               (dom/label {:class "switch-vis" :for "report-type-%"} "  Percent ")))
           (om/build comment-component {:cursor comp-data :key :comment}))
         (om/build pie-chart (get-chart-data comp-data head-data prefix))))))
