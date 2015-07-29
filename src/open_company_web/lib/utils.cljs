@@ -19,7 +19,9 @@
     (clojure.string/replace num-str "," "")))
 
 (defn handle-change [cursor value key]
-  (om/transact! cursor key (fn [_] value)))
+  (if (array? key)
+    (om/transact! cursor assoc-in key (fn [_] value))
+    (om/transact! cursor key (fn [_] value))))
 
 (defn String->Number [str]
   (let [n (js/parseFloat str)]
