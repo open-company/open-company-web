@@ -5,6 +5,9 @@ lein: lein2
 sudo: false
 before_script: lein2 clean
 script: lein2 test!
+cache:
+  directories:
+  - "$HOME/.m2"
 branches:
   only:
   - master
