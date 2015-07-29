@@ -2,7 +2,7 @@
     (:require [om.core :as om :include-macros true]
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
-              [open-company-web.utils :refer [thousands-separator handle-change String->Number display get-channel]]
+              [open-company-web.lib.utils :refer [thousands-separator handle-change String->Number display get-channel]]
               [cljs.core.async :refer [put!]]))
 
 (defn focus-and-move-cursor [owner]
@@ -43,7 +43,7 @@
           on-change (:on-change view-data)
           pluralize (if (contains? view-data :pluralize) (:pluralize view-data) true)
           suffix (if (and pluralize (not (= (get data key) 1))) "s" "")]
-      (dom/div
+      (dom/div {:class "report-editable-line"}
         (if (> (count prefix) 0) (dom/span {:class "label"} (str prefix)))
         (dom/label {
           :class "editable-label"
@@ -72,7 +72,7 @@
           pluralize (if (contains? data :pluralize) (:pluralize data) true)
           plural-suffix (or (:plural-suffix data) "s")
           suffix (if (and pluralize (not (= number 1))) plural-suffix "")]
-      (dom/span
+      (dom/span {:class "report-line"}
         (if-not (= (count prefix) 0)
           (dom/span {:class "label"} (str prefix)))
         (dom/span {:class "num"} (thousands-separator number))

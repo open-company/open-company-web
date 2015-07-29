@@ -5,7 +5,7 @@
             [open-company-web.components.link :refer [link]]
             [om-bootstrap.panel :as p]
             [om-bootstrap.input :as i]
-            [open-company-web.iso4217.iso4217 :refer [iso4217 sorted-iso4217]]))
+            [open-company-web.lib.iso4217 :refer [iso4217 sorted-iso4217]]))
 
 (def months ["January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December"])
 (def years ["2015" "2014" "2013" "2012" "2011" "2010"])

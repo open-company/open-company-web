@@ -1,14 +1,13 @@
-(ns open-company-web.server
+(ns open-company-web.lib.server
   "Development-time server. This role is played by an nginx proxy in production."
   (:require [ring.util.response :refer [file-response]]
             [compojure.core :refer [defroutes GET PUT POST]]
-            [compojure.route :as route]
-            [compojure.handler :as handler]))
+            [compojure.route :as route]))
 
 (defn index []
   (file-response "public/index.html" {:root "resources"}))
 
-(defroutes routes
+(defroutes resources
   ; serve the react app for all requests
   (GET "*" [] (index))
   ; remove the static paths
@@ -16,9 +15,9 @@
   (route/files "/js/*" {:root "resources/public"})
   (route/files "/img/*" {:root "resources/public"}))
 
-(defn request-handler [handler]
+(defn request-handler [routes]
  (fn [request]
-   (handler request)))
+   (routes request)))
 
 (def handler
-  (request-handler routes))
+  (request-handler resources))

@@ -2,6 +2,7 @@
 
 [![MPL License](http://img.shields.io/badge/license-MPL-blue.svg?style=flat)](https://www.mozilla.org/MPL/2.0/)
 [![Roadmap on Trello](http://img.shields.io/badge/roadmap-trello-blue.svg?style=flat)](https://trello.com/b/3naVWHgZ/open-company-development)
+[![Build Status](https://travis-ci.org/open-company/open-company-web.svg?branch=master)](https://travis-ci.org/open-company/open-company-web)
 
 ## Overview
 
@@ -62,7 +63,7 @@ To get an interactive development environment, you need to install a customized 
 cd ..
 git clone https://github.com/bago2k4/cljs-http
 cd cljs-http
-git checkout alternative-headers
+git checkout alternative-headers-temp
 lein install
 ```
 
@@ -100,6 +101,27 @@ lein cljsbuild once min
 
 Open your browser in `resources/public/index.html`. You will not
 get live reloading nor a REPL.
+
+## Tests
+
+Install [PhantomJS](https://http://phantomjs.org/) downloading the latest binary [here](https://github.com/eugene1g/phantomjs/releases), the one from their site is currently broken.
+
+Then move the `phantomjs` binary somewhere reachable by your `PATH` so you can run:
+
+```console
+phantomjs -v
+```
+
+Then run:
+
+```console
+lein test!
+```
+
+For more info on testing:
+
+- Plugin: [bensu/doo](https://github.com/bensu/doo)
+- React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/doo)
 
 ## License
 
