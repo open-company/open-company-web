@@ -13,7 +13,7 @@
 (def ^:dynamic c)
 
 (def test-atom {
-  :ticker "OPEN"
+  :symbol "OPEN"
   :OPEN {
     :symbol "OPEN"
     :links [

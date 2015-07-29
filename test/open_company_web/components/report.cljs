@@ -13,7 +13,7 @@
 (def ^:dynamic c)
 
 (def test-atom {
-  :ticker "OPEN"
+  :symbol "OPEN"
   :year "2015"
   :period "Q4"
   :OPEN {

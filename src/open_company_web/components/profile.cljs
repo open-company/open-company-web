@@ -12,7 +12,7 @@
   (will-mount [_]
     (om/set-state! owner :selected-tab 1))
   (render [_]
-    (let [symbol (:ticker data)
+    (let [symbol (:symbol data)
           company-data ((keyword symbol) data)]
       (dom/div
         (n/nav {

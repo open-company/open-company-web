@@ -105,8 +105,8 @@
         ; make sure the report contains all the keys :headcount :finances :compensation
         (let [report-data (merge empty-report body)]
           ; add the new report data
-          (let [ticker (:symbol report-data)
+          (let [symbol (:symbol report-data)
                 year (:year report-data)
                 period (:period report-data)
-                report-key (keyword (str "report-" ticker "-" year "-" period))]
-            (swap! app-state assoc-in [(keyword ticker) report-key] report-data)))))))
+                report-key (keyword (str "report-" symbol "-" year "-" period))]
+            (swap! app-state assoc-in [(keyword symbol) report-key] report-data)))))))

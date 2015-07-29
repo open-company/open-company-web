@@ -41,39 +41,39 @@
       (let [body (if (:success response) (json->cljs (:body response)) {})]
         (flux/dispatch dispatcher/companies body)))))
 
-(defn get-company [ticker]
+(defn get-company [symbol]
   (when symbol
-    (apiget ticker nil
+    (apiget symbol nil
       (fn [response]
         (let [body (if (:success response) (json->cljs (:body response)) {})]
           (flux/dispatch dispatcher/company body))))))
 
-(defn real-get-report [ticker year period]
-  (apiget (str ticker "/" year "/" period) nil
+(defn real-get-report [symbol year period]
+  (apiget (str symbol "/" year "/" period) nil
     (fn [response]
       (let [body (if (:success response) (json->cljs (:body response)) {})]
         (flux/dispatch dispatcher/report body)))))
 
-(defn get-report [ticker year period]
-  (when (and ticker year period)
-    (if (contains? @dispatcher/app-state (keyword ticker))
+(defn get-report [symbol year period]
+  (when (and symbol year period)
+    (if (contains? @dispatcher/app-state (keyword symbol))
       ; load the report only
-      (real-get-report ticker year period)
+      (real-get-report symbol year period)
       ; load the company data before the report data
       (do
         (flux/register
           dispatcher/company
           (fn [response]
-            (real-get-report ticker year period)))
+            (real-get-report symbol year period)))
         ; load company data
-        (get-company ticker)))))
+        (get-company symbol)))))
 
-(defn save-or-create-report [ticker year period data]
-  (when (and ticker year period data)
+(defn save-or-create-report [symbol year period data]
+  (when (and symbol year period data)
     (when (or (:headcount data) (:finances data) (:compensation data))
       (let [json-data (cljs->json (dissoc data :links))]
         (apiput
-          (str ticker "/" year "/" period)
+          (str symbol "/" year "/" period)
           { :json-params json-data
             :alternative-headers {
               ; required by Chrome

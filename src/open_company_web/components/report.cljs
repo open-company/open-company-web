@@ -23,20 +23,20 @@
     (let [save-change (get-channel "save-report")]
         (go (loop []
           (let [change (<! save-change)
-                ticker (:ticker data)
+                symbol (:symbol data)
                 year (:year data)
                 period (:period data)
-                company-data ((keyword ticker) @app-state)
-                report-key (keyword (str "report-" ticker "-" year "-" period))
+                company-data ((keyword symbol) @app-state)
+                report-key (keyword (str "report-" symbol "-" year "-" period))
                 report-data (report-key company-data)]
-            (save-or-create-report ticker year period report-data)
+            (save-or-create-report symbol year period report-data)
             (recur))))))
   (render [_]
-    (let [ticker (:ticker data)
+    (let [symbol (:symbol data)
           year (:year data)
           period (:period data)
-          company-data ((keyword ticker) data)
-          report-key (keyword (str "report-" ticker "-" year "-" period))
+          company-data ((keyword symbol) data)
+          report-key (keyword (str "report-" symbol "-" year "-" period))
           report-data (report-key company-data)]
       (dom/div {:class "report-container"}
         (dom/h2 (:name company-data) " Report for " year " " period)
@@ -44,7 +44,7 @@
           (:loading data)
           (dom/div nil "Loading")
 
-          (and (contains? data (keyword ticker)) (contains? company-data report-key))
+          (and (contains? data (keyword symbol)) (contains? company-data report-key))
           (dom/div nil
             (om/build currency-picker report-data)
             (n/nav {
@@ -72,11 +72,11 @@
   (will-mount [_]
     (om/set-state! owner :selected-tab 1))
   (render [_]
-    (let [ticker (:ticker data)
+    (let [symbol (:symbol data)
           year (:year data)
           period (:period data)
-          company-data ((keyword ticker) data)
-          report-key (keyword (str "report-" ticker "-" year "-" period))
+          company-data ((keyword symbol) data)
+          report-key (keyword (str "report-" symbol "-" year "-" period))
           report-data (report-key company-data)
           headcount (:headcount report-data)]
       (dom/div
@@ -85,7 +85,7 @@
           (:loading data)
           (dom/div nil "Loading")
 
-          (and (contains? data (keyword ticker)) (contains? company-data report-key))
+          (and (contains? data (keyword symbol)) (contains? company-data report-key))
           (dom/div nil
             (n/nav {
               :class "tab-navigation"
