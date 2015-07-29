@@ -5,6 +5,12 @@
 
 (enable-console-print!)
 
+(def path (atom {}))
+
+(defn save-route [route parts]
+  (swap! path assoc :route route)
+  (doseq [[k v] parts] (swap! path assoc k v)))
+
 (defn get-token []
   (str js/window.location.pathname js/window.location.search))
 
@@ -27,4 +33,5 @@
   (secretary/dispatch! (get-token)))
 
 (defn nav! [token]
+  (swap! path {})
   (.setToken open-company-web.core/history token))
