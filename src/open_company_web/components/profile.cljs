@@ -1,4 +1,5 @@
 (ns open-company-web.components.profile
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
@@ -6,11 +7,25 @@
             [open-company-web.components.profile-components.company :refer [basics mission on-the-web]]
             [om-bootstrap.nav :as n]
             [om-bootstrap.panel :as p]
-            [open-company-web.router :as router]))
+            [open-company-web.router :as router]
+            [open-company-web.lib.utils :refer [add-channel get-channel]]
+            [open-company-web.api :refer [save-or-create-company]]
+            [cljs.core.async :refer [put! chan <!]]
+            [open-company-web.dispatcher :refer [app-state]]))
 
 (defcomponent profile [data owner]
+  (init-state [_]
+    (let [save-chan (chan)]
+      (add-channel "save-company" save-chan)))
   (will-mount [_]
-    (om/set-state! owner :selected-tab 1))
+    (om/set-state! owner :selected-tab 1)
+    (let [save-change (get-channel "save-company")]
+        (go (loop []
+          (let [change (<! save-change)
+                symbol (:symbol data)
+                company-data ((keyword symbol) @app-state)]
+            (save-or-create-company symbol company-data)
+            (recur))))))
   (render [_]
     (let [symbol (:symbol data)
           company-data ((keyword symbol) data)]
