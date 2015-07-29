@@ -42,7 +42,7 @@
                 (dom/h4 "Loading data..."))
 
               (contains? company-data :symbol)
-              (om/build profile company-data)
+              (om/build profile data)
               ; (dom/div
               ;   (for [report reports]
               ;     (om/build report-link {
