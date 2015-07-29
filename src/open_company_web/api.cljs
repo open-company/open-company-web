@@ -84,3 +84,22 @@
           (fn [response]
             (let [body (if (:success response) (json->cljs (:body response)) {})]
               (flux/dispatch dispatcher/report body))))))))
+
+(defn save-or-create-company [symbol data]
+  (when (and symbol data)
+    (let [data (dissoc data :headcount)
+          data (dissoc data :finances)
+          data (dissoc data :compensation)
+          data (dissoc data :links)
+          json-data (cljs->json data)]
+      (apiput symbol
+        { :json-params json-data
+          :alternative-headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (content-type "company")
+          }}
+        (fn [response]
+          (let [body (if (:success response) (json->cljs (:body response)) {})]
+            (flux/dispatch dispatcher/company body)))))))
