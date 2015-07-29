@@ -3,7 +3,7 @@
     (:require [om.core :as om :include-macros true]
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
-              [open-company-web.utils :refer [handle-change add-channel get-channel]]
+              [open-company-web.lib.utils :refer [handle-change add-channel get-channel]]
               [open-company-web.components.headcount :refer [headcount readonly-headcount]]
               [open-company-web.components.finances :refer [finances readonly-finances]]
               [open-company-web.components.compensation :refer [compensation readonly-compensation]]

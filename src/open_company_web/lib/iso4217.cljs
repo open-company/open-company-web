@@ -1,4 +1,4 @@
-(ns open-company-web.iso4217.iso4217)
+(ns open-company-web.lib.iso4217)
 
 ; The currencies db comes from https://github.com/zwacky/isoCurrency
 

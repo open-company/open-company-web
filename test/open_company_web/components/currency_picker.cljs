@@ -12,9 +12,7 @@
 ; dynamic mount point for components
 (def ^:dynamic c)
 
-(def test-atom {
-  :currency "USD"
-})
+(def test-atom {:currency "USD"})
 
 (deftest test-currency-picker-component
   (testing "Currency picker component"

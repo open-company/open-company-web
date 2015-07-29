@@ -1,7 +1,7 @@
-(ns open-company-web.utils
+(ns open-company-web.lib.utils
     (:require [om.core :as om :include-macros true]
               [clojure.string]
-              [open-company-web.iso4217.iso4217 :refer [iso4217]]))
+              [open-company-web.lib.iso4217 :refer [iso4217]]))
 
 (defn abs [n] (max n (- n)))
 

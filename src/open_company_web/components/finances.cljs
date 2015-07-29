@@ -2,7 +2,7 @@
     (:require [om.core :as om :include-macros true]
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
-              [open-company-web.utils :refer [abs thousands-separator handle-change get-symbols-for-currency-code]]
+              [open-company-web.lib.utils :refer [abs thousands-separator handle-change get-symbols-for-currency-code]]
               [open-company-web.components.report-line :refer [report-editable-line report-line]]
               [open-company-web.components.comment :refer [comment-component]]
               [om-bootstrap.random :as  r]))

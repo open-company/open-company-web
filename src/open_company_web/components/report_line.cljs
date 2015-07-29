@@ -2,7 +2,7 @@
     (:require [om.core :as om :include-macros true]
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
-              [open-company-web.utils :refer [thousands-separator handle-change String->Number display get-channel]]
+              [open-company-web.lib.utils :refer [thousands-separator handle-change String->Number display get-channel]]
               [cljs.core.async :refer [put!]]))
 
 (defn focus-and-move-cursor [owner]

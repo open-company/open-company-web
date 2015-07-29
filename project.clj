@@ -92,7 +92,7 @@
    ;; if you want to embed a ring handler into the figwheel http-kit
    ;; server, this is for simple ring servers, if this
    ;; doesn't work for you just run your own server :)
-   :ring-handler open-company-web.server/handler
+   :ring-handler open-company-web.lib.server/handler
 
    ;; To be able to open files in your editor from the heads up display
    ;; you will need to put a script on your path.

@@ -2,8 +2,8 @@
     (:require [om.core :as om :include-macros true]
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
-              [open-company-web.utils :refer [handle-change]]
-              [open-company-web.iso4217.iso4217 :refer [iso4217 sorted-iso4217]]
+              [open-company-web.lib.utils :refer [handle-change]]
+              [open-company-web.lib.iso4217 :refer [iso4217 sorted-iso4217]]
               [om-bootstrap.button :as b]
               [dommy.core :as dommy :refer-macros [sel1 sel]]))
 

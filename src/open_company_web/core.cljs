@@ -8,7 +8,7 @@
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
             [open-company-web.components.report :refer [report readonly-report]]
-            [open-company-web.raven :refer [raven-setup]]
+            [open-company-web.lib.raven :refer [raven-setup]]
             [open-company-web.dispatcher :as dispatcher :refer [app-state]]
             [open-company-web.api :as api]
             [goog.events :as events])

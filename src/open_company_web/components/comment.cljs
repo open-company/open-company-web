@@ -1,7 +1,7 @@
 (ns open-company-web.components.comment
     (:require [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
-              [open-company-web.utils :refer [abs thousands-separator handle-change get-channel]]
+              [open-company-web.lib.utils :refer [abs thousands-separator handle-change get-channel]]
               [cljs.core.async :refer [put!]]))
 
 

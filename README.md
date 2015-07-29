@@ -105,7 +105,8 @@ get live reloading nor a REPL.
 ## Tests
 
 Install [PhantomJS](https://http://phantomjs.org/) downloading the latest binary [here](https://github.com/eugene1g/phantomjs/releases), the one from their site is currently broken.
-Then move the binary somewhere reachable by your `PATH` so you can run:
+
+Then move the `phantomjs` binary somewhere reachable by your `PATH` so you can run:
 
 ```console
 phantomjs -v
