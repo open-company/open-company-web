@@ -11,9 +11,8 @@
   ;     "founders" 2
   ;     "executives" 0
   ;     "ft-employees" 3
-  ;     "ft-contractors" 0
   ;     "pt-employees" 0
-  ;     "pt-contractors" 2
+  ;     "contractors" 2
   ;     "comment" "Transparency headcount comment."
   ;   },
   ;   "finances" {
@@ -41,9 +40,8 @@
   ;     "founders" 1
   ;     "executives" 2
   ;     "ft-employees" 1
-  ;     "ft-contractors" 2
   ;     "pt-employees" 1
-  ;     "pt-contractors" 4
+  ;     "contractors" 4
   ;     "comment" "Buffer headcount comment."
   ;   },
   ;   "finances" {

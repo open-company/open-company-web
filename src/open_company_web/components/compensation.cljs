@@ -14,7 +14,7 @@
   (let [show-founders (> (:founders head-data) 0)
         show-executives (> (:executives head-data) 0)
         show-employees (> (+ (:ft-employees head-data) (:pt-employees head-data)) 0)
-        show-contrators (> (+ (:ft-contractors head-data) (:pt-contractors head-data)) 0)]
+        show-contrators (> (:contractors head-data) 0)]
     { :symbol symbol
       :columns [["string" "Compensation"] ["number" "Amount"]]
       :values [[:Founders (if show-founders (:founders data) 0)]
@@ -33,7 +33,7 @@
           show-founders (> (:founders head-data) 0)
           show-executives (> (:executives head-data) 0)
           show-employees (> (+ (:ft-employees head-data) (:pt-employees head-data)) 0)
-          show-contrators (> (+ (:ft-contractors head-data) (:pt-contractors head-data)) 0)
+          show-contrators (> (:contractors head-data) 0)
           comp-data (:compensation data)
           percentage (:percentage comp-data)
           founders (if show-founders (:founders comp-data) 0)
@@ -51,14 +51,13 @@
           total-compensation (+ (if show-contrators contractors 0) total-compensation)
           total-compensation (gstring/format "%.2f" total-compensation)
           employees-count (+ (:ft-employees head-data) (:pt-employees head-data))
-          contractors-count (+ (:ft-contractors head-data) (:pt-contractors head-data))
           founders-label (str "founder" (if (= (:founders head-data) 1) "" "s") " comp. this month")
           founders-label (if founders (str founders-label " (" (calc-percentage founders total-compensation) "%)") founders-label)
           executives-label (str "executive" (if (= (:executives head-data) 1) "" "s") " comp. this month")
           executives-label (if executives (str executives-label " (" (calc-percentage executives total-compensation) "%)") executives-label)
           employees-label (str "employee" (if (= employees-count 1) "" "s") " comp. this month")
           employees-label (if employees (str employees-label " (" (calc-percentage employees total-compensation) "%)") employees-label)
-          contractors-label (str "contractor" (if (= contractors-count 1) "" "s") " comp. this month")
+          contractors-label (str "contractor" (if (= contractors 1) "" "s") " comp. this month")
           contractors-label (if contractors (str contractors-label " (" (calc-percentage contractors total-compensation) "%)") contractors-label)]
       (p/panel {:header (dom/h3 "Compensation") :class "report-list compensation clearfix"}
         (dom/div {:class "report-list-left"}
@@ -122,7 +121,7 @@
           show-founders (> (:founders head-data) 0)
           show-executives (> (:executives head-data) 0)
           show-employees (> (+ (:ft-employees head-data) (:pt-employees head-data)) 0)
-          show-contrators (> (+ (:ft-contractors head-data) (:pt-contractors head-data)) 0)
+          show-contrators (> (:contractors head-data) 0)
           comp-data (:compensation data)
           percentage (:percentage comp-data)
           founders (if show-founders (:founders comp-data) 0)

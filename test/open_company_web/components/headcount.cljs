@@ -17,7 +17,7 @@
     :founders 2
     :executives 1
     :pt-employees 3
-    :ft-contractors 4
+    :contractors 4
   }
 })
 
