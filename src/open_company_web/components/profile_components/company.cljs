@@ -6,7 +6,7 @@
             [om-bootstrap.panel :as p]
             [om-bootstrap.input :as i]
             [open-company-web.lib.iso4217 :refer [iso4217 sorted-iso4217]]
-            [open-company-web.lib.utils :refer [handle-change get-channel]]
+            [open-company-web.lib.utils :refer [handle-change get-channel change-value save-values]]
             [cljs.core.async :refer [put!]]))
 
 (def months [
@@ -27,13 +27,6 @@
 
 (def stages ["Idea" "Prototype" "Closed beta" "Open beta" "Launched" "Pivoting" "Exited" "Closed"])
 
-(defn change-value [cursor e key]
-  (handle-change cursor (.. e -target -value) key))
-
-(defn save-values []
-  (let [save-channel (get-channel "save-company")]
-    (put! save-channel 1)))
-
 (defn founded-changed [owner data]
   (let [founded-month-el (om/get-ref owner "founded-month")
         founded-month-value (.-value (.getDOMNode founded-month-el))
@@ -41,7 +34,7 @@
         founded-year-value (.-value (.getDOMNode founded-year-el))
         value (str founded-year-value "-" founded-month-value)]
     (handle-change data value :founded)
-    (save-values)))
+    (save-values "save-company")))
 
 (defn open-since-changed [owner data]
   (let [open-month-el (om/get-ref owner "open-month")
@@ -50,7 +43,7 @@
         open-year-value (.-value (.getDOMNode open-year-el))
         value (str open-year-value "-" open-month-value)]
     (handle-change data value :open-since)
-    (save-values)))
+    (save-values "save-company")))
 
 (defn save-new-web-link [owner data]
   (let [web-label-el (om/get-ref owner "new-web-label")
@@ -59,13 +52,13 @@
         web-url-value (.-value (.getDOMNode web-url-el))]
     (when (and (> (count web-label-value) 0) (> (count web-url-value) 0))
       (handle-change data web-url-value [:web (keyword web-label-value)])
-      (save-values))))
+      (save-values "save-company"))))
 
 (defn remove-web-link [data key]
   (let [web-links (:web data)
         web-links-clean (dissoc web-links key)]
     (handle-change data web-links-clean :web)
-    (save-values)))
+    (save-values "save-company")))
 
 (defcomponent option [data owner]
   (render [_]
@@ -98,7 +91,7 @@
                     :class "form-control"
                     :maxLength 5
                     :on-change #(change-value data % :symbol)
-                    :on-blur #(save-values)
+                    :on-blur #(save-values "save-company")
                     :placeholder ""}))
                 (dom/p {:class "help-block"} "1 to 5 alpha-numeric characters, eg. OPEN, BUFFR, 2XTR"))
 
@@ -111,7 +104,7 @@
                     :id "name"
                     :value (:name data)
                     :on-change #(change-value data % :name)
-                    :on-blur #(save-values)
+                    :on-blur #(save-values "save-company")
                     :class "form-control"}))
                 (dom/p {:class "help-block"} "Casual company name (leave out Inc., LLC, etc.)"))
 
@@ -123,7 +116,7 @@
                     :id "stage"
                     :value (:stage data)
                     :className "form-control"
-                    :onChange (fn [e] (change-value data e :stage) (save-values))}
+                    :onChange (fn [e] (change-value data e :stage) (save-values "save-company"))}
                     (for [stage stages]
                       (om/build option {:text stage}))))
                   (dom/p {:class "help-block"} "Which of the following best describes your progress?"))
@@ -184,7 +177,7 @@
                     :value (:tagline data)
                     :placeholder "optional"
                     :on-change #(change-value data % :tagline)
-                    :on-blur #(save-values)
+                    :on-blur #(save-values "save-company")
                     :class "form-control"}))
                 (dom/p {:class "help-block"} ""))
 
@@ -207,7 +200,7 @@
                     :type "file"
                     :id "currency"
                     :value (:currency data)
-                    :on-change (fn [e] (change-value data e :currency) (save-values))
+                    :on-change (fn [e] (change-value data e :currency) (save-values "save-company"))
                     :class "form-control"}
                       (for [currency (sorted-iso4217)]
                         (let [symbol (:symbol currency)
@@ -226,7 +219,7 @@
                     :value (:location data)
                     :class "form-control"
                     :on-change #(change-value data % :location)
-                    :on-blur #(save-values)
+                    :on-blur #(save-values "save-company")
                     :placeholder "eg. Paris, France"})
                   (dom/a {:on-click #(.preventDefault %)}
                     (dom/i {:class "fa fa-plus"})
@@ -243,7 +236,7 @@
                     :value (:tags data)
                     :class "form-control"
                     :on-change #(change-value data % :tags)
-                    :on-blur #(save-values)
+                    :on-blur #(save-values "save-company")
                     :placeholder "eg. B2B, mobile, finance, internet of things, security, blockchain"}))
                 (dom/p {:class "help-block"} ""))
 
@@ -257,7 +250,7 @@
                     :value (:email data)
                     :class "form-control"
                     :on-change #(change-value data % :email)
-                    :on-blur #(save-values)
+                    :on-blur #(save-values "save-company")
                     :placeholder "eg. hello@startup.com"}))
                 (dom/p {:class "help-block"} "Best way to contact the company (email, URL, phone number, etc.)")))))))))
 
@@ -279,7 +272,7 @@
                   :rows "5"
                   :value (:description data)
                   :on-change #(change-value data % :description)
-                  :on-blur #(save-values)
+                  :on-blur #(save-values "save-company")
                   :placeholder "Explain your business, what market do you serve, what problems do you solve, who are your customers, why do they like you, what is distinct about your approach?"})))
 
             ;; Mission
@@ -292,7 +285,7 @@
                   :rows "5"
                   :value (:mission data)
                   :on-change #(change-value data % :mission)
-                  :on-blur #(save-values)
+                  :on-blur #(save-values "save-company")
                   :placeholder "Why did you start this particular business? Why are you the best founding team to start it?"})))))))))
 
 (defcomponent on-the-web [data owner]
@@ -313,7 +306,7 @@
                     :id "company"
                     :value (:company (:web data))
                     :on-change #(change-value data % [:web :company])
-                    :on-blur #(save-values)
+                    :on-blur #(save-values "save-company")
                     :placeholder "http://startup.com/"}))
                 (dom/span {:class "help-block"} ""))
 
@@ -327,7 +320,7 @@
                     :id "about"
                     :value (:about (:web data))
                     :on-change #(change-value data % [:web :about])
-                    :on-blur #(save-values)
+                    :on-blur #(save-values "save-company")
                     :placeholder "http://startup.com/about"}))
                 (dom/p {:class "help-block"} "Optional"))
 
@@ -341,7 +334,7 @@
                     :class "form-control"
                     :id "twitter"
                     :on-change #(change-value data % [:web :twitter])
-                    :on-blur #(save-values)
+                    :on-blur #(save-values "save-company")
                     :value (:twitter (:web data))}))
                 (dom/p {:class "help-block"} "Optional"))
 
@@ -355,7 +348,7 @@
                     :class "form-control"
                     :id "facebook"
                     :on-change #(change-value data % [:web :facebook])
-                    :on-blur #(save-values)
+                    :on-blur #(save-values "save-company")
                     :value (:facebook (:web data))}))
                 (dom/p {:class "help-block"} "Optional"))
 
@@ -369,7 +362,7 @@
                     :class "form-control"
                     :id "linkedin"
                     :on-change #(change-value data % [:web :linkedin])
-                    :on-blur #(save-values)
+                    :on-blur #(save-values "save-company")
                     :value (:linkedin (:web data))}))
                 (dom/p {:class "help-block"} "Optional"))
 
@@ -383,7 +376,7 @@
                     :class "form-control"
                     :id "github"
                     :on-change #(change-value data % [:web :github])
-                    :on-blur #(save-values)
+                    :on-blur #(save-values "save-company")
                     :value (:github (:web data))}))
                 (dom/p {:class "help-block"} "Optional"))
 
@@ -397,7 +390,7 @@
                     :class "form-control"
                     :id "angellist"
                     :on-change #(change-value data % [:web :angellist])
-                    :on-blur #(save-values)
+                    :on-blur #(save-values "save-company")
                     :value (:angellist (:web data))}))
                 (dom/p {:class "help-block"} "Optional"))
 
@@ -411,7 +404,7 @@
                       :class "form-control"
                       :id (name key)
                       :on-change #(change-value data % [:web key])
-                      :on-blur #(save-values)
+                      :on-blur #(save-values "save-company")
                       :value value})
                     (dom/a {:on-click (fn [e]
                                         (.preventDefault e)
