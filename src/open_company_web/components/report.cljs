@@ -8,11 +8,14 @@
               [open-company-web.components.finances :refer [finances readonly-finances]]
               [open-company-web.components.compensation :refer [compensation readonly-compensation]]
               [open-company-web.components.currency-picker :refer [currency-picker]]
+              [open-company-web.components.navbar :refer [navbar]]
+              [open-company-web.components.sidebar :refer [sidebar]]
               [open-company-web.components.link :refer [link]]
               [open-company-web.dispatcher :refer [app-state]]
               [om-bootstrap.nav :as n]
               [open-company-web.api :refer [save-or-create-report]]
-              [cljs.core.async :refer [put! chan <!]]))
+              [cljs.core.async :refer [put! chan <!]]
+              [open-company-web.router :as router]))
 
 (defcomponent report [data owner]
   (init-state [_]
@@ -37,36 +40,62 @@
           period (:period data)
           company-data ((keyword symbol) data)
           report-key (keyword (str "report-" symbol "-" year "-" period))
-          report-data (report-key company-data)]
-      (dom/div {:class "report-container"}
-        (dom/h2 (:name company-data) " Report for " year " " period)
-        (cond
-          (:loading data)
-          (dom/div nil "Loading")
-
-          (and (contains? data (keyword symbol)) (contains? company-data report-key))
-          (dom/div nil
-            (om/build currency-picker report-data)
+          report-data (report-key company-data)
+          reports (filterv #(= (:rel %) "report") (:links company-data))]
+      (dom/div {:class "report-container row"}
+        (om/build navbar company-data)
+        (dom/div {:class "container-fluid"}
+          (om/build sidebar {:active "reports"})
+          (dom/div {:class "col-md-11 col-md-offset-1 main"}
             (n/nav {
-              :class "tab-navigation"
-              :bs-style "tabs"
-              :active-key (om/get-state owner :selected-tab)
-              :on-select #(om/set-state! owner :selected-tab %) }
-              (n/nav-item {:key 1 :href ""} "Headcount")
-              (n/nav-item {:key 2 :href ""} "Finances")
-              (n/nav-item {:key 3 :href ""} "Compensation"))
-            (case (om/get-state owner :selected-tab)
-              1 (om/build headcount (:headcount report-data))
-              2 (om/build finances {
-                  :finances (:finances report-data)
-                  :currency (:currency report-data)})
-              3 (om/build compensation {
-                  :compensation (:compensation report-data)
-                  :headcount (:headcount report-data)
-                  :currency (:currency report-data)})))
+              :class "profile-tab-navigation"
+              :bs-style "tabs"}
 
-          :else
-          (dom/div nil "Report not found"))))))
+              (let [url (str "/" symbol "/summary")]
+                (n/nav-item {
+                  :key "summary"
+                  :href url
+                  :on-click (fn [e] (.preventDefault e) (router/nav! url))
+                  } "Summary"))
+
+              (for [report reports]
+                (let [href (:href report)
+                      parts (clojure.string/split href "/")
+                      rep-year (nth parts 4)
+                      rep-period (nth parts 5)
+                      rep-key (str "report-" symbol "-" year "-" period)
+                      link (str "/" symbol "/" rep-year "/" rep-period "/edit")]
+                  (n/nav-item {
+                    :key rep-key
+                    :href link
+                    :on-click (fn [e] (.preventDefault e) (router/nav! link))
+                    :class (if (= (name report-key) rep-key) "active" "")
+                    } (str rep-period " " rep-year))))
+
+              (let [url (str "/" symbol "/new-report")]
+                (n/nav-item {
+                  :key "new-report"
+                  :href url
+                  :on-click (fn [e] (.preventDefault e) (router/nav! url))
+                  } (dom/i {:class "fa fa-plus"}))))
+            (cond
+
+              (:loading data)
+              (dom/div nil "Loading")
+
+              (and (contains? data (keyword symbol)) (contains? company-data report-key))
+              (dom/div
+                (om/build finances {
+                    :finances (:finances report-data)
+                    :currency (:currency report-data)})
+                (om/build headcount (:headcount report-data))
+                (om/build compensation {
+                    :compensation (:compensation report-data)
+                    :headcount (:headcount report-data)
+                    :currency (:currency report-data)}))
+
+              :else
+              (dom/div nil "Report not found"))))))))
 
 (defcomponent readonly-report [data owner]
   (will-mount [_]
