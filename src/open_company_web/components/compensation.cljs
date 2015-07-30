@@ -7,7 +7,8 @@
               [open-company-web.components.comment :refer [comment-component]]
               [open-company-web.components.pie-chart :refer [pie-chart]]
               [goog.string :as gstring]
-              [om-bootstrap.random :as r]))
+              [om-bootstrap.random :as r]
+              [om-bootstrap.panel :as p]))
 
 (defn get-chart-data [data head-data symbol]
   (let [show-founders (> (:founders head-data) 0)
@@ -59,7 +60,7 @@
           employees-label (if employees (str employees-label " (" (calc-percentage employees total-compensation) "%)") employees-label)
           contractors-label (str "contractor" (if (= contractors-count 1) "" "s") " comp. this month")
           contractors-label (if contractors (str contractors-label " (" (calc-percentage contractors total-compensation) "%)") contractors-label)]
-      (r/well {:class "report-list compensation clearfix"}
+      (p/panel {:header (dom/h3 "Compensation") :class "report-list compensation clearfix"}
         (dom/div {:class "report-list-left"}
           (when show-founders
             (om/build report-editable-line {
