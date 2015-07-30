@@ -10,13 +10,13 @@
   (render [_]
     (dom/div {:class "col-mid-1 sidebar"}
       (dom/ul {:class "nav nav-sidebar"}
-        (dom/li {:class "active"}
+        (dom/li {:class (if (= (:active data) "profile") "active" "")}
           (om/build link {:href "/profile" :name "Profile"}))
-        (dom/li nil
+        (dom/li {:class (if (= (:active data) "organization") "active" "")}
           (om/build link {:href "/organization" :name "Organization"}))
-        (dom/li nil
+        (dom/li {:class (if (= (:active data) "equity") "active" "")}
           (om/build link {:href "/equity" :name "Equity"}))
-        (dom/li nil
+        (dom/li {:class (if (= (:active data) "agreements") "active" "")}
           (om/build link {:href "/agreements" :name "Agreements"}))
-        (dom/li nil
+        (dom/li {:class (if (= (:active data) "reports") "active" "")}
           (om/build link {:href "/reports" :name "Reports"}))))))
