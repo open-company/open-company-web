@@ -1,5 +1,9 @@
 /* some style */
 
+a{
+  cursor: pointer;
+}
+
 /*
  * Global add-ons
  */
