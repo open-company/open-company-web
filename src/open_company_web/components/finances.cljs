@@ -5,7 +5,8 @@
               [open-company-web.lib.utils :refer [abs thousands-separator handle-change get-symbols-for-currency-code]]
               [open-company-web.components.report-line :refer [report-editable-line report-line]]
               [open-company-web.components.comment :refer [comment-component]]
-              [om-bootstrap.random :as  r]))
+              [om-bootstrap.random :as  r]
+              [om-bootstrap.panel :as p]))
 
 (defcomponent finances [data owner]
   (render [_]
@@ -20,7 +21,7 @@
           profitable (if (> burn-rate 0) "Yes" "No")
           run-away (if (<= burn-rate 0) (quot cash burn-rate) "N/A")
           currency-symbol (get-symbols-for-currency-code currency)]
-      (r/well {:class "report-list finances clearfix"}
+      (p/panel {:header (dom/h3 "Finances") :class "report-list finances clearfix"}
         (dom/div {:class "report-list-left"}
           (om/build report-editable-line {
             :cursor (:finances data)

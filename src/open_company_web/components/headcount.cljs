@@ -6,7 +6,8 @@
               [open-company-web.components.report-line :refer [report-line report-editable-line]]
               [open-company-web.components.comment :refer [comment-component]]
               [open-company-web.components.pie-chart :refer [pie-chart]]
-              [om-bootstrap.random :as  r]))
+              [om-bootstrap.random :as  r]
+              [om-bootstrap.panel :as p]))
 
 (defn get-chart-data [data]
   { :columns [["string" "Job"] ["number" "Number"]]
@@ -27,7 +28,7 @@
           pt-contractors (:pt-contractors data)
           total-headcount (+ founders executives ft-employees ft-contractors pt-employees pt-contractors)
           full-time-equivalent (+ founders executives ft-employees ft-contractors (/ pt-employees 2) (/ pt-contractors 2))]
-      (r/well {:class "report-list headcount clearfix"}
+      (p/panel {:header (dom/h3 "Headcount") :class "report-list headcount clearfix"}
         (dom/div {:class "report-list-left"}
           (om/build report-editable-line {:cursor data :key :founders :label "founder"})
           (om/build report-editable-line {:cursor data :key :executives :label "executive"})
