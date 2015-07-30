@@ -34,7 +34,7 @@
       (dom/div {:class "company-container row"}
         (om/build navbar company-data)
         (dom/div {:class "container-fluid"}
-          (om/build sidebar {})
+          (om/build sidebar {:active "profile"})
           (dom/div {:class "col-md-11 col-md-offset-1 main"}
             (cond
 
