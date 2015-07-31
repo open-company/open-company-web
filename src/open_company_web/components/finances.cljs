@@ -105,7 +105,7 @@
             (dom/div {:class "form-group"}
               (dom/label {:class "col-md-2 control-label"} burn-rate-label)
               (dom/label {:class "col-md-2 control-label"}
-                (dom/span {:class burn-rate-classes} (thousands-separator burn-rate)))
+                (dom/span {:class burn-rate-classes} (str currency-symbol (thousands-separator burn-rate))))
               (dom/p {:class "help-block"} burn-rate-helper))
 
             ;; Runaway
