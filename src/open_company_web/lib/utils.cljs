@@ -28,12 +28,14 @@
     #js {}
     #js {:display "none"}))
 
-(defn get-symbols-for-currency-code
-  [code]
-  (let [kw (keyword code)
-        dict (get iso4217 kw)
-        symbol (if (contains? dict :symbol) (:symbol dict) code)
-        ret (or symbol (:code dict))]
+(defn get-currency [currency-code]
+  (let [kw (keyword currency-code)]
+    (get iso4217 kw)))
+
+(defn get-symbol-for-currency-code [currency-code]
+  (let [currency (get-currency currency-code)
+        symbol (if (contains? currency :symbol) (:symbol currency) currency-code)
+        ret (or symbol (:code currency))]
   ret))
 
 (def channel-coll (atom {}))
@@ -55,3 +57,8 @@
 (defn save-values [channel-name]
   (let [save-channel (get-channel channel-name)]
     (put! save-channel 1)))
+
+(defn in?
+  "true if seq contains elm"
+  [seq elm]
+  (some #(= elm %) seq))
