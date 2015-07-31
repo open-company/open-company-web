@@ -34,7 +34,12 @@
 
 (defn get-symbol-for-currency-code [currency-code]
   (let [currency (get-currency currency-code)
-        symbol (if (contains? currency :symbol) (:symbol currency) currency-code)
+        symbol (if
+                (and
+                  (contains? currency :symbol)
+                  (> (count (:symbol currency)) 0))
+                (:symbol currency)
+                currency-code)
         ret (or symbol (:code currency))]
   ret))
 
