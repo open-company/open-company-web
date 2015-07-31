@@ -20,56 +20,56 @@
 ;; setup Sentry error reporting
 (defonce raven (raven-setup))
 
-(defn render-company [symbol loading target]
-  ; (swap! app-state assoc :symbol symbol)
-  (when loading
-    (swap! app-state assoc :loading true))
-  (om/root company app-state target))
-
-; Routes - Do not define routes if js/document#app
-; is not defined because we are in the tests
+; Routes - Do not define routes when js/document#app
+; is undefined because it crashed the tests
 (if-let [target (. js/document (getElementById "app"))]
   (do
     (defroute list-page-route "/companies" []
+      ; save route
       (router/save-route ["companies"] {})
+      ; load data from api
       (api/get-companies)
+      ; render component
       (om/root list-companies app-state {:target target}))
 
     (defroute company-profile-route "/:symbol" {symbol :symbol}
       ; save route
       (router/save-route [symbol] {:symbol symbol})
-
-      (if-not (contains? app-state (keyword symbol))
-        (do
-          (api/get-company symbol)
-          (render-company symbol true {:target target}))
-        (render-company symbol false {:target target})))
+      ; load data from api
+      (api/get-company symbol)
+      (swap! app-state assoc :loading true)
+      ; render compoenent
+      (om/root company app-state {:target target}))
 
     (defroute report-summary-route "/:symbol/summary" {symbol :symbol}
       ; save route
       (router/save-route [symbol "summary"] {:symbol symbol})
-
+      ; load data from api
       (swap! app-state assoc :loading true)
       (api/get-company symbol)
+      ; render component
       (om/root report app-state {:target target}))
 
     (defroute report-editable-route "/:symbol/:year/:period/edit" {symbol :symbol year :year period :period}
       ; save route
       (router/save-route [symbol year period "edit"] {:symbol symbol :year year :period period})
-
+      ; load data from api
       (swap! app-state assoc :loading true)
       (api/get-report symbol year period)
+      ; render component
       (om/root report app-state {:target target}))
 
     (defroute report-route "/:symbol/:year/:period" {symbol :symbol year :year period :period}
       ; save route
       (router/save-route [symbol year period] {:symbol symbol :year year :period period})
-
+      ; load data from api
       (swap! app-state assoc :loading true)
       (api/get-report symbol year period)
+      ; render component
       (om/root readonly-report app-state {:target target}))
 
     (defroute not-found-route "*" []
+      ; render component
       (om/root page-not-found app-state {:target target}))))
 
 (defonce history
