@@ -11,16 +11,40 @@
               [open-company-web.components.navbar :refer [navbar]]
               [open-company-web.components.sidebar :refer [sidebar]]
               [open-company-web.components.link :refer [link]]
+              [open-company-web.components.new-report-popover :refer [new-report-popover]]
               [open-company-web.dispatcher :refer [app-state]]
               [om-bootstrap.nav :as n]
               [open-company-web.api :refer [save-or-create-report]]
               [cljs.core.async :refer [put! chan <!]]
               [open-company-web.router :as router]))
 
+(defn create-new-report [owner company-data new-year new-period]
+  (let [symbol (:symbol company-data)]
+    ; hide popover
+    (om/set-state! owner :show-new-report-popover false)
+    ; when the data are correct: FIXME check year and period
+    (when (and new-year new-period)
+      (let [new-report-key (str "report-" symbol "-" new-year "-" new-period)
+            links (:links company-data)]
+        ; add an empty report
+        (om/transact! company-data assoc (keyword new-report-key) {
+          :finances {}
+          :headcount {}
+          :compensation {}
+          })
+        ; add the report to links
+        (om/transact! company-data :links #(conj % {
+          :href (str "/v1/companies/" symbol "/" new-year "/" new-period)
+          :rel "report"
+          }))
+        ; navigate to the new report
+        (router/nav! (str "/" symbol "/" new-year "/" new-period "/edit"))))))
+
 (defcomponent report [data owner]
   (init-state [_]
     (let [chan (chan)]
-      (utils/add-channel "save-report" chan)))
+      (utils/add-channel "save-report" chan))
+    {:show-new-report-popover false})
   (will-mount [_]
     (om/set-state! owner :selected-tab 1)
     (let [save-change (utils/get-channel "save-report")]
@@ -78,8 +102,18 @@
                 (n/nav-item {
                   :key "new-report"
                   :href url
-                  :on-click (fn [e] (.preventDefault e) (router/nav! url))
-                  } (dom/i {:class "fa fa-plus"}))))
+                  :on-click (fn [e]
+                              ; toggle popover
+                              (let [toggle (not (om/get-state owner :show-new-report-popover))]
+                                (om/set-state! owner :show-new-report-popover toggle))
+                              (.preventDefault e))}
+                  (dom/i {:class "fa fa-plus"}))))
+
+            ; New report popover
+            (when (om/get-state owner :show-new-report-popover)
+              (om/build new-report-popover {
+                :on-create (fn [new-year new-period]
+                            (create-new-report owner company-data new-year new-period))}))
 
             (cond
 
