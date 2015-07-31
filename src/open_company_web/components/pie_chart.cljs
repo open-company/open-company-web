@@ -28,8 +28,8 @@
 
 (defcomponent pie-chart [chart-data owner]
   (did-mount [_]
-    (draw-chart (:symbol chart-data) (:columns chart-data) (:values chart-data) (.getDOMNode (om/get-ref owner "chart"))))
+    (draw-chart (:prefix chart-data) (:columns chart-data) (:values chart-data) (.getDOMNode (om/get-ref owner "chart"))))
   (did-update [_ _ _]
-    (draw-chart (:symbol chart-data) (:columns chart-data) (:values chart-data) (.getDOMNode (om/get-ref owner "chart"))))
+    (draw-chart (:prefix chart-data) (:columns chart-data) (:values chart-data) (.getDOMNode (om/get-ref owner "chart"))))
   (render [_]
     (dom/div #js {:className "chart-container" :ref "chart" })))

@@ -11,24 +11,14 @@
               [open-company-web.components.link :refer [link]]
               [open-company-web.components.sidebar :refer [sidebar]]
               [open-company-web.components.profile :refer [profile]]
+              [open-company-web.router :as router]
               [clojure.string :as str]))
 
 (enable-console-print!)
 
-(defcomponent report-link [data owner]
-  (render [_]
-    (let [symbol (:symbol data)
-          link-parts (str/split (:report data) "/")
-          year (nth link-parts 4)
-          period (nth link-parts 5)]
-      (dom/div {:class "report-link"}
-        (om/build link {
-          :href (str "/companies/" symbol "/" year "/" period)
-          :name (str year " - " period)})))))
-
 (defcomponent company [data owner]
   (render [_]
-    (let [symbol (:symbol data)
+    (let [symbol (:symbol @router/path)
           company-data ((keyword symbol) data)
           reports (filterv #(= (:rel %) "report") (:links company-data))]
       (dom/div {:class "company-container row"}
@@ -44,13 +34,8 @@
 
               (contains? company-data :symbol)
               (om/build profile data)
-              ; (dom/div
-              ;   (for [report reports]
-              ;     (om/build report-link {
-              ;       :report (:href report)
-              ;       :symbol symbol})))
 
               :else
               (dom/div
-                (dom/h2 (str (:symbol data) " not found"))
+                (dom/h2 (str (:symbol @router/path) " not found"))
                 (om/build link {:href "/" :name "Back home"})))))))))

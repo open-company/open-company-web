@@ -3,7 +3,7 @@
     (:require [om.core :as om :include-macros true]
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
-              [open-company-web.lib.utils :refer [handle-change add-channel get-channel]]
+              [open-company-web.lib.utils :as utils]
               [open-company-web.components.headcount :refer [headcount readonly-headcount]]
               [open-company-web.components.finances :refer [finances readonly-finances]]
               [open-company-web.components.compensation :refer [compensation readonly-compensation]]
@@ -20,28 +20,29 @@
 (defcomponent report [data owner]
   (init-state [_]
     (let [chan (chan)]
-      (add-channel "save-report" chan)))
+      (utils/add-channel "save-report" chan)))
   (will-mount [_]
     (om/set-state! owner :selected-tab 1)
-    (let [save-change (get-channel "save-report")]
+    (let [save-change (utils/get-channel "save-report")]
         (go (loop []
           (let [change (<! save-change)
-                symbol (:symbol data)
-                year (:year data)
-                period (:period data)
+                symbol (:symbol @router/path)
+                year (:year @router/path)
+                period (:period @router/path)
                 company-data ((keyword symbol) @app-state)
                 report-key (keyword (str "report-" symbol "-" year "-" period))
                 report-data (report-key company-data)]
             (save-or-create-report symbol year period report-data)
             (recur))))))
   (render [_]
-    (let [symbol (:symbol data)
-          year (:year data)
-          period (:period data)
+    (let [symbol (:symbol @router/path)
+          year (:year @router/path)
+          period (:period @router/path)
           company-data ((keyword symbol) data)
           report-key (keyword (str "report-" symbol "-" year "-" period))
           report-data (report-key company-data)
-          reports (filterv #(= (:rel %) "report") (:links company-data))]
+          reports (filterv #(= (:rel %) "report") (:links company-data))
+          is-summary (utils/in? (:route @router/path) "summary")]
       (dom/div {:class "report-container row"}
         (om/build navbar company-data)
         (dom/div {:class "container-fluid"}
@@ -56,6 +57,7 @@
                   :key "summary"
                   :href url
                   :on-click (fn [e] (.preventDefault e) (router/nav! url))
+                  :class (if is-summary "active" "")
                   } "Summary"))
 
               (for [report reports]
@@ -63,7 +65,7 @@
                       parts (clojure.string/split href "/")
                       rep-year (nth parts 4)
                       rep-period (nth parts 5)
-                      rep-key (str "report-" symbol "-" year "-" period)
+                      rep-key (str "report-" symbol "-" rep-year "-" rep-period)
                       link (str "/" symbol "/" rep-year "/" rep-period "/edit")]
                   (n/nav-item {
                     :key rep-key
@@ -78,6 +80,7 @@
                   :href url
                   :on-click (fn [e] (.preventDefault e) (router/nav! url))
                   } (dom/i {:class "fa fa-plus"}))))
+
             (cond
 
               (:loading data)
@@ -94,6 +97,9 @@
                     :headcount (:headcount report-data)
                     :currency (:currency report-data)}))
 
+              is-summary
+              (dom/div nil (dom/h3 "Reports summary"))
+
               :else
               (dom/div nil "Report not found"))))))))
 
@@ -101,9 +107,9 @@
   (will-mount [_]
     (om/set-state! owner :selected-tab 1))
   (render [_]
-    (let [symbol (:symbol data)
-          year (:year data)
-          period (:period data)
+    (let [symbol (:symbol @router/path)
+          year (:year @router/path)
+          period (:period @router/path)
           company-data ((keyword symbol) data)
           report-key (keyword (str "report-" symbol "-" year "-" period))
           report-data (report-key company-data)

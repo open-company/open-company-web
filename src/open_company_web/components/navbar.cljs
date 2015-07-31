@@ -3,7 +3,8 @@
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
               [open-company-web.components.link :refer [link]]
-              [om-bootstrap.nav :as n]))
+              [om-bootstrap.nav :as n]
+              [open-company-web.router :as router]))
 
 (defcomponent navbar [data owner]
   (render [_]
@@ -11,8 +12,8 @@
       (dom/div {:class "navbar-header"}
         (om/build link {
           :class "navbar-brand"
-          :href (str "/companies/" (:symbol data))
-          :name (str (:symbol data) " - " (:name data))}))
+          :href (str "/companies/" (:symbol @router/path))
+          :name (str (:symbol @router/path) " - " (:name data))}))
       (dom/div {:id "navbar" :class "navbar-collapse collapse"}
         (dom/ul {:class "nav navbar-nav navbar-right"}
           (dom/li nil

@@ -1,6 +1,7 @@
 (ns open-company-web.dispatcher
   (:require [cljs-flux.dispatcher :as flux]
-            [no.en.core :refer [deep-merge]]))
+            [no.en.core :refer [deep-merge]]
+            [open-company-web.router :as router]))
 
 (defonce app-state (atom {
   ; :OPEN {
@@ -103,8 +104,8 @@
         ; make sure the report contains all the keys :headcount :finances :compensation
         (let [report-data (merge empty-report body)]
           ; add the new report data
-          (let [symbol (:symbol report-data)
-                year (:year report-data)
-                period (:period report-data)
+          (let [symbol (:symbol @router/path)
+                year (:year @router/path)
+                period (:period @router/path)
                 report-key (keyword (str "report-" symbol "-" year "-" period))]
             (swap! app-state assoc-in [(keyword symbol) report-key] report-data)))))))

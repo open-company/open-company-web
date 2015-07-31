@@ -22,12 +22,12 @@
     (let [save-change (get-channel "save-company")]
         (go (loop []
           (let [change (<! save-change)
-                symbol (:symbol data)
+                symbol (:symbol @router/path)
                 company-data ((keyword symbol) @app-state)]
             (save-or-create-company symbol company-data)
             (recur))))))
   (render [_]
-    (let [symbol (:symbol data)
+    (let [symbol (:symbol @router/path)
           company-data ((keyword symbol) data)]
       (dom/div
         (n/nav {
