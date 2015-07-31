@@ -21,7 +21,7 @@
 (defonce raven (raven-setup))
 
 (defn render-company [symbol loading target]
-  (swap! app-state assoc :symbol symbol)
+  ; (swap! app-state assoc :symbol symbol)
   (when loading
     (swap! app-state assoc :loading true))
   (om/root company app-state target))
@@ -35,14 +35,23 @@
       (api/get-companies)
       (om/root list-companies app-state {:target target}))
 
-    (defroute editable-page-route "/:symbol" {symbol :symbol}
+    (defroute company-profile-route "/:symbol" {symbol :symbol}
       ; save route
       (router/save-route [symbol] {:symbol symbol})
+
       (if-not (contains? app-state (keyword symbol))
         (do
           (api/get-company symbol)
           (render-company symbol true {:target target}))
         (render-company symbol false {:target target})))
+
+    (defroute report-summary-route "/:symbol/summary" {symbol :symbol}
+      ; save route
+      (router/save-route [symbol "summary"] {:symbol symbol})
+
+      (swap! app-state assoc :loading true)
+      (api/get-company symbol)
+      (om/root report app-state {:target target}))
 
     (defroute report-editable-route "/:symbol/:year/:period/edit" {symbol :symbol year :year period :period}
       ; save route
@@ -50,9 +59,6 @@
 
       (swap! app-state assoc :loading true)
       (api/get-report symbol year period)
-      (swap! app-state assoc :symbol symbol)
-      (swap! app-state assoc :year year)
-      (swap! app-state assoc :period period)
       (om/root report app-state {:target target}))
 
     (defroute report-route "/:symbol/:year/:period" {symbol :symbol year :year period :period}
@@ -61,9 +67,6 @@
 
       (swap! app-state assoc :loading true)
       (api/get-report symbol year period)
-      (swap! app-state assoc :symbol symbol)
-      (swap! app-state assoc :year year)
-      (swap! app-state assoc :period period)
       (om/root readonly-report app-state {:target target}))
 
     (defroute not-found-route "*" []
