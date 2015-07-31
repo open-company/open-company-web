@@ -89,7 +89,8 @@
                     :on-blur (fn [e]
                                 (utils/handle-change comp-data (utils/String->Number (.. e -target -value)) :founders)
                                 (om/set-state! owner :founders (utils/thousands-separator (.. e -target -value)))
-                                (utils/save-values "save-report"))
+                                (utils/save-values "save-report")
+                                (.stopPropagation e))
                     :placeholder (:text currency-dict)}))
                 (dom/p {:class "help-block"} "Founder cash compensation this quarter")))
 
@@ -108,7 +109,8 @@
                       :on-blur (fn [e]
                                   (utils/handle-change comp-data (utils/String->Number (.. e -target -value)) :executives)
                                   (om/set-state! owner :executives (utils/thousands-separator (.. e -target -value)))
-                                  (utils/save-values "save-report"))
+                                  (utils/save-values "save-report")
+                                  (.stopPropagation e))
                       :placeholder (:text currency-dict)}))
                   (dom/p {:class "help-block"} "Executives cash compensation this quarter")))
 
@@ -127,7 +129,8 @@
                       :on-blur (fn [e]
                                   (utils/handle-change comp-data (utils/String->Number (.. e -target -value)) :employees)
                                   (om/set-state! owner :employees (utils/thousands-separator (.. e -target -value)))
-                                  (utils/save-values "save-report"))
+                                  (utils/save-values "save-report")
+                                  (.stopPropagation e))
                       :placeholder (:text currency-dict)}))
                   (dom/p {:class "help-block"} "Employees cash compensation this quarter")))
 
@@ -146,7 +149,8 @@
                       :on-blur (fn [e]
                                   (utils/handle-change comp-data (utils/String->Number (.. e -target -value)) :contractors)
                                   (om/set-state! owner :contractors (utils/thousands-separator (.. e -target -value)))
-                                  (utils/save-values "save-report"))
+                                  (utils/save-values "save-report")
+                                  (.stopPropagation e))
                       :placeholder (:text currency-dict)}))
                   (dom/p {:class "help-block"} "Cost for contractors this quarter"))))
 
@@ -162,7 +166,9 @@
             :rows "5"
             :value (:comment comp-data)
             :on-change #(utils/handle-change comp-data (.. % -target -value) :comment)
-            :on-blur #(utils/save-values "save-report")
+            :on-blur (fn [e]
+                        (utils/save-values "save-report")
+                        (.stopPropagation e))
             :placeholder "Comments: explain any recent significant changes in compensation costs"})
           (dom/div {:class "col-md-1"}))))))
 

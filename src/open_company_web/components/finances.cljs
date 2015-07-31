@@ -50,7 +50,8 @@
                   :on-blur (fn [e]
                               (utils/change-value finances e :cash)
                               (om/set-state! owner :cash (utils/thousands-separator (.. e -target -value)))
-                              (utils/save-values "save-report"))
+                              (utils/save-values "save-report")
+                              (.stopPropagation e))
                   }))
               (dom/p {:class "help-block"} "Cash and cash equivalents"))
 
@@ -69,7 +70,8 @@
                   :on-blur (fn [e]
                               (utils/change-value finances e :revenue)
                               (om/set-state! owner :revenue (utils/thousands-separator (.. e -target -value)))
-                              (utils/save-values "save-report"))
+                              (utils/save-values "save-report")
+                              (.stopPropagation e))
                   }))
               (dom/p {:class "help-block"} "All revenue this quarter (not investments)"))
 
@@ -88,11 +90,12 @@
                   :on-blur (fn [e]
                               (utils/change-value finances e :costs)
                               (om/set-state! owner :costs (utils/thousands-separator (.. e -target -value)))
-                              (utils/save-values "save-report"))
+                              (utils/save-values "save-report")
+                              (.stopPropagation e))
                   }))
               (dom/p {:class "help-block"} "All costs this quarter including salaries"))
 
-            ;; Runaway
+            ;; Profitable
             (dom/div {:class "form-group"}
               (dom/label {:class "col-md-2 control-label"} "Profitable?")
               (dom/label {:class "col-md-2 control-label"} profitable)
@@ -102,14 +105,15 @@
             (dom/div {:class "form-group"}
               (dom/label {:class "col-md-2 control-label"} burn-rate-label)
               (dom/label {:class "col-md-2 control-label"}
-                (dom/span {:class burn-rate-classes} (str currency-symbol (utils/thousands-separator burn-rate))))
+                (dom/span {:class burn-rate-classes} (str (utils/thousands-separator burn-rate) " " currency-symbol)))
               (dom/p {:class "help-block"} burn-rate-helper))
 
             ;; Runaway
-            (dom/div {:class "form-group"}
-              (dom/label {:class "col-md-2 control-label"} "Runway?")
-              (dom/label {:class "col-md-2 control-label"} run-away)
-              (dom/p {:class "help-block"} (str "Time until cash on hand is " currency-symbol "0")))))
+            (when (<= burn-rate 0)
+              (dom/div {:class "form-group"}
+                (dom/label {:class "col-md-2 control-label"} "Runway?")
+                (dom/label {:class "col-md-2 control-label"} run-away)
+                (dom/p {:class "help-block"} (str "Time until cash on hand is " currency-symbol "0"))))))
 
         ;; Comment textarea
         (dom/div {:class "row"}
@@ -119,7 +123,9 @@
             :rows "5"
             :value (:comment finances)
             :on-change #(utils/handle-change finances (.. % -target -value) :comment)
-            :on-blur #(utils/save-values "save-report")
+            :on-blur (fn [e]
+                      (utils/save-values "save-report")
+                      (.stopPropagation e))
             :placeholder "Comments: explain any recent significant changes in costs or revenue, provide guidance on revenue and profitablity expectations"})
           (dom/div {:class "col-md-1"}))))))
 

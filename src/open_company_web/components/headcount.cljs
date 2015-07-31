@@ -46,7 +46,8 @@
                   :on-blur (fn [e]
                               (utils/handle-change data (utils/String->Number (.. e -target -value)) :founders)
                               (om/set-state! owner :founders (utils/thousands-separator (.. e -target -value)))
-                              (utils/save-values "save-report"))}))
+                              (utils/save-values "save-report")
+                              (.stopPropagation e))}))
               (dom/p {:class "help-block"} "Currently employed founders"))
             (dom/div {:class "form-group"}
               (dom/label {:for "executives" :class "col-md-4 control-label"} "Executives")
@@ -60,7 +61,8 @@
                   :on-blur (fn [e]
                               (utils/handle-change data (utils/String->Number (.. e -target -value)) :executives)
                               (om/set-state! owner :executives (utils/thousands-separator (.. e -target -value)))
-                              (utils/save-values "save-report"))})))
+                              (utils/save-values "save-report")
+                              (.stopPropagation e))})))
             (dom/div {:class "form-group"}
               (dom/label {:for "ft-employees" :class "col-md-4 control-label"} "Full-time")
               (dom/div {:class "input-group col-md-2"}
@@ -73,7 +75,8 @@
                   :on-blur (fn [e]
                               (utils/handle-change data (utils/String->Number (.. e -target -value)) :ft-employees)
                               (om/set-state! owner :ft-employees (utils/thousands-separator (.. e -target -value)))
-                              (utils/save-values "save-report"))})))
+                              (utils/save-values "save-report")
+                              (.stopPropagation e))})))
             (dom/div {:class "form-group"}
               (dom/label {:for "pt-employees" :class "col-md-4 control-label"} "Part-time")
               (dom/div {:class "input-group col-md-2"}
@@ -86,7 +89,8 @@
                   :on-blur (fn [e]
                               (utils/handle-change data (utils/String->Number (.. e -target -value)) :pt-employees)
                               (om/set-state! owner :pt-employees (utils/thousands-separator (.. e -target -value)))
-                              (utils/save-values "save-report"))})))
+                              (utils/save-values "save-report")
+                              (.stopPropagation e))})))
             (dom/div {:class "form-group"}
               (dom/label {:for "contractors" :class "col-md-4 control-label"} "Contractors")
               (dom/div {:class "input-group col-md-2"}
@@ -99,7 +103,8 @@
                   :on-blur (fn [e]
                               (utils/handle-change data (utils/String->Number (.. e -target -value)) :contractors)
                               (om/set-state! owner :contractors (utils/thousands-separator (.. e -target -value)))
-                              (utils/save-values "save-report"))}))
+                              (utils/save-values "save-report")
+                              (.stopPropagation e))}))
               (dom/p {:class "help-block"} "People classified as contractors"))
             (dom/div {:class "form-group"}
               (dom/label {:class "col-md-4 control-label"} "Total")
@@ -113,7 +118,9 @@
             :rows "5"
             :value (:comment data)
             :on-change #(utils/handle-change data (.. % -target -value) :comment)
-            :on-blur #(utils/save-values "save-report")
+            :on-blur (fn [e]
+                      (utils/save-values "save-report")
+                      (.stopPropagation e))
             :placeholder "Comments: explain any recent additions or deductions in headcount, expected short-term hiring plans, important skills gaps and recruiting efforts"})
           (dom/div {:class "col-md-1"}))))))
 
