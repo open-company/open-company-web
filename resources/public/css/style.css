@@ -132,11 +132,11 @@ div.report-list span.num{
   font-weight: bold;
 }
 
-div.report-list span.num.red{
+span.num.red{
   color: red;
 }
 
-div.report-list span.num.green{
+span.num.green{
   color: green;
 }
 
