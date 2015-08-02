@@ -3,7 +3,7 @@
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
               [open-company-web.components.report-line :refer [report-line report-editable-line]]
-              [open-company-web.utils :refer [thousands-separator handle-change get-symbols-for-currency-code]]
+              [open-company-web.lib.utils :refer [thousands-separator handle-change get-symbols-for-currency-code]]
               [open-company-web.components.comment :refer [comment-component]]
               [open-company-web.components.pie-chart :refer [pie-chart]]
               [goog.string :as gstring]

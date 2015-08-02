@@ -2,7 +2,7 @@
     (:require [om.core :as om :include-macros true]
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
-              [open-company-web.utils :refer [handle-change]]
+              [open-company-web.lib.utils :refer [handle-change]]
               [open-company-web.components.headcount :refer [headcount]]
               [open-company-web.components.finances :refer [finances]]
               [open-company-web.components.compensation :refer [compensation]]
@@ -18,7 +18,7 @@
           link-parts (str/split (:report data) "/")
           year (nth link-parts 4)
           period (nth link-parts 5)]
-      (dom/div
+      (dom/div {:class "report-link"}
         (om/build link {
           :href (str "/companies/" symbol "/" year "/" period)
           :name (str year " - " period)})))))
@@ -28,7 +28,7 @@
     (let [symbol (:ticker data)
           company-data ((keyword symbol) data)
           reports (filterv #(= (:rel %) "report") (:links company-data))]
-      (dom/div
+      (dom/div {:class "company-container"}
         (dom/h2 (str (:name company-data) " - Dashboard"))
         (cond
           (:loading data)

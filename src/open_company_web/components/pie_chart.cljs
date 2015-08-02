@@ -18,12 +18,13 @@
     data-table))
 
 (defn draw-chart [symbol columns data dom-node]
-  (let [data-table (add-rows columns data symbol)
-        options (clj->js {
-                  :title  ""
-                  :width 600
-                  :height 250})]
-    (when dom-node (.draw (js/google.visualization.PieChart. dom-node) data-table options))))
+  (when (.-google js/window)
+    (let [data-table (add-rows columns data symbol)
+          options (clj->js {
+                    :title  ""
+                    :width 600
+                    :height 250})]
+      (when dom-node (.draw (js/google.visualization.PieChart. dom-node) data-table options)))))
 
 (defcomponent pie-chart [chart-data owner]
   (did-mount [_]

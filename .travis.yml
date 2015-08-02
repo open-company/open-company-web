@@ -1,3 +1,17 @@
 language: clojure
+jdk:
+  - oraclejdk8
 lein: lein2
-script: lein2 doo phantom test once
+sudo: false
+before_script: lein2 clean
+script: lein2 test!
+cache:
+  directories:
+  - "$HOME/.m2"
+branches:
+  only:
+  - master
+  - mainline
+notifications:
+  slack:
+    secure: ARbvDz3oduvMPxFD5IwSgcygyajJJUQ8Vu9saa8RWuHuFjERT8Kh0KC9diKgISHgBZyRmUkiL+2hO/ICMg6R+CpFmkKfzZXZbLXeAL2yi3/Pm4vRVohhQFBDtYE9eby/yxSmKXcuBRpPdBTNilw3q+MITBOqn1lBZIBPKF5NgCakIEq+RSvv8ImSqqw1qKpAJrzBQpS3mriVEQJQgof70G1sY6RvCgCV5rvxiKD/xJp+qdSaVcT/qpTN5FZ/0dy+wSKjwOUOlr6FtbAjglrX5WnpHV072HTNtYqqdGa7n8MzxxN8N93F2ehC9xQqvYDg6O/OJjCz46idKV+TsYpi01aX0KAkuEelAhwhKhL/2TBN78Qf0edyKBEJqQHbYok7zNsbDUTblCOWgKqED/mAbC8BsmVgjpRlDcxtyxIDu1j3Fo8qXVlMtckZVfqu+GCA3RlVenqHi/GenjyFTIqQjK/y9KwAMLkmXQQVHNv1praTI8x4nOSqYcdsH2yGaTSWnZME29mUMgdN4F7gZfXWAeg11w3kvWuagDTn53cpZbaHPDYp9cQ9JdMCW6DJuG28zC9hCJc5atlwgs0ljoDwqV9/CPQtmjfnq1nMyhEcYeSX20E0vTzHL370Y6qyz9jBCI1Iw7seG5ozcR5KKhDbrweXaXpGd5CsO70BYSwqwUw=
