@@ -17,7 +17,8 @@
               [om-bootstrap.nav :as n]
               [open-company-web.api :refer [save-or-create-report]]
               [cljs.core.async :refer [put! chan <!]]
-              [open-company-web.router :as router]))
+              [open-company-web.router :as router]
+              [dommy.core :refer-macros [sel1]]))
 
 (defn create-new-report [owner company-data new-year new-period]
   (let [symbol (:symbol company-data)]
@@ -108,7 +109,7 @@
                 (n/nav-item {
                   :key "new-report"
                   :href url
-                  :ref "new-report-button"
+                  :id "new-report-button"
                   :on-click (fn [e]
                               ; toggle popover
                               (let [toggle (not (om/get-state owner :show-new-report-popover))]
@@ -118,13 +119,12 @@
 
             ; New report popover
             (when (om/get-state owner :show-new-report-popover)
-              (let [new-report-button (.getDOMNode (om/get-ref owner "new-report-button"))]
-                (om/build new-report-popover {
-                  :offsetTop (.-offsetTop new-report-button)
-                  :offsetLeft (.-offsetLeft new-report-button)
-                  :on-create (fn [new-year new-period]
-                              (create-new-report owner company-data new-year new-period))
-                  :hide-cb #(om/set-state! owner :show-new-report-popover false)})))
+              (om/build new-report-popover {
+                :offsetTop (.-offsetTop (sel1 :#new-report-button))
+                :offsetLeft (.-offsetLeft (sel1 :#new-report-button))
+                :on-create (fn [new-year new-period]
+                            (create-new-report owner company-data new-year new-period))
+                :hide-cb #(om/set-state! owner :show-new-report-popover false)}))
 
             (cond
 
