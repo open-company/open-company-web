@@ -5,17 +5,19 @@
               [om.core :as om :include-macros true]
               [dommy.core :as dommy :refer-macros [sel1 sel]]
               [open-company-web.components.page :refer [company]]
-              [om.dom :as dom :include-macros true]))
+              [om.dom :as dom :include-macros true]
+              [open-company-web.router :as router]))
 
 (enable-console-print!)
 
 ; dynamic mount point for components
 (def ^:dynamic c)
 
+(def company-symbol "OPEN")
+
 (def test-atom {
-  :symbol "OPEN"
   :OPEN {
-    :symbol "OPEN"
+    :symbol company-symbol
     :links [
       {
         :rel "report"
@@ -27,6 +29,7 @@
 
 (deftest test-company-component
   (testing "Company component"
+    (router/set-route! [company-symbol] {:symbol company-symbol})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root company app-state {:target c})
