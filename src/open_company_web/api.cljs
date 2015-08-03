@@ -75,7 +75,7 @@
         (apiput
           (str symbol "/" year "/" period)
           { :json-params json-data
-            :alternative-headers {
+            :headers {
               ; required by Chrome
               "Access-Control-Allow-Headers" "Content-Type"
               ; custom content type
