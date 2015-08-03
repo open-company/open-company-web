@@ -11,12 +11,18 @@
     (.-value dom-node)))
 
 (defcomponent new-report-popover [data owner]
+  (did-mount [_]
+    ; delay the focus on the year
+    (js/setTimeout
+      #(.focus (.getDOMNode (om/get-ref owner "year")))
+      100))
   (render [_]
-    (let [on-create (:on-create data)]
+    (let [on-create (:on-create data)
+          hide-cb (:hide-cb data)]
       (r/popover {
         :placement "bottom"
-        :position-top "50"
-        :position-left "105px"
+        :position-top (str (+ (:offsetTop data) 30) "px")
+        :position-left (str (- (:offsetLeft data) 117) "px")
         :title "New report"}
         (dom/div {:class "row"}
           (dom/form {:class "form-horizontal col-sm-12"}
@@ -42,4 +48,8 @@
             (b/button {
               :bs-style "primary"
               :on-click #(on-create (get-value-from-ref owner "year") (get-value-from-ref owner "period"))}
-              "Create")))))))
+              "Create")
+            (b/button {
+              :bs-style "link"
+              :on-click #(hide-cb)}
+              "Cancel")))))))
