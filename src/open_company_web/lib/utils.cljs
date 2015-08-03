@@ -90,12 +90,16 @@
     "B5" "September - October"
     "B6" "November - December"
 
-    "T1" "January - April"
-    "T2" "May - August"
-    "T3" "September - December"
-
     "Q1" "January - March"
     "Q2" "April - June"
     "Q3" "July - September"
     "Q4" "October - December"
+
+    "T1" "January - April"
+    "T2" "May - August"
+    "T3" "September - December"
+
+    "S1" "January - June"
+    "S2" "July - December"
+
     ""))
