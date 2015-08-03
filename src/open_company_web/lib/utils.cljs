@@ -83,23 +83,9 @@
     "M11" "November"
     "M12" "December"
 
-    "B1" "January - February"
-    "B2" "March - April"
-    "B3" "May - June"
-    "B4" "July - August"
-    "B5" "September - October"
-    "B6" "November - December"
-
     "Q1" "January - March"
     "Q2" "April - June"
     "Q3" "July - September"
     "Q4" "October - December"
-
-    "T1" "January - April"
-    "T2" "May - August"
-    "T3" "September - December"
-
-    "S1" "January - June"
-    "S2" "July - December"
 
     ""))
