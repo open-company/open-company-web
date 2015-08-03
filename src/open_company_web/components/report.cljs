@@ -122,14 +122,16 @@
 
               (and (contains? data (keyword symbol)) (contains? company-data report-key))
               (dom/div
-                (om/build finances {
-                    :finances (:finances report-data)
-                    :currency (:currency company-data)})
-                (om/build headcount (:headcount report-data))
-                (om/build compensation {
-                    :compensation (:compensation report-data)
-                    :headcount (:headcount report-data)
-                    :currency (:currency company-data)}))
+                (dom/h2 (str symbol " - " period " " year " (" (utils/get-long-period period) ")"))
+                (dom/div
+                  (om/build finances {
+                      :finances (:finances report-data)
+                      :currency (:currency company-data)})
+                  (om/build headcount (:headcount report-data))
+                  (om/build compensation {
+                      :compensation (:compensation report-data)
+                      :headcount (:headcount report-data)
+                      :currency (:currency company-data)})))
 
               is-summary
               (dom/div nil (dom/h3 "Reports summary"))
