@@ -5,24 +5,40 @@
             [om-bootstrap.random :as r]
             [om-bootstrap.button :as b]))
 
+(def current-year (.getFullYear (new js/Date)))
+
+(def years (range 1950 (+ current-year 1)))
+(def periods ["M1"
+              "M2"
+              "M3"
+              "M4"
+              "M5"
+              "M6"
+              "M7"
+              "M8"
+              "M9"
+              "M10"
+              "M11"
+              "M12"
+              ""
+              "Q1"
+              "Q2"
+              "Q3"
+              "Q4"])
+
 (defn get-value-from-ref [owner ref]
   (let [el (om/get-ref owner ref)
         dom-node (.getDOMNode el)]
     (.-value dom-node)))
 
 (defcomponent new-report-popover [data owner]
-  (did-mount [_]
-    ; delay the focus on the year
-    (js/setTimeout
-      #(.focus (.getDOMNode (om/get-ref owner "year")))
-      100))
   (render [_]
     (let [on-create (:on-create data)
           hide-cb (:hide-cb data)]
       (r/popover {
         :placement "bottom"
         :position-top (str (+ (:offsetTop data) 30) "px")
-        :position-left (str (- (:offsetLeft data) 117) "px")
+        :position-left (str (- (:offsetLeft data) 63) "px")
         :title "New report"}
         (dom/div {:class "row"}
           (dom/form {:class "form-horizontal col-sm-12"}
@@ -30,20 +46,24 @@
             (dom/div {:class "form-group"}
               (dom/label {:class "col-sm-4 control-label"} "Year")
               (dom/div {:class "input-group col-sm-8"}
-                (dom/input #js {
-                  :type "text"
-                  :placeholder "2015"
+                (dom/select #js {
+                  :className "form-control"
                   :ref "year"
-                  :className "form-control"})))
+                  :defaultValue current-year
+                  }
+                  (for [year years]
+                    (dom/option {:value year} year)))))
             ; period
             (dom/div {:class "form-group"}
               (dom/label {:class "col-sm-4 control-label"} "Period")
               (dom/div {:class "input-group col-sm-8"}
-                (dom/input #js {
-                  :type "text"
+                (dom/select #js {
+                  :className "form-control"
                   :ref "period"
-                  :placeholder "M6"
-                  :className "form-control"})))
+                  :defaultValue "M1"
+                  }
+                  (for [period periods]
+                    (dom/option {:value period} period)))))
             ; button
             (b/button {
               :bs-style "primary"
