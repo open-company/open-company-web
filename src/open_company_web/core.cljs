@@ -26,7 +26,7 @@
   (do
     (defroute list-page-route "/companies" []
       ; save route
-      (router/save-route ["companies"] {})
+      (router/set-route! ["companies"] {})
       ; load data from api
       (api/get-companies)
       ; render component
@@ -34,7 +34,7 @@
 
     (defroute company-profile-route "/:symbol" {symbol :symbol}
       ; save route
-      (router/save-route [symbol] {:symbol symbol})
+      (router/set-route! [symbol] {:symbol symbol})
       ; load data from api
       (api/get-company symbol)
       (swap! app-state assoc :loading true)
@@ -43,7 +43,7 @@
 
     (defroute report-summary-route "/:symbol/summary" {symbol :symbol}
       ; save route
-      (router/save-route [symbol "summary"] {:symbol symbol})
+      (router/set-route! [symbol "summary"] {:symbol symbol})
       ; load data from api
       (swap! app-state assoc :loading true)
       (api/get-company symbol)
@@ -52,7 +52,7 @@
 
     (defroute report-editable-route "/:symbol/:year/:period/edit" {symbol :symbol year :year period :period}
       ; save route
-      (router/save-route [symbol year period "edit"] {:symbol symbol :year year :period period})
+      (router/set-route! [symbol year period "edit"] {:symbol symbol :year year :period period})
       ; load data from api
       (swap! app-state assoc :loading true)
       (api/get-report symbol year period)
@@ -61,7 +61,7 @@
 
     (defroute report-route "/:symbol/:year/:period" {symbol :symbol year :year period :period}
       ; save route
-      (router/save-route [symbol year period] {:symbol symbol :year year :period period})
+      (router/set-route! [symbol year period] {:symbol symbol :year year :period period})
       ; load data from api
       (swap! app-state assoc :loading true)
       (api/get-report symbol year period)
