@@ -94,7 +94,7 @@
           json-data (cljs->json data)]
       (apiput symbol
         { :json-params json-data
-          :alternative-headers {
+          :headers {
             ; required by Chrome
             "Access-Control-Allow-Headers" "Content-Type"
             ; custom content type
