@@ -19,17 +19,22 @@
 
 (defcomponent headcount [data owner]
   (will-mount [_]
-    (om/set-state! owner :founders (utils/thousands-separator (:founders data)))
-    (om/set-state! owner :executives (utils/thousands-separator (:executives data)))
-    (om/set-state! owner :ft-employees (utils/thousands-separator (:ft-employees data)))
-    (om/set-state! owner :pt-employees (utils/thousands-separator (:pt-employees data)))
-    (om/set-state! owner :contractors (utils/thousands-separator (:contractors data))))
+    (let [founders (if (contains? data :founders) (:founders data) 0)
+          executives (if (contains? data :executives) (:executives data) 0)
+          ft-employees (if (contains? data :ft-employees) (:ft-employees data) 0)
+          pt-employees (if (contains? data :pt-employees) (:pt-employees data) 0)
+          contractors (if (contains? data :contractors) (:contractors data) 0)]
+      (om/set-state! owner :founders (utils/thousands-separator founders))
+      (om/set-state! owner :executives (utils/thousands-separator executives))
+      (om/set-state! owner :ft-employees (utils/thousands-separator ft-employees))
+      (om/set-state! owner :pt-employees (utils/thousands-separator pt-employees))
+      (om/set-state! owner :contractors (utils/thousands-separator contractors))))
   (render [_]
-    (let [founders (:founders data)
-          executives (:executives data)
-          ft-employees (:ft-employees data)
-          pt-employees (:pt-employees data)
-          contractors (:contractors data)
+    (let [founders (if (contains? data :founders) (:founders data) 0)
+          executives (if (contains? data :executives) (:executives data) 0)
+          ft-employees (if (contains? data :ft-employees) (:ft-employees data) 0)
+          pt-employees (if (contains? data :pt-employees) (:pt-employees data) 0)
+          contractors (if (contains? data :contractors) (:contractors data) 0)
           total (+ founders executives ft-employees pt-employees contractors)]
       (p/panel {:header (dom/h3 "Headcount") :class "headcount clearfix"}
         (dom/div {:class "headcount row"}
