@@ -32,7 +32,7 @@
           contractors (:contractors data)
           total (+ founders executives ft-employees pt-employees contractors)]
       (p/panel {:header (dom/h3 "Headcount") :class "headcount clearfix"}
-        (dom/div {:class "row"}
+        (dom/div {:class "headcount row"}
           (dom/form {:class "form-horizontal col-md-6"}
             (dom/div {:class "form-group"}
               (dom/label {:for "founders" :class "col-md-4 control-label"} "Founders")

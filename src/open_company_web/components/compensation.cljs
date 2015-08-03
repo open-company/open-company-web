@@ -55,7 +55,7 @@
           currency-symbol (utils/get-symbol-for-currency-code currency)
           prefix (str currency-symbol " ")]
       (p/panel {:header (dom/h3 "Compensation") :class "compensation clearfix"}
-        (dom/div {:class "row"}
+        (dom/div {:class "compensation row"}
           (dom/form {:class "form-horizontal col-sm-6"}
 
             ;; Percentage

@@ -34,7 +34,7 @@
           currency-dict (utils/get-currency currency)
           currency-symbol (utils/get-symbol-for-currency-code currency)]
       (p/panel {:header (dom/h3 "Finances") :class "finances clearfix"}
-        (dom/div {:class "row"}
+        (dom/div {:class "finances row"}
           (dom/form {:class "form-horizontal"}
 
             ;; Cash
