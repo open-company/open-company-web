@@ -67,3 +67,35 @@
   "true if seq contains elm"
   [seq elm]
   (some #(= elm %) seq))
+
+(defn get-long-period [period]
+  (case period
+    "M1" "January"
+    "M2" "February"
+    "M3" "March"
+    "M4" "April"
+    "M5" "May"
+    "M6" "June"
+    "M7" "July"
+    "M8" "August"
+    "M9" "September"
+    "M10" "October"
+    "M11" "November"
+    "M12" "December"
+
+    "B1" "January - February"
+    "B2" "March - April"
+    "B3" "May - June"
+    "B4" "July - August"
+    "B5" "September - October"
+    "B6" "November - December"
+
+    "T1" "January - April"
+    "T2" "May - August"
+    "T3" "September - December"
+
+    "Q1" "January - March"
+    "Q2" "April - June"
+    "Q3" "July - September"
+    "Q4" "October - December"
+    ""))
