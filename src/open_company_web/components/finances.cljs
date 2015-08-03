@@ -24,11 +24,13 @@
           costs (:costs finances)
           currency (:currency data)
           burn-rate (- revenue costs)
-          burn-rate-label (if (> burn-rate 0) "Growth rate" "Burn rate")
-          burn-rate-classes (str "num " (if (> burn-rate 0) "green" "red"))
-          burn-rate-helper (if (> burn-rate 0) "Cash earned this quarter" "Cash used this quarter")
-          profitable (if (> burn-rate 0) "Yes" "No")
-          run-away (if (<= burn-rate 0) (quot cash burn-rate) "N/A")
+          burn-rate (if (js/isNaN burn-rate) 0 burn-rate)
+          positive-diff (>= burn-rate 0)
+          burn-rate-label (if positive-diff "Growth rate" "Burn rate")
+          burn-rate-classes (str "num " (if positive-diff "green" "red"))
+          burn-rate-helper (if positive-diff "Cash earned this quarter" "Cash used this quarter")
+          profitable (if positive-diff "Yes" "No")
+          run-away (if (not positive-diff) (quot cash burn-rate) "N/A")
           currency-dict (utils/get-currency currency)
           currency-symbol (utils/get-symbol-for-currency-code currency)]
       (p/panel {:header (dom/h3 "Finances") :class "finances clearfix"}
