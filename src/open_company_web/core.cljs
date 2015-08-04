@@ -1,19 +1,14 @@
 (ns ^:figwheel-always open-company-web.core
   (:require [om.core :as om :include-macros true]
-            [om-tools.dom :as dom :include-macros true]
-            [secretary.core :as secretary :include-macros true :refer-macros [defroute]]
-            [cljs-flux.dispatcher :as flux]
-            [open-company-web.router :as router :refer [make-history handle-url-change]]
+            [secretary.core :refer-macros [defroute]]
+            [open-company-web.router :as router]
             [open-company-web.components.page :refer [company]]
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
             [open-company-web.components.report :refer [report readonly-report]]
             [open-company-web.lib.raven :refer [raven-setup]]
-            [open-company-web.dispatcher :as dispatcher :refer [app-state]]
-            [open-company-web.api :as api]
-            [goog.events :as events])
-  (:import [goog.history EventType])
-  (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
+            [open-company-web.dispatcher :refer [app-state]]
+            [open-company-web.api :as api]))
 
 (enable-console-print!)
 
@@ -71,13 +66,6 @@
     (defroute not-found-route "*" []
       ; render component
       (om/root page-not-found app-state {:target target}))))
-
-(defonce history
-  (doto (make-history)
-    (goog.events/listen EventType.NAVIGATE
-      ;; wrap in a fn to allow live reloading
-      #(handle-url-change %))
-    (.setEnabled true)))
 
 (defn on-js-reload []
   ;; optionally touch your app-state to force rerendering depending on

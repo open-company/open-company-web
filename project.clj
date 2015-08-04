@@ -10,10 +10,12 @@
 
   :dependencies [
     [org.clojure/clojure "1.7.0"] ; Lisp on the JVM http://clojure.org/documentation
-    [org.clojure/clojurescript "1.7.28"] ; Cljs compiler https://github.com/clojure/clojurescript
+    [org.clojure/clojurescript "1.7.28"] ; ClojureScript compiler https://github.com/clojure/clojurescript
     [org.clojure/core.async "0.1.346.0-17112a-alpha"] ; Async library https://github.com/clojure/core.async
     [org.omcljs/om "0.9.0" :exclusions [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
-    [cljs-http "0.1.36"] ; Http for cljs https://github.com/r0man/cljs-http
+    [cljs-http "0.1.36"] ; HTTP for cljs https://github.com/r0man/cljs-http
+    [prismatic/schema "0.4.3"] ; Dependency of om-tools https://github.com/Prismatic/schema
+    [prismatic/plumbing "0.4.4"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [prismatic/om-tools "0.3.11"] ; Tools for Om https://github.com/Prismatic/om-tools
     [sablono "0.3.5" :exclusions [cljsjs/react]] ; Hiccup templating for Om/React https://github.com/r0man/sablono
     [secretary "1.2.3"] ; Client-side router https://github.com/gf3/secretary
@@ -22,7 +24,7 @@
     [cljs-flux "0.1.1"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     [com.cognitect/transit-cljs "0.8.220"] ; Cljs wrapper for javascript JSON https://github.com/cognitect/transit-cljs
     [racehub/om-bootstrap "0.5.3"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
-    [noencore "0.1.21"] ; Clojure & ClojureScript functions not in core. https://github.com/r0man/noencore
+    [noencore "0.1.21"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
   ]
 
   :plugins [
@@ -30,13 +32,17 @@
     [lein-figwheel "0.3.7"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
     [lein-ancient "0.6.7"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
     [lein-doo "0.1.3-SNAPSHOT"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
+    [lein-deps-tree "0.1.2"] ; Print a tree of project dependencies https://github.com/the-kenny/lein-deps-tree
   ]
 
   :profiles {
     :dev {
       :dependencies [
-        [ring "1.4.0"]
-        [compojure "1.4.0"]]}}
+        [ring "1.4.0"] ; Web framework https://github.com/ring-clojure/ring
+        [compojure "1.4.0"] ; Web routing http://github.com/weavejester/compojure
+      ]
+    }
+  }
 
   :source-paths ["src"]
 
