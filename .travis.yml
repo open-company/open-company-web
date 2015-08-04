@@ -4,7 +4,7 @@ jdk:
 lein: lein2
 sudo: false
 before_script:
-  - export JAVA_OPTS="-Xms768m -Xmx1536m"
+  - export JAVA_OPTS="-Xms1024m -Xmx2048m"
   - echo $JAVA_OPTS
   - lein2 clean
 script: lein2 test!
