@@ -3,8 +3,13 @@ jdk:
   - oraclejdk8
 lein: lein2
 sudo: true
+before_install:
+  - wget https://s3.amazonaws.com/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2
+  - tar -xjf phantomjs-2.0.0-ubuntu-12.04.tar.bz2
+  - sudo rm -rf /usr/local/phantomjs/bin/phantomjs
+  - sudo mv phantomjs /usr/local/phantomjs/bin/phantomjs
 before_script:
-  - export JAVA_OPTS="-Xms1024m -Xmx2048m"
+  - export JAVA_OPTS="-Xms2048m -Xmx3072m"
   - echo $JAVA_OPTS
   - lein2 clean
 script: lein2 test!
