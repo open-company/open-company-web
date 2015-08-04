@@ -1,6 +1,6 @@
 language: clojure
 jdk:
-  - oraclejdk8
+  - oraclejdk7
 lein: lein2
 sudo: false
 before_script:
