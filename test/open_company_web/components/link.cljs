@@ -20,7 +20,7 @@
 (deftest test-link-component
   (testing "Link component"
     (let [c (tu/new-container!)
-          _ (om/root link app-state {:target c})
+          _ (om/root link test-data {:target c})
           link-node (sel1 c [:a])]
       (is (not (nil? link-node)))
       (tu/unmount! c))))
