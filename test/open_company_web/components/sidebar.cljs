@@ -1,9 +1,11 @@
-(ns test.open-company-web.components.page
-    (:require [cljs.test :refer-macros [deftest testing is]]
+(ns test.open-company-web.components.sidebar
+    (:require [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
+              [cljs-react-test.simulate :as sim]
               [cljs-react-test.utils :as tu]
               [om.core :as om :include-macros true]
               [dommy.core :as dommy :refer-macros [sel1 sel]]
-              [open-company-web.components.page :refer [company]]
+              [open-company-web.components.sidebar :refer [sidebar]]
+              [om.dom :as dom :include-macros true]
               [open-company-web.router :as router]))
 
 (enable-console-print!)
@@ -25,12 +27,12 @@
   }
 })
 
-(deftest test-company-component
-  (testing "Company component"
+(deftest test-sidebar-component
+  (testing "Sidebar component"
     (router/set-route! [company-symbol] {:symbol company-symbol})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
-          _ (om/root company app-state {:target c})
-          company-node (sel1 c [:div.company-container])]
-      (is (not (nil? company-node)))
+          _ (om/root sidebar app-state {:target c})
+          sidebar-node (sel c [:div.sidebar])]
+      (is (not (nil? sidebar-node)))
       (tu/unmount! c))))

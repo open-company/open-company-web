@@ -11,7 +11,9 @@
             [test.open-company-web.components.page-not-found]
             [test.open-company-web.components.pie-chart]
             [test.open-company-web.components.report]
-            [test.open-company-web.components.report-line]))
+            [test.open-company-web.components.report-line]
+            [test.open-company-web.components.navbar]
+            [test.open-company-web.components.sidebar]))
 
 (enable-console-print!)
 
@@ -26,4 +28,6 @@
            'test.open-company-web.components.headcount
            'test.open-company-web.components.compensation
            'test.open-company-web.components.page-not-found
-           'test.open-company-web.components.page)
+           'test.open-company-web.components.page
+           'test.open-company-web.components.navbar
+           'test.open-company-web.components.sidebar)
