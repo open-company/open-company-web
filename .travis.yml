@@ -3,7 +3,10 @@ jdk:
   - oraclejdk8
 lein: lein2
 sudo: false
-before_script: lein2 clean
+before_script:
+  - "export JAVA_OPTS=-Xmx512m"
+  - "echo $JAVA_OPTS"
+  - lein2 clean
 script: lein2 test!
 cache:
   directories:
