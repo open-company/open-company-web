@@ -9,7 +9,7 @@ before_install:
   - sudo rm -rf /usr/local/phantomjs/bin/phantomjs
   - sudo mv phantomjs /usr/local/phantomjs/bin/phantomjs
 before_script:
-  - export JAVA_OPTS="-Xms2048m -Xmx3072m"
+  - export JAVA_OPTS="-Xms256m -Xmx2048m"
   - echo $JAVA_OPTS
   - lein2 clean
 script: lein2 test!
