@@ -12,7 +12,10 @@ before_script:
   - export JAVA_OPTS="-Xms256m -Xmx2048m"
   - echo $JAVA_OPTS
   - lein2 clean
-script: lein2 test!
+script:
+  - lein2 test-navigation!
+  - lein2 test-report!
+  - lein2 test-ui-components!
 cache:
   directories:
   - "$HOME/.m2"

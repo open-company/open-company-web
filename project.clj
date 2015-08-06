@@ -73,51 +73,69 @@
           :optimizations :advanced
           :pretty-print false}}
 
-      :test {
-        :id "test"
+      :test-navigation {
+        :id "test-navigation"
         :source-paths ["src" "test"]
         :compiler {
-          :main "test.test-runner"
-          :output-to "target/testable.js"
-          :source-map "target/testable.js.map"
-          :optimizations :whitespace
-          :cache-analysis false
-          :pretty-print true}}}}
+          :main "test.test-navigation"
+          :output-to "target/testable-navigation.js"
+          :source-map "target/testable-navigation.js.map"
+          :optimizations :advanced}}
+
+      :test-report {
+        :id "test-report"
+        :source-paths ["src" "test"]
+        :compiler {
+          :main "test.test-report"
+          :output-to "target/testable-report.js"
+          :source-map "target/testable-report.js.map"
+          :optimizations :advanced}}
+
+      :test-ui-components {
+        :id "test-ui-components"
+        :source-paths ["src" "test"]
+        :compiler {
+          :main "test.test-ui-components"
+          :output-to "target/testable-components.js"
+          :source-map "target/testable-components.js.map"
+          :optimizations :advanced}}}}
 
   :figwheel {
-   ;; :http-server-root "public" ;; default and assumes "resources"
-   ;; :server-port 3449 ;; default
-   ;; :server-ip "127.0.0.1"
+    ;; :http-server-root "public" ;; default and assumes "resources"
+    ;; :server-port 3449 ;; default
+    ;; :server-ip "127.0.0.1"
 
-   :css-dirs ["resources/public/css"] ;; watch and update CSS
+    :css-dirs ["resources/public/css"] ;; watch and update CSS
 
-   ;; Start an nREPL server into the running figwheel process
-   ;; :nrepl-port 7888
+    ;; Start an nREPL server into the running figwheel process
+    ;; :nrepl-port 7888
 
-   ;; Server Ring Handler (optional)
-   ;; if you want to embed a ring handler into the figwheel http-kit
-   ;; server, this is for simple ring servers, if this
-   ;; doesn't work for you just run your own server :)
-   :ring-handler open-company-web.lib.server/handler
+    ;; Server Ring Handler (optional)
+    ;; if you want to embed a ring handler into the figwheel http-kit
+    ;; server, this is for simple ring servers, if this
+    ;; doesn't work for you just run your own server :)
+    :ring-handler open-company-web.lib.server/handler
 
-   ;; To be able to open files in your editor from the heads up display
-   ;; you will need to put a script on your path.
-   ;; that script will have to take a file path and a line number
-   ;; ie. in  ~/bin/myfile-opener
-   ;; #! /bin/sh
-   ;; emacsclient -n +$2 $1
-   ;;
-   ;; :open-file-command "myfile-opener"
+    ;; To be able to open files in your editor from the heads up display
+    ;; you will need to put a script on your path.
+    ;; that script will have to take a file path and a line number
+    ;; ie. in  ~/bin/myfile-opener
+    ;; #! /bin/sh
+    ;; emacsclient -n +$2 $1
+    ;;
+    ;; :open-file-command "myfile-opener"
 
-   ;; if you want to disable the REPL
-   ;; :repl false
+    ;; if you want to disable the REPL
+    ;; :repl false
 
-   ;; to configure a different figwheel logfile path
-   ;; :server-logfile "tmp/logs/figwheel-logfile.log"
+    ;; to configure a different figwheel logfile path
+    ;; :server-logfile "tmp/logs/figwheel-logfile.log"
   }
 
   :aliases {
     "ancient" ["with-profile" "dev" "do" "ancient" ":allow-qualified," "ancient" ":plugins" ":allow-qualified"] ; check for out of date dependencies
-    "test!" ["doo" "phantom" "test" "once"]
+    "test-navigation!" ["doo" "phantom" "test-navigation" "once"]
+    "test-report!" ["doo" "phantom" "test-report" "once"]
+    "test-ui-components!" ["doo" "phantom" "test-ui-components" "once"]
   }
 )
