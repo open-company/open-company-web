@@ -80,7 +80,7 @@
           :main "test.test-navigation"
           :output-to "target/testable-navigation.js"
           :source-map "target/testable-navigation.js.map"
-          :optimizations :advanced}}
+          :optimizations :whitespace}}
 
       :test-report {
         :id "test-report"
@@ -89,7 +89,7 @@
           :main "test.test-report"
           :output-to "target/testable-report.js"
           :source-map "target/testable-report.js.map"
-          :optimizations :advanced}}
+          :optimizations :whitespace}}
 
       :test-ui-components {
         :id "test-ui-components"
@@ -98,7 +98,7 @@
           :main "test.test-ui-components"
           :output-to "target/testable-components.js"
           :source-map "target/testable-components.js.map"
-          :optimizations :advanced}}}}
+          :optimizations :whitespace}}}}
 
   :figwheel {
     ;; :http-server-root "public" ;; default and assumes "resources"
@@ -134,8 +134,10 @@
 
   :aliases {
     "ancient" ["with-profile" "dev" "do" "ancient" ":allow-qualified," "ancient" ":plugins" ":allow-qualified"] ; check for out of date dependencies
+    "test!" ["doo" "phantom" "test" "once"]
     "test-navigation!" ["doo" "phantom" "test-navigation" "once"]
     "test-report!" ["doo" "phantom" "test-report" "once"]
     "test-ui-components!" ["doo" "phantom" "test-ui-components" "once"]
+    "test-all!" ["do" "test-navigation!," "test-report!," "test-ui-components!"] ; don't use in CI
   }
 )
