@@ -6,13 +6,14 @@
             [open-company-web.dispatcher :as dispatcher]
             [cljs-flux.dispatcher :as flux]
             [cognitect.transit :as t]
-            [clojure.walk :refer [keywordize-keys stringify-keys]]))
+            [clojure.walk :refer [keywordize-keys stringify-keys]]
+            [open-company-web.local-settings :as ls]))
 
 (def api-version "v1")
 
 (def company-endpoint "companies")
 
-(def endpoint (str "http://localhost:3000/" api-version "/" company-endpoint "/"))
+(def endpoint (str ls/api-server-domain "/" api-version "/" company-endpoint "/"))
 
 (defn- content-type [type]
   (str "application/vnd.open-company." type "+json;version=1"))
