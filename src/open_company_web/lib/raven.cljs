@@ -1,12 +1,11 @@
-(ns open-company-web.lib.raven)
+(ns open-company-web.lib.raven
+    (:require [open-company-web.local-settings :as ls]))
 
-(def dsn "https://eab4fe25a2ab4ea1b1d6e10185d63844@app.getsentry.com/48160")
-
-(def whitelistUrls {:whitelistUrls ["locahost" "127.0.0.1"]})
+(def whitelistUrls {:whitelistUrls ls/local-whitelist-array})
 
 (defn raven-setup []
   (when (.-Raven js/window)
-    (let [raven (.config js/Raven dsn whitelistUrls)]
+    (let [raven (.config js/Raven ls/local-dsn whitelistUrls)]
       (.install raven))))
 
 (defn test-raven []
