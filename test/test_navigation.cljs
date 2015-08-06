@@ -1,4 +1,4 @@
-(ns test.test-runner
+(ns test.test-navigation
   (:require [doo.runner :refer-macros [doo-tests]]
             [test.open-company-web.components.page]
             [test.open-company-web.components.page-not-found]

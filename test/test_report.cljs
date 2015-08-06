@@ -1,4 +1,4 @@
-(ns test.test-runner
+(ns test.test-report
   (:require [doo.runner :refer-macros [doo-tests]]
             [test.open-company-web.components.report]
             [test.open-company-web.components.report-line]
