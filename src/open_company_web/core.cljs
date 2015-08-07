@@ -8,7 +8,9 @@
             [open-company-web.components.report :refer [report readonly-report]]
             [open-company-web.lib.raven :refer [raven-setup]]
             [open-company-web.dispatcher :refer [app-state]]
-            [open-company-web.api :as api]))
+            [open-company-web.api :as api]
+            [goog.events :as events])
+  (:import [goog.history EventType]))
 
 (enable-console-print!)
 
@@ -66,6 +68,13 @@
     (defroute not-found-route "*" []
       ; render component
       (om/root page-not-found app-state {:target target}))))
+
+(defonce history
+  (doto (router/make-history)
+    (events/listen EventType.NAVIGATE
+      ;; wrap in a fn to allow live reloading
+      #(router/handle-url-change %))
+    (.setEnabled true)))
 
 (defn on-js-reload []
   ;; optionally touch your app-state to force rerendering depending on

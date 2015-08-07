@@ -1,8 +1,6 @@
 (ns open-company-web.router
-  (:require [secretary.core :as secretary :include-macros true :refer-macros [defroute]]
-            [goog.events :as events])
-  (:import [goog.history Html5History]
-           [goog.history EventType]))
+  (:require [secretary.core :as secretary])
+  (:import [goog.history Html5History]))
 
 (enable-console-print!)
 
@@ -33,13 +31,7 @@
   ;; dispatch on the token
   (secretary/dispatch! (get-token)))
 
-(defonce history
-  (doto (make-history)
-    (goog.events/listen EventType.NAVIGATE
-      ;; wrap in a fn to allow live reloading
-      #(handle-url-change %))
-    (.setEnabled true)))
-
+; FIXME: remove the worning of history not found
 (defn nav! [token]
   (swap! path {})
-  (.setToken history token))
+  (.setToken open-company-web.core/history token))
