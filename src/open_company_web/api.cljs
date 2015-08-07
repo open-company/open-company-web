@@ -41,58 +41,57 @@
       (let [body (if (:success response) (json->cljs (:body response)) {})]
         (flux/dispatch dispatcher/companies body)))))
 
-(defn get-company [symbol]
-  (when symbol
-    (apiget symbol nil
+(defn get-company [ticker]
+  (when ticker
+    (apiget ticker nil
       (fn [response]
         (let [body (if (:success response) (json->cljs (:body response)) {})]
           (flux/dispatch dispatcher/company body))))))
 
-(defn real-get-report [symbol year period]
-  (apiget (str symbol "/" year "/" period) nil
+(defn real-get-report [ticker year period]
+  (apiget (str ticker "/" year "/" period) nil
     (fn [response]
       (let [body (if (:success response) (json->cljs (:body response)) {})]
         (flux/dispatch dispatcher/report body)))))
 
-(defn get-report [symbol year period]
-  (when (and symbol year period)
-    (if (contains? @dispatcher/app-state (keyword symbol))
+(defn get-report [ticker year period]
+  (when (and ticker year period)
+    (if (contains? @dispatcher/app-state (keyword ticker))
       ; load the report only
-      (real-get-report symbol year period)
+      (real-get-report ticker year period)
       ; load the company data before the report data
       (do
         (flux/register
           dispatcher/company
           (fn [response]
-            (real-get-report symbol year period)))
+            (real-get-report ticker year period)))
         ; load company data
-        (get-company symbol)))))
+        (get-company ticker)))))
 
-(defn save-or-create-report [symbol year period data]
-  (when (and symbol year period data)
-    (when (or (:headcount data) (:finances data) (:compensation data))
-      (let [json-data (cljs->json (dissoc data :links))]
-        (apiput
-          (str symbol "/" year "/" period)
-          { :json-params json-data
-            :headers {
-              ; required by Chrome
-              "Access-Control-Allow-Headers" "Content-Type"
-              ; custom content type
-              "content-type" (content-type "report")
-            }}
-          (fn [response]
-            (let [body (if (:success response) (json->cljs (:body response)) {})]
-              (flux/dispatch dispatcher/report body))))))))
+(defn save-or-create-report [ticker year period data]
+  (when (and ticker year period data (or (:headcount data) (:finances data) (:compensation data)))
+    (let [json-data (cljs->json (dissoc data :links))]
+      (apiput
+        (str ticker "/" year "/" period)
+        { :json-params json-data
+          :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (content-type "report")
+          }}
+        (fn [response]
+          (let [body (if (:success response) (json->cljs (:body response)) {})]
+            (flux/dispatch dispatcher/report body)))))))
 
-(defn save-or-create-company [symbol data]
-  (when (and symbol data)
+(defn save-or-create-company [ticker data]
+  (when (and ticker data)
     (let [data (dissoc data :headcount)
           data (dissoc data :finances)
           data (dissoc data :compensation)
           data (dissoc data :links)
           json-data (cljs->json data)]
-      (apiput symbol
+      (apiput ticker
         { :json-params json-data
           :headers {
             ; required by Chrome

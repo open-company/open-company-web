@@ -18,9 +18,10 @@
 
 (defcomponent company [data owner]
   (render [_]
-    (let [symbol (:symbol @router/path)
-          company-data ((keyword symbol) data)
+    (let [ticker (:ticker @router/path)
+          company-data ((keyword ticker) data)
           reports (filterv #(= (:rel %) "report") (:links company-data))]
+      (println "company: " ticker)
       (dom/div {:class "company-container row"}
         (om/build navbar company-data)
         (dom/div {:class "container-fluid"}
@@ -37,5 +38,5 @@
 
               :else
               (dom/div
-                (dom/h2 (str (:symbol @router/path) " not found"))
+                (dom/h2 (str (:ticker @router/path) " not found"))
                 (om/build link {:href "/" :name "Back home"})))))))))

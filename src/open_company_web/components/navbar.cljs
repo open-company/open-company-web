@@ -12,8 +12,8 @@
       (dom/div {:class "navbar-header"}
         (om/build link {
           :class "navbar-brand"
-          :href (str "/companies/" (:symbol @router/path))
-          :name (str (:symbol @router/path) " - " (:name data))}))
+          :href (str "/companies/" (:ticker @router/path))
+          :name (str (:ticker @router/path) " - " (:name data))}))
       (dom/div {:id "navbar" :class "navbar-collapse collapse"}
         (dom/ul {:class "nav navbar-nav navbar-right"}
           (dom/li nil

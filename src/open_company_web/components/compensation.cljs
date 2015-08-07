@@ -10,12 +10,12 @@
               [om-bootstrap.random :as r]
               [om-bootstrap.panel :as p]))
 
-(defn get-chart-data [data head-data symbol]
+(defn get-chart-data [data head-data ticker]
   (let [show-founders (> (:founders head-data) 0)
         show-executives (> (:executives head-data) 0)
         show-employees (> (+ (:ft-employees head-data) (:pt-employees head-data)) 0)
         show-contractors (> (:contractors head-data) 0)]
-    { :prefix symbol
+    { :prefix ticker
       :columns [["string" "Compensation"] ["number" "Amount"]]
       :values [[:Founders (if show-founders (:founders data) 0)]
               [:Executives (if show-executives (:executives data) 0)]

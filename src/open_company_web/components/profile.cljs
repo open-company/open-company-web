@@ -22,38 +22,38 @@
     (let [save-change (get-channel "save-company")]
         (go (loop []
           (let [change (<! save-change)
-                symbol (:symbol @router/path)
-                company-data ((keyword symbol) @app-state)]
-            (save-or-create-company symbol company-data)
+                ticker (:ticker @router/path)
+                company-data ((keyword ticker) @app-state)]
+            (save-or-create-company ticker company-data)
             (recur))))))
   (render [_]
-    (let [symbol (:symbol @router/path)
-          company-data ((keyword symbol) data)]
+    (let [ticker (:ticker @router/path)
+          company-data ((keyword ticker) data)]
       (dom/div
         (n/nav {
           :class "profile-tab-navigation"
           :bs-style "tabs"
           :active-key (om/get-state owner :selected-tab)
           :on-select #(om/set-state! owner :selected-tab %) }
-          (let [url (str "/" symbol)]
+          (let [url (str "/" ticker)]
             (n/nav-item {
               :key 1
               :href url
               :onClick (fn[e] (.preventDefault e) (router/nav! url))}
               "Company"))
-          (let [url (str "/" symbol "#team")]
+          (let [url (str "/" ticker "#team")]
             (n/nav-item {
               :key 2
               :href url
               :onClick (fn[e] (.preventDefault e) (router/nav! url))}
               "Team"))
-          (let [url (str "/" symbol "#products")]
+          (let [url (str "/" ticker "#products")]
             (n/nav-item {
               :key 3
               :href url
               :onClick (fn[e] (.preventDefault e) (router/nav! url))}
               "Products / Services"))
-          (let [url (str "/" symbol "#funding")]
+          (let [url (str "/" ticker "#funding")]
             (n/nav-item {
               :key 4
               :href url

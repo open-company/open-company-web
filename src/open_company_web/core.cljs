@@ -29,39 +29,39 @@
       ; render component
       (om/root list-companies app-state {:target target}))
 
-    (defroute company-profile-route "/:symbol" {symbol :symbol}
+    (defroute company-profile-route "/:ticker" {ticker :ticker}
       ; save route
-      (router/set-route! [symbol] {:symbol symbol})
+      (router/set-route! [ticker] {:ticker ticker})
       ; load data from api
-      (api/get-company symbol)
+      (api/get-company ticker)
       (swap! app-state assoc :loading true)
       ; render compoenent
       (om/root company app-state {:target target}))
 
-    (defroute report-summary-route "/:symbol/summary" {symbol :symbol}
+    (defroute report-summary-route "/:ticker/summary" {ticker :ticker}
       ; save route
-      (router/set-route! [symbol "summary"] {:symbol symbol})
+      (router/set-route! [ticker "summary"] {:ticker ticker})
       ; load data from api
       (swap! app-state assoc :loading true)
-      (api/get-company symbol)
+      (api/get-company ticker)
       ; render component
       (om/root report app-state {:target target}))
 
-    (defroute report-editable-route "/:symbol/:year/:period/edit" {symbol :symbol year :year period :period}
+    (defroute report-editable-route "/:ticker/:year/:period/edit" {ticker :ticker year :year period :period}
       ; save route
-      (router/set-route! [symbol year period "edit"] {:symbol symbol :year year :period period})
+      (router/set-route! [ticker year period "edit"] {:ticker ticker :year year :period period})
       ; load data from api
       (swap! app-state assoc :loading true)
-      (api/get-report symbol year period)
+      (api/get-report ticker year period)
       ; render component
       (om/root report app-state {:target target}))
 
-    (defroute report-route "/:symbol/:year/:period" {symbol :symbol year :year period :period}
+    (defroute report-route "/:ticker/:year/:period" {ticker :ticker year :year period :period}
       ; save route
-      (router/set-route! [symbol year period] {:symbol symbol :year year :period period})
+      (router/set-route! [ticker year period] {:ticker ticker :year year :period period})
       ; load data from api
       (swap! app-state assoc :loading true)
-      (api/get-report symbol year period)
+      (api/get-report ticker year period)
       ; render component
       (om/root readonly-report app-state {:target target}))
 

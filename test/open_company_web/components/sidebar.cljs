@@ -29,7 +29,7 @@
 
 (deftest test-sidebar-component
   (testing "Sidebar component"
-    (router/set-route! [company-symbol] {:symbol company-symbol})
+    (router/set-route! [company-symbol] {:ticker company-symbol})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root sidebar app-state {:target c})

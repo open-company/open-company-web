@@ -29,7 +29,7 @@
 
 (deftest test-navbar-component
   (testing "Navbar component"
-    (router/set-route! [company-symbol] {:symbol company-symbol})
+    (router/set-route! [company-symbol] {:ticker company-symbol})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root navbar app-state {:target c})

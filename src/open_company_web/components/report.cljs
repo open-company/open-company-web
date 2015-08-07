@@ -21,12 +21,12 @@
               [dommy.core :refer-macros [sel1]]))
 
 (defn create-new-report [owner company-data new-year new-period]
-  (let [symbol (:symbol company-data)]
+  (let [ticker (:ticker company-data)]
     ; hide popover
     (om/set-state! owner :show-new-report-popover false)
     ; when the data are correct: FIXME check year and period
     (when (and new-year new-period)
-      (let [new-report-key (str "report-" symbol "-" new-year "-" new-period)
+      (let [new-report-key (str "report-" ticker "-" new-year "-" new-period)
             links (:links company-data)]
         ; add an empty report
         (om/transact! company-data assoc (keyword new-report-key) {
@@ -36,13 +36,13 @@
           })
         ; add the report to links
         (om/transact! company-data :links #(conj % {
-          :href (str "/v1/companies/" symbol "/" new-year "/" new-period)
+          :href (str "/v1/companies/" ticker "/" new-year "/" new-period)
           :rel "report"
           }))
         ; create the report on the server
-        (api/save-or-create-report symbol new-year new-period {:finances {}})
+        (api/save-or-create-report ticker new-year new-period {:finances {}})
         ; navigate to the new report
-        (router/nav! (str "/" symbol "/" new-year "/" new-period "/edit"))))))
+        (router/nav! (str "/" ticker "/" new-year "/" new-period "/edit"))))))
 
 (defcomponent report [data owner]
   (init-state [_]
@@ -54,20 +54,20 @@
     (let [save-change (utils/get-channel "save-report")]
         (go (loop []
           (let [change (<! save-change)
-                symbol (:symbol @router/path)
+                ticker (:ticker @router/path)
                 year (:year @router/path)
                 period (:period @router/path)
-                company-data ((keyword symbol) @app-state)
-                report-key (keyword (str "report-" symbol "-" year "-" period))
+                company-data ((keyword ticker) @app-state)
+                report-key (keyword (str "report-" ticker "-" year "-" period))
                 report-data (report-key company-data)]
-            (save-or-create-report symbol year period report-data)
+            (save-or-create-report ticker year period report-data)
             (recur))))))
   (render [_]
-    (let [symbol (:symbol @router/path)
+    (let [ticker (:ticker @router/path)
           year (:year @router/path)
           period (:period @router/path)
-          company-data ((keyword symbol) data)
-          report-key (keyword (str "report-" symbol "-" year "-" period))
+          company-data ((keyword ticker) data)
+          report-key (keyword (str "report-" ticker "-" year "-" period))
           report-data (report-key company-data)
           reports (filterv #(= (:rel %) "report") (:links company-data))
           is-summary (utils/in? (:route @router/path) "summary")]
@@ -81,7 +81,7 @@
               :bs-style "tabs"}
 
               ; Report summary
-              (let [url (str "/" symbol "/summary")]
+              (let [url (str "/" ticker "/summary")]
                 (n/nav-item {
                   :key "summary"
                   :href url
@@ -95,8 +95,8 @@
                       parts (clojure.string/split href "/")
                       rep-year (nth parts 4)
                       rep-period (nth parts 5)
-                      rep-key (str "report-" symbol "-" rep-year "-" rep-period)
-                      link (str "/" symbol "/" rep-year "/" rep-period "/edit")]
+                      rep-key (str "report-" ticker "-" rep-year "-" rep-period)
+                      link (str "/" ticker "/" rep-year "/" rep-period "/edit")]
                   (n/nav-item {
                     :key rep-key
                     :href link
@@ -105,7 +105,7 @@
                     } (str rep-period " " rep-year))))
 
               ; New report tab
-              (let [url (str "/" symbol "/new-report")]
+              (let [url (str "/" ticker "/new-report")]
                 (n/nav-item {
                   :key "new-report"
                   :href url
@@ -131,9 +131,9 @@
               (:loading data)
               (dom/div nil "Loading")
 
-              (and (contains? data (keyword symbol)) (contains? company-data report-key))
+              (and (contains? data (keyword ticker)) (contains? company-data report-key))
               (dom/div
-                (dom/h2 (str symbol " - " period " " year " (" (utils/get-long-period period) ")"))
+                (dom/h2 (str ticker " - " period " " year " (" (utils/get-long-period period) ")"))
                 (dom/div
                   (om/build finances {
                       :finances (:finances report-data)
@@ -154,11 +154,11 @@
   (will-mount [_]
     (om/set-state! owner :selected-tab 1))
   (render [_]
-    (let [symbol (:symbol @router/path)
+    (let [ticker (:ticker @router/path)
           year (:year @router/path)
           period (:period @router/path)
-          company-data ((keyword symbol) data)
-          report-key (keyword (str "report-" symbol "-" year "-" period))
+          company-data ((keyword ticker) data)
+          report-key (keyword (str "report-" ticker "-" year "-" period))
           report-data (report-key company-data)
           headcount (:headcount report-data)]
       (dom/div
@@ -167,7 +167,7 @@
           (:loading data)
           (dom/div nil "Loading")
 
-          (and (contains? data (keyword symbol)) (contains? company-data report-key))
+          (and (contains? data (keyword ticker)) (contains? company-data report-key))
           (dom/div nil
             (n/nav {
               :class "tab-navigation"
