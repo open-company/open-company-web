@@ -134,7 +134,6 @@
 
   :aliases {
     "ancient" ["with-profile" "dev" "do" "ancient" ":allow-qualified," "ancient" ":plugins" ":allow-qualified"] ; check for out of date dependencies
-    "test!" ["doo" "phantom" "test" "once"]
     "test-navigation!" ["doo" "phantom" "test-navigation" "once"]
     "test-report!" ["doo" "phantom" "test-report" "once"]
     "test-ui-components!" ["doo" "phantom" "test-ui-components" "once"]
