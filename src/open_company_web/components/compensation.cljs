@@ -1,135 +1,88 @@
 (ns open-company-web.components.compensation
-    (:require [om.core :as om :include-macros true]
-              [om-tools.core :as om-core :refer-macros [defcomponent]]
-              [om-tools.dom :as dom :include-macros true]
-              [open-company-web.components.report-line :refer [report-line report-editable-line]]
-              [open-company-web.lib.utils :as utils]
-              [open-company-web.components.comment :refer [comment-component]]
-              [open-company-web.components.pie-chart :refer [pie-chart]]
-              [goog.string :as gstring]
-              [om-bootstrap.random :as r]
-              [om-bootstrap.panel :as p]))
+  (:require [om.core :as om :include-macros true]
+            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.dom :as dom :include-macros true]
+            [open-company-web.components.report-line :refer [report-line report-editable-line]]
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.components.comment :refer [comment-component comment-readonly-component]]
+            [open-company-web.components.pie-chart :refer [pie-chart]]
+            [open-company-web.components.report.compensation-section :refer [compensation-section]]
+            [open-company-web.components.report.percentage-switch :refer [percentage-switch]]
+            [goog.string :as gstring]
+            [om-bootstrap.random :as r]
+            [om-bootstrap.panel :as p]))
 
-(defn get-chart-data [data head-data ticker]
-  (let [show-founders (> (:founders head-data) 0)
+(defn get-chart-data [data ticker]
+  (let [head-data (:headcount data)
+        comp-data (:compensation data)
+        show-founders (> (:founders head-data) 0)
         show-executives (> (:executives head-data) 0)
         show-employees (> (+ (:ft-employees head-data) (:pt-employees head-data)) 0)
         show-contractors (> (:contractors head-data) 0)]
     { :prefix ticker
       :columns [["string" "Compensation"] ["number" "Amount"]]
-      :values [[:Founders (if show-founders (:founders data) 0)]
-              [:Executives (if show-executives (:executives data) 0)]
-              [:Employees (if show-employees (:employees data) 0)]
-              [:Contractors (if show-contractors (:contractors data) 0)]]}))
+      :values [[:Founders (if show-founders (:founders comp-data) 0)]
+              [:Executives (if show-executives (:executives comp-data) 0)]
+              [:Employees (if show-employees (:employees comp-data) 0)]
+              [:Contractors (if show-contractors (:contractors comp-data) 0)]]}))
 
 (defn calc-percentage
   [dollar total]
   (let [perc (gstring/format "%.2f" (* (/ dollar total) 100))]
     (js/parseFloat perc)))
 
-(defn compensation-section [owner data key-name value description currency-symbol]
-  (let [currency-dict (utils/get-currency currency-symbol)
-        currency-symbol (utils/get-symbol-for-currency-code currency-symbol)
-        string-name (name key-name)
-        camel-case-name (str (clojure.string/upper-case (first string-name)) (subs string-name 2))]
-    (dom/div {:class "form-group"}
-      (dom/label {:class "col-md-4 control-label"} camel-case-name)
-      (dom/div {:class "input-group col-md-3"}
-        (dom/div {:class "input-group-addon"} currency-symbol)
-        (dom/input {
-          :type "text"
-          :class "form-control"
-          :value (om/get-state owner key-name)
-          :on-focus #(om/set-state! owner key-name value)
-          :on-change #(om/set-state! owner key-name (.. % -target -value))
-          :on-blur (fn [e]
-                      (utils/handle-change data (utils/String->Number (.. e -target -value)) key-name)
-                      (om/set-state! owner key-name (utils/thousands-separator (.. e -target -value)))
-                      (utils/save-values "save-report")
-                      (.stopPropagation e))
-          :placeholder (:text currency-dict)}))
-      (dom/p {:class "help-block"} description))))
-
 (defcomponent compensation [data owner]
-  (will-mount [_]
-    (let [comp-data (:compensation data)
-          founders (:founders comp-data)
-          executives (:executives comp-data)
-          employees (:employees comp-data)
-          contractors (:contractors comp-data)]
-      (om/set-state! owner :founders (utils/thousands-separator founders))
-      (om/set-state! owner :executives (utils/thousands-separator executives))
-      (om/set-state! owner :employees (utils/thousands-separator employees))
-      (om/set-state! owner :contractors (utils/thousands-separator contractors))))
   (render [_]
     (let [head-data (:headcount data)
-          show-founders (> (:founders head-data) 0)
-          show-executives (> (:executives head-data) 0)
-          show-employees (> (+ (:ft-employees head-data) (:pt-employees head-data)) 0)
-          show-contractors (> (:contractors head-data) 0)
           comp-data (:compensation data)
-          percentage (:percentage comp-data)
-          founders (if show-founders (:founders comp-data) 0)
-          executives (if show-executives (:executives comp-data) 0)
-          employees (if show-employees (:employees comp-data) 0)
-          contractors (if show-contractors (:contractors comp-data) 0)
           currency (:currency data)
-          currency-dict (utils/get-currency currency)
           currency-symbol (utils/get-symbol-for-currency-code currency)
           prefix (str currency-symbol " ")]
       (p/panel {:header (dom/h3 "Compensation") :class "compensation clearfix"}
         (dom/div {:class "compensation row"}
+
+          ;; Compensation sections
           (dom/form {:class "form-horizontal col-sm-6"}
 
             ;; Percentage
-            (dom/div {:class "form-group"}
-              (dom/label {:for "show-as" :class "col-md-4 control-label"} "Show as")
-              (dom/div {:class "btn-group btn-toggle col-md-3"}
-                (dom/button {
-                  :type "button"
-                  :class (str "btn btn-success" (when (not percentage) " active"))
-                  :on-click #(utils/handle-change comp-data false :percentage)}
-                  currency-symbol)
-                (dom/button {
-                  :type "button"
-                  :class (str "btn btn-default" (when percentage " active"))
-                  :on-click #(utils/handle-change comp-data true :percentage)}
-                  "%"))
-              (dom/p {:class "help-block"} (str "Viewers will see as " (if percentage "%" currency-symbol))))
+            (om/build percentage-switch data)
 
             ;; Founders
-            (when show-founders
-              (compensation-section owner comp-data :founders founders "Founder cash compensation this quarter" currency))
+            (om/build compensation-section {
+              :cursor data
+              :key-name :founders
+              :label "Founders"
+              :description "Founder cash compensation this quarter"})
 
-              ;; Executives
-              (when show-executives
-                (compensation-section owner comp-data :executives executives "Executives cash compensation this quarter" currency))
+            ;; Executives
+            (om/build compensation-section {
+              :cursor data
+              :key-name :executives
+              :label "Executives"
+              :description "Executives cash compensation this quarter"})
 
-              ;; Empoyees
-              (when show-employees
-                (compensation-section owner comp-data :employees employees "Employees cash compensation this quarter" currency))
+            ;; Empoyees
+            (om/build compensation-section {
+              :cursor data
+              :key-name :employees
+              :label "Employees"
+              :description "Employees cash compensation this quarter"})
 
-              ;; Contractors
-              (when show-contractors
-                (compensation-section owner comp-data :contractors contractors "Cost for contractors this quarter" currency)))
+            ;; Contractors
+            (om/build compensation-section {
+              :cursor data
+              :key-name :contractors
+              :label "Contractors"
+              :description "Cost for contractors this quarter"}))
 
           ;; Pie chart
           (dom/div {:class "col-sm-6"}
-            (om/build pie-chart (get-chart-data comp-data head-data prefix))))
+            (om/build pie-chart (get-chart-data data prefix))))
 
         ;; Comment
-        (dom/div {:class "row"}
-          (dom/div {:class "col-md-1"})
-          (dom/textarea {
-            :class "col-md-10"
-            :rows "5"
-            :value (:comment comp-data)
-            :on-change #(utils/handle-change comp-data (.. % -target -value) :comment)
-            :on-blur (fn [e]
-                        (utils/save-values "save-report")
-                        (.stopPropagation e))
-            :placeholder "Comments: explain any recent significant changes in compensation costs"})
-          (dom/div {:class "col-md-1"}))))))
+        (om/build comment-component {
+          :cursor comp-data
+          :placeholder "Comments: explain any recent significant changes in compensation costs"})))))
 
 (defcomponent readonly-compensation [data owner]
   (render [_]
@@ -193,5 +146,5 @@
               :number (utils/thousands-separator
                         (if percentage (calc-percentage total-compensation total-compensation) total-compensation))
               :label "total compensation this month"}))
-          (om/build comment-component {:cursor comp-data :key :comment :disabled true}))
-        (om/build pie-chart (get-chart-data comp-data head-data prefix))))))
+          (om/build comment-readonly-component {:cursor comp-data :key :comment :disabled true}))
+        (om/build pie-chart (get-chart-data data prefix))))))
