@@ -27,6 +27,29 @@
   (let [perc (gstring/format "%.2f" (* (/ dollar total) 100))]
     (js/parseFloat perc)))
 
+(defn compensation-section [owner data key-name value description currency-symbol]
+  (let [currency-dict (utils/get-currency currency-symbol)
+        currency-symbol (utils/get-symbol-for-currency-code currency-symbol)
+        string-name (name key-name)
+        camel-case-name (str (clojure.string/upper-case (first string-name)) (subs string-name 2))]
+    (dom/div {:class "form-group"}
+      (dom/label {:class "col-md-4 control-label"} camel-case-name)
+      (dom/div {:class "input-group col-md-3"}
+        (dom/div {:class "input-group-addon"} currency-symbol)
+        (dom/input {
+          :type "text"
+          :class "form-control"
+          :value (om/get-state owner key-name)
+          :on-focus #(om/set-state! owner key-name value)
+          :on-change #(om/set-state! owner key-name (.. % -target -value))
+          :on-blur (fn [e]
+                      (utils/handle-change data (utils/String->Number (.. e -target -value)) key-name)
+                      (om/set-state! owner key-name (utils/thousands-separator (.. e -target -value)))
+                      (utils/save-values "save-report")
+                      (.stopPropagation e))
+          :placeholder (:text currency-dict)}))
+      (dom/p {:class "help-block"} description))))
+
 (defcomponent compensation [data owner]
   (will-mount [_]
     (let [comp-data (:compensation data)
@@ -76,83 +99,19 @@
 
             ;; Founders
             (when show-founders
-              (dom/div {:class "form-group"}
-                (dom/label {:for "founder-compensation" :class "col-md-4 control-label"} "Founders")
-                (dom/div {:class "input-group col-md-3"}
-                  (dom/div {:class "input-group-addon"} currency-symbol)
-                  (dom/input {
-                    :type "text"
-                    :class "form-control"
-                    :value (om/get-state owner :founders)
-                    :on-focus #(om/set-state! owner :founders founders)
-                    :on-change #(om/set-state! owner :founders (.. % -target -value))
-                    :on-blur (fn [e]
-                                (utils/handle-change comp-data (utils/String->Number (.. e -target -value)) :founders)
-                                (om/set-state! owner :founders (utils/thousands-separator (.. e -target -value)))
-                                (utils/save-values "save-report")
-                                (.stopPropagation e))
-                    :placeholder (:text currency-dict)}))
-                (dom/p {:class "help-block"} "Founder cash compensation this quarter")))
+              (compensation-section owner comp-data :founders founders "Founder cash compensation this quarter" currency))
 
               ;; Executives
               (when show-executives
-                (dom/div {:class "form-group"}
-                  (dom/label {:for "executives-compensation" :class "col-md-4 control-label"} "Executives")
-                  (dom/div {:class "input-group col-md-3"}
-                    (dom/div {:class "input-group-addon"} currency-symbol)
-                    (dom/input {
-                      :type "text"
-                      :class "form-control"
-                      :value (om/get-state owner :executives)
-                      :on-focus #(om/set-state! owner :executives executives)
-                      :on-change #(om/set-state! owner :executives (.. % -target -value))
-                      :on-blur (fn [e]
-                                  (utils/handle-change comp-data (utils/String->Number (.. e -target -value)) :executives)
-                                  (om/set-state! owner :executives (utils/thousands-separator (.. e -target -value)))
-                                  (utils/save-values "save-report")
-                                  (.stopPropagation e))
-                      :placeholder (:text currency-dict)}))
-                  (dom/p {:class "help-block"} "Executives cash compensation this quarter")))
+                (compensation-section owner comp-data :executives executives "Executives cash compensation this quarter" currency))
 
-              ;; Executives
+              ;; Empoyees
               (when show-employees
-                (dom/div {:class "form-group"}
-                  (dom/label {:for "employees-compensation" :class "col-md-4 control-label"} "Employees")
-                  (dom/div {:class "input-group col-md-3"}
-                    (dom/div {:class "input-group-addon"} currency-symbol)
-                    (dom/input {
-                      :type "text"
-                      :class "form-control"
-                      :value (om/get-state owner :employees)
-                      :on-focus #(om/set-state! owner :employees employees)
-                      :on-change #(om/set-state! owner :employees (.. % -target -value))
-                      :on-blur (fn [e]
-                                  (utils/handle-change comp-data (utils/String->Number (.. e -target -value)) :employees)
-                                  (om/set-state! owner :employees (utils/thousands-separator (.. e -target -value)))
-                                  (utils/save-values "save-report")
-                                  (.stopPropagation e))
-                      :placeholder (:text currency-dict)}))
-                  (dom/p {:class "help-block"} "Employees cash compensation this quarter")))
+                (compensation-section owner comp-data :employees employees "Employees cash compensation this quarter" currency))
 
               ;; Contractors
               (when show-contractors
-                (dom/div {:class "form-group"}
-                  (dom/label {:for "contractors-compensation" :class "col-md-4 control-label"} "Contractors")
-                  (dom/div {:class "input-group col-md-3"}
-                    (dom/div {:class "input-group-addon"} currency-symbol)
-                    (dom/input {
-                      :type "text"
-                      :class "form-control"
-                      :value (om/get-state owner :contractors)
-                      :on-focus #(om/set-state! owner :contractors contractors)
-                      :on-change #(om/set-state! owner :contractors (.. % -target -value))
-                      :on-blur (fn [e]
-                                  (utils/handle-change comp-data (utils/String->Number (.. e -target -value)) :contractors)
-                                  (om/set-state! owner :contractors (utils/thousands-separator (.. e -target -value)))
-                                  (utils/save-values "save-report")
-                                  (.stopPropagation e))
-                      :placeholder (:text currency-dict)}))
-                  (dom/p {:class "help-block"} "Cost for contractors this quarter"))))
+                (compensation-section owner comp-data :contractors contractors "Cost for contractors this quarter" currency)))
 
           ;; Pie chart
           (dom/div {:class "col-sm-6"}
