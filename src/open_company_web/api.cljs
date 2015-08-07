@@ -86,11 +86,8 @@
 
 (defn save-or-create-company [ticker data]
   (when (and ticker data)
-    (let [data (dissoc data :headcount)
-          data (dissoc data :finances)
-          data (dissoc data :compensation)
-          data (dissoc data :links)
-          json-data (cljs->json data)]
+    (let [company-data (dissoc data :headcount :finances :compensation :links)
+          json-data (cljs->json company-data)]
       (apiput ticker
         { :json-params json-data
           :headers {
