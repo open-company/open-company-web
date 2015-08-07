@@ -4,9 +4,15 @@
               [om-tools.dom :as dom :include-macros true]
               [open-company-web.components.report-line :refer [report-line]]
               [open-company-web.components.comment :refer [comment-component comment-readonly-component]]
+              [open-company-web.components.report.finances-section :refer [finances-section]]
               [om-bootstrap.random :as  r]
               [om-bootstrap.panel :as p]
               [open-company-web.lib.utils :as utils]))
+
+(def finances-rows [
+  {:label "Cash on hand" :key-name :cash :help-block "Cash and cash equivalents"}
+  {:label "Revenue" :key-name :revenue :help-block "All revenue this quarter"}
+  {:label "Costs" :key-name :costs :help-block "All costs this quarter including salaries"}])
 
 (defcomponent finances [data owner]
   (will-mount [_]
@@ -37,65 +43,11 @@
         (dom/div {:class "finances row"}
           (dom/form {:class "form-horizontal"}
 
-            ;; Cash
-            (dom/div {:class "form-group"}
-              (dom/label {:for "cash" :class "col-md-2 control-label"} "Cash on hand")
-              (dom/div {:class "input-group col-md-2"}
-                (dom/div {:class "input-group-addon"} currency-symbol)
-                (dom/input {
-                  :type "text"
-                  :class "form-control"
-                  :value (om/get-state owner :cash)
-                  :on-focus #(om/set-state! owner :cash cash)
-                  :placeholder (:text currency-dict)
-                  :on-change #(om/set-state! owner :cash (.. % -target -value))
-                  :on-blur (fn [e]
-                              (utils/change-value finances e :cash)
-                              (om/set-state! owner :cash (utils/thousands-separator (.. e -target -value)))
-                              (utils/save-values "save-report")
-                              (.stopPropagation e))
-                  }))
-              (dom/p {:class "help-block"} "Cash and cash equivalents"))
-
-            ;; Renvenue
-            (dom/div {:class "form-group"}
-              (dom/label {:for "revenue" :class "col-md-2 control-label"} "Revenue")
-              (dom/div {:class "input-group col-md-2"}
-                (dom/div {:class "input-group-addon"} currency-symbol)
-                (dom/input {
-                  :type "text"
-                  :class "form-control"
-                  :value (om/get-state owner :revenue)
-                  :on-focus #(om/set-state! owner :revenue revenue)
-                  :placeholder (:text currency-dict)
-                  :on-change #(om/set-state! owner :revenue (.. % -target -value))
-                  :on-blur (fn [e]
-                              (utils/change-value finances e :revenue)
-                              (om/set-state! owner :revenue (utils/thousands-separator (.. e -target -value)))
-                              (utils/save-values "save-report")
-                              (.stopPropagation e))
-                  }))
-              (dom/p {:class "help-block"} "All revenue this quarter (not investments)"))
-
-            ;; Costs
-            (dom/div {:class "form-group"}
-              (dom/label {:for "costs" :class "col-md-2 control-label"} "Costs")
-              (dom/div {:class "input-group col-md-2"}
-                (dom/div {:class "input-group-addon"} currency-symbol)
-                (dom/input {
-                  :type "text"
-                  :class "form-control"
-                  :value (om/get-state owner :costs)
-                  :on-focus #(om/set-state! owner :costs costs)
-                  :placeholder (:text currency-dict)
-                  :on-change #(om/set-state! owner :costs (.. % -target -value))
-                  :on-blur (fn [e]
-                              (utils/change-value finances e :costs)
-                              (om/set-state! owner :costs (utils/thousands-separator (.. e -target -value)))
-                              (utils/save-values "save-report")
-                              (.stopPropagation e))
-                  }))
-              (dom/p {:class "help-block"} "All costs this quarter including salaries"))
+            (for [section finances-rows]
+              (om/build finances-section (merge section {
+                :cursor finances
+                :prefix currency-symbol
+                :placeholder (:text currency-dict)})))
 
             ;; Profitable
             (dom/div {:class "form-group"}
@@ -123,6 +75,11 @@
           :placeholder "Comments: explain any recent significant changes in costs or revenue, provide guidance on revenue and profitablity expectations"
           })))))
 
+(def readonly-finances-sections [
+  {:number cash :label "cash on hand"}
+  {:number revenue :label "revenue this month"}
+  {:number costs :label "costs this month"}])
+
 (defcomponent readonly-finances [data owner]
   (render [_]
     (let [finances (:finances data)
@@ -138,27 +95,10 @@
           currency-symbol (utils/get-symbol-for-currency-code currency)]
       (r/well {:class "report-list finances clearfix"}
         (dom/div {:class "report-list-left"}
-          (when (not (= cash nil))
-            (dom/div
-              (om/build report-line {
-                :number cash
-                :prefix currency-symbol
-                :label "cash on hand"
-                :pluralize false})))
-          (when (not (= revenue nil))
-            (dom/div
-              (om/build report-line {
-                :number revenue
-                :prefix currency-symbol
-                :label "revenue this month"
-                :pluralize false})))
-          (when (not (= costs nil))
-            (dom/div
-              (om/build report-line {
-                :number costs
-                :prefix currency-symbol
-                :label "costs this month"
-                :pluralize false})))
+          (for [section readonly-finances-sections]
+            (when (not (= (:number section) nil))
+              (dom/div
+                (om/build report-line (merge section {:prefix currency-symbol :pluralize false})))))
           (dom/div
             (dom/span {:class "label"} (str "Profitable this month? " profitable)))
           (dom/div
