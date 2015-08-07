@@ -3,7 +3,7 @@
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
               [open-company-web.components.report-line :refer [report-line]]
-              [open-company-web.components.comment :refer [comment-component]]
+              [open-company-web.components.comment :refer [comment-component comment-readonly-component]]
               [om-bootstrap.random :as  r]
               [om-bootstrap.panel :as p]
               [open-company-web.lib.utils :as utils]))
@@ -118,18 +118,10 @@
                 (dom/p {:class "help-block"} (str "Time until cash on hand is " currency-symbol "0"))))))
 
         ;; Comment textarea
-        (dom/div {:class "row"}
-          (dom/div {:class "col-md-1"})
-          (dom/textarea {
-            :class "col-md-10"
-            :rows "5"
-            :value (:comment finances)
-            :on-change #(utils/handle-change finances (.. % -target -value) :comment)
-            :on-blur (fn [e]
-                      (utils/save-values "save-report")
-                      (.stopPropagation e))
-            :placeholder "Comments: explain any recent significant changes in costs or revenue, provide guidance on revenue and profitablity expectations"})
-          (dom/div {:class "col-md-1"}))))))
+        (om/build comment-component {
+          :cursor finances
+          :placeholder "Comments: explain any recent significant changes in costs or revenue, provide guidance on revenue and profitablity expectations"
+          })))))
 
 (defcomponent readonly-finances [data owner]
   (render [_]
@@ -175,4 +167,4 @@
             (dom/span {:class burn-rate-classes} (utils/thousands-separator (utils/abs burn-rate))))
           (dom/div
             (dom/span {:class "label"} "Runaway: " (if (<= burn-rate 0) (str (utils/abs run-away) " months") "N/A")))
-          (om/build comment-component {:cursor finances :key :comment :disabled true}))))))
+          (om/build comment-readonly-component {:cursor finances :key :comment :disabled true}))))))
