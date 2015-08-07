@@ -21,7 +21,6 @@
     (let [ticker (:ticker @router/path)
           company-data ((keyword ticker) data)
           reports (filterv #(= (:rel %) "report") (:links company-data))]
-      (println "company: " ticker)
       (dom/div {:class "company-container row"}
         (om/build navbar company-data)
         (dom/div {:class "container-fluid"}
