@@ -31,6 +31,12 @@
   (let [perc (gstring/format "%.2f" (* (/ dollar total) 100))]
     (js/parseFloat perc)))
 
+(def compensation-rows [
+  {:key-name :founders :label "Founders" :description "Founder cash compensation this quarter"}
+  {:key-name :executives :label "Executives" :description "Executives cash compensation this quarter"}
+  {:key-name :employees :label "Employees" :description "Employees cash compensation this quarter"}
+  {:key-name :contractors :label "Contractors" :description "Cost for contractors this quarter"}])
+
 (defcomponent compensation [data owner]
   (render [_]
     (let [head-data (:headcount data)
@@ -47,34 +53,8 @@
             ;; Percentage
             (om/build percentage-switch data)
 
-            ;; Founders
-            (om/build compensation-section {
-              :cursor data
-              :key-name :founders
-              :label "Founders"
-              :description "Founder cash compensation this quarter"})
-
-            ;; Executives
-            (om/build compensation-section {
-              :cursor data
-              :key-name :executives
-              :label "Executives"
-              :description "Executives cash compensation this quarter"})
-
-            ;; Empoyees
-            (om/build compensation-section {
-              :cursor data
-              :key-name :employees
-              :label "Employees"
-              :description "Employees cash compensation this quarter"})
-
-            ;; Contractors
-            (om/build compensation-section {
-              :cursor data
-              :key-name :contractors
-              :label "Contractors"
-              :description "Cost for contractors this quarter"}))
-
+            (for [section compensation-rows]
+              (om/build compensation-section (merge section {:cursor data}))))
           ;; Pie chart
           (dom/div {:class "col-sm-6"}
             (om/build pie-chart (get-chart-data data prefix))))
