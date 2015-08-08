@@ -70,7 +70,7 @@
                           {:number pt-employees :label "part-time employee"}
                           {:number contractors :label "contractor"}]]
             (for [section sections]
-              (when (:value section)
+              (when (:number section)
                 (dom/div
                   (om/build report-line section)))))
           (dom/div
