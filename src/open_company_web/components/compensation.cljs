@@ -92,34 +92,18 @@
           total-compensation (gstring/format "%.2f" total-compensation)]
       (r/well {:class "report-list compensation clearfix"}
         (dom/div {:class "report-list-left"}
-          (when show-founders
-            (dom/div
-              (om/build report-line {
-                :number (if percentage (calc-percentage founders total-compensation) founders)
-                :prefix prefix
-                :label founders-label
-                :pluralize false})))
-          (when show-executives
-            (dom/div
-              (om/build report-line {
-                :number (if percentage (calc-percentage executives total-compensation) executives)
-                :prefix prefix
-                :label executives-label
-                :pluralize false})))
-          (when show-employees
-            (dom/div
-              (om/build report-editable-line {
-                :number (if percentage (calc-percentage employees total-compensation) employees)
-                :prefix prefix
-                :label employees-label
-                :pluralize false})))
-          (when show-contractors
-            (dom/div
-              (om/build report-editable-line {
-                :number (if percentage (calc-percentage contractors total-compensation) contractors)
-                :prefix prefix
-                :label contractors-label
-                :pluralize false})))
+
+          ;; Report lines
+          (let [sections [{:show-section show-founders :number (if percentage (calc-percentage founders total-compensation) founders) :label founders-label}
+                          {:show-section show-executives :number (if percentage (calc-percentage executives total-compensation) executives) :label executives-label}
+                          {:show-section show-employees :number (if percentage (calc-percentage employees total-compensation) employees) :label employees-label}
+                          {:show-section show-contractors :number (if percentage (calc-percentage contractors total-compensation) founders) :label contractors-label}]]
+            (for [section sections]
+              (when (:show-section section)
+                (dom/div
+                  (om/build report-line (merge section {:prefix prefix :pluralize false}))))))
+
+          ;; Total compensation
           (dom/div
             (om/build report-line {
               :prefix prefix
