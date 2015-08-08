@@ -21,7 +21,7 @@
               [dommy.core :refer-macros [sel1]]))
 
 (defn create-new-report [owner company-data new-year new-period]
-  (let [ticker (:ticker company-data)]
+  (let [ticker (:symbol company-data)]
     ; hide popover
     (om/set-state! owner :show-new-report-popover false)
     ; when the data are correct: FIXME check year and period
@@ -133,7 +133,7 @@
 
               (and (contains? data (keyword ticker)) (contains? company-data report-key))
               (dom/div
-                (dom/h2 (str ticker " - " period " " year " (" (utils/get-long-period period) ")"))
+                (dom/h2 (str ticker " - " period " " year " (" (utils/get-period-string period) ")"))
                 (dom/div
                   (om/build finances {
                       :finances (:finances report-data)
