@@ -16,18 +16,18 @@
 
 (defcomponent finances [data owner]
   (will-mount [_]
-    (let [finances (:finances data)
-          cash (:cash finances)
-          revenue (:revenue finances)
-          costs (:costs finances)]
+    (let [fin-data (:finances data)
+          cash (:cash fin-data)
+          revenue (:revenue fin-data)
+          costs (:costs fin-data)]
       (om/set-state! owner :cash (utils/thousands-separator cash))
       (om/set-state! owner :revenue (utils/thousands-separator revenue))
       (om/set-state! owner :costs (utils/thousands-separator costs))))
   (render [_]
-    (let [finances (:finances data)
-          cash (:cash finances)
-          revenue (:revenue finances)
-          costs (:costs finances)
+    (let [fin-data (:finances data)
+          cash (:cash fin-data)
+          revenue (:revenue fin-data)
+          costs (:costs fin-data)
           currency (:currency data)
           burn-rate (- revenue costs)
           burn-rate (if (js/isNaN burn-rate) 0 burn-rate)
@@ -45,7 +45,7 @@
 
             (for [section finances-rows]
               (om/build finances-section (merge section {
-                :cursor finances
+                :cursor fin-data
                 :prefix currency-symbol
                 :placeholder (:text currency-dict)})))
 
@@ -71,21 +71,16 @@
 
         ;; Comment textarea
         (om/build comment-component {
-          :cursor finances
+          :cursor fin-data
           :placeholder "Comments: explain any recent significant changes in costs or revenue, provide guidance on revenue and profitablity expectations"
           })))))
 
-(def readonly-finances-sections [
-  {:number cash :label "cash on hand"}
-  {:number revenue :label "revenue this month"}
-  {:number costs :label "costs this month"}])
-
 (defcomponent readonly-finances [data owner]
   (render [_]
-    (let [finances (:finances data)
-          cash (:cash finances)
-          revenue (:revenue finances)
-          costs (:costs finances)
+    (let [fin-data (:finances data)
+          cash (:cash fin-data)
+          revenue (:revenue fin-data)
+          costs (:costs fin-data)
           currency (:currency data)
           burn-rate (- revenue costs)
           burn-rate-label (if (> burn-rate 0) "Growth rate: " "Burn rate: ")
@@ -95,10 +90,15 @@
           currency-symbol (utils/get-symbol-for-currency-code currency)]
       (r/well {:class "report-list finances clearfix"}
         (dom/div {:class "report-list-left"}
-          (for [section readonly-finances-sections]
-            (when (not (= (:number section) nil))
-              (dom/div
-                (om/build report-line (merge section {:prefix currency-symbol :pluralize false})))))
+
+          (let [sections [{:number cash :label "cash on hand"}
+                          {:number revenue :label "revenue this month"}
+                          {:number costs :label "costs this month"}]]
+            (for [section sections]
+              (when (not (= (:number section) nil))
+                (dom/div
+                  (om/build report-line (merge section {:prefix currency-symbol :pluralize false}))))))
+
           (dom/div
             (dom/span {:class "label"} (str "Profitable this month? " profitable)))
           (dom/div
@@ -107,4 +107,4 @@
             (dom/span {:class burn-rate-classes} (utils/thousands-separator (utils/abs burn-rate))))
           (dom/div
             (dom/span {:class "label"} "Runaway: " (if (<= burn-rate 0) (str (utils/abs run-away) " months") "N/A")))
-          (om/build comment-readonly-component {:cursor finances :key :comment :disabled true}))))))
+          (om/build comment-readonly-component {:cursor fin-data :key :comment :disabled true}))))))
