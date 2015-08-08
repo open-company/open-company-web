@@ -89,3 +89,16 @@
     "Q4" "October - December"
 
     ""))
+
+(defn get-week-string [week]
+ (let [week-number (subs week 1)]
+    (str "Week " week-number)))
+
+(defn get-period-string [period]
+  (if (.startsWith period "W")
+    (get-week-string period)
+    (get-long-period period)))
+
+(defn get-periods [prefix n]
+ (let [r (range 1 (+ n 1))]
+    (into [] (for [a r] (str prefix a)))))
