@@ -110,6 +110,12 @@
    ;; :server-logfile "tmp/logs/figwheel-logfile.log"
   }
 
+  ; Ring
+  :ring {
+    :handler open-company-web.lib.server/handler
+    :reload-paths ["src"] ; work around issue https://github.com/weavejester/lein-ring/issues/68
+  }
+
   :aliases {
     "ancient" ["with-profile" "dev" "do" "ancient" ":allow-qualified," "ancient" ":plugins" ":allow-qualified"] ; check for out of date dependencies
     "test!" ["doo" "phantom" "test" "once"]
