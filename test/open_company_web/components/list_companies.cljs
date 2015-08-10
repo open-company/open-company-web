@@ -30,8 +30,6 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root list-companies app-state {:target c})
-          companies-node (sel1 c [:ul])
-          companies-li-nodes (sel c [:li])]
+          companies-node (sel1 c [:ul])]
       (is (not (nil? companies-node)))
-      (is (= (count companies-li-nodes) (count (:companies test-atom))))
       (tu/unmount! c))))

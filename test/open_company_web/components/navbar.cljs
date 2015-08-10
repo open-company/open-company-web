@@ -1,10 +1,10 @@
-(ns test.open-company-web.components.report
+(ns test.open-company-web.components.navbar
     (:require [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
               [cljs-react-test.simulate :as sim]
               [cljs-react-test.utils :as tu]
               [om.core :as om :include-macros true]
               [dommy.core :as dommy :refer-macros [sel1 sel]]
-              [open-company-web.components.report :refer [report]]
+              [open-company-web.components.navbar :refer [navbar]]
               [om.dom :as dom :include-macros true]
               [open-company-web.router :as router]))
 
@@ -14,26 +14,25 @@
 (def ^:dynamic c)
 
 (def company-symbol "OPEN")
-(def year "2015")
-(def period "Q4")
 
 (def test-atom {
-  :symbol company-symbol
-  :year year
-  :period period
   :OPEN {
-    :report-OPEN-2014-Q4 {
-
-    }
+    :symbol company-symbol
+    :links [
+      {
+        :rel "report"
+        :href "/v1/companies/OPEN/2015/Q1"
+      }
+    ]
   }
 })
 
-(deftest test-report-component
-  (testing "Report component"
-    (router/set-route! [company-symbol year period] {:ticker company-symbol :year year :period period})
+(deftest test-navbar-component
+  (testing "Navbar component"
+    (router/set-route! [company-symbol] {:ticker company-symbol})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
-          _ (om/root report app-state {:target c})
-          report-node (sel1 c [:div.report-container])]
-      (is (not (nil? report-node)))
+          _ (om/root navbar app-state {:target c})
+          navbar-node (sel c [:div#navbar])]
+      (is (not (nil? navbar-node)))
       (tu/unmount! c))))

@@ -1,7 +1,8 @@
 (ns open-company-web.lib.utils
     (:require [om.core :as om :include-macros true]
               [clojure.string]
-              [open-company-web.lib.iso4217 :refer [iso4217]]))
+              [open-company-web.lib.iso4217 :refer [iso4217]]
+              [cljs.core.async :refer [put!]]))
 
 (defn abs [n] (max n (- n)))
 
@@ -18,9 +19,6 @@
   (let [num-str (str number)]
     (clojure.string/replace num-str "," "")))
 
-(defn handle-change [cursor value key]
-  (om/transact! cursor key (fn [_] value)))
-
 (defn String->Number [str]
   (let [n (js/parseFloat str)]
     (if (js/isNaN n) 0 n)))
@@ -30,12 +28,19 @@
     #js {}
     #js {:display "none"}))
 
-(defn get-symbols-for-currency-code
-  [code]
-  (let [kw (keyword code)
-        dict (get iso4217 kw)
-        symbol (if (contains? dict :symbol) (:symbol dict) code)
-        ret (or symbol (:code dict))]
+(defn get-currency [currency-code]
+  (let [kw (keyword currency-code)]
+    (get iso4217 kw)))
+
+(defn get-symbol-for-currency-code [currency-code]
+  (let [currency (get-currency currency-code)
+        symbol (if
+                (and
+                  (contains? currency :symbol)
+                  (> (count (:symbol currency)) 0))
+                (:symbol currency)
+                currency-code)
+        ret (or symbol (:code currency))]
   ret))
 
 (def channel-coll (atom {}))
@@ -45,3 +50,55 @@
 
 (defn get-channel [channel-name]
   (@channel-coll channel-name))
+
+(defn handle-change [cursor value key]
+  (if (array? key)
+    (om/transact! cursor assoc-in key (fn [_] value))
+    (om/transact! cursor key (fn [_] value))))
+
+(defn change-value [cursor e key]
+  (handle-change cursor (.. e -target -value) key))
+
+(defn save-values [channel-name]
+  (let [save-channel (get-channel channel-name)]
+    (put! save-channel 1)))
+
+(defn in?
+  "true if seq contains elm"
+  [seq elm]
+  (some #(= elm %) seq))
+
+(defn get-long-period [period]
+  (case period
+    "M1" "January"
+    "M2" "February"
+    "M3" "March"
+    "M4" "April"
+    "M5" "May"
+    "M6" "June"
+    "M7" "July"
+    "M8" "August"
+    "M9" "September"
+    "M10" "October"
+    "M11" "November"
+    "M12" "December"
+
+    "Q1" "January - March"
+    "Q2" "April - June"
+    "Q3" "July - September"
+    "Q4" "October - December"
+
+    ""))
+
+(defn get-week-string [week]
+ (let [week-number (subs week 1)]
+    (str "Week " week-number)))
+
+(defn get-period-string [period]
+  (if (.startsWith period "W")
+    (get-week-string period)
+    (get-long-period period)))
+
+(defn get-periods [prefix n]
+ (let [r (range 1 (+ n 1))]
+    (into [] (for [a r] (str prefix a)))))

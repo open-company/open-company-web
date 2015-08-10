@@ -1,119 +1,68 @@
 (ns open-company-web.components.compensation
-    (:require [om.core :as om :include-macros true]
-              [om-tools.core :as om-core :refer-macros [defcomponent]]
-              [om-tools.dom :as dom :include-macros true]
-              [open-company-web.components.report-line :refer [report-line report-editable-line]]
-              [open-company-web.lib.utils :refer [thousands-separator handle-change get-symbols-for-currency-code]]
-              [open-company-web.components.comment :refer [comment-component]]
-              [open-company-web.components.pie-chart :refer [pie-chart]]
-              [goog.string :as gstring]
-              [om-bootstrap.random :as r]))
+  (:require [om.core :as om :include-macros true]
+            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.dom :as dom :include-macros true]
+            [open-company-web.components.report-line :refer [report-line report-editable-line]]
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.components.comment :refer [comment-component comment-readonly-component]]
+            [open-company-web.components.pie-chart :refer [pie-chart]]
+            [open-company-web.components.report.compensation-section :refer [compensation-section]]
+            [open-company-web.components.report.percentage-switch :refer [percentage-switch]]
+            [goog.string :as gstring]
+            [om-bootstrap.random :as r]
+            [om-bootstrap.panel :as p]))
 
-(defn get-chart-data [data head-data symbol]
-  (let [show-founders (> (:founders head-data) 0)
+(defn get-chart-data [data ticker]
+  (let [head-data (:headcount data)
+        comp-data (:compensation data)
+        show-founders (> (:founders head-data) 0)
         show-executives (> (:executives head-data) 0)
         show-employees (> (+ (:ft-employees head-data) (:pt-employees head-data)) 0)
-        show-contrators (> (+ (:ft-contractors head-data) (:pt-contractors head-data)) 0)]
-    { :symbol symbol
+        show-contractors (> (:contractors head-data) 0)]
+    { :prefix ticker
       :columns [["string" "Compensation"] ["number" "Amount"]]
-      :values [[:Founders (if show-founders (:founders data) 0)]
-              [:Executives (if show-executives (:executives data) 0)]
-              [:Employees (if show-employees (:employees data) 0)]
-              [:Contractors (if show-contrators (:contractors data) 0)]]}))
+      :values [[:Founders (if show-founders (:founders comp-data) 0)]
+              [:Executives (if show-executives (:executives comp-data) 0)]
+              [:Employees (if show-employees (:employees comp-data) 0)]
+              [:Contractors (if show-contractors (:contractors comp-data) 0)]]}))
 
 (defn calc-percentage
   [dollar total]
   (let [perc (gstring/format "%.2f" (* (/ dollar total) 100))]
     (js/parseFloat perc)))
 
+(def compensation-rows [
+  {:key-name :founders :label "Founders" :description "Founder cash compensation this quarter"}
+  {:key-name :executives :label "Executives" :description "Executives cash compensation this quarter"}
+  {:key-name :employees :label "Employees" :description "Employees cash compensation this quarter"}
+  {:key-name :contractors :label "Contractors" :description "Cost for contractors this quarter"}])
+
 (defcomponent compensation [data owner]
   (render [_]
     (let [head-data (:headcount data)
-          show-founders (> (:founders head-data) 0)
-          show-executives (> (:executives head-data) 0)
-          show-employees (> (+ (:ft-employees head-data) (:pt-employees head-data)) 0)
-          show-contrators (> (+ (:ft-contractors head-data) (:pt-contractors head-data)) 0)
           comp-data (:compensation data)
-          percentage (:percentage comp-data)
-          founders (if show-founders (:founders comp-data) 0)
-          executives (if show-executives (:executives comp-data) 0)
-          employees (if show-employees (:employees comp-data) 0)
-          contractors (if show-contrators (:contractors comp-data) 0)
           currency (:currency data)
-          currency-symbol (get-symbols-for-currency-code currency)
-          prefix (str currency-symbol " ")
-          comment (:comment comp-data)
-          total-compensation 0
-          total-compensation (+ (if show-founders founders 0) total-compensation)
-          total-compensation (+ (if show-executives executives 0) total-compensation)
-          total-compensation (+ (if show-employees employees 0) total-compensation)
-          total-compensation (+ (if show-contrators contractors 0) total-compensation)
-          total-compensation (gstring/format "%.2f" total-compensation)
-          employees-count (+ (:ft-employees head-data) (:pt-employees head-data))
-          contractors-count (+ (:ft-contractors head-data) (:pt-contractors head-data))
-          founders-label (str "founder" (if (= (:founders head-data) 1) "" "s") " comp. this month")
-          founders-label (if founders (str founders-label " (" (calc-percentage founders total-compensation) "%)") founders-label)
-          executives-label (str "executive" (if (= (:executives head-data) 1) "" "s") " comp. this month")
-          executives-label (if executives (str executives-label " (" (calc-percentage executives total-compensation) "%)") executives-label)
-          employees-label (str "employee" (if (= employees-count 1) "" "s") " comp. this month")
-          employees-label (if employees (str employees-label " (" (calc-percentage employees total-compensation) "%)") employees-label)
-          contractors-label (str "contractor" (if (= contractors-count 1) "" "s") " comp. this month")
-          contractors-label (if contractors (str contractors-label " (" (calc-percentage contractors total-compensation) "%)") contractors-label)]
-      (r/well {:class "report-list compensation clearfix"}
-        (dom/div {:class "report-list-left"}
-          (when show-founders
-            (om/build report-editable-line {
-              :cursor comp-data
-              :key :founders
-              :prefix prefix
-              :label founders-label
-              :pluralize false}))
-          (when show-executives
-            (om/build report-editable-line {
-              :cursor comp-data
-              :key :executives
-              :prefix prefix
-              :label executives-label
-              :pluralize false}))
-          (when show-employees
-            (om/build report-editable-line {
-              :cursor comp-data
-              :key :employees
-              :prefix prefix
-              :label employees-label
-              :pluralize false}))
-          (when show-contrators
-            (om/build report-editable-line {
-              :cursor comp-data
-              :key :contractors
-              :prefix prefix
-              :label contractors-label
-              :pluralize false}))
-          (dom/div
-            (om/build report-line {
-              :prefix prefix
-              :number (thousands-separator total-compensation)
-              :label "total compensation this month"}))
-          (dom/div
-            (dom/span {:class "label"} "Report in: "
-              (dom/input {
-                :type "radio"
-                :name "report-type"
-                :value currency
-                :id "report-type-$"
-                :checked (not percentage)
-                :on-click #(handle-change comp-data false "percentage")})
-              (dom/label {:class "switch-vis" :for "report-type-$"} (str " " currency-symbol "  "))
-              (dom/input {
-                :type "radio"
-                :name "report-type"
-                :value "%"
-                :id "report-type-%"
-                :checked percentage
-                :on-click #(handle-change comp-data true "percentage")})
-              (dom/label {:class "switch-vis" :for "report-type-%"} "  Percent ")))
-          (om/build comment-component {:cursor comp-data :key :comment}))
-        (om/build pie-chart (get-chart-data comp-data head-data prefix))))))
+          currency-symbol (utils/get-symbol-for-currency-code currency)
+          prefix (str currency-symbol " ")]
+      (p/panel {:header (dom/h3 "Compensation") :class "compensation clearfix"}
+        (dom/div {:class "compensation row"}
+
+          ;; Compensation sections
+          (dom/form {:class "form-horizontal col-sm-6"}
+
+            ;; Percentage
+            (om/build percentage-switch data)
+
+            (for [section compensation-rows]
+              (om/build compensation-section (merge section {:cursor data}))))
+          ;; Pie chart
+          (dom/div {:class "col-sm-6"}
+            (om/build pie-chart (get-chart-data data prefix))))
+
+        ;; Comment
+        (om/build comment-component {
+          :cursor comp-data
+          :placeholder "Comments: explain any recent significant changes in compensation costs"})))))
 
 (defcomponent readonly-compensation [data owner]
   (render [_]
@@ -121,15 +70,15 @@
           show-founders (> (:founders head-data) 0)
           show-executives (> (:executives head-data) 0)
           show-employees (> (+ (:ft-employees head-data) (:pt-employees head-data)) 0)
-          show-contrators (> (+ (:ft-contractors head-data) (:pt-contractors head-data)) 0)
+          show-contractors (> (:contractors head-data) 0)
           comp-data (:compensation data)
           percentage (:percentage comp-data)
           founders (if show-founders (:founders comp-data) 0)
           executives (if show-executives (:executives comp-data) 0)
           employees (if show-employees (:employees comp-data) 0)
-          contractors (if show-contrators (:contractors comp-data) 0)
+          contractors (if show-contractors (:contractors comp-data) 0)
           currency (:currency data)
-          currency-symbol (get-symbols-for-currency-code currency)
+          currency-symbol (utils/get-symbol-for-currency-code currency)
           prefix (str (if percentage "%" currency-symbol) " ")
           founders-label (str "founder" (if (= (:founders head-data) 1) "" "s") " compensation this month")
           executives-label (str "executive" (if (= (:executives head-data) 1) "" "s") " compensation this month")
@@ -139,43 +88,27 @@
           total-compensation (+ (if show-founders founders 0) total-compensation)
           total-compensation (+ (if show-executives executives 0) total-compensation)
           total-compensation (+ (if show-employees employees 0) total-compensation)
-          total-compensation (+ (if show-contrators contractors 0) total-compensation)
+          total-compensation (+ (if show-contractors contractors 0) total-compensation)
           total-compensation (gstring/format "%.2f" total-compensation)]
       (r/well {:class "report-list compensation clearfix"}
         (dom/div {:class "report-list-left"}
-          (when show-founders
-            (dom/div
-              (om/build report-line {
-                :number (if percentage (calc-percentage founders total-compensation) founders)
-                :prefix prefix
-                :label founders-label
-                :pluralize false})))
-          (when show-executives
-            (dom/div
-              (om/build report-line {
-                :number (if percentage (calc-percentage executives total-compensation) executives)
-                :prefix prefix
-                :label executives-label
-                :pluralize false})))
-          (when show-employees
-            (dom/div
-              (om/build report-editable-line {
-                :number (if percentage (calc-percentage employees total-compensation) employees)
-                :prefix prefix
-                :label employees-label
-                :pluralize false})))
-          (when show-contrators
-            (dom/div
-              (om/build report-editable-line {
-                :number (if percentage (calc-percentage contractors total-compensation) contractors)
-                :prefix prefix
-                :label contractors-label
-                :pluralize false})))
+
+          ;; Report lines
+          (let [sections [{:show-section show-founders :number (if percentage (calc-percentage founders total-compensation) founders) :label founders-label}
+                          {:show-section show-executives :number (if percentage (calc-percentage executives total-compensation) executives) :label executives-label}
+                          {:show-section show-employees :number (if percentage (calc-percentage employees total-compensation) employees) :label employees-label}
+                          {:show-section show-contractors :number (if percentage (calc-percentage contractors total-compensation) founders) :label contractors-label}]]
+            (for [section sections]
+              (when (:show-section section)
+                (dom/div
+                  (om/build report-line (merge section {:prefix prefix :pluralize false}))))))
+
+          ;; Total compensation
           (dom/div
             (om/build report-line {
               :prefix prefix
-              :number (thousands-separator
+              :number (utils/thousands-separator
                         (if percentage (calc-percentage total-compensation total-compensation) total-compensation))
               :label "total compensation this month"}))
-          (om/build comment-component {:cursor comp-data :key :comment :disabled true}))
-        (om/build pie-chart (get-chart-data comp-data head-data prefix))))))
+          (om/build comment-readonly-component {:cursor comp-data :key :comment :disabled true}))
+        (om/build pie-chart (get-chart-data data prefix))))))

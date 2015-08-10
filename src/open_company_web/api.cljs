@@ -42,7 +42,7 @@
         (flux/dispatch dispatcher/companies body)))))
 
 (defn get-company [ticker]
-  (when symbol
+  (when ticker
     (apiget ticker nil
       (fn [response]
         (let [body (if (:success response) (json->cljs (:body response)) {})]
@@ -69,18 +69,33 @@
         (get-company ticker)))))
 
 (defn save-or-create-report [ticker year period data]
-  (when (and ticker year period data)
-    (when (or (:headcount data) (:finances data) (:compensation data))
-      (let [json-data (cljs->json (dissoc data :links))]
-        (apiput
-          (str ticker "/" year "/" period)
-          { :json-params json-data
-            :alternative-headers {
-              ; required by Chrome
-              "Access-Control-Allow-Headers" "Content-Type"
-              ; custom content type
-              "content-type" (content-type "report")
-            }}
-          (fn [response]
-            (let [body (if (:success response) (json->cljs (:body response)) {})]
-              (flux/dispatch dispatcher/report body))))))))
+  (when (and ticker year period data (or (:headcount data) (:finances data) (:compensation data)))
+    (let [json-data (cljs->json (dissoc data :links))]
+      (apiput
+        (str ticker "/" year "/" period)
+        { :json-params json-data
+          :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (content-type "report")
+          }}
+        (fn [response]
+          (let [body (if (:success response) (json->cljs (:body response)) {})]
+            (flux/dispatch dispatcher/report body)))))))
+
+(defn save-or-create-company [ticker data]
+  (when (and ticker data)
+    (let [company-data (dissoc data :headcount :finances :compensation :links)
+          json-data (cljs->json company-data)]
+      (apiput ticker
+        { :json-params json-data
+          :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (content-type "company")
+          }}
+        (fn [response]
+          (let [body (if (:success response) (json->cljs (:body response)) {})]
+            (flux/dispatch dispatcher/company body)))))))

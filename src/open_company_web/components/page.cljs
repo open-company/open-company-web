@@ -7,42 +7,35 @@
               [open-company-web.components.finances :refer [finances]]
               [open-company-web.components.compensation :refer [compensation]]
               [open-company-web.components.currency-picker :refer [currency-picker]]
+              [open-company-web.components.navbar :refer [navbar]]
               [open-company-web.components.link :refer [link]]
+              [open-company-web.components.sidebar :refer [sidebar]]
+              [open-company-web.components.profile :refer [profile]]
+              [open-company-web.router :as router]
               [clojure.string :as str]))
 
 (enable-console-print!)
 
-(defcomponent report-link [data owner]
-  (render [_]
-    (let [symbol (:symbol data)
-          link-parts (str/split (:report data) "/")
-          year (nth link-parts 4)
-          period (nth link-parts 5)]
-      (dom/div {:class "report-link"}
-        (om/build link {
-          :href (str "/companies/" symbol "/" year "/" period)
-          :name (str year " - " period)})))))
-
 (defcomponent company [data owner]
   (render [_]
-    (let [symbol (:ticker data)
-          company-data ((keyword symbol) data)
+    (let [ticker (:ticker @router/path)
+          company-data ((keyword ticker) data)
           reports (filterv #(= (:rel %) "report") (:links company-data))]
-      (dom/div {:class "company-container"}
-        (dom/h2 (str (:name company-data) " - Dashboard"))
-        (cond
-          (:loading data)
-          (dom/div
-            (dom/h4 "Loading data..."))
+      (dom/div {:class "company-container row"}
+        (om/build navbar company-data)
+        (dom/div {:class "container-fluid"}
+          (om/build sidebar {:active "profile"})
+          (dom/div {:class "col-md-11 col-md-offset-1 main"}
+            (cond
 
-          (contains? company-data :symbol)
-          (dom/div
-            (for [report reports]
-              (om/build report-link {
-                :report (:href report)
-                :symbol symbol})))
+              (:loading data)
+              (dom/div
+                (dom/h4 "Loading data..."))
 
-          :else
-          (dom/div
-            (dom/h2 (str (:ticker data) " not found"))
-            (om/build link {:href "/" :name "Back home"})))))))
+              (contains? company-data :symbol)
+              (om/build profile data)
+
+              :else
+              (dom/div
+                (dom/h2 (str (:ticker @router/path) " not found"))
+                (om/build link {:href "/" :name "Back home"})))))))))

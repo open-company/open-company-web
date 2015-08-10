@@ -25,7 +25,7 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root finances app-state {:target c})
-          finances-node (sel1 c [:.report-list])]
+          finances-node (sel1 c [:div.finances])]
       (is (not (nil? finances-node)))
       (tu/unmount! c))))
 
