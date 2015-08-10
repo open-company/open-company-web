@@ -23,7 +23,7 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root compensation app-state {:target c})
-          container-node (sel1 c [:.report-list])]
+          container-node (sel1 c [:div.compensation])]
       (is (not (nil? container-node)))
       (tu/unmount! c))))
 

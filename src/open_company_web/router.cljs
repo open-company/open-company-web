@@ -1,9 +1,14 @@
 (ns open-company-web.router
-  (:require [secretary.core :as secretary :include-macros true :refer-macros [defroute]])
-  (:import [goog.history Html5History]
-           [goog History]))
+  (:require [secretary.core :as secretary])
+  (:import [goog.history Html5History]))
 
 (enable-console-print!)
+
+(def path (atom {}))
+
+(defn set-route! [route parts]
+  (swap! path assoc :route route)
+  (doseq [[k v] parts] (swap! path assoc k v)))
 
 (defn get-token []
   (str js/window.location.pathname js/window.location.search))
@@ -26,5 +31,7 @@
   ;; dispatch on the token
   (secretary/dispatch! (get-token)))
 
+; FIXME: remove the worning of history not found
 (defn nav! [token]
+  (swap! path {})
   (.setToken open-company-web.core/history token))

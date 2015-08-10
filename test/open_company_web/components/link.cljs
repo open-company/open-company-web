@@ -12,7 +12,7 @@
 ; dynamic mount point for components
 (def ^:dynamic c)
 
-(def test-data {
+(def test-atom {
   :href "/"
   :name "asd"
 })
@@ -20,6 +20,7 @@
 (deftest test-link-component
   (testing "Link component"
     (let [c (tu/new-container!)
+          app-state (atom test-atom) 
           _ (om/root link app-state {:target c})
           link-node (sel1 c [:a])]
       (is (not (nil? link-node)))

@@ -1,71 +1,79 @@
 (ns ^:figwheel-always open-company-web.core
   (:require [om.core :as om :include-macros true]
-            [om-tools.dom :as dom :include-macros true]
-            [secretary.core :as secretary :include-macros true :refer-macros [defroute]]
-            [cljs-flux.dispatcher :as flux]
-            [open-company-web.router :refer [make-history handle-url-change]]
+            [secretary.core :refer-macros [defroute]]
+            [open-company-web.router :as router]
             [open-company-web.components.page :refer [company]]
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
             [open-company-web.components.report :refer [report readonly-report]]
             [open-company-web.lib.raven :refer [raven-setup]]
-            [open-company-web.dispatcher :as dispatcher :refer [app-state]]
+            [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.api :as api]
             [goog.events :as events])
-  (:import [goog.history EventType])
-  (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
+  (:import [goog.history EventType]))
 
 (enable-console-print!)
 
 ;; setup Sentry error reporting
 (defonce raven (raven-setup))
 
-(defn render-company [ticker loading target]
-  (swap! app-state assoc :ticker ticker)
-  (when loading
-    (swap! app-state assoc :loading true))
-  (om/root company app-state target))
-
-; Routes - Do not define routes if js/document#app
-; is not defined because we are in the tests
+; Routes - Do not define routes when js/document#app
+; is undefined because it crashed the tests
 (if-let [target (. js/document (getElementById "app"))]
   (do
-    (defroute list-page-route "/" []
+    (defroute list-page-route "/companies" []
+      ; save route
+      (router/set-route! ["companies"] {})
+      ; load data from api
       (api/get-companies)
+      ; render component
       (om/root list-companies app-state {:target target}))
 
-    (defroute editable-page-route "/companies/:symbol" {ticker :symbol}
-      (do
-        (if-not (contains? app-state (keyword ticker))
-          (do
-            (api/get-company ticker)
-            (render-company ticker true {:target target}))
-          (render-company ticker false {:target target}))))
-
-    (defroute report-editable-route "/companies/:symbol/:year/:period/edit" {ticker :symbol year :year period :period}
+    (defroute company-profile-route "/:ticker" {ticker :ticker}
+      ; save route
+      (router/set-route! [ticker] {:ticker ticker})
+      ; load data from api
+      (api/get-company ticker)
       (swap! app-state assoc :loading true)
-      (api/get-report ticker year period)
-      (swap! app-state assoc :ticker ticker)
-      (swap! app-state assoc :year year)
-      (swap! app-state assoc :period period)
+      ; render compoenent
+      (om/root company app-state {:target target}))
+
+    (defroute report-summary-route "/:ticker/summary" {ticker :ticker}
+      ; save route
+      (router/set-route! [ticker "summary"] {:ticker ticker})
+      ; load data from api
+      (swap! app-state assoc :loading true)
+      (api/get-company ticker)
+      ; render component
       (om/root report app-state {:target target}))
 
-    (defroute report-route "/companies/:symbol/:year/:period" {ticker :symbol year :year period :period}
+    (defroute report-editable-route "/:ticker/:year/:period/edit" {ticker :ticker year :year period :period}
+      ; save route
+      (router/set-route! [ticker year period "edit"] {:ticker ticker :year year :period period})
+      ; load data from api
       (swap! app-state assoc :loading true)
       (api/get-report ticker year period)
-      (swap! app-state assoc :ticker ticker)
-      (swap! app-state assoc :year year)
-      (swap! app-state assoc :period period)
+      ; render component
+      (om/root report app-state {:target target}))
+
+    (defroute report-route "/:ticker/:year/:period" {ticker :ticker year :year period :period}
+      ; save route
+      (router/set-route! [ticker year period] {:ticker ticker :year year :period period})
+      ; load data from api
+      (swap! app-state assoc :loading true)
+      (api/get-report ticker year period)
+      ; render component
       (om/root readonly-report app-state {:target target}))
 
     (defroute not-found-route "*" []
+      ; render component
       (om/root page-not-found app-state {:target target}))))
 
 (defonce history
-  (doto (make-history)
-    (goog.events/listen EventType.NAVIGATE
+  (doto (router/make-history)
+    (events/listen EventType.NAVIGATE
       ;; wrap in a fn to allow live reloading
-      #(handle-url-change %))
+      #(router/handle-url-change %))
     (.setEnabled true)))
 
 (defn on-js-reload []

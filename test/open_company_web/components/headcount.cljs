@@ -17,7 +17,7 @@
     :founders 2
     :executives 1
     :pt-employees 3
-    :ft-contractors 4
+    :contractors 4
   }
 })
 
@@ -26,7 +26,7 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root headcount app-state {:target c})
-          headcount-node (sel1 c [:.report-list])]
+          headcount-node (sel1 c [:div.headcount])]
       (is (not (nil? headcount-node)))
       (tu/unmount! c))))
 
