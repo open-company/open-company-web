@@ -23,7 +23,7 @@
 (defn create-new-report [owner company-data new-year new-period]
   (let [ticker (:symbol company-data)
         links (:links company-data)
-        new-report-link (str "/v1/companies/" ticker "/" new-year "/" new-period)]
+        new-report-link (str "/companies/" ticker "/reports/" new-year "/" new-period)]
     ; hide popover
     (om/set-state! owner :show-new-report-popover false)
     ; when the data are correct: FIXME check year and period
@@ -40,7 +40,7 @@
             })
           ; add the report to links
           (om/transact! company-data :links #(conj % {
-            :href (str "/v1/companies/" ticker "/" new-year "/" new-period)
+            :href (str "/companies/" ticker "/reports/" new-year "/" new-period)
             :rel "report"
             }))
           ; create the report on the server

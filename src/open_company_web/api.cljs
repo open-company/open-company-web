@@ -8,14 +8,12 @@
             [cognitect.transit :as t]
             [clojure.walk :refer [keywordize-keys stringify-keys]]))
 
-(def api-version "v1")
-
 (def company-endpoint "companies")
 
-(def endpoint (str "http://localhost:3000/" api-version "/" company-endpoint "/"))
+(def endpoint (str "http://localhost:3000/" company-endpoint "/"))
 
 (defn- content-type [type]
-  (str "application/vnd.open-company." type "+json;version=1"))
+  (str "application/vnd.open-company." type ".v1+json"))
 
 (defn- json->cljs [json]
   (let [reader (t/reader :json)]
@@ -49,7 +47,7 @@
           (flux/dispatch dispatcher/company body))))))
 
 (defn real-get-report [ticker year period]
-  (apiget (str ticker "/" year "/" period) nil
+  (apiget (str ticker "/reports/" year "/" period) nil
     (fn [response]
       (let [body (if (:success response) (json->cljs (:body response)) {})]
         (flux/dispatch dispatcher/report body)))))
@@ -72,7 +70,7 @@
   (when (and ticker year period data (or (:headcount data) (:finances data) (:compensation data)))
     (let [json-data (cljs->json (dissoc data :links))]
       (apiput
-        (str ticker "/" year "/" period)
+        (str ticker "/reports/" year "/" period)
         { :json-params json-data
           :headers {
             ; required by Chrome

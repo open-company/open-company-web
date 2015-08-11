@@ -19,7 +19,7 @@
     :links [
       {
         :rel "report"
-        :href "/v1/companies/OPEN/2015/Q1"
+        :href "/companies/OPEN/reports/2015/Q1"
       }
     ]
   }
