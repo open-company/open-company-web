@@ -8,11 +8,17 @@
 
 (def current-year (.getFullYear (new js/Date)))
 
-(def years (range 1950 (+ current-year 1)))
+(def years (range 2013 (+ current-year 1)))
 
-(def periods (concat (get-periods "W" 52) [""] (get-periods "M" 12) [""] (get-periods "Q" 4)))
+(def periods (concat (get-periods "Q" 4) [""] (get-periods "M" 12)))
 
-(defn get-value-from-ref [owner ref]
+(defn- period-label [period]
+  (let [label (get-period-string period)]
+    (if (re-find #"^Q" period) 
+      (str period ": " label)
+      label)))
+
+(defn- get-value-from-ref [owner ref]
   (let [el (om/get-ref owner ref)
         dom-node (.getDOMNode el)]
     (.-value dom-node)))
@@ -51,7 +57,7 @@
                   }
                   (dom/option {:value ""} "Select a period:")
                   (for [period periods]
-                    (dom/option {:value period} (str period " - " (get-period-string period)))))))
+                    (dom/option {:value period} (period-label period))))))
             ; button
             (b/button {
               :bs-style "primary"
