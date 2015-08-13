@@ -77,28 +77,28 @@
         :id "test-navigation"
         :source-paths ["src" "test"]
         :compiler {
-          :main "test.test-navigation"
+          :main 'test.test-navigation
           :output-to "target/testable-navigation.js"
           :source-map "target/testable-navigation.js.map"
-          :optimizations :whitespace}}
+          :optimizations :none}}
 
       :test-report {
         :id "test-report"
         :source-paths ["src" "test"]
         :compiler {
-          :main "test.test-report"
+          :main 'test.test-report
           :output-to "target/testable-report.js"
           :source-map "target/testable-report.js.map"
-          :optimizations :whitespace}}
+          :optimizations :none}}
 
       :test-ui-components {
         :id "test-ui-components"
         :source-paths ["src" "test"]
         :compiler {
-          :main "test.test-ui-components"
+          :main 'test.test-ui-components
           :output-to "target/testable-components.js"
           :source-map "target/testable-components.js.map"
-          :optimizations :whitespace}}}}
+          :optimizations :none}}}}
 
   :figwheel {
     ;; :http-server-root "public" ;; default and assumes "resources"
