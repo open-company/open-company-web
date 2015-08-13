@@ -29,36 +29,36 @@
       ; render component
       (om/root list-companies app-state {:target target}))
 
-    (defroute company-profile-route "/:ticker" {ticker :ticker}
+    (defroute company-profile-route "/companies/:ticker" {ticker :ticker}
       ; save route
-      (router/set-route! [ticker] {:ticker ticker})
+      (router/set-route! ["companies" ticker] {:ticker ticker})
       ; load data from api
       (api/get-company ticker)
       (swap! app-state assoc :loading true)
       ; render compoenent
       (om/root company app-state {:target target}))
 
-    (defroute report-summary-route "/:ticker/summary" {ticker :ticker}
+    (defroute report-summary-route "/companies/:ticker/summary" {ticker :ticker}
       ; save route
-      (router/set-route! [ticker "summary"] {:ticker ticker})
+      (router/set-route! ["companies" ticker "summary"] {:ticker ticker})
       ; load data from api
       (swap! app-state assoc :loading true)
       (api/get-company ticker)
       ; render component
       (om/root report app-state {:target target}))
 
-    (defroute report-editable-route "/:ticker/:year/:period/edit" {ticker :ticker year :year period :period}
+    (defroute report-editable-route "/companies/:ticker/reports/:year/:period/edit" {ticker :ticker year :year period :period}
       ; save route
-      (router/set-route! [ticker year period "edit"] {:ticker ticker :year year :period period})
+      (router/set-route! ["companies" ticker "reports" year period "edit"] {:ticker ticker :year year :period period})
       ; load data from api
       (swap! app-state assoc :loading true)
       (api/get-report ticker year period)
       ; render component
       (om/root report app-state {:target target}))
 
-    (defroute report-route "/:ticker/:year/:period" {ticker :ticker year :year period :period}
+    (defroute report-route "/companies/:ticker/reports/:year/:period" {ticker :ticker year :year period :period}
       ; save route
-      (router/set-route! [ticker year period] {:ticker ticker :year year :period period})
+      (router/set-route! ["companies" ticker "reports" year period] {:ticker ticker :year year :period period})
       ; load data from api
       (swap! app-state assoc :loading true)
       (api/get-report ticker year period)

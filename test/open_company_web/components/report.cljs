@@ -30,7 +30,7 @@
 
 (deftest test-report-component
   (testing "Report component"
-    (router/set-route! [company-symbol year period] {:ticker company-symbol :year year :period period})
+    (router/set-route! ["companies" company-symbol "reports" year period] {:ticker company-symbol :year year :period period})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root report app-state {:target c})

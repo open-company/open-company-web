@@ -46,7 +46,7 @@
           ; create the report on the server
           (api/save-or-create-report ticker new-year new-period {:finances {}})))
       ; navigate to the new report
-      (router/nav! (str "/" ticker "/" new-year "/" new-period "/edit")))))
+      (router/nav! (str "/companies" ticker "/reports" new-year "/" new-period "/edit")))))
 
 (defcomponent report [data owner]
   (init-state [_]
@@ -85,7 +85,7 @@
               :bs-style "tabs"}
 
               ; Report summary
-              (let [url (str "/" ticker "/summary")]
+              (let [url (str "/companies/" ticker "/summary")]
                 (n/nav-item {
                   :key "summary"
                   :href url
@@ -100,7 +100,7 @@
                       rep-year (nth parts 4)
                       rep-period (nth parts 5)
                       rep-key (str "report-" ticker "-" rep-year "-" rep-period)
-                      link (str "/" ticker "/" rep-year "/" rep-period "/edit")]
+                      link (str "/companies/" ticker "/reports/" rep-year "/" rep-period "/edit")]
                   (n/nav-item {
                     :key rep-key
                     :href link
@@ -109,7 +109,7 @@
                     } (str rep-period " " rep-year))))
 
               ; New report tab
-              (let [url (str "/" ticker "/new-report")]
+              (let [url (str "/companies/" ticker "/new-report")]
                 (n/nav-item {
                   :key "new-report"
                   :href url
