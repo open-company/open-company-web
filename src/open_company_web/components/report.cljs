@@ -23,26 +23,26 @@
 (defn create-new-report [owner company-data new-year new-period]
   (let [ticker (:symbol company-data)
         links (:links company-data)
-        new-report-link (str "/companies/" ticker "/reports/" new-year "/" new-period)]
+        new-report-link (str "/companies/" ticker "/reports/" new-year "/" new-period)
+        filter-predicate #(and (= (:rel %) "report") (= (:href %) new-report-link))
+        filter-result (into [] (filter filter-predicate links))]
     ; hide popover
     (om/set-state! owner :show-new-report-popover false)
     ; when the data are correct: FIXME check year and period
     (when (and new-year new-period)
       ;; check if the report already exists,, if it exists skipe the save report
-      (when (> (.-length (filter #(and (= (:rel %) "report") (= (:href %) new-report-link)) links)) 0)
+      (when (<= (count filter-result) 0)
         (let [new-report-key (str "report-" ticker "-" new-year "-" new-period)
               links (:links company-data)]
-            ; add an empty report
+          ; add the report to links
+          (om/transact! company-data :links #(conj % {
+            :href new-report-link
+            :rel "report"}))
+          ; add an empty report
           (om/transact! company-data assoc (keyword new-report-key) {
             :finances {}
             :headcount {}
-            :compensation {}
-            })
-          ; add the report to links
-          (om/transact! company-data :links #(conj % {
-            :href (str "/companies/" ticker "/reports/" new-year "/" new-period)
-            :rel "report"
-            }))
+            :compensation {}})
           ; create the report on the server
           (api/save-or-create-report ticker new-year new-period {:finances {}})))
       ; navigate to the new report
@@ -135,7 +135,7 @@
               (:loading data)
               (dom/div nil "Loading")
 
-              (and (contains? data (keyword ticker)) (contains? company-data report-key))
+              (and (contains? data (keyword ticker)) (contains? company-data report-key) (not is-summary))
               (dom/div
                 (dom/h2 (str ticker " - " period " " year " (" (utils/get-period-string period) ")"))
                 (dom/div
