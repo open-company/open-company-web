@@ -90,7 +90,7 @@
         ; load the report only
         (let [links (:links ((keyword ticker) @dispatcher/app-state))
               report-link (link-for links "report" year period)]
-          (get-report (:href report-link)))
+          (get-report report-link))
         ; load the company data before the report data
         (do
           (flux/register
