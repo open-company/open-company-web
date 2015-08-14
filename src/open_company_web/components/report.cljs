@@ -48,6 +48,15 @@
       ; navigate to the new report
       (router/nav! (str "/companies" ticker "/reports" new-year "/" new-period "/edit")))))
 
+(defn sort-reports [el1 el2]
+  (let [el1-year (str (:year el1))
+        el2-year (str (:year el2))
+        el1-period (:period el1)
+        el2-period (:period el2)]
+    (if (= el1-year el2-year)
+      (compare el1-period el2-period))
+      (compare el1-year el2-year)))
+
 (defcomponent report [data owner]
   (init-state [_]
     (let [chan (chan)]
@@ -73,7 +82,8 @@
           company-data ((keyword ticker) data)
           report-key (keyword (str "report-" ticker "-" year "-" period))
           report-data (report-key company-data)
-          reports (filterv #(= (:rel %) "report") (:links company-data))
+          filtered-reports (filterv #(= (:rel %) "report") (:links company-data))
+          reports (sort sort-reports filtered-reports)
           is-summary (utils/in? (:route @router/path) "summary")]
       (dom/div {:class "report-container row"}
         (om/build navbar company-data)
