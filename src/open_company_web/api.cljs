@@ -33,19 +33,21 @@
 (def apipost (partial req http/post))
 (def apiput (partial req http/put))
 
-(defn- link-for [links rel year period]
-  (let [partial-res (filter #(= (:rel %) rel) links)
-        partial-res (if year
-                      (filter #(= (str (:year %)) year) partial-res)
-                      partial-res)
-        partial-res (if period
-                      (filter #(= (:period %) period) partial-res)
-                      partial-res)]
-    (when (> (count partial-res) 0)
-      (first partial-res))))
+(defn- link-for
+  ([links rel]
+    (let [pred #(if (= (:rel %) rel) %)
+          result (some pred links)]
+      result))
+  ([links rel year period]
+    (let [pred #(if (and
+                      (= (:rel %) rel)
+                      (= (str (:year %)) year)
+                      (= (:period %) period)) %)
+          result (some pred links)]
+      result)))
 
 (defn get-companies []
-  (apiget "" nil (fn [response]
+  (apiget "/companies" nil (fn [response]
       (let [body (if (:success response) (json->cljs (:body response)) {})]
         (flux/dispatch dispatcher/companies body)))))
 
