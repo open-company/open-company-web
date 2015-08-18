@@ -10,14 +10,14 @@
 
   :dependencies [
     [org.clojure/clojure "1.7.0"] ; Lisp on the JVM http://clojure.org/documentation
-    [org.clojure/clojurescript "1.7.58"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    [org.clojure/clojurescript "1.7.107"] ; ClojureScript compiler https://github.com/clojure/clojurescript
     [org.clojure/core.async "0.1.346.0-17112a-alpha"] ; Async library https://github.com/clojure/core.async
     [org.omcljs/om "0.9.0" :exclusions [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
-    [cljs-http "0.1.36"] ; HTTP for cljs https://github.com/r0man/cljs-http
+    [cljs-http "0.1.37"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/schema "0.4.3"] ; Dependency of om-tools https://github.com/Prismatic/schema
     [prismatic/plumbing "0.4.4"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
-    [prismatic/om-tools "0.3.11"] ; Tools for Om https://github.com/Prismatic/om-tools
-    [sablono "0.3.5" :exclusions [cljsjs/react]] ; Hiccup templating for Om/React https://github.com/r0man/sablono
+    [prismatic/om-tools "0.3.12"] ; Tools for Om https://github.com/Prismatic/om-tools
+    [sablono "0.3.6" :exclusions [cljsjs/react]] ; Hiccup templating for Om/React https://github.com/r0man/sablono
     [secretary "1.2.3"] ; Client-side router https://github.com/gf3/secretary
     [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; React test utilities https://github.com/bensu/cljs-react-test
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
@@ -31,7 +31,7 @@
     [lein-cljsbuild "1.0.6"] ; ClojureScript compiler https://github.com/emezeske/lein-cljsbuild
     [lein-figwheel "0.3.7"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
     [lein-ancient "0.6.7"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
-    [lein-doo "0.1.3-SNAPSHOT"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
+    [lein-doo "0.1.4"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
     [lein-deps-tree "0.1.2"] ; Print a tree of project dependencies https://github.com/the-kenny/lein-deps-tree
   ]
 
@@ -77,28 +77,28 @@
         :id "test-navigation"
         :source-paths ["src" "test"]
         :compiler {
-          :main "test.test-navigation"
+          :main 'test.test-navigation
           :output-to "target/testable-navigation.js"
           :source-map "target/testable-navigation.js.map"
-          :optimizations :whitespace}}
+          :optimizations :none}}
 
       :test-report {
         :id "test-report"
         :source-paths ["src" "test"]
         :compiler {
-          :main "test.test-report"
+          :main 'test.test-report
           :output-to "target/testable-report.js"
           :source-map "target/testable-report.js.map"
-          :optimizations :whitespace}}
+          :optimizations :none}}
 
       :test-ui-components {
         :id "test-ui-components"
         :source-paths ["src" "test"]
         :compiler {
-          :main "test.test-ui-components"
+          :main 'test.test-ui-components
           :output-to "target/testable-components.js"
           :source-map "target/testable-components.js.map"
-          :optimizations :whitespace}}}}
+          :optimizations :none}}}}
 
   :figwheel {
     ;; :http-server-root "public" ;; default and assumes "resources"
@@ -134,6 +134,8 @@
 
   :aliases {
     "ancient" ["with-profile" "dev" "do" "ancient" ":allow-qualified," "ancient" ":plugins" ":allow-qualified"] ; check for out of date dependencies
+    "build" ["cljsbuild" "once" "dev"]
+    "build!" ["cljsbuild" "once" "min"]
     "test-navigation!" ["doo" "phantom" "test-navigation" "once"]
     "test-report!" ["doo" "phantom" "test-report" "once"]
     "test-ui-components!" ["doo" "phantom" "test-ui-components" "once"]

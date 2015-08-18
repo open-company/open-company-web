@@ -151,7 +151,8 @@
                 (dom/div
                   (om/build finances {
                       :finances (:finances report-data)
-                      :currency (:currency company-data)})
+                      :currency (:currency company-data)
+                      :period period})
                   (om/build headcount (:headcount report-data))
                   (om/build compensation {
                       :compensation (:compensation report-data)
