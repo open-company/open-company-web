@@ -18,7 +18,7 @@
     [prismatic/plumbing "0.4.4"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [prismatic/om-tools "0.3.12"] ; Tools for Om https://github.com/Prismatic/om-tools
     [sablono "0.3.6" :exclusions [cljsjs/react]] ; Hiccup templating for Om/React https://github.com/r0man/sablono
-    [secretary "1.2.3"] ; Client-side router https://github.com/gf3/secretary
+    [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
     [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; React test utilities https://github.com/bensu/cljs-react-test
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
