@@ -37,6 +37,9 @@
           ; add the report to links
           (om/transact! company-data :links #(conj % {
             :href new-report-link
+            :year new-year
+            :period new-period
+            :type "application/vnd.open-company.report.v1+json;charset=UTF-8"
             :rel "report"}))
           ; add an empty report
           (om/transact! company-data assoc (keyword new-report-key) {
@@ -46,7 +49,7 @@
           ; create the report on the server
           (api/save-or-create-report ticker new-year new-period {:finances {}})))
       ; navigate to the new report
-      (router/nav! (str "/companies" ticker "/reports" new-year "/" new-period "/edit")))))
+      (router/nav! (str "/companies/" ticker "/reports/" new-year "/" new-period "/edit")))))
 
 (defn sort-reports [el1 el2]
   (let [el1-year (str (:year el1))
@@ -106,9 +109,8 @@
               ; Report tabs
               (for [report reports]
                 (let [href (:href report)
-                      parts (clojure.string/split href "/")
-                      rep-year (nth parts 4)
-                      rep-period (nth parts 5)
+                      rep-year (:year report)
+                      rep-period (:period report)
                       rep-key (str "report-" ticker "-" rep-year "-" rep-period)
                       link (str "/companies/" ticker "/reports/" rep-year "/" rep-period "/edit")]
                   (n/nav-item {
@@ -116,7 +118,7 @@
                     :href link
                     :on-click (fn [e] (.preventDefault e) (router/nav! link))
                     :class (if (= (name report-key) rep-key) "active" "")
-                    } (str rep-period " " rep-year))))
+                    } (str (utils/get-period-string rep-period) " " rep-year))))
 
               ; New report tab
               (let [url (str "/companies/" ticker "/new-report")]
