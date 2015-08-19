@@ -1,6 +1,6 @@
 (ns ^:figwheel-always open-company-web.core
   (:require [om.core :as om :include-macros true]
-            [secretary.core :refer-macros [defroute]]
+            [secretary.core :as secretary :refer-macros [defroute]]
             [open-company-web.router :as router]
             [open-company-web.components.page :refer [company]]
             [open-company-web.components.list-companies :refer [list-companies]]
@@ -18,7 +18,7 @@
 (defonce raven (raven-setup))
 
 ; Routes - Do not define routes when js/document#app
-; is undefined because it crashed the tests
+; is undefined because it breaks tests
 (if-let [target (. js/document (getElementById "app"))]
   (do
     (defroute list-page-route "/companies" []
@@ -29,7 +29,7 @@
       ; render component
       (om/root list-companies app-state {:target target}))
 
-    (defroute company-profile-route "/:ticker" {ticker :ticker}
+    (defroute company-profile-route "/:ticker" {{ticker :ticker} :params}
       ; save route
       (router/set-route! [ticker] {:ticker ticker})
       ; load data from api
@@ -38,7 +38,7 @@
       ; render compoenent
       (om/root company app-state {:target target}))
 
-    (defroute report-summary-route "/:ticker/summary" {ticker :ticker}
+    (defroute report-summary-route "/:ticker/summary" {{ticker :ticker} :params}
       ; save route
       (router/set-route! [ticker "summary"] {:ticker ticker})
       ; load data from api
@@ -47,7 +47,7 @@
       ; render component
       (om/root report app-state {:target target}))
 
-    (defroute report-editable-route "/:ticker/:year/:period/edit" {ticker :ticker year :year period :period}
+    (defroute report-editable-route "/:ticker/:year/:period/edit" {{ticker :ticker year :year period :period} :params}
       ; save route
       (router/set-route! [ticker year period "edit"] {:ticker ticker :year year :period period})
       ; load data from api
@@ -56,7 +56,7 @@
       ; render component
       (om/root report app-state {:target target}))
 
-    (defroute report-route "/:ticker/:year/:period" {ticker :ticker year :year period :period}
+    (defroute report-route "/:ticker/:year/:period" {{ticker :ticker year :year period :period} :params}
       ; save route
       (router/set-route! [ticker year period] {:ticker ticker :year year :period period})
       ; load data from api
@@ -67,13 +67,32 @@
 
     (defroute not-found-route "*" []
       ; render component
-      (om/root page-not-found app-state {:target target}))))
+      (om/root page-not-found app-state {:target target}))
+
+    (def dispatch!
+      (secretary/uri-dispatcher [list-page-route
+                                 company-profile-route
+                                 report-summary-route
+                                 report-editable-route
+                                 report-route
+                                 not-found-route]))
+
+    (defn handle-url-change [e]
+      ;; we are checking if this event is due to user action,
+      ;; such as click a link, a back button, etc.
+      ;; as opposed to programmatically setting the URL with the API
+      (when-not (.-isNavigation e)
+        ;; in this case, we're setting it so
+        ;; let's scroll to the top to simulate a navigation
+        (js/window.scrollTo 0 0))
+      ;; dispatch on the token
+      (dispatch! (router/get-token)))))
 
 (defonce history
   (doto (router/make-history)
     (events/listen EventType.NAVIGATE
       ;; wrap in a fn to allow live reloading
-      #(router/handle-url-change %))
+      #(handle-url-change %))
     (.setEnabled true)))
 
 (defn on-js-reload []

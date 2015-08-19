@@ -39,6 +39,7 @@
             (dom/input {
               :type "text"
               :class "form-control"
+              :id (name key-name)
               :value (om/get-state owner :value)
               :on-focus #(om/set-state! owner :value value)
               :on-change #(om/set-state! owner :value (.. % -target -value))
