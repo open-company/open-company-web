@@ -27,13 +27,14 @@
             :type "text"
             :class "form-control"
             :value (om/get-state owner :value)
+            :id (name key-name)
             :on-focus #(om/set-state! owner :value value)
             :placeholder placeholder
             :on-change #(om/set-state! owner :value (.. % -target -value))
             :on-blur (fn [e]
                         (let [e-value (.. e -target -value)]
                           (utils/handle-change cursor e-value key-name)
-                          (om/set-state! owner :cash (utils/thousands-separator e-value))
+                          (om/set-state! owner :value (utils/thousands-separator e-value))
                           (utils/save-values "save-report")
                           (.stopPropagation e)))
             }))

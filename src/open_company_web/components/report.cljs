@@ -23,30 +23,42 @@
 (defn create-new-report [owner company-data new-year new-period]
   (let [ticker (:symbol company-data)
         links (:links company-data)
-        new-report-link (str "/companies/" ticker "/reports/" new-year "/" new-period)]
+        new-report-link (str "/companies/" ticker "/reports/" new-year "/" new-period)
+        filter-predicate #(and (= (:rel %) "report") (= (:href %) new-report-link))
+        filter-result (into [] (filter filter-predicate links))]
     ; hide popover
     (om/set-state! owner :show-new-report-popover false)
     ; when the data are correct: FIXME check year and period
     (when (and new-year new-period)
       ;; check if the report already exists,, if it exists skipe the save report
-      (when (> (.-length (filter #(and (= (:rel %) "report") (= (:href %) new-report-link)) links)) 0)
+      (when (<= (count filter-result) 0)
         (let [new-report-key (str "report-" ticker "-" new-year "-" new-period)
               links (:links company-data)]
-            ; add an empty report
+          ; add the report to links
+          (om/transact! company-data :links #(conj % {
+            :href new-report-link
+            :year new-year
+            :period new-period
+            :type "application/vnd.open-company.report.v1+json;charset=UTF-8"
+            :rel "report"}))
+          ; add an empty report
           (om/transact! company-data assoc (keyword new-report-key) {
             :finances {}
             :headcount {}
-            :compensation {}
-            })
-          ; add the report to links
-          (om/transact! company-data :links #(conj % {
-            :href (str "/companies/" ticker "/reports/" new-year "/" new-period)
-            :rel "report"
-            }))
+            :compensation {}})
           ; create the report on the server
           (api/save-or-create-report ticker new-year new-period {:finances {}})))
       ; navigate to the new report
-      (router/nav! (str "/" ticker "/" new-year "/" new-period "/edit")))))
+      (router/nav! (str "/companies/" ticker "/reports/" new-year "/" new-period "/edit")))))
+
+(defn sort-reports [el1 el2]
+  (let [el1-year (str (:year el1))
+        el2-year (str (:year el2))
+        el1-period (:period el1)
+        el2-period (:period el2)]
+    (if (= el1-year el2-year)
+      (compare el1-period el2-period))
+      (compare el1-year el2-year)))
 
 (defcomponent report [data owner]
   (init-state [_]
@@ -73,7 +85,8 @@
           company-data ((keyword ticker) data)
           report-key (keyword (str "report-" ticker "-" year "-" period))
           report-data (report-key company-data)
-          reports (filterv #(= (:rel %) "report") (:links company-data))
+          filtered-reports (filterv #(= (:rel %) "report") (:links company-data))
+          reports (sort sort-reports filtered-reports)
           is-summary (utils/in? (:route @router/path) "summary")]
       (dom/div {:class "report-container row"}
         (om/build navbar company-data)
@@ -85,7 +98,7 @@
               :bs-style "tabs"}
 
               ; Report summary
-              (let [url (str "/" ticker "/summary")]
+              (let [url (str "/companies/" ticker "/summary")]
                 (n/nav-item {
                   :key "summary"
                   :href url
@@ -96,20 +109,19 @@
               ; Report tabs
               (for [report reports]
                 (let [href (:href report)
-                      parts (clojure.string/split href "/")
-                      rep-year (nth parts 4)
-                      rep-period (nth parts 5)
+                      rep-year (:year report)
+                      rep-period (:period report)
                       rep-key (str "report-" ticker "-" rep-year "-" rep-period)
-                      link (str "/" ticker "/" rep-year "/" rep-period "/edit")]
+                      link (str "/companies/" ticker "/reports/" rep-year "/" rep-period "/edit")]
                   (n/nav-item {
                     :key rep-key
                     :href link
                     :on-click (fn [e] (.preventDefault e) (router/nav! link))
                     :class (if (= (name report-key) rep-key) "active" "")
-                    } (str rep-period " " rep-year))))
+                    } (str (utils/get-period-string rep-period) " " rep-year))))
 
               ; New report tab
-              (let [url (str "/" ticker "/new-report")]
+              (let [url (str "/companies/" ticker "/new-report")]
                 (n/nav-item {
                   :key "new-report"
                   :href url
@@ -135,13 +147,14 @@
               (:loading data)
               (dom/div nil "Loading")
 
-              (and (contains? data (keyword ticker)) (contains? company-data report-key))
+              (and (contains? data (keyword ticker)) (contains? company-data report-key) (not is-summary))
               (dom/div
                 (dom/h2 (str ticker " - " period " " year " (" (utils/get-period-string period) ")"))
                 (dom/div
                   (om/build finances {
                       :finances (:finances report-data)
-                      :currency (:currency company-data)})
+                      :currency (:currency company-data)
+                      :period period})
                   (om/build headcount (:headcount report-data))
                   (om/build compensation {
                       :compensation (:compensation report-data)

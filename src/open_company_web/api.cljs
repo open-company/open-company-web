@@ -9,9 +9,8 @@
             [clojure.walk :refer [keywordize-keys stringify-keys]]
             [open-company-web.local-settings :as ls]))
 
-(def company-endpoint "companies")
 
-(def endpoint (str ls/api-server-domain "/" company-endpoint "/"))
+(def ^:private endpoint ls/api-server-domain)
 
 (defn- content-type [type]
   (str "application/vnd.open-company." type ".v1+json"))
@@ -31,70 +30,95 @@
           response (<! (method (str endpoint path) data))]
       (on-complete response))))
 
-(def apiget (partial req http/get))
-(def apipost (partial req http/post))
-(def apiput (partial req http/put))
+(def ^:private api-get (partial req http/get))
+(def ^:private api-post (partial req http/post))
+(def ^:private api-put (partial req http/put))
+
+(defn- link-for
+  ([links rel] (some #(if (= (:rel %) rel) %) links))
+  ([links rel year period]
+    (let [pred #(if (and
+                      (= (:rel %) rel)
+                      (= (str (:year %)) year)
+                      (= (:period %) period)) %)]
+      (some pred links))))
 
 (defn get-companies []
-  (apiget "" nil (fn [response]
+  (api-get "/companies" nil (fn [response]
       (let [body (if (:success response) (json->cljs (:body response)) {})]
         (flux/dispatch dispatcher/companies body)))))
 
 (defn get-company [ticker]
   (when ticker
-    (apiget ticker nil
+    (api-get (str "/companies/" ticker) nil
       (fn [response]
         (let [body (if (:success response) (json->cljs (:body response)) {})]
           (flux/dispatch dispatcher/company body))))))
 
-(defn real-get-report [ticker year period]
-  (apiget (str ticker "/reports/" year "/" period) nil
-    (fn [response]
-      (let [body (if (:success response) (json->cljs (:body response)) {})]
-        (flux/dispatch dispatcher/report body)))))
-
-(defn get-report [ticker year period]
-  (when (and ticker year period)
-    (if (contains? @dispatcher/app-state (keyword ticker))
-      ; load the report only
-      (real-get-report ticker year period)
-      ; load the company data before the report data
-      (do
-        (flux/register
-          dispatcher/company
-          (fn [response]
-            (real-get-report ticker year period)))
-        ; load company data
-        (get-company ticker)))))
-
-(defn save-or-create-report [ticker year period data]
-  (when (and ticker year period data (or (:headcount data) (:finances data) (:compensation data)))
-    (let [json-data (cljs->json (dissoc data :links))]
-      (apiput
-        (str ticker "/reports/" year "/" period)
-        { :json-params json-data
-          :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (content-type "report")
-          }}
-        (fn [response]
-          (let [body (if (:success response) (json->cljs (:body response)) {})]
-            (flux/dispatch dispatcher/report body)))))))
-
 (defn save-or-create-company [ticker data]
   (when (and ticker data)
     (let [company-data (dissoc data :headcount :finances :compensation :links)
-          json-data (cljs->json company-data)]
-      (apiput ticker
+          json-data (cljs->json company-data)
+          report-link (link-for (:links data) "update" nil nil)]
+      (api-put (:href report-link)
         { :json-params json-data
           :headers {
             ; required by Chrome
             "Access-Control-Allow-Headers" "Content-Type"
             ; custom content type
-            "content-type" (content-type "company")
+            "content-type" (:type report-link)
           }}
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})]
             (flux/dispatch dispatcher/company body)))))))
+
+(defn get-report
+  ([report-link]
+    (api-get (:href report-link) {
+        :headers {
+          "Access-Control-Allow-Headers" "Content-Type"
+          "content-type" (:type report-link)
+        }
+      }
+      (fn [response]
+        (let [body (if (:success response) (json->cljs (:body response)) {})]
+          (flux/dispatch dispatcher/report body)))))
+  ([ticker year period]
+    (when (and ticker year period)
+      (if (contains? @dispatcher/app-state (keyword ticker))
+        
+        ; load the report only
+        (let [links (:links ((keyword ticker) @dispatcher/app-state))
+              report-link (link-for links "report" year period)]
+          (get-report report-link))
+        
+        ; load the company data before the report data
+        (do
+          (flux/register
+            dispatcher/company
+            (fn [response]
+              (let [links (:links response)
+                    report-url (link-for links "report" year period)]
+                (get-report report-url))))
+          ; load company data
+          (get-company ticker))))))
+
+(defn save-or-create-report
+  ([report-link data]
+    (when (and report-link data (or (:headcount data) (:finances data) (:compensation data)))
+      (let [json-data (cljs->json (dissoc data :links))]
+        (api-put (:href report-link)
+          { :json-params json-data
+            :headers {
+              ; required by Chrome
+              "Access-Control-Allow-Headers" "Content-Type"
+              ; custom content type
+              "content-type" (:type report-link)
+            }}
+          (fn [response]
+            (let [body (if (:success response) (json->cljs (:body response)) {})]
+              (flux/dispatch dispatcher/report body)))))))
+  ([ticker year period data]
+    (let [company-data ((keyword ticker) @dispatcher/app-state)]
+      (if-let [report-link (link-for (:links company-data) "report" year period)]
+        (save-or-create-report report-link data)))))

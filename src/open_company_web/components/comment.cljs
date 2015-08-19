@@ -34,5 +34,4 @@
           :onChange #(when (not disabled)
                       (utils/handle-change (:cursor data) (.. % -target -value) (:key data)))
           :on-blur (fn [e] (put! save-channel 1) (.stopPropagation e))
-          :disabled disabled
-          })))))
+          :disabled disabled})))))

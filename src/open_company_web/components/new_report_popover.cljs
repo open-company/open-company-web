@@ -42,6 +42,7 @@
                   :className "form-control"
                   :ref "year"
                   :defaultValue current-year
+                  :id "new-report-year"
                   }
                   (dom/option {:value ""} "Select a year:")
                   (for [year years]
@@ -54,6 +55,7 @@
                   :className "form-control"
                   :ref "period"
                   :defaultValue ""
+                  :id "new-report-month"
                   }
                   (dom/option {:value ""} "Select a period:")
                   (for [period periods]

@@ -16,12 +16,12 @@
         (dom/div {:class "btn-group btn-toggle col-md-3"}
           (dom/button {
             :type "button"
-            :class (str "btn btn-success" (when (not percentage) " active"))
+            :class (str "btn btn-success currency " (when (not percentage) " active"))
             :on-click #(utils/handle-change comp-data false :percentage)}
             currency-symbol)
           (dom/button {
             :type "button"
-            :class (str "btn btn-default" (when percentage " active"))
+            :class (str "btn btn-default percentage" (when percentage " active"))
             :on-click #(utils/handle-change comp-data true :percentage)}
             "%"))
         (dom/p {:class "help-block"} (str "Viewers will see as " (if percentage "%" currency-symbol)))))))

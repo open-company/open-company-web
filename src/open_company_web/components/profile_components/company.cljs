@@ -402,7 +402,7 @@
                     (dom/input {
                       :type "text"
                       :class "form-control"
-                      :id (name key)
+                      :id (str "custom-" (name key))
                       :on-change #(change-value data % [:web key])
                       :on-blur #(save-values "save-company")
                       :value value})
