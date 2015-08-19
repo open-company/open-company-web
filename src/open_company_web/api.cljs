@@ -9,7 +9,7 @@
             [clojure.walk :refer [keywordize-keys stringify-keys]]))
 
 
-(def endpoint "http://localhost:3000")
+(def ^:private endpoint "http://localhost:3000")
 
 (defn- content-type [type]
   (str "application/vnd.open-company." type ".v1+json"))
@@ -29,31 +29,27 @@
           response (<! (method (str endpoint path) data))]
       (on-complete response))))
 
-(def apiget (partial req http/get))
-(def apipost (partial req http/post))
-(def apiput (partial req http/put))
+(def ^:private api-get (partial req http/get))
+(def ^:private api-post (partial req http/post))
+(def ^:private api-put (partial req http/put))
 
 (defn- link-for
-  ([links rel]
-    (let [pred #(if (= (:rel %) rel) %)
-          result (some pred links)]
-      result))
+  ([links rel] (some #(if (= (:rel %) rel) %) links))
   ([links rel year period]
     (let [pred #(if (and
                       (= (:rel %) rel)
                       (= (str (:year %)) year)
-                      (= (:period %) period)) %)
-          result (some pred links)]
-      result)))
+                      (= (:period %) period)) %)]
+      (some pred links))))
 
 (defn get-companies []
-  (apiget "/companies" nil (fn [response]
+  (api-get "/companies" nil (fn [response]
       (let [body (if (:success response) (json->cljs (:body response)) {})]
         (flux/dispatch dispatcher/companies body)))))
 
 (defn get-company [ticker]
   (when ticker
-    (apiget (str "/companies/" ticker) nil
+    (api-get (str "/companies/" ticker) nil
       (fn [response]
         (let [body (if (:success response) (json->cljs (:body response)) {})]
           (flux/dispatch dispatcher/company body))))))
@@ -63,7 +59,7 @@
     (let [company-data (dissoc data :headcount :finances :compensation :links)
           json-data (cljs->json company-data)
           report-link (link-for (:links data) "update" nil nil)]
-      (apiput (:href report-link)
+      (api-put (:href report-link)
         { :json-params json-data
           :headers {
             ; required by Chrome
@@ -77,7 +73,7 @@
 
 (defn get-report
   ([report-link]
-    (apiget (:href report-link) {
+    (api-get (:href report-link) {
         :headers {
           "Access-Control-Allow-Headers" "Content-Type"
           "content-type" (:type report-link)
@@ -89,10 +85,12 @@
   ([ticker year period]
     (when (and ticker year period)
       (if (contains? @dispatcher/app-state (keyword ticker))
+        
         ; load the report only
         (let [links (:links ((keyword ticker) @dispatcher/app-state))
               report-link (link-for links "report" year period)]
           (get-report report-link))
+        
         ; load the company data before the report data
         (do
           (flux/register
@@ -108,7 +106,7 @@
   ([report-link data]
     (when (and report-link data (or (:headcount data) (:finances data) (:compensation data)))
       (let [json-data (cljs->json (dissoc data :links))]
-        (apiput (:href report-link)
+        (api-put (:href report-link)
           { :json-params json-data
             :headers {
               ; required by Chrome
