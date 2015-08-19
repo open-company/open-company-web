@@ -76,7 +76,7 @@
         :id "test-navigation"
         :source-paths ["src" "test"]
         :compiler {
-          :main 'test.test-navigation
+          :main "test.test-navigation"
           :output-to "target/testable-navigation.js"
           :source-map "target/testable-navigation.js.map"
           :optimizations :none}}
@@ -85,7 +85,7 @@
         :id "test-company"
         :source-paths ["src" "test"]
         :compiler {
-          :main 'test.test-company
+          :main "test.test-company"
           :output-to "target/testable-company.js"
           :source-map "target/testable-company.js.map"
           :optimizations :none}}
@@ -94,7 +94,7 @@
         :id "test-ui-components"
         :source-paths ["src" "test"]
         :compiler {
-          :main 'test.test-ui-components
+          :main "test.test-ui-components"
           :output-to "target/testable-components.js"
           :source-map "target/testable-components.js.map"
           :optimizations :none}}
