@@ -29,7 +29,7 @@
   (render [_]
     (let [ticker (:ticker @router/path)
           company-data ((keyword ticker) data)]
-      (dom/div
+      (dom/div {:class "profile-container"}
         (n/nav {
           :class "profile-tab-navigation"
           :bs-style "tabs"

@@ -14,15 +14,14 @@
     [org.clojure/core.async "0.1.346.0-17112a-alpha"] ; Async library https://github.com/clojure/core.async
     [org.omcljs/om "0.9.0" :exclusions [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
     [cljs-http "0.1.37"] ; HTTP for cljs https://github.com/r0man/cljs-http
-    [prismatic/schema "0.4.3"] ; Dependency of om-tools https://github.com/Prismatic/schema
+    [prismatic/schema "0.4.4"] ; Dependency of om-tools https://github.com/Prismatic/schema
     [prismatic/plumbing "0.4.4"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [prismatic/om-tools "0.3.12"] ; Tools for Om https://github.com/Prismatic/om-tools
-    [sablono "0.3.6" :exclusions [cljsjs/react]] ; Hiccup templating for Om/React https://github.com/r0man/sablono
-    [secretary "1.2.3"] ; Client-side router https://github.com/gf3/secretary
+    [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
     [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; React test utilities https://github.com/bensu/cljs-react-test
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
-    [com.cognitect/transit-cljs "0.8.220"] ; Cljs wrapper for javascript JSON https://github.com/cognitect/transit-cljs
+    [com.cognitect/transit-cljs "0.8.220"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
     [racehub/om-bootstrap "0.5.3"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
     [noencore "0.1.21"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
   ]
@@ -82,13 +81,13 @@
           :source-map "target/testable-navigation.js.map"
           :optimizations :none}}
 
-      :test-report {
-        :id "test-report"
+      :test-company {
+        :id "test-company"
         :source-paths ["src" "test"]
         :compiler {
-          :main 'test.test-report
-          :output-to "target/testable-report.js"
-          :source-map "target/testable-report.js.map"
+          :main 'test.test-company
+          :output-to "target/testable-company.js"
+          :source-map "target/testable-company.js.map"
           :optimizations :none}}
 
       :test-ui-components {
@@ -98,7 +97,8 @@
           :main 'test.test-ui-components
           :output-to "target/testable-components.js"
           :source-map "target/testable-components.js.map"
-          :optimizations :none}}}}
+          :optimizations :none}}
+  }}
 
   :figwheel {
     ;; :http-server-root "public" ;; default and assumes "resources"
@@ -137,8 +137,8 @@
     "build" ["cljsbuild" "once" "dev"]
     "build!" ["cljsbuild" "once" "min"]
     "test-navigation!" ["doo" "phantom" "test-navigation" "once"]
-    "test-report!" ["doo" "phantom" "test-report" "once"]
+    "test-company!" ["doo" "phantom" "test-company" "once"]
     "test-ui-components!" ["doo" "phantom" "test-ui-components" "once"]
-    "test-all!" ["do" "test-navigation!," "test-report!," "test-ui-components!"] ; don't use in CI
+    "test-all!" ["do" "test-navigation!," "test-company!," "test-ui-components!"] ; don't use in CI
   }
 )
