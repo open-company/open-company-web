@@ -27,6 +27,7 @@
             :type "text"
             :class "form-control"
             :value (om/get-state owner :value)
+            :id (name key-name)
             :on-focus #(om/set-state! owner :value value)
             :placeholder placeholder
             :on-change #(om/set-state! owner :value (.. % -target -value))

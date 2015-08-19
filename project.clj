@@ -82,13 +82,13 @@
           :source-map "target/testable-navigation.js.map"
           :optimizations :none}}
 
-      :test-report {
-        :id "test-report"
+      :test-company {
+        :id "test-company"
         :source-paths ["src" "test"]
         :compiler {
-          :main 'test.test-report
-          :output-to "target/testable-report.js"
-          :source-map "target/testable-report.js.map"
+          :main 'test.test-company
+          :output-to "target/testable-company.js"
+          :source-map "target/testable-company.js.map"
           :optimizations :none}}
 
       :test-ui-components {
@@ -137,8 +137,8 @@
     "build" ["cljsbuild" "once" "dev"]
     "build!" ["cljsbuild" "once" "min"]
     "test-navigation!" ["doo" "phantom" "test-navigation" "once"]
-    "test-report!" ["doo" "phantom" "test-report" "once"]
+    "test-company!" ["doo" "phantom" "test-company" "once"]
     "test-ui-components!" ["doo" "phantom" "test-ui-components" "once"]
-    "test-all!" ["do" "test-navigation!," "test-report!," "test-ui-components!"] ; don't use in CI
+    "test-all!" ["do" "test-navigation!," "test-company!," "test-ui-components!"] ; don't use in CI
   }
 )
