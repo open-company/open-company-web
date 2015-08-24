@@ -40,7 +40,16 @@
 (defcomponent compensation [data owner]
   (render [_]
     (let [head-data (:headcount data)
+          headdata-count (+ (:founders head-data)
+                            (:executives head-data)
+                            (:ft-employees head-data)
+                            (:pt-employees head-data)
+                            (:contractors head-data))
           comp-data (:compensation data)
+          compensation-count (+ (:founders comp-data)
+                                (:executives comp-data)
+                                (:employees comp-data)
+                                (:contractors comp-data))
           currency (:currency data)
           currency-symbol (utils/get-symbol-for-currency-code currency)
           prefix (str currency-symbol " ")]
@@ -51,13 +60,15 @@
           (dom/form {:class "form-horizontal col-sm-6"}
 
             ;; Percentage
-            (om/build percentage-switch data)
+            (when (> headdata-count 0)
+              (om/build percentage-switch data))
 
             (for [section compensation-rows]
               (om/build compensation-section (merge section {:cursor data}))))
           ;; Pie chart
-          (dom/div {:class "col-sm-6"}
-            (om/build pie-chart (get-chart-data data prefix))))
+          (when (> compensation-count 0)
+            (dom/div {:class "col-sm-6"}
+              (om/build pie-chart (get-chart-data data prefix)))))
 
         ;; Comment
         (om/build comment-component {

@@ -58,20 +58,20 @@
             (dom/div {:class "form-group"}
               (dom/label {:class "col-md-2 control-label"} "Profitable?")
               (dom/label {:class "col-md-2 control-label"} profitable)
-              (dom/p {:class "help-block"} (str "Costs exceed revenue this " period-string)))
+              (dom/p {:class "help-block"} (if (= profitable "-") "" (str "Costs exceed revenue this " period-string))))
 
             ;; Burn rate
             (dom/div {:class "form-group"}
               (dom/label {:class "col-md-2 control-label"} burn-rate-label)
               (dom/label {:class "col-md-2 control-label"}
                 (dom/span {:class burn-rate-classes} (str currency-symbol (utils/thousands-separator (utils/abs burn-rate)))))
-              (dom/p {:class "help-block"} burn-rate-helper))
+              (dom/p {:class "help-block"} (if (= burn-rate 0) "" burn-rate-helper)))
 
             ;; Runaway
             (when (< burn-rate 0)
               (dom/div {:class "form-group"}
                 (dom/label {:class "col-md-2 control-label"} "Runway")
-                (dom/label {:class "col-md-2 control-label run-away"} run-away)
+                (dom/label {:class "col-md-2 control-label run-away"} (utils/thousands-separator run-away))
                 (dom/p {:class "help-block"} (str "days of cash remaining"))))))
 
         ;; Comment textarea

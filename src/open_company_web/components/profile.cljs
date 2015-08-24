@@ -35,25 +35,25 @@
           :bs-style "tabs"
           :active-key (om/get-state owner :selected-tab)
           :on-select #(om/set-state! owner :selected-tab %) }
-          (let [url (str "/" ticker)]
+          (let [url (str "/companies/" ticker)]
             (n/nav-item {
               :key 1
               :href url
               :onClick (fn[e] (.preventDefault e) (router/nav! url))}
               "Company"))
-          (let [url (str "/" ticker "#team")]
+          (let [url (str "/companies/" ticker "#team")]
             (n/nav-item {
               :key 2
               :href url
               :onClick (fn[e] (.preventDefault e) (router/nav! url))}
               "Team"))
-          (let [url (str "/" ticker "#products")]
+          (let [url (str "/companies/" ticker "#products")]
             (n/nav-item {
               :key 3
               :href url
               :onClick (fn[e] (.preventDefault e) (router/nav! url))}
               "Products / Services"))
-          (let [url (str "/" ticker "#funding")]
+          (let [url (str "/companies/" ticker "#funding")]
             (n/nav-item {
               :key 4
               :href url

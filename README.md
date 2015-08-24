@@ -4,24 +4,27 @@
 [![Roadmap on Trello](http://img.shields.io/badge/roadmap-trello-blue.svg?style=flat)](https://trello.com/b/3naVWHgZ/open-company-development)
 [![Build Status](https://travis-ci.org/open-company/open-company-web.svg?branch=master)](https://travis-ci.org/open-company/open-company-web)
 
+
 ## Overview
 
 > Transparency, honesty, kindness, good stewardship, even humor, work in businesses at all times.
 
 > -- [John Gerzema](http://www.johngerzema.com/)
 
-Build your company in the open with transparency for your co-founders, your team, and your investors. Or share your company's journey with everyone, your customers and the rest of the startup community too.
+Employees and investors, co-founders and execs, they all want more transparency from their startups, but there’s no consensus about what it means to be transparent, so we've created a platform that makes it easy for startups to be open. What information is essential for everyone to know and how often should it be shared? Why is it important? How will it empower everyone in the business? How should stakeholders be able to ask questions and what sort of answers should they get?
 
-[OpenCompany.io](https://opencompany.io) is GitHub for the rest of your company:
+[OpenCompany.io](https://opencompany.io) is GitHub for the rest of your company.
 
-* **Dashboard** - An easy tool for founders to provide transparency to their teams and beyond.
-* **Founders' Guide** - Tools, best practices and insights from open company founders and their companies.
-* **Open Company Directory** - Founders sharing with their teams and beyond.
-* **Community** - Spread the word and knowledge and inspire more founders to open up.
+When a startup is operating transparently, they can use their information to tell a better story. Real transparency happens when you present key information in a way that inspires new ideas and encourages discussion. Whether it’s the weekly all-hands, a special team update on financing, or a monthly investor report, stakeholders are encouraged to comment and ask questions alongside the information being presented. The interaction allows everyone to be a part of the story.
 
-Like the open companies we promote and support, the [OpenCompany.io](https://opencompany.io) platform is completely transparent. The company supporting this effort, Transparency, LLC, is an open company. The platform is open source software, and open company data is [open data](https://en.wikipedia.org/wiki/Open_data) accessible through the [platform API](https://github.com/open-company/open-company-api).
+Transparency also requires greater accessibility, so everything is kept in one place for stakeholders. This is especially helpful for remote or absent employees and stakeholders that can’t be there for live presentations. It also means there is historical context that helps to bring new employees up to speed, to refresh memories, and to see how the company is evolving by scanning back and forth across time. 
 
-To get started, head to [OpenCompany.io](https://opencompany.io).
+Transparency expectations are changing. Just as open source changed the way we build software, transparency changes how we build successful startups.
+
+Like the open companies we promote and support, the [OpenCompany.io](https://opencompany.io) platform is completely transparent. The company supporting this effort, Transparency, LLC, is an open company. The [platform](https://github.com/open-company/open-company-web) is open source software, and open company data is [open data](https://en.wikipedia.org/wiki/Open_data) accessible through this platform API.
+
+To get started, head to: [OpenCompany.io](https://opencompany.io)
+
 
 ## Local Setup
 
@@ -54,6 +57,7 @@ git clone https://github.com/open-company/open-company-web.git
 cd open-company-web
 lein deps
 ```
+
 
 ## Usage
 
@@ -90,6 +94,7 @@ lein cljsbuild once min
 Open your browser in `resources/public/index.html`. You will not
 get live reloading nor a REPL.
 
+
 ## Tests
 
 Install [PhantomJS](https://http://phantomjs.org/) downloading the latest binary [here](https://github.com/eugene1g/phantomjs/releases), the one from their site is currently broken.
@@ -110,6 +115,12 @@ For more info on testing:
 
 - Plugin: [bensu/doo](https://github.com/bensu/doo)
 - React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/doo)
+
+
+## Participation
+
+Please note that this project is released with a [Contributor Code of Conduct](https://github.com/open-company/open-company-web/blob/mainline/CODE-OF-CONDUCT.md). By participating in this project you agree to abide by its terms.
+
 
 ## License
 

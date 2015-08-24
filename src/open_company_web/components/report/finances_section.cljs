@@ -34,7 +34,7 @@
             :on-blur (fn [e]
                         (let [e-value (.. e -target -value)]
                           (utils/handle-change cursor e-value key-name)
-                          (om/set-state! owner :cash (utils/thousands-separator e-value))
+                          (om/set-state! owner :value (utils/thousands-separator e-value))
                           (utils/save-values "save-report")
                           (.stopPropagation e)))
             }))
