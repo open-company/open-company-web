@@ -11,17 +11,17 @@
 
 > -- [John Gerzema](http://www.johngerzema.com/)
 
-Employees and investors, co-founders and execs, they all want more transparency from their startups, but there’s no consensus about what it means to be transparent, so we've created a platform that makes it easy for startups to be open. What information is essential for everyone to know and how often should it be shared? Why is it important? How will it empower everyone in the business? How should stakeholders be able to ask questions and what sort of answers should they get?
+Employees and investors, co-founders and execs, they all want more transparency from their startups, but there's no consensus about what it means to be transparent. OpenCompany is a platform that simplifies how key business information is shared with stakeholders.
+
+When information about growth, finances, ownership and challenges is shared transparently, it inspires new ideas and new levels of stakeholder engagement. OpenCompany makes it easy for founders to engage with employees and investors, creating a sense of ownership and urgency for everyone.
 
 [OpenCompany.io](https://opencompany.io) is GitHub for the rest of your company.
 
-When a startup is operating transparently, they can use their information to tell a better story. Real transparency happens when you present key information in a way that inspires new ideas and encourages discussion. Whether it’s the weekly all-hands, a special team update on financing, or a monthly investor report, stakeholders are encouraged to comment and ask questions alongside the information being presented. The interaction allows everyone to be a part of the story.
+To maintain transparency, OpenCompany information is always accessible and easy to find. Being able to search or flip through prior updates empowers everyone. Historical context brings new employees and investors up to speed, refreshes memories, and shows how the company is evolving over time.
 
-Transparency also requires greater accessibility, so everything is kept in one place for stakeholders. This is especially helpful for remote or absent employees and stakeholders that can’t be there for live presentations. It also means there is historical context that helps to bring new employees up to speed, to refresh memories, and to see how the company is evolving by scanning back and forth across time. 
+Transparency expectations are changing. Startups need to change as well if they are going to attract and retain savvy employees and investors. Just as open source changed the way we build software, transparency changes how we build successful startups with information that is open, interactive, and always accessible. The OpenCompany platform turns transparency into a competitive advantage.
 
-Transparency expectations are changing. Just as open source changed the way we build software, transparency changes how we build successful startups.
-
-Like the open companies we promote and support, the [OpenCompany.io](https://opencompany.io) platform is completely transparent. The company supporting this effort, Transparency, LLC, is an open company. The [platform](https://github.com/open-company/open-company-web) is open source software, and open company data is [open data](https://en.wikipedia.org/wiki/Open_data) accessible through this platform API.
+Like the open companies we promote and support, the [OpenCompany.io](https://opencompany.io) platform is completely transparent. The company supporting this effort, Transparency, LLC, is an open company. This platform is open source software, and open company data is [open data](https://en.wikipedia.org/wiki/Open_data) accessible through the [platform API](https://github.com/open-company/open-company-api).
 
 To get started, head to: [OpenCompany.io](https://opencompany.io)
 
