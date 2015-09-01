@@ -13,6 +13,7 @@
   ; remove the static paths
   (route/files "/css/*" {:root "resources/public"})
   (route/files "/js/*" {:root "resources/public"})
+  (route/files "/lib/*" {:root "resources/public"})
   (route/files "/img/*" {:root "resources/public"}))
 
 (defn request-handler [routes]
