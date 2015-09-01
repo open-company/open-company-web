@@ -188,3 +188,13 @@ span.label{
   padding: 0;
   margin: 0;
 }
+
+span img.user-icon{
+  height: 15px;
+  width: 18px;
+  margin-right: 5px;
+}
+
+.select2-container{
+  width: 100% !important;
+}
