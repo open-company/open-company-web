@@ -1,5 +1,6 @@
 // jQuery
-var $ = function(){};
+var $ = {};
+$.select2 = function(){};
 var jQuery = function(){};
 // google
 var google = {};
