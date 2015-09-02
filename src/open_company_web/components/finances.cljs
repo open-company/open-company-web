@@ -100,7 +100,7 @@
                           {:number revenue :label "revenue this month"}
                           {:number costs :label "costs this month"}]]
             (for [section sections]
-              (when (not (= (:number section) nil))
+              (when-not (= (:number section) nil)
                 (dom/div
                   (om/build report-line (merge section {:prefix currency-symbol :pluralize false}))))))
 
