@@ -24,6 +24,7 @@
     (cdr/add-script! "/lib/select2/js/select2.js")
     (cdr/add-style! "/lib/select2/css/select2.css"))
   (did-mount [_]
+    ; async initialize the user selector widget
     (.setTimeout js/window (fn []
                              (let [us (.$ js/window ".user-selector")]
                                (.select2 us (clj->js {"templateResult" format-state
