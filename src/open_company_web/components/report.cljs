@@ -19,7 +19,7 @@
               [cljs.core.async :refer [put! chan <!]]
               [open-company-web.router :as router]
               [dommy.core :refer-macros [sel1]]
-              [open-company-web.components.user-selector :refer [user-select]]))
+              [open-company-web.components.user-selector :refer [user-selector]]))
 
 (defn create-new-report [owner company-data new-year new-period]
   (let [ticker (:symbol company-data)
@@ -161,7 +161,7 @@
                       :compensation (:compensation report-data)
                       :headcount (:headcount report-data)
                       :currency (:currency company-data)})
-                  (om/build user-select {:logged-in-user "U06STCKLN"})))
+                  (om/build user-selector {:value "U06STCKLN" :users utils/users})))
 
               is-summary
               (dom/div nil (dom/h3 "Reports summary"))
