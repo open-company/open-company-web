@@ -36,5 +36,5 @@
           (dom/option {
                        :value (:id user)
                        :disabled (:is_bot user)
-                       :data-icon (:image_48 (:profile user))}
+                       :data-icon (:image_24 (:profile user))}
                       (get-name user)))))))
