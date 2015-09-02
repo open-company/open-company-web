@@ -161,7 +161,7 @@
                       :compensation (:compensation report-data)
                       :headcount (:headcount report-data)
                       :currency (:currency company-data)})
-                  (om/build user-select {})))
+                  (om/build user-select {:logged-in-user "U06STCKLN"})))
 
               is-summary
               (dom/div nil (dom/h3 "Reports summary"))
