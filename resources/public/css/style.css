@@ -190,11 +190,13 @@ span.label{
 }
 
 span img.user-icon{
-  height: 15px;
-  width: 18px;
+  height: 25px;
+  width: 25px;
   margin-right: 5px;
 }
 
-.select2-container{
-  width: 100% !important;
+.select2-selection span img.user-icon{
+  height: 20px;
+  width: 20px;
+  margin-right: 5px;
 }
