@@ -25,9 +25,16 @@
   (did-mount [_]
     (.setTimeout js/window (fn []
                              (let [us (.$ js/window ".user-selector")]
-                               (.select2 us (clj->js {"templateResult" format-state})))) 1000))
+                               (.select2 us (clj->js {"templateResult" format-state
+                                                      "templateSelection" format-state})))) 1000))
   (render [_]
     (dom/div {:class "col-md-4"}
-      (dom/select {:class "user-selector"}
+      (dom/select {:class "user-selector"
+                   :value (:logged-in-user data)
+                   :style {"width" "100%"}}
         (for [user utils/users]
-          (dom/option {:value (:id user) :data-icon (:image_48 (:profile user))} (get-name user)))))))
+          (dom/option {
+                       :value (:id user)
+                       :disabled (:is_bot user)
+                       :data-icon (:image_48 (:profile user))}
+                      (get-name user)))))))
