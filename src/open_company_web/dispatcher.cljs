@@ -1,7 +1,8 @@
 (ns open-company-web.dispatcher
   (:require [cljs-flux.dispatcher :as flux]
             [no.en.core :refer [deep-merge]]
-            [open-company-web.router :as router]))
+            [open-company-web.router :as router]
+            [shodan.console :as console]))
 
 (defonce app-state (atom {
   ; :OPEN {
@@ -71,6 +72,8 @@
 
 (def report (flux/dispatcher))
 
+(def auth-settings (flux/dispatcher))
+
 (def companies-list-dispatch
   (flux/register
     companies
@@ -109,3 +112,14 @@
                 period (:period @router/path)
                 report-key (keyword (str "report-" ticker "-" year "-" period))]
             (swap! app-state assoc-in [(keyword ticker) report-key] report-data)))))))
+
+(def auth-settings-dispatch
+  (flux/register
+    auth-settings
+    (fn [body]
+      (when body
+        ; remove loading key
+        (swap! app-state dissoc :loading)
+        ; add auth-settings data
+        (swap! app-state assoc :auth-settings body)))))
+
