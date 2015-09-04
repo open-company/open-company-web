@@ -4,7 +4,7 @@
 (def whitelistUrls {:whitelistUrls ls/local-whitelist-array})
 
 (defn raven-setup []
-  (when (.-Raven js/window)
+  (when (and (.-Raven js/window) ls/local-dsn)
     (let [raven (.config js/Raven ls/local-dsn whitelistUrls)]
       (.install raven))))
 
