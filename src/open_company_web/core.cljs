@@ -6,6 +6,7 @@
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
             [open-company-web.components.report :refer [report readonly-report]]
+            [open-company-web.components.login :refer [login]]
             [open-company-web.lib.raven :refer [raven-setup]]
             [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.api :as api]
@@ -21,6 +22,14 @@
 ; is undefined because it breaks tests
 (if-let [target (. js/document (getElementById "app"))]
   (do
+    (defroute login-route "/login" []
+      ; save route
+      (router/set-route! ["login"] {})
+      ; load data from api
+      (api/get-auth-settings)
+      ; render component
+      (om/root login app-state {:target target}))
+
     (defroute list-page-route "/companies" []
       ; save route
       (router/set-route! ["companies"] {})
@@ -70,7 +79,8 @@
       (om/root page-not-found app-state {:target target}))
 
     (def dispatch!
-      (secretary/uri-dispatcher [list-page-route
+      (secretary/uri-dispatcher [login-route
+                                 list-page-route
                                  company-profile-route
                                  report-summary-route
                                  report-editable-route
