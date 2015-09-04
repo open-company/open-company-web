@@ -10,7 +10,9 @@
             [open-company-web.local-settings :as ls]))
 
 
-(def ^:private endpoint ls/api-server-domain)
+(def ^:private api-endpoint ls/api-server-domain)
+
+(def ^:private auth-endpoint ls/auth-server-domain)
 
 (defn- content-type [type]
   (str "application/vnd.open-company." type ".v1+json"))
@@ -23,16 +25,18 @@
   (let [stringified-coll (stringify-keys coll)]
     (clj->js stringified-coll)))
 
-(defn- req [method path params on-complete]
+(defn- req [endpoint method path params on-complete]
   (go
     (let [data {:with-credentials? false}
           data (when params (merge data params))
           response (<! (method (str endpoint path) data))]
       (on-complete response))))
 
-(def ^:private api-get (partial req http/get))
-(def ^:private api-post (partial req http/post))
+(def ^:private api-get (partial req api-endpoint http/get))
+(def ^:private api-post (partial req api-endpoint http/post))
 (def ^:private api-put (partial req http/put))
+
+(def ^:private auth-get (partial req auth-endpoint http/get))
 
 (defn- link-for
   ([links rel] (some #(if (= (:rel %) rel) %) links))
@@ -122,3 +126,15 @@
     (let [company-data ((keyword ticker) @dispatcher/app-state)]
       (if-let [report-link (link-for (:links company-data) "report" year period)]
         (save-or-create-report report-link data)))))
+
+(defn get-auth-settings []
+  (auth-get "/auth-settings" {
+        :headers {
+          "Access-Control-Allow-Headers" "Content-Type"
+          "content-type" "application/json"
+        }
+      }
+  (fn [response]
+    (let [body (if (:success response) (:body response) {})]
+      (flux/dispatch dispatcher/auth-settings body)))))
+
