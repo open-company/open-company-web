@@ -62,6 +62,8 @@ lein deps
 
 ## Usage
 
+Users of the [OpenCompany.io](https://opencompany.io) platform should get started by going to [OpenCompany.io](https://opencompany.io). The following usage is for developers wanting to work on the platform's Web application software.
+
 To get an interactive development environment run:
 
 ```console
