@@ -8,9 +8,11 @@
             [open-company-web.components.report :refer [report readonly-report]]
             [open-company-web.components.login :refer [login]]
             [open-company-web.lib.raven :refer [raven-setup]]
+            [open-company-web.lib.utils :as utils]
             [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.api :as api]
-            [goog.events :as events])
+            [goog.events :as events]
+            [open-company-web.lib.cookies :as cook])
   (:import [goog.history EventType]))
 
 (enable-console-print!)
@@ -22,7 +24,12 @@
 ; is undefined because it breaks tests
 (if-let [target (. js/document (getElementById "app"))]
   (do
-    (defroute login-route "/login" []
+    (defroute login-route "/login" {:keys [query-params]}
+      (when (contains? query-params :jwt)
+        (cook/set-cookie! :jwt (:jwt query-params))
+        (swap! app-state assoc :jwt (:jwt query-params))
+        ;redirect to dashboard
+        (utils/redirect! "/companies"))
       ; save route
       (router/set-route! ["login"] {})
       ; load data from api
