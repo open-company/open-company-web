@@ -94,6 +94,9 @@
  (let [r (range 1 (+ n 1))]
     (into [] (for [a r] (str prefix a)))))
 
+(defn redirect! [loc]
+  (set! (.-location js/window) loc))
+
 (def users [
   { :tz_label "Pacific Daylight Time"
     :deleted false
