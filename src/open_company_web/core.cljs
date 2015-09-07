@@ -26,6 +26,7 @@
       ; save route
       (router/set-route! ["login"] {})
       ; load data from api
+      (swap! app-state assoc :loading true)
       (api/get-auth-settings)
       ; render component
       (om/root login app-state {:target target}))
