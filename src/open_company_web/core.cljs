@@ -14,7 +14,7 @@
             [goog.events :as events]
             [open-company-web.lib.cookies :as cook]
             [open-company-web.local-settings :as ls]
-            [shodan.console :as console])
+            [open-company-web.lib.jwt :as jwt])
   (:import [goog.history EventType]))
 
 (enable-console-print!)
@@ -27,21 +27,21 @@
 (if-let [target (. js/document (getElementById "app"))]
   (do
     (defroute login-route "/login" {:keys [query-params]}
-      (when (contains? query-params :jwt)
-        (cook/set-cookie! :jwt (:jwt query-params) (* 60 60 24 365) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-        ;redirect to dashboard
-        (console/log "dispatch /companies")
-        (utils/redirect! "/companies"))
-      ; save route
-      (router/set-route! ["login"] {})
-      ; load data from api
-      (swap! app-state assoc :loading true)
-      (api/get-auth-settings)
-      ; render component
-      (om/root login app-state {:target target}))
+      (if (contains? query-params :jwt)
+        (do
+          (cook/set-cookie! :jwt (:jwt query-params) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+          ;redirect to dashboard
+          (utils/redirect! "/companies"))
+        (do
+          ; save route
+          (router/set-route! ["login"] {})
+          ; load data from api
+          (swap! app-state assoc :loading true)
+          (api/get-auth-settings)
+          ; render component
+          (om/root login app-state {:target target}))))
 
     (defroute list-page-route "/companies" []
-      (cook/get-cookie :jwt)
       ; save route
       (router/set-route! ["companies"] {})
       ; load data from api
