@@ -7,7 +7,8 @@
             [cljs-flux.dispatcher :as flux]
             [cognitect.transit :as t]
             [clojure.walk :refer [keywordize-keys stringify-keys]]
-            [open-company-web.local-settings :as ls]))
+            [open-company-web.local-settings :as ls]
+            [open-company-web.lib.jwt :as j]))
 
 
 (def ^:private api-endpoint ls/api-server-domain)
@@ -27,7 +28,9 @@
 
 (defn- req [endpoint method path params on-complete]
   (go
-    (let [data {:with-credentials? false}
+    (let [jwt (j/jwt)
+          params (when jwt (assoc-in params [:headers "Authorization"] (str "Bearer " jwt)))
+          data {:with-credentials? false}
           data (when params (merge data params))
           response (<! (method (str endpoint path) data))]
       (on-complete response))))
