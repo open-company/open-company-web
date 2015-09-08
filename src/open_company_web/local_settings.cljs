@@ -9,3 +9,7 @@
 
 ;; Auth
 (def auth-server-domain "http://localhost:3003")
+
+;; JWT
+(def jwt-cookie-domain "localhost")
+(def jwt-cookie-secure false)
