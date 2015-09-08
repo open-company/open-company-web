@@ -29,6 +29,7 @@
 (defn- req [endpoint method path params on-complete]
   (go
     (let [jwt (j/jwt)
+          params (assoc-in params [:headers "Access-Control-Allow-Headers"] "Content-Type, Authorization")
           params (when jwt (assoc-in params [:headers "Authorization"] (str "Bearer " jwt)))
           data {:with-credentials? false}
           data (when params (merge data params))
@@ -70,9 +71,6 @@
       (api-put (:href report-link)
         { :json-params json-data
           :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
             "content-type" (:type report-link)
           }}
         (fn [response]
@@ -83,7 +81,6 @@
   ([report-link]
     (api-get (:href report-link) {
         :headers {
-          "Access-Control-Allow-Headers" "Content-Type"
           "content-type" (:type report-link)
         }
       }
@@ -117,9 +114,6 @@
         (api-put (:href report-link)
           { :json-params json-data
             :headers {
-              ; required by Chrome
-              "Access-Control-Allow-Headers" "Content-Type"
-              ; custom content type
               "content-type" (:type report-link)
             }}
           (fn [response]
@@ -133,7 +127,6 @@
 (defn get-auth-settings []
   (auth-get "/auth-settings" {
         :headers {
-          "Access-Control-Allow-Headers" "Content-Type"
           "content-type" "application/json"
         }
       }
