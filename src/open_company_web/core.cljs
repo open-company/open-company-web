@@ -12,7 +12,9 @@
             [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.api :as api]
             [goog.events :as events]
-            [open-company-web.lib.cookies :as cook])
+            [open-company-web.lib.cookies :as cook]
+            [open-company-web.local-settings :as ls]
+            [shodan.console :as console])
   (:import [goog.history EventType]))
 
 (enable-console-print!)
@@ -26,9 +28,9 @@
   (do
     (defroute login-route "/login" {:keys [query-params]}
       (when (contains? query-params :jwt)
-        (cook/set-cookie! :jwt (:jwt query-params))
-        (swap! app-state assoc :jwt (:jwt query-params))
+        (cook/set-cookie! :jwt (:jwt query-params) (* 60 60 24 365) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
         ;redirect to dashboard
+        (console/log "dispatch /companies")
         (utils/redirect! "/companies"))
       ; save route
       (router/set-route! ["login"] {})
@@ -39,6 +41,7 @@
       (om/root login app-state {:target target}))
 
     (defroute list-page-route "/companies" []
+      (cook/get-cookie :jwt)
       ; save route
       (router/set-route! ["companies"] {})
       ; load data from api
