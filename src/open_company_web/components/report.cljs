@@ -163,7 +163,7 @@
                       :headcount (:headcount report-data)
                       :currency (:currency company-data)})
                   (dom/div {:class "panel"}
-                    (om/build cell {:value "1,234,123,123.12" :placeholder "put money here" :prefix "$" :cell-state :new}))
+                    (om/build cell {:value "1234123123.12" :placeholder "put money here" :prefix "$"}))
                   (dom/div {:class "panel"}
                     (om/build user-selector {:value "U06STCKLN" :users utils/users}))))
 
