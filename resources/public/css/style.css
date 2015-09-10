@@ -200,3 +200,54 @@ span img.user-icon{
   width: 20px;
   margin-right: 5px;
 }
+
+.cell {
+  border: 2px solid transparent;
+  width: 170px;
+  height: 30px;
+}
+
+.cell .cell-int {
+  width: 100%;
+}
+
+.cell .cell-int span, .cell .cell-int input{
+  width: 100%;
+  text-align: right;
+}
+
+.cell .state-new {
+  border: 2px solid black;
+}
+
+.cell .state-new span {
+  color: lightgray;
+}
+
+.cell .state-display {
+  border: 2px solid transparent;
+}
+
+.cell .state-display span {
+  color: black;
+}
+
+.cell .state-draft {
+  border: 2px solid transparent;
+  border-bottom: 2px solid black;
+}
+
+.cell .state-draft span {
+  color: black;
+}
+
+.cell .state-edit {
+  border: 2px solid blue;
+}
+
+.cell .state-edit input {
+  color: black;
+  border: 0px solid black;
+  outline: none;
+  text-align: left;
+}
