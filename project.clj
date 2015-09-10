@@ -24,7 +24,6 @@
     [racehub/om-bootstrap "0.5.3"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
     [noencore "0.1.21"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
-    [shodan "0.4.2"] ; A ClojureScript library providing wrappers for the JavaScript console API. https://github.com/noprompt/shodan
   ]
 
   :plugins [
@@ -40,6 +39,7 @@
       :dependencies [
         [ring "1.4.0"] ; Web framework https://github.com/ring-clojure/ring
         [compojure "1.4.0"] ; Web routing http://github.com/weavejester/compojure
+        [shodan "0.4.2"] ; A ClojureScript library providing wrappers for the JavaScript console API. https://github.com/noprompt/shodan
       ]
     }
   }
