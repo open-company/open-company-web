@@ -39,12 +39,15 @@
 
 (defcomponent cell [data owner]
   (init-state [_]
-    {:cell-state (initial-cell-state data)
-     :inital-value (:value data)
-     :value (.parseFloat js/window (:value data))})
+    (let [parsed-value (.parseFloat js/window (:value data))
+          value (if (js/isNaN parsed-value) "" parsed-value)]
+      {:cell-state (initial-cell-state data)
+       :inital-value (:value data)
+       :value value}))
   (render [_]
     (let [value (om/get-state owner :value)
           float-value (.parseFloat js/window value)
+          float-value (if (js/isNaN float-value) "" float-value)
           formatted-value (format-value float-value)
           prefix-value (if (:prefix data) (str (:prefix data) formatted-value) formatted-value)
           final-value (if (:suffix data) (str (:suffix data) prefix-value) prefix-value)]
@@ -75,7 +78,12 @@
                                    (set! (.-value input) (.-value input)))
                        :onChange #(om/update-state! owner :value (fn [_] (.. % -target -value)))
                        :onBlur #(let [value (.. % -target -value)
-                                      state (if (= value (om/get-state owner :inital-value)) :display :draft)]
+                                      init-value (om/get-state owner :inital-value)
+                                      ; if the value is the same as it was at the start
+                                      ; go to the :display state, else go to :draft
+                                      state (if (= value init-value) :display :draft)
+                                      ; if the value is empty and it was empty got to the :new state
+                                      state (if (and (= state :display) (= value "")) :new state)]
                                   (to-state owner state))
                        :onKeyDown #(when (= (.-key %) "Enter") (to-state owner :draft))})))))))
 
