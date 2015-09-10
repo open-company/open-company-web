@@ -74,6 +74,8 @@
                        :onFocus #(let [input (.getDOMNode (om/get-ref owner "edit-field"))]
                                    (set! (.-value input) (.-value input)))
                        :onChange #(om/update-state! owner :value (fn [_] (.. % -target -value)))
-                       :onBlur #(to-state owner :draft)
+                       :onBlur #(let [value (.. % -target -value)
+                                      state (if (= value (om/get-state owner :inital-value)) :display :draft)]
+                                  (to-state owner state))
                        :onKeyDown #(when (= (.-key %) "Enter") (to-state owner :draft))})))))))
 
