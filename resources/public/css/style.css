@@ -201,51 +201,51 @@ span img.user-icon{
   margin-right: 5px;
 }
 
-.cell {
+.comp-cell {
   border: 2px solid transparent;
   width: 170px;
   height: 30px;
 }
 
-.cell .cell-int {
+.comp-cell .comp-cell-int {
   width: 100%;
 }
 
-.cell .cell-int span, .cell .cell-int input{
+.comp-cell .comp-cell-int span, .comp-cell .comp-cell-int input{
   width: 100%;
   text-align: right;
 }
 
-.cell .state-new {
+.comp-cell .state-new {
   border: 2px solid black;
 }
 
-.cell .state-new span {
+.comp-cell .state-new span {
   color: lightgray;
 }
 
-.cell .state-display {
+.comp-cell .state-display {
   border: 2px solid transparent;
 }
 
-.cell .state-display span {
+.comp-cell .state-display span {
   color: black;
 }
 
-.cell .state-draft {
+.comp-cell .state-draft {
   border: 2px solid transparent;
   border-bottom: 2px solid black;
 }
 
-.cell .state-draft span {
+.comp-cell .state-draft span {
   color: black;
 }
 
-.cell .state-edit {
+.comp-cell .state-edit {
   border: 2px solid blue;
 }
 
-.cell .state-edit input {
+.comp-cell .state-edit input {
   color: black;
   border: 0px solid black;
   outline: none;
