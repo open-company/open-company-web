@@ -2,8 +2,7 @@
   (:require [om.core :as om]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.lib.utils :as utils]
-            [cljs.core.async :refer [put!]]))
+            [open-company-web.lib.utils :as utils]))
 
 ;; Cell component
 ;; props: 
@@ -31,11 +30,9 @@
   [data]
   (let [value (:value data)
         state (:cell-state data)]
-    (if state
-      state
-      (if (> (count value) 0)
-        :display
-        :new))))
+    (or state (if (pos? (count value))
+      :display
+      :new))))
 
 (defcomponent cell [data owner]
   (init-state [_]
@@ -44,33 +41,44 @@
       {:cell-state (initial-cell-state data)
        :inital-value (:value data)
        :value value}))
+  (did-mount [_]
+    (.tooltip (.$ js/window "[data-toggle=\"tooltip\"]")))
   (render [_]
     (let [value (om/get-state owner :value)
           float-value (.parseFloat js/window value)
           float-value (if (js/isNaN float-value) "" float-value)
           formatted-value (format-value float-value)
           prefix-value (if (:prefix data) (str (:prefix data) formatted-value) formatted-value)
-          final-value (if (:suffix data) (str (:suffix data) prefix-value) prefix-value)]
-      (dom/div {:class "cell"}
-        (case (om/get-state owner :cell-state)
-          
+          final-value (if (:suffix data) (str (:suffix data) prefix-value) prefix-value)
+          state (om/get-state owner :cell-state)
+          tooltip-text (case state
+                        :new      "Click to enter data"
+                        :display  "Click to edit data"
+                        :draft    "Click to modify data"
+                        :edit     "Press enter to save")]
+      (dom/div {:class "comp-cell"
+                :data-placement "top"
+                :data-toggle "tooltip"
+                :title tooltip-text}
+        (case state
+
           :new
-          (dom/div {:class "cell-int state-new"
+          (dom/div {:class "comp-cell-int state-new"
                     :on-click #(to-state owner :edit)}
             (dom/span {} (:placeholder data)))
-          
+
           :display
-          (dom/div {:class "cell-int state-display"
+          (dom/div {:class "comp-cell-int state-display"
                     :on-click #(to-state owner :edit)}
             (dom/span {} final-value))
-          
+
           :draft
-          (dom/div {:class "cell-int state-draft"
+          (dom/div {:class "comp-cell-int state-draft"
                     :on-click #(to-state owner :edit)}
             (dom/span {} final-value))
-          
+
           :edit
-          (dom/div {:class "cell-int state-edit"}
+          (dom/div {:class "comp-cell-int state-edit"}
             (dom/input #js {
                        :ref "edit-field"
                        :value value
@@ -86,4 +94,3 @@
                                       state (if (and (= state :display) (= value "")) :new state)]
                                   (to-state owner state))
                        :onKeyDown #(when (= (.-key %) "Enter") (to-state owner :draft))})))))))
-
