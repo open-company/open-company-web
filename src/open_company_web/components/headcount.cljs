@@ -5,18 +5,31 @@
               [open-company-web.lib.utils :as utils]
               [open-company-web.components.report-line :refer [report-line]]
               [open-company-web.components.comment :refer [comment-component comment-readonly-component]]
-              [open-company-web.components.pie-chart :refer [pie-chart]]
+              [open-company-web.components.charts :as charts]
               [open-company-web.components.report.headcount-section :refer [headcount-section]]
               [om-bootstrap.random :as r]
               [om-bootstrap.panel :as p]))
 
 (defn get-chart-data [data]
-  { :columns [["string" "Job"] ["number" "Number"]]
-    :values [["Founders" (:founders data)]
-            ["Executives" (:executives data)]
-            ["Full-time employees" (:ft-employees data)]
-            ["Part-time employees" (:pt-employees data)]
-            ["Contractors" (:contractors data)]]})
+  (let [columns [["string" "Job"] ["number" "Number"]]
+        values (vector)
+        values (if (:founders data)
+                 (conj values ["Founders" (:founders data)])
+                 values)
+        values (if (> (:executives data) 0)
+                 (conj values ["Executives" (:executives data)])
+                 values)
+        values (if (> (:ft-employees data) 0)
+                 (conj values ["Full-time employees" (:ft-employees data)])
+                 values)
+        values (if (> (:pt-employees data) 0)
+                 (conj values ["Part-time employees" (:pt-employees data)])
+                 values)
+        values (if (> (:contractors data) 0)
+                 (conj values ["Contractors" (:contractors data)])
+                 values)]
+    { :columns columns
+      :values values}))
 
 (def headcount-rows [
   {:key-name :founders :label "Founders" :help-block "Currently employed founders"}
@@ -33,7 +46,7 @@
           pt-employees (if (contains? data :pt-employees) (:pt-employees data) 0)
           contractors (if (contains? data :contractors) (:contractors data) 0)
           total (+ founders executives ft-employees pt-employees contractors)]
-      (p/panel {:header (dom/h3 "Headcount") :class "headcount clearfix"}
+      (p/panel {:header (dom/h3 "Headcount") :class "report-panel headcount clearfix"}
         (dom/div {:class "headcount row"}
 
           ;; Form
@@ -47,7 +60,7 @@
               (dom/label {:class "col-md-1 control-label"} (utils/thousands-separator total))))
 
           (dom/div {:class "col-sm-5"}
-            (om/build pie-chart (get-chart-data data))))
+            (om/build charts/column-chart (get-chart-data data))))
 
         (om/build comment-component {
           :cursor data
@@ -76,4 +89,4 @@
           (dom/div
             (om/build report-line {:number total-headcount :label "total" :pluralize false}))
           (om/build comment-readonly-component {:cursor data :key :comment :disabled true}))
-        (om/build pie-chart (get-chart-data data))))))
+        (om/build charts/pie-chart (get-chart-data data))))))
