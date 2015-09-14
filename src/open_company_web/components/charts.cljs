@@ -49,7 +49,7 @@
                     "negativeParens" true
                     "pattern" "###,###.##"
                     "prefix" (if (= currency-symbol "%") "" currency-symbol)
-                    "suffix" (if (not (= currency-symbol "%")) "" "%")})]
+                    "suffix" (if-not (= currency-symbol "%") "" "%")})]
     (doseq [x columns]
       (.addColumn data-table (first x) (second x)))
     (.addRows data-table (clj->js data))
