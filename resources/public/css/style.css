@@ -121,10 +121,19 @@ div.report-list div.report-list-left{
   display: block;
 }
 
+div.chart-container{
+  width: 600px;
+}
+
 div.report-list div.chart-container{
   margin-left: 300px;
   width: 600px;
   margin-top: 30px;
+}
+
+div.report-panel div.chart-container{
+  margin-left: -71px;
+  margin-top: 0px;
 }
 
 div.report-list span.num{
