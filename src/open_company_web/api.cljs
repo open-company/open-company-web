@@ -125,5 +125,5 @@
         (save-or-create-report report-link data)))))
 
 
-(defn load-finance []
+(defn load-finances []
   (flux/dispatch dispatcher/finance finances-data/finance))
