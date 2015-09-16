@@ -126,4 +126,4 @@
 
 
 (defn load-finances []
-  (flux/dispatch dispatcher/finance finances-data/finance))
+  (flux/dispatch dispatcher/finances finances-data/finances))
