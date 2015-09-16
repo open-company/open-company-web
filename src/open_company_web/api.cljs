@@ -7,7 +7,8 @@
             [cljs-flux.dispatcher :as flux]
             [cognitect.transit :as t]
             [clojure.walk :refer [keywordize-keys stringify-keys]]
-            [open-company-web.local-settings :as ls]))
+            [open-company-web.local-settings :as ls]
+            [open-company-web.data.finance :as finance-data]))
 
 
 (def ^:private endpoint ls/api-server-domain)
@@ -122,3 +123,7 @@
     (let [company-data ((keyword ticker) @dispatcher/app-state)]
       (if-let [report-link (link-for (:links company-data) "report" year period)]
         (save-or-create-report report-link data)))))
+
+
+(defn load-finance []
+  (flux/dispatch dispatcher/finance finance-data/finance))
