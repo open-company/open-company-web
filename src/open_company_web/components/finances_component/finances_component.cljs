@@ -38,13 +38,13 @@
               (om/build cash (:finances data))
               
               "revenue"
-              (om/build revenue data)
+              (om/build revenue (:finances data))
               
               "costs"
-              (om/build costs data)
+              (om/build costs (:finances data))
               
               "burn-rate"
-              (om/build burn-rate data)
+              (om/build burn-rate (:finances data))
               
               "runaway"
-              (om/build runaway data))))))))
+              (om/build runaway (:finances data)))))))))
