@@ -71,7 +71,7 @@
 
 (def report (flux/dispatcher))
 
-(def finance (flux/dispatcher))
+(def finances (flux/dispatcher))
 
 (def companies-list-dispatch
   (flux/register
@@ -112,9 +112,9 @@
                 report-key (keyword (str "report-" ticker "-" year "-" period))]
             (swap! app-state assoc-in [(keyword ticker) report-key] report-data)))))))
 
-(def finance-dispatch
+(def finances-dispatch
   (flux/register
-    finance
+    finances
     (fn [body]
       (when body
         (swap! app-state dissoc :loading)
