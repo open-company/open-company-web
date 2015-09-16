@@ -4,6 +4,7 @@
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
               [open-company-web.lib.utils :as utils]
+              [open-company-web.data.users :refer (users)]
               [open-company-web.components.headcount :refer [headcount readonly-headcount]]
               [open-company-web.components.finances :refer [finances readonly-finances]]
               [open-company-web.components.compensation :refer [compensation readonly-compensation]]
@@ -161,7 +162,7 @@
                       :compensation (:compensation report-data)
                       :headcount (:headcount report-data)
                       :currency (:currency company-data)})
-                  (om/build user-selector {:value "U06STCKLN" :users utils/users})))
+                  (om/build user-selector {:value "U06STCKLN" :users users})))
 
               is-summary
               (dom/div nil (dom/h3 "Reports summary"))
