@@ -5,7 +5,9 @@
             [open-company-web.components.link :refer [link]]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.lib.iso4217 :refer [iso4217]]))
+            [open-company-web.lib.iso4217 :refer [iso4217]]
+            [open-company-web.components.charts :refer [column-chart]]
+            [open-company-web.components.finances-component.utils :refer [get-chart-data]]))
 
 (defcomponent cash [data owner]
   (render [_]
@@ -16,4 +18,5 @@
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))]
       (dom/div {:class "section cash"}
         (dom/h3 {} (str cur-symbol cash-val))
-        (dom/p {} period)))))
+        (dom/p {} period)
+        (om/build column-chart (get-chart-data finances-data cur-symbol :cash "Cash"))))))
