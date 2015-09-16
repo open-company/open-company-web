@@ -6,6 +6,7 @@
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
             [open-company-web.components.report :refer [report readonly-report]]
+            [open-company-web.components.finances.finances-component :refer [finances]]
             [open-company-web.lib.raven :refer [raven-setup]]
             [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.api :as api]
@@ -65,6 +66,15 @@
       ; render component
       (om/root readonly-report app-state {:target target}))
 
+    (defroute finances-route "/finances/:tab" {{tab :tab} :params}
+      ; save route
+      (router/set-route! ["finances" tab] {:tab tab})
+      ; load data from api
+      (swap! app-state assoc :loading true)
+      (api/load-finances)
+      ; render component
+      (om/root finances app-state {:target target}))
+
     (defroute not-found-route "*" []
       ; render component
       (om/root page-not-found app-state {:target target}))
@@ -75,6 +85,7 @@
                                  report-summary-route
                                  report-editable-route
                                  report-route
+                                 finances-route
                                  not-found-route]))
 
     (defn handle-url-change [e]
