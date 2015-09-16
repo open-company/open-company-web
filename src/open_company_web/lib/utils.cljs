@@ -103,7 +103,8 @@
     "09" "September"
     "10" "October"
     "11" "November"
-    "12" "December"))
+    "12" "December"
+    ""))
 
 (defn period-string [period]
   (let [[year month] (clojure.string/split period "-")
@@ -117,4 +118,6 @@
     (into [] (for [a r] (str prefix a)))))
 
 (defn format-value [value]
-  (.toLocaleString value))
+  (if (nil? value)
+    0
+    (.toLocaleString value)))
