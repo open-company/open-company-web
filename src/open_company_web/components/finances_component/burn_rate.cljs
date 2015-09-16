@@ -16,6 +16,6 @@
           period (utils/period-string (:period value-set))
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))]
       (dom/div {:class "section burn-rate"}
-        (dom/h3 {} (str cur-symbol burn-rates-val))
+        (dom/h3 {} (str cur-symbol burn-rate-val))
         (dom/p {} period)
         (om/build column-chart (get-chart-data finances-data cur-symbol :burn-rate "Burn Rate"))))))
