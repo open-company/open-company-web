@@ -121,3 +121,15 @@
   (if (nil? value)
     0
     (.toLocaleString value)))
+
+(defn calc-burnrate-runaway
+  "Helper function that add burn-rate and runaway to each update section"
+  [update]
+  (let [costs (:costs update)
+        revenue (:revenue update)
+        cash (:cash update)
+        burn-rate (- revenue costs)
+        burn-rate (if (js/isNaN burn-rate) 0 burn-rate)
+        period-run-away (/ cash (abs burn-rate))
+        runaway (int (* period-run-away 30))]
+    (merge update {:burn-rate burn-rate :runaway runaway})))
