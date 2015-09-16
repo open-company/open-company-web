@@ -12,3 +12,5 @@ google.visualization.DataTable.addColumn = function(){};
 google.visualization.DataTable.addRows = function(){};
 google.visualization.PieChart = {};
 google.visualization.PieChart.draw = function(){};
+google.visualization.ColumnChart = {};
+google.visualization.ColumnChart.draw = function(){};
