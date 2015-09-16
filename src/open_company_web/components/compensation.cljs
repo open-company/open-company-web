@@ -21,16 +21,16 @@
         show-contractors (> (:contractors head-data) 0)
         values (vector)
         values (if show-founders
-                 (conj values [:Founders (if show-founders (:founders comp-data) 0)])
+                 (conj values [:Founders (:founders comp-data)])
                  values)
         values (if show-executives
-                 (conj values [:Executives (if show-executives (:executives comp-data) 0)])
+                 (conj values [:Executives (:executives comp-data)])
                  values)
         values (if show-employees
-                 (conj values [:Employees (if show-employees (:employees comp-data) 0)])
+                 (conj values [:Employees (:employees comp-data)])
                  values)
         values (if show-contractors
-                 (conj values [:Contractors (if show-contractors (:contractors comp-data) 0)])
+                 (conj values [:Contractors (:contractors comp-data)])
                  values)]
     { :prefix ticker
       :columns [["string" "Compensation"] ["number" "Amount"]]
