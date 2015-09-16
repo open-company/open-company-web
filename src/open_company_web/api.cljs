@@ -8,7 +8,7 @@
             [cognitect.transit :as t]
             [clojure.walk :refer [keywordize-keys stringify-keys]]
             [open-company-web.local-settings :as ls]
-            [open-company-web.data.finance :as finance-data]))
+            [open-company-web.data.finances :as finances-data]))
 
 
 (def ^:private endpoint ls/api-server-domain)
@@ -126,4 +126,4 @@
 
 
 (defn load-finance []
-  (flux/dispatch dispatcher/finance finance-data/finance))
+  (flux/dispatch dispatcher/finance finances-data/finance))
