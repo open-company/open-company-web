@@ -1,7 +1,8 @@
 (ns open-company-web.dispatcher
   (:require [cljs-flux.dispatcher :as flux]
             [no.en.core :refer [deep-merge]]
-            [open-company-web.router :as router]))
+            [open-company-web.router :as router]
+            [open-company-web.lib.utils :as utils]))
 
 (defonce app-state (atom {
   ; :OPEN {
@@ -117,5 +118,8 @@
     finances
     (fn [body]
       (when body
-        (swap! app-state dissoc :loading)
-        (swap! app-state assoc :finances body)))))
+        (let [updates (:data (:oc:finances body))
+              fixed-updates (into [] (map utils/calc-burnrate-runaway updates))
+              fixed-body (assoc-in body [:oc:finances :data] fixed-updates)]
+          (swap! app-state dissoc :loading)
+          (swap! app-state assoc :finances fixed-body))))))
