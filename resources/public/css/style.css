@@ -234,3 +234,9 @@ div.finances div.finances-body div.section{
 div.finances div.finances-body div.section h3{
   margin-bottom: 0px;
 }
+
+div.finances div.finances-body div.section div.chart-container{
+  position: relative;
+  left: 50%;
+  margin-left: -300px;
+}
