@@ -6,7 +6,7 @@
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
             [open-company-web.components.report :refer [report readonly-report]]
-            [open-company-web.components.finances.finances-component :refer [finances]]
+            [open-company-web.components.finances-component.finances-component :refer [finances]]
             [open-company-web.lib.raven :refer [raven-setup]]
             [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.api :as api]
