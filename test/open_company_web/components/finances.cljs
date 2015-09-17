@@ -5,7 +5,7 @@
               [cljs-react-test.utils :as tu]
               [om.core :as om :include-macros true]
               [dommy.core :as dommy :refer-macros [sel1 sel]]
-              [open-company-web.components.finances :refer [finances readonly-finances calc-run-away]]
+              [open-company-web.components.finances :refer [finances readonly-finances calc-runway]]
               [om.dom :as dom :include-macros true]))
 
 (enable-console-print!)
@@ -35,40 +35,40 @@
     :revenue 100
     :costs 200}}))
 
-(deftest test-calc-run-away
+(deftest test-calc-runway
   (testing "Run away calculation"
-    (is (calc-run-away "M1" 1000 100) 300)
-    (is (calc-run-away "Q1" 1000 100) 1200)))
+    (is (calc-runway "M1" 1000 100) 300)
+    (is (calc-runway "Q1" 1000 100) 1200)))
 
 (deftest test-finances-component
-  (testing "Finances component | Positive run-away"
+  (testing "Finances component | Positive runway"
     (let [c (tu/new-container!)
           app-state (atom positive-atom)
           _ (om/root finances app-state {:target c})
           finances-node (sel1 c [:div.finances])
-          run-away (sel1 c [:label.run-away])]
+          runway (sel1 c [:label.runway])]
       (is (not (nil? finances-node)))
-      (is (nil? run-away))
+      (is (nil? runway))
       (tu/unmount! c)))
 
-  (testing "Finances component | Break even run-away"
+  (testing "Finances component | Break even runway"
     (let [c (tu/new-container!)
           app-state (atom break-even-atom)
           _ (om/root finances app-state {:target c})
           finances-node (sel1 c [:div.finances])
-          run-away (sel1 c [:label.run-away])]
+          runway (sel1 c [:label.runway])]
       (is (not (nil? finances-node)))
-      (is (nil? run-away))
+      (is (nil? runway))
       (tu/unmount! c)))
 
-  (testing "Finances component | Negative run-away"
+  (testing "Finances component | Negative runway"
     (let [c (tu/new-container!)
           app-state (atom negative-atom)
           _ (om/root finances app-state {:target c})
           finances-node (sel1 c [:div.finances])
-          run-away (sel1 c [:label.run-away])]
+          runway (sel1 c [:label.runway])]
       (is (not (nil? finances-node)))
-      (is (not (nil? run-away)))
+      (is (not (nil? runway)))
       (tu/unmount! c))))
 
 (deftest test-readonly-finances-component

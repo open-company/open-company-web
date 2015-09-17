@@ -9,10 +9,10 @@
               [om-bootstrap.panel :as p]
               [open-company-web.lib.utils :as utils]))
 
-(defn calc-run-away [period cash burn-rate]
-  (let [period-run-away (/ cash (utils/abs burn-rate))
+(defn calc-runway [period cash burn-rate]
+  (let [period-runway (/ cash (utils/abs burn-rate))
         period-devider (if (= (first period) "M") 30 (* 30 4))]
-    (int (* period-run-away period-devider))))
+    (int (* period-runway period-devider))))
 
 (defcomponent finances [data owner]
   (will-mount [_]
@@ -38,7 +38,7 @@
           burn-rate-classes (str "num " (if (= burn-rate 0) "" (if positive-diff "green" "red")))
           burn-rate-helper (str "Cash " (if positive-diff "earned" "used") " this " period-string)
           profitable (if (= burn-rate 0) "-" (if positive-diff "Yes" "No"))
-          run-away (calc-run-away period cash burn-rate)
+          runway (calc-runway period cash burn-rate)
           currency-dict (utils/get-currency currency)
           currency-symbol (utils/get-symbol-for-currency-code currency)
           finances-rows [{:label "Cash on hand" :key-name :cash :help-block "Cash and cash equivalents"}
@@ -67,11 +67,11 @@
                 (dom/span {:class burn-rate-classes} (str currency-symbol (utils/thousands-separator (utils/abs burn-rate)))))
               (dom/p {:class "help-block"} (if (= burn-rate 0) "" burn-rate-helper)))
 
-            ;; Runaway
+            ;; Runway
             (when (< burn-rate 0)
               (dom/div {:class "form-group"}
                 (dom/label {:class "col-md-2 control-label"} "Runway")
-                (dom/label {:class "col-md-2 control-label run-away"} (utils/thousands-separator run-away))
+                (dom/label {:class "col-md-2 control-label runway"} (utils/thousands-separator runway))
                 (dom/p {:class "help-block"} (str "days of cash remaining"))))))
 
         ;; Comment textarea
@@ -91,7 +91,7 @@
           burn-rate-label (if (> burn-rate 0) "Growth rate: " "Burn rate: ")
           burn-rate-classes (str "num " (if (> burn-rate 0) "green" "red"))
           profitable (if (> burn-rate 0) "Yes" "No")
-          run-away (if (<= burn-rate 0) (quot cash burn-rate) "N/A")
+          runway (if (<= burn-rate 0) (quot cash burn-rate) "N/A")
           currency-symbol (utils/get-symbol-for-currency-code currency)]
       (r/well {:class "report-list finances clearfix"}
         (dom/div {:class "report-list-left"}
@@ -111,5 +111,5 @@
             (dom/span {:class "label"} currency-symbol)
             (dom/span {:class burn-rate-classes} (utils/thousands-separator (utils/abs burn-rate))))
           (dom/div
-            (dom/span {:class "label"} "Runaway: " (if (<= burn-rate 0) (str (utils/abs run-away) " months") "N/A")))
+            (dom/span {:class "label"} "Runway: " (if (<= burn-rate 0) (str (utils/abs runway) " months") "N/A")))
           (om/build comment-readonly-component {:cursor fin-data :key :comment :disabled true}))))))

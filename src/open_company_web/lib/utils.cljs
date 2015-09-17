@@ -122,14 +122,21 @@
     0
     (.toLocaleString value)))
 
-(defn calc-burnrate-runaway
-  "Helper function that add burn-rate and runaway to each update section"
+(defn calc-burnrate-runway
+  "Helper function that add burn-rate and runway to each update section"
   [update]
   (let [costs (:costs update)
         revenue (:revenue update)
         cash (:cash update)
         burn-rate (- revenue costs)
         burn-rate (if (js/isNaN burn-rate) 0 burn-rate)
-        period-run-away (/ cash (abs burn-rate))
-        runaway (int (* period-run-away 30))]
-    (merge update {:burn-rate burn-rate :runaway runaway})))
+        period-runway (/ cash (abs burn-rate))
+        runway (int (* period-runway 30))]
+    (merge update {:burn-rate burn-rate :runway runway})))
+
+(defn camel-case-str [value]
+  (let [upper-value (clojure.string/replace value #"^(\w)" #(clojure.string/upper-case (first %1)))]
+    (clojure.string/replace upper-value #"-(\w)"
+                            #(str " " (clojure.string/upper-case (second %1))))))
+  
+  

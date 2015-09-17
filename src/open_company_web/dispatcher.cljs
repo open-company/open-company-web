@@ -119,7 +119,7 @@
     (fn [body]
       (when body
         (let [updates (:data (:oc:finances body))
-              fixed-updates (into [] (map utils/calc-burnrate-runaway updates))
+              fixed-updates (into [] (map utils/calc-burnrate-runway updates))
               fixed-body (assoc-in body [:oc:finances :data] fixed-updates)]
           (swap! app-state dissoc :loading)
           (swap! app-state assoc :finances fixed-body))))))

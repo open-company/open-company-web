@@ -13,5 +13,5 @@
   (let [chart-data (partial chart-data-at-index data keyw)
         placeholder-vect (subvec [0 1 2 3 4 5 6] 0 (min (count data) columns))]
     { :prefix prefix
-      :columns [["string" column-name] ["number" "Amount"]]
+      :columns [["string" column-name] ["number" (utils/camel-case-str (name keyw))]]
       :values (into [] (map chart-data placeholder-vect))}))

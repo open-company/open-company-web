@@ -8,7 +8,7 @@
             [open-company-web.components.finances-component.revenue :refer (revenue)]
             [open-company-web.components.finances-component.costs :refer (costs)]
             [open-company-web.components.finances-component.burn-rate :refer (burn-rate)]
-            [open-company-web.components.finances-component.runaway :refer (runaway)]))
+            [open-company-web.components.finances-component.runway :refer (runway)]))
 
 (defcomponent finances [data owner]
   (init-state [_]
@@ -21,7 +21,7 @@
           revenue-classes (str classes (when (= focus "revenue") " active"))
           costs-classes (str classes (when (= focus "costs") " active"))
           burn-rate-classes (str classes (when (= focus "burn-rate") " active"))
-          runaway-classes (str classes (when (= focus "runaway") " active"))
+          runway-classes (str classes (when (= focus "runway") " active"))
           author (:author (:oc:finances finances-data))]
       (if (:loading data)
         (dom/h4 {} "Loading data...")
@@ -32,7 +32,7 @@
             (om/build link {:class revenue-classes :href "/finances/revenue" :name "Revenue"})
             (om/build link {:class costs-classes :href "/finances/costs" :name "Costs"})
             (om/build link {:class burn-rate-classes :href "/finances/burn-rate" :name "Burn Rate"})
-            (om/build link {:class runaway-classes :href "/finances/runaway" :name "Runaway"}))
+            (om/build link {:class runway-classes :href "/finances/runway" :name "Runway"}))
           (dom/div {:class "finances-body"}
             (case focus
               
@@ -48,8 +48,8 @@
               "burn-rate"
               (om/build burn-rate finances-data)
               
-              "runaway"
-              (om/build runaway (:finances data)))
+              "runway"
+              (om/build runway (:finances data)))
             (dom/div {:class "author"}
               (dom/p {} "3 days ago")
               (dom/img {:src (:image author) :alt (:name author) :class "author-image"}))))))))
