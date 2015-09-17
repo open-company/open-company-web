@@ -9,6 +9,8 @@
             [open-company-web.components.finances-component.costs :refer (costs)]
             [open-company-web.components.finances-component.burn-rate :refer (burn-rate)]
             [open-company-web.components.finances-component.runway :refer (runway)]
+            [open-company-web.components.update-footer :refer (update-footer)]
+            [open-company-web.components.rich-editor :refer (rich-editor)]
             [open-company-web.lib.utils :as utils]))
 
 (defcomponent finances [data owner]
@@ -22,9 +24,7 @@
           revenue-classes (str classes (when (= focus "revenue") " active"))
           costs-classes (str classes (when (= focus "costs") " active"))
           burn-rate-classes (str classes (when (= focus "burn-rate") " active"))
-          runway-classes (str classes (when (= focus "runway") " active"))
-          author (:author (:oc:finances finances-data))
-          updated-at (:updated-at (:oc:finances finances-data))]
+          runway-classes (str classes (when (= focus "runway") " active"))]
       (if (:loading data)
         (dom/h4 {} "Loading data...")
         (dom/div {:class "finances"}
@@ -52,7 +52,6 @@
               
               "runway"
               (om/build runway (:finances data)))
-            (dom/div {:class "author"}
-              (dom/p {:class "timeago"} (utils/time-since updated-at))
-              (dom/img {:src (:image author) :alt (:name author) :class "author-image"}))))))))
-
+            (om/build update-footer {:updated-at (:updated-at (:oc:finances finances-data))
+                                     :author (:author (:oc:finances finances-data))})
+            (om/build rich-editor (:commentary (:oc:finances finances-data)))))))))
