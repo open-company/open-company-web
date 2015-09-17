@@ -75,14 +75,14 @@
         :costs 19546
       }      
     ]
-    :updated-at "2015-09-14T20:49:19Z"
+    :updated-at "2015-09-17T12:29:30Z"
     :author {
       :name "Iacopo Carraro"
       :slack_id "U06STCKLN"
       :image "https://secure.gravatar.com/avatar/98b5456ea1c562024f41501ffd7bc3c6.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0022.png"
     }
     :commentary {
-      :body "<p>...</p>"
+      :body "<h3>Title of commentary</h3><p>This is the body of commentary with an external <a href=\"http://www.google.it\">link to google</a>.</p>"
       :updated-at "2015-09-14T20:49:19Z"
       :author {
         :name "Stuart Levinson"
