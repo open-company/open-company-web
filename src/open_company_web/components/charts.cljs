@@ -1,11 +1,9 @@
 (ns ^:figwheel-always open-company-web.components.charts
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
-            [om-tools.dom :as dom :include-macros true]
-            [shodan.inspection :refer (inspect)]))
+            [om-tools.dom :as dom :include-macros true]))
 
 (defn pie-add-rows [columns data currency-symbol]
-  (inspect columns)
   (let [data-table (js/google.visualization.DataTable.)
         formatter (js/google.visualization.NumberFormat. #js {
                     "negativeColor" "red",
