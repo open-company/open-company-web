@@ -241,7 +241,7 @@ div.finances div.finances-body div.section div.chart-container{
   margin-left: -300px;
 }
 
-div.finances div.finances-body div.author{
+div.update-footer{
   position: relative;
   left: 50%;
   margin-left: -300px;
@@ -250,14 +250,26 @@ div.finances div.finances-body div.author{
   vertical-align: middle;
 }
 
-div.finances div.finances-body div.author p{
+div.update-footer p{
   float: left;
   margin: 5px;
   color: lightgray;
 }
 
-div.finances div.finances-body div.author img.author-image{
+div.update-footer img.author-image{
   height: 30px;
   width: 30px;
   float: left;
+  border-radius: 3px;
+}
+
+div.rich-editor-container {
+  position: relative;
+  left: 50%;
+  margin-left: -300px;
+  width: 600px;
+}
+
+div.rich-eidor-container div.rich-editor{
+  width: 100%;
 }
