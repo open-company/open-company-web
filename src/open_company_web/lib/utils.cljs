@@ -139,4 +139,25 @@
     (clojure.string/replace upper-value #"-(\w)"
                             #(str " " (clojure.string/upper-case (second %1))))))
   
-  
+(defn time-since
+  "Get a string representing the elapsed time from a date in the past"
+  [past-date]
+  (let [past (.getTime (new js/Date past-date))
+        now (.getTime (new js/Date))
+        seconds (.floor js/Math (/ (- now past) 1000))
+        years-interval (.floor js/Math (/ seconds 31536000))]
+    (if (> years-interval 1)
+      (str years-interval " years ago")
+      (let [months-interval (.floor js/Math (/ seconds 2592000))]
+        (if (> months-interval 1)
+          (str months-interval " months ago")
+          (let [days-interval (.floor js/Math (/ seconds 86400))]
+            (if (> days-interval 1)
+              (str days-interval " days ago")
+              (let [hours-interval (.floor js/Math (/ seconds 3600))]
+                (if (> hours-interval 1)
+                  (str hours-interval " hours ago")
+                  (let [minutes-interval (.floor js/Math (/ seconds 60))]
+                    (if (> minutes-interval 1)
+                      (str minutes-interval " minutes ago")
+                      (str "just now"))))))))))))
