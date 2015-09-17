@@ -2,6 +2,8 @@
 var $ = {};
 $.select2 = function(){};
 var jQuery = function(){};
+// Hallo
+var hallo = function(){};
 // google
 var google = {};
 google.visualization = {};
