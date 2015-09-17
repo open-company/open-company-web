@@ -240,3 +240,24 @@ div.finances div.finances-body div.section div.chart-container{
   left: 50%;
   margin-left: -300px;
 }
+
+div.finances div.finances-body div.author{
+  position: relative;
+  left: 50%;
+  margin-left: -300px;
+  width: 600px;
+  height: 30px;
+  vertical-align: middle;
+}
+
+div.finances div.finances-body div.author p{
+  float: left;
+  margin: 5px;
+  color: lightgray;
+}
+
+div.finances div.finances-body div.author img.author-image{
+  height: 30px;
+  width: 30px;
+  float: left;
+}
