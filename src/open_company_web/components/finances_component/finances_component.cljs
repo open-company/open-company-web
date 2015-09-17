@@ -16,11 +16,13 @@
   (render [_]
     (let [focus (om/get-state owner :focus)
           classes "finances-link"
+          finances-data (:finances data)
           cash-classes (str classes (when (= focus "cash") " active"))
           revenue-classes (str classes (when (= focus "revenue") " active"))
           costs-classes (str classes (when (= focus "costs") " active"))
           burn-rate-classes (str classes (when (= focus "burn-rate") " active"))
-          runaway-classes (str classes (when (= focus "runaway") " active"))]
+          runaway-classes (str classes (when (= focus "runaway") " active"))
+          author (:author (:oc:finances finances-data))]
       (if (:loading data)
         (dom/h4 {} "Loading data...")
         (dom/div {:class "finances"}
@@ -35,16 +37,20 @@
             (case focus
               
               "cash"
-              (om/build cash (:finances data))
+              (om/build cash finances-data)
               
               "revenue"
-              (om/build revenue (:finances data))
+              (om/build revenue finances-data)
               
               "costs"
-              (om/build costs (:finances data))
+              (om/build costs finances-data)
               
               "burn-rate"
-              (om/build burn-rate (:finances data))
+              (om/build burn-rate finances-data)
               
               "runaway"
-              (om/build runaway (:finances data)))))))))
+              (om/build runaway (:finances data)))
+            (dom/div {:class "author"}
+              (dom/p {} "3 days ago")
+              (dom/img {:src (:image author) :alt (:name author) :class "author-image"}))))))))
+
