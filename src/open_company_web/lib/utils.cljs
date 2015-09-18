@@ -161,3 +161,30 @@
                     (if (> minutes-interval 1)
                       (str minutes-interval " minutes ago")
                       (str "just now"))))))))))))
+
+(defn get-click-position
+  "Return the x position inside the clicked element"
+  [event]
+  (let [client-x (.-clientX event)
+        bound-rect (.getBoundingClientRect (.-target event))
+        lf (.-left bound-rect)
+        from-left (- client-x lf)]
+    from-left))
+
+(defn set-caret-position!
+  "Move the caret to the specified position of a certain element"
+  [elem caret-pos]
+  (when elem
+    (cond
+      (.-createTextRange elem)
+      (let [rg (.createTextRange elem)]
+        (.move rg "character" caret-pos)
+        (.select rg))
+
+      (.-selectionStart elem)
+      (do
+        (.focus elem)
+        (.setSelectionRange elem caret-pos caret-pos))
+
+      :else
+      (.focus elem))))
