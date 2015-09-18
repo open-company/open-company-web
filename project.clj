@@ -14,7 +14,7 @@
     [org.omcljs/om "0.9.0" :exclusions [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
     [cljs-http "0.1.37"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/schema "1.0.1"] ; Dependency of om-tools https://github.com/Prismatic/schema
-    [prismatic/plumbing "0.4.4"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
+    [prismatic/plumbing "0.5.0"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [prismatic/om-tools "0.3.12"] ; Tools for Om https://github.com/Prismatic/om-tools
     [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
     [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; React test utilities https://github.com/bensu/cljs-react-test
@@ -24,12 +24,11 @@
     [racehub/om-bootstrap "0.5.3"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
     [noencore "0.1.21"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
-    [shodan "0.4.2"] ; A ClojureScript library providing wrappers for the JavaScript console API. https://github.com/noprompt/shodan
   ]
 
   :plugins [
     [lein-cljsbuild "1.1.0"] ; ClojureScript compiler https://github.com/emezeske/lein-cljsbuild
-    [lein-figwheel "0.3.9"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
+    [lein-figwheel "0.4.0"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
     [lein-ancient "0.6.7"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
     [lein-doo "0.1.4"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
     [lein-deps-tree "0.1.2"] ; Print a tree of project dependencies https://github.com/the-kenny/lein-deps-tree
@@ -40,6 +39,7 @@
       :dependencies [
         [ring "1.4.0"] ; Web framework https://github.com/ring-clojure/ring
         [compojure "1.4.0"] ; Web routing http://github.com/weavejester/compojure
+        [shodan "0.4.2"] ; A ClojureScript library providing wrappers for the JavaScript console API. https://github.com/noprompt/shodan
       ]
     }
   }
