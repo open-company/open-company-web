@@ -4,7 +4,20 @@
   :name "Buffer"
   :currency "USD"
   
-  :sections ["oc:finances"]
+  :sections ["oc:finances", "oc:challenges"]
+  
+  :oc:challenges {
+    :title "Key Challenges"
+    :body "<h3>Recruiting</h3><p>We're continuing our fast pace of growing the team, and we'd love your help to spread the word about all our <a>current open positions</a>, <a href=\"http://twitter.com\">Twitter</a> or <a href=\"http://buffer.com\">Buffer</a>.</p>
+<h3>Spead & Reliability</h3><p>We've made some key speed and reliability <a href=\"/improvements\">improvements</a> to <a href=\"http://buffer.com/b2b\">Buffer for business</a>, but there is still a ways to go. Everyone please drop everything and support the devops team in anyway you can when we have an outage situation.</p>
+<h3>Onbarding</h3><p>We're in the <a href=\"/early-stages\">early stages</a> of experimenting with a progress indicator in the onboarding improvement ideas to <a href=\"/gretchen\">Gretchen</a>."
+    :updated-at "2015-09-14T20:49:19Z"
+    :author {
+      :name "Stuart Levinson"
+      :slack_id "U06SQLDFT"
+      :image "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
+    }
+  }
   
   :oc:finances {
     :data [
