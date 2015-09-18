@@ -370,3 +370,11 @@ div.editable-title-container input{
   border: 1px solid black;
   outline: none;
 }
+
+form.linkForm input.url {
+  color: black;
+}
+
+form.linkForm input.submit {
+  background-color: gray;
+}
