@@ -34,8 +34,10 @@
 (defcomponent rich-editor [data owner]
   (init-state [_]
     {:editor nil
+     :initial-body (:body data)
      :hallo-loaded false
-     :did-mount false})
+     :did-mount false
+     :editing false})
   (will-mount [_]
     ; add dependencies:
     ; jQuery UI
@@ -56,9 +58,21 @@
     (dom/div {:class "rich-editor-container"}
       (dom/div #js {:className "rich-editor"
                     :ref "rich-editor"
-                    :onBlur (fn [e]
-                                (let [value (.. e -target -innerHTML)]
-                                  (utils/handle-change data value :body)))
+                    :onClick (fn [e]
+                               (om/update-state! owner :editing (fn[_] true)))
                     :dangerouslySetInnerHTML (clj->js {"__html" (:body data)})})
-      (om/build update-footer {:author (:author data) :updated-at (:updated-at data)}))))
+      (if (om/get-state owner :editing)
+        (dom/div {:class "rich-editor-save"}
+          (dom/button {:class "btn btn-success"
+                       :on-click #(println "Save with api!")} "Save")
+          (dom/button {:class "btn btn-default cancel-button"
+                       :on-click (fn[e]
+                                   (let [init-value (om/get-state owner :initial-body)
+                                         el (.getDOMNode (om/get-ref owner "rich-editor"))]
+                                     (println "Cancel: " init-value)
+                                     (utils/handle-change data init-value :body)
+                                     (set! (.-innerHTML el) init-value))
+                                   (om/update-state! owner :editing (fn[_]false)))
+                       } "Cancel"))
+        (om/build update-footer {:author (:author data) :updated-at (:updated-at data)})))))
 
