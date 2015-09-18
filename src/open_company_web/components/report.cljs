@@ -167,7 +167,7 @@
                     (om/build cell {:value "1234123123.12" :placeholder "you shouldn't see this!" :prefix "$"})
                     (om/build cell {:value "" :placeholder "you should see this!" :prefix "$"}))
                   (dom/div {:class "panel"}
-                    (om/build user-selector {:value "U06STCKLN" :users utils/users}))))
+                    (om/build user-selector {:value "U06STCKLN" :users users}))))
 
               is-summary
               (dom/div nil (dom/h3 "Reports summary"))
