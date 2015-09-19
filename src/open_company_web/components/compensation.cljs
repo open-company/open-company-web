@@ -5,7 +5,7 @@
             [open-company-web.components.report-line :refer [report-line report-editable-line]]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.comment :refer [comment-component comment-readonly-component]]
-            [open-company-web.components.pie-chart :refer [pie-chart]]
+            [open-company-web.components.charts :as charts]
             [open-company-web.components.report.compensation-section :refer [compensation-section]]
             [open-company-web.components.report.percentage-switch :refer [percentage-switch]]
             [goog.string :as gstring]
@@ -18,13 +18,23 @@
         show-founders (> (:founders head-data) 0)
         show-executives (> (:executives head-data) 0)
         show-employees (> (+ (:ft-employees head-data) (:pt-employees head-data)) 0)
-        show-contractors (> (:contractors head-data) 0)]
+        show-contractors (> (:contractors head-data) 0)
+        values (vector)
+        values (if show-founders
+                 (conj values [:Founders (if show-founders (:founders comp-data) 0)])
+                 values)
+        values (if show-executives
+                 (conj values [:Executives (if show-executives (:executives comp-data) 0)])
+                 values)
+        values (if show-employees
+                 (conj values [:Employees (if show-employees (:employees comp-data) 0)])
+                 values)
+        values (if show-contractors
+                 (conj values [:Contractors (if show-contractors (:contractors comp-data) 0)])
+                 values)]
     { :prefix ticker
       :columns [["string" "Compensation"] ["number" "Amount"]]
-      :values [[:Founders (if show-founders (:founders comp-data) 0)]
-              [:Executives (if show-executives (:executives comp-data) 0)]
-              [:Employees (if show-employees (:employees comp-data) 0)]
-              [:Contractors (if show-contractors (:contractors comp-data) 0)]]}))
+      :values values}))
 
 (defn calc-percentage
   [dollar total]
@@ -53,7 +63,7 @@
           currency (:currency data)
           currency-symbol (utils/get-symbol-for-currency-code currency)
           prefix (str currency-symbol " ")]
-      (p/panel {:header (dom/h3 "Compensation") :class "compensation clearfix"}
+      (p/panel {:header (dom/h3 "Compensation") :class "report-panel compensation clearfix"}
         (dom/div {:class "compensation row"}
 
           ;; Compensation sections
@@ -68,7 +78,7 @@
           ;; Pie chart
           (when (> compensation-count 0)
             (dom/div {:class "col-sm-6"}
-              (om/build pie-chart (get-chart-data data prefix)))))
+              (om/build charts/column-chart (get-chart-data data prefix)))))
 
         ;; Comment
         (om/build comment-component {
@@ -122,4 +132,4 @@
                         (if percentage (calc-percentage total-compensation total-compensation) total-compensation))
               :label "total compensation this month"}))
           (om/build comment-readonly-component {:cursor comp-data :key :comment :disabled true}))
-        (om/build pie-chart (get-chart-data data prefix))))))
+        (om/build charts/pie-chart (get-chart-data data prefix))))))

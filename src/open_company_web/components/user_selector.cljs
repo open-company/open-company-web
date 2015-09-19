@@ -12,7 +12,7 @@
       (:name user))))
 
 (defn format-state [state]
-  (if (not (.-id state)) (.-text state))
+  (if-not (.-id state) (.-text state))
   (let [text (.-text state)
         el (.$ js/window (.-element state))
         img (.data el "icon")
