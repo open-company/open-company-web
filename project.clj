@@ -15,7 +15,7 @@
     [cljs-http "0.1.37"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/schema "1.0.1"] ; Dependency of om-tools https://github.com/Prismatic/schema
     [prismatic/plumbing "0.5.0"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
-    [prismatic/om-tools "0.3.12"] ; Tools for Om https://github.com/Prismatic/om-tools
+    [prismatic/om-tools "0.4.0"] ; Tools for Om https://github.com/Prismatic/om-tools
     [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
     [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; React test utilities https://github.com/bensu/cljs-react-test
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
