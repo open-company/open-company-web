@@ -44,7 +44,7 @@
           finances-rows [{:label "Cash on hand" :key-name :cash :help-block "Cash and cash equivalents"}
                          {:label "Revenue" :key-name :revenue :help-block (str "All revenue this " period-string)}
                          {:label "Costs" :key-name :costs :help-block (str "All costs this " period-string " including salaries")}]]
-      (p/panel {:header (dom/h3 "Finances") :class "finances clearfix"}
+      (p/panel {:header (dom/h3 "Finances") :class "report-panel finances clearfix"}
         (dom/div {:class "finances row"}
           (dom/form {:class "form-horizontal"}
 

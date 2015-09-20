@@ -121,10 +121,19 @@ div.report-list div.report-list-left{
   display: block;
 }
 
+div.chart-container{
+  width: 600px;
+}
+
 div.report-list div.chart-container{
   margin-left: 300px;
   width: 600px;
   margin-top: 30px;
+}
+
+div.report-panel div.chart-container{
+  margin-left: -71px;
+  margin-top: 0px;
 }
 
 div.report-list span.num{
@@ -199,4 +208,55 @@ span img.user-icon{
   height: 20px;
   width: 20px;
   margin-right: 5px;
+}
+
+.comp-cell {
+  border: 2px solid transparent;
+  width: 170px;
+  height: 30px;
+}
+
+.comp-cell .comp-cell-int {
+  width: 100%;
+}
+
+.comp-cell .comp-cell-int span, .comp-cell .comp-cell-int input{
+  width: 100%;
+  text-align: right;
+}
+
+.comp-cell .state-new {
+  border: 2px solid black;
+}
+
+.comp-cell .state-new span {
+  color: lightgray;
+}
+
+.comp-cell .state-display {
+  border: 2px solid transparent;
+}
+
+.comp-cell .state-display span {
+  color: black;
+}
+
+.comp-cell .state-draft {
+  border: 2px solid transparent;
+  border-bottom: 2px solid black;
+}
+
+.comp-cell .state-draft span {
+  color: black;
+}
+
+.comp-cell .state-edit {
+  border: 2px solid blue;
+}
+
+.comp-cell .state-edit input {
+  color: black;
+  border: 0px solid black;
+  outline: none;
+  text-align: left;
 }
