@@ -65,8 +65,8 @@
 
 (defn in?
   "true if seq contains elm"
-  [seq elm]
-  (some #(= elm %) seq))
+  [coll elm]
+  (some #(= elm %) coll))
 
 (defn get-period-string [period]
   (case period
@@ -106,10 +106,10 @@
     "12" "December"
     ""))
 
-(defn period-string [period]
+(defn period-string [period & flags]
   (let [[year month] (clojure.string/split period "-")
         month-str (month-string month)]
-    (if (or (= month "01") (= month "12"))
+    (if (or (in? flags :force-year) (= month "01") (= month "12"))
       (str month-str " " year)
       month-str)))
 
@@ -188,3 +188,20 @@
 
       :else
       (.focus elem))))
+
+(defn class-set
+  "Given a map of class names as keys return a string of the those classes that evaulates as true"
+  [classes]
+  (apply str (map #(str " " (name %)) (keys (filter #(second %) classes)))))
+
+(defn period-exists [period data]
+  (if (> (count (filter #(= (:period %) period) data)) 0)
+    true
+    false))
+
+(defn current-period []
+  (let [date (js/Date.)
+        month (+ (.getMonth date) 1)
+        month-str (str (when (< month 10) "0") month)
+        cur-period (str (.getFullYear date) "-" month-str)]
+    cur-period))
