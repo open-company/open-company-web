@@ -30,7 +30,7 @@
   [data]
   (let [value (:value data)
         state (:cell-state data)]
-    (or state (if (pos? (count value))
+    (or state (if (>= value 0)
       :display
       :new))))
 
@@ -46,7 +46,7 @@
   (render [_]
     (let [value (om/get-state owner :value)
           float-value (.parseFloat js/window value)
-          float-value (if (js/isNaN float-value) "" float-value)
+          float-value (if (js/isNaN float-value) 0 float-value)
           formatted-value (format-value float-value)
           prefix-value (if (:prefix data) (str (:prefix data) formatted-value) formatted-value)
           final-value (if (:suffix data) (str (:suffix data) prefix-value) prefix-value)
