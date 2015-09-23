@@ -227,6 +227,13 @@ div.finances div.link-bar a.finances-link.active{
   text-decoration: none;
 }
 
+div.finances div.finances-body{
+  width: 600px;
+  left: 50%;
+  margin-left: -300px;
+  position: relative;
+}
+
 div.finances div.finances-body div.section{
   text-align: center;
 }
@@ -280,7 +287,7 @@ div.rich-editor-container div.rich-editor-save button.cancel-button{
 
 .comp-cell {
   border: 2px solid transparent;
-  width: 170px;
+  width: 100px;
   height: 30px;
 }
 
@@ -377,4 +384,47 @@ form.linkForm input.url {
 
 form.linkForm input.submit {
   background-color: gray;
+}
+
+div.finances div.finances-body.edit{
+  width: 800px;
+  left: 50%;
+  margin-left: -400px;
+  position: relative;
+}
+
+div.finances-body i.editable-pen{
+  opacity: 0;
+  margin-left: 10px;
+  cursor: default;
+}
+
+div.finances-body.editable i.editable-pen{
+  opacity: 1;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+div.finances-body table.table td, div.finances-body table.table th{
+  text-align: right;
+}
+
+div.finances-body table.table td.no-cell{
+  padding-top: 12px;
+}
+
+div.finances-body table.table td.new-row-placeholder{
+  color: lightgray;
+}
+
+div.finances-body table.table td div.comp-cell{
+  float: right;
+}
+
+div.finances-body div.finances-edit-buttons{
+  margin-left: 234px;
+}
+
+div.finances-body div.finances-edit-buttons button.cancel{
+  margin-left: 10px;
 }
