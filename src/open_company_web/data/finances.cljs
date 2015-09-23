@@ -4,7 +4,7 @@
   :name "Buffer"
   :currency "USD"
   
-  :sections ["oc:finances", "oc:challenges"]
+  :sections ["oc:finances" "oc:challenges"]
   
   :oc:challenges {
     :title "Key Challenges"
