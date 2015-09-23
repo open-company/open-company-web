@@ -6,7 +6,7 @@
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
             [open-company-web.components.report :refer [report readonly-report]]
-            [open-company-web.components.finances-component.finances-component :refer [finances]]
+            [open-company-web.components.finances-component.finances-component :refer [finances finances-edit]]
             [open-company-web.components.challenges-component.challenges :refer [challenges]]
             [open-company-web.lib.raven :refer [raven-setup]]
             [open-company-web.dispatcher :refer [app-state]]
@@ -76,6 +76,15 @@
       ; render component
       (om/root finances app-state {:target target}))
 
+    (defroute finances-edit-route "/finances/edit" {}
+      ; save route
+      (router/set-route! ["finances" "edit"] {})
+      ; load data from api
+      (swap! app-state assoc :loading true)
+      (api/load-finances)
+      ; render component
+      (om/root finances-edit app-state {:target target}))
+
     (defroute challenges-route "/challenges" {}
       ; save route
       (router/set-route! ["challenges"] {})
@@ -95,6 +104,7 @@
                                  report-summary-route
                                  report-editable-route
                                  report-route
+                                 finances-edit-route
                                  finances-route
                                  challenges-route
                                  not-found-route]))
