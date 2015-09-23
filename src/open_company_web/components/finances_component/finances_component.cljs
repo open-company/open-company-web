@@ -62,28 +62,29 @@
 
 (defcomponent finances-edit-row [data owner]
   (render [_]
-    (let [prefix (:prefix data)]
+    (let [prefix (:prefix data)
+          is-new (:new data)]
       (dom/tr {}
-        (dom/td {:class "no-cell"} (utils/period-string (:period data) (:force-year data)))
+        (dom/td {:class "no-cell"} (utils/period-string (:period data) (when is-new :force-year)))
         (dom/td {}
           (om/build cell {:value (:cash data)
-                          :placeholder (if (= (:cell-state data) :new) "at month end" "")
+                          :placeholder (if is-new "at month end" "")
                           :prefix prefix
-                          :cell-state (:cell-state data)}))
+                          :cell-state (if is-new :new :display)}))
         (dom/td {}
           (om/build cell {:value (:revenue data)
-                          :placeholder (if (= (:cell-state data) :new) "entire month" "")
+                          :placeholder (if is-new "entire month" "")
                           :prefix prefix
-                          :cell-state (:cell-state data)}))
+                          :cell-state (if is-new :new :display)}))
         (dom/td {}
           (om/build cell {:value (:costs data)
-                          :placeholder (if (= (:cell-state data) :new) "entire month" "")
+                          :placeholder (if is-new "entire month" "")
                           :prefix prefix
-                          :cell-state (:cell-state data)}))
-        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder (= (:cell-state data) :new)})}
-                (:burn-rate data))
-        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder (= (:cell-state data) :new)})}
-                (:runway data))))))
+                          :cell-state (if is-new :new :display)}))
+        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
+                (if is-new "calculated" (:burn-rate data)))
+        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
+                (if is-new "calculated" (:runway data)))))))
 
 (defcomponent finances-edit [data owner]
   (render [_]
@@ -111,10 +112,7 @@
                 (when-not (utils/period-exists cur-period (:data finances-data))
                   (om/build finances-edit-row {:prefix cur-symbol
                                                :period cur-period
-                                               :cell-state :new
-                                               :force-year true
-                                               :burn-rate "calculated"
-                                               :runway "calculated"}))
+                                               :new true}))
                 (om/build-all finances-edit-row rows-data)))
             (dom/div {:class "finances-edit-buttons"}
               (dom/button {:class "btn btn-success"
