@@ -15,7 +15,6 @@
                                     "underline" true}}
       :halloheadings {"formatBlocks" ["p" "h1"]}
       :hallolists {}
-      :halloreundo {}
       :hallolink {}
       :halloblacklist {}}
   ; :toolbar "halloToolbarFixed" ; uncomment for fixed toolbar
