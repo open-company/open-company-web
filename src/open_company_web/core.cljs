@@ -67,7 +67,7 @@
       ; render component
       (om/root readonly-report app-state {:target target}))
 
-    (defroute finances-route "/finances/:tab" {{tab :tab} :params}
+    (defn finances-handler [tab]
       ; save route
       (router/set-route! ["finances" tab] {:tab tab})
       ; load data from api
@@ -75,6 +75,12 @@
       (api/load-finances)
       ; render component
       (om/root finances app-state {:target target}))
+
+    (defroute finances-route "/finances/:tab" {{tab :tab} :params}
+      (finances-handler tab))
+
+    (defroute finances-home-route "/finances" {}
+      (finances-handler "cash"))
 
     (defroute finances-edit-route "/finances/edit" {}
       ; save route
@@ -106,6 +112,7 @@
                                  report-route
                                  finances-edit-route
                                  finances-route
+                                 finances-home-route
                                  challenges-route
                                  not-found-route]))
 
