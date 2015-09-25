@@ -275,10 +275,12 @@ div.rich-editor-container {
   left: 50%;
   margin-left: -300px;
   width: 600px;
+  margin-top: 30px;
 }
 
-div.rich-eidor-container div.rich-editor{
+div.rich-editor-container div.rich-editor{
   width: 100%;
+  margin-bottom: 10px;
 }
 
 div.rich-editor-container div.rich-editor-save button.cancel-button{
