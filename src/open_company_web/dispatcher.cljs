@@ -4,75 +4,12 @@
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
 
-(defonce app-state (atom {
-  ; :OPEN {
-  ;   "name" "Transparency, LLC"
-  ;   "symbol" "OPEN"
-  ;   "currency" ["USD"]
-  ;   "headcount" {
-  ;     "founders" 2
-  ;     "executives" 0
-  ;     "ft-employees" 3
-  ;     "pt-employees" 0
-  ;     "contractors" 2
-  ;     "comment" "Transparency headcount comment."
-  ;   },
-  ;   "finances" {
-  ;     "cash" 173228
-  ;     "revenue" 2767
-  ;     "costs" 22184
-  ;     "burn-rate" -19417
-  ;     "runway" "9 months"
-  ;     "comment" "Transparency finances comment."
-  ;   },
-  ;   "compensation" {
-  ;     "percentage" false
-  ;     "founders" 6357
-  ;     "executives" 0
-  ;     "employees" 5899
-  ;     "contractors" 2582
-  ;     "comment" "Transparency compensation comment."
-  ;   }
-  ; }
-  ; "BUFFR" {
-  ;   "name" "Buffer"
-  ;   "symbol" "BUFFR"
-  ;   "currency" ["USD"]
-  ;   "headcount" {
-  ;     "founders" 1
-  ;     "executives" 2
-  ;     "ft-employees" 1
-  ;     "pt-employees" 1
-  ;     "contractors" 4
-  ;     "comment" "Buffer headcount comment."
-  ;   },
-  ;   "finances" {
-  ;     "cash" 323232
-  ;     "revenue" 1234
-  ;     "costs" 11321
-  ;     "burn-rate" -10000
-  ;     "runway" "9 months"
-  ;     "comment" "Buffer finances comment."
-  ;   },
-  ;   "compensation" {
-  ;     "percentage" true
-  ;     "founders" 40
-  ;     "executives" 40
-  ;     "employees" 10
-  ;     "contractors" 10
-  ;     "comment" "Buffer compensation comment."
-  ;   }
-  ; }
-}))
+(defonce app-state (atom {}))
 
 
 (def companies (flux/dispatcher))
 
 (def company (flux/dispatcher))
-
-(def report (flux/dispatcher))
-
-(def finances (flux/dispatcher))
 
 (def companies-list-dispatch
   (flux/register
@@ -89,37 +26,4 @@
         ; remove loading key
         (swap! app-state dissoc :loading)
         ; add the new values to the atom
-        (swap! app-state assoc (keyword (:symbol body)) body)))))
-
-(def empty-report {
-  :headcount {}
-  :finances {}
-  :compensation {}
-})
-
-(def report-dispatch
-  (flux/register
-    report
-    (fn [body]
-      (when body
-        ; remove loading key
-        (swap! app-state dissoc :loading)
-        ; make sure the report contains all the keys :headcount :finances :compensation
-        (let [report-data (merge empty-report body)]
-          ; add the new report data
-          (let [ticker (:ticker @router/path)
-                year (:year @router/path)
-                period (:period @router/path)
-                report-key (keyword (str "report-" ticker "-" year "-" period))]
-            (swap! app-state assoc-in [(keyword ticker) report-key] report-data)))))))
-
-(def finances-dispatch
-  (flux/register
-    finances
-    (fn [body]
-      (when body
-        (let [updates (:data (:oc:finances body))
-              fixed-updates (into [] (map utils/calc-burnrate-runway updates))
-              fixed-body (assoc-in body [:oc:finances :data] fixed-updates)]
-          (swap! app-state dissoc :loading)
-          (swap! app-state assoc :finances fixed-body))))))
+        (swap! app-state assoc (keyword (:slug body)) body)))))
