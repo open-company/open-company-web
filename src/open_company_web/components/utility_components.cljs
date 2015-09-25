@@ -6,7 +6,8 @@
 
 (defcomponent editable-pen [data owner]
   (render [_]
-    (dom/i {:class "fa fa-pencil editable-pen"
-            :on-click #(do
-                        (-> % .preventDefault)
-                        (router/nav! "/finances/edit"))})))
+    (let [slug (:slug @router/path)]
+      (dom/i {:class "fa fa-pencil editable-pen"
+              :on-click #(do
+                          (-> % .preventDefault)
+                          (router/nav! (str "/companies/" slug "/finances/edit")))}))))
