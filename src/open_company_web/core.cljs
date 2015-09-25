@@ -5,9 +5,6 @@
             [open-company-web.components.page :refer [company]]
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
-            [open-company-web.components.report :refer [report readonly-report]]
-            [open-company-web.components.finances-component.finances-component :refer [finances finances-edit]]
-            [open-company-web.components.challenges-component.challenges :refer [challenges]]
             [open-company-web.lib.raven :refer [raven-setup]]
             [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.api :as api]
@@ -31,74 +28,31 @@
       ; render component
       (om/root list-companies app-state {:target target}))
 
-    (defroute company-profile-route "/companies/:ticker" {{ticker :ticker} :params}
+    (defroute company-profile-route "/companies/:slug" {{slug :slug} :params}
       ; save route
-      (router/set-route! ["companies" ticker] {:ticker ticker})
+      (router/set-route! ["companies" slug] {:slug slug})
       ; load data from api
-      (api/get-company ticker)
+      (api/get-company slug)
       (swap! app-state assoc :loading true)
       ; render compoenent
       (om/root company app-state {:target target}))
 
-    (defroute report-summary-route "/companies/:ticker/summary" {{ticker :ticker} :params}
+    (defn finances-handler [slug section tab]
       ; save route
-      (router/set-route! ["companies" ticker "summary"] {:ticker ticker})
-      ; load data from api
-      (swap! app-state assoc :loading true)
-      (api/get-company ticker)
+      (router/set-route! ["companies" slug section tab] {:slug slug :section section :tab tab})
+      ; if there are no company data
+      (when-not (contains? @app-state (keyword slug))
+        ; load data from api
+        (swap! app-state assoc :loading true)
+        (api/get-company slug))
       ; render component
-      (om/root report app-state {:target target}))
+      (om/root company app-state {:target target}))
 
-    (defroute report-editable-route "/companies/:ticker/reports/:year/:period/edit" {{ticker :ticker year :year period :period} :params}
-      ; save route
-      (router/set-route! ["companies" ticker "reports" year period "edit"] {:ticker ticker :year year :period period})
-      ; load data from api
-      (swap! app-state assoc :loading true)
-      (api/get-report ticker year period)
-      ; render component
-      (om/root report app-state {:target target}))
+    (defroute section-route "/companies/:slug/:section" {{slug :slug section :section} :params}
+      (finances-handler slug section "cash"))
 
-    (defroute report-route "/companies/:ticker/reports/:year/:period" {{ticker :ticker year :year period :period} :params}
-      ; save route
-      (router/set-route! ["companies" ticker "reports" year period] {:ticker ticker :year year :period period})
-      ; load data from api
-      (swap! app-state assoc :loading true)
-      (api/get-report ticker year period)
-      ; render component
-      (om/root readonly-report app-state {:target target}))
-
-    (defn finances-handler [tab]
-      ; save route
-      (router/set-route! ["finances" tab] {:tab tab})
-      ; load data from api
-      (swap! app-state assoc :loading true)
-      (api/load-finances)
-      ; render component
-      (om/root finances app-state {:target target}))
-
-    (defroute finances-route "/finances/:tab" {{tab :tab} :params}
-      (finances-handler tab))
-
-    (defroute finances-home-route "/finances" {}
-      (finances-handler "cash"))
-
-    (defroute finances-edit-route "/finances/edit" {}
-      ; save route
-      (router/set-route! ["finances" "edit"] {})
-      ; load data from api
-      (swap! app-state assoc :loading true)
-      (api/load-finances)
-      ; render component
-      (om/root finances-edit app-state {:target target}))
-
-    (defroute challenges-route "/challenges" {}
-      ; save route
-      (router/set-route! ["challenges"] {})
-      ; load data from api
-      (swap! app-state assoc :loading true)
-      (api/load-finances)
-      ; render component
-      (om/root challenges app-state {:target target}))
+    (defroute section-tab-route "/companies/:slug/:section/:tab" {{slug :slug section :section tab :tab} :params}
+      (finances-handler slug section tab))
 
     (defroute not-found-route "*" []
       ; render component
@@ -107,13 +61,8 @@
     (def dispatch!
       (secretary/uri-dispatcher [list-page-route
                                  company-profile-route
-                                 report-summary-route
-                                 report-editable-route
-                                 report-route
-                                 finances-edit-route
-                                 finances-route
-                                 finances-home-route
-                                 challenges-route
+                                 section-route
+                                 section-tab-route
                                  not-found-route]))
 
     (defn handle-url-change [e]
