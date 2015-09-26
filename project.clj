@@ -135,7 +135,7 @@
   }
 
   :aliases {
-    "ancient" ["with-profile" "dev" "do" "ancient" ":allow-qualified," "ancient" ":plugins" ":allow-qualified"] ; check for out of date dependencies
+    "ancient!" ["do" "ancient" ":allow-qualified," "ancient" ":plugins" ":allow-qualified"] ; check for out of date dependencies
     "build" ["cljsbuild" "once" "dev"]
     "build!" ["cljsbuild" "once" "min"]
     "test-navigation!" ["doo" "phantom" "test-navigation" "once"]
