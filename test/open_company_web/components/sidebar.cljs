@@ -13,11 +13,11 @@
 ; dynamic mount point for components
 (def ^:dynamic c)
 
-(def company-symbol "OPEN")
+(def company-slug "buffer")
 
 (def test-atom {
-  :OPEN {
-    :symbol company-symbol
+  :buffer {
+    :slug company-slug
     :links [
       {
         :rel "report"
@@ -29,7 +29,8 @@
 
 (deftest test-sidebar-component
   (testing "Sidebar component"
-    (router/set-route! ["companies" company-symbol] {:ticker company-symbol})
+    (router/set-route! ["companies" company-slug]
+                       {:slug company-slug})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root sidebar app-state {:target c})
