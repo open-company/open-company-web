@@ -58,6 +58,5 @@
                                      (om/update-state! owner :title (fn [_] value)))
                         :onBlur #(om/update-state! owner :editing (fn [_]false))
                         :onKeyDown #(when (= (.-key %) "Enter")
-                                      (om/update-state! owner :editing (fn [_]false)))
-                    }))
+                                      (om/update-state! owner :editing (fn [_]false)))}))
       (dom/span #js {:ref "hidden-span" :className "hidden-span"} (:title data)))))
