@@ -3,10 +3,11 @@
 (def finances {
   :name "Buffer"
   :currency "USD"
+  :slug "buffer"
   
-  :sections ["oc:finances" "oc:challenges"]
+  :sections ["finances" "challenges"]
   
-  :oc:challenges {
+  :challenges {
     :title "Key Challenges"
     :body "<h3>Recruiting</h3><p>We're continuing our fast pace of growing the team, and we'd love your help to spread the word about all our <a>current open positions</a>, <a href=\"http://twitter.com\">Twitter</a> or <a href=\"http://buffer.com\">Buffer</a>.</p>
 <h3>Spead & Reliability</h3><p>We've made some key speed and reliability <a href=\"/improvements\">improvements</a> to <a href=\"http://buffer.com/b2b\">Buffer for business</a>, but there is still a ways to go. Everyone please drop everything and support the devops team in anyway you can when we have an outage situation.</p>
@@ -19,7 +20,7 @@
     }
   }
   
-  :oc:finances {
+  :finances {
     :data [
       {
         :period "2015-08"
@@ -106,13 +107,13 @@
         {
           :rel "self"
           :method "GET"
-          :href "/companies/buffer/oc:finances/commentary"
+          :href "/companies/buffer/finances/commentary"
           :type "application/vnd.open-company.commentary.v1+json"
         }
         {
           :rel "update"
           :method "POST"
-          :href "/companies/buffer/oc:finances/commentary"
+          :href "/companies/buffer/finances/commentary"
           :type "application/vnd.open-company.commentary.v1+json"
         }
       ]
@@ -121,20 +122,20 @@
       {
         :rel "self"
         :method "GET"
-        :href "/companies/buffer/oc:finances"
-        :type "application/vnd.open-company.section.oc:finances.v1+json"
+        :href "/companies/buffer/finances"
+        :type "application/vnd.open-company.section.finances.v1+json"
       }
       {
         :rel "update"
         :method "POST"
-        :href "/companies/buffer/oc:finances"
-        :type "application/vnd.open-company.section.oc:finances.v1+json"
+        :href "/companies/buffer/finances"
+        :type "application/vnd.open-company.section.finances.v1+json"
       }
       {
         :rel "partial-update"
         :method "PATCH"
-        :href "/companies/buffer/oc:finances"
-        :type "application/vnd.open-company.section.oc:finances.v1+json"
+        :href "/companies/buffer/finances"
+        :type "application/vnd.open-company.section.finances.v1+json"
       }
     ]
   }
