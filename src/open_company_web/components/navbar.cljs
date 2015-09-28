@@ -7,9 +7,7 @@
               [open-company-web.router :as router]))
 
 (defn company-title [data]
-  (if (contains? data :ticker)
-    (str (:ticker data) " - " (:name data))
-    (str (:name data))))
+  (str (:name data)))
 
 (defcomponent navbar [data owner]
   (render [_]
@@ -17,7 +15,7 @@
       (dom/div {:class "navbar-header"}
         (om/build link {
           :class "navbar-brand"
-          :href (if (contains? data :ticker) (str "/companies/" (:ticker data)) "")
+          :href (if (contains? data :slug) (str "/companies/" (:slug data)) "")
           :name (company-title data)}))
       (dom/div {:id "navbar" :class "navbar-collapse collapse"}
         (dom/ul {:class "nav navbar-nav navbar-right"}
