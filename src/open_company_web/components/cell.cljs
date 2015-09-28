@@ -42,7 +42,9 @@
        :inital-value (:value data)
        :value value}))
   (did-mount [_]
-    (.tooltip (.$ js/window "[data-toggle=\"tooltip\"]")))
+    ; initialize tooltips only if jquery is loaded, avoid tests crash
+    (when (.-$ js/window)
+      (.tooltip (.$ js/window "[data-toggle=\"tooltip\"]"))))
   (render [_]
     (let [value (om/get-state owner :value)
           float-value (.parseFloat js/window value)
