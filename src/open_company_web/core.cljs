@@ -20,13 +20,19 @@
 ; is undefined because it breaks tests
 (if-let [target (. js/document (getElementById "app"))]
   (do
-    (defroute list-page-route "/companies" []
+    (defn home-handler []
       ; save route
       (router/set-route! ["companies"] {})
       ; load data from api
       (api/get-companies)
       ; render component
       (om/root list-companies app-state {:target target}))
+
+    (defroute home-page-route "/" []
+      (home-handler))
+
+    (defroute list-page-route "/companies" []
+      (home-handler))
 
     (defroute company-profile-route "/companies/:slug" {{slug :slug} :params}
       ; save route
@@ -59,7 +65,8 @@
       (om/root page-not-found app-state {:target target}))
 
     (def dispatch!
-      (secretary/uri-dispatcher [list-page-route
+      (secretary/uri-dispatcher [home-page-route
+                                 list-page-route
                                  company-profile-route
                                  section-route
                                  section-tab-route
