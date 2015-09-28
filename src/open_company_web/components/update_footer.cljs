@@ -8,4 +8,4 @@
   (render [_]
     (dom/div {:class "update-footer"}
       (dom/p {:class "timeago"} (utils/time-since (:updated-at data)))
-      (dom/img {:src (:image (:author data)) :alt (:name (:author data)) :class "author-image"}))))
+      (dom/img {:src (:image (:author data)) :title (:name (:author data)) :class "author-image"}))))
