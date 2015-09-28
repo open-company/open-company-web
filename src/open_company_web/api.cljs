@@ -56,12 +56,12 @@
         (let [body (if (:success response) (json->cljs (:body response)) {})]
           (flux/dispatch dispatcher/company body))))))
 
-(defn save-or-create-company [ticker data]
-  (when (and ticker data)
+(defn save-or-create-company[data]
+  (when data
     (let [company-data (dissoc data :headcount :finances :compensation :links)
           json-data (cljs->json company-data)
           company-link (link-for (:links data) "update" nil nil)]
-      (api-put (:href report-link)
+      (api-put (:href company-link)
         { :json-params json-data
           :headers {
             ; required by Chrome
