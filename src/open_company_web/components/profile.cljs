@@ -31,7 +31,7 @@
           (let [change (<! save-change)
                 slug (:slug @router/path)
                 company-data ((keyword slug) @app-state)]
-            (save-or-create-company slug company-data)
+            (save-or-create-company company-data)
             (recur))))))
   (render [_]
     (let [slug (:slug @router/path)
