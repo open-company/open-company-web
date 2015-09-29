@@ -57,7 +57,7 @@
               (om/build burn-rate company-data)
 
               "runway"
-              (om/build runway (:finances data)))
+              (om/build runway company-data))
             (om/build update-footer {:updated-at (:updated-at finances-data)
                                      :author (:author finances-data)})
             (om/build rich-editor (:commentary finances-data))))))))
