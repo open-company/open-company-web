@@ -25,5 +25,11 @@
       (when body
         ; remove loading key
         (swap! app-state dissoc :loading)
-        ; add the new values to the atom
-        (swap! app-state assoc (keyword (:slug body)) body)))))
+        ; calc burn-rate and runway
+        ; and add the new values to the atom
+        (if (utils/in? (:sections body) "finances")
+          (let [finances (:data (:finances body))
+                fixed-finances (into [] (map utils/calc-burnrate-runway finances))
+                fixed-body (assoc-in body [:finances :data] fixed-finances)]
+            (swap! app-state assoc (keyword (:slug body)) fixed-body))
+          (swap! app-state assoc (keyword (:slug body)) body))))))
