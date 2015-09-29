@@ -384,8 +384,8 @@ form.linkForm input.url {
   color: black;
 }
 
-form.linkForm input.submit {
-  background-color: gray;
+form.linkForm input#addlinkButton {
+  background-color: black;
 }
 
 div.finances div.finances-body.edit{
