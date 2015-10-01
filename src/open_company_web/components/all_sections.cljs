@@ -19,5 +19,7 @@
           sorted-sections (sort #(sort-sections %1 %2 company-data) kw-section-names)]
       (dom/div {:class "sections-container"}
         (let [merge-partial (partial merge {:data company-data})
-              sections-data (map #(merge {:data company-data :section %}) sorted-sections)]
+              sections-data (map #(merge {:read-only true
+                                          :data company-data
+                                          :section %}) sorted-sections)]
           (om/build-all section-selector sections-data))))))
