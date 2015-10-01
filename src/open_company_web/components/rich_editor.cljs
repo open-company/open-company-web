@@ -33,7 +33,7 @@
 (defcomponent rich-editor [data owner]
   (init-state [_]
     {:editor nil
-     :initial-body (:body data)
+     :initial-body (:body (:section-data data))
      :hallo-loaded false
      :did-mount false
      :editing false})
@@ -54,24 +54,28 @@
     (om/update-state! owner :did-mount (fn [_]true))
     (init-hallo! owner))
   (render [_]
-    (dom/div {:class "rich-editor-container"}
-      (dom/div #js {:className "rich-editor"
-                    :ref "rich-editor"
-                    :onClick (fn [e]
-                               (om/update-state! owner :editing (fn[_] true)))
-                    :dangerouslySetInnerHTML (clj->js {"__html" (:body data)})})
-      (if (om/get-state owner :editing)
-        (dom/div {:class "rich-editor-save"}
-          (dom/button {:class "btn btn-success"
-                       :on-click #(println "Save with api!")} "Save")
-          (dom/button {:class "btn btn-default cancel-button"
-                       :on-click (fn[e]
-                                   (let [init-value (om/get-state owner :initial-body)
-                                         el (.getDOMNode (om/get-ref owner "rich-editor"))]
-                                     (println "Cancel: " init-value)
-                                     (utils/handle-change data init-value :body)
-                                     (set! (.-innerHTML el) init-value))
-                                   (om/update-state! owner :editing (fn[_]false)))
-                       } "Cancel"))
-        (om/build update-footer {:author (:author data) :updated-at (:updated-at data)})))))
+    (let [section-data (:section-data data)
+          section (:section data)]
+      (dom/div {:class "rich-editor-container"}
+        (dom/div #js {:className "rich-editor"
+                      :ref "rich-editor"
+                      :onClick (fn [e]
+                                 (om/update-state! owner :editing (fn[_] true)))
+                      :dangerouslySetInnerHTML (clj->js {"__html" (:body section-data)})})
+        (if (om/get-state owner :editing)
+          (dom/div {:class "rich-editor-save"}
+            (dom/button {:class "btn btn-success"
+                         :on-click #(println "Save with api!")} "Save")
+            (dom/button {:class "btn btn-default cancel-button"
+                         :on-click (fn[e]
+                                     (let [init-value (om/get-state owner :initial-body)
+                                           el (.getDOMNode (om/get-ref owner "rich-editor"))]
+                                       (println "Cancel: " init-value)
+                                       (utils/handle-change section-data init-value :body)
+                                       (set! (.-innerHTML el) init-value))
+                                     (om/update-state! owner :editing (fn[_]false)))
+                         } "Cancel"))
+          (om/build update-footer {:author (:author section-data)
+                                   :updated-at (:updated-at section-data)
+                                   :section section}))))))
 
