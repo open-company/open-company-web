@@ -2,7 +2,8 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.router :as router]))
 
 (defn check-length [value elem px-pos cur-char-idx]
   (let [substr (subs value 0 cur-char-idx)]
@@ -42,14 +43,22 @@
 (defcomponent editable-title [data owner]
   (init-state [_]
     {:title (:title data)
-     :editing false})
+     :editing false
+     :read-only (:read-only data)})
   (render [_]
     (dom/div {:class "editable-title-container"}
       (if-not (om/get-state owner :editing)
-        (dom/h2 {:class "editable-title fix"
+        (dom/h2 {:class (str "editable-title fix" (when (:read-only data) " read-only"))
                  :on-click (fn [e]
-                             (om/update-state! owner :editing (fn [_]true))
-                             (delay-focus-input owner (utils/get-click-position e)))}
+                             (if (om/get-state owner :read-only)
+                               ; not editable
+                               (do
+                                 (.preventDefault e)
+                                 (router/nav! (str "/companies/" (:slug @router/path) "/" (name (:section data)))))
+                               ; editable:
+                               (do
+                                 (om/update-state! owner :editing (fn [_]true))
+                                 (delay-focus-input owner (utils/get-click-position e)))))}
                 (om/get-state owner :title))
         (dom/input #js {:ref "editable-title-input"
                         :className "editable-title edit"
