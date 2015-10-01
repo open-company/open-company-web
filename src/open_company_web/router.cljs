@@ -7,6 +7,7 @@
 (def path (atom {}))
 
 (defn set-route! [route parts]
+  (reset! path {})
   (swap! path assoc :route route)
   (doseq [[k v] parts] (swap! path assoc k v)))
 
