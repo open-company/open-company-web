@@ -22,7 +22,8 @@
 (defcomponent finances [data owner]
   (init-state [_]
     {:focus "cash"
-     :hover false})
+     :hover false
+     :read-only (:read-only data)})
   (render [_]
     (let [focus (om/get-state owner :focus)
           classes "finances-link"
@@ -33,10 +34,17 @@
           revenue-classes (str classes (when (= focus "revenue") " active"))
           costs-classes (str classes (when (= focus "costs") " active"))
           burn-rate-classes (str classes (when (= focus "burn-rate") " active"))
-          runway-classes (str classes (when (= focus "runway") " active"))]
+          runway-classes (str classes (when (= focus "runway") " active"))
+          read-only (:read-only data)
+          subsection-data {:company-data company-data :read-only read-only}]
       (dom/div {:class "row"}
         (dom/div {:class "finances"}
-          (dom/h2 {} "Finances")
+          (dom/h2 {:class (utils/class-set {:finances-title true
+                                            :linked (om/get-state owner :read-only)})
+                   :on-click #(when (om/get-state owner :read-only)
+                                (-> % .preventDefault)
+                                (router/nav! (str "/companies/" slug "/finances")))}
+                  "Finances")
           (dom/div {:class "link-bar"}
             (dom/a {:href "#"
                     :class cash-classes
@@ -63,29 +71,31 @@
                     :title "Runway"
                     :data-tab "runway"
                     :on-click #(subsection-click % owner)} "Runway"))
-          (dom/div {:class (utils/class-set {:finances-body true :editable (om/get-state owner :hover)})
+          (dom/div {:class (utils/class-set {:finances-body true :editable (and (not (om/get-state owner :read-only)) (om/get-state owner :hover))})
                     :on-mouse-over #(om/update-state! owner :hover (fn [_] true))
                     :on-mouse-out #(om/update-state! owner :hover (fn [_] false))}
             (case focus
 
               "cash"
-              (om/build cash company-data)
+              (om/build cash subsection-data)
 
               "revenue"
-              (om/build revenue company-data)
+              (om/build revenue subsection-data)
 
               "costs"
-              (om/build costs company-data)
+              (om/build costs subsection-data)
 
               "burn-rate"
-              (om/build burn-rate company-data)
+              (om/build burn-rate subsection-data)
 
               "runway"
               (om/build runway company-data))
             (om/build update-footer {:updated-at (:updated-at finances-data)
                                      :author (:author finances-data)
                                      :section :finances})
-            (om/build rich-editor {:section-data (:commentary finances-data) :section :finances})))))))
+            (om/build rich-editor {:read-only read-only
+                                   :section-data (:commentary finances-data)
+                                   :section :finances})))))))
 
 (defcomponent finances-edit-row [data owner]
   (render [_]
@@ -116,7 +126,8 @@
 (defcomponent finances-edit [data owner]
   (render [_]
     (let [slug (:slug @router/path)
-          finances-data (:finances ((keyword slug) data))
+          company-data (:company-data data)
+          finances-data (:finances company-data)
           cur-symbol (utils/get-symbol-for-currency-code (:currency (:finances data)))
           rows-data (map #(merge {:prefix cur-symbol} %) (:data finances-data))
           cur-period (utils/current-period)]
