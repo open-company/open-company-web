@@ -9,18 +9,24 @@
 (defcomponent section-selector [data owner]
   (render [_]
     (let [section (:section data)
+          read-only (:read-only data)
           tab (:tab @router/path)
           company-data (:data data)]
       (cond
         ; finances edit
         (and (= section :finances) (= tab "edit"))
-        (om/build finances-edit data)
+        (om/build finances-edit {:company-data company-data
+                                 :section :finances})
         ; finances
         (= section :finances)
-        (om/build finances {:section :finances :company-data company-data})
+        (om/build finances {:read-only read-only
+                            :section :finances
+                            :company-data company-data})
         ; else it is a simple section
         (contains? company-data section)
-        (om/build simple-section {:section section :company-data company-data})
+        (om/build simple-section {:read-only read-only
+                                  :section section
+                                  :company-data company-data})
         ; section not found
         :else
         (dom/h4 {} (str "Section " (name section) " not found"))))))
