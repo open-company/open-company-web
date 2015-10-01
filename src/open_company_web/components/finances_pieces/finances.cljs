@@ -83,8 +83,9 @@
               "runway"
               (om/build runway company-data))
             (om/build update-footer {:updated-at (:updated-at finances-data)
-                                     :author (:author finances-data)})
-            (om/build rich-editor (:commentary finances-data))))))))
+                                     :author (:author finances-data)
+                                     :section :finances})
+            (om/build rich-editor {:section-data (:commentary finances-data) :section :finances})))))))
 
 (defcomponent finances-edit-row [data owner]
   (render [_]
