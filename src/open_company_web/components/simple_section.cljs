@@ -12,11 +12,10 @@
 (defcomponent simple-section [data owner]
   (render [_]
     (let [company-data (:company-data data)
-          section (:section data)
-          section-kw (keyword section)]
+          section (:section data)]
       (if (:loading company-data)
         (dom/h4 {} "Loading data...")
         (dom/div {:class "simple-section section"}
-          (om/build editable-title {:title (:title (section-kw company-data))})
+          (om/build editable-title {:title (:title (section company-data))})
           (dom/div {:class "challenges-body"}
-            (om/build rich-editor (section-kw company-data))))))))
+            (om/build rich-editor {:section-data (section company-data) :section section})))))))
