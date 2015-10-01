@@ -21,14 +21,15 @@
 })
 
 (defn init-hallo! [owner]
-  (let [hallo-loaded (om/get-state owner :hallo-loaded)
-        did-mount (om/get-state owner :did-mount)]
-    (when (and hallo-loaded did-mount)
-      (let [hallo-opts (clj->js hallo-format)
-            editor-node (.getDOMNode (om/get-ref owner "rich-editor"))
-            jquery-node (.$ js/window editor-node)
-            init-editor (.hallo jquery-node hallo-opts)]
-        (om/update-state! owner :editor (fn[_] init-editor))))))
+  (when-not (om/get-state owner :read-only)
+    (let [hallo-loaded (om/get-state owner :hallo-loaded)
+          did-mount (om/get-state owner :did-mount)]
+      (when (and hallo-loaded did-mount)
+        (let [hallo-opts (clj->js hallo-format)
+              editor-node (.getDOMNode (om/get-ref owner "rich-editor"))
+              jquery-node (.$ js/window editor-node)
+              init-editor (.hallo jquery-node hallo-opts)]
+          (om/update-state! owner :editor (fn[_] init-editor)))))))
 
 (defcomponent rich-editor [data owner]
   (init-state [_]
@@ -36,7 +37,8 @@
      :initial-body (:body (:section-data data))
      :hallo-loaded false
      :did-mount false
-     :editing false})
+     :editing false
+     :read-only (:read-only data)})
   (will-mount [_]
     ; add dependencies:
     ; jQuery UI
@@ -60,7 +62,8 @@
         (dom/div #js {:className "rich-editor"
                       :ref "rich-editor"
                       :onClick (fn [e]
-                                 (om/update-state! owner :editing (fn[_] true)))
+                                 (when-not (om/get-state owner :read-only)
+                                   (om/update-state! owner :editing (fn[_] true))))
                       :dangerouslySetInnerHTML (clj->js {"__html" (:body section-data)})})
         (if (om/get-state owner :editing)
           (dom/div {:class "rich-editor-save"}
