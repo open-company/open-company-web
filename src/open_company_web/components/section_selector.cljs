@@ -8,20 +8,19 @@
 
 (defcomponent section-selector [data owner]
   (render [_]
-    (let [slug (:slug @router/path)
-          section (:section @router/path)
+    (let [section (:section data)
           tab (:tab @router/path)
-          company-data ((keyword slug) data)]
+          company-data (:data data)]
       (cond
         ; finances edit
-        (and (= section "finances") (= tab "edit"))
+        (and (= section :finances) (= tab "edit"))
         (om/build finances-edit data)
         ; finances
-        (= section "finances")
-        (om/build finances data)
+        (= section :finances)
+        (om/build finances {:section :finances :company-data company-data})
         ; else it is a simple section
-        (contains? company-data (keyword section))
-        (om/build simple-section {:section section :company-data ((keyword slug) data)})
+        (contains? company-data section)
+        (om/build simple-section {:section section :company-data company-data})
         ; section not found
         :else
-        (dom/h4 {} (str "Section " section " not found"))))))
+        (dom/h4 {} (str "Section " (name section) " not found"))))))
