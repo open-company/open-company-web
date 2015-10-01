@@ -11,12 +11,12 @@
 
 (defcomponent revenue [data owner]
   (render [_]
-    (let [finances-data (:data (:finances data))
+    (let [finances-data (:data (:finances (:company-data data)))
           value-set (first finances-data)
           revenue-val (utils/format-value (:revenue value-set))
           period (utils/period-string (:period value-set))
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))]
-      (dom/div {:class "section revenue"}
+      (dom/div {:class (str "section revenue" (when (:read-only data) " read-only"))}
         (dom/h3 {}
                 (str cur-symbol revenue-val)
                 (om/build editable-pen {}))

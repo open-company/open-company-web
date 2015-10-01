@@ -11,12 +11,12 @@
 
 (defcomponent burn-rate [data owner]
   (render [_]
-    (let [finances-data (:data (:finances data))
+    (let [finances-data (:data (:finances (:company-data data)))
           value-set (first finances-data)
           burn-rate-val (utils/format-value (:burn-rate value-set))
           period (utils/period-string (:period value-set))
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))]
-      (dom/div {:class "section burn-rate"}
+      (dom/div {:class (str "section burn-rate" (when (:read-only data) " read-only"))}
         (dom/h3 {}
                 (str cur-symbol burn-rate-val)
                 (om/build editable-pen {}))

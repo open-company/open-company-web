@@ -11,12 +11,12 @@
 
 (defcomponent costs [data owner]
   (render [_]
-    (let [finances-data (:data (:finances data))
+    (let [finances-data (:data (:finances (:company-data data)))
           value-set (first finances-data)
           costs-val (utils/format-value (:costs value-set))
           period (utils/period-string (:period value-set))
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))]
-      (dom/div {:class "section costs"}
+      (dom/div {:class (str "section costs" (when (:read-only data) " read-only"))}
         (dom/h3 {}
                 (str cur-symbol costs-val)
                 (om/build editable-pen {}))

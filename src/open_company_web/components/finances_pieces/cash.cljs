@@ -11,12 +11,12 @@
 
 (defcomponent cash [data owner]
   (render [_]
-    (let [finances-data (:data (:finances data))
+    (let [finances-data (:data (:finances (:company-data data)))
           value-set (first finances-data)
           cash-val (utils/format-value (:cash value-set))
           period (utils/period-string (:period value-set))
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))]
-      (dom/div {:class "section cash"}
+      (dom/div {:class (str "section cash" (when (:read-only data) " read-only"))}
         (dom/h3 {}
                 (str cur-symbol cash-val)
                 (om/build editable-pen {}))
