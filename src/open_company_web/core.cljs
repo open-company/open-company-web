@@ -52,17 +52,6 @@
       ; render compoenent
       (om/root company app-state {:target target}))
 
-    (defn finances-handler [slug section tab]
-      ; save route
-      (router/set-route! ["companies" slug section tab] {:slug slug :section section :tab tab})
-      ; if there are no company data
-      (when-not (contains? @app-state (keyword slug))
-        ; load data from api
-        (swap! app-state assoc :loading true)
-        (api/get-company slug))
-      ; render component
-      (om/root company app-state {:target target}))
-
     (defn section-handler [slug section]
       ; if there are no company data
       (when-not (contains? @app-state (keyword slug))
