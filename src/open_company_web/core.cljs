@@ -34,7 +34,16 @@
     (defroute list-page-route "/companies" []
       (home-handler))
 
-    (defroute company-profile-route "/companies/:slug" {{slug :slug} :params}
+    (defroute company-profile-route "/companies/:slug/profile" {{slug :slug} :params}
+      ; save route
+      (router/set-route! ["companies" slug] {:slug slug})
+      ; load data from api
+      (api/get-company slug)
+      (swap! app-state assoc :loading true)
+      ; render compoenent
+      (om/root company app-state {:target target}))
+
+    (defroute company-route "/companies/:slug" {{slug :slug} :params}
       ; save route
       (router/set-route! ["companies" slug] {:slug slug})
       ; load data from api
@@ -54,11 +63,24 @@
       ; render component
       (om/root company app-state {:target target}))
 
-    (defroute section-route "/companies/:slug/:section" {{slug :slug section :section} :params}
-      (finances-handler slug section "cash"))
+    (defn section-handler [slug section]
+      ; if there are no company data
+      (when-not (contains? @app-state (keyword slug))
+        ; load data from api
+        (swap! app-state assoc :loading true)
+        (api/get-company slug))
+      ; render component
+      (om/root company app-state {:target target}))
 
-    (defroute section-tab-route "/companies/:slug/:section/:tab" {{slug :slug section :section tab :tab} :params}
-      (finances-handler slug section tab))
+    (defroute section-route "/companies/:slug/:section" {{slug :slug section :section} :params}
+      ; save route
+      (router/set-route! ["companies" slug section] {:slug slug :section section})
+      (section-handler slug section))
+
+    (defroute section-edit-route "/companies/:slug/:section/edit" {{slug :slug section :section} :params}
+      ; save route
+      (router/set-route! ["companies" slug section "edit"] {:slug slug :section section :tab "edit"})
+      (section-handler slug section))
 
     (defroute not-found-route "*" []
       ; render component
@@ -67,9 +89,10 @@
     (def dispatch!
       (secretary/uri-dispatcher [home-page-route
                                  list-page-route
+                                 company-route
                                  company-profile-route
                                  section-route
-                                 section-tab-route
+                                 section-edit-route
                                  not-found-route]))
 
     (defn handle-url-change [e]
