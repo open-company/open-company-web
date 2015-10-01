@@ -214,6 +214,10 @@ div.finances h2{
   text-align: center;
 }
 
+div.finances h2.linked{
+  cursor: pointer;
+}
+
 div.finances div.link-bar{
   text-align: center;
 }
@@ -346,6 +350,14 @@ div.editable-title-container{
   height: 37px;
   margin-top: 10px;
   margin-bottom: 10px;
+}
+
+div.editable-title-container h2{
+  cursor: text;
+}
+
+div.editable-title-container h2.read-only{
+  cursor: pointer;
 }
 
 div.editable-title-container h2,
