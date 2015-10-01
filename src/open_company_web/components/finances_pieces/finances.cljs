@@ -14,31 +14,55 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.cell :refer [cell]]))
 
+(defn subsection-click [e owner]
+  (.preventDefault e)
+  (let [tab  (.. e -target -dataset -tab)]
+    (om/update-state! owner :focus (fn [] tab))))
+
 (defcomponent finances [data owner]
   (init-state [_]
-    {:focus (:tab @router/path)
+    {:focus "cash"
      :hover false})
   (render [_]
     (let [focus (om/get-state owner :focus)
           classes "finances-link"
           slug (:slug @router/path)
-          company-data ((keyword slug) data)
+          company-data (:company-data data)
           finances-data (:finances company-data)
           cash-classes (str classes (when (= focus "cash") " active"))
           revenue-classes (str classes (when (= focus "revenue") " active"))
           costs-classes (str classes (when (= focus "costs") " active"))
           burn-rate-classes (str classes (when (= focus "burn-rate") " active"))
-          runway-classes (str classes (when (= focus "runway") " active"))
-          partial-link (str "/companies/" slug "/finances/")]
+          runway-classes (str classes (when (= focus "runway") " active"))]
       (dom/div {:class "row"}
         (dom/div {:class "finances"}
           (dom/h2 {} "Finances")
           (dom/div {:class "link-bar"}
-            (om/build link {:class cash-classes :href (str partial-link "cash") :name "Cash"})
-            (om/build link {:class revenue-classes :href (str partial-link "revenue") :name "Revenue"})
-            (om/build link {:class costs-classes :href (str partial-link "costs") :name "Costs"})
-            (om/build link {:class burn-rate-classes :href (str partial-link "burn-rate") :name "Burn Rate"})
-            (om/build link {:class runway-classes :href (str partial-link "runway") :name "Runway"}))
+            (dom/a {:href "#"
+                    :class cash-classes
+                    :title "Cash"
+                    :data-tab "cash"
+                    :on-click #(subsection-click % owner)} "Cash")
+            (dom/a {:href "#"
+                    :class revenue-classes
+                    :title "Revenue"
+                    :data-tab "revenue"
+                    :on-click #(subsection-click % owner)} "Revenue")
+            (dom/a {:href "#"
+                    :class costs-classes
+                    :title "Costs"
+                    :data-tab "costs"
+                    :on-click #(subsection-click % owner)} "Costs")
+            (dom/a {:href "#"
+                    :class burn-rate-classes
+                    :title "Burn rate"
+                    :data-tab "burn-rate"
+                    :on-click #(subsection-click % owner)} "Burn rate")
+            (dom/a {:href "#"
+                    :class runway-classes
+                    :title "Runway"
+                    :data-tab "runway"
+                    :on-click #(subsection-click % owner)} "Runway"))
           (dom/div {:class (utils/class-set {:finances-body true :editable (om/get-state owner :hover)})
                     :on-mouse-over #(om/update-state! owner :hover (fn [_] true))
                     :on-mouse-out #(om/update-state! owner :hover (fn [_] false))}
@@ -124,5 +148,5 @@
                 (dom/button {:class "btn btn-default cancel"
                              :on-click #(do
                                           (-> % .preventDefault)
-                                          (router/nav! (str "/companies/" slug "/finances/cash")))} "Cancel")))))))))
+                                          (router/nav! (str "/companies/" slug "/finances")))} "Cancel")))))))))
   
