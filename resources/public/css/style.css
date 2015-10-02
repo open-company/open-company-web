@@ -442,3 +442,32 @@ div.finances-body div.finances-edit-buttons{
 div.finances-body div.finances-edit-buttons button.cancel{
   margin-left: 10px;
 }
+
+div.recent-updates{
+  margin-top: 8px;
+}
+
+div.recent-updates ul.recent-updates-list{
+  width: 300px;
+}
+
+div.recent-updates div.recent-updates-item{
+  height: 27px;
+}
+
+div.recent-updates div.recent-updates-item p.title {
+  font-size: 14px;
+  color: black;
+  float: left;
+}
+
+div.recent-updates div.recent-updates-item span.updated-at {
+  font-size: 11px;
+  color: gray;
+  float: right;
+}
+
+a.settings i{
+  color: lightgray;
+  font-size: 18px;
+}
