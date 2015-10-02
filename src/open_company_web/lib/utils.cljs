@@ -233,7 +233,7 @@
 (defn sort-sections [company-data]
   (let [section-keys (get-section-keys company-data)
         sections (get-sections section-keys company-data)]
-    (sort #(compare (:updated-at %1) (:updated-at %2)) sections)))
+    (sort #(compare (:updated-at %2) (:updated-at %1)) sections)))
 
 (defn add-section-names [company-data]
   (let [section-keys (get-section-keys company-data)]
