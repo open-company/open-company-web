@@ -205,3 +205,46 @@
         month-str (str (when (< month 10) "0") month)
         cur-period (str (.getFullYear date) "-" month-str)]
     cur-period))
+
+(defn get-section-keys [company-data]
+  (let [section-names (:sections company-data)]
+    (into [] (map keyword section-names))))
+
+(defn sort-section-keys-func [a b company-data]
+  (let [sec1 (a company-data)
+        sec2 (b company-data)]
+    (compare (:updated-at sec2) (:updated-at sec1))))
+
+(defn sort-section-keys [company-data]
+  (let [section-keys (get-section-keys company-data)]
+    (sort #(sort-section-keys-func %1 %2 company-data) section-keys)))
+
+(defn get-sections [section-keys company-data]
+  (loop [ks section-keys
+         sections []]
+    (if (> (count ks) 0)
+      (do
+        (let [k (first ks)
+              section (k company-data)]
+          (recur (subvec ks 1)
+                 (conj sections section))))
+      sections)))
+
+(defn sort-sections [company-data]
+  (let [section-keys (get-section-keys company-data)
+        sections (get-sections section-keys company-data)]
+    (sort #(compare (:updated-at %1) (:updated-at %2)) sections)))
+
+(defn add-section-names [company-data]
+  (let [section-keys (get-section-keys company-data)]
+    (loop [sections section-keys
+           body company-data]
+      (if (> (count sections) 0)
+        (do
+          (let [cur-key (first sections)
+                section (cur-key body)
+                updated-section (merge {:section (name cur-key)} section)
+                updated-body (assoc body cur-key updated-section)]
+            (recur (subvec sections 1)
+                   updated-body)))
+        body))))
