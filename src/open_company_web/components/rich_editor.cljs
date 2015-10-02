@@ -25,11 +25,11 @@
     (let [hallo-loaded (om/get-state owner :hallo-loaded)
           did-mount (om/get-state owner :did-mount)]
       (when (and hallo-loaded did-mount)
-        (let [hallo-opts (clj->js hallo-format)
-              editor-node (.getDOMNode (om/get-ref owner "rich-editor"))
-              jquery-node (.$ js/window editor-node)
-              init-editor (.hallo jquery-node hallo-opts)]
-          (om/update-state! owner :editor (fn[_] init-editor)))))))
+        (when-let [editor-node (.getDOMNode (om/get-ref owner "rich-editor"))]
+          (let [hallo-opts (clj->js hallo-format)
+                jquery-node (.$ js/window editor-node)
+                init-editor (.hallo jquery-node hallo-opts)]
+            (om/update-state! owner :editor (fn[_] init-editor))))))))
 
 (defcomponent rich-editor [data owner]
   (init-state [_]
