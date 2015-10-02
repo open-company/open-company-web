@@ -3,7 +3,8 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.section-selector :refer [section-selector]]
-            [open-company-web.router :as router]))
+            [open-company-web.router :as router]
+            [open-company-web.lib.utils :as utils]))
 
 (defn sort-sections [a b company-data]
   (let [sec1 (a company-data)
@@ -14,12 +15,11 @@
   (render [_]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)
-          section-names (:sections company-data)
-          kw-section-names (map keyword section-names)
-          sorted-sections (sort #(sort-sections %1 %2 company-data) kw-section-names)]
+          sorted-section-keys (utils/sort-section-keys company-data)]
       (dom/div {:class "sections-container"}
         (let [merge-partial (partial merge {:data company-data})
-              sections-data (map #(merge {:read-only true
-                                          :data company-data
-                                          :section %}) sorted-sections)]
+              sections-data (map (fn [section]{:read-only true
+                                               :data company-data
+                                               :section section})
+                                 sorted-section-keys)]
           (om/build-all section-selector sections-data))))))
