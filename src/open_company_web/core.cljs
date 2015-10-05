@@ -34,23 +34,28 @@
     (defroute list-page-route "/companies" []
       (home-handler))
 
-    (defroute company-profile-route "/companies/:slug/profile" {{slug :slug} :params}
-      ; save route
-      (router/set-route! ["companies" slug] {:slug slug})
-      ; load data from api
-      (api/get-company slug)
-      (swap! app-state assoc :loading true)
-      ; render compoenent
-      (om/root company app-state {:target target}))
+    (defroute company-profile-route "/companies/:slug/profile" {:as params}
+      (let [slug (:slug (:params params))
+            query-params (:query-params params)]
+        ; save route
+        (router/set-route! ["companies" slug] {:slug slug :query-params query-params})
+        ; load data from api
+        (api/get-company slug)
+        (swap! app-state assoc :loading true)
+        ; render compoenent
+        (om/root company app-state {:target target})))
 
-    (defroute company-route "/companies/:slug" {{slug :slug} :params}
-      ; save route
-      (router/set-route! ["companies" slug] {:slug slug})
-      ; load data from api
-      (api/get-company slug)
-      (swap! app-state assoc :loading true)
-      ; render compoenent
-      (om/root company app-state {:target target}))
+    (defroute company-route "/companies/:slug" {:as params}
+      (let [slug (:slug (:params params))
+            query-params (:query-params params)]
+        ; save route
+        (router/set-route! ["companies" slug] {:slug slug
+                                               :query-params query-params})
+        ; load data from api
+        (api/get-company slug)
+        (swap! app-state assoc :loading true)
+        ; render compoenent
+        (om/root company app-state {:target target})))
 
     (defn section-handler [slug section]
       ; if there are no company data
@@ -61,15 +66,26 @@
       ; render component
       (om/root company app-state {:target target}))
 
-    (defroute section-route "/companies/:slug/:section" {{slug :slug section :section} :params}
-      ; save route
-      (router/set-route! ["companies" slug section] {:slug slug :section section})
-      (section-handler slug section))
+    (defroute section-route "/companies/:slug/:section" {:as params}
+      (let [slug (:slug (:params params))
+            section (:section (:params params))
+            query-params (:query-params params)]
+        ; save route
+        (router/set-route! ["companies" slug section] {:slug slug
+                                                       :section section
+                                                       :query-params query-params})
+        (section-handler slug section)))
 
-    (defroute section-edit-route "/companies/:slug/:section/edit" {{slug :slug section :section} :params}
-      ; save route
-      (router/set-route! ["companies" slug section "edit"] {:slug slug :section section :tab "edit"})
-      (section-handler slug section))
+    (defroute section-edit-route "/companies/:slug/:section/edit" {:as params}
+      (let [slug (:slug (:params params))
+            section (:section (:params params))
+            query-params (:query-params params)]
+        ; save route
+        (router/set-route! ["companies" slug section "edit"] {:slug slug
+                                                              :section section
+                                                              :tab "edit"
+                                                              :query-params query-params})
+        (section-handler slug section)))
 
     (defroute not-found-route "*" []
       ; render component
