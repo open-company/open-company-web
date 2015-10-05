@@ -1,6 +1,9 @@
 // jQuery
 var $ = {};
 $.select2 = function(){};
+$.tooltip = function(){};
+$.width = function(){};
+$.hallo = function(){};
 var jQuery = function(){};
 // Hallo
 var hallo = function(){};
