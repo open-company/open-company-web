@@ -471,3 +471,50 @@ a.settings i{
   color: lightgray;
   font-size: 18px;
 }
+
+div.revisions-navigator{
+  width: 600px;
+  left: 50%;
+  margin-left: 300px;
+  height: 50px;
+}
+
+div.revisions-navigator div.revisions-navigator-left{
+  float: left;
+}
+
+div.revisions-navigator div.revisions-navigator-left div.double-prev{
+  font-size: 20px;
+  margin-top: 6px;
+}
+
+div.revisions-navigator div.revisions-navigator-left div.single-prev{
+  font-size: 28px;
+}
+
+div.revisions-navigator div.revisions-navigator-left div.single-prev,
+div.revisions-navigator div.revisions-navigator-left div.double-prev{
+  color: black;
+  float: left;
+  margin-left: 10px;
+}
+
+div.revisions-navigator div.revisions-navigator-right{
+  float: right;
+}
+
+div.revisions-navigator div.revisions-navigator-right div.double-next{
+  font-size: 20px;
+  margin-top: 6px;
+}
+
+div.revisions-navigator div.revisions-navigator-right div.single-next{
+  font-size: 28px;
+}
+
+div.revisions-navigator div.revisions-navigator-right div.single-next,
+div.revisions-navigator div.revisions-navigator-right div.double-next{
+  float: right;
+  margin-right: 10px;
+  color: black;
+}
