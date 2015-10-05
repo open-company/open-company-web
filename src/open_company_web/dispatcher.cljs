@@ -26,7 +26,8 @@
         ; remove loading key
         (swap! app-state dissoc :loading)
         ; add section name inside each section
-        (let [updated-body (utils/add-section-names body)]
+        (let [updated-body (utils/add-section-names body)
+              updated-body (utils/add-revisions "values" body)]
           ; calc burn-rate and runway
           ; and add the new values to the atom
           (if (utils/in? (:sections updated-body) "finances")
