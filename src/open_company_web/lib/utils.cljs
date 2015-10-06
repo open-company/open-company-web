@@ -276,7 +276,7 @@
 (defn revision-last [revisions as-of]
   (let [sorted-revisions (sort-revisions revisions)
         rev (last sorted-revisions)]
-    (if (or rev (not= (:updated-at rev) as-of))
+    (if (and rev (not= (:updated-at rev) as-of))
       (:href rev)
       nil)))
 
@@ -297,6 +297,6 @@
 (defn revision-first [revisions as-of]
   (let [sorted-revisions (sort-revisions revisions)
         rev (first sorted-revisions)]
-    (if (or rev (not= (:updated-at rev) as-of))
+    (if (and rev (not= (:updated-at rev) as-of))
       (:href rev)
       false)))
