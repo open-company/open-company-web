@@ -7,15 +7,13 @@
 
 (defcomponent revisions-navigator [data owner]
   (render [_]
-    (let [as-of (:as-of @router/path)
+    (let [as-of (:as-of (:query-params @router/path))
           rev-first (utils/revision-first data as-of)
           rev-prev (utils/revision-prev data as-of)
           rev-first (if (= rev-prev rev-first) nil rev-first)
           rev-next (utils/revision-next data as-of)
           rev-last (utils/revision-last data as-of)
           rev-last (if (= rev-next rev-last) nil rev-last)]
-      (println "revision-navigator next:" rev-next)
-      (println "revision-navigator prev:" rev-prev)
       (dom/div {:class "revisions-navigator"}
         (dom/div {:class "revisions-navigator-left"}
           (when rev-first
