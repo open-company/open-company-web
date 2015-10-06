@@ -259,52 +259,40 @@
 (defn sort-revisions [revisions]
   (into [] (sort #(compare (:updated-at %1) (:updated-at %2)) revisions)))
 
-(defn revision-prev [revisions as-of]
-  (if as-of
-    (let [sorted-revisions (sort-revisions revisions)]
-      (println (count sorted-revisions))
-      (let [as-of-rev (first (filter #(= (:updated-at %) as-of) revisions))]
-        (println "prev as-of-rev" as-of-rev)
-        (loop [idx 0
-               prev-rev nil]
-          (println "prev loop" idx prev-rev)
-          (let [cur-rev (get sorted-revisions idx)
-                prev-idx (inc idx)]
-            (if (>= prev-idx (count sorted-revisions))
-              nil ; as-of revision not found, no more revision to check
-              (if (= cur-rev as-of-rev)
-                (:href prev-rev)
-                (recur (inc idx)
-                       cur-rev)))))))
-    false))
+(defn revision-prev
+  "Return the first future revision"
+  [revisions as-of]
+  (let [sorted-revisions (sort-revisions revisions)]
+    (loop [idx 0
+           prev-rev nil]
+      (let [rev (get sorted-revisions idx)]
+        (if (= (:updated-at rev) as-of)
+          (:href prev-rev)
+          (if (= idx (- (count sorted-revisions) 1))
+            nil
+            (recur (inc idx)
+                   rev)))))))
 
 (defn revision-last [revisions as-of]
   (let [sorted-revisions (sort-revisions revisions)
         rev (last sorted-revisions)]
     (if (or rev (not= (:updated-at rev) as-of))
-      nil
-      (:href rev))))
+      (:href rev)
+      nil)))
 
-(defn revision-next [revisions as-of]
-  (if as-of
-    (let [sorted-revisions (sort-revisions revisions)]
-      (println (count sorted-revisions))
-      (let [as-of-rev (first (filter #(= (:updated-at %) as-of) revisions))]
-        (println "next as-of-rev" as-of-rev)
-        (loop [idx (- (count sorted-revisions) 1)
-               next-rev (get sorted-revisions idx)]
-          (println "next loop" idx next-rev)
-          (let [cur-rev (get sorted-revisions idx)
-                next-idx (dec idx)]
-            (if (= idx 0)
-              (do
-                (println "next-idx = 0")
-                nil)
-              (if (= cur-rev as-of-rev)
-                (:href next-rev)
-                (recur (dec idx)
-                       cur-rev)))))))
-    false))
+(defn revision-next
+  "Return the first future revision"
+  [revisions as-of]
+  (let [sorted-revisions (sort-revisions revisions)]
+    (loop [idx (- (count sorted-revisions) 1)
+           next-rev nil]
+      (let [rev (get sorted-revisions idx)]
+        (if (= (:updated-at rev) as-of)
+          (:href next-rev)
+          (if (= idx 0)
+            nil
+            (recur (dec idx)
+                   rev)))))))
 
 (defn revision-first [revisions as-of]
   (let [sorted-revisions (sort-revisions revisions)
