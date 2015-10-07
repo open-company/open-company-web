@@ -87,7 +87,7 @@
                        :onFocus #(let [input (.getDOMNode (om/get-ref owner "edit-field"))]
                                    (set! (.-value input) (.-value input)))
                        :onChange #(om/update-state! owner :value (fn [_] (.. % -target -value)))
-                       :onBlur #(let [value (.. % -target -value)
+                       :onBlur #(let [value (.parseFloat js/window (.. % -target -value))
                                       init-value (om/get-state owner :inital-value)
                                       ; if the value is the same as it was at the start
                                       ; go to the :display state, else go to :draft
