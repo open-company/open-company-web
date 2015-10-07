@@ -36,10 +36,6 @@
 (def ^:private api-post (partial req http/post))
 (def ^:private api-put (partial req http/put))
 
-(defn link-for
-  ([links rel] (some #(if (= (:rel %) rel) % nil) links))
-  ([links rel method] (some #(if (and (= (:method %) method) (= (:rel %) rel)) % nil) links)))
-
 (defn get-companies []
   (api-get "/companies" nil (fn [response]
       (let [body (if (:success response) (json->cljs (:body response)) {})]
@@ -56,7 +52,7 @@
   (when data
     (let [company-data (dissoc data :headcount :finances :compensation :links)
           json-data (cljs->json company-data)
-          company-link (link-for (:links data) "update")]
+          company-link (utils/link-for (:links data) "update")]
       (api-put (:href company-link)
         { :json-params json-data
           :headers {
@@ -76,7 +72,7 @@
           section (:section section-data)
           section-data (dissoc section-data :section :revisions :updated-at :author :links)
           json-data (cljs->json section-data)
-          section-link (link-for links "update" "PUT")]
+          section-link (utils/link-for links "update" "PUT")]
       (api-put (:href section-link)
         { :json-params json-data
           :headers {
