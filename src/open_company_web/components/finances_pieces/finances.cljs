@@ -12,7 +12,8 @@
             [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.components.rich-editor :refer (rich-editor)]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.cell :refer [cell]]))
+            [open-company-web.components.cell :refer [cell]]
+            [open-company-web.components.revisions-navigator :refer [revisions-navigator]]))
 
 (defn subsection-click [e owner]
   (.preventDefault e)
@@ -30,13 +31,16 @@
           slug (:slug @router/path)
           company-data (:company-data data)
           finances-data (:finances company-data)
+          commentary-data (:commentary finances-data)
           cash-classes (str classes (when (= focus "cash") " active"))
           revenue-classes (str classes (when (= focus "revenue") " active"))
           costs-classes (str classes (when (= focus "costs") " active"))
           burn-rate-classes (str classes (when (= focus "burn-rate") " active"))
           runway-classes (str classes (when (= focus "runway") " active"))
           read-only (:read-only data)
-          subsection-data {:company-data company-data :read-only read-only}]
+          subsection-data {:company-data company-data
+                           :read-only read-only
+                           :editable-click-callback (:editable-click-callback data)}]
       (dom/div {:class "row"}
         (dom/div {:class "finances"}
           (dom/h2 {:class (utils/class-set {:finances-title true
@@ -71,7 +75,9 @@
                     :title "Runway"
                     :data-tab "runway"
                     :on-click #(subsection-click % owner)} "Runway"))
-          (dom/div {:class (utils/class-set {:finances-body true :editable (and (not (om/get-state owner :read-only)) (om/get-state owner :hover))})
+          (dom/div {:class (utils/class-set {:finances-body true
+                                             :editable (and (not (om/get-state owner :read-only))
+                                                            (om/get-state owner :hover))})
                     :on-mouse-over #(om/update-state! owner :hover (fn [_] true))
                     :on-mouse-out #(om/update-state! owner :hover (fn [_] false))}
             (case focus
@@ -94,8 +100,11 @@
                                      :author (:author finances-data)
                                      :section :finances})
             (om/build rich-editor {:read-only read-only
-                                   :section-data (:commentary finances-data)
-                                   :section :finances})))))))
+                                   :section-data commentary-data
+                                   :section :finances})
+            (om/build revisions-navigator {:revisions (:revisions finances-data)
+                                           :actual-revision (utils/link-for (:links finances-data) "self" "GET")
+                                           :section :finances})))))))
 
 (defcomponent finances-edit-row [data owner]
   (render [_]
@@ -158,7 +167,5 @@
                 (dom/button {:class "btn btn-success"
                              :on-click #(println "Save with api!")} "Save")
                 (dom/button {:class "btn btn-default cancel"
-                             :on-click #(do
-                                          (-> % .preventDefault)
-                                          (router/nav! (str "/companies/" slug "/finances")))} "Cancel")))))))))
+                             :on-click (:cancel-edit-callback data)} "Cancel")))))))))
   
