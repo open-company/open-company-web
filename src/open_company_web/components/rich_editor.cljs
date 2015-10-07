@@ -21,15 +21,14 @@
 })
 
 (defn init-hallo! [owner]
-  (when-not (om/get-state owner :read-only)
-    (let [hallo-loaded (om/get-state owner :hallo-loaded)
-          did-mount (om/get-state owner :did-mount)]
-      (when (and hallo-loaded did-mount)
-        (when-let [editor-node (.getDOMNode (om/get-ref owner "rich-editor"))]
-          (let [hallo-opts (clj->js hallo-format)
-                jquery-node (.$ js/window editor-node)
-                init-editor (.hallo jquery-node hallo-opts)]
-            (om/update-state! owner :editor (fn[_] init-editor))))))))
+  (let [hallo-loaded (om/get-state owner :hallo-loaded)
+        did-mount (om/get-state owner :did-mount)]
+    (when (and hallo-loaded did-mount)
+      (when-let [editor-node (.getDOMNode (om/get-ref owner "rich-editor"))]
+        (let [hallo-opts (clj->js hallo-format)
+              jquery-node (.$ js/window editor-node)
+              init-editor (.hallo jquery-node hallo-opts)]
+          (om/update-state! owner :editor (fn[_] init-editor)))))))
 
 (defcomponent rich-editor [data owner]
   (init-state [_]
@@ -37,24 +36,25 @@
      :initial-body (:body (:section-data data))
      :hallo-loaded false
      :did-mount false
-     :editing false
-     :read-only (:read-only data)})
+     :editing false})
   (will-mount [_]
-    ; add dependencies:
-    ; jQuery UI
-    (cdr/add-style! "/lib/jquery-ui/jquery-ui.theme.min.css")
-    (cdr/add-style! "/lib/jquery-ui/jquery-ui.structure.min.css")
-    (cdr/add-style! "/lib/jquery-ui/jquery-ui.min.css")
-    ; Add js synchronously: jquery ui, rangy and hallo
-    (cdr/add-scripts! [{:src "/lib/jquery-ui/jquery-ui.min.js"}
-                       {:src "//rangy.googlecode.com/svn/trunk/currentrelease/rangy-core.js"}
-                       {:src "/lib/hallo/hallo.js"}]
-                      (fn []
-                        (om/update-state! owner :hallo-loaded (fn [_]true))
-                        (init-hallo! owner))))
+    (when (not (:read-only data))
+      ; add dependencies:
+      ; jQuery UI
+      (cdr/add-style! "/lib/jquery-ui/jquery-ui.theme.min.css")
+      (cdr/add-style! "/lib/jquery-ui/jquery-ui.structure.min.css")
+      (cdr/add-style! "/lib/jquery-ui/jquery-ui.min.css")
+      ; Add js synchronously: jquery ui, rangy and hallo
+      (cdr/add-scripts! [{:src "/lib/jquery-ui/jquery-ui.min.js"}
+                         {:src "//rangy.googlecode.com/svn/trunk/currentrelease/rangy-core.js"}
+                         {:src "/lib/hallo/hallo.js"}]
+                        (fn []
+                          (om/update-state! owner :hallo-loaded (fn [_]true))
+                          (init-hallo! owner)))))
   (did-mount [_]
-    (om/update-state! owner :did-mount (fn [_]true))
-    (init-hallo! owner))
+    (when (not (:read-only data))
+      (om/update-state! owner :did-mount (fn [_]true))
+      (init-hallo! owner)))
   (render [_]
     (let [section-data (:section-data data)
           section (:section data)]
@@ -62,7 +62,7 @@
         (dom/div #js {:className "rich-editor"
                       :ref "rich-editor"
                       :onClick (fn [e]
-                                 (when-not (om/get-state owner :read-only)
+                                 (when-not (:read-only data)
                                    (om/update-state! owner :editing (fn[_] true))))
                       :dangerouslySetInnerHTML (clj->js {"__html" (:body section-data)})})
         (if (om/get-state owner :editing)
