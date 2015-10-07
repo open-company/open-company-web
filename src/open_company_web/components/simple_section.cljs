@@ -48,4 +48,5 @@
                                    :section-data section-data
                                    :section section
                                    :save-channel (str "save-section-" section)}))
-          (om/build revisions-navigator (:revisions section-data)))))))
+          (om/build revisions-navigator {:revisions (:revisions section-data)
+                                         :actual-revision (:href (utils/link-for (:links section-data) "self" "GET"))}))))))
