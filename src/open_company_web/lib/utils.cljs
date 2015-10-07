@@ -214,7 +214,7 @@
 (defn sort-section-keys-func [a b company-data]
   (let [sec1 (a company-data)
         sec2 (b company-data)]
-    (compare (:updated-at sec2) (:updated-at sec1))))
+    (compare (:sorter sec2) (:sorter sec1))))
 
 (defn sort-section-keys [company-data]
   (let [section-keys (get-section-keys company-data)]
@@ -236,73 +236,23 @@
         sections (get-sections section-keys company-data)]
     (sort #(compare (:updated-at %2) (:updated-at %1)) sections)))
 
-(defn add-section-names [company-data]
+(defn fix-sections [company-data]
+  "add section name in each section and a section sorter"
   (let [section-keys (get-section-keys company-data)]
     (loop [sections section-keys
            body company-data]
-      (if (> (count sections) 0)
-        (do
-          (let [cur-key (first sections)
-                section (cur-key body)
-                updated-section (merge {:section (name cur-key)} section)
-                updated-body (assoc body cur-key updated-section)]
-            (recur (subvec sections 1)
-                   updated-body)))
+      (if (pos? (count sections))
+        (let [cur-key (first sections)
+              section (cur-key body)
+              updated-section (assoc section :section (name cur-key))
+              updated-section (assoc updated-section :sorter (:updated-at section))
+              updated-body (assoc body cur-key updated-section)]
+          (recur (subvec sections 1)
+                 updated-body))
         body))))
 
 (defn sort-revisions [revisions]
   (into [] (sort #(compare (:updated-at %1) (:updated-at %2)) revisions)))
-
-(defn revision-next
-  "Return the first future revision"
-  [revisions as-of actual]
-  (let [sorted-revisions (sort-revisions revisions)]
-    (loop [idx (dec (count sorted-revisions))
-           next-rev nil]
-      (let [rev (get sorted-revisions idx)]
-        (cond
-          ; we got the revision we are looking
-          (= (compare (:updated-at rev) as-of) 0)
-          (if (nil? next-rev)
-            actual ; return the actual rev if the next-rev is nil: ie: we are looking at the first past rev
-            (:href next-rev)) ; return the previous revision
-          ; we are to the actual rev so no newer rev
-          (< (compare (:updated-at rev) as-of) 0)
-          nil
-          ; else
-          :else
-          (if (= idx 0)
-            nil ; return nil as we checked all the revisions
-            (recur (dec idx)
-                   rev)))))))
-
-(defn revision-last [revisions as-of actual]
-  (if (not= actual (revision-next revisions as-of actual))
-    actual
-    nil))
-
-(defn revision-prev
-  "Return the first future revision"
-  [revisions as-of]
-  (let [sorted-revisions (sort-revisions revisions)]
-    (loop [idx 0
-           prev-rev nil]
-      (let [rev (get sorted-revisions idx)]
-        (if (>= (compare (:updated-at rev) as-of) 0)
-          (:href prev-rev)
-          (if (= idx (dec (count sorted-revisions)))
-            (:href rev) ;return the last possible value as it's past
-            (recur (inc idx)
-                   rev)))))))
-
-(defn revision-first [revisions as-of]
-  (let [sorted-revisions (sort-revisions revisions)
-        rev (first sorted-revisions)]
-    (if (and rev
-             (< (compare (:updated-at rev) as-of) 0)
-             (not= (:href rev) (revision-prev revisions as-of)))
-      (:href rev)
-      false)))
 
 (defn add-zero [v]
   (str (when (< v 10) "0") v))
@@ -310,7 +260,7 @@
 (defn as-of [date]
   (let [year (.getFullYear date)
         month (add-zero (inc (.getMonth date)))
-        day (.getDate date)
+        day (add-zero (.getDate date))
         hours (add-zero (.getHours date))
         minutes (add-zero (.getMinutes date))
         seconds (add-zero (.getSeconds date))]
