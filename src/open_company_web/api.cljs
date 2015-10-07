@@ -9,7 +9,8 @@
             [clojure.walk :refer [keywordize-keys stringify-keys]]
             [open-company-web.local-settings :as ls]
             [open-company-web.data.finances :as finances-data]
-            [open-company-web.router :as router]))
+            [open-company-web.router :as router]
+            [open-company-web.lib.utils :as utils]))
 
 
 (def ^:private endpoint ls/api-server-domain)
@@ -85,3 +86,22 @@
           (let [body (if (:success response) (json->cljs (:body response)) {})]
             (flux/dispatch dispatcher/section {:body body :section section :slug (keyword slug)})))))))
 
+(defn load-revision
+  ([revision slug section]
+   (load-revision revision slug section false false))
+  ([revision slug section read-only commentary?]
+    (when revision
+      (api-get (:href revision)
+        {:headers {
+          ; required by Chrome
+              "Access-Control-Allow-Headers" "Content-Type"
+              ; custom content type
+              "content-type" (:type revision)}}
+        (fn [response]
+          (let [body (if (:success response) (json->cljs (:body response)) {})
+                dispatch-body {:body body
+                               :section section
+                               :slug (keyword slug)
+                               :read-only read-only}
+                dispatch-body (if commentary? (merge {:commentary true} dispatch-body) dispatch-body)]
+            (flux/dispatch dispatcher/revision dispatch-body)))))))
