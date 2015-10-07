@@ -40,9 +40,15 @@
                     (utils/set-caret-position! el char-pos)))
                100))
 
+(defn save-section [data owner]
+  ; dismiss editing
+  (om/update-state! owner :editing (fn [_]false))
+  ; async signal to save data
+  (.setTimeout js/window (fn [] (utils/save-values (:save-channel data))) 100))
+
 (defcomponent editable-title [data owner]
   (init-state [_]
-    {:title (:title data)
+    {:title (:title (:section-data data))
      :editing false
      :read-only (:read-only data)})
   (render [_]
@@ -64,8 +70,11 @@
                         :className "editable-title edit"
                         :value (om/get-state owner :title)
                         :onChange #(let [value (.. % -target -value)]
-                                     (om/update-state! owner :title (fn [_] value)))
-                        :onBlur #(om/update-state! owner :editing (fn [_]false))
+                                     (om/update-state! owner :title (fn [_] value))
+                                     (utils/handle-change (:section-data data) value :title))
+                        :onBlur #(save-section data owner)
                         :onKeyDown #(when (= (.-key %) "Enter")
-                                      (om/update-state! owner :editing (fn [_]false)))}))
+                                      (save-section data owner))}))
       (dom/span #js {:ref "hidden-span" :className "hidden-span"} (:title data)))))
+
+
