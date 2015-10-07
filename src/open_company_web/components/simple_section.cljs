@@ -35,18 +35,22 @@
     (let [company-data (:company-data data)
           section (:section data)
           section-data (section company-data)
-          read-only (:read-only data)]
+          read-only (:read-only section-data)]
       (if (:loading company-data)
         (dom/h4 {} "Loading data...")
         (dom/div {:class "simple-section section"}
-          (om/build editable-title {:section-data section-data
+          (om/build editable-title {:read-only read-only
+                                    :section-data section-data
                                     :section section
-                                    :read-only read-only
                                     :save-channel (str "save-section-" section)})
           (dom/div {:class "simple-section-body"}
             (om/build rich-editor {:read-only read-only
                                    :section-data section-data
                                    :section section
                                    :save-channel (str "save-section-" section)}))
-          (om/build revisions-navigator {:revisions (:revisions section-data)
-                                         :actual-revision (:href (utils/link-for (:links section-data) "self" "GET"))}))))))
+          (dom/div {:class "simple-section-revisions-navigator"}
+            (om/build revisions-navigator {:revisions (:revisions section-data)
+                                           :section section
+                                           :updated-at (:updated-at section-data)
+                                           :loading (:loading section-data)
+                                           :navigate-cb #(utils/handle-change section-data true :loading)})))))))
