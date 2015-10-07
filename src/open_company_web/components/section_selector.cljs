@@ -7,6 +7,8 @@
             [open-company-web.components.simple-section :refer (simple-section)]))
 
 (defcomponent section-selector [data owner]
+  (init-state [_]
+    {:finances-edit false})
   (render [_]
     (let [section (:section data)
           read-only (:read-only data)
@@ -14,14 +16,16 @@
           company-data (:data data)]
       (cond
         ; finances edit
-        (and (= section :finances) (= tab "edit"))
+        (and (= section :finances) (om/get-state owner :finances-edit))
         (om/build finances-edit {:company-data company-data
-                                 :section :finances})
+                                 :section :finances
+                                 :cancel-edit-callback #(om/update-state! owner :finances-edit (fn [_] false))})
         ; finances
-        (= section :finances)
+        (and (= section :finances) (not (om/get-state owner :finances-edit)))
         (om/build finances {:read-only read-only
                             :section :finances
-                            :company-data company-data})
+                            :company-data company-data
+                            :editable-click-callback #(om/update-state! owner :finances-edit (fn [_] true))})
         ; else it is a simple section
         (contains? company-data section)
         (om/build simple-section {:read-only read-only
