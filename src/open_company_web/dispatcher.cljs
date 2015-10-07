@@ -11,6 +11,8 @@
 
 (def company (flux/dispatcher))
 
+(def section (flux/dispatcher))
+
 (def companies-list-dispatch
   (flux/register
     companies
@@ -26,8 +28,7 @@
         ; remove loading key
         (swap! app-state dissoc :loading)
         ; add section name inside each section
-        (let [updated-body (utils/add-section-names body)
-              updated-body (utils/add-revisions "values" body)]
+        (let [updated-body (utils/add-section-names body)]
           ; calc burn-rate and runway
           ; and add the new values to the atom
           (if (utils/in? (:sections updated-body) "finances")
@@ -36,3 +37,12 @@
                   fixed-body (assoc-in updated-body [:finances :data] fixed-finances)]
               (swap! app-state assoc (keyword (:slug updated-body)) fixed-body))
             (swap! app-state assoc (keyword (:slug updated-body)) updated-body)))))))
+
+(def section-dispatch
+  (flux/register
+    section
+    (fn [body]
+      (when body
+        ; remove loading key
+        (swap! app-state dissoc :loading)
+        (swap! app-state assoc-in [(:slug body) (:section body)] (:body body))))))
