@@ -19,6 +19,6 @@
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))}
         (dom/h3 {}
                 runway-val
-                (om/build editable-pen {}))
+                (om/build editable-pen {:click-callback (:editable-click-callback data)}))
         (dom/p {} period)
         (om/build column-chart (get-chart-data finances-data "" :runway "runway"))))))

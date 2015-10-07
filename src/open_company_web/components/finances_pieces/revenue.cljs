@@ -19,6 +19,6 @@
       (dom/div {:class (str "section revenue" (when (:read-only data) " read-only"))}
         (dom/h3 {}
                 (str cur-symbol revenue-val)
-                (om/build editable-pen {}))
+                (om/build editable-pen {:click-callback (:editable-click-callback data)}))
         (dom/p {} period)
         (om/build column-chart (get-chart-data finances-data cur-symbol :revenue "Revenue"))))))
