@@ -29,13 +29,13 @@
         :else
         (recur (inc ch))))))
 
-(defn delay-focus-input [owner position]
+(defn delay-focus-input [owner position title]
   (.setTimeout js/window
                #(let [el (.getDOMNode (om/get-ref owner "editable-title-input"))]
                   (.focus el)
                   ; (utils/set-caret-position! el position)
                   (let [span (.getDOMNode (om/get-ref owner "hidden-span"))
-                        value (om/get-state owner :title)
+                        value title
                         char-pos (get-char-index value span position)]
                     (utils/set-caret-position! el char-pos)))
                100))
@@ -43,38 +43,37 @@
 (defn save-section [data owner]
   ; dismiss editing
   (om/update-state! owner :editing (fn [_]false))
-  ; async signal to save data
-  (.setTimeout js/window (fn [] (utils/save-values (:save-channel data))) 100))
+  (let [title (clojure.string/trim (:title (:section-data data)))]
+    ; update the title to remove the spaces
+    (utils/handle-change (:section-data data) title :title)
+    (when (not= (om/get-state owner :initial-title) title)
+      ; async signal to save data
+      (.setTimeout js/window (fn [] (utils/save-values (:save-channel data))) 100)
+      (om/update-state! owner :initial-title (fn [_]title)))))
 
 (defcomponent editable-title [data owner]
   (init-state [_]
-    {:title (:title (:section-data data))
-     :editing false
-     :read-only (:read-only data)})
+    {:editing false
+     :initial-title (:title (:section-data data))})
   (render [_]
-    (dom/div {:class "editable-title-container"}
-      (if-not (om/get-state owner :editing)
-        (dom/h2 {:class (str "editable-title fix" (when (:read-only data) " read-only"))
-                 :on-click (fn [e]
-                             (if (om/get-state owner :read-only)
-                               ; not editable
-                               (do
-                                 (.preventDefault e)
-                                 (router/nav! (str "/companies/" (:slug @router/path) "/" (name (:section data)))))
-                               ; editable:
-                               (do
-                                 (om/update-state! owner :editing (fn [_]true))
-                                 (delay-focus-input owner (utils/get-click-position e)))))}
-                (om/get-state owner :title))
-        (dom/input #js {:ref "editable-title-input"
-                        :className "editable-title edit"
-                        :value (om/get-state owner :title)
-                        :onChange #(let [value (.. % -target -value)]
-                                     (om/update-state! owner :title (fn [_] value))
-                                     (utils/handle-change (:section-data data) value :title))
-                        :onBlur #(save-section data owner)
-                        :onKeyDown #(when (= (.-key %) "Enter")
-                                      (save-section data owner))}))
-      (dom/span #js {:ref "hidden-span" :className "hidden-span"} (:title data)))))
+    (let [section-data (:section-data data)
+          title (:title section-data)]
+      (dom/div {:class "editable-title-container"}
+        (if-not (om/get-state owner :editing)
+          (dom/h2 {:class (str "editable-title fix" (when (:read-only data) " read-only"))
+                   :on-click (fn [e]
+                               (when-not (:read-only data)
+                                   (om/update-state! owner :editing (fn [_]true))
+                                   (delay-focus-input owner (utils/get-click-position e) title)))}
+                  title)
+          (dom/input #js {:ref "editable-title-input"
+                          :className "editable-title edit"
+                          :value title
+                          :onChange #(let [value (.. % -target -value)]
+                                       (utils/handle-change section-data value :title))
+                          :onBlur #(save-section data owner)
+                          :onKeyDown #(when (= (.-key %) "Enter")
+                                        (save-section data owner))}))
+        (dom/span #js {:ref "hidden-span" :className "hidden-span"} title)))))
 
 
