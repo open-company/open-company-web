@@ -60,6 +60,9 @@
     (om/update-state! owner :as-of (fn [_] (:updated-at rev)))
     (api/load-revision rev (keyword (:slug @router/path)) section read-only commentary)))
 
+(defn date-string [rev]
+  (str (:name (:author rev)) " about " (utils/time-since (:updated-at rev))))
+
 (defcomponent revisions-navigator [data owner]
   (init-state [_]
     (let [revisions (:revisions data)
@@ -82,23 +85,23 @@
           (dom/div {}
             (dom/div {:class "revisions-navigator-left"}
               (when rev-first
-                (dom/a {:href (:href rev-first)
+                (dom/a {:title (date-string rev-first)
                         :on-click #(nav-revision! % rev-first owner data true)}
                   (dom/div {:class "double-prev"}
                     (dom/i {:class "fa fa-backward"}))))
               (when rev-prev
-                (dom/a {:href (:href rev-prev)
+                (dom/a {:title (date-string rev-prev)
                         :on-click #(nav-revision! % rev-prev owner data true)}
                   (dom/div {:class "single-prev"}
                     (dom/i {:class "fa fa-caret-left"})))))
             (dom/div {:class "revisions-navigator-right"}
               (when rev-last
-                (dom/a {:href (:href rev-last)
+                (dom/a {:title (date-string rev-last)
                         :on-click #(nav-revision! % rev-last owner data false)}
                   (dom/div {:class "double-next"}
                     (dom/i {:class "fa fa-forward"}))))
               (when rev-next
-                (dom/a {:href (:href rev-next)
+                (dom/a {:title (date-string rev-next)
                         :on-click #(nav-revision! % rev-next owner data (= (:updated-at rev-next) (:updated-at last-revision)))}
                   (dom/div {:class "single-next"}
                     (dom/i {:class "fa fa-caret-right"})))))))))))
