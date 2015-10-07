@@ -8,6 +8,4 @@
   (render [_]
     (let [slug (:slug @router/path)]
       (dom/i {:class "fa fa-pencil editable-pen"
-              :on-click #(do
-                          (-> % .preventDefault)
-                          (router/nav! (str "/companies/" slug "/finances/edit")))}))))
+              :on-click (:click-callback data)}))))
