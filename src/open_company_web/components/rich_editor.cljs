@@ -68,12 +68,16 @@
         (if (om/get-state owner :editing)
           (dom/div {:class "rich-editor-save"}
             (dom/button {:class "btn btn-success"
-                         :on-click #(println "Save with api!")} "Save")
+                         :on-click (fn [e]
+                                     (let [value (.. (om/get-ref owner "rich-editor") getDOMNode -innerHTML)]
+                                       (om/update-state! owner :editing (fn[_]false))
+                                       (utils/handle-change section-data value :body)
+                                       (utils/save-values (:save-channel data))))
+                         } "Save")
             (dom/button {:class "btn btn-default cancel-button"
                          :on-click (fn[e]
                                      (let [init-value (om/get-state owner :initial-body)
                                            el (.getDOMNode (om/get-ref owner "rich-editor"))]
-                                       (println "Cancel: " init-value)
                                        (utils/handle-change section-data init-value :body)
                                        (set! (.-innerHTML el) init-value))
                                      (om/update-state! owner :editing (fn[_]false)))
