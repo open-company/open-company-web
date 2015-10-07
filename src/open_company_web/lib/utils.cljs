@@ -3,8 +3,7 @@
               [clojure.string]
               [open-company-web.lib.iso4217 :refer [iso4217]]
               [cljs.core.async :refer [put!]]
-              [open-company-web.router :as router]
-              [open-company-web.data.revisions :refer [revisions]]))
+              [open-company-web.router :as router]))
 
 (defn abs [n] (max n (- n)))
 
@@ -251,13 +250,36 @@
                    updated-body)))
         body))))
 
-(defn add-revisions [section-name body]
-  (let [slug (:slug @router/path)
-        revs (revisions slug section-name)]
-    (assoc-in body [(keyword section-name) :revisions] revs)))
-
 (defn sort-revisions [revisions]
   (into [] (sort #(compare (:updated-at %1) (:updated-at %2)) revisions)))
+
+(defn revision-next
+  "Return the first future revision"
+  [revisions as-of actual]
+  (let [sorted-revisions (sort-revisions revisions)]
+    (loop [idx (dec (count sorted-revisions))
+           next-rev nil]
+      (let [rev (get sorted-revisions idx)]
+        (cond
+          ; we got the revision we are looking
+          (= (compare (:updated-at rev) as-of) 0)
+          (if (nil? next-rev)
+            actual ; return the actual rev if the next-rev is nil: ie: we are looking at the first past rev
+            (:href next-rev)) ; return the previous revision
+          ; we are to the actual rev so no newer rev
+          (< (compare (:updated-at rev) as-of) 0)
+          nil
+          ; else
+          :else
+          (if (= idx 0)
+            nil ; return nil as we checked all the revisions
+            (recur (dec idx)
+                   rev)))))))
+
+(defn revision-last [revisions as-of actual]
+  (if (not= actual (revision-next revisions as-of actual))
+    actual
+    nil))
 
 (defn revision-prev
   "Return the first future revision"
@@ -266,37 +288,38 @@
     (loop [idx 0
            prev-rev nil]
       (let [rev (get sorted-revisions idx)]
-        (if (= (:updated-at rev) as-of)
+        (if (>= (compare (:updated-at rev) as-of) 0)
           (:href prev-rev)
-          (if (= idx (- (count sorted-revisions) 1))
-            nil
+          (if (= idx (dec (count sorted-revisions)))
+            (:href rev) ;return the last possible value as it's past
             (recur (inc idx)
-                   rev)))))))
-
-(defn revision-last [revisions as-of]
-  (let [sorted-revisions (sort-revisions revisions)
-        rev (last sorted-revisions)]
-    (if (and rev (not= (:updated-at rev) as-of))
-      (:href rev)
-      nil)))
-
-(defn revision-next
-  "Return the first future revision"
-  [revisions as-of]
-  (let [sorted-revisions (sort-revisions revisions)]
-    (loop [idx (- (count sorted-revisions) 1)
-           next-rev nil]
-      (let [rev (get sorted-revisions idx)]
-        (if (= (:updated-at rev) as-of)
-          (:href next-rev)
-          (if (= idx 0)
-            nil
-            (recur (dec idx)
                    rev)))))))
 
 (defn revision-first [revisions as-of]
   (let [sorted-revisions (sort-revisions revisions)
         rev (first sorted-revisions)]
-    (if (and rev (not= (:updated-at rev) as-of))
+    (if (and rev
+             (< (compare (:updated-at rev) as-of) 0)
+             (not= (:href rev) (revision-prev revisions as-of)))
       (:href rev)
       false)))
+
+(defn add-zero [v]
+  (str (when (< v 10) "0") v))
+
+(defn as-of [date]
+  (let [year (.getFullYear date)
+        month (add-zero (inc (.getMonth date)))
+        day (.getDate date)
+        hours (add-zero (.getHours date))
+        minutes (add-zero (.getMinutes date))
+        seconds (add-zero (.getSeconds date))]
+    (str year "-" month "-" day "T" hours ":" minutes ":" seconds "Z")))
+
+(defn as-of-now []
+  (let [date (new js/Date)]
+    (as-of date)))
+
+(defn link-for
+  ([links rel] (some #(if (= (:rel %) rel) % nil) links))
+  ([links rel method] (some #(if (and (= (:method %) method) (= (:rel %) rel)) % nil) links)))
