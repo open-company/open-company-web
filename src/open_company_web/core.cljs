@@ -29,6 +29,7 @@
     (defroute login-route "/login" {:keys [query-params]}
       (if (contains? query-params :jwt)
         (do
+          (println "jwt: " (jwt/decode (:jwt query-params)))
           (cook/set-cookie! :jwt (:jwt query-params) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
           ;redirect to dashboard
           (utils/redirect! "/companies"))
