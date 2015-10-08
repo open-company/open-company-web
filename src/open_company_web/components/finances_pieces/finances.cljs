@@ -31,7 +31,7 @@
           slug (:slug @router/path)
           company-data (:company-data data)
           finances-data (:finances company-data)
-          commentary-data (:commentary finances-data)
+          notes-data (:notes finances-data)
           cash-classes (str classes (when (= focus "cash") " active"))
           revenue-classes (str classes (when (= focus "revenue") " active"))
           costs-classes (str classes (when (= focus "costs") " active"))
@@ -100,7 +100,7 @@
                                      :author (:author finances-data)
                                      :section :finances})
             (om/build rich-editor {:read-only read-only
-                                   :section-data commentary-data
+                                   :section-data notes-data
                                    :section :finances})
             (om/build revisions-navigator {:revisions (:revisions finances-data)
                                            :actual-revision (utils/link-for (:links finances-data) "self" "GET")
