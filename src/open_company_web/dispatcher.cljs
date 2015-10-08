@@ -56,13 +56,13 @@
       (when body
         ; remove loading key
         (swap! app-state dissoc :loading)
-        (let [commentary? (contains? body :commentary)
+        (let [notes? (contains? body :notes)
               assoc-in-coll [(:slug body) (:section body)]
-              assoc-in-coll (if commentary? (conj assoc-in-coll :commentary) assoc-in-coll)
+              assoc-in-coll (if notes? (conj assoc-in-coll :notes) assoc-in-coll)
               sec-body (:body body)
               sec-body (if (:read-only body) (assoc sec-body :read-only true) sec-body)
               section ((:section body) ((:slug body) @app-state))
-              section (if commentary? (:commentary section) section)
+              section (if notes? (:notes section) section)
               section-revision (merge section sec-body)
               section-revision (dissoc section-revision :loading)]
           (swap! app-state assoc-in assoc-in-coll section-revision))))))

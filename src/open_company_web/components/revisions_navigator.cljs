@@ -55,10 +55,10 @@
 (defn nav-revision! [e rev owner data read-only]
   (.preventDefault e)
   (let [section (:section data)
-        commentary (:commentary data)]
+        notes (:notes data)]
     ((:navigate-cb data))
     (om/update-state! owner :as-of (fn [_] (:updated-at rev)))
-    (api/load-revision rev (keyword (:slug @router/path)) section read-only commentary)))
+    (api/load-revision rev (keyword (:slug @router/path)) section read-only notes)))
 
 (defn date-string [rev]
   (str (:name (:author rev)) " about " (utils/time-since (:updated-at rev))))
@@ -77,8 +77,7 @@
           rev-prev  (revision-prev revisions as-of)
           rev-next  (revision-next revisions as-of)
           rev-last  (if rev-next (revision-last revisions as-of) nil)
-          section (:section data)
-          commentary (:commentary data)]
+          section (:section data)]
       (dom/div {:class "revisions-navigator"}
         (if (:loading data)
           (dom/div {:style {:text-align "center"}} "Loading...")

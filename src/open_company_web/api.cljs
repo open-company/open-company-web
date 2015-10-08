@@ -8,7 +8,6 @@
             [cognitect.transit :as t]
             [clojure.walk :refer [keywordize-keys stringify-keys]]
             [open-company-web.local-settings :as ls]
-            [open-company-web.data.finances :as finances-data]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
 
@@ -89,7 +88,7 @@
 (defn load-revision
   ([revision slug section]
    (load-revision revision slug section false false))
-  ([revision slug section read-only commentary?]
+  ([revision slug section read-only notes?]
     (when revision
       (api-get (:href revision)
         {:headers {
@@ -103,5 +102,5 @@
                                :section section
                                :slug (keyword slug)
                                :read-only read-only}
-                dispatch-body (if commentary? (merge {:commentary true} dispatch-body) dispatch-body)]
+                dispatch-body (if notes? (merge {:notes true} dispatch-body) dispatch-body)]
             (flux/dispatch dispatcher/revision dispatch-body)))))))
