@@ -3,7 +3,7 @@
             [test.open-company-web.components.comment]
             [test.open-company-web.components.currency-picker]
             [test.open-company-web.components.link]
-            [test.open-company-web.components.pie-chart]
+            [test.open-company-web.components.charts]
             [test.open-company-web.components.user-selector]
             [test.open-company-web.components.login]))
 
@@ -16,6 +16,6 @@
   'test.open-company-web.components.comment
   'test.open-company-web.components.currency-picker
   'test.open-company-web.components.link
-  'test.open-company-web.components.pie-chart
+  'test.open-company-web.components.charts
   'test.open-company-web.components.user-selector
   'test.open-company-web.components.login)
