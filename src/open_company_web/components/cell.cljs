@@ -16,7 +16,9 @@
 (defn- format-value [value]
   (.toLocaleString value))
 
-(defn- to-state [owner state]
+(defn- to-state [owner data state]
+  (when (= state :draft)
+    ((:draft-cb data) (.. (om/get-ref owner "edit-field") getDOMNode -value)))
   (om/update-state! owner :cell-state (fn [_] state))
   (when (= state :edit)
     (.setTimeout js/window #(let [input (om/get-ref owner "edit-field")]
@@ -66,17 +68,17 @@
 
           :new
           (dom/div {:class "comp-cell-int state-new"
-                    :on-click #(to-state owner :edit)}
+                    :on-click #(to-state owner data :edit)}
             (dom/span {} (:placeholder data)))
 
           :display
           (dom/div {:class "comp-cell-int state-display"
-                    :on-click #(to-state owner :edit)}
+                    :on-click #(to-state owner data :edit)}
             (dom/span {} final-value))
 
           :draft
           (dom/div {:class "comp-cell-int state-draft"
-                    :on-click #(to-state owner :edit)}
+                    :on-click #(to-state owner data :edit)}
             (dom/span {} final-value))
 
           :edit
@@ -94,5 +96,5 @@
                                       state (if (= value init-value) :display :draft)
                                       ; if the value is empty and it was empty got to the :new state
                                       state (if (and (= state :display) (= value "")) :new state)]
-                                  (to-state owner state))
-                       :onKeyDown #(when (= (.-key %) "Enter") (to-state owner :draft))})))))))
+                                  (to-state owner data state))
+                       :onKeyDown #(when (= (.-key %) "Enter") (to-state owner data :draft))})))))))
