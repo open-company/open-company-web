@@ -109,37 +109,55 @@
 (defcomponent finances-edit-row [data owner]
   (render [_]
     (let [prefix (:prefix data)
-          is-new (:new data)]
+          finances-data (:cursor data)
+          is-new (:new finances-data)]
       (dom/tr {}
-        (dom/td {:class "no-cell"} (utils/period-string (:period data) (when is-new :force-year)))
+        (dom/td {:class "no-cell"} (utils/period-string (:period finances-data) (when is-new :force-year)))
         (dom/td {}
-          (om/build cell {:value (:cash data)
+          (om/build cell {:value (:cash finances-data)
                           :placeholder (if is-new "at month end" "")
                           :prefix prefix
-                          :cell-state (if is-new :new :display)}))
+                          :cell-state (if is-new :new :display)
+                          :draft-cb #(utils/handle-change finances-data % :cash)}))
         (dom/td {}
-          (om/build cell {:value (:revenue data)
+          (om/build cell {:value (:revenue finances-data)
                           :placeholder (if is-new "entire month" "")
                           :prefix prefix
-                          :cell-state (if is-new :new :display)}))
+                          :cell-state (if is-new :new :display)
+                          :draft-cb #(utils/handle-change finances-data % :revenue)}))
         (dom/td {}
-          (om/build cell {:value (:costs data)
+          (om/build cell {:value (:costs finances-data)
                           :placeholder (if is-new "entire month" "")
                           :prefix prefix
-                          :cell-state (if is-new :new :display)}))
+                          :cell-state (if is-new :new :display)
+                          :draft-cb #(utils/handle-change data % :costs)}))
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
-                (if is-new "calculated" (:burn-rate data)))
+                (if is-new "calculated" (:burn-rate finances-data)))
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
-                (if is-new "calculated" (:runway data)))))))
+                (if is-new "calculated" (:runway finances-data)))))))
 
 (defcomponent finances-edit [data owner]
+  (init-state [_]
+    ; add a new line if necessary
+    (let [company-data (:company-data data)
+          finances-data (:finances company-data)
+          cur-period (utils/current-period)]
+      (when-not (utils/period-exists cur-period (:data finances-data))
+        (let [new-period {:period cur-period
+                          :cash nil
+                          :costs nil
+                          :revenue nil
+                          :new true}
+              new-data (into [new-period] (:data finances-data))]
+          (om/transact! finances-data :data (fn [_]new-data)))))
+    {})
   (render [_]
     (let [slug (:slug @router/path)
           company-data (:company-data data)
           finances-data (:finances company-data)
           cur-symbol (utils/get-symbol-for-currency-code (:currency (:finances data)))
-          rows-data (map #(merge {:prefix cur-symbol} %) (:data finances-data))
-          cur-period (utils/current-period)]
+          cur-period (utils/current-period)
+          rows-data (map #(merge {:prefix cur-symbol} {:cursor %}) (:data finances-data))]
       (if (:loading data)
         ; loading
         (dom/h4 {} "Loading data...")
@@ -158,14 +176,10 @@
                     (dom/th {} "Burn")
                     (dom/th {} "Runway")))
                 (dom/tbody {}
-                  (when-not (utils/period-exists cur-period (:data finances-data))
-                    (om/build finances-edit-row {:prefix cur-symbol
-                                                 :period cur-period
-                                                 :new true}))
                   (om/build-all finances-edit-row rows-data)))
               (dom/div {:class "finances-edit-buttons"}
                 (dom/button {:class "btn btn-success"
-                             :on-click #(println "Save with api!")} "Save")
+                             :on-click #(println "Save with api!" (:data finances-data))} "Save")
                 (dom/button {:class "btn btn-default cancel"
                              :on-click (:cancel-edit-callback data)} "Cancel")))))))))
   
