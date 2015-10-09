@@ -22,8 +22,7 @@
                                  :cancel-edit-callback #(om/update-state! owner :finances-edit (fn [_] false))})
         ; finances
         (and (= section :finances) (not (om/get-state owner :finances-edit)))
-        (om/build finances {:read-only read-only
-                            :section :finances
+        (om/build finances {:section :finances
                             :company-data company-data
                             :editable-click-callback #(om/update-state! owner :finances-edit (fn [_] true))})
         ; else it is a simple section
