@@ -19,7 +19,7 @@
     (let [save-channel (chan)
           section (:section data)]
       (utils/add-channel (str "save-section-" section) save-channel))
-    {})
+    {:read-only false})
   (will-mount [_]
     (let [save-change (utils/get-channel (str "save-section-" (:section data)))]
         (go (loop []
@@ -35,7 +35,7 @@
     (let [company-data (:company-data data)
           section (:section data)
           section-data (section company-data)
-          read-only (:read-only section-data)]
+          read-only (or (:loading section-data) (om/get-state owner :read-only))]
       (if (:loading company-data)
         (dom/h4 {} "Loading data...")
         (dom/div {:class "simple-section section"}
@@ -53,4 +53,6 @@
                                            :section section
                                            :updated-at (:updated-at section-data)
                                            :loading (:loading section-data)
-                                           :navigate-cb #(utils/handle-change section-data true :loading)})))))))
+                                           :navigate-cb (fn [read-only]
+                                                          (utils/handle-change section-data true :loading)
+                                                          (om/update-state! owner :read-only (fn [_]read-only)))})))))))
