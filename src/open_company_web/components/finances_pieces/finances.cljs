@@ -22,9 +22,10 @@
 
 (defcomponent finances [data owner]
   (init-state [_]
-    {:focus "cash"
-     :hover false
-     :read-only (:read-only data)})
+    (let [company-data (:company-data data)
+          finances-data (:finances company-data)]
+      {:focus "cash"
+       :hover false}))
   (render [_]
     (let [focus (om/get-state owner :focus)
           classes "finances-link"
@@ -37,17 +38,13 @@
           costs-classes (str classes (when (= focus "costs") " active"))
           burn-rate-classes (str classes (when (= focus "burn-rate") " active"))
           runway-classes (str classes (when (= focus "runway") " active"))
-          read-only (:read-only data)
+          read-only (:loading finances-data)
           subsection-data {:company-data company-data
                            :read-only read-only
                            :editable-click-callback (:editable-click-callback data)}]
       (dom/div {:class "row"}
         (dom/div {:class "finances"}
-          (dom/h2 {:class (utils/class-set {:finances-title true
-                                            :linked (om/get-state owner :read-only)})
-                   :on-click #(when (om/get-state owner :read-only)
-                                (-> % .preventDefault)
-                                (router/nav! (str "/companies/" slug "/finances")))}
+          (dom/h2 {:class "finances-title"}
                   "Finances")
           (dom/div {:class "link-bar"}
             (dom/a {:href "#"
@@ -76,7 +73,7 @@
                     :data-tab "runway"
                     :on-click #(subsection-click % owner)} "Runway"))
           (dom/div {:class (utils/class-set {:finances-body true
-                                             :editable (and (not (om/get-state owner :read-only))
+                                             :editable (and (not read-only)
                                                             (om/get-state owner :hover))})
                     :on-mouse-over #(om/update-state! owner :hover (fn [_] true))
                     :on-mouse-out #(om/update-state! owner :hover (fn [_] false))}
@@ -103,8 +100,10 @@
                                    :section-data notes-data
                                    :section :finances})
             (om/build revisions-navigator {:revisions (:revisions finances-data)
-                                           :actual-revision (utils/link-for (:links finances-data) "self" "GET")
-                                           :section :finances})))))))
+                                           :section :finances
+                                           :updated-at (:updated-at finances-data)
+                                           :loading (:loading finances-data)
+                                           :navigate-cb #(utils/handle-change finances-data true :loading)})))))))
 
 (defcomponent finances-edit-row [data owner]
   (render [_]

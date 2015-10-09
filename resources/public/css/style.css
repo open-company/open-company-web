@@ -101,6 +101,10 @@ span.num.red {
   padding-right: 15px;
 }
 
+.hidden {
+  display: none;
+}
+
 div#app{
   margin-top: 50px;
 }
@@ -278,7 +282,8 @@ div.rich-editor-container {
   margin-top: 30px;
 }
 
-div.rich-editor-container div.rich-editor{
+div.rich-editor-container div.rich-editor,
+div.rich-editor-container div.fake-rich-editor{
   width: 100%;
   margin-bottom: 10px;
 }
