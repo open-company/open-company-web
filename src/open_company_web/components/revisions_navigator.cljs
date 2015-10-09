@@ -56,7 +56,7 @@
   (.preventDefault e)
   (let [section (:section data)
         notes (:notes data)]
-    ((:navigate-cb data))
+    ((:navigate-cb data) read-only)
     (om/update-state! owner :as-of (fn [_] (:updated-at rev)))
     (api/load-revision rev (keyword (:slug @router/path)) section read-only notes)))
 
@@ -101,6 +101,6 @@
                     (dom/i {:class "fa fa-forward"}))))
               (when rev-next
                 (dom/a {:title (date-string rev-next)
-                        :on-click #(nav-revision! % rev-next owner data (= (:updated-at rev-next) (:updated-at last-revision)))}
+                        :on-click #(nav-revision! % rev-next owner data (not= (:updated-at rev-next) (:updated-at last-revision)))}
                   (dom/div {:class "single-next"}
                     (dom/i {:class "fa fa-caret-right"})))))))))))
