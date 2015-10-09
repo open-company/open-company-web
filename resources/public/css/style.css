@@ -214,10 +214,6 @@ div.finances h2{
   text-align: center;
 }
 
-div.finances h2.linked{
-  cursor: pointer;
-}
-
 div.finances div.link-bar{
   text-align: center;
 }
