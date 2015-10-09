@@ -57,9 +57,12 @@
       (init-hallo! owner)))
   (render [_]
     (let [section-data (:section-data data)
-          section (:section data)]
+          section (:section data)
+          read-only (:read-only data)]
       (dom/div {:class "rich-editor-container"}
-        (dom/div #js {:className "rich-editor"
+        (dom/div {:class (utils/class-set {:fake-rich-editor true :hidden (not read-only)})
+                  :dangerouslySetInnerHTML (clj->js {"__html" (:body section-data)})})
+        (dom/div #js {:className (utils/class-set {:rich-editor true :hidden read-only})
                       :ref "rich-editor"
                       :onClick (fn [e]
                                  (when-not (:read-only data)
@@ -85,4 +88,3 @@
           (om/build update-footer {:author (:author section-data)
                                    :updated-at (:updated-at section-data)
                                    :section section}))))))
-
