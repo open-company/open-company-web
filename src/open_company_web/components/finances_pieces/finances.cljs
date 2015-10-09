@@ -25,7 +25,8 @@
     (let [company-data (:company-data data)
           finances-data (:finances company-data)]
       {:focus "cash"
-       :hover false}))
+       :hover false
+       :read-only false}))
   (render [_]
     (let [focus (om/get-state owner :focus)
           classes "finances-link"
@@ -38,7 +39,7 @@
           costs-classes (str classes (when (= focus "costs") " active"))
           burn-rate-classes (str classes (when (= focus "burn-rate") " active"))
           runway-classes (str classes (when (= focus "runway") " active"))
-          read-only (:loading finances-data)
+          read-only (or (:loading finances-data) (om/get-state owner :read-only))
           subsection-data {:company-data company-data
                            :read-only read-only
                            :editable-click-callback (:editable-click-callback data)}]
@@ -103,7 +104,9 @@
                                            :section :finances
                                            :updated-at (:updated-at finances-data)
                                            :loading (:loading finances-data)
-                                           :navigate-cb #(utils/handle-change finances-data true :loading)})))))))
+                                           :navigate-cb (fn [read-only]
+                                                          (utils/handle-change finances-data true :loading)
+                                                          (om/update-state! owner :read-only (fn [_]read-only)))})))))))
 
 (defcomponent finances-edit-row [data owner]
   (render [_]
