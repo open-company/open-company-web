@@ -47,7 +47,10 @@
       (when body
         ; remove loading key
         (swap! app-state dissoc :loading)
-        (swap! app-state assoc-in [(:slug body) (:section body)] (:body body))))))
+        (let [section-body (:body body)
+              fixed-finances (into [] (map utils/calc-burnrate-runway (:data section-body)))
+              section-body (if (= (:section body) :finances) (assoc section-body :data fixed-finances) section-body)]
+          (swap! app-state assoc-in [(:slug body) (:section body)] section-body))))))
 
 (def revision-dispatch
   (flux/register
