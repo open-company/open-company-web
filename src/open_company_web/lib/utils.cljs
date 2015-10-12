@@ -7,6 +7,11 @@
 
 (defn abs [n] (max n (- n)))
 
+(defn sort-by-key-pred [k & invert]
+  (if-not (first invert)
+    (fn [a b] (compare (k a) (k b)))
+    (fn [a b] (compare (k b) (k a)))))
+
 (defn thousands-separator [number]
   (let [parts (clojure.string/split (str number) "." 1)
         int-part (first parts)
@@ -233,8 +238,9 @@
 
 (defn sort-sections [company-data]
   (let [section-keys (get-section-keys company-data)
-        sections (get-sections section-keys company-data)]
-    (sort #(compare (:updated-at %2) (:updated-at %1)) sections)))
+        sections (get-sections section-keys company-data)
+        sort-pred (sort-by-key-pred :updated-at true)]
+    (sort #(sort-pred %1 %2) sections)))
 
 (defn fix-sections [company-data]
   "add section name in each section and a section sorter"
@@ -252,7 +258,8 @@
         body))))
 
 (defn sort-revisions [revisions]
-  (into [] (sort #(compare (:updated-at %1) (:updated-at %2)) revisions)))
+  (let [sort-pred (sort-by-key-pred :updated-at)]
+    (into [] (sort #(sort-pred %1 %2) revisions))))
 
 (defn add-zero [v]
   (str (when (< v 10) "0") v))
