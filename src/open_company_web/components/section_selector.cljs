@@ -19,7 +19,7 @@
         (and (= section :finances) (om/get-state owner :finances-edit))
         (om/build finances-edit {:company-data company-data
                                  :section :finances
-                                 :cancel-edit-callback #(om/update-state! owner :finances-edit (fn [_] false))})
+                                 :close-edit-cb #(om/update-state! owner :finances-edit (fn [_] false))})
         ; finances
         (and (= section :finances) (not (om/get-state owner :finances-edit)))
         (om/build finances {:section :finances
