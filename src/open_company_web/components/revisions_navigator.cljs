@@ -77,7 +77,9 @@
           rev-prev  (revision-prev revisions as-of)
           rev-next  (revision-next revisions as-of)
           rev-last  (if rev-next (revision-last revisions as-of) nil)
-          section (:section data)]
+          section (:section data)
+          latest? (= (:updated-at last-revision) as-of)
+          rev-first (if latest? nil rev-first)]
       (dom/div {:class "revisions-navigator"}
         (if (:loading data)
           (dom/div {:style {:text-align "center"}} "Loading...")
