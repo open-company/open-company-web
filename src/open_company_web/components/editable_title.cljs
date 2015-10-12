@@ -5,10 +5,11 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]))
 
-(defn check-length [value elem px-pos cur-char-idx]
+(defn check-length [value elem px-pos cur-char-idx offset]
   (let [substr (subs value 0 cur-char-idx)]
     (set! (.-innerHTML elem) substr)
-    (let [str-width (.width (.$ js/window elem))
+    (let [$e (.$ js/window elem)
+          str-width (+ (.width $e) offset)
           diff (utils/abs (- px-pos str-width))]
       (if (or (>= str-width px-pos)
               (< diff 5))
@@ -16,18 +17,22 @@
         false))))
 
 (defn get-char-index [value elem px-pos]
-  (loop [ch 0]
-    (let [check (check-length value elem px-pos ch)]
-      (cond
-        ; found character
-        check
-        check
-        ; not found but no more chars
-        (= ch (count value))
-        (count value)
-        ; recur to next char
-        :else
-        (recur (inc ch))))))
+  (let [$e (.$ js/window elem)
+          offset (.offset $e)
+          parent-offset (.offset (.parent $e))
+          offset (- (.-left offset) (.-left parent-offset))]
+    (loop [ch 1]
+      (let [check (check-length value elem px-pos ch offset)]
+        (cond
+          ; found character
+          check
+          check
+          ; not found but no more chars
+          (= ch (count value))
+          (count value)
+          ; recur to next char
+          :else
+          (recur (inc ch)))))))
 
 (defn delay-focus-input [owner position title]
   (.setTimeout js/window
@@ -35,9 +40,9 @@
                   (.focus el)
                   ; (utils/set-caret-position! el position)
                   (let [span (.getDOMNode (om/get-ref owner "hidden-span"))
-                        value title
-                        char-pos (get-char-index value span position)]
-                    (utils/set-caret-position! el char-pos)))
+                        char-pos (get-char-index title span position)]
+                    (utils/set-caret-position! el char-pos)
+                    (set! (.-innerHTML span) title)))
                100))
 
 (defn save-section [data owner]
@@ -74,6 +79,7 @@
                           :onBlur #(save-section data owner)
                           :onKeyDown #(when (= (.-key %) "Enter")
                                         (save-section data owner))}))
-        (dom/span #js {:ref "hidden-span" :className "hidden-span"} title)))))
+        (dom/div {:style {:text-align "center"}}
+          (dom/span #js {:ref "hidden-span" :className "hidden-span"} title))))))
 
 

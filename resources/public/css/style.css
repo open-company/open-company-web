@@ -364,6 +364,7 @@ div.editable-title-container h2.read-only{
 div.editable-title-container h2,
 div.editable-title-container input,
 div.editable-title-container span.hidden-span{
+  text-align: center;
   color: black;
   font-size: 30px;
   font-family: inherit;
