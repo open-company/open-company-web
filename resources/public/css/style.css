@@ -415,7 +415,7 @@ div.finances-body i.editable-pen{
   cursor: default;
 }
 
-div.finances-body.editable i.editable-pen{
+div.finances-body.editable:hover i.editable-pen{
   opacity: 1;
   margin-left: 10px;
   cursor: pointer;

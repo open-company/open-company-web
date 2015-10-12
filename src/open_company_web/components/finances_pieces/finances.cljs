@@ -28,7 +28,6 @@
     (let [company-data (:company-data data)
           finances-data (:finances company-data)]
       {:focus "cash"
-       :hover false
        :read-only false}))
   (render [_]
     (let [focus (om/get-state owner :focus)
@@ -77,10 +76,7 @@
                     :data-tab "runway"
                     :on-click #(subsection-click % owner)} "Runway"))
           (dom/div {:class (utils/class-set {:finances-body true
-                                             :editable (and (not read-only)
-                                                            (om/get-state owner :hover))})
-                    :on-mouse-over #(om/update-state! owner :hover (fn [_] true))
-                    :on-mouse-out #(om/update-state! owner :hover (fn [_] false))}
+                                             :editable (not read-only)})}
             (case focus
 
               "cash"
