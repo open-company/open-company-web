@@ -35,6 +35,7 @@
 (def ^:private api-get (partial req http/get))
 (def ^:private api-post (partial req http/post))
 (def ^:private api-put (partial req http/put))
+(def ^:private api-patch (partial req http/patch))
 
 (defn get-companies []
   (api-get "/companies" nil (fn [response]
@@ -93,9 +94,9 @@
       (api-get (:href revision)
         {:headers {
           ; required by Chrome
-              "Access-Control-Allow-Headers" "Content-Type"
-              ; custom content type
-              "content-type" (:type revision)}}
+          "Access-Control-Allow-Headers" "Content-Type"
+          ; custom content type
+          "content-type" (:type revision)}}
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})
                 dispatch-body {:body body
@@ -104,3 +105,26 @@
                                :read-only read-only}
                 dispatch-body (if notes? (merge {:notes true} dispatch-body) dispatch-body)]
             (flux/dispatch dispatcher/revision dispatch-body)))))))
+
+(defn update-finances-data[finances-data]
+  (when finances-data
+    (let [links (:links finances-data)
+          slug (:slug @router/path)
+          data {:data (map #(dissoc % :burn-rate :runway) (:data finances-data))}
+          json-data (cljs->json data)
+          finances-link (utils/link-for links "update" "PATCH")]
+      (api-patch (:href finances-link)
+        { :json-params json-data
+          :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (:type finances-link)}}
+        (fn [response]
+          (let [body (if (:success response) (json->cljs (:body response)) {})
+                dispatch-body {:body (merge {:section :finances :sorter (:updated-at body)} body)
+                               :section :finances
+                               :slug (keyword slug)}]
+            (flux/dispatch dispatcher/section dispatch-body)))))))
+
+
