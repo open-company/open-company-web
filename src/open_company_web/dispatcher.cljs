@@ -36,7 +36,9 @@
           (if (utils/in? (:sections updated-body) "finances")
             (let [finances (:data (:finances updated-body))
                   fixed-finances (into [] (map utils/calc-burnrate-runway finances))
-                  fixed-body (assoc-in updated-body [:finances :data] fixed-finances)]
+                  sort-pred (utils/sort-by-key-pred :period true)
+                  sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
+                  fixed-body (assoc-in updated-body [:finances :data] sorted-finances)]
               (swap! app-state assoc (keyword (:slug updated-body)) fixed-body))
             (swap! app-state assoc (keyword (:slug updated-body)) updated-body)))))))
 
@@ -49,7 +51,11 @@
         (swap! app-state dissoc :loading)
         (let [section-body (:body body)
               fixed-finances (into [] (map utils/calc-burnrate-runway (:data section-body)))
-              section-body (if (= (:section body) :finances) (assoc section-body :data fixed-finances) section-body)]
+              sort-pred (utils/sort-by-key-pred :period true)
+              sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
+              section-body (if (= (:section body) :finances)
+                             (assoc section-body :data sorted-finances)
+                             section-body)]
           (swap! app-state assoc-in [(:slug body) (:section body)] section-body))))))
 
 (def revision-dispatch
