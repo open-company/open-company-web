@@ -504,7 +504,17 @@ div.revisions-navigator div.revisions-navigator-left div.double-prev{
 }
 
 div.revisions-navigator div.revisions-navigator-left div.single-prev{
+  margin-top: 5px;
+}
+
+div.revisions-navigator div.revisions-navigator-left div.single-prev i{
   font-size: 28px;
+  float:left;
+}
+div.revisions-navigator div.revisions-navigator-left div.single-prev p{
+  font-size: 14px;
+  margin: 5px 0px 0px 8px;
+  float: left;
 }
 
 div.revisions-navigator div.revisions-navigator-left div.single-prev,
@@ -524,7 +534,18 @@ div.revisions-navigator div.revisions-navigator-right div.double-next{
 }
 
 div.revisions-navigator div.revisions-navigator-right div.single-next{
+  margin-top: 5px;
+}
+
+div.revisions-navigator div.revisions-navigator-right div.single-next i{
   font-size: 28px;
+  float:right;
+}
+
+div.revisions-navigator div.revisions-navigator-right div.single-next p{
+  font-size: 14px;
+  margin: 5px 8px 0px 0px;
+  float: right;
 }
 
 div.revisions-navigator div.revisions-navigator-right div.single-next,

@@ -61,7 +61,10 @@
     (api/load-revision rev (keyword (:slug @router/path)) section read-only notes)))
 
 (defn date-string [rev]
-  (str (:name (:author rev)) " about " (utils/time-since (:updated-at rev))))
+  (let [date (new js/Date (:updated-at rev))
+        month (utils/month-string (utils/add-zero (.getMonth date)))
+        day (utils/add-zero (.getDate date))]
+    (str month " " day)))
 
 (defcomponent revisions-navigator [data owner]
   (init-state [_]
@@ -79,30 +82,30 @@
           rev-last  (if rev-next (revision-last revisions as-of) nil)
           section (:section data)
           latest? (= (:updated-at last-revision) as-of)
-          rev-first (if latest? nil rev-first)]
+          rev-first (if latest? nil rev-first)
+          next-date (str "Next (" (date-string rev-next) ")")
+          prev-date (str "Previous (" (date-string rev-prev) ")")]
       (dom/div {:class "revisions-navigator"}
         (if (:loading data)
           (dom/div {:style {:text-align "center"}} "Loading...")
           (dom/div {}
             (dom/div {:class "revisions-navigator-left"}
               (when rev-first
-                (dom/a {:title (date-string rev-first)
-                        :on-click #(nav-revision! % rev-first owner data true)}
+                (dom/a {:on-click #(nav-revision! % rev-first owner data true)}
                   (dom/div {:class "double-prev"}
                     (dom/i {:class "fa fa-backward"}))))
               (when rev-prev
-                (dom/a {:title (date-string rev-prev)
-                        :on-click #(nav-revision! % rev-prev owner data true)}
+                (dom/a {:on-click #(nav-revision! % rev-prev owner data true)}
                   (dom/div {:class "single-prev"}
-                    (dom/i {:class "fa fa-caret-left"})))))
+                    (dom/i {:class "fa fa-caret-left"})
+                    (dom/p {} prev-date)))))
             (dom/div {:class "revisions-navigator-right"}
               (when rev-last
-                (dom/a {:title (date-string rev-last)
-                        :on-click #(nav-revision! % rev-last owner data false)}
+                (dom/a {:on-click #(nav-revision! % rev-last owner data false)}
                   (dom/div {:class "double-next"}
                     (dom/i {:class "fa fa-forward"}))))
               (when rev-next
-                (dom/a {:title (date-string rev-next)
-                        :on-click #(nav-revision! % rev-next owner data (not= (:updated-at rev-next) (:updated-at last-revision)))}
+                (dom/a {:on-click #(nav-revision! % rev-next owner data (not= (:updated-at rev-next) (:updated-at last-revision)))}
                   (dom/div {:class "single-next"}
-                    (dom/i {:class "fa fa-caret-right"})))))))))))
+                    (dom/i {:class "fa fa-caret-right"})
+                    (dom/p {} next-date)))))))))))
