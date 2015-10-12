@@ -93,7 +93,7 @@
               (om/build burn-rate subsection-data)
 
               "runway"
-              (om/build runway company-data))
+              (om/build runway subsection-data))
             (om/build update-footer {:updated-at (:updated-at finances-data)
                                      :author (:author finances-data)
                                      :section :finances})
@@ -112,54 +112,96 @@
   (render [_]
     (let [prefix (:prefix data)
           finances-data (:cursor data)
-          is-new (:new finances-data)]
+          is-new (:new finances-data)
+          cell-state (if is-new :new :display)
+          change-cb (:change-cb data)]
       (dom/tr {}
         (dom/td {:class "no-cell"} (utils/period-string (:period finances-data) (when is-new :force-year)))
         (dom/td {}
           (om/build cell {:value (:cash finances-data)
                           :placeholder (if is-new "at month end" "")
                           :prefix prefix
-                          :cell-state (if is-new :new :display)
-                          :draft-cb #(utils/handle-change finances-data % :cash)}))
+                          :cell-state cell-state
+                          :draft-cb #(change-cb :cash %)}))
         (dom/td {}
           (om/build cell {:value (:revenue finances-data)
                           :placeholder (if is-new "entire month" "")
                           :prefix prefix
-                          :cell-state (if is-new :new :display)
-                          :draft-cb #(utils/handle-change finances-data % :revenue)}))
+                          :cell-state cell-state
+                          :draft-cb #(change-cb :revenue %)}))
         (dom/td {}
           (om/build cell {:value (:costs finances-data)
                           :placeholder (if is-new "entire month" "")
                           :prefix prefix
-                          :cell-state (if is-new :new :display)
-                          :draft-cb #(utils/handle-change data % :costs)}))
+                          :cell-state cell-state
+                          :draft-cb #(change-cb :costs %)}))
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
                 (if is-new "calculated" (:burn-rate finances-data)))
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
                 (if is-new "calculated" (:runway finances-data)))))))
+
+(defn save-new-row? [finances-data]
+  (let [new-period (first (filter #(and (contains? % :new) (true? (:new %))) finances-data))]
+    (if (or (not (nil? (:cash new-period)))
+            (not (nil? (:costs new-period)))
+            (not (nil? (:revenue new-period))))
+      true
+      false)))
+
+(defn row-ok? [row]
+  (if (or (nil? (:cash row))
+          (nil? (:costs row))
+          (nil? (:revenue row)))
+    false
+    true))
+
+(defn save-data [owner finances-data original-cursor close-cb]
+  "Save the edit data that lives in the component state to the cursor and
+  send the save signal"
+  (let [array-data (to-array finances-data)
+        new-row (first (filter #(and (contains? % :new) (true? (:new %))) array-data))
+        new-index (.indexOf array-data new-row)
+        should-save-new (save-new-row? array-data)
+        to-save (filter #(not (:new %)) array-data)
+        new-row (dissoc new-row :new)
+        to-save (if should-save-new (into [] (conj to-save new-row)) (into [] to-save))]
+    (if-not (every? row-ok? to-save)
+      (.alert js/window "Check the finances values")
+      (let [fixed-finances (into [] (map utils/calc-burnrate-runway to-save))]
+        (om/update! original-cursor :data fixed-finances)
+        (close-cb)))))
 
 (defcomponent finances-edit [data owner]
   (init-state [_]
     ; add a new line if necessary
     (let [company-data (:company-data data)
           finances-data (:finances company-data)
+          initial-data (:data finances-data)
           cur-period (utils/current-period)]
-      (when-not (utils/period-exists cur-period (:data finances-data))
+      (if-not (utils/period-exists cur-period initial-data)
         (let [new-period {:period cur-period
                           :cash nil
                           :costs nil
                           :revenue nil
                           :new true}
-              new-data (into [new-period] (:data finances-data))]
-          (om/transact! finances-data :data (fn [_]new-data)))))
-    {})
+              new-data (into [new-period] initial-data)]
+          {:data new-data
+           :initial-data initial-data})
+          {:data finances-data
+           :initial-data initial-data})))
   (render [_]
     (let [slug (:slug @router/path)
-          company-data (:company-data data)
-          finances-data (:finances company-data)
+          finances-data (om/get-state owner :data)
           cur-symbol (utils/get-symbol-for-currency-code (:currency (:finances data)))
-          cur-period (utils/current-period)
-          rows-data (map #(merge {:prefix cur-symbol} {:cursor %}) (:data finances-data))]
+          rows-data (map (fn [row] 
+                           (merge {:prefix cur-symbol
+                                   :change-cb (fn [k v]
+                                                (let [idx (.indexOf (to-array finances-data) row)
+                                                      new-row (update row k (fn[_]v))
+                                                      new-rows (assoc finances-data idx new-row)]
+                                                  (om/update-state! owner :data (fn [_] new-rows))))}
+                                  {:cursor row}))
+                         finances-data)]
       (if (:loading data)
         ; loading
         (dom/h4 {} "Loading data...")
@@ -178,10 +220,17 @@
                     (dom/th {} "Burn")
                     (dom/th {} "Runway")))
                 (dom/tbody {}
-                  (om/build-all finances-edit-row rows-data)))
+                  (for [row rows-data]
+                    (om/build finances-edit-row row {:key (str (rand 4))}))))
               (dom/div {:class "finances-edit-buttons"}
                 (dom/button {:class "btn btn-success"
-                             :on-click #(println "Save with api!" (:data finances-data))} "Save")
+                             :on-click #(save-data owner
+                                                   (om/get-state owner :data)
+                                                   (:finances (:company-data data))
+                                                   (:close-edit-cb data))} "Save")
                 (dom/button {:class "btn btn-default cancel"
-                             :on-click (:cancel-edit-callback data)} "Cancel")))))))))
-  
+                             :on-click (fn [_]
+                                         (let [initial-data (om/get-state owner :initial-data)]
+                                           (utils/handle-change (:finances (:company-data data)) initial-data :data))
+                                         ((:close-edit-cb data)))}
+                            "Cancel")))))))))
