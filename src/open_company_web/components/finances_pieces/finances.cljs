@@ -13,7 +13,10 @@
             [open-company-web.components.rich-editor :refer (rich-editor)]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.cell :refer [cell]]
-            [open-company-web.components.revisions-navigator :refer [revisions-navigator]]))
+            [open-company-web.components.revisions-navigator :refer [revisions-navigator]]
+            [open-company-web.api :as api]
+            [open-company-web.dispatcher :refer [app-state]]
+            [shodan.inspection :refer (inspect)]))
 
 (defn subsection-click [e owner]
   (.preventDefault e)
@@ -167,9 +170,22 @@
         to-save (if should-save-new (into [] (conj to-save new-row)) (into [] to-save))]
     (if-not (every? row-ok? to-save)
       (.alert js/window "Check the finances values")
-      (let [fixed-finances (into [] (map utils/calc-burnrate-runway to-save))]
+      (let [fixed-finances (into [] (map utils/calc-burnrate-runway to-save))
+            slug (keyword (:slug @router/path))]
         (om/update! original-cursor :data fixed-finances)
+        (api/update-finances-data (:finances (slug @app-state)))
         (close-cb)))))
+
+(defn replace-row-in-data [owner finances-data row k v]
+  "Find and replace the edited row"
+  (let [array-data (js->clj (to-array finances-data))
+        new-row (update row k (fn[_]v))]
+    (loop [idx 0]
+      (let [cur-row (get array-data idx)]
+        (if (= (:period cur-row) (:period new-row))
+            (let [new-rows (assoc array-data idx new-row)]
+              (om/update-state! owner :data (fn [_] new-rows)))
+          (recur (inc idx)))))))
 
 (defcomponent finances-edit [data owner]
   (init-state [_]
@@ -187,7 +203,7 @@
               new-data (into [new-period] initial-data)]
           {:data new-data
            :initial-data initial-data})
-          {:data finances-data
+          {:data initial-data
            :initial-data initial-data})))
   (render [_]
     (let [slug (:slug @router/path)
@@ -195,11 +211,7 @@
           cur-symbol (utils/get-symbol-for-currency-code (:currency (:finances data)))
           rows-data (map (fn [row] 
                            (merge {:prefix cur-symbol
-                                   :change-cb (fn [k v]
-                                                (let [idx (.indexOf (to-array finances-data) row)
-                                                      new-row (update row k (fn[_]v))
-                                                      new-rows (assoc finances-data idx new-row)]
-                                                  (om/update-state! owner :data (fn [_] new-rows))))}
+                                   :change-cb (fn [k v] (replace-row-in-data owner finances-data row k v))}
                                   {:cursor row}))
                          finances-data)]
       (if (:loading data)
