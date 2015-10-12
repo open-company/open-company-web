@@ -13,12 +13,14 @@
   (render [_]
     (let [finances-data (:data (:finances (:company-data data)))
           value-set (first finances-data)
-          costs-val (utils/format-value (:costs value-set))
           period (utils/period-string (:period value-set))
-          cur-symbol (utils/get-symbol-for-currency-code (:currency data))]
-      (dom/div {:class (str "section costs" (when (:read-only data) " read-only"))}
+          cur-symbol (utils/get-symbol-for-currency-code (:currency (:company-data data)))
+          costs-val (str cur-symbol (utils/format-value (:costs value-set)))]
+      (dom/div {:class (utils/class-set {:section true
+                                         :costs true
+                                         :read-only (:read-only data)})}
         (dom/h3 {}
-                (str cur-symbol costs-val)
+                costs-val
                 (om/build editable-pen {:click-callback (:editable-click-callback data)}))
         (dom/p {} period)
         (om/build column-chart (get-chart-data finances-data cur-symbol :costs "Costs"))))))

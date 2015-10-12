@@ -13,12 +13,14 @@
   (render [_]
     (let [finances-data (:data (:finances (:company-data data)))
           value-set (first finances-data)
-          burn-rate-val (utils/format-value (:burn-rate value-set))
           period (utils/period-string (:period value-set))
-          cur-symbol (utils/get-symbol-for-currency-code (:currency data))]
-      (dom/div {:class (str "section burn-rate" (when (:read-only data) " read-only"))}
+          cur-symbol (utils/get-symbol-for-currency-code (:currency (:company-data data)))
+          burn-rate-val (str cur-symbol (utils/format-value (:burn-rate value-set)))]
+      (dom/div {:class (utils/class-set {:section true
+                                         :burn-rate true
+                                         :read-only (:read-only data)})}
         (dom/h3 {}
-                (str cur-symbol burn-rate-val)
+                burn-rate-val
                 (om/build editable-pen {:click-callback (:editable-click-callback data)}))
         (dom/p {} period)
         (om/build column-chart (get-chart-data finances-data cur-symbol :burn-rate "Burn Rate"))))))
