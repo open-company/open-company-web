@@ -18,7 +18,7 @@
 
 (defn- to-state [owner data state]
   (when (= state :draft)
-    ((:draft-cb data) (.. (om/get-ref owner "edit-field") getDOMNode -value)))
+    ((:draft-cb data) (.parseFloat js/window (.. (om/get-ref owner "edit-field") getDOMNode -value))))
   (om/update-state! owner :cell-state (fn [_] state))
   (when (= state :edit)
     (.setTimeout js/window #(let [input (om/get-ref owner "edit-field")]
