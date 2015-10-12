@@ -533,3 +533,9 @@ div.revisions-navigator div.revisions-navigator-right div.double-next{
   margin-right: 10px;
   color: black;
 }
+
+hr.section-separator{
+  background-color: lightgray;
+  width: 600px;
+  height: 1px;
+}

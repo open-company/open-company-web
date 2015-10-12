@@ -18,7 +18,12 @@
           sorted-section-keys (utils/sort-section-keys company-data)]
       (dom/div {:class "sections-container"}
         (let [merge-partial (partial merge {:data company-data})
-              sections-data (map (fn [section]{:data company-data
+              sections-data (into [] (map (fn [section]{:data company-data
                                                :section section})
-                                 sorted-section-keys)]
-          (om/build-all section-selector sections-data))))))
+                                 sorted-section-keys))]
+          (for [idx (range 0 (count sections-data))]
+            (let [section (sections-data idx)]
+              (dom/div {}
+                (om/build section-selector section)
+                (when (not= idx (dec (count sections-data)))
+                  (dom/hr {:class "section-separator"}))))))))))
