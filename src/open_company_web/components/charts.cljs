@@ -60,7 +60,8 @@
           options (clj->js {
                     :title  ""
                     :width 600
-                    :height 250})]
+                    :height 250
+                    :legend #js {"position" "none"}})]
       (when dom-node (.draw (js/google.visualization.ColumnChart. dom-node) data-table options)))))
 
 (defcomponent column-chart [chart-data owner]
