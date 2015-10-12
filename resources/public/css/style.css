@@ -4,6 +4,10 @@ a{
   cursor: pointer;
 }
 
+a:hover, a:hover *{
+  text-decoration: none;
+}
+
 /*
  * Global add-ons
  */
@@ -257,14 +261,18 @@ div.update-footer{
   left: 50%;
   margin-left: -300px;
   width: 600px;
-  height: 30px;
+  height: 40px;
   vertical-align: middle;
 }
 
-div.update-footer p{
-  float: left;
-  margin: 5px;
+div.update-footer div{
+  margin: 0px 0px 0px 35px;
   color: lightgray;
+  text-decoration: none;
+}
+
+div.update-footer div.author{
+  color: gray;
 }
 
 div.update-footer img.author-image{
@@ -272,6 +280,7 @@ div.update-footer img.author-image{
   width: 30px;
   float: left;
   border-radius: 3px;
+  margin-top: 5px;
 }
 
 div.rich-editor-container {
