@@ -13,8 +13,12 @@
 ; dynamic mount point for components
 (def ^:dynamic c)
 
+(def ^:private body
+  "<h3>Recruiting</h3><p>We're continuing our fast pace of growing the team, and we'd love your help to spread the word about all our <a>current open positions</a>.</p>")
+
 (def test-atom {
-  :body "<h3>Recruiting</h3><p>We're continuing our fast pace of growing the team, and we'd love your help to spread the word about all our <a>current open positions</a>, <a href=\"http://twitter.com\">Twitter</a> or <a href=\"http://buffer.com\">Buffer</a>.</p>"
+  :body body
+  :section "update"
   :updated-at "2015-09-14T20:49:19Z"
   :author {
     :name "Stuart Levinson"
@@ -29,9 +33,6 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root rich-editor app-state {:target c})
-          rich-editor-node (sel1 c [:div.rich-editor])
-          header (sel1 c [:h3])]
+          rich-editor-node (sel1 c [:div.rich-editor])]
       (is (not (nil? rich-editor-node)))
-      (is (not (nil? header)))
-      (is (= (.-innerHTML header) "Recruiting"))
       (tu/unmount! c))))
