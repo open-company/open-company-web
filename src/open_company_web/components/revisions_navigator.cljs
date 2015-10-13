@@ -104,21 +104,21 @@
           (dom/div {}
             (dom/div {:class "revisions-navigator-left"}
               (when rev-first
-                (dom/a {:on-click #(nav-revision! % rev-first owner data true)}
+                (dom/a {:class "rev-double-prev" :on-click #(nav-revision! % rev-first owner data true)}
                   (dom/div {:class "double-prev"}
                     (dom/i {:class "fa fa-backward"}))))
               (when rev-prev
-                (dom/a {:on-click #(nav-revision! % rev-prev owner data true)}
+                (dom/a {:class "rev-single-prev" :on-click #(nav-revision! % rev-prev owner data true)}
                   (dom/div {:class "single-prev"}
                     (dom/i {:class "fa fa-caret-left"})
                     (dom/p {} prev-date)))))
             (dom/div {:class "revisions-navigator-right"}
               (when rev-last
-                (dom/a {:on-click #(nav-revision! % rev-last owner data false)}
+                (dom/a {:class "rev-double-next" :on-click #(nav-revision! % rev-last owner data false)}
                   (dom/div {:class "double-next"}
                     (dom/i {:class "fa fa-forward"}))))
               (when rev-next
-                (dom/a {:on-click #(nav-revision! % rev-next owner data (not= (:updated-at rev-next) (:updated-at last-revision)))}
+                (dom/a {:class "rev-single-next" :on-click #(nav-revision! % rev-next owner data (not= (:updated-at rev-next) (:updated-at last-revision)))}
                   (dom/div {:class "single-next"}
                     (dom/i {:class "fa fa-caret-right"})
                     (dom/p {} next-date)))))))))))
