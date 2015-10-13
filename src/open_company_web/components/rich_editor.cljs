@@ -31,6 +31,9 @@
               init-editor (.hallo jquery-node hallo-opts)]
           (om/update-state! owner :editor (fn[_] init-editor)))))))
 
+(defn set-editing! [owner active]
+  (om/update-state! owner :editing (fn [_]active)))
+
 (defcomponent rich-editor [data owner]
   (init-state [_]
     {:editor nil
@@ -67,14 +70,20 @@
                       :ref "rich-editor"
                       :onClick (fn [e]
                                  (when-not (:read-only data)
-                                   (om/update-state! owner :editing (fn[_] true))))
+                                   (set-editing! owner true)))
+                      :onBlur (fn [e]
+                                (if-let [editor-ref (om/get-ref owner "rich-editor")]
+                                  (let [editor-el (.getDOMNode editor-ref)
+                                        innerHTML (.-innerHTML editor-el)]
+                                    (when (= innerHTML (:body section-data))
+                                      (set-editing! owner false)))))
                       :dangerouslySetInnerHTML (clj->js {"__html" (:body section-data)})})
         (if (om/get-state owner :editing)
           (dom/div {:class "rich-editor-save"}
             (dom/button {:class "btn btn-success"
                          :on-click (fn [e]
                                      (let [value (.. (om/get-ref owner "rich-editor") getDOMNode -innerHTML)]
-                                       (om/update-state! owner :editing (fn[_]false))
+                                       (set-editing! owner false)
                                        (utils/handle-change section-data value :body)
                                        (utils/save-values (:save-channel data))))
                          } "Save")
@@ -84,7 +93,7 @@
                                            el (.getDOMNode (om/get-ref owner "rich-editor"))]
                                        (utils/handle-change section-data init-value :body)
                                        (set! (.-innerHTML el) init-value))
-                                     (om/update-state! owner :editing (fn[_]false)))
+                                     (set-editing! owner false))
                          } "Cancel"))
           (om/build update-footer {:author (:author section-data)
                                    :updated-at (:updated-at section-data)
