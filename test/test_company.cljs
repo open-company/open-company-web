@@ -1,6 +1,9 @@
 (ns test.test-company
   (:require [doo.runner :refer-macros [doo-tests]]
             [test.open-company-web.components.profile]
+            [test.open-company-web.components.all-sections]
+            [test.open-company-web.components.recent-updates]
+            [test.open-company-web.components.revisions-navigator]
             [test.open-company-web.components.finances-pieces.burn-rate]
             [test.open-company-web.components.finances-pieces.cash]
             [test.open-company-web.components.finances-pieces.costs]
@@ -15,6 +18,9 @@
 
 (doo-tests
   'test.open-company-web.components.profile
+  'test.open-company-web.components.all-sections
+  'test.open-company-web.components.recent-updates
+  'test.open-company-web.components.revisions-navigator
   'test.open-company-web.components.finances-pieces.burn-rate
   'test.open-company-web.components.finances-pieces.cash
   'test.open-company-web.components.finances-pieces.costs
