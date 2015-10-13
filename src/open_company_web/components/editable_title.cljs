@@ -67,6 +67,8 @@
     (let [section-data (:section-data data)
           title (om/get-state owner :title)]
       (dom/div {:class "editable-title-container"}
+        (dom/div {:class "hidden-span-container"}
+          (dom/span #js {:ref "hidden-span" :className "hidden-span"} title))
         (if-not (om/get-state owner :editing)
           (dom/h2 {:class (str "editable-title fix" (when (:read-only data) " read-only"))
                    :on-click (fn [e]
@@ -86,6 +88,4 @@
                                         (= (.-key %) "Escape")
                                         (do
                                           (om/update-state! owner :title (fn [_](om/get-state owner :initial-title)))
-                                          (om/update-state! owner :editing (fn [_]false))))}))
-        (dom/div {:style {:text-align "center"}}
-          (dom/span #js {:ref "hidden-span" :className "hidden-span"} title))))))
+                                          (om/update-state! owner :editing (fn [_]false))))}))))))

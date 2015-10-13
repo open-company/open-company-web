@@ -224,6 +224,7 @@ div.finances h2{
 
 div.finances div.link-bar{
   text-align: center;
+  z-index: 1;
 }
 
 div.finances div.link-bar a.finances-link{
@@ -394,6 +395,16 @@ div.editable-title-container span.hidden-span{
   width: 100%;
   height: 37px;
 /*  float: left;*/
+}
+
+div.editable-title-container div.hidden-span-container{
+  z-index: -1;
+  opacity: 0;
+  text-align: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 600px;
 }
 
 div.editable-title-container span.hidden-span{
