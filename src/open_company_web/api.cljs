@@ -70,7 +70,7 @@
   (when section-data
     (let [links (:links section-data)
           slug (:slug @router/path)
-          section (:section section-data)
+          section (keyword (:section section-data))
           section-data (dissoc section-data :section :revisions :updated-at :author :links :sorter)
           json-data (cljs->json section-data)
           section-link (utils/link-for links "update" "PUT")]
