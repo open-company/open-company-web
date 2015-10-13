@@ -15,6 +15,7 @@
 
 (def test-atom {
   :updated-at "2015-09-14T20:49:19Z"
+  :section "update"
   :author {
     :name "Stuart Levinson"
     :slack_id "U06SQLDFT"
@@ -28,8 +29,10 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root update-footer app-state {:target c})
-          timeago-node (sel1 c [:p.timeago])
+          timeago-node (sel1 c [:div.timeago])
+          author-node (sel1 c [:div.author])
           image-node (sel1 c [:img.author-image])]
       (is (not (nil? timeago-node)))
+      (is (not (nil? author-node)))
       (is (not (nil? image-node)))
       (tu/unmount! c))))
