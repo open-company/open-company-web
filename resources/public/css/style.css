@@ -521,7 +521,10 @@ div.revisions-navigator div.revisions-navigator-left div.single-prev,
 div.revisions-navigator div.revisions-navigator-left div.double-prev{
   color: black;
   float: left;
-  margin-left: 10px;
+}
+
+div.revisions-navigator div.revisions-navigator-left div.double-prev{
+  margin-right: 10px;
 }
 
 div.revisions-navigator div.revisions-navigator-right{
@@ -551,8 +554,11 @@ div.revisions-navigator div.revisions-navigator-right div.single-next p{
 div.revisions-navigator div.revisions-navigator-right div.single-next,
 div.revisions-navigator div.revisions-navigator-right div.double-next{
   float: right;
-  margin-right: 10px;
   color: black;
+}
+
+div.revisions-navigator div.revisions-navigator-right div.double-next{
+  margin-left: 10px;
 }
 
 hr.section-separator{
