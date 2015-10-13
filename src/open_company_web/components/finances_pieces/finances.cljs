@@ -45,7 +45,7 @@
           subsection-data {:company-data company-data
                            :read-only read-only
                            :editable-click-callback (:editable-click-callback data)}]
-      (dom/div {:class "row"}
+      (dom/div {:class "row" :id "section-finances"}
         (dom/div {:class "finances"}
           (dom/h2 {:class "finances-title"}
                   "Finances")
