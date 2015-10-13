@@ -7,13 +7,17 @@
 
 (defcomponent recent-updates-item [data owner]
   (render [_]
-    (let [section-title (if (= (:section data) "finances") "Finances" (:title data))
-          href (str "/companies/" (:slug @router/path) "/" (:section data))]
+    (let [section (:section data)
+          section-title (if (= section "finances") "Finances" (:title data))
+          href (str "#" (name section))]
       (dom/li {}
         (dom/a {:href href
                 :on-click (fn [e]
                             (.preventDefault e)
-                            (router/nav! href))}
+                            (let [section-el (.$ js/window (str "#section-" (name section)))
+                                  section-offset (.offset section-el)
+                                  top (- (.-top section-offset) 60)]
+                              (.scrollTo js/$ #js {"top" (str top "px") "left" "0px"})))}
           (dom/div {:class "recent-updates-item"}
             (dom/p {:class "title"} section-title)
             (dom/span {:class "updated-at"} (utils/time-since (:updated-at data)))))))))
