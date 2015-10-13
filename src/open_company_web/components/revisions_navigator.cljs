@@ -1,10 +1,12 @@
 (ns open-company-web.components.revisions-navigator
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
-            [open-company-web.api :as api]))
+            [open-company-web.api :as api]
+            [cljs.core.async :refer [put! chan <!]]))
 
 (defn revision-next
   "Return the first future revision"
@@ -68,10 +70,21 @@
 
 (defcomponent revisions-navigator [data owner]
   (init-state [_]
+    (let [ch (chan)
+          ch-name (str "revisions-update-" (name (:section data)))]
+      (utils/add-channel ch-name ch))
     (let [revisions (:revisions data)
           sorted-revisions (utils/sort-revisions revisions)
           last-revision (last sorted-revisions)]
       {:as-of (:updated-at data)}))
+  (will-mount [_]
+    ; wait for revisions-update-{section} signal than update to latest revision if we already are on the latest
+    (let [section (name (:section data))
+          ch (utils/get-channel (str "revisions-update-" section))]
+      (go (loop []
+        (let [change (<! ch)]
+          (om/update-state! owner :as-of (fn[_] (:as-of change)))
+          (recur))))))
   (render [_]
     (let [revisions (utils/sort-revisions (:revisions data))
           last-revision (last revisions)
