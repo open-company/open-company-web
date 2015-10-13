@@ -46,11 +46,14 @@
                100))
 
 (defn save-section [data owner]
-  ; dismiss editing
-  (om/update-state! owner :editing (fn [_]false))
-  (let [title (clojure.string/trim (:title (:section-data data)))]
+  (let [title (clojure.string/trim (om/get-state owner :title))
+        section-data (:section-data data)]
+    ; change the cursor value
+    (utils/handle-change section-data title :title)
+    ; dismiss editing
+    (om/update-state! owner :editing (fn [_]false))
     ; update the title to remove the spaces
-    (utils/handle-change (:section-data data) title :title)
+    (utils/handle-change section-data title :title)
     (when (not= (om/get-state owner :initial-title) title)
       ; async signal to save data
       (.setTimeout js/window (fn [] (utils/save-values (:save-channel data))) 100)
@@ -59,10 +62,11 @@
 (defcomponent editable-title [data owner]
   (init-state [_]
     {:editing false
-     :initial-title (:title (:section-data data))})
+     :initial-title (:title (:section-data data))
+     :title (:title (:section-data data))})
   (render [_]
     (let [section-data (:section-data data)
-          title (:title section-data)]
+          title (om/get-state owner :title)]
       (dom/div {:class "editable-title-container"}
         (if-not (om/get-state owner :editing)
           (dom/h2 {:class (str "editable-title fix" (when (:read-only data) " read-only"))
@@ -75,10 +79,15 @@
                           :className "editable-title edit"
                           :value title
                           :onChange #(let [value (.. % -target -value)]
-                                       (utils/handle-change section-data value :title))
+                                       (om/update-state! owner :title (fn[_] value)))
                           :onBlur #(save-section data owner)
-                          :onKeyDown #(when (= (.-key %) "Enter")
-                                        (save-section data owner))}))
+                          :onKeyDown #(cond
+                                        (= (.-key %) "Enter")
+                                        (save-section data owner)
+                                        (= (.-key %) "Escape")
+                                        (do
+                                          (om/update-state! owner :title (fn[_](om/get-state owner :initial-title)))
+                                          (om/update-state! owner :editing (fn[_]false))))}))
         (dom/div {:style {:text-align "center"}}
           (dom/span #js {:ref "hidden-span" :className "hidden-span"} title))))))
 
