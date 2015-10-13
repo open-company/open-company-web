@@ -13,7 +13,9 @@
 (def ^:dynamic c)
 
 (def test-atom {
-  :title "Test editable title"
+  :section-data {
+    :title "Test editable title"
+  }
 })
 
 (deftest test-editable-title-component
