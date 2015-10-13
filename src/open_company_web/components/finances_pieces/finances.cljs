@@ -1,4 +1,5 @@
 (ns open-company-web.components.finances-pieces.finances
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
@@ -16,7 +17,8 @@
             [open-company-web.components.revisions-navigator :refer [revisions-navigator]]
             [open-company-web.api :as api]
             [open-company-web.dispatcher :refer [app-state]]
-            [shodan.inspection :refer (inspect)]))
+            [open-company-web.components.editable-title :refer [editable-title]]
+            [cljs.core.async :refer [put! chan <!]]))
 
 (defn subsection-click [e owner]
   (.preventDefault e)
@@ -25,10 +27,22 @@
 
 (defcomponent finances [data owner]
   (init-state [_]
+    (let [save-channel (chan)]
+      (utils/add-channel "save-section-finances" save-channel))
     (let [company-data (:company-data data)
           finances-data (:finances company-data)]
       {:focus "cash"
        :read-only false}))
+  (will-mount [_]
+    (let [save-change (utils/get-channel "save-section-finances")]
+        (go (loop []
+          (let [change (<! save-change)
+                cursor @app-state
+                slug (:slug @router/path)
+                company-data ((keyword slug) cursor)
+                section-data (:finances company-data)]
+            (api/save-or-create-section section-data)
+            (recur))))))
   (render [_]
     (let [focus (om/get-state owner :focus)
           classes "finances-link"
@@ -47,8 +61,10 @@
                            :editable-click-callback (:editable-click-callback data)}]
       (dom/div {:class "row" :id "section-finances"}
         (dom/div {:class "finances"}
-          (dom/h2 {:class "finances-title"}
-                  "Finances")
+          (om/build editable-title {:read-only read-only
+                                    :section-data finances-data
+                                    :section :finances
+                                    :save-channel "save-section-finances"})
           (dom/div {:class "link-bar"}
             (dom/a {:href "#"
                     :class cash-classes
