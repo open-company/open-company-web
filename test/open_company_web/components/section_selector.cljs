@@ -14,20 +14,18 @@
 (def ^:dynamic c)
 
 (def test-atom {
-  :name "Buffer"
-  :currency "USD"
-  :slug "buffer"
-  :sections []
+  :read-only false
+  :section "update"
+  :data {}
 })
 
 (deftest test-section-selector-component
   (testing "Section selector component"
-    (router/set-route! ["companies" "buffer" "section" "cash"]
-                       {:slug "buffer" :section "section" :tab "cash"})
+    (router/set-route! ["companies" "buffer"]
+                       {:slug "buffer"})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root section-selector app-state {:target c})
-          section-selector-node (sel1 c [:h4])]
+          section-selector-node (sel1 c [:div.section-selector])]
       (is (not (nil? section-selector-node)))
-      (is (= (.-innerHTML section-selector-node) "Section section not found"))
       (tu/unmount! c))))
