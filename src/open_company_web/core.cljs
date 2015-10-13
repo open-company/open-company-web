@@ -51,9 +51,10 @@
         ; save route
         (router/set-route! ["companies" slug] {:slug slug
                                                :query-params query-params})
-        ; load data from api
-        (api/get-company slug)
-        (swap! app-state assoc :loading true)
+        (when-not (contains? @app-state (keyword slug))
+          ; load data from api
+          (api/get-company slug)
+          (swap! app-state assoc :loading true))
         ; render compoenent
         (om/root company app-state {:target target})))
 
