@@ -16,7 +16,8 @@
   :value 1234
   :placeholder "placeholder"
   :prefix "$"
-  :cell-state :new})
+  :cell-state :new
+  :draft-cb #()})
 
 
 (deftest test-cell-component
