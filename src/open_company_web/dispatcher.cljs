@@ -2,7 +2,9 @@
   (:require [cljs-flux.dispatcher :as flux]
             [no.en.core :refer [deep-merge]]
             [open-company-web.router :as router]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.lib.utils :as utils]
+            [shodan.inspection :refer (inspect)]
+            [cljs.core.async :refer [put!]]))
 
 (defonce app-state (atom {}))
 
@@ -55,8 +57,15 @@
               sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
               section-body (if (= (:section body) :finances)
                              (assoc section-body :data sorted-finances)
-                             section-body)]
-          (swap! app-state assoc-in [(:slug body) (:section body)] section-body))))))
+                             section-body)
+              section-body (assoc section-body :section (:section body))
+              section-body (assoc section-body :sorter (:updated-at section-body))]
+          (swap! app-state assoc-in [(:slug body) (:section body)] section-body)
+          ; signal to update as-of
+          (let [ch (utils/get-channel (str "revisions-update-" (name (:section body))))
+                revisions (utils/sort-revisions (:revisions section-body))
+                last-revision (last revisions)]
+            (put! ch {:as-of (:updated-at last-revision)})))))))
 
 (def revision-dispatch
   (flux/register
