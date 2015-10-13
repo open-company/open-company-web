@@ -4,6 +4,7 @@ $.select2 = function(){};
 $.tooltip = function(){};
 $.width = function(){};
 $.hallo = function(){};
+$.scrollTo = function(){};
 var jQuery = function(){};
 // Hallo
 var hallo = function(){};
