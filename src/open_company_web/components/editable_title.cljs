@@ -46,14 +46,10 @@
                100))
 
 (defn save-section [data owner]
-  (let [title (clojure.string/trim (om/get-state owner :title))
-        section-data (:section-data data)]
-    ; change the cursor value
-    (utils/handle-change section-data title :title)
-    ; dismiss editing
-    (om/update-state! owner :editing (fn [_]false))
-    ; update the title to remove the spaces
-    (utils/handle-change section-data title :title)
+  ; dismiss editing
+  (om/update-state! owner :editing (fn [_]false))
+  (let [title (clojure.string/trim (om/get-state owner :title))]
+    (utils/handle-change (:section-data data) title :title)
     (when (not= (om/get-state owner :initial-title) title)
       ; async signal to save data
       (.setTimeout js/window (fn [] (utils/save-values (:save-channel data))) 100)
@@ -64,6 +60,9 @@
     {:editing false
      :initial-title (:title (:section-data data))
      :title (:title (:section-data data))})
+  (will-update [_ next-props next-state]
+    (when (not= next-props data)
+      (om/update-state! owner :title (fn [_] (:title (:section-data next-props))))))
   (render [_]
     (let [section-data (:section-data data)
           title (om/get-state owner :title)]
@@ -79,16 +78,14 @@
                           :className "editable-title edit"
                           :value title
                           :onChange #(let [value (.. % -target -value)]
-                                       (om/update-state! owner :title (fn[_] value)))
+                                       (om/update-state! owner :title (fn [_]value)))
                           :onBlur #(save-section data owner)
                           :onKeyDown #(cond
                                         (= (.-key %) "Enter")
                                         (save-section data owner)
                                         (= (.-key %) "Escape")
                                         (do
-                                          (om/update-state! owner :title (fn[_](om/get-state owner :initial-title)))
-                                          (om/update-state! owner :editing (fn[_]false))))}))
+                                          (om/update-state! owner :title (fn [_](om/get-state owner :initial-title)))
+                                          (om/update-state! owner :editing (fn [_]false))))}))
         (dom/div {:style {:text-align "center"}}
           (dom/span #js {:ref "hidden-span" :className "hidden-span"} title))))))
-
-
