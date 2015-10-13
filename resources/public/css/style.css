@@ -297,6 +297,10 @@ div.rich-editor-container div.fake-rich-editor{
   margin-bottom: 10px;
 }
 
+div.rich-editor-container div.rich-editor-save{
+  height: 40px;
+}
+
 div.rich-editor-container div.rich-editor-save button.cancel-button{
   margin-left: 10px;
 }
