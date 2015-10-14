@@ -68,6 +68,11 @@
   (let [save-channel (get-channel channel-name)]
     (put! save-channel 1)))
 
+(defn in?
+  "true if seq contains elm"
+  [coll elm]
+  (some #(= elm %) coll))
+
 (defn get-period-string [period]
   (case period
     "M1" "January"
@@ -109,7 +114,7 @@
 (defn period-string [period & flags]
   (let [[year month] (clojure.string/split period "-")
         month-str (month-string month)]
-    (if (or (contains? flags :force-year) (= month "01") (= month "12"))
+    (if (or (in? flags :force-year) (= month "01") (= month "12"))
       (str month-str " " year)
       month-str)))
 
