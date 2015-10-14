@@ -35,13 +35,17 @@
         (let [updated-body (utils/fix-sections body)]
           ; calc burn-rate and runway
           ; and add the new values to the atom
-          (if (contains? (:sections updated-body) "finances")
-            (let [finances (:data (:finances updated-body))
-                  fixed-finances (into [] (map utils/calc-burnrate-runway finances))
+          (if (utils/in? (:sections updated-body) "finances")
+            (let [finances (:finances updated-body)
+                  finances-data (:data finances)
+                  fixed-finances (into [] (map utils/calc-burnrate-runway finances-data))
                   sort-pred (utils/sort-by-key-pred :period true)
                   sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
-                  fixed-body (assoc-in updated-body [:finances :data] sorted-finances)]
-              (swap! app-state assoc (keyword (:slug updated-body)) fixed-body))
+                  fixed-body (assoc-in updated-body [:finances :data] sorted-finances)
+                  body-with-notes (if-not (contains? (:finances fixed-body) :notes)
+                                    (assoc fixed-body :finances (merge (:finances fixed-body) {:notes {:body ""}}))
+                                    fixed-body)]
+              (swap! app-state assoc (keyword (:slug updated-body)) body-with-notes))
             (swap! app-state assoc (keyword (:slug updated-body)) updated-body)))))))
 
 (def section-dispatch
