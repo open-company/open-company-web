@@ -76,7 +76,7 @@
                                                    :hidden read-only
                                                    :no-data should-show-placeholder})
                       :ref "rich-editor"
-                      :onClick (fn [e]
+                      :onFocus (fn [e]
                                  (when-not (:read-only data)
                                    (set-editing! owner true)))
                       :onBlur (fn [e]
