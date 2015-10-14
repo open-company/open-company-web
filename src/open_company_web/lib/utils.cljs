@@ -2,9 +2,15 @@
     (:require [om.core :as om :include-macros true]
               [clojure.string]
               [open-company-web.lib.iso4217 :refer [iso4217]]
-              [cljs.core.async :refer [put!]]))
+              [cljs.core.async :refer [put!]]
+              [open-company-web.router :as router]))
 
 (defn abs [n] (max n (- n)))
+
+(defn sort-by-key-pred [k & invert]
+  (if-not (first invert)
+    (fn [a b] (compare (k a) (k b)))
+    (fn [a b] (compare (k b) (k a)))))
 
 (defn thousands-separator [number]
   (let [parts (clojure.string/split (str number) "." 1)
@@ -39,9 +45,8 @@
                   (contains? currency :symbol)
                   (> (count (:symbol currency)) 0))
                 (:symbol currency)
-                currency-code)
-        ret (or symbol (:code currency))]
-  ret))
+                currency-code)]
+    (or symbol (:code currency))))
 
 (def channel-coll (atom {}))
 
@@ -62,11 +67,6 @@
 (defn save-values [channel-name]
   (let [save-channel (get-channel channel-name)]
     (put! save-channel 1)))
-
-(defn in?
-  "true if seq contains elm"
-  [seq elm]
-  (some #(= elm %) seq))
 
 (defn get-period-string [period]
   (case period
@@ -90,152 +90,187 @@
 
     ""))
 
+(defn month-string [month]
+  (case month
+    "01" "January"
+    "02" "February"
+    "03" "March"
+    "04" "April"
+    "05" "May"
+    "06" "June"
+    "07" "July"
+    "08" "August"
+    "09" "September"
+    "10" "October"
+    "11" "November"
+    "12" "December"
+    ""))
+
+(defn period-string [period & flags]
+  (let [[year month] (clojure.string/split period "-")
+        month-str (month-string month)]
+    (if (or (contains? flags :force-year) (= month "01") (= month "12"))
+      (str month-str " " year)
+      month-str)))
+
 (defn get-periods [prefix n]
  (let [r (range 1 (+ n 1))]
     (into [] (for [a r] (str prefix a)))))
 
-(def users [
-  { :tz_label "Pacific Daylight Time"
-    :deleted false
-    :is_bot false
-    :color "e7392d"
-    :real_name "Iacopo Carraro"
-    :name "iacopo"
-    :has_files true
-    :tz nil
-    :is_primary_owner false
-    :is_restricted false
-    :is_admin false
-    :is_ultra_restricted false
-    :status nil
-    :id "U06STCKLN"
-    :is_owner false
-    :has_2fa false
-    :profile {
-      :email "iacopo@opencompany.io"
-      :first_name "Iacopo"
-      :real_name_normalized "Iacopo Carraro"
-      :image_48 "https://secure.gravatar.com/avatar/98b5456ea1c562024f41501ffd7bc3c6.jpg?s=48&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0022-48.png"
-      :image_192 "https://secure.gravatar.com/avatar/98b5456ea1c562024f41501ffd7bc3c6.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0022.png"
-      :real_name "Iacopo Carraro"
-      :image_72 "https://secure.gravatar.com/avatar/98b5456ea1c562024f41501ffd7bc3c6.jpg?s=72&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0022-72.png"
-      :image_24 "https://secure.gravatar.com/avatar/98b5456ea1c562024f41501ffd7bc3c6.jpg?s=24&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0022-24.png"
-      :image_32 "https://secure.gravatar.com/avatar/98b5456ea1c562024f41501ffd7bc3c6.jpg?s=32&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0022-32.png"
-      :last_name "Carraro"}
-    :tz_offset -25200}
-  { :tz_label "Pacific Daylight Time"
-    :deleted false
-    :is_bot false
-    :color "3c989f"
-    :real_name "Scott Johnson"
-    :name "scott"
-    :has_files false
-    :tz nil
-    :is_primary_owner false
-    :is_restricted false
-    :is_admin false
-    :is_ultra_restricted false
-    :status nil
-    :id "U06SU26MD"
-    :is_owner false
-    :profile {
-      :email "scott@opencompany.io"
-      :first_name "Scott"
-      :real_name_normalized "Scott Johnson"
-      :image_48 "https://secure.gravatar.com/avatar/dd620d96970e0f7565cb4c12044eb7f9.jpg?s=48&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0018-48.png"
-      :image_192 "https://secure.gravatar.com/avatar/dd620d96970e0f7565cb4c12044eb7f9.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0018.png"
-      :real_name "Scott Johnson"
-      :image_72 "https://secure.gravatar.com/avatar/dd620d96970e0f7565cb4c12044eb7f9.jpg?s=72&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F3654%2Fimg%2Favatars%2Fava_0018-72.png"
-      :image_24 "https://secure.gravatar.com/avatar/dd620d96970e0f7565cb4c12044eb7f9.jpg?s=24&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0018-24.png"
-      :image_32 "https://secure.gravatar.com/avatar/dd620d96970e0f7565cb4c12044eb7f9.jpg?s=32&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0018-32.png"
-      :last_name "Johnson"
-    }
-    :tz_offset -25200}
-  { :tz_label "Pacific Daylight Time"
-    :deleted false
-    :is_bot false
-    :color "9f69e7"
-    :real_name ""
-    :name "sean"
-    :has_files true
-    :tz nil
-    :is_primary_owner true
-    :is_restricted false
-    :is_admin true
-    :is_ultra_restricted false
-    :status nil
-    :id "U06SBTXJR"
-    :is_owner true
-    :profile {
-      :real_name ""
-      :real_name_normalized ""
-      :email "sean@opencompany.io"
-      :image_24 "https://secure.gravatar.com/avatar/f5b8fc1affa266c8072068f811f63e04.jpg?s=24&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0020-24.png"
-      :image_32 "https://secure.gravatar.com/avatar/f5b8fc1affa266c8072068f811f63e04.jpg?s=32&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0020-32.png"
-      :image_48 "https://secure.gravatar.com/avatar/f5b8fc1affa266c8072068f811f63e04.jpg?s=48&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0020-48.png"
-      :image_72 "https://secure.gravatar.com/avatar/f5b8fc1affa266c8072068f811f63e04.jpg?s=72&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0020-72.png"
-      :image_192 "https://secure.gravatar.com/avatar/f5b8fc1affa266c8072068f811f63e04.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F3654%2Fimg%2Favatars%2Fava_0020.png"
-    }
-    :tz_offset -25200}
-  { :tz_label "Pacific Daylight Time"
-    :deleted false
-    :is_bot false
-    :color "4bbe2e"
-    :real_name "Stuart Levinson"
-    :name "stuart"
-    :has_files true
-    :tz nil
-    :is_primary_owner false
-    :is_restricted false
-    :is_admin false
-    :is_ultra_restricted false
-    :status nil
-    :id "U06SQLDFT"
-    :is_owner false
-    :profile {
-      :email "stuart@opencompany.io"
-      :first_name "Stuart"
-      :real_name_normalized "Stuart Levinson"
-      :image_48 "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=48&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015-48.png"
-      :image_192 "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
-      :real_name "Stuart Levinson"
-      :image_72 "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=72&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015-72.png"
-      :image_24 "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=24&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015-24.png"
-      :image_32 "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=32&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015-32.png"
-      :last_name "Levinson"
-    }
-    :tz_offset -25200}
-  { :tz_label "Pacific Daylight Time"
-    :deleted false
-    :is_bot true
-    :color "674b1b"
-    :real_name "Transparency Bot"
-    :name "transparencybot"
-    :has_files false
-    :tz nil
-    :is_primary_owner false
-    :is_restricted false
-    :is_admin false
-    :is_ultra_restricted false
-    :status nil
-    :id "U09GS25L4"
-    :is_owner false
-    :profile {
-      :image_512 "https://avatars.slack-edge.com/2015-08-24/9570128512_e722b04e32ec23b1b6ec_192.jpg"
-      :first_name "Transparency"
-      :real_name_normalized "Transparency Bot"
-      :image_48 "https://avatars.slack-edge.com/2015-08-24/9570128512_e722b04e32ec23b1b6ec_48.jpg"
-      :image_192 "https://avatars.slack-edge.com/2015-08-24/9570128512_e722b04e32ec23b1b6ec_192.jpg"
-      :real_name "Transparency Bot"
-      :image_original "https://avatars.slack-edge.com/2015-08-24/9570128512_e722b04e32ec23b1b6ec_original.jpg"
-      :image_72 "https://avatars.slack-edge.com/2015-08-24/9570128512_e722b04e32ec23b1b6ec_72.jpg"
-      :image_24 "https://avatars.slack-edge.com/2015-08-24/9570128512_e722b04e32ec23b1b6ec_24.jpg"
-      :title "Helps open your company"
-      :image_32 "https://avatars.slack-edge.com/2015-08-24/9570128512_e722b04e32ec23b1b6ec_32.jpg"
-      :last_name "Bot"
-      :image_1024 "https://avatars.slack-edge.com/2015-08-24/9570128512_e722b04e32ec23b1b6ec_192.jpg"
-      :bot_id "B09GS6LSW"
-    }
-    :tz_offset -25200
-  }
-])
+(defn format-value [value]
+  (if (nil? value)
+    0
+    (.toLocaleString value)))
+
+(defn calc-burnrate-runway
+  "Helper function that add burn-rate and runway to each update section"
+  [update]
+  (let [costs (:costs update)
+        revenue (:revenue update)
+        cash (:cash update)
+        burn-rate (- revenue costs)
+        burn-rate (if (js/isNaN burn-rate) 0 burn-rate)
+        period-runway (/ cash (abs burn-rate))
+        runway (int (* period-runway 30))]
+    (merge update {:burn-rate burn-rate :runway runway})))
+
+(defn camel-case-str [value]
+  (let [upper-value (clojure.string/replace value #"^(\w)" #(clojure.string/upper-case (first %1)))]
+    (clojure.string/replace upper-value #"-(\w)"
+                            #(str " " (clojure.string/upper-case (second %1))))))
+  
+(defn time-since
+  "Get a string representing the elapsed time from a date in the past"
+  [past-date]
+  (let [past (.getTime (new js/Date past-date))
+        now (.getTime (new js/Date))
+        seconds (.floor js/Math (/ (- now past) 1000))
+        years-interval (.floor js/Math (/ seconds 31536000))]
+    (if (> years-interval 1)
+      (str years-interval " years ago")
+      (let [months-interval (.floor js/Math (/ seconds 2592000))]
+        (if (> months-interval 1)
+          (str months-interval " months ago")
+          (let [days-interval (.floor js/Math (/ seconds 86400))]
+            (if (> days-interval 1)
+              (str days-interval " days ago")
+              (let [hours-interval (.floor js/Math (/ seconds 3600))]
+                (if (> hours-interval 1)
+                  (str hours-interval " hours ago")
+                  (let [minutes-interval (.floor js/Math (/ seconds 60))]
+                    (if (> minutes-interval 1)
+                      (str minutes-interval " minutes ago")
+                      (str "just now"))))))))))))
+
+(defn get-click-position
+  "Return the x position inside the clicked element"
+  [event]
+  (let [client-x (.-clientX event)
+        bound-rect (.getBoundingClientRect (.-target event))
+        lf (.-left bound-rect)
+        from-left (- client-x lf)]
+    from-left))
+
+(defn set-caret-position!
+  "Move the caret to the specified position of a certain element"
+  [elem caret-pos]
+  (when elem
+    (cond
+      (.-createTextRange elem)
+      (let [rg (.createTextRange elem)]
+        (.move rg "character" caret-pos)
+        (.select rg))
+
+      (.-selectionStart elem)
+      (do
+        (.focus elem)
+        (.setSelectionRange elem caret-pos caret-pos))
+
+      :else
+      (.focus elem))))
+
+(defn class-set
+  "Given a map of class names as keys return a string of the those classes that evaulates as true"
+  [classes]
+  (apply str (map #(str " " (name %)) (keys (filter #(second %) classes)))))
+
+(defn period-exists [period data]
+  (if (> (count (filter #(= (:period %) period) data)) 0)
+    true
+    false))
+
+(defn current-period []
+  (let [date (js/Date.)
+        month (+ (.getMonth date) 1)
+        month-str (str (when (< month 10) "0") month)
+        cur-period (str (.getFullYear date) "-" month-str)]
+    cur-period))
+
+(defn get-section-keys [company-data]
+  (let [section-names (:sections company-data)]
+    (into [] (map keyword section-names))))
+
+(defn sort-section-keys-func [a b company-data]
+  (let [sec1 (a company-data)
+        sec2 (b company-data)]
+    (compare (:sorter sec2) (:sorter sec1))))
+
+(defn sort-section-keys [company-data]
+  (let [section-keys (get-section-keys company-data)]
+    (sort #(sort-section-keys-func %1 %2 company-data) section-keys)))
+
+(defn get-sections [section-keys company-data]
+  (loop [ks section-keys
+         sections []]
+    (if (> (count ks) 0)
+      (do
+        (let [k (first ks)
+              section (k company-data)]
+          (recur (subvec ks 1)
+                 (conj sections section))))
+      sections)))
+
+(defn sort-sections [company-data]
+  (let [section-keys (get-section-keys company-data)
+        sections (get-sections section-keys company-data)
+        sort-pred (sort-by-key-pred :updated-at true)]
+    (sort #(sort-pred %1 %2) sections)))
+
+(defn fix-sections [company-data]
+  "add section name in each section and a section sorter"
+  (let [section-keys (get-section-keys company-data)]
+    (loop [sections section-keys
+           body company-data]
+      (if (pos? (count sections))
+        (let [cur-key (first sections)
+              section (cur-key body)
+              updated-section (assoc section :section (name cur-key))
+              updated-section (assoc updated-section :sorter (:updated-at section))
+              updated-body (assoc body cur-key updated-section)]
+          (recur (subvec sections 1)
+                 updated-body))
+        body))))
+
+(defn sort-revisions [revisions]
+  (let [sort-pred (sort-by-key-pred :updated-at)]
+    (into [] (sort #(sort-pred %1 %2) revisions))))
+
+(defn add-zero [v]
+  (str (when (< v 10) "0") v))
+
+(defn as-of [date]
+  (let [year (.getFullYear date)
+        month (add-zero (inc (.getMonth date)))
+        day (add-zero (.getDate date))
+        hours (add-zero (.getHours date))
+        minutes (add-zero (.getMinutes date))
+        seconds (add-zero (.getSeconds date))]
+    (str year "-" month "-" day "T" hours ":" minutes ":" seconds "Z")))
+
+(defn as-of-now []
+  (let [date (new js/Date)]
+    (as-of date)))
+
+(defn link-for
+  ([links rel] (some #(if (= (:rel %) rel) % nil) links))
+  ([links rel method] (some #(if (and (= (:method %) method) (= (:rel %) rel)) % nil) links)))

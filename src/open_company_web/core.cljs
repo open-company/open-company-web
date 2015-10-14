@@ -5,7 +5,6 @@
             [open-company-web.components.page :refer [company]]
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
-            [open-company-web.components.report :refer [report readonly-report]]
             [open-company-web.lib.raven :refer [raven-setup]]
             [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.api :as api]
@@ -21,7 +20,7 @@
 ; is undefined because it breaks tests
 (if-let [target (. js/document (getElementById "app"))]
   (do
-    (defroute list-page-route "/companies" []
+    (defn home-handler []
       ; save route
       (router/set-route! ["companies"] {})
       ; load data from api
@@ -29,52 +28,77 @@
       ; render component
       (om/root list-companies app-state {:target target}))
 
-    (defroute company-profile-route "/companies/:ticker" {{ticker :ticker} :params}
-      ; save route
-      (router/set-route! ["companies" ticker] {:ticker ticker})
-      ; load data from api
-      (api/get-company ticker)
-      (swap! app-state assoc :loading true)
-      ; render compoenent
+    (defroute home-page-route "/" []
+      (home-handler))
+
+    (defroute list-page-route "/companies" []
+      (home-handler))
+
+    (defroute company-profile-route "/companies/:slug/profile" {:as params}
+      (let [slug (:slug (:params params))
+            query-params (:query-params params)]
+        ; save route
+        (router/set-route! ["companies" slug] {:slug slug :query-params query-params})
+        ; load data from api
+        (api/get-company slug)
+        (swap! app-state assoc :loading true)
+        ; render compoenent
+        (om/root company app-state {:target target})))
+
+    (defroute company-route "/companies/:slug" {:as params}
+      (let [slug (:slug (:params params))
+            query-params (:query-params params)]
+        ; save route
+        (router/set-route! ["companies" slug] {:slug slug
+                                               :query-params query-params})
+        (when-not (contains? @app-state (keyword slug))
+          ; load data from api
+          (api/get-company slug)
+          (swap! app-state assoc :loading true))
+        ; render compoenent
+        (om/root company app-state {:target target})))
+
+    (defn section-handler [slug section]
+      ; if there are no company data
+      (when-not (contains? @app-state (keyword slug))
+        ; load data from api
+        (swap! app-state assoc :loading true)
+        (api/get-company slug))
+      ; render component
       (om/root company app-state {:target target}))
 
-    (defroute report-summary-route "/companies/:ticker/summary" {{ticker :ticker} :params}
-      ; save route
-      (router/set-route! ["companies" ticker "summary"] {:ticker ticker})
-      ; load data from api
-      (swap! app-state assoc :loading true)
-      (api/get-company ticker)
-      ; render component
-      (om/root report app-state {:target target}))
+    (defroute section-route "/companies/:slug/:section" {:as params}
+      (let [slug (:slug (:params params))
+            section (:section (:params params))
+            query-params (:query-params params)]
+        ; save route
+        (router/set-route! ["companies" slug section] {:slug slug
+                                                       :section section
+                                                       :query-params query-params})
+        (section-handler slug section)))
 
-    (defroute report-editable-route "/companies/:ticker/reports/:year/:period/edit" {{ticker :ticker year :year period :period} :params}
-      ; save route
-      (router/set-route! ["companies" ticker "reports" year period "edit"] {:ticker ticker :year year :period period})
-      ; load data from api
-      (swap! app-state assoc :loading true)
-      (api/get-report ticker year period)
-      ; render component
-      (om/root report app-state {:target target}))
-
-    (defroute report-route "/companies/:ticker/reports/:year/:period" {{ticker :ticker year :year period :period} :params}
-      ; save route
-      (router/set-route! ["companies" ticker "reports" year period] {:ticker ticker :year year :period period})
-      ; load data from api
-      (swap! app-state assoc :loading true)
-      (api/get-report ticker year period)
-      ; render component
-      (om/root readonly-report app-state {:target target}))
+    (defroute section-edit-route "/companies/:slug/:section/edit" {:as params}
+      (let [slug (:slug (:params params))
+            section (:section (:params params))
+            query-params (:query-params params)]
+        ; save route
+        (router/set-route! ["companies" slug section "edit"] {:slug slug
+                                                              :section section
+                                                              :tab "edit"
+                                                              :query-params query-params})
+        (section-handler slug section)))
 
     (defroute not-found-route "*" []
       ; render component
       (om/root page-not-found app-state {:target target}))
 
     (def dispatch!
-      (secretary/uri-dispatcher [list-page-route
+      (secretary/uri-dispatcher [home-page-route
+                                 list-page-route
+                                 company-route
                                  company-profile-route
-                                 report-summary-route
-                                 report-editable-route
-                                 report-route
+                                 section-route
+                                 section-edit-route
                                  not-found-route]))
 
     (defn handle-url-change [e]
@@ -99,5 +123,6 @@
   ;; optionally touch your app-state to force rerendering depending on
   ;; your application
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
+  (.clear js/console)
   (dispatch! (router/get-token))
 )

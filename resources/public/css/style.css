@@ -4,6 +4,10 @@ a{
   cursor: pointer;
 }
 
+a:hover, a:hover *{
+  text-decoration: none;
+}
+
 /*
  * Global add-ons
  */
@@ -99,6 +103,10 @@ span.num.red {
   float: left;
   padding-left: 15px;
   padding-right: 15px;
+}
+
+.hidden {
+  display: none;
 }
 
 div#app{
@@ -210,9 +218,101 @@ span img.user-icon{
   margin-right: 5px;
 }
 
+div.finances h2{
+  text-align: center;
+}
+
+div.finances div.link-bar{
+  text-align: center;
+  z-index: 1;
+}
+
+div.finances div.link-bar a.finances-link{
+  text-decoration: underline;
+  margin: 10px;
+}
+
+div.finances div.link-bar a.finances-link.active{
+  text-decoration: none;
+}
+
+div.finances div.finances-body{
+  width: 600px;
+  left: 50%;
+  margin-left: -300px;
+  position: relative;
+}
+
+div.finances div.finances-body div.section{
+  text-align: center;
+}
+
+div.finances div.finances-body div.section h3{
+  margin-bottom: 0px;
+}
+
+div.finances div.finances-body div.section h3 span{
+  margin-left: 24px;
+}
+
+div.finances div.finances-body div.section div.chart-container{
+  position: relative;
+  left: 50%;
+  margin-left: -300px;
+}
+
+div.update-footer{
+  position: relative;
+  left: 50%;
+  margin-left: -300px;
+  width: 600px;
+  height: 40px;
+  vertical-align: middle;
+}
+
+div.update-footer div{
+  margin: 0px 0px 0px 35px;
+  color: lightgray;
+  text-decoration: none;
+}
+
+div.update-footer div.author{
+  color: gray;
+}
+
+div.update-footer img.author-image{
+  height: 30px;
+  width: 30px;
+  float: left;
+  border-radius: 3px;
+  margin-top: 5px;
+}
+
+div.rich-editor-container {
+  position: relative;
+  left: 50%;
+  margin-left: -300px;
+  width: 600px;
+  margin-top: 30px;
+}
+
+div.rich-editor-container div.rich-editor,
+div.rich-editor-container div.fake-rich-editor{
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+div.rich-editor-container div.rich-editor-save{
+  height: 40px;
+}
+
+div.rich-editor-container div.rich-editor-save button.cancel-button{
+  margin-left: 10px;
+}
+
 .comp-cell {
   border: 2px solid transparent;
-  width: 170px;
+  width: 100px;
   height: 30px;
 }
 
@@ -259,4 +359,229 @@ span img.user-icon{
   border: 0px solid black;
   outline: none;
   text-align: left;
+}
+
+div.editable-title-container{
+  width: 600px;
+  position: relative;
+  left: 50%;
+  margin-left: -300px;
+  height: 37px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+div.editable-title-container h2{
+  cursor: text;
+}
+
+div.editable-title-container h2.read-only{
+  cursor: pointer;
+}
+
+div.editable-title-container h2,
+div.editable-title-container input,
+div.editable-title-container span.hidden-span{
+  text-align: center;
+  color: black;
+  font-size: 30px;
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1.1;
+  color: inherit;
+  box-sizing: border-box;
+  padding: 0px;
+  margin: 0px;
+  width: 100%;
+  height: 37px;
+/*  float: left;*/
+}
+
+div.editable-title-container div.hidden-span-container{
+  z-index: -1;
+  opacity: 0;
+  text-align: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 600px;
+}
+
+div.editable-title-container span.hidden-span{
+  opacity: 0;
+}
+
+div.editable-title-container h2{
+  border: 1px solid white;
+  outline: none;
+  padding-top: 1px;
+}
+
+div.editable-title-container input{
+  border: 1px solid black;
+  outline: none;
+}
+
+form.linkForm input.url {
+  color: black;
+}
+
+form.linkForm input#addlinkButton {
+  background-color: black;
+}
+
+div.finances div.finances-body.edit{
+  width: 800px;
+  left: 50%;
+  margin-left: -400px;
+  position: relative;
+}
+
+div.finances-body i.editable-pen{
+  opacity: 0;
+  margin-left: 10px;
+  cursor: default;
+}
+
+div.finances-body.editable:hover i.editable-pen{
+  opacity: 1;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+div.finances-body table.table td, div.finances-body table.table th{
+  text-align: right;
+}
+
+div.finances-body table.table td.no-cell{
+  padding-top: 12px;
+}
+
+div.finances-body table.table td.new-row-placeholder{
+  color: lightgray;
+}
+
+div.finances-body table.table td div.comp-cell{
+  float: right;
+}
+
+div.finances-body div.finances-edit-buttons{
+  margin-left: 234px;
+}
+
+div.finances-body div.finances-edit-buttons button.cancel{
+  margin-left: 10px;
+}
+
+div.recent-updates{
+  margin-top: 8px;
+}
+
+div.recent-updates ul.recent-updates-list{
+  width: 300px;
+}
+
+div.recent-updates div.recent-updates-item{
+  height: 27px;
+}
+
+div.recent-updates div.recent-updates-item p.title {
+  font-size: 14px;
+  color: black;
+  float: left;
+}
+
+div.recent-updates div.recent-updates-item span.updated-at {
+  font-size: 11px;
+  color: gray;
+  float: right;
+}
+
+a.settings i{
+  color: lightgray;
+  font-size: 18px;
+}
+
+div.simple-section-revisions-navigator{
+  width: 600px;
+  left: 50%;
+  margin-left: 300px;
+}
+
+div.revisions-navigator{
+  width: 100%;
+  height: 34px;
+}
+
+div.revisions-navigator div.revisions-navigator-left{
+  float: left;
+}
+
+div.revisions-navigator div.revisions-navigator-left div.double-prev{
+  font-size: 20px;
+  margin-top: 6px;
+}
+
+div.revisions-navigator div.revisions-navigator-left div.single-prev{
+  margin-top: 5px;
+}
+
+div.revisions-navigator div.revisions-navigator-left div.single-prev i{
+  font-size: 28px;
+  float:left;
+}
+div.revisions-navigator div.revisions-navigator-left div.single-prev p{
+  font-size: 14px;
+  margin: 5px 0px 0px 8px;
+  float: left;
+}
+
+div.revisions-navigator div.revisions-navigator-left div.single-prev,
+div.revisions-navigator div.revisions-navigator-left div.double-prev{
+  color: black;
+  float: left;
+}
+
+div.revisions-navigator div.revisions-navigator-left div.double-prev{
+  margin-right: 10px;
+}
+
+div.revisions-navigator div.revisions-navigator-right{
+  float: right;
+}
+
+div.revisions-navigator div.revisions-navigator-right div.double-next{
+  font-size: 20px;
+  margin-top: 6px;
+}
+
+div.revisions-navigator div.revisions-navigator-right div.single-next{
+  margin-top: 5px;
+}
+
+div.revisions-navigator div.revisions-navigator-right div.single-next i{
+  font-size: 28px;
+  float:right;
+}
+
+div.revisions-navigator div.revisions-navigator-right div.single-next p{
+  font-size: 14px;
+  margin: 5px 8px 0px 0px;
+  float: right;
+}
+
+div.revisions-navigator div.revisions-navigator-right div.single-next,
+div.revisions-navigator div.revisions-navigator-right div.double-next{
+  float: right;
+  color: black;
+}
+
+div.revisions-navigator div.revisions-navigator-right div.double-next{
+  margin-left: 10px;
+}
+
+hr.section-separator{
+  background-color: lightgray;
+  width: 600px;
+  height: 1px;
 }

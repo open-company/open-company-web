@@ -5,7 +5,9 @@
             [om.core :as om :include-macros true]
             [dommy.core :as dommy :refer-macros [sel1 sel]]
             [open-company-web.components.profile :refer [profile]]
-            [om.dom :as dom :include-macros true]))
+            [om.dom :as dom :include-macros true]
+            [open-company-web.data.finances :as finances-data]
+            [open-company-web.router :as router]))
 
 (enable-console-print!)
 
@@ -16,10 +18,13 @@
   ; basics
   :offsetTop 0
   :offsetLeft 0
+  :buffer finances-data/finances
 })
 
 (deftest test-profile-component
   (testing "Profile component"
+    (router/set-route! ["companies" "buffer" "finances" "cash"]
+                       {:slug "buffer" :section "finances" :tab "cash"})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root profile app-state {:target c})

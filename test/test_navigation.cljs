@@ -4,7 +4,8 @@
             [test.open-company-web.components.page-not-found]
             [test.open-company-web.components.list-companies]
             [test.open-company-web.components.navbar]
-            [test.open-company-web.components.sidebar]))
+            [test.open-company-web.components.sidebar]
+            [test.open-company-web.components.section-selector]))
 
 (enable-console-print!)
 
@@ -16,4 +17,5 @@
   'test.open-company-web.components.page-not-found
   'test.open-company-web.components.list-companies
   'test.open-company-web.components.navbar
-  'test.open-company-web.components.sidebar)
+  'test.open-company-web.components.sidebar
+  'test.open-company-web.components.section-selector)
