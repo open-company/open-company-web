@@ -35,7 +35,7 @@
         (let [updated-body (utils/fix-sections body)]
           ; calc burn-rate and runway
           ; and add the new values to the atom
-          (if (utils/in? (:sections updated-body) "finances")
+          (if (contains? (:sections updated-body) "finances")
             (let [finances (:data (:finances updated-body))
                   fixed-finances (into [] (map utils/calc-burnrate-runway finances))
                   sort-pred (utils/sort-by-key-pred :period true)

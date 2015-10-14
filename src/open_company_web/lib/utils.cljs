@@ -45,9 +45,8 @@
                   (contains? currency :symbol)
                   (> (count (:symbol currency)) 0))
                 (:symbol currency)
-                currency-code)
-        ret (or symbol (:code currency))]
-  ret))
+                currency-code)]
+    (or symbol (:code currency))))
 
 (def channel-coll (atom {}))
 
@@ -68,11 +67,6 @@
 (defn save-values [channel-name]
   (let [save-channel (get-channel channel-name)]
     (put! save-channel 1)))
-
-(defn in?
-  "true if seq contains elm"
-  [coll elm]
-  (some #(= elm %) coll))
 
 (defn get-period-string [period]
   (case period
@@ -115,7 +109,7 @@
 (defn period-string [period & flags]
   (let [[year month] (clojure.string/split period "-")
         month-str (month-string month)]
-    (if (or (in? flags :force-year) (= month "01") (= month "12"))
+    (if (or (contains? flags :force-year) (= month "01") (= month "12"))
       (str month-str " " year)
       month-str)))
 
