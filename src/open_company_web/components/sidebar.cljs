@@ -3,38 +3,23 @@
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
               [open-company-web.components.link :refer [link]]
-              [open-company-web.router :as router]))
+              [open-company-web.router :as router]
+              [open-company-web.lib.utils :as utils]))
+
+(defcomponent sidebar-item [data owner]
+  (render [_]
+    (let [section (:section data)
+          slug (:slug @router/path)
+          selected-section (:section @router/path)]
+      (dom/li {:class (if (= section selected-section) "active" "")}
+        (om/build link {:href (str "/companies/" slug "/" section) :name (utils/camel-case-str section)})))))
 
 (defcomponent sidebar [data owner]
-  (init-state [_]
-    {:path @router/path})
   (render [_]
-    (let [path (om/get-state owner :path)
-          ticker (:ticker path)
-          profile-url (str "/companies/" ticker)
-          organization-url (str "/companies/" ticker "/organization")
-          equity-url (str "/companies/" ticker "/equity")
-          agreements-url (str "/companies/" ticker "/agreements")
-          reports-url (str "/companies/" ticker "/summary")
-          is-profile (= (:active data) "profile")
-          is-organization (= (:active data) "organization")
-          is-equity (= (:active data) "equity")
-          is-agreements (= (:active data) "agreements")
-          is-report (= (:active data) "reports")]
+    (let [slug (:slug @router/path)
+          company-data ((keyword slug) data)
+          sections (:sections company-data)
+          sections-data (map #(merge {:section % :active false} {}) sections)]
       (dom/div {:class "col-mid-1 sidebar"}
         (dom/ul {:class "nav nav-sidebar"}
-          ; profile
-          (dom/li {:class (if is-profile "active" "")}
-            (om/build link {:href profile-url :name "Profile"}))
-          ; organization
-          (dom/li {:class (if is-organization "active" "")}
-            (om/build link {:href organization-url :name "Organization"}))
-          ; equity
-          (dom/li {:class (if is-equity "active" "")}
-            (om/build link {:href equity-url :name "Equity"}))
-          ; agreements
-          (dom/li {:class (if is-agreements "active" "")}
-            (om/build link {:href agreements-url :name "Agreements"}))
-          ; reports
-          (dom/li {:class (if is-report "active" "")}
-            (om/build link {:href reports-url :name "Reports"})))))))
+          (om/build-all sidebar-item sections-data))))))
