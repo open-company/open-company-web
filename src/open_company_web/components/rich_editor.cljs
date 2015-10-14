@@ -62,11 +62,19 @@
   (render [_]
     (let [section-data (:section-data data)
           section (:section data)
-          read-only (:read-only data)]
+          read-only (:read-only data)
+          editing (om/get-state owner :editing)
+          no-data (nil? (:author section-data)) ; if we have no author means we had no data
+          should-show-placeholder (and (not editing) no-data)
+          placeholder "Finances notes here..."
+          body (if should-show-placeholder placeholder (:body section-data))]
       (dom/div {:class "rich-editor-container"}
-        (dom/div {:class (utils/class-set {:fake-rich-editor true :hidden (not read-only)})
-                  :dangerouslySetInnerHTML (clj->js {"__html" (:body section-data)})})
-        (dom/div #js {:className (utils/class-set {:rich-editor true :hidden read-only})
+        (dom/div {:class (utils/class-set {:fake-rich-editor true
+                                           :hidden (not read-only)})
+                  :dangerouslySetInnerHTML (clj->js {"__html" body})})
+        (dom/div #js {:className (utils/class-set {:rich-editor true
+                                                   :hidden read-only
+                                                   :no-data should-show-placeholder})
                       :ref "rich-editor"
                       :onClick (fn [e]
                                  (when-not (:read-only data)
@@ -75,10 +83,10 @@
                                 (if-let [editor-ref (om/get-ref owner "rich-editor")]
                                   (let [editor-el (.getDOMNode editor-ref)
                                         innerHTML (.-innerHTML editor-el)]
-                                    (when (= innerHTML (:body section-data))
+                                    (when (= innerHTML body)
                                       (set-editing! owner false)))))
-                      :dangerouslySetInnerHTML (clj->js {"__html" (:body section-data)})})
-        (if (om/get-state owner :editing)
+                      :dangerouslySetInnerHTML (clj->js {"__html" body})})
+        (if editing
           (dom/div {:class "rich-editor-save"}
             (dom/button {:class "btn btn-success"
                          :on-click (fn [e]
@@ -95,6 +103,7 @@
                                        (set! (.-innerHTML el) init-value))
                                      (set-editing! owner false))
                          } "Cancel"))
-          (om/build update-footer {:author (:author section-data)
-                                   :updated-at (:updated-at section-data)
-                                   :section section}))))))
+          (when (not no-data)
+            (om/build update-footer {:author (:author section-data)
+                                     :updated-at (:updated-at section-data)
+                                     :section section})))))))
