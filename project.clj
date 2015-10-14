@@ -10,7 +10,7 @@
 
   :dependencies [
     [org.clojure/clojure "1.7.0"] ; Lisp on the JVM http://clojure.org/documentation
-    [org.clojure/clojurescript "1.7.122"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    [org.clojure/clojurescript "1.7.145"] ; ClojureScript compiler https://github.com/clojure/clojurescript
     [org.omcljs/om "0.9.0" :exclusions [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
     [cljs-http "0.1.37"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/schema "1.0.1"] ; Dependency of om-tools https://github.com/Prismatic/schema
@@ -28,9 +28,9 @@
 
   :plugins [
     [lein-cljsbuild "1.1.0"] ; ClojureScript compiler https://github.com/emezeske/lein-cljsbuild
-    [lein-figwheel "0.4.0"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
+    [lein-figwheel "0.4.1"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
     [lein-ancient "0.6.7"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
-    [lein-doo "0.1.4"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
+    [lein-doo "0.1.5"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
     [lein-deps-tree "0.1.2"] ; Print a tree of project dependencies https://github.com/the-kenny/lein-deps-tree
   ]
 
