@@ -1,4 +1,4 @@
-(ns open-company-web.data.users)
+(ns test.open-company-web.data.users)
 
 (def users [
   { :tz_label "Pacific Daylight Time"

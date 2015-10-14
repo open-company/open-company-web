@@ -6,7 +6,7 @@
               [dommy.core :as dommy :refer-macros [sel1 sel]]
               [open-company-web.components.finances.revenue :refer [revenue]]
               [om.dom :as dom :include-macros true]
-              [open-company-web.data.finances :refer [finances]]))
+              [test.open-company-web.data.finances :refer [finances]]))
 
 (enable-console-print!)
 

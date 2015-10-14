@@ -6,7 +6,7 @@
               [dommy.core :as dommy :refer-macros [sel1 sel]]
               [open-company-web.components.rich-editor :refer [rich-editor]]
               [om.dom :as dom :include-macros true]
-              [open-company-web.data.finances :as finances-data]))
+              [test.open-company-web.data.finances :as finances-data]))
 
 (enable-console-print!)
 

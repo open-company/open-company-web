@@ -1,4 +1,4 @@
-(ns open-company-web.data.finances)
+(ns test.open-company-web.data.finances)
 
 (def finances {
   :name "Buffer"
