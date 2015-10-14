@@ -2,75 +2,19 @@
   (:require [cljs-flux.dispatcher :as flux]
             [no.en.core :refer [deep-merge]]
             [open-company-web.router :as router]
-            [shodan.console :as console]))
+            [open-company-web.lib.utils :as utils]
+            [cljs.core.async :refer [put!]]))
 
-(defonce app-state (atom {
-  ; :OPEN {
-  ;   "name" "Transparency, LLC"
-  ;   "symbol" "OPEN"
-  ;   "currency" ["USD"]
-  ;   "headcount" {
-  ;     "founders" 2
-  ;     "executives" 0
-  ;     "ft-employees" 3
-  ;     "pt-employees" 0
-  ;     "contractors" 2
-  ;     "comment" "Transparency headcount comment."
-  ;   },
-  ;   "finances" {
-  ;     "cash" 173228
-  ;     "revenue" 2767
-  ;     "costs" 22184
-  ;     "burn-rate" -19417
-  ;     "runway" "9 months"
-  ;     "comment" "Transparency finances comment."
-  ;   },
-  ;   "compensation" {
-  ;     "percentage" false
-  ;     "founders" 6357
-  ;     "executives" 0
-  ;     "employees" 5899
-  ;     "contractors" 2582
-  ;     "comment" "Transparency compensation comment."
-  ;   }
-  ; }
-  ; "BUFFR" {
-  ;   "name" "Buffer"
-  ;   "symbol" "BUFFR"
-  ;   "currency" ["USD"]
-  ;   "headcount" {
-  ;     "founders" 1
-  ;     "executives" 2
-  ;     "ft-employees" 1
-  ;     "pt-employees" 1
-  ;     "contractors" 4
-  ;     "comment" "Buffer headcount comment."
-  ;   },
-  ;   "finances" {
-  ;     "cash" 323232
-  ;     "revenue" 1234
-  ;     "costs" 11321
-  ;     "burn-rate" -10000
-  ;     "runway" "9 months"
-  ;     "comment" "Buffer finances comment."
-  ;   },
-  ;   "compensation" {
-  ;     "percentage" true
-  ;     "founders" 40
-  ;     "executives" 40
-  ;     "employees" 10
-  ;     "contractors" 10
-  ;     "comment" "Buffer compensation comment."
-  ;   }
-  ; }
-}))
+(defonce app-state (atom {}))
 
 
 (def companies (flux/dispatcher))
 
 (def company (flux/dispatcher))
 
-(def report (flux/dispatcher))
+(def section (flux/dispatcher))
+
+(def revision (flux/dispatcher))
 
 (def auth-settings (flux/dispatcher))
 
@@ -88,30 +32,59 @@
       (when body
         ; remove loading key
         (swap! app-state dissoc :loading)
-        ; add the new values to the atom
-        (swap! app-state assoc (keyword (:symbol body)) body)))))
+        ; add section name inside each section
+        (let [updated-body (utils/fix-sections body)]
+          ; calc burn-rate and runway
+          ; and add the new values to the atom
+          (if (contains? (:sections updated-body) "finances")
+            (let [finances (:data (:finances updated-body))
+                  fixed-finances (into [] (map utils/calc-burnrate-runway finances))
+                  sort-pred (utils/sort-by-key-pred :period true)
+                  sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
+                  fixed-body (assoc-in updated-body [:finances :data] sorted-finances)]
+              (swap! app-state assoc (keyword (:slug updated-body)) fixed-body))
+            (swap! app-state assoc (keyword (:slug updated-body)) updated-body)))))))
 
-(def empty-report {
-  :headcount {}
-  :finances {}
-  :compensation {}
-})
-
-(def report-dispatch
+(def section-dispatch
   (flux/register
-    report
+    section
     (fn [body]
       (when body
         ; remove loading key
         (swap! app-state dissoc :loading)
-        ; make sure the report contains all the keys :headcount :finances :compensation
-        (let [report-data (merge empty-report body)]
-          ; add the new report data
-          (let [ticker (:ticker @router/path)
-                year (:year @router/path)
-                period (:period @router/path)
-                report-key (keyword (str "report-" ticker "-" year "-" period))]
-            (swap! app-state assoc-in [(keyword ticker) report-key] report-data)))))))
+        (let [section-body (:body body)
+              fixed-finances (into [] (map utils/calc-burnrate-runway (:data section-body)))
+              sort-pred (utils/sort-by-key-pred :period true)
+              sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
+              section-body (if (= (:section body) :finances)
+                             (assoc section-body :data sorted-finances)
+                             section-body)
+              section-body (assoc section-body :section (:section body))
+              section-body (assoc section-body :sorter (:updated-at section-body))]
+          (swap! app-state assoc-in [(:slug body) (:section body)] section-body)
+          ; signal to update as-of
+          (let [ch (utils/get-channel (str "revisions-update-" (name (:section body))))
+                revisions (utils/sort-revisions (:revisions section-body))
+                last-revision (last revisions)]
+            (put! ch {:as-of (:updated-at last-revision)})))))))
+
+(def revision-dispatch
+  (flux/register
+    revision
+    (fn [body]
+      (when body
+        ; remove loading key
+        (swap! app-state dissoc :loading)
+        (let [notes? (contains? body :notes)
+              assoc-in-coll [(:slug body) (:section body)]
+              assoc-in-coll (if notes? (conj assoc-in-coll :notes) assoc-in-coll)
+              sec-body (:body body)
+              sec-body (if (:read-only body) (assoc sec-body :read-only true) sec-body)
+              section ((:section body) ((:slug body) @app-state))
+              section (if notes? (:notes section) section)
+              section-revision (merge section sec-body)
+              section-revision (dissoc section-revision :loading)]
+          (swap! app-state assoc-in assoc-in-coll section-revision))))))
 
 (def auth-settings-dispatch
   (flux/register
@@ -122,4 +95,3 @@
         (swap! app-state dissoc :loading)
         ; add auth-settings data
         (swap! app-state assoc :auth-settings body)))))
-

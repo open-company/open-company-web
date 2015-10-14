@@ -6,7 +6,7 @@
               [dommy.core :as dommy :refer-macros [sel1 sel]]
               [open-company-web.components.user-selector :refer [user-selector]]
               [om.dom :as dom :include-macros true]
-              [open-company-web.lib.utils :refer [users]]))
+              [test.open-company-web.data.users :refer [users]]))
 
 (enable-console-print!)
 
