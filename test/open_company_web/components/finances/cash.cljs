@@ -1,10 +1,10 @@
-(ns test.open-company-web.components.finances-pieces.cash
+(ns test.open-company-web.components.finances.cash
     (:require [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
               [cljs-react-test.simulate :as sim]
               [cljs-react-test.utils :as tu]
               [om.core :as om :include-macros true]
               [dommy.core :as dommy :refer-macros [sel1 sel]]
-              [open-company-web.components.finances-pieces.cash :refer [cash]]
+              [open-company-web.components.finances.cash :refer [cash]]
               [om.dom :as dom :include-macros true]
               [open-company-web.data.finances :refer [finances]]))
 

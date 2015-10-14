@@ -4,12 +4,12 @@
             [test.open-company-web.components.all-sections]
             [test.open-company-web.components.recent-updates]
             [test.open-company-web.components.revisions-navigator]
-            [test.open-company-web.components.finances-pieces.burn-rate]
-            [test.open-company-web.components.finances-pieces.cash]
-            [test.open-company-web.components.finances-pieces.costs]
-            [test.open-company-web.components.finances-pieces.revenue]
-            [test.open-company-web.components.finances-pieces.runway]
-            [test.open-company-web.components.finances-pieces.finances]))
+            [test.open-company-web.components.finances.burn-rate]
+            [test.open-company-web.components.finances.cash]
+            [test.open-company-web.components.finances.costs]
+            [test.open-company-web.components.finances.revenue]
+            [test.open-company-web.components.finances.runway]
+            [test.open-company-web.components.finances.finances]))
 
 (enable-console-print!)
 
@@ -21,9 +21,9 @@
   'test.open-company-web.components.all-sections
   'test.open-company-web.components.recent-updates
   'test.open-company-web.components.revisions-navigator
-  'test.open-company-web.components.finances-pieces.burn-rate
-  'test.open-company-web.components.finances-pieces.cash
-  'test.open-company-web.components.finances-pieces.costs
-  'test.open-company-web.components.finances-pieces.revenue
-  'test.open-company-web.components.finances-pieces.runway
-  'test.open-company-web.components.finances-pieces.finances)
+  'test.open-company-web.components.finances.burn-rate
+  'test.open-company-web.components.finances.cash
+  'test.open-company-web.components.finances.costs
+  'test.open-company-web.components.finances.revenue
+  'test.open-company-web.components.finances.runway
+  'test.open-company-web.components.finances.finances)

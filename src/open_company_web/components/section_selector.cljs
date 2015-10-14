@@ -3,7 +3,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
-            [open-company-web.components.finances-pieces.finances :refer (finances finances-edit)]
+            [open-company-web.components.finances.finances :refer (finances finances-edit)]
             [open-company-web.components.simple-section :refer (simple-section)]))
 
 (defcomponent section-selector [data owner]

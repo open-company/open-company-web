@@ -1,15 +1,15 @@
-(ns open-company-web.components.finances-pieces.finances
+(ns open-company-web.components.finances.finances
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.link :refer [link]]
             [open-company-web.router :as router]
-            [open-company-web.components.finances-pieces.cash :refer (cash)]
-            [open-company-web.components.finances-pieces.revenue :refer (revenue)]
-            [open-company-web.components.finances-pieces.costs :refer (costs)]
-            [open-company-web.components.finances-pieces.burn-rate :refer (burn-rate)]
-            [open-company-web.components.finances-pieces.runway :refer (runway)]
+            [open-company-web.components.finances.cash :refer (cash)]
+            [open-company-web.components.finances.revenue :refer (revenue)]
+            [open-company-web.components.finances.costs :refer (costs)]
+            [open-company-web.components.finances.burn-rate :refer (burn-rate)]
+            [open-company-web.components.finances.runway :refer (runway)]
             [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.components.rich-editor :refer (rich-editor)]
             [open-company-web.lib.utils :as utils]

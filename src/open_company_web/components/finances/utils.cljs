@@ -1,4 +1,4 @@
-(ns open-company-web.components.finances-pieces.utils
+(ns open-company-web.components.finances.utils
   (:require [open-company-web.lib.utils :as utils]))
 
 (def columns 7)
