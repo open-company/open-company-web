@@ -49,9 +49,14 @@
                     "prefix" (if (= currency-symbol "%") "" currency-symbol)
                     "suffix" (if-not (= currency-symbol "%") "" "%")})]
     (doseq [x columns]
-      (.addColumn data-table (first x) (second x)))
+      (if (vector? x)
+        (.addColumn data-table (first x) (second x))
+        (.addColumn data-table x)))
     (.addRows data-table (clj->js data))
-    (.format formatter data-table 1)
+    (doseq [idx (range (count columns))]
+      (let [column (columns idx)]
+        (when (and (vector? column) (= (first column) "number"))
+          (.format formatter data-table idx))))
     data-table))
 
 (defn column-draw-chart [currency-symbol columns data dom-node]
