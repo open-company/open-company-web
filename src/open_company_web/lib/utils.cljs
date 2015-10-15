@@ -127,17 +127,36 @@
     0
     (.toLocaleString value)))
 
-(defn calc-burnrate-runway
+(defn burn-rate [revenue costs]
+  (- revenue costs))
+
+(defn avg-burn-rate [periods]
+  (let [burn-rates (map #(burn-rate (:revenue %) (:costs %)) periods)
+        tot (count burn-rates)]
+    (apply (fn [& items]
+             (/ (apply + items) tot)) burn-rates)))
+
+(defn calc-runway
   "Helper function that add burn-rate and runway to each update section"
-  [update]
-  (let [costs (:costs update)
-        revenue (:revenue update)
-        cash (:cash update)
-        burn-rate (- revenue costs)
-        burn-rate (if (js/isNaN burn-rate) 0 burn-rate)
-        period-runway (/ cash (abs burn-rate))
-        runway (int (* period-runway 30))]
-    (merge update {:burn-rate burn-rate :runway runway})))
+  [finances-data]
+  (let [sort-pred (sort-by-key-pred :period)
+        sorted-data (into [] (sort #(sort-pred %1 %2) finances-data))]
+    (loop [idx 1
+           datas sorted-data]
+      (let [start   (max 0 (- idx 3))
+            avg     (avg-burn-rate (subvec datas start idx))]
+        (if (neg? avg)
+          (let [period  (datas (dec idx))
+                fixed-period (assoc period :runway (abs (int (* (/ (:cash period) avg) 30))))
+                datas   (assoc datas (dec idx) fixed-period)]
+            (if (< idx (dec (count sorted-data)))
+              (recur (inc idx)
+                     datas)
+              datas))
+          (if (< idx (dec (count sorted-data)))
+            (recur (inc idx)
+                   datas)
+            datas))))))
 
 (defn camel-case-str [value]
   (let [upper-value (clojure.string/replace value #"^(\w)" #(clojure.string/upper-case (first %1)))]
