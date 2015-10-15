@@ -26,7 +26,7 @@
 (defn- get-chart-data [data prefix]
   "Vector of max *columns elements of [:Label value]"
   (let [chart-data (partial chart-data-at-index data)
-        placeholder-vect (subvec (range columns) 0 (min (count data) columns))]
+        placeholder-vect (range (min (count data) columns))]
     { :prefix prefix
       ; :columns [["string" column-name] ["number" "Costs"] ["number" "Revenue"] ["number" "Cash flow"] {:role "style"}]
       :columns [["string" "Period"]
@@ -36,7 +36,8 @@
                 #js {"type" "string" "role" "style"}
                 ["number" "Cash flow"]
                 #js {"type" "string" "role" "style"}]
-      :values (into [] (map chart-data placeholder-vect))}))
+      :values (into [] (map chart-data placeholder-vect))
+      :pattern "###,###.##"}))
 
 (defcomponent cash-flow [data owner]
   (render [_]
