@@ -4,7 +4,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
-            [open-company-web.components.finances.cash :refer (cash)]
+            [open-company-web.components.finances.cash-flow :refer (cash-flow)]
             [open-company-web.components.finances.revenue :refer (revenue)]
             [open-company-web.components.finances.costs :refer (costs)]
             [open-company-web.components.finances.burn-rate :refer (burn-rate)]
@@ -32,7 +32,7 @@
     (let [company-data (:company-data data)
           finances-data (:finances company-data)
           notes-data (:notes finances-data)]
-      {:focus "cash"
+      {:focus "cash-flow"
        :read-only false}))
   (will-mount [_]
     (let [save-change (utils/get-channel "save-section-finances")]
@@ -60,7 +60,7 @@
           company-data (:company-data data)
           finances-data (:finances company-data)
           notes-data (:notes finances-data)
-          cash-classes (str classes (when (= focus "cash") " active"))
+          cash-classes (str classes (when (= focus "cash-flow") " active"))
           revenue-classes (str classes (when (= focus "revenue") " active"))
           costs-classes (str classes (when (= focus "costs") " active"))
           burn-rate-classes (str classes (when (= focus "burn-rate") " active"))
@@ -79,8 +79,8 @@
             (dom/a {:href "#"
                     :class cash-classes
                     :title "Cash"
-                    :data-tab "cash"
-                    :on-click #(subsection-click % owner)} "Cash")
+                    :data-tab "cash-flow"
+                    :on-click #(subsection-click % owner)} "Cash flow")
             (dom/a {:href "#"
                     :class revenue-classes
                     :title "Revenue"
@@ -105,8 +105,8 @@
                                              :editable (not read-only)})}
             (case focus
 
-              "cash"
-              (om/build cash subsection-data)
+              "cash-flow"
+              (om/build cash-flow subsection-data)
 
               "revenue"
               (om/build revenue subsection-data)
