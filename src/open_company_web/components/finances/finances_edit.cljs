@@ -67,7 +67,7 @@
         to-save (if should-save-new (into [] (conj to-save new-row)) (into [] to-save))]
     (if-not (every? row-ok? to-save)
       (.alert js/window "Check the finances values")
-      (let [fixed-finances (into [] (map utils/calc-burnrate-runway to-save))
+      (let [fixed-finances (utils/calc-runway to-save)
             slug (keyword (:slug @router/path))]
         (om/update! original-cursor :data fixed-finances)
         (api/update-finances-data (:finances (slug @app-state)))
