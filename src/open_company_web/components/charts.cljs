@@ -40,12 +40,12 @@
   (render [_]
     (dom/div #js {:className "chart-container pie-chart" :ref "pie-chart" })))
 
-(defn column-add-rows [columns data currency-symbol]
+(defn column-add-rows [columns data currency-symbol pattern]
   (let [data-table (js/google.visualization.DataTable.)
         formatter (js/google.visualization.NumberFormat. #js {
                     "negativeColor" "red",
                     "negativeParens" true
-                    "pattern" "###,###.##"
+                    "pattern" pattern ;"###,###.##"
                     "prefix" (if (= currency-symbol "%") "" currency-symbol)
                     "suffix" (if-not (= currency-symbol "%") "" "%")})]
     (doseq [x columns]
@@ -59,9 +59,9 @@
           (.format formatter data-table idx))))
     data-table))
 
-(defn column-draw-chart [currency-symbol columns data dom-node]
+(defn column-draw-chart [currency-symbol columns pattern data dom-node]
   (when (.-google js/window)
-    (let [data-table (column-add-rows columns data currency-symbol)
+    (let [data-table (column-add-rows columns data currency-symbol pattern)
           options (clj->js {
                     :title  ""
                     :width 600
@@ -74,11 +74,13 @@
   (did-mount [_]
     (column-draw-chart (:prefix chart-data)
                        (:columns chart-data)
+                       (:pattern chart-data)
                        (:values chart-data)
                        (.getDOMNode (om/get-ref owner "column-chart"))))
   (did-update [_ _ _]
     (column-draw-chart (:prefix chart-data)
                        (:columns chart-data)
+                       (:pattern chart-data)
                        (:values chart-data)
                        (.getDOMNode (om/get-ref owner "column-chart"))))
   (render [_]
