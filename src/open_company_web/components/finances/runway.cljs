@@ -21,4 +21,10 @@
                 runway-val
                 (om/build editable-pen {:click-callback (:editable-click-callback data)}))
         (dom/p {} period)
-        (om/build column-chart (get-chart-data finances-data "" :runway "runway"))))))
+        (om/build column-chart (get-chart-data finances-data
+                                               ""
+                                               :runway
+                                               "runway"
+                                               #js {"type" "string" "role" "style"}
+                                               "fill-color: red"
+                                               "###,### days"))))))
