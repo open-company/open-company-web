@@ -38,7 +38,7 @@
           (if (utils/in? (:sections updated-body) "finances")
             (let [finances (:finances updated-body)
                   finances-data (:data finances)
-                  fixed-finances (into [] (map utils/calc-burnrate-runway finances-data))
+                  fixed-finances (utils/calc-runway finances-data)
                   sort-pred (utils/sort-by-key-pred :period true)
                   sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
                   fixed-body (assoc-in updated-body [:finances :data] sorted-finances)
@@ -56,7 +56,7 @@
         ; remove loading key
         (swap! app-state dissoc :loading)
         (let [section-body (:body body)
-              fixed-finances (into [] (map utils/calc-burnrate-runway (:data section-body)))
+              fixed-finances (utils/calc-runway (:data section-body))
               sort-pred (utils/sort-by-key-pred :period true)
               sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
               section-body (if (= (:section body) :finances)
