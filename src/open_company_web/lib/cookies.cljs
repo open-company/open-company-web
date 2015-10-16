@@ -15,3 +15,6 @@
 
 (defn get-cookie [c-name]
   (.get cookies-static-obj (name c-name)))
+
+(defn remove-cookie! [c-name]
+  (.remove cookies-static-obj (name c-name)))
