@@ -6,10 +6,12 @@
             [test.open-company-web.components.revisions-navigator]
             [test.open-company-web.components.finances.burn-rate]
             [test.open-company-web.components.finances.cash]
+            [test.open-company-web.components.finances.cash-flow]
             [test.open-company-web.components.finances.costs]
             [test.open-company-web.components.finances.revenue]
             [test.open-company-web.components.finances.runway]
-            [test.open-company-web.components.finances.finances]))
+            [test.open-company-web.components.finances.finances]
+            [test.open-company-web.components.finances.finances-edit]))
 
 (enable-console-print!)
 
@@ -23,7 +25,9 @@
   'test.open-company-web.components.revisions-navigator
   'test.open-company-web.components.finances.burn-rate
   'test.open-company-web.components.finances.cash
+  'test.open-company-web.components.finances.cash-flow
   'test.open-company-web.components.finances.costs
   'test.open-company-web.components.finances.revenue
   'test.open-company-web.components.finances.runway
-  'test.open-company-web.components.finances.finances)
+  'test.open-company-web.components.finances.finances
+  'test.open-company-web.components.finances.finances-edit)
