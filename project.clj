@@ -24,6 +24,7 @@
     [racehub/om-bootstrap "0.5.3"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
     [noencore "0.1.21"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
+    [devcards "0.2.0-3"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
   ]
 
   :plugins [
@@ -50,6 +51,17 @@
 
   :cljsbuild {
     :builds {
+      :devcard {
+        :id :devcards
+        :source-paths ["src"]
+        :figwheel { :devcards true}
+        :compiler {
+          :main "open-company-web.lib.devcards"
+          :asset-path "/js/compiled/out"
+          :output-to "resources/public/js/compiled/devcards/oc_devcards.js"
+          :output-dir "resources/public/js/compiled/out"
+          :source-map-timestamp true
+          :pretty-print true}}
       :dev {
         :id "dev"
         :source-paths ["src"]
