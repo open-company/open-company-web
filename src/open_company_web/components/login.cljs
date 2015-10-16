@@ -13,9 +13,12 @@
         (dom/h2 "Loading...")
 
         (and (not (:loading data)) (contains? data :auth-settings))
-        (dom/a {:href (:full-url (:auth-settings data))}
-          (dom/img {:alt "Login with Slack"
-                    :height "40"
-                    :width "139"
-                    :src "https://platform.slack-edge.com/img/add_to_slack.png"
-                    :srcSet "https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"}))))))
+        (dom/div {}
+          (when (contains? data :access)
+            (dom/h4 {:class "login-error-message"} (str "Error during login attempt: " (:access data))))
+          (dom/a {:href (:full-url (:auth-settings data))}
+            (dom/img {:alt "Login with Slack"
+                      :height "40"
+                      :width "139"
+                      :src "https://platform.slack-edge.com/img/add_to_slack.png"
+                      :srcSet "https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"})))))))
