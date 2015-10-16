@@ -47,7 +47,7 @@
           cur-symbol (utils/get-symbol-for-currency-code (:currency (:company-data data)))
           cash-val (str cur-symbol (utils/format-value (:cash value-set)))]
       (dom/div {:class (utils/class-set {:section true
-                                         :cash true
+                                         :cash-flow true
                                          :read-only (:read-only data)})}
         (dom/h3 {}
                 cash-val
