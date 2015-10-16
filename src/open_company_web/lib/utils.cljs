@@ -147,9 +147,10 @@
             avg     (avg-burn-rate (subvec datas start idx))]
         (if (neg? avg)
           (let [period  (datas (dec idx))
-                fixed-period (assoc period :runway (abs (int (* (/ (:cash period) avg) 30))))
+                runway (abs (int (* (/ (:cash period) avg) 30)))
+                fixed-period (assoc period :runway runway)
                 datas   (assoc datas (dec idx) fixed-period)]
-            (if (< idx (dec (count sorted-data)))
+            (if (< idx (count sorted-data))
               (recur (inc idx)
                      datas)
               datas))
