@@ -3,7 +3,6 @@
             [no.en.core :refer [deep-merge]]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
-            [shodan.inspection :refer (inspect)]
             [cljs.core.async :refer [put!]]))
 
 (defonce app-state (atom {}))
@@ -16,6 +15,8 @@
 (def section (flux/dispatcher))
 
 (def revision (flux/dispatcher))
+
+(def auth-settings (flux/dispatcher))
 
 (def companies-list-dispatch
   (flux/register
@@ -88,3 +89,13 @@
               section-revision (merge section sec-body)
               section-revision (dissoc section-revision :loading)]
           (swap! app-state assoc-in assoc-in-coll section-revision))))))
+
+(def auth-settings-dispatch
+  (flux/register
+    auth-settings
+    (fn [body]
+      (when body
+        ; remove loading key
+        (swap! app-state dissoc :loading)
+        ; add auth-settings data
+        (swap! app-state assoc :auth-settings body)))))

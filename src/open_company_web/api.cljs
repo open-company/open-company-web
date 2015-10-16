@@ -8,11 +8,14 @@
             [cognitect.transit :as t]
             [clojure.walk :refer [keywordize-keys stringify-keys]]
             [open-company-web.local-settings :as ls]
+            [open-company-web.lib.jwt :as j]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
 
 
-(def ^:private endpoint ls/api-server-domain)
+(def ^:private api-endpoint ls/api-server-domain)
+
+(def ^:private auth-endpoint ls/auth-server-domain)
 
 (defn- content-type [type]
   (str "application/vnd.open-company." type ".v1+json"))
@@ -25,17 +28,22 @@
   (let [stringified-coll (stringify-keys coll)]
     (clj->js stringified-coll)))
 
-(defn- req [method path params on-complete]
+(defn- req [endpoint method path params on-complete]
   (go
-    (let [data {:with-credentials? false}
+    (let [jwt (j/jwt)
+          params (assoc-in params [:headers "Access-Control-Allow-Headers"] "Content-Type, Authorization")
+          params (when jwt (assoc-in params [:headers "Authorization"] (str "Bearer " jwt)))
+          data {:with-credentials? false}
           data (when params (merge data params))
           response (<! (method (str endpoint path) data))]
       (on-complete response))))
 
-(def ^:private api-get (partial req http/get))
-(def ^:private api-post (partial req http/post))
+(def ^:private api-get (partial req api-endpoint http/get))
+(def ^:private api-post (partial req api-endpoint http/post))
 (def ^:private api-put (partial req http/put))
 (def ^:private api-patch (partial req http/patch))
+
+(def ^:private auth-get (partial req auth-endpoint http/get))
 
 (defn get-companies []
   (api-get "/companies" nil (fn [response]
@@ -65,6 +73,16 @@
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})]
             (flux/dispatch dispatcher/company body)))))))
+
+(defn get-auth-settings []
+  (auth-get "/auth-settings" {
+        :headers {
+          "content-type" "application/json"
+        }
+      }
+  (fn [response]
+    (let [body (if (:success response) (:body response) {})]
+      (flux/dispatch dispatcher/auth-settings body)))))
 
 (defn save-or-create-section[section-data]
   (when section-data

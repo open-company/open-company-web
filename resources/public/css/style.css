@@ -589,3 +589,8 @@ hr.section-separator{
   width: 600px;
   height: 1px;
 }
+
+h4.login-error-message{
+  color: red;
+  font-size: 14px;
+}

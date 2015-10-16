@@ -122,6 +122,9 @@
  (let [r (range 1 (+ n 1))]
     (into [] (for [a r] (str prefix a)))))
 
+(defn redirect! [loc]
+  (set! (.-location js/window) loc))
+
 (defn format-value [value]
   (if (nil? value)
     0

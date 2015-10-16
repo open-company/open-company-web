@@ -20,3 +20,5 @@ google.visualization.PieChart = {};
 google.visualization.PieChart.draw = function(){};
 google.visualization.ColumnChart = {};
 google.visualization.ColumnChart.draw = function(){};
+// jwt
+var jwt_decode = function(){};
