@@ -15,7 +15,10 @@
         (and (not (:loading data)) (contains? data :auth-settings))
         (dom/div {}
           (when (contains? data :access)
-            (dom/h4 {:class "login-error-message"} (str "Error during login attempt: " (:access data))))
+            (let [msg (if (= (:access data) "denied")
+                        "OpenCompany requires verification with your Slack team. Please allow access."
+                        "There is a temporary error validating with Slack. Please try again later.")]
+              (dom/h4 {:class "login-error-message"} msg)))
           (dom/a {:href (:full-url (:auth-settings data))}
             (dom/img {:alt "Login with Slack"
                       :height "40"
