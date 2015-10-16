@@ -4,7 +4,7 @@
               [cljs-react-test.utils :as tu]
               [om.core :as om :include-macros true]
               [dommy.core :as dommy :refer-macros [sel1 sel]]
-              [open-company-web.components.finances.finances :refer [finances finances-edit]]
+              [open-company-web.components.finances.finances :refer [finances]]
               [om.dom :as dom :include-macros true]
               [test.open-company-web.data.finances :as finances-data]
               [open-company-web.router :as router]))
@@ -24,17 +24,6 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root finances app-state {:target c})
-          finances-node (sel1 c [:div.finances])]
-      (is (not (nil? finances-node)))
-      (tu/unmount! c))))
-
-(deftest test-finances-edit-component
-  (testing "Finances edit component"
-    (router/set-route! ["companies" "buffer" "finances" "edit"]
-                       {:slug "buffer" :section "finances" :tab "edit"})
-    (let [c (tu/new-container!)
-          app-state (atom test-atom)
-          _ (om/root finances-edit app-state {:target c})
           finances-node (sel1 c [:div.finances])]
       (is (not (nil? finances-node)))
       (tu/unmount! c))))
