@@ -16,7 +16,7 @@
           cell-state (if is-new :new :display)
           change-cb (:change-cb data)]
       (dom/tr {}
-        (dom/td {:class "no-cell"} (utils/period-string (:period finances-data) (when is-new :force-year)))
+        (dom/td {:class "no-cell"} (utils/period-string (:period finances-data) :force-year))
         (dom/td {}
           (om/build cell {:value (:cash finances-data)
                           :placeholder (if is-new "at month end" "")
@@ -35,11 +35,14 @@
                           :prefix prefix
                           :cell-state cell-state
                           :draft-cb #(change-cb :costs %)}))
+        (when (:show-burn data)
+          (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
+            (if is-new "calculated" (.toLocaleString (- (:revenue finances-data) (:costs finances-data))))))
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
-                (if is-new "calculated" (:runway finances-data)))))))
+                (if is-new "calculated" (.toLocaleString (:runway finances-data))))))))
 
 (defn save-new-row? [finances-data]
-  (let [new-period (first (filter #(and (contains? % :new) (true? (:new %))) finances-data))]
+  (let [new-period (some #(true? (:new %)) finances-data)]
     (or (:cash new-period)
         (:costs new-period)
         (:revenue new-period))))
@@ -100,11 +103,12 @@
           {:data initial-data
            :initial-data initial-data})))
   (render [_]
-    (let [slug (:slug @router/path)
-          finances-data (om/get-state owner :data)
-          cur-symbol (utils/get-symbol-for-currency-code (:currency (:finances data)))
-          rows-data (map (fn [row] 
+    (let [finances-data (om/get-state owner :data)
+          cur-symbol (utils/get-symbol-for-currency-code (:currency (:company-data data)))
+          show-burn (some #(pos? (:revenue %)) finances-data)
+          rows-data (map (fn [row]
                            (merge {:prefix cur-symbol
+                                   :show-burn show-burn
                                    :change-cb (fn [k v]
                                                 (replace-row-in-data owner finances-data row k v))}
                                   {:cursor row}))
@@ -124,6 +128,8 @@
                     (dom/th {} "Cash")
                     (dom/th {} "Revenue")
                     (dom/th {} "Costs")
+                    (when show-burn
+                      (dom/th {} "Burn"))
                     (dom/th {} "Runway")))
                 (dom/tbody {}
                   (for [row rows-data]
