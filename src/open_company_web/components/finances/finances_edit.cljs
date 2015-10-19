@@ -42,7 +42,7 @@
                 (if is-new "calculated" (str (.toLocaleString (:runway finances-data)) " days")))))))
 
 (defn save-new-row? [finances-data]
-  (let [new-period (some #(true? (:new %)) finances-data)]
+  (let [new-period (first (filter #(true? (:new %)) finances-data))]
     (or (:cash new-period)
         (:costs new-period)
         (:revenue new-period))))
