@@ -8,7 +8,6 @@
             [open-company-web.components.finances.cash-flow :refer (cash-flow)]
             [open-company-web.components.finances.revenue :refer (revenue)]
             [open-company-web.components.finances.costs :refer (costs)]
-            [open-company-web.components.finances.burn-rate :refer (burn-rate)]
             [open-company-web.components.finances.runway :refer (runway)]
             [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.components.rich-editor :refer (rich-editor)]
@@ -65,7 +64,6 @@
           cash-flow-classes (str classes (when (= focus "cash-flow") " active"))
           revenue-classes (str classes (when (= focus "revenue") " active"))
           costs-classes (str classes (when (= focus "costs") " active"))
-          burn-rate-classes (str classes (when (= focus "burn-rate") " active"))
           runway-classes (str classes (when (= focus "runway") " active"))
           read-only (or (:loading finances-data) (om/get-state owner :read-only))
           subsection-data {:company-data company-data
