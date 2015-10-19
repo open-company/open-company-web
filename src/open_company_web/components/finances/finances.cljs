@@ -72,7 +72,7 @@
           finances-row-data (:data finances-data)
           sum-revenues (apply + (map #(:revenue %) finances-row-data))
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
-          need-runway (some #(contains? % :runway) finances-row-data)]
+          needs-runway (some #(contains? % :runway) finances-row-data)]
       (dom/div {:class "row" :id "section-finances"}
         (dom/div {:class "finances"}
           (om/build editable-title {:read-only read-only
@@ -90,7 +90,7 @@
                     :title first-title
                     :data-tab "cash-flow"
                     :on-click #(subsection-click % owner)} first-title)
-            (when need-runway
+            (when needs-runway
               (dom/a {:href "#"
                       :class runway-classes
                       :title "Runway"
@@ -113,10 +113,11 @@
             (om/build update-footer {:updated-at (:updated-at finances-data)
                                      :author (:author finances-data)
                                      :section :finances})
-            (om/build rich-editor {:read-only read-only
-                                   :section-data notes-data
-                                   :section :finances
-                                   :save-channel "save-finances-notes"})
+            (when (or (not read-only) (nil? (:body notes-data)))
+              (om/build rich-editor {:read-only read-only
+                                     :section-data notes-data
+                                     :section :finances
+                                     :save-channel "save-finances-notes"}))
             (om/build revisions-navigator {:revisions (:revisions finances-data)
                                            :section :finances
                                            :updated-at (:updated-at finances-data)
