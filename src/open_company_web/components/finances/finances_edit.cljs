@@ -41,8 +41,8 @@
 (defn save-new-row? [finances-data]
   (let [new-period (first (filter #(and (contains? % :new) (true? (:new %))) finances-data))]
     (or (:cash new-period)
-            (:costs new-period)
-            (:revenue new-period))))
+        (:costs new-period)
+        (:revenue new-period))))
 
 (defn row-ok? [row]
   (and (:cash row)
