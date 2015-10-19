@@ -17,7 +17,7 @@
   (.toLocaleString value))
 
 (defn- to-state [owner data state]
-  (when (= state :draft)
+  (when (or (= state :draft) (= state :display) (= state :new))
     ((:draft-cb data) (.parseFloat js/window (.. (om/get-ref owner "edit-field") getDOMNode -value))))
   (om/update-state! owner :cell-state (fn [_] state))
   (when (= state :edit)
