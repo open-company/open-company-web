@@ -12,7 +12,9 @@
 (defcomponent cash [data owner]
   (render [_]
     (let [finances-data (:data (:finances (:company-data data)))
-          value-set (first finances-data)
+          sort-pred (utils/sort-by-key-pred :period true)
+          sorted-finances (sort #(sort-pred %1 %2) finances-data)
+          value-set (first sorted-finances)
           period (utils/period-string (:period value-set))
           cur-symbol (utils/get-symbol-for-currency-code (:currency (:company-data data)))
           cash-val (str cur-symbol (utils/format-value (:cash value-set)))]
@@ -23,4 +25,4 @@
                 cash-val
                 (om/build editable-pen {:click-callback (:editable-click-callback data)}))
         (dom/p {} period)
-        (om/build column-chart (get-chart-data finances-data cur-symbol :cash "Cash"))))))
+        (om/build column-chart (get-chart-data sorted-finances cur-symbol :cash "Cash"))))))

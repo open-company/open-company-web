@@ -11,7 +11,9 @@
 (defcomponent runway [data owner]
   (render [_]
     (let [finances-data (:data (:finances (:company-data data)))
-          value-set (first finances-data)
+          sort-pred (utils/sort-by-key-pred :period true)
+          sorted-finances (sort #(sort-pred %1 %2) finances-data)
+          value-set (first sorted-finances)
           runway-val (utils/format-value (:runway value-set))
           period (utils/period-string (:period value-set))
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))]
@@ -20,7 +22,7 @@
                 runway-val
                 (om/build editable-pen {:click-callback (:editable-click-callback data)}))
         (dom/p {} period)
-        (om/build column-chart (get-chart-data finances-data
+        (om/build column-chart (get-chart-data sorted-finances
                                                ""
                                                :runway
                                                "runway"

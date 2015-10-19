@@ -10,7 +10,8 @@
 (def columns 5)
 
 (defn chart-data-at-index [data idx]
-  (let [rev-idx (- (dec (min (count data) columns)) idx)
+  (let [data (to-array data)
+        rev-idx (- (dec (min (count data) columns)) idx)
         obj (get data rev-idx)
         cash-flow (- (:revenue obj) (:costs obj))
         cash-flow-pos? (pos? cash-flow)
@@ -42,7 +43,9 @@
 (defcomponent cash-flow [data owner]
   (render [_]
     (let [finances-data (:data (:finances (:company-data data)))
-          value-set (first finances-data)
+          sort-pred (utils/sort-by-key-pred :period true)
+          sorted-finances (sort #(sort-pred %1 %2) finances-data)
+          value-set (first sorted-finances)
           period (utils/period-string (:period value-set))
           cur-symbol (utils/get-symbol-for-currency-code (:currency (:company-data data)))
           cash-val (str cur-symbol (utils/format-value (:cash value-set)))]
@@ -53,4 +56,4 @@
                 cash-val
                 (om/build editable-pen {:click-callback (:editable-click-callback data)}))
         (dom/p {} period)
-        (om/build column-chart (get-chart-data finances-data cur-symbol))))))
+        (om/build column-chart (get-chart-data sorted-finances cur-symbol))))))
