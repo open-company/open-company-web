@@ -83,6 +83,9 @@
               assoc-in-coll [(:slug body) (:section body)]
               assoc-in-coll (if notes? (conj assoc-in-coll :notes) assoc-in-coll)
               sec-body (:body body)
+              is-finances (= (:section body) :finances)
+              sec-body (when (and is-finances (not notes?))
+                         (assoc sec-body :data (utils/calc-runway (:data sec-body))))
               sec-body (if (:read-only body) (assoc sec-body :read-only true) sec-body)
               section ((:section body) ((:slug body) @app-state))
               section (if notes? (:notes section) section)
