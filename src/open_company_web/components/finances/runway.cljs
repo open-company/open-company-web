@@ -27,5 +27,5 @@
                                                :runway
                                                "runway"
                                                #js {"type" "string" "role" "style"}
-                                               "fill-color: red"
+                                               "fill-color: blue"
                                                "###,### days"))))))
