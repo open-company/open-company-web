@@ -69,9 +69,10 @@
           subsection-data {:company-data company-data
                            :read-only read-only
                            :editable-click-callback (:editable-click-callback data)}
-          sum-revenues (apply + (map #(:revenue %) (:data finances-data)))
+          finances-row-data (:data finances-data)
+          sum-revenues (apply + (map #(:revenue %) finances-row-data))
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
-          need-runway (some #(contains? % :runway) (:data finances-data))]
+          need-runway (some #(contains? % :runway) finances-row-data)]
       (dom/div {:class "row" :id "section-finances"}
         (dom/div {:class "finances"}
           (om/build editable-title {:read-only read-only
