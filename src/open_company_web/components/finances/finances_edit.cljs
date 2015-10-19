@@ -36,24 +36,18 @@
                           :cell-state cell-state
                           :draft-cb #(change-cb :costs %)}))
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
-                (if is-new "calculated" (:burn-rate finances-data)))
-        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
                 (if is-new "calculated" (:runway finances-data)))))))
 
 (defn save-new-row? [finances-data]
   (let [new-period (first (filter #(and (contains? % :new) (true? (:new %))) finances-data))]
-    (if (or (not (nil? (:cash new-period)))
-            (not (nil? (:costs new-period)))
-            (not (nil? (:revenue new-period))))
-      true
-      false)))
+    (or (:cash new-period)
+            (:costs new-period)
+            (:revenue new-period))))
 
 (defn row-ok? [row]
-  (if (or (nil? (:cash row))
-          (nil? (:costs row))
-          (nil? (:revenue row)))
-    false
-    true))
+  (and (:cash row)
+       (:costs row)
+       (:revenue row)))
 
 (defn save-data [owner finances-data original-cursor close-cb]
   "Save the edit data that lives in the component state to the cursor and
@@ -80,8 +74,11 @@
     (loop [idx 0]
       (let [cur-row (get array-data idx)]
         (if (= (:period cur-row) (:period new-row))
-            (let [new-rows (assoc array-data idx new-row)]
-              (om/update-state! owner :data (fn [_] new-rows)))
+          (let [new-rows (assoc array-data idx new-row)
+                runway-rows (utils/calc-runway new-rows)
+                sort-pred (utils/sort-by-key-pred :period true)
+                sorted-rows (sort #(sort-pred %1 %2) runway-rows)]
+            (om/update-state! owner :data (fn [_] sorted-rows)))
           (recur (inc idx)))))))
 
 (defcomponent finances-edit [data owner]
@@ -108,7 +105,8 @@
           cur-symbol (utils/get-symbol-for-currency-code (:currency (:finances data)))
           rows-data (map (fn [row] 
                            (merge {:prefix cur-symbol
-                                   :change-cb (fn [k v] (replace-row-in-data owner finances-data row k v))}
+                                   :change-cb (fn [k v]
+                                                (replace-row-in-data owner finances-data row k v))}
                                   {:cursor row}))
                          finances-data)]
       (if (:loading data)
@@ -126,11 +124,10 @@
                     (dom/th {} "Cash")
                     (dom/th {} "Revenue")
                     (dom/th {} "Costs")
-                    (dom/th {} "Burn")
                     (dom/th {} "Runway")))
                 (dom/tbody {}
                   (for [row rows-data]
-                    (om/build finances-edit-row row {:key (str (rand 4))}))))
+                    (om/build finances-edit-row row))))
               (dom/div {:class "finances-edit-buttons"}
                 (dom/button {:class "btn btn-success"
                              :on-click #(save-data owner
