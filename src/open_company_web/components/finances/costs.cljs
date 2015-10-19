@@ -25,4 +25,9 @@
                 costs-val
                 (om/build editable-pen {:click-callback (:editable-click-callback data)}))
         (dom/p {} period)
-        (om/build column-chart (get-chart-data sorted-finances cur-symbol :costs "Costs"))))))
+        (om/build column-chart (get-chart-data sorted-finances
+                                               cur-symbol
+                                               :costs
+                                               "Costs"
+                                               #js {"type" "string" "role" "style"}
+                                               "fill-color: #0266C8"))))))

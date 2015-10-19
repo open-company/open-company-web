@@ -23,4 +23,9 @@
                 revenue-val
                 (om/build editable-pen {:click-callback (:editable-click-callback data)}))
         (dom/p {} period)
-        (om/build column-chart (get-chart-data finances-data cur-symbol :revenue "Revenue"))))))
+        (om/build column-chart (get-chart-data finances-data
+                                               cur-symbol
+                                               :revenue 
+                                               "Revenue"
+                                               #js {"type" "string" "role" "style"}
+                                               "fill-color: #0266C8"))))))
