@@ -16,13 +16,13 @@
     :updated-at "2015-09-14T20:49:19Z"
     :author {
       :name "Stuart Levinson"
-      :slack_id "U06SQLDFT"
-      :image "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
+      :user-id "U06SQLDFT"
+      :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
     }
   }
   
   :finances {
-    :section :finacnes
+    :section :finances
     :data [
       {
         :period "2015-08"
@@ -95,7 +95,7 @@
     :updated-at "2015-09-17T12:29:30Z"
     :author {
       :name "Iacopo Carraro"
-      :slack_id "U06STCKLN"
+      :user-id "U06STCKLN"
       :image "https://secure.gravatar.com/avatar/98b5456ea1c562024f41501ffd7bc3c6.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0022.png"
     }
     :notes {
@@ -103,8 +103,8 @@
       :updated-at "2015-09-14T20:49:19Z"
       :author {
         :name "Stuart Levinson"
-        :slack_id "U06SQLDFT"
-        :image "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
+        :user-id "U06SQLDFT"
+        :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
       }
       :links [
         {
@@ -152,7 +152,7 @@
       :updated-at "2015-09-11T22:14:24Z"
       :author {
         :name "Iacopo Carraro"
-        :slack_id "U06STCKLN"
+        :user-id "U06STCKLN"
         :image "https://secure.gravatar.com/avatar/98b5456ea1c562024f41501ffd7bc3c6.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0022.png"
       }
     }
@@ -164,8 +164,8 @@
       :updated-at "2015-09-10T22:14:24Z"
       :author {
         :name "Stuart Levinson"
-        :slack_id "U06SQLDFT"
-        :image "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
+        :user-id "U06SQLDFT"
+        :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
       }
     }
     {
@@ -176,8 +176,8 @@
       :updated-at "2015-09-09T22:14:24Z"
       :author {
         :name "Stuart Levinson"
-        :slack_id "U06SQLDFT"
-        :image "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
+        :user-id "U06SQLDFT"
+        :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
       }
     }
     {
@@ -188,8 +188,8 @@
       :updated-at "2015-09-08T22:14:24Z"
       :author {
         :name "Stuart Levinson"
-        :slack_id "U06SQLDFT"
-        :image "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
+        :user-id "U06SQLDFT"
+        :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
       }
     }
     {
@@ -200,8 +200,8 @@
       :updated-at "2015-09-07T22:14:24Z"
       :author {
         :name "Stuart Levinson"
-        :slack_id "U06SQLDFT"
-        :image "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
+        :user-id "U06SQLDFT"
+        :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
       }
     }
   ]
