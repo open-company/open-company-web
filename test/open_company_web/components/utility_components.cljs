@@ -6,7 +6,7 @@
               [dommy.core :as dommy :refer-macros [sel1 sel]]
               [open-company-web.components.utility-components :refer [editable-pen]]
               [om.dom :as dom :include-macros true]
-              [test.open-company-web.data.users :refer [users]]))
+              [open-company-web.data.users :refer [users]]))
 
 (enable-console-print!)
 

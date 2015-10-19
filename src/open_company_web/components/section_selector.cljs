@@ -12,7 +12,6 @@
   (render [_]
     (let [section (:section data)
           read-only (:read-only data)
-          tab (:tab @router/path)
           company-data (:data data)]
       (dom/div {:class "section-selector"}
         (cond

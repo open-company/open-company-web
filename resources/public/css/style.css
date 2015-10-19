@@ -479,6 +479,7 @@ div.recent-updates{
 
 div.recent-updates ul.recent-updates-list{
   width: 300px;
+  top: auto;
 }
 
 div.recent-updates div.recent-updates-item{
