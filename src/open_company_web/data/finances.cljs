@@ -1,4 +1,4 @@
-(ns test.open-company-web.data.finances)
+(ns open-company-web.data.finances)
 
 (def finances {
   :name "Buffer"
@@ -8,6 +8,7 @@
   :sections ["finances" "challenges"]
   
   :challenges {
+    :section :challenges
     :title "Key Challenges"
     :body "<h3>Recruiting</h3><p>We're continuing our fast pace of growing the team, and we'd love your help to spread the word about all our <a>current open positions</a>, <a href=\"http://twitter.com\">Twitter</a> or <a href=\"http://buffer.com\">Buffer</a>.</p>
 <h3>Spead & Reliability</h3><p>We've made some key speed and reliability <a href=\"/improvements\">improvements</a> to <a href=\"http://buffer.com/b2b\">Buffer for business</a>, but there is still a ways to go. Everyone please drop everything and support the devops team in anyway you can when we have an outage situation.</p>
@@ -21,6 +22,7 @@
   }
   
   :finances {
+    :section :finacnes
     :data [
       {
         :period "2015-08"
@@ -89,6 +91,7 @@
         :costs 19546
       }      
     ]
+    :title "Finances report"
     :updated-at "2015-09-17T12:29:30Z"
     :author {
       :name "Iacopo Carraro"
