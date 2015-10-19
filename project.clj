@@ -47,7 +47,7 @@
 
   :source-paths ["src"]
 
-  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" "resources/public/js/devcards"]
+  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
   :cljsbuild {
     :builds {
@@ -72,9 +72,9 @@
         :figwheel { :devcards true}
         :compiler {
           :main "open-company-web.lib.devcards"
-          :asset-path "/js/compiled/out"
+          :asset-path "/js/compiled/out_devcards"
           :output-to "resources/public/js/compiled/devcards/oc_devcards.js"
-          :output-dir "resources/public/js/compiled/out"
+          :output-dir "resources/public/js/compiled/out_devcards"
           :optimizations :none
           :source-map-timestamp true
           :pretty-print true}}
