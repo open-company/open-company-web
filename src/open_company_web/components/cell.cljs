@@ -36,6 +36,16 @@
       :display
       :new))))
 
+(defn exit-cell [e owner data]
+  (let [value (.parseFloat js/window (.. e -target -value))
+        init-value (om/get-state owner :inital-value)
+        ; if the value is the same as it was at the start
+        ; go to the :display state, else go to :draft
+        state (if (= value init-value) :display :draft)
+        ; if the value is empty and it was empty got to the :new state
+        state (if (and (= state :display) (= value "")) :new state)]
+    (to-state owner data state)))
+
 (defcomponent cell [data owner]
   (init-state [_]
     (let [parsed-value (.parseFloat js/window (:value data))
@@ -63,7 +73,8 @@
       (dom/div {:class "comp-cell"
                 :data-placement "top"
                 :data-toggle "tooltip"
-                :title tooltip-text}
+                :title tooltip-text
+                :data-tab-cb #(println "here i am" (:period data) (:key data))}
         (case state
 
           :new
@@ -89,12 +100,14 @@
                        :onFocus #(let [input (.getDOMNode (om/get-ref owner "edit-field"))]
                                    (set! (.-value input) (.-value input)))
                        :onChange #(om/update-state! owner :value (fn [_] (.. % -target -value)))
-                       :onBlur #(let [value (.parseFloat js/window (.. % -target -value))
-                                      init-value (om/get-state owner :inital-value)
-                                      ; if the value is the same as it was at the start
-                                      ; go to the :display state, else go to :draft
-                                      state (if (= value init-value) :display :draft)
-                                      ; if the value is empty and it was empty got to the :new state
-                                      state (if (and (= state :display) (= value "")) :new state)]
-                                  (to-state owner data state))
-                       :onKeyDown #(when (= (.-key %) "Enter") (to-state owner data :draft))})))))))
+                       :onBlur #(exit-cell % owner data)
+                       :onKeyDown #(cond
+
+                                     (= "Enter" (.-key %))
+                                     (exit-cell % owner data)
+
+                                     (= "Tab" (.-key %))
+                                     (do
+                                       (exit-cell % owner data)
+                                       ((:tab-cb data) (:period data) (:key data))
+                                       (.preventDefault %)))})))))))
