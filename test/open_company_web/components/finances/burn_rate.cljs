@@ -6,7 +6,7 @@
               [dommy.core :as dommy :refer-macros [sel1 sel]]
               [open-company-web.components.finances.burn-rate :refer [burn-rate]]
               [om.dom :as dom :include-macros true]
-              [test.open-company-web.data.finances :refer [finances]]))
+              [open-company-web.data.finances :refer [finances]]))
 
 (enable-console-print!)
 
