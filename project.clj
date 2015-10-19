@@ -51,17 +51,6 @@
 
   :cljsbuild {
     :builds {
-      :devcard {
-        :id :devcards
-        :source-paths ["src"]
-        :figwheel { :devcards true}
-        :compiler {
-          :main "open-company-web.lib.devcards"
-          :asset-path "/js/compiled/out"
-          :output-to "resources/public/js/compiled/devcards/oc_devcards.js"
-          :output-dir "resources/public/js/compiled/out"
-          :source-map-timestamp true
-          :pretty-print true}}
       :dev {
         :id "dev"
         :source-paths ["src"]
@@ -73,6 +62,20 @@
           :asset-path "/js/compiled/out"
           :output-to "resources/public/js/compiled/open_company.js"
           :output-dir "resources/public/js/compiled/out"
+          :optimizations :none
+          :source-map-timestamp true
+          :pretty-print true}}
+
+      :devcards {
+        :id "devcards"
+        :source-paths ["src"]
+        :figwheel { :devcards true}
+        :compiler {
+          :main "open-company-web.lib.devcards"
+          :asset-path "/js/compiled/out"
+          :output-to "resources/public/js/compiled/devcards/oc_devcards.js"
+          :output-dir "resources/public/js/compiled/out"
+          :optimizations :none
           :source-map-timestamp true
           :pretty-print true}}
 
