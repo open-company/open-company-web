@@ -12,9 +12,22 @@
   (render [_]
     (let [prefix (:prefix data)
           finances-data (:cursor data)
+          period (:period finances-data)
           is-new (:new finances-data)
           cell-state (if is-new :new :display)
-          change-cb (:change-cb data)]
+          change-cb (:change-cb data)
+          tab-cb (fn [period k]
+                   ((:tab-cb data) period k))
+          burn-rate (if is-new
+                      "calculated"
+                      (.toLocaleString (- (:revenue finances-data) (:costs finances-data))))
+          runway-val (if (nil? (:runway finances-data))
+                       0
+                       (.toLocaleString (:runway finances-data)))
+          runway (if is-new
+                   "calculated"
+                   (str runway-val " days"))
+          ref-prefix (str (:period finances-data) "-")]
       (dom/tr {}
         (dom/td {:class "no-cell"} (utils/period-string (:period finances-data) :force-year))
         (dom/td {}
@@ -22,24 +35,36 @@
                           :placeholder (if is-new "at month end" "")
                           :prefix prefix
                           :cell-state cell-state
-                          :draft-cb #(change-cb :cash %)}))
+                          :draft-cb #(change-cb :cash %)
+                          :period period
+                          :key "cash"
+                          :tab-cb tab-cb
+                          :ref (str ref-prefix "cash")}))
         (dom/td {}
           (om/build cell {:value (:revenue finances-data)
                           :placeholder (if is-new "entire month" "")
                           :prefix prefix
                           :cell-state cell-state
-                          :draft-cb #(change-cb :revenue %)}))
+                          :draft-cb #(change-cb :revenue %)
+                          :period period
+                          :key "revenue"
+                          :tab-cb tab-cb
+                          :ref (str ref-prefix "revenue")}))
         (dom/td {}
           (om/build cell {:value (:costs finances-data)
                           :placeholder (if is-new "entire month" "")
                           :prefix prefix
                           :cell-state cell-state
-                          :draft-cb #(change-cb :costs %)}))
+                          :draft-cb #(change-cb :costs %)
+                          :period period
+                          :key "costs"
+                          :tab-cb tab-cb
+                          :ref (str ref-prefix "costs")}))
         (when (:show-burn data)
           (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
-            (if is-new "calculated" (.toLocaleString (- (:revenue finances-data) (:costs finances-data))))))
+            burn-rate))
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
-                (if is-new "calculated" (str (.toLocaleString (:runway finances-data)) " days")))))))
+                runway)))))
 
 (defn save-new-row? [finances-data]
   (let [new-period (first (filter #(true? (:new %)) finances-data))]
@@ -106,11 +131,16 @@
     (let [finances-data (om/get-state owner :data)
           cur-symbol (utils/get-symbol-for-currency-code (:currency (:company-data data)))
           show-burn (some #(pos? (:revenue %)) finances-data)
+          tab-cb (fn [period k]
+                   (println "finances-edit tab-cb" period k)
+                   (let [react-obj (om/get-ref owner (str period "-" k))]
+                     (println "react-obj" react-obj)))
           rows-data (map (fn [row]
                            (merge {:prefix cur-symbol
                                    :show-burn show-burn
                                    :change-cb (fn [k v]
-                                                (replace-row-in-data owner finances-data row k v))}
+                                                (replace-row-in-data owner finances-data row k v))
+                                   :tab-cb tab-cb}
                                   {:cursor row}))
                          finances-data)]
       (if (:loading data)
