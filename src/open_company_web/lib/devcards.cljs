@@ -1,13 +1,43 @@
 (ns open-company-web.lib.devcards
   (:require [devcards.core :as dc]
-            [open-company-web.components.editable-title :refer [editable-title]])
+            [open-company-web.components.simple-section :refer [simple-section]]
+            [open-company-web.components.finances.finances :refer [finances]]
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.data.finances :as company-data]
+            [open-company-web.components.recent-updates :refer [recent-updates]]
+            [open-company-web.router :as router])
   (:require-macros [devcards.core :as dc :refer [defcard]]))
 
-(defcard dc-editable-title
-  "Editable title component"
-  (dc/om-root editable-title {})
-  {:section-data {:title "This is a title"}
+(router/set-route! ["companies" "buffer"] {:slug "buffer"})
+
+(defn challenges-data []
+  (let [data (dissoc company-data/finances :finances)
+        data (assoc data :sections ["challenges"])]
+    data))
+
+(defn finances-data []
+  (let [data (dissoc company-data/finances :challenges)
+        data (assoc data :sections ["finances"])]
+    data))
+
+(defcard dc-simple-section
+  "Simple section component"
+  (dc/om-root simple-section {})
+  {:section :challenges
    :read-only false
-   :section :finances
-   :save-channel "test"}
+   :company-data (challenges-data)}
+  {:inspect-data true :history true})
+
+(defcard dc-finances
+  "Finances component"
+  (dc/om-root finances {})
+  {:section :finances
+   :company-data (finances-data)
+   :editable-click-callback #()}
+  {:inspect-data true :history true})
+
+(defcard dc-recent-updates
+  "Recent updates component"
+  (dc/om-root recent-updates {})
+  company-data/finances
   {:inspect-data true :history true})
