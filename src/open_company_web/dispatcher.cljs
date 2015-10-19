@@ -49,6 +49,25 @@
               (swap! app-state assoc (keyword (:slug updated-body)) body-with-notes))
             (swap! app-state assoc (keyword (:slug updated-body)) updated-body)))))))
 
+(defn add-section-name [section-body section-name]
+  (assoc section-body :section (keyword section-name)))
+
+(defn add-section-sorter [section-body]
+  (assoc section-body :sorter (:updated-at section-body)))
+
+(defn fix-finances-data [section-body section-name]
+  (if (= (keyword section-name) :finances)
+    (let [fixed-finances (utils/calc-runway (:data section-body))
+          sort-pred (utils/sort-by-key-pred :period true)
+          sorted-finances (sort #(sort-pred %1 %2) fixed-finances)]
+      (assoc section-body :data sorted-finances))
+    section-body))
+
+(defn fix-section [section-body section-name]
+  (let [fixed-section (add-section-sorter (add-section-name section-body section-name))
+        fixed-section (fix-finances-data fixed-section section-name)]
+    fixed-section))
+
 (def section-dispatch
   (flux/register
     section
@@ -56,19 +75,11 @@
       (when body
         ; remove loading key
         (swap! app-state dissoc :loading)
-        (let [section-body (:body body)
-              fixed-finances (utils/calc-runway (:data section-body))
-              sort-pred (utils/sort-by-key-pred :period true)
-              sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
-              section-body (if (= (:section body) :finances)
-                             (assoc section-body :data sorted-finances)
-                             section-body)
-              section-body (assoc section-body :section (:section body))
-              section-body (assoc section-body :sorter (:updated-at section-body))]
-          (swap! app-state assoc-in [(:slug body) (:section body)] section-body)
+        (let [fixed-section (fix-section (:body body) (:section body))]
+          (swap! app-state assoc-in [(:slug body) (:section body)] fixed-section)
           ; signal to update as-of
           (let [ch (utils/get-channel (str "revisions-update-" (name (:section body))))
-                revisions (utils/sort-revisions (:revisions section-body))
+                revisions (utils/sort-revisions (:revisions fixed-section))
                 last-revision (last revisions)]
             (put! ch {:as-of (:updated-at last-revision)})))))))
 
