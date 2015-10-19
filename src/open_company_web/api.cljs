@@ -40,8 +40,8 @@
 
 (def ^:private api-get (partial req api-endpoint http/get))
 (def ^:private api-post (partial req api-endpoint http/post))
-(def ^:private api-put (partial req http/put))
-(def ^:private api-patch (partial req http/patch))
+(def ^:private api-put (partial req api-endpoint http/put))
+(def ^:private api-patch (partial req api-endpoint http/patch))
 
 (def ^:private auth-get (partial req auth-endpoint http/get))
 
