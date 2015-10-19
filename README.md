@@ -82,6 +82,15 @@ get a Browser Connected REPL. An easy way to test it is:
 
 You should see an alert in the browser window.
 
+If you want to use the [devcards](https://github.com/bhauman/devcards) for development, run:
+
+```console
+lein figwheel devcards
+```
+
+Then load [http://localhost:3449/devcards](http://localhost:3449/devcards) in your browser.
+
+
 To clean all compiled files:
 
 ```console
@@ -118,13 +127,6 @@ For more info on testing:
 
 - Plugin: [bensu/doo](https://github.com/bensu/doo)
 - React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/doo)
-
-If you want to use the [devcards](https://github.com/bhauman/devcards) run
-
-```console
-lein figwheel devcards
-```
-then load [http://localhost:3449/devcards](http://localhost:3449/devcards) from your browser.
 
 
 ## Participation
