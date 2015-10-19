@@ -4,7 +4,8 @@
 (def columns 7)
 
 (defn chart-data-at-index [data keyw idx]
-  (let [rev-idx (- (- (min (count data) columns) 1) idx)
+  (let [data (to-array data)
+        rev-idx (- (- (min (count data) columns) 1) idx)
         obj (get data rev-idx)]
     [(utils/period-string (:period obj)) (keyw obj)]))
 
