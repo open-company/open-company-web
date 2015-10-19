@@ -124,7 +124,7 @@ If you want to use the [devcards](https://github.com/bhauman/devcards) run
 ```console
 lein figwheel devcards
 ```
-then load [http://localhost:3449/devcards](http://localhost:3449/devcards) from your browser
+then load [http://localhost:3449/devcards](http://localhost:3449/devcards) from your browser.
 
 
 ## Participation
