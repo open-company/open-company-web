@@ -39,7 +39,7 @@
           (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
             (if is-new "calculated" (.toLocaleString (- (:revenue finances-data) (:costs finances-data))))))
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
-                (if is-new "calculated" (.toLocaleString (:runway finances-data))))))))
+                (if is-new "calculated" (str (.toLocaleString (:runway finances-data)) " days")))))))
 
 (defn save-new-row? [finances-data]
   (let [new-period (some #(true? (:new %)) finances-data)]
