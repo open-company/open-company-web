@@ -1,4 +1,4 @@
-(ns test.open-company-web.data.finances)
+(ns open-company-web.data.finances)
 
 (def finances {
   :name "Buffer"
@@ -8,6 +8,7 @@
   :sections ["finances" "challenges"]
   
   :challenges {
+    :section :challenges
     :title "Key Challenges"
     :body "<h3>Recruiting</h3><p>We're continuing our fast pace of growing the team, and we'd love your help to spread the word about all our <a>current open positions</a>, <a href=\"http://twitter.com\">Twitter</a> or <a href=\"http://buffer.com\">Buffer</a>.</p>
 <h3>Spead & Reliability</h3><p>We've made some key speed and reliability <a href=\"/improvements\">improvements</a> to <a href=\"http://buffer.com/b2b\">Buffer for business</a>, but there is still a ways to go. Everyone please drop everything and support the devops team in anyway you can when we have an outage situation.</p>
@@ -15,12 +16,13 @@
     :updated-at "2015-09-14T20:49:19Z"
     :author {
       :name "Stuart Levinson"
-      :slack_id "U06SQLDFT"
-      :image "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
+      :user-id "U06SQLDFT"
+      :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
     }
   }
   
   :finances {
+    :section :finances
     :data [
       {
         :period "2015-08"
@@ -89,10 +91,11 @@
         :costs 19546
       }      
     ]
+    :title "Finances report"
     :updated-at "2015-09-17T12:29:30Z"
     :author {
       :name "Iacopo Carraro"
-      :slack_id "U06STCKLN"
+      :user-id "U06STCKLN"
       :image "https://secure.gravatar.com/avatar/98b5456ea1c562024f41501ffd7bc3c6.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0022.png"
     }
     :notes {
@@ -100,8 +103,8 @@
       :updated-at "2015-09-14T20:49:19Z"
       :author {
         :name "Stuart Levinson"
-        :slack_id "U06SQLDFT"
-        :image "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
+        :user-id "U06SQLDFT"
+        :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
       }
       :links [
         {
@@ -149,7 +152,7 @@
       :updated-at "2015-09-11T22:14:24Z"
       :author {
         :name "Iacopo Carraro"
-        :slack_id "U06STCKLN"
+        :user-id "U06STCKLN"
         :image "https://secure.gravatar.com/avatar/98b5456ea1c562024f41501ffd7bc3c6.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0022.png"
       }
     }
@@ -161,8 +164,8 @@
       :updated-at "2015-09-10T22:14:24Z"
       :author {
         :name "Stuart Levinson"
-        :slack_id "U06SQLDFT"
-        :image "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
+        :user-id "U06SQLDFT"
+        :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
       }
     }
     {
@@ -173,8 +176,8 @@
       :updated-at "2015-09-09T22:14:24Z"
       :author {
         :name "Stuart Levinson"
-        :slack_id "U06SQLDFT"
-        :image "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
+        :user-id "U06SQLDFT"
+        :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
       }
     }
     {
@@ -185,8 +188,8 @@
       :updated-at "2015-09-08T22:14:24Z"
       :author {
         :name "Stuart Levinson"
-        :slack_id "U06SQLDFT"
-        :image "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
+        :user-id "U06SQLDFT"
+        :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
       }
     }
     {
@@ -197,8 +200,8 @@
       :updated-at "2015-09-07T22:14:24Z"
       :author {
         :name "Stuart Levinson"
-        :slack_id "U06SQLDFT"
-        :image "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
+        :user-id "U06SQLDFT"
+        :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
       }
     }
   ]

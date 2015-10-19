@@ -7,8 +7,12 @@
 (defn index []
   (file-response "public/index.html" {:root "resources"}))
 
+(defn devcards []
+  (file-response "public/devcards.html" {:root "resources"}))
+
 (defroutes resources
   ; serve the react app for all requests
+  (GET "/devcards" [] (devcards))
   (GET "*" [] (index))
   ; remove the static paths
   (route/files "/css/*" {:root "resources/public"})
