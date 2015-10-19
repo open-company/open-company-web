@@ -14,7 +14,8 @@
           sort-pred (utils/sort-by-key-pred :period true)
           sorted-finances (sort #(sort-pred %1 %2) finances-data)
           value-set (first sorted-finances)
-          runway-val (utils/format-value (:runway value-set))
+          runway-value (:runway value-set)
+          runway-val (if (pos? runway-value) (utils/format-value runway-value) "Profitable")
           period (utils/period-string (:period value-set))
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))]
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))}
@@ -27,5 +28,5 @@
                                                :runway
                                                "runway"
                                                #js {"type" "string" "role" "style"}
-                                               "fill-color: blue"
+                                               "fill-color: #0266C8"
                                                "###,### days"))))))

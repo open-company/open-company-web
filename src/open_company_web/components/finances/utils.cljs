@@ -6,10 +6,14 @@
 (defn chart-data-at-index [data keyw column-name prefix idx]
   (let [data (to-array data)
         rev-idx (- (- (min (count data) columns) 1) idx)
-        obj (get data rev-idx)]
+        obj (get data rev-idx)
+        value (keyw obj)
+        label (if value
+                (str (utils/period-string (:period obj)) " " column-name ": " prefix (.toLocaleString (keyw obj)))
+                "Profitable")]
     [(utils/period-string (:period obj))
-     (keyw obj)
-     (str (utils/period-string (:period obj)) " " column-name ": " prefix (.toLocaleString (keyw obj)))]))
+     value
+     label]))
 
 (defn- get-chart-data [data prefix keyw column-name & [style fill-color pattern]]
   "Vector of max *columns elements of [:Label value]"
