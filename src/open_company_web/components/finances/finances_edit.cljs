@@ -31,15 +31,13 @@
                      (= k :costs)
                      (when next-period
                        (signal-tab next-period :cash))))
-          burn-rate (if is-new
+          burn-rate (- (:revenue finances-data) (:costs finances-data))
+          burn-rate (if (js/isNaN burn-rate)
                       "calculated"
-                      (.toLocaleString (- (:revenue finances-data) (:costs finances-data))))
-          runway-val (if (nil? (:runway finances-data))
-                       0
-                       (.toLocaleString (:runway finances-data)))
-          runway (if is-new
+                      (str prefix (.toLocaleString burn-rate)))
+          runway (if (and is-new (nil? (:runway finances-data)))
                    "calculated"
-                   (str runway-val " days"))
+                   (str (.toLocaleString (:runway finances-data)) " days"))
           ref-prefix (str (:period finances-data) "-")]
       (dom/tr {}
         (dom/td {:class "no-cell"} (utils/period-string (:period finances-data) :force-year))
