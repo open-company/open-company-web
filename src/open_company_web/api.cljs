@@ -31,10 +31,10 @@
 (defn- req [endpoint method path params on-complete]
   (go
     (let [jwt (j/jwt)
-          params (assoc-in params [:headers "Access-Control-Allow-Headers"] "Content-Type, Authorization")
-          params (when jwt (assoc-in params [:headers "Authorization"] (str "Bearer " jwt)))
-          data {:with-credentials? false}
-          data (when params (merge data params))
+          allow-params (assoc-in params [:headers "Access-Control-Allow-Headers"] "Content-Type, Authorization")
+          jwt-params (when jwt (assoc-in allow-params [:headers "Authorization"] (str "Bearer " jwt)))
+          initial-data {:with-credentials? false}
+          data (when jwt-params (merge initial-data jwt-params))
           response (<! (method (str endpoint path) data))]
       (on-complete response))))
 
