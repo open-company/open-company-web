@@ -1,8 +1,10 @@
 (ns open-company-web.components.cell
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.lib.utils :as utils]
+            [cljs.core.async :refer [chan <!]]))
 
 ;; Cell component
 ;; props: 
@@ -48,6 +50,7 @@
 
 (defcomponent cell [data owner]
   (init-state [_]
+    (utils/add-channel (str (:period data) (:key data)) (chan))
     (let [parsed-value (.parseFloat js/window (:value data))
           value (if (js/isNaN parsed-value) "" parsed-value)]
       {:cell-state (initial-cell-state data)
@@ -56,7 +59,12 @@
   (did-mount [_]
     ; initialize tooltips only if jquery is loaded, avoid tests crash
     (when (.-$ js/window)
-      (.tooltip (.$ js/window "[data-toggle=\"tooltip\"]"))))
+      (.tooltip (.$ js/window "[data-toggle=\"tooltip\"]")))
+    (go (loop []
+      (let [ch (utils/get-channel (str (:period data) (:key data)))
+            signal (<! ch)]
+        (to-state owner data :edit)
+        (recur)))))
   (render [_]
     (let [value (om/get-state owner :value)
           float-value (.parseFloat js/window value)
@@ -73,8 +81,7 @@
       (dom/div {:class "comp-cell"
                 :data-placement "top"
                 :data-toggle "tooltip"
-                :title tooltip-text
-                :data-tab-cb #(println "here i am" (:period data) (:key data))}
+                :title tooltip-text}
         (case state
 
           :new
@@ -110,4 +117,4 @@
                                      (do
                                        (exit-cell % owner data)
                                        ((:tab-cb data) (:period data) (:key data))
-                                       (.preventDefault %)))})))))))
+                                       (.preventDefault %))))})))))))
