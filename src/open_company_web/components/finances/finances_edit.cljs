@@ -6,7 +6,12 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.cell :refer [cell]]
             [open-company-web.api :as api]
-            [open-company-web.dispatcher :refer [app-state]]))
+            [open-company-web.dispatcher :refer [app-state]]
+            [cljs.core.async :refer [put! chan <!]]))
+
+(defn signal-tab [period k]
+  (let [ch (utils/get-channel (str period k))]
+    (put! ch {:period period :key k})))
 
 (defcomponent finances-edit-row [data owner]
   (render [_]
@@ -16,8 +21,16 @@
           is-new (:new finances-data)
           cell-state (if is-new :new :display)
           change-cb (:change-cb data)
+          next-period (:next-period data)
           tab-cb (fn [period k]
-                   ((:tab-cb data) period k))
+                   (cond
+                     (= k :cash)
+                     (signal-tab (:period finances-data) :revenue)
+                     (= k :revenue)
+                     (signal-tab (:period finances-data) :costs)
+                     (= k :costs)
+                     (when next-period
+                       (signal-tab next-period :cash))))
           burn-rate (if is-new
                       "calculated"
                       (.toLocaleString (- (:revenue finances-data) (:costs finances-data))))
@@ -37,9 +50,8 @@
                           :cell-state cell-state
                           :draft-cb #(change-cb :cash %)
                           :period period
-                          :key "cash"
-                          :tab-cb tab-cb
-                          :ref (str ref-prefix "cash")}))
+                          :key :cash
+                          :tab-cb tab-cb}))
         (dom/td {}
           (om/build cell {:value (:revenue finances-data)
                           :placeholder (if is-new "entire month" "")
@@ -47,9 +59,8 @@
                           :cell-state cell-state
                           :draft-cb #(change-cb :revenue %)
                           :period period
-                          :key "revenue"
-                          :tab-cb tab-cb
-                          :ref (str ref-prefix "revenue")}))
+                          :key :revenue
+                          :tab-cb tab-cb}))
         (dom/td {}
           (om/build cell {:value (:costs finances-data)
                           :placeholder (if is-new "entire month" "")
@@ -57,9 +68,8 @@
                           :cell-state cell-state
                           :draft-cb #(change-cb :costs %)
                           :period period
-                          :key "costs"
-                          :tab-cb tab-cb
-                          :ref (str ref-prefix "costs")}))
+                          :key :costs
+                          :tab-cb tab-cb}))
         (when (:show-burn data)
           (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
             burn-rate))
@@ -109,13 +119,22 @@
             (om/update-state! owner :data (fn [_] sorted-rows)))
           (recur (inc idx)))))))
 
+(defn next-period [data idx]
+  (let [data (to-array data)]
+    (if (< idx (dec (count data)))
+      (let [next-row (get data (inc idx))]
+        (:period next-row))
+      nil)))
+
 (defcomponent finances-edit [data owner]
   (init-state [_]
     ; add a new line if necessary
     (let [company-data (:company-data data)
           finances-data (:finances company-data)
           initial-data (:data finances-data)
-          cur-period (utils/current-period)]
+          cur-period (utils/current-period)
+          init-state {:data initial-data
+                      :initial-data initial-data}]
       (if-not (utils/period-exists cur-period initial-data)
         (let [new-period {:period cur-period
                           :cash nil
@@ -123,26 +142,20 @@
                           :revenue nil
                           :new true}
               new-data (into [new-period] initial-data)]
-          {:data new-data
-           :initial-data initial-data})
-          {:data initial-data
-           :initial-data initial-data})))
+          (update init-state :data (fn [_]new-data)))
+          init-state)))
   (render [_]
     (let [finances-data (om/get-state owner :data)
           cur-symbol (utils/get-symbol-for-currency-code (:currency (:company-data data)))
           show-burn (some #(pos? (:revenue %)) finances-data)
-          tab-cb (fn [period k]
-                   (println "finances-edit tab-cb" period k)
-                   (let [react-obj (om/get-ref owner (str period "-" k))]
-                     (println "react-obj" react-obj)))
-          rows-data (map (fn [row]
-                           (merge {:prefix cur-symbol
-                                   :show-burn show-burn
-                                   :change-cb (fn [k v]
-                                                (replace-row-in-data owner finances-data row k v))
-                                   :tab-cb tab-cb}
-                                  {:cursor row}))
-                         finances-data)]
+          rows-data (into [] (map (fn [row]
+                           (let [v {:prefix cur-symbol
+                                    :show-burn show-burn
+                                    :change-cb (fn [k v]
+                                                 (replace-row-in-data owner finances-data row k v))
+                                    :cursor row}]
+                             v))
+                         finances-data))]
       (if (:loading data)
         ; loading
         (dom/h4 {} "Loading data...")
@@ -162,8 +175,11 @@
                       (dom/th {} "Burn"))
                     (dom/th {} "Runway")))
                 (dom/tbody {}
-                  (for [row rows-data]
-                    (om/build finances-edit-row row))))
+                  (for [idx (range (count rows-data))]
+                    (let [row-data (get rows-data idx)
+                          next-period (next-period finances-data idx)
+                          row (assoc row-data :next-period next-period)]
+                      (om/build finances-edit-row row)))))
               (dom/div {:class "finances-edit-buttons"}
                 (dom/button {:class "btn btn-success"
                              :on-click #(save-data owner
