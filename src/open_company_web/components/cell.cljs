@@ -117,4 +117,4 @@
                                      (do
                                        (exit-cell % owner data)
                                        ((:tab-cb data) (:period data) (:key data))
-                                       (.preventDefault %))))})))))))
+                                       (.preventDefault %)))})))))))
