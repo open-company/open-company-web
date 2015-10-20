@@ -277,3 +277,6 @@
 (defn link-for
   ([links rel] (some #(if (= (:rel %) rel) % nil) links))
   ([links rel method] (some #(if (and (= (:method %) method) (= (:rel %) rel)) % nil) links)))
+
+(defn px [n]
+  (str n "px"))
