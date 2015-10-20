@@ -63,7 +63,7 @@
     (go (loop []
       (let [ch (utils/get-channel (str (:period data) (:key data)))
             signal (<! ch)]
-        (to-state owner data :edit)
+        (.setTimeout js/window #(to-state owner data :edit) 100)
         (recur)))))
   (render [_]
     (let [value (om/get-state owner :value)
