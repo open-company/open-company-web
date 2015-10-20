@@ -4,6 +4,8 @@
               [om-tools.dom :as dom :include-macros true]
               [open-company-web.components.link :refer [link]]
               [open-company-web.components.recent-updates :refer [recent-updates]]
+              [open-company-web.components.user-avatar :refer [user-avatar]]
+              [open-company-web.components.company-avatar :refer [company-avatar]]
               [om-bootstrap.nav :as n]
               [open-company-web.router :as router]))
 
@@ -14,15 +16,12 @@
   (render [_]
     (n/navbar {:inverse? true :fixed-top? true :fluid true :collapse? true}
       (dom/div {:class "navbar-header"}
-        (om/build link {
-          :class "navbar-brand"
-          :href (if (contains? data :slug) (str "/companies/" (:slug data)) "")
-          :name (company-title data)}))
+        (when (contains? @router/path :slug)
+          (om/build company-avatar {:company-data data :navbar-brand true})))
       (dom/div {:id "navbar" :class "navbar-collapse collapse"}
         (dom/ul {:class "nav navbar-nav navbar-right"}
           (when (contains? @router/path :slug)
             (dom/li {}
               (om/build recent-updates data)))
           (dom/li {}
-            (dom/a {:href "/settings" :class "settings"}
-              (dom/i {:class "fa fa-gear"}))))))))
+            (om/build user-avatar {})))))))

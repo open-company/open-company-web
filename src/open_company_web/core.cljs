@@ -5,6 +5,7 @@
             [open-company-web.components.page :refer [company]]
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
+            [open-company-web.components.user-profile :refer [user-profile]]
             [open-company-web.components.login :refer [login]]
             [open-company-web.lib.raven :refer [raven-setup]]
             [open-company-web.lib.utils :as utils]
@@ -121,6 +122,9 @@
                                                               :query-params query-params})
         (section-handler slug section)))
 
+    (defroute user-profile-route "/profile" {:as params}
+      (om/root user-profile app-state {:target target}))
+
     (defroute not-found-route "*" []
       ; render component
       (om/root page-not-found app-state {:target target}))
@@ -133,6 +137,7 @@
                                  company-profile-route
                                  section-route
                                  section-edit-route
+                                 user-profile-route
                                  not-found-route]))
 
     (defn login-wall []
