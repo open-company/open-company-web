@@ -6,8 +6,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]))
 
-(defn get-px [n]
-  (str n "px"))
+(def df-company-avatar-size 40)
 
 (defcomponent company-avatar [data owner]
   (render [_]
@@ -17,13 +16,11 @@
                            (first (:name (:company-data data)))
                            (first slug))
             company-home (str "/companies/" slug)
-            width (if (:width data)
-                    (:width data)
-                    40)
-            height (if (:height data)
-                     (:height data)
-                     40)
-            bd-radius (int (/ width 2))]
+            av-size (if (:size data)
+                      (:size data)
+                      df-company-avatar-size)
+            px-size (utils/px av-size)
+            bd-radius (utils/px (int (/ av-size 2)))]
         (dom/div {:class (utils/class-set {:company-avatar true
                                            :navbar-brand (:navbar-brand data)})}
           (dom/a {:href company-home
@@ -31,9 +28,9 @@
                               (.preventDefault e)
                               (router/nav! company-home))}
             (dom/div {:class "company-avatar-img"
-                      :style {:width (get-px width)
-                              :height (get-px height)
-                              :border-radius (get-px bd-radius)}
+                      :style {:width px-size
+                              :height px-size
+                              :border-radius bd-radius}
                       :src (jwt/get-key :avatar)
                       :title (jwt/get-key :real-name)}
               (dom/span {:class "company-avatar-name"} (clojure.string/upper-case first-letter)))))))))
