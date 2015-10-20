@@ -113,7 +113,7 @@
             (om/build update-footer {:updated-at (:updated-at finances-data)
                                      :author (:author finances-data)
                                      :section :finances})
-            (when (or (not read-only) (nil? (:body notes-data)))
+            (when (and (not read-only) (not (nil? notes-data)) (not (nil? (:body notes-data))))
               (om/build rich-editor {:read-only read-only
                                      :section-data notes-data
                                      :section :finances
