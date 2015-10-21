@@ -59,7 +59,7 @@
           (.format formatter data-table idx))))
     data-table))
 
-(defn column-draw-chart [currency-symbol columns pattern data dom-node]
+(defn column-draw-chart [currency-symbol columns pattern data column-thickness dom-node]
   (when (.-google js/window)
     (let [data-table (column-add-rows columns data currency-symbol pattern)
           options (clj->js {
@@ -71,7 +71,7 @@
                                 "gridlineColor" "transparent"
                                 "baselineColor" "transparent"
                                 "textPosition" "none"}
-                    :bar #js { "groupWidth" "10%"}})]
+                    :bar #js { "groupWidth" column-thickness}})]
       (when dom-node (.draw (js/google.visualization.ColumnChart. dom-node) data-table options)))))
 
 (defcomponent column-chart [chart-data owner]
@@ -80,12 +80,18 @@
                        (:columns chart-data)
                        (:pattern chart-data)
                        (:values chart-data)
+                       (if (contains? chart-data :column-thickness)
+                         (:column-thickness chart-data)
+                         "10%")
                        (.getDOMNode (om/get-ref owner "column-chart"))))
   (did-update [_ _ _]
     (column-draw-chart (:prefix chart-data)
                        (:columns chart-data)
                        (:pattern chart-data)
                        (:values chart-data)
+                       (if (contains? chart-data :column-thickness)
+                         (:column-thickness chart-data)
+                         "10%")
                        (.getDOMNode (om/get-ref owner "column-chart"))))
   (render [_]
     (dom/div #js {:className "chart-container column-chart" :ref "column-chart" })))
