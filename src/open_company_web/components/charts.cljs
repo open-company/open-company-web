@@ -62,7 +62,11 @@
                     :width 600
                     :height 250
                     :legend #js {"position" "none"}
-                    :vAxis #js {"minValue" 0}})]
+                    :vAxis #js {"minValue" 0
+                                "gridlineColor" "transparent"
+                                "baselineColor" "transparent"
+                                "textPosition" "none"}
+                    :bar #js { "groupWidth" "10%"}})]
       (when dom-node (.draw (js/google.visualization.ColumnChart. dom-node) data-table options)))))
 
 (defcomponent column-chart [chart-data owner]
