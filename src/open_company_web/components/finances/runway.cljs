@@ -15,7 +15,8 @@
           sorted-finances (sort #(sort-pred %1 %2) finances-data)
           value-set (first sorted-finances)
           runway-value (:runway value-set)
-          runway-val (if (pos? runway-value) (str (utils/format-value runway-value) " days") "Profitable")
+          ;; use not neg? here rather than pos? to account for 0 days runway
+          runway-val (if (not (neg? runway-value)) (str (utils/format-value runway-value) " days") "Profitable")
           period (utils/period-string (:period value-set))
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))]
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))}
