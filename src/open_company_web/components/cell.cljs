@@ -1,8 +1,10 @@
 (ns open-company-web.components.cell
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.lib.utils :as utils]
+            [cljs.core.async :refer [chan <!]]))
 
 ;; Cell component
 ;; props: 
@@ -17,7 +19,7 @@
   (.toLocaleString value))
 
 (defn- to-state [owner data state]
-  (when (= state :draft)
+  (when (or (= state :draft) (= state :display) (= state :new))
     ((:draft-cb data) (.parseFloat js/window (.. (om/get-ref owner "edit-field") getDOMNode -value))))
   (om/update-state! owner :cell-state (fn [_] state))
   (when (= state :edit)
@@ -36,8 +38,19 @@
       :display
       :new))))
 
+(defn exit-cell [e owner data]
+  (let [value (.parseFloat js/window (.. e -target -value))
+        init-value (om/get-state owner :inital-value)
+        ; if the value is the same as it was at the start
+        ; go to the :display state, else go to :draft
+        state (if (= value init-value) :display :draft)
+        ; if the value is empty and it was empty got to the :new state
+        state (if (and (= state :display) (= value "")) :new state)]
+    (to-state owner data state)))
+
 (defcomponent cell [data owner]
   (init-state [_]
+    (utils/add-channel (str (:period data) (:key data)) (chan))
     (let [parsed-value (.parseFloat js/window (:value data))
           value (if (js/isNaN parsed-value) "" parsed-value)]
       {:cell-state (initial-cell-state data)
@@ -46,7 +59,12 @@
   (did-mount [_]
     ; initialize tooltips only if jquery is loaded, avoid tests crash
     (when (.-$ js/window)
-      (.tooltip (.$ js/window "[data-toggle=\"tooltip\"]"))))
+      (.tooltip (.$ js/window "[data-toggle=\"tooltip\"]")))
+    (go (loop []
+      (let [ch (utils/get-channel (str (:period data) (:key data)))
+            signal (<! ch)]
+        (.setTimeout js/window #(to-state owner data :edit) 100)
+        (recur)))))
   (render [_]
     (let [value (om/get-state owner :value)
           float-value (.parseFloat js/window value)
@@ -59,7 +77,7 @@
                         :new      "Click to enter data"
                         :display  "Click to edit data"
                         :draft    "Click to modify data"
-                        :edit     "Press enter to save")]
+                        :edit     "Press enter")]
       (dom/div {:class "comp-cell"
                 :data-placement "top"
                 :data-toggle "tooltip"
@@ -89,12 +107,14 @@
                        :onFocus #(let [input (.getDOMNode (om/get-ref owner "edit-field"))]
                                    (set! (.-value input) (.-value input)))
                        :onChange #(om/update-state! owner :value (fn [_] (.. % -target -value)))
-                       :onBlur #(let [value (.parseFloat js/window (.. % -target -value))
-                                      init-value (om/get-state owner :inital-value)
-                                      ; if the value is the same as it was at the start
-                                      ; go to the :display state, else go to :draft
-                                      state (if (= value init-value) :display :draft)
-                                      ; if the value is empty and it was empty got to the :new state
-                                      state (if (and (= state :display) (= value "")) :new state)]
-                                  (to-state owner data state))
-                       :onKeyDown #(when (= (.-key %) "Enter") (to-state owner data :draft))})))))))
+                       :onBlur #(exit-cell % owner data)
+                       :onKeyDown #(cond
+
+                                     (= "Enter" (.-key %))
+                                     (exit-cell % owner data)
+
+                                     (= "Tab" (.-key %))
+                                     (do
+                                       (exit-cell % owner data)
+                                       ((:tab-cb data) (:period data) (:key data))
+                                       (.preventDefault %)))})))))))

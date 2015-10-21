@@ -36,14 +36,37 @@
         (let [updated-body (utils/fix-sections body)]
           ; calc burn-rate and runway
           ; and add the new values to the atom
-          (if (contains? (:sections updated-body) "finances")
-            (let [finances (:data (:finances updated-body))
-                  fixed-finances (into [] (map utils/calc-burnrate-runway finances))
+          (if (utils/in? (:sections updated-body) "finances")
+            (let [finances (:finances updated-body)
+                  finances-data (:data finances)
+                  fixed-finances (utils/calc-runway finances-data)
                   sort-pred (utils/sort-by-key-pred :period true)
                   sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
-                  fixed-body (assoc-in updated-body [:finances :data] sorted-finances)]
-              (swap! app-state assoc (keyword (:slug updated-body)) fixed-body))
+                  fixed-body (assoc-in updated-body [:finances :data] sorted-finances)
+                  body-with-notes (if-not (contains? (:finances fixed-body) :notes)
+                                    (assoc fixed-body :finances (merge (:finances fixed-body) {:notes {:body ""}}))
+                                    fixed-body)]
+              (swap! app-state assoc (keyword (:slug updated-body)) body-with-notes))
             (swap! app-state assoc (keyword (:slug updated-body)) updated-body)))))))
+
+(defn add-section-name [section-body section-name]
+  (assoc section-body :section (keyword section-name)))
+
+(defn add-section-sorter [section-body]
+  (assoc section-body :sorter (:updated-at section-body)))
+
+(defn fix-finances-data [section-body section-name]
+  (if (= (keyword section-name) :finances)
+    (let [fixed-finances (utils/calc-runway (:data section-body))
+          sort-pred (utils/sort-by-key-pred :period true)
+          sorted-finances (sort #(sort-pred %1 %2) fixed-finances)]
+      (assoc section-body :data sorted-finances))
+    section-body))
+
+(defn fix-section [section-body section-name]
+  (let [fixed-section (add-section-sorter (add-section-name section-body section-name))
+        fixed-section (fix-finances-data fixed-section section-name)]
+    fixed-section))
 
 (def section-dispatch
   (flux/register
@@ -52,19 +75,11 @@
       (when body
         ; remove loading key
         (swap! app-state dissoc :loading)
-        (let [section-body (:body body)
-              fixed-finances (into [] (map utils/calc-burnrate-runway (:data section-body)))
-              sort-pred (utils/sort-by-key-pred :period true)
-              sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
-              section-body (if (= (:section body) :finances)
-                             (assoc section-body :data sorted-finances)
-                             section-body)
-              section-body (assoc section-body :section (:section body))
-              section-body (assoc section-body :sorter (:updated-at section-body))]
-          (swap! app-state assoc-in [(:slug body) (:section body)] section-body)
+        (let [fixed-section (fix-section (:body body) (:section body))]
+          (swap! app-state assoc-in [(:slug body) (:section body)] fixed-section)
           ; signal to update as-of
           (let [ch (utils/get-channel (str "revisions-update-" (name (:section body))))
-                revisions (utils/sort-revisions (:revisions section-body))
+                revisions (utils/sort-revisions (:revisions fixed-section))
                 last-revision (last revisions)]
             (put! ch {:as-of (:updated-at last-revision)})))))))
 
@@ -79,6 +94,10 @@
               assoc-in-coll [(:slug body) (:section body)]
               assoc-in-coll (if notes? (conj assoc-in-coll :notes) assoc-in-coll)
               sec-body (:body body)
+              is-finances (= (:section body) :finances)
+              sec-body (if (and is-finances (not notes?))
+                         (assoc sec-body :data (utils/calc-runway (:data sec-body)))
+                         sec-body)
               sec-body (if (:read-only body) (assoc sec-body :read-only true) sec-body)
               section ((:section body) ((:slug body) @app-state))
               section (if notes? (:notes section) section)

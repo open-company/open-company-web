@@ -30,7 +30,7 @@
               (contains? @router/path :section)
               (om/build section-selector {:data company-data :section (keyword (:section @router/path))})
 
-              (contains? (:route @router/path) "profile")
+              (utils/in? (:route @router/path) "profile")
               (om/build company-profile data)
 
               (and (not (contains? data :loading)) (contains? data (keyword slug)))
