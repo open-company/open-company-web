@@ -31,17 +31,17 @@
 (defn- req [endpoint method path params on-complete]
   (go
     (let [jwt (j/jwt)
-          params (assoc-in params [:headers "Access-Control-Allow-Headers"] "Content-Type, Authorization")
-          params (when jwt (assoc-in params [:headers "Authorization"] (str "Bearer " jwt)))
-          data {:with-credentials? false}
-          data (when params (merge data params))
+          allow-params (assoc-in params [:headers "Access-Control-Allow-Headers"] "Content-Type, Authorization")
+          jwt-params (when jwt (assoc-in allow-params [:headers "Authorization"] (str "Bearer " jwt)))
+          initial-data {:with-credentials? false}
+          data (when jwt-params (merge initial-data jwt-params))
           response (<! (method (str endpoint path) data))]
       (on-complete response))))
 
 (def ^:private api-get (partial req api-endpoint http/get))
 (def ^:private api-post (partial req api-endpoint http/post))
-(def ^:private api-put (partial req http/put))
-(def ^:private api-patch (partial req http/patch))
+(def ^:private api-put (partial req api-endpoint http/put))
+(def ^:private api-patch (partial req api-endpoint http/patch))
 
 (def ^:private auth-get (partial req auth-endpoint http/get))
 
@@ -143,4 +143,24 @@
                 dispatch-body {:body (merge {:section :finances :sorter (:updated-at body)} body)
                                :section :finances
                                :slug (keyword slug)}]
+            (flux/dispatch dispatcher/section dispatch-body)))))))
+
+(defn update-finances-notes[notes links]
+  (when notes
+    (let [slug (:slug @router/path)
+          json-data (cljs->json {:notes notes})
+          finances-link (utils/link-for links "update" "PATCH")]
+      (api-patch (:href finances-link)
+        { :json-params json-data
+          :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (:type finances-link)}}
+        (fn [response]
+          (let [body (if (:success response) (json->cljs (:body response)) {})
+                dispatch-body {:body (merge {:section :finances :sorter (:updated-at body)} body)
+                               :section :finances
+                               :slug (keyword slug)
+                               :notes true}]
             (flux/dispatch dispatcher/section dispatch-body)))))))

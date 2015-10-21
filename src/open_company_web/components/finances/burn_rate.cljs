@@ -23,4 +23,9 @@
                 burn-rate-val
                 (om/build editable-pen {:click-callback (:editable-click-callback data)}))
         (dom/p {} period)
-        (om/build column-chart (get-chart-data finances-data cur-symbol :burn-rate "Burn Rate"))))))
+        (om/build column-chart (get-chart-data finances-data
+                                               cur-symbol
+                                               :burn-rate
+                                               "Burn Rate"
+                                               #js {"type" "string" "role" "style"}
+                                               "fill-color: #0266C8"))))))
