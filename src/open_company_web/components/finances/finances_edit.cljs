@@ -36,9 +36,11 @@
           burn-rate (if (js/isNaN burn)
                       "calculated"
                       (str burn-prefix (.toLocaleString (utils/abs burn))))
-          runway (if (and is-new (nil? (:runway finances-data)))
-                   "calculated"
-                   (str (.toLocaleString (:runway finances-data)) " days"))
+          runway-days (:runway finances-data)
+          runway (cond
+                  (and is-new (nil? runway-days)) "calculated"
+                  (nil? runway-days) "profitable"
+                  :else (str (.toLocaleString runway-days) " days"))
           ref-prefix (str (:period finances-data) "-")]
       (dom/tr {}
         (dom/td {:class "no-cell"} (utils/period-string (:period finances-data) :force-year))
