@@ -24,7 +24,6 @@
     [racehub/om-bootstrap "0.5.3"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
     [noencore "0.1.21"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
-    [devcards "0.2.0-8"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
   ]
 
   :plugins [
@@ -41,6 +40,7 @@
         [ring "1.4.0"] ; Web framework https://github.com/ring-clojure/ring
         [compojure "1.4.0"] ; Web routing http://github.com/weavejester/compojure
         [shodan "0.4.2"] ; A ClojureScript library providing wrappers for the JavaScript console API. https://github.com/noprompt/shodan
+        [devcards "0.2.0-8"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
       ]
     }
   }
@@ -152,7 +152,7 @@
   :aliases {
     "ancient" ["ancient" ":all" ":allow-qualified"] ; check for out of date dependencies
     "build" ["cljsbuild" "once" "dev"]
-    "build!" ["cljsbuild" "once" "min"]
+    "build!" ["with-profile" "prod" "cljsbuild" "once" "min"]
     "test-navigation!" ["doo" "phantom" "test-navigation" "once"]
     "test-company!" ["doo" "phantom" "test-company" "once"]
     "test-ui-components!" ["doo" "phantom" "test-ui-components" "once"]
