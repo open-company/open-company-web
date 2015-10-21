@@ -77,7 +77,7 @@
                         :new      "Click to enter data"
                         :display  "Click to edit data"
                         :draft    "Click to modify data"
-                        :edit     "Press enter to save")]
+                        :edit     "Press enter")]
       (dom/div {:class "comp-cell"
                 :data-placement "top"
                 :data-toggle "tooltip"

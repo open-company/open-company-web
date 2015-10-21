@@ -31,16 +31,18 @@
                      (= k :costs)
                      (when next-period
                        (signal-tab next-period :cash))))
-          burn-rate (- (:revenue finances-data) (:costs finances-data))
-          burn-rate (if (js/isNaN burn-rate)
+          burn (- (:revenue finances-data) (:costs finances-data))
+          burn-prefix (if (neg? burn) (str "-" prefix) prefix)
+          burn-rate (if (js/isNaN burn)
                       "calculated"
-                      (str prefix (.toLocaleString burn-rate)))
+                      (str burn-prefix (.toLocaleString (utils/abs burn))))
           runway (if (and is-new (nil? (:runway finances-data)))
                    "calculated"
                    (str (.toLocaleString (:runway finances-data)) " days"))
           ref-prefix (str (:period finances-data) "-")]
       (dom/tr {}
         (dom/td {:class "no-cell"} (utils/period-string (:period finances-data) :force-year))
+        ;; cash
         (dom/td {}
           (om/build cell {:value (:cash finances-data)
                           :placeholder (if is-new "at month end" "")
@@ -50,6 +52,7 @@
                           :period period
                           :key :cash
                           :tab-cb tab-cb}))
+        ;; revenue
         (dom/td {}
           (om/build cell {:value (:revenue finances-data)
                           :placeholder (if is-new "entire month" "")
@@ -59,6 +62,7 @@
                           :period period
                           :key :revenue
                           :tab-cb tab-cb}))
+        ;; costs
         (dom/td {}
           (om/build cell {:value (:costs finances-data)
                           :placeholder (if is-new "entire month" "")
@@ -68,9 +72,11 @@
                           :period period
                           :key :costs
                           :tab-cb tab-cb}))
+        ;; Burn
         (when (:show-burn data)
           (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
             burn-rate))
+        ;; Runway
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
                 runway)))))
 
