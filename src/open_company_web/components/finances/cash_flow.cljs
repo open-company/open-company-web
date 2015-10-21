@@ -17,7 +17,7 @@
         cash-flow (if (js/isNaN cash-flow) 0 cash-flow)
         cash-flow-pos? (pos? cash-flow)
         abs-cash-flow (utils/abs cash-flow)]
-    [(utils/period-string (:period obj))
+    [(utils/period-string (:period obj) :short-month)
      (:costs obj)
      "fill-color: red"
      (str (utils/period-string (:period obj)) " Costs: " prefix (.toLocaleString (:costs obj)))
@@ -45,7 +45,8 @@
                 #js {"type" "string" "role" "style"}
                 #js {"type" "string" "role" "tooltip"}]
       :values (into [] (map chart-data placeholder-vect))
-      :pattern "###,###.##"}))
+      :pattern "###,###.##"
+      :column-thickness "30%"}))
 
 (defcomponent cash-flow [data owner]
   (render [_]
