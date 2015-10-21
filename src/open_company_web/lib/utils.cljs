@@ -111,9 +111,29 @@
     "12" "December"
     ""))
 
+(defn month-short-string [month]
+  (case month
+    "01" "JAN"
+    "02" "FEB"
+    "03" "MAR"
+    "04" "APR"
+    "05" "MAY"
+    "06" "JUN"
+    "07" "JUL"
+    "08" "AUG"
+    "09" "SEP"
+    "10" "OCT"
+    "11" "NOV"
+    "12" "DEC"
+    ""))
+
 (defn period-string [period & flags]
-  (let [[year month] (clojure.string/split period "-")
-        month-str (month-string month)]
+  (let [force-year (in? flags :force-year)
+        short-month-string (in? flags :short-month)
+        [year month] (clojure.string/split period "-")
+        month-str (if short-month-string 
+                    (month-short-string month)
+                    (month-string month))]
     (if (or (in? flags :force-year) (= month "01") (= month "12"))
       (str month-str " " year)
       month-str)))
