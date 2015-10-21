@@ -1,5 +1,9 @@
 /* some style */
 
+html, body{
+  font-family: "Proxima nova";
+}
+
 a{
   cursor: pointer;
 }
@@ -265,6 +269,7 @@ div.update-footer{
   position: relative;
   left: 50%;
   margin-left: -300px;
+  margin-top: 30px;
   width: 600px;
   height: 40px;
   vertical-align: middle;
@@ -299,7 +304,6 @@ div.rich-editor-container {
 div.rich-editor-container div.rich-editor,
 div.rich-editor-container div.fake-rich-editor{
   width: 100%;
-  margin-bottom: 10px;
 }
 
 div.rich-editor-container div.rich-editor-save{
@@ -507,6 +511,7 @@ div.simple-section-revisions-navigator{
   width: 600px;
   left: 50%;
   margin-left: 300px;
+  margin-top: 30px;
 }
 
 div.revisions-navigator{
@@ -585,6 +590,8 @@ hr.section-separator{
   background-color: lightgray;
   width: 600px;
   height: 1px;
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 h4.login-error-message{
@@ -622,14 +629,36 @@ div.company-avatar div.company-avatar-img{
   border: 1px solid black;
   margin-top: -10px;
   padding: 9px;
+  float: left;
 }
 
-div.company-avatar div.company-avatar-img span.company-avatar-name{
+div.company-avatar div.company-avatar-img span.company-avatar-initial{
   font-size: 28px;
+  color: black;
+}
+
+div.company-avatar div.company-avatar-name{
+  float: left;
+  font-size: 16px;
+  margin-left: 10px;
   color: black;
 }
 
 nav.navbar{
   background-color: white;
   border-bottom: 1px solid black;
+}
+
+div.rich-editor *::selection{
+  background: #C1E7F4;
+}
+
+div.rich-editor *::-moz-selection{
+  background: #C1E7F4;
+}
+
+div.rich-editor a{
+  font-weight: bold;
+  text-decoration: underline;
+  color: black;
 }
