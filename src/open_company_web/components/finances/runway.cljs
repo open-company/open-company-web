@@ -30,6 +30,6 @@
                                                :runway
                                                "runway"
                                                #js {"type" "string" "role" "style"}
-                                               "fill-color: #0266C8"
+                                               "fill-color: #ADADAD"
                                                "###,### days"
                                                " days"))))))
