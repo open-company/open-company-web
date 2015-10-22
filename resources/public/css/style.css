@@ -119,7 +119,7 @@ div#app{
 
 nav.navbar{
   background-color: white;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
 }
 
 nav.tab-navigation{
@@ -282,12 +282,16 @@ div.update-footer{
 
 div.update-footer div{
   margin: 0px 0px 0px 35px;
-  color: lightgray;
+  color: rgba(0, 0, 0, 0.4);
   text-decoration: none;
 }
 
 div.update-footer div.author{
-  color: gray;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+div.update-footer div.timeago{
+  color: rgba(0, 0, 0, 0.4);
 }
 
 div.update-footer img.author-image{
@@ -308,7 +312,7 @@ div.rich-editor-container {
 }
 
 div.rich-editor-container div.rich-editor.no-data{
-  color: lightgray;
+  color: rgba(0, 0, 0, 0.4);
 }
 
 div.rich-editor-container div.rich-editor,
@@ -361,6 +365,8 @@ div.rich-editor-container button.collapse-button{
   color: rgb(37, 138, 36);
   text-decoration: none;
   font-size: 16px;
+  margin-left: 0px;
+  padding-left: 0px;
 }
 
 .comp-cell {
@@ -383,7 +389,7 @@ div.rich-editor-container button.collapse-button{
 }
 
 .comp-cell .state-new span {
-  color: lightgray;
+  color: rgba(0, 0, 0, 0.4);
 }
 
 .comp-cell .state-display {
@@ -511,7 +517,7 @@ div.finances-body table.table td.no-cell{
 }
 
 div.finances-body table.table td.new-row-placeholder{
-  color: lightgray;
+  color: rgba(0, 0, 0, 0.4);
 }
 
 div.finances-body table.table td div.comp-cell{
@@ -551,16 +557,12 @@ div.recent-updates div.recent-updates-item span.updated-at {
   float: right;
 }
 
-a.settings i{
-  color: lightgray;
-  font-size: 18px;
-}
-
 div.simple-section-revisions-navigator{
   width: 600px;
   left: 50%;
-  margin-left: 300px;
+  margin-left: -300px;
   margin-top: 30px;
+  position: relative;
 }
 
 div.revisions-navigator{
@@ -570,6 +572,13 @@ div.revisions-navigator{
 
 div.revisions-navigator div.revisions-navigator-left{
   float: left;
+}
+
+div.revisions-navigator div.revisions-navigator-left div.single-prev,
+div.revisions-navigator div.revisions-navigator-right div.single-next,
+div.revisions-navigator div.revisions-navigator-left div.double-prev,
+div.revisions-navigator div.revisions-navigator-right div.double-next{
+  color: rgba(0, 0, 0, 0.4);
 }
 
 div.revisions-navigator div.revisions-navigator-left div.double-prev{
@@ -593,7 +602,6 @@ div.revisions-navigator div.revisions-navigator-left div.single-prev p{
 
 div.revisions-navigator div.revisions-navigator-left div.single-prev,
 div.revisions-navigator div.revisions-navigator-left div.double-prev{
-  color: black;
   float: left;
 }
 
@@ -628,7 +636,6 @@ div.revisions-navigator div.revisions-navigator-right div.single-next p{
 div.revisions-navigator div.revisions-navigator-right div.single-next,
 div.revisions-navigator div.revisions-navigator-right div.double-next{
   float: right;
-  color: black;
 }
 
 div.revisions-navigator div.revisions-navigator-right div.double-next{
@@ -636,7 +643,7 @@ div.revisions-navigator div.revisions-navigator-right div.double-next{
 }
 
 hr.section-separator{
-  background-color: lightgray;
+  background-color: rgba(0, 0, 0, 0.4);
   width: 600px;
   height: 1px;
   margin-top: 30px;
