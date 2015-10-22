@@ -157,10 +157,11 @@
     "ancient" ["ancient" ":all" ":allow-qualified"] ; check for out of date dependencies
     "build" ["cljsbuild" "once" "dev"]
     "build!" ["cljsbuild" "once" "min"]
+    "figwheel!" ["with-profile" "+devcards" "figwheel"]
     "devcards" ["with-profile" "+devcards" "figwheel" "devcards"]
-    "test-navigation!" ["doo" "phantom" "test-navigation" "once"]
-    "test-company!" ["doo" "phantom" "test-company" "once"]
-    "test-ui-components!" ["doo" "phantom" "test-ui-components" "once"]
+    "test-navigation!" ["with-profile" "+devcards" "doo" "phantom" "test-navigation" "once"]
+    "test-company!" ["with-profile" "+devcards" "doo" "phantom" "test-company" "once"]
+    "test-ui-components!" ["with-profile" "+devcards" "doo" "phantom" "test-ui-components" "once"]
     "test-all!" ["do" "test-navigation!," "test-company!," "test-ui-components!"] ; don't use in CI
   }
 )
