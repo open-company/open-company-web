@@ -69,7 +69,7 @@
         (let [rich-editor-node (.getDOMNode rich-editor-ref)
               $-rich-editor (.$ js/window rich-editor-node)
               height (.height $-rich-editor)]
-          (when (< height 200)
+          (when (< height 300)
             (collapse owner false))))))
   (render [_]
     (let [section-data (:section-data data)
