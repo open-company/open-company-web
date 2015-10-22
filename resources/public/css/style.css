@@ -117,6 +117,11 @@ div#app{
   margin-top: 50px;
 }
 
+nav.navbar{
+  background-color: white;
+  border-bottom: 1px solid black;
+}
+
 nav.tab-navigation{
   margin-top: 10px;
 }
@@ -317,6 +322,31 @@ div.rich-editor-container div.rich-editor-save{
 
 div.rich-editor-container div.rich-editor-save button.cancel-button{
   margin-left: 10px;
+}
+
+div.rich-editor-container div.rich-editor *::selection{
+  background: #C1E7F4;
+}
+
+div.rich-editor-container div.rich-editor *::-moz-selection{
+  background: #C1E7F4;
+}
+
+div.rich-editor-container div.rich-editor a{
+  font-weight: bold;
+  text-decoration: underline;
+  color: black;
+}
+
+div.rich-editor-container div.rich-editor.collapsed{
+  overflow: hidden;
+  max-height: 200px;
+}
+
+div.rich-editor-container button.collapse-button{
+  color: rgb(37, 138, 36);
+  text-decoration: none;
+  font-size: 16px;
 }
 
 .comp-cell {
@@ -599,6 +629,12 @@ hr.section-separator{
   margin-bottom: 30px;
 }
 
+@media (-webkit-min-device-pixel-ratio: 2){
+  hr.section-separator{
+    height: 0.5px;
+  }
+}
+
 h4.login-error-message{
   color: red;
   font-size: 14px;
@@ -646,24 +682,5 @@ div.company-avatar div.company-avatar-name{
   float: left;
   font-size: 16px;
   margin-left: 10px;
-  color: black;
-}
-
-nav.navbar{
-  background-color: white;
-  border-bottom: 1px solid black;
-}
-
-div.rich-editor *::selection{
-  background: #C1E7F4;
-}
-
-div.rich-editor *::-moz-selection{
-  background: #C1E7F4;
-}
-
-div.rich-editor a{
-  font-weight: bold;
-  text-decoration: underline;
   color: black;
 }
