@@ -40,9 +40,13 @@
         [ring "1.4.0"] ; Web framework https://github.com/ring-clojure/ring
         [compojure "1.4.0"] ; Web routing http://github.com/weavejester/compojure
         [shodan "0.4.2"] ; A ClojureScript library providing wrappers for the JavaScript console API. https://github.com/noprompt/shodan
-        [devcards "0.2.0-8"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
       ]
     }
+    :devcards [:dev {
+      :dependencies [
+        [devcards "0.2.0-8"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
+      ]
+    }]
   }
 
   :source-paths ["src"]
@@ -152,7 +156,8 @@
   :aliases {
     "ancient" ["ancient" ":all" ":allow-qualified"] ; check for out of date dependencies
     "build" ["cljsbuild" "once" "dev"]
-    "build!" ["with-profile" "prod" "cljsbuild" "once" "min"]
+    "build!" ["cljsbuild" "once" "min"]
+    "devcards" ["with-profile" "+devcards" "figwheel" "devcards"]
     "test-navigation!" ["doo" "phantom" "test-navigation" "once"]
     "test-company!" ["doo" "phantom" "test-company" "once"]
     "test-ui-components!" ["doo" "phantom" "test-ui-components" "once"]
