@@ -9,6 +9,7 @@ $.scrollTo = function(){};
 $.scroll = function(){};
 $.scrollTop = function(){};
 $.css = function(){};
+$.offset = function(){};
 var jQuery = function(){};
 // Hallo
 var hallo = function(){};
