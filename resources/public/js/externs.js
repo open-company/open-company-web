@@ -5,6 +5,7 @@ $.tooltip = function(){};
 $.width = function(){};
 $.hallo = function(){};
 $.scrollTo = function(){};
+$.scroll = function(){};
 var jQuery = function(){};
 // Hallo
 var hallo = function(){};
