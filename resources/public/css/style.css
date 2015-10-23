@@ -245,7 +245,7 @@ div.finances div.link-bar{
 }
 
 div.finances div.link-bar a.finances-link{
-  text-decoration: none;
+  text-decoration: underline;
   color: #707070;
   margin-left: 0px;
   margin-right: 60px;
@@ -253,7 +253,7 @@ div.finances div.link-bar a.finances-link{
 }
 
 div.finances div.link-bar a.finances-link.active{
-  text-decoration: underline;
+  text-decoration: none;
   color: #191919;
 }
 
@@ -712,4 +712,24 @@ div.company-avatar div.company-avatar-name{
   font-size: 16px;
   margin-left: 10px;
   color: black;
+}
+
+button.oc-btn{
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  font-size: 10px;
+  margin-left: 0px;
+  margin-right: 20px;
+  height: 20px;
+  width: 60px;
+  border-radius: 4px;
+  background-color: transparent;
+  margin-top: 50px;
+}
+
+button.oc-btn.oc-success{
+  color: green;
+}
+
+button.oc-btn.oc-cancel{
+  color: rgba(0, 0, 0, 0.4);
 }
