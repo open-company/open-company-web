@@ -106,21 +106,21 @@
                        :on-click #(collapse owner false)} "Continue reading"))
         (if editing
           (dom/div {:class "rich-editor-save"}
-            (dom/button {:class "btn btn-success"
+            (dom/button {:class "oc-btn oc-cancel"
+                 :on-click (fn[e]
+                             (let [init-value (om/get-state owner :initial-body)
+                                   el (.getDOMNode (om/get-ref owner "rich-editor"))]
+                               (utils/handle-change section-data init-value :body)
+                               (set! (.-innerHTML el) init-value))
+                             (set-editing! owner false))
+                 } "CANCEL")
+            (dom/button {:class "oc-btn oc-success"
                          :on-click (fn [e]
                                      (let [value (.. (om/get-ref owner "rich-editor") getDOMNode -innerHTML)]
                                        (set-editing! owner false)
                                        (utils/handle-change section-data value :body)
                                        (utils/save-values (:save-channel data))))
-                         } "Save")
-            (dom/button {:class "btn btn-default cancel-button"
-                         :on-click (fn[e]
-                                     (let [init-value (om/get-state owner :initial-body)
-                                           el (.getDOMNode (om/get-ref owner "rich-editor"))]
-                                       (utils/handle-change section-data init-value :body)
-                                       (set! (.-innerHTML el) init-value))
-                                     (set-editing! owner false))
-                         } "Cancel"))
+                         } "SAVE"))
           (when (not no-data)
             (om/build update-footer {:author (:author section-data)
                                      :updated-at (:updated-at section-data)
