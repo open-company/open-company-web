@@ -26,7 +26,7 @@
      (str (utils/period-string (:period obj)) " Revenue: " prefix (.toLocaleString (:revenue obj)))
      abs-cash-flow
      (str "fill-color: " (if cash-flow-pos? "green" "red"))
-     (str (utils/period-string (:period obj)) " Cash flow: -" prefix (.toLocaleString abs-cash-flow))]))
+     (str (utils/period-string (:period obj)) " Cash flow: " (when (neg? cash-flow) "-") prefix (.toLocaleString abs-cash-flow))]))
 
 (defn- get-chart-data [data prefix]
   "Vector of max *columns elements of [:Label value]"
