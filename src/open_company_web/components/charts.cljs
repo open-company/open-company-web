@@ -65,12 +65,14 @@
           options (clj->js {
                     :title  ""
                     :width 600
-                    :height 250
+                    :height 290
                     :legend #js {"position" "none"}
                     :vAxis #js {"minValue" 0
                                 "gridlineColor" "transparent"
                                 "baselineColor" "transparent"
                                 "textPosition" "none"}
+                    :hAxis #js {"textStyle" #js {"fontSize" 9}}
+                    :chartArea #js {"left" 0 "top" 30 "width" "100%" "height" "80%"}
                     :bar #js { "groupWidth" column-thickness}})]
       (when dom-node (.draw (js/google.visualization.ColumnChart. dom-node) data-table options)))))
 
