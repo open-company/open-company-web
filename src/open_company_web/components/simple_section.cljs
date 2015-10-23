@@ -38,7 +38,7 @@
           read-only (or (:loading section-data) (om/get-state owner :read-only))]
       (if (:loading company-data)
         (dom/h4 {} "Loading data...")
-        (dom/div {:class "simple-section section" :id (str "section-" (name section))}
+        (dom/div {:class "simple-section section-container" :id (str "section-" (name section))}
           (om/build editable-title {:read-only read-only
                                     :section-data section-data
                                     :section section

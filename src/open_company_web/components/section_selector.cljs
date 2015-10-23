@@ -12,9 +12,9 @@
 
 (defn sections-focuser []
   (let [scroll-top (.scrollTop (.$ js/window js/window))
-        sections (.$ js/window ".section")
+        sections (.$ js/window ".section-container")
         window-height (.height (.$ js/window js/window))
-        pivot (int (* (/ window-height 100) 50))
+        pivot (int (* (/ window-height 100) 30))
         tot (- window-height pivot)]
     (.each sections
            (fn [n item]
