@@ -21,10 +21,6 @@
           period (utils/period-string (:period value-set))
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))]
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))}
-        (dom/h3 {}
-                runway
-                (om/build editable-pen {:click-callback (:editable-click-callback data)}))
-        (dom/p {} period)
         (om/build column-chart (get-chart-data sorted-finances
                                                ""
                                                :runway
@@ -32,4 +28,8 @@
                                                #js {"type" "string" "role" "style"}
                                                "fill-color: #ADADAD"
                                                "###,### days"
-                                               " days"))))))
+                                               " days"))
+        (dom/h3 {}
+                runway
+                (om/build editable-pen {:click-callback (:editable-click-callback data)}))
+        (dom/p {} period)))))

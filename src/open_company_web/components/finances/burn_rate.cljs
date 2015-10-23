@@ -19,13 +19,13 @@
       (dom/div {:class (utils/class-set {:section true
                                          :burn-rate true
                                          :read-only (:read-only data)})}
-        (dom/h3 {}
-                burn-rate-val
-                (om/build editable-pen {:click-callback (:editable-click-callback data)}))
-        (dom/p {} period)
         (om/build column-chart (get-chart-data finances-data
                                                cur-symbol
                                                :burn-rate
                                                "Burn Rate"
                                                #js {"type" "string" "role" "style"}
-                                               "fill-color: #0266C8"))))))
+                                               "fill-color: #0266C8"))
+        (dom/h3 {}
+                burn-rate-val
+                (om/build editable-pen {:click-callback (:editable-click-callback data)}))
+        (dom/p {} period)))))

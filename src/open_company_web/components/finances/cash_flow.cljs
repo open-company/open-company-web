@@ -60,8 +60,8 @@
       (dom/div {:class (utils/class-set {:section true
                                          :cash-flow true
                                          :read-only (:read-only data)})}
+        (om/build column-chart (get-chart-data sorted-finances cur-symbol))
         (dom/h3 {}
                 cash-val
                 (om/build editable-pen {:click-callback (:editable-click-callback data)}))
-        (dom/p {} period)
-        (om/build column-chart (get-chart-data sorted-finances cur-symbol))))))
+        (dom/p {} period)))))
