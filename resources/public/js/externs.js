@@ -11,6 +11,7 @@ $.scrollTop = function(){};
 $.css = function(){};
 $.offset = {};
 $.offset.top = {};
+$.each = function(){};
 var jQuery = function(){};
 // Hallo
 var hallo = function(){};
