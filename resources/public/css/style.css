@@ -227,22 +227,34 @@ span img.user-icon{
   margin-right: 5px;
 }
 
-div.finances h2{
-  text-align: center;
+div.finances h2.finances-edit-title{
+  text-align: left;
+  position: relative;
+  width: 600px;
+  margin-left: -300px;
+  left: 50%;
 }
 
 div.finances div.link-bar{
-  text-align: center;
+  text-align: left;
   z-index: 1;
+  margin-left: -300px;
+  left: 50%;
+  width: 600px;
+  position: relative;
 }
 
 div.finances div.link-bar a.finances-link{
-  text-decoration: underline;
-  margin: 10px;
+  text-decoration: none;
+  color: #707070;
+  margin-left: 0px;
+  margin-right: 60px;
+  font-size: 16px;
 }
 
 div.finances div.link-bar a.finances-link.active{
-  text-decoration: none;
+  text-decoration: underline;
+  color: #191919;
 }
 
 div.finances div.finances-body{
@@ -253,15 +265,11 @@ div.finances div.finances-body{
 }
 
 div.finances div.finances-body div.section{
-  text-align: center;
+  text-align: left;
 }
 
 div.finances div.finances-body div.section h3{
   margin-bottom: 0px;
-}
-
-div.finances div.finances-body div.section h3 span{
-  margin-left: 24px;
 }
 
 div.finances div.finances-body div.section div.chart-container{
@@ -441,7 +449,7 @@ div.editable-title-container h2.read-only{
 div.editable-title-container h2,
 div.editable-title-container input,
 div.editable-title-container span.hidden-span{
-  text-align: center;
+  text-align: left;
   color: black;
   font-size: 30px;
   font-family: inherit;
@@ -459,7 +467,7 @@ div.editable-title-container span.hidden-span{
 div.editable-title-container div.hidden-span-container{
   z-index: -1;
   opacity: 0;
-  text-align: center;
+  text-align: left;
   position: absolute;
   top: 0;
   left: 0;
