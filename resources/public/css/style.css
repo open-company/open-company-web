@@ -284,7 +284,7 @@ div.update-footer{
   margin-left: -300px;
   margin-top: 30px;
   width: 600px;
-  height: 40px;
+  height: 24px;
   vertical-align: middle;
 }
 
@@ -295,11 +295,15 @@ div.update-footer div{
 }
 
 div.update-footer div.author{
-  color: rgba(0, 0, 0, 0.8);
+  color: #4C4B4B;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 div.update-footer div.timeago{
-  color: rgba(0, 0, 0, 0.4);
+  color: #5B5B5B;
+  font-size: 13px;
+  font-weight: 300;
 }
 
 div.update-footer img.author-image{
@@ -319,13 +323,29 @@ div.rich-editor-container {
   min-height: 90px;
 }
 
+div.rich-editor-container div.rich-editor{
+  color: #191919;
+}
+
+div.rich-editor-container div.rich-editor,
+div.rich-editor-container div.rich-editor p{
+   font-weight: normal;
+   font-size: 19px;
+}
+
+div.rich-editor-container div.rich-editor h1,
+div.rich-editor-container div.rich-editor h3{
+  font-weight: 600;
+   font-size: 24px; 
+}
+
 div.rich-editor-container div.rich-editor.no-data{
   color: rgba(0, 0, 0, 0.4);
 }
 
 div.rich-editor-container div.rich-editor,
 div.rich-editor-container div.fake-rich-editor{
-  width: 100%;
+  width: 400px;
 }
 
 div.rich-editor-container div.rich-editor-save{
@@ -370,9 +390,10 @@ div.rich-editor-container div.rich-editor.collapsed:after{
 }
 
 div.rich-editor-container button.collapse-button{
-  color: rgb(37, 138, 36);
+  color: #2F9B34;
   text-decoration: none;
-  font-size: 16px;
+  font-size: 19px;
+  font-weight: 600;
   margin-left: 0px;
   padding-left: 0px;
 }
@@ -433,7 +454,7 @@ div.editable-title-container{
   position: relative;
   left: 50%;
   margin-left: -300px;
-  height: 37px;
+  height: 55px;
   margin-top: 10px;
   margin-bottom: 10px;
 }
@@ -450,18 +471,17 @@ div.editable-title-container h2,
 div.editable-title-container input,
 div.editable-title-container span.hidden-span{
   text-align: left;
-  color: black;
-  font-size: 30px;
+  color: #2D2D2D !important;
+  font-size: 48px;
   font-family: inherit;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.1;
   color: inherit;
   box-sizing: border-box;
   padding: 0px;
   margin: 0px;
   width: 100%;
-  height: 37px;
-/*  float: left;*/
+  height: 55px;
 }
 
 div.editable-title-container div.hidden-span-container{
@@ -569,13 +589,13 @@ div.simple-section-revisions-navigator{
   width: 600px;
   left: 50%;
   margin-left: -300px;
-  margin-top: 30px;
   position: relative;
 }
 
 div.revisions-navigator{
   width: 100%;
   height: 34px;
+  margin-top: 30px;
 }
 
 div.revisions-navigator div.revisions-navigator-left{
@@ -586,7 +606,7 @@ div.revisions-navigator div.revisions-navigator-left div.single-prev,
 div.revisions-navigator div.revisions-navigator-right div.single-next,
 div.revisions-navigator div.revisions-navigator-left div.double-prev,
 div.revisions-navigator div.revisions-navigator-right div.double-next{
-  color: rgba(0, 0, 0, 0.4);
+  color: #5B5B5B;
 }
 
 div.revisions-navigator div.revisions-navigator-left div.double-prev{
@@ -603,7 +623,6 @@ div.revisions-navigator div.revisions-navigator-left div.single-prev i{
   float:left;
 }
 div.revisions-navigator div.revisions-navigator-left div.single-prev p{
-  font-size: 14px;
   margin: 5px 0px 0px 8px;
   float: left;
 }
@@ -636,9 +655,20 @@ div.revisions-navigator div.revisions-navigator-right div.single-next i{
 }
 
 div.revisions-navigator div.revisions-navigator-right div.single-next p{
-  font-size: 14px;
   margin: 5px 8px 0px 0px;
   float: right;
+}
+
+div.revisions-navigator p.rev-nav-label{
+  color: #5B5B5B;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+div.revisions-navigator p.rev-nav-date{
+  color: #5B5B5B;
+  font-size: 16px;
+  font-weight: 300;
 }
 
 div.revisions-navigator div.revisions-navigator-right div.single-next,
