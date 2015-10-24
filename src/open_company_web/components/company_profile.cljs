@@ -1,4 +1,4 @@
-(ns open-company-web.components.profile
+(ns open-company-web.components.company-profile
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
@@ -13,14 +13,14 @@
             [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.lib.iso4217 :refer [iso4217 sorted-iso4217]]))
 
-(defcomponent option [data owner]
+(defcomponent currency-option [data owner]
   (render [_]
     (dom/option {
       :value (or (:value data) (:text data))
       :disabled (and (contains? :value data) (= (count (:value data)) 0))}
       (:text data))))
 
-(defcomponent profile [data owner]
+(defcomponent company-profile [data owner]
   (init-state [_]
     (let [save-chan (chan)]
       (add-channel "save-company" save-chan)))
@@ -86,5 +86,5 @@
                           (let [symbol (:symbol currency)
                                 display-symbol (or symbol (:code currency))
                                 label (str (:text currency) " " display-symbol)]
-                            (om/build option {:value (:code currency) :text label})))))
+                            (om/build currency-option {:value (:code currency) :text label})))))
                   (dom/p {:class "help-block"} "Currency business uses for its finances")))))))))

@@ -5,10 +5,16 @@
             [open-company-web.components.page :refer [company]]
             [open-company-web.components.list-companies :refer [list-companies]]
             [open-company-web.components.page-not-found :refer [page-not-found]]
+            [open-company-web.components.user-profile :refer [user-profile]]
+            [open-company-web.components.login :refer [login]]
             [open-company-web.lib.raven :refer [raven-setup]]
+            [open-company-web.lib.utils :as utils]
             [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.api :as api]
-            [goog.events :as events])
+            [goog.events :as events]
+            [open-company-web.lib.cookies :as cook]
+            [open-company-web.local-settings :as ls]
+            [open-company-web.lib.jwt :as jwt])
   (:import [goog.history EventType]))
 
 (enable-console-print!)
@@ -20,6 +26,34 @@
 ; is undefined because it breaks tests
 (if-let [target (. js/document (getElementById "app"))]
   (do
+
+    (defroute login-route "/login" {:keys [query-params]}
+      (if (contains? query-params :jwt)
+        (do ; contains :jwt so auth went well
+          (cook/set-cookie! :jwt (:jwt query-params) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+          ;redirect to dashboard
+          (if-let [login-redirect (cook/get-cookie :login-redirect)]
+            (do
+              ; remove the login redirect cookie
+              (cook/remove-cookie! :login-redirect)
+              ; redirect to the initial path
+              (utils/redirect! login-redirect))
+            ; redirect to / if no cookie is set
+            (utils/redirect! "/")))
+        (do
+          (when (contains? query-params :login-redirect)
+            (cook/set-cookie! :login-redirect (:login-redirect query-params)))
+          ; save route
+          (router/set-route! ["login"] {})
+          ; load data from api
+          (swap! app-state assoc :loading true)
+          (api/get-auth-settings)
+          (when (contains? query-params :access)
+            ;login went bad, add the error message to the app-state
+            (swap! app-state assoc :access (:access query-params)))
+          ; render component
+          (om/root login app-state {:target target}))))
+
     (defn home-handler []
       ; save route
       (router/set-route! ["companies"] {})
@@ -88,18 +122,30 @@
                                                               :query-params query-params})
         (section-handler slug section)))
 
+    (defroute user-profile-route "/profile" {:as params}
+      (om/root user-profile app-state {:target target}))
+
     (defroute not-found-route "*" []
       ; render component
       (om/root page-not-found app-state {:target target}))
 
     (def dispatch!
-      (secretary/uri-dispatcher [home-page-route
+      (secretary/uri-dispatcher [login-route
+                                 home-page-route
                                  list-page-route
                                  company-route
                                  company-profile-route
                                  section-route
                                  section-edit-route
+                                 user-profile-route
                                  not-found-route]))
+
+    (defn login-wall []
+      (let [token (router/get-token)]
+        (when-not (.startsWith token "/login")
+          (if (cook/get-cookie :jwt)
+            true
+            (utils/redirect! (str "/login?login-redirect=" (router/get-token)))))))
 
     (defn handle-url-change [e]
       ;; we are checking if this event is due to user action,
@@ -109,6 +155,8 @@
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
         (js/window.scrollTo 0 0))
+      ; check if the user is logged in
+      (login-wall)
       ;; dispatch on the token
       (dispatch! (router/get-token)))))
 

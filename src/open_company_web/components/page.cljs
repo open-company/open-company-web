@@ -4,7 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.navbar :refer [navbar]]
             [open-company-web.components.link :refer [link]]
-            [open-company-web.components.profile :refer [profile]]
+            [open-company-web.components.company-profile :refer [company-profile]]
             [open-company-web.router :as router]
             [open-company-web.components.section-selector :refer [section-selector]]
             [open-company-web.components.all-sections :refer [all-sections]]
@@ -30,8 +30,8 @@
               (contains? @router/path :section)
               (om/build section-selector {:data company-data :section (keyword (:section @router/path))})
 
-              (contains? (:route @router/path) "profile")
-              (om/build profile data)
+              (utils/in? (:route @router/path) "profile")
+              (om/build company-profile data)
 
               (and (not (contains? data :loading)) (contains? data (keyword slug)))
               (om/build all-sections data)

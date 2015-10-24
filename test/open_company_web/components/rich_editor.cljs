@@ -22,8 +22,8 @@
   :updated-at "2015-09-14T20:49:19Z"
   :author {
     :name "Stuart Levinson"
-    :slack_id "U06SQLDFT"
-    :image "https://secure.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F66f9%2Fimg%2Favatars%2Fava_0015.png"
+    :user-id "U06SQLDFT"
+    :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
   }
 })
 

@@ -294,6 +294,11 @@ div.rich-editor-container {
   margin-left: -300px;
   width: 600px;
   margin-top: 30px;
+  min-height: 90px;
+}
+
+div.rich-editor-container div.rich-editor.no-data{
+  color: lightgray;
 }
 
 div.rich-editor-container div.rich-editor,
@@ -479,6 +484,7 @@ div.recent-updates{
 
 div.recent-updates ul.recent-updates-list{
   width: 300px;
+  top: auto;
 }
 
 div.recent-updates div.recent-updates-item{
@@ -584,4 +590,51 @@ hr.section-separator{
   background-color: lightgray;
   width: 600px;
   height: 1px;
+}
+
+h4.login-error-message{
+  color: red;
+  font-size: 14px;
+}
+
+div.user-profile div.panel-heading{
+  font-weight: bold;
+  font-size: 16px;
+}
+
+div.user-profile div.panel-body span.user-profile-label{
+  width: 150px;
+  float: left;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+div.user-avatar img.user-avatar-img{
+  margin: 10px;
+}
+
+div.user-avatar span.user-avatar-name{
+  margin-right: 10px;
+  color: #2D2D2D;
+  font-size: 12pt;
+}
+
+div.company-avatar a, div.company-avatar a:hover{
+  text-decoration: none;
+}
+
+div.company-avatar div.company-avatar-img{
+  border: 1px solid black;
+  margin-top: -10px;
+  padding: 9px;
+}
+
+div.company-avatar div.company-avatar-img span.company-avatar-name{
+  font-size: 28px;
+  color: black;
+}
+
+nav.navbar{
+  background-color: white;
+  border-bottom: 1px solid black;
 }

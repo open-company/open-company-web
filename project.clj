@@ -42,6 +42,11 @@
         [shodan "0.4.2"] ; A ClojureScript library providing wrappers for the JavaScript console API. https://github.com/noprompt/shodan
       ]
     }
+    :devcards [:dev {
+      :dependencies [
+        [devcards "0.2.0-8"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
+      ]
+    }]
   }
 
   :source-paths ["src"]
@@ -61,6 +66,20 @@
           :asset-path "/js/compiled/out"
           :output-to "resources/public/js/compiled/open_company.js"
           :output-dir "resources/public/js/compiled/out"
+          :optimizations :none
+          :source-map-timestamp true
+          :pretty-print true}}
+
+      :devcards {
+        :id "devcards"
+        :source-paths ["src"]
+        :figwheel { :devcards true}
+        :compiler {
+          :main "open-company-web.lib.devcards"
+          :asset-path "/js/compiled/out_devcards"
+          :output-to "resources/public/js/compiled/devcards/oc_devcards.js"
+          :output-dir "resources/public/js/compiled/out_devcards"
+          :optimizations :none
           :source-map-timestamp true
           :pretty-print true}}
 
@@ -138,9 +157,11 @@
     "ancient" ["ancient" ":all" ":allow-qualified"] ; check for out of date dependencies
     "build" ["cljsbuild" "once" "dev"]
     "build!" ["cljsbuild" "once" "min"]
-    "test-navigation!" ["doo" "phantom" "test-navigation" "once"]
-    "test-company!" ["doo" "phantom" "test-company" "once"]
-    "test-ui-components!" ["doo" "phantom" "test-ui-components" "once"]
+    "figwheel!" ["with-profile" "+devcards" "figwheel"]
+    "devcards" ["with-profile" "+devcards" "figwheel" "devcards"]
+    "test-navigation!" ["with-profile" "+devcards" "doo" "phantom" "test-navigation" "once"]
+    "test-company!" ["with-profile" "+devcards" "doo" "phantom" "test-company" "once"]
+    "test-ui-components!" ["with-profile" "+devcards" "doo" "phantom" "test-ui-components" "once"]
     "test-all!" ["do" "test-navigation!," "test-company!," "test-ui-components!"] ; don't use in CI
   }
 )

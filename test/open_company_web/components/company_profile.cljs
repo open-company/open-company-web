@@ -1,10 +1,10 @@
-(ns test.open-company-web.components.profile
+(ns test.open-company-web.components.company-profile
   (:require [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
             [cljs-react-test.simulate :as sim]
             [cljs-react-test.utils :as tu]
             [om.core :as om :include-macros true]
             [dommy.core :as dommy :refer-macros [sel1 sel]]
-            [open-company-web.components.profile :refer [profile]]
+            [open-company-web.components.company-profile :refer [company-profile]]
             [om.dom :as dom :include-macros true]
             [open-company-web.data.finances :as finances-data]
             [open-company-web.router :as router]))
@@ -27,7 +27,7 @@
                        {:slug "buffer" :section "finances" :tab "cash"})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
-          _ (om/root profile app-state {:target c})
+          _ (om/root company-profile app-state {:target c})
           profile-node (sel1 c [:div.profile-container])]
       (is (not (nil? profile-node)))
       (tu/unmount! c))))

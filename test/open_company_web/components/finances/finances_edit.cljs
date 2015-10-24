@@ -1,10 +1,10 @@
-(ns test.open-company-web.components.finances.finances
+(ns test.open-company-web.components.finances.finances-edit
     (:require [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
               [cljs-react-test.simulate :as sim]
               [cljs-react-test.utils :as tu]
               [om.core :as om :include-macros true]
               [dommy.core :as dommy :refer-macros [sel1 sel]]
-              [open-company-web.components.finances.finances :refer [finances]]
+              [open-company-web.components.finances.finances-edit :refer [finances-edit]]
               [om.dom :as dom :include-macros true]
               [open-company-web.data.finances :as finances-data]
               [open-company-web.router :as router]))
@@ -16,14 +16,13 @@
 
 (def test-atom {:buffer finances-data/finances})
 
-
-(deftest test-finances-component
-  (testing "Finances component"
-    (router/set-route! ["companies" "buffer" "finances" "cash"]
-                       {:slug "buffer" :section "finances" :tab "cash"})
+(deftest test-finances-edit-component
+  (testing "Finances edit component"
+    (router/set-route! ["companies" "buffer" "finances" "edit"]
+                       {:slug "buffer" :section "finances" :tab "edit"})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
-          _ (om/root finances app-state {:target c})
+          _ (om/root finances-edit app-state {:target c})
           finances-node (sel1 c [:div.finances])]
       (is (not (nil? finances-node)))
       (tu/unmount! c))))
