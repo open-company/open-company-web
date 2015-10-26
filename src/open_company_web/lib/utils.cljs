@@ -272,9 +272,11 @@
       (if (pos? (count sections))
         (let [cur-key (first sections)
               section (cur-key body)
-              updated-section (assoc section :section (name cur-key))
-              updated-section (assoc updated-section :sorter (:updated-at section))
-              updated-body (assoc body cur-key updated-section)]
+              with-section-key (assoc section :section (name cur-key))
+              with-as-of (assoc with-section-key :as-of (:updated-at section))
+              width-read-only (assoc with-as-of :read-only false)
+              width-sorter (assoc width-read-only :sorter (:updated-at section))
+              updated-body (assoc body cur-key width-sorter)]
           (recur (subvec sections 1)
                  updated-body))
         body))))
