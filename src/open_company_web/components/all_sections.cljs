@@ -21,6 +21,7 @@
           (let [section-data (section company-data)]
             (dom/div {}
               (om/build section-selector {:section-data section-data
-                                          :section section})
+                                          :section section
+                                          :loading (:loading company-data)})
               (when (not= section (last sorted-section-keys))
                 (dom/hr {:class "section-separator"})))))))))
