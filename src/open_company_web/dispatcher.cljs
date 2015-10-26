@@ -1,9 +1,9 @@
 (ns open-company-web.dispatcher
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs-flux.dispatcher :as flux]
             [no.en.core :refer [deep-merge]]
             [open-company-web.router :as router]
-            [open-company-web.lib.utils :as utils]
-            [cljs.core.async :refer [put!]]))
+            [open-company-web.lib.utils :as utils]))
 
 (defonce app-state (atom {}))
 
@@ -55,6 +55,9 @@
 (defn add-section-sorter [section-body]
   (assoc section-body :sorter (:updated-at section-body)))
 
+(defn add-section-as-of [section-body]
+  (assoc section-body :as-of (:updated-at section-body)))
+
 (defn fix-finances-data [section-body section-name]
   (if (= (keyword section-name) :finances)
     (let [fixed-finances (utils/calc-runway (:data section-body))
@@ -64,7 +67,7 @@
     section-body))
 
 (defn fix-section [section-body section-name]
-  (let [fixed-section (add-section-sorter (add-section-name section-body section-name))
+  (let [fixed-section (add-section-as-of (add-section-sorter (add-section-name section-body section-name)))
         fixed-section (fix-finances-data fixed-section section-name)]
     fixed-section))
 
@@ -76,12 +79,7 @@
         ; remove loading key
         (swap! app-state dissoc :loading)
         (let [fixed-section (fix-section (:body body) (:section body))]
-          (swap! app-state assoc-in [(:slug body) (:section body)] fixed-section)
-          ; signal to update as-of
-          (let [ch (utils/get-channel (str "revisions-update-" (name (:section body))))
-                revisions (utils/sort-revisions (:revisions fixed-section))
-                last-revision (last revisions)]
-            (put! ch {:as-of (:updated-at last-revision)})))))))
+          (swap! app-state assoc-in [(:slug body) (:section body)] fixed-section))))))
 
 (def revision-dispatch
   (flux/register
@@ -102,6 +100,7 @@
               section ((:section body) ((:slug body) @app-state))
               section (if notes? (:notes section) section)
               section-revision (merge section sec-body)
+              section-revision (assoc section-revision :as-of (:updated-at section-revision))
               section-revision (dissoc section-revision :loading)]
           (swap! app-state assoc-in assoc-in-coll section-revision))))))
 
