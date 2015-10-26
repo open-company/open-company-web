@@ -13,24 +13,24 @@
   (render [_]
     (let [section (:section data)
           read-only (:read-only data)
-          company-data (:data data)]
+          section-data (:section-data data)]
       (dom/div {:class "section-selector"}
         (cond
           ; finances edit
           (and (= section :finances) (om/get-state owner :finances-edit))
-          (om/build finances-edit {:company-data company-data
+          (om/build finances-edit {:section-data section-data
                                    :section :finances
                                    :close-edit-cb #(om/update-state! owner :finances-edit (fn [_] false))})
           ; finances
           (and (= section :finances) (not (om/get-state owner :finances-edit)))
           (om/build finances {:section :finances
-                              :company-data company-data
+                              :section-data section-data
                               :editable-click-callback #(om/update-state! owner :finances-edit (fn [_] true))})
           ; else it is a simple section
-          (contains? company-data section)
+          section-data
           (om/build simple-section {:read-only read-only
                                     :section section
-                                    :company-data company-data})
+                                    :section-data section-data})
           ; section not found
           :else
           (dom/h4 {} (str "Section " (name section) " not found")))))))
