@@ -1,5 +1,4 @@
 (ns open-company-web.dispatcher
-  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs-flux.dispatcher :as flux]
             [no.en.core :refer [deep-merge]]
             [open-company-web.router :as router]
