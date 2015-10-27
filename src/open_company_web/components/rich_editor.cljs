@@ -64,13 +64,14 @@
       (om/update-state! owner :did-mount (fn [_]true))
       (init-hallo! owner)))
   (did-update [_ _ _]
-    (when (om/get-state owner :collapsed)
-      (if-let [rich-editor-ref (om/get-ref owner "rich-editor")]
-        (let [rich-editor-node (.getDOMNode rich-editor-ref)
-              $-rich-editor (.$ js/window rich-editor-node)
-              height (.height $-rich-editor)]
-          (when (< height 300)
-            (collapse owner false))))))
+    (when (.-$ js/window) ; avoid to crash on tests because of jquery
+      (when (om/get-state owner :collapsed)
+        (if-let [rich-editor-ref (om/get-ref owner "rich-editor")]
+          (let [rich-editor-node (.getDOMNode rich-editor-ref)
+                $-rich-editor (.$ js/window rich-editor-node)
+                height (.height $-rich-editor)]
+            (when (< height 300)
+              (collapse owner false)))))))
   (render [_]
     (let [section-data (:section-data data)
           section (:section data)
