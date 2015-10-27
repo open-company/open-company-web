@@ -218,32 +218,32 @@ span img.user-icon{
   margin-right: 5px;
 }
 
-div.finances h2{
+div.composed-section h2{
   text-align: center;
 }
 
-div.finances div.link-bar{
+div.composed-section div.link-bar{
   text-align: center;
   z-index: 1;
 }
 
-div.finances div.link-bar a.finances-link{
+div.composed-section div.link-bar a.composed-section-link{
   text-decoration: underline;
   margin: 10px;
 }
 
-div.finances div.link-bar a.finances-link.active{
+div.composed-section div.link-bar a.composed-section-link.active{
   text-decoration: none;
 }
 
-div.finances div.finances-body{
+div.composed-section div.composed-section-body{
   width: 600px;
   left: 50%;
   margin-left: -300px;
   position: relative;
 }
 
-div.finances div.finances-body div.section{
+div.composed-section div.composed-section-body div.section{
   text-align: center;
 }
 
