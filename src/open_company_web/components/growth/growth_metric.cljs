@@ -5,14 +5,6 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.charts :refer [column-chart]]))
 
-(defn currency-from-unit [unit]
-  (if (< (count unit) 4)
-    (let [currency (utils/get-symbol-for-currency-code unit)]
-      (if currency
-        currency
-        false))
-    false))
-
 (def columns 7)
 
 (defn chart-data-at-index [data column-name prefix suffix idx]
@@ -55,9 +47,9 @@
           value-set (first sorted-metric)
           period (utils/period-string (:period value-set))
           metric-unit (:unit metric-info)
-          cur-unit (currency-from-unit metric-unit)
+          cur-unit (utils/get-symbol-for-currency-code unit)
           unit (if cur-unit nil (utils/camel-case-str metric-unit))
-          value (.toLocaleString (:value value-set))
+          value (if (:value value-set) (.toLocaleString (:value value-set)) "")
           label (if cur-unit (str cur-unit value) (str value " " unit))]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
@@ -65,9 +57,10 @@
         (dom/h3 {} (:name metric-info))
         (dom/h3 {} label)
         (dom/p {} period)
-        (om/build column-chart (get-chart-data sorted-metric
-                                               cur-unit
-                                               (:name metric-info)
-                                               #js {"type" "string" "role" "style"}
-                                               "fill-color: #0266C8"
-                                               unit))))))
+        (when (> (count metric-data) 0)
+          (om/build column-chart (get-chart-data sorted-metric
+                                                 cur-unit
+                                                 (:name metric-info)
+                                                 #js {"type" "string" "role" "style"}
+                                                 "fill-color: #0266C8"
+                                                 unit)))))))
