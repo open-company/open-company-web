@@ -55,7 +55,7 @@
             (recur))))))
   (render [_]
     (let [focus (om/get-state owner :focus)
-          classes "finances-link"
+          classes "composed-section-link"
           slug (:slug @router/path)
           company-data (:company-data data)
           finances-data (:finances company-data)
@@ -74,7 +74,7 @@
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
           needs-runway (some #(contains? % :runway) finances-row-data)]
       (dom/div {:class "row" :id "section-finances"}
-        (dom/div {:class "finances"}
+        (dom/div {:class "composed-section finances"}
           (om/build editable-title {:read-only read-only
                                     :section-data finances-data
                                     :section :finances
@@ -96,7 +96,7 @@
                       :title "Runway"
                       :data-tab "runway"
                       :on-click #(subsection-click % owner)} "Runway")))
-          (dom/div {:class (utils/class-set {:finances-body true
+          (dom/div {:class (utils/class-set {:composed-section-body true
                                              :editable (not read-only)})}
             (case focus
 
