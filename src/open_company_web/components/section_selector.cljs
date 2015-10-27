@@ -10,30 +10,9 @@
             [shodan.inspection :refer [inspect]]
             [shodan.console :as console]))
 
-(defn sections-focuser []
-  (let [scroll-top (.scrollTop (.$ js/window js/window))
-        sections (.$ js/window ".section-container, .section-separator")
-        window-height (.height (.$ js/window js/window))
-        pivot (int (* (/ window-height 100) 30))
-        tot (- window-height pivot)]
-    (.each sections
-           (fn [n item]
-             (let [$-item (.$ js/window item)
-                   item-offset-top (.-top (.offset $-item))
-                   distance (- item-offset-top scroll-top)
-                   el-tot (- distance pivot)]
-               (if-not (> distance pivot)
-                 (.css $-item #js {"opacity" "1"})
-                 (let [opac-percent (/ (* el-tot 100) tot)]
-                   (.css $-item #js {"opacity" (str (- 1 (/ opac-percent 100)))}))))))))
-
 (defcomponent section-selector [data owner]
   (init-state [_]
     {:finances-edit false})
-  (did-mount [_]
-    (let [jq-body (.$ js/window js/window)]
-      (.scroll jq-body #(sections-focuser)))
-    (sections-focuser))
   (render [_]
     (let [section (:section data)
           read-only (:read-only data)
