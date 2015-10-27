@@ -16,30 +16,33 @@
 
 (def test-atom {
   :section :test
-  :revisions [
-    {
-      :rel "revision",
-      :method "GET",
-      :href "/companies/test/finances?as-of=2015-10-13T20:42:47Z"
-      :type "application/vnd.open-company.section.v1+json"
-      :updated-at "2015-10-13T20:42:47Z"
-    }
-    {
-      :rel "revision"
-      :method "GET"
-      :href "/companies/test/finances?as-of=2015-10-13T20:42:12Z"
-      :type "application/vnd.open-company.section.v1+json"
-      :updated-at "2015-10-13T20:42:12Z"
-    }
-    {
-      :rel "revision"
-      :method "GET"
-      :href "/companies/test/finances?as-of=2015-10-13T17:45:08Z"
-      :type "application/vnd.open-company.section.v1+json"
-      :updated-at "2015-10-13T17:45:08Z"
-    }
-  ]
-  :updated-at "2015-10-13T20:42:47Z"
+  :section-data {
+    :revisions [
+      {
+        :rel "revision",
+        :method "GET",
+        :href "/companies/test/finances?as-of=2015-10-13T20:42:47Z"
+        :type "application/vnd.open-company.section.v1+json"
+        :updated-at "2015-10-13T20:42:47Z"
+      }
+      {
+        :rel "revision"
+        :method "GET"
+        :href "/companies/test/finances?as-of=2015-10-13T20:42:12Z"
+        :type "application/vnd.open-company.section.v1+json"
+        :updated-at "2015-10-13T20:42:12Z"
+      }
+      {
+        :rel "revision"
+        :method "GET"
+        :href "/companies/test/finances?as-of=2015-10-13T17:45:08Z"
+        :type "application/vnd.open-company.section.v1+json"
+        :updated-at "2015-10-13T17:45:08Z"
+      }
+    ]
+    :updated-at "2015-10-13T20:42:47Z"
+    :as-of "2015-10-13T20:42:47Z"
+  }
   :loading false
   :navigate-cb nil})
 
