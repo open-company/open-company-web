@@ -349,7 +349,7 @@ div.rich-editor-container div.fake-rich-editor{
 }
 
 div.rich-editor-container div.rich-editor-save{
-  height: 40px;
+  height: 44px;
 }
 
 div.rich-editor-container div.rich-editor-save button.cancel-button{
@@ -753,7 +753,7 @@ button.oc-btn{
   width: 60px;
   border-radius: 4px;
   background-color: transparent;
-  margin-top: 50px;
+  margin-top: 30px;
 }
 
 button.oc-btn.oc-success{
