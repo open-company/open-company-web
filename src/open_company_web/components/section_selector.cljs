@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
             [open-company-web.components.finances.finances :refer (finances)]
+            [open-company-web.components.growth.growth :refer (growth)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.simple-section :refer (simple-section)]))
 
@@ -16,6 +17,10 @@
           company-data (:data data)]
       (dom/div {:class "section-selector"}
         (cond
+          ; growth
+          (= section :growth)
+          (om/build growth {:section :growth
+                            :company-data company-data})
           ; finances edit
           (and (= section :finances) (om/get-state owner :finances-edit))
           (om/build finances-edit {:company-data company-data
