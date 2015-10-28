@@ -29,8 +29,7 @@
           save-notes-channel (chan)]
       (utils/add-channel "save-section-finances" save-channel)
       (utils/add-channel "save-finances-notes" save-notes-channel))
-    (let [company-data (:company-data data)
-          finances-data (:finances company-data)
+    (let [finances-data (:section-data data)
           notes-data (:notes finances-data)]
       {:focus "cash"
        :read-only false}))
@@ -38,27 +37,19 @@
     (let [save-change (utils/get-channel "save-section-finances")]
         (go (loop []
           (let [change (<! save-change)
-                cursor @app-state
-                slug (:slug @router/path)
-                company-data ((keyword slug) cursor)
-                section-data (:finances company-data)]
+                section-data (:section-data data)]
             (api/save-or-create-section section-data)
             (recur)))))
     (let [save-notes-change (utils/get-channel "save-finances-notes")]
         (go (loop []
           (let [change (<! save-notes-change)
-                cursor @app-state
-                slug (:slug @router/path)
-                company-data ((keyword slug) cursor)
-                section-data (:finances company-data)]
+                section-data (:section-data data)]
             (api/update-finances-notes (:notes section-data) (:links section-data))
             (recur))))))
   (render [_]
     (let [focus (om/get-state owner :focus)
           classes "finances-link"
-          slug (:slug @router/path)
-          company-data (:company-data data)
-          finances-data (:finances company-data)
+          finances-data (:section-data data)
           notes-data (:notes finances-data)
           cash-classes (str classes (when (= focus "cash") " active"))
           cash-flow-classes (str classes (when (= focus "cash-flow") " active"))
@@ -66,7 +57,7 @@
           costs-classes (str classes (when (= focus "costs") " active"))
           runway-classes (str classes (when (= focus "runway") " active"))
           read-only (or (:loading finances-data) (om/get-state owner :read-only))
-          subsection-data {:company-data company-data
+          subsection-data {:section-data finances-data
                            :read-only read-only
                            :editable-click-callback (:editable-click-callback data)}
           finances-row-data (:data finances-data)
@@ -118,9 +109,8 @@
                                      :section-data notes-data
                                      :section :finances
                                      :save-channel "save-finances-notes"}))
-            (om/build revisions-navigator {:revisions (:revisions finances-data)
+            (om/build revisions-navigator {:section-data finances-data
                                            :section :finances
-                                           :updated-at (:updated-at finances-data)
                                            :loading (:loading finances-data)
                                            :navigate-cb (fn [read-only]
                                                           (utils/handle-change finances-data true :loading)

@@ -89,7 +89,15 @@
     (let [links (:links section-data)
           slug (:slug @router/path)
           section (keyword (:section section-data))
-          section-data (dissoc section-data :section :revisions :updated-at :author :links :sorter :loading)
+          section-data (dissoc section-data :section
+                                            :revisions
+                                            :updated-at
+                                            :author
+                                            :links
+                                            :sorter
+                                            :loading
+                                            :as-of
+                                            :read-only)
           json-data (cljs->json section-data)
           section-link (utils/link-for links "update" "PUT")]
       (api-put (:href section-link)

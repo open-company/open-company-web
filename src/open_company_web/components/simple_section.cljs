@@ -32,11 +32,10 @@
             (save-or-create-section section-data)
             (recur))))))
   (render [_]
-    (let [company-data (:company-data data)
-          section (:section data)
-          section-data (section company-data)
+    (let [section (:section data)
+          section-data (:section-data data)
           read-only (or (:loading section-data) (om/get-state owner :read-only))]
-      (if (:loading company-data)
+      (if (:loading data)
         (dom/h4 {} "Loading data...")
         (dom/div {:class "simple-section section-container" :id (str "section-" (name section))}
           (om/build editable-title {:read-only read-only
@@ -49,9 +48,8 @@
                                    :section section
                                    :save-channel (str "save-section-" section)}))
           (dom/div {:class "simple-section-revisions-navigator"}
-            (om/build revisions-navigator {:revisions (:revisions section-data)
+            (om/build revisions-navigator {:section-data section-data
                                            :section section
-                                           :updated-at (:updated-at section-data)
                                            :loading (:loading section-data)
                                            :navigate-cb (fn [read-only]
                                                           (utils/handle-change section-data true :loading)
