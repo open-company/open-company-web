@@ -42,9 +42,7 @@
       (when body
         ; remove loading key
         (swap! app-state dissoc :loading)
-        (println "section-dispatch" (:title (:body body)))
         (let [fixed-section (utils/fix-section (:body body) (:section body))]
-          (println "fixed-section" (:title fixed-section))
           (swap! app-state assoc-in [(:slug body) (:section body)] fixed-section))))))
 
 (def revision-dispatch
