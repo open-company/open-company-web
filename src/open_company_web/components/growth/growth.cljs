@@ -19,16 +19,14 @@
 
 (defcomponent growth [data owner]
   (init-state [_]
-    (let [company-data (:company-data data)
-          metrics-data (:metrics (:growth company-data))]
+    (let [metrics-data (:metrics (:section-data data))]
       {:focus (:slug (first metrics-data))
        :read-only false}))
   (render [_]
     (let [focus (om/get-state owner :focus)
           growth-link-class :composed-section-link
           slug (:slug @router/path)
-          company-data (:company-data data)
-          growth-section (:growth company-data)
+          growth-section (:section-data data)
           metrics-data (:metrics growth-section)
           growth-data (:data growth-section)
           notes-data (:notes growth-section)
