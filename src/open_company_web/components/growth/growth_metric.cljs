@@ -47,20 +47,30 @@
           value-set (first sorted-metric)
           period (utils/period-string (:period value-set))
           metric-unit (:unit metric-info)
-          cur-unit (utils/get-symbol-for-currency-code unit)
-          unit (if cur-unit nil (utils/camel-case-str metric-unit))
+          cur-unit (utils/get-symbol-for-currency-code metric-unit)
+          fixed-cur-unit (if (= cur-unit metric-unit)
+                     nil
+                     cur-unit)
+          unit (if fixed-cur-unit nil (utils/camel-case-str metric-unit))
           value (if (:value value-set) (.toLocaleString (:value value-set)) "")
-          label (if cur-unit (str cur-unit value) (str value " " unit))]
+          metric-name (:name metric-info)
+          name-has-unit (> (.indexOf (str metric-name) metric-unit) -1)
+          label (if fixed-cur-unit
+                  (str fixed-cur-unit value)
+                  (if name-has-unit
+                    (str value)
+                    (str value " " unit)))]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})}
-        (dom/h3 {} (:name metric-info))
-        (dom/h3 {} label)
-        (dom/p {} period)
         (when (> (count metric-data) 0)
-          (om/build column-chart (get-chart-data sorted-metric
-                                                 cur-unit
-                                                 (:name metric-info)
-                                                 #js {"type" "string" "role" "style"}
-                                                 "fill-color: #0266C8"
-                                                 unit)))))))
+          (dom/div {}
+            (om/build column-chart (get-chart-data sorted-metric
+                                                   fixed-cur-unit
+                                                   (:name metric-info)
+                                                   #js {"type" "string" "role" "style"}
+                                                   "fill-color: #ADADAD"
+                                                   unit))
+            (dom/h3 {} (str metric-name ":"))
+            (dom/h3 {} label)
+            (dom/p {} period)))))))
