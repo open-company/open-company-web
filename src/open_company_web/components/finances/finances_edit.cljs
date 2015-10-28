@@ -7,6 +7,7 @@
             [open-company-web.components.cell :refer [cell]]
             [open-company-web.api :as api]
             [open-company-web.dispatcher :refer [app-state]]
+            [open-company-web.components.finances.utils :as finances-utils]
             [cljs.core.async :refer [put! chan <!]]))
 
 (defn signal-tab [period k]
@@ -135,8 +136,7 @@
 (defcomponent finances-edit [data owner]
   (init-state [_]
     ; add a new line if necessary
-    (let [company-data (:company-data data)
-          finances-data (:finances company-data)
+    (let [finances-data (:section-data data)
           initial-data (:data finances-data)
           cur-period (utils/current-period)
           init-state {:data initial-data
@@ -152,7 +152,8 @@
           init-state)))
   (render [_]
     (let [finances-data (om/get-state owner :data)
-          cur-symbol (utils/get-symbol-for-currency-code (:currency (:company-data data)))
+          currency (finances-utils/get-currency-for-current-company)
+          cur-symbol (utils/get-symbol-for-currency-code currency)
           show-burn (some #(pos? (:revenue %)) finances-data)
           rows-data (into [] (map (fn [row]
                            (let [v {:prefix cur-symbol
@@ -168,7 +169,7 @@
         ; real component
         (dom/div {:class "row"}
           (dom/div {:class "finances"}
-            (dom/h2 {} "Finances")
+            (dom/h2 {:class "finances-edit-title"} (:title (:finances (:company-data data))))
             (dom/div {:class "finances-body edit"}
               (dom/table {:class "table table-striped"}
                 (dom/thead {}
@@ -190,11 +191,11 @@
                 (dom/button {:class "btn btn-success"
                              :on-click #(save-data owner
                                                    (om/get-state owner :data)
-                                                   (:finances (:company-data data))
+                                                   (:section-data data)
                                                    (:close-edit-cb data))} "Save")
                 (dom/button {:class "btn btn-default cancel"
                              :on-click (fn [_]
                                          (let [initial-data (om/get-state owner :initial-data)]
-                                           (utils/handle-change (:finances (:company-data data)) initial-data :data))
+                                           (utils/handle-change (:section-data data) initial-data :data))
                                          ((:close-edit-cb data)))}
                             "Cancel")))))))))

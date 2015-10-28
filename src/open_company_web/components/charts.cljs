@@ -59,15 +59,21 @@
           (.format formatter data-table idx))))
     data-table))
 
-(defn column-draw-chart [currency-symbol columns pattern data dom-node]
+(defn column-draw-chart [currency-symbol columns pattern data column-thickness dom-node]
   (when (.-google js/window)
     (let [data-table (column-add-rows columns data currency-symbol pattern)
           options (clj->js {
                     :title  ""
                     :width 600
-                    :height 250
+                    :height 290
                     :legend #js {"position" "none"}
-                    :vAxis #js {"minValue" 0}})]
+                    :vAxis #js {"minValue" 0
+                                "gridlineColor" "transparent"
+                                "baselineColor" "transparent"
+                                "textPosition" "none"}
+                    :hAxis #js {"textStyle" #js {"fontSize" 9}}
+                    :chartArea #js {"left" 0 "top" 30 "width" "100%" "height" "80%"}
+                    :bar #js { "groupWidth" column-thickness}})]
       (when dom-node (.draw (js/google.visualization.ColumnChart. dom-node) data-table options)))))
 
 (defcomponent column-chart [chart-data owner]
@@ -76,12 +82,18 @@
                        (:columns chart-data)
                        (:pattern chart-data)
                        (:values chart-data)
+                       (if (contains? chart-data :column-thickness)
+                         (:column-thickness chart-data)
+                         "10%")
                        (.getDOMNode (om/get-ref owner "column-chart"))))
   (did-update [_ _ _]
     (column-draw-chart (:prefix chart-data)
                        (:columns chart-data)
                        (:pattern chart-data)
                        (:values chart-data)
+                       (if (contains? chart-data :column-thickness)
+                         (:column-thickness chart-data)
+                         "10%")
                        (.getDOMNode (om/get-ref owner "column-chart"))))
   (render [_]
     (dom/div #js {:className "chart-container column-chart" :ref "column-chart" })))

@@ -1,5 +1,7 @@
 (ns open-company-web.components.finances.utils
-  (:require [open-company-web.lib.utils :as utils]))
+  (:require [open-company-web.lib.utils :as utils]
+            [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dispatcher]))
 
 (def columns 7)
 
@@ -11,7 +13,7 @@
         label (if value
                 (str (utils/period-string (:period obj)) " " column-name ": " prefix (.toLocaleString (keyw obj)) suffix)
                 "Profitable")]
-    [(utils/period-string (:period obj))
+    [(utils/period-string (:period obj) :short-month)
      value
      label]))
 
@@ -29,3 +31,8 @@
       :columns columns
       :values values
       :pattern (if pattern pattern "###,###.##")}))
+
+(defn get-currency-for-current-company []
+  (let [slug (:slug @router/path)
+        company-data ((keyword slug) @dispatcher/app-state)]
+    (:currency company-data)))

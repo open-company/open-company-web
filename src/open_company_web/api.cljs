@@ -89,7 +89,15 @@
     (let [links (:links section-data)
           slug (:slug @router/path)
           section (keyword (:section section-data))
-          section-data (dissoc section-data :section :revisions :updated-at :author :links :sorter :loading)
+          section-data (dissoc section-data :section
+                                            :revisions
+                                            :updated-at
+                                            :author
+                                            :links
+                                            :sorter
+                                            :loading
+                                            :as-of
+                                            :read-only)
           json-data (cljs->json section-data)
           section-link (utils/link-for links "update" "PUT")]
       (api-put (:href section-link)
@@ -106,8 +114,8 @@
 
 (defn load-revision
   ([revision slug section]
-   (load-revision revision slug section false false))
-  ([revision slug section read-only notes?]
+   (load-revision revision slug section false))
+  ([revision slug section read-only]
     (when revision
       (api-get (:href revision)
         {:headers {
@@ -120,8 +128,7 @@
                 dispatch-body {:body body
                                :section section
                                :slug (keyword slug)
-                               :read-only read-only}
-                dispatch-body (if notes? (merge {:notes true} dispatch-body) dispatch-body)]
+                               :read-only read-only}]
             (flux/dispatch dispatcher/revision dispatch-body)))))))
 
 (defn update-finances-data[finances-data]
