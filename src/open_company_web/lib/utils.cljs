@@ -284,21 +284,42 @@
         sort-pred (sort-by-key-pred :updated-at true)]
     (sort #(sort-pred %1 %2) sections)))
 
+(def finances-empty-notes {:notes {:body ""}})
+
+(defn fix-finances [section-body]
+  (let [finances-data (:data section-body)
+        fixed-finances (calc-runway finances-data)
+        sort-pred (sort-by-key-pred :period true)
+        sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
+        fixed-section (assoc section-body :data sorted-finances)
+        section-with-notes (if (contains? fixed-section :notes)
+                             fixed-section
+                             (assoc fixed-section :notes finances-empty-notes))]
+    section-with-notes))
+
+(defn fix-section [section-body section-name & [sorter read-only]]
+  (let [read-only (or read-only false)
+        sorter (or sorter (:updated-at section-body))
+        with-section-key (assoc section-body :section (name section-name))
+        with-as-of (assoc with-section-key :as-of (:updated-at with-section-key))
+        with-read-only (assoc with-as-of :read-only read-only)
+        with-sorter (assoc with-read-only :sorter sorter)]
+    (if (= section-name :finances)
+      (fix-finances with-sorter)
+      with-sorter)))
+
 (defn fix-sections [company-data]
   "add section name in each section and a section sorter"
   (let [section-keys (get-section-keys company-data)]
-    (loop [sections section-keys
-           body company-data]
-      (if (pos? (count sections))
-        (let [cur-key (first sections)
-              section (cur-key body)
-              with-section-key (assoc section :section (name cur-key))
-              with-as-of (assoc with-section-key :as-of (:updated-at section))
-              width-read-only (assoc with-as-of :read-only false)
-              width-sorter (assoc width-read-only :sorter (:updated-at section))
-              updated-body (assoc body cur-key width-sorter)]
-          (recur (subvec sections 1)
-                 updated-body))
+    (loop [body company-data
+           idx  0]
+      (if (< idx (count section-keys))
+        (let [section-name (section-keys idx)
+              section-body (section-name company-data)
+              fixed-section (fix-section section-body section-name)
+              fixed-body (assoc body section-name fixed-section)]
+          (recur fixed-body
+                 (inc idx)))
         body))))
 
 (defn sort-revisions [revisions]
