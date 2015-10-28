@@ -23,7 +23,7 @@
           ; growth
           (= section :growth)
           (om/build growth {:section :growth
-                            :company-data company-data})
+                            :section-data section-data})
           ; finances edit
           (and (= section :finances) (om/get-state owner :finances-edit))
           (om/build finances-edit {:section-data section-data
