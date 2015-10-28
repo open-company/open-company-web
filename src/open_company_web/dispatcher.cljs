@@ -24,6 +24,8 @@
       (when body
         (swap! app-state assoc :companies (:companies (:collection body)))))))
 
+(def finances-empty-notes {:notes {:body ""}})
+
 (def company-dispatch
   (flux/register
     company
@@ -43,7 +45,7 @@
                   sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
                   fixed-body (assoc-in updated-body [:finances :data] sorted-finances)
                   body-with-notes (if-not (contains? (:finances fixed-body) :notes)
-                                    (assoc fixed-body :finances (merge (:finances fixed-body) {:notes {:body ""}}))
+                                    (assoc fixed-body :finances (merge (:finances fixed-body) finances-empty-notes))
                                     fixed-body)]
               (swap! app-state assoc (keyword (:slug updated-body)) body-with-notes))
             (swap! app-state assoc (keyword (:slug updated-body)) updated-body)))))))
@@ -61,12 +63,16 @@
   (if (= (keyword section-name) :finances)
     (let [fixed-finances (utils/calc-runway (:data section-body))
           sort-pred (utils/sort-by-key-pred :period true)
-          sorted-finances (sort #(sort-pred %1 %2) fixed-finances)]
-      (assoc section-body :data sorted-finances))
+          sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
+          finances-with-notes (merge finances-empty-notes section-body)]
+      (assoc finances-with-notes :data sorted-finances))
     section-body))
 
-(defn fix-section [section-body section-name]
-  (let [fixed-section (add-section-as-of (add-section-sorter (add-section-name section-body section-name)))
+(defn fix-section [section-body section-name & [no-sorter]]
+  (let [fixed-section (add-section-as-of (add-section-name section-body section-name))
+        fixed-section (if no-sorter
+                        fixed-section
+                        (add-section-sorter fixed-section))
         fixed-section (fix-finances-data fixed-section section-name)]
     fixed-section))
 
@@ -87,21 +93,11 @@
       (when body
         ; remove loading key
         (swap! app-state dissoc :loading)
-        (let [notes? (contains? body :notes)
-              assoc-in-coll [(:slug body) (:section body)]
-              assoc-in-coll (if notes? (conj assoc-in-coll :notes) assoc-in-coll)
-              sec-body (:body body)
-              is-finances (= (:section body) :finances)
-              sec-body (if (and is-finances (not notes?))
-                         (assoc sec-body :data (utils/calc-runway (:data sec-body)))
-                         sec-body)
-              sec-body (if (:read-only body) (assoc sec-body :read-only true) sec-body)
-              section ((:section body) ((:slug body) @app-state))
-              section (if notes? (:notes section) section)
-              section-revision (merge section sec-body)
-              section-revision (assoc section-revision :as-of (:updated-at section-revision))
-              section-revision (dissoc section-revision :loading)]
-          (swap! app-state assoc-in assoc-in-coll section-revision))))))
+        (let [assoc-in-coll [(:slug body) (:section body)]
+              section-revision (fix-section (:body body) (:section body) true)
+              old-sorter (:sorter (get-in @app-state assoc-in-coll))
+              section-revision-sorter (assoc section-revision :sorter old-sorter)]
+          (swap! app-state assoc-in assoc-in-coll section-revision-sorter))))))
 
 (def auth-settings-dispatch
   (flux/register

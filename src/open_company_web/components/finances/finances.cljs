@@ -4,6 +4,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dispatcher]
             [open-company-web.components.finances.cash :refer (cash)]
             [open-company-web.components.finances.cash-flow :refer (cash-flow)]
             [open-company-web.components.finances.revenue :refer (revenue)]
@@ -14,9 +15,8 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.revisions-navigator :refer [revisions-navigator]]
             [open-company-web.api :as api]
-            [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.components.editable-title :refer [editable-title]]
-            [cljs.core.async :refer [put! chan <!]]))
+            [cljs.core.async :refer [chan <!]]))
 
 (defn subsection-click [e owner]
   (.preventDefault e)
@@ -37,13 +37,21 @@
     (let [save-change (utils/get-channel "save-section-finances")]
         (go (loop []
           (let [change (<! save-change)
-                section-data (:section-data data)]
+                cursor @dispatcher/app-state
+                slug (:slug @router/path)
+                company-data ((keyword slug) cursor)
+                section (:section data)
+                section-data (section company-data)]
             (api/save-or-create-section section-data)
             (recur)))))
     (let [save-notes-change (utils/get-channel "save-finances-notes")]
         (go (loop []
           (let [change (<! save-notes-change)
-                section-data (:section-data data)]
+                cursor @dispatcher/app-state
+                slug (:slug @router/path)
+                company-data ((keyword slug) cursor)
+                section (:section data)
+                section-data (section company-data)]
             (api/update-finances-notes (:notes section-data) (:links section-data))
             (recur))))))
   (render [_]
@@ -101,15 +109,15 @@
 
               "runway"
               (om/build runway subsection-data))
-            (when (and notes-data (:author notes-data))
-              (om/build update-footer {:updated-at (:updated-at finances-data)
+            (om/build update-footer {:updated-at (:updated-at finances-data)
                                        :author (:author finances-data)
-                                       :section :finances}))
-            (when (and notes-data (:body notes-data))
-              (om/build rich-editor {:read-only read-only
-                                     :section-data notes-data
-                                     :section :finances
-                                     :save-channel "save-finances-notes"}))
+                                       :section :finances})
+            (when (or (not (empty? (:body notes-data))) (not read-only))
+              (dom/div {}
+                (om/build rich-editor {:read-only read-only
+                                       :section-data notes-data
+                                       :section :finances
+                                       :save-channel "save-finances-notes"})))
             (om/build revisions-navigator {:section-data finances-data
                                            :section :finances
                                            :loading (:loading finances-data)
