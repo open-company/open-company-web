@@ -22,15 +22,15 @@
           currency (finances-utils/get-currency-for-current-company)
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))]
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))}
-        (dom/h3 {}
-                runway
-                (om/build editable-pen {:click-callback (:editable-click-callback data)}))
-        (dom/p {} period)
         (om/build column-chart (finances-utils/get-chart-data sorted-finances
                                                               ""
                                                               :runway
                                                               "runway"
                                                               #js {"type" "string" "role" "style"}
-                                                              "fill-color: #0266C8"
+                                                              "fill-color: #ADADAD"
                                                               "###,### days"
-                                                              " days"))))))
+                                                              " days"))
+        (dom/h3 {}
+                runway
+                (om/build editable-pen {:click-callback (:editable-click-callback data)}))
+        (dom/p {} period)))))

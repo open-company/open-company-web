@@ -16,7 +16,7 @@
             [open-company-web.components.revisions-navigator :refer [revisions-navigator]]
             [open-company-web.api :as api]
             [open-company-web.components.editable-title :refer [editable-title]]
-            [cljs.core.async :refer [put! chan <!]]))
+            [cljs.core.async :refer [chan <!]]))
 
 (defn subsection-click [e owner]
   (.preventDefault e)
@@ -72,7 +72,7 @@
           sum-revenues (apply + (map #(:revenue %) finances-row-data))
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
           needs-runway (some #(contains? % :runway) finances-row-data)]
-      (dom/div {:class "row" :id "section-finances"}
+      (dom/div {:class "section-container row" :id "section-finances"}
         (dom/div {:class "composed-section finances"}
           (om/build editable-title {:read-only read-only
                                     :section-data finances-data
@@ -110,13 +110,14 @@
               "runway"
               (om/build runway subsection-data))
             (om/build update-footer {:updated-at (:updated-at finances-data)
-                                     :author (:author finances-data)
-                                     :section :finances})
-            (when (and (not read-only) (not (nil? notes-data)) (not (nil? (:body notes-data))))
-              (om/build rich-editor {:read-only read-only
-                                     :section-data notes-data
-                                     :section :finances
-                                     :save-channel "save-finances-notes"}))
+                                       :author (:author finances-data)
+                                       :section :finances})
+            (when (or (not (empty? (:body notes-data))) (not read-only))
+              (dom/div {}
+                (om/build rich-editor {:read-only read-only
+                                       :section-data notes-data
+                                       :section :finances
+                                       :save-channel "save-finances-notes"})))
             (om/build revisions-navigator {:section-data finances-data
                                            :section :finances
                                            :loading (:loading finances-data)

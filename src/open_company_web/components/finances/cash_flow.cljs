@@ -18,7 +18,7 @@
         cash-flow (if (js/isNaN cash-flow) 0 cash-flow)
         cash-flow-pos? (pos? cash-flow)
         abs-cash-flow (utils/abs cash-flow)]
-    [(utils/period-string (:period obj))
+    [(utils/period-string (:period obj) :short-month)
      (:costs obj)
      "fill-color: red"
      (str (utils/period-string (:period obj)) " Costs: " prefix (.toLocaleString (:costs obj)))
@@ -27,7 +27,7 @@
      (str (utils/period-string (:period obj)) " Revenue: " prefix (.toLocaleString (:revenue obj)))
      abs-cash-flow
      (str "fill-color: " (if cash-flow-pos? "green" "red"))
-     (str (utils/period-string (:period obj)) " Cash flow: -" prefix (.toLocaleString abs-cash-flow))]))
+     (str (utils/period-string (:period obj)) " Cash flow: " (when (neg? cash-flow) "-") prefix (.toLocaleString abs-cash-flow))]))
 
 (defn- get-chart-data [data prefix]
   "Vector of max *columns elements of [:Label value]"
@@ -46,7 +46,8 @@
                 #js {"type" "string" "role" "style"}
                 #js {"type" "string" "role" "tooltip"}]
       :values (into [] (map chart-data placeholder-vect))
-      :pattern "###,###.##"}))
+      :pattern "###,###.##"
+      :column-thickness "30%"}))
 
 (defcomponent cash-flow [data owner]
   (render [_]
@@ -61,8 +62,8 @@
       (dom/div {:class (utils/class-set {:section true
                                          :cash-flow true
                                          :read-only (:read-only data)})}
+        (om/build column-chart (get-chart-data sorted-finances cur-symbol))
         (dom/h3 {}
                 cash-val
                 (om/build editable-pen {:click-callback (:editable-click-callback data)}))
-        (dom/p {} period)
-        (om/build column-chart (get-chart-data sorted-finances cur-symbol))))))
+        (dom/p {} period)))))

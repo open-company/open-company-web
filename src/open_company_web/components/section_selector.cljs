@@ -6,7 +6,10 @@
             [open-company-web.components.finances.finances :refer (finances)]
             [open-company-web.components.growth.growth :refer (growth)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
-            [open-company-web.components.simple-section :refer (simple-section)]))
+            [open-company-web.components.simple-section :refer (simple-section)]
+            [open-company-web.lib.utils :as utils]
+            [shodan.inspection :refer [inspect]]
+            [shodan.console :as console]))
 
 (defcomponent section-selector [data owner]
   (init-state [_]
@@ -15,7 +18,7 @@
     (let [section (:section data)
           read-only (:read-only data)
           section-data (:section-data data)]
-      (dom/div {:class "section-selector"}
+      (dom/div #js {:className "section-selector" :ref "section-selector"}
         (cond
           ; growth
           (= section :growth)

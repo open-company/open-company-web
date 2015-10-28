@@ -13,7 +13,7 @@
         label (if value
                 (str (utils/period-string (:period obj)) " " column-name ": " prefix (.toLocaleString (keyw obj)) suffix)
                 "Profitable")]
-    [(utils/period-string (:period obj))
+    [(utils/period-string (:period obj) :short-month)
      value
      label]))
 

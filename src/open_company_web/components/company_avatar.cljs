@@ -12,9 +12,10 @@
   (render [_]
     (when (:company-data data)
       (let [slug (:slug @router/path)
-            first-letter (if (contains? (:company-data data) :name)
-                           (first (:name (:company-data data)))
-                           (first slug))
+            company-name (if (contains? (:company-data data) :name)
+                           (:name (:company-data data))
+                           (utils/camel-case-str slug))
+            first-letter (first (clojure.string/upper-case company-name))
             company-home (str "/companies/" slug)
             av-size (if (:size data)
                       (:size data)
@@ -33,4 +34,5 @@
                               :border-radius bd-radius}
                       :src (jwt/get-key :avatar)
                       :title (jwt/get-key :real-name)}
-              (dom/span {:class "company-avatar-name"} (clojure.string/upper-case first-letter)))))))))
+              (dom/span {:class "company-avatar-initial"} (clojure.string/upper-case first-letter)))
+            (dom/div {:class "company-avatar-name"} company-name)))))))

@@ -54,11 +54,10 @@
 
 (defn nav-revision! [e rev owner data read-only]
   (.preventDefault e)
-  (let [section (:section data)
-        notes (:notes data)]
+  (let [section (:section data)]
     ((:navigate-cb data) read-only)
     (utils/handle-change (:section-data data) (:updated-at rev) :as-of)
-    (api/load-revision rev (keyword (:slug @router/path)) section read-only notes)))
+    (api/load-revision rev (keyword (:slug @router/path)) section read-only)))
 
 (defn date-string [rev]
   (let [date (new js/Date (:updated-at rev))
@@ -79,8 +78,8 @@
           section (:section data)
           latest? (= (:updated-at last-revision) as-of)
           rev-first (if latest? nil rev-first)
-          next-date (str "Next (" (date-string rev-next) ")")
-          prev-date (str "Previous (" (date-string rev-prev) ")")]
+          next-date (date-string rev-next)
+          prev-date (date-string rev-prev)]
       (dom/div {:class "revisions-navigator"}
         (if (:loading data)
           (dom/div {:style {:text-align "center"}} "Loading...")
@@ -94,7 +93,8 @@
                 (dom/a {:class "rev-single-prev" :on-click #(nav-revision! % rev-prev owner data true)}
                   (dom/div {:class "single-prev"}
                     (dom/i {:class "fa fa-caret-left"})
-                    (dom/p {} prev-date)))))
+                    (dom/p {:class "rev-nav-label"} "Previous")
+                    (dom/p {:class "rev-nav-date"} (str "(" prev-date ")"))))))
             (dom/div {:class "revisions-navigator-right"}
               (when rev-last
                 (dom/a {:class "rev-double-next" :on-click #(nav-revision! % rev-last owner data false)}
@@ -104,4 +104,5 @@
                 (dom/a {:class "rev-single-next" :on-click #(nav-revision! % rev-next owner data (not= (:updated-at rev-next) (:updated-at last-revision)))}
                   (dom/div {:class "single-next"}
                     (dom/i {:class "fa fa-caret-right"})
-                    (dom/p {} next-date)))))))))))
+                    (dom/p {:class "rev-nav-label"} "Next")
+                    (dom/p {:class "rev-nav-date"} (str "(" next-date ")"))))))))))))

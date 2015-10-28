@@ -22,13 +22,13 @@
       (dom/div {:class (utils/class-set {:section true
                                          :costs true
                                          :read-only (:read-only data)})}
-        (dom/h3 {}
-                costs-val
-                (om/build editable-pen {:click-callback (:editable-click-callback data)}))
-        (dom/p {} period)
         (om/build column-chart (finances-utils/get-chart-data sorted-finances
                                                               cur-symbol
                                                               :costs
                                                               "Costs"
                                                               #js {"type" "string" "role" "style"}
-                                                              "fill-color: #0266C8"))))))
+                                                              "fill-color: #ADADAD"))
+        (dom/h3 {}
+                costs-val
+                (om/build editable-pen {:click-callback (:editable-click-callback data)}))
+        (dom/p {} period)))))
