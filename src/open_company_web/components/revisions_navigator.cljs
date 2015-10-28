@@ -1,12 +1,10 @@
 (ns open-company-web.components.revisions-navigator
-  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
-            [open-company-web.api :as api]
-            [cljs.core.async :refer [put! chan <!]]))
+            [open-company-web.api :as api]))
 
 (defn revision-next
   "Return the first future revision"
@@ -59,36 +57,21 @@
   (let [section (:section data)
         notes (:notes data)]
     ((:navigate-cb data) read-only)
-    (om/update-state! owner :as-of (fn [_] (:updated-at rev)))
+    (utils/handle-change (:section-data data) (:updated-at rev) :as-of)
     (api/load-revision rev (keyword (:slug @router/path)) section read-only notes)))
 
 (defn date-string [rev]
   (let [date (new js/Date (:updated-at rev))
-        month (utils/month-string (utils/add-zero (.getMonth date)))
+        month (utils/month-string (utils/add-zero (inc (.getMonth date))))
         day (utils/add-zero (.getDate date))]
     (str month " " day)))
 
 (defcomponent revisions-navigator [data owner]
-  (init-state [_]
-    (let [ch (chan)
-          ch-name (str "revisions-update-" (name (:section data)))]
-      (utils/add-channel ch-name ch))
-    (let [revisions (:revisions data)
-          sorted-revisions (utils/sort-revisions revisions)
-          last-revision (last sorted-revisions)]
-      {:as-of (:updated-at data)}))
-  (will-mount [_]
-    ; wait for revisions-update-{section} signal than update to latest revision if we already are on the latest
-    (let [section (name (:section data))
-          ch (utils/get-channel (str "revisions-update-" section))]
-      (go (loop []
-        (let [change (<! ch)]
-          (om/update-state! owner :as-of (fn[_] (:as-of change)))
-          (recur))))))
   (render [_]
-    (let [revisions (utils/sort-revisions (:revisions data))
+    (let [section-data (:section-data data)
+          revisions (utils/sort-revisions (:revisions section-data))
           last-revision (last revisions)
-          as-of (om/get-state owner :as-of)
+          as-of (:as-of section-data)
           rev-first (revision-first revisions as-of)
           rev-prev  (revision-prev revisions as-of)
           rev-next  (revision-next revisions as-of)

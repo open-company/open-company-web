@@ -6,14 +6,15 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.iso4217 :refer [iso4217]]
             [open-company-web.components.charts :refer [column-chart]]
-            [open-company-web.components.finances.utils :refer [get-chart-data]]
+            [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.utility-components :refer [editable-pen]]))
 
 (defcomponent revenue [data owner]
   (render [_]
-    (let [finances-data (:data (:finances (:company-data data)))
+    (let [finances-data (:data (:section-data data))
           value-set (first finances-data)
           period (utils/period-string (:period value-set))
+          currency (finances-utils/get-currency-for-current-company)
           cur-symbol (utils/get-symbol-for-currency-code (:currency (:company-data data)))
           revenue-val (str cur-symbol (utils/format-value (:revenue value-set)))]
       (dom/div {:class (utils/class-set {:section true
@@ -23,9 +24,9 @@
                 revenue-val
                 (om/build editable-pen {:click-callback (:editable-click-callback data)}))
         (dom/p {} period)
-        (om/build column-chart (get-chart-data finances-data
-                                               cur-symbol
-                                               :revenue 
-                                               "Revenue"
-                                               #js {"type" "string" "role" "style"}
-                                               "fill-color: #0266C8"))))))
+        (om/build column-chart (finances-utils/get-chart-data finances-data
+                                                              cur-symbol
+                                                              :revenue 
+                                                              "Revenue"
+                                                              #js {"type" "string" "role" "style"}
+                                                              "fill-color: #0266C8"))))))
