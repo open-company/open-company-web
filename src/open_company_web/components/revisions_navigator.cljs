@@ -54,11 +54,10 @@
 
 (defn nav-revision! [e rev owner data read-only]
   (.preventDefault e)
-  (let [section (:section data)
-        notes (:notes data)]
+  (let [section (:section data)]
     ((:navigate-cb data) read-only)
     (utils/handle-change (:section-data data) (:updated-at rev) :as-of)
-    (api/load-revision rev (keyword (:slug @router/path)) section read-only notes)))
+    (api/load-revision rev (keyword (:slug @router/path)) section read-only)))
 
 (defn date-string [rev]
   (let [date (new js/Date (:updated-at rev))
