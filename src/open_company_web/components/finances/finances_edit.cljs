@@ -169,7 +169,7 @@
         ; real component
         (dom/div {:class "row"}
           (dom/div {:class "finances"}
-            (dom/h2 {} "Finances")
+            (dom/h2 {:class "finances-edit-title"} (:title (:finances (:company-data data))))
             (dom/div {:class "finances-body edit"}
               (dom/table {:class "table table-striped"}
                 (dom/thead {}

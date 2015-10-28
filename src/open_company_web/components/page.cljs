@@ -17,7 +17,7 @@
   (render [_]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)]
-      (dom/div {:class "company-container row"}
+      (dom/div {:class "company-container container"}
         (om/build navbar company-data)
         (dom/div {:class "container-fluid"}
           (dom/div {:class "col-md-12 main"}

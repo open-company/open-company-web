@@ -5,7 +5,10 @@
             [open-company-web.router :as router]
             [open-company-web.components.finances.finances :refer (finances)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
-            [open-company-web.components.simple-section :refer (simple-section)]))
+            [open-company-web.components.simple-section :refer (simple-section)]
+            [open-company-web.lib.utils :as utils]
+            [shodan.inspection :refer [inspect]]
+            [shodan.console :as console]))
 
 (defcomponent section-selector [data owner]
   (init-state [_]
@@ -14,7 +17,7 @@
     (let [section (:section data)
           read-only (:read-only data)
           section-data (:section-data data)]
-      (dom/div {:class "section-selector"}
+      (dom/div #js {:className "section-selector" :ref "section-selector"}
         (cond
           ; finances edit
           (and (= section :finances) (om/get-state owner :finances-edit))

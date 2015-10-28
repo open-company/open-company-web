@@ -20,8 +20,5 @@
           (om/build company-avatar {:company-data data :navbar-brand true})))
       (dom/div {:id "navbar" :class "navbar-collapse collapse"}
         (dom/ul {:class "nav navbar-nav navbar-right"}
-          (when (contains? @router/path :slug)
-            (dom/li {}
-              (om/build recent-updates data)))
           (dom/li {}
             (om/build user-avatar {})))))))

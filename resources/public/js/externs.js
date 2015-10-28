@@ -3,8 +3,15 @@ var $ = {};
 $.select2 = function(){};
 $.tooltip = function(){};
 $.width = function(){};
+$.height = function(){};
 $.hallo = function(){};
 $.scrollTo = function(){};
+$.scroll = function(){};
+$.scrollTop = function(){};
+$.css = function(){};
+$.offset = {};
+$.offset.top = {};
+$.each = function(){};
 var jQuery = function(){};
 // Hallo
 var hallo = function(){};

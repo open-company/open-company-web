@@ -1,5 +1,9 @@
 /* some style */
 
+html, body{
+  font-family: "proxima-nova", sans-serif;
+}
+
 a{
   cursor: pointer;
 }
@@ -113,6 +117,11 @@ div#app{
   margin-top: 50px;
 }
 
+nav.navbar{
+  background-color: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+}
+
 nav.tab-navigation{
   margin-top: 10px;
 }
@@ -218,22 +227,34 @@ span img.user-icon{
   margin-right: 5px;
 }
 
-div.finances h2{
-  text-align: center;
+div.finances h2.finances-edit-title{
+  text-align: left;
+  position: relative;
+  width: 600px;
+  margin-left: -300px;
+  left: 50%;
 }
 
 div.finances div.link-bar{
-  text-align: center;
+  text-align: left;
   z-index: 1;
+  margin-left: -300px;
+  left: 50%;
+  width: 600px;
+  position: relative;
 }
 
 div.finances div.link-bar a.finances-link{
   text-decoration: underline;
-  margin: 10px;
+  color: #707070;
+  margin-left: 0px;
+  margin-right: 60px;
+  font-size: 16px;
 }
 
 div.finances div.link-bar a.finances-link.active{
   text-decoration: none;
+  color: #191919;
 }
 
 div.finances div.finances-body{
@@ -244,15 +265,11 @@ div.finances div.finances-body{
 }
 
 div.finances div.finances-body div.section{
-  text-align: center;
+  text-align: left;
 }
 
 div.finances div.finances-body div.section h3{
   margin-bottom: 0px;
-}
-
-div.finances div.finances-body div.section h3 span{
-  margin-left: 24px;
 }
 
 div.finances div.finances-body div.section div.chart-container{
@@ -265,19 +282,28 @@ div.update-footer{
   position: relative;
   left: 50%;
   margin-left: -300px;
+  margin-top: 30px;
   width: 600px;
-  height: 40px;
+  height: 24px;
   vertical-align: middle;
 }
 
 div.update-footer div{
   margin: 0px 0px 0px 35px;
-  color: lightgray;
+  color: rgba(0, 0, 0, 0.4);
   text-decoration: none;
 }
 
 div.update-footer div.author{
-  color: gray;
+  color: #4C4B4B;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+div.update-footer div.timeago{
+  color: #5B5B5B;
+  font-size: 13px;
+  font-weight: 300;
 }
 
 div.update-footer img.author-image{
@@ -297,22 +323,96 @@ div.rich-editor-container {
   min-height: 90px;
 }
 
+div.rich-editor-container div.rich-editor{
+  color: #191919;
+}
+
+div.rich-editor-container div.rich-editor img,
+div.rich-editor-container div.fake-rich-editor img{
+  max-width: 500px;
+}
+
+div.rich-editor-container div.rich-editor ul img,
+div.rich-editor-container div.fake-rich-editor ul img{
+  max-width: 460px;
+}
+
+div.rich-editor-container div.rich-editor ul ul img,
+div.rich-editor-container div.fake-rich-editor ul ul img{
+  max-width: 420px;
+}
+
+div.rich-editor-container div.rich-editor,
+div.rich-editor-container div.rich-editor p,
+div.rich-editor-container div.fake-rich-editor,
+div.rich-editor-container div.fake-rich-editor p{
+   font-weight: normal;
+   font-size: 19px;
+}
+
+div.rich-editor-container div.rich-editor h1,
+div.rich-editor-container div.rich-editor h3{
+  font-weight: 600;
+   font-size: 24px; 
+}
+
 div.rich-editor-container div.rich-editor.no-data{
-  color: lightgray;
+  color: rgba(0, 0, 0, 0.4);
 }
 
 div.rich-editor-container div.rich-editor,
 div.rich-editor-container div.fake-rich-editor{
-  width: 100%;
-  margin-bottom: 10px;
+  width: 500px;
 }
 
 div.rich-editor-container div.rich-editor-save{
-  height: 40px;
+  height: 44px;
 }
 
 div.rich-editor-container div.rich-editor-save button.cancel-button{
   margin-left: 10px;
+}
+
+div.rich-editor-container div.rich-editor *::selection{
+  background: #C1E7F4;
+}
+
+div.rich-editor-container div.rich-editor *::-moz-selection{
+  background: #C1E7F4;
+}
+
+div.rich-editor-container div.rich-editor a{
+  font-weight: bold;
+  text-decoration: underline;
+  color: black;
+}
+
+div.rich-editor-container div.rich-editor.collapsed{
+  overflow: hidden;
+  max-height: 300px;
+  position: relative;
+}
+
+div.rich-editor-container div.rich-editor.collapsed:after{
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  content: "";
+  background: linear-gradient(
+    to top,
+    rgba(255,255,255, 1) 0%,
+    rgba(255,255,255, 0) 40%
+  );
+}
+
+div.rich-editor-container button.collapse-button{
+  color: #2F9B34;
+  text-decoration: none;
+  font-size: 19px;
+  font-weight: 600;
+  margin-left: 0px;
+  padding-left: 0px;
 }
 
 .comp-cell {
@@ -335,7 +435,7 @@ div.rich-editor-container div.rich-editor-save button.cancel-button{
 }
 
 .comp-cell .state-new span {
-  color: lightgray;
+  color: rgba(0, 0, 0, 0.4);
 }
 
 .comp-cell .state-display {
@@ -371,7 +471,7 @@ div.editable-title-container{
   position: relative;
   left: 50%;
   margin-left: -300px;
-  height: 37px;
+  height: 55px;
   margin-top: 10px;
   margin-bottom: 10px;
 }
@@ -387,25 +487,24 @@ div.editable-title-container h2.read-only{
 div.editable-title-container h2,
 div.editable-title-container input,
 div.editable-title-container span.hidden-span{
-  text-align: center;
-  color: black;
-  font-size: 30px;
+  text-align: left;
+  color: #2D2D2D !important;
+  font-size: 48px;
   font-family: inherit;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.1;
   color: inherit;
   box-sizing: border-box;
   padding: 0px;
   margin: 0px;
   width: 100%;
-  height: 37px;
-/*  float: left;*/
+  height: 55px;
 }
 
 div.editable-title-container div.hidden-span-container{
   z-index: -1;
   opacity: 0;
-  text-align: center;
+  text-align: left;
   position: absolute;
   top: 0;
   left: 0;
@@ -463,7 +562,7 @@ div.finances-body table.table td.no-cell{
 }
 
 div.finances-body table.table td.new-row-placeholder{
-  color: lightgray;
+  color: rgba(0, 0, 0, 0.4);
 }
 
 div.finances-body table.table td div.comp-cell{
@@ -503,24 +602,28 @@ div.recent-updates div.recent-updates-item span.updated-at {
   float: right;
 }
 
-a.settings i{
-  color: lightgray;
-  font-size: 18px;
-}
-
 div.simple-section-revisions-navigator{
   width: 600px;
   left: 50%;
-  margin-left: 300px;
+  margin-left: -300px;
+  position: relative;
 }
 
 div.revisions-navigator{
   width: 100%;
   height: 34px;
+  margin-top: 30px;
 }
 
 div.revisions-navigator div.revisions-navigator-left{
   float: left;
+}
+
+div.revisions-navigator div.revisions-navigator-left div.single-prev,
+div.revisions-navigator div.revisions-navigator-right div.single-next,
+div.revisions-navigator div.revisions-navigator-left div.double-prev,
+div.revisions-navigator div.revisions-navigator-right div.double-next{
+  color: #5B5B5B;
 }
 
 div.revisions-navigator div.revisions-navigator-left div.double-prev{
@@ -537,14 +640,12 @@ div.revisions-navigator div.revisions-navigator-left div.single-prev i{
   float:left;
 }
 div.revisions-navigator div.revisions-navigator-left div.single-prev p{
-  font-size: 14px;
   margin: 5px 0px 0px 8px;
   float: left;
 }
 
 div.revisions-navigator div.revisions-navigator-left div.single-prev,
 div.revisions-navigator div.revisions-navigator-left div.double-prev{
-  color: black;
   float: left;
 }
 
@@ -571,15 +672,25 @@ div.revisions-navigator div.revisions-navigator-right div.single-next i{
 }
 
 div.revisions-navigator div.revisions-navigator-right div.single-next p{
-  font-size: 14px;
   margin: 5px 8px 0px 0px;
   float: right;
+}
+
+div.revisions-navigator p.rev-nav-label{
+  color: #5B5B5B;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+div.revisions-navigator p.rev-nav-date{
+  color: #5B5B5B;
+  font-size: 16px;
+  font-weight: 300;
 }
 
 div.revisions-navigator div.revisions-navigator-right div.single-next,
 div.revisions-navigator div.revisions-navigator-right div.double-next{
   float: right;
-  color: black;
 }
 
 div.revisions-navigator div.revisions-navigator-right div.double-next{
@@ -587,9 +698,17 @@ div.revisions-navigator div.revisions-navigator-right div.double-next{
 }
 
 hr.section-separator{
-  background-color: lightgray;
+  background-color: rgba(0, 0, 0, 0.4);
   width: 600px;
   height: 1px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2){
+  hr.section-separator{
+    height: 0.5px;
+  }
 }
 
 h4.login-error-message{
@@ -627,14 +746,37 @@ div.company-avatar div.company-avatar-img{
   border: 1px solid black;
   margin-top: -10px;
   padding: 9px;
+  float: left;
 }
 
-div.company-avatar div.company-avatar-img span.company-avatar-name{
+div.company-avatar div.company-avatar-img span.company-avatar-initial{
   font-size: 28px;
   color: black;
 }
 
-nav.navbar{
-  background-color: white;
-  border-bottom: 1px solid black;
+div.company-avatar div.company-avatar-name{
+  float: left;
+  font-size: 16px;
+  margin-left: 10px;
+  color: black;
+}
+
+button.oc-btn{
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  font-size: 10px;
+  margin-left: 0px;
+  margin-right: 20px;
+  height: 20px;
+  width: 60px;
+  border-radius: 4px;
+  background-color: transparent;
+  margin-top: 30px;
+}
+
+button.oc-btn.oc-success{
+  color: green;
+}
+
+button.oc-btn.oc-cancel{
+  color: rgba(0, 0, 0, 0.4);
 }
