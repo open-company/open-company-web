@@ -327,6 +327,21 @@ div.rich-editor-container div.rich-editor{
   color: #191919;
 }
 
+div.rich-editor-container div.rich-editor img,
+div.rich-editor-container div.fake-rich-editor img{
+  max-width: 500px;
+}
+
+div.rich-editor-container div.rich-editor ul img,
+div.rich-editor-container div.fake-rich-editor ul img{
+  max-width: 460px;
+}
+
+div.rich-editor-container div.rich-editor ul ul img,
+div.rich-editor-container div.fake-rich-editor ul ul img{
+  max-width: 420px;
+}
+
 div.rich-editor-container div.rich-editor,
 div.rich-editor-container div.rich-editor p,
 div.rich-editor-container div.fake-rich-editor,
