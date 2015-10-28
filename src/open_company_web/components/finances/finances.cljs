@@ -101,10 +101,11 @@
 
               "runway"
               (om/build runway subsection-data))
-            (om/build update-footer {:updated-at (:updated-at finances-data)
-                                     :author (:author finances-data)
-                                     :section :finances})
-            (when (and (not read-only) (not (nil? notes-data)) (not (nil? (:body notes-data))))
+            (when (and notes-data (:author notes-data))
+              (om/build update-footer {:updated-at (:updated-at finances-data)
+                                       :author (:author finances-data)
+                                       :section :finances}))
+            (when (and notes-data (:body notes-data))
               (om/build rich-editor {:read-only read-only
                                      :section-data notes-data
                                      :section :finances
