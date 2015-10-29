@@ -3,7 +3,8 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.charts :refer [column-chart]]))
+            [open-company-web.components.charts :refer [column-chart]]
+            [clojure.string :as clj-str]))
 
 (def columns 7)
 
@@ -17,7 +18,7 @@
                    column-name
                    ": "
                    (if prefix prefix "")
-                   (.toLocaleString value)
+                   (if value (.toLocaleString value) "")
                    (if suffix (str " " suffix) ""))]
     [(utils/period-string (:period obj))
      value
@@ -54,7 +55,7 @@
           unit (if fixed-cur-unit nil (utils/camel-case-str metric-unit))
           value (if (:value value-set) (.toLocaleString (:value value-set)) "")
           metric-name (:name metric-info)
-          name-has-unit (> (.indexOf (str metric-name) metric-unit) -1)
+          name-has-unit (> (.indexOf (clj-str/lower-case (str metric-name)) (clj-str/lower-case metric-unit)) -1)
           label (if fixed-cur-unit
                   (str fixed-cur-unit value)
                   (if name-has-unit
