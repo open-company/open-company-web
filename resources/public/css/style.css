@@ -545,13 +545,13 @@ div.finances div.finances-body.edit{
   position: relative;
 }
 
-div.finances-body i.editable-pen{
+div.composed-section-body i.editable-pen{
   opacity: 0;
   margin-left: 10px;
   cursor: default;
 }
 
-div.finances-body.editable:hover i.editable-pen{
+div.composed-section-body.editable:hover i.editable-pen{
   opacity: 1;
   margin-left: 10px;
   cursor: pointer;
