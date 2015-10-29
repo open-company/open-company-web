@@ -7,9 +7,7 @@
             [open-company-web.components.growth.growth :refer (growth)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.simple-section :refer (simple-section)]
-            [open-company-web.lib.utils :as utils]
-            [shodan.inspection :refer [inspect]]
-            [shodan.console :as console]))
+            [open-company-web.lib.utils :as utils]))
 
 (defcomponent section-selector [data owner]
   (init-state [_]
