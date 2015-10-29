@@ -291,9 +291,7 @@
         sort-pred (sort-by-key-pred :period true)
         sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
         fixed-section (assoc section-body :data sorted-finances)
-        section-with-notes (if (contains? fixed-section :notes)
-                             fixed-section
-                             (assoc fixed-section :notes finances-empty-notes))]
+        section-with-notes (merge finances-empty-notes fixed-section)]
     section-with-notes))
 
 (defn fix-section [section-body section-name & [sorter read-only]]
