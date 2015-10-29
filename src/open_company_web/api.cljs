@@ -152,22 +152,22 @@
                                :slug (keyword slug)}]
             (flux/dispatch dispatcher/section dispatch-body)))))))
 
-(defn update-finances-notes[notes links]
-  (when notes
+(defn patch-section-notes [notes-data links section]
+  (when notes-data
     (let [slug (:slug @router/path)
-          json-data (cljs->json {:notes notes})
-          finances-link (utils/link-for links "update" "PATCH")]
-      (api-patch (:href finances-link)
+          clean-notes-data (dissoc notes-data :author :updated-at)
+          json-data (cljs->json {:notes notes-data})
+          section-link (utils/link-for links "update" "PATCH")]
+      (api-patch (:href section-link)
         { :json-params json-data
           :headers {
             ; required by Chrome
             "Access-Control-Allow-Headers" "Content-Type"
             ; custom content type
-            "content-type" (:type finances-link)}}
+            "content-type" (:type section-link)}}
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})
-                dispatch-body {:body (merge {:section :finances :sorter (:updated-at body)} body)
-                               :section :finances
-                               :slug (keyword slug)
-                               :notes true}]
+                dispatch-body {:body (merge {:section section :sorter (:updated-at body)} body)
+                               :section section
+                               :slug (keyword slug)}]
             (flux/dispatch dispatcher/section dispatch-body)))))))
