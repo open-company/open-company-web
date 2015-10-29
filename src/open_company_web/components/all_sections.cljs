@@ -24,4 +24,4 @@
                                           :section section
                                           :loading (:loading company-data)})
               (when (not= section (last sorted-section-keys))
-                (dom/hr {:class "section-separator"})))))))))
+                (dom/hr {:class "section-separator" :size "0"})))))))))
