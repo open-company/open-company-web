@@ -44,7 +44,8 @@
      :hallo-loaded false
      :did-mount false
      :editing false
-     :collapsed true})
+     :should-collapse true
+     :collapsed false})
   (will-mount [_]
     (when (not (:read-only data))
       ; add dependencies:
@@ -65,13 +66,14 @@
       (init-hallo! owner)))
   (did-update [_ _ _]
     (when (.-$ js/window) ; avoid to crash on tests because of jquery
-      (when (om/get-state owner :collapsed)
+      (when (om/get-state owner :should-collapse)
         (if-let [rich-editor-ref (om/get-ref owner "rich-editor")]
           (let [rich-editor-node (.getDOMNode rich-editor-ref)
                 $-rich-editor (.$ js/window rich-editor-node)
                 height (.height $-rich-editor)]
-            (when (< height 300)
-              (collapse owner false)))))))
+            (om/update-state! owner :should-collapse (fn [_]false))
+            (when (>= height 480)
+              (collapse owner true)))))))
   (render [_]
     (let [section-data (:section-data data)
           section (:section data)
@@ -121,8 +123,4 @@
                                        (set-editing! owner false)
                                        (utils/handle-change section-data value :body)
                                        (utils/save-values (:save-channel data))))
-                         } "SAVE"))
-          (when (not no-data)
-            (om/build update-footer {:author (:author section-data)
-                                     :updated-at (:updated-at section-data)
-                                     :section section})))))))
+                         } "SAVE")))))))
