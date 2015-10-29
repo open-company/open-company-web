@@ -14,7 +14,9 @@
             [test.open-company-web.components.finances.revenue]
             [test.open-company-web.components.finances.runway]
             [test.open-company-web.components.finances.finances]
-            [test.open-company-web.components.finances.finances-edit]))
+            [test.open-company-web.components.finances.finances-edit]
+            [test.open-company-web.components.growth.growth]
+            [test.open-company-web.components.growth.growth-metric]))
 
 (enable-console-print!)
 
@@ -36,4 +38,6 @@
   'test.open-company-web.components.finances.revenue
   'test.open-company-web.components.finances.runway
   'test.open-company-web.components.finances.finances
-  'test.open-company-web.components.finances.finances-edit)
+  'test.open-company-web.components.finances.finances-edit
+  'test.open-company-web.components.growth.growth
+  'test.open-company-web.components.growth.growth-metric)
