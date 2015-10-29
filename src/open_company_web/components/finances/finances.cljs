@@ -74,9 +74,6 @@
           needs-runway (some #(contains? % :runway) finances-row-data)]
       (dom/div {:class "section-container row" :id "section-finances"}
         (dom/div {:class "finances"}
-          (om/build update-footer {:updated-at (:updated-at finances-data)
-                                       :author (:author finances-data)
-                                       :section :finances})
           (om/build editable-title {:read-only read-only
                                     :section-data finances-data
                                     :section :finances
@@ -112,12 +109,11 @@
 
               "runway"
               (om/build runway subsection-data))
+            (om/build update-footer {:updated-at (:updated-at finances-data)
+                                     :author (:author finances-data)
+                                     :section :finances})
             (when (or (not (empty? (:body notes-data))) (not read-only))
               (dom/div {}
-                (when (:author notes-data)
-                  (om/build update-footer {:author (:author notes-data)
-                                           :updated-at (:updated-at notes-data)
-                                           :section :finances}))
                 (om/build rich-editor {:read-only read-only
                                        :section-data notes-data
                                        :section :finances
