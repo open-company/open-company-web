@@ -34,10 +34,15 @@
   (render [_]
     (let [section (:section data)
           section-data (:section-data data)
-          read-only (or (:loading section-data) (om/get-state owner :read-only))]
+          read-only (or (:loading section-data) (om/get-state owner :read-only))
+          no-data (nil? (:author section-data))]
       (if (:loading data)
         (dom/h4 {} "Loading data...")
         (dom/div {:class "simple-section section-container" :id (str "section-" (name section))}
+          (when (not no-data)
+            (om/build update-footer {:author (:author section-data)
+                                     :updated-at (:updated-at section-data)
+                                     :section section}))
           (om/build editable-title {:read-only read-only
                                     :section-data section-data
                                     :section section
