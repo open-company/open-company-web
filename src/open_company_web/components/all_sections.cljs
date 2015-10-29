@@ -15,13 +15,13 @@
   (render [_]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)
-          sorted-section-keys (utils/sort-section-keys company-data)]
+          section-keys (utils/get-section-keys company-data)]
       (dom/div {:class "sections-container"}
-        (for [section sorted-section-keys]
+        (for [section section-keys]
           (let [section-data (section company-data)]
             (dom/div {}
               (om/build section-selector {:section-data section-data
                                           :section section
                                           :loading (:loading company-data)})
-              (when (not= section (last sorted-section-keys))
+              (when (not= section (last section-keys))
                 (dom/hr {:class "section-separator" :size "0"})))))))))
