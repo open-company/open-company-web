@@ -52,7 +52,7 @@
                 company-data ((keyword slug) cursor)
                 section (:section data)
                 section-data (section company-data)]
-            (api/update-finances-notes (:notes section-data) (:links section-data))
+            (api/patch-section-notes (:notes section-data) (:links section-data) section)
             (recur))))))
   (render [_]
     (let [focus (om/get-state owner :focus)
