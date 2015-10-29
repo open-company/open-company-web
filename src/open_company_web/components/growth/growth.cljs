@@ -1,16 +1,18 @@
 (ns open-company-web.components.growth.growth
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dispatcher]
             [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.components.rich-editor :refer (rich-editor)]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.revisions-navigator :refer [revisions-navigator]]
             [open-company-web.api :as api]
-            [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.components.editable-title :refer [editable-title]]
-            [open-company-web.components.growth.growth-metric :refer [growth-metric]]))
+            [open-company-web.components.growth.growth-metric :refer [growth-metric]]
+            [cljs.core.async :refer [chan <!]]))
 
 (defn subsection-click [e owner]
   (.preventDefault e)
@@ -19,9 +21,22 @@
 
 (defcomponent growth [data owner]
   (init-state [_]
+    (let [save-notes-channel (chan)]
+      (utils/add-channel "save-growth-notes" save-notes-channel))
     (let [metrics-data (:metrics (:section-data data))]
       {:focus (:slug (first metrics-data))
        :read-only false}))
+  (will-mount [_]
+    (let [save-notes-change (utils/get-channel "save-growth-notes")]
+        (go (loop []
+          (let [change (<! save-notes-change)
+                cursor @dispatcher/app-state
+                slug (:slug @router/path)
+                company-data ((keyword slug) cursor)
+                section (:section data)
+                section-data (section company-data)]
+            (api/patch-section-notes (:notes section-data) (:links section-data) section)
+            (recur))))))
   (render [_]
     (let [focus (om/get-state owner :focus)
           growth-link-class :composed-section-link
@@ -66,9 +81,8 @@
                                      :section-data notes-data
                                      :section :growth
                                      :save-channel "save-growth-notes"}))
-            (om/build revisions-navigator {:revisions (:revisions growth-section)
+            (om/build revisions-navigator {:section-data growth-section
                                            :section :growth
-                                           :updated-at (:updated-at growth-section)
                                            :loading (:loading growth-section)
                                            :navigate-cb (fn [read-only]
                                                           (utils/handle-change growth-section true :loading)
