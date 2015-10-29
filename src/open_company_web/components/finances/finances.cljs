@@ -113,11 +113,10 @@
                                        :author (:author finances-data)
                                        :section :finances})
             (when (or (not (empty? (:body notes-data))) (not read-only))
-              (dom/div {}
-                (om/build rich-editor {:read-only read-only
-                                       :section-data notes-data
-                                       :section :finances
-                                       :save-channel "save-finances-notes"})))
+              (om/build rich-editor {:read-only read-only
+                                     :section-data notes-data
+                                     :section :finances
+                                     :save-channel "save-finances-notes"}))
             (om/build revisions-navigator {:section-data finances-data
                                            :section :finances
                                            :loading (:loading finances-data)
