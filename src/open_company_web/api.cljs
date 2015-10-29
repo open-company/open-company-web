@@ -94,7 +94,6 @@
                                             :updated-at
                                             :author
                                             :links
-                                            :sorter
                                             :loading
                                             :as-of
                                             :read-only)
