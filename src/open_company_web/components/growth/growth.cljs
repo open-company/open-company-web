@@ -61,7 +61,7 @@
             (om/build update-footer {:updated-at (:updated-at growth-section)
                                      :author (:author growth-section)
                                      :section :growth})
-            (when (and (not read-only) (not (nil? notes-data)) (not (nil? (:body notes-data))))
+            (when (or (not (empty? (:body notes-data))) (not read-only))
               (om/build rich-editor {:read-only read-only
                                      :section-data notes-data
                                      :section :growth
