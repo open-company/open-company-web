@@ -409,13 +409,27 @@ div.rich-editor-container div.rich-editor.collapsed:after{
   );
 }
 
-div.rich-editor-container button.collapse-button{
-  color: #2F9B34;
+div.rich-editor-container button.collapse-button:focus,
+div.rich-editor-container button.expand-button:focus{
+  outline: none;
+}
+
+div.rich-editor-container button.collapse-button,
+div.rich-editor-container button.expand-button{
   text-decoration: none;
   font-size: 19px;
   font-weight: 600;
   margin-left: 0px;
   padding-left: 0px;
+  outline: none;
+}
+
+div.rich-editor-container button.expand-button{
+  color: #2F9B34;
+}
+
+div.rich-editor-container button.collapse-button{
+  color: red;
 }
 
 .comp-cell {
