@@ -14,7 +14,7 @@
     ; --- DO NOT UPDATE OM, the 1.x.x code is Om Next and requires changes on our part https://github.com/omcljs/om/wiki/Quick-Start-(om.next)
     [org.omcljs/om "0.9.0" :exclusions [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
     [cljs-http "0.1.37"] ; HTTP for cljs https://github.com/r0man/cljs-http
-    [prismatic/schema "1.0.2"] ; Dependency of om-tools https://github.com/Prismatic/schema
+    [prismatic/schema "1.0.3"] ; Dependency of om-tools https://github.com/Prismatic/schema
     [prismatic/plumbing "0.5.1"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [prismatic/om-tools "0.4.0"] ; Tools for Om https://github.com/Prismatic/om-tools
     [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
