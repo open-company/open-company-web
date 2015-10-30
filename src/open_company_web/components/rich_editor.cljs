@@ -31,11 +31,17 @@
               init-editor (.hallo jquery-node hallo-opts)]
           (om/update-state! owner :editor (fn[_] init-editor)))))))
 
-(defn set-editing! [owner active]
-  (om/update-state! owner :editing (fn [_]active)))
+(defn set-state! [owner k v]
+  (om/update-state! owner k (fn [_]v)))
 
-(defn collapse [owner v]
-  (om/update-state! owner :collapsed (fn [_]v)))
+(defn user-expanded! [owner v]
+  (set-state! owner :user-expanded v))
+
+(defn editing! [owner active]
+  (set-state! owner :editing active))
+
+(defn collapsed! [owner v]
+  (set-state! owner :collapsed v))
 
 (defcomponent rich-editor [data owner]
   (init-state [_]
@@ -45,7 +51,8 @@
      :did-mount false
      :editing false
      :should-collapse true
-     :collapsed false})
+     :collapsed false
+     :user-expanded false})
   (will-mount [_]
     (when (not (:read-only data))
       ; add dependencies:
@@ -73,7 +80,7 @@
                 height (.height $-rich-editor)]
             (om/update-state! owner :should-collapse (fn [_]false))
             (when (>= height 480)
-              (collapse owner true)))))))
+              (collapsed! owner true)))))))
   (render [_]
     (let [section-data (:section-data data)
           section (:section data)
@@ -83,7 +90,8 @@
           should-show-placeholder (and (not editing) no-data)
           placeholder "Finances notes here..."
           body (if should-show-placeholder placeholder (:body section-data))
-          collapsed (om/get-state owner :collapsed)]
+          collapsed (om/get-state owner :collapsed)
+          user-expanded (om/get-state owner :user-expanded)]
       (dom/div {:class "rich-editor-container"}
         (dom/div {:class (utils/class-set {:fake-rich-editor true
                                            :hidden (not read-only)})
@@ -94,19 +102,29 @@
                                                    :collapsed collapsed})
                       :ref "rich-editor"
                       :onFocus (fn [e]
-                                 (collapse owner false)
+                                 (when collapsed
+                                  (collapsed! owner false)
+                                  (user-expanded! owner true))
                                  (when-not (:read-only data)
-                                   (set-editing! owner true)))
+                                   (editing! owner true)))
                       :onBlur (fn [e]
                                 (if-let [editor-ref (om/get-ref owner "rich-editor")]
                                   (let [editor-el (.getDOMNode editor-ref)
                                         innerHTML (.-innerHTML editor-el)]
                                     (when (= innerHTML body)
-                                      (set-editing! owner false)))))
+                                      (editing! owner false)))))
                       :dangerouslySetInnerHTML (clj->js {"__html" body})})
-        (when collapsed
-          (dom/button {:class "btn btn-link collapse-button"
-                       :on-click #(collapse owner false)} "Continue reading"))
+        (if collapsed
+          (dom/button {:class "btn btn-link expand-button"
+                       :on-click (fn [e]
+                                   (collapsed! owner false)
+                                   (user-expanded! owner true))}
+                      "Continue reading")
+          (when user-expanded
+            (dom/button {:class "btn btn-link collapse-button"
+                         :on-click (fn [e]
+                                    (collapsed! owner true)
+                                    (user-expanded! owner false))} "Show less")))
         (if editing
           (dom/div {:class "rich-editor-save"}
             (dom/button {:class "oc-btn oc-cancel"
@@ -115,12 +133,12 @@
                                    el (.getDOMNode (om/get-ref owner "rich-editor"))]
                                (utils/handle-change section-data init-value :body)
                                (set! (.-innerHTML el) init-value))
-                             (set-editing! owner false))
+                             (editing! owner false))
                  } "CANCEL")
             (dom/button {:class "oc-btn oc-success"
                          :on-click (fn [e]
                                      (let [value (.. (om/get-ref owner "rich-editor") getDOMNode -innerHTML)]
-                                       (set-editing! owner false)
+                                       (editing! owner false)
                                        (utils/handle-change section-data value :body)
                                        (utils/save-values (:save-channel data))))
                          } "SAVE"))
