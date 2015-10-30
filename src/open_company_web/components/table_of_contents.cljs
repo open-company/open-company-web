@@ -27,5 +27,4 @@
                                         top (- (.-top section-offset) 60)]
                                     (.scrollTo js/$ #js {"top" (str top "px") "left" "0px"} 500)))}
                 (dom/p {:class "section-title"} (:title section-data))
-                (dom/p {:class "section-date"} (utils/time-since (:udpated-at section-data)))))))))))
-
+                (dom/p {:class "section-date"} (utils/time-since (:updated-at section-data)))))))))))
