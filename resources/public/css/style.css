@@ -227,7 +227,11 @@ span img.user-icon{
   margin-right: 5px;
 }
 
-div.finances h2.finances-edit-title{
+div.composed-section h2{
+  text-align: left;
+}
+
+div.composed-section h2.finances-edit-title{
   text-align: left;
   position: relative;
   width: 600px;
@@ -235,7 +239,7 @@ div.finances h2.finances-edit-title{
   left: 50%;
 }
 
-div.finances div.link-bar{
+div.composed-section div.link-bar{
   text-align: left;
   z-index: 1;
   margin-left: -300px;
@@ -244,7 +248,7 @@ div.finances div.link-bar{
   position: relative;
 }
 
-div.finances div.link-bar a.finances-link{
+div.composed-section div.link-bar a.composed-section-link{
   text-decoration: underline;
   color: #707070;
   margin-left: 0px;
@@ -252,19 +256,19 @@ div.finances div.link-bar a.finances-link{
   font-size: 16px;
 }
 
-div.finances div.link-bar a.finances-link.active{
+div.composed-section div.link-bar a.composed-section-link.active{
   text-decoration: none;
   color: #191919;
 }
 
-div.finances div.finances-body{
+div.composed-section div.composed-section-body{
   width: 600px;
   left: 50%;
   margin-left: -300px;
   position: relative;
 }
 
-div.finances div.finances-body div.section{
+div.composed-section div.composed-section-body div.section{
   text-align: left;
 }
 
@@ -540,13 +544,13 @@ div.finances div.finances-body.edit{
   position: relative;
 }
 
-div.finances-body i.editable-pen{
+div.composed-section-body i.editable-pen{
   opacity: 0;
   margin-left: 10px;
   cursor: default;
 }
 
-div.finances-body.editable:hover i.editable-pen{
+div.composed-section-body.editable:hover i.editable-pen{
   opacity: 1;
   margin-left: 10px;
   cursor: pointer;

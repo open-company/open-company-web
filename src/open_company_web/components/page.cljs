@@ -11,8 +11,6 @@
             [clojure.string :as str]
             [open-company-web.lib.utils :as utils]))
 
-(enable-console-print!)
-
 (defcomponent company [data owner]
   (render [_]
     (let [slug (:slug @router/path)
@@ -28,7 +26,9 @@
                 (dom/h4 "Loading data..."))
 
               (contains? @router/path :section)
-              (om/build section-selector {:data company-data :section (keyword (:section @router/path))})
+              (let [section (keyword (:section @router/path))
+                    section-data (section company-data)]
+                (om/build section-selector {:section-data section-data :section section}))
 
               (utils/in? (:route @router/path) "profile")
               (om/build company-profile data)

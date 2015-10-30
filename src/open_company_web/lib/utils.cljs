@@ -40,13 +40,12 @@
 
 (defn get-symbol-for-currency-code [currency-code]
   (let [currency (get-currency currency-code)
-        symbol (if
-                (and
+        sym (if (and
                   (contains? currency :symbol)
                   (> (count (:symbol currency)) 0))
                 (:symbol currency)
                 currency-code)]
-    (or symbol (:code currency))))
+    (or sym (:code currency))))
 
 (def channel-coll (atom {}))
 
