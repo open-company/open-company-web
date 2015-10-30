@@ -8,6 +8,7 @@
             [open-company-web.router :as router]
             [open-company-web.components.section-selector :refer [section-selector]]
             [open-company-web.components.all-sections :refer [all-sections]]
+            [open-company-web.components.table-of-contents :refer [table-of-contents]]
             [clojure.string :as str]
             [open-company-web.lib.utils :as utils]))
 
@@ -18,7 +19,10 @@
       (dom/div {:class "company-container container"}
         (om/build navbar company-data)
         (dom/div {:class "container-fluid"}
-          (dom/div {:class "col-md-12 main"}
+          (dom/div {:class "col-md-3 toc"}
+            (om/build table-of-contents company-data))
+          (dom/div {:class "col-md-1"})
+          (dom/div {:class "col-md-7 main"}
             (cond
 
               (:loading data)
