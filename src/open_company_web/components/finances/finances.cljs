@@ -110,8 +110,8 @@
               "runway"
               (om/build runway subsection-data))
             (om/build update-footer {:updated-at (:updated-at finances-data)
-                                       :author (:author finances-data)
-                                       :section :finances})
+                                     :author (:author finances-data)
+                                     :section :finances})
             (when (or (not (empty? (:body notes-data))) (not read-only))
               (dom/div {}
                 (om/build rich-editor {:read-only read-only
