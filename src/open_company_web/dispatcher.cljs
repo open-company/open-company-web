@@ -42,9 +42,7 @@
       (when body
         ; remove loading key
         (swap! app-state dissoc :loading)
-        (println "section-dispatch" (:title (:body body)))
         (let [fixed-section (utils/fix-section (:body body) (:section body))]
-          (println "fixed-section" (:title fixed-section))
           (swap! app-state assoc-in [(:slug body) (:section body)] fixed-section))))))
 
 (def revision-dispatch
@@ -55,9 +53,8 @@
         ; remove loading key
         (swap! app-state dissoc :loading)
         (let [assoc-in-coll [(:slug body) (:section body)]
-              old-sorter (:sorter (get-in @app-state assoc-in-coll))
               read-only (:read-only body)
-              fixed-section (utils/fix-section (:body body) (:section body) old-sorter read-only)]
+              fixed-section (utils/fix-section (:body body) (:section body) read-only)]
           (swap! app-state assoc-in assoc-in-coll fixed-section))))))
 
 (def auth-settings-dispatch

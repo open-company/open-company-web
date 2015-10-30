@@ -62,7 +62,13 @@
       ; render component
       (om/root list-companies app-state {:target target}))
 
+    (defroute home-page-route-slash "/" []
+      (home-handler))
+
     (defroute home-page-route "/" []
+      (home-handler))
+
+    (defroute list-page-route-slash "/companies/" []
       (home-handler))
 
     (defroute list-page-route "/companies" []
@@ -131,7 +137,9 @@
 
     (def dispatch!
       (secretary/uri-dispatcher [login-route
+                                 home-page-route-slash
                                  home-page-route
+                                 list-page-route-slash
                                  list-page-route
                                  company-route
                                  company-profile-route

@@ -67,7 +67,7 @@ a:hover, a:hover *{
  * Main content
  */
  .main {
-    padding: 20px;
+    padding: 0px 20px 0px 20px;
 }
 @media (min-width: 768px) {
     .main {
@@ -320,7 +320,6 @@ div.rich-editor-container {
   margin-left: -300px;
   width: 600px;
   margin-top: 30px;
-  min-height: 90px;
 }
 
 div.rich-editor-container div.rich-editor{
@@ -389,7 +388,7 @@ div.rich-editor-container div.rich-editor a{
 
 div.rich-editor-container div.rich-editor.collapsed{
   overflow: hidden;
-  max-height: 300px;
+  max-height: 450px;
   position: relative;
 }
 
@@ -472,7 +471,7 @@ div.editable-title-container{
   left: 50%;
   margin-left: -300px;
   height: 55px;
-  margin-top: 10px;
+  margin-top: 30px;
   margin-bottom: 10px;
 }
 
@@ -489,7 +488,7 @@ div.editable-title-container input,
 div.editable-title-container span.hidden-span{
   text-align: left;
   color: #2D2D2D !important;
-  font-size: 48px;
+  font-size: 36px;
   font-family: inherit;
   font-weight: 600;
   line-height: 1.1;
@@ -698,17 +697,12 @@ div.revisions-navigator div.revisions-navigator-right div.double-next{
 }
 
 hr.section-separator{
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.2);
   width: 600px;
   height: 1px;
+  border: 0px solid transparent;
   margin-top: 30px;
-  margin-bottom: 30px;
-}
-
-@media (-webkit-min-device-pixel-ratio: 2){
-  hr.section-separator{
-    height: 0.5px;
-  }
+  margin-bottom: 0px;
 }
 
 h4.login-error-message{

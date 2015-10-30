@@ -258,15 +258,6 @@
   (let [section-names (:sections company-data)]
     (into [] (map keyword section-names))))
 
-(defn sort-section-keys-func [a b company-data]
-  (let [sec1 (a company-data)
-        sec2 (b company-data)]
-    (compare (:sorter sec2) (:sorter sec1))))
-
-(defn sort-section-keys [company-data]
-  (let [section-keys (get-section-keys company-data)]
-    (sort #(sort-section-keys-func %1 %2 company-data) section-keys)))
-
 (defn get-sections [section-keys company-data]
   (loop [ks section-keys
          sections []]
@@ -292,21 +283,17 @@
         sort-pred (sort-by-key-pred :period true)
         sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
         fixed-section (assoc section-body :data sorted-finances)
-        section-with-notes (if (contains? fixed-section :notes)
-                             fixed-section
-                             (assoc fixed-section :notes finances-empty-notes))]
+        section-with-notes (merge finances-empty-notes fixed-section)]
     section-with-notes))
 
-(defn fix-section [section-body section-name & [sorter read-only]]
+(defn fix-section [section-body section-name & [read-only]]
   (let [read-only (or read-only false)
-        sorter (or sorter (:updated-at section-body))
         with-section-key (assoc section-body :section (name section-name))
         with-as-of (assoc with-section-key :as-of (:updated-at with-section-key))
-        with-read-only (assoc with-as-of :read-only read-only)
-        with-sorter (assoc with-read-only :sorter sorter)]
+        with-read-only (assoc with-as-of :read-only read-only)]
     (if (= section-name :finances)
-      (fix-finances with-sorter)
-      with-sorter)))
+      (fix-finances with-read-only)
+      with-read-only)))
 
 (defn fix-sections [company-data]
   "add section name in each section and a section sorter"

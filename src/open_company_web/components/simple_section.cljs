@@ -5,7 +5,6 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.link :refer [link]]
             [open-company-web.router :as router]
-            [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.components.rich-editor :refer (rich-editor)]
             [open-company-web.components.editable-title :refer (editable-title)]
             [open-company-web.api :refer [save-or-create-section]]

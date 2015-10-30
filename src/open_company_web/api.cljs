@@ -94,7 +94,6 @@
                                             :updated-at
                                             :author
                                             :links
-                                            :sorter
                                             :loading
                                             :as-of
                                             :read-only)
@@ -147,7 +146,7 @@
             "content-type" (:type finances-link)}}
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})
-                dispatch-body {:body (merge {:section :finances :sorter (:updated-at body)} body)
+                dispatch-body {:body (merge {:section :finances} body)
                                :section :finances
                                :slug (keyword slug)}]
             (flux/dispatch dispatcher/section dispatch-body)))))))
@@ -166,7 +165,7 @@
             "content-type" (:type finances-link)}}
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})
-                dispatch-body {:body (merge {:section :finances :sorter (:updated-at body)} body)
+                dispatch-body {:body (merge {:section :finances} body)
                                :section :finances
                                :slug (keyword slug)
                                :notes true}]
