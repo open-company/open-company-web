@@ -6,11 +6,6 @@
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
 
-(defn sort-sections [a b company-data]
-  (let [sec1 (a company-data)
-        sec2 (b company-data)]
-    (compare (:updated-at sec2) (:updated-at sec1))))
-
 (defcomponent all-sections [data owner]
   (render [_]
     (let [slug (:slug @router/path)
