@@ -8,13 +8,13 @@
 (defcomponent table-of-contents [data owner]
   (render [_]
     (let [sections (:sections data)
-          categories (into [] (keys sections))]
+          categories (:categories data)]
       (dom/div #js {:className "table-of-contents" :ref "table-of-contents"}
         (dom/div {:class "table-of-contents-inner"}
           (for [category categories]
             (dom/div {:class "category-container"}
               (dom/div {:class "category"} (dom/h3 (utils/camel-case-str (name category))))
-              (for [section (into [] (get sections category))]
+              (for [section (into [] (get sections (keyword category)))]
                 (let [section-data ((keyword section) data)]
                   (dom/div {:class "category-section"}
                     (dom/a {:href "#"
