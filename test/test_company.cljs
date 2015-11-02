@@ -2,7 +2,6 @@
   (:require [doo.runner :refer-macros [doo-tests]]
             [test.open-company-web.components.company-profile]
             [test.open-company-web.components.all-sections]
-            [test.open-company-web.components.recent-updates]
             [test.open-company-web.components.revisions-navigator]
             [test.open-company-web.components.company-avatar]
             [test.open-company-web.components.user-avatar]
@@ -14,7 +13,10 @@
             [test.open-company-web.components.finances.revenue]
             [test.open-company-web.components.finances.runway]
             [test.open-company-web.components.finances.finances]
-            [test.open-company-web.components.finances.finances-edit]))
+            [test.open-company-web.components.finances.finances-edit]
+            [test.open-company-web.components.growth.growth]
+            [test.open-company-web.components.growth.growth-metric]
+            [test.open-company-web.components.table-of-contents]))
 
 (enable-console-print!)
 
@@ -24,7 +26,6 @@
 (doo-tests
   'test.open-company-web.components.company-profile
   'test.open-company-web.components.all-sections
-  'test.open-company-web.components.recent-updates
   'test.open-company-web.components.revisions-navigator
   'test.open-company-web.components.company-avatar
   'test.open-company-web.components.user-avatar
@@ -36,4 +37,7 @@
   'test.open-company-web.components.finances.revenue
   'test.open-company-web.components.finances.runway
   'test.open-company-web.components.finances.finances
-  'test.open-company-web.components.finances.finances-edit)
+  'test.open-company-web.components.finances.finances-edit
+  'test.open-company-web.components.growth.growth
+  'test.open-company-web.components.growth.growth-metric
+  'test.open-company-web.components.table-of-contents)

@@ -52,11 +52,11 @@
                 company-data ((keyword slug) cursor)
                 section (:section data)
                 section-data (section company-data)]
-            (api/update-finances-notes (:notes section-data) (:links section-data))
+            (api/patch-section-notes (:notes section-data) (:links section-data) section)
             (recur))))))
   (render [_]
     (let [focus (om/get-state owner :focus)
-          classes "finances-link"
+          classes "composed-section-link"
           finances-data (:section-data data)
           notes-data (:notes finances-data)
           cash-classes (str classes (when (= focus "cash") " active"))
@@ -73,7 +73,7 @@
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
           needs-runway (some #(contains? % :runway) finances-row-data)]
       (dom/div {:class "section-container row" :id "section-finances"}
-        (dom/div {:class "finances"}
+        (dom/div {:class "composed-section finances"}
           (om/build editable-title {:read-only read-only
                                     :section-data finances-data
                                     :section :finances
@@ -95,7 +95,7 @@
                       :title "Runway"
                       :data-tab "runway"
                       :on-click #(subsection-click % owner)} "Runway")))
-          (dom/div {:class (utils/class-set {:finances-body true
+          (dom/div {:class (utils/class-set {:composed-section-body true
                                              :editable (not read-only)})}
             (case focus
 
@@ -113,11 +113,10 @@
                                      :author (:author finances-data)
                                      :section :finances})
             (when (or (not (empty? (:body notes-data))) (not read-only))
-              (dom/div {}
-                (om/build rich-editor {:read-only read-only
-                                       :section-data notes-data
-                                       :section :finances
-                                       :save-channel "save-finances-notes"})))
+              (om/build rich-editor {:read-only read-only
+                                     :section-data notes-data
+                                     :section :finances
+                                     :save-channel "save-finances-notes"}))
             (om/build revisions-navigator {:section-data finances-data
                                            :section :finances
                                            :loading (:loading finances-data)

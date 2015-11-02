@@ -4,11 +4,10 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
             [open-company-web.components.finances.finances :refer (finances)]
+            [open-company-web.components.growth.growth :refer (growth)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.simple-section :refer (simple-section)]
-            [open-company-web.lib.utils :as utils]
-            [shodan.inspection :refer [inspect]]
-            [shodan.console :as console]))
+            [open-company-web.lib.utils :as utils]))
 
 (defcomponent section-selector [data owner]
   (init-state [_]
@@ -19,6 +18,10 @@
           section-data (:section-data data)]
       (dom/div #js {:className "section-selector" :ref "section-selector"}
         (cond
+          ; growth
+          (= section :growth)
+          (om/build growth {:section :growth
+                            :section-data section-data})
           ; finances edit
           (and (= section :finances) (om/get-state owner :finances-edit))
           (om/build finances-edit {:section-data section-data

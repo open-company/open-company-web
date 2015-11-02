@@ -8,10 +8,9 @@
             [open-company-web.router :as router]
             [open-company-web.components.section-selector :refer [section-selector]]
             [open-company-web.components.all-sections :refer [all-sections]]
+            [open-company-web.components.table-of-contents :refer [table-of-contents]]
             [clojure.string :as str]
             [open-company-web.lib.utils :as utils]))
-
-(enable-console-print!)
 
 (defcomponent company [data owner]
   (render [_]
@@ -20,7 +19,10 @@
       (dom/div {:class "company-container container"}
         (om/build navbar company-data)
         (dom/div {:class "container-fluid"}
-          (dom/div {:class "col-md-12 main"}
+          (dom/div {:class "col-md-3 toc"}
+            (om/build table-of-contents company-data))
+          (dom/div {:class "col-md-1"})
+          (dom/div {:class "col-md-7 main"}
             (cond
 
               (:loading data)
@@ -28,7 +30,9 @@
                 (dom/h4 "Loading data..."))
 
               (contains? @router/path :section)
-              (om/build section-selector {:data company-data :section (keyword (:section @router/path))})
+              (let [section (keyword (:section @router/path))
+                    section-data (section company-data)]
+                (om/build section-selector {:section-data section-data :section section}))
 
               (utils/in? (:route @router/path) "profile")
               (om/build company-profile data)

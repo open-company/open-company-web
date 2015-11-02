@@ -117,17 +117,6 @@
                                                        :query-params query-params})
         (section-handler slug section)))
 
-    (defroute section-edit-route "/companies/:slug/:section/edit" {:as params}
-      (let [slug (:slug (:params params))
-            section (:section (:params params))
-            query-params (:query-params params)]
-        ; save route
-        (router/set-route! ["companies" slug section "edit"] {:slug slug
-                                                              :section section
-                                                              :tab "edit"
-                                                              :query-params query-params})
-        (section-handler slug section)))
-
     (defroute user-profile-route "/profile" {:as params}
       (om/root user-profile app-state {:target target}))
 
@@ -144,7 +133,6 @@
                                  company-route
                                  company-profile-route
                                  section-route
-                                 section-edit-route
                                  user-profile-route
                                  not-found-route]))
 
