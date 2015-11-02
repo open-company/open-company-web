@@ -7,12 +7,8 @@
 
 (defcomponent update-footer [data owner]
   (render [_]
-    (let [timeago (utils/time-since (:updated-at data))
-          timeago (if (not (= timeago "just now"))
-                    (str "about " timeago)
-                    timeago)]
-      (dom/div {:class "update-footer"}
-        (dom/a {:href (str "/companies/" (:slug @router/path) "/" (name (:section data)))}
-          (dom/img {:src (:image (:author data)) :title (:name (:author data)) :class "author-image"})
-            (dom/div {:class "author"} (:name (:author data)))
-            (dom/div {:class "timeago"} timeago))))))
+    (dom/div {:class "update-footer"}
+      (dom/a {:href (str "/companies/" (:slug @router/path) "/" (name (:section data)))}
+        (dom/img {:src (:image (:author data)) :title (:name (:author data)) :class "author-image"})
+          (dom/div {:class "author"} (:name (:author data)))
+          (dom/div {:class "timeago"} (utils/time-since (:updated-at data)))))))

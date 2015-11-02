@@ -59,12 +59,6 @@
     (utils/handle-change (:section-data data) (:updated-at rev) :as-of)
     (api/load-revision rev (keyword (:slug @router/path)) section read-only)))
 
-(defn date-string [rev]
-  (let [date (new js/Date (:updated-at rev))
-        month (utils/month-string (utils/add-zero (inc (.getMonth date))))
-        day (utils/add-zero (.getDate date))]
-    (str month " " day)))
-
 (defcomponent revisions-navigator [data owner]
   (render [_]
     (let [section-data (:section-data data)
@@ -78,10 +72,10 @@
           section (:section data)
           latest? (= (:updated-at last-revision) as-of)
           rev-first (if latest? nil rev-first)
-          first-date (date-string rev-first)
-          prev-date (date-string rev-prev)
-          next-date (date-string rev-next)
-          last-date (date-string rev-last)]
+          first-date (utils/date-string (utils/js-date (:updated-at rev-first)))
+          prev-date  (utils/date-string (utils/js-date (:updated-at rev-prev)))
+          next-date  (utils/date-string (utils/js-date (:updated-at rev-next)))
+          last-date  (utils/date-string (utils/js-date (:updated-at rev-last)))]
       (dom/div {:class "revisions-navigator"}
         (if (:loading data)
           (dom/div {:style {:text-align "center"}} "Loading...")

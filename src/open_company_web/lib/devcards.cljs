@@ -4,7 +4,6 @@
             [open-company-web.components.finances.finances :refer [finances]]
             [open-company-web.lib.utils :as utils]
             [open-company-web.data.finances :as company-data]
-            [open-company-web.components.recent-updates :refer [recent-updates]]
             [open-company-web.router :as router])
   (:require-macros [devcards.core :as dc :refer [defcard]]))
 
@@ -34,10 +33,4 @@
   {:section :finances
    :company-data (finances-data)
    :editable-click-callback #()}
-  {:inspect-data true :history true})
-
-(defcard dc-recent-updates
-  "Recent updates component"
-  (dc/om-root recent-updates {})
-  company-data/finances
   {:inspect-data true :history true})

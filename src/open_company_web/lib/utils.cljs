@@ -185,29 +185,52 @@
   (let [upper-value (clojure.string/replace value #"^(\w)" #(clojure.string/upper-case (first %1)))]
     (clojure.string/replace upper-value #"-(\w)"
                             #(str " " (clojure.string/upper-case (second %1))))))
+
+(defn js-date [ & [date-str]]
+  (if date-str
+    (new js/Date date-str)
+    (new js/Date)))
+
+(defn add-zero [v]
+  (str (when (< v 10) "0") v))
+
+(defn date-string [js-date & [year]]
+  (let [month (month-string (add-zero (inc (.getMonth js-date))))
+        day (add-zero (.getDate js-date))]
+    (str month " " day (when year (str ", " (.getFullYear js-date))))))
+
+(defn pluralize [string n]
+  (if (pos? n)
+    (str string "s")
+    string))
   
 (defn time-since
   "Get a string representing the elapsed time from a date in the past"
   [past-date]
-  (let [past (.getTime (new js/Date past-date))
-        now (.getTime (new js/Date))
+  (let [past-js-date (js-date past-date)
+        past (.getTime past-js-date)
+        now (.getTime (js-date))
         seconds (.floor js/Math (/ (- now past) 1000))
-        years-interval (.floor js/Math (/ seconds 31536000))]
-    (if (> years-interval 1)
-      (str years-interval " years ago")
-      (let [months-interval (.floor js/Math (/ seconds 2592000))]
-        (if (> months-interval 1)
-          (str months-interval " months ago")
-          (let [days-interval (.floor js/Math (/ seconds 86400))]
-            (if (> days-interval 1)
-              (str days-interval " days ago")
-              (let [hours-interval (.floor js/Math (/ seconds 3600))]
-                (if (> hours-interval 1)
-                  (str hours-interval " hours ago")
-                  (let [minutes-interval (.floor js/Math (/ seconds 60))]
-                    (if (> minutes-interval 1)
-                      (str minutes-interval " minutes ago")
-                      (str "just now"))))))))))))
+        years-interval (.floor js/Math (/ seconds 31536000))
+        months-interval (.floor js/Math (/ seconds 2592000))
+        days-interval (.floor js/Math (/ seconds 86400))
+        hours-interval (.floor js/Math (/ seconds 3600))
+        minutes-interval (.floor js/Math (/ seconds 60))]
+    (cond
+      (pos? years-interval)
+      (date-string past-js-date true)
+
+      (pos? months-interval)
+      (date-string past-js-date)
+
+      (pos? days-interval)
+      (str days-interval " " (pluralize "day" days-interval) " ago")
+
+      (pos? hours-interval)
+      (str hours-interval " " (pluralize "hour" hours-interval) " ago")
+
+      :else
+      "just now")))
 
 (defn get-click-position
   "Return the x position inside the clicked element"
@@ -254,8 +277,8 @@
     cur-period))
 
 (defn get-section-keys [company-data]
-  (let [section-names (:sections company-data)]
-    (into [] (map keyword section-names))))
+  "Get the section names, as a sequence of keywords, in category order and order in the category."
+  (map keyword (flatten (map #(get-in company-data [:sections (keyword %)]) (:categories company-data)))))
 
 (defn get-sections [section-keys company-data]
   (loop [ks section-keys
@@ -267,12 +290,6 @@
           (recur (subvec ks 1)
                  (conj sections section))))
       sections)))
-
-(defn sort-sections [company-data]
-  (let [section-keys (get-section-keys company-data)
-        sections (get-sections section-keys company-data)
-        sort-pred (sort-by-key-pred :updated-at true)]
-    (sort #(sort-pred %1 %2) sections)))
 
 (def finances-empty-notes {:notes {:body ""}})
 
@@ -312,9 +329,6 @@
   (let [sort-pred (sort-by-key-pred :updated-at)]
     (into [] (sort #(sort-pred %1 %2) revisions))))
 
-(defn add-zero [v]
-  (str (when (< v 10) "0") v))
-
 (defn as-of [date]
   (let [year (.getFullYear date)
         month (add-zero (inc (.getMonth date)))
@@ -325,7 +339,7 @@
     (str year "-" month "-" day "T" hours ":" minutes ":" seconds "Z")))
 
 (defn as-of-now []
-  (let [date (new js/Date)]
+  (let [date (js-date)]
     (as-of date)))
 
 (defn link-for

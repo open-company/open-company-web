@@ -3,7 +3,6 @@
               [om-tools.core :as om-core :refer-macros [defcomponent]]
               [om-tools.dom :as dom :include-macros true]
               [open-company-web.components.link :refer [link]]
-              [open-company-web.components.recent-updates :refer [recent-updates]]
               [open-company-web.components.user-avatar :refer [user-avatar]]
               [open-company-web.components.company-avatar :refer [company-avatar]]
               [om-bootstrap.nav :as n]
