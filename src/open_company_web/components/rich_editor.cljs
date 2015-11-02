@@ -4,7 +4,8 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.lib.utils :as utils]
-            [cljs-dynamic-resources.core :as cdr]))
+            [cljs-dynamic-resources.core :as cdr]
+            [shodan.console :as console]))
 
 (def hallo-format {
   :editable true
@@ -43,6 +44,15 @@
 (defn collapsed! [owner v]
   (set-state! owner :collapsed v))
 
+(defn collapse-if-needed [owner]
+  (if-let [rich-editor-ref (om/get-ref owner "rich-editor")]
+    (let [rich-editor-node (.getDOMNode rich-editor-ref)
+          $-rich-editor (.$ js/window rich-editor-node)
+          height (.height $-rich-editor)]
+      (om/update-state! owner :should-collapse (fn [_]false))
+      (when (>= height 480)
+        (collapsed! owner true)))))
+
 (defcomponent rich-editor [data owner]
   (init-state [_]
     {:editor nil
@@ -72,15 +82,14 @@
       (om/update-state! owner :did-mount (fn [_]true))
       (init-hallo! owner)))
   (did-update [_ _ _]
-    (when (.-$ js/window) ; avoid to crash on tests because of jquery
-      (when (om/get-state owner :should-collapse)
-        (if-let [rich-editor-ref (om/get-ref owner "rich-editor")]
-          (let [rich-editor-node (.getDOMNode rich-editor-ref)
-                $-rich-editor (.$ js/window rich-editor-node)
-                height (.height $-rich-editor)]
-            (om/update-state! owner :should-collapse (fn [_]false))
-            (when (>= height 480)
-              (collapsed! owner true)))))))
+    ; run only if needed and do not crash on tests
+    (when (and (.-$ js/window) (om/get-state owner :should-collapse))
+      ; collapse initially
+      (collapse-if-needed owner)
+      ; rerun collapse calc after every image load
+      (let [all-images (.$ js/window "div.rich-editor img")]
+      (.each js/$ all-images (fn [idx item]
+                               (.load (.$ js/window item) #(collapse-if-needed owner)))))))
   (render [_]
     (let [section-data (:section-data data)
           section (:section data)
