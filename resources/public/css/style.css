@@ -817,6 +817,8 @@ div.table-of-contents div.table-of-contents-inner div.category{
 
 div.table-of-contents div.table-of-contents-inner div.category h3{
   font-size: 16px;
+  text-transform: uppercase;
+  font-weight: bold;
 }
 
 div.table-of-contents div.table-of-contents-inner div.category-section{
