@@ -277,8 +277,17 @@
     cur-period))
 
 (defn get-section-keys [company-data]
-  (let [section-names (:sections company-data)]
-    (into [] (map keyword section-names))))
+  (let [sections (:sections company-data)
+        categories (into [] (keys sections))]
+    (loop [all-sections []
+           idx 0]
+      (if (< idx (count categories))
+        (let [category (get categories idx)
+              sections (category sections)
+              sections-key (map #(keyword %) sections)]
+          (recur (into [] (concat all-sections sections-key))
+                 (inc idx)))
+          all-sections))))
 
 (defn get-sections [section-keys company-data]
   (loop [ks section-keys
@@ -290,12 +299,6 @@
           (recur (subvec ks 1)
                  (conj sections section))))
       sections)))
-
-(defn sort-sections [company-data]
-  (let [section-keys (get-section-keys company-data)
-        sections (get-sections section-keys company-data)
-        sort-pred (sort-by-key-pred :updated-at true)]
-    (sort #(sort-pred %1 %2) sections)))
 
 (def finances-empty-notes {:notes {:body ""}})
 
