@@ -277,17 +277,8 @@
     cur-period))
 
 (defn get-section-keys [company-data]
-  (let [sections (:sections company-data)
-        categories (into [] (keys sections))]
-    (loop [all-sections []
-           idx 0]
-      (if (< idx (count categories))
-        (let [category (get categories idx)
-              sections (category sections)
-              sections-key (map #(keyword %) sections)]
-          (recur (into [] (concat all-sections sections-key))
-                 (inc idx)))
-          all-sections))))
+  "Get the section names, as a sequence of keywords, in category order and order in the category."
+  (map keyword (flatten (map #(get-in company-data [:sections (keyword %)]) (:categories company-data)))))
 
 (defn get-sections [section-keys company-data]
   (loop [ks section-keys
