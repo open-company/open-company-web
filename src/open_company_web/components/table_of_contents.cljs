@@ -13,7 +13,7 @@
         (dom/div {:class "table-of-contents-inner"}
           (for [category categories]
             (dom/div {:class "category-container"}
-              (dom/div {:class "category"} (dom/h3 (utils/camel-case-str (name category))))
+              (dom/div {:class (utils/class-set {:category true :empty (zero? (count ((keyword category) sections)))})} (dom/h3 (utils/camel-case-str (name category))))
               (for [section (into [] (get sections (keyword category)))]
                 (let [section-data ((keyword section) data)]
                   (dom/div {:class "category-section"}
