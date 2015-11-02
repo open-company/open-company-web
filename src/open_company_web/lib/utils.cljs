@@ -278,7 +278,7 @@
 
 (defn get-section-keys [company-data]
   "Get the section names, as a sequence of keywords, in category order and order in the category."
-  (map keyword (flatten (map #(get-in company-data [:sections (keyword %)]) (:categories company-data)))))
+  (into [] (map keyword (flatten (map #(get-in company-data [:sections (keyword %)]) (:categories company-data))))))
 
 (defn get-sections [section-keys company-data]
   (loop [ks section-keys
