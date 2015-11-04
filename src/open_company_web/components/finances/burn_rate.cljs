@@ -26,7 +26,11 @@
                                                               "Burn Rate"
                                                               #js {"type" "string" "role" "style"}
                                                               "fill-color: #109DB7"))
-        (dom/h3 {}
-                burn-rate-val
-                (om/build editable-pen {:click-callback (:editable-click-callback data)}))
-        (dom/p {} period)))))
+        (dom/div {:class "chart-footer-container"}
+          (dom/div {:class "target-actual-container"}
+            (dom/div {:class "actual-container"}
+              (dom/h3 {:class "actual"} burn-rate-val)
+              (dom/h3 {:class "actual-label"} "ACTUAL"))))
+        (dom/div {:class "chart-footer-container"}
+          (dom/div {:class "period-container"}
+            (dom/p {} period)))))))

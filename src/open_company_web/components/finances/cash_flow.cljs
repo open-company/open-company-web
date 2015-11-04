@@ -66,7 +66,11 @@
                                          :cash-flow true
                                          :read-only (:read-only data)})}
         (om/build column-chart (get-chart-data sorted-finances cur-symbol))
-        (dom/h3 {}
-                cash-val
-                (om/build editable-pen {:click-callback (:editable-click-callback data)}))
-        (dom/p {} period)))))
+        (dom/div {:class "chart-footer-container"}
+          (dom/div {:class "target-actual-container"}
+            (dom/div {:class "actual-container"}
+              (dom/h3 {:class "actual green"} cash-val)
+              (dom/h3 {:class "actual-label"} "ACTUAL"))))
+        (dom/div {:class "chart-footer-container"}
+          (dom/div {:class "period-container"}
+            (dom/p {} period)))))))
