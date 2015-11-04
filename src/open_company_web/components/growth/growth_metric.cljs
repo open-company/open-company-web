@@ -54,8 +54,7 @@
                      cur-unit)
           unit (if fixed-cur-unit nil (utils/camel-case-str metric-unit))
           value (if (:value value-set) (.toLocaleString (:value value-set)) "")
-          metric-name (:name metric-info)
-          name-has-unit (> (.indexOf (clj-str/lower-case (str metric-name)) (clj-str/lower-case metric-unit)) -1)
+          name-has-unit (.indexOf (clj-str/lower-case (str (:name metric-info))) (clj-str/lower-case metric-unit))
           label (if fixed-cur-unit
                   (str fixed-cur-unit value)
                   (if name-has-unit
@@ -72,6 +71,16 @@
                                                    #js {"type" "string" "role" "style"}
                                                    "fill-color: #ADADAD"
                                                    unit))
-            (dom/h3 {} (str metric-name ":"))
-            (dom/h3 {} label)
-            (dom/p {} period)))))))
+            (dom/div {:class "chart-footer-container"}
+              (dom/div {:class (utils/class-set {:target-value-container true :double (:target value-set)})}
+                (when (:target value-set)
+                  (dom/div {:class "target-container"}
+                    (dom/h3 {:class "target"} (.toLocaleString (:target value-set)))
+                    (dom/h3 {:class "target-label"} "TARGET")))
+                (dom/div {:class "value-container"}
+                  (dom/h3 {:class "value"} label)
+                  (dom/h3 {:class "value-label"} "VALUE"))))
+            (dom/div {:class "chart-footer-container"}
+              (dom/div {:class "period-container"}
+                (dom/p {} period)))
+            ))))))
