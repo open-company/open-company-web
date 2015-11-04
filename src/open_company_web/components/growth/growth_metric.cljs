@@ -62,7 +62,7 @@
       :columns columns
       :values values
       :pattern "###,###.##"
-      :column-thickness (if has-target "30%" "10%")}))
+      :column-thickness (if has-target "28" "14")}))
 
 (defn get-actual [metrics]
   (some #(when (:value (metrics %)) %) (vec (range (count metrics)))))
@@ -110,5 +110,4 @@
                   (dom/h3 {:class "actual-label"} "ACTUAL"))))
             (dom/div {:class "chart-footer-container"}
               (dom/div {:class "period-container"}
-                (dom/p {} period)))
-            ))))))
+                (dom/p {} period)))))))))

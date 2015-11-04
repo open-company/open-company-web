@@ -50,7 +50,7 @@
                 #js {"type" "string" "role" "tooltip"}]
       :values (into [] (map chart-data placeholder-vect))
       :pattern "###,###.##"
-      :column-thickness "30%"}))
+      :column-thickness "42"}))
 
 (defcomponent cash-flow [data owner]
   (render [_]
