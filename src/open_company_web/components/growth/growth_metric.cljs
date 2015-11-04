@@ -8,24 +8,23 @@
 
 (def columns-num 7)
 
+(defn get-graph-tooltip [period label prefix value suffix]
+  (str (utils/period-string period)
+       " "
+       label
+       ": "
+       (if prefix prefix "")
+       value
+       (if suffix (str " " suffix) "")))
+
 (defn chart-data-at-index [data column-name prefix suffix has-target idx]
   (let [data (to-array data)
         rev-idx (- (dec (min (count data) columns-num)) idx)
         obj (get data rev-idx)
         value (:value obj)
         target (or (:target obj) 0)
-        label (str (utils/period-string (:period obj))
-                   " "
-                   column-name
-                   ": "
-                   (if prefix prefix "")
-                   (if value (.toLocaleString value) "")
-                   (if suffix (str " " suffix) ""))
-        target-label (str (utils/period-string (:period obj))
-                           " target: "
-                           (if prefix prefix "")
-                           (if value (.toLocaleString target) "")
-                           (if suffix (str " " suffix) ""))
+        label (get-graph-tooltip (:period obj) column-name prefix value suffix)
+        target-label (get-graph-tooltip (:period obj) "target" prefix (.toLocaleString target) suffix)
         values (if has-target
                  [(utils/period-string (:period obj))
                   target
@@ -88,17 +87,16 @@
                   (str fixed-cur-unit actual)
                   (if name-has-unit
                     (str actual)
-                    (str actual " " unit)))
-          chart-data (get-chart-data sorted-metric
-                                     fixed-cur-unit
-                                     (:name metric-info)
-                                     unit)]
+                    (str actual " " unit)))]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})}
         (when (> (count metric-data) 0)
           (dom/div {}
-            (om/build column-chart chart-data)
+            (om/build column-chart (get-chart-data sorted-metric
+                                                   fixed-cur-unit
+                                                   (:name metric-info)
+                                                   unit))
             (dom/div {:class "chart-footer-container"}
               (dom/div {:class (utils/class-set {:target-actual-container true :double (:target actual-set)})}
                 (when (:target actual-set)
