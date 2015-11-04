@@ -227,6 +227,18 @@ span img.user-icon{
   margin-right: 5px;
 }
 
+div.composed-section i.add-metric{
+  color: #707070;
+  opacity: 0;
+  cursor: default;
+}
+
+div.composed-section:hover i.add-metric{
+  opacity: 1;
+  margin-left: -30px;
+  cursor: pointer;
+}
+
 div.composed-section h2{
   text-align: left;
 }
