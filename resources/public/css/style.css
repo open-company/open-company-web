@@ -315,6 +315,16 @@ div.composed-section div.section div.chart-footer-container div.actual-container
   float: right;
 }
 
+div.target-actual-container div.target-container h3 {
+  text-align: right;
+  margin-right: 15px;
+}
+
+div.target-actual-container.double div.actual-container h3 {
+  text-align: left;
+  margin-left: 15px;
+}
+
 div.composed-section div.section div.chart-footer-container div.actual-container h3.actual {
   color: #ADADAD;
 }
