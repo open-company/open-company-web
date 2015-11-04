@@ -79,7 +79,7 @@
                     (dom/h3 {:class "target-label"} "TARGET")))
                 (dom/div {:class "value-container"}
                   (dom/h3 {:class "value"} label)
-                  (dom/h3 {:class "value-label"} "VALUE"))))
+                  (dom/h3 {:class "value-label"} "ACTUAL"))))
             (dom/div {:class "chart-footer-container"}
               (dom/div {:class "period-container"}
                 (dom/p {} period)))
