@@ -25,7 +25,7 @@
                                                               :burn-rate
                                                               "Burn Rate"
                                                               #js {"type" "string" "role" "style"}
-                                                              "fill-color: #0266C8"))
+                                                              "fill-color: #109DB7"))
         (dom/h3 {}
                 burn-rate-val
                 (om/build editable-pen {:click-callback (:editable-click-callback data)}))

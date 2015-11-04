@@ -10,6 +10,9 @@
 
 (def columns 5)
 
+(def green-color "#26C485")
+(def red-color "#d72a46")
+
 (defn chart-data-at-index [data prefix idx]
   (let [data (to-array data)
         rev-idx (- (dec (min (count data) columns)) idx)
@@ -20,13 +23,13 @@
         abs-cash-flow (utils/abs cash-flow)]
     [(utils/period-string (:period obj) :short-month)
      (:costs obj)
-     "fill-color: red"
+     (str "fill-color: " red-color)
      (str (utils/period-string (:period obj)) " Costs: " prefix (.toLocaleString (:costs obj)))
      (:revenue obj)
-     "fill-color: green"
+     (str "fill-color: " green-color)
      (str (utils/period-string (:period obj)) " Revenue: " prefix (.toLocaleString (:revenue obj)))
      abs-cash-flow
-     (str "fill-color: " (if cash-flow-pos? "green" "red"))
+     (str "fill-color: " (if cash-flow-pos? green-color red-color))
      (str (utils/period-string (:period obj)) " Cash flow: " (when (neg? cash-flow) "-") prefix (.toLocaleString abs-cash-flow))]))
 
 (defn- get-chart-data [data prefix]
