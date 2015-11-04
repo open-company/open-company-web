@@ -285,6 +285,47 @@ div.composed-section div.composed-section-body div.section{
   text-align: left;
 }
 
+div.composed-section div.section div.chart-footer-container {
+  text-align: center;
+}
+
+div.composed-section div.section div.chart-footer-container div.target-value-container {
+  width: 150px;
+  height: 112px;
+  margin-left: 225px;
+}
+
+div.composed-section div.section div.chart-footer-container div.target-value-container.double {
+  width: 300px;
+  margin-left: 150px;
+}
+
+div.composed-section div.section div.chart-footer-container div.value-container {
+  width: 150px;
+  float: right;
+}
+
+div.composed-section div.section div.chart-footer-container div.value-container h3.value {
+  color: #ADADAD;
+}
+
+div.composed-section div.section div.chart-footer-container div.target-container {
+  width: 150px;
+  float: left;
+}
+
+div.composed-section div.section div.chart-footer-container div.target-container h3.target {
+  color: #26C485;
+}
+
+div.composed-section div.section div.chart-footer-container div.period-container {
+  text-transform: capitalize;
+  font-weight: bold;
+  color: black;
+  font-size: 32px;
+  font-weight: 300;
+}
+
 div.finances div.finances-body div.section h3{
   margin-bottom: 0px;
 }
