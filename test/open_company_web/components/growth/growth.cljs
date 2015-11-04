@@ -27,7 +27,12 @@
     :data [
         {:period "2015-10"
          :slug "test-metric"
-         :value 123456}]}})
+         :target 123456
+         :value 123456}
+        {:period "2015-11"
+         :slug "test-metric"
+         :target 654321
+         :value 654321}]}})
 
 (deftest test-growth-component
   (testing "Growth component"
