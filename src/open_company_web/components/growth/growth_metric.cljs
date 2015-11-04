@@ -6,46 +6,76 @@
             [open-company-web.components.charts :refer [column-chart]]
             [clojure.string :as clj-str]))
 
-(def columns 7)
+(def columns-num 7)
 
-(defn chart-data-at-index [data column-name prefix suffix idx]
+(defn chart-data-at-index [data column-name prefix suffix has-target idx]
   (let [data (to-array data)
-        rev-idx (- (dec (min (count data) columns)) idx)
+        rev-idx (- (dec (min (count data) columns-num)) idx)
         obj (get data rev-idx)
         value (:value obj)
+        target (or (:target obj) 0)
         label (str (utils/period-string (:period obj))
                    " "
                    column-name
                    ": "
                    (if prefix prefix "")
                    (if value (.toLocaleString value) "")
-                   (if suffix (str " " suffix) ""))]
-    [(utils/period-string (:period obj))
-     value
-     label]))
+                   (if suffix (str " " suffix) ""))
+        target-label (str (utils/period-string (:period obj))
+                           " target: "
+                           (if prefix prefix "")
+                           (if value (.toLocaleString target) "")
+                           (if suffix (str " " suffix) ""))
+        values (if has-target
+                 [(utils/period-string (:period obj))
+                  target
+                  "fill-color: #DDDDDD"
+                  target-label
+                  value
+                  "fill-color: #109DB7"
+                  label]
+                 [(utils/period-string (:period obj))
+                  value
+                  "fill-color: #109DB7"
+                  label])]
+    values))
 
-(defn- get-chart-data [data prefix column-name style fill-color tooltip-suffix]
+(defn- get-chart-data [data prefix column-name tooltip-suffix]
   "Vector of max *columns elements of [:Label value]"
-  (let [chart-data (partial chart-data-at-index data column-name prefix tooltip-suffix)
-        placeholder-vect (into [] (range (min (count data) columns)))
-        columns [["string" column-name]
-                 ["number" column-name]
-                 #js {"type" "string" "role" "tooltip"}]
-        columns (if style (conj columns style) columns)
-        values (into [] (map chart-data placeholder-vect))
-        values (if fill-color (map #(assoc % 3 fill-color) values) values)]
+  (let [has-target (some #(:target %) data)
+        chart-data (partial chart-data-at-index data column-name prefix tooltip-suffix has-target)
+        columns (if has-target
+                  [["string" column-name]
+                   ["number" "target"]
+                   #js {"type" "string" "role" "style"}
+                   #js {"type" "string" "role" "tooltip"}
+                   ["number" column-name]
+                   #js {"type" "string" "role" "style"}
+                   #js {"type" "string" "role" "tooltip"}]
+                  [["string" column-name]
+                   ["number" column-name]
+                   #js {"type" "string" "role" "style"}
+                   #js {"type" "string" "role" "tooltip"}])
+        mapper (vec (range (min (count data) columns-num)))
+        values (vec (map chart-data mapper))]
     { :prefix (if prefix prefix "")
       :columns columns
       :values values
-      :pattern "###,###.##"}))
+      :pattern "###,###.##"
+      :column-thickness (if has-target "30%" "10%")}))
+
+(defn get-actual [metrics]
+  (some #(when (:value (metrics %)) %) (vec (range (count metrics)))))
 
 (defcomponent growth-metric [data owner]
   (render [_]
     (let [metric-info (:metric-info data)
           metric-data (:metric-data data)
           sort-pred (utils/sort-by-key-pred :period true)
-          sorted-metric (sort #(sort-pred %1 %2) metric-data)
-          actual-set (first sorted-metric)
+          sorted-metric (vec (sort #(sort-pred %1 %2) metric-data))
+          actual-idx (get-actual sorted-metric)
+          actual-set (sorted-metric actual-idx)
+          actual (.toLocaleString (:value actual-set))
           period (utils/period-string (:period actual-set))
           metric-unit (:unit metric-info)
           cur-unit (utils/get-symbol-for-currency-code metric-unit)
@@ -53,24 +83,22 @@
                      nil
                      cur-unit)
           unit (if fixed-cur-unit nil (utils/camel-case-str metric-unit))
-          actual (if (:value actual-set) (.toLocaleString (:value actual-set)) "")
           name-has-unit (.indexOf (clj-str/lower-case (str (:name metric-info))) (clj-str/lower-case metric-unit))
           label (if fixed-cur-unit
                   (str fixed-cur-unit actual)
                   (if name-has-unit
                     (str actual)
-                    (str actual " " unit)))]
+                    (str actual " " unit)))
+          chart-data (get-chart-data sorted-metric
+                                     fixed-cur-unit
+                                     (:name metric-info)
+                                     unit)]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})}
         (when (> (count metric-data) 0)
           (dom/div {}
-            (om/build column-chart (get-chart-data sorted-metric
-                                                   fixed-cur-unit
-                                                   (:name metric-info)
-                                                   #js {"type" "string" "role" "style"}
-                                                   "fill-color: #ADADAD"
-                                                   unit))
+            (om/build column-chart chart-data)
             (dom/div {:class "chart-footer-container"}
               (dom/div {:class (utils/class-set {:target-actual-container true :double (:target actual-set)})}
                 (when (:target actual-set)
