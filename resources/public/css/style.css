@@ -329,6 +329,14 @@ div.composed-section div.section div.chart-footer-container div.actual-container
   color: #109DB7;
 }
 
+div.composed-section div.section div.chart-footer-container div.actual-container h3.actual.gray {
+  color: #ADADAD;
+}
+
+div.composed-section div.section div.chart-footer-container div.actual-container h3.actual.green {
+  color: #26C485;
+}
+
 div.composed-section div.section div.chart-footer-container div.actual-container h3.actual-label {
   font-size: 12px;
   font-weight: 700;
