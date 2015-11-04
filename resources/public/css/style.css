@@ -399,6 +399,7 @@ div.rich-editor-container div.rich-editor.collapsed{
 div.rich-editor-container div.rich-editor.collapsed:after{
   bottom: 0;
   position: absolute;
+  left: 0px;
   width: 100%;
   height: 100%;
   content: "";
@@ -813,6 +814,10 @@ div.table-of-contents div.table-of-contents-inner{
 
 div.table-of-contents div.table-of-contents-inner div.category{
   margin-left: 30px;
+}
+
+div.table-of-contents div.table-of-contents-inner div.category.empty{
+  color: rgba(0, 0, 0, 0.4);
 }
 
 div.table-of-contents div.table-of-contents-inner div.category h3{
