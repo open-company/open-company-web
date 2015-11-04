@@ -289,24 +289,39 @@ div.composed-section div.section div.chart-footer-container {
   text-align: center;
 }
 
-div.composed-section div.section div.chart-footer-container div.target-value-container {
+div.composed-section div.section div.chart-footer-container h3 {
+  margin-top: 10px;
+  margin-bottom: 0px;
+}
+
+div.composed-section div.section div.period-container p {
+  margin-top: 10px;
+  margin-bottom: 0px;
+}
+
+div.composed-section div.section div.chart-footer-container div.target-actual-container {
   width: 150px;
-  height: 112px;
+  height: 70px;
   margin-left: 225px;
 }
 
-div.composed-section div.section div.chart-footer-container div.target-value-container.double {
+div.composed-section div.section div.chart-footer-container div.target-actual-container.double {
   width: 300px;
   margin-left: 150px;
 }
 
-div.composed-section div.section div.chart-footer-container div.value-container {
+div.composed-section div.section div.chart-footer-container div.actual-container {
   width: 150px;
   float: right;
 }
 
-div.composed-section div.section div.chart-footer-container div.value-container h3.value {
+div.composed-section div.section div.chart-footer-container div.actual-container h3.actual {
   color: #ADADAD;
+}
+
+div.composed-section div.section div.chart-footer-container div.actual-container h3.actual-label {
+  font-size: 12px;
+  font-weight: 700;
 }
 
 div.composed-section div.section div.chart-footer-container div.target-container {
@@ -316,6 +331,11 @@ div.composed-section div.section div.chart-footer-container div.target-container
 
 div.composed-section div.section div.chart-footer-container div.target-container h3.target {
   color: #26C485;
+}
+
+div.composed-section div.section div.chart-footer-container div.target-container h3.target-label {
+  font-size: 12px;
+  font-weight: 700;
 }
 
 div.composed-section div.section div.chart-footer-container div.period-container {

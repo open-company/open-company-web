@@ -45,21 +45,21 @@
           metric-data (:metric-data data)
           sort-pred (utils/sort-by-key-pred :period true)
           sorted-metric (sort #(sort-pred %1 %2) metric-data)
-          value-set (first sorted-metric)
-          period (utils/period-string (:period value-set))
+          actual-set (first sorted-metric)
+          period (utils/period-string (:period actual-set))
           metric-unit (:unit metric-info)
           cur-unit (utils/get-symbol-for-currency-code metric-unit)
           fixed-cur-unit (if (= cur-unit metric-unit)
                      nil
                      cur-unit)
           unit (if fixed-cur-unit nil (utils/camel-case-str metric-unit))
-          value (if (:value value-set) (.toLocaleString (:value value-set)) "")
+          actual (if (:value actual-set) (.toLocaleString (:value actual-set)) "")
           name-has-unit (.indexOf (clj-str/lower-case (str (:name metric-info))) (clj-str/lower-case metric-unit))
           label (if fixed-cur-unit
-                  (str fixed-cur-unit value)
+                  (str fixed-cur-unit actual)
                   (if name-has-unit
-                    (str value)
-                    (str value " " unit)))]
+                    (str actual)
+                    (str actual " " unit)))]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})}
@@ -72,14 +72,14 @@
                                                    "fill-color: #ADADAD"
                                                    unit))
             (dom/div {:class "chart-footer-container"}
-              (dom/div {:class (utils/class-set {:target-value-container true :double (:target value-set)})}
-                (when (:target value-set)
+              (dom/div {:class (utils/class-set {:target-actual-container true :double (:target actual-set)})}
+                (when (:target actual-set)
                   (dom/div {:class "target-container"}
-                    (dom/h3 {:class "target"} (.toLocaleString (:target value-set)))
+                    (dom/h3 {:class "target"} (.toLocaleString (:target actual-set)))
                     (dom/h3 {:class "target-label"} "TARGET")))
-                (dom/div {:class "value-container"}
-                  (dom/h3 {:class "value"} label)
-                  (dom/h3 {:class "value-label"} "ACTUAL"))))
+                (dom/div {:class "actual-container"}
+                  (dom/h3 {:class "actual"} label)
+                  (dom/h3 {:class "actual-label"} "ACTUAL"))))
             (dom/div {:class "chart-footer-container"}
               (dom/div {:class "period-container"}
                 (dom/p {} period)))
