@@ -112,7 +112,6 @@
                                                    :hidden (not read-only)
                                                    :collapsed collapsed})
                       :ref "fake-rich-editor"
-                      :contenteditable false
                       :dangerouslySetInnerHTML (clj->js {"__html" body})})
         (dom/div #js {:className (utils/class-set {:rich-editor true
                                                    :hidden read-only
