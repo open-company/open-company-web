@@ -31,7 +31,7 @@
         (dom/div {:class "chart-footer-container"}
           (dom/div {:class "target-actual-container"}
             (dom/div {:class "actual-container"}
-              (dom/h3 {:class "actual gray"} cash-val)
+              (dom/h3 {:class "actual green"} cash-val)
               (dom/h3 {:class "actual-label"} "ACTUAL"))))
         (dom/div {:class "chart-footer-container"}
           (dom/div {:class "period-container"}

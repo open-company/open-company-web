@@ -33,7 +33,7 @@
         (dom/div {:class "chart-footer-container"}
           (dom/div {:class "target-actual-container"}
             (dom/div {:class "actual-container"}
-              (dom/h3 {:class "actual gray"} runway)
+              (dom/h3 {:class "actual green"} runway)
               (dom/h3 {:class "actual-label"} "ACTUAL"))))
         (dom/div {:class "chart-footer-container"}
           (dom/div {:class "period-container"}
