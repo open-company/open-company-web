@@ -84,7 +84,7 @@
                        (:values chart-data)
                        (if (contains? chart-data :column-thickness)
                          (:column-thickness chart-data)
-                         "10%")
+                         "14")
                        (.getDOMNode (om/get-ref owner "column-chart"))))
   (did-update [_ _ _]
     (column-draw-chart (:prefix chart-data)
@@ -93,7 +93,7 @@
                        (:values chart-data)
                        (if (contains? chart-data :column-thickness)
                          (:column-thickness chart-data)
-                         "10%")
+                         "14")
                        (.getDOMNode (om/get-ref owner "column-chart"))))
   (render [_]
     (dom/div #js {:className "chart-container column-chart" :ref "column-chart" })))

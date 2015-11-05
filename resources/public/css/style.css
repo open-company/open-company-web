@@ -227,6 +227,18 @@ span img.user-icon{
   margin-right: 5px;
 }
 
+div.composed-section i.add-metric{
+  color: #707070;
+  opacity: 0;
+  cursor: default;
+}
+
+div.composed-section:hover i.add-metric{
+  opacity: 1;
+  margin-left: -30px;
+  cursor: pointer;
+}
+
 div.composed-section h2{
   text-align: left;
 }
@@ -254,6 +266,7 @@ div.composed-section div.link-bar a.composed-section-link{
   margin-left: 0px;
   margin-right: 60px;
   font-size: 16px;
+  display: inline-block;
 }
 
 div.composed-section div.link-bar a.composed-section-link.active{
@@ -270,6 +283,85 @@ div.composed-section div.composed-section-body{
 
 div.composed-section div.composed-section-body div.section{
   text-align: left;
+}
+
+div.composed-section div.section div.chart-footer-container {
+  text-align: center;
+}
+
+div.composed-section div.section div.chart-footer-container h3 {
+  margin-top: 10px;
+  margin-bottom: 0px;
+}
+
+div.composed-section div.section div.period-container p {
+  margin-top: 10px;
+  margin-bottom: 0px;
+}
+
+div.composed-section div.section div.chart-footer-container div.target-actual-container {
+  width: 150px;
+  height: 70px;
+  margin-left: 225px;
+}
+
+div.composed-section div.section div.chart-footer-container div.target-actual-container.double {
+  width: 300px;
+  margin-left: 150px;
+}
+
+div.composed-section div.section div.chart-footer-container div.actual-container {
+  width: 150px;
+  float: right;
+}
+
+div.target-actual-container div.target-container h3 {
+  text-align: right;
+  margin-right: 15px;
+}
+
+div.target-actual-container.double div.actual-container h3 {
+  text-align: left;
+  margin-left: 15px;
+}
+
+div.composed-section div.section div.chart-footer-container div.actual-container h3.actual {
+  color: #109DB7;
+}
+
+div.composed-section div.section div.chart-footer-container div.actual-container h3.actual.gray {
+  color: #ADADAD;
+}
+
+div.composed-section div.section div.chart-footer-container div.actual-container h3.actual.green {
+  color: #26C485;
+}
+
+div.composed-section div.section div.chart-footer-container div.actual-container h3.actual-label {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+div.composed-section div.section div.chart-footer-container div.target-container {
+  width: 150px;
+  float: left;
+}
+
+div.composed-section div.section div.chart-footer-container div.target-container h3.target {
+  color: #ADADAD;
+}
+
+div.composed-section div.section div.chart-footer-container div.target-container h3.target-label {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+div.composed-section div.section div.chart-footer-container div.period-container {
+  text-transform: capitalize;
+  font-weight: bold;
+  color: black;
+  font-size: 32px;
+  font-weight: 300;
 }
 
 div.finances div.finances-body div.section h3{

@@ -12,6 +12,7 @@
             [open-company-web.api :as api]
             [open-company-web.components.editable-title :refer [editable-title]]
             [open-company-web.components.growth.growth-metric :refer [growth-metric]]
+            [open-company-web.components.utility-components :refer [add-metric]]
             [cljs.core.async :refer [chan <!]]))
 
 (defn subsection-click [e owner]
@@ -19,13 +20,25 @@
   (let [tab  (.. e -target -dataset -tab)]
     (om/update-state! owner :focus (fn [] tab))))
 
+(defn filter-metrics [section-data]
+  (let [metrics (:metrics section-data)
+        values (:data section-data)]
+    (map (fn [idx]
+           (let [metric (metrics idx)
+                 metric-values (filter #(= (:slug %) (:slug metric)) values)]
+             (when (> (count metric-values) 1)
+               metric)))
+         (range (count (:metrics section-data))))))
+
 (defcomponent growth [data owner]
+
   (init-state [_]
     (let [save-notes-channel (chan)]
       (utils/add-channel "save-growth-notes" save-notes-channel))
-    (let [metrics-data (:metrics (:section-data data))]
+    (let [metrics-data (filter-metrics (:section-data data))]
       {:focus (:slug (first metrics-data))
        :read-only false}))
+
   (will-mount [_]
     (let [save-notes-change (utils/get-channel "save-growth-notes")]
         (go (loop []
@@ -37,12 +50,13 @@
                 section-data (section company-data)]
             (api/patch-section-notes (:notes section-data) (:links section-data) section)
             (recur))))))
+
   (render [_]
     (let [focus (om/get-state owner :focus)
           growth-link-class :composed-section-link
           slug (:slug @router/path)
           growth-section (:section-data data)
-          metrics-data (:metrics growth-section)
+          metrics-data (filter-metrics growth-section)
           growth-data (:data growth-section)
           notes-data (:notes growth-section)
           read-only (or (:loading growth-section) (om/get-state owner :read-only))
@@ -68,7 +82,8 @@
                     :class metric-classes
                     :title mname
                     :data-tab mslug
-                    :on-click #(subsection-click % owner)} mname))))
+                    :on-click #(subsection-click % owner)} mname)))
+            (om/build add-metric {:click-callback nil}))
           (dom/div {:class (utils/class-set {:composed-section-body true
                                              :editable (not read-only)})}
             ;; growth metric currently shown
