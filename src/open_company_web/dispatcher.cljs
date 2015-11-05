@@ -2,7 +2,8 @@
   (:require [cljs-flux.dispatcher :as flux]
             [no.en.core :refer [deep-merge]]
             [open-company-web.router :as router]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.caches :refer [revisions]]))
 
 (defonce app-state (atom {}))
 
@@ -53,8 +54,8 @@
         ; remove loading key
         (swap! app-state dissoc :loading)
         (let [fixed-section (utils/fix-section (:body body) (:section body) true)
-              assoc-in-coll [(:slug body) (:section body) :revisions-cache (:updated-at fixed-section)]]
-          (swap! app-state assoc-in assoc-in-coll fixed-section))))))
+              assoc-in-coll [(:slug body) (:section body) (:updated-at fixed-section)]]
+          (swap! revisions assoc-in assoc-in-coll fixed-section))))))
 
 (def auth-settings-dispatch
   (flux/register
