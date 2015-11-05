@@ -947,7 +947,7 @@ div.table-of-contents div.table-of-contents-inner div.category-section a p.secti
 
 div.section-animator-box {
   position: relative;
-  width: 600px
+  overflow: hidden;
 }
 
 div.section-animator-box div.section-box-new,
