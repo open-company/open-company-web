@@ -10,7 +10,8 @@
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.jwt :as j]
             [open-company-web.router :as router]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.caches :refer [revisions]]))
 
 
 (def ^:private api-endpoint ls/api-server-domain)
@@ -115,6 +116,7 @@
 (defn load-revision
   [revision slug section]
     (when revision
+      (swap! revisions assoc-in [slug (keyword section) (:updated-at revision)] :loading)
       (api-get (:href revision)
         {:headers {
           ; required by Chrome
