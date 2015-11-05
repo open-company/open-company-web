@@ -363,4 +363,4 @@
     (.scrollTo js/$ #js {"top" (str top "px") "left" "0px"} (or duration 500))))
 
 (defn scroll-to-section [section-name]
-  (scroll-to-id (str "#section-" (name section-name))))
+  (scroll-to-id (str "section-" (name section-name))))
