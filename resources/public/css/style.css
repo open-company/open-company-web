@@ -850,3 +850,16 @@ div.table-of-contents div.table-of-contents-inner div.category-section a p.secti
   font-size: 11px;
   margin-bottom: 0px;
 }
+
+div.section-animator-box {
+  position: relative;
+  width: 600px
+}
+
+div.section-animator-box div.section-box-new,
+div.section-animator-box div.section-box-old {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 600px;
+}
