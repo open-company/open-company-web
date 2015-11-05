@@ -52,7 +52,8 @@
 (defn calc-height-imgs-onload [section-name]
   (-> (.$ js/window (str "#sec-box-" section-name))
       (.bind "DOMSubtreeModified"
-             (fn [] (-> (.$ js/window (str "#sec-box-" section-name " img"))
+             (fn [] (setup-box-height section-name)
+                    (-> (.$ js/window (str "#sec-box-" section-name " img"))
                         (.bind "load" #(setup-box-height section-name)))))))
 
 (defcomponent section-selector [data owner]
