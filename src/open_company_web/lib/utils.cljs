@@ -356,11 +356,11 @@
     (let [slug (keyword (:slug @router/path))]
       (((keyword section) (slug @revisions)) as-of))))
 
-(defn scroll-to-id [id]
+(defn scroll-to-id [id & [duration]]
   (let [section-el (.$ js/window (str "#" id))
         section-offset (.offset section-el)
         top (- (.-top section-offset) 60)]
-    (.scrollTo js/$ #js {"top" (str top "px") "left" "0px"} 500)))
+    (.scrollTo js/$ #js {"top" (str top "px") "left" "0px"} (or duration 500))))
 
 (defn scroll-to-section [section-name]
   (scroll-to-id (str "#section-" (name section-name))))
