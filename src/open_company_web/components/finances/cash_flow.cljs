@@ -22,12 +22,12 @@
         cash-flow-pos? (pos? cash-flow)
         abs-cash-flow (utils/abs cash-flow)]
     [(utils/period-string (:period obj) :short-month)
-     (:costs obj)
-     (str "fill-color: " red-color)
-     (str (utils/period-string (:period obj)) " Costs: " prefix (.toLocaleString (:costs obj)))
      (:revenue obj)
      (str "fill-color: " green-color)
      (str (utils/period-string (:period obj)) " Revenue: " prefix (.toLocaleString (:revenue obj)))
+     (:costs obj)
+     (str "fill-color: " red-color)
+     (str (utils/period-string (:period obj)) " Costs: " prefix (.toLocaleString (:costs obj)))
      abs-cash-flow
      (str "fill-color: " (if cash-flow-pos? green-color red-color))
      (str (utils/period-string (:period obj)) " Cash flow: " (when (neg? cash-flow) "-") prefix (.toLocaleString abs-cash-flow))]))
@@ -37,12 +37,11 @@
   (let [chart-data (partial chart-data-at-index data prefix)
         placeholder-vect (range (min (count data) columns))]
     { :prefix prefix
-      ; :columns [["string" column-name] ["number" "Costs"] ["number" "Revenue"] ["number" "Cash flow"] {:role "style"}]
       :columns [["string" "Period"]
-                ["number" "Costs"]
+                ["number" "Revenue"]
                 #js {"type" "string" "role" "style"}
                 #js {"type" "string" "role" "tooltip"}
-                ["number" "Revenue"]
+                ["number" "Costs"]
                 #js {"type" "string" "role" "style"}
                 #js {"type" "string" "role" "tooltip"}
                 ["number" "Cash flow"]
