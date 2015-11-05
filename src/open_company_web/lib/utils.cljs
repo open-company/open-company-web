@@ -3,7 +3,8 @@
               [clojure.string]
               [open-company-web.lib.iso4217 :refer [iso4217]]
               [cljs.core.async :refer [put!]]
-              [open-company-web.router :as router]))
+              [open-company-web.router :as router]
+              [open-company-web.caches :refer [revisions]]))
 
 (defn abs [n] (max n (- n)))
 
@@ -349,13 +350,17 @@
 (defn px [n]
   (str n "px"))
 
-(defn select-section-data [section-data as-of]
+(defn select-section-data [section-data section as-of]
   (if (= as-of (:updated-at section-data))
     section-data
-    ((:revisions-cache section-data) as-of)))
+    (let [slug (keyword (:slug @router/path))]
+      (((keyword section) (slug @revisions)) as-of))))
 
-(defn scroll-to-section [section-name]
-  (let [section-el (.$ js/window (str "#section-" (name section-name)))
+(defn scroll-to-id [id]
+  (let [section-el (.$ js/window (str "#" id))
         section-offset (.offset section-el)
         top (- (.-top section-offset) 60)]
     (.scrollTo js/$ #js {"top" (str top "px") "left" "0px"} 500)))
+
+(defn scroll-to-section [section-name]
+  (scroll-to-id (str "#section-" (name section-name))))
