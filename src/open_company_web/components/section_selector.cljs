@@ -29,18 +29,22 @@
 (defn revisions-navigation-cb [owner section-name as-of]
   (om/update-state! owner :as-of (fn [_]as-of)))
 
+(def anim-d 1000)
+
 (defn animate-section-translation [owner section-name]
-  (let [old-box-id (str "#sec-box-old-" section-name)
-        new-box-id (str "#sec-box-new-" section-name)]
-    (.fadeTo (.$ js/window old-box-id) 500 0)
-    (.fadeTo (.$ js/window new-box-id) 500 1 #(om/update-state! owner :old-as-of (fn [_](om/get-state owner :as-of))))
-    (utils/scroll-to-id (str "sec-box-" section-name))))
+  (let [old-box (.$ js/window (str "#sec-box-old-" section-name))
+        new-box (.$ js/window (str "#sec-box-new-" section-name))]
+    (.fadeTo old-box anim-d 0)
+    (.fadeTo new-box anim-d 1
+             #(om/update-state! owner :old-as-of (fn [_](om/get-state owner :as-of))))
+    (utils/scroll-to-id (str "sec-box-" section-name) anim-d)))
 
 (defn prepare-animation [owner section-name]
-  (let [old-box-id (str "#sec-box-old-" section-name)
-        new-box-id (str "#sec-box-new-" section-name)]
-    (.css (.$ js/window old-box-id) "opacity" 1)
-    (.css (.$ js/window new-box-id) "opacity" 0)
+  (let [old-box (.$ js/window (str "#sec-box-old-" section-name))
+        new-box (.$ js/window (str "#sec-box-new-" section-name))
+        new-box-height (.height new-box)]
+    (.css old-box "opacity" 1)
+    (.css new-box "opacity" 0)
     (.setTimeout js/window #(animate-section-translation owner section-name) 1)))
 
 (defn setup-box-height [section-name]
