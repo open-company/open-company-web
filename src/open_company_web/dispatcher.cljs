@@ -52,9 +52,8 @@
       (when body
         ; remove loading key
         (swap! app-state dissoc :loading)
-        (let [assoc-in-coll [(:slug body) (:section body)]
-              read-only (:read-only body)
-              fixed-section (utils/fix-section (:body body) (:section body) read-only)]
+        (let [fixed-section (utils/fix-section (:body body) (:section body) true)
+              assoc-in-coll [(:slug body) (:section body) :revisions-cache (:updated-at fixed-section)]]
           (swap! app-state assoc-in assoc-in-coll fixed-section))))))
 
 (def auth-settings-dispatch
