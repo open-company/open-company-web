@@ -27,10 +27,14 @@
                                                               :runway
                                                               "runway"
                                                               #js {"type" "string" "role" "style"}
-                                                              "fill-color: #ADADAD"
+                                                              "fill-color: #26C485"
                                                               "###,### days"
                                                               " days"))
-        (dom/h3 {}
-                runway
-                (om/build editable-pen {:click-callback (:editable-click-callback data)}))
-        (dom/p {} period)))))
+        (dom/div {:class "chart-footer-container"}
+          (dom/div {:class "target-actual-container"}
+            (dom/div {:class "actual-container"}
+              (dom/h3 {:class "actual green"} runway)
+              (dom/h3 {:class "actual-label"} "ACTUAL"))))
+        (dom/div {:class "chart-footer-container"}
+          (dom/div {:class "period-container"}
+            (dom/p {} period)))))))

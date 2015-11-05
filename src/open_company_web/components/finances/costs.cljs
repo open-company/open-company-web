@@ -28,7 +28,11 @@
                                                               "Costs"
                                                               #js {"type" "string" "role" "style"}
                                                               "fill-color: #ADADAD"))
-        (dom/h3 {}
-                costs-val
-                (om/build editable-pen {:click-callback (:editable-click-callback data)}))
-        (dom/p {} period)))))
+        (dom/div {:class "chart-footer-container"}
+          (dom/div {:class "target-actual-container"}
+            (dom/div {:class "actual-container"}
+              (dom/h3 {:class "actual gray"} costs-val)
+              (dom/h3 {:class "actual-label"} "ACTUAL"))))
+        (dom/div {:class "chart-footer-container"}
+          (dom/div {:class "period-container"}
+            (dom/p {} period)))))))

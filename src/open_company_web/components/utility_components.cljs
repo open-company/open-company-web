@@ -9,3 +9,9 @@
     (let [slug (:slug @router/path)]
       (dom/i {:class "fa fa-pencil editable-pen"
               :on-click (:click-callback data)}))))
+
+(defcomponent add-metric [data owner]
+  (render [_]
+    (let [slug (:slug @router/path)]
+      (dom/i {:class "fa fa-plus-circle add-metric"
+              :on-click (:click-callback data)}))))
