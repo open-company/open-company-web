@@ -58,6 +58,7 @@
       (.bind "DOMSubtreeModified"
              (fn [] (setup-box-height section-name)
                     (-> (.$ js/window (str "#sec-box-" section-name " img"))
+                        (.unbind "load")
                         (.bind "load" #(setup-box-height section-name)))))))
 
 (defcomponent section-selector [data owner]
@@ -71,8 +72,6 @@
       (setup-box-height section-name)
       ; listens for dom changes and recalculate the height when img tags load
       (calc-height-imgs-onload section-name)))
-  (did-update [_ _ _]
-    (setup-box-height (name (:section data))))
   (render [_]
     (let [showing-revision (om/get-state owner :as-of)
           old-revision (om/get-state owner :old-as-of)
