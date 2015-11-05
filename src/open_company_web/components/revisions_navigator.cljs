@@ -5,8 +5,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.api :as api]
-            [open-company-web.caches :as cache]
-            [shodan.console :as console]))
+            [open-company-web.caches :as cache]))
 
 (defn revision-next
   "Return the first future revision"
@@ -78,22 +77,14 @@
           slug (keyword (:slug @router/path))
           section (:section data)
           revisions-list (section (slug @cache/revisions))]
-      (when (= section :update)
-        (console/log "revisions-navigator :update render"))
       ; preload previous revision
       (when (and rev-prev (not (contains? revisions-list (:updated-at rev-prev))))
-        (when (= section :update)
-          (console/log "load prev" (:updated-at rev-prev)))
         (api/load-revision rev-prev slug section))
       ; preload first revision
       (when (and rev-first (not (contains? revisions-list (:updated-at rev-first))))
-        (when (= section :update)
-          (console/log "load first" (:updated-at rev-first)))
         (api/load-revision rev-first slug section))
       ; preload next revision as it can be that it's missing (ie: user jumped to the first rev then went forward)
       (when (and (not (= (:updated-at rev-next) (:actual-as-of data))) rev-next (not (contains? revisions-list (:updated-at rev-next))))
-        (when (= section :update)
-          (console/log "load next" (:updated-at rev-next)))
         (api/load-revision rev-next slug section))
       (dom/div {:class "revisions-navigator"}
         (if (:loading data)

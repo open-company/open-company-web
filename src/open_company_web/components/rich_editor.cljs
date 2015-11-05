@@ -4,8 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.lib.utils :as utils]
-            [cljs-dynamic-resources.core :as cdr]
-            [shodan.console :as console]))
+            [cljs-dynamic-resources.core :as cdr]))
 
 (def hallo-format {
   :editable true
