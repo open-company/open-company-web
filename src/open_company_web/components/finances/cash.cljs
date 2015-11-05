@@ -27,7 +27,7 @@
                                                               :cash
                                                               "Cash"
                                                               #js {"type" "string" "role" "style"}
-                                                              "fill-color: #ADADAD"))
+                                                              "fill-color: #26C485"))
         (dom/div {:class "chart-footer-container"}
           (dom/div {:class "target-actual-container"}
             (dom/div {:class "actual-container"}

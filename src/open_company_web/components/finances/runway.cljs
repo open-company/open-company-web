@@ -27,7 +27,7 @@
                                                               :runway
                                                               "runway"
                                                               #js {"type" "string" "role" "style"}
-                                                              "fill-color: #ADADAD"
+                                                              "fill-color: #26C485"
                                                               "###,### days"
                                                               " days"))
         (dom/div {:class "chart-footer-container"}
