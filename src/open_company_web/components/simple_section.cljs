@@ -13,16 +13,11 @@
             [cljs.core.async :refer [put! chan <!]]
             [open-company-web.dispatcher :as dispatcher]))
 
-(defn revisions-navigator-cb [owner section-name as-of]
-  (om/update-state! owner :as-of (fn [_]as-of))
-  (utils/scroll-to-section section-name))
-
 (defcomponent simple-section [data owner]
   (init-state [_]
     (let [save-channel (chan)
           section (:section data)]
-      (utils/add-channel (str "save-section-" section) save-channel))
-    {:as-of (:updated-at (:section-data data))})
+      (utils/add-channel (str "save-section-" section) save-channel)))
   (will-mount [_]
     (let [save-change (utils/get-channel (str "save-section-" (:section data)))]
         (go (loop []
@@ -35,14 +30,13 @@
             (save-or-create-section section-data)
             (recur))))))
   (render [_]
-    (let [showing-revision (om/get-state owner :as-of)
-          section (:section data)
-          actual-data (:section-data data)
-          section-data (utils/select-section-data actual-data showing-revision)
-          read-only (or (:loading section-data) (not (= showing-revision (:updated-at actual-data))))]
+    (let [section (:section data)
+          section-data (:section-data data)
+          read-only (:read-only data)]
       (if (:loading data)
         (dom/h4 {} "Loading data...")
-        (dom/div {:class "simple-section section-container" :id (str "section-" (name section))}
+        (dom/div {:class "simple-section section-container"
+                  :id (str "section-" (name section))}
           (om/build editable-title {:read-only read-only
                                     :section-data section-data
                                     :section section
@@ -55,5 +49,5 @@
           (dom/div {:class "simple-section-revisions-navigator"}
             (om/build revisions-navigator {:section-data section-data
                                            :section section
-                                           :loading (:loading section-data)
-                                           :navigate-cb #(revisions-navigator-cb owner (name section) %)})))))))
+                                           :actual-as-of (:actual-as-of data)
+                                           :navigate-cb (:revisions-navigation-cb data)})))))))

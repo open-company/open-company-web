@@ -23,10 +23,6 @@
   (let [tab  (.. e -target -dataset -tab)]
     (om/update-state! owner :focus (fn [] tab))))
 
-(defn revisions-navigator-cb [owner section-name as-of]
-  (om/update-state! owner :as-of (fn [_]as-of))
-  (utils/scroll-to-section section-name))
-
 (defcomponent finances [data owner]
   (init-state [_]
     (let [save-channel (chan)
@@ -62,15 +58,14 @@
     (let [showing-revision (om/get-state owner :as-of)
           focus (om/get-state owner :focus)
           classes "composed-section-link"
-          actual-finances-data (:section-data data)
-          finances-data (utils/select-section-data actual-finances-data showing-revision)
+          finances-data (:section-data data)
           notes-data (:notes finances-data)
           cash-classes (str classes (when (= focus "cash") " active"))
           cash-flow-classes (str classes (when (= focus "cash-flow") " active"))
           revenue-classes (str classes (when (= focus "revenue") " active"))
           costs-classes (str classes (when (= focus "costs") " active"))
           runway-classes (str classes (when (= focus "runway") " active"))
-          read-only (or (:loading finances-data) (not (= showing-revision (:updated-at actual-finances-data))))
+          read-only (:read-only data)
           subsection-data {:section-data finances-data
                            :read-only read-only
                            :editable-click-callback (:editable-click-callback data)}
@@ -125,5 +120,5 @@
                                      :save-channel "save-finances-notes"}))
             (om/build revisions-navigator {:section-data finances-data
                                            :section :finances
-                                           :loading (:loading finances-data)
-                                           :navigate-cb #(revisions-navigator-cb owner "finances" %)})))))))
+                                           :actual-as-of (:actual-as-of data)
+                                           :navigate-cb (:revisions-navigation-cb data)})))))))

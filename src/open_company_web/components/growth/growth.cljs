@@ -19,10 +19,6 @@
   (let [tab  (.. e -target -dataset -tab)]
     (om/update-state! owner :focus (fn [] tab))))
 
-(defn revisions-navigator-cb [owner section-name as-of]
-  (om/update-state! owner :as-of (fn [_]as-of))
-  (utils/scroll-to-section section-name))
-
 (defcomponent growth [data owner]
   (init-state [_]
     (let [save-notes-channel (chan)]
@@ -46,12 +42,11 @@
           focus (om/get-state owner :focus)
           growth-link-class :composed-section-link
           slug (:slug @router/path)
-          actual-growth-section (:section-data data)
-          growth-section (utils/select-section-data actual-growth-section showing-revision)
+          growth-section (:section-data data)
           metrics-data (:metrics growth-section)
           growth-data (:data growth-section)
           notes-data (:notes growth-section)
-          read-only (or (:loading growth-section) (not (= showing-revision (:updated-at actual-growth-section))))
+          read-only (:read-only data)
           focus-metric-data (filter #(= (:slug %) focus) growth-data)
           focus-metric-info (first (filter #(= (:slug %) focus) metrics-data))
           subsection-data {:metric-data focus-metric-data
@@ -89,5 +84,5 @@
                                      :save-channel "save-growth-notes"}))
             (om/build revisions-navigator {:section-data growth-section
                                            :section :growth
-                                           :loading (:loading growth-section)
-                                           :navigate-cb #(revisions-navigator-cb owner "growth" %)})))))))
+                                           :actual-as-of (:actual-as-of data)
+                                           :navigate-cb (:revisions-navigation-cb data)})))))))
