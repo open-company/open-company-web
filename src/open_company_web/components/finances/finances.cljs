@@ -23,6 +23,10 @@
   (let [tab  (.. e -target -dataset -tab)]
     (om/update-state! owner :focus (fn [] tab))))
 
+(defn revisions-navigator-cb [owner section-name as-of]
+  (om/update-state! owner :as-of (fn [_]as-of))
+  (utils/scroll-to-section section-name))
+
 (defcomponent finances [data owner]
   (init-state [_]
     (let [save-channel (chan)
@@ -32,7 +36,7 @@
     (let [finances-data (:section-data data)
           notes-data (:notes finances-data)]
       {:focus "cash"
-       :read-only false}))
+       :as-of (:updated-at finances-data)}))
   (will-mount [_]
     (let [save-change (utils/get-channel "save-section-finances")]
         (go (loop []
@@ -55,16 +59,18 @@
             (api/patch-section-notes (:notes section-data) (:links section-data) section)
             (recur))))))
   (render [_]
-    (let [focus (om/get-state owner :focus)
+    (let [showing-revision (om/get-state owner :as-of)
+          focus (om/get-state owner :focus)
           classes "composed-section-link"
-          finances-data (:section-data data)
+          actual-finances-data (:section-data data)
+          finances-data (utils/select-section-data actual-finances-data showing-revision)
           notes-data (:notes finances-data)
           cash-classes (str classes (when (= focus "cash") " active"))
           cash-flow-classes (str classes (when (= focus "cash-flow") " active"))
           revenue-classes (str classes (when (= focus "revenue") " active"))
           costs-classes (str classes (when (= focus "costs") " active"))
           runway-classes (str classes (when (= focus "runway") " active"))
-          read-only (or (:loading finances-data) (om/get-state owner :read-only))
+          read-only (or (:loading finances-data) (not (= showing-revision (:updated-at actual-finances-data))))
           subsection-data {:section-data finances-data
                            :read-only read-only
                            :editable-click-callback (:editable-click-callback data)}
@@ -120,6 +126,4 @@
             (om/build revisions-navigator {:section-data finances-data
                                            :section :finances
                                            :loading (:loading finances-data)
-                                           :navigate-cb (fn [read-only]
-                                                          (utils/handle-change finances-data true :loading)
-                                                          (om/update-state! owner :read-only (fn [_]read-only)))})))))))
+                                           :navigate-cb #(revisions-navigator-cb owner "finances" %)})))))))

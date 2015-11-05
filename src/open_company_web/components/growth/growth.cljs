@@ -19,13 +19,17 @@
   (let [tab  (.. e -target -dataset -tab)]
     (om/update-state! owner :focus (fn [] tab))))
 
+(defn revisions-navigator-cb [owner section-name as-of]
+  (om/update-state! owner :as-of (fn [_]as-of))
+  (utils/scroll-to-section section-name))
+
 (defcomponent growth [data owner]
   (init-state [_]
     (let [save-notes-channel (chan)]
       (utils/add-channel "save-growth-notes" save-notes-channel))
     (let [metrics-data (:metrics (:section-data data))]
       {:focus (:slug (first metrics-data))
-       :read-only false}))
+       :as-of (:updated-at (:section-data data))}))
   (will-mount [_]
     (let [save-notes-change (utils/get-channel "save-growth-notes")]
         (go (loop []
@@ -38,14 +42,16 @@
             (api/patch-section-notes (:notes section-data) (:links section-data) section)
             (recur))))))
   (render [_]
-    (let [focus (om/get-state owner :focus)
+    (let [showing-revision (om/get-state owner :as-of)
+          focus (om/get-state owner :focus)
           growth-link-class :composed-section-link
           slug (:slug @router/path)
-          growth-section (:section-data data)
+          actual-growth-section (:section-data data)
+          growth-section (utils/select-section-data actual-growth-section showing-revision)
           metrics-data (:metrics growth-section)
           growth-data (:data growth-section)
           notes-data (:notes growth-section)
-          read-only (or (:loading growth-section) (om/get-state owner :read-only))
+          read-only (or (:loading growth-section) (not (= showing-revision (:updated-at actual-growth-section))))
           focus-metric-data (filter #(= (:slug %) focus) growth-data)
           focus-metric-info (first (filter #(= (:slug %) focus) metrics-data))
           subsection-data {:metric-data focus-metric-data
@@ -84,6 +90,4 @@
             (om/build revisions-navigator {:section-data growth-section
                                            :section :growth
                                            :loading (:loading growth-section)
-                                           :navigate-cb (fn [read-only]
-                                                          (utils/handle-change growth-section true :loading)
-                                                          (om/update-state! owner :read-only (fn [_]read-only)))})))))))
+                                           :navigate-cb #(revisions-navigator-cb owner "growth" %)})))))))
