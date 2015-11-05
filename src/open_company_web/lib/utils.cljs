@@ -348,3 +348,14 @@
 
 (defn px [n]
   (str n "px"))
+
+(defn select-section-data [section-data as-of]
+  (if (= as-of (:updated-at section-data))
+    section-data
+    ((:revisions-cache section-data) as-of)))
+
+(defn scroll-to-section [section-name]
+  (let [section-el (.$ js/window (str "#section-" (name section-name)))
+        section-offset (.offset section-el)
+        top (- (.-top section-offset) 60)]
+    (.scrollTo js/$ #js {"top" (str top "px") "left" "0px"} 500)))
