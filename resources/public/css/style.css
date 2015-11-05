@@ -482,13 +482,15 @@ div.rich-editor-container div.rich-editor a{
   color: black;
 }
 
-div.rich-editor-container div.rich-editor.collapsed{
+div.rich-editor-container div.rich-editor.collapsed,
+div.rich-editor-container div.fake-rich-editor.collapsed{
   overflow: hidden;
   max-height: 450px;
   position: relative;
 }
 
-div.rich-editor-container div.rich-editor.collapsed:after{
+div.rich-editor-container div.rich-editor.collapsed:after,
+div.rich-editor-container div.fake-rich-editor.collapsed:after{
   bottom: 0;
   position: absolute;
   left: 0px;
@@ -591,7 +593,7 @@ div.editable-title-container h2{
 }
 
 div.editable-title-container h2.read-only{
-  cursor: pointer;
+  cursor: text;
 }
 
 div.editable-title-container h2,
