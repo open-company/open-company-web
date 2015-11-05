@@ -31,12 +31,14 @@
          (range (count (:metrics section-data))))))
 
 (defcomponent growth [data owner]
+
   (init-state [_]
     (let [save-notes-channel (chan)]
       (utils/add-channel "save-growth-notes" save-notes-channel))
     (let [metrics-data (filter-metrics (:section-data data))]
       {:focus (:slug (first metrics-data))
        :read-only false}))
+
   (will-mount [_]
     (let [save-notes-change (utils/get-channel "save-growth-notes")]
         (go (loop []
@@ -48,6 +50,7 @@
                 section-data (section company-data)]
             (api/patch-section-notes (:notes section-data) (:links section-data) section)
             (recur))))))
+
   (render [_]
     (let [focus (om/get-state owner :focus)
           growth-link-class :composed-section-link

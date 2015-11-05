@@ -9,12 +9,10 @@
 (def columns-num 7)
 
 (defn get-graph-tooltip [period label prefix value suffix]
-  (str (utils/period-string period)
-       " "
-       label
+  (str label
        ": "
-       (if prefix prefix "")
-       value
+       (or prefix "")
+       (if value (.toLocaleString value) "")
        (if suffix (str " " suffix) "")))
 
 (defn chart-data-at-index [data column-name prefix suffix has-target idx]
@@ -79,15 +77,21 @@
           metric-unit (:unit metric-info)
           cur-unit (utils/get-symbol-for-currency-code metric-unit)
           fixed-cur-unit (if (= cur-unit metric-unit)
-                     nil
-                     cur-unit)
+                            nil
+                            cur-unit)
           unit (if fixed-cur-unit nil (utils/camel-case-str metric-unit))
           name-has-unit (.indexOf (clj-str/lower-case (str (:name metric-info))) (clj-str/lower-case metric-unit))
-          label (if fixed-cur-unit
-                  (str fixed-cur-unit actual)
-                  (if name-has-unit
-                    (str actual)
-                    (str actual " " unit)))]
+          actual-with-label (if fixed-cur-unit
+                              (str fixed-cur-unit actual)
+                              (if name-has-unit
+                                (str actual)
+                                (str actual " " unit)))
+          target (if (:target actual-set) (.toLocaleString (:target actual-set)) nil)
+          target-with-label (if fixed-cur-unit
+                              (str fixed-cur-unit target)
+                              (if name-has-unit
+                                (str target)
+                                (str target " " unit)))]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})}
@@ -98,13 +102,13 @@
                                                    (:name metric-info)
                                                    unit))
             (dom/div {:class "chart-footer-container"}
-              (dom/div {:class (utils/class-set {:target-actual-container true :double (:target actual-set)})}
-                (when (:target actual-set)
+              (dom/div {:class (utils/class-set {:target-actual-container true :double target})}
+                (when target
                   (dom/div {:class "target-container"}
-                    (dom/h3 {:class "target"} (.toLocaleString (:target actual-set)))
+                    (dom/h3 {:class "target"} target-with-label)
                     (dom/h3 {:class "target-label"} "TARGET")))
                 (dom/div {:class "actual-container"}
-                  (dom/h3 {:class "actual"} label)
+                  (dom/h3 {:class "actual"} actual-with-label)
                   (dom/h3 {:class "actual-label"} "ACTUAL"))))
             (dom/div {:class "chart-footer-container"}
               (dom/div {:class "period-container"}
