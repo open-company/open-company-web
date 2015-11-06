@@ -950,8 +950,7 @@ div.section-animator-box {
   overflow: hidden;
 }
 
-div.section-animator-box div.section-box-new,
-div.section-animator-box div.section-box-old {
+div.section-animator-box div.section-box {
   position: absolute;
   top: 0;
   left: 0;
