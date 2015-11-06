@@ -12,6 +12,7 @@ $.css = function(){};
 $.fadeTo = function(){};
 $.animate = function(){};
 $.bind = function(){};
+$.unbind = function(){};
 $.offset = {};
 $.offset.top = {};
 $.each = function(){};
