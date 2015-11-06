@@ -446,7 +446,9 @@ div.rich-editor-container div.fake-rich-editor p{
 }
 
 div.rich-editor-container div.rich-editor h1,
-div.rich-editor-container div.rich-editor h3{
+div.rich-editor-container div.rich-editor h3,
+div.rich-editor-container div.fake-rich-editor h1,
+div.rich-editor-container div.fake-rich-editor h3,{
   font-weight: 600;
    font-size: 24px; 
 }
