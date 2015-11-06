@@ -18,7 +18,7 @@
     (let [save-channel (chan)
           section (:section data)]
       (utils/add-channel (str "save-section-" section) save-channel))
-    {:read-only false})
+    {:read-only (:read-only data)})
   (will-mount [_]
     (let [save-change (utils/get-channel (str "save-section-" (:section data)))]
         (go (loop []
