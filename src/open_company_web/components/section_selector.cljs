@@ -91,7 +91,7 @@
        :animating false
        :first-box true}))
   (did-mount [_]
-    (when (.-$ js/window) ; to not crash tests
+    (when (.$ js/window) ; to not crash tests
       (let [section-name (name (:section data))]
         (setup-box-height section-name owner)
         ; listens for dom changes and recalculate the height when img tags load
