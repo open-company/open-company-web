@@ -20,21 +20,11 @@
   (let [tab  (.. e -target -dataset -tab)]
     (om/update-state! owner :focus (fn [] tab))))
 
-(defn filter-metrics [section-data]
-  (let [metrics (:metrics section-data)
-        values (:data section-data)]
-    (map (fn [idx]
-           (let [metric (metrics idx)
-                 metric-values (filter #(= (:slug %) (:slug metric)) values)]
-             (when (> (count metric-values) 1)
-               metric)))
-         (range (count (:metrics section-data))))))
-
 (defcomponent growth [data owner]
   (init-state [_]
     (let [save-notes-channel (chan)]
       (utils/add-channel "save-growth-notes" save-notes-channel))
-    (let [metrics-data (filter-metrics (:section-data data))]
+    (let [metrics-data (:metrics (:section-data data))]
       {:focus (:slug (first metrics-data))}))
   (will-mount [_]
     (let [save-notes-change (utils/get-channel "save-growth-notes")]
@@ -50,10 +40,9 @@
   (render [_]
     (let [showing-revision (om/get-state owner :as-of)
           focus (om/get-state owner :focus)
-          growth-link-class :composed-section-link
           slug (:slug @router/path)
           growth-section (:section-data data)
-          metrics-data (filter-metrics growth-section)
+          metrics-data (:metrics growth-section)
           growth-data (:data growth-section)
           notes-data (:notes growth-section)
           read-only (:read-only data)
@@ -68,19 +57,20 @@
                                     :section-data growth-section
                                     :section :growth
                                     :save-channel "save-section-growth"})
-          (dom/div {:class "link-bar"}
-            (for [metric metrics-data]
-              (let [mslug (:slug metric)
-                    mname (:name metric)
-                    metric-classes (utils/class-set {growth-link-class true
-                                                     mslug true
-                                                     :active (= focus mslug)})]
-                (dom/a {:href "#"
-                    :class metric-classes
-                    :title mname
-                    :data-tab mslug
-                    :on-click #(subsection-click % owner)} mname)))
-            (om/build add-metric {:click-callback nil}))
+          (when (> (count metrics-data) 1)
+            (dom/div {:class "link-bar"}
+              (for [metric metrics-data]
+                (let [mslug (:slug metric)
+                      mname (:name metric)
+                      metric-classes (utils/class-set {:composed-section-link true
+                                                       mslug true
+                                                       :active (= focus mslug)})]
+                  (dom/a {:href "#"
+                      :class metric-classes
+                      :title mname
+                      :data-tab mslug
+                      :on-click #(subsection-click % owner)} mname)))
+            (om/build add-metric {:click-callback nil})))
           (dom/div {:class (utils/class-set {:composed-section-body true
                                              :editable (not read-only)})}
             ;; growth metric currently shown
