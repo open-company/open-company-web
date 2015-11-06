@@ -351,10 +351,11 @@
   (str n "px"))
 
 (defn select-section-data [section-data section as-of]
-  (if (= as-of (:updated-at section-data))
-    section-data
-    (let [slug (keyword (:slug @router/path))]
-      (((keyword section) (slug @revisions)) as-of))))
+  (when as-of
+    (if (= as-of (:updated-at section-data))
+      section-data
+      (let [slug (keyword (:slug @router/path))]
+        (((keyword section) (slug @revisions)) as-of)))))
 
 (defn scroll-to-id [id & [duration]]
   (let [section-el (.$ js/window (str "#" id))
