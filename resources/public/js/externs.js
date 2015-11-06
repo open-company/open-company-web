@@ -10,6 +10,7 @@ $.scroll = function(){};
 $.scrollTop = function(){};
 $.css = function(){};
 $.fadeTo = function(){};
+$.animate = function(){};
 $.bind = function(){};
 $.offset = {};
 $.offset.top = {};
