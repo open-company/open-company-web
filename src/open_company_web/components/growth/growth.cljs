@@ -57,8 +57,8 @@
                                     :section-data growth-section
                                     :section :growth
                                     :save-channel "save-section-growth"})
-          (when (> (count metrics-data) 1)
-            (dom/div {:class "link-bar"}
+          (dom/div {:class "link-bar"}
+            (when (> (count metrics-data) 1)
               (for [metric metrics-data]
                 (let [mslug (:slug metric)
                       mname (:name metric)
@@ -69,8 +69,8 @@
                       :class metric-classes
                       :title mname
                       :data-tab mslug
-                      :on-click #(subsection-click % owner)} mname)))
-            (om/build add-metric {:click-callback nil})))
+                      :on-click #(subsection-click % owner)} mname))))
+            (om/build add-metric {:click-callback nil :metrics-count (count metrics-data)}))
           (dom/div {:class (utils/class-set {:composed-section-body true
                                              :editable (not read-only)})}
             ;; growth metric currently shown
