@@ -55,7 +55,7 @@
   (let [first-box (om/get-state owner :first-box)
         a-box (.$ js/window (str "#sec-box-a-" section-name))
         b-box (.$ js/window (str "#sec-box-b-" section-name))
-        next-box-height (next-box-height owner section-name)
+        next-box-height (min 724 (next-box-height owner section-name))
         box (.$ js/window (str "#sec-box-" section-name))]
     (.animate box #js {"height" (str next-box-height "px")} anim-d)
     (.fadeTo a-box anim-d (if first-box 0 1))
