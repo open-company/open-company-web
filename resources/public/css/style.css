@@ -239,6 +239,10 @@ div.composed-section:hover i.add-metric{
   cursor: pointer;
 }
 
+div.composed-section:hover i.add-metric.no-links{
+  margin-left: 5px;
+}
+
 div.composed-section h2{
   text-align: left;
 }
