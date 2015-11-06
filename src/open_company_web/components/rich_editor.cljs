@@ -79,7 +79,10 @@
   (did-mount [_]
     (when (not (:read-only data))
       (om/update-state! owner :did-mount (fn [_]true))
-      (init-hallo! owner data)))
+      (init-hallo! owner data))
+    (when (and (.-$ js/window) (om/get-state owner :should-collapse))
+      ; collapse initially
+      (collapse-if-needed owner data)))
   (will-update [_ next-props _]
     (when (not (= (:body (:section-data data)) (:body (:section-data next-props))))
       ; reset collapsed and should-collapse
