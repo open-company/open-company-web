@@ -91,10 +91,11 @@
        :animating false
        :first-box true}))
   (did-mount [_]
-    (let [section-name (name (:section data))]
-      (setup-box-height section-name owner)
-      ; listens for dom changes and recalculate the height when img tags load
-      (calc-height-imgs-onload section-name owner)))
+    (when (.-$ js/window) ; to not crash tests
+      (let [section-name (name (:section data))]
+        (setup-box-height section-name owner)
+        ; listens for dom changes and recalculate the height when img tags load
+        (calc-height-imgs-onload section-name owner))))
   (render [_]
     (let [showing-revision (om/get-state owner :as-of)
           next-revision (om/get-state owner :next-as-of)
