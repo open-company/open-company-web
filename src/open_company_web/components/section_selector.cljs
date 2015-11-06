@@ -79,7 +79,6 @@
       (.bind "DOMSubtreeModified"
              (fn [] (setup-box-height section-name owner)
                     (-> (.$ js/window (str "#sec-box-" section-name " img"))
-                        (.unbind "load")
                         (.bind "load" #(setup-box-height section-name owner)))))))
 
 (defcomponent section-selector [data owner]
