@@ -43,7 +43,9 @@
   (set-state! owner :collapsed v))
 
 (defn collapse-if-needed [owner data]
-  (if-let [rich-editor-ref (om/get-ref owner "rich-editor-height")]
+  (if-let [rich-editor-ref (if (:read-only data)
+                             (om/get-ref owner "fake-rich-editor")
+                             (om/get-ref owner "rich-editor"))]
     (let [rich-editor-node (.getDOMNode rich-editor-ref)
           $-rich-editor (.$ js/window rich-editor-node)
           height (.height $-rich-editor)]
@@ -108,32 +110,30 @@
           body (if should-show-placeholder placeholder (:body section-data))
           collapsed (om/get-state owner :collapsed)
           user-expanded (om/get-state owner :user-expanded)]
-      (dom/div {:class "rich-editor-container clearfix"}
-        ; (if read-only
-        (dom/div #js {:className "rich-editor-height clearfix" :ref "rich-editor-height"}
-          (dom/div #js {:className (utils/class-set {:fake-rich-editor true
-                                                     :hidden (not read-only)
-                                                     :collapsed collapsed})
-                        :ref "fake-rich-editor"
-                        :dangerouslySetInnerHTML (clj->js {"__html" body})})
-          (dom/div #js {:className (utils/class-set {:rich-editor true
-                                                     :hidden read-only
-                                                     :no-data should-show-placeholder
-                                                     :collapsed collapsed})
-                        :ref "rich-editor"
-                        :onFocus (fn [e]
-                                   (when collapsed
-                                    (collapsed! owner false)
-                                    (user-expanded! owner true))
-                                   (when-not (:read-only data)
-                                     (editing! owner true)))
-                        :onBlur (fn [e]
-                                  (if-let [editor-ref (om/get-ref owner "rich-editor")]
-                                    (let [editor-el (.getDOMNode editor-ref)
-                                          innerHTML (.-innerHTML editor-el)]
-                                      (when (= innerHTML body)
-                                        (editing! owner false)))))
-                        :dangerouslySetInnerHTML (clj->js {"__html" body})}))
+      (dom/div {:class "rich-editor-container group"}
+        (dom/div #js {:className (utils/class-set {:fake-rich-editor true
+                                                   :hidden (not read-only)
+                                                   :collapsed collapsed})
+                      :ref "fake-rich-editor"
+                      :dangerouslySetInnerHTML (clj->js {"__html" body})})
+        (dom/div #js {:className (utils/class-set {:rich-editor true
+                                                   :hidden read-only
+                                                   :no-data should-show-placeholder
+                                                   :collapsed collapsed})
+                      :ref "rich-editor"
+                      :onFocus (fn [e]
+                                 (when collapsed
+                                  (collapsed! owner false)
+                                  (user-expanded! owner true))
+                                 (when-not (:read-only data)
+                                   (editing! owner true)))
+                      :onBlur (fn [e]
+                                (if-let [editor-ref (om/get-ref owner "rich-editor")]
+                                  (let [editor-el (.getDOMNode editor-ref)
+                                        innerHTML (.-innerHTML editor-el)]
+                                    (when (= innerHTML body)
+                                      (editing! owner false)))))
+                      :dangerouslySetInnerHTML (clj->js {"__html" body})})
         (if collapsed
           (dom/button {:class "btn btn-link expand-button"
                        :on-click (fn [e]
