@@ -43,15 +43,23 @@
   (set-state! owner :collapsed v))
 
 (defn collapse-if-needed [owner data]
-  (if-let [rich-editor-ref (if (:read-only data)
-                             (om/get-ref owner "fake-rich-editor")
-                             (om/get-ref owner "rich-editor"))]
+  (if-let [rich-editor-ref (om/get-ref owner "rich-editor-height")]
     (let [rich-editor-node (.getDOMNode rich-editor-ref)
           $-rich-editor (.$ js/window rich-editor-node)
           height (.height $-rich-editor)]
       (om/update-state! owner :should-collapse (fn [_]false))
       (when (>= height 480)
         (collapsed! owner true)))))
+
+(defn calc-collapse-add-onload [owner data]
+  ; run only if needed and do not crash on tests
+  (when (and (.-$ js/window) (om/get-state owner :should-collapse))
+    ; collapse initially
+    (collapse-if-needed owner data)
+    ; rerun collapse calc after every image load
+    (let [all-images (.$ js/window "div.rich-editor img")]
+      (.each js/$ all-images (fn [idx item]
+                               (.load (.$ js/window item) #(collapse-if-needed owner data)))))))
 
 (defcomponent rich-editor [data owner]
   (init-state [_]
@@ -80,9 +88,7 @@
     (when (not (:read-only data))
       (om/update-state! owner :did-mount (fn [_]true))
       (init-hallo! owner data))
-    (when (and (.-$ js/window) (om/get-state owner :should-collapse))
-      ; collapse initially
-      (collapse-if-needed owner data)))
+    (calc-collapse-add-onload owner data))
   (will-update [_ next-props _]
     (when (not (= (:body (:section-data data)) (:body (:section-data next-props))))
       ; reset collapsed and should-collapse
@@ -90,14 +96,7 @@
       (user-expanded! owner false)
       (set-state! owner :should-collapse true)))
   (did-update [_ _ _]
-    ; run only if needed and do not crash on tests
-    (when (and (.-$ js/window) (om/get-state owner :should-collapse))
-      ; collapse initially
-      (collapse-if-needed owner data)
-      ; rerun collapse calc after every image load
-      (let [all-images (.$ js/window "div.rich-editor img")]
-        (.each js/$ all-images (fn [idx item]
-                               (.load (.$ js/window item) #(collapse-if-needed owner data)))))))
+    (calc-collapse-add-onload owner data))
   (render [_]
     (let [section-data (:section-data data)
           section (:section data)
@@ -109,31 +108,32 @@
           body (if should-show-placeholder placeholder (:body section-data))
           collapsed (om/get-state owner :collapsed)
           user-expanded (om/get-state owner :user-expanded)]
-      (dom/div {:class "rich-editor-container"}
+      (dom/div {:class "rich-editor-container clearfix"}
         ; (if read-only
-        (dom/div #js {:className (utils/class-set {:fake-rich-editor true
-                                                   :hidden (not read-only)
-                                                   :collapsed collapsed})
-                      :ref "fake-rich-editor"
-                      :dangerouslySetInnerHTML (clj->js {"__html" body})})
-        (dom/div #js {:className (utils/class-set {:rich-editor true
-                                                   :hidden read-only
-                                                   :no-data should-show-placeholder
-                                                   :collapsed collapsed})
-                      :ref "rich-editor"
-                      :onFocus (fn [e]
-                                 (when collapsed
-                                  (collapsed! owner false)
-                                  (user-expanded! owner true))
-                                 (when-not (:read-only data)
-                                   (editing! owner true)))
-                      :onBlur (fn [e]
-                                (if-let [editor-ref (om/get-ref owner "rich-editor")]
-                                  (let [editor-el (.getDOMNode editor-ref)
-                                        innerHTML (.-innerHTML editor-el)]
-                                    (when (= innerHTML body)
-                                      (editing! owner false)))))
-                      :dangerouslySetInnerHTML (clj->js {"__html" body})})
+        (dom/div #js {:className "rich-editor-height clearfix" :ref "rich-editor-height"}
+          (dom/div #js {:className (utils/class-set {:fake-rich-editor true
+                                                     :hidden (not read-only)
+                                                     :collapsed collapsed})
+                        :ref "fake-rich-editor"
+                        :dangerouslySetInnerHTML (clj->js {"__html" body})})
+          (dom/div #js {:className (utils/class-set {:rich-editor true
+                                                     :hidden read-only
+                                                     :no-data should-show-placeholder
+                                                     :collapsed collapsed})
+                        :ref "rich-editor"
+                        :onFocus (fn [e]
+                                   (when collapsed
+                                    (collapsed! owner false)
+                                    (user-expanded! owner true))
+                                   (when-not (:read-only data)
+                                     (editing! owner true)))
+                        :onBlur (fn [e]
+                                  (if-let [editor-ref (om/get-ref owner "rich-editor")]
+                                    (let [editor-el (.getDOMNode editor-ref)
+                                          innerHTML (.-innerHTML editor-el)]
+                                      (when (= innerHTML body)
+                                        (editing! owner false)))))
+                        :dangerouslySetInnerHTML (clj->js {"__html" body})}))
         (if collapsed
           (dom/button {:class "btn btn-link expand-button"
                        :on-click (fn [e]
