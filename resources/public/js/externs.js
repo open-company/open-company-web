@@ -11,7 +11,14 @@ $.scrollTop = function(){};
 $.css = function(){};
 $.offset = {};
 $.offset.top = {};
+$.offset.left = {};
 $.each = function(){};
+$.click = function(){};
+$.remove = function(){};
+$.fadeIn = function(){};
+$.fadeOut = function(){};
+$.fadeIn = function(){};
+$.hover = function(){};
 var jQuery = function(){};
 // Hallo
 var hallo = function(){};
