@@ -17,8 +17,7 @@
   (init-state [_]
     (let [save-channel (chan)
           section (:section data)]
-      (utils/add-channel (str "save-section-" section) save-channel))
-    {:read-only (:read-only data)})
+      (utils/add-channel (str "save-section-" section) save-channel)))
   (will-mount [_]
     (let [save-change (utils/get-channel (str "save-section-" (:section data)))]
         (go (loop []
@@ -33,10 +32,11 @@
   (render [_]
     (let [section (:section data)
           section-data (:section-data data)
-          read-only (or (:loading section-data) (om/get-state owner :read-only))]
+          read-only (:read-only data)]
       (if (:loading data)
         (dom/h4 {} "Loading data...")
-        (dom/div {:class "simple-section section-container" :id (str "section-" (name section))}
+        (dom/div {:class "simple-section section-container"
+                  :id (str "section-" (name section))}
           (om/build editable-title {:read-only read-only
                                     :section-data section-data
                                     :section section
@@ -49,7 +49,5 @@
           (dom/div {:class "simple-section-revisions-navigator"}
             (om/build revisions-navigator {:section-data section-data
                                            :section section
-                                           :loading (:loading section-data)
-                                           :navigate-cb (fn [read-only]
-                                                          (utils/handle-change section-data true :loading)
-                                                          (om/update-state! owner :read-only (fn [_]read-only)))})))))))
+                                           :actual-as-of (:actual-as-of data)
+                                           :navigate-cb (:revisions-navigation-cb data)})))))))

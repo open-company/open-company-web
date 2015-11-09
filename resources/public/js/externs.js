@@ -1,5 +1,6 @@
 // jQuery
 var $ = {};
+var jQuery = function(){};
 $.select2 = function(){};
 $.tooltip = function(){};
 $.width = function(){};
@@ -9,10 +10,15 @@ $.scrollTo = function(){};
 $.scroll = function(){};
 $.scrollTop = function(){};
 $.css = function(){};
+$.fadeTo = function(){};
+$.animate = function(){};
+$.bind = function(){};
+$.unbind = function(){};
 $.offset = {};
 $.offset.top = {};
 $.each = function(){};
-var jQuery = function(){};
+$.each.load = function(){};
+$.load = function(){};
 // Hallo
 var hallo = function(){};
 // google

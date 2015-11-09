@@ -13,25 +13,25 @@
 ; dynamic mount point for components
 (def ^:dynamic c)
 
-(def company-slug "buffer")
-
 (def test-atom {
-  :company-data {
-    :update {
-      :body "Simple section text"
-      :updated-at "2015-09-14T20:49:19Z"
-      :author {
-        :name "Stuart Levinson"
-        :user-id "U06SQLDFT"
-        :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
-      }
+  :section-data {
+    :body "Simple section text"
+    :updated-at "2015-09-14T20:49:19Z"
+    :author {
+      :name "Stuart Levinson"
+      :user-id "U06SQLDFT"
+      :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
     }
+    :section :update
   }
+  :read-only false
   :section :update
 })
 
 (deftest test-simple-section-component
   (testing "Simple section component"
+    (router/set-route! ["companies" "buffer"]
+                       {:slug "buffer"})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root simple-section app-state {:target c})

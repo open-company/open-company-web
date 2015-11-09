@@ -10,7 +10,8 @@
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.jwt :as j]
             [open-company-web.router :as router]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.caches :refer [revisions]]))
 
 
 (def ^:private api-endpoint ls/api-server-domain)
@@ -96,7 +97,8 @@
                                             :links
                                             :loading
                                             :as-of
-                                            :read-only)
+                                            :read-only
+                                            :revisions-cache)
           json-data (cljs->json section-data)
           section-link (utils/link-for links "update" "PUT")]
       (api-put (:href section-link)
@@ -112,10 +114,9 @@
             (flux/dispatch dispatcher/section {:body body :section section :slug (keyword slug)})))))))
 
 (defn load-revision
-  ([revision slug section]
-   (load-revision revision slug section false))
-  ([revision slug section read-only]
+  [revision slug section]
     (when revision
+      (swap! revisions assoc-in [slug (keyword section) (:updated-at revision)] :loading)
       (api-get (:href revision)
         {:headers {
           ; required by Chrome
@@ -126,9 +127,8 @@
           (let [body (if (:success response) (json->cljs (:body response)) {})
                 dispatch-body {:body body
                                :section section
-                               :slug (keyword slug)
-                               :read-only read-only}]
-            (flux/dispatch dispatcher/revision dispatch-body)))))))
+                               :slug (keyword slug)}]
+            (flux/dispatch dispatcher/revision dispatch-body))))))
 
 (defn update-finances-data[finances-data]
   (when finances-data
