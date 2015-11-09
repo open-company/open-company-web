@@ -642,7 +642,7 @@ div.editable-title-container span.hidden-span{
 div.editable-title-container h2{
   border: 1px solid white;
   outline: none;
-  padding-top: 1px;
+  padding-top: 7px;
 }
 
 div.editable-title-container input{
