@@ -4,7 +4,8 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
-            [open-company-web.api :as api]))
+            [open-company-web.api :as api]
+            [open-company-web.caches :as cache]))
 
 (defn revision-next
   "Return the first future revision"
@@ -52,19 +53,16 @@
       rev
       false)))
 
-(defn nav-revision! [e rev owner data read-only]
+(defn nav-revision! [e rev navigate-cb]
   (.preventDefault e)
-  (let [section (:section data)]
-    ((:navigate-cb data) read-only)
-    (utils/handle-change (:section-data data) (:updated-at rev) :as-of)
-    (api/load-revision rev (keyword (:slug @router/path)) section read-only)))
+  (navigate-cb (:updated-at rev)))
 
 (defcomponent revisions-navigator [data owner]
   (render [_]
     (let [section-data (:section-data data)
           revisions (utils/sort-revisions (:revisions section-data))
           last-revision (last revisions)
-          as-of (:as-of section-data)
+          as-of (:updated-at section-data)
           rev-first (revision-first revisions as-of)
           rev-prev  (revision-prev revisions as-of)
           rev-next  (revision-next revisions as-of)
@@ -75,7 +73,19 @@
           first-date (utils/date-string (utils/js-date (:updated-at rev-first)))
           prev-date  (utils/date-string (utils/js-date (:updated-at rev-prev)))
           next-date  (utils/date-string (utils/js-date (:updated-at rev-next)))
-          last-date  (utils/date-string (utils/js-date (:updated-at rev-last)))]
+          last-date  (utils/date-string (utils/js-date (:updated-at rev-last)))
+          slug (keyword (:slug @router/path))
+          section (:section data)
+          revisions-list (section (slug @cache/revisions))]
+      ; preload previous revision
+      (when (and rev-prev (not (contains? revisions-list (:updated-at rev-prev))))
+        (api/load-revision rev-prev slug section))
+      ; preload first revision
+      (when (and rev-first (not (contains? revisions-list (:updated-at rev-first))))
+        (api/load-revision rev-first slug section))
+      ; preload next revision as it can be that it's missing (ie: user jumped to the first rev then went forward)
+      (when (and (not (= (:updated-at rev-next) (:actual-as-of data))) rev-next (not (contains? revisions-list (:updated-at rev-next))))
+        (api/load-revision rev-next slug section))
       (dom/div {:class "revisions-navigator"}
         (if (:loading data)
           (dom/div {:style {:text-align "center"}} "Loading...")
@@ -83,13 +93,13 @@
             (dom/div {:class "revisions-navigator-left"}
               (when rev-first
                 (dom/a {:class "rev-double-prev"
-                        :on-click #(nav-revision! % rev-first owner data true)
+                        :on-click #(nav-revision! % rev-first (:navigate-cb data))
                         :title first-date}
                   (dom/div {:class "double-prev"}
                     (dom/i {:class "fa fa-backward"}))))
               (when rev-prev
                 (dom/a {:class "rev-single-prev"
-                        :on-click #(nav-revision! % rev-prev owner data true)
+                        :on-click #(nav-revision! % rev-prev (:navigate-cb data))
                         :title prev-date}
                   (dom/div {:class "single-prev"}
                     (dom/i {:class "fa fa-caret-left"})
@@ -97,17 +107,13 @@
             (dom/div {:class "revisions-navigator-right"}
               (when rev-last
                 (dom/a {:class "rev-double-next"
-                        :on-click #(nav-revision! % rev-last owner data false)
+                        :on-click #(nav-revision! % rev-last (:navigate-cb data))
                         :title last-date}
                   (dom/div {:class "double-next"}
                     (dom/i {:class "fa fa-forward"}))))
               (when rev-next
                 (dom/a {:class "rev-single-next"
-                        :on-click #(nav-revision! %
-                                                  rev-next
-                                                  owner
-                                                  data
-                                                  (not= (:updated-at rev-next) (:updated-at last-revision)))
+                        :on-click #(nav-revision! % rev-next (:navigate-cb data))
                         :title next-date}
                   (dom/div {:class "single-next"}
                     (dom/i {:class "fa fa-caret-right"})

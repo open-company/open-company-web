@@ -1,5 +1,6 @@
 // jQuery
 var $ = {};
+var jQuery = function(){};
 $.select2 = function(){};
 $.tooltip = function(){};
 $.width = function(){};
@@ -9,6 +10,10 @@ $.scrollTo = function(){};
 $.scroll = function(){};
 $.scrollTop = function(){};
 $.css = function(){};
+$.fadeTo = function(){};
+$.animate = function(){};
+$.bind = function(){};
+$.unbind = function(){};
 $.offset = {};
 $.offset.top = {};
 $.offset.left = {};
@@ -17,9 +22,9 @@ $.click = function(){};
 $.remove = function(){};
 $.fadeIn = function(){};
 $.fadeOut = function(){};
-$.fadeIn = function(){};
 $.hover = function(){};
-var jQuery = function(){};
+$.each.load = function(){};
+$.load = function(){};
 // Hallo
 var hallo = function(){};
 // google

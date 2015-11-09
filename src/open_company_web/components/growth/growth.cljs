@@ -20,25 +20,12 @@
   (let [tab  (.. e -target -dataset -tab)]
     (om/update-state! owner :focus (fn [] tab))))
 
-(defn filter-metrics [section-data]
-  (let [metrics (:metrics section-data)
-        values (:data section-data)]
-    (map (fn [idx]
-           (let [metric (metrics idx)
-                 metric-values (filter #(= (:slug %) (:slug metric)) values)]
-             (when (> (count metric-values) 1)
-               metric)))
-         (range (count (:metrics section-data))))))
-
 (defcomponent growth [data owner]
-
   (init-state [_]
     (let [save-notes-channel (chan)]
       (utils/add-channel "save-growth-notes" save-notes-channel))
-    (let [metrics-data (filter-metrics (:section-data data))]
-      {:focus (:slug (first metrics-data))
-       :read-only false}))
-
+    (let [metrics-data (:metrics (:section-data data))]
+      {:focus (:slug (first metrics-data))}))
   (will-mount [_]
     (let [save-notes-change (utils/get-channel "save-growth-notes")]
         (go (loop []
@@ -50,16 +37,15 @@
                 section-data (section company-data)]
             (api/patch-section-notes (:notes section-data) (:links section-data) section)
             (recur))))))
-
   (render [_]
-    (let [focus (om/get-state owner :focus)
-          growth-link-class :composed-section-link
+    (let [showing-revision (om/get-state owner :as-of)
+          focus (om/get-state owner :focus)
           slug (:slug @router/path)
           growth-section (:section-data data)
-          metrics-data (filter-metrics growth-section)
+          metrics-data (:metrics growth-section)
           growth-data (:data growth-section)
           notes-data (:notes growth-section)
-          read-only (or (:loading growth-section) (om/get-state owner :read-only))
+          read-only (:read-only data)
           focus-metric-data (filter #(= (:slug %) focus) growth-data)
           focus-metric-info (first (filter #(= (:slug %) focus) metrics-data))
           subsection-data {:metric-data focus-metric-data
@@ -72,18 +58,19 @@
                                     :section :growth
                                     :save-channel "save-section-growth"})
           (dom/div {:class "link-bar"}
-            (for [metric metrics-data]
-              (let [mslug (:slug metric)
-                    mname (:name metric)
-                    metric-classes (utils/class-set {growth-link-class true
-                                                     mslug true
-                                                     :active (= focus mslug)})]
-                (dom/a {:href "#"
-                    :class metric-classes
-                    :title mname
-                    :data-tab mslug
-                    :on-click #(subsection-click % owner)} mname)))
-            (om/build add-metric {:click-callback nil}))
+            (when (> (count metrics-data) 1)
+              (for [metric metrics-data]
+                (let [mslug (:slug metric)
+                      mname (:name metric)
+                      metric-classes (utils/class-set {:composed-section-link true
+                                                       mslug true
+                                                       :active (= focus mslug)})]
+                  (dom/a {:href "#"
+                      :class metric-classes
+                      :title mname
+                      :data-tab mslug
+                      :on-click #(subsection-click % owner)} mname))))
+            (om/build add-metric {:click-callback nil :metrics-count (count metrics-data)}))
           (dom/div {:class (utils/class-set {:composed-section-body true
                                              :editable (not read-only)})}
             ;; growth metric currently shown
@@ -98,7 +85,5 @@
                                      :save-channel "save-growth-notes"}))
             (om/build revisions-navigator {:section-data growth-section
                                            :section :growth
-                                           :loading (:loading growth-section)
-                                           :navigate-cb (fn [read-only]
-                                                          (utils/handle-change growth-section true :loading)
-                                                          (om/update-state! owner :read-only (fn [_]read-only)))})))))))
+                                           :actual-as-of (:actual-as-of data)
+                                           :navigate-cb (:revisions-navigation-cb data)})))))))

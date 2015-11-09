@@ -4,8 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.lib.utils :as utils]
-            [cljs-dynamic-resources.core :as cdr]
-            [shodan.console :as console]))
+            [cljs-dynamic-resources.core :as cdr]))
 
 (def hallo-format {
   :editable true
@@ -21,16 +20,15 @@
   ; :toolbar "halloToolbarFixed" ; uncomment for fixed toolbar
 })
 
-(defn init-hallo! [owner]
+(defn init-hallo! [owner data]
   (let [hallo-loaded (om/get-state owner :hallo-loaded)
         did-mount (om/get-state owner :did-mount)]
     (when (and hallo-loaded did-mount)
       (when-let [editor-ref (om/get-ref owner "rich-editor")]
         (let [editor-node (.getDOMNode editor-ref)
               hallo-opts (clj->js hallo-format)
-              jquery-node (.$ js/window editor-node)
-              init-editor (.hallo jquery-node hallo-opts)]
-          (om/update-state! owner :editor (fn[_] init-editor)))))))
+              jquery-node (.$ js/window editor-node)]
+          (.hallo jquery-node hallo-opts))))))
 
 (defn set-state! [owner k v]
   (om/update-state! owner k (fn [_]v)))
@@ -44,8 +42,10 @@
 (defn collapsed! [owner v]
   (set-state! owner :collapsed v))
 
-(defn collapse-if-needed [owner]
-  (if-let [rich-editor-ref (om/get-ref owner "rich-editor")]
+(defn collapse-if-needed [owner data]
+  (if-let [rich-editor-ref (if (:read-only data)
+                             (om/get-ref owner "fake-rich-editor")
+                             (om/get-ref owner "rich-editor"))]
     (let [rich-editor-node (.getDOMNode rich-editor-ref)
           $-rich-editor (.$ js/window rich-editor-node)
           height (.height $-rich-editor)]
@@ -53,10 +53,19 @@
       (when (>= height 480)
         (collapsed! owner true)))))
 
+(defn calc-collapse-add-onload [owner data]
+  ; run only if needed and do not crash on tests
+  (when (and (.-$ js/window) (om/get-state owner :should-collapse))
+    ; collapse initially
+    (collapse-if-needed owner data)
+    ; rerun collapse calc after every image load
+    (let [all-images (.$ js/window "div.rich-editor img")]
+      (.each js/$ all-images (fn [idx item]
+                               (.load (.$ js/window item) #(collapse-if-needed owner data)))))))
+
 (defcomponent rich-editor [data owner]
   (init-state [_]
-    {:editor nil
-     :initial-body (:body (:section-data data))
+    {:initial-body (:body (:section-data data))
      :hallo-loaded false
      :did-mount false
      :editing false
@@ -76,20 +85,20 @@
                          {:src "/lib/hallo/hallo.js"}]
                         (fn []
                           (om/update-state! owner :hallo-loaded (fn [_]true))
-                          (init-hallo! owner)))))
+                          (init-hallo! owner data)))))
   (did-mount [_]
     (when (not (:read-only data))
       (om/update-state! owner :did-mount (fn [_]true))
-      (init-hallo! owner)))
+      (init-hallo! owner data))
+    (calc-collapse-add-onload owner data))
+  (will-update [_ next-props _]
+    (when (not (= (:body (:section-data data)) (:body (:section-data next-props))))
+      ; reset collapsed and should-collapse
+      (collapsed! owner false)
+      (user-expanded! owner false)
+      (set-state! owner :should-collapse true)))
   (did-update [_ _ _]
-    ; run only if needed and do not crash on tests
-    (when (and (.-$ js/window) (om/get-state owner :should-collapse))
-      ; collapse initially
-      (collapse-if-needed owner)
-      ; rerun collapse calc after every image load
-      (let [all-images (.$ js/window "div.rich-editor img")]
-      (.each js/$ all-images (fn [idx item]
-                               (.load (.$ js/window item) #(collapse-if-needed owner)))))))
+    (calc-collapse-add-onload owner data))
   (render [_]
     (let [section-data (:section-data data)
           section (:section data)
@@ -101,10 +110,12 @@
           body (if should-show-placeholder placeholder (:body section-data))
           collapsed (om/get-state owner :collapsed)
           user-expanded (om/get-state owner :user-expanded)]
-      (dom/div {:class "rich-editor-container"}
-        (dom/div {:class (utils/class-set {:fake-rich-editor true
-                                           :hidden (not read-only)})
-                  :dangerouslySetInnerHTML (clj->js {"__html" body})})
+      (dom/div {:class "rich-editor-container group"}
+        (dom/div #js {:className (utils/class-set {:fake-rich-editor true
+                                                   :hidden (not read-only)
+                                                   :collapsed collapsed})
+                      :ref "fake-rich-editor"
+                      :dangerouslySetInnerHTML (clj->js {"__html" body})})
         (dom/div #js {:className (utils/class-set {:rich-editor true
                                                    :hidden read-only
                                                    :no-data should-show-placeholder
