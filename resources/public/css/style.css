@@ -910,8 +910,7 @@ div.sections-container{
 div.table-of-contents{
   position: fixed;
   top: 50px;
-  overflow: scroll;
-  overflow-y: scroll;
+  overflow-y: auto;
   height: 90%;
   padding: 10px;
   color: #2D2D2D;
@@ -920,8 +919,7 @@ div.table-of-contents{
 div.table-of-contents div.table-of-contents-inner{
   width: 100%;
   height: 100%;
-  overflow: scroll;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 div.table-of-contents div.table-of-contents-inner div.category{
