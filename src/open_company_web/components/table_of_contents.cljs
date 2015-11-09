@@ -7,21 +7,28 @@
 
 (def first-cat-placeholder "first-category")
 
+
+
 (defn setup-plus-position [e]
   (let [target (.$ js/window (.-target e))
-        position (.offset target)]
+        offset (.position target)
+        t-top (- (.-top offset) 5)
+        t-left (+ (.-left offset) 208)]
     (-> (.$ js/window ".add-section")
-        (.css #js {"left" (+ (.-left position) 90) "top" (- (.-top position) 56)}))))
+        (.css #js {"left" t-left "top" t-top}))))
 
 (defn show-popover [e owner]
   (om/update-state! owner :hover-new-section (fn [_]false))
   (om/update-state! owner :hover-add-section (fn [_]false))
-  (let [plus-offset (.offset (.$ js/window ".add-section"))
-        popover (.$ js/window ".new-section-popover-container")]
+  (let [section (or (om/get-state owner :hover-new-section)
+                    (om/get-state owner :hover-add-section))
+        plus-offset (.position (.$ js/window ".add-section"))
+        popover (.$ js/window ".new-section-popover-container")
+        window-scrolltop (.scrollTop (.$ js/window js/window))]
     (.click popover (fn [e]
                       (.fadeOut popover 400 #(.css popover #js {"display" "none"}))))
-    (.css popover #js {"top" (str (- (.-top plus-offset) 50) "px")
-                       "left" (str (- (.-left plus-offset) 100) "px")})
+    (.css popover #js {"top" (str (+ (.-top plus-offset) 40 window-scrolltop) "px")
+                       "left" (str (+ (.-left plus-offset) 100) "px")})
     (.setTimeout js/window #(.fadeIn popover 400) 0)))
 
 (defn setup-hover-events [owner]
@@ -40,28 +47,36 @@
                 (fn [e]
                   (om/update-state! owner :hover-add-section (fn [_]false)))))))
 
+(defn remove-section [section-name]
+  (println "Removing section still WIP"))
+
+(defn add-popover-container []
+  (let [popover (.$ js/window "<div class='new-section-popover-container'></div>")
+        body (.$ js/window (.-body js/document))]
+    (.append body popover)))
+
 (defcomponent table-of-contents [data owner]
   (init-state [_]
     {:hover-add-section false
      :hover-new-section false})
   (did-mount [_]
-    (setup-hover-events owner))
+    (setup-hover-events owner)
+    (add-popover-container))
   (did-update [_ _ _]
     (setup-hover-events owner))
   (render [_]
     (let [sections (:sections data)
           categories (:categories data)]
       (dom/div #js {:className "table-of-contents" :ref "table-of-contents"}
-        (dom/div {:class "new-section-popover-container"})
+        (dom/div {:class (utils/class-set {:add-section true
+                                           :show (or (om/get-state owner :hover-add-section)
+                                                      (om/get-state owner :hover-new-section))})
+                  :on-click #(show-popover % owner)}
+          (dom/i {:class "fa fa-plus"}))
         (dom/div {:class "table-of-contents-inner"}
           (for [category categories]
             (dom/div {:class "category-container"}
               (dom/div {:class (utils/class-set {:category true :empty (zero? (count ((keyword category) sections)))})} (dom/h3 (utils/camel-case-str (name category))))
-              (dom/div {:class (utils/class-set {:add-section true
-                                                 :show (or (om/get-state owner :hover-add-section)
-                                                            (om/get-state owner :hover-new-section))})
-                        :on-click #(show-popover % owner)}
-                (dom/i {:class "fa fa-plus"}))
               (dom/div {:id (str "new-section-" first-cat-placeholder)
                         :class (utils/class-set {:new-section true
                                                  :hover (or (= (om/get-state owner :hover-new-section) (str "new-section-" first-cat-placeholder))
@@ -72,6 +87,8 @@
                 (let [section-data ((keyword section) data)]
                   (dom/div {}
                     (dom/div {:class "category-section"}
+                      (dom/div {:class "category-section-close"
+                                :on-click #(remove-section (name section))})
                       (dom/a {:href "#"
                               :on-click (fn [e]
                                           (.preventDefault e)
