@@ -921,8 +921,69 @@ div.table-of-contents div.table-of-contents-inner div.category h3{
 }
 
 div.table-of-contents div.table-of-contents-inner div.category-section{
-  margin-left: 60px;
-  margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-left: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+div.table-of-contents div.table-of-contents-inner div.category-section:hover{
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+div.table-of-contents div.table-of-contents-inner div.new-section{
+  height: 8px;
+  margin-left: 20px;
+  margin-right: 20px;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+div.table-of-contents div.table-of-contents-inner div.new-section div.new-section-internal {
+  height: 1px;
+  position: relative;
+  top: 4px;
+  left: 0px;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  display: none;
+}
+
+div.table-of-contents div.table-of-contents-inner div.new-section.hover div.new-section-internal {
+  display: block;
+}
+
+div.table-of-contents div.add-section {
+  width: 20px;
+  height: 20px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  position: absolute;
+  display: none;
+  padding: 2px 0 0 4px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+div.table-of-contents div.add-section:after {
+  right: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-color: rgba(0, 0, 0, 0);
+  border-right-color: rgba(0, 0, 0, 0.1);
+  border-width: 4px;
+  margin-top: -4px;
+}
+
+div.table-of-contents div.add-section.show {
+  display: block;
 }
 
 div.table-of-contents div.table-of-contents-inner div.category-section a,
@@ -943,4 +1004,21 @@ div.table-of-contents div.table-of-contents-inner div.category-section a p.secti
   font-weight: lighter;
   font-size: 11px;
   margin-bottom: 0px;
+}
+
+div.new-section-popover-container{
+  display: none;
+  position: absolute;
+  width: 500px;
+  height: 521px;
+  top: 0;
+  left: 0;
+  background-image: url("/img/popover.png");
+  background-repeat: no-repeat;
+  background-color: white;
+  background-position: 0 0;
+  background-size: 500px 521px;
+  z-index: 1000;
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
 }
