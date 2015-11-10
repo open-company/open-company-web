@@ -16,9 +16,10 @@
     {:hover false})
   (did-mount [_]
     (when (.-$ js/window)
-      (.hover (.$ js/window (str "#" (get-footer-id data)))
-              #(om/update-state! owner :hover (fn [_]true))
-              #(om/update-state! owner :hover (fn [_]false)))))
+      (let [component-id (get-footer-id data)]
+        (.hover (.$ js/window (str "#" component-id ", #" component-id "-hover"))
+                #(om/update-state! owner :hover (fn [_]true))
+                #(om/update-state! owner :hover (fn [_]false))))))
   (render [_]
     (dom/div {:class "update-footer"}
       (dom/a {:href "#"
@@ -27,6 +28,7 @@
                   :id (get-footer-id data)}
                  (utils/time-since (:updated-at data)))
         (dom/div {:class (utils/class-set {:update-footer-hover true
-                                           :show (om/get-state owner :hover)})}
+                                           :show (om/get-state owner :hover)})
+                  :id (str (get-footer-id data) "-hover")}
           (dom/img {:src (:image (:author data)) :title (:name (:author data)) :class "author-image"})
             (dom/div {:class "author"} (:name (:author data))))))))
