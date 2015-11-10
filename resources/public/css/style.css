@@ -389,9 +389,9 @@ div.update-footer{
   left: 50%;
   margin-left: -300px;
   margin-top: 30px;
-  width: 600px;
   height: 24px;
   vertical-align: middle;
+  cursor: default;
 }
 
 div.update-footer div{
@@ -410,6 +410,7 @@ div.update-footer div.timeago{
   color: #5B5B5B;
   font-size: 13px;
   font-weight: 300;
+  width: 100px;
 }
 
 div.update-footer img.author-image{

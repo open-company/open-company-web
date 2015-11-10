@@ -22,13 +22,11 @@
                 #(om/update-state! owner :hover (fn [_]false))))))
   (render [_]
     (dom/div {:class "update-footer"}
-      (dom/a {:href "#"
-              :on-click #(.preventDefault %)}
-        (dom/div {:class "timeago"
-                  :id (get-footer-id data)}
-                 (utils/time-since (:updated-at data)))
-        (dom/div {:class (utils/class-set {:update-footer-hover true
-                                           :show (om/get-state owner :hover)})
-                  :id (str (get-footer-id data) "-hover")}
-          (dom/img {:src (:image (:author data)) :title (:name (:author data)) :class "author-image"})
-            (dom/div {:class "author"} (:name (:author data))))))))
+      (dom/div {:class "timeago"
+                :id (get-footer-id data)}
+               (utils/time-since (:updated-at data)))
+      (dom/div {:class (utils/class-set {:update-footer-hover true
+                                         :show (om/get-state owner :hover)})
+                :id (str (get-footer-id data) "-hover")}
+        (dom/img {:src (:image (:author data)) :title (:name (:author data)) :class "author-image"})
+          (dom/div {:class "author"} (:name (:author data)))))))
