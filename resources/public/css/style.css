@@ -395,7 +395,7 @@ div.update-footer{
 }
 
 div.update-footer div{
-  margin: 0px 0px 0px 35px;
+  margin: 0px;
   color: rgba(0, 0, 0, 0.4);
   text-decoration: none;
 }
@@ -966,4 +966,24 @@ div.section-animator-box div.section-box {
   top: 0;
   left: 0;
   width: 600px;
+}
+
+div.update-footer div.update-footer-hover{
+  display: none;
+  width: 200px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  position: absolute;
+  top: -5px;
+  left: 80px;
+  background-color: white;
+  padding: 5px;
+}
+
+div.update-footer div.update-footer-hover div.author {
+  margin-top: 8px;
+}
+
+div.update-footer div.update-footer-hover.hover {
+  display: block;
 }
