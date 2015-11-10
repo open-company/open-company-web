@@ -89,6 +89,9 @@
        :as-of as-of
        :animating false
        :first-box true}))
+  (did-update [_ prev-props _]
+    (when-not (= (:updated-at (:section-data data)) (:updated-at (:section-data prev-props)))
+      (om/update-state! owner :as-of (fn [_](:updated-at (:section-data data))))))
   (did-mount [_]
     (when (.-$ js/window) ; to not crash tests
       (let [section-name (name (:section data))]
