@@ -19,6 +19,7 @@ $.offset.top = {};
 $.each = function(){};
 $.each.load = function(){};
 $.load = function(){};
+$.hover = function(){};
 // Hallo
 var hallo = function(){};
 // google
