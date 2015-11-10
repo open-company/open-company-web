@@ -19,21 +19,22 @@
         (.css #js {"left" t-left "top" t-top}))))
 
 (defn show-popover [e owner]
-  (om/update-state! owner :hover-new-section (fn [_]false))
-  (om/update-state! owner :hover-add-section (fn [_]false))
-  (let [section (or (om/get-state owner :hover-new-section)
-                    (om/get-state owner :hover-add-section))
-        plus-offset (.position (.$ js/window ".add-section"))
-        popover (.$ js/window ".new-section-popover-container")
-        window-scrolltop (.scrollTop (.$ js/window js/window))]
-    (.click popover (fn [e]
-                      (.fadeOut popover 400 #(.css popover #js {"display" "none"}))))
-    (.css popover #js {"top" (str (+ (.-top plus-offset) 40 window-scrolltop) "px")
-                       "left" (str (+ (.-left plus-offset) 100) "px")})
-    (.setTimeout js/window #(.fadeIn popover 400) 0)))
+  (when (.-$ js/window) ; avoid tests crash
+    (om/update-state! owner :hover-new-section (fn [_]false))
+    (om/update-state! owner :hover-add-section (fn [_]false))
+    (let [section (or (om/get-state owner :hover-new-section)
+                      (om/get-state owner :hover-add-section))
+          plus-offset (.position (.$ js/window ".add-section"))
+          popover (.$ js/window ".new-section-popover-container")
+          window-scrolltop (.scrollTop (.$ js/window js/window))]
+      (.click popover (fn [e]
+                        (.fadeOut popover 400 #(.css popover #js {"display" "none"}))))
+      (.css popover #js {"top" (str (+ (.-top plus-offset) 40 window-scrolltop) "px")
+                         "left" (str (+ (.-left plus-offset) 100) "px")})
+      (.setTimeout js/window #(.fadeIn popover 400) 0))))
 
 (defn setup-hover-events [owner]
-  (when (.-$ js/window)
+  (when (.-$ js/window) ; avoid tests crash
     (-> (.$ js/window ".new-section")
         (.hover (fn [e]
                   (setup-plus-position e)
@@ -49,9 +50,10 @@
                   (om/update-state! owner :hover-add-section (fn [_]false)))))))
 
 (defn add-popover-container []
-  (let [popover (.$ js/window "<div class='new-section-popover-container'></div>")
-        body (.$ js/window (.-body js/document))]
-    (.append body popover)))
+  (when (.-$ js/window) ; avoid tests crash
+    (let [popover (.$ js/window "<div class='new-section-popover-container'></div>")
+          body (.$ js/window (.-body js/document))]
+      (.append body popover))))
 
 (defcomponent table-of-contents [data owner]
   (init-state [_]
