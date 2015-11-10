@@ -3,7 +3,8 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.api :as api]))
 
 (def first-cat-placeholder "first-category")
 
@@ -47,9 +48,6 @@
                 (fn [e]
                   (om/update-state! owner :hover-add-section (fn [_]false)))))))
 
-(defn remove-section [section-name]
-  (println "Removing section still WIP"))
-
 (defn add-popover-container []
   (let [popover (.$ js/window "<div class='new-section-popover-container'></div>")
         body (.$ js/window (.-body js/document))]
@@ -88,7 +86,7 @@
                   (dom/div {}
                     (dom/div {:class "category-section"}
                       (dom/div {:class "category-section-close"
-                                :on-click #(remove-section (name section))})
+                                :on-click #(api/remove-section (name section))})
                       (dom/a {:href "#"
                               :on-click (fn [e]
                                           (.preventDefault e)
