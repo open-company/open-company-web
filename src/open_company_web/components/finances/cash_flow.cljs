@@ -8,14 +8,12 @@
             [open-company-web.components.utility-components :refer [editable-pen]]
             [open-company-web.components.finances.utils :as finances-utils]))
 
-(def columns 5)
-
 (def green-color "#26C485")
 (def red-color "#d72a46")
 
 (defn chart-data-at-index [data prefix idx]
   (let [data (to-array data)
-        rev-idx (- (dec (min (count data) columns)) idx)
+        rev-idx (- (dec (min (count data) finances-utils/columns-num)) idx)
         obj (get data rev-idx)
         cash-flow (- (:revenue obj) (:costs obj))
         cash-flow (if (js/isNaN cash-flow) 0 cash-flow)
@@ -34,8 +32,9 @@
 
 (defn- get-chart-data [data prefix]
   "Vector of max *columns elements of [:Label value]"
-  (let [chart-data (partial chart-data-at-index data prefix)
-        placeholder-vect (range (min (count data) columns))]
+  (let [fixed-data (finances-utils/placeholder-data data)
+        chart-data (partial chart-data-at-index fixed-data prefix)
+        placeholder-vect (range finances-utils/columns-num)]
     { :prefix prefix
       :columns [["string" "Period"]
                 ["number" "Revenue"]
