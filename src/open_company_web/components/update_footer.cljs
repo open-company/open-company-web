@@ -9,7 +9,7 @@
     {:hover false})
   (did-mount [_]
     (when (.-$ js/window)
-      (.hover (.$ js/window "div.update-footer div.timeago")
+      (.hover (.$ js/window "div.update-footer div.timeago, div.update-footer-hover")
               #(om/update-state! owner :hover (fn [_]true))
               #(om/update-state! owner :hover (fn [_]false)))))
   (render [_]
