@@ -683,7 +683,7 @@ div.finances div.link-bar i.editable-pen{
   cursor: pointer;
 }
 
-div.finances div.link-bar.editable:hover i.editable-pen{
+div.finances:hover div.link-bar.editable i.editable-pen{
   opacity: 1;
 }
 
