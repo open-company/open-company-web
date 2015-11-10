@@ -9,14 +9,16 @@
     {:hover false})
   (did-mount [_]
     (when (.-$ js/window)
-      (.hover (.$ js/window "div.update-footer div.timeago, div.update-footer-hover")
+      (.hover (.$ js/window (str "#update-footer-" (name (:section data))))
               #(om/update-state! owner :hover (fn [_]true))
               #(om/update-state! owner :hover (fn [_]false)))))
   (render [_]
     (dom/div {:class "update-footer"}
       (dom/a {:href "#"
               :on-click #(.preventDefault %)}
-        (dom/div {:class "timeago"} (utils/time-since (:updated-at data)))
+        (dom/div {:class "timeago"
+                  :id (str "update-footer-" (name (:section data)))}
+                 (utils/time-since (:updated-at data)))
         (dom/div {:class (utils/class-set {:update-footer-hover true
                                            :show (om/get-state owner :hover)})}
           (dom/img {:src (:image (:author data)) :title (:name (:author data)) :class "author-image"})
