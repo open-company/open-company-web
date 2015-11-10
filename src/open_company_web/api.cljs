@@ -170,3 +170,30 @@
                                :section section
                                :slug (keyword slug)}]
             (flux/dispatch dispatcher/section dispatch-body)))))))
+
+(defn patch-sections [sections]
+  (when sections
+    (let [slug (keyword (:slug @router/path))
+          company-data (slug @dispatcher/app-state)
+          company-patch-link (utils/link-for (:links company-data) "update" "PATCH")
+          json-data (cljs->json {:sections sections})]
+      (api-patch (:href company-patch-link)
+        { :json-params json-data
+          :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (:type company-patch-link)}}
+        (fn [response]
+          (let [body (if (:success response) (json->cljs (:body response)) {})]
+            (flux/dispatch dispatcher/company body)))))))
+
+(defn remove-section [section-name]
+  (when (and section-name)
+    (let [slug (keyword (:slug @router/path))
+          company-data (slug @dispatcher/app-state)
+          sections (:sections company-data)
+          new-sections (apply merge (map (fn [[k v]]
+                                           {k (utils/vec-dissoc v section-name)})
+                                         sections))]
+      (patch-sections new-sections))))
