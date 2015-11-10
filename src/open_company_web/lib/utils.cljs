@@ -73,6 +73,9 @@
   [coll elm]
   (some #(= elm %) coll))
 
+(defn vec-dissoc [coll elem]
+  (vec (filter #(not (= elem %)) coll)))
+
 (defn get-period-string [period]
   (case period
     "M1" "January"
