@@ -4,7 +4,7 @@
               [open-company-web.lib.iso4217 :refer [iso4217]]
               [cljs.core.async :refer [put!]]
               [open-company-web.router :as router]
-              [open-company-web.caches :refer [revisions]]))
+              [open-company-web.caches :refer [revisions-cache]]))
 
 (defn abs [n] (max n (- n)))
 
@@ -355,10 +355,11 @@
 
 (defn select-section-data [section-data section as-of]
   (when as-of
-    (if (= as-of (:updated-at section-data))
-      section-data
-      (let [slug (keyword (:slug @router/path))]
-        (((keyword section) (slug @revisions)) as-of)))))
+    (let [slug (keyword (:slug @router/path))]
+      (if (or (not (contains? (slug revisions-cache) section))
+              (= as-of (:updated-at section-data)))
+        section-data
+        (((keyword section) (slug @revisions-cache)) as-of)))))
 
 (defn scroll-to-id [id & [duration]]
   (let [section-el (.$ js/window (str "#" id))
