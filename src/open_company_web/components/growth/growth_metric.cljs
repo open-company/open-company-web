@@ -23,17 +23,20 @@
         target (or (:target obj) 0)
         label (get-graph-tooltip (:period obj) column-name prefix value suffix)
         target-label (get-graph-tooltip (:period obj) "target" prefix (.toLocaleString target) suffix)
+        period (utils/period-string (:period obj) :short-month)
+        gray-color "fill-color: #DDDDDD"
+        blue-color "fill-color: #109DB7"
         values (if has-target
-                 [(utils/period-string (:period obj))
+                 [period
                   target
-                  "fill-color: #DDDDDD"
+                  gray-color
                   target-label
                   value
-                  "fill-color: #109DB7"
+                  blue-color
                   label]
-                 [(utils/period-string (:period obj))
+                 [period
                   value
-                  "fill-color: #109DB7"
+                  blue-color
                   label])]
     values))
 
