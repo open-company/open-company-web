@@ -69,7 +69,7 @@
      :hallo-loaded false
      :did-mount false
      :editing false
-     :should-collapse true
+     :should-collapse false
      :collapsed false
      :user-expanded false})
   (will-mount [_]
@@ -96,7 +96,7 @@
       ; reset collapsed and should-collapse
       (collapsed! owner false)
       (user-expanded! owner false)
-      (set-state! owner :should-collapse true)))
+      (set-state! owner :should-collapse false)))
   (did-update [_ _ _]
     (calc-collapse-add-onload owner data))
   (render [_]
