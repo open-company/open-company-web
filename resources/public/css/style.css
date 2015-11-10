@@ -677,6 +677,18 @@ div.composed-section-body.editable:hover i.editable-pen{
   cursor: pointer;
 }
 
+div.finances div.link-bar i.editable-pen{
+  opacity: 0;
+  margin-left: 10px;
+  cursor: default;
+}
+
+div.finances div.link-bar.editable:hover i.editable-pen{
+  opacity: 1;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
 div.finances-body table.table td, div.finances-body table.table th{
   text-align: right;
 }
