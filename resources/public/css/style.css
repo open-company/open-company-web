@@ -970,7 +970,6 @@ div.section-animator-box div.section-box {
 
 div.update-footer div.update-footer-hover{
   display: none;
-  width: 200px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 2px;
   position: absolute;
