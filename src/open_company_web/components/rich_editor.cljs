@@ -165,4 +165,5 @@
           (when (not no-data)
             (om/build update-footer {:author (:author section-data)
                                      :updated-at (:updated-at section-data)
-                                     :section section})))))))
+                                     :section section
+                                     :notes (:notes data)})))))))
