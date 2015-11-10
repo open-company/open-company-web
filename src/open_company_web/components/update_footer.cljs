@@ -11,18 +11,26 @@
                 "")]
     (str "update-footer-" section-name notes)))
 
+(defn setup-popover [data owner]
+  (when (.-$ js/window)
+    (let [component-id (get-footer-id data)
+          timeago-width (.width (.$ js/window (str "#" component-id)))
+          hover-div (.$ js/window (str "#" component-id "-hover"))]
+      (.css hover-div #js {"left" (str (+ timeago-width 15) "px")})
+      (.hover (.$ js/window (str "#" component-id ", #" component-id "-hover"))
+              #(om/update-state! owner :hover (fn [_]true))
+              #(om/update-state! owner :hover (fn [_]false))))))
+
 (defcomponent update-footer [data owner]
   (init-state [_]
     {:hover false})
   (did-mount [_]
-    (when (.-$ js/window)
-      (let [component-id (get-footer-id data)]
-        (.hover (.$ js/window (str "#" component-id ", #" component-id "-hover"))
-                #(om/update-state! owner :hover (fn [_]true))
-                #(om/update-state! owner :hover (fn [_]false))))))
+    (setup-popover data owner))
+  (did-update [_ _ _]
+    (setup-popover data owner))
   (render [_]
     (dom/div {:class "update-footer"}
-      (dom/div {:class "timeago"
+      (dom/span {:class "timeago"
                 :id (get-footer-id data)}
                (utils/time-since (:updated-at data)))
       (dom/div {:class (utils/class-set {:update-footer-hover true

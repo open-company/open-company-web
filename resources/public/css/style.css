@@ -406,11 +406,11 @@ div.update-footer div.author{
   font-weight: 600;
 }
 
-div.update-footer div.timeago{
+div.update-footer span.timeago{
   color: #5B5B5B;
   font-size: 13px;
   font-weight: 300;
-  width: 100px;
+  float: left;
 }
 
 div.update-footer img.author-image{
