@@ -20,17 +20,14 @@
       (dom/div {:class (utils/class-set {:section true
                                          :burn-rate true
                                          :read-only (:read-only data)})}
+        (dom/div {:class "chart-footer-container"}
+          (dom/div {:class "target-actual-container"}
+            (dom/div {:class "actual-container"}
+              (dom/h3 {:class "actual green"} burn-rate-val)
+              (dom/h3 {:class "actual-label gray"} (str "as of " (finances-utils/get-as-of-string (:period value-set)))))))
         (om/build column-chart (finances-utils/get-chart-data finances-data
                                                               cur-symbol
                                                               :burn-rate
                                                               "Burn Rate"
                                                               #js {"type" "string" "role" "style"}
-                                                              "fill-color: #109DB7"))
-        (dom/div {:class "chart-footer-container"}
-          (dom/div {:class "target-actual-container"}
-            (dom/div {:class "actual-container"}
-              (dom/h3 {:class "actual"} burn-rate-val)
-              (dom/h3 {:class "actual-label"} "ACTUAL"))))
-        (dom/div {:class "chart-footer-container"}
-          (dom/div {:class "period-container"}
-            (dom/p {} period)))))))
+                                                              "fill-color: #109DB7"))))))
