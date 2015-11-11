@@ -31,15 +31,6 @@
         fix-year (if change-year (dec int-year) int-year)]
     (str fix-year "-" (utils/add-zero fix-month))))
 
-(defn- get-previous-period [period]
-  (let [[year month] (clojure.string/split period "-")
-        int-year (int year)
-        int-month (int month)
-        dec-month (dec int-month)
-        fix-year (if (zero? dec-month) (dec int-year) int-year)
-        fix-month (if (zero? dec-month) 12 dec-month)]
-    (str fix-year "-" (utils/add-zero fix-month))))
-
 (defn placeholder-data [data]
   (if (>= (count data) columns-num)
     data
@@ -78,3 +69,8 @@
   (let [slug (:slug @router/path)
         company-data ((keyword slug) @dispatcher/app-state)]
     (:currency company-data)))
+
+(defn get-as-of-string [period]
+  (let [[year month] (clojure.string/split period "-")
+        month-name (utils/month-string month)]
+    (str month-name ", " year)))
