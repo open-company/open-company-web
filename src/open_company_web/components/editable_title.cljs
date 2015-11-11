@@ -5,11 +5,11 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]))
 
-(defn check-length [value elem px-pos cur-char-idx offset]
+(defn check-length [value elem px-pos cur-char-idx]
   (let [substr (subs value 0 cur-char-idx)]
     (set! (.-innerHTML elem) substr)
     (let [$e (.$ js/window elem)
-          str-width (+ (.width $e) offset)
+          str-width (.width $e)
           diff (utils/abs (- px-pos str-width))]
       (if (or (>= str-width px-pos)
               (< diff 5))
@@ -17,12 +17,9 @@
         false))))
 
 (defn get-char-index [value elem px-pos]
-  (let [$e (.$ js/window elem)
-          offset (.offset $e)
-          parent-offset (.offset (.parent $e))
-          offset (- (.-left offset) (.-left parent-offset))]
+  (let [$e (.$ js/window elem)]
     (loop [ch 1]
-      (let [check (check-length value elem px-pos ch offset)]
+      (let [check (check-length value elem px-pos ch)]
         (cond
           ; found character
           check
