@@ -50,7 +50,8 @@
           focus-metric-info (first (filter #(= (:slug %) focus) metrics-data))
           subsection-data {:metric-data focus-metric-data
                            :metric-info focus-metric-info
-                           :read-only read-only}]
+                           :read-only read-only
+                           :total-metrics (count metrics-data)}]
       (dom/div {:class "row" :id "section-growth"}
         (dom/div {:class "growth composed-section"}
           (om/build editable-title {:read-only read-only
@@ -65,11 +66,10 @@
                       metric-classes (utils/class-set {:composed-section-link true
                                                        mslug true
                                                        :active (= focus mslug)})]
-                  (dom/a {:href "#"
-                      :class metric-classes
-                      :title mname
-                      :data-tab mslug
-                      :on-click #(subsection-click % owner)} mname))))
+                  (dom/a {:class metric-classes
+                          :title mname
+                          :data-tab mslug
+                          :on-click #(subsection-click % owner)} mname))))
             (om/build add-metric {:click-callback nil :metrics-count (count metrics-data)}))
           (dom/div {:class (utils/class-set {:composed-section-body true
                                              :editable (not read-only)})}
