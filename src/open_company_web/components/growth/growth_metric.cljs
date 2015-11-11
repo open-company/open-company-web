@@ -19,7 +19,6 @@
        (if suffix (str " " suffix) "")))
 
 (defn chart-data-at-index [data column-name columns-num prefix suffix has-target interval idx]
-  (println "aaa" interval)
   (let [data (to-array data)
         rev-idx (- (dec columns-num) idx)
         obj (get data rev-idx)
@@ -70,7 +69,6 @@
 
 (defn- get-chart-data [data prefix column-name tooltip-suffix columns-num interval]
   "Vector of max *columns elements of [:Label value]"
-  (println "aaab" interval)
   (let [fixed-data (placeholder-data data columns-num)
         has-target (some #(:target %) data)
         chart-data (partial chart-data-at-index fixed-data column-name columns-num prefix tooltip-suffix has-target interval)
