@@ -23,7 +23,7 @@
       (str (quot runway-days (* 30 12)) " years"))))
 
 (defn get-runway-subtitle [cash avg-burn-rate runway-days cur-symbol]
-  (str cur-symbol (.toLocaleString cash) " ÷ " cur-symbol (.toLocaleString avg-burn-rate) " 3-months avg. burn: " (get-rounded-runway runway-days [:round])))
+  (str cur-symbol (.toLocaleString cash) " ÷ " cur-symbol (.toLocaleString (or avg-burn-rate 0)) " 3-months avg. burn: " (get-rounded-runway runway-days [:round])))
 
 (defcomponent runway [data owner]
   (render [_]
