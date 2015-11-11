@@ -399,7 +399,6 @@
     (str n "th")))
 
 (defn get-period-string [period interval & [flags]]
-  (println "asd" period interval)
   (case interval
     "quarterly"
     (let [[month year] (clojure.string/split period "-")]
