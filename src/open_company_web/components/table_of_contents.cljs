@@ -70,17 +70,18 @@
       (dom/div #js {:className "table-of-contents" :ref "table-of-contents"}
         (dom/div {:class (utils/class-set {:add-section true
                                            :show (or (om/get-state owner :hover-add-section)
-                                                      (om/get-state owner :hover-new-section))})
+                                                     (om/get-state owner :hover-new-section))})
                   :on-click #(show-popover % owner)}
           (dom/i {:class "fa fa-plus"}))
         (dom/div {:class "table-of-contents-inner"}
           (for [category categories]
             (dom/div {:class "category-container"}
-              (dom/div {:class (utils/class-set {:category true :empty (zero? (count ((keyword category) sections)))})} (dom/h3 (utils/camel-case-str (name category))))
-              (dom/div {:id (str "new-section-" first-cat-placeholder)
+              (dom/div {:class (utils/class-set {:category true
+                                                 :empty (zero? (count ((keyword category) sections)))})} (dom/h3 (utils/camel-case-str (name category))))
+              (dom/div {:id (str "new-section-first-" category)
                         :class (utils/class-set {:new-section true
-                                                 :hover (or (= (om/get-state owner :hover-new-section) (str "new-section-" first-cat-placeholder))
-                                                            (= (om/get-state owner :hover-add-section) (str "new-section-" first-cat-placeholder)))})
+                                                 :hover (or (= (om/get-state owner :hover-new-section) (str "new-section-first-" category))
+                                                            (= (om/get-state owner :hover-add-section) (str "new-section-first-" category)))})
                         :on-click #(show-popover % owner)}
                 (dom/div {:class "new-section-internal"}))
               (for [section (into [] (get sections (keyword category)))]
