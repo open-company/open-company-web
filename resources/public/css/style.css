@@ -325,6 +325,12 @@ div.composed-section div.section div.chart-footer-container div.actual-container
   float: right;
 }
 
+div.composed-section div.section div.chart-footer-container.chart-header div.actual-container {
+  width: 600px;
+  float: none;
+  margin-left: -225px;
+}
+
 div.target-actual-container div.target-container h3 {
   text-align: right;
   margin-right: 15px;
@@ -347,9 +353,17 @@ div.composed-section div.section div.chart-footer-container div.actual-container
   color: #26C485;
 }
 
+div.composed-section div.section div.chart-footer-container div.actual-container h3.actual.red {
+  color: #d72a46;
+}
+
 div.composed-section div.section div.chart-footer-container div.actual-container h3.actual-label {
   font-size: 12px;
   font-weight: 700;
+}
+
+div.composed-section div.section div.chart-footer-container div.actual-container h3.actual-label.gray {
+  color: #ADADAD;
 }
 
 div.composed-section div.section div.chart-footer-container div.target-container {
