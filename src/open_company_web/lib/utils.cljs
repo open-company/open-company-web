@@ -76,28 +76,6 @@
 (defn vec-dissoc [coll elem]
   (vec (filter #(not (= elem %)) coll)))
 
-(defn get-period-string [period]
-  (case period
-    "M1" "January"
-    "M2" "February"
-    "M3" "March"
-    "M4" "April"
-    "M5" "May"
-    "M6" "June"
-    "M7" "July"
-    "M8" "August"
-    "M9" "September"
-    "M10" "October"
-    "M11" "November"
-    "M12" "December"
-
-    "Q1" "January - March"
-    "Q2" "April - June"
-    "Q3" "July - September"
-    "Q4" "October - December"
-
-    ""))
-
 (defn month-string [month]
   (case month
     "01" "January"
