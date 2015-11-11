@@ -18,7 +18,8 @@
        (if value (.toLocaleString value) "")
        (if suffix (str " " suffix) "")))
 
-(defn chart-data-at-index [data column-name columns-num prefix suffix has-target idx]
+(defn chart-data-at-index [data column-name columns-num prefix suffix has-target interval idx]
+  (println "aaa" interval)
   (let [data (to-array data)
         rev-idx (- (dec columns-num) idx)
         obj (get data rev-idx)
@@ -26,7 +27,7 @@
         target (or (:target obj) 0)
         label (get-graph-tooltip (:period obj) column-name prefix value suffix)
         target-label (get-graph-tooltip (:period obj) "target" prefix (.toLocaleString target) suffix)
-        period (utils/period-string (:period obj) :short-month)
+        period (utils/get-period-string (:period obj) interval [:short])
         gray-color "fill-color: #DDDDDD"
         blue-color "fill-color: #109DB7"
         values (if has-target
@@ -67,11 +68,12 @@
                     plc-vec)]
       (concat data vect))))
 
-(defn- get-chart-data [data prefix column-name tooltip-suffix columns-num]
+(defn- get-chart-data [data prefix column-name tooltip-suffix columns-num interval]
   "Vector of max *columns elements of [:Label value]"
+  (println "aaab" interval)
   (let [fixed-data (placeholder-data data columns-num)
         has-target (some #(:target %) data)
-        chart-data (partial chart-data-at-index fixed-data column-name columns-num prefix tooltip-suffix has-target)
+        chart-data (partial chart-data-at-index fixed-data column-name columns-num prefix tooltip-suffix has-target interval)
         columns (if has-target
                   [["string" column-name]
                    ["number" "target"]
@@ -104,7 +106,8 @@
           actual-idx (get-actual sorted-metric)
           actual-set (sorted-metric actual-idx)
           actual (.toLocaleString (:value actual-set))
-          period (utils/period-string (:period actual-set))
+          interval (:interval metric-info)
+          period (utils/get-period-string (:period actual-set) interval)
           metric-unit (:unit metric-info)
           cur-unit (utils/get-symbol-for-currency-code metric-unit)
           fixed-cur-unit (if (= cur-unit metric-unit)
@@ -132,7 +135,8 @@
                                                    fixed-cur-unit
                                                    (:name metric-info)
                                                    unit
-                                                   (get-columns-num (:interval metric-info))))
+                                                   (get-columns-num interval)
+                                                   interval))
             (dom/div {:class "chart-footer-container"}
               (dom/div {:class (utils/class-set {:target-actual-container true :double target})}
                 (when target
