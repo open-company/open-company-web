@@ -69,7 +69,7 @@
           currency (finances-utils/get-currency-for-current-company)
           cur-symbol (utils/get-symbol-for-currency-code currency)
           cash-val (str cur-symbol (utils/format-value (:cash value-set)))
-          cash-flow-val (:avg-burn-rate value-set)
+          cash-flow-val (or (:avg-burn-rate value-set) 0)
           [year month] (clojure.string/split (:period value-set) "-")
           int-month (int month)
           month-3 (- int-month 2)
