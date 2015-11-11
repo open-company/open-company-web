@@ -6,7 +6,10 @@
             [open-company-web.components.charts :refer [column-chart]]
             [clojure.string :as clj-str]))
 
-(def columns-num 7)
+(defn get-columns-num [interval]
+  (case interval
+    "monthly" 12
+    8))
 
 (defn get-graph-tooltip [period label prefix value suffix]
   (str label
@@ -15,9 +18,9 @@
        (if value (.toLocaleString value) "")
        (if suffix (str " " suffix) "")))
 
-(defn chart-data-at-index [data column-name prefix suffix has-target idx]
+(defn chart-data-at-index [data column-name columns-num prefix suffix has-target idx]
   (let [data (to-array data)
-        rev-idx (- (dec (min (count data) columns-num)) idx)
+        rev-idx (- (dec columns-num) idx)
         obj (get data rev-idx)
         value (:value obj)
         target (or (:target obj) 0)
@@ -40,10 +43,35 @@
                   label])]
     values))
 
-(defn- get-chart-data [data prefix column-name tooltip-suffix]
+(defn- get-past-period [period diff columns-num]
+  (let [[year month] (clojure.string/split period "-")
+        int-year (int year)
+        int-month (int month)
+        diff-month (- int-month diff)
+        change-year (<= diff-month 0)
+        fix-month (if change-year (+ columns-num diff-month) diff-month)
+        fix-year (if change-year (dec int-year) int-year)]
+    (str fix-year "-" (utils/add-zero fix-month))))
+
+(defn placeholder-data [data columns-num]
+  (if (>= (count data) columns-num)
+    data
+    (let [first-period (or (:period (last data)) (utils/current-period))
+          rest-data (- columns-num (count data))
+          diff (- columns-num (count data))
+          plc-vec (vec (reverse (range rest-data)))
+          vect (map (fn [n]
+                      {:period (get-past-period first-period (- diff n) columns-num)
+                       :slug (:slug first-period)
+                       :value 0})
+                    plc-vec)]
+      (concat data vect))))
+
+(defn- get-chart-data [data prefix column-name tooltip-suffix columns-num]
   "Vector of max *columns elements of [:Label value]"
-  (let [has-target (some #(:target %) data)
-        chart-data (partial chart-data-at-index data column-name prefix tooltip-suffix has-target)
+  (let [fixed-data (placeholder-data data columns-num)
+        has-target (some #(:target %) data)
+        chart-data (partial chart-data-at-index fixed-data column-name columns-num prefix tooltip-suffix has-target)
         columns (if has-target
                   [["string" column-name]
                    ["number" "target"]
@@ -56,7 +84,7 @@
                    ["number" column-name]
                    #js {"type" "string" "role" "style"}
                    #js {"type" "string" "role" "tooltip"}])
-        mapper (vec (range (min (count data) columns-num)))
+        mapper (vec (range columns-num))
         values (vec (map chart-data mapper))]
     { :prefix (if prefix prefix "")
       :columns columns
@@ -83,18 +111,18 @@
                             nil
                             cur-unit)
           unit (if fixed-cur-unit nil (utils/camel-case-str metric-unit))
-          name-has-unit (.indexOf (clj-str/lower-case (str (:name metric-info))) (clj-str/lower-case metric-unit))
+          name-has-unit (> (.indexOf (clj-str/lower-case (str (:name metric-info))) (clj-str/lower-case metric-unit)) -1)
           actual-with-label (if fixed-cur-unit
                               (str fixed-cur-unit actual)
-                              (if name-has-unit
+                              (if (and name-has-unit (> (:total-metrics data) 1))
                                 (str actual)
-                                (str actual " " unit)))
+                                (str actual (if (= unit "%") "" " ") unit)))
           target (if (:target actual-set) (.toLocaleString (:target actual-set)) nil)
           target-with-label (if fixed-cur-unit
                               (str fixed-cur-unit target)
-                              (if name-has-unit
+                              (if (and name-has-unit (> (:total-metrics data) 1))
                                 (str target)
-                                (str target " " unit)))]
+                                (str target (if (= unit "%") "" " ") unit)))]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})}
@@ -103,7 +131,8 @@
             (om/build column-chart (get-chart-data sorted-metric
                                                    fixed-cur-unit
                                                    (:name metric-info)
-                                                   unit))
+                                                   unit
+                                                   (get-columns-num (:interval metric-info))))
             (dom/div {:class "chart-footer-container"}
               (dom/div {:class (utils/class-set {:target-actual-container true :double target})}
                 (when target
