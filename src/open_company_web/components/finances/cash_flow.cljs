@@ -15,20 +15,29 @@
   (let [data (to-array data)
         rev-idx (- (dec (min (count data) finances-utils/columns-num)) idx)
         obj (get data rev-idx)
-        cash-flow (- (:revenue obj) (:costs obj))
-        cash-flow (if (js/isNaN cash-flow) 0 cash-flow)
+        cash-flow (:burn-rate obj)
         cash-flow-pos? (pos? cash-flow)
         abs-cash-flow (utils/abs cash-flow)]
     [(utils/period-string (:period obj) :short-month)
      (:revenue obj)
      (str "fill-color: " green-color)
-     (str (utils/period-string (:period obj)) " Revenue: " prefix (.toLocaleString (:revenue obj)))
+     (str (utils/period-string (:period obj))
+          " Revenue: "
+          prefix
+          (.toLocaleString (:revenue obj)))
      (:costs obj)
      (str "fill-color: " red-color)
-     (str (utils/period-string (:period obj)) " Costs: " prefix (.toLocaleString (:costs obj)))
+     (str (utils/period-string (:period obj))
+          " Costs: "
+          prefix
+          (.toLocaleString (:costs obj)))
      abs-cash-flow
      (str "fill-color: " (if cash-flow-pos? green-color red-color))
-     (str (utils/period-string (:period obj)) " Cash flow: " (when (neg? cash-flow) "-") prefix (.toLocaleString abs-cash-flow))]))
+     (str (utils/period-string (:period obj))
+          " Cash flow: "
+          (when (neg? cash-flow) "-")
+          prefix
+          (.toLocaleString abs-cash-flow))]))
 
 (defn- get-chart-data [data prefix]
   "Vector of max *columns elements of [:Label value]"
@@ -59,16 +68,22 @@
           period (utils/period-string (:period value-set))
           currency (finances-utils/get-currency-for-current-company)
           cur-symbol (utils/get-symbol-for-currency-code currency)
-          cash-val (str cur-symbol (utils/format-value (:cash value-set)))]
+          cash-val (str cur-symbol (utils/format-value (:cash value-set)))
+          cash-flow-val (:avg-burn-rate value-set)
+          [year month] (clojure.string/split (:period value-set) "-")
+          int-month (int month)
+          month-3 (- int-month 2)
+          month-3-fixed (utils/add-zero (if (<= month-3 0) (- 12 month-3) month-3))]
       (dom/div {:class (utils/class-set {:section true
                                          :cash-flow true
                                          :read-only (:read-only data)})}
-        (om/build column-chart (get-chart-data sorted-finances cur-symbol))
         (dom/div {:class "chart-footer-container"}
           (dom/div {:class "target-actual-container"}
             (dom/div {:class "actual-container"}
-              (dom/h3 {:class "actual green"} cash-val)
-              (dom/h3 {:class "actual-label"} "ACTUAL"))))
-        (dom/div {:class "chart-footer-container"}
-          (dom/div {:class "period-container"}
-            (dom/p {} period)))))))
+              (dom/h3 {:class (utils/class-set {:actual true
+                                                :green (pos? cash-flow-val)
+                                                :red (not (pos? cash-flow-val))})}
+                                               (str cur-symbol (.toLocaleString cash-flow-val)))
+              (dom/h3 {:class "actual-label gray"}
+                      (str "3 months avg " (utils/month-short-string month-3-fixed) " - " (utils/month-short-string month))))))
+        (om/build column-chart (get-chart-data sorted-finances cur-symbol))))))
