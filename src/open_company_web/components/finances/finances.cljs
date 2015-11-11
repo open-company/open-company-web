@@ -66,8 +66,12 @@
           costs-classes (str classes (when (= focus "costs") " active"))
           runway-classes (str classes (when (= focus "runway") " active"))
           read-only (:read-only data)
+          cursor @dispatcher/app-state
+          slug (:slug @router/path)
+          company-data ((keyword slug) cursor)
           subsection-data {:section-data finances-data
                            :read-only read-only
+                           :currency (:currency company-data)
                            :editable-click-callback (:editable-click-callback data)}
           finances-row-data (:data finances-data)
           sum-revenues (apply + (map #(:revenue %) finances-row-data))
