@@ -73,28 +73,6 @@
   [coll elm]
   (some #(= elm %) coll))
 
-(defn get-period-string [period]
-  (case period
-    "M1" "January"
-    "M2" "February"
-    "M3" "March"
-    "M4" "April"
-    "M5" "May"
-    "M6" "June"
-    "M7" "July"
-    "M8" "August"
-    "M9" "September"
-    "M10" "October"
-    "M11" "November"
-    "M12" "December"
-
-    "Q1" "January - March"
-    "Q2" "April - June"
-    "Q3" "July - September"
-    "Q4" "October - December"
-
-    ""))
-
 (defn month-string [month]
   (case month
     "01" "January"
@@ -171,7 +149,9 @@
         (if (neg? avg)
           (let [period  (datas (dec idx))
                 runway (abs (int (* (/ (:cash period) avg) 30)))
-                fixed-period (assoc period :runway runway)
+                fixed-period (merge period {:runway runway
+                                            :avg-burn-rate avg
+                                            :burn-rate (burn-rate (:revenue period) (:costs period))})
                 datas   (assoc datas (dec idx) fixed-period)]
             (if (< idx (count sorted-data))
               (recur (inc idx)
@@ -365,3 +345,70 @@
 
 (defn scroll-to-section [section-name]
   (scroll-to-id (str "section-" (name section-name))))
+
+(defn get-quarter-string [quarter & [flags]]
+  (case quarter
+    "3"
+    (if (in? flags :short)
+      "First"
+      "First quarter")
+    "6"
+    (if (in? flags :short)
+      "Second"
+      "Second quarter")
+    "9"
+    (if (in? flags :short)
+      "Third"
+      "Third quarter")
+    "12"
+    (if (in? flags :short)
+      "Fourth"
+      "Fourth quarter")))
+
+(defn week-number
+  "From https://gist.github.com/remvee/2735ee151ab6ec075255
+  Week number according to the ISO-8601 standard, weeks starting on
+  Monday. The first week of the year is the week that contains that
+  year's first Thursday (='First 4-day week'). The highest week number
+  in a year is either 52 or 53."
+  [ts]
+  (let [year (.getFullYear ts)
+        month (.getMonth ts)
+        date (.getDate ts)
+        day (.getDay ts)
+        thursday (js/Date. year month (- (+ date 4) (if (= 0 day) 7 day)))
+        year-start (js/Date. year 0 1)]
+    (Math/ceil (/ (+ (/ (- (.getTime thursday)
+                           (.getTime year-start))
+                        (* 1000 60 60 24))
+                     1)
+                  7))))
+
+(defn add-ordinal-indicator [n]
+  (case (mod n 10)
+    1
+    (str n "st")
+    2
+    (str n "nd")
+    3
+    (str n "rd")
+    (str n "th")))
+
+(defn get-period-string [period interval & [flags]]
+  (println "asd" period interval)
+  (case interval
+    "quarterly"
+    (let [[month year] (clojure.string/split period "-")]
+      (if (in? flags :short)
+        (get-quarter-string month [:short])
+        (get-quarter-string month)))
+    "monthly"
+    (let [[year month] (clojure.string/split period "-")]
+      (if (in? flags :short)
+        (month-short-string month)
+        (month-string month)))
+    "weekly"
+    (let [week-num (add-ordinal-indicator (week-number (new js/Date period)))]
+      (if (in? flags :short)
+        (str week-num)
+        (str week-num " week")))))
