@@ -4,7 +4,7 @@
               [open-company-web.lib.iso4217 :refer [iso4217]]
               [cljs.core.async :refer [put!]]
               [open-company-web.router :as router]
-              [open-company-web.caches :refer [revisions]]))
+              [open-company-web.caches :as caches]))
 
 (defn abs [n] (max n (- n)))
 
@@ -72,6 +72,31 @@
   "true if seq contains elm"
   [coll elm]
   (some #(= elm %) coll))
+
+(defn vec-dissoc [coll elem]
+  (vec (filter #(not (= elem %)) coll)))
+
+(defn get-period-string [period]
+  (case period
+    "M1" "January"
+    "M2" "February"
+    "M3" "March"
+    "M4" "April"
+    "M5" "May"
+    "M6" "June"
+    "M7" "July"
+    "M8" "August"
+    "M9" "September"
+    "M10" "October"
+    "M11" "November"
+    "M12" "December"
+
+    "Q1" "January - March"
+    "Q2" "April - June"
+    "Q3" "July - September"
+    "Q4" "October - December"
+
+    ""))
 
 (defn month-string [month]
   (case month
@@ -332,10 +357,11 @@
 
 (defn select-section-data [section-data section as-of]
   (when as-of
-    (if (= as-of (:updated-at section-data))
-      section-data
-      (let [slug (keyword (:slug @router/path))]
-        (((keyword section) (slug @revisions)) as-of)))))
+    (let [slug (keyword (:slug @router/path))]
+      (if (or (not (contains? (slug @caches/revisions) section))
+              (= as-of (:updated-at section-data)))
+        section-data
+        (((keyword section) (slug @caches/revisions)) as-of)))))
 
 (defn scroll-to-id [id & [duration]]
   (let [section-el (.$ js/window (str "#" id))

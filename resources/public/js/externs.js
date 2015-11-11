@@ -16,7 +16,16 @@ $.bind = function(){};
 $.unbind = function(){};
 $.offset = {};
 $.offset.top = {};
+$.offset.left = {};
+$.position = {};
+$.position.top = {};
+$.position.left = {};
 $.each = function(){};
+$.click = function(){};
+$.remove = function(){};
+$.fadeIn = function(){};
+$.fadeOut = function(){};
+$.hover = function(){};
 $.each.load = function(){};
 $.load = function(){};
 // Hallo
