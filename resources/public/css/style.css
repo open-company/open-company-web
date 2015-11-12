@@ -948,14 +948,11 @@ div.table-of-contents div.table-of-contents-inner div.category h3{
 
 div.table-of-contents div.table-of-contents-inner div.category-section{
   height: 57px;
-  width: 207px;
-  margin-right: 20px;
-  padding-left: 10px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  width: 205px;
+  padding: 10px 0px 10px 10px;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category-section div.category-section-close {
+div.table-of-contents div.category-sortable div.category-section-close {
   float: left;
   opacity: 0;
   cursor: pointer;
@@ -966,17 +963,35 @@ div.table-of-contents div.table-of-contents-inner div.category-section div.categ
   background-size: 20px 20px;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category-section:hover div.category-section-close{
+div.table-of-contents div.category-sortable:hover div.category-section-close,
+div.table-of-contents div.category-sortable.ui-draggable-dragging div.category-section-close{
+  opacity: 1;
+}
+
+div.table-of-contents div.category-sortable div.category-section-sortable {
+  float: right;
+  opacity: 0;
+  cursor: hand;
+  margin-top: 6px;
+  background-image: url("/img/draggable.png");
+  width: 20px;
+  height: 30px;
+  background-size: 20px 30px;
+}
+
+div.table-of-contents div.category-sortable:hover div.category-section-sortable,
+div.table-of-contents div.category-sortable.ui-draggable-dragging div.category-section-sortable{
   opacity: 1;
 }
 
 div.table-of-contents div.table-of-contents-inner div.category-section a {
-  margin-left: 10px;
-  width: 160px;
+  margin: 0 10px 0 10px;
+  width: 135px;
   float: left;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category-section:hover{
+div.table-of-contents div.table-of-contents-inner div.category-sortable:hover,
+div.table-of-contents div.table-of-contents-inner div.category-sortable.ui-draggable-dragging{
   background-color: rgba(0, 0, 0, 0.07);
 }
 
