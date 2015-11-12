@@ -4,6 +4,8 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.api :as api]
+            [dommy.core :as dommy :refer-macros [sel1 sel]]
             [open-company-web.api :as api]))
 
 (def first-cat-placeholder "first-category")
@@ -55,15 +57,31 @@
           body (.$ js/window (.-body js/document))]
       (.append body popover))))
 
+(defn get-section-form-id [section-id]
+  (get (clojure.string/split section-id "-") 2))
+
+(defn sort-end [event ui categories]
+  (let [sections (apply merge (map (fn [category]
+                                     {(keyword category) (vec (map #(get-section-form-id (.-id %))
+                                                                   (sel (str "div.category-sortable.category-" category))))})
+                                   categories))]
+    (api/patch-sections sections)))
+
+(defn setup-sortable [categories]
+  (.sortable (.$ js/window ".category-container") #js {"axis" "y"
+                                                       "stop" #(sort-end %1 %2 categories)}))
+
 (defcomponent table-of-contents [data owner]
   (init-state [_]
     {:hover-add-section false
      :hover-new-section false})
   (did-mount [_]
     (setup-hover-events owner)
-    (add-popover-container))
+    (add-popover-container)
+    (setup-sortable (:categories data)))
   (did-update [_ _ _]
-    (setup-hover-events owner))
+    (setup-hover-events owner)
+    (setup-sortable (:categories data)))
   (render [_]
     (let [sections (:sections data)
           categories (:categories data)]
@@ -76,16 +94,19 @@
         (dom/div {:class "table-of-contents-inner"}
           (for [category categories]
             (dom/div {:class "category-container"}
-              (dom/div {:class (utils/class-set {:category true :empty (zero? (count ((keyword category) sections)))})} (dom/h3 (utils/camel-case-str (name category))))
+              (dom/div {:class (utils/class-set {:category true
+                                                 :empty (zero? (count ((keyword category) sections)))})}
+                       (dom/h3 (utils/camel-case-str (name category))))
               (dom/div {:id (str "new-section-" first-cat-placeholder)
                         :class (utils/class-set {:new-section true
                                                  :hover (or (= (om/get-state owner :hover-new-section) (str "new-section-" first-cat-placeholder))
                                                             (= (om/get-state owner :hover-add-section) (str "new-section-" first-cat-placeholder)))})
                         :on-click #(show-popover % owner)}
                 (dom/div {:class "new-section-internal"}))
-              (for [section (into [] (get sections (keyword category)))]
+              (for [section ((keyword category) sections)]
                 (let [section-data ((keyword section) data)]
-                  (dom/div {}
+                  (dom/div {:class (str "category-sortable category-" category)
+                            :id (str "section-sort-" (name section))}
                     (dom/div {:class "category-section"}
                       (dom/div {:class "category-section-close"
                                 :on-click #(api/remove-section (name section))})
@@ -94,7 +115,8 @@
                                           (.preventDefault e)
                                           (utils/scroll-to-section (name section)))}
                         (dom/p {:class "section-title"} (:title section-data))
-                        (dom/p {:class "section-date"} (utils/time-since (:updated-at section-data)))))
+                        (dom/p {:class "section-date"} (utils/time-since (:updated-at section-data))))
+                      (dom/div {:class "category-section-sortable"}))
                     (dom/div {:id (str "new-section-" (name section))
                               :class (utils/class-set {:new-section true
                                                        :hover (or (= (om/get-state owner :hover-new-section) (str "new-section-" (name section)))
