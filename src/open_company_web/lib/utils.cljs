@@ -4,7 +4,9 @@
               [open-company-web.lib.iso4217 :refer [iso4217]]
               [cljs.core.async :refer [put!]]
               [open-company-web.router :as router]
-              [open-company-web.caches :as caches]))
+              [open-company-web.caches :as caches]
+              [cljs-time.format :as cljs-time-format]
+              [cljs-time.core :as cljs-time]))
 
 (defn abs [n] (max n (- n)))
 
@@ -76,21 +78,87 @@
 (defn vec-dissoc [coll elem]
   (vec (filter #(not (= elem %)) coll)))
 
-(defn month-string [month]
-  (case month
-    "01" "January"
-    "02" "February"
-    "03" "March"
-    "04" "April"
-    "05" "May"
-    "06" "June"
-    "07" "July"
-    "08" "August"
-    "09" "September"
-    "10" "October"
-    "11" "November"
-    "12" "December"
-    ""))
+(defn month-string [month & [flags]]
+  (let [short-month (in? flags :short)]
+    (case month
+      "01" (if short-month
+             "JAN"
+             "January")
+      "02" (if short-month
+             "FEB"
+             "February")
+      "03" (if short-month
+             "MAR"
+             "March")
+      "04" (if short-month
+             "APR"
+             "April")
+      "05" (if short-month
+             "MAY"
+             "May")
+      "06" (if short-month
+             "JUN"
+             "June")
+      "07" (if short-month
+             "JUL"
+             "July")
+      "08" (if short-month
+             "AUG"
+             "August")
+      "09" (if short-month
+             "SEP"
+             "September")
+      "10" (if short-month
+             "OCT"
+             "October")
+      "11" (if short-month
+             "NOV"
+             "November")
+      "12" (if short-month
+             "DEC"
+             "December")
+      "")))
+
+(defn month-string-int [month & [flags]]
+  (let [short-month (in? flags :short)]
+    (case month
+      1 (if short-month
+          "JAN"
+          "January")
+      2 (if short-month
+          "FEB"
+          "February")
+      3 (if short-month
+          "MAR"
+          "March")
+      4 (if short-month
+          "APR"
+          "April")
+      5 (if short-month
+          "MAY"
+          "May")
+      6 (if short-month
+          "JUN"
+          "June")
+      7 (if short-month
+          "JUL"
+          "July")
+      8 (if short-month
+          "AUG"
+          "August")
+      9 (if short-month
+          "SEP"
+          "September")
+      10 (if short-month
+          "OCT"
+          "October")
+      11 (if short-month
+          "NOV"
+          "November")
+      12 (if short-month
+          "DEC"
+          "December")
+      "")))
 
 (defn month-short-string [month]
   (case month
@@ -350,68 +418,52 @@
 (defn scroll-to-section [section-name]
   (scroll-to-id (str "section-" (name section-name))))
 
-(defn get-quarter-string [quarter & [flags]]
-  (case quarter
-    "3"
-    (if (in? flags :short)
-      "First"
-      "First quarter")
-    "6"
-    (if (in? flags :short)
-      "Second"
-      "Second quarter")
-    "9"
-    (if (in? flags :short)
-      "Third"
-      "Third quarter")
-    "12"
-    (if (in? flags :short)
-      "Fourth"
-      "Fourth quarter")))
+(defn get-quarter-from-month [month & [flags]]
+  (let [short-str (in? flags :short)]
+    (cond
+      (and (>= month 1) (<= month 3))
+      (if short-str
+        "Q1"
+        "January - March")
+      (and (>= month 4) (<= month 6))
+      (if short-str
+        "Q2"
+        "April - June")
+      (and (>= month 7) (<= month 9))
+      (if short-str
+        "Q3"
+        "July - September")
+      (and (>= month 10) (<= month 12))
+      (if short-str
+        "Q4"
+        "October - December"))))
 
-(defn week-number
-  "From https://gist.github.com/remvee/2735ee151ab6ec075255
-  Week number according to the ISO-8601 standard, weeks starting on
-  Monday. The first week of the year is the week that contains that
-  year's first Thursday (='First 4-day week'). The highest week number
-  in a year is either 52 or 53."
-  [ts]
-  (let [year (.getFullYear ts)
-        month (.getMonth ts)
-        date (.getDate ts)
-        day (.getDay ts)
-        thursday (js/Date. year month (- (+ date 4) (if (= 0 day) 7 day)))
-        year-start (js/Date. year 0 1)]
-    (Math/ceil (/ (+ (/ (- (.getTime thursday)
-                           (.getTime year-start))
-                        (* 1000 60 60 24))
-                     1)
-                  7))))
 
-(defn add-ordinal-indicator [n]
-  (case (mod n 10)
-    1
-    (str n "st")
-    2
-    (str n "nd")
-    3
-    (str n "rd")
-    (str n "th")))
+(def quarterly-input-format (cljs-time-format/formatter "MM-yyyy"))
+(def monthly-input-format (cljs-time-format/formatter "yyyy-MM"))
+(def weekly-input-format (cljs-time-format/formatter "yyyy-MM-dd"))
 
-(defn get-period-string [period interval & [flags]]
+(defn get-formatter [interval]
+  "Get the date formatter from the interval type."
   (case interval
     "quarterly"
-    (let [[month year] (clojure.string/split period "-")]
-      (if (in? flags :short)
-        (get-quarter-string month [:short])
-        (get-quarter-string month)))
+    quarterly-input-format
     "monthly"
-    (let [[year month] (clojure.string/split period "-")]
-      (if (in? flags :short)
-        (month-short-string month)
-        (month-string month)))
+    monthly-input-format
     "weekly"
-    (let [week-num (add-ordinal-indicator (week-number (new js/Date period)))]
-      (if (in? flags :short)
-        (str week-num)
-        (str week-num " week")))))
+    weekly-input-format
+    :else
+    weekly-input-format))
+
+(defn get-period-string [period interval & [flags]]
+  "Get descriptive string for the period by interval. Use :short as a flag to get
+  the short formatted string."
+  (let [formatter (get-formatter interval)
+        date (cljs-time-format/parse formatter period)]
+    (case interval
+      "quarterly"
+      (str (get-quarter-from-month (cljs-time/month date) flags) " " (cljs-time/year date))
+      "monthly"
+      (str (month-string-int (cljs-time/month date) flags))
+      "weekly"
+      (str (month-string-int (cljs-time/month date) flags) " " (cljs-time/day date)))))
