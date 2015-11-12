@@ -76,12 +76,10 @@
     (when (not (:read-only data))
       ; add dependencies:
       ; jQuery UI
-      (cdr/add-style! "/lib/jquery-ui/jquery-ui.theme.min.css")
       (cdr/add-style! "/lib/jquery-ui/jquery-ui.structure.min.css")
       (cdr/add-style! "/lib/jquery-ui/jquery-ui.min.css")
       ; Add js synchronously: jquery ui, rangy and hallo
-      (cdr/add-scripts! [{:src "/lib/jquery-ui/jquery-ui.min.js"}
-                         {:src "/lib/rangy/rangy-core.min.js"}
+      (cdr/add-scripts! [{:src "/lib/rangy/rangy-core.min.js"}
                          {:src "/lib/hallo/hallo.js"}]
                         (fn []
                           (om/update-state! owner :hallo-loaded (fn [_]true))
