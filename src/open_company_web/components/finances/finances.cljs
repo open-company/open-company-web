@@ -123,7 +123,8 @@
               (om/build rich-editor {:read-only read-only
                                      :section-data notes-data
                                      :section :finances
-                                     :save-channel "save-finances-notes"}))
+                                     :save-channel "save-finances-notes"
+                                     :notes true}))
             (om/build revisions-navigator {:section-data finances-data
                                            :section :finances
                                            :actual-as-of (:actual-as-of data)
