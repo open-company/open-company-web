@@ -256,17 +256,11 @@ div.composed-section h2{
 div.composed-section h2.finances-edit-title{
   text-align: left;
   position: relative;
-  width: 600px;
-  margin-left: -300px;
-  left: 50%;
 }
 
 div.composed-section div.link-bar{
   text-align: left;
   z-index: 1;
-  margin-left: -300px;
-  left: 50%;
-  width: 600px;
   position: relative;
 }
 
@@ -285,9 +279,6 @@ div.composed-section div.link-bar a.composed-section-link.active{
 }
 
 div.composed-section div.composed-section-body{
-  width: 600px;
-  left: 50%;
-  margin-left: -300px;
   position: relative;
 }
 
@@ -394,14 +385,10 @@ div.finances div.finances-body div.section h3{
 
 div.finances div.finances-body div.section div.chart-container{
   position: relative;
-  left: 50%;
-  margin-left: -300px;
 }
 
 div.update-footer{
   position: relative;
-  left: 50%;
-  margin-left: -300px;
   margin-top: 30px;
   height: 24px;
   vertical-align: middle;
@@ -437,9 +424,6 @@ div.update-footer img.author-image{
 
 div.rich-editor-container {
   position: relative;
-  left: 50%;
-  margin-left: -300px;
-  width: 600px;
   margin-top: 30px;
 }
 
@@ -606,10 +590,7 @@ div.rich-editor-container button.collapse-button{
 }
 
 div.editable-title-container{
-  width: 600px;
   position: relative;
-  left: 50%;
-  margin-left: -300px;
   height: 55px;
   margin-top: 30px;
   margin-bottom: 10px;
@@ -675,8 +656,6 @@ form.linkForm input#addlinkButton {
 
 div.finances div.finances-body.edit{
   width: 800px;
-  left: 50%;
-  margin-left: -400px;
   position: relative;
 }
 
@@ -752,9 +731,6 @@ div.recent-updates div.recent-updates-item span.updated-at {
 }
 
 div.simple-section-revisions-navigator{
-  width: 600px;
-  left: 50%;
-  margin-left: -300px;
   position: relative;
 }
 
@@ -851,8 +827,8 @@ hr.section-separator{
   width: 600px;
   height: 1px;
   border: 0px solid transparent;
-  margin-top: 30px;
-  margin-bottom: 0px;
+  border-top: 0px solid transparent;
+  margin: 30px 0 0 0;
 }
 
 h4.login-error-message{
@@ -927,9 +903,6 @@ button.oc-btn.oc-cancel{
 
 div.sections-container{
   position: relative;
-  width: 600px;
-  margin-left: -300px;
-  left: 50%;
 }
 
 div.table-of-contents{
@@ -939,6 +912,12 @@ div.table-of-contents{
   height: 90%;
   padding: 10px;
   color: #2D2D2D;
+}
+
+@media (max-width: 1024px) {
+  div.table-of-contents {
+    display: none;
+  }
 }
 
 div.table-of-contents div.table-of-contents-inner{
