@@ -64,7 +64,13 @@ lein deps
 
 Users of the [OpenCompany.io](https://opencompany.io) platform should get started by going to [OpenCompany.io](https://opencompany.io). The following usage is for developers wanting to work on the platform's Web application software.
 
-To get an interactive development environment run:
+Local usage requires you to run 2 services, the [API service](https://github.com/open-company/open-company-api) and the [Auth service](https://github.com/open-company/open-company-auth). Both can be started in their respective repositiories with:
+
+```console
+lein start
+```
+
+To get an interactive web development environment run:
 
 ```console
 lein figwheel!
