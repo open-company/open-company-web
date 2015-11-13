@@ -67,7 +67,7 @@ Users of the [OpenCompany.io](https://opencompany.io) platform should get starte
 To get an interactive development environment run:
 
 ```console
-lein figwheel
+lein figwheel!
 ```
 
 Open your browser to [http://localhost:3449/](http://localhost:3449/).
