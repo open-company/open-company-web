@@ -29,7 +29,7 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root update-footer app-state {:target c})
-          timeago-node (sel1 c [:div.timeago])
+          timeago-node (sel1 c [:span.timeago])
           author-node (sel1 c [:div.author])
           image-node (sel1 c [:img.author-image])]
       (is (not (nil? timeago-node)))

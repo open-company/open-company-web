@@ -389,13 +389,13 @@ div.update-footer{
   left: 50%;
   margin-left: -300px;
   margin-top: 30px;
-  width: 600px;
   height: 24px;
   vertical-align: middle;
+  cursor: default;
 }
 
 div.update-footer div{
-  margin: 0px 0px 0px 35px;
+  margin: 0px;
   color: rgba(0, 0, 0, 0.4);
   text-decoration: none;
 }
@@ -406,10 +406,11 @@ div.update-footer div.author{
   font-weight: 600;
 }
 
-div.update-footer div.timeago{
+div.update-footer span.timeago{
   color: #5B5B5B;
   font-size: 13px;
   font-weight: 300;
+  float: left;
 }
 
 div.update-footer img.author-image{
@@ -1080,4 +1081,47 @@ div.section-animator-box div.section-box {
   top: 0;
   left: 0;
   width: 600px;
+}
+
+div.update-footer div.update-footer-hover {
+  display: none;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  position: absolute;
+  top: -14px;
+  left: 80px;
+  background-color: white;
+  padding: 5px;
+}
+
+div.update-footer div.update-footer-hover div.author {
+  margin: 8px 0 0 35px;
+}
+
+div.update-footer div.update-footer-hover.hover {
+  display: block;
+}
+
+div.update-footer-hover:after, div.update-footer-hover:before {
+  right: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+div.update-footer-hover:after {
+  border-color: transparent; /*rgba(136, 183, 213, 0);*/
+  border-right-color: white;
+  border-width: 7px;
+  margin-top: -7px;
+}
+div.update-footer-hover:before {
+  border-color: rgba(0, 0, 0, 0);
+  border-right-color: rgba(0, 0, 0, 0.3);
+  border-width: 8px;
+  margin-top: -8px;
 }
