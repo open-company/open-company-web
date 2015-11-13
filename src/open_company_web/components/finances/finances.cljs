@@ -7,7 +7,6 @@
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.components.finances.cash :refer (cash)]
             [open-company-web.components.finances.cash-flow :refer (cash-flow)]
-            [open-company-web.components.finances.revenue :refer (revenue)]
             [open-company-web.components.finances.costs :refer (costs)]
             [open-company-web.components.finances.runway :refer (runway)]
             [open-company-web.components.update-footer :refer (update-footer)]
@@ -77,7 +76,7 @@
           finances-row-data (:data finances-data)
           sum-revenues (apply + (map #(:revenue %) finances-row-data))
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
-          needs-runway (some #(contains? % :runway) finances-row-data)]
+          needs-runway (some #(and (contains? % :runway) (neg? (:runway %))) finances-row-data)]
       (dom/div {:class "section-container" :id "section-finances"}
         (dom/div {:class "composed-section finances"}
           (om/build editable-title {:read-only read-only
