@@ -77,7 +77,7 @@
       (dom/div {:class (utils/class-set {:section true
                                          :cash-flow true
                                          :read-only (:read-only data)})}
-        (dom/div {:class "chart-footer-container"}
+        (dom/div {:class "chart-header-container"}
           (dom/div {:class "target-actual-container"}
             (dom/div {:class "actual-container"}
               (dom/h3 {:class (utils/class-set {:actual true
