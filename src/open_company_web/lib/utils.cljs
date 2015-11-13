@@ -199,31 +199,34 @@
     0
     (.toLocaleString value)))
 
-(defn burn-rate [revenue costs]
+(defn calc-burn-rate [revenue costs]
   (- revenue costs))
 
-(defn avg-burn-rate [periods]
-  (let [burn-rates (map #(burn-rate (:revenue %) (:costs %)) periods)
+(defn calc-avg-burn-rate [periods]
+  (let [burn-rates (map #(calc-burn-rate (:revenue %) (:costs %)) periods)
         tot (count burn-rates)]
     (apply (fn [& items]
              (/ (apply + items) tot)) burn-rates)))
 
-(defn calc-runway
+(defn calc-runway [cash burn-rate]
+  (int (* (/ cash burn-rate) 30)))
+
+(defn calc-burnrate-runway
   "Helper function that add burn-rate and runway to each update section"
   [finances-data]
   (let [sort-pred (sort-by-key-pred :period)
         sorted-data (into [] (sort #(sort-pred %1 %2) finances-data))]
     (loop [idx 1
            datas sorted-data]
-      (let [start   (max 0 (- idx 3))
-            avg     (avg-burn-rate (subvec datas start idx))]
+      (let [start (max 0 (- idx 3))
+            avg-burn-rate (calc-avg-burn-rate (subvec datas start idx))]
         (let [period  (datas (dec idx))
-              runway (abs (int (* (/ (:cash period) avg) 30)))
+              runway (calc-runway (:cash period) avg-burn-rate) 
               fixed-period (merge period {:runway runway
-                                          :avg-burn-rate avg
-                                          :burn-rate (burn-rate (:revenue period) (:costs period))})
+                                          :avg-burn-rate avg-burn-rate
+                                          :burn-rate (calc-burn-rate (:revenue period) (:costs period))})
               datas   (assoc datas (dec idx) fixed-period)]
-          (if (< idx (dec (count sorted-data)))
+          (if (< idx (count sorted-data))
             (recur (inc idx)
                    datas)
             datas))))))
@@ -342,7 +345,7 @@
 
 (defn fix-finances [section-body]
   (let [finances-data (:data section-body)
-        fixed-finances (calc-runway finances-data)
+        fixed-finances (calc-burnrate-runway finances-data)
         sort-pred (sort-by-key-pred :period true)
         sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
         fixed-section (assoc section-body :data sorted-finances)
