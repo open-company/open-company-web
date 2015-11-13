@@ -5,18 +5,18 @@
 
 (def columns-num 12)
 
-(defn chart-data-at-index [data keyw column-name prefix suffix idx]
+(defn chart-data-at-index [data keyw column-name prefix suffix real-data-count idx]
   (let [data (to-array data)
         rev-idx (- (- (min (count data) columns-num) 1) idx)
-        has-value (< idx (count data))
-        obj (if has-value (get data rev-idx) 0)
+        has-value (>= idx real-data-count)
+        obj (get data rev-idx)
         value (keyw obj)
-        label (if value
-                (str (utils/period-string (:period obj)) " " column-name ": " prefix (.toLocaleString (keyw obj)) suffix)
-                "Profitable")
-        period (if has-value
-                 (utils/period-string (:period obj) :short-month)
-                 )]
+        label (if has-value
+                (if (and (= keyw :runway) (zero? value))
+                  "Profitable"
+                  (str (utils/period-string (:period obj)) " " column-name ": " prefix (.toLocaleString (keyw obj)) suffix))
+                "N/A")
+        period (utils/period-string (:period obj) :short-month)]
     [period
      value
      label]))
@@ -52,7 +52,7 @@
 (defn- get-chart-data [data prefix keyw column-name & [style fill-color pattern tooltip-suffix]]
   "Vector of max *columns-num elements of [:Label value]"
   (let [fixed-data (placeholder-data data)
-        chart-data (partial chart-data-at-index fixed-data keyw column-name prefix tooltip-suffix)
+        chart-data (partial chart-data-at-index fixed-data keyw column-name prefix tooltip-suffix (count data))
         placeholder-vect (vec (range columns-num))
         columns [["string" column-name]
                  ["number" (utils/camel-case-str (name keyw))]
