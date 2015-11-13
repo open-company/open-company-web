@@ -7,7 +7,8 @@
             [open-company-web.lib.iso4217 :refer [iso4217]]
             [open-company-web.components.charts :refer [column-chart]]
             [open-company-web.components.finances.utils :as finances-utils]
-            [open-company-web.components.utility-components :refer [editable-pen]]))
+            [open-company-web.components.utility-components :refer [editable-pen]]
+            [open-company-web.lib.oc-colors :as occ]))
 
 (defcomponent revenue [data owner]
   (render [_]
@@ -20,17 +21,14 @@
       (dom/div {:class (utils/class-set {:section true
                                          :revenue true
                                          :read-only (:read-only data)})}
+        (dom/div {:class "chart-header-container"}
+          (dom/div {:class "target-actual-container"}
+            (dom/div {:class "actual-container"}
+              (dom/h3 {:class "actual gray"} revenue-val)
+              (dom/h3 {:class "actual-label gray"} (str "as of " (finances-utils/get-as-of-string (:period value-set)))))))
         (om/build column-chart (finances-utils/get-chart-data finances-data
                                                               cur-symbol
                                                               :revenue 
                                                               "Revenue"
                                                               #js {"type" "string" "role" "style"}
-                                                              "fill-color: #ADADAD"))
-        (dom/div {:class "chart-footer-container"}
-          (dom/div {:class "target-actual-container"}
-            (dom/div {:class "actual-container"}
-              (dom/h3 {:class "actual gray"} revenue-val)
-              (dom/h3 {:class "actual-label"} "ACTUAL"))))
-        (dom/div {:class "chart-footer-container"}
-          (dom/div {:class "period-container"}
-            (dom/p {} period)))))))
+                                                              (occ/fill-color :gray)))))))

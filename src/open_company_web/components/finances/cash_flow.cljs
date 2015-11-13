@@ -6,10 +6,8 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.charts :refer [column-chart]]
             [open-company-web.components.utility-components :refer [editable-pen]]
-            [open-company-web.components.finances.utils :as finances-utils]))
-
-(def green-color "#26C485")
-(def red-color "#d72a46")
+            [open-company-web.components.finances.utils :as finances-utils]
+            [open-company-web.lib.oc-colors :as occ]))
 
 (defn chart-data-at-index [data prefix idx]
   (let [data (to-array data)
@@ -20,19 +18,19 @@
         abs-cash-flow (utils/abs cash-flow)]
     [(utils/period-string (:period obj) :short-month)
      (:revenue obj)
-     (str "fill-color: " green-color)
+     (occ/fill-color :green)
      (str (utils/period-string (:period obj))
           " Revenue: "
           prefix
           (.toLocaleString (:revenue obj)))
      (:costs obj)
-     (str "fill-color: " red-color)
+     (occ/fill-color :red)
      (str (utils/period-string (:period obj))
           " Costs: "
           prefix
           (.toLocaleString (:costs obj)))
      abs-cash-flow
-     (str "fill-color: " (if cash-flow-pos? green-color red-color))
+     (occ/fill-color (if cash-flow-pos? :green :red))
      (str (utils/period-string (:period obj))
           " Cash flow: "
           (when (neg? cash-flow) "-")
