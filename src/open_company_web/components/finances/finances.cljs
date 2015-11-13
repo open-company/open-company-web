@@ -78,7 +78,7 @@
           sum-revenues (apply + (map #(:revenue %) finances-row-data))
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
           needs-runway (some #(contains? % :runway) finances-row-data)]
-      (dom/div {:class "section-container row" :id "section-finances"}
+      (dom/div {:class "section-container" :id "section-finances"}
         (dom/div {:class "composed-section finances"}
           (om/build editable-title {:read-only read-only
                                     :section-data finances-data

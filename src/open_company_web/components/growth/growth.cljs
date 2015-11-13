@@ -52,8 +52,8 @@
                            :metric-info focus-metric-info
                            :read-only read-only
                            :total-metrics (count metrics-data)}]
-      (dom/div {:class "row" :id "section-growth"}
-        (dom/div {:class "growth composed-section"}
+      (dom/div {:class "section-container" :id "section-growth"}
+        (dom/div {:class "composed-section growth"}
           (om/build editable-title {:read-only read-only
                                     :section-data growth-section
                                     :section :growth
