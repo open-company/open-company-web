@@ -43,7 +43,7 @@
                           runway
                           (get-rounded-runway runway-value))]
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))}
-        (dom/div {:class "chart-footer-container chart-header"}
+        (dom/div {:class "chart-header-container"}
           (dom/div {:class "target-actual-container"}
             (dom/div {:class "actual-container"}
               (dom/h3 {:class "actual green"} runway-string)
