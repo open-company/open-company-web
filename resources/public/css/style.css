@@ -307,7 +307,6 @@ div.composed-section div.section div.period-container p {
 }
 
 div.composed-section div.section div.chart-header-container div.target-actual-container{
-  width: 250px;
   height: 70px;
 }
 
@@ -317,14 +316,9 @@ div.composed-section div.section div.chart-footer-container div.target-actual-co
   margin-left: 225px;
 }
 
-div.composed-section div.section div.chart-header-container div.target-actual-container.double,
 div.composed-section div.section div.chart-footer-container div.target-actual-container.double {
   width: 300px;
   margin-left: 150px;
-}
-
-div.composed-section div.section div.chart-header-container div.actual-container{
-  width: 250px;
 }
 
 div.composed-section div.section div.chart-footer-container div.actual-container {
