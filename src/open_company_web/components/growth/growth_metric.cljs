@@ -4,7 +4,8 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.charts :refer [column-chart]]
-            [clojure.string :as clj-str]))
+            [clojure.string :as clj-str]
+            [open-company-web.lib.oc-colors :as occ]))
 
 (defn get-columns-num [interval]
   (case interval
@@ -27,19 +28,17 @@
         label (get-graph-tooltip (:period obj) column-name prefix value suffix)
         target-label (get-graph-tooltip (:period obj) "target" prefix (.toLocaleString target) suffix)
         period (utils/get-period-string (:period obj) interval [:short])
-        gray-color "fill-color: #DDDDDD"
-        blue-color "fill-color: #109DB7"
         values (if has-target
                  [period
                   target
-                  gray-color
+                  (occ/fill-color :gray)
                   target-label
                   value
-                  blue-color
+                  (occ/fill-color :blue)
                   label]
                  [period
                   value
-                  blue-color
+                  (occ/fill-color :blue)
                   label])]
     values))
 
