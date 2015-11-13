@@ -217,17 +217,12 @@
            datas sorted-data]
       (let [start   (max 0 (- idx 3))
             avg     (avg-burn-rate (subvec datas start idx))]
-        (if (neg? avg)
-          (let [period  (datas (dec idx))
-                runway (abs (int (* (/ (:cash period) avg) 30)))
-                fixed-period (merge period {:runway runway
-                                            :avg-burn-rate avg
-                                            :burn-rate (burn-rate (:revenue period) (:costs period))})
-                datas   (assoc datas (dec idx) fixed-period)]
-            (if (< idx (count sorted-data))
-              (recur (inc idx)
-                     datas)
-              datas))
+        (let [period  (datas (dec idx))
+              runway (abs (int (* (/ (:cash period) avg) 30)))
+              fixed-period (merge period {:runway runway
+                                          :avg-burn-rate avg
+                                          :burn-rate (burn-rate (:revenue period) (:costs period))})
+              datas   (assoc datas (dec idx) fixed-period)]
           (if (< idx (dec (count sorted-data)))
             (recur (inc idx)
                    datas)
