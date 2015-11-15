@@ -91,7 +91,7 @@ You should see an alert in the browser window.
 If you want to use the [devcards](https://github.com/bhauman/devcards) for development, run:
 
 ```console
-lein devcards
+lein devcards!
 ```
 
 Then load [http://localhost:3449/devcards](http://localhost:3449/devcards) in your browser.

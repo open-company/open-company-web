@@ -136,7 +136,7 @@
           slug (:slug @router/path)
           data {:data (map #(dissoc % :burn-rate :runway) (:data finances-data))}
           json-data (cljs->json data)
-          finances-link (utils/link-for links "update" "PATCH")]
+          finances-link (utils/link-for links "partial-update" "PATCH")]
       (api-patch (:href finances-link)
         { :json-params json-data
           :headers {
@@ -156,7 +156,7 @@
     (let [slug (:slug @router/path)
           clean-notes-data (dissoc notes-data :author :updated-at)
           json-data (cljs->json {:notes notes-data})
-          section-link (utils/link-for links "update" "PATCH")]
+          section-link (utils/link-for links "partial-update" "PATCH")]
       (api-patch (:href section-link)
         { :json-params json-data
           :headers {
@@ -175,7 +175,7 @@
   (when sections
     (let [slug (keyword (:slug @router/path))
           company-data (slug @dispatcher/app-state)
-          company-patch-link (utils/link-for (:links company-data) "update" "PATCH")
+          company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
           json-data (cljs->json {:sections sections})]
       (api-patch (:href company-patch-link)
         { :json-params json-data
