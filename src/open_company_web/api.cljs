@@ -1,17 +1,17 @@
 (ns open-company-web.api
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [cljs.core.async :as async :refer [<!]]
+  (:require-macros [cljs.core.async.macros :refer (go)])
+  (:require [cljs.core.async :as async :refer (<!)]
             [cljs-http.client :as http]
-            [clojure.string :refer [join]]
+            [clojure.string :refer (join)]
             [open-company-web.dispatcher :as dispatcher]
             [cljs-flux.dispatcher :as flux]
             [cognitect.transit :as t]
-            [clojure.walk :refer [keywordize-keys stringify-keys]]
+            [clojure.walk :refer (keywordize-keys stringify-keys)]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.jwt :as j]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.caches :refer [revisions]]))
+            [open-company-web.caches :refer (revisions)]))
 
 
 (def ^:private api-endpoint ls/api-server-domain)

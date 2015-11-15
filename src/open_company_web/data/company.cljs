@@ -1,14 +1,14 @@
-(ns open-company-web.data.finances)
+(ns open-company-web.data.company)
 
-(def finances {
+(def company {
   :name "Buffer"
   :currency "USD"
   :slug "buffer"
   
-  :sections ["finances" "challenges"]
+  :categories ["progress", "company"]
+  :sections {:progress ["finances" "challenges" "growth"] :company []}
   
   :challenges {
-    :section :challenges
     :title "Key Challenges"
     :body "<h3>Recruiting</h3><p>We're continuing our fast pace of growing the team, and we'd love your help to spread the word about all our <a>current open positions</a>, <a href=\"http://twitter.com\">Twitter</a> or <a href=\"http://buffer.com\">Buffer</a>.</p>
 <h3>Spead & Reliability</h3><p>We've made some key speed and reliability <a href=\"/improvements\">improvements</a> to <a href=\"http://buffer.com/b2b\">Buffer for business</a>, but there is still a ways to go. Everyone please drop everything and support the devops team in anyway you can when we have an outage situation.</p>
@@ -21,8 +21,78 @@
     }
   }
   
+  :growth {
+    :title "Key metrics"
+    :metrics [
+      {
+        :slug "test-metric"
+        :name "Test metric"
+        :interval "monthly"
+        :unit "USD"
+        :target "high"
+      }]
+    :data [
+      {
+        :period "10-2015"
+        :slug "test-metric"
+        :value 12345
+      }
+      {
+        :period "11-2015"
+        :slug "test-metric"
+        :value 13456
+      }]
+    :author {
+      :user-id "123456"
+      :image "http://www.emoticonswallpapers.com/avatar/cartoons/Wiley-Coyote-Dazed.jpg"
+      :name "Wile E. Coyote"
+    }
+    :notes {
+      :body "This is what I have to say about that."
+      :author {
+        :user-id "123456"
+        :image "http://www.emoticonswallpapers.com/avatar/cartoons/Wiley-Coyote-Dazed.jpg"
+        :name "Wile E. Coyote"
+      }
+      :links [
+        {
+          :rel "self"
+          :method "GET"
+          :href "/companies/buffer/growth/notes"
+          :type "application/vnd.open-company.notes.v1+json"
+        }
+        {
+          :rel "update"
+          :method "POST"
+          :href "/companies/buffer/growth/notes"
+          :type "application/vnd.open-company.notes.v1+json"
+        }
+      ]
+    }
+    :updated-at "2015-09-14T20:49:19Z"
+    :links [
+      {
+        :rel "self"
+        :method "GET"
+        :href "/companies/buffer/growth"
+        :type "application/vnd.open-company.section.v1+json"
+      }
+      {
+        :rel "update"
+        :method "POST"
+        :href "/companies/buffer/growth"
+        :type "application/vnd.open-company.section.v1+json"
+      }
+      {
+        :rel "partial-update"
+        :method "PATCH"
+        :href "/companies/buffer/growth"
+        :type "application/vnd.open-company.section.v1+json"
+      }
+    ]
+  }
+
   :finances {
-    :section :finances
     :data [
       {
         :period "2015-08"
@@ -126,19 +196,19 @@
         :rel "self"
         :method "GET"
         :href "/companies/buffer/finances"
-        :type "application/vnd.open-company.section.finances.v1+json"
+        :type "application/vnd.open-company.section.v1+json"
       }
       {
         :rel "update"
         :method "POST"
         :href "/companies/buffer/finances"
-        :type "application/vnd.open-company.section.finances.v1+json"
+        :type "application/vnd.open-company.section.v1+json"
       }
       {
         :rel "partial-update"
         :method "PATCH"
         :href "/companies/buffer/finances"
-        :type "application/vnd.open-company.section.finances.v1+json"
+        :type "application/vnd.open-company.section.v1+json"
       }
     ]
   }
