@@ -16,6 +16,7 @@
             [open-company-web.components.revisions-navigator :refer [revisions-navigator]]
             [open-company-web.api :as api]
             [open-company-web.components.editable-title :refer [editable-title]]
+            [open-company-web.components.utility-components :refer [editable-pen]]
             [cljs.core.async :refer [chan <!]]))
 
 (defn subsection-click [e owner]
@@ -79,7 +80,8 @@
                                     :section-data finances-data
                                     :section :finances
                                     :save-channel "save-section-finances"})
-          (dom/div {:class "link-bar"}
+          (dom/div {:class (utils/class-set {:link-bar true
+                                             :editable (not read-only)})}
             (dom/a {:href "#"
                     :class cash-classes
                     :title "Cash"
@@ -95,9 +97,9 @@
                       :class runway-classes
                       :title "Runway"
                       :data-tab "runway"
-                      :on-click #(subsection-click % owner)} "Runway")))
-          (dom/div {:class (utils/class-set {:composed-section-body true
-                                             :editable (not read-only)})}
+                      :on-click #(subsection-click % owner)} "Runway"))
+            (om/build editable-pen {:click-callback (:editable-click-callback data)}))
+          (dom/div {:class (utils/class-set {:composed-section-body true})}
             (case focus
 
               "cash"
@@ -117,7 +119,8 @@
               (om/build rich-editor {:read-only read-only
                                      :section-data notes-data
                                      :section :finances
-                                     :save-channel "save-finances-notes"}))
+                                     :save-channel "save-finances-notes"
+                                     :notes true}))
             (om/build revisions-navigator {:section-data finances-data
                                            :section :finances
                                            :actual-as-of (:actual-as-of data)

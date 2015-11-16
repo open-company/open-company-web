@@ -9,14 +9,13 @@
   :min-lein-version "2.5.1" ; highest version supported by Travis-CI as of 7/5/2015
 
   :dependencies [
-    [org.clojure/clojure "1.7.0"] ; Lisp on the JVM http://clojure.org/documentation
-    ; --- DO NOT UPDATE to 1.7.166, errors
-    [org.clojure/clojurescript "1.7.145"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    [org.clojure/clojure "1.8.0-RC1"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojurescript "1.7.170"] ; ClojureScript compiler https://github.com/clojure/clojurescript
     ; --- DO NOT UPDATE OM, the 1.x.x code is Om Next and requires changes on our part https://github.com/omcljs/om/wiki/Quick-Start-(om.next)
     [org.omcljs/om "0.9.0" :exclusions [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
     [cljs-http "0.1.37"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/schema "1.0.3"] ; Dependency of om-tools https://github.com/Prismatic/schema
-    [prismatic/plumbing "0.5.1"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
+    [prismatic/plumbing "0.5.2"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [prismatic/om-tools "0.4.0"] ; Tools for Om https://github.com/Prismatic/om-tools
     [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
     [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; React test utilities https://github.com/bensu/cljs-react-test
@@ -29,8 +28,8 @@
   ]
 
   :plugins [
-    [lein-cljsbuild "1.1.0"] ; ClojureScript compiler https://github.com/emezeske/lein-cljsbuild
-    [lein-figwheel "0.4.1"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
+    [lein-cljsbuild "1.1.1"] ; ClojureScript compiler https://github.com/emezeske/lein-cljsbuild
+    [lein-figwheel "0.5.0-SNAPSHOT"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
     [lein-ancient "0.6.8"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
     [lein-doo "0.1.5"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
     [lein-deps-tree "0.1.2"] ; Print a tree of project dependencies https://github.com/the-kenny/lein-deps-tree
@@ -160,7 +159,7 @@
     "build" ["cljsbuild" "once" "dev"]
     "build!" ["cljsbuild" "once" "min"]
     "figwheel!" ["with-profile" "+devcards" "figwheel"]
-    "devcards" ["with-profile" "+devcards" "figwheel" "devcards"]
+    "devcards!" ["with-profile" "+devcards" "figwheel" "devcards"]
     "test-navigation!" ["with-profile" "+devcards" "doo" "phantom" "test-navigation" "once"]
     "test-company!" ["with-profile" "+devcards" "doo" "phantom" "test-company" "once"]
     "test-ui-components!" ["with-profile" "+devcards" "doo" "phantom" "test-ui-components" "once"]

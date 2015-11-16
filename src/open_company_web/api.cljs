@@ -1,17 +1,17 @@
 (ns open-company-web.api
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [cljs.core.async :as async :refer [<!]]
+  (:require-macros [cljs.core.async.macros :refer (go)])
+  (:require [cljs.core.async :as async :refer (<!)]
             [cljs-http.client :as http]
-            [clojure.string :refer [join]]
+            [clojure.string :refer (join)]
             [open-company-web.dispatcher :as dispatcher]
             [cljs-flux.dispatcher :as flux]
             [cognitect.transit :as t]
-            [clojure.walk :refer [keywordize-keys stringify-keys]]
+            [clojure.walk :refer (keywordize-keys stringify-keys)]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.jwt :as j]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.caches :refer [revisions]]))
+            [open-company-web.caches :refer (revisions)]))
 
 
 (def ^:private api-endpoint ls/api-server-domain)
@@ -136,7 +136,7 @@
           slug (:slug @router/path)
           data {:data (map #(dissoc % :burn-rate :runway) (:data finances-data))}
           json-data (cljs->json data)
-          finances-link (utils/link-for links "update" "PATCH")]
+          finances-link (utils/link-for links "partial-update" "PATCH")]
       (api-patch (:href finances-link)
         { :json-params json-data
           :headers {
@@ -156,7 +156,7 @@
     (let [slug (:slug @router/path)
           clean-notes-data (dissoc notes-data :author :updated-at)
           json-data (cljs->json {:notes notes-data})
-          section-link (utils/link-for links "update" "PATCH")]
+          section-link (utils/link-for links "partial-update" "PATCH")]
       (api-patch (:href section-link)
         { :json-params json-data
           :headers {
@@ -170,3 +170,30 @@
                                :section section
                                :slug (keyword slug)}]
             (flux/dispatch dispatcher/section dispatch-body)))))))
+
+(defn patch-sections [sections]
+  (when sections
+    (let [slug (keyword (:slug @router/path))
+          company-data (slug @dispatcher/app-state)
+          company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
+          json-data (cljs->json {:sections sections})]
+      (api-patch (:href company-patch-link)
+        { :json-params json-data
+          :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (:type company-patch-link)}}
+        (fn [response]
+          (let [body (if (:success response) (json->cljs (:body response)) {})]
+            (flux/dispatch dispatcher/company body)))))))
+
+(defn remove-section [section-name]
+  (when (and section-name)
+    (let [slug (keyword (:slug @router/path))
+          company-data (slug @dispatcher/app-state)
+          sections (:sections company-data)
+          new-sections (apply merge (map (fn [[k v]]
+                                           {k (utils/vec-dissoc v section-name)})
+                                         sections))]
+      (patch-sections new-sections))))

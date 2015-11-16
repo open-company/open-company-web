@@ -4,7 +4,7 @@
               [open-company-web.lib.iso4217 :refer [iso4217]]
               [cljs.core.async :refer [put!]]
               [open-company-web.router :as router]
-              [open-company-web.caches :refer [revisions]]))
+              [open-company-web.caches :as caches]))
 
 (defn abs [n] (max n (- n)))
 
@@ -72,6 +72,9 @@
   "true if seq contains elm"
   [coll elm]
   (some #(= elm %) coll))
+
+(defn vec-dissoc [coll elem]
+  (vec (filter #(not (= elem %)) coll)))
 
 (defn get-period-string [period]
   (case period
@@ -195,6 +198,12 @@
 (defn add-zero [v]
   (str (when (< v 10) "0") v))
 
+(defn add-zeros [v]
+  (str (cond
+        (< v 10) "00"
+        (< v 100) "0")
+    v))
+
 (defn date-string [js-date & [year]]
   (let [month (month-string (add-zero (inc (.getMonth js-date))))
         day (add-zero (.getDate js-date))]
@@ -303,17 +312,20 @@
         section-with-notes (merge finances-empty-notes fixed-section)]
     section-with-notes))
 
-(defn fix-section [section-body section-name & [read-only]]
+(defn fix-section 
+  "Add `:section` name, `:as-of` and `:read-only` keys to the section map"
+  [section-body section-name & [read-only]]
   (let [read-only (or read-only false)
-        with-section-key (assoc section-body :section (name section-name))
-        with-as-of (assoc with-section-key :as-of (:updated-at with-section-key))
-        with-read-only (assoc with-as-of :read-only read-only)]
+        with-read-only (-> section-body
+                        (assoc :section (name section-name))
+                        (assoc :as-of (:updated-at section-body))
+                        (assoc :read-only read-only))]
     (if (= section-name :finances)
       (fix-finances with-read-only)
       with-read-only)))
 
 (defn fix-sections [company-data]
-  "add section name in each section and a section sorter"
+  "Add section name in each section and a section sorter"
   (let [section-keys (get-section-keys company-data)]
     (loop [body company-data
            idx  0]
@@ -336,8 +348,9 @@
         day (add-zero (.getDate date))
         hours (add-zero (.getHours date))
         minutes (add-zero (.getMinutes date))
-        seconds (add-zero (.getSeconds date))]
-    (str year "-" month "-" day "T" hours ":" minutes ":" seconds "Z")))
+        seconds (add-zero (.getSeconds date))
+        millis (add-zeros (.getMilliseconds date))]
+    (str year "-" month "-" day "T" hours ":" minutes ":" seconds "." millis "Z")))
 
 (defn as-of-now []
   (let [date (js-date)]
@@ -352,10 +365,11 @@
 
 (defn select-section-data [section-data section as-of]
   (when as-of
-    (if (= as-of (:updated-at section-data))
-      section-data
-      (let [slug (keyword (:slug @router/path))]
-        (((keyword section) (slug @revisions)) as-of)))))
+    (let [slug (keyword (:slug @router/path))]
+      (if (or (not (contains? (slug @caches/revisions) section))
+              (= as-of (:updated-at section-data)))
+        section-data
+        (((keyword section) (slug @caches/revisions)) as-of)))))
 
 (defn scroll-to-id [id & [duration]]
   (let [section-el (.$ js/window (str "#" id))

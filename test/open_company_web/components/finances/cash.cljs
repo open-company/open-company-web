@@ -6,7 +6,7 @@
               [dommy.core :as dommy :refer-macros [sel1 sel]]
               [open-company-web.components.finances.cash :refer [cash]]
               [om.dom :as dom :include-macros true]
-              [open-company-web.data.finances :refer [finances]]))
+              [open-company-web.data.company :refer (company)]))
 
 (enable-console-print!)
 
@@ -16,7 +16,7 @@
 (deftest test-cash-component
   (testing "Cash component"
     (let [c (tu/new-container!)
-          app-state (atom finances)
+          app-state (atom company)
           _ (om/root cash app-state {:target c})
           chart-node (sel1 c [:div.section.cash])]
       (is (not (nil? chart-node)))
