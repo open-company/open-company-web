@@ -82,7 +82,8 @@
               (om/build rich-editor {:read-only read-only
                                      :section-data notes-data
                                      :section :growth
-                                     :save-channel "save-growth-notes"}))
+                                     :save-channel "save-growth-notes"
+                                     :notes true}))
             (om/build revisions-navigator {:section-data growth-section
                                            :section :growth
                                            :actual-as-of (:actual-as-of data)

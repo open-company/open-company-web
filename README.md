@@ -29,7 +29,7 @@ To get started, head to: [OpenCompany.io](https://opencompany.io)
 
 ## Local Setup
 
-Users of the [OpenCompany.io](https://opencompany.io) platform should get started by going to [OpenCompany.io](https://opencompany.io). The following local setup is for developers wanting to work on the platform's Web application software.
+Users of the [OpenCompany](https://opencompany.io) platform should get started by going to [OpenCompany.io](https://opencompany.io). The following local setup is for developers wanting to work on the platform's Web application software.
 
 Most of the dependencies are internal, meaning [Leiningen](https://github.com/technomancy/leiningen) will handle getting them for you. There are a few exceptions:
 
@@ -62,12 +62,18 @@ lein deps
 
 ## Usage
 
-Users of the [OpenCompany.io](https://opencompany.io) platform should get started by going to [OpenCompany.io](https://opencompany.io). The following usage is for developers wanting to work on the platform's Web application software.
+Users of the [OpenCompany](https://opencompany.io) platform should get started by going to [OpenCompany.io](https://opencompany.io). The following usage is for developers wanting to work on the platform's Web application software.
 
-To get an interactive development environment run:
+Local usage requires you to run 2 services, the [API service](https://github.com/open-company/open-company-api) and the [Auth service](https://github.com/open-company/open-company-auth). Both can be started in their respective repositiories with:
 
 ```console
-lein figwheel
+lein start
+```
+
+To get an interactive web development environment run:
+
+```console
+lein figwheel!
 ```
 
 Open your browser to [http://localhost:3449/](http://localhost:3449/).
@@ -85,7 +91,7 @@ You should see an alert in the browser window.
 If you want to use the [devcards](https://github.com/bhauman/devcards) for development, run:
 
 ```console
-lein devcards
+lein devcards!
 ```
 
 Then load [http://localhost:3449/devcards](http://localhost:3449/devcards) in your browser.

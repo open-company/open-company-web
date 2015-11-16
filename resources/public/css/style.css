@@ -1,10 +1,22 @@
-/* some style */
+/*
+Comment font-weight to font name mapping: https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
 
-html, body{
+100 Thin (Hairline)
+200 Extra Light (Ultra Light)
+300 Light
+400 Normal
+500 Medium
+600 Semi Bold (Demi Bold)
+700 Bold 
+800 Extra Bold (Ultra Bold)
+900 Black (Heavy)
+*/
+
+html, body {
   font-family: "proxima-nova", sans-serif;
 }
 
-a{
+a {
   cursor: pointer;
 }
 
@@ -109,7 +121,7 @@ span.num.red {
 }
 
 /* Reset bootstrap 3.3.5 help block overflow */
-.input-group[class*=col-]{
+.input-group[class*=col-] {
   float: left;
   padding-left: 15px;
   padding-right: 15px;
@@ -119,16 +131,16 @@ span.num.red {
   display: none;
 }
 
-div#app{
+div#app {
   margin-top: 50px;
 }
 
-nav.navbar{
+nav.navbar {
   background-color: white;
   border-bottom: 1px solid rgba(0, 0, 0, 0.6);
 }
 
-nav.tab-navigation{
+nav.tab-navigation {
   margin-top: 10px;
 }
 
@@ -138,55 +150,55 @@ div.report-list {
   background-color: white;
 }
 
-div.report-list div.report-list-left{
+div.report-list div.report-list-left {
   width: 330px;
   float: left;
   display: block;
 }
 
-div.chart-container{
+div.chart-container {
   width: 600px;
 }
 
-div.report-list div.chart-container{
+div.report-list div.chart-container {
   margin-left: 300px;
   width: 600px;
   margin-top: 30px;
 }
 
-div.report-panel div.chart-container{
+div.report-panel div.chart-container {
   margin-left: -71px;
   margin-top: 0px;
 }
 
-div.report-list span.num{
+div.report-list span.num {
   color: black;
   font-weight: bold;
 }
 
-span.num.red{
+span.num.red {
   color: red;
 }
 
-span.num.green{
+span.num.green {
   color: green;
 }
 
-div.report-list span.label, div.report-list label.label{
+div.report-list span.label, div.report-list label.label {
   color: black;
 }
 
-div.report-list label.comments-label{
+div.report-list label.comments-label {
   margin: 10px 0px 0px;
   padding: 0px;
   color: black;
 }
 
-label.switch-vis{
+label.switch-vis {
   margin: 0px 5px;
 }
 
-div.report-list input.editable-data, div.report-list input.editable-data:focus{
+div.report-list input.editable-data, div.report-list input.editable-data:focus {
   outline: 0;
   border: 0px solid black;
   border-bottom: 1px solid blue;
@@ -198,7 +210,7 @@ div.report-list input.editable-data, div.report-list input.editable-data:focus{
   padding: 0px;
 }
 
-div.report-list label.editable-label{
+div.report-list label.editable-label {
   width: 80px;
   color: black;
   border-bottom: 1px solid black;
@@ -209,7 +221,7 @@ div.report-list label.editable-label{
   margin: 0px 0px 5px 0px;
 }
 
-div.report-list textarea.comment{
+div.report-list textarea.comment {
   width: 200px;
   border: 1px solid black;
   padding: 5px;
@@ -221,31 +233,31 @@ span.label{
   margin: 0;
 }
 
-span img.user-icon{
+span img.user-icon {
   height: 24px;
   width: 24px;
   margin-right: 5px;
 }
 
-.select2-selection span img.user-icon{
+.select2-selection span img.user-icon {
   height: 20px;
   width: 20px;
   margin-right: 5px;
 }
 
-div.composed-section i.add-metric{
+div.composed-section i.add-metric {
   color: #707070;
   opacity: 0;
   cursor: default;
 }
 
-div.composed-section:hover i.add-metric{
+div.composed-section:hover i.add-metric {
   opacity: 1;
   margin-left: -30px;
   cursor: pointer;
 }
 
-div.composed-section:hover i.add-metric.no-links{
+div.composed-section:hover i.add-metric.no-links {
   margin-left: 5px;
 }
 
@@ -253,7 +265,7 @@ div.composed-section h2{
   text-align: left;
 }
 
-div.composed-section h2.finances-edit-title{
+div.composed-section h2.finances-edit-title {
   text-align: left;
   position: relative;
   width: 600px;
@@ -261,7 +273,7 @@ div.composed-section h2.finances-edit-title{
   left: 50%;
 }
 
-div.composed-section div.link-bar{
+div.composed-section div.link-bar {
   text-align: left;
   z-index: 1;
   margin-left: -300px;
@@ -270,7 +282,7 @@ div.composed-section div.link-bar{
   position: relative;
 }
 
-div.composed-section div.link-bar a.composed-section-link{
+div.composed-section div.link-bar a.composed-section-link {
   text-decoration: underline;
   color: #707070;
   margin-left: 0px;
@@ -279,19 +291,19 @@ div.composed-section div.link-bar a.composed-section-link{
   display: inline-block;
 }
 
-div.composed-section div.link-bar a.composed-section-link.active{
+div.composed-section div.link-bar a.composed-section-link.active {
   text-decoration: none;
   color: #191919;
 }
 
-div.composed-section div.composed-section-body{
+div.composed-section div.composed-section-body {
   width: 600px;
   left: 50%;
   margin-left: -300px;
   position: relative;
 }
 
-div.composed-section div.composed-section-body div.section{
+div.composed-section div.composed-section-body div.section {
   text-align: left;
 }
 
@@ -374,42 +386,43 @@ div.composed-section div.section div.chart-footer-container div.period-container
   font-weight: 300;
 }
 
-div.finances div.finances-body div.section h3{
+div.finances div.finances-body div.section h3 {
   margin-bottom: 0px;
 }
 
-div.finances div.finances-body div.section div.chart-container{
+div.finances div.finances-body div.section div.chart-container {
   position: relative;
   left: 50%;
   margin-left: -300px;
 }
 
-div.update-footer{
+div.update-footer {
   position: relative;
   left: 50%;
   margin-left: -300px;
   margin-top: 30px;
-  width: 600px;
   height: 24px;
   vertical-align: middle;
+  cursor: default;
 }
 
-div.update-footer div{
-  margin: 0px 0px 0px 35px;
+div.update-footer div {
+  margin: 0px;
   color: rgba(0, 0, 0, 0.4);
   text-decoration: none;
 }
 
-div.update-footer div.author{
+div.update-footer div.author {
   color: #4C4B4B;
   font-size: 16px;
   font-weight: 600;
 }
 
-div.update-footer div.timeago{
+div.update-footer span.timeago {
   color: #5B5B5B;
   font-size: 13px;
   font-weight: 300;
+  float: left;
 }
 
 div.update-footer img.author-image{
@@ -428,29 +441,29 @@ div.rich-editor-container {
   margin-top: 30px;
 }
 
-div.rich-editor-container div.rich-editor{
+div.rich-editor-container div.rich-editor {
   color: #191919;
 }
 
 div.rich-editor-container div.rich-editor img,
-div.rich-editor-container div.fake-rich-editor img{
+div.rich-editor-container div.fake-rich-editor img {
   max-width: 500px;
 }
 
 div.rich-editor-container div.rich-editor ul img,
-div.rich-editor-container div.fake-rich-editor ul img{
+div.rich-editor-container div.fake-rich-editor ul img {
   max-width: 460px;
 }
 
 div.rich-editor-container div.rich-editor ul ul img,
-div.rich-editor-container div.fake-rich-editor ul ul img{
+div.rich-editor-container div.fake-rich-editor ul ul img {
   max-width: 420px;
 }
 
 div.rich-editor-container div.rich-editor,
 div.rich-editor-container div.rich-editor p,
 div.rich-editor-container div.fake-rich-editor,
-div.rich-editor-container div.fake-rich-editor p{
+div.rich-editor-container div.fake-rich-editor p {
    font-weight: normal;
    font-size: 19px;
 }
@@ -458,51 +471,51 @@ div.rich-editor-container div.fake-rich-editor p{
 div.rich-editor-container div.rich-editor h1,
 div.rich-editor-container div.rich-editor h3,
 div.rich-editor-container div.fake-rich-editor h1,
-div.rich-editor-container div.fake-rich-editor h3,{
+div.rich-editor-container div.fake-rich-editor h3 {
   font-weight: 600;
    font-size: 24px; 
 }
 
-div.rich-editor-container div.rich-editor.no-data{
+div.rich-editor-container div.rich-editor.no-data {
   color: rgba(0, 0, 0, 0.4);
 }
 
 div.rich-editor-container div.rich-editor,
-div.rich-editor-container div.fake-rich-editor{
+div.rich-editor-container div.fake-rich-editor {
   width: 500px;
 }
 
-div.rich-editor-container div.rich-editor-save{
+div.rich-editor-container div.rich-editor-save {
   height: 44px;
 }
 
-div.rich-editor-container div.rich-editor-save button.cancel-button{
+div.rich-editor-container div.rich-editor-save button.cancel-button {
   margin-left: 10px;
 }
 
-div.rich-editor-container div.rich-editor *::selection{
+div.rich-editor-container div.rich-editor *::selection {
   background: #C1E7F4;
 }
 
-div.rich-editor-container div.rich-editor *::-moz-selection{
+div.rich-editor-container div.rich-editor *::-moz-selection {
   background: #C1E7F4;
 }
 
-div.rich-editor-container div.rich-editor a{
+div.rich-editor-container div.rich-editor a {
   font-weight: bold;
   text-decoration: underline;
   color: black;
 }
 
 div.rich-editor-container div.rich-editor.collapsed,
-div.rich-editor-container div.fake-rich-editor.collapsed{
+div.rich-editor-container div.fake-rich-editor.collapsed {
   overflow: hidden;
   max-height: 450px;
   position: relative;
 }
 
 div.rich-editor-container div.rich-editor.collapsed:after,
-div.rich-editor-container div.fake-rich-editor.collapsed:after{
+div.rich-editor-container div.fake-rich-editor.collapsed:after {
   bottom: 0;
   position: absolute;
   left: 0px;
@@ -517,12 +530,12 @@ div.rich-editor-container div.fake-rich-editor.collapsed:after{
 }
 
 div.rich-editor-container button.collapse-button:focus,
-div.rich-editor-container button.expand-button:focus{
+div.rich-editor-container button.expand-button:focus {
   outline: none;
 }
 
 div.rich-editor-container button.collapse-button,
-div.rich-editor-container button.expand-button{
+div.rich-editor-container button.expand-button {
   text-decoration: none;
   font-size: 19px;
   font-weight: 600;
@@ -531,11 +544,11 @@ div.rich-editor-container button.expand-button{
   outline: none;
 }
 
-div.rich-editor-container button.expand-button{
+div.rich-editor-container button.expand-button {
   color: #2F9B34;
 }
 
-div.rich-editor-container button.collapse-button{
+div.rich-editor-container button.collapse-button {
   color: red;
 }
 
@@ -549,7 +562,7 @@ div.rich-editor-container button.collapse-button{
   width: 100%;
 }
 
-.comp-cell .comp-cell-int span, .comp-cell .comp-cell-int input{
+.comp-cell .comp-cell-int span, .comp-cell .comp-cell-int input {
   width: 100%;
   text-align: right;
 }
@@ -590,7 +603,7 @@ div.rich-editor-container button.collapse-button{
   text-align: left;
 }
 
-div.editable-title-container{
+div.editable-title-container {
   width: 600px;
   position: relative;
   left: 50%;
@@ -600,17 +613,17 @@ div.editable-title-container{
   margin-bottom: 10px;
 }
 
-div.editable-title-container h2{
+div.editable-title-container h2 {
   cursor: text;
 }
 
-div.editable-title-container h2.read-only{
+div.editable-title-container h2.read-only {
   cursor: text;
 }
 
 div.editable-title-container h2,
 div.editable-title-container input,
-div.editable-title-container span.hidden-span{
+div.editable-title-container span.hidden-span {
   text-align: left;
   color: #2D2D2D !important;
   font-size: 36px;
@@ -625,7 +638,7 @@ div.editable-title-container span.hidden-span{
   height: 55px;
 }
 
-div.editable-title-container div.hidden-span-container{
+div.editable-title-container div.hidden-span-container {
   z-index: -1;
   opacity: 0;
   text-align: left;
@@ -635,17 +648,17 @@ div.editable-title-container div.hidden-span-container{
   width: 600px;
 }
 
-div.editable-title-container span.hidden-span{
+div.editable-title-container span.hidden-span {
   opacity: 0;
 }
 
-div.editable-title-container h2{
+div.editable-title-container h2 {
   border: 1px solid white;
   outline: none;
   padding-top: 7px;
 }
 
-div.editable-title-container input{
+div.editable-title-container input {
   border: 1px solid black;
   outline: none;
 }
@@ -658,69 +671,69 @@ form.linkForm input#addlinkButton {
   background-color: black;
 }
 
-div.finances div.finances-body.edit{
+div.finances div.finances-body.edit {
   width: 800px;
   left: 50%;
   margin-left: -400px;
   position: relative;
 }
 
-div.composed-section-body i.editable-pen{
+div.composed-section-body i.editable-pen {
   opacity: 0;
   margin-left: 10px;
   cursor: default;
 }
 
-div.composed-section-body.editable:hover i.editable-pen{
+div.composed-section-body.editable:hover i.editable-pen {
   opacity: 1;
   margin-left: 10px;
   cursor: pointer;
 }
 
-div.finances div.link-bar i.editable-pen{
+div.finances div.link-bar i.editable-pen {
   opacity: 0;
   margin-left: -20px;
   cursor: pointer;
 }
 
-div.finances:hover div.link-bar.editable i.editable-pen{
+div.finances:hover div.link-bar.editable i.editable-pen {
   opacity: 1;
 }
 
-div.finances-body table.table td, div.finances-body table.table th{
+div.finances-body table.table td, div.finances-body table.table th {
   text-align: right;
 }
 
-div.finances-body table.table td.no-cell{
+div.finances-body table.table td.no-cell {
   padding-top: 12px;
 }
 
-div.finances-body table.table td.new-row-placeholder{
+div.finances-body table.table td.new-row-placeholder {
   color: rgba(0, 0, 0, 0.4);
 }
 
-div.finances-body table.table td div.comp-cell{
+div.finances-body table.table td div.comp-cell {
   float: right;
 }
 
-div.finances-body div.finances-edit-buttons{
+div.finances-body div.finances-edit-buttons {
   margin-left: 234px;
 }
 
-div.finances-body div.finances-edit-buttons button.cancel{
+div.finances-body div.finances-edit-buttons button.cancel {
   margin-left: 10px;
 }
 
-div.recent-updates{
+div.recent-updates {
   margin-top: 8px;
 }
 
-div.recent-updates ul.recent-updates-list{
+div.recent-updates ul.recent-updates-list {
   width: 300px;
   top: auto;
 }
 
-div.recent-updates div.recent-updates-item{
+div.recent-updates div.recent-updates-item {
   height: 27px;
 }
 
@@ -736,102 +749,102 @@ div.recent-updates div.recent-updates-item span.updated-at {
   float: right;
 }
 
-div.simple-section-revisions-navigator{
+div.simple-section-revisions-navigator {
   width: 600px;
   left: 50%;
   margin-left: -300px;
   position: relative;
 }
 
-div.revisions-navigator{
+div.revisions-navigator {
   width: 100%;
   height: 34px;
   margin-top: 30px;
 }
 
-div.revisions-navigator div.revisions-navigator-left{
+div.revisions-navigator div.revisions-navigator-left {
   float: left;
 }
 
 div.revisions-navigator div.revisions-navigator-left div.single-prev,
 div.revisions-navigator div.revisions-navigator-right div.single-next,
 div.revisions-navigator div.revisions-navigator-left div.double-prev,
-div.revisions-navigator div.revisions-navigator-right div.double-next{
+div.revisions-navigator div.revisions-navigator-right div.double-next {
   color: #5B5B5B;
 }
 
-div.revisions-navigator div.revisions-navigator-left div.double-prev{
+div.revisions-navigator div.revisions-navigator-left div.double-prev {
   font-size: 20px;
   margin-top: 6px;
 }
 
-div.revisions-navigator div.revisions-navigator-left div.single-prev{
+div.revisions-navigator div.revisions-navigator-left div.single-prev {
   margin-top: 5px;
 }
 
-div.revisions-navigator div.revisions-navigator-left div.single-prev i{
+div.revisions-navigator div.revisions-navigator-left div.single-prev i {
   font-size: 28px;
   float:left;
 }
-div.revisions-navigator div.revisions-navigator-left div.single-prev p{
+div.revisions-navigator div.revisions-navigator-left div.single-prev p {
   margin: 5px 0px 0px 8px;
   float: left;
 }
 
 div.revisions-navigator div.revisions-navigator-left div.single-prev,
-div.revisions-navigator div.revisions-navigator-left div.double-prev{
+div.revisions-navigator div.revisions-navigator-left div.double-prev {
   float: left;
 }
 
-div.revisions-navigator div.revisions-navigator-left div.double-prev{
+div.revisions-navigator div.revisions-navigator-left div.double-prev {
   margin-right: 10px;
 }
 
-div.revisions-navigator div.revisions-navigator-right{
+div.revisions-navigator div.revisions-navigator-right {
   float: right;
 }
 
-div.revisions-navigator div.revisions-navigator-right div.double-next{
+div.revisions-navigator div.revisions-navigator-right div.double-next {
   font-size: 20px;
   margin-top: 6px;
 }
 
-div.revisions-navigator div.revisions-navigator-right div.single-next{
+div.revisions-navigator div.revisions-navigator-right div.single-next {
   margin-top: 5px;
 }
 
-div.revisions-navigator div.revisions-navigator-right div.single-next i{
+div.revisions-navigator div.revisions-navigator-right div.single-next i {
   font-size: 28px;
   float:right;
 }
 
-div.revisions-navigator div.revisions-navigator-right div.single-next p{
+div.revisions-navigator div.revisions-navigator-right div.single-next p {
   margin: 5px 8px 0px 0px;
   float: right;
 }
 
-div.revisions-navigator p.rev-nav-label{
+div.revisions-navigator p.rev-nav-label {
   color: #5B5B5B;
   font-size: 16px;
   font-weight: normal;
 }
 
-div.revisions-navigator p.rev-nav-date{
+div.revisions-navigator p.rev-nav-date {
   color: #5B5B5B;
   font-size: 16px;
   font-weight: 300;
 }
 
 div.revisions-navigator div.revisions-navigator-right div.single-next,
-div.revisions-navigator div.revisions-navigator-right div.double-next{
+div.revisions-navigator div.revisions-navigator-right div.double-next {
   float: right;
 }
 
-div.revisions-navigator div.revisions-navigator-right div.double-next{
+div.revisions-navigator div.revisions-navigator-right div.double-next {
   margin-left: 10px;
 }
 
-hr.section-separator{
+hr.section-separator {
   background-color: rgba(0, 0, 0, 0.2);
   width: 600px;
   height: 1px;
@@ -840,57 +853,57 @@ hr.section-separator{
   margin-bottom: 0px;
 }
 
-h4.login-error-message{
+h4.login-error-message {
   color: red;
   font-size: 14px;
 }
 
-div.user-profile div.panel-heading{
+div.user-profile div.panel-heading {
   font-weight: bold;
   font-size: 16px;
 }
 
-div.user-profile div.panel-body span.user-profile-label{
+div.user-profile div.panel-body span.user-profile-label {
   width: 150px;
   float: left;
   font-size: 14px;
   font-weight: bold;
 }
 
-div.user-avatar img.user-avatar-img{
+div.user-avatar img.user-avatar-img {
   margin: 10px;
 }
 
-div.user-avatar span.user-avatar-name{
+div.user-avatar span.user-avatar-name {
   margin-right: 10px;
   color: #2D2D2D;
   font-size: 12pt;
 }
 
-div.company-avatar a, div.company-avatar a:hover{
+div.company-avatar a, div.company-avatar a:hover {
   text-decoration: none;
 }
 
-div.company-avatar div.company-avatar-img{
+div.company-avatar div.company-avatar-img {
   border: 1px solid black;
   margin-top: -10px;
   padding: 9px;
   float: left;
 }
 
-div.company-avatar div.company-avatar-img span.company-avatar-initial{
+div.company-avatar div.company-avatar-img span.company-avatar-initial {
   font-size: 28px;
   color: black;
 }
 
-div.company-avatar div.company-avatar-name{
+div.company-avatar div.company-avatar-name {
   float: left;
   font-size: 16px;
   margin-left: 10px;
   color: black;
 }
 
-button.oc-btn{
+button.oc-btn {
   border: 1px solid rgba(0, 0, 0, 0.4);
   font-size: 10px;
   margin-left: 0px;
@@ -902,22 +915,22 @@ button.oc-btn{
   margin-top: 30px;
 }
 
-button.oc-btn.oc-success{
+button.oc-btn.oc-success {
   color: green;
 }
 
-button.oc-btn.oc-cancel{
+button.oc-btn.oc-cancel {
   color: rgba(0, 0, 0, 0.4);
 }
 
-div.sections-container{
+div.sections-container {
   position: relative;
   width: 600px;
   margin-left: -300px;
   left: 50%;
 }
 
-div.table-of-contents{
+div.table-of-contents {
   position: fixed;
   top: 50px;
   overflow-y: auto;
@@ -927,27 +940,27 @@ div.table-of-contents{
   width: 241px;
 }
 
-div.table-of-contents div.table-of-contents-inner{
+div.table-of-contents div.table-of-contents-inner {
   width: 100%;
   height: 100%;
   overflow-y: auto;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category{
+div.table-of-contents div.table-of-contents-inner div.category {
   margin-left: 30px;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category.empty{
+div.table-of-contents div.table-of-contents-inner div.category.empty {
   color: rgba(0, 0, 0, 0.4);
 }
 
-div.table-of-contents div.table-of-contents-inner div.category h3{
+div.table-of-contents div.table-of-contents-inner div.category h3 {
   font-size: 16px;
   text-transform: uppercase;
   font-weight: bold;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category-section{
+div.table-of-contents div.table-of-contents-inner div.category-section {
   height: 57px;
   width: 195px;
   padding: 10px 0px 10px 10px;
@@ -982,7 +995,7 @@ div.table-of-contents div.category-section div.category-section-sortable {
 
 div.table-of-contents div.category-section:hover div.category-section-sortable,
 div.table-of-contents div.category-section.ui-draggable-dragging div.category-section-sortable{
-  opacity: 1;
+opacity: 1;
 }
 
 div.table-of-contents div.table-of-contents-inner div.category-section a {
@@ -993,10 +1006,10 @@ div.table-of-contents div.table-of-contents-inner div.category-section a {
 
 div.table-of-contents div.table-of-contents-inner div.category-section:hover,
 div.table-of-contents div.table-of-contents-inner div.category-section.ui-draggable-dragging{
-  background-color: rgba(0, 0, 0, 0.07);
+background-color: rgba(0, 0, 0, 0.07);
 }
 
-div.table-of-contents div.table-of-contents-inner div.new-section{
+div.table-of-contents div.table-of-contents-inner div.new-section {
   height: 8px;
   margin-left: 20px;
   margin-right: 14px;
@@ -1054,24 +1067,24 @@ div.table-of-contents div.add-section.show {
 div.table-of-contents div.table-of-contents-inner div.category-section a,
 div.table-of-contents div.table-of-contents-inner div.category-section a:hover,
 div.table-of-contents div.table-of-contents-inner div.category-section a:active,
-div.table-of-contents div.table-of-contents-inner div.category-section a:visited{
+div.table-of-contents div.table-of-contents-inner div.category-section a:visited {
   text-decoration: none;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category-section a p.section-title{
+div.table-of-contents div.table-of-contents-inner div.category-section a p.section-title {
   color: #2D2D2D;
   font-size: 16px;
   margin-bottom: 0px;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category-section a p.section-date{
+div.table-of-contents div.table-of-contents-inner div.category-section a p.section-date {
   color: #5B5B5B;
   font-weight: lighter;
   font-size: 11px;
   margin-bottom: 0px;
 }
 
-div.new-section-popover-container{
+div.new-section-popover-container {
   display: none;
   position: absolute;
   width: 500px;
@@ -1097,4 +1110,47 @@ div.section-animator-box div.section-box {
   top: 0;
   left: 0;
   width: 600px;
+}
+
+div.update-footer div.update-footer-hover {
+  display: none;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  position: absolute;
+  top: -14px;
+  left: 80px;
+  background-color: white;
+  padding: 5px;
+}
+
+div.update-footer div.update-footer-hover div.author {
+  margin: 8px 0 0 35px;
+}
+
+div.update-footer div.update-footer-hover.hover {
+  display: block;
+}
+
+div.update-footer-hover:after, div.update-footer-hover:before {
+  right: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+div.update-footer-hover:after {
+  border-color: transparent; /*rgba(136, 183, 213, 0);*/
+  border-right-color: white;
+  border-width: 7px;
+  margin-top: -7px;
+}
+div.update-footer-hover:before {
+  border-color: rgba(0, 0, 0, 0);
+  border-right-color: rgba(0, 0, 0, 0.3);
+  border-width: 8px;
+  margin-top: -8px;
 }

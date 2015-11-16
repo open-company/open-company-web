@@ -1,6 +1,6 @@
 (ns open-company-web.components.rich-editor
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.lib.utils :as utils]
@@ -16,8 +16,8 @@
       :halloheadings {"formatBlocks" ["p" "h1"]}
       :hallolists {}
       :hallolink {}
+      ;; :toolbar "halloToolbarFixed" ; uncomment for fixed toolbar
       :halloblacklist {}}
-  ; :toolbar "halloToolbarFixed" ; uncomment for fixed toolbar
 })
 
 (defn init-hallo! [owner data]
@@ -49,7 +49,7 @@
     (let [rich-editor-node (.getDOMNode rich-editor-ref)
           $-rich-editor (.$ js/window rich-editor-node)
           height (.height $-rich-editor)]
-      (om/update-state! owner :should-collapse (fn [_]false))
+      (om/update-state! owner :should-collapse (fn [_] false))
       (when (>= height 480)
         (collapsed! owner true)))))
 
@@ -64,16 +64,18 @@
                                (.load (.$ js/window item) #(collapse-if-needed owner data)))))))
 
 (defcomponent rich-editor [data owner]
+
   (init-state [_]
     {:initial-body (:body (:section-data data))
      :hallo-loaded false
      :did-mount false
      :editing false
-     :should-collapse true
+     :should-collapse false
      :collapsed false
      :user-expanded false})
+
   (will-mount [_]
-    (when (not (:read-only data))
+    (when-not (:read-only data)
       ; add dependencies:
       ; jQuery UI
       (cdr/add-style! "/lib/jquery-ui/jquery-ui.structure.min.css")
@@ -84,19 +86,23 @@
                         (fn []
                           (om/update-state! owner :hallo-loaded (fn [_]true))
                           (init-hallo! owner data)))))
+
   (did-mount [_]
-    (when (not (:read-only data))
+    (when-not (:read-only data)
       (om/update-state! owner :did-mount (fn [_]true))
       (init-hallo! owner data))
     (calc-collapse-add-onload owner data))
+
   (will-update [_ next-props _]
-    (when (not (= (:body (:section-data data)) (:body (:section-data next-props))))
+    (when-not (= (:body (:section-data data)) (:body (:section-data next-props)))
       ; reset collapsed and should-collapse
       (collapsed! owner false)
       (user-expanded! owner false)
-      (set-state! owner :should-collapse true)))
+      (set-state! owner :should-collapse false)))
+
   (did-update [_ _ _]
     (calc-collapse-add-onload owner data))
+
   (render [_]
     (let [section-data (:section-data data)
           section (:section data)
@@ -160,7 +166,8 @@
                                        (utils/handle-change section-data value :body)
                                        (utils/save-values (:save-channel data))))
                          } "SAVE"))
-          (when (not no-data)
+          (when-not no-data
             (om/build update-footer {:author (:author section-data)
                                      :updated-at (:updated-at section-data)
-                                     :section section})))))))
+                                     :section section
+                                     :notes (:notes data)})))))))
