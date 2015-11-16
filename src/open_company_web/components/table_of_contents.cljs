@@ -15,7 +15,7 @@
   (let [target (.$ js/window (.-target e))
         offset (.position target)
         t-top (- (.-top offset) 5)
-        t-left (+ (.-left offset) 208)]
+        t-left (+ (.-left offset) 195)]
     (-> (.$ js/window ".add-section")
         (.css #js {"left" t-left "top" t-top}))))
 
@@ -59,11 +59,12 @@
 (defn get-section-form-id [section-id]
   (get (clojure.string/split section-id "--") 1))
 
+(defn resort-category [category]
+  {(keyword category) (vec (map #(get-section-form-id (.-id %))
+                                (sel (str "div.category-sortable.category-" category))))})
+
 (defn sort-end [event ui categories]
-  (let [sections (apply merge (map (fn [category]
-                                     {(keyword category) (vec (map #(get-section-form-id (.-id %))
-                                                                   (sel (str "div.category-sortable.category-" category))))})
-                                   categories))]
+  (let [sections (apply merge (map #(resort-category %) categories))]
     (api/patch-sections sections)))
 
 (defn setup-sortable [categories]
