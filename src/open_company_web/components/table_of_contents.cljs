@@ -5,12 +5,11 @@
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
             [open-company-web.api :as api]
-            [dommy.core :as dommy :refer-macros [sel1 sel]]
-            [open-company-web.api :as api]))
+            [dommy.core :as dommy :refer-macros (sel1 sel)]
+            [open-company-web.api :as api]
+            [open-company-web.components.ToC-item :refer (ToC-item)]))
 
 (def first-cat-placeholder "first-category")
-
-
 
 (defn setup-plus-position [e]
   (let [target (.$ js/window (.-target e))
@@ -58,7 +57,7 @@
       (.append body popover))))
 
 (defn get-section-form-id [section-id]
-  (get (clojure.string/split section-id "-") 2))
+  (get (clojure.string/split section-id "--") 1))
 
 (defn sort-end [event ui categories]
   (let [sections (apply merge (map (fn [category]
@@ -68,8 +67,9 @@
     (api/patch-sections sections)))
 
 (defn setup-sortable [categories]
-  (.sortable (.$ js/window ".category-container") #js {"axis" "y"
-                                                       "stop" #(sort-end %1 %2 categories)}))
+  (.sortable (.$ js/window ".category-sections-container")
+             #js {"axis" "y"
+                  "stop" #(sort-end %1 %2 categories)}))
 
 (defcomponent table-of-contents [data owner]
   (init-state [_]
@@ -82,6 +82,7 @@
   (did-update [_ _ _]
     (setup-hover-events owner)
     (setup-sortable (:categories data)))
+  (display-name [_] "ToC")
   (render [_]
     (let [sections (:sections data)
           categories (:categories data)]
@@ -103,23 +104,13 @@
                                                             (= (om/get-state owner :hover-add-section) (str "new-section-" first-cat-placeholder)))})
                         :on-click #(show-popover % owner)}
                 (dom/div {:class "new-section-internal"}))
-              (for [section ((keyword category) sections)]
-                (let [section-data ((keyword section) data)]
-                  (dom/div {:class (str "category-sortable category-" category)
-                            :id (str "section-sort-" (name section))}
-                    (dom/div {:class "category-section"}
-                      (dom/div {:class "category-section-close"
-                                :on-click #(api/remove-section (name section))})
-                      (dom/a {:href "#"
-                              :on-click (fn [e]
-                                          (.preventDefault e)
-                                          (utils/scroll-to-section (name section)))}
-                        (dom/p {:class "section-title"} (:title section-data))
-                        (dom/p {:class "section-date"} (utils/time-since (:updated-at section-data))))
-                      (dom/div {:class "category-section-sortable"}))
-                    (dom/div {:id (str "new-section-" (name section))
-                              :class (utils/class-set {:new-section true
-                                                       :hover (or (= (om/get-state owner :hover-new-section) (str "new-section-" (name section)))
-                                                                  (= (om/get-state owner :hover-add-section) (str "new-section-" (name section))))})
-                              :on-click #(show-popover % owner)}
-                      (dom/div {:class "new-section-internal"}))))))))))))
+              (dom/div {:class "category-sections-container"}
+                (for [section ((keyword category) sections)]
+                  (let [section-data ((keyword section) data)]
+                    (om/build ToC-item {:category category
+                                        :section section
+                                        :title (:title section-data)
+                                        :updated-at (:updated-at section-data)
+                                        :show-popover #(show-popover % owner)
+                                        :hover (or (= (om/get-state owner :hover-new-section) (str "new-section-" (name section)))
+                                                   (= (om/get-state owner :hover-add-section) (str "new-section-" (name section))))})))))))))))
