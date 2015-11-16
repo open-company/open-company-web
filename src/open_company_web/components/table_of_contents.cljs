@@ -68,9 +68,10 @@
     (api/patch-sections sections)))
 
 (defn setup-sortable [categories]
-  (.sortable (.$ js/window ".category-sections-container")
-             #js {"axis" "y"
-                  "stop" #(sort-end %1 %2 categories)}))
+  (when (.-$ js/window)
+    (.sortable (.$ js/window ".category-sections-container")
+               #js {"axis" "y"
+                    "stop" #(sort-end %1 %2 categories)})))
 
 (defcomponent table-of-contents [data owner]
   (init-state [_]
