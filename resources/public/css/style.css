@@ -924,6 +924,7 @@ div.table-of-contents{
   height: 90%;
   padding: 10px;
   color: #2D2D2D;
+  width: 241px;
 }
 
 div.table-of-contents div.table-of-contents-inner{
@@ -948,11 +949,11 @@ div.table-of-contents div.table-of-contents-inner div.category h3{
 
 div.table-of-contents div.table-of-contents-inner div.category-section{
   height: 57px;
-  width: 205px;
+  width: 195px;
   padding: 10px 0px 10px 10px;
 }
 
-div.table-of-contents div.category-sortable div.category-section-close {
+div.table-of-contents div.category-section div.category-section-close {
   float: left;
   opacity: 0;
   cursor: pointer;
@@ -963,12 +964,12 @@ div.table-of-contents div.category-sortable div.category-section-close {
   background-size: 20px 20px;
 }
 
-div.table-of-contents div.category-sortable:hover div.category-section-close,
+div.table-of-contents div.category-section:hover div.category-section-close,
 div.table-of-contents div.category-sortable.ui-draggable-dragging div.category-section-close{
   opacity: 1;
 }
 
-div.table-of-contents div.category-sortable div.category-section-sortable {
+div.table-of-contents div.category-section div.category-section-sortable {
   float: right;
   opacity: 0;
   cursor: hand;
@@ -979,26 +980,26 @@ div.table-of-contents div.category-sortable div.category-section-sortable {
   background-size: 20px 30px;
 }
 
-div.table-of-contents div.category-sortable:hover div.category-section-sortable,
-div.table-of-contents div.category-sortable.ui-draggable-dragging div.category-section-sortable{
+div.table-of-contents div.category-section:hover div.category-section-sortable,
+div.table-of-contents div.category-section.ui-draggable-dragging div.category-section-sortable{
   opacity: 1;
 }
 
 div.table-of-contents div.table-of-contents-inner div.category-section a {
   margin: 0 10px 0 10px;
-  width: 135px;
+  width: 125px;
   float: left;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category-sortable:hover,
-div.table-of-contents div.table-of-contents-inner div.category-sortable.ui-draggable-dragging{
+div.table-of-contents div.table-of-contents-inner div.category-section:hover,
+div.table-of-contents div.table-of-contents-inner div.category-section.ui-draggable-dragging{
   background-color: rgba(0, 0, 0, 0.07);
 }
 
 div.table-of-contents div.table-of-contents-inner div.new-section{
   height: 8px;
   margin-left: 20px;
-  margin-right: 20px;
+  margin-right: 14px;
   background-color: transparent;
   cursor: pointer;
 }
@@ -1028,6 +1029,7 @@ div.table-of-contents div.add-section {
   color: white;
   font-size: 14px;
   cursor: pointer;
+  z-index: 10;
 }
 
 div.table-of-contents div.add-section:after {
