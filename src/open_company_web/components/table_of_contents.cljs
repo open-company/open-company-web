@@ -86,7 +86,8 @@
   (render [_]
     (let [sections (:sections data)
           categories (:categories data)]
-      (dom/div #js {:className "table-of-contents" :ref "table-of-contents"}
+      (dom/div #js {:className "table-of-contents"
+                    :ref "table-of-contents"}
         (dom/div {:class (utils/class-set {:add-section true
                                            :show (or (om/get-state owner :hover-add-section)
                                                       (om/get-state owner :hover-new-section))})
@@ -94,7 +95,8 @@
           (dom/i {:class "fa fa-plus"}))
         (dom/div {:class "table-of-contents-inner"}
           (for [category categories]
-            (dom/div {:class "category-container"}
+            (dom/div {:class "category-container"
+                      :key (apply str ((keyword category) sections))}
               (dom/div {:class (utils/class-set {:category true
                                                  :empty (zero? (count ((keyword category) sections)))})}
                        (dom/h3 (utils/camel-case-str (name category))))
