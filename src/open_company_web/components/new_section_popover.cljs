@@ -3,11 +3,13 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.api :as api]))
+            [open-company-web.api :as api]
+            [cljs.core.async :refer (put!)]))
 
 (defn add-section [e category section]
   (.preventDefault e)
-  (utils/get-channel "add-section"))
+  (let [ch (utils/get-channel "add-section")]
+    (put! ch {:category category :section section})))
 
 (defcomponent new-section-popover [data owner]
   (init-state [_]
