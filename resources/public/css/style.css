@@ -1159,6 +1159,7 @@ div.new-section-popover {
   border: 2px solid rgba(0, 0, 0, 0.8);
   border-radius: 4px;
   overflow: auto;
+  padding: 10px;
 }
 
 div.new-section-popover div.new-section-container {
