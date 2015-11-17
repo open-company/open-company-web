@@ -11,7 +11,8 @@
             [open-company-web.lib.jwt :as j]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.caches :refer (revisions)]))
+            [open-company-web.caches :refer (revisions)]
+            [open-company-web.data.new-section :as new-sections-data]))
 
 
 (def ^:private api-endpoint ls/api-server-domain)
@@ -197,3 +198,20 @@
                                            {k (utils/vec-dissoc v section-name)})
                                          sections))]
       (patch-sections new-sections))))
+
+(defn get-new-sections []
+  (let [slug (keyword (:slug @router/path))
+        company-data (slug @dispatcher/app-state)
+        links (:links company-data)
+        add-section-link (utils/link-for links "section-list" "GET")]
+    (api-get (:href add-section-link)
+      { :headers {
+          ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type"
+          ; custom content type
+          "content-type" (:type add-section-link)}}
+      (fn [response]
+        ; TODO: remove this comment, it's for dev
+        ; (flux/dispatch dispatcher/new-section new-sections-data/new-section)))))
+        (let [body (if (:response response) (json->cljs (:body response)) {})]
+          (flux/dispatch dispatcher/new-section new-sections-data/new-section))))))
