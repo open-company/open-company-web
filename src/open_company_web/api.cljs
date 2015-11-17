@@ -211,7 +211,6 @@
           ; custom content type
           "content-type" (:type add-section-link)}}
       (fn [response]
-        ; TODO: remove this comment, it's for dev
-        ; (flux/dispatch dispatcher/new-section new-sections-data/new-section)))))
-        (let [body (if (:response response) (json->cljs (:body response)) {})]
+        (let [body (if (:success response) (json->cljs (:body response)) {})]
           (flux/dispatch dispatcher/new-section new-sections-data/new-section))))))
+          ; (flux/dispatch dispatcher/new-section body))))))
