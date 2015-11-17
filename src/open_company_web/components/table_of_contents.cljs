@@ -1,25 +1,20 @@
 (ns open-company-web.components.table-of-contents
-  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require-macros [cljs.core.async.macros :refer (go)])
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [cljs.core.async :refer [chan <!]]
+            [cljs.core.async :refer (chan <!)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
             [open-company-web.api :as api]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.components.new-section-popover :refer (new-section-popover)]))
 
-(def first-cat-placeholder "firstcategoryplaceholder")
+(def first-sec-placeholder "firstsectionplaceholder")
 
 (defn get-category-section-info [e]
   (let [target (.-target e)
-        target-id (.-id target)
-        parent-id (.-id (.-parentNode target))
-        el-id (if (empty? target-id)
-                          parent-id
-                          target-id)
-        $el (.$ js/window (str "#" el-id))
+        $el (.$ js/window target)
         category (.data $el "category")
         section (.data $el "section")]
     {:category category :section section}))
@@ -59,24 +54,22 @@
                 :data-category (name category)
                 :data-section (name section)
                 :on-click #(show-popover %)}
-        (dom/div {:class "new-section-internal"})
+        (dom/div {:class "new-section-internal"
+                  :data-category (name category)
+                  :data-section (name section)})
         (dom/div {:class "add-section"
-                  :data-category ""
-                  :data-section ""
+                  :data-category (name category)
+                  :data-section (name section)
                   :on-click #(show-popover %)}
-          (dom/i {:class "fa fa-plus"})))))
+          (dom/i {:class "fa fa-plus"}))))))
 
 (defcomponent table-of-contents [data owner]
   (did-mount [_]
     (let [add-section-chan (chan)]
-      (utils/add-channel add-section-chan "add-section")
+      (utils/add-channel "add-section" add-section-chan)
       (go (loop []
-        (let [change (<! add-section-chan)
-              cursor @dispatcher/app-state
-              slug (:slug @router/path)
-              company-data ((keyword slug) cursor)
-              section (:section data)
-              section-data (section company-data)]
+        (let [change (<! add-section-chan)]
+          (println "add-section-cb" (:category change) (:section change))
           (recur)))))
     (add-popover-container data))
   (render [_]
@@ -93,7 +86,7 @@
                                                  :empty (zero? (count ((keyword category) sections)))})}
                        (dom/h3 (utils/camel-case-str (name category))))
               (om/build add-section {:category category
-                                     :section first-cat-placeholder})
+                                     :section first-sec-placeholder})
               (for [section (into [] (get sections (keyword category)))]
                 (let [section-data ((keyword section) data)]
                   (dom/div {}
@@ -105,6 +98,6 @@
                                           (.preventDefault e)
                                           (utils/scroll-to-section (name section)))}
                         (dom/p {:class "section-title"} (:title section-data))
-                        (dom/p {:class "section-date"} (utils/time-since (:updated-at section-data))))
-                      (om/build add-section {:category category
-                                             :section section}))))))))))))
+                        (dom/p {:class "section-date"} (utils/time-since (:updated-at section-data)))))
+                    (om/build add-section {:category category
+                                           :section section})))))))))))
