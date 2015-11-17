@@ -18,6 +18,8 @@
 
 (def auth-settings (flux/dispatcher))
 
+(def new-section (flux/dispatcher))
+
 (def companies-list-dispatch
   (flux/register
     companies
@@ -66,3 +68,10 @@
         (swap! app-state dissoc :loading)
         ; add auth-settings data
         (swap! app-state assoc :auth-settings body)))))
+
+(def new-section-dispatch
+  (flux/register
+    new-section
+    (fn [body]
+      (when body
+        (swap! app-state assoc :new-section body)))))
