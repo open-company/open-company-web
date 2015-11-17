@@ -36,25 +36,25 @@
        :as-of (:updated-at finances-data)}))
   (will-mount [_]
     (let [save-change (utils/get-channel "save-section-finances")]
-        (go (loop []
-          (let [change (<! save-change)
-                cursor @dispatcher/app-state
-                slug (:slug @router/path)
-                company-data ((keyword slug) cursor)
-                section (:section data)
-                section-data (section company-data)]
-            (api/save-or-create-section section-data)
-            (recur)))))
+      (go (loop []
+        (let [change (<! save-change)
+              cursor @dispatcher/app-state
+              slug (:slug @router/path)
+              company-data ((keyword slug) cursor)
+              section (:section data)
+              section-data (section company-data)]
+          (api/save-or-create-section section-data)
+          (recur)))))
     (let [save-notes-change (utils/get-channel "save-finances-notes")]
-        (go (loop []
-          (let [change (<! save-notes-change)
-                cursor @dispatcher/app-state
-                slug (:slug @router/path)
-                company-data ((keyword slug) cursor)
-                section (:section data)
-                section-data (section company-data)]
-            (api/patch-section-notes (:notes section-data) (:links section-data) section)
-            (recur))))))
+      (go (loop []
+        (let [change (<! save-notes-change)
+              cursor @dispatcher/app-state
+              slug (:slug @router/path)
+              company-data ((keyword slug) cursor)
+              section (:section data)
+              section-data (section company-data)]
+          (api/patch-section-notes (:notes section-data) (:links section-data) section)
+          (recur))))))
   (render [_]
     (let [showing-revision (om/get-state owner :as-of)
           focus (om/get-state owner :focus)
