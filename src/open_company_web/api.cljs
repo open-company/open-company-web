@@ -11,8 +11,7 @@
             [open-company-web.lib.jwt :as j]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.caches :refer (revisions)]
-            [open-company-web.data.new-section :as new-sections-data]))
+            [open-company-web.caches :refer (revisions)]))
 
 
 (def ^:private api-endpoint ls/api-server-domain)
@@ -212,5 +211,4 @@
           "content-type" (:type add-section-link)}}
       (fn [response]
         (let [body (if (:success response) (json->cljs (:body response)) {})]
-          (flux/dispatch dispatcher/new-section new-sections-data/new-section))))))
-          ; (flux/dispatch dispatcher/new-section body))))))
+          (flux/dispatch dispatcher/new-section body))))))
