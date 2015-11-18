@@ -6,10 +6,10 @@
             [open-company-web.api :as api]
             [cljs.core.async :refer (put!)]))
 
-(defn add-section [e category section]
+(defn add-section [e category section section-body]
   (.preventDefault e)
   (let [ch (utils/get-channel "add-section")]
-    (put! ch {:category category :section section})))
+    (put! ch {:category category :section section :section-defaults (dissoc section-body :name :core)})))
 
 (defcomponent new-section-popover [data owner]
   (init-state [_]
@@ -28,6 +28,6 @@
                 (dom/div {:class "new-section-category-sections"}
                   (for [section (:sections category)]
                     (dom/div {:class "new-section-category-section"}
-                      (dom/a {:href "" :on-click #(add-section % (:name category) (:name section))}
+                      (dom/a {:href "" :on-click #(add-section % (:name category) (:name section) section)}
                       (dom/h4 {:class "section-title"} (:title section))
                       (dom/p {:class "section-description"} (:description section))))))))))))))
