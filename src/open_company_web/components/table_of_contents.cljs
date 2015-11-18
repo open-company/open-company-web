@@ -21,8 +21,7 @@
 
 (defn show-popover [e category section]
   (when (.-$ js/window) ; avoid tests crash
-    (let [{:keys [category section] :as catsec} (get-category-section-info e)
-          $info (.$ js/window "#last-add-section-info")]
+    (let [$info (.$ js/window "#last-add-section-info")]
       (.data $info "category" category)
       (.data $info "section" section))
     (let [popover (.$ js/window "#new-section-popover-container")]
@@ -45,27 +44,61 @@
                                {:target (.getElementById js/document "new-section-popover-container")})
                      1000)))))
 
+(defn insert-section
+  [category-into section-after category-to-insert section-to-insert sections]
+  (let [category-kw (keyword category-into)
+        category (category-kw sections)]
+    (if (= section-to-insert first-sec-placeholder)
+      (let [new-category (conj section-to-insert (category-kw sections))]
+        (merge sections {category-kw new-category}))
+      (if-not (= category-into category-to-insert)
+        (let [new-category (conj section-to-insert (category-kw sections))]
+          (merge sections {category-kw new-category}))
+        (let [idx (inc (.indexOf (to-array category) section-after))
+              [before after] (split-at idx category)
+              new-category (vec (concat before [section-to-insert] after))]
+          (merge sections {category-kw new-category}))))))
+
+(defn handle-add-section-change [change]
+  (let [$info (.$ js/window "#last-add-section-info")
+        last-section (.data $info "section")
+        last-category (.data $info "category")
+        slug (keyword (:slug @router/path))
+        company-data (slug @dispatcher/app-state)
+        sections (:sections company-data)
+        new-categories (insert-section last-category last-section (:category change) (:section change) sections)
+        section-defaults (utils/fix-section (merge (:section-defaults change) {:oc-editing true
+                                                                               :updated-at (utils/as-of-now)})
+                                            (name (:section change)))
+        new-section-kw (keyword (:section change))]
+    (swap! dispatcher/app-state assoc-in [slug] (merge (slug @dispatcher/app-state) {new-section-kw section-defaults}))
+    (swap! dispatcher/app-state assoc-in [slug :sections] new-categories)
+    (.setTimeout js/window #(utils/scroll-to-section new-section-kw) 1000)))
+
 (defcomponent add-section [data owner]
+
   (render [_]
     (let [section (name (:section data))
           category (name (:category data))]
       (dom/div {:id (str "new-section-*-" (name section))
                 :class "new-section"
                 :on-click #(show-popover % category section)}
-        (dom/div {:class "new-section-internal")
+        (dom/div {:class "new-section-internal"})
         (dom/div {:class "add-section"
                   :on-click #(show-popover % category section)}
           (dom/i {:class "fa fa-plus"}))))))
 
 (defcomponent table-of-contents [data owner]
+
   (did-mount [_]
     (let [add-section-chan (chan)]
       (utils/add-channel "add-section" add-section-chan)
       (go (loop []
         (let [change (<! add-section-chan)]
-          (println "add-section-cb" (:category change) (:section change))
+          (handle-add-section-change change)
           (recur)))))
     (add-popover-container data))
+
   (render [_]
     (let [sections (:sections data)
           categories (:categories data)]
