@@ -110,7 +110,7 @@
           section (:section data)
           read-only (:read-only data)
           editing (om/get-state owner :editing)
-          no-data (nil? (:author section-data)) ; if we have no author means we had no data
+          no-data (empty? (:body section-data)) ; if we have no author means we have no data
           should-show-placeholder (and (not editing) no-data)
           placeholder "Finances notes here..."
           body (if should-show-placeholder placeholder (:body section-data))
