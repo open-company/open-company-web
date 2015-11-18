@@ -19,7 +19,7 @@
         section (.data $el "section")]
     {:category category :section section}))
 
-(defn show-popover [e]
+(defn show-popover [e category section]
   (when (.-$ js/window) ; avoid tests crash
     (let [{:keys [category section] :as catsec} (get-category-section-info e)
           $info (.$ js/window "#last-add-section-info")]
@@ -47,20 +47,14 @@
 
 (defcomponent add-section [data owner]
   (render [_]
-    (let [section (:section data)
-          category (:category data)]
+    (let [section (name (:section data))
+          category (name (:category data))]
       (dom/div {:id (str "new-section-*-" (name section))
                 :class "new-section"
-                :data-category (name category)
-                :data-section (name section)
-                :on-click #(show-popover %)}
-        (dom/div {:class "new-section-internal"
-                  :data-category (name category)
-                  :data-section (name section)})
+                :on-click #(show-popover % category section)}
+        (dom/div {:class "new-section-internal")
         (dom/div {:class "add-section"
-                  :data-category (name category)
-                  :data-section (name section)
-                  :on-click #(show-popover %)}
+                  :on-click #(show-popover % category section)}
           (dom/i {:class "fa fa-plus"}))))))
 
 (defcomponent table-of-contents [data owner]
