@@ -21,11 +21,13 @@
 
 (defn show-popover [e category section]
   (when (.-$ js/window) ; avoid tests crash
+    (.css (.$ js/window "body") #js {"overflow" "hidden"})
     (let [$info (.$ js/window "#last-add-section-info")]
       (.data $info "category" category)
       (.data $info "section" section))
     (let [popover (.$ js/window "#new-section-popover-container")]
       (.click popover (fn [e]
+                        (.css (.$ js/window "body") #js {"overflow" ""})
                         (.fadeOut popover 400 #(.css popover #js {"display" "none"}))))
       (.setTimeout js/window #(.fadeIn popover 400) 0))))
 
