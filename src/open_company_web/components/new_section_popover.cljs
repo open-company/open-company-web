@@ -11,7 +11,7 @@
 (defn add-section [e category section section-body]
   (.preventDefault e)
   (let [ch (utils/get-channel "add-section")]
-    (put! ch {:category category :section section :section-defaults (dissoc section-body :name :core)})))
+    (put! ch {:category category :section section :section-defaults (dissoc section-body :name :core :image)})))
 
 (defn filter-sections [old-sections new-sections]
   (filter #(not (utils/in? old-sections (:name %)))
