@@ -1197,6 +1197,7 @@ div.new-section-popover div.bottom-gradient {
 }
 
 div.new-section-popover div.top-gradient {
+  border-top: 1px solid rgba(0,0,0,0.15);
   right:0;
   top:148px;
   left:0;
