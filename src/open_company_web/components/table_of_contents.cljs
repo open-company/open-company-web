@@ -21,12 +21,14 @@
 
 (defn hide-popover [e]
   (when (.-$ js/window)
-    (.css (.$ js/window "body") #js {"overflow" ""})
-    (let [popover (.$ js/window "#new-section-popover-container")]
-      (.fadeOut popover 400 #(.css popover #js {"display" "none"})))
-    (.setTimeout js/window #(try
-                              (om/detach-root (.$ js/window "#new-section-popover-container"))
-                              (catch :default e)) 1500)))
+    (try
+      (.css (.$ js/window "body") #js {"overflow" ""})
+      (let [popover (.$ js/window "#new-section-popover-container")]
+        (.fadeOut popover 400 #(.css popover #js {"display" "none"})))
+      (.setTimeout js/window #(try
+                                (om/detach-root (.$ js/window "#new-section-popover-container"))
+                                (catch :default e)) 1500)
+      (catch :default e))))
 
 (defn add-popover-container []
   (when (.-$ js/window) ; avoid tests crash
@@ -134,6 +136,11 @@
                   :data-category ""
                   :data-section ""})
         (dom/div {:class "table-of-contents-inner"}
+          (dom/div {:class "add-new-section-top group"
+                    :on-click #(show-popover % nil nil)}
+            (dom/div {:class "add-new-section-plus"}
+              (dom/i {:class "fa fa-plus"}))
+            (dom/h4 {} "Add new section"))
           (for [category categories]
             (dom/div {:class "category-container"}
               (dom/div {:class (utils/class-set {:category true
