@@ -1176,13 +1176,46 @@ div.new-section-popover div.new-section-container {
   height: 290px;
 }
 
-div.new-section-popover div.new-section-container div.new-section-category {
+div.new-section-popover div.new-section-category{
+  margin-top: 10px;
+}
+
+div.new-section-popover div.bottom-gradient {
+  right:0;
+  bottom:0;
+  left:0;
+  position:absolute;
+  z-index:2;
+  height:40px; /* adjust it to your needs */
+  background: url(data:image/svg+xml;base64,alotofcodehere);
+  background: -moz-linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(255,255,255,1) 70%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(70%,rgba(255,255,255,1)));
+  background: -webkit-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+  background: -o-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+  background: -ms-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+  background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+}
+
+div.new-section-popover div.top-gradient {
+  right:0;
+  top:148px;
+  left:0;
+  position:absolute;
+  z-index:2;
+  height:40px; /* adjust it to your needs */
+  background: url(data:image/svg+xml;base64,alotofcodehere);
+  background: -moz-linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(255,255,255,1) 70%);
+  background: -webkit-gradient(linear, left bottom, left top, color-stop(0%,rgba(255,255,255,0)), color-stop(70%,rgba(255,255,255,1)));
+  background: -webkit-linear-gradient(bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+  background: -o-linear-gradient(bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+  background: -ms-linear-gradient(bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+  background: linear-gradient(to top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
 }
 
 div.new-section-popover div.new-section-container div.new-section-category h3 {
-  font-size: 15px;
+  font-size: 12px;
   font-weight: bold;
-  margin: 10px 10px 20px 10px;
+  margin: 0px 10px 20px 10px;
 }
 
 div.new-section-category-section {
@@ -1216,11 +1249,11 @@ div.new-section-category-section div.section-details {
 
 div.new-section-category-section div.section-details h4 {
   margin: 5px 0 0 0;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 div.new-section-category-section div.section-details p {
-  font-size: 13px;
+  font-size: 10px;
 }
 
 div.new-section-category-section div.section-details h4,

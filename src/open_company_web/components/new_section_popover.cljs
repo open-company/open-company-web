@@ -40,6 +40,7 @@
         (dom/img {:src "/img/add_new_section_icon.png" :width "80" :height "82"})
         (dom/h4 {} "Add a new section")
         (dom/div {:class "new-section-container"}
+          (dom/div {:class "gradient top-gradient"})
           (for [category sections]
             (when (pos? (count (:sections category)))
               (dom/div {:class "new-section-category"}
@@ -53,4 +54,5 @@
                                     :src (get-section-image category section)}))
                         (dom/div {:class "section-details"}
                           (dom/h4 {:class "section-title"} (:title section))
-                          (dom/p {:class "section-description"} (:description section)))))))))))))))
+                          (dom/p {:class "section-description"} (:description section)))))))))))
+        (dom/div {:class "gradient bottom-gradient"})))))
