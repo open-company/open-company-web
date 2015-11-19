@@ -23,6 +23,9 @@
            (merge category
                   {:sections (filter-sections (category-kw old-categories) (:sections category))})))))
 
+(defn get-section-image [category section]
+  "/img/new_section_placeholder_image.svg")
+
 (defcomponent new-section-popover [data owner]
   (init-state [_]
     (api/get-new-sections)
@@ -33,6 +36,7 @@
           old-sections (:sections company-data)
           sections (filter-categories old-sections (:categories (:new-section data)))]
       (dom/div {:class "new-section-popover"}
+        (dom/div {:class "new-section-popover-close"})
         (dom/img {:src "/img/add_new_section_icon.png" :width "80" :height "82"})
         (dom/h4 {} "Add a new section")
         (dom/div {:class "new-section-container"}
@@ -44,5 +48,9 @@
                   (for [section (:sections category)]
                     (dom/div {:class "new-section-category-section"}
                       (dom/a {:href "" :on-click #(add-section % (:name category) (:name section) section)}
-                      (dom/h4 {:class "section-title"} (:title section))
-                      (dom/p {:class "section-description"} (:description section))))))))))))))
+                        (dom/div {:class "section-icon-container"}
+                          (dom/img {:class (str "section-placeholder " (:name category) "-" (:name section) "-icon")
+                                    :src (get-section-image category section)}))
+                        (dom/div {:class "section-details"}
+                          (dom/h4 {:class "section-title"} (:title section))
+                          (dom/p {:class "section-description"} (:description section)))))))))))))))
