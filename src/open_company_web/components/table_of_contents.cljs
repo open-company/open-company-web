@@ -46,18 +46,25 @@
 
 (defn insert-section
   [category-into section-after category-to-insert section-to-insert sections]
-  (let [category-kw (keyword category-into)
-        category (category-kw sections)]
-    (if (= section-to-insert first-sec-placeholder)
-      (let [new-category (conj section-to-insert (category-kw sections))]
-        (merge sections {category-kw new-category}))
-      (if-not (= category-into category-to-insert)
-        (let [new-category (conj section-to-insert (category-kw sections))]
-          (merge sections {category-kw new-category}))
-        (let [idx (inc (.indexOf (to-array category) section-after))
-              [before after] (split-at idx category)
-              new-category (vec (concat before [section-to-insert] after))]
-          (merge sections {category-kw new-category}))))))
+  (let [category-kw (keyword category-to-insert)
+        category (category-kw sections)
+        fixed-section-after (if (= category-into category-to-insert)
+                                  section-after
+                                  first-sec-placeholder)]
+    (cond
+      ; category doesn't exist, create it with the new section
+      (not (contains? sections category-kw))
+      (merge sections {category-kw [section-to-insert]})
+      ; category exists, section is placeholder for first place
+      (= fixed-section-after first-sec-placeholder)
+      (let [new-category (concat [section-to-insert] (category-kw sections))]
+        (merge sections {category-kw (vec new-category)}))
+      ; category exists, adding section
+      :else
+      (let [idx (inc (.indexOf (to-array category) section-after))
+            [before after] (split-at idx category)
+            new-category (vec (concat before [section-to-insert] after))]
+        (merge sections {category-kw new-category})))))
 
 (defn handle-add-section-change [change]
   (let [$info (.$ js/window "#last-add-section-info")
@@ -66,13 +73,18 @@
         slug (keyword (:slug @router/path))
         company-data (slug @dispatcher/app-state)
         sections (:sections company-data)
-        new-categories (insert-section last-category last-section (:category change) (:section change) sections)
+        new-sections (insert-section last-category last-section (:category change) (:section change) sections)
         section-defaults (utils/fix-section (merge (:section-defaults change) {:oc-editing true
                                                                                :updated-at (utils/as-of-now)})
                                             (name (:section change)))
-        new-section-kw (keyword (:section change))]
+        new-section-kw (keyword (:section change))
+        new-category (:category change)
+        new-categories (if (utils/in? (:categories company-data) new-category)
+                         (:categories company-data)
+                         (conj (:categories company-data) new-category))]
     (swap! dispatcher/app-state assoc-in [slug] (merge (slug @dispatcher/app-state) {new-section-kw section-defaults}))
-    (swap! dispatcher/app-state assoc-in [slug :sections] new-categories)
+    (swap! dispatcher/app-state assoc-in [slug :sections] new-sections)
+    (swap! dispatcher/app-state assoc-in [slug :categories] new-categories)
     (.setTimeout js/window #(utils/scroll-to-section new-section-kw) 1000)))
 
 (defcomponent add-section [data owner]
