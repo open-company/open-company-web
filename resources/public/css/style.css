@@ -1233,15 +1233,46 @@ div.new-section-category-section div.section-icon-container {
   float: left;
 }
 
-div.new-section-category-section div.section-icon-container img.section-placeholder {
-  width: 20px;
-  height: 20px;
-  margin: 10px;
-  color: blue;
+div.section-icon-container div.section-icon-inner {
+  width: 24px;
+  height: 24px;
+  margin: 8px;
 }
 
-div.new-section-category-section div.section-icon-container img.section-placeholder svg path{
-  fill: #94d31b;
+div.section-icon-container div.section-icon-inner svg path,
+div.section-icon-container div.section-icon-inner svg polygon {
+  fill: black;
+}
+
+div.section-icon-container div.section-icon-inner.green svg path,
+div.section-icon-container div.section-icon-inner.green svg polygon {
+  fill: #26C484;
+}
+
+div.section-icon-container div.section-icon-inner.darkblue svg path,
+div.section-icon-container div.section-icon-inner.darkblue svg polygon {
+  fill: #004E64;
+}
+
+div.section-icon-container div.section-icon-inner.lightblue svg path,
+div.section-icon-container div.section-icon-inner.lightblue svg polygon {
+  fill: #029DB7;
+}
+
+div.section-icon-container div.section-icon-inner.icon-placeholder {
+  padding-top: 0 !important;
+}
+
+div.section-icon-container div.section-icon-inner.progress-update-inner {
+  padding-top: 4px;
+}
+
+div.section-icon-container div.section-icon-inner.progress-press-inner {
+  padding-top: 3px;
+}
+
+div.section-icon-container div.section-icon-inner.progress-business-development-inner {
+  padding-top: 4px;
 }
 
 div.new-section-category-section div.section-details {
