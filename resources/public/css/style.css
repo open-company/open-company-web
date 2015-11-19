@@ -1172,6 +1172,8 @@ div.new-section-popover > h4{
 div.new-section-popover div.new-section-container {
   background-color: white;
   text-align: left;
+  overflow: auto;
+  height: 290px;
 }
 
 div.new-section-popover div.new-section-container div.new-section-category {
