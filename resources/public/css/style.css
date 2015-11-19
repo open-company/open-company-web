@@ -1214,6 +1214,8 @@ div.new-section-popover div.top-gradient {
 
 div.new-section-popover div.new-section-container div.new-section-category h3 {
   font-size: 12px;
+  text-transform: uppercase;
+  font-variant: small-caps;
   font-weight: bold;
   margin: 0px 10px 20px 10px;
 }
