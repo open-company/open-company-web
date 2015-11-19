@@ -19,19 +19,16 @@
         section (.data $el "section")]
     {:category category :section section}))
 
-(defn show-popover [e category section]
-  (when (.-$ js/window) ; avoid tests crash
-    (.css (.$ js/window "body") #js {"overflow" "hidden"})
-    (let [$info (.$ js/window "#last-add-section-info")]
-      (.data $info "category" category)
-      (.data $info "section" section))
+(defn hide-popover [e]
+  (when (.-$ js/window)
+    (.css (.$ js/window "body") #js {"overflow" ""})
     (let [popover (.$ js/window "#new-section-popover-container")]
-      (.click popover (fn [e]
-                        (.css (.$ js/window "body") #js {"overflow" ""})
-                        (.fadeOut popover 400 #(.css popover #js {"display" "none"}))))
-      (.setTimeout js/window #(.fadeIn popover 400) 0))))
+      (.fadeOut popover 400 #(.css popover #js {"display" "none"})))
+    (.setTimeout js/window #(try
+                              (om/detach-root (.$ js/window "#new-section-popover-container"))
+                              (catch :default e)) 1500)))
 
-(defn add-popover-container [data]
+(defn add-popover-container []
   (when (.-$ js/window) ; avoid tests crash
     (let [popover (.$ js/window "<div id='new-section-popover-container'></div>")
           body (.$ js/window (.-body js/document))]
@@ -44,7 +41,18 @@
                      #(om/root new-section-popover
                                dispatcher/app-state
                                {:target (.getElementById js/document "new-section-popover-container")})
-                     1000)))))
+                     1)))))
+
+(defn show-popover [e category section]
+  (when (.-$ js/window) ; avoid tests crash
+    (add-popover-container)
+    (.css (.$ js/window "body") #js {"overflow" "hidden"})
+    (let [$info (.$ js/window "#last-add-section-info")]
+      (.data $info "category" category)
+      (.data $info "section" section))
+    (let [popover (.$ js/window "#new-section-popover-container")]
+      (.click popover hide-popover)
+      (.setTimeout js/window #(.fadeIn popover 400) 0))))
 
 (defn insert-section
   [category-into section-after category-to-insert section-to-insert sections]
@@ -111,7 +119,12 @@
         (let [change (<! add-section-chan)]
           (handle-add-section-change change)
           (recur)))))
-    (add-popover-container data))
+    (let [close-new-section-popover-chan (chan)]
+      (utils/add-channel "close-new-section-popover" close-new-section-popover-chan)
+      (go (loop []
+        (let [change (<! close-new-section-popover-chan)]
+          (hide-popover nil)
+          (recur))))))
 
   (render [_]
     (let [sections (:sections data)
