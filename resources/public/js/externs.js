@@ -1,6 +1,7 @@
 // jQuery
 var $ = {};
 var jQuery = function(){};
+jQuery.get = function(){};
 $.select2 = function(){};
 $.tooltip = function(){};
 $.width = function(){};
@@ -31,6 +32,10 @@ $.load = function(){};
 $.hover = function(){};
 $.data = function(){};
 $.append = function(){};
+$.sortable = function(){};
+$.get = function(){};
+// svgcss
+var svgcss = function(){};
 // Hallo
 var hallo = function(){};
 // google
