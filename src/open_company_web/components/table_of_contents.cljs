@@ -172,11 +172,6 @@
                   :data-category ""
                   :data-section ""})
         (dom/div {:class "table-of-contents-inner"}
-          (dom/div {:class "add-new-section-top group"
-                    :on-click #(show-popover % nil nil)}
-            (dom/div {:class "add-new-section-plus"}
-              (dom/i {:class "fa fa-plus"}))
-            (dom/h4 {} "Add new section"))
           (for [category categories]
             (let [sections ((keyword category) sections)
                   sections-key (str (name category) (apply str sections))]
@@ -190,9 +185,12 @@
                 (dom/div {:class "category-sections-container"}
                   (for [section sections]
                     (let [section-data ((keyword section) data)]
-                      (om/build table-of-contents-item {
-                                          :category category
-                                          :section section
-                                          :title (:title section-data)
-                                          :updated-at (:updated-at section-data)
-                                          :show-popover #(show-popover % (name category) (:name section-data))}))))))))))))
+                      (dom/div {}
+                        (om/build table-of-contents-item {
+                                            :category category
+                                            :section section
+                                            :title (:title section-data)
+                                            :updated-at (:updated-at section-data)
+                                            :show-popover #(show-popover % (name category) (:name section-data))})
+                        (om/build add-section {:category (name category)
+                                               :section (:section section-data)})))))))))))))
