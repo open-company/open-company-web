@@ -3,7 +3,7 @@
             [no.en.core :refer [deep-merge]]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.caches :refer [revisions]]))
+            [open-company-web.caches :refer [revisions new-sections]]))
 
 (defonce app-state (atom {}))
 
@@ -74,4 +74,4 @@
     new-section
     (fn [body]
       (when body
-        (swap! app-state assoc :new-section body)))))
+        (swap! new-sections assoc :categories (:categories body))))))
