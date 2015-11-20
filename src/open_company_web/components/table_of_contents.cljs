@@ -7,7 +7,7 @@
             [open-company-web.api :as api]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [open-company-web.api :as api]
-            [open-company-web.components.ToC-item :refer (ToC-item)]))
+            [open-company-web.components.table-of-contents-item :refer (table-of-contents-item)]))
 
 (def first-cat-placeholder "first-category")
 
@@ -74,17 +74,22 @@
                     "stop" #(sort-end %1 %2 categories)})))
 
 (defcomponent table-of-contents [data owner]
+
   (init-state [_]
     {:hover-add-section false
      :hover-new-section false})
+
   (did-mount [_]
     (setup-hover-events owner)
     (add-popover-container)
     (setup-sortable (:categories data)))
+
   (did-update [_ _ _]
     (setup-hover-events owner)
     (setup-sortable (:categories data)))
+  
   (display-name [_] "ToC")
+
   (render [_]
     (let [sections (:sections data)
           categories (:categories data)]
@@ -104,17 +109,22 @@
                        (dom/h3 (utils/camel-case-str (name category))))
               (dom/div {:id (str "new-section-" first-cat-placeholder)
                         :class (utils/class-set {:new-section true
-                                                 :hover (or (= (om/get-state owner :hover-new-section) (str "new-section-" first-cat-placeholder))
-                                                            (= (om/get-state owner :hover-add-section) (str "new-section-" first-cat-placeholder)))})
+                                                 :hover (or (= (om/get-state owner :hover-new-section)
+                                                               (str "new-section-" first-cat-placeholder))
+                                                            (= (om/get-state owner :hover-add-section)
+                                                               (str "new-section-" first-cat-placeholder)))})
                         :on-click #(show-popover % owner)}
                 (dom/div {:class "new-section-internal"}))
               (dom/div {:class "category-sections-container"}
                 (for [section ((keyword category) sections)]
                   (let [section-data ((keyword section) data)]
-                    (om/build ToC-item {:category category
+                    (om/build table-of-contents-item {
+                                        :category category
                                         :section section
                                         :title (:title section-data)
                                         :updated-at (:updated-at section-data)
                                         :show-popover #(show-popover % owner)
-                                        :hover (or (= (om/get-state owner :hover-new-section) (str "new-section-" (name section)))
-                                                   (= (om/get-state owner :hover-add-section) (str "new-section-" (name section))))})))))))))))
+                                        :hover (or (= (om/get-state owner :hover-new-section)
+                                                      (str "new-section-" (name section)))
+                                                   (= (om/get-state owner :hover-add-section)
+                                                      (str "new-section-" (name section))))})))))))))))

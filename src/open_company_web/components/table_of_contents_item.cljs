@@ -1,4 +1,4 @@
-(ns open-company-web.components.ToC-item
+(ns open-company-web.components.table-of-contents-item
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
@@ -6,8 +6,10 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.api :as api]))
 
-(defcomponent ToC-item [data owner]
-  (display-name [_] (str "ToC-item" (:seciton data)))
+(defcomponent table-of-contents-item [data owner]
+  
+  (display-name [_] (str "table-of-contents-item" (:seciton data)))
+  
   (render [_]
     (let [category (:category data)
           section (:section data)]
