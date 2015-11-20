@@ -4,7 +4,9 @@
               [open-company-web.lib.iso4217 :refer [iso4217]]
               [cljs.core.async :refer [put!]]
               [open-company-web.router :as router]
-              [open-company-web.caches :as caches]))
+              [open-company-web.caches :as caches]
+              [cljs-time.format :as cljs-time-format]
+              [cljs-time.core :as cljs-time]))
 
 (defn abs [n] (max n (- n)))
 
@@ -76,43 +78,87 @@
 (defn vec-dissoc [coll elem]
   (vec (filter #(not (= elem %)) coll)))
 
-(defn get-period-string [period]
-  (case period
-    "M1" "January"
-    "M2" "February"
-    "M3" "March"
-    "M4" "April"
-    "M5" "May"
-    "M6" "June"
-    "M7" "July"
-    "M8" "August"
-    "M9" "September"
-    "M10" "October"
-    "M11" "November"
-    "M12" "December"
+(defn month-string [month & [flags]]
+  (let [short-month (in? flags :short)]
+    (case month
+      "01" (if short-month
+             "JAN"
+             "January")
+      "02" (if short-month
+             "FEB"
+             "February")
+      "03" (if short-month
+             "MAR"
+             "March")
+      "04" (if short-month
+             "APR"
+             "April")
+      "05" (if short-month
+             "MAY"
+             "May")
+      "06" (if short-month
+             "JUN"
+             "June")
+      "07" (if short-month
+             "JUL"
+             "July")
+      "08" (if short-month
+             "AUG"
+             "August")
+      "09" (if short-month
+             "SEP"
+             "September")
+      "10" (if short-month
+             "OCT"
+             "October")
+      "11" (if short-month
+             "NOV"
+             "November")
+      "12" (if short-month
+             "DEC"
+             "December")
+      "")))
 
-    "Q1" "January - March"
-    "Q2" "April - June"
-    "Q3" "July - September"
-    "Q4" "October - December"
-
-    ""))
-
-(defn month-string [month]
-  (case month
-    "01" "January"
-    "02" "February"
-    "03" "March"
-    "04" "April"
-    "05" "May"
-    "06" "June"
-    "07" "July"
-    "08" "August"
-    "09" "September"
-    "10" "October"
-    "11" "November"
-    "12" "December"
-    ""))
+(defn month-string-int [month & [flags]]
+  (let [short-month (in? flags :short)]
+    (case month
+      1 (if short-month
+          "JAN"
+          "January")
+      2 (if short-month
+          "FEB"
+          "February")
+      3 (if short-month
+          "MAR"
+          "March")
+      4 (if short-month
+          "APR"
+          "April")
+      5 (if short-month
+          "MAY"
+          "May")
+      6 (if short-month
+          "JUN"
+          "June")
+      7 (if short-month
+          "JUL"
+          "July")
+      8 (if short-month
+          "AUG"
+          "August")
+      9 (if short-month
+          "SEP"
+          "September")
+      10 (if short-month
+          "OCT"
+          "October")
+      11 (if short-month
+          "NOV"
+          "November")
+      12 (if short-month
+          "DEC"
+          "December")
+      "")))
 
 (defn month-short-string [month]
   (case month
@@ -153,34 +199,34 @@
     0
     (.toLocaleString value)))
 
-(defn burn-rate [revenue costs]
+(defn calc-burn-rate [revenue costs]
   (- revenue costs))
 
-(defn avg-burn-rate [periods]
-  (let [burn-rates (map #(burn-rate (:revenue %) (:costs %)) periods)
+(defn calc-avg-burn-rate [periods]
+  (let [burn-rates (map #(calc-burn-rate (:revenue %) (:costs %)) periods)
         tot (count burn-rates)]
     (apply (fn [& items]
              (/ (apply + items) tot)) burn-rates)))
 
-(defn calc-runway
+(defn calc-runway [cash burn-rate]
+  (int (* (/ cash burn-rate) 30)))
+
+(defn calc-burnrate-runway
   "Helper function that add burn-rate and runway to each update section"
   [finances-data]
   (let [sort-pred (sort-by-key-pred :period)
         sorted-data (into [] (sort #(sort-pred %1 %2) finances-data))]
     (loop [idx 1
            datas sorted-data]
-      (let [start   (max 0 (- idx 3))
-            avg     (avg-burn-rate (subvec datas start idx))]
-        (if (neg? avg)
-          (let [period  (datas (dec idx))
-                runway (abs (int (* (/ (:cash period) avg) 30)))
-                fixed-period (assoc period :runway runway)
-                datas   (assoc datas (dec idx) fixed-period)]
-            (if (< idx (count sorted-data))
-              (recur (inc idx)
-                     datas)
-              datas))
-          (if (< idx (dec (count sorted-data)))
+      (let [start (max 0 (- idx 3))
+            avg-burn-rate (calc-avg-burn-rate (subvec datas start idx))]
+        (let [period  (datas (dec idx))
+              runway (calc-runway (:cash period) avg-burn-rate) 
+              fixed-period (merge period {:runway runway
+                                          :avg-burn-rate avg-burn-rate
+                                          :burn-rate (calc-burn-rate (:revenue period) (:costs period))})
+              datas   (assoc datas (dec idx) fixed-period)]
+          (if (< idx (count sorted-data))
             (recur (inc idx)
                    datas)
             datas))))))
@@ -288,7 +334,7 @@
 
 (defn get-section-keys [company-data]
   "Get the section names, as a vector of keywords, in category order and order in the category."
-  (vec (map keyword (flatten (map #(get-in company-data [:sections (keyword %)]) (:categories company-data))))))
+  (vec (map keyword (flatten (remove nil? (map #(get-in company-data [:sections (keyword %)]) (:categories company-data)))))))
 
 (defn get-sections [section-keys company-data]
   (loop [ks section-keys
@@ -305,7 +351,7 @@
 
 (defn fix-finances [section-body]
   (let [finances-data (:data section-body)
-        fixed-finances (calc-runway finances-data)
+        fixed-finances (calc-burnrate-runway finances-data)
         sort-pred (sort-by-key-pred :period true)
         sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
         fixed-section (assoc section-body :data sorted-finances)
@@ -379,3 +425,53 @@
 
 (defn scroll-to-section [section-name]
   (scroll-to-id (str "section-" (name section-name))))
+
+(defn get-quarter-from-month [month & [flags]]
+  (let [short-str (in? flags :short)]
+    (cond
+      (and (>= month 1) (<= month 3))
+      (if short-str
+        "Q1"
+        "January - March")
+      (and (>= month 4) (<= month 6))
+      (if short-str
+        "Q2"
+        "April - June")
+      (and (>= month 7) (<= month 9))
+      (if short-str
+        "Q3"
+        "July - September")
+      (and (>= month 10) (<= month 12))
+      (if short-str
+        "Q4"
+        "October - December"))))
+
+
+(def quarterly-input-format (cljs-time-format/formatter "MM-yyyy"))
+(def monthly-input-format (cljs-time-format/formatter "yyyy-MM"))
+(def weekly-input-format (cljs-time-format/formatter "yyyy-MM-dd"))
+
+(defn get-formatter [interval]
+  "Get the date formatter from the interval type."
+  (case interval
+    "quarterly"
+    quarterly-input-format
+    "monthly"
+    monthly-input-format
+    "weekly"
+    weekly-input-format
+    :else
+    weekly-input-format))
+
+(defn get-period-string [period interval & [flags]]
+  "Get descriptive string for the period by interval. Use :short as a flag to get
+  the short formatted string."
+  (let [formatter (get-formatter interval)
+        date (cljs-time-format/parse formatter period)]
+    (case interval
+      "quarterly"
+      (str (get-quarter-from-month (cljs-time/month date) flags) " " (cljs-time/year date))
+      "monthly"
+      (str (month-string-int (cljs-time/month date) flags))
+      "weekly"
+      (str (month-string-int (cljs-time/month date) flags) " " (cljs-time/day date)))))

@@ -23,6 +23,7 @@
       {:slug "test-metric"
        :name "Test metric"
        :target "high"
+       :interval "monthly"
        :unit "tests"}]
     :data [
         {:period "2015-10"

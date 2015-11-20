@@ -13,11 +13,10 @@
 (defcomponent list-companies [data owner]
   (render [_]
     (let [company-list (:companies data)]
-      (dom/div {:class "row"}
+      (dom/div {:class "row-fluid"}
         (om/build navbar data)
-        (dom/div {:class "container-fluid"}
-          (dom/h1 "Companies:")
-          (if (> (count company-list) 0)
-            (dom/ul
-              (om/build-all list-page-item company-list))
-            (dom/h2 "No companies found.")))))))
+        (dom/h1 "Companies:")
+        (if (> (count company-list) 0)
+          (dom/ul
+            (om/build-all list-page-item company-list))
+          (dom/h2 "No companies found."))))))

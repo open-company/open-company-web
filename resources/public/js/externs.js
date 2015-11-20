@@ -29,6 +29,7 @@ $.hover = function(){};
 $.each.load = function(){};
 $.load = function(){};
 $.hover = function(){};
+$.sortable = function(){};
 // Hallo
 var hallo = function(){};
 // google

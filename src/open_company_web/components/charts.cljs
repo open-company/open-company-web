@@ -1,6 +1,6 @@
 (ns open-company-web.components.charts
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]))
 
 (defn pie-add-rows [columns data currency-symbol]
@@ -77,6 +77,7 @@
       (when dom-node (.draw (js/google.visualization.ColumnChart. dom-node) data-table options)))))
 
 (defcomponent column-chart [chart-data owner]
+
   (did-mount [_]
     (column-draw-chart (:prefix chart-data)
                        (:columns chart-data)
@@ -86,6 +87,7 @@
                          (:column-thickness chart-data)
                          "14")
                        (.getDOMNode (om/get-ref owner "column-chart"))))
+
   (did-update [_ _ _]
     (column-draw-chart (:prefix chart-data)
                        (:columns chart-data)
@@ -95,5 +97,6 @@
                          (:column-thickness chart-data)
                          "14")
                        (.getDOMNode (om/get-ref owner "column-chart"))))
+
   (render [_]
     (dom/div #js {:className "chart-container column-chart" :ref "column-chart" })))
