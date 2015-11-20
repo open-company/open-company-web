@@ -284,9 +284,14 @@ div.composed-section div.link-bar a.composed-section-link {
   display: inline-block;
 }
 
-div.composed-section div.link-bar a.composed-section-link.active {
+div.finances div.link-bar a.composed-section-link.active {
   text-decoration: none;
   color: #26C485;
+}
+
+div.growth div.link-bar a.composed-section-link.active {
+  text-decoration: none;
+  color: #109DB7;
 }
 
 div.composed-section div.composed-section-body{
