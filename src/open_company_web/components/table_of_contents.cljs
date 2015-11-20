@@ -103,9 +103,7 @@
         (dom/div {:class "table-of-contents-inner"}
           (for [category categories]
             (let [sections ((keyword category) sections)
-                  sections-key (if (empty? sections)
-                                 (str (rand 10))
-                                 (apply str sections))]
+                  sections-key (str (name category) (apply str sections))]
               (dom/div {:class "category-container"
                         :key sections-key}
                 (dom/div {:class (utils/class-set {:category true
