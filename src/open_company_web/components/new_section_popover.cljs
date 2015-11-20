@@ -69,11 +69,9 @@
     (.setTimeout js/window #(.svgcss js/window) 1)))
 
 (defcomponent new-section-popover [data owner]
-  (init-state [_]
-    (api/get-new-sections)
-    {})
   (did-mount [_]
-    (replace-svg))
+    (replace-svg)
+    (.setTimeout js/window #(api/get-new-sections) 1000))
   (did-update [_ _ _]
     (replace-svg))
   (render [_]
