@@ -338,9 +338,7 @@ div.composed-section div.section div.chart-footer-container div.actual-container
 
 div.composed-section div.section div.chart-header-container.chart-header div.actual-container,
 div.composed-section div.section div.chart-footer-container.chart-header div.actual-container {
-  /*width: 600px;*/
   float: none;
-  /*margin-left: -225px;*/
 }
 
 div.target-actual-container div.target-container h3 {

@@ -15,6 +15,7 @@
     (put! ch {:period period :key k})))
 
 (defcomponent finances-edit-row [data owner]
+  
   (render [_]
     (let [prefix (:prefix data)
           finances-data (:cursor data)
@@ -134,6 +135,7 @@
       nil)))
 
 (defcomponent finances-edit [data owner]
+  
   (init-state [_]
     ; add a new line if necessary
     (let [finances-data (:section-data data)
@@ -150,6 +152,7 @@
               new-data (into [new-period] initial-data)]
           (update init-state :data (fn [_]new-data)))
           init-state)))
+  
   (render [_]
     (let [finances-data (om/get-state owner :data)
           currency (finances-utils/get-currency-for-current-company)
