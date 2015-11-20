@@ -1,9 +1,9 @@
 (ns open-company-web.components.growth.growth-metric
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.charts :refer [column-chart]]
+            [open-company-web.components.charts :refer (column-chart)]
             [clojure.string :as clj-str]
             [open-company-web.lib.oc-colors :as occ]))
 
@@ -66,8 +66,9 @@
                     plc-vec)]
       (concat data vect))))
 
-(defn- get-chart-data [data prefix column-name tooltip-suffix columns-num interval]
+(defn- get-chart-data
   "Vector of max *columns elements of [:Label value]"
+  [data prefix column-name tooltip-suffix columns-num interval]
   (let [fixed-data (placeholder-data data columns-num)
         has-target (some #(:target %) data)
         chart-data (partial chart-data-at-index fixed-data column-name columns-num prefix tooltip-suffix has-target interval)
@@ -95,6 +96,7 @@
   (some #(when (:value (metrics %)) %) (vec (range (count metrics)))))
 
 (defcomponent growth-metric [data owner]
+
   (render [_]
     (let [metric-info (:metric-info data)
           metric-data (:metric-data data)
@@ -110,7 +112,7 @@
           fixed-cur-unit (if (= cur-unit metric-unit)
                             nil
                             cur-unit)
-          unit (if fixed-cur-unit nil (utils/camel-case-str metric-unit))
+          unit (if fixed-cur-unit nil metric-unit)
           name-has-unit (> (.indexOf (clj-str/lower-case (str (:name metric-info))) (clj-str/lower-case metric-unit)) -1)
           actual-with-label (if fixed-cur-unit
                               (str fixed-cur-unit actual)
