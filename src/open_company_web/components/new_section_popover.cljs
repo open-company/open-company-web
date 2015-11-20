@@ -36,6 +36,7 @@
   "progress-customer-service"
   "progress-marketing"
   "progress-press"
+  "progress-sales"
   "progress-business-development"
   "progress-help"
   "progress-kudos"
