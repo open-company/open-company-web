@@ -70,15 +70,14 @@
 
 (defcomponent new-section-popover [data owner]
   (did-mount [_]
-    (replace-svg)
-    (.setTimeout js/window #(api/get-new-sections) 1000))
+    (replace-svg))
   (did-update [_ _ _]
     (replace-svg))
   (render [_]
     (let [slug (keyword (:slug @router/path))
-          company-data (slug data)
+          company-data (slug @dispatcher/app-state)
           old-sections (:sections company-data)
-          sections (filter-categories old-sections (:categories (:new-section data)))]
+          sections (filter-categories old-sections (:categories data))]
       (dom/div {:class "new-section-popover"}
         (dom/div {:class "new-section-popover-close"
                   :on-click #(put! (utils/get-channel "close-new-section-popover") {})})
