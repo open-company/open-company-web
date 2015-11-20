@@ -21,7 +21,7 @@
     [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; React test utilities https://github.com/bensu/cljs-react-test
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
-    [com.cognitect/transit-cljs "0.8.225"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
+    [com.cognitect/transit-cljs "0.8.232"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
     [racehub/om-bootstrap "0.5.3"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
     [noencore "0.1.21"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
@@ -45,7 +45,7 @@
     }
     :devcards [:dev {
       :dependencies [
-        [devcards "0.2.0-8"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
+        [devcards "0.2.1"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
       ]
     }]
   }
