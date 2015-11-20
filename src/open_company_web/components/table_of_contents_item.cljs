@@ -24,9 +24,4 @@
                               (utils/scroll-to-section (name section)))}
             (dom/p {:class "section-title"} (:title data))
             (dom/p {:class "section-date"} (utils/time-since (:updated-at data))))
-          (dom/div {:class "category-section-sortable"}))
-        (dom/div {:id (str "new-section-" (name section))
-                  :class (utils/class-set {:new-section true
-                                           :hover (:hover data)})
-                  :on-click (:show-popover data)}
-          (dom/div {:class "new-section-internal"}))))))
+          (dom/div {:class "category-section-sortable"}))))))
