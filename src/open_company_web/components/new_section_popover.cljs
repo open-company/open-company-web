@@ -23,38 +23,7 @@
            (merge category
                   {:sections (filter-sections (category-kw old-categories) (:sections category))})))))
 
-(def icons-path "/img/section-icons/")
-
-(def icons-list [
-  ; progress
-  "progress-update"
-  "progress-highlights"
-  "progress-growth"
-  "progress-challenges"
-  "progress-team"
-  "progress-product"
-  "progress-customer-service"
-  "progress-marketing"
-  "progress-press"
-  "progress-sales"
-  "progress-business-development"
-  "progress-help"
-  "progress-kudos"
-  ; company
-  "company-diversity"
-  "company-values"
-  "company-privacy"
-  "company-mission"
-  ; financial
-  "financial-finances"
-  "financial-compensation"
-  "financial-ownership"])
-
-(defn get-section-image [category section]
-  (let [nm (str category "-" section)]
-    (if (utils/in? icons-list nm)
-      (str icons-path nm ".svg")
-      (str icons-path "placeholder.svg"))))
+(def placeholder-icon "/img/section-icons/placeholder.svg")
 
 (def class-counter (atom -1))
 
@@ -94,6 +63,7 @@
                   (for [section (:sections category)]
                     (let [color-class (get-color-class)
                           section-name (:name section)
+                          section-icon (or (:image section) placeholder-icon)
                           category-name (:name category)
                           section-uniq (str category-name "-" section-name)
                           section-img-class (str section-uniq "-icon")
@@ -105,9 +75,9 @@
                             (dom/div {:class (utils/class-set {:section-icon-inner true
                                                                section-inner-class true
                                                                color-class true
-                                                               :icon-placeholder (not (utils/in? icons-list section-uniq))})}
+                                                               :icon-placeholder (= section-icon placeholder-icon)})}
                               (dom/img {:class (str "section-placeholder svg " section-img-class)
-                                        :src (get-section-image category-name section-name)})))
+                                        :src section-icon})))
                           (dom/div {:class "section-details"}
                             (dom/h4 {:class "section-title"} (:title section))
                             (dom/p {:class "section-description"} (:description section))))))))))))
