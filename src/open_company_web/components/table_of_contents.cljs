@@ -8,7 +8,8 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.api :as api]
             [open-company-web.dispatcher :as dispatcher]
-            [open-company-web.components.new-section-popover :refer (new-section-popover)]))
+            [open-company-web.components.new-section-popover :refer (new-section-popover)]
+            [open-company-web.caches :as caches]))
 
 (def first-sec-placeholder "firstsectionplaceholder")
 
@@ -41,7 +42,7 @@
       (when-not (pos? (.-length (.$ js/window "body div#new-section-popover-container div.new-section-popover")))
         (.setTimeout js/window
                      #(om/root new-section-popover
-                               dispatcher/app-state
+                               caches/new-sections
                                {:target (.getElementById js/document "new-section-popover-container")})
                      1)))))
 
@@ -112,6 +113,16 @@
                   :on-click #(show-popover % category section)}
           (dom/i {:class "fa fa-plus"}))))))
 
+(def new-sections-requested (atom false))
+
+(defn get-new-sections-if-needed [data]
+  (when (not @new-sections-requested)
+    (let [slug (keyword (:slug @router/path))
+          company-data (slug @dispatcher/app-state)]
+      (when (and (empty? @caches/new-sections) (not (empty? company-data)))
+        (swap! new-sections-requested not)
+        (api/get-new-sections)))))
+
 (defcomponent table-of-contents [data owner]
 
   (did-mount [_]
@@ -129,6 +140,7 @@
           (recur))))))
 
   (render [_]
+    (get-new-sections-if-needed data)
     (let [sections (:sections data)
           categories (:categories data)]
       (dom/div #js {:className "table-of-contents" :ref "table-of-contents"}
