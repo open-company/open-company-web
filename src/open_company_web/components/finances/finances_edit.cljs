@@ -121,7 +121,7 @@
       (let [cur-row (get array-data idx)]
         (if (= (:period cur-row) (:period new-row))
           (let [new-rows (assoc array-data idx new-row)
-                runway-rows (utils/calc-runway new-rows)
+                runway-rows (utils/calc-burnrate-runway new-rows)
                 sort-pred (utils/sort-by-key-pred :period true)
                 sorted-rows (sort #(sort-pred %1 %2) runway-rows)]
             (om/update-state! owner :data (fn [_] sorted-rows)))
