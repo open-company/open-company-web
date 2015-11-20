@@ -102,29 +102,33 @@
           (dom/i {:class "fa fa-plus"}))
         (dom/div {:class "table-of-contents-inner"}
           (for [category categories]
-            (dom/div {:class "category-container"
-                      :key (apply str ((keyword category) sections))}
-              (dom/div {:class (utils/class-set {:category true
-                                                 :empty (zero? (count ((keyword category) sections)))})}
-                       (dom/h3 (utils/camel-case-str (name category))))
-              (dom/div {:id (str "new-section-" first-cat-placeholder)
-                        :class (utils/class-set {:new-section true
-                                                 :hover (or (= (om/get-state owner :hover-new-section)
-                                                               (str "new-section-" first-cat-placeholder))
-                                                            (= (om/get-state owner :hover-add-section)
-                                                               (str "new-section-" first-cat-placeholder)))})
-                        :on-click #(show-popover % owner)}
-                (dom/div {:class "new-section-internal"}))
-              (dom/div {:class "category-sections-container"}
-                (for [section ((keyword category) sections)]
-                  (let [section-data ((keyword section) data)]
-                    (om/build table-of-contents-item {
-                                        :category category
-                                        :section section
-                                        :title (:title section-data)
-                                        :updated-at (:updated-at section-data)
-                                        :show-popover #(show-popover % owner)
-                                        :hover (or (= (om/get-state owner :hover-new-section)
-                                                      (str "new-section-" (name section)))
-                                                   (= (om/get-state owner :hover-add-section)
-                                                      (str "new-section-" (name section))))})))))))))))
+            (let [sections ((keyword category) sections)
+                  sections-key (if (empty? sections)
+                                 (str (rand 10))
+                                 (apply str sections))]
+              (dom/div {:class "category-container"
+                        :key sections-key}
+                (dom/div {:class (utils/class-set {:category true
+                                                   :empty (empty? sections)})}
+                         (dom/h3 (utils/camel-case-str (name category))))
+                (dom/div {:id (str "new-section-" first-cat-placeholder)
+                          :class (utils/class-set {:new-section true
+                                                   :hover (or (= (om/get-state owner :hover-new-section)
+                                                                 (str "new-section-" first-cat-placeholder))
+                                                              (= (om/get-state owner :hover-add-section)
+                                                                 (str "new-section-" first-cat-placeholder)))})
+                          :on-click #(show-popover % owner)}
+                  (dom/div {:class "new-section-internal"}))
+                (dom/div {:class "category-sections-container"}
+                  (for [section sections]
+                    (let [section-data ((keyword section) data)]
+                      (om/build table-of-contents-item {
+                                          :category category
+                                          :section section
+                                          :title (:title section-data)
+                                          :updated-at (:updated-at section-data)
+                                          :show-popover #(show-popover % owner)
+                                          :hover (or (= (om/get-state owner :hover-new-section)
+                                                        (str "new-section-" (name section)))
+                                                     (= (om/get-state owner :hover-add-section)
+                                                        (str "new-section-" (name section))))}))))))))))))
