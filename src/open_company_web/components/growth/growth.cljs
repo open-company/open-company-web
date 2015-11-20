@@ -21,11 +21,13 @@
     (om/update-state! owner :focus (fn [] tab))))
 
 (defcomponent growth [data owner]
+  
   (init-state [_]
     (let [save-notes-channel (chan)]
       (utils/add-channel "save-growth-notes" save-notes-channel))
     (let [metrics-data (:metrics (:section-data data))]
       {:focus (:slug (first metrics-data))}))
+  
   (will-mount [_]
     (let [save-notes-change (utils/get-channel "save-growth-notes")]
         (go (loop []
@@ -37,6 +39,7 @@
                 section-data (section company-data)]
             (api/patch-section-notes (:notes section-data) (:links section-data) section)
             (recur))))))
+  
   (render [_]
     (let [showing-revision (om/get-state owner :as-of)
           focus (om/get-state owner :focus)
