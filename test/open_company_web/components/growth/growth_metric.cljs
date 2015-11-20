@@ -20,6 +20,7 @@
     :slug metric-slug
     :name "Test metric"
     :target "high"
+    :interval "monthly"
     :unit "test"}
   :metric-data [{
     :period "2015-10"

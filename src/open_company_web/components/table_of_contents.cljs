@@ -9,7 +9,10 @@
             [open-company-web.api :as api]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.components.new-section-popover :refer (new-section-popover)]
-            [open-company-web.caches :as caches]))
+            [open-company-web.caches :as caches]
+            [dommy.core :as dommy :refer-macros (sel1 sel)]
+            [open-company-web.api :as api]
+            [open-company-web.components.table-of-contents-item :refer (table-of-contents-item)]))
 
 (def first-sec-placeholder "firstsectionplaceholder")
 
@@ -123,9 +126,27 @@
         (swap! new-sections-requested not)
         (api/get-new-sections)))))
 
+(defn get-section-form-id [section-id]
+  (get (clojure.string/split section-id "--") 1))
+
+(defn resort-category [category]
+  {(keyword category) (vec (map #(get-section-form-id (.-id %))
+                                (sel (str "div.category-sortable.category-" category))))})
+
+(defn sort-end [event ui categories]
+  (let [sections (apply merge (map #(resort-category %) categories))]
+    (api/patch-sections sections)))
+
+(defn setup-sortable [categories]
+  (when (.-$ js/window)
+    (.sortable (.$ js/window ".category-sections-container")
+               #js {"axis" "y"
+                    "stop" #(sort-end %1 %2 categories)})))
+
 (defcomponent table-of-contents [data owner]
 
   (did-mount [_]
+    (setup-sortable (:categories data))
     (let [add-section-chan (chan)]
       (utils/add-channel "add-section" add-section-chan)
       (go (loop []
@@ -138,6 +159,9 @@
         (let [change (<! close-new-section-popover-chan)]
           (hide-popover nil)
           (recur))))))
+
+  (did-update [_ _ _]
+    (setup-sortable (:categories data)))
 
   (render [_]
     (get-new-sections-if-needed data)
@@ -154,23 +178,21 @@
               (dom/i {:class "fa fa-plus"}))
             (dom/h4 {} "Add new section"))
           (for [category categories]
-            (dom/div {:class "category-container"}
-              (dom/div {:class (utils/class-set {:category true
-                                                 :empty (zero? (count ((keyword category) sections)))})}
-                       (dom/h3 (utils/camel-case-str (name category))))
-              (om/build add-section {:category category
-                                     :section first-sec-placeholder})
-              (for [section (into [] (get sections (keyword category)))]
-                (let [section-data ((keyword section) data)]
-                  (dom/div {}
-                    (dom/div {:class "category-section"}
-                      (dom/div {:class "category-section-close"
-                                :on-click #(api/remove-section (name section))})
-                      (dom/a {:href "#"
-                              :on-click (fn [e]
-                                          (.preventDefault e)
-                                          (utils/scroll-to-section (name section)))}
-                        (dom/p {:class "section-title"} (:title section-data))
-                        (dom/p {:class "section-date"} (utils/time-since (:updated-at section-data)))))
-                    (om/build add-section {:category category
-                                           :section section})))))))))))
+            (let [sections ((keyword category) sections)
+                  sections-key (str (name category) (apply str sections))]
+              (dom/div {:class "category-container"
+                        :key sections-key}
+                (dom/div {:class (utils/class-set {:category true
+                                                   :empty (empty? sections)})}
+                         (dom/h3 (utils/camel-case-str (name category))))
+                (om/build add-section {:category category
+                                       :section first-sec-placeholder})
+                (dom/div {:class "category-sections-container"}
+                  (for [section sections]
+                    (let [section-data ((keyword section) data)]
+                      (om/build table-of-contents-item {
+                                          :category category
+                                          :section section
+                                          :title (:title section-data)
+                                          :updated-at (:updated-at section-data)
+                                          :show-popover #(show-popover % (name category) (:name section-data))}))))))))))))

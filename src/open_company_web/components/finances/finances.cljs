@@ -1,23 +1,22 @@
 (ns open-company-web.components.finances.finances
-  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require-macros [cljs.core.async.macros :refer (go)])
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.components.finances.cash :refer (cash)]
             [open-company-web.components.finances.cash-flow :refer (cash-flow)]
-            [open-company-web.components.finances.revenue :refer (revenue)]
             [open-company-web.components.finances.costs :refer (costs)]
             [open-company-web.components.finances.runway :refer (runway)]
             [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.components.rich-editor :refer (rich-editor)]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.revisions-navigator :refer [revisions-navigator]]
+            [open-company-web.components.revisions-navigator :refer (revisions-navigator)]
             [open-company-web.api :as api]
-            [open-company-web.components.editable-title :refer [editable-title]]
-            [open-company-web.components.utility-components :refer [editable-pen]]
-            [cljs.core.async :refer [chan <!]]))
+            [open-company-web.components.editable-title :refer (editable-title)]
+            [open-company-web.components.utility-components :refer (editable-pen)]
+            [cljs.core.async :refer (chan <!)]))
 
 (defn subsection-click [e owner]
   (.preventDefault e)
@@ -25,6 +24,7 @@
     (om/update-state! owner :focus (fn [] tab))))
 
 (defcomponent finances [data owner]
+  
   (init-state [_]
     (let [save-channel (chan)
           save-notes-channel (chan)]
@@ -34,6 +34,7 @@
           notes-data (:notes finances-data)]
       {:focus "cash"
        :as-of (:updated-at finances-data)}))
+  
   (will-mount [_]
     (let [save-change (utils/get-channel "save-section-finances")]
       (go (loop []
@@ -55,6 +56,7 @@
               section-data (section company-data)]
           (api/patch-section-notes (:notes section-data) (:links section-data) section)
           (recur))))))
+
   (render [_]
     (let [showing-revision (om/get-state owner :as-of)
           focus (om/get-state owner :focus)
@@ -67,14 +69,18 @@
           costs-classes (str classes (when (= focus "costs") " active"))
           runway-classes (str classes (when (= focus "runway") " active"))
           read-only (:read-only data)
+          cursor @dispatcher/app-state
+          slug (:slug @router/path)
+          company-data ((keyword slug) cursor)
           subsection-data {:section-data finances-data
                            :read-only read-only
+                           :currency (:currency company-data)
                            :editable-click-callback (:editable-click-callback data)}
           finances-row-data (:data finances-data)
           sum-revenues (apply + (map #(:revenue %) finances-row-data))
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
-          needs-runway (some #(contains? % :runway) finances-row-data)]
-      (dom/div {:class "section-container row" :id "section-finances"}
+          needs-runway (some #(and (contains? % :runway) (neg? (:runway %))) finances-row-data)]
+      (dom/div {:class "section-container" :id "section-finances"}
         (dom/div {:class "composed-section finances"}
           (om/build editable-title {:read-only read-only
                                     :section-data finances-data

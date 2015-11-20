@@ -25,6 +25,7 @@
     [racehub/om-bootstrap "0.5.3"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
     [noencore "0.1.21"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
+    [com.andrewmcveigh/cljs-time "0.3.14"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
   ]
 
   :plugins [

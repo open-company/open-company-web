@@ -14,6 +14,7 @@ Comment font-weight to font name mapping: https://developer.mozilla.org/en-US/do
 
 html, body {
   font-family: "proxima-nova", sans-serif;
+  height: 100%;
 }
 
 a {
@@ -160,9 +161,7 @@ div.chart-container {
   width: 600px;
 }
 
-div.report-list div.chart-container {
-  margin-left: 300px;
-  width: 600px;
+div.report-list div.chart-container{
   margin-top: 30px;
 }
 
@@ -268,17 +267,11 @@ div.composed-section h2{
 div.composed-section h2.finances-edit-title {
   text-align: left;
   position: relative;
-  width: 600px;
-  margin-left: -300px;
-  left: 50%;
 }
 
 div.composed-section div.link-bar {
   text-align: left;
   z-index: 1;
-  margin-left: -300px;
-  left: 50%;
-  width: 600px;
   position: relative;
 }
 
@@ -296,10 +289,7 @@ div.composed-section div.link-bar a.composed-section-link.active {
   color: #191919;
 }
 
-div.composed-section div.composed-section-body {
-  width: 600px;
-  left: 50%;
-  margin-left: -300px;
+div.composed-section div.composed-section-body{
   position: relative;
 }
 
@@ -307,11 +297,16 @@ div.composed-section div.composed-section-body div.section {
   text-align: left;
 }
 
+div.composed-section div.section div.chart-header-container {
+  text-align: left;
+}
+
 div.composed-section div.section div.chart-footer-container {
   text-align: center;
 }
 
-div.composed-section div.section div.chart-footer-container h3 {
+div.composed-section div.section div.chart-header-container h3,
+div.composed-section div.section div.chart-footer-container h3, {
   margin-top: 10px;
   margin-bottom: 0px;
 }
@@ -319,6 +314,10 @@ div.composed-section div.section div.chart-footer-container h3 {
 div.composed-section div.section div.period-container p {
   margin-top: 10px;
   margin-bottom: 0px;
+}
+
+div.composed-section div.section div.chart-header-container div.target-actual-container{
+  height: 70px;
 }
 
 div.composed-section div.section div.chart-footer-container div.target-actual-container {
@@ -337,6 +336,11 @@ div.composed-section div.section div.chart-footer-container div.actual-container
   float: right;
 }
 
+div.composed-section div.section div.chart-header-container.chart-header div.actual-container,
+div.composed-section div.section div.chart-footer-container.chart-header div.actual-container {
+  float: none;
+}
+
 div.target-actual-container div.target-container h3 {
   text-align: right;
   margin-right: 15px;
@@ -347,38 +351,54 @@ div.target-actual-container.double div.actual-container h3 {
   margin-left: 15px;
 }
 
-div.composed-section div.section div.chart-footer-container div.actual-container h3.actual {
+div.chart-header-container div.actual-container h3.actual {
+  margin-bottom: 10px;
+}
+
+div.actual-container h3.actual {
   color: #109DB7;
 }
 
-div.composed-section div.section div.chart-footer-container div.actual-container h3.actual.gray {
+div.actual-container h3.actual.gray {
   color: #ADADAD;
 }
 
-div.composed-section div.section div.chart-footer-container div.actual-container h3.actual.green {
+div.actual-container h3.actual.green {
   color: #26C485;
 }
 
-div.composed-section div.section div.chart-footer-container div.actual-container h3.actual-label {
+div.actual-container h3.actual.red {
+  color: #d72a46;
+}
+
+div.chart-header-container div.actual-container h3.actual-label {
+  margin-top: 10px;
+}
+
+div.actual-container h3.actual-label {
   font-size: 12px;
   font-weight: 700;
 }
 
-div.composed-section div.section div.chart-footer-container div.target-container {
+div.actual-container h3.actual-label.gray {
+  color: #ADADAD;
+}
+
+div.target-container {
   width: 150px;
   float: left;
 }
 
-div.composed-section div.section div.chart-footer-container div.target-container h3.target {
+div.target-container h3.target {
   color: #ADADAD;
 }
 
-div.composed-section div.section div.chart-footer-container div.target-container h3.target-label {
+div.target-container h3.target-label {
   font-size: 12px;
   font-weight: 700;
 }
 
-div.composed-section div.section div.chart-footer-container div.period-container {
+div.period-container {
   text-transform: capitalize;
   font-weight: bold;
   color: black;
@@ -392,14 +412,10 @@ div.finances div.finances-body div.section h3 {
 
 div.finances div.finances-body div.section div.chart-container {
   position: relative;
-  left: 50%;
-  margin-left: -300px;
 }
 
 div.update-footer {
   position: relative;
-  left: 50%;
-  margin-left: -300px;
   margin-top: 30px;
   height: 24px;
   vertical-align: middle;
@@ -435,9 +451,6 @@ div.update-footer img.author-image{
 
 div.rich-editor-container {
   position: relative;
-  left: 50%;
-  margin-left: -300px;
-  width: 600px;
   margin-top: 30px;
 }
 
@@ -603,11 +616,7 @@ div.rich-editor-container button.collapse-button {
   text-align: left;
 }
 
-div.editable-title-container {
-  width: 600px;
-  position: relative;
-  left: 50%;
-  margin-left: -300px;
+div.editable-title-container{
   height: 55px;
   margin-top: 30px;
   margin-bottom: 10px;
@@ -673,8 +682,6 @@ form.linkForm input#addlinkButton {
 
 div.finances div.finances-body.edit {
   width: 800px;
-  left: 50%;
-  margin-left: -400px;
   position: relative;
 }
 
@@ -749,10 +756,7 @@ div.recent-updates div.recent-updates-item span.updated-at {
   float: right;
 }
 
-div.simple-section-revisions-navigator {
-  width: 600px;
-  left: 50%;
-  margin-left: -300px;
+div.simple-section-revisions-navigator{
   position: relative;
 }
 
@@ -846,11 +850,11 @@ div.revisions-navigator div.revisions-navigator-right div.double-next {
 
 hr.section-separator {
   background-color: rgba(0, 0, 0, 0.2);
-  width: 600px;
+  width: 100%;
   height: 1px;
   border: 0px solid transparent;
-  margin-top: 30px;
-  margin-bottom: 0px;
+  border-top: 0px solid transparent;
+  margin: 30px 0 0 0;
 }
 
 h4.login-error-message {
@@ -925,9 +929,6 @@ button.oc-btn.oc-cancel {
 
 div.sections-container {
   position: relative;
-  width: 600px;
-  margin-left: -300px;
-  left: 50%;
 }
 
 div.table-of-contents {
@@ -937,9 +938,16 @@ div.table-of-contents {
   height: 90%;
   padding: 10px;
   color: #2D2D2D;
+  width: 241px;
 }
 
-div.table-of-contents div.table-of-contents-inner {
+@media (max-width: 1024px) {
+  div.table-of-contents {
+    display: none;
+  }
+}
+
+div.table-of-contents div.table-of-contents-inner{
   width: 100%;
   height: 100%;
   overflow-y: auto;
@@ -989,14 +997,11 @@ div.table-of-contents div.table-of-contents-inner div.category h3 {
 
 div.table-of-contents div.table-of-contents-inner div.category-section {
   height: 57px;
-  width: 207px;
-  margin-right: 20px;
-  padding-left: 10px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  width: 195px;
+  padding: 10px 0px 10px 10px;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category-section div.category-section-close {
+div.table-of-contents div.category-section div.category-section-close {
   float: left;
   opacity: 0;
   cursor: pointer;
@@ -1007,24 +1012,42 @@ div.table-of-contents div.table-of-contents-inner div.category-section div.categ
   background-size: 20px 20px;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category-section:hover div.category-section-close {
+div.table-of-contents div.category-section:hover div.category-section-close,
+div.table-of-contents div.category-sortable.ui-draggable-dragging div.category-section-close{
   opacity: 1;
 }
 
+div.table-of-contents div.category-section div.category-section-sortable {
+  float: right;
+  opacity: 0;
+  cursor: hand;
+  margin-top: 6px;
+  background-image: url("/img/draggable.png");
+  width: 20px;
+  height: 30px;
+  background-size: 20px 30px;
+}
+
+div.table-of-contents div.category-section:hover div.category-section-sortable,
+div.table-of-contents div.category-section.ui-draggable-dragging div.category-section-sortable{
+opacity: 1;
+}
+
 div.table-of-contents div.table-of-contents-inner div.category-section a {
-  margin-left: 10px;
-  width: 160px;
+  margin: 0 10px 0 10px;
+  width: 125px;
   float: left;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category-section:hover {
-  background-color: rgba(0, 0, 0, 0.07);
+div.table-of-contents div.table-of-contents-inner div.category-section:hover,
+div.table-of-contents div.table-of-contents-inner div.category-section.ui-draggable-dragging{
+background-color: rgba(0, 0, 0, 0.07);
 }
 
 div.table-of-contents div.table-of-contents-inner div.new-section {
   height: 8px;
   margin-left: 20px;
-  margin-right: 20px;
+  margin-right: 14px;
   background-color: transparent;
   cursor: pointer;
 }
@@ -1056,6 +1079,7 @@ div.table-of-contents div.table-of-contents-inner div.new-section div.add-sectio
   color: white;
   font-size: 14px;
   cursor: pointer;
+  z-index: 10;
 }
 
 div.table-of-contents div.table-of-contents-inner div.new-section:hover div.add-section {

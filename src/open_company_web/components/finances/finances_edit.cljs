@@ -15,6 +15,7 @@
     (put! ch {:period period :key k})))
 
 (defcomponent finances-edit-row [data owner]
+  
   (render [_]
     (let [prefix (:prefix data)
           finances-data (:cursor data)
@@ -106,7 +107,7 @@
         to-save (if should-save-new (into [] (conj to-save new-row)) (into [] to-save))]
     (if-not (every? row-ok? to-save)
       (.alert js/window "Check the finances values")
-      (let [fixed-finances (utils/calc-runway to-save)
+      (let [fixed-finances (utils/calc-burnrate-runway to-save)
             slug (keyword (:slug @router/path))]
         (om/update! original-cursor :data fixed-finances)
         (api/update-finances-data (:finances (slug @app-state)))
@@ -120,7 +121,7 @@
       (let [cur-row (get array-data idx)]
         (if (= (:period cur-row) (:period new-row))
           (let [new-rows (assoc array-data idx new-row)
-                runway-rows (utils/calc-runway new-rows)
+                runway-rows (utils/calc-burnrate-runway new-rows)
                 sort-pred (utils/sort-by-key-pred :period true)
                 sorted-rows (sort #(sort-pred %1 %2) runway-rows)]
             (om/update-state! owner :data (fn [_] sorted-rows)))
@@ -134,6 +135,7 @@
       nil)))
 
 (defcomponent finances-edit [data owner]
+  
   (init-state [_]
     ; add a new line if necessary
     (let [finances-data (:section-data data)
@@ -150,6 +152,7 @@
               new-data (into [new-period] initial-data)]
           (update init-state :data (fn [_]new-data)))
           init-state)))
+  
   (render [_]
     (let [finances-data (om/get-state owner :data)
           currency (finances-utils/get-currency-for-current-company)
