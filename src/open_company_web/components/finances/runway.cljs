@@ -1,12 +1,12 @@
 (ns open-company-web.components.finances.runway
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.lib.iso4217 :refer [iso4217]]
-            [open-company-web.components.charts :refer [column-chart]]
+            [open-company-web.lib.iso4217 :refer (iso4217)]
+            [open-company-web.components.charts :refer (column-chart)]
             [open-company-web.components.finances.utils :as finances-utils]
-            [open-company-web.components.utility-components :refer [editable-pen]]
+            [open-company-web.components.utility-components :refer (editable-pen)]
             [goog.string :as gstring]
             [open-company-web.lib.oc-colors :as occ]))
 
@@ -32,6 +32,7 @@
     0))
 
 (defcomponent runway [data owner]
+  
   (render [_]
     (let [finances-data (:data (:section-data data))
           sort-pred (utils/sort-by-key-pred :period true)
