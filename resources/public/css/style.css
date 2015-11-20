@@ -955,34 +955,6 @@ div.table-of-contents div.table-of-contents-inner{
   overflow-y: auto;
 }
 
-div.table-of-contents div.table-of-contents-inner div.add-new-section-top{
-  color: black;
-  cursor: pointer;
-  margin: 10px 0 0px 30px;
-}
-
-div.table-of-contents div.table-of-contents-inner div.add-new-section-top div.add-new-section-plus{
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  width: 16px;
-  height: 16px;
-  float: left;
-}
-
-div.table-of-contents div.table-of-contents-inner div.add-new-section-top div.add-new-section-plus i{
-  margin: 1px 0 0 3px;
-  font-size: 12px;
-  color: white;
-}
-
-div.table-of-contents div.table-of-contents-inner div.add-new-section-top h4{
-  font-size: 12px;
-  font-variant: small-caps;
-  float: left;
-  width: 150px;
-  margin: 2px 0 0 5px;
-}
-
 div.table-of-contents div.table-of-contents-inner div.category {
   margin-left: 30px;
 }
@@ -1059,7 +1031,7 @@ div.table-of-contents div.table-of-contents-inner div.new-section div.new-sectio
   position: relative;
   top: 4px;
   left: 0px;
-  width: 183px;
+  width: 178px;
   background-color: rgba(0, 0, 0, 0.1);
   display: none;
 }
@@ -1074,7 +1046,7 @@ div.table-of-contents div.table-of-contents-inner div.new-section div.add-sectio
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 2px;
   position: relative;
-  left: 186px;
+  left: 181px;
   top: -6px;
   display: none;
   padding: 2px 0 0 4px;
@@ -1214,7 +1186,7 @@ div.new-section-popover {
   border: 1px solid rgba(0, 0, 0, 0.8);
   border-radius: 4px;
   overflow: auto;
-  padding: 20px 10px 10px 10px;
+  padding: 20px 0px 10px 10px;
 }
 
 div.new-section-popover > h4{
@@ -1331,8 +1303,8 @@ div.section-icon-container div.section-icon-inner.progress-business-development-
 }
 
 div.new-section-category-section div.section-details {
-  float: right;
-  width: 295px;
+  float: left;
+  width: 275px;
 }
 
 div.new-section-category-section div.section-details h4 {
