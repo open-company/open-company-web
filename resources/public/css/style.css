@@ -286,7 +286,7 @@ div.composed-section div.link-bar a.composed-section-link {
 
 div.composed-section div.link-bar a.composed-section-link.active {
   text-decoration: none;
-  color: #191919;
+  color: #26C485;
 }
 
 div.composed-section div.composed-section-body{
@@ -373,6 +373,8 @@ div.actual-container h3.actual.red {
 
 div.chart-header-container div.actual-container h3.actual-label {
   margin-top: 10px;
+  font-size: 14px;
+  font-weight: normal;
 }
 
 div.actual-container h3.actual-label {
