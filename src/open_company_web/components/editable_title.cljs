@@ -54,8 +54,7 @@
 
 (defcomponent editable-title [data owner]
   (init-state [_]
-    {:editing false
-     :initial-title (:title (:section-data data))
+    {:initial-title (:title (:section-data data))
      :title (:title (:section-data data))})
   (will-update [_ next-props next-state]
     (when (not= next-props data)
@@ -66,23 +65,25 @@
       (dom/div {:class "editable-title-container"}
         (dom/div {:class "hidden-span-container"}
           (dom/span #js {:ref "hidden-span" :className "hidden-span"} title))
-        (if-not (om/get-state owner :editing)
+        (if-not (:editing data)
           (dom/h2 {:class (str "editable-title fix" (when (:read-only data) " read-only"))
                    :on-click (fn [e]
                                (when-not (:read-only data)
-                                   (om/update-state! owner :editing (fn [_]true))
-                                   (delay-focus-input owner (utils/get-click-position e) title)))}
+                                 ((:editable-cb data))
+                                 (delay-focus-input owner (utils/get-click-position e) title)))}
                   title)
           (dom/input #js {:ref "editable-title-input"
                           :className "editable-title edit"
                           :value title
                           :onChange #(let [value (.. % -target -value)]
                                        (om/update-state! owner :title (fn [_]value)))
-                          :onBlur #(save-section data owner)
+                          :onBlur (fn [e]
+                                    (om/update-state! owner :title (fn [_](om/get-state owner :initial-title)))
+                                    ((:cancel-edit-cb data)))
                           :onKeyDown #(cond
                                         (= (.-key %) "Enter")
                                         (save-section data owner)
                                         (= (.-key %) "Escape")
                                         (do
                                           (om/update-state! owner :title (fn [_](om/get-state owner :initial-title)))
-                                          (om/update-state! owner :editing (fn [_]false))))}))))))
+                                          ((:cancel-edit-cb data))))}))))))
