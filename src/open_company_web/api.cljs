@@ -211,4 +211,4 @@
           "content-type" (:type add-section-link)}}
       (fn [response]
         (let [body (if (:success response) (json->cljs (:body response)) {})]
-          (flux/dispatch dispatcher/new-section body))))))
+          (flux/dispatch dispatcher/new-section {:response body :slug slug}))))))
