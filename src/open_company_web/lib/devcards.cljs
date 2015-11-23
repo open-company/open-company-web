@@ -49,7 +49,7 @@
     :section :finances
     :section-data finances-data
     :read-only false
-    :editable-click-callback #()
+    :editable-cb #()
   }
   {
     :inspect-data true
@@ -63,7 +63,7 @@
     :section :finances
     :section-data finances-data
     :read-only true
-    :editable-click-callback #()
+    :editable-cb #()
   }
   {
     :inspect-data true
@@ -77,7 +77,7 @@
     :section :growth
     :section-data growth-data
     :read-only false
-    :editable-click-callback #()
+    :editable-cb #()
   }
   {
     :inspect-data true
@@ -91,7 +91,7 @@
     :section :growth
     :section-data growth-data
     :read-only true
-    :editable-click-callback #()
+    :editable-cb #()
   }
   {
     :inspect-data true
