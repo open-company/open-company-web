@@ -854,7 +854,7 @@ hr.section-separator {
   height: 1px;
   border: 0px solid transparent;
   border-top: 0px solid transparent;
-  margin: 30px 0 0 0;
+  margin: 0;
 }
 
 h4.login-error-message {
@@ -1110,6 +1110,7 @@ div.new-section-popover-container {
 
 div.section-animator-box {
   position: relative;
+  margin-bottom: 30px;
 }
 
 div.section-animator-box div.section-box {
