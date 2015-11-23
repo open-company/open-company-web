@@ -1,6 +1,6 @@
 (ns open-company-web.components.section-selector
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
             [open-company-web.components.finances.finances :refer (finances)]
@@ -12,11 +12,8 @@
 (defn editing! [owner v]
   (om/update-state! owner :editing (fn [_]v)))
 
-(defn section-component [section-name editable]
+(defn section-component [section-name]
   (cond
-    (and (= :finances (keyword section-name)) editable)
-    finances-edit
-
     (= :finances (keyword section-name))
     finances
 
@@ -105,38 +102,43 @@
           actual-data (:section-data data)
           section-data (utils/select-section-data actual-data section showing-revision)
           next-section-data (utils/select-section-data actual-data section next-revision)
-          read-only (or (:loading section-data) (not (= showing-revision (:updated-at actual-data))))
           editing (om/get-state owner :editing)
           animating (and next-revision (not (= showing-revision next-revision)))
           first-box (om/get-state owner :first-box)
           a-section-data (if first-box section-data next-section-data)
-          b-section-data (if first-box next-section-data section-data)]
+          b-section-data (if first-box next-section-data section-data)
+          a-read-only (not (= (:updated-at a-section-data) (:updated-at actual-data)))
+          b-read-only (not (= (:updated-at b-section-data) (:updated-at actual-data)))]
       (dom/div #js {:className "section-selector" :ref "section-selector"}
         (dom/div {:class "section-animator-box" :id (str "sec-box-" (name section))}
           (when a-section-data
             (dom/div {:class "section-box"
                       :id (str "sec-box-a-" (name section))
                       :style {:opacity (if first-box 1 0)}}
-              (om/build (section-component section editing) {:section-data a-section-data
+              (om/build (section-component section) {:section-data a-section-data
                                                              :section section
                                                              :actual-as-of (:updated-at actual-data)
                                                              :loading (:loading data)
                                                              :revisions-navigation-cb #(revisions-navigation-cb owner section %)
-                                                             :close-edit-cb #(editing! owner false)
-                                                             :editable-click-callback #(editing! owner true)
-                                                             :read-only (not (= (:updated-at a-section-data) (:updated-at actual-data)))})))
+                                                             :editing (om/get-state owner :editing)
+                                                             :editable-cb #(editing! owner true)
+                                                             :cancel-edit-cb #(editing! owner false)
+                                                             :save-edit-cb #()
+                                                             :read-only a-read-only})))
           (when b-section-data
             (dom/div {:class "section-box"
                       :id (str "sec-box-b-" (name section))
                       :style {:opacity (if first-box 0 1)}}
-              (om/build (section-component section editing) {:section-data b-section-data
+              (om/build (section-component section) {:section-data b-section-data
                                                              :section section
                                                              :actual-as-of (:updated-at actual-data)
                                                              :loading (:loading data)
                                                              :revisions-navigation-cb #(revisions-navigation-cb owner section %)
-                                                             :close-edit-cb #(editing! owner false)
-                                                             :editable-click-callback #(editing! owner true)
-                                                             :read-only (not (= (:updated-at b-section-data) (:updated-at actual-data)))})))
+                                                             :editing (om/get-state owner :editing)
+                                                             :editable-cb #(editing! owner true)
+                                                             :cancel-edit-cb #(editing! owner false)
+                                                             :save-edit-cb #()
+                                                             :read-only b-read-only})))
           (when animating
             (.setTimeout js/window #(animate-section-translation owner (name section)) 1)
             nil))))))
