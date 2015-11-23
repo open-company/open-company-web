@@ -113,38 +113,22 @@
                             nil
                             cur-unit)
           unit (if fixed-cur-unit nil metric-unit)
-          name-has-unit (> (.indexOf (clj-str/lower-case (str (:name metric-info))) (clj-str/lower-case metric-unit)) -1)
           actual-with-label (if fixed-cur-unit
                               (str fixed-cur-unit actual)
-                              (if (and name-has-unit (> (:total-metrics data) 1))
-                                (str actual)
-                                (str actual (if (= unit "%") "" " ") unit)))
-          target (if (:target actual-set) (.toLocaleString (:target actual-set)) nil)
-          target-with-label (if fixed-cur-unit
-                              (str fixed-cur-unit target)
-                              (if (and name-has-unit (> (:total-metrics data) 1))
-                                (str target)
-                                (str target (if (= unit "%") "" " ") unit)))]
+                              (str actual (if (= unit "%") "" " ") unit))]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})}
         (when (> (count metric-data) 0)
           (dom/div {}
+            (dom/div {:class "chart-header-container"}
+              (dom/div {:class "target-actual-container"}
+                (dom/div {:class "actual-container"}
+                  (dom/h3 {:class "actual"} actual-with-label)
+                  (dom/h3 {:class "actual-label blue"} (str "as of " (utils/get-period-string (:period actual-set) interval))))))
             (om/build column-chart (get-chart-data sorted-metric
                                                    fixed-cur-unit
                                                    (:name metric-info)
                                                    unit
                                                    (get-columns-num interval)
-                                                   interval))
-            (dom/div {:class "chart-footer-container"}
-              (dom/div {:class (utils/class-set {:target-actual-container true :double target})}
-                (when target
-                  (dom/div {:class "target-container"}
-                    (dom/h3 {:class "target"} target-with-label)
-                    (dom/h3 {:class "target-label"} "TARGET")))
-                (dom/div {:class "actual-container"}
-                  (dom/h3 {:class "actual"} actual-with-label)
-                  (dom/h3 {:class "actual-label"} "ACTUAL"))))
-            (dom/div {:class "chart-footer-container"}
-              (dom/div {:class "period-container"}
-                (dom/p {} period)))))))))
+                                                   interval))))))))
