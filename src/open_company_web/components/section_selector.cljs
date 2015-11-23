@@ -78,23 +78,42 @@
                     (-> (.$ js/window (str "#sec-box-" section-name " img"))
                         (.bind "load" #(setup-box-height section-name owner)))))))
 
+(defn has-changed? [section-data initial-section-data]
+  (cond
+    (= (:section section-data) :finances)
+    true
+    (= (:section section-data) :growth)
+    true
+    :else
+    (or (not= (:title initial-section-data) (:title section-data))
+        (not= (:body initial-section-data) (:body section-data)))))
+
+(defn cancel-edit [owner data]
+  (when-not (has-changed? (:section-data data) (om/get-state owner :initial-section-data))
+    (editing! owner false)))
+
 (defcomponent section-selector [data owner]
+
   (init-state [_]
     (let [as-of (:updated-at (:section-data data))]
       {:editing false
        :next-as-of nil
        :as-of as-of
        :animating false
+       :initial-section-data (:section-data data)
        :first-box true}))
+
   (did-update [_ prev-props _]
     (when-not (= (:updated-at (:section-data data)) (:updated-at (:section-data prev-props)))
       (om/update-state! owner :as-of (fn [_](:updated-at (:section-data data))))))
+
   (did-mount [_]
     (when (.-$ js/window) ; to not crash tests
       (let [section-name (name (:section data))]
         (setup-box-height section-name owner)
         ; listens for dom changes and recalculate the height when img tags load
         (calc-height-imgs-onload section-name owner))))
+
   (render [_]
     (let [showing-revision (om/get-state owner :as-of)
           next-revision (om/get-state owner :next-as-of)
@@ -122,8 +141,8 @@
                                                              :revisions-navigation-cb #(revisions-navigation-cb owner section %)
                                                              :editing (om/get-state owner :editing)
                                                              :editable-cb #(editing! owner true)
-                                                             :cancel-edit-cb #(editing! owner false)
-                                                             :save-edit-cb #()
+                                                             :cancel-edit-cb #(cancel-edit owner data)
+                                                             :save-edit-cb #(cancel-edit owner data)
                                                              :read-only a-read-only})))
           (when b-section-data
             (dom/div {:class "section-box"
@@ -136,8 +155,8 @@
                                                              :revisions-navigation-cb #(revisions-navigation-cb owner section %)
                                                              :editing (om/get-state owner :editing)
                                                              :editable-cb #(editing! owner true)
-                                                             :cancel-edit-cb #(editing! owner false)
-                                                             :save-edit-cb #()
+                                                             :cancel-edit-cb #(cancel-edit owner data)
+                                                             :save-edit-cb #(cancel-edit owner data)
                                                              :read-only b-read-only})))
           (when animating
             (.setTimeout js/window #(animate-section-translation owner (name section)) 1)
