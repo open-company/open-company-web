@@ -37,7 +37,8 @@
 (defn add-popover-container []
   (when (.-$ js/window) ; avoid tests crash
     (let [popover (.$ js/window "<div id='new-section-popover-container'></div>")
-          body (.$ js/window (.-body js/document))]
+          body (.$ js/window (.-body js/document))
+          slug (keyword (:slug @router/path))]
       ; if the new-section-popover div is not present add it
       (when-not (pos? (.-length (.$ js/window "body div#new-section-popover-container")))
         (.append body popover))
@@ -45,7 +46,7 @@
       (when-not (pos? (.-length (.$ js/window "body div#new-section-popover-container div.new-section-popover")))
         (.setTimeout js/window
                      #(om/root new-section-popover
-                               caches/new-sections
+                               (slug @caches/new-sections)
                                {:target (.getElementById js/document "new-section-popover-container")})
                      1)))))
 
@@ -116,14 +117,12 @@
                   :on-click #(show-popover % category section)}
           (dom/i {:class "fa fa-plus"}))))))
 
-(def new-sections-requested (atom false))
-
-(defn get-new-sections-if-needed [data]
-  (when (not @new-sections-requested)
+(defn get-new-sections-if-needed [owner]
+  (when (not (om/get-state owner :new-sections-requested))
     (let [slug (keyword (:slug @router/path))
           company-data (slug @dispatcher/app-state)]
-      (when (and (empty? @caches/new-sections) (not (empty? company-data)))
-        (swap! new-sections-requested not)
+      (when (and (empty? (slug @caches/new-sections)) (not (empty? company-data)))
+        (om/update-state! owner :new-sections-requested not)
         (api/get-new-sections)))))
 
 (defn get-section-form-id [section-id]
@@ -145,8 +144,12 @@
 
 (defcomponent table-of-contents [data owner]
 
+  (init-state [_]
+    {:new-sections-requested false})
+
   (did-mount [_]
     (setup-sortable (:categories data))
+    (get-new-sections-if-needed owner)
     (let [add-section-chan (chan)]
       (utils/add-channel "add-section" add-section-chan)
       (go (loop []
@@ -161,10 +164,10 @@
           (recur))))))
 
   (did-update [_ _ _]
+    (get-new-sections-if-needed owner)
     (setup-sortable (:categories data)))
 
   (render [_]
-    (get-new-sections-if-needed data)
     (let [sections (:sections data)
           categories (:categories data)]
       (dom/div #js {:className "table-of-contents" :ref "table-of-contents"}
