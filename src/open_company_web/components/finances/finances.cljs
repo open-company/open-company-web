@@ -75,7 +75,7 @@
           subsection-data {:section-data finances-data
                            :read-only read-only
                            :currency (:currency company-data)
-                           :editable-click-callback (:editable-click-callback data)}
+                           :editable-cb (:editable-cb data)}
           finances-row-data (:data finances-data)
           sum-revenues (apply + (map #(:revenue %) finances-row-data))
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
@@ -104,7 +104,7 @@
                       :title "Runway"
                       :data-tab "runway"
                       :on-click #(subsection-click % owner)} "Runway"))
-            (om/build editable-pen {:click-callback (:editable-click-callback data)}))
+            (om/build editable-pen {:click-callback (:editable-cb data)}))
           (dom/div {:class (utils/class-set {:composed-section-body true})}
             (case focus
 
