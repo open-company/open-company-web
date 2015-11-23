@@ -112,7 +112,7 @@
           fixed-cur-unit (if (= cur-unit metric-unit)
                             nil
                             cur-unit)
-          unit (if fixed-cur-unit nil metric-unit)
+          unit (if fixed-cur-unit nil (utils/camel-case-str metric-unit))
           actual-with-label (if fixed-cur-unit
                               (str fixed-cur-unit actual)
                               (str actual (if (= unit "%") "" " ") unit))]
@@ -124,8 +124,8 @@
             (dom/div {:class "chart-header-container"}
               (dom/div {:class "target-actual-container"}
                 (dom/div {:class "actual-container"}
-                  (dom/h3 {:class "actual"} actual-with-label)
-                  (dom/h3 {:class "actual-label blue"} (str "as of " (utils/get-period-string (:period actual-set) interval))))))
+                  (dom/h3 {:class "actual blue"} actual-with-label)
+                  (dom/h3 {:class "actual-label gray"} (str "as of " (utils/get-period-string (:period actual-set) interval))))))
             (om/build column-chart (get-chart-data sorted-metric
                                                    fixed-cur-unit
                                                    (:name metric-info)
