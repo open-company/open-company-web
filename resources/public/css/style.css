@@ -139,7 +139,7 @@ div#app {
 @media (min-width: 960px) {
   nav.navbar > div {
     width: 1170px;
-    padding-left: 55px;
+    padding-left: 85px;
     padding-right: 280px;
   }
 }
@@ -959,6 +959,10 @@ div.table-of-contents div.table-of-contents-inner{
   width: 100%;
   height: 100%;
   overflow-y: auto;
+}
+
+div.table-of-contents div.table-of-contents-inner div.category {
+  margin-left: 30px;
 }
 
 div.table-of-contents div.table-of-contents-inner div.category.empty {
