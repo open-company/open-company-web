@@ -93,13 +93,13 @@
             (dom/div {:class "revisions-navigator-left"}
               (when rev-first
                 (dom/a {:class "rev-double-prev"
-                        :on-click #(nav-revision! % rev-first (:navigate-cb data))
+                        :on-click #(nav-revision! % rev-first (:revisions-navigation-cb data))
                         :title first-date}
                   (dom/div {:class "double-prev"}
                     (dom/i {:class "fa fa-backward"}))))
               (when rev-prev
                 (dom/a {:class "rev-single-prev"
-                        :on-click #(nav-revision! % rev-prev (:navigate-cb data))
+                        :on-click #(nav-revision! % rev-prev (:revisions-navigation-cb data))
                         :title prev-date}
                   (dom/div {:class "single-prev"}
                     (dom/i {:class "fa fa-caret-left"})
@@ -107,13 +107,13 @@
             (dom/div {:class "revisions-navigator-right"}
               (when rev-last
                 (dom/a {:class "rev-double-next"
-                        :on-click #(nav-revision! % rev-last (:navigate-cb data))
+                        :on-click #(nav-revision! % rev-last (:revisions-navigation-cb data))
                         :title last-date}
                   (dom/div {:class "double-next"}
                     (dom/i {:class "fa fa-forward"}))))
               (when rev-next
                 (dom/a {:class "rev-single-next"
-                        :on-click #(nav-revision! % rev-next (:navigate-cb data))
+                        :on-click #(nav-revision! % rev-next (:revisions-navigation-cb data))
                         :title next-date}
                   (dom/div {:class "single-next"}
                     (dom/i {:class "fa fa-caret-right"})
