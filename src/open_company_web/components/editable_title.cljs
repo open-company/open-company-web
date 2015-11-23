@@ -53,15 +53,18 @@
       (om/update-state! owner :initial-title (fn [_]title)))))
 
 (defcomponent editable-title [data owner]
+
   (init-state [_]
     {:initial-title (:title (:section-data data))
      :title (:title (:section-data data))})
+
   (will-update [_ next-props next-state]
     (when (not= next-props data)
       (om/update-state! owner :title (fn [_] (:title (:section-data next-props))))))
+
   (render [_]
     (let [section-data (:section-data data)
-          title (om/get-state owner :title)]
+          title (:title section-data)]
       (dom/div {:class "editable-title-container"}
         (dom/div {:class "hidden-span-container"}
           (dom/span #js {:ref "hidden-span" :className "hidden-span"} title))
@@ -76,10 +79,10 @@
                           :className "editable-title edit"
                           :value title
                           :onChange #(let [value (.. % -target -value)]
-                                       (om/update-state! owner :title (fn [_]value)))
-                          :onBlur (fn [e]
-                                    (om/update-state! owner :title (fn [_](om/get-state owner :initial-title)))
-                                    ((:cancel-edit-cb data)))
+                                       (utils/handle-change (:section-data data) value :title))
+                          ; :onBlur (fn [e]
+                          ;           (om/update-state! owner :title (fn [_](om/get-state owner :initial-title)))
+                          ;           ((:cancel-edit-cb data)))
                           :onKeyDown #(cond
                                         (= (.-key %) "Enter")
                                         (save-section data owner)
