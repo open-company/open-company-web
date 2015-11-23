@@ -11,7 +11,8 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.revisions-navigator :refer (revisions-navigator)]
             [cljs.core.async :refer (chan <!)]
-            [open-company-web.dispatcher :as dispatcher]))
+            [open-company-web.dispatcher :as dispatcher]
+            [open-company-web.components.section-footer :refer (section-footer)]))
 
 (defcomponent simple-section [data owner]
 
@@ -33,24 +34,13 @@
             (recur))))))
 
   (render [_]
-    (let [section (:section data)
-          section-data (:section-data data)
-          read-only (:read-only data)]
+    (let [section (:section data)]
       (if (:loading data)
         (dom/h4 {} "Loading data...")
         (dom/div {:class "simple-section section-container"
                   :id (str "section-" (name section))}
-          (om/build editable-title {:read-only read-only
-                                    :section-data section-data
-                                    :section section
-                                    :save-channel (str "save-section-" section)})
+          (om/build editable-title (merge data {:save-channel (str "save-section-" section)}))
           (dom/div {:class "simple-section-body"}
-            (om/build rich-editor {:read-only read-only
-                                   :section-data section-data
-                                   :section section
-                                   :save-channel (str "save-section-" section)}))
+            (om/build rich-editor (merge data {:save-channel (str "save-section-" section)})))
           (dom/div {:class "simple-section-revisions-navigator"}
-            (om/build revisions-navigator {:section-data section-data
-                                           :section section
-                                           :actual-as-of (:actual-as-of data)
-                                           :navigate-cb (:revisions-navigation-cb data)})))))))
+            (om/build section-footer data)))))))
