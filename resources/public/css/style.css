@@ -456,6 +456,13 @@ div.rich-editor-container {
 
 div.rich-editor-container div.rich-editor {
   color: #191919;
+  border: 1px solid transparent;
+}
+
+div.rich-editor-container div.rich-editor:focus,
+div.rich-editor-container div.rich-editor.editing {
+  outline: none;
+  border: 1px solid black;
 }
 
 div.rich-editor-container div.rich-editor img,
@@ -498,11 +505,11 @@ div.rich-editor-container div.fake-rich-editor {
   width: 500px;
 }
 
-div.rich-editor-container div.rich-editor-save {
-  height: 44px;
+div.section-footer div.save-section {
+  height: 64px;
 }
 
-div.rich-editor-container div.rich-editor-save button.cancel-button {
+div.section-footer div.save-section button.cancel-button {
   margin-left: 10px;
 }
 
@@ -643,7 +650,7 @@ div.editable-title-container span.hidden-span {
   box-sizing: border-box;
   padding: 0px;
   margin: 0px;
-  width: 100%;
+  width: 500px;
   height: 55px;
 }
 
@@ -754,10 +761,6 @@ div.recent-updates div.recent-updates-item span.updated-at {
   font-size: 11px;
   color: gray;
   float: right;
-}
-
-div.simple-section-revisions-navigator{
-  position: relative;
 }
 
 div.revisions-navigator {
@@ -1117,6 +1120,10 @@ div.section-animator-box div.section-box {
   top: 0;
   left: 0;
   width: 600px;
+}
+
+div.update-footer.section-editing {
+  opacity: 0.2;
 }
 
 div.update-footer div.update-footer-hover {
