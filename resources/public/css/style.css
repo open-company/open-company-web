@@ -136,6 +136,14 @@ div#app {
   margin-top: 50px;
 }
 
+@media (min-width: 960px) {
+  nav.navbar > div {
+    width: 1170px;
+    padding-left: 55px;
+    padding-right: 280px;
+  }
+}
+
 nav.navbar {
   background-color: white;
   border-bottom: 1px solid rgba(0, 0, 0, 0.6);
@@ -953,10 +961,6 @@ div.table-of-contents div.table-of-contents-inner{
   overflow-y: auto;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category {
-  margin-left: 30px;
-}
-
 div.table-of-contents div.table-of-contents-inner div.category.empty {
   color: rgba(0, 0, 0, 0.4);
 }
@@ -1018,7 +1022,6 @@ background-color: rgba(0, 0, 0, 0.07);
 
 div.table-of-contents div.table-of-contents-inner div.new-section {
   height: 8px;
-  margin-left: 20px;
   margin-right: 14px;
   background-color: transparent;
   cursor: pointer;
