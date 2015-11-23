@@ -1195,9 +1195,9 @@ div.new-section-popover {
 }
 
 div.new-section-popover > h4{
-  font-size: 14px;
+  font-size: 16px;
   margin-top: 10px;
-  margin-bottom: 30px;
+  margin-bottom: 29px;
 }
 
 div.new-section-popover div.new-section-container {
@@ -1245,7 +1245,8 @@ div.new-section-popover div.top-gradient {
 }
 
 div.new-section-popover div.new-section-container div.new-section-category h3 {
-  font-size: 12px;
+  font-size: 16px;
+  color: #2D2D2D;
   text-transform: uppercase;
   font-variant: small-caps;
   font-weight: bold;
@@ -1313,12 +1314,13 @@ div.new-section-category-section div.section-details {
 }
 
 div.new-section-category-section div.section-details h4 {
-  margin: 5px 0 0 0;
-  font-size: 12px;
+  margin: 3px 0 0 0;
+  font-size: 16px;
+  color: #2D2D2D;
 }
 
 div.new-section-category-section div.section-details p {
-  font-size: 10px;
+  font-size: 14px;
 }
 
 div.new-section-category-section div.section-details h4,
