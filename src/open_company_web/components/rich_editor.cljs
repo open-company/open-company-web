@@ -63,10 +63,16 @@
       (.each js/$ all-images (fn [idx item]
                                (.load (.$ js/window item) #(collapse-if-needed owner data)))))))
 
+(defn get-inner-html [owner]
+  (if-let [editor-ref (om/get-ref owner "rich-editor")]
+    (let [editor-el (.getDOMNode editor-ref)]
+      (.-innerHTML editor-el))))
+
 (defcomponent rich-editor [data owner]
 
   (init-state [_]
     {:initial-body (:body (:section-data data))
+     :body (:body (:section-data data))
      :hallo-loaded false
      :did-mount false
      :should-collapse false
@@ -90,6 +96,11 @@
     (when-not (:read-only data)
       (om/update-state! owner :did-mount (fn [_]true))
       (init-hallo! owner data))
+    (when-let [editor (om/get-ref owner "rich-editor")]
+      (let [editor-node (.getDOMNode editor)]
+        (.addEventListener editor-node
+                           "input"
+                           #(utils/handle-change (:section-data data) (.-innerHTML editor-node) :body))))
     (calc-collapse-add-onload owner data))
 
   (will-update [_ next-props _]
@@ -99,6 +110,8 @@
             el (.getDOMNode (om/get-ref owner "rich-editor"))]
         (utils/handle-change section-data init-value :body)
         (set! (.-innerHTML el) init-value)))
+    (when-not (om/get-state owner :body) (:body (:section-data next-props))
+      (om/update-state! owner :body (:body (:section-data next-props))))
     (when-not (= (:body (:section-data data)) (:body (:section-data next-props)))
       ; reset collapsed and should-collapse
       (collapsed! owner false)
@@ -116,7 +129,9 @@
           no-data (nil? (:author section-data)) ; if we have no author means we had no data
           should-show-placeholder (and (not editing) no-data)
           placeholder "Finances notes here..."
-          body (if should-show-placeholder placeholder (:body section-data))
+          body (if should-show-placeholder
+                 placeholder
+                 (om/get-state owner :body))
           collapsed (om/get-state owner :collapsed)
           user-expanded (om/get-state owner :user-expanded)]
       (dom/div {:class "rich-editor-container group"}
@@ -137,12 +152,13 @@
                                   (user-expanded! owner true))
                                  (when-not (:read-only data)
                                    ((:editable-cb data))))
-                      :onBlur (fn [e]
-                                (if-let [editor-ref (om/get-ref owner "rich-editor")]
-                                  (let [editor-el (.getDOMNode editor-ref)
-                                        innerHTML (.-innerHTML editor-el)]
-                                    (when (= innerHTML body)
-                                      ((:cancel-edit-cb data))))))
+                      ; :onBlur #((:cancel-edit-cb data))
+                      :onKeyDown #(cond
+                                    (= (.-key %) "Escape")
+                                    ((:cancel-edit-cb data)))
+                      :onChange (fn [e]
+                                  (let [innerHTML (get-inner-html owner)]
+                                    (utils/handle-change section-data :body innerHTML)))
                       :dangerouslySetInnerHTML (clj->js {"__html" body})})
         (if collapsed
           (dom/button {:class "btn btn-link expand-button"
