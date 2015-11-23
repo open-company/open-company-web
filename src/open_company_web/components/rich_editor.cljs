@@ -69,7 +69,6 @@
     {:initial-body (:body (:section-data data))
      :hallo-loaded false
      :did-mount false
-     :editing false
      :should-collapse false
      :collapsed false
      :user-expanded false})
@@ -94,6 +93,12 @@
     (calc-collapse-add-onload owner data))
 
   (will-update [_ next-props _]
+    (when (and (:editing data) (not (:editing next-props)))
+      (let [section-data (:section-data data)
+            init-value (om/get-state owner :initial-body)
+            el (.getDOMNode (om/get-ref owner "rich-editor"))]
+        (utils/handle-change section-data init-value :body)
+        (set! (.-innerHTML el) init-value)))
     (when-not (= (:body (:section-data data)) (:body (:section-data next-props)))
       ; reset collapsed and should-collapse
       (collapsed! owner false)
@@ -107,7 +112,7 @@
     (let [section-data (:section-data data)
           section (:section data)
           read-only (:read-only data)
-          editing (om/get-state owner :editing)
+          editing (:editing data)
           no-data (nil? (:author section-data)) ; if we have no author means we had no data
           should-show-placeholder (and (not editing) no-data)
           placeholder "Finances notes here..."
@@ -123,6 +128,7 @@
         (dom/div #js {:className (utils/class-set {:rich-editor true
                                                    :hidden read-only
                                                    :no-data should-show-placeholder
+                                                   :editing editing
                                                    :collapsed collapsed})
                       :ref "rich-editor"
                       :onFocus (fn [e]
@@ -130,13 +136,13 @@
                                   (collapsed! owner false)
                                   (user-expanded! owner true))
                                  (when-not (:read-only data)
-                                   (editing! owner true)))
+                                   ((:editable-cb data))))
                       :onBlur (fn [e]
                                 (if-let [editor-ref (om/get-ref owner "rich-editor")]
                                   (let [editor-el (.getDOMNode editor-ref)
                                         innerHTML (.-innerHTML editor-el)]
                                     (when (= innerHTML body)
-                                      (editing! owner false)))))
+                                      ((:cancel-edit-cb data))))))
                       :dangerouslySetInnerHTML (clj->js {"__html" body})})
         (if collapsed
           (dom/button {:class "btn btn-link expand-button"
@@ -149,25 +155,9 @@
                          :on-click (fn [e]
                                     (collapsed! owner true)
                                     (user-expanded! owner false))} "Show less")))
-        (if editing
-          (dom/div {:class "rich-editor-save"}
-            (dom/button {:class "oc-btn oc-cancel"
-                 :on-click (fn[e]
-                             (let [init-value (om/get-state owner :initial-body)
-                                   el (.getDOMNode (om/get-ref owner "rich-editor"))]
-                               (utils/handle-change section-data init-value :body)
-                               (set! (.-innerHTML el) init-value))
-                             (editing! owner false))
-                 } "CANCEL")
-            (dom/button {:class "oc-btn oc-success"
-                         :on-click (fn [e]
-                                     (let [value (.. (om/get-ref owner "rich-editor") getDOMNode -innerHTML)]
-                                       (editing! owner false)
-                                       (utils/handle-change section-data value :body)
-                                       (utils/save-values (:save-channel data))))
-                         } "SAVE"))
-          (when-not no-data
-            (om/build update-footer {:author (:author section-data)
-                                     :updated-at (:updated-at section-data)
-                                     :section section
-                                     :notes (:notes data)})))))))
+        (when-not no-data
+          (om/build update-footer {:author (:author section-data)
+                                   :updated-at (:updated-at section-data)
+                                   :section section
+                                   :editing editing
+                                   :notes (:notes data)}))))))
