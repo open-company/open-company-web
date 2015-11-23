@@ -376,6 +376,10 @@ div.actual-container h3.actual.red {
   color: #d72a46;
 }
 
+div.actual-container h3.actual.blue {
+  color: #109DB7;
+}
+
 div.chart-header-container div.actual-container h3.actual-label {
   margin-top: 10px;
   font-size: 14px;
