@@ -74,4 +74,6 @@
     new-section
     (fn [body]
       (when body
-        (swap! new-sections assoc :categories (:categories body))))))
+        (let [slug (:slug body)
+              response (:response body)]
+          (swap! new-sections assoc-in [(keyword slug) :categories] (:categories response)))))))
