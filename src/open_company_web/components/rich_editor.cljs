@@ -79,7 +79,6 @@
                                                              (when-not (:read-only data)
                                                                ((:start-editing-cb data))))
                                                  :editing editing
-                                                 :on-blur (:cancel-if-needed-cb data)
                                                  :on-change (:change-cb data)
                                                  :body-counter (:body-counter data)
                                                  :class (utils/class-set {:rich-editor true
