@@ -93,9 +93,8 @@
     (let [last-change (= (:body-counter next-props) @change-counter)
           html-changed (not= (trim (:html next-props)) (trim (div-inner-html owner)))
           class-change (not= (:class next-props) (:class data))
-          locked-change (not= (:locked next-props) (:locked data))
           placeholder-change (not= (:placeholder next-props) (:placeholder data))
-          should-change (or (and html-changed last-change) class-change locked-change placeholder-change)]
+          should-change (or (and html-changed last-change) class-change placeholder-change)]
       should-change))
 
   (did-update [_ _ _]
@@ -116,6 +115,5 @@
                     :onFocus #(emit-change owner data :on-focus)
                     :onBlur #(emit-change owner data :on-blur)
                     :placeholder (:placeholder data)
-                    :contentEditable (str (not (:locked data)))
                     :dangerouslySetInnerHTML (clj->js {"__html" fixed-html})
                     :ref "div-content-editable"}))))
