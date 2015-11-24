@@ -87,7 +87,6 @@
                                                                           :no-data should-show-placeholder
                                                                           :editing editing
                                                                           :collapsed collapsed})
-                                                 :locked read-only
                                                  :placeholder (:placeholder data)})
         (if collapsed
           (dom/button {:class "btn btn-link expand-button"
