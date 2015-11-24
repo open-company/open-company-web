@@ -171,12 +171,16 @@
                                :slug (keyword slug)}]
             (flux/dispatch dispatcher/section dispatch-body)))))))
 
-(defn patch-sections [sections]
+(defn patch-sections [sections & [new-section section-name]]
   (when sections
     (let [slug (keyword (:slug @router/path))
           company-data (slug @dispatcher/app-state)
           company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
-          json-data (cljs->json {:sections sections})]
+          payload (if (and new-section section-name)
+                    {:sections sections
+                     (keyword section-name) new-section}
+                    {:sections sections})
+          json-data (cljs->json payload)]
       (api-patch (:href company-patch-link)
         { :json-params json-data
           :headers {
