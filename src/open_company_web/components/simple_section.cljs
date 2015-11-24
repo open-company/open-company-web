@@ -25,7 +25,8 @@
       (not= (:body (:section-data data)) (om/get-state owner :body))))
 
 (defn cancel-if-needed-cb [owner data]
-  (when (not (has-changes owner data))
+  (when (and (not (has-changes owner data))
+             (not (om/get-state owner :oc-editing)))
     (cancel-cb owner data)))
 
 (defn save-cb [owner data]
@@ -116,5 +117,7 @@
           (if editing
             (om/build section-footer {:edting editing
                                       :cancel-cb cancel-cb
-                                      :save-cb save-cb})
+                                      :save-cb save-cb
+                                      :is-new-section (om/get-state owner :oc-editing)
+                                      :save-disabled (empty? (om/get-state owner :body))})
             (om/build revisions-navigator data)))))))
