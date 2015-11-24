@@ -35,7 +35,6 @@
   (.setTimeout js/window
                #(let [el (.getDOMNode (om/get-ref owner "editable-title-input"))]
                   (.focus el)
-                  ; (utils/set-caret-position! el position)
                   (let [span (.getDOMNode (om/get-ref owner "hidden-span"))
                         char-pos (get-char-index title span position)]
                     (utils/set-caret-position! el char-pos)
