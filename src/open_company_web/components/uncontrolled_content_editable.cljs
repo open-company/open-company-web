@@ -48,10 +48,12 @@
       ; on focus
       (= event :on-focus)
       (when (contains? data :on-focus)
+        (om/set-state! owner :focus true)
         ((:on-focus data)))
       ; on blur
       (= event :on-blur)
       (when (contains? data :on-blur)
+        (om/set-state! owner :focus false)
         ((:on-blur data)))
       ; on change
       (= event :on-change)
@@ -65,11 +67,21 @@
   (when (not (nil? v))
     (clojure.string/trim v)))
 
+(defn get-html [owner data]
+  (let [html (:html data)
+        no-data (empty? html)
+        should-show-placeholder (and (not (om/get-state owner :focus)) no-data)
+        placeholder (:placeholder data)]
+    (if should-show-placeholder
+      placeholder
+      html)))
+
 (defcomponent uncontrolled-content-editable [data owner]
 
   (init-state [_]
     {:hallo-loaded false
-     :did-mount false})
+     :did-mount false
+     :focus false})
   
 (will-mount [_]
     (when-not (:read-only data)
@@ -99,23 +111,16 @@
 
   (did-update [_ _ _]
     (when (not= (:html data) (div-inner-html owner))
-      (set! (.-innerHTML (div-node owner)) (:html data))))
+      (let [html (get-html owner data)]
+        (set! (.-innerHTML (div-node owner)) html))))
 
   (render [_]
-    (let [html (:html data)
-          no-data (empty? html)
-          editing (:editing data)
-          should-show-placeholder (and (not editing) no-data)
-          placeholder (:placeholder data)
-          fixed-html (if should-show-placeholder
-                       placeholder
-                       html)]
+    (let [html (get-html owner data)]
       (dom/div #js {:className (:class data)
                     :onInput #(emit-change owner data :on-change)
                     :onFocus #(emit-change owner data :on-focus)
                     :onBlur #(emit-change owner data :on-blur)
-                    :placeholder (:placeholder data)
                     ; :contentEditable WARN: do not set contentEditable here or it breaks the load
                     ; event of the images needed to calculate the div size
-                    :dangerouslySetInnerHTML (clj->js {"__html" fixed-html})
+                    :dangerouslySetInnerHTML (clj->js {"__html" html})
                     :ref "div-content-editable"}))))
