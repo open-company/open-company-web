@@ -112,7 +112,7 @@
                                    :updated-at (:updated-at (:section-data data))
                                    :section section
                                    :editing editing
-                                   :notes (:notes (:section-data data))})
+                                   :notes false})
           (dom/div {:class "simple-section-footer"}
             (if editing
               (om/build section-footer {:edting editing
