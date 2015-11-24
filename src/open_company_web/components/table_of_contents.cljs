@@ -64,16 +64,16 @@
 (defn insert-section
   [category-into section-after category-to-insert section-to-insert sections]
   (let [category-kw (keyword category-to-insert)
-        category (category-kw sections)
-        fixed-section-after (if (= category-into category-to-insert)
-                                  section-after
-                                  first-sec-placeholder)]
+        category (category-kw sections)]
     (cond
       ; category doesn't exist, create it with the new section
       (not (contains? sections category-kw))
       (merge sections {category-kw [section-to-insert]})
+      ; category are different, adding as last section
+      (not= category-into category-to-insert)
+      (merge sections {category-kw (conj (category-kw sections) section-to-insert)})
       ; category exists, section is placeholder for first place
-      (= fixed-section-after first-sec-placeholder)
+      (= section-after first-sec-placeholder)
       (let [new-category (concat [section-to-insert] (category-kw sections))]
         (merge sections {category-kw (vec new-category)}))
       ; category exists, adding section
