@@ -36,10 +36,10 @@
           section-data {:title title
                         :body body}]
       (if (om/get-state owner :oc-editing)
-        ; save a new category
+        ; save a new section
         (let [slug (keyword (:slug @router/path))
               company-data (slug @dispatcher/app-state)]
-          (api/add-section (:sections company-data) section-data (:section data)))
+          (api/patch-sections (:sections company-data) section-data (:section data)))
         ; save an existing section
         (api/save-or-create-section (merge section-data {:links (:links (:section-data data))
                                                          :section (:section data)}))))
