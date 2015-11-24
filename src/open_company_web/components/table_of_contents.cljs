@@ -69,7 +69,7 @@
       ; category doesn't exist, create it with the new section
       (not (contains? sections category-kw))
       (merge sections {category-kw [section-to-insert]})
-      ; category are different, adding as last section
+      ; categories are different, adding as last section
       (not= category-into category-to-insert)
       (merge sections {category-kw (conj (category-kw sections) section-to-insert)})
       ; category exists, section is placeholder for first place
