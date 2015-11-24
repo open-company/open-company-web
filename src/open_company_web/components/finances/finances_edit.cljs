@@ -2,13 +2,10 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.cell :refer [cell]]
-            [open-company-web.api :as api]
-            [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.components.finances.utils :as finances-utils]
-            [cljs.core.async :refer [put! chan <!]]))
+            [cljs.core.async :refer [put!]]))
 
 (defn signal-tab [period k]
   (let [ch (utils/get-channel (str period k))]
@@ -83,35 +80,6 @@
         ;; Runway
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
                 runway)))))
-
-(defn save-new-row? [finances-data]
-  (let [new-period (first (filter #(true? (:new %)) finances-data))]
-    (or (:cash new-period)
-        (:costs new-period)
-        (:revenue new-period))))
-
-(defn row-ok? [row]
-  (and (:cash row)
-       (:costs row)
-       (:revenue row)))
-
-(defn save-data [owner finances-data original-cursor close-cb]
-  "Save the edit data that lives in the component state to the cursor and
-  send the save signal"
-  (let [array-data (to-array finances-data)
-        new-row (first (filter #(and (contains? % :new) (true? (:new %))) array-data))
-        new-index (.indexOf array-data new-row)
-        should-save-new (save-new-row? array-data)
-        to-save (filter #(not (:new %)) array-data)
-        new-row (dissoc new-row :new)
-        to-save (if should-save-new (into [] (conj to-save new-row)) (into [] to-save))]
-    (if-not (every? row-ok? to-save)
-      (.alert js/window "Check the finances values")
-      (let [fixed-finances (utils/calc-burnrate-runway to-save)
-            slug (keyword (:slug @router/path))]
-        (om/update! original-cursor :data fixed-finances)
-        (api/update-finances-data (:finances (slug @app-state)))
-        (close-cb)))))
 
 (defn replace-row-in-data [owner finances-data row k v]
   "Find and replace the edited row"
