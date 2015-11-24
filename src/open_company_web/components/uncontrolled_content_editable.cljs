@@ -115,5 +115,7 @@
                     :onFocus #(emit-change owner data :on-focus)
                     :onBlur #(emit-change owner data :on-blur)
                     :placeholder (:placeholder data)
+                    ; :contentEditable WARN: do not set contentEditable here or it breaks the load
+                    ; event of the images needed to calculate the div size
                     :dangerouslySetInnerHTML (clj->js {"__html" fixed-html})
                     :ref "div-content-editable"}))))
