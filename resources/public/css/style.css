@@ -707,8 +707,9 @@ form.linkForm input#addlinkButton {
 }
 
 div.finances div.finances-body.edit {
-  width: 800px;
   position: relative;
+  border: 1px solid black;
+  width: 650px;
 }
 
 div.composed-section-body i.editable-pen {
