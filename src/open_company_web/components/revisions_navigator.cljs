@@ -86,35 +86,36 @@
       ; preload next revision as it can be that it's missing (ie: user jumped to the first rev then went forward)
       (when (and (not (= (:updated-at rev-next) (:actual-as-of data))) rev-next (not (contains? revisions-list (:updated-at rev-next))))
         (api/load-revision rev-next slug section))
-      (dom/div {:class "revisions-navigator"}
-        (if (:loading data)
-          (dom/div {:style {:text-align "center"}} "Loading...")
-          (dom/div {}
-            (dom/div {:class "revisions-navigator-left"}
-              (when rev-first
-                (dom/a {:class "rev-double-prev"
-                        :on-click #(nav-revision! % rev-first (:revisions-navigation-cb data))
-                        :title first-date}
-                  (dom/div {:class "double-prev"}
-                    (dom/i {:class "fa fa-backward"}))))
-              (when rev-prev
-                (dom/a {:class "rev-single-prev"
-                        :on-click #(nav-revision! % rev-prev (:revisions-navigation-cb data))
-                        :title prev-date}
-                  (dom/div {:class "single-prev"}
-                    (dom/i {:class "fa fa-caret-left"})
-                    (dom/p {:class "rev-nav-label"} "Previous")))))
-            (dom/div {:class "revisions-navigator-right"}
-              (when rev-last
-                (dom/a {:class "rev-double-next"
-                        :on-click #(nav-revision! % rev-last (:revisions-navigation-cb data))
-                        :title last-date}
-                  (dom/div {:class "double-next"}
-                    (dom/i {:class "fa fa-forward"}))))
-              (when rev-next
-                (dom/a {:class "rev-single-next"
-                        :on-click #(nav-revision! % rev-next (:revisions-navigation-cb data))
-                        :title next-date}
-                  (dom/div {:class "single-next"}
-                    (dom/i {:class "fa fa-caret-right"})
-                    (dom/p {:class "rev-nav-label"} "Next")))))))))))
+      (when (or rev-first rev-prev rev-next rev-last)
+        (dom/div {:class "revisions-navigator"}
+          (if (:loading data)
+            (dom/div {:style {:text-align "center"}} "Loading...")
+            (dom/div {}
+              (dom/div {:class "revisions-navigator-left"}
+                (when rev-first
+                  (dom/a {:class "rev-double-prev"
+                          :on-click #(nav-revision! % rev-first (:revisions-navigation-cb data))
+                          :title first-date}
+                    (dom/div {:class "double-prev"}
+                      (dom/i {:class "fa fa-backward"}))))
+                (when rev-prev
+                  (dom/a {:class "rev-single-prev"
+                          :on-click #(nav-revision! % rev-prev (:revisions-navigation-cb data))
+                          :title prev-date}
+                    (dom/div {:class "single-prev"}
+                      (dom/i {:class "fa fa-caret-left"})
+                      (dom/p {:class "rev-nav-label"} "Previous")))))
+              (dom/div {:class "revisions-navigator-right"}
+                (when rev-last
+                  (dom/a {:class "rev-double-next"
+                          :on-click #(nav-revision! % rev-last (:revisions-navigation-cb data))
+                          :title last-date}
+                    (dom/div {:class "double-next"}
+                      (dom/i {:class "fa fa-forward"}))))
+                (when rev-next
+                  (dom/a {:class "rev-single-next"
+                          :on-click #(nav-revision! % rev-next (:revisions-navigation-cb data))
+                          :title next-date}
+                    (dom/div {:class "single-next"}
+                      (dom/i {:class "fa fa-caret-right"})
+                      (dom/p {:class "rev-nav-label"} "Next"))))))))))))

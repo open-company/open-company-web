@@ -3,7 +3,7 @@
             [no.en.core :refer [deep-merge]]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.caches :refer [revisions]]))
+            [open-company-web.caches :refer [revisions new-sections]]))
 
 (defonce app-state (atom {}))
 
@@ -17,6 +17,8 @@
 (def revision (flux/dispatcher))
 
 (def auth-settings (flux/dispatcher))
+
+(def new-section (flux/dispatcher))
 
 (def companies-list-dispatch
   (flux/register
@@ -66,3 +68,12 @@
         (swap! app-state dissoc :loading)
         ; add auth-settings data
         (swap! app-state assoc :auth-settings body)))))
+
+(def new-section-dispatch
+  (flux/register
+    new-section
+    (fn [body]
+      (when body
+        (let [slug (:slug body)
+              response (:response body)]
+          (swap! new-sections assoc-in [(keyword slug) :categories] (:categories response)))))))
