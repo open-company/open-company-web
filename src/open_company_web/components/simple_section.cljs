@@ -81,41 +81,40 @@
           cancel-cb #(cancel-cb owner data)
           cancel-if-needed-cb #(cancel-if-needed-cb owner data)
           save-cb #(save-cb owner data)]
-      (if (:loading data)
-        (dom/h4 {} "Loading data...")
-        (dom/div {:class "simple-section section-container"
-                  :id (str "section-" (name section))}
+      (dom/div {:class "simple-section section-container"
+                :id (str "section-" (name section))}
 
-          (om/build editable-title {:editing editing
-                                    :read-only (:read-only data)
-                                    :title (om/get-state owner :title)
-                                    :start-editing-cb start-editing-cb
-                                    :change-cb title-change-cb
-                                    :cancel-cb cancel-cb
-                                    :cancel-if-needed-cb cancel-if-needed-cb
-                                    :save-cb save-cb})
+        (om/build editable-title {:editing editing
+                                  :read-only (:read-only data)
+                                  :title (om/get-state owner :title)
+                                  :start-editing-cb start-editing-cb
+                                  :change-cb title-change-cb
+                                  :cancel-cb cancel-cb
+                                  :cancel-if-needed-cb cancel-if-needed-cb
+                                  :save-cb save-cb})
 
-          (dom/div {:class "simple-section-body"}
-            (om/build rich-editor {:editing editing
-                                   :section section
-                                   :body-counter (om/get-state owner :body-counter)
-                                   :read-only (:read-only data)
-                                   :body (om/get-state owner :body)
-                                   :placeholder (str (utils/camel-case-str (name (:section data))) " notes here...")
-                                   :start-editing-cb start-editing-cb
-                                   :change-cb body-change-cb
-                                   :cancel-cb cancel-cb
-                                   :cancel-if-needed-cb cancel-if-needed-cb
-                                   :save-cb save-cb}))
+        (dom/div {:class "simple-section-body"}
+          (om/build rich-editor {:editing editing
+                                 :section section
+                                 :body-counter (om/get-state owner :body-counter)
+                                 :read-only (:read-only data)
+                                 :body (om/get-state owner :body)
+                                 :placeholder (or (:placeholder (:section-data data))
+                                                  (str (utils/camel-case-str (name (:section data))) " notes here..."))
+                                 :start-editing-cb start-editing-cb
+                                 :change-cb body-change-cb
+                                 :cancel-cb cancel-cb
+                                 :cancel-if-needed-cb cancel-if-needed-cb
+                                 :save-cb save-cb}))
 
-          (om/build update-footer {:author (:author (:section-data data))
-                                   :updated-at (:updated-at (:section-data data))
-                                   :section section
-                                   :editing editing
-                                   :notes false})
-          (dom/div {:class "simple-section-footer"}
-            (if editing
-              (om/build section-footer {:edting editing
-                                        :cancel-cb cancel-cb
-                                        :save-cb save-cb})
-              (om/build revisions-navigator data))))))))
+        (om/build update-footer {:author (:author (:section-data data))
+                                 :updated-at (:updated-at (:section-data data))
+                                 :section section
+                                 :editing editing
+                                 :notes false})
+        (dom/div {:class "simple-section-footer"}
+          (if editing
+            (om/build section-footer {:edting editing
+                                      :cancel-cb cancel-cb
+                                      :save-cb save-cb})
+            (om/build revisions-navigator data)))))))
