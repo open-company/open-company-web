@@ -197,3 +197,18 @@
                                            {k (utils/vec-dissoc v section-name)})
                                          sections))]
       (patch-sections new-sections))))
+
+(defn get-new-sections []
+  (let [slug (keyword (:slug @router/path))
+        company-data (slug @dispatcher/app-state)
+        links (:links company-data)
+        add-section-link (utils/link-for links "section-list" "GET")]
+    (api-get (:href add-section-link)
+      { :headers {
+          ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type"
+          ; custom content type
+          "content-type" (:type add-section-link)}}
+      (fn [response]
+        (let [body (if (:success response) (json->cljs (:body response)) {})]
+          (flux/dispatch dispatcher/new-section {:response body :slug slug}))))))
