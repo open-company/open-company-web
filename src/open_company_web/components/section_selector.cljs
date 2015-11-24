@@ -135,29 +135,29 @@
                       :id (str "sec-box-a-" (name section))
                       :style {:opacity (if first-box 1 0)}}
               (om/build (section-component section) {:section-data a-section-data
-                                                             :section section
-                                                             :actual-as-of (:updated-at actual-data)
-                                                             :loading (:loading data)
-                                                             :revisions-navigation-cb #(revisions-navigation-cb owner section %)
-                                                             :editing (om/get-state owner :editing)
-                                                             :editable-cb #(editing! owner true)
-                                                             :cancel-edit-cb #(cancel-edit owner data)
-                                                             :save-edit-cb #(cancel-edit owner data)
-                                                             :read-only a-read-only})))
+                                                     :section section
+                                                     :actual-as-of (:updated-at actual-data)
+                                                     :loading (:loading data)
+                                                     :revisions-navigation-cb #(revisions-navigation-cb owner section %)
+                                                     :editing (om/get-state owner :editing)
+                                                     :editable-cb #(editing! owner true)
+                                                     :cancel-edit-cb #(cancel-edit owner data)
+                                                     :save-edit-cb #(cancel-edit owner data)
+                                                     :read-only a-read-only})))
           (when b-section-data
             (dom/div {:class "section-box"
                       :id (str "sec-box-b-" (name section))
                       :style {:opacity (if first-box 0 1)}}
               (om/build (section-component section) {:section-data b-section-data
-                                                             :section section
-                                                             :actual-as-of (:updated-at actual-data)
-                                                             :loading (:loading data)
-                                                             :revisions-navigation-cb #(revisions-navigation-cb owner section %)
-                                                             :editing (om/get-state owner :editing)
-                                                             :editable-cb #(editing! owner true)
-                                                             :cancel-edit-cb #(cancel-edit owner data)
-                                                             :save-edit-cb #(cancel-edit owner data)
-                                                             :read-only b-read-only})))
+                                                     :section section
+                                                     :actual-as-of (:updated-at actual-data)
+                                                     :loading (:loading data)
+                                                     :revisions-navigation-cb #(revisions-navigation-cb owner section %)
+                                                     :editing (om/get-state owner :editing)
+                                                     :editable-cb #(editing! owner true)
+                                                     :cancel-edit-cb #(cancel-edit owner data)
+                                                     :save-edit-cb #(cancel-edit owner data)
+                                                     :read-only b-read-only})))
           (when animating
             (.setTimeout js/window #(animate-section-translation owner (name section)) 1)
             nil))))))
