@@ -166,39 +166,23 @@
                                     :cursor row}]
                              v))
                          finances-data))]
-      (if (:loading data)
-        ; loading
-        (dom/h4 {} "Loading data...")
-        ; real component
-        (dom/div {:class "row"}
-          (dom/div {:class "finances"}
-            (dom/h2 {:class "finances-edit-title"} (:title (:finances (:company-data data))))
-            (dom/div {:class "finances-body edit"}
-              (dom/table {:class "table table-striped"}
-                (dom/thead {}
-                  (dom/tr {}
-                    (dom/th {} "")
-                    (dom/th {} "Cash")
-                    (dom/th {} "Revenue")
-                    (dom/th {} "Costs")
-                    (when show-burn
-                      (dom/th {} "Burn"))
-                    (dom/th {} "Runway")))
-                (dom/tbody {}
-                  (for [idx (range (count rows-data))]
-                    (let [row-data (get rows-data idx)
-                          next-period (next-period finances-data idx)
-                          row (assoc row-data :next-period next-period)]
-                      (om/build finances-edit-row row)))))
-              (dom/div {:class "finances-edit-buttons"}
-                (dom/button {:class "btn btn-success"
-                             :on-click #(save-data owner
-                                                   (om/get-state owner :data)
-                                                   (:section-data data)
-                                                   (:close-edit-cb data))} "Save")
-                (dom/button {:class "btn btn-default cancel"
-                             :on-click (fn [_]
-                                         (let [initial-data (om/get-state owner :initial-data)]
-                                           (utils/handle-change (:section-data data) initial-data :data))
-                                         ((:close-edit-cb data)))}
-                            "Cancel")))))))))
+      ; real component
+      (dom/div {:class "finances"}
+        (dom/h2 {:class "finances-edit-title"} (:title (:finances (:company-data data))))
+        (dom/div {:class "finances-body edit"}
+          (dom/table {:class "table table-striped"}
+            (dom/thead {}
+              (dom/tr {}
+                (dom/th {} "")
+                (dom/th {} "Cash")
+                (dom/th {} "Revenue")
+                (dom/th {} "Costs")
+                (when show-burn
+                  (dom/th {} "Burn"))
+                (dom/th {} "Runway")))
+            (dom/tbody {}
+              (for [idx (range (count rows-data))]
+                (let [row-data (get rows-data idx)
+                      next-period (next-period finances-data idx)
+                      row (assoc row-data :next-period next-period)]
+                  (om/build finances-edit-row row))))))))))
