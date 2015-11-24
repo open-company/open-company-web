@@ -39,10 +39,13 @@
     (.setTimeout js/window #(.svgcss js/window) 1)))
 
 (defcomponent new-section-popover [data owner]
+
   (did-mount [_]
     (replace-svg))
+
   (did-update [_ _ _]
     (replace-svg))
+
   (render [_]
     (let [slug (keyword (:slug @router/path))
           company-data (slug @dispatcher/app-state)
