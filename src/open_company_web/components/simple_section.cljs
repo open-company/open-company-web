@@ -29,12 +29,22 @@
     (cancel-cb owner data)))
 
 (defn save-cb [owner data]
-  (when (has-changes owner data)
-    (api/save-or-create-section {:links (:links (:section-data data))
-                                 :section (:section data)
-                                 :body (om/get-state owner :body)
-                                 :title (om/get-state owner :title)})
-    (om/set-state! owner :editing false)))
+  (when (or (has-changes owner data) ; when the section already exists
+            (om/get-state owner :oc-editing)) ; when the section is new
+    (let [title (om/get-state owner :title)
+          body (om/get-state owner :body)
+          section-data {:title title
+                        :body body}]
+      (if (om/get-state owner :oc-editing)
+        ; save a new category
+        (let [slug (keyword (:slug @router/path))
+              company-data (slug @dispatcher/app-state)]
+          (api/add-section (:sections company-data) section-data (:section data)))
+        ; save an existing section
+        (api/save-or-create-section (merge section-data {:links (:links (:section-data data))
+                                                         :section (:section data)}))))
+    (om/set-state! owner :editing false)
+    (om/set-state! owner :oc-editing false)))
 
 (defn start-editing-cb [owner data]
   (om/set-state! owner :editing true))
@@ -50,9 +60,11 @@
 (defcomponent simple-section [data owner]
 
   (init-state [_]
-    {:editing false
-     :title (:title (:section-data data))
-     :body (:body (:section-data data))})
+    (let [new-added-section (:oc-editing (:section-data data))]
+      {:editing (not (not new-added-section))
+       :oc-editing new-added-section
+       :title (:title (:section-data data))
+       :body (:body (:section-data data))}))
 
   (will-receive-props [_ next-props]
     ; this means the title or the body has changed from the API or at a upper lever of this component
