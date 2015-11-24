@@ -9,12 +9,11 @@
   (render [_]
     (let [editing (:editing data)]
       (dom/div {:class "section-footer"}
-        (if-not editing
-          (om/build revisions-navigator data)
-          (dom/div {:class "save-section"}
-            (dom/button {:class "oc-btn oc-cancel"
-                         :on-click (:cancel-edit-cb data)}
-                        "CANCEL")
-            (dom/button {:class "oc-btn oc-success"
-                         :on-click (fn [e])}
-                        "SAVE")))))))
+        (dom/div {:class "save-section"}
+          (dom/button {:class "oc-btn oc-cancel"
+                       :on-click (:cancel-cb data)}
+                      "CANCEL")
+          (dom/button {:class "oc-btn oc-success"
+                       :on-click (fn [e]
+                                   ((:save-cb data)))}
+                      "SAVE"))))))
