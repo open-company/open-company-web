@@ -84,7 +84,7 @@
                                                  :body-counter (:body-counter data)
                                                  :class (utils/class-set {:rich-editor true
                                                                           :hidden read-only
-                                                                          :no-data should-show-placeholder
+                                                                          :no-data (empty? body)
                                                                           :editing editing
                                                                           :collapsed collapsed})
                                                  :placeholder (:placeholder data)})
