@@ -946,6 +946,10 @@ button.oc-btn.oc-success {
   color: green;
 }
 
+button.oc-btn.oc-success.disabled {
+  opacity: 0.3;
+}
+
 button.oc-btn.oc-cancel {
   color: rgba(0, 0, 0, 0.4);
 }
