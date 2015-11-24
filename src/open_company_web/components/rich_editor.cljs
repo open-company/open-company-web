@@ -2,33 +2,8 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.lib.utils :as utils]
-            [cljs-dynamic-resources.core :as cdr]))
-
-(def hallo-format {
-  :editable true
-  :plugins {
-      :halloformat { "formattings" {"bold" true
-                                    "italic" true
-                                    "strikethrough" true
-                                    "underline" true}}
-      :halloheadings {"formatBlocks" ["p" "h1"]}
-      :hallolists {}
-      :hallolink {}
-      ;; :toolbar "halloToolbarFixed" ; uncomment for fixed toolbar
-      :halloblacklist {}}
-})
-
-(defn init-hallo! [owner data]
-  (let [hallo-loaded (om/get-state owner :hallo-loaded)
-        did-mount (om/get-state owner :did-mount)]
-    (when (and hallo-loaded did-mount)
-      (when-let [editor-ref (om/get-ref owner "rich-editor")]
-        (let [editor-node (.getDOMNode editor-ref)
-              hallo-opts (clj->js hallo-format)
-              jquery-node (.$ js/window editor-node)]
-          (.hallo jquery-node hallo-opts))))))
+            [open-company-web.components.uncontrolled-content-editable :refer [uncontrolled-content-editable]]))
 
 (defn set-state! [owner k v]
   (om/update-state! owner k (fn [_]v)))
@@ -36,22 +11,18 @@
 (defn user-expanded! [owner v]
   (set-state! owner :user-expanded v))
 
-(defn editing! [owner active]
-  (set-state! owner :editing active))
-
 (defn collapsed! [owner v]
   (set-state! owner :collapsed v))
 
 (defn collapse-if-needed [owner data]
-  (if-let [rich-editor-ref (if (:read-only data)
-                             (om/get-ref owner "fake-rich-editor")
-                             (om/get-ref owner "rich-editor"))]
-    (let [rich-editor-node (.getDOMNode rich-editor-ref)
-          $-rich-editor (.$ js/window rich-editor-node)
-          height (.height $-rich-editor)]
-      (om/update-state! owner :should-collapse (fn [_] false))
-      (when (>= height 480)
-        (collapsed! owner true)))))
+  (let [selector (if (:read-only data)
+                   (str "div#section-" (name (:section data)) " div.fake-rich-editor")
+                   (str "div#section-" (name (:section data)) " div.rich-editor"))
+        $-rich-editor (.$ js/window selector)
+        height (.height $-rich-editor)]
+    (om/update-state! owner :should-collapse (fn [_] false))
+    (when (>= height 480)
+      (collapsed! owner true))))
 
 (defn calc-collapse-add-onload [owner data]
   ; run only if needed and do not crash on tests
@@ -63,75 +34,35 @@
       (.each js/$ all-images (fn [idx item]
                                (.load (.$ js/window item) #(collapse-if-needed owner data)))))))
 
-(defn get-inner-html [owner]
-  (if-let [editor-ref (om/get-ref owner "rich-editor")]
-    (let [editor-el (.getDOMNode editor-ref)]
-      (.-innerHTML editor-el))))
-
 (defcomponent rich-editor [data owner]
 
   (init-state [_]
-    {:initial-body (:body (:section-data data))
-     :body (:body (:section-data data))
-     :hallo-loaded false
-     :did-mount false
-     :should-collapse false
+    {:should-collapse false
      :collapsed false
      :user-expanded false})
 
-  (will-mount [_]
-    (when-not (:read-only data)
-      ; add dependencies:
-      ; jQuery UI
-      (cdr/add-style! "/lib/jquery-ui/jquery-ui.structure.min.css")
-      (cdr/add-style! "/lib/jquery-ui/jquery-ui.min.css")
-      ; Add js synchronously: jquery ui, rangy and hallo
-      (cdr/add-scripts! [{:src "/lib/rangy/rangy-core.min.js"}
-                         {:src "/lib/hallo/hallo.js"}]
-                        (fn []
-                          (om/update-state! owner :hallo-loaded (fn [_]true))
-                          (init-hallo! owner data)))))
-
   (did-mount [_]
-    (when-not (:read-only data)
-      (om/update-state! owner :did-mount (fn [_]true))
-      (init-hallo! owner data))
-    (when-let [editor (om/get-ref owner "rich-editor")]
-      (let [editor-node (.getDOMNode editor)]
-        (.addEventListener editor-node
-                           "input"
-                           #(utils/handle-change (:section-data data) (.-innerHTML editor-node) :body))))
     (calc-collapse-add-onload owner data))
 
   (will-update [_ next-props _]
-    (when (and (:editing data) (not (:editing next-props)))
-      (let [section-data (:section-data data)
-            init-value (om/get-state owner :initial-body)
-            el (.getDOMNode (om/get-ref owner "rich-editor"))]
-        (utils/handle-change section-data init-value :body)
-        (set! (.-innerHTML el) init-value)))
-    (when-not (om/get-state owner :body) (:body (:section-data next-props))
-      (om/update-state! owner :body (:body (:section-data next-props))))
-    (when-not (= (:body (:section-data data)) (:body (:section-data next-props)))
+    (when (not= (:body data) (:body next-props))
       ; reset collapsed and should-collapse
       (collapsed! owner false)
       (user-expanded! owner false)
       (set-state! owner :should-collapse false)))
 
-  (did-update [_ _ _]
+  (did-update [_ prev-props _]
     (calc-collapse-add-onload owner data))
 
   (render [_]
-    (let [section-data (:section-data data)
-          section (:section data)
-          read-only (:read-only data)
+    (let [read-only (:read-only data)
           editing (:editing data)
-          no-data (empty? (:body section-data))
+          no-data (empty? (:body data))
           should-show-placeholder (and (not editing) no-data)
-          placeholder (str (utils/camel-case-str (name section)) " notes here...")
+          placeholder (:placeholder data)
           body (if should-show-placeholder
                  placeholder
-                 (:body section-data))
+                 (:body data))
           collapsed (om/get-state owner :collapsed)
           user-expanded (om/get-state owner :user-expanded)]
       (dom/div {:class "rich-editor-container group"}
@@ -140,26 +71,24 @@
                                                    :collapsed collapsed})
                       :ref "fake-rich-editor"
                       :dangerouslySetInnerHTML (clj->js {"__html" body})})
-        (dom/div #js {:className (utils/class-set {:rich-editor true
-                                                   :hidden read-only
-                                                   :no-data should-show-placeholder
-                                                   :editing editing
-                                                   :collapsed collapsed})
-                      :ref "rich-editor"
-                      :onFocus (fn [e]
-                                 (when collapsed
-                                  (collapsed! owner false)
-                                  (user-expanded! owner true))
-                                 (when-not (:read-only data)
-                                   ((:editable-cb data))))
-                      ; :onBlur #((:cancel-edit-cb data))
-                      :onKeyDown #(cond
-                                    (= (.-key %) "Escape")
-                                    ((:cancel-edit-cb data)))
-                      :onChange (fn [e]
-                                  (let [innerHTML (get-inner-html owner)]
-                                    (utils/handle-change section-data :body innerHTML)))
-                      :dangerouslySetInnerHTML (clj->js {"__html" body})})
+        (om/build uncontrolled-content-editable {:html body
+                                                 :on-focus (fn [e]
+                                                             (when collapsed
+                                                              (collapsed! owner false)
+                                                              (user-expanded! owner true))
+                                                             (when-not (:read-only data)
+                                                               ((:start-editing-cb data))))
+                                                 :editing editing
+                                                 :on-blur (:cancel-if-needed-cb data)
+                                                 :on-change (:change-cb data)
+                                                 :body-counter (:body-counter data)
+                                                 :class (utils/class-set {:rich-editor true
+                                                                          :hidden read-only
+                                                                          :no-data should-show-placeholder
+                                                                          :editing editing
+                                                                          :collapsed collapsed})
+                                                 :locked read-only
+                                                 :placeholder (:placeholder data)})
         (if collapsed
           (dom/button {:class "btn btn-link expand-button"
                        :on-click (fn [e]
@@ -170,10 +99,4 @@
             (dom/button {:class "btn btn-link collapse-button"
                          :on-click (fn [e]
                                     (collapsed! owner true)
-                                    (user-expanded! owner false))} "Show less")))
-        (when-not no-data
-          (om/build update-footer {:author (:author section-data)
-                                   :updated-at (:updated-at section-data)
-                                   :section section
-                                   :editing editing
-                                   :notes (:notes data)}))))))
+                                    (user-expanded! owner false))} "Show less")))))))
