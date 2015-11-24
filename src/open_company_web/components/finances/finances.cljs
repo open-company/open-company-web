@@ -83,9 +83,13 @@
       (dom/div {:class "section-container" :id "section-finances"}
         (dom/div {:class "composed-section finances"}
           (om/build editable-title {:read-only read-only
-                                    :section-data finances-data
-                                    :section :finances
-                                    :save-channel "save-section-finances"})
+                                    :editing false
+                                    :title (:title finances-data)
+                                    :start-editing-cb #()
+                                    :change-cb #()
+                                    :cancel-cb #()
+                                    :cancel-if-needed-cb #()
+                                    :save-cb #()})
           (dom/div {:class (utils/class-set {:link-bar true
                                              :editable (not read-only)})}
             (dom/a {:href "#"
