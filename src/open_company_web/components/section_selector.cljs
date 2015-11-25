@@ -9,9 +9,6 @@
             [open-company-web.components.simple-section :refer (simple-section)]
             [open-company-web.lib.utils :as utils]))
 
-(defn editing! [owner v]
-  (om/update-state! owner :editing (fn [_]v)))
-
 (defn section-component [section-name]
   (cond
     (= :finances (keyword section-name))
@@ -78,29 +75,13 @@
                     (-> (.$ js/window (str "#sec-box-" section-name " img"))
                         (.bind "load" #(setup-box-height section-name owner)))))))
 
-(defn has-changed? [section-data initial-section-data]
-  (cond
-    (= (:section section-data) :finances)
-    true
-    (= (:section section-data) :growth)
-    true
-    :else
-    (or (not= (:title initial-section-data) (:title section-data))
-        (not= (:body initial-section-data) (:body section-data)))))
-
-(defn cancel-edit [owner data]
-  (when-not (has-changed? (:section-data data) (om/get-state owner :initial-section-data))
-    (editing! owner false)))
-
 (defcomponent section-selector [data owner]
 
   (init-state [_]
     (let [as-of (:updated-at (:section-data data))]
-      {:editing false
-       :next-as-of nil
+      {:next-as-of nil
        :as-of as-of
        :animating false
-       :initial-section-data (:section-data data)
        :first-box true}))
 
   (did-update [_ prev-props _]
@@ -121,7 +102,6 @@
           actual-data (:section-data data)
           section-data (utils/select-section-data actual-data section showing-revision)
           next-section-data (utils/select-section-data actual-data section next-revision)
-          editing (om/get-state owner :editing)
           animating (and next-revision (not (= showing-revision next-revision)))
           first-box (om/get-state owner :first-box)
           a-section-data (if first-box section-data next-section-data)
@@ -137,12 +117,7 @@
               (om/build (section-component section) {:section-data a-section-data
                                                      :section section
                                                      :actual-as-of (:updated-at actual-data)
-                                                     :loading (:loading data)
                                                      :revisions-navigation-cb #(revisions-navigation-cb owner section %)
-                                                     :editing (om/get-state owner :editing)
-                                                     :editable-cb #(editing! owner true)
-                                                     :cancel-edit-cb #(cancel-edit owner data)
-                                                     :save-edit-cb #(cancel-edit owner data)
                                                      :read-only a-read-only})))
           (when b-section-data
             (dom/div {:class "section-box"
@@ -151,12 +126,7 @@
               (om/build (section-component section) {:section-data b-section-data
                                                      :section section
                                                      :actual-as-of (:updated-at actual-data)
-                                                     :loading (:loading data)
                                                      :revisions-navigation-cb #(revisions-navigation-cb owner section %)
-                                                     :editing (om/get-state owner :editing)
-                                                     :editable-cb #(editing! owner true)
-                                                     :cancel-edit-cb #(cancel-edit owner data)
-                                                     :save-edit-cb #(cancel-edit owner data)
                                                      :read-only b-read-only})))
           (when animating
             (.setTimeout js/window #(animate-section-translation owner (name section)) 1)
