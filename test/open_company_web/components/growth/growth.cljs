@@ -6,42 +6,45 @@
               [dommy.core :as dommy :refer-macros [sel1 sel]]
               [open-company-web.components.growth.growth :refer [growth]]
               [om.dom :as dom :include-macros true]
-              [open-company-web.router :as router]))
+              [open-company-web.data.company :refer (company)]
+              [open-company-web.router :as router]
+              [open-company-web.lib.utils :as utils]))
 
 (enable-console-print!)
 
 ; dynamic mount point for components
 (def ^:dynamic c)
 
-(def test-atom {
-  :section "test"
-  :section-data {
-    :title "Test"
-    :notes {
-      :body "Test body"}
-    :metrics [
-      {:slug "test-metric"
-       :name "Test metric"
-       :target "high"
-       :interval "monthly"
-       :unit "tests"}]
-    :data [
-        {:period "2015-10"
-         :slug "test-metric"
-         :target 123456
-         :value 123456}
-        {:period "2015-11"
-         :slug "test-metric"
-         :target 654321
-         :value 654321}]}})
+(def company-data (utils/fix-sections company))
+
+(def test-atom {:section-data (:growth company-data)
+                :section :growth
+                :actual-as-of (:updated-at (:growth company-data))
+                :revisions-navigation-cb #()
+                :read-only false})
 
 (deftest test-growth-component
   (testing "Growth component"
-    (router/set-route! ["companies" "buffer" "growth"]
-                       {:slug "buffer" :section "growth"})
+    (router/set-route! ["companies" "buffer"]
+                       {:slug "buffer"})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
-          _ (om/root growth app-state {:target c})
-          growth-node (sel1 c [:div.growth])]
-      (is (not (nil? growth-node)))
+          _ (om/root growth app-state {:target c})]
+      (is (not (nil? (sel1 c [:div.growth]))))
+      ; editable click
+      (sim/click (sel1 c [:h2.editable-title]) nil)
+      (om.core/render-all)
+      (is (not (nil? (sel1 c [:div.save-section]))))
+      ; cancel click
+      (sim/click (sel1 c [:div.save-section :button.oc-cancel]) nil)
+      (om.core/render-all)
+      (is (nil? (sel1 c [:div.save-section])))
+      ; editable again
+      (sim/click (sel1 c [:h2.editable-title]) nil)
+      (om.core/render-all)
+      (is (not (nil? (sel1 c [:div.save-section]))))
+      ; save click
+      (sim/click (sel1 c [:div.save-section :button.oc-success]) nil)
+      (om.core/render-all)
+      (is (nil? (sel1 c [:div.save-section])))
       (tu/unmount! c))))
