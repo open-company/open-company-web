@@ -33,12 +33,12 @@
       }]
     :data [
       {
-        :period "10-2015"
+        :period "2015-10"
         :slug "test-metric"
         :value 12345
       }
       {
-        :period "11-2015"
+        :period "2015-11"
         :slug "test-metric"
         :value 13456
       }]
@@ -49,6 +49,7 @@
     }
     :notes {
       :body "This is what I have to say about that."
+      :updated-at "2015-09-14T20:49:19Z"
       :author {
         :user-id "123456"
         :image "http://www.emoticonswallpapers.com/avatar/cartoons/Wiley-Coyote-Dazed.jpg"
