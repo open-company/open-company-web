@@ -3,6 +3,7 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [cljs-dynamic-resources.core :as cdr]
+            [open-company-web.lib.utils :as utils]
             [clojure.string]))
 
 ;; Inspired to https://github.com/lovasoa/react-contenteditable/issues/3
@@ -116,7 +117,7 @@
 
   (render [_]
     (let [html (get-html owner data)]
-      (dom/div #js {:className (:class data)
+      (dom/div #js {:className (utils/class-set (merge (:class data) {:no-data (empty? (:html data))}))
                     :onInput #(emit-change owner data :on-change)
                     :onFocus #(emit-change owner data :on-focus)
                     :onBlur #(emit-change owner data :on-blur)
