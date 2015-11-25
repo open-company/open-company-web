@@ -81,11 +81,10 @@
                                                  :editing editing
                                                  :on-change (:change-cb data)
                                                  :body-counter (:body-counter data)
-                                                 :class (utils/class-set {:rich-editor true
-                                                                          :hidden read-only
-                                                                          :no-data (empty? body)
-                                                                          :editing editing
-                                                                          :collapsed collapsed})
+                                                 :class {:rich-editor true
+                                                         :hidden read-only
+                                                         :editing editing
+                                                         :collapsed collapsed}
                                                  :placeholder (:placeholder data)})
         (if collapsed
           (dom/button {:class "btn btn-link expand-button"
