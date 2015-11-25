@@ -88,7 +88,7 @@
   
   (init-state [_]
     (let [section-data (:section-data data)
-        notes-data (:notes section-data)]
+          notes-data (:notes section-data)]
       {:focus "cash"
        :editing (not (not (:oc-editing section-data)))
        :finances-data (:data section-data)
@@ -129,8 +129,7 @@
           start-editing-fn #(start-editing-cb owner data)
           subsection-data {:section-data section-data
                            :read-only read-only
-                           :currency (:currency company-data)
-                           :editable-cb start-editing-fn}]
+                           :currency (:currency company-data)}]
       (dom/div {:class "section-container" :id "section-finances"}
         (dom/div {:class "composed-section finances"}
           (om/build editable-title {:read-only read-only
