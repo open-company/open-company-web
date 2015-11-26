@@ -76,23 +76,23 @@
   (render [_]
     (let [section (:section data)
           editing (om/get-state owner :editing)
-          start-editing-cb #(start-editing-cb owner data)
-          title-change-cb (partial change-cb owner :title)
-          body-change-cb (partial change-cb owner :body)
-          cancel-cb #(cancel-cb owner data)
-          cancel-if-needed-cb #(cancel-if-needed-cb owner data)
-          save-cb #(save-cb owner data)]
+          start-editing-fn #(start-editing-cb owner data)
+          title-change-fn (partial change-cb owner :title)
+          body-change-fn (partial change-cb owner :body)
+          cancel-fn #(cancel-cb owner data)
+          cancel-if-needed-fn #(cancel-if-needed-cb owner data)
+          save-fn #(save-cb owner data)]
       (dom/div {:class "simple-section section-container"
                 :id (str "section-" (name section))}
 
         (om/build editable-title {:editing editing
                                   :read-only (:read-only data)
                                   :title (om/get-state owner :title)
-                                  :start-editing-cb start-editing-cb
-                                  :change-cb title-change-cb
-                                  :cancel-cb cancel-cb
-                                  :cancel-if-needed-cb cancel-if-needed-cb
-                                  :save-cb save-cb})
+                                  :start-editing-cb start-editing-fn
+                                  :change-cb title-change-fn
+                                  :cancel-cb cancel-fn
+                                  :cancel-if-needed-cb cancel-if-needed-fn
+                                  :save-cb save-fn})
 
         (dom/div {:class "simple-section-body"}
           (om/build rich-editor {:editing editing
@@ -102,11 +102,11 @@
                                  :body (om/get-state owner :body)
                                  :placeholder (or (:placeholder (:section-data data))
                                                   (str (utils/camel-case-str (name (:section data))) " notes here..."))
-                                 :start-editing-cb start-editing-cb
-                                 :change-cb body-change-cb
-                                 :cancel-cb cancel-cb
-                                 :cancel-if-needed-cb cancel-if-needed-cb
-                                 :save-cb save-cb}))
+                                 :start-editing-cb start-editing-fn
+                                 :change-cb body-change-fn
+                                 :cancel-cb cancel-fn
+                                 :cancel-if-needed-cb cancel-if-needed-fn
+                                 :save-cb save-fn}))
 
         (om/build update-footer {:author (:author (:section-data data))
                                  :updated-at (:updated-at (:section-data data))
@@ -116,8 +116,8 @@
         (dom/div {:class "simple-section-footer"}
           (if editing
             (om/build section-footer {:edting editing
-                                      :cancel-cb cancel-cb
-                                      :save-cb save-cb
+                                      :cancel-cb cancel-fn
+                                      :save-cb save-fn
                                       :is-new-section (om/get-state owner :oc-editing)
                                       :save-disabled (empty? (om/get-state owner :body))})
             (om/build revisions-navigator data)))))))
