@@ -43,21 +43,21 @@
   (when-let [dnode (div-node owner)]
     (.-innerHTML dnode)))
 
-(defn emit-change [owner data event]
+(defn emit-change [owner data event-type event]
   (when-not (:disable-change-listener data)
     (cond
       ; on focus
-      (= event :on-focus)
+      (= event-type :on-focus)
       (when (contains? data :on-focus)
         (om/set-state! owner :focus true)
         ((:on-focus data)))
       ; on blur
-      (= event :on-blur)
+      (= event-type :on-blur)
       (when (contains? data :on-blur)
         (om/set-state! owner :focus false)
         ((:on-blur data)))
       ; on change
-      (= event :on-change)
+      (= event-type :on-change)
       (let [html (div-inner-html owner)]
         (when (not= html @last-html)
           (swap! change-counter inc)
@@ -83,8 +83,8 @@
     {:hallo-loaded false
      :did-mount false
      :focus false})
-  
-(will-mount [_]
+
+  (will-mount [_]
     (when-not (:read-only data)
       ; add dependencies:
       ; jQuery UI
@@ -105,9 +105,10 @@
   (should-update [_ next-props _]
     (let [last-change (= (:body-counter next-props) @change-counter)
           html-changed (not= (trim (:html next-props)) (trim (div-inner-html owner)))
-          class-change (not= (:class next-props) (:class data))
-          placeholder-change (not= (:placeholder next-props) (:placeholder data))
-          should-change (or (and html-changed last-change) class-change placeholder-change)]
+          class-changed (or (not= (:class next-props) (:class data)) ; class have changed
+                            (and (empty? (:html data)) (not (empty? (:html next-props))))) ; or html was empty and is not anymore
+          placeholder-changed (not= (:placeholder next-props) (:placeholder data))
+          should-change (or (and html-changed last-change) class-changed placeholder-changed)]
       should-change))
 
   (did-update [_ _ _]
@@ -118,9 +119,9 @@
   (render [_]
     (let [html (get-html owner data)]
       (dom/div #js {:className (utils/class-set (merge (:class data) {:no-data (empty? (:html data))}))
-                    :onInput #(emit-change owner data :on-change)
-                    :onFocus #(emit-change owner data :on-focus)
-                    :onBlur #(emit-change owner data :on-blur)
+                    :onInput #(emit-change owner data :on-change %)
+                    :onFocus #(emit-change owner data :on-focus %)
+                    :onBlur #(emit-change owner data :on-blur %)
                     ; :contentEditable WARN: do not set contentEditable here or it breaks the load
                     ; event of the images needed to calculate the div size
                     :dangerouslySetInnerHTML (clj->js {"__html" html})
