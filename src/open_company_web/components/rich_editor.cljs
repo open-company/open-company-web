@@ -60,9 +60,7 @@
           no-data (empty? (:body data))
           should-show-placeholder (and (not editing) no-data)
           placeholder (:placeholder data)
-          body (if should-show-placeholder
-                 placeholder
-                 (:body data))
+          body (:body data)
           collapsed (om/get-state owner :collapsed)
           user-expanded (om/get-state owner :user-expanded)]
       (dom/div {:class "rich-editor-container group"}
@@ -78,6 +76,8 @@
                                                               (user-expanded! owner true))
                                                              (when-not (:read-only data)
                                                                ((:start-editing-cb data))))
+                                                 :on-blur (:cancel-if-needed-cb data)
+                                                 :read-only read-only
                                                  :editing editing
                                                  :on-change (:change-cb data)
                                                  :body-counter (:body-counter data)
