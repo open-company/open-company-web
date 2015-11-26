@@ -62,7 +62,7 @@
 
   (init-state [_]
     (let [new-added-section (:oc-editing (:section-data data))]
-      {:editing (not (not new-added-section))
+      {:editing new-added-section
        :oc-editing new-added-section
        :title (:title (:section-data data))
        :body (:body (:section-data data))}))
