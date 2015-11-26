@@ -23,14 +23,16 @@
 })
 
 (defn init-hallo! [owner data]
-  (let [hallo-loaded (om/get-state owner :hallo-loaded)
-        did-mount (om/get-state owner :did-mount)]
-    (when (and hallo-loaded did-mount)
-      (when-let [editor-ref (om/get-ref owner "div-content-editable")]
-        (let [editor-node (.getDOMNode editor-ref)
-              hallo-opts (clj->js hallo-format)
-              jquery-node (.$ js/window editor-node)]
-          (.hallo jquery-node hallo-opts))))))
+  (when (not (om/get-state owner :hallo-initialized))
+    (let [hallo-loaded (om/get-state owner :hallo-loaded)
+          did-mount (om/get-state owner :did-mount)]
+      (when (and hallo-loaded did-mount)
+        (when-let [editor-ref (om/get-ref owner "div-content-editable")]
+          (let [editor-node (.getDOMNode editor-ref)
+                hallo-opts (clj->js hallo-format)
+                jquery-node (.$ js/window editor-node)]
+            (.hallo jquery-node hallo-opts)
+            (om/set-state! owner :hallo-initialized true)))))))
 
 (def last-html (atom nil))
 (def change-counter (atom 0))
@@ -82,6 +84,7 @@
   (init-state [_]
     {:hallo-loaded false
      :did-mount false
+     :hallo-initialized false
      :focus false})
 
   (will-mount [_]
@@ -120,7 +123,8 @@
     (let [html (get-html owner data)]
       (dom/div #js {:className (utils/class-set (merge (:class data) {:no-data (empty? (:html data))}))
                     :onInput #(emit-change owner data :on-change %)
-                    :onFocus #(emit-change owner data :on-focus %)
+                    :onFocus #(when (not (:read-only data))
+                                (emit-change owner data :on-focus %))
                     :onBlur #(emit-change owner data :on-blur %)
                     ; :contentEditable WARN: do not set contentEditable here or it breaks the load
                     ; event of the images needed to calculate the div size
