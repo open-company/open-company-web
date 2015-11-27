@@ -66,6 +66,9 @@
                     :title  ""
                     :width 600
                     :height 290
+                    :animation #js {"startup" true
+                                    "duration" 1000
+                                    "easing" "out"}
                     :legend #js {"position" "none"}
                     :vAxis #js {"minValue" 0
                                 "gridlineColor" "transparent"
@@ -76,27 +79,45 @@
                     :bar #js { "groupWidth" column-thickness}})]
       (when dom-node (.draw (js/google.visualization.ColumnChart. dom-node) data-table options)))))
 
+(defn draw-chart [owner chart-data]
+  (column-draw-chart (:prefix chart-data)
+                     (:columns chart-data)
+                     (:pattern chart-data)
+                     (:values chart-data)
+                     (if (contains? chart-data :column-thickness)
+                       (:column-thickness chart-data)
+                       "14")
+                     (.getDOMNode (om/get-ref owner "column-chart"))))
+
+(defn check-scrolls-and-draw [owner chart-data initial-check]
+  (when-not (om/get-state owner :animated)
+    (when-let [chart-ref (om/get-ref owner "column-chart")]
+      (let [chart-node (.getDOMNode chart-ref)
+            $chart-node (.$ js/window chart-node)
+            chart-offset-top (.-top (.offset $chart-node))
+            $window (.$ js/window js/window)
+            window-scroll-top (.scrollTop $window)
+            window-outer-height (.innerHeight $window)
+            win-scroll  (+ window-scroll-top window-outer-height)]
+        (when (and (> chart-offset-top window-scroll-top)
+                   (< (+ chart-offset-top 290) win-scroll))
+          (draw-chart owner chart-data)
+          (om/set-state! owner :animated true))))))
+
+(defn draw-chart-when-visible [owner chart-data]
+  (check-scrolls-and-draw owner chart-data true)
+  (when-not (om/get-state owner :animated)
+    (.scroll (.$ js/window js/window)
+               (fn [e]
+                 (check-scrolls-and-draw owner chart-data false)))))
+
 (defcomponent column-chart [chart-data owner]
 
-  (did-mount [_]
-    (column-draw-chart (:prefix chart-data)
-                       (:columns chart-data)
-                       (:pattern chart-data)
-                       (:values chart-data)
-                       (if (contains? chart-data :column-thickness)
-                         (:column-thickness chart-data)
-                         "14")
-                       (.getDOMNode (om/get-ref owner "column-chart"))))
+  (init-state [_]
+    {:animated false})
 
-  (did-update [_ _ _]
-    (column-draw-chart (:prefix chart-data)
-                       (:columns chart-data)
-                       (:pattern chart-data)
-                       (:values chart-data)
-                       (if (contains? chart-data :column-thickness)
-                         (:column-thickness chart-data)
-                         "14")
-                       (.getDOMNode (om/get-ref owner "column-chart"))))
+  (did-mount [_]
+    (.setTimeout js/window #(draw-chart-when-visible owner chart-data) 1000))
 
   (render [_]
     (dom/div #js {:className "chart-container column-chart" :ref "column-chart" })))
