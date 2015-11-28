@@ -23,16 +23,16 @@
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     [com.cognitect/transit-cljs "0.8.232"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
     [racehub/om-bootstrap "0.5.3"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
-    [noencore "0.1.21"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
+    [noencore "0.2.0"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
     [com.andrewmcveigh/cljs-time "0.3.14"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
   ]
 
   :plugins [
     [lein-cljsbuild "1.1.1"] ; ClojureScript compiler https://github.com/emezeske/lein-cljsbuild
-    [lein-figwheel "0.5.0-1"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
+    [lein-figwheel "0.5.0-2"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
     [lein-ancient "0.6.8"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
-    [lein-doo "0.1.5"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
+    [lein-doo "0.1.6-rc.1"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
     [lein-deps-tree "0.1.2"] ; Print a tree of project dependencies https://github.com/the-kenny/lein-deps-tree
   ]
 
