@@ -68,6 +68,7 @@
                                                    :hidden (not read-only)
                                                    :collapsed collapsed})
                       :ref "fake-rich-editor"
+                      :placeholder (:placeholder data)
                       :dangerouslySetInnerHTML (clj->js {"__html" body})})
         (om/build uncontrolled-content-editable {:html body
                                                  :on-focus (fn [e]
