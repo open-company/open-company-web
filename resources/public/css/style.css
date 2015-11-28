@@ -473,9 +473,18 @@ div.rich-editor-container {
   margin-top: 30px;
 }
 
+div.rich-editor[contenteditable=true]:empty:before,
+div.fake-rich-editor[contenteditable=true]:empty:before{
+  content: attr(placeholder);
+  display: block; /* For Firefox */
+  color: rgba(0, 0, 0, 0.4);
+}
+
+
 div.rich-editor-container div.rich-editor {
   color: #191919;
   border: 1px solid transparent;
+  min-height: 50px;
 }
 
 div.rich-editor-container div.rich-editor:focus,
