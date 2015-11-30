@@ -30,7 +30,7 @@
       (let [popover (.$ js/window "#new-section-popover-container")]
         (.fadeOut popover 400 #(.css popover #js {"display" "none"})))
       (.setTimeout js/window #(try
-                                (om/detach-root (.$ js/window "#new-section-popover-container"))
+                                (om/detach-root (.getElementById js/document "new-section-popover-container"))
                                 (catch :default e)) 1500)
       (catch :default e))))
 
