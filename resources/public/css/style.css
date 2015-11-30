@@ -1046,12 +1046,11 @@ div.table-of-contents div.table-of-contents-inner div.category-section a {
   width: 135px;
   float: left;
   overflow: hidden;
-  word-wrap: break-word;
 }
 
 div.table-of-contents div.table-of-contents-inner div.category-section:hover,
 div.table-of-contents div.table-of-contents-inner div.category-section.ui-draggable-dragging{
-background-color: rgba(0, 0, 0, 0.07);
+  background-color: rgba(0, 0, 0, 0.07);
 }
 
 div.table-of-contents div.table-of-contents-inner div.new-section {
@@ -1126,8 +1125,8 @@ div.table-of-contents div.table-of-contents-inner div.category-section a span.se
   font-size: 16px;
   margin-bottom: 0px;
   white-space: nowrap;
+  display: block;
   word-wrap: break-word;
-  float: left;
   width: 100%;
 }
 
@@ -1136,7 +1135,6 @@ div.table-of-contents div.table-of-contents-inner div.category-section a span.se
   font-weight: lighter;
   font-size: 11px;
   margin-bottom: 0px;
-  float: left;
   width: 100%;
 }
 
