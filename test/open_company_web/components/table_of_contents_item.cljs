@@ -27,8 +27,8 @@
           _ (om/root table-of-contents-item app-state {:target c})
           section-close (sel1 c [:div.category-section-close])
           section-link (sel1 c [:div.category-section :a])
-          section-title (sel1 c [:p.section-title])
-          section-date (sel1 c [:p.section-date])
+          section-title (sel1 c [:span.section-title])
+          section-date (sel1 c [:span.section-date])
           category-section-sortable (sel1 c [:div.category-section-sortable])]
       (is (not (nil? section-close)))
       (is (not (nil? section-link)))
