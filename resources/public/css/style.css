@@ -652,7 +652,7 @@ div.rich-editor-container button.collapse-button {
 }
 
 div.editable-title-container{
-  min-height: 55px;
+  min-height: 65px;
   margin-top: 30px;
   margin-bottom: 10px;
 }
@@ -665,9 +665,10 @@ div.editable-title-container h2.read-only {
   cursor: text;
 }
 
-div.editable-title-container h2,
-div.editable-title-container input,
-div.editable-title-container span.hidden-span {
+/*div.editable-title-container h2,*/
+div.editable-title-container textarea,
+div.hidden-autogrow-div
+{
   text-align: left;
   color: #2D2D2D !important;
   font-size: 36px;
@@ -675,11 +676,11 @@ div.editable-title-container span.hidden-span {
   font-weight: 600;
   line-height: 1.1;
   color: inherit;
-  box-sizing: border-box;
-  padding: 0px;
+  padding: 10px 0;
   margin: 0px;
   width: 500px;
-  min-height: 55px;
+  min-height: 65px;
+  box-sizing: border-box;
 }
 
 div.editable-title-container div.hidden-span-container {
@@ -696,13 +697,13 @@ div.editable-title-container span.hidden-span {
   opacity: 0;
 }
 
-div.editable-title-container h2 {
+div.editable-title-container textarea.editable-title {
   border: 1px solid white;
   outline: none;
-  padding-top: 7px;
+  resize: none;
 }
 
-div.editable-title-container input {
+div.editable-title-container textarea.editable-title.edit {
   border: 1px solid black;
   outline: none;
 }
