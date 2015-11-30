@@ -88,6 +88,7 @@
         (om/build editable-title {:editing editing
                                   :read-only (:read-only data)
                                   :title (om/get-state owner :title)
+                                  :section (:section data)
                                   :start-editing-cb start-editing-fn
                                   :change-cb title-change-fn
                                   :cancel-cb cancel-fn
