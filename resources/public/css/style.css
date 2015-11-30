@@ -1013,7 +1013,7 @@ div.table-of-contents div.category-section div.category-section-close {
   float: left;
   opacity: 0;
   cursor: pointer;
-  margin-top: 6px;
+  margin-top: 9px;
   background-image: url("/img/remove_section.png");
   width: 20px;
   height: 20px;
