@@ -103,7 +103,9 @@
     (swap! dispatcher/app-state assoc-in [slug] (merge (slug @dispatcher/app-state) {new-section-kw placeholder-section-defaults}))
     (swap! dispatcher/app-state assoc-in [slug :sections] new-sections)
     (swap! dispatcher/app-state assoc-in [slug :categories] new-categories)
-    (.setTimeout js/window #(utils/scroll-to-section new-section-kw) 1000)))
+    (.setTimeout js/window #(do
+                              (utils/scroll-toc-to-id (str "section-sort--" (:section change)))
+                              (utils/scroll-to-section new-section-kw)) 1000)))
 
 (defcomponent add-section [data owner]
 
