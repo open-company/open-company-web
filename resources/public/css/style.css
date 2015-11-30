@@ -652,7 +652,7 @@ div.rich-editor-container button.collapse-button {
 }
 
 div.editable-title-container{
-  height: 55px;
+  min-height: 55px;
   margin-top: 30px;
   margin-bottom: 10px;
 }
@@ -679,7 +679,7 @@ div.editable-title-container span.hidden-span {
   padding: 0px;
   margin: 0px;
   width: 500px;
-  height: 55px;
+  min-height: 55px;
 }
 
 div.editable-title-container div.hidden-span-container {
