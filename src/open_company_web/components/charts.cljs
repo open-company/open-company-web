@@ -117,7 +117,7 @@
     {:animated false})
 
   (did-mount [_]
-    (.setTimeout js/window #(draw-chart-when-visible owner chart-data) 1000))
+    (.setTimeout js/window #(draw-chart-when-visible owner chart-data) 200))
 
   (render [_]
     (dom/div #js {:className "chart-container column-chart" :ref "column-chart" })))
