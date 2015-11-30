@@ -32,7 +32,7 @@
           _ (om/root simple-section app-state {:target c})]
       (is (not (nil? (sel c [:div.simple-section]))))
       ; editable click
-      (sim/click (sel1 c [:h2.editable-title]) nil)
+      (sim/focus (sel1 c [:textarea.editable-title]) nil)
       (om.core/render-all)
       (is (not (nil? (sel1 c [:div.save-section]))))
       ; cancel click
@@ -40,13 +40,13 @@
       (om.core/render-all)
       (is (nil? (sel1 c [:div.save-section])))
       ; editable again
-      (sim/click (sel1 c [:h2.editable-title]) nil)
+      (sim/focus (sel1 c [:textarea.editable-title]) nil)
       (om.core/render-all)
       (is (not (nil? (sel1 c [:div.save-section]))))
       ; edit title
-      (sim/change (sel1 c [:div.editable-title-container :input.editable-title]) {:target {:value "Test title"}})
+      (sim/change (sel1 c [:div.editable-title-container :textarea.editable-title]) {:target {:value "Test title"}})
       (om.core/render-all)
-      (is (= (.-value (sel1 c [:div.editable-title-container :input.editable-title])) "Test title"))
+      (is (= (.-value (sel1 c [:div.editable-title-container :textarea.editable-title])) "Test title"))
       ; save click
       (sim/click (sel1 c [:div.save-section :button.oc-success]) nil)
       (om.core/render-all)

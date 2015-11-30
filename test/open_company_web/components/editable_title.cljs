@@ -16,6 +16,7 @@
   :editing false
   :read-only false
   :title "Test editable title"
+  :section "test"
   :start-editing-cb #()
   :change-cb #()
   :cancel-cb #()
@@ -28,6 +29,6 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root editable-title app-state {:target c})
-          h2-node (sel1 c [:h2.editable-title])]
-      (is (not (nil? h2-node)))
+          textarea-node (sel1 c [:textarea.editable-title])]
+      (is (not (nil? textarea-node)))
       (tu/unmount! c))))

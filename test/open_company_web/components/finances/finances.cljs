@@ -40,7 +40,7 @@
       (om.core/render-all)
       (is (nil? (sel1 c [:div.save-section])))
       ; editable again
-      (sim/click (sel1 c [:h2.editable-title]) nil)
+      (sim/focus (sel1 c [:textarea.editable-title]) nil)
       (om.core/render-all)
       (is (not (nil? (sel1 c [:div.save-section]))))
       ; save click
