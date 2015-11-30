@@ -12,35 +12,20 @@
 ; dynamic mount point for components
 (def ^:dynamic c)
 
-(def on-change-called (atom false))
-(def on-focus-called (atom false))
-(def on-blur-called (atom false))
-
 (def test-atom {
-  :html ""
-  :on-focus #(reset! on-focus-called true)
+  :html "test UCE body"
   :editing false
-  :on-change #(reset! on-change-called true)
   :body-counter 0
-  :class {:rich-editor true}
+  :class "rich-editor"
   :placeholder "Placeholder"
 })
 
 (deftest test-uncontrolled-content-editable-component
-  (testing "Uncontrolled content editable component with placeholder"
+  (testing "Uncontrolled content editable component"
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root uncontrolled-content-editable app-state {:target c})
-          div (sel1 c [:div.rich-editor.no-data])]
-      (is (not (nil? div)))
-      (is (= (.-innerHTML div) (:placeholder test-atom)))
-      (tu/unmount! c)))
-  (testing "Uncontrolled content editable component"
-    (let [c (tu/new-container!)
-          fixed-test-atom (merge test-atom {:html "Body"})
-          app-state (atom fixed-test-atom)
-          _ (om/root uncontrolled-content-editable app-state {:target c})
           div (sel1 c [:div.rich-editor])]
       (is (not (nil? div)))
-      (is (= (.-innerHTML div) (:html fixed-test-atom)))
+      (is (= (.-innerHTML div) (:html test-atom)))
       (tu/unmount! c))))
