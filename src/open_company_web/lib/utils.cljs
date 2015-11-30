@@ -420,7 +420,7 @@
 (defn get-scroll-top [id]
   (let [section-el (.$ js/window (str "#" id))
         section-offset (.offset section-el)]
-    (.-top section-offset))
+    (.-top section-offset)))
 
 (defn scroll-to-id [id & [duration]]
   (let [top (- (get-scroll-top id) 60)]
@@ -430,7 +430,7 @@
   (scroll-to-id (str "section-" (name section-name))))
 
 (defn scroll-toc-to-id [id]
-  (let [top (- (get-scroll-top id) 60)]
+  (let [top (get-scroll-top id)]
     (.scrollTo (.$ js/window ".table-of-contents-inner")
                #js {"top" (str top "px") "left" "0px"} 500)))
 
