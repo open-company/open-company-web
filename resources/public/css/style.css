@@ -490,6 +490,7 @@ div.rich-editor-container div.rich-editor {
 div.rich-editor-container div.rich-editor:focus,
 div.rich-editor-container div.rich-editor.editing {
   outline: none;
+  overflow: hidden;
   border: 1px solid black;
 }
 
