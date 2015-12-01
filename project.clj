@@ -46,7 +46,7 @@
     }
     :devcards [:dev {
       :dependencies [
-        [devcards "0.2.1"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
+        [devcards "0.2.0-8"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
       ]
     }]
   }
