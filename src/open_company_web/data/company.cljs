@@ -13,7 +13,7 @@
     :body "<h3>Recruiting</h3><p>We're continuing our fast pace of growing the team, and we'd love your help to spread the word about all our <a>current open positions</a>, <a href=\"http://twitter.com\">Twitter</a> or <a href=\"http://buffer.com\">Buffer</a>.</p>
 <h3>Spead & Reliability</h3><p>We've made some key speed and reliability <a href=\"/improvements\">improvements</a> to <a href=\"http://buffer.com/b2b\">Buffer for business</a>, but there is still a ways to go. Everyone please drop everything and support the devops team in anyway you can when we have an outage situation.</p>
 <h3>Onbarding</h3><p>We're in the <a href=\"/early-stages\">early stages</a> of experimenting with a progress indicator in the onboarding improvement ideas to <a href=\"/gretchen\">Gretchen</a>."
-    :updated-at "2015-09-14T20:49:19Z"
+    :updated-at "2015-09-14T20:49:19.000Z"
     :author {
       :name "Stuart Levinson"
       :user-id "U06SQLDFT"
@@ -55,6 +55,7 @@
         :image "http://www.emoticonswallpapers.com/avatar/cartoons/Wiley-Coyote-Dazed.jpg"
         :name "Wile E. Coyote"
       }
+      :updated-at "2015-09-14T20:49:19.000Z"
       :links [
         {
           :rel "self"
@@ -70,7 +71,7 @@
         }
       ]
     }
-    :updated-at "2015-09-14T20:49:19Z"
+    :updated-at "2015-09-14T20:49:19.000Z"
     :links [
       {
         :rel "self"
@@ -163,7 +164,7 @@
       }      
     ]
     :title "Finances report"
-    :updated-at "2015-09-17T12:29:30Z"
+    :updated-at "2015-09-17T12:29:30.000Z"
     :author {
       :name "Iacopo Carraro"
       :user-id "U06STCKLN"
@@ -171,7 +172,7 @@
     }
     :notes {
       :body "<h3>Title of notes</h3><p>This is the body of notes with an external <a href=\"http://www.google.it\">link to google</a>.</p>"
-      :updated-at "2015-09-14T20:49:19Z"
+      :updated-at "2015-09-14T20:49:19.000Z"
       :author {
         :name "Stuart Levinson"
         :user-id "U06SQLDFT"
@@ -220,7 +221,7 @@
       :method "GET"
       :href "/companies/buffer?as-of=2015-09-11T22:14:24Z"
       :type "application/vnd.open-company.v1+json"
-      :updated-at "2015-09-11T22:14:24Z"
+      :updated-at "2015-09-11T22:14:24.000Z"
       :author {
         :name "Iacopo Carraro"
         :user-id "U06STCKLN"
@@ -232,7 +233,7 @@
       :method "GET"
       :href "/companies/buffer?as-of=2015-09-10T22:14:24Z"
       :type "application/vnd.open-company.v1+json"
-      :updated-at "2015-09-10T22:14:24Z"
+      :updated-at "2015-09-10T22:14:24.000Z"
       :author {
         :name "Stuart Levinson"
         :user-id "U06SQLDFT"
@@ -244,7 +245,7 @@
       :method "GET"
       :href "/companies/buffer?as-of=2015-09-09T22:14:24Z"
       :type "application/vnd.open-company.v1+json"
-      :updated-at "2015-09-09T22:14:24Z"
+      :updated-at "2015-09-09T22:14:24.000Z"
       :author {
         :name "Stuart Levinson"
         :user-id "U06SQLDFT"
@@ -256,7 +257,7 @@
       :method "GET"
       :href "/companies/buffer?as-of=2015-09-08T22:14:24Z"
       :type "application/vnd.open-company.v1+json"
-      :updated-at "2015-09-08T22:14:24Z"
+      :updated-at "2015-09-08T22:14:24.000Z"
       :author {
         :name "Stuart Levinson"
         :user-id "U06SQLDFT"
@@ -268,7 +269,7 @@
       :method "GET"
       :href "/companies/buffer?as-of=2015-09-07T22:14:24Z"
       :type "application/vnd.open-company.v1+json"
-      :updated-at "2015-09-07T22:14:24Z"
+      :updated-at "2015-09-07T22:14:24.000Z"
       :author {
         :name "Stuart Levinson"
         :user-id "U06SQLDFT"
