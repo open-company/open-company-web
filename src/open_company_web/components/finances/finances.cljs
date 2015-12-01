@@ -99,7 +99,7 @@
   (will-receive-props [_ next-props]
     ; this means the section datas have changed from the API or at a upper lever of this component
     (when-not (= next-props (om/get-props owner))
-      (om/set-state! owner #(get-state owner next-props))))
+      (om/set-state! owner (get-state owner next-props))))
 
   (render [_]
     (let [showing-revision (om/get-state owner :as-of)
