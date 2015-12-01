@@ -17,8 +17,9 @@
     ; (when-let [text-area (om/get-ref owner "editable-title-textarea")]
       (let [$textarea (.$ js/window (str "textarea#editable-title-" (name (:section data))))
             autogrower (.autogrow $textarea (clj->js {"cloneClass" "hidden-autogrow-div"
+                                                      "speed" 100
                                                       "onInitialize" true
-                                                      "fixMinHeight" true}))]
+                                                      "fixMinHeight" false}))]
         (om/set-state! owner :autogrower autogrower))))
 
 (defcomponent editable-title [data owner]
