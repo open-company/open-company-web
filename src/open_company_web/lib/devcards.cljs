@@ -10,11 +10,13 @@
 
 (router/set-route! ["companies" "buffer"] {:slug "buffer"})
 
-(def challenges-data (:challenges company-data/company))
+(def fixed-company-data (utils/fix-sections company-data/company))
 
-(def finances-data (:finances company-data/company))
+(def challenges-data (:challenges fixed-company-data))
 
-(def growth-data (:growth company-data/company))
+(def finances-data (:finances fixed-company-data))
+
+(def growth-data (:growth fixed-company-data))
 
 (defcard text-rw-section
   "A read/write text section component"
