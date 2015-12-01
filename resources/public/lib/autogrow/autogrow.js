@@ -80,7 +80,7 @@
                     } while (newHeight === clone[0].scrollHeight);
                     newHeight++; //adding one back eliminates a wiggle on deletion 
                     clone.remove();
-                    box.focus(); // Fix issue with Chrome losing focus from the textarea.
+                    // box.focus(); // Fix issue with Chrome losing focus from the textarea.
                     
                     //if user selects all and deletes or holds down delete til beginning
                     //user could get here and shrink whole box
