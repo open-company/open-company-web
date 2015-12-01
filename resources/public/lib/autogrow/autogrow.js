@@ -14,7 +14,6 @@
         ;
         opts = $.isPlainObject(opts) ? opts : {context: opts ? opts : $(document)};
         opts = $.extend({}, defaults, opts);
-        console.log(selector)
         that.each(function(i, elem){
             var min, clone;
             elem = $(elem);
