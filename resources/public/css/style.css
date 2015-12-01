@@ -652,7 +652,6 @@ div.rich-editor-container button.collapse-button {
 }
 
 div.editable-title-container{
-  min-height: 65px;
   margin-top: 30px;
   margin-bottom: 10px;
 }
@@ -679,7 +678,7 @@ div.hidden-autogrow-div
   padding: 10px 0;
   margin: 0px;
   width: 500px;
-  min-height: 65px;
+  min-height: 35px;
   box-sizing: border-box;
 }
 
