@@ -49,13 +49,12 @@
     }
     :notes {
       :body "This is what I have to say about that."
-      :updated-at "2015-09-14T20:49:19Z"
+      :updated-at "2015-09-14T20:49:19.000Z"
       :author {
         :user-id "123456"
         :image "http://www.emoticonswallpapers.com/avatar/cartoons/Wiley-Coyote-Dazed.jpg"
         :name "Wile E. Coyote"
       }
-      :updated-at "2015-09-14T20:49:19.000Z"
       :links [
         {
           :rel "self"
