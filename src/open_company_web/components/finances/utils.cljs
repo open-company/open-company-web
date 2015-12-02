@@ -65,11 +65,6 @@
       :values values
       :pattern (if pattern pattern "###,###.##")}))
 
-(defn get-currency-for-current-company []
-  (let [slug (:slug @router/path)
-        company-data ((keyword slug) @dispatcher/app-state)]
-    (:currency company-data)))
-
 (defn get-as-of-string [period]
   (let [[year month] (clojure.string/split period "-")
         month-name (utils/month-string month)]

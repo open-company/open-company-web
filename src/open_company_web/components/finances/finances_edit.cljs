@@ -123,7 +123,7 @@
   
   (render [_]
     (let [finances-data (om/get-state owner :data)
-          currency (finances-utils/get-currency-for-current-company)
+          currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
           show-burn (some #(pos? (:revenue %)) finances-data)
           rows-data (into [] (map (fn [row]

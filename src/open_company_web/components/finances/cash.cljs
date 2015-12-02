@@ -15,7 +15,7 @@
           sorted-finances (sort #(sort-pred %1 %2) finances-data)
           value-set (first sorted-finances)
           period (utils/period-string (:period value-set))
-          currency (finances-utils/get-currency-for-current-company)
+          currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
           cash-val (str cur-symbol (utils/format-value (:cash value-set)))]
       (dom/div {:class (utils/class-set {:section true
