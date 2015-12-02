@@ -282,6 +282,7 @@ div.composed-section div.link-bar {
   text-align: left;
   z-index: 1;
   position: relative;
+  font-family: "proxima-nova", sans-serif;
 }
 
 div.composed-section div.link-bar a.composed-section-link {
@@ -313,10 +314,12 @@ div.composed-section div.composed-section-body div.section {
 
 div.composed-section div.section div.chart-header-container {
   text-align: left;
+  font-family: "proxima-nova", sans-serif;
 }
 
 div.composed-section div.section div.chart-footer-container {
   text-align: center;
+  font-family: "proxima-nova", sans-serif;
 }
 
 div.composed-section div.section div.chart-header-container h3,
@@ -440,6 +443,7 @@ div.update-footer {
   height: 24px;
   vertical-align: middle;
   cursor: default;
+  font-family: "proxima-nova", sans-serif;
 }
 
 div.update-footer div {
@@ -472,6 +476,7 @@ div.update-footer img.author-image{
 div.rich-editor-container {
   position: relative;
   margin-top: 30px;
+  font-family: "proxima-nova", sans-serif;
 }
 
 div.rich-editor[contenteditable=true]:empty:before,
@@ -673,7 +678,7 @@ div.hidden-autogrow-div
   text-align: left;
   color: #2D2D2D !important;
   font-size: 36px;
-  font-family: inherit;
+  font-family: "proxima-nova", sans-serif;
   font-weight: 600;
   line-height: 1.1;
   color: inherit;
@@ -798,6 +803,7 @@ div.revisions-navigator {
   width: 100%;
   height: 34px;
   margin-top: 30px;
+  font-family: "proxima-nova", sans-serif;
 }
 
 div.revisions-navigator div.revisions-navigator-left {
