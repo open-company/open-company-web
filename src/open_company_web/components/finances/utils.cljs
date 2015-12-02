@@ -31,23 +31,24 @@
         fix-year (if change-year (dec int-year) int-year)]
     (str fix-year "-" (utils/add-zero fix-month))))
 
-(defn placeholder-data [data]
-  (if (>= (count data) columns-num)
-    data
-    (let [first-period (or (:period (last data)) (utils/current-period))
-          rest-data (- columns-num (count data))
-          diff (- columns-num (count data))
-          plc-vec (vec (reverse (range rest-data)))
-          vect (map (fn [n]
-                      {:period (get-past-period first-period (- diff n))
-                       :cash 0
-                       :revenue 0
-                       :costs 0
-                       :runway 0
-                       :burn-rate 0
-                       :value 0})
-                    plc-vec)]
-      (concat data vect))))
+(defn placeholder-data [initial-data]
+  (let [current-period (utils/current-period)]
+    (let [fixed-data (for [idx (range 1 13)]
+                       (let [prev-period (get-past-period current-period idx)
+                             period-exists (utils/period-exists prev-period initial-data)]
+                         (if period-exists
+                           (some #(when (= (:period %) prev-period) %) initial-data)
+                           {:period prev-period
+                            :cash 0
+                            :costs 0
+                            :revenue 0
+                            :burn-rate 0
+                            :runway 0
+                            :avg-burn-rate 0
+                            :value 0
+                            :new true})))]
+      (vec fixed-data))))
+      ;(apply merge (map #(hash-map (:period %) %) fixed-data)))))
 
 (defn- get-chart-data [data prefix keyw column-name & [style fill-color pattern tooltip-suffix]]
   "Vector of max *columns-num elements of [:Label value]"
