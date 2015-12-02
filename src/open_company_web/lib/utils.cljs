@@ -176,6 +176,10 @@
     "12" "DEC"
     ""))
 
+(defn get-month [period]
+  (let [[year month] (clojure.string/split period "-")]
+    (month-short-string month)))
+
 (defn period-string [period & flags]
   (let [force-year (in? flags :force-year)
         short-month-string (in? flags :short-month)
