@@ -22,6 +22,6 @@
                   :on-click (fn [e]
                               (.preventDefault e)
                               (utils/scroll-to-section (name section)))}
-            (dom/p {:class "section-title"} (:title data))
-            (dom/p {:class "section-date"} (utils/time-since (:updated-at data))))
+            (dom/span {:class "section-title"} (:title data))
+            (dom/span {:class "section-date"} (utils/time-since (:updated-at data))))
           (dom/div {:class "category-section-sortable"}))))))

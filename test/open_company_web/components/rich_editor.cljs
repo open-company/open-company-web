@@ -16,14 +16,12 @@
   "<h3>Recruiting</h3><p>We're continuing our fast pace of growing the team, and we'd love your help to spread the word about all our <a>current open positions</a>.</p>")
 
 (def test-atom {
-  :body body
-  :section "update"
-  :updated-at "2015-09-14T20:49:19Z"
-  :author {
-    :name "Stuart Levinson"
-    :user-id "U06SQLDFT"
-    :image "https://avatars.slack-edge.com/2015-10-16/12647678369_79b4fbf15439d29d5457_192.jpg"
-  }
+  :editing false
+  :section :test
+  :body-counter 0
+  :read-only false
+  :body "test body"
+  :placeholder "Placeholder text"
 })
 
 
@@ -32,6 +30,6 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root rich-editor app-state {:target c})
-          rich-editor-node (sel1 c [:div.rich-editor])]
+          rich-editor-node (sel1 c [:div.rich-editor-container])]
       (is (not (nil? rich-editor-node)))
       (tu/unmount! c))))

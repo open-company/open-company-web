@@ -30,7 +30,7 @@
       (let [popover (.$ js/window "#new-section-popover-container")]
         (.fadeOut popover 400 #(.css popover #js {"display" "none"})))
       (.setTimeout js/window #(try
-                                (om/detach-root (.$ js/window "#new-section-popover-container"))
+                                (om/detach-root (.getElementById js/document "new-section-popover-container"))
                                 (catch :default e)) 1500)
       (catch :default e))))
 
@@ -64,16 +64,16 @@
 (defn insert-section
   [category-into section-after category-to-insert section-to-insert sections]
   (let [category-kw (keyword category-to-insert)
-        category (category-kw sections)
-        fixed-section-after (if (= category-into category-to-insert)
-                                  section-after
-                                  first-sec-placeholder)]
+        category (category-kw sections)]
     (cond
       ; category doesn't exist, create it with the new section
       (not (contains? sections category-kw))
       (merge sections {category-kw [section-to-insert]})
+      ; categories are different, adding as last section
+      (not= category-into category-to-insert)
+      (merge sections {category-kw (conj (category-kw sections) section-to-insert)})
       ; category exists, section is placeholder for first place
-      (= fixed-section-after first-sec-placeholder)
+      (= section-after first-sec-placeholder)
       (let [new-category (concat [section-to-insert] (category-kw sections))]
         (merge sections {category-kw (vec new-category)}))
       ; category exists, adding section
@@ -94,15 +94,18 @@
         section-defaults (utils/fix-section (merge (:section-defaults change) {:oc-editing true
                                                                                :updated-at (utils/as-of-now)})
                                             (name (:section change)))
+        placeholder-section-defaults (assoc (dissoc section-defaults :body) :placeholder (:body (:section-defaults change)))
         new-section-kw (keyword (:section change))
         new-category (:category change)
         new-categories (if (utils/in? (:categories company-data) new-category)
                          (:categories company-data)
                          (conj (:categories company-data) new-category))]
-    (swap! dispatcher/app-state assoc-in [slug] (merge (slug @dispatcher/app-state) {new-section-kw section-defaults}))
+    (swap! dispatcher/app-state assoc-in [slug] (merge (slug @dispatcher/app-state) {new-section-kw placeholder-section-defaults}))
     (swap! dispatcher/app-state assoc-in [slug :sections] new-sections)
     (swap! dispatcher/app-state assoc-in [slug :categories] new-categories)
-    (.setTimeout js/window #(utils/scroll-to-section new-section-kw) 1000)))
+    (.setTimeout js/window #(do
+                              (utils/scroll-toc-to-id (str "section-sort--" (:section change)))
+                              (utils/scroll-to-section new-section-kw)) 1000)))
 
 (defcomponent add-section [data owner]
 

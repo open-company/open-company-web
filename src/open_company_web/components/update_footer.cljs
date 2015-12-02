@@ -29,7 +29,8 @@
   (did-update [_ _ _]
     (setup-popover data owner))
   (render [_]
-    (dom/div {:class "update-footer"}
+    (dom/div {:class (utils/class-set {:update-footer true
+                                       :section-editing (:editing data)})}
       (dom/span {:class "timeago"
                 :id (get-footer-id data)}
                (utils/time-since (:updated-at data)))

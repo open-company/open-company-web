@@ -167,6 +167,7 @@ div.report-list div.report-list-left {
 
 div.chart-container {
   width: 600px;
+  height: 290px;
 }
 
 div.report-list div.chart-container{
@@ -473,8 +474,25 @@ div.rich-editor-container {
   margin-top: 30px;
 }
 
+div.rich-editor[contenteditable=true]:empty:before,
+div.fake-rich-editor[contenteditable=true]:empty:before{
+  content: attr(placeholder);
+  display: block; /* For Firefox */
+  color: rgba(0, 0, 0, 0.4);
+}
+
+
 div.rich-editor-container div.rich-editor {
   color: #191919;
+  border: 1px solid transparent;
+  min-height: 50px;
+}
+
+div.rich-editor-container div.rich-editor:focus,
+div.rich-editor-container div.rich-editor.editing {
+  outline: none;
+  overflow: hidden;
+  border: 1px solid black;
 }
 
 div.rich-editor-container div.rich-editor img,
@@ -517,11 +535,11 @@ div.rich-editor-container div.fake-rich-editor {
   width: 500px;
 }
 
-div.rich-editor-container div.rich-editor-save {
-  height: 44px;
+div.section-footer div.save-section {
+  height: 64px;
 }
 
-div.rich-editor-container div.rich-editor-save button.cancel-button {
+div.section-footer div.save-section button.cancel-button {
   margin-left: 10px;
 }
 
@@ -636,7 +654,6 @@ div.rich-editor-container button.collapse-button {
 }
 
 div.editable-title-container{
-  height: 55px;
   margin-top: 30px;
   margin-bottom: 10px;
 }
@@ -649,9 +666,10 @@ div.editable-title-container h2.read-only {
   cursor: text;
 }
 
-div.editable-title-container h2,
-div.editable-title-container input,
-div.editable-title-container span.hidden-span {
+/*div.editable-title-container h2,*/
+div.editable-title-container textarea,
+div.hidden-autogrow-div
+{
   text-align: left;
   color: #2D2D2D !important;
   font-size: 36px;
@@ -659,11 +677,11 @@ div.editable-title-container span.hidden-span {
   font-weight: 600;
   line-height: 1.1;
   color: inherit;
-  box-sizing: border-box;
-  padding: 0px;
+  padding: 10px 0;
   margin: 0px;
-  width: 100%;
-  height: 55px;
+  width: 500px;
+  min-height: 35px;
+  box-sizing: border-box;
 }
 
 div.editable-title-container div.hidden-span-container {
@@ -680,13 +698,13 @@ div.editable-title-container span.hidden-span {
   opacity: 0;
 }
 
-div.editable-title-container h2 {
+div.editable-title-container textarea.editable-title {
   border: 1px solid white;
   outline: none;
-  padding-top: 7px;
+  resize: none;
 }
 
-div.editable-title-container input {
+div.editable-title-container textarea.editable-title.edit {
   border: 1px solid black;
   outline: none;
 }
@@ -700,8 +718,9 @@ form.linkForm input#addlinkButton {
 }
 
 div.finances div.finances-body.edit {
-  width: 800px;
   position: relative;
+  border: 1px solid black;
+  width: 650px;
 }
 
 div.composed-section-body i.editable-pen {
@@ -773,10 +792,6 @@ div.recent-updates div.recent-updates-item span.updated-at {
   font-size: 11px;
   color: gray;
   float: right;
-}
-
-div.simple-section-revisions-navigator{
-  position: relative;
 }
 
 div.revisions-navigator {
@@ -942,6 +957,10 @@ button.oc-btn.oc-success {
   color: green;
 }
 
+button.oc-btn.oc-success.disabled {
+  opacity: 0.3;
+}
+
 button.oc-btn.oc-cancel {
   color: rgba(0, 0, 0, 0.4);
 }
@@ -996,7 +1015,7 @@ div.table-of-contents div.category-section div.category-section-close {
   float: left;
   opacity: 0;
   cursor: pointer;
-  margin-top: 6px;
+  margin-top: 9px;
   background-image: url("/img/remove_section.png");
   width: 20px;
   height: 20px;
@@ -1025,14 +1044,15 @@ opacity: 1;
 }
 
 div.table-of-contents div.table-of-contents-inner div.category-section a {
-  margin: 0 10px 0 10px;
-  width: 125px;
+  margin: 0 0 0 10px;
+  width: 135px;
   float: left;
+  overflow: hidden;
 }
 
 div.table-of-contents div.table-of-contents-inner div.category-section:hover,
 div.table-of-contents div.table-of-contents-inner div.category-section.ui-draggable-dragging{
-background-color: rgba(0, 0, 0, 0.07);
+  background-color: rgba(0, 0, 0, 0.07);
 }
 
 div.table-of-contents div.table-of-contents-inner div.new-section {
@@ -1102,18 +1122,22 @@ div.table-of-contents div.table-of-contents-inner div.category-section a:visited
   text-decoration: none;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category-section a p.section-title {
+div.table-of-contents div.table-of-contents-inner div.category-section a span.section-title {
   color: #2D2D2D;
   font-size: 16px;
   margin-bottom: 0px;
   white-space: nowrap;
+  display: block;
+  word-wrap: break-word;
+  width: 100%;
 }
 
-div.table-of-contents div.table-of-contents-inner div.category-section a p.section-date {
+div.table-of-contents div.table-of-contents-inner div.category-section a span.section-date {
   color: #5B5B5B;
   font-weight: lighter;
   font-size: 11px;
   margin-bottom: 0px;
+  width: 100%;
 }
 
 div#new-section-popover-container {
@@ -1137,6 +1161,10 @@ div.section-animator-box div.section-box {
   top: 0;
   left: 0;
   width: 600px;
+}
+
+div.update-footer.section-editing {
+  opacity: 0.2;
 }
 
 div.update-footer div.update-footer-hover {

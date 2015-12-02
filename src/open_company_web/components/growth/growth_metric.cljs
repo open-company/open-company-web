@@ -118,7 +118,8 @@
                               (str actual (if (= unit "%") "" " ") unit))]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
-                                         :read-only (:read-only data)})}
+                                         :read-only (:read-only data)})
+                :key (:slug metric-info)}
         (when (> (count metric-data) 0)
           (dom/div {}
             (dom/div {:class "chart-header-container"}

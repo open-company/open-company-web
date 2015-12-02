@@ -8,9 +8,10 @@
             [test.open-company-web.components.editable-title]
             [test.open-company-web.components.cell]
             [test.open-company-web.components.rich-editor]
-            [test.open-company-web.components.simple-section]
             [test.open-company-web.components.update-footer]
-            [test.open-company-web.components.utility-components]))
+            [test.open-company-web.components.utility-components]
+            [test.open-company-web.components.section-footer]
+            [test.open-company-web.components.uncontrolled-content-editable]))
 
 (enable-console-print!)
 
@@ -26,6 +27,7 @@
   'test.open-company-web.components.editable-title
   'test.open-company-web.components.cell
   'test.open-company-web.components.rich-editor
-  'test.open-company-web.components.simple-section
   'test.open-company-web.components.update-footer
-  'test.open-company-web.components.utility-components)
+  'test.open-company-web.components.utility-components
+  'test.open-company-web.components.section-footer
+  'test.open-company-web.components.uncontrolled-content-editable)
