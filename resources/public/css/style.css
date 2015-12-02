@@ -1378,3 +1378,7 @@ div.new-section-popover-close{
   background-size: 24px 24px;
   background-position: 0 0;
 }
+
+div.finances-body.edit table {
+  margin-bottom: 0px;
+}
