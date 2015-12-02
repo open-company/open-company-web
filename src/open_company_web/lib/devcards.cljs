@@ -14,7 +14,7 @@
 
 (def fixed-company-data (utils/fix-sections company-data/company))
 
-(def challenges-data (:challenges fixed-company-data))
+(def values-data (:values fixed-company-data))
 
 (def finances-data (:finances fixed-company-data))
 
@@ -26,8 +26,8 @@
   "A text section component"
   (dc/om-root section-selector {})
   {
-    :section :challenges
-    :section-data challenges-data
+    :section :values
+    :section-data values-data
   }
   {
     :inspect-data true
