@@ -134,7 +134,7 @@
   (when finances-data
     (let [links (:links finances-data)
           slug (:slug @router/path)
-          data {:data (map #(dissoc % :burn-rate :runway) (:data finances-data))}
+          data {:data (map #(dissoc % :burn-rate :runway :avg-burn-rate :value :new) (:data finances-data))}
           json-data (cljs->json data)
           finances-link (utils/link-for links "partial-update" "PATCH")]
       (api-patch (:href finances-link)
