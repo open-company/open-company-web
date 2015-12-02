@@ -13,7 +13,7 @@
     (let [finances-data (:data (:section-data data))
           value-set (first finances-data)
           period (utils/period-string (:period value-set))
-          currency (finances-utils/get-currency-for-current-company)
+          currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
           burn-rate-val (str cur-symbol (utils/format-value (:burn-rate value-set)))]
       (dom/div {:class (utils/class-set {:section true

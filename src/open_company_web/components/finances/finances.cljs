@@ -114,8 +114,6 @@
           runway-classes (str classes (when (= focus "runway") " active"))
           read-only (:read-only data)
           cursor @dispatcher/app-state
-          slug (:slug @router/path)
-          company-data ((keyword slug) cursor)
           finances-row-data (:data section-data)
           sum-revenues (apply + (map #(:revenue %) finances-row-data))
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
@@ -129,7 +127,7 @@
           start-editing-fn #(start-editing-cb owner data)
           subsection-data {:section-data section-data
                            :read-only read-only
-                           :currency (:currency company-data)}]
+                           :currency (:currency data)}]
       (dom/div {:class "section-container" :id "section-finances"}
         (dom/div {:class "composed-section finances"}
           (om/build editable-title {:read-only read-only
