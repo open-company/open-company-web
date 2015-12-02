@@ -47,7 +47,7 @@
                     "Profitable"
                     (str (utils/format-value (utils/abs runway-value)) " days"))
           period (utils/period-string (:period value-set))
-          currency (finances-utils/get-currency-for-current-company)
+          currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))
           runway-string (if is-profitable
                           runway

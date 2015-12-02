@@ -116,6 +116,7 @@
                       :style {:opacity (if first-box 1 0)}}
               (om/build (section-component section) {:section-data a-section-data
                                                      :section section
+                                                     :currency (:currency data)
                                                      :actual-as-of (:updated-at actual-data)
                                                      :revisions-navigation-cb #(revisions-navigation-cb owner section %)
                                                      :read-only a-read-only})))
