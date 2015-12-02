@@ -40,6 +40,7 @@
   {
     :section :finances
     :section-data finances-data
+    :currency (:currency fixed-company-data)
   }
   {
     :inspect-data true
