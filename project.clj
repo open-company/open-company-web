@@ -9,7 +9,7 @@
   :min-lein-version "2.5.1" ; highest version supported by Travis-CI as of 7/5/2015
 
   :dependencies [
-    [org.clojure/clojure "1.8.0-RC1"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojure "1.8.0-RC3"] ; Lisp on the JVM http://clojure.org/documentation
     [org.clojure/clojurescript "1.7.189"] ; ClojureScript compiler https://github.com/clojure/clojurescript
     ; --- DO NOT UPDATE OM, the 1.x.x code is Om Next and requires changes on our part https://github.com/omcljs/om/wiki/Quick-Start-(om.next)
     [org.omcljs/om "0.9.0" :exclusions [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
@@ -46,6 +46,7 @@
     }
     :devcards [:dev {
       :dependencies [
+      ; --- DO NOT UPDATE DEVCARDS, the 0.2.1 code results in an error: Uncaught TypeError: Cannot read property 'render' of undefined
         [devcards "0.2.0-8"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
       ]
     }]
