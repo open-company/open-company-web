@@ -166,25 +166,26 @@
                                     :cancel-cb cancel-fn
                                     :cancel-if-needed-cb cancel-if-needed-fn
                                     :save-cb save-fn})
-          (dom/div {:class (utils/class-set {:link-bar true
-                                             :editable (not read-only)})}
-            (dom/a {:href "#"
-                    :class cash-classes
-                    :title "Cash"
-                    :data-tab "cash"
-                    :on-click #(subsection-click % owner)} "Cash")
-            (dom/a {:href "#"
-                    :class cash-flow-classes
-                    :title first-title
-                    :data-tab "cash-flow"
-                    :on-click #(subsection-click % owner)} first-title)
-            (when needs-runway
+          (when (not editing)
+            (dom/div {:class (utils/class-set {:link-bar true
+                                               :editable (not read-only)})}
               (dom/a {:href "#"
-                      :class runway-classes
-                      :title "Runway"
-                      :data-tab "runway"
-                      :on-click #(subsection-click % owner)} "Runway"))
-            (om/build editable-pen {:click-callback start-editing-fn}))
+                      :class cash-classes
+                      :title "Cash"
+                      :data-tab "cash"
+                      :on-click #(subsection-click % owner)} "Cash")
+              (dom/a {:href "#"
+                      :class cash-flow-classes
+                      :title first-title
+                      :data-tab "cash-flow"
+                      :on-click #(subsection-click % owner)} first-title)
+              (when needs-runway
+                (dom/a {:href "#"
+                        :class runway-classes
+                        :title "Runway"
+                        :data-tab "runway"
+                        :on-click #(subsection-click % owner)} "Runway"))
+              (om/build editable-pen {:click-callback start-editing-fn})))
           (dom/div {:class (utils/class-set {:composed-section-body true})}
             (if editing
               (om/build finances-edit {:finances-data (om/get-state owner :finances-data)
