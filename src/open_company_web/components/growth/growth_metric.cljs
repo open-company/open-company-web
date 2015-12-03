@@ -19,10 +19,9 @@
        (if value (.toLocaleString value) "")
        (if suffix (str " " suffix) "")))
 
-(defn chart-data-at-index [data column-name columns-num prefix suffix has-target interval idx]
+(defn chart-data-at-index [data column-name prefix suffix has-target interval idx]
   (let [data (to-array data)
-        rev-idx (- (dec columns-num) idx)
-        obj (get data rev-idx)
+        obj (get (vec (reverse data)) idx)
         value (:value obj)
         target (or (:target obj) 0)
         label (get-graph-tooltip (:period obj) column-name prefix value suffix)
@@ -52,26 +51,26 @@
         fix-year (if change-year (dec int-year) int-year)]
     (str fix-year "-" (utils/add-zero fix-month))))
 
-(defn placeholder-data [data columns-num]
-  (if (>= (count data) columns-num)
-    data
-    (let [first-period (or (:period (last data)) (utils/current-period))
-          rest-data (- columns-num (count data))
-          diff (- columns-num (count data))
-          plc-vec (vec (reverse (range rest-data)))
-          vect (map (fn [n]
-                      {:period (get-past-period first-period (- diff n) columns-num)
-                       :slug (:slug first-period)
-                       :value 0})
-                    plc-vec)]
-      (concat data vect))))
+(defn chart-placeholder-data [initial-data]
+  (let [first-period (:period (last initial-data))
+        last-period (:period (first initial-data))
+        months-diff (utils/periods-diff-in-months first-period last-period)]
+    (vec
+      (for [idx (range 0 (inc months-diff))]
+        (let [prev-period (get-past-period last-period idx (count initial-data))
+              period-exists (utils/period-exists prev-period initial-data)]
+          (if period-exists
+            (some #(when (= (:period %) prev-period) %) initial-data)
+            {:period prev-period
+             :slug (:slug first-period)
+             :value nil}))))))
 
 (defn- get-chart-data
   "Vector of max *columns elements of [:Label value]"
-  [data prefix column-name tooltip-suffix columns-num interval]
-  (let [fixed-data (placeholder-data data columns-num)
+  [data prefix column-name tooltip-suffix interval]
+  (let [fixed-data (chart-placeholder-data data)
         has-target (some #(:target %) data)
-        chart-data (partial chart-data-at-index fixed-data column-name columns-num prefix tooltip-suffix has-target interval)
+        chart-data (partial chart-data-at-index fixed-data column-name prefix tooltip-suffix has-target interval)
         columns (if has-target
                   [["string" column-name]
                    ["number" "target"]
@@ -84,7 +83,7 @@
                    ["number" column-name]
                    #js {"type" "string" "role" "style"}
                    #js {"type" "string" "role" "tooltip"}])
-        mapper (vec (range columns-num))
+        mapper (vec (range (count fixed-data)))
         values (vec (map chart-data mapper))]
     { :prefix (if prefix prefix "")
       :columns columns
@@ -131,5 +130,4 @@
                                                    fixed-cur-unit
                                                    (:name metric-info)
                                                    unit
-                                                   (get-columns-num interval)
                                                    interval))))))))
