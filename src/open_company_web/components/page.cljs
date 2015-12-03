@@ -16,6 +16,7 @@
   (render [_]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)]
+      (utils/update-page-title (str "OpenCompany - " (:name company-data)))
       (dom/div {:class "company-container container"}
         (om/build navbar company-data)
         (dom/div {:class "container-fluid"}

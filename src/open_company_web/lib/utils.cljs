@@ -487,3 +487,6 @@
       (str (month-string-int (cljs-time/month date) flags))
       "weekly"
       (str (month-string-int (cljs-time/month date) flags) " " (cljs-time/day date)))))
+
+(defn update-page-title [title]
+  (set! (.-title js/document) title))
