@@ -57,9 +57,6 @@
        :inital-value (:value data)
        :value value}))
   (did-mount [_]
-    ; initialize tooltips only if jquery is loaded, avoid tests crash
-    (when (.-$ js/window)
-      (.tooltip (.$ js/window "[data-toggle=\"tooltip\"]")))
     (go (loop []
       (let [ch (utils/get-channel (str (:period data) (:key data)))
             signal (<! ch)]
@@ -72,16 +69,8 @@
           formatted-value (format-value float-value)
           prefix-value (if (:prefix data) (str (:prefix data) formatted-value) formatted-value)
           final-value (if (:suffix data) (str (:suffix data) prefix-value) prefix-value)
-          state (om/get-state owner :cell-state)
-          tooltip-text (case state
-                        :new      "Click to enter data"
-                        :display  "Click to edit data"
-                        :draft    "Click to modify data"
-                        :edit     "Press enter")]
-      (dom/div {:class "comp-cell"
-                :data-placement "top"
-                :data-toggle "tooltip"
-                :title tooltip-text}
+          state (om/get-state owner :cell-state)]
+      (dom/div {:class "comp-cell"}
         (case state
 
           :new

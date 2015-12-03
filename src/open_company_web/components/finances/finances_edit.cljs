@@ -113,6 +113,28 @@
         sorter (utils/sort-by-key-pred :period true)]
     (sort #(sorter %1 %2) runway-rows)))
 
+(defn get-12-months [last-period]
+  (vec
+    (for [idx (range 1 13)]
+      (let [prev-period (finances-utils/get-past-period last-period idx)]
+        {:period prev-period
+         :cash 0
+         :revenue 0
+         :costs 0
+         :burn-rate 0
+         :avg-burn-rate 0
+         :runway 0
+         :value 0
+         :new true}))))
+
+
+(defn more-12-month [owner]
+  (let [sorted-data (om/get-state owner :sorted-data)
+        last-data (last sorted-data)
+        last-period (:period last-data)
+        more-12 (get-12-months last-period)]
+    (om/set-state! owner :sorted-data (concat sorted-data more-12))))
+
 (defcomponent finances-edit [data owner]
 
   (init-state [_]
@@ -151,4 +173,13 @@
                       row (merge row-data {:next-period next-period
                                            :needs-month (or (= idx 0)
                                                             (= idx (dec (count rows-data))))})]
-                  (om/build finances-edit-row row))))))))))
+                  (om/build finances-edit-row row)))
+              (dom/tr {}
+                (dom/td {}
+                  (dom/a {:on-click #(more-12-month owner)} "More..."))
+                (dom/td {})
+                (dom/td {})
+                (dom/td {})
+                (dom/td {})
+                (dom/td {})
+                (dom/td {})))))))))
