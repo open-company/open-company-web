@@ -64,7 +64,7 @@
     (let [data-table (column-add-rows columns data currency-symbol pattern)
           options (clj->js {
                     :title  ""
-                    :width 600
+                    :width (min 600 (* 50 (count data)))
                     :height 290
                     :animation #js {"startup" true
                                     "duration" 1000
