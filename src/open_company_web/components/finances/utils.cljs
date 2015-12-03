@@ -2,14 +2,14 @@
   (:require [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
-            [cljs-time.core :as t]))
+            [cljs-time.core :as t]
+            [cljs-time.format :as f]))
 
 (def columns-num 12)
 
-(defn chart-data-at-index [data keyw column-name prefix suffix real-data-count idx]
+(defn chart-data-at-index [data keyw column-name prefix suffix idx]
   (let [data (to-array data)
-        rev-idx (- (- (min (count data) columns-num) 1) idx)
-        obj (get data rev-idx)
+        obj (get (vec (reverse data)) idx)
         has-value (and (contains? obj keyw) (not (nil? (keyw obj))))
         value (keyw obj)
         label (if has-value
@@ -24,25 +24,15 @@
 
 (defn- get-past-period [period diff]
   (let [[year month] (clojure.string/split period "-")
-        int-year (int year)
-        int-month (int month)
-        diff-month (- int-month diff)
-        change-year (<= diff-month 0)
-        fix-month (if change-year (+ columns-num diff-month) diff-month)
-        fix-year (if change-year (dec int-year) int-year)]
-    (str fix-year "-" (utils/add-zero fix-month))))
-
-(defn periods-diff [first-period last-period]
-  (let [[first-year first-month] (clojure.string/split first-period "-")
-        [last-year last-month] (clojure.string/split last-period "-")
-        first-date (t/date-time (int first-year) (int first-month))
-        last-date (t/date-time (int last-year) (int last-month))]
-    (t/in-months (t/interval first-date last-date))))
+        period-date (t/date-time (int year) (int month))
+        past-date (t/minus period-date (t/months diff))
+        formatter (utils/get-formatter "monthly")]
+    (f/unparse formatter past-date)))
 
 (defn chart-placeholder-data [initial-data]
   (let [first-period (:period (last initial-data))
         last-period (:period (first initial-data))
-        months-diff (periods-diff first-period last-period)]
+        months-diff (utils/periods-diff-in-months first-period last-period)]
     (vec
       (for [idx (range 0 (inc months-diff))]
         (let [prev-period (get-past-period last-period idx)
@@ -79,10 +69,10 @@
       ;(apply merge (map #(hash-map (:period %) %) fixed-data)))))
 
 (defn- get-chart-data [data prefix keyw column-name & [style fill-color pattern tooltip-suffix]]
-  "Vector of max *columns-num elements of [:Label value]"
+  "Vector of max *(count fixed-data) elements of [:Label value]"
   (let [fixed-data (chart-placeholder-data data)
-        chart-data (partial chart-data-at-index fixed-data keyw column-name prefix tooltip-suffix (count data))
-        placeholder-vect (vec (range columns-num))
+        chart-data (partial chart-data-at-index fixed-data keyw column-name prefix tooltip-suffix)
+        placeholder-vect (vec (range (count fixed-data)))
         columns [["string" column-name]
                  ["number" (utils/camel-case-str (name keyw))]
                  #js {"type" "string" "role" "tooltip"}]
