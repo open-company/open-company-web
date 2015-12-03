@@ -20,7 +20,7 @@
             [open-company-web.components.section-footer :refer (section-footer)]))
 
 (defn map-placeholder-data [data]
-  (let [fixed-data (finances-utils/placeholder-data data)]
+  (let [fixed-data (finances-utils/edit-placeholder-data data)]
     (apply merge (map #(hash-map (:period %) %) fixed-data))))
 
 (defn subsection-click [e owner]
