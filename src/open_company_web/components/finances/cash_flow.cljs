@@ -37,7 +37,7 @@
 
 (defn- get-chart-data [data prefix]
   "Vector of max *columns elements of [:Label value]"
-  (let [fixed-data (finances-utils/placeholder-data data)
+  (let [fixed-data (finances-utils/chart-placeholder-data data)
         chart-data (partial chart-data-at-index fixed-data prefix)
         placeholder-vect (range finances-utils/columns-num)]
     { :prefix prefix
