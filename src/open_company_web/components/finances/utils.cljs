@@ -8,8 +8,8 @@
 (defn chart-data-at-index [data keyw column-name prefix suffix real-data-count idx]
   (let [data (to-array data)
         rev-idx (- (- (min (count data) columns-num) 1) idx)
-        has-value (>= idx real-data-count)
         obj (get data rev-idx)
+        has-value (and (contains? obj keyw) (not (nil? (keyw obj))))
         value (keyw obj)
         label (if has-value
                 (if (and (= keyw :runway) (zero? value))
@@ -39,13 +39,13 @@
                          (if period-exists
                            (some #(when (= (:period %) prev-period) %) initial-data)
                            {:period prev-period
-                            :cash 0
-                            :costs 0
-                            :revenue 0
-                            :burn-rate 0
-                            :runway 0
-                            :avg-burn-rate 0
-                            :value 0
+                            :cash nil
+                            :costs nil
+                            :revenue nil
+                            :burn-rate nil
+                            :runway nil
+                            :avg-burn-rate nil
+                            :value nil
                             :new true})))]
       (vec fixed-data))))
       ;(apply merge (map #(hash-map (:period %) %) fixed-data)))))
