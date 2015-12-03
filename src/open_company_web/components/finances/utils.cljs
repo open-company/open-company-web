@@ -1,7 +1,8 @@
 (ns open-company-web.components.finances.utils
   (:require [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
-            [open-company-web.dispatcher :as dispatcher]))
+            [open-company-web.dispatcher :as dispatcher]
+            [cljs-time.core :as t]))
 
 (def columns-num 12)
 
@@ -31,7 +32,34 @@
         fix-year (if change-year (dec int-year) int-year)]
     (str fix-year "-" (utils/add-zero fix-month))))
 
-(defn placeholder-data [initial-data]
+(defn periods-diff [first-period last-period]
+  (let [[first-year first-month] (clojure.string/split first-period "-")
+        [last-year last-month] (clojure.string/split last-period "-")
+        first-date (t/date-time (int first-year) (int first-month))
+        last-date (t/date-time (int last-year) (int last-month))]
+    (t/in-months (t/interval first-date last-date))))
+
+(defn chart-placeholder-data [initial-data]
+  (let [first-period (:period (last initial-data))
+        last-period (:period (first initial-data))
+        months-diff (periods-diff first-period last-period)]
+    (vec
+      (for [idx (range 0 (inc months-diff))]
+        (let [prev-period (get-past-period last-period idx)
+              period-exists (utils/period-exists prev-period initial-data)]
+          (if period-exists
+            (some #(when (= (:period %) prev-period) %) initial-data)
+            {:period prev-period
+                            :cash nil
+                            :costs nil
+                            :revenue nil
+                            :burn-rate nil
+                            :runway nil
+                            :avg-burn-rate nil
+                            :value nil
+                            :new true}))))))
+
+(defn edit-placeholder-data [initial-data]
   (let [current-period (utils/current-period)]
     (let [fixed-data (for [idx (range 1 13)]
                        (let [prev-period (get-past-period current-period idx)
@@ -52,7 +80,7 @@
 
 (defn- get-chart-data [data prefix keyw column-name & [style fill-color pattern tooltip-suffix]]
   "Vector of max *columns-num elements of [:Label value]"
-  (let [fixed-data (placeholder-data data)
+  (let [fixed-data (chart-placeholder-data data)
         chart-data (partial chart-data-at-index fixed-data keyw column-name prefix tooltip-suffix (count data))
         placeholder-vect (vec (range columns-num))
         columns [["string" column-name]
