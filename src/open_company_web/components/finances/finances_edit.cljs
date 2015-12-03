@@ -118,13 +118,13 @@
     (for [idx (range 1 13)]
       (let [prev-period (finances-utils/get-past-period last-period idx)]
         {:period prev-period
-         :cash 0
-         :revenue 0
-         :costs 0
-         :burn-rate 0
-         :avg-burn-rate 0
-         :runway 0
-         :value 0
+         :cash nil
+         :revenue nil
+         :costs nil
+         :burn-rate nil
+         :avg-burn-rate nil
+         :runway nil
+         :value nil
          :new true}))))
 
 
