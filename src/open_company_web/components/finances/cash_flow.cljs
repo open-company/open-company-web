@@ -50,8 +50,9 @@
                 ["number" "Cash flow"]
                 #js {"type" "string" "role" "style"}
                 #js {"type" "string" "role" "tooltip"}]
-      :values (into [] (map chart-data placeholder-vect))
+      :values (vec (map chart-data placeholder-vect))
       :pattern "###,###.##"
+      :max-show finances-utils/columns-num
       :column-thickness "42"}))
 
 (defcomponent cash-flow [data owner]

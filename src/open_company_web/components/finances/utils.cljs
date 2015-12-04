@@ -83,7 +83,7 @@
     { :prefix prefix
       :columns columns
       :values values-with-color
-      :max-show 12
+      :max-show columns-num
       :pattern (if pattern pattern "###,###.##")}))
 
 (defn get-as-of-string [period]
