@@ -87,6 +87,7 @@
         values (vec (map chart-data mapper))]
     { :prefix (if prefix prefix "")
       :columns columns
+      :max-show (get-columns-num interval)
       :values values
       :pattern "###,###.##"
       :column-thickness (if has-target "28" "14")}))
