@@ -19,10 +19,6 @@
             [open-company-web.components.utility-components :refer (editable-pen)]
             [open-company-web.components.section-footer :refer (section-footer)]))
 
-(defn map-placeholder-data [data]
-  (let [fixed-data (finances-utils/edit-placeholder-data data)]
-    (apply merge (map #(hash-map (:period %) %) fixed-data))))
-
 (defn subsection-click [e owner]
   (.preventDefault e)
   (let [tab  (.. e -target -dataset -tab)]
@@ -35,7 +31,7 @@
   (let [section-data (:section-data data)
         notes-data (:notes section-data)]
     (om/set-state! owner :title (:title section-data))
-    (om/set-state! owner :finances-data (map-placeholder-data (:data section-data)))
+    (om/set-state! owner :finances-data (finances-utils/map-placeholder-data (:data section-data)))
     (om/set-state! owner :notes-body (:body notes-data))
     (om/set-state! owner :editing false)))
 
@@ -43,7 +39,7 @@
   (let [section-data (:section-data data)
         notes-data (:notes-data section-data)]
     (or (not= (:title section-data) (om/get-state owner :title))
-        (not= (map-placeholder-data (:data section-data)) (om/get-state owner :finances-data))
+        (not= (finances-utils/map-placeholder-data (:data section-data)) (om/get-state owner :finances-data))
         (not= (:body notes-data) (om/get-state owner :notes-body)))))
 
 (defn cancel-if-needed-cb [owner data]
@@ -103,7 +99,7 @@
     {:focus (or (om/get-state owner :focus) "cash")
      :editing (or (not (not (:oc-editing section-data)))
                   (om/get-state owner :editing))
-     :finances-data (map-placeholder-data (:data section-data))
+     :finances-data (finances-utils/map-placeholder-data (:data section-data))
      :title (:title section-data)
      :notes-body (:body (:notes section-data))
      :as-of (:updated-at section-data)}))
@@ -113,7 +109,7 @@
   (init-state [_]
     (let [section-data (:section-data data)
           notes-data (:notes section-data)
-          finances-data (map-placeholder-data (:data section-data))]
+          finances-data (finances-utils/map-placeholder-data (:data section-data))]
       {:focus "cash"
        :editing (not (not (:oc-editing section-data)))
        :finances-data finances-data

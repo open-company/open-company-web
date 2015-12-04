@@ -90,3 +90,7 @@
   (let [[year month] (clojure.string/split period "-")
         month-name (utils/month-string month)]
     (str month-name ", " year)))
+
+(defn map-placeholder-data [data]
+  (let [fixed-data (edit-placeholder-data data)]
+    (apply merge (map #(hash-map (:period %) %) fixed-data))))
