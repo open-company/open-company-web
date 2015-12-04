@@ -50,8 +50,11 @@
                             :new true}))))))
 
 (defn edit-placeholder-data [initial-data]
-  (let [current-period (utils/current-period)]
-    (let [fixed-data (for [idx (range 1 13)]
+  (let [current-period (utils/current-period)
+        last-period (last initial-data)
+        diff (utils/periods-diff-in-months (:period last-period) current-period)
+        data-count (max 13 (inc diff))]
+    (let [fixed-data (for [idx (range 1 data-count)]
                        (let [prev-period (get-past-period current-period idx)
                              period-exists (utils/period-exists prev-period initial-data)]
                          (if period-exists
