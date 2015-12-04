@@ -66,7 +66,6 @@
                             :value nil
                             :new true})))]
       (vec fixed-data))))
-      ;(apply merge (map #(hash-map (:period %) %) fixed-data)))))
 
 (defn- get-chart-data [data prefix keyw column-name & [style fill-color pattern tooltip-suffix]]
   "Vector of max *(count fixed-data) elements of [:Label value]"
@@ -78,10 +77,13 @@
                  #js {"type" "string" "role" "tooltip"}]
         columns (if style (conj columns style) columns)
         values (vec (map chart-data placeholder-vect))
-        values (if fill-color (map #(assoc % 3 fill-color) values) values)]
+        values-with-color (if fill-color
+                            (map #(assoc % 3 fill-color) values)
+                            values)]
     { :prefix prefix
       :columns columns
-      :values values
+      :values values-with-color
+      :max-show 12
       :pattern (if pattern pattern "###,###.##")}))
 
 (defn get-as-of-string [period]
