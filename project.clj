@@ -32,7 +32,7 @@
     [lein-cljsbuild "1.1.1"] ; ClojureScript compiler https://github.com/emezeske/lein-cljsbuild
     [lein-figwheel "0.5.0-2"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
     [lein-ancient "0.6.8"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
-    [lein-doo "0.1.6-rc.1"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
+    [lein-doo "0.1.6"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
     [lein-deps-tree "0.1.2"] ; Print a tree of project dependencies https://github.com/the-kenny/lein-deps-tree
   ]
 
