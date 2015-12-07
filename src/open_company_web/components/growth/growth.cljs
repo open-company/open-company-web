@@ -81,6 +81,7 @@
                   (om/get-state owner :editing))
      :growth-data (:data section-data)
      :growth-metrics (:metrics section-data)
+     :oc-editing (:oc-editing section-data)
      :title (:title section-data)
      :notes-body (:body (:notes section-data))
      :as-of (:updated-at section-data)}))
@@ -107,6 +108,8 @@
           focus (om/get-state owner :focus)
           slug (:slug @router/path)
           section-data (:section-data data)
+          section (:section data)
+          section-name (utils/camel-case-str (name section))
           growth-metrics (:metrics section-data)
           growth-data (:data section-data)
           notes-data (:notes section-data)
@@ -129,6 +132,8 @@
           (om/build editable-title {:read-only read-only
                                     :editing editing
                                     :title (om/get-state owner :title)
+                                    :placeholder (or (:title-placeholder section-data)
+                                                     section-name)
                                     :section (:section data)
                                     :start-editing-cb start-editing-fn
                                     :change-cb title-change-fn
@@ -164,7 +169,8 @@
                                      :body-counter (om/get-state owner :body-counter)
                                      :read-only (:read-only data)
                                      :body (om/get-state owner :notes-body)
-                                     :placeholder (str (utils/camel-case-str (name (:section data))) " notes here...")
+                                     :placeholder (or (:body-placeholder section-data)
+                                                      (str section-name " notes here..."))
                                      :start-editing-cb start-editing-fn
                                      :change-cb notes-body-change-fn
                                      :cancel-cb cancel-fn
@@ -179,7 +185,6 @@
             (if editing
               (om/build section-footer {:edting editing
                                         :cancel-cb cancel-fn
+                                        :is-new-section (om/get-state owner :oc-editing)
                                         :save-cb save-fn})
               (om/build revisions-navigator data))))))))
-
-
