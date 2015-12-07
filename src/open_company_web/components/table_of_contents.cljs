@@ -13,9 +13,8 @@
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [open-company-web.api :as api]
             [open-company-web.components.table-of-contents-item :refer (table-of-contents-item)]
-            [open-company-web.lib.section-utils :as section-utils]))
-
-(def first-sec-placeholder "firstsectionplaceholder")
+            [open-company-web.lib.section-utils :as section-utils]
+            [open-company-web.components.finances.utils :as finances-utils]))
 
 (defn get-category-section-info [e]
   (let [target (.-target e)
@@ -66,10 +65,10 @@
   (let [$info (.$ js/window "#last-add-section-info")
         last-section (.data $info "section")
         last-category (.data $info "category")]
-    (section-utils/add-section last-category last-section (:section change) (:category change) (:section-defaults change))
+    (section-utils/add-section last-category last-section (:category change) (:section change) (:section-defaults change))
     (.setTimeout js/window #(do
                               (utils/scroll-toc-to-id (str "section-sort--" (:section change)))
-                              (utils/scroll-to-section new-section-kw)) 1000)))
+                              (utils/scroll-to-section (:section change))) 1000)))
 
 (defcomponent add-section [data owner]
 
@@ -151,7 +150,7 @@
                                                    :empty (empty? sections)})}
                          (dom/h3 (utils/camel-case-str (name category))))
                 (om/build add-section {:category category
-                                       :section first-sec-placeholder})
+                                       :section finances-utils/first-section-placeholder})
                 (dom/div {:class "category-sections-container"}
                   (for [section sections]
                     (let [section-data ((keyword section) data)]
