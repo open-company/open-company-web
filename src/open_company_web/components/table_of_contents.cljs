@@ -12,7 +12,8 @@
             [open-company-web.caches :as caches]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [open-company-web.api :as api]
-            [open-company-web.components.table-of-contents-item :refer (table-of-contents-item)]))
+            [open-company-web.components.table-of-contents-item :refer (table-of-contents-item)]
+            [open-company-web.lib.section-utils :as section-utils]))
 
 (def first-sec-placeholder "firstsectionplaceholder")
 
@@ -61,57 +62,11 @@
       (.click popover hide-popover)
       (.setTimeout js/window #(.fadeIn popover 400) 0))))
 
-(defn insert-section
-  [category-into section-after category-to-insert section-to-insert sections]
-  (let [category-kw (keyword category-to-insert)
-        category (category-kw sections)]
-    (cond
-      ; category doesn't exist, create it with the new section
-      (not (contains? sections category-kw))
-      (merge sections {category-kw [section-to-insert]})
-      ; categories are different, adding as last section
-      (not= category-into category-to-insert)
-      (merge sections {category-kw (conj (category-kw sections) section-to-insert)})
-      ; category exists, section is placeholder for first place
-      (= section-after first-sec-placeholder)
-      (let [new-category (concat [section-to-insert] (category-kw sections))]
-        (merge sections {category-kw (vec new-category)}))
-      ; category exists, adding section
-      :else
-      (let [idx (inc (.indexOf (to-array category) section-after))
-            [before after] (split-at idx category)
-            new-category (vec (concat before [section-to-insert] after))]
-        (merge sections {category-kw new-category})))))
-
 (defn handle-add-section-change [change]
   (let [$info (.$ js/window "#last-add-section-info")
         last-section (.data $info "section")
-        last-category (.data $info "category")
-        slug (keyword (:slug @router/path))
-        company-data (slug @dispatcher/app-state)
-        sections (:sections company-data)
-        new-sections (insert-section last-category last-section (:category change) (:section change) sections)
-        section-defaults (utils/fix-section (merge (:section-defaults change) {:oc-editing true
-                                                                               :updated-at (utils/as-of-now)})
-                                            (name (:section change)))
-        body-placeholder (if (contains? section-defaults :note)
-                           (:note section-defaults)
-                           (:body section-defaults))
-        with-body-placeholder (-> section-defaults
-                                  (dissoc :body)
-                                  (dissoc :note)
-                                  (assoc :body-placeholder body-placeholder))
-        with-title-placeholder (-> with-body-placeholder
-                                   (dissoc :title)
-                                   (assoc :title-placeholder (:title with-body-placeholder)))
-        new-section-kw (keyword (:section change))
-        new-category (:category change)
-        new-categories (if (utils/in? (:categories company-data) new-category)
-                         (:categories company-data)
-                         (conj (:categories company-data) new-category))]
-    (swap! dispatcher/app-state assoc-in [slug] (merge (slug @dispatcher/app-state) {new-section-kw with-title-placeholder}))
-    (swap! dispatcher/app-state assoc-in [slug :sections] new-sections)
-    (swap! dispatcher/app-state assoc-in [slug :categories] new-categories)
+        last-category (.data $info "category")]
+    (section-utils/add-section last-category last-section (:section change) (:category change) (:section-defaults change))
     (.setTimeout js/window #(do
                               (utils/scroll-toc-to-id (str "section-sort--" (:section change)))
                               (utils/scroll-to-section new-section-kw)) 1000)))
