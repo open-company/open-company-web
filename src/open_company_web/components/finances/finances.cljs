@@ -112,6 +112,7 @@
           finances-data (finances-utils/map-placeholder-data (:data section-data))]
       {:focus "cash"
        :editing (not (not (:oc-editing section-data)))
+       :oc-editing (:oc-editing section-data)
        :finances-data finances-data
        :title (:title section-data)
        :notes-body (:body (:notes section-data))
@@ -126,6 +127,8 @@
     (let [showing-revision (om/get-state owner :as-of)
           focus (om/get-state owner :focus)
           classes "composed-section-link"
+          section (:section data)
+          section-name (utils/camel-case-str (name section))
           section-data (:section-data data)
           notes-data (:notes section-data)
           cash-classes (str classes (when (= focus "cash") " active"))
@@ -154,7 +157,8 @@
           (om/build editable-title {:read-only read-only
                                     :editing editing
                                     :title (om/get-state owner :title)
-                                    :section (:section data)
+                                    :placeholder (or (:title-placeholder section-data) section-name)
+                                    :section section
                                     :start-editing-cb start-editing-fn
                                     :change-cb title-change-fn
                                     :cancel-cb cancel-fn
@@ -208,7 +212,7 @@
                                      :body-counter (om/get-state owner :body-counter)
                                      :read-only (:read-only data)
                                      :body (om/get-state owner :notes-body)
-                                     :placeholder (str (utils/camel-case-str (name (:section data))) " notes here...")
+                                     :placeholder (or (:body-placeholder section-data) (str section-name " notes here..."))
                                      :start-editing-cb start-editing-fn
                                      :change-cb notes-body-change-fn
                                      :cancel-cb cancel-fn
@@ -223,5 +227,6 @@
             (if editing
               (om/build section-footer {:edting editing
                                         :cancel-cb cancel-fn
+                                        :is-new-section (om/get-state owner :oc-editing)
                                         :save-cb save-fn})
               (om/build revisions-navigator data))))))))
