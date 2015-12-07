@@ -10,9 +10,10 @@
     (let [editing (:editing data)]
       (dom/div {:class "section-footer"}
         (dom/div {:class "save-section"}
-          (when (not (:is-new-section data))
-            (dom/button {:class "oc-btn oc-cancel"
-                         :on-click (:cancel-cb data)}
+          (dom/button {:class "oc-btn oc-cancel"
+                       :on-click (:cancel-cb data)}
+                      (if (:is-new-section data)
+                        "DELETE"
                         "CANCEL"))
           (dom/button {:class (utils/class-set {:oc-btn true
                                                 :oc-success true
