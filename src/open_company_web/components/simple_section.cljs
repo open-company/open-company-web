@@ -17,7 +17,7 @@
 (defn cancel-cb [owner data]
   (if (om/get-state owner :oc-editing)
     ; remove an unsaved section
-    (section-utils/remove-unsaved-section (:section data))
+    (section-utils/remove-section (:section data))
     ; cancel editing
     (do
       (om/set-state! owner :title (:title (:section-data data)))
