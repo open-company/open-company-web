@@ -94,13 +94,22 @@
         section-defaults (utils/fix-section (merge (:section-defaults change) {:oc-editing true
                                                                                :updated-at (utils/as-of-now)})
                                             (name (:section change)))
-        placeholder-section-defaults (assoc (dissoc section-defaults :body) :placeholder (:body (:section-defaults change)))
+        body-placeholder (if (contains? section-defaults :note)
+                           (:note section-defaults)
+                           (:body section-defaults))
+        with-body-placeholder (-> section-defaults
+                                  (dissoc :body)
+                                  (dissoc :note)
+                                  (assoc :body-placeholder body-placeholder))
+        with-title-placeholder (-> with-body-placeholder
+                                   (dissoc :title)
+                                   (assoc :title-placeholder (:title with-body-placeholder)))
         new-section-kw (keyword (:section change))
         new-category (:category change)
         new-categories (if (utils/in? (:categories company-data) new-category)
                          (:categories company-data)
                          (conj (:categories company-data) new-category))]
-    (swap! dispatcher/app-state assoc-in [slug] (merge (slug @dispatcher/app-state) {new-section-kw placeholder-section-defaults}))
+    (swap! dispatcher/app-state assoc-in [slug] (merge (slug @dispatcher/app-state) {new-section-kw with-title-placeholder}))
     (swap! dispatcher/app-state assoc-in [slug :sections] new-sections)
     (swap! dispatcher/app-state assoc-in [slug :categories] new-categories)
     (.setTimeout js/window #(do
@@ -195,7 +204,7 @@
                         (om/build table-of-contents-item {
                                             :category category
                                             :section section
-                                            :title (:title section-data)
+                                            :title (or (:title section-data) (:title-placeholder section-data))
                                             :updated-at (:updated-at section-data)
                                             :show-popover #(show-popover % (name category) (:name section-data))})
                         (om/build add-section {:category (name category)
