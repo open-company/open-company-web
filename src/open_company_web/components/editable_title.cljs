@@ -47,6 +47,7 @@
                            :id (str "editable-title-" (name (:section data)))
                            :className (utils/class-set {:editable-title true
                                                         :edit (:editing data)})
+                           :placeholder (:placeholder data)
                            :disabled (:read-only data)
                            :value title
                            :onFocus #((:start-editing-cb data))
