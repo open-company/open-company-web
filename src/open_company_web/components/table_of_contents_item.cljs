@@ -4,7 +4,8 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.api :as api]))
+            [open-company-web.api :as api]
+            [open-company-web.lib.section-utils :as section-utils]))
 
 (defcomponent table-of-contents-item [data owner]
   
@@ -17,7 +18,7 @@
                 :id (str "section-sort--" (name section))}
         (dom/div {:class "category-section"}
           (dom/div {:class "category-section-close"
-                    :on-click #(api/remove-section (name section))})
+                    :on-click #(section-utils/remove-section (name section))})
           (dom/a {:href "#"
                   :on-click (fn [e]
                               (.preventDefault e)
