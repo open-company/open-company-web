@@ -2,7 +2,8 @@
   (:require [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
-            [open-company-web.components.finances.utils :as finances-utils]))
+            [open-company-web.components.finances.utils :as finances-utils]
+            [open-company-web.api :as api]))
 
 (defn insert-section
   [category-into section-after category-to-insert section-to-insert sections]
@@ -52,7 +53,7 @@
     (swap! dispatcher/app-state assoc-in [slug :sections] new-sections)
     (swap! dispatcher/app-state assoc-in [slug :categories] new-categories)))
 
-(defn remove-section [sections section-name]
+(defn- remove-seciton-from-sections [sections section-name]
   (apply merge (map (fn [[k v]]
                       (hash-map k (utils/vec-dissoc v section-name)))
                     sections)))
@@ -61,8 +62,17 @@
   (let [section (keyword section-name)
         slug (keyword (:slug @router/path))
         company-data (slug @dispatcher/app-state)
-        new-sections (remove-section (:sections company-data) section-name)]
+        new-sections (remove-seciton-from-sections (:sections company-data) section-name)]
     ; remove the section body
     (swap! dispatcher/app-state update-in [slug] dissoc section)
     ; remove the section from sections
     (swap! dispatcher/app-state assoc-in [slug :sections] new-sections)))
+
+(defn remove-section [section-name]
+  (let [section (keyword section-name)
+        slug (keyword (:slug @router/path))
+        company-data (slug @dispatcher/app-state)
+        section-data (section company-data)]
+    (if (:oc-editing section-data)
+      (remove-unsaved-section section-name)
+      (api/remove-section section-name))))
