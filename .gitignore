@@ -7,9 +7,7 @@ pom.xml
 /out/
 /target/
 .lein-*
-.lein-plugins/
 .repl
 .nrepl-port
 .DS_Store
-.lein-*
 *.sublime-*
