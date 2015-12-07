@@ -7,6 +7,8 @@
 
 (def columns-num 12)
 
+(def first-section-placeholder "firstsectionplaceholder")
+
 (defn chart-data-at-index [data keyw column-name prefix suffix idx]
   (let [data (to-array data)
         obj (get (vec (reverse data)) idx)
