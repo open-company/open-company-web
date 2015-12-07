@@ -1,7 +1,8 @@
 (ns open-company-web.lib.section-utils
   (:require [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
-            [open-company-web.dispatcher :as dispatcher]))
+            [open-company-web.dispatcher :as dispatcher]
+            [open-company-web.components.finances.utils :as finances-utils]))
 
 (defn insert-section
   [category-into section-after category-to-insert section-to-insert sections]
@@ -15,7 +16,7 @@
       (not= category-into category-to-insert)
       (merge sections {category-kw (conj (category-kw sections) section-to-insert)})
       ; category exists, section is placeholder for first place
-      (= section-after first-sec-placeholder)
+      (= section-after finances-utils/first-section-placeholder)
       (let [new-category (concat [section-to-insert] (category-kw sections))]
         (merge sections {category-kw (vec new-category)}))
       ; category exists, adding section
@@ -52,7 +53,9 @@
     (swap! dispatcher/app-state assoc-in [slug :categories] new-categories)))
 
 (defn remove-section [sections section-name]
-  (apply merge (map #({(first %) (utils/vec-dissoc (second %) section-name)}) sections)))
+  (apply merge (map (fn [[k v]]
+                      (hash-map k (utils/vec-dissoc v section-name)))
+                    sections)))
 
 (defn remove-unsaved-section [section-name]
   (let [section (keyword section-name)
@@ -60,6 +63,6 @@
         company-data (slug @dispatcher/app-state)
         new-sections (remove-section (:sections company-data) section-name)]
     ; remove the section body
-    (swap! dispatcher/app-state assoc-in [slug] (dissoc section-body section))
+    (swap! dispatcher/app-state update-in [slug] dissoc section)
     ; remove the section from sections
     (swap! dispatcher/app-state assoc-in [slug :sections] new-sections)))
