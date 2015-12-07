@@ -356,7 +356,7 @@
 (def finances-empty-notes {:notes {:body ""}})
 
 (defn fix-finances [section-body]
-  (let [finances-data (:data section-body)
+  (let [finances-data (if (contains? section-body :data) (:data section-body) [])
         fixed-finances (calc-burnrate-runway finances-data)
         sort-pred (sort-by-key-pred :period true)
         sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
