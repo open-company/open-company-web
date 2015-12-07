@@ -29,6 +29,16 @@
         formatter (utils/get-formatter "monthly")]
     (f/unparse formatter past-date)))
 
+(defn placeholder-data [period]
+  {:period period
+   :cash nil
+   :costs nil
+   :revenue nil
+   :burn-rate nil
+   :runway nil
+   :avg-burn-rate nil
+   :new true})
+
 (defn chart-placeholder-data [initial-data]
   (let [first-period (:period (last initial-data))
         last-period (:period (first initial-data))
@@ -39,35 +49,21 @@
               period-exists (utils/period-exists prev-period initial-data)]
           (if period-exists
             (some #(when (= (:period %) prev-period) %) initial-data)
-            {:period prev-period
-                            :cash nil
-                            :costs nil
-                            :revenue nil
-                            :burn-rate nil
-                            :runway nil
-                            :avg-burn-rate nil
-                            :value nil
-                            :new true}))))))
+            (placeholder-data prev-period)))))))
 
 (defn edit-placeholder-data [initial-data]
   (let [current-period (utils/current-period)
-        last-period (last initial-data)
-        diff (utils/periods-diff-in-months (:period last-period) current-period)
+        last-period (if (last initial-data)
+                      (:period (last initial-data))
+                      (get-past-period current-period 12))
+        diff (utils/periods-diff-in-months last-period current-period)
         data-count (max 13 (inc diff))]
     (let [fixed-data (for [idx (range 1 data-count)]
                        (let [prev-period (get-past-period current-period idx)
                              period-exists (utils/period-exists prev-period initial-data)]
                          (if period-exists
                            (some #(when (= (:period %) prev-period) %) initial-data)
-                           {:period prev-period
-                            :cash nil
-                            :costs nil
-                            :revenue nil
-                            :burn-rate nil
-                            :runway nil
-                            :avg-burn-rate nil
-                            :value nil
-                            :new true})))]
+                           (placeholder-data prev-period))))]
       (vec fixed-data))))
 
 (defn- get-chart-data [data prefix keyw column-name & [style fill-color pattern tooltip-suffix]]
