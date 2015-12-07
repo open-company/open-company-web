@@ -98,7 +98,9 @@
                                             :loading
                                             :as-of
                                             :read-only
-                                            :revisions-cache)
+                                            :revisions-cache
+                                            :title-placeholder
+                                            :body-placeholder)
           json-data (cljs->json section-data)
           section-link (utils/link-for links "update" "PUT")]
       (api-put (:href section-link)
