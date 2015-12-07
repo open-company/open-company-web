@@ -75,6 +75,8 @@
 
   (render [_]
     (let [section (:section data)
+          section-name (utils/camel-case-str (name section))
+          section-data (:section-data data)
           editing (om/get-state owner :editing)
           start-editing-fn #(start-editing-cb owner data)
           title-change-fn (partial change-cb owner :title)
@@ -88,6 +90,7 @@
         (om/build editable-title {:editing editing
                                   :read-only (:read-only data)
                                   :title (om/get-state owner :title)
+                                  :placeholder (or (:title-placeholder section-data) section-name)
                                   :section (:section data)
                                   :start-editing-cb start-editing-fn
                                   :change-cb title-change-fn
@@ -101,16 +104,16 @@
                                  :body-counter (om/get-state owner :body-counter)
                                  :read-only (:read-only data)
                                  :body (om/get-state owner :body)
-                                 :placeholder (or (:placeholder (:section-data data))
-                                                  (str (utils/camel-case-str (name (:section data))) " notes here..."))
+                                 :placeholder (or (:body-placeholder section-data)
+                                                  (str section-name " notes here..."))
                                  :start-editing-cb start-editing-fn
                                  :change-cb body-change-fn
                                  :cancel-cb cancel-fn
                                  :cancel-if-needed-cb cancel-if-needed-fn
                                  :save-cb save-fn}))
 
-        (om/build update-footer {:author (:author (:section-data data))
-                                 :updated-at (:updated-at (:section-data data))
+        (om/build update-footer {:author (:author section-data)
+                                 :updated-at (:updated-at section-data)
                                  :section section
                                  :editing editing
                                  :notes false})
