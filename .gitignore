@@ -12,3 +12,4 @@ pom.xml
 .nrepl-port
 .DS_Store
 .lein-*
+*.sublime-*
