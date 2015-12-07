@@ -100,7 +100,8 @@
                                             :read-only
                                             :revisions-cache
                                             :title-placeholder
-                                            :body-placeholder)
+                                            :body-placeholder
+                                            :oc-editing)
           json-data (cljs->json section-data)
           section-link (utils/link-for links "update" "PUT")]
       (api-put (:href section-link)
