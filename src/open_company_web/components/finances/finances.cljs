@@ -13,6 +13,7 @@
             [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.components.rich-editor :refer (rich-editor)]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.section-utils :as section-utils]
             [open-company-web.components.revisions-navigator :refer (revisions-navigator)]
             [open-company-web.api :as api]
             [open-company-web.components.editable-title :refer (editable-title)]
@@ -28,12 +29,16 @@
   (om/set-state! owner :editing true))
 
 (defn cancel-cb [owner data]
-  (let [section-data (:section-data data)
-        notes-data (:notes section-data)]
-    (om/set-state! owner :title (:title section-data))
-    (om/set-state! owner :finances-data (finances-utils/map-placeholder-data (:data section-data)))
-    (om/set-state! owner :notes-body (:body notes-data))
-    (om/set-state! owner :editing false)))
+  (if (om/get-state owner :oc-editing)
+    ; remove an unsaved section
+    (section-utils/remove-unsaved-section (:section data))
+    ; cancel editing
+    (let [section-data (:section-data data)
+          notes-data (:notes section-data)]
+      (om/set-state! owner :title (:title section-data))
+      (om/set-state! owner :finances-data (finances-utils/map-placeholder-data (:data section-data)))
+      (om/set-state! owner :notes-body (:body notes-data))
+      (om/set-state! owner :editing false))))
 
 (defn has-changes [owner data]
   (let [section-data (:section-data data)

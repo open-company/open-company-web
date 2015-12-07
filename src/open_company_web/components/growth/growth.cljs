@@ -12,7 +12,8 @@
             [open-company-web.components.editable-title :refer [editable-title]]
             [open-company-web.components.growth.growth-metric :refer [growth-metric]]
             [open-company-web.components.utility-components :refer [add-metric]]
-            [open-company-web.components.section-footer :refer (section-footer)]))
+            [open-company-web.components.section-footer :refer (section-footer)]
+            [open-company-web.lib.section-utils :as section-utils]))
 
 (defn subsection-click [e owner]
   (.preventDefault e)
@@ -23,13 +24,17 @@
   (om/set-state! owner :editing true))
 
 (defn cancel-cb [owner data]
-  (let [section-data (:section-data data)
-        notes-data (:notes section-data)]
-    (om/set-state! owner :title (:title section-data))
-    (om/set-state! owner :growth-data (:data section-data))
-    (om/set-state! owner :growth-metrics (:metrics section-data))
-    (om/set-state! owner :notes-body (:body notes-data))
-    (om/set-state! owner :editing false)))
+  (if (om/get-state owner :oc-editing)
+    ; remove an unsaved section
+    (section-utils/remove-unsaved-section (:section data))
+    ; cancel editing
+    (let [section-data (:section-data data)
+          notes-data (:notes section-data)]
+      (om/set-state! owner :title (:title section-data))
+      (om/set-state! owner :growth-data (:data section-data))
+      (om/set-state! owner :growth-metrics (:metrics section-data))
+      (om/set-state! owner :notes-body (:body notes-data))
+      (om/set-state! owner :editing false))))
 
 (defn has-changes [owner data]
   (let [section-data (:section-data data)

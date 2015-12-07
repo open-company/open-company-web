@@ -1,5 +1,4 @@
 (ns open-company-web.components.simple-section
-  (:require-macros [cljs.core.async.macros :refer (go)])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -9,16 +8,21 @@
             [open-company-web.api :refer (save-or-create-section)]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.revisions-navigator :refer (revisions-navigator)]
-            [cljs.core.async :refer (chan <!)]
             [open-company-web.api :as api]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.components.section-footer :refer (section-footer)]
-            [open-company-web.components.update-footer :refer (update-footer)]))
+            [open-company-web.components.update-footer :refer (update-footer)]
+            [open-company-web.lib.section-utils :as section-utils]))
 
 (defn cancel-cb [owner data]
-  (om/set-state! owner :title (:title (:section-data data)))
-  (om/set-state! owner :body (:body (:section-data data)))
-  (om/set-state! owner :editing false))
+  (if (om/get-state owner :oc-editing)
+    ; remove an unsaved section
+    (section-utils/remove-unsaved-section (:section data))
+    ; cancel editing
+    (do
+      (om/set-state! owner :title (:title (:section-data data)))
+      (om/set-state! owner :body (:body (:section-data data)))
+      (om/set-state! owner :editing false))))
 
 (defn has-changes [owner data]
   (or (not= (:title (:section-data data)) (om/get-state owner :title))
