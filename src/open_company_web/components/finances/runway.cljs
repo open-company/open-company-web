@@ -23,9 +23,9 @@
 
 (defn get-runway-subtitle [cash avg-burn-rate runway-days cur-symbol]
   (str cur-symbol (.toLocaleString (or cash 0))
-       " ÷ "
+       " ÷ a 3-month avg. burn of "
        cur-symbol (.toLocaleString (utils/abs (or avg-burn-rate 0)))
-       " 3-months avg. burn: "
+       " ≅ "
        (get-rounded-runway runway-days [:round])))
 
 (defn fix-runway [runway]
