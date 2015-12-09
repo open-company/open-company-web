@@ -137,7 +137,7 @@
   (did-update [_ prev-props _]
     (when (not= (:values prev-props) (:values chart-data))
       (om/set-state! owner :animated false)
-      (.setTimeout js/window #(draw-chart-when-visible owner chart-data) 200)))
+      (draw-chart-when-visible owner chart-data)))
 
   (render [_]
     (let [data-count (count (:values chart-data))
