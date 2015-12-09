@@ -28,19 +28,21 @@
 (defn start-editing-cb [owner data]
   (om/set-state! owner :editing true))
 
+(defn start-data-editing-cb [owner data]
+  (om/set-state! owner :data-editing true))
+
 (defn cancel-cb [owner data]
   (if (om/get-state owner :oc-editing)
     ; remove an unsaved section
     (section-utils/remove-section (name (:section data)))
     ; cancel editing
     (let [section-data (:section-data data)
-              notes-data (:notes section-data)]
-      (when (om/get-state owner :editing)
-        (om/set-state! owner :title (:title section-data))
-        (om/set-state! owner :notes-body (:body notes-data)))
-      (when (om/get-state owner :data-editing)
-        (om/set-state! owner :finances-data (finances-utils/map-placeholder-data (:data section-data))))
-      (om/set-state! owner :editing false))))
+          notes-data (:notes section-data)]
+      (om/set-state! owner :title (:title section-data))
+      (om/set-state! owner :notes-body (:body notes-data))
+      (om/set-state! owner :finances-data (finances-utils/map-placeholder-data (:data section-data)))
+      (om/set-state! owner :editing false)
+      (om/set-state! owner :data-editing false))))
 
 (defn has-data-changes [owner data]
   (let [section-data (:section-data data)]
@@ -164,6 +166,7 @@
           title-change-fn (partial change-cb owner :title)
           cancel-if-needed-fn #(cancel-if-needed-cb owner data)
           start-editing-fn #(start-editing-cb owner data)
+          start-data-editing-fn #(start-data-editing-cb owner data)
           subsection-data {:section-data section-data
                            :read-only read-only
                            :currency (:currency data)}]
@@ -198,7 +201,7 @@
                         :title "Runway"
                         :data-tab "runway"
                         :on-click #(subsection-click % owner)} "Runway"))
-              (om/build editable-pen {:click-callback start-editing-fn})))
+              (om/build editable-pen {:click-callback start-data-editing-fn})))
           (dom/div {:class (utils/class-set {:composed-section-body true})}
             (if data-editing
               (om/build finances-edit {:finances-data (om/get-state owner :finances-data)
