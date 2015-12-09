@@ -183,7 +183,8 @@
           (dom/div {:class (utils/class-set {:composed-section-body true})}
             (if editing
               (om/build finances-edit {:finances-data (om/get-state owner :finances-data)
-                                       :change-finances-cb (partial change-finances-data-cb owner)})
+                                       :change-finances-cb (partial change-finances-data-cb owner)
+                                       :currency (:currency data)})
               (case focus
 
                 "cash"
