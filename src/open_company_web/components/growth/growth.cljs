@@ -23,6 +23,9 @@
 (defn start-editing-cb [owner data]
   (om/set-state! owner :editing true))
 
+(defn start-data-editing-cb [owner data]
+  (om/set-state! owner :data-editing true))
+
 (defn cancel-cb [owner data]
   (if (om/get-state owner :oc-editing)
     ; remove an unsaved section
@@ -34,18 +37,22 @@
       (om/set-state! owner :growth-data (:data section-data))
       (om/set-state! owner :growth-metrics (:metrics section-data))
       (om/set-state! owner :notes-body (:body notes-data))
-      (om/set-state! owner :editing false))))
+      (om/set-state! owner :editing false)
+      (om/set-state! owner :data-editing false))))
+
+(defn has-data-changes [owner data]
+  (let [section-data (:section-data data)]
+    (or (not= (:data section-data) (om/get-state owner :section-data))
+        (not= (:metrics section-data) (om/get-state owner :growth-metrics)))))
 
 (defn has-changes [owner data]
   (let [section-data (:section-data data)
         notes-data (:notes-data section-data)]
     (or (not= (:title section-data) (om/get-state owner :title))
-        (not= (:data section-data) (om/get-state owner :section-data))
-        (not= (:metrics section-data) (om/get-state owner :growth-metrics))
         (not= (:body notes-data) (om/get-state owner :notes-body)))))
 
 (defn cancel-if-needed-cb [owner data]
-  (when (not (has-changes owner data))
+  (when (and (not (has-changes owner data)) (not (has-data-changes owner data)))
     (cancel-cb owner data)))
 
 (defn change-cb [owner k v & [c]]
@@ -58,6 +65,7 @@
 
 (defn save-cb [owner data]
   (when (or (has-changes owner data) ; when the section already exists
+            (has-data-changes owner data)
             (om/get-state owner :oc-editing)) ; when the section is new
     (let [title (om/get-state owner :title)
           notes-body (om/get-state owner :notes-body)
@@ -82,8 +90,9 @@
   (let [section-data (:section-data data)
         notes-data (:notes section-data)]
     {:focus (or (om/get-state owner :focus) "cash")
-     :editing (or (not (not (:oc-editing section-data)))
-                  (om/get-state owner :editing))
+     :editing (om/get-state owner :editing)
+     :data-editing (or (not (not (:oc-editing section-data)))
+                       (om/get-state owner :data-editing))
      :growth-data (:data section-data)
      :growth-metrics (:metrics section-data)
      :oc-editing (:oc-editing section-data)
@@ -97,7 +106,8 @@
     (let [section-data (:section-data data)
           growth-metrics (:metrics section-data)]
       {:focus (:slug (first growth-metrics))
-       :editing (not (not (:oc-editing section-data)))
+       :editing false
+       :data-editing (not (not (:oc-editing section-data)))
        :growth-data (:data section-data)
        :growth-metrics (:metrics section-data)
        :title (:title section-data)
@@ -126,6 +136,7 @@
                            :read-only read-only
                            :total-metrics (count growth-metrics)}
           editing (om/get-state owner :editing)
+          data-editing (om/get-state owner :data-editing)
           cancel-fn #(cancel-cb owner data)
           save-fn #(save-cb owner data)
           notes-body-change-fn (partial change-cb owner :notes-body)
@@ -165,7 +176,7 @@
             (om/build update-footer {:updated-at (:updated-at section-data)
                                      :author (:author section-data)
                                      :section :growth
-                                     :editing editing
+                                     :editing (or editing data-editing)
                                      :notes false})
             (when (or (not (empty? (:body notes-data)))
                       (not read-only))
@@ -187,7 +198,7 @@
                                        :section :growth
                                        :editing editing
                                        :notes true}))
-            (if editing
+            (if (or editing data-editing)
               (om/build section-footer {:edting editing
                                         :cancel-cb cancel-fn
                                         :is-new-section (om/get-state owner :oc-editing)
