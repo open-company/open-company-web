@@ -37,7 +37,7 @@
                       (str burn-prefix (.toLocaleString (utils/abs burn))))
           runway-days (:runway finances-data)
           runway (cond
-                  (and is-new (nil? runway-days)) "calculated"
+                  (and is-new (zero? runway-days)) "calculated"
                   (or (pos? runway-days) (zero? runway-days) (nil? runway-days)) "profitable"
                   :else (str (.toLocaleString (utils/abs runway-days)) " days"))
           ref-prefix (str (:period finances-data) "-")
