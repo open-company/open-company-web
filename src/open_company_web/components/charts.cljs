@@ -42,7 +42,7 @@
 
 (defn chart-options [owner data column-thickness max-value startup]
   (clj->js {:title  ""
-            :width (min 600 (* 50 (count data)))
+            :width (min 600 (max (* 50 (count data)) 120))
             :height 290
             :animation #js {"startup" startup
                             "duration" 400
