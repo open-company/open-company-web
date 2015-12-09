@@ -179,7 +179,7 @@
                                     :cancel-cb cancel-fn
                                     :cancel-if-needed-cb cancel-if-needed-fn
                                     :save-cb save-fn})
-          (when (not editing)
+          (when (not data-editing)
             (dom/div {:class (utils/class-set {:link-bar true
                                                :editable (not read-only)})}
               (dom/a {:href "#"
