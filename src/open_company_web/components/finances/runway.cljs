@@ -8,25 +8,43 @@
             [goog.string :as gstring]
             [open-company-web.lib.oc-colors :as occ]))
 
+(defn remove-trailing-zero [string]
+  "Remove the last zero(s) in a numeric string only after the dot.
+   Remote the dot too if it is the last char after removing the zeros"
+  (cond
+
+    (and (not= (.indexOf string ".") -1) (= (last string) "0"))
+    (remove-trailing-zero (subs string 0 (dec (count string))))
+
+    (= (last string) ".")
+    (subs string 0 (dec (count string)))
+
+    :else
+    string))
+
 (defn get-rounded-runway [runway-days & [flags]]
   (cond
     (< runway-days 90)
     (str runway-days " days")
     (< runway-days (* 30 24))
     (if (utils/in? flags :round)
-      (str (gstring/format "%.2f" (/ runway-days 30)) " months")
+      (if (utils/in? flags :remove-trailing-zero)
+        (str (remove-trailing-zero (gstring/format "%.2f" (/ runway-days 30))) " months")
+        (str (gstring/format "%.2f" (/ runway-days 30)) " months"))
       (str (quot runway-days 30) " months"))
     :else
     (if (utils/in? flags :round)
-      (str (gstring/format "%.2f" (/ runway-days (* 30 12))) " years")
+      (if (utils/in? flags :remove-trailing-zero)
+        (str (remove-trailing-zero (gstring/format "%.2f" (/ runway-days (* 30 12)))) " years")
+        (str (gstring/format "%.2f" (/ runway-days (* 30 12))) " years"))
       (str (quot runway-days (* 30 12)) " years"))))
 
 (defn get-runway-subtitle [cash avg-burn-rate runway-days cur-symbol]
   (str cur-symbol (.toLocaleString (or cash 0))
-       " ÷ "
-       cur-symbol (.toLocaleString (utils/abs (or avg-burn-rate 0)))
-       " 3-months avg. burn: "
-       (get-rounded-runway runway-days [:round])))
+       " ÷ a 3-month avg. burn of "
+       cur-symbol (.toLocaleString (utils/abs (or (int avg-burn-rate) 0)))
+       " ≅ "
+       (str (get-rounded-runway runway-days [:round :remove-trailing-zero]))))
 
 (defn fix-runway [runway]
   (if (neg? runway)

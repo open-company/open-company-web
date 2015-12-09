@@ -82,5 +82,5 @@
                                                 :red (not (pos? cash-flow-val))})}
                                                (str cur-symbol (.toLocaleString (int cash-flow-val))))
               (dom/h3 {:class "actual-label gray"}
-                      (str "3 months avg " (utils/month-short-string month-3-fixed) " - " (utils/month-short-string month))))))
+                      (str "3 months avg. " (utils/month-string month-3-fixed) " to " (utils/month-string month))))))
         (om/build column-chart (get-chart-data sorted-finances cur-symbol))))))
