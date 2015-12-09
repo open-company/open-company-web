@@ -38,11 +38,15 @@
           runway-days (:runway finances-data)
           runway (cond
                   (and is-new (nil? runway-days)) "calculated"
-                  (nil? runway-days) "profitable"
-                  :else (str (.toLocaleString runway-days) " days"))
-          ref-prefix (str (:period finances-data) "-")]
+                  (or (pos? runway-days) (zero? runway-days) (nil? runway-days)) "profitable"
+                  :else (str (.toLocaleString (utils/abs runway-days)) " days"))
+          ref-prefix (str (:period finances-data) "-")
+          period-month (utils/get-month period)
+          needs-year (or (= period-month "JAN")
+                         (= period-month "DEC")
+                         (:needs-month data))]
       (dom/tr {}
-        (dom/td {:class "no-cell"} (utils/period-string (:period finances-data) :force-year))
+        (dom/td {:class "no-cell"} (utils/period-string (:period finances-data) (when needs-year :force-year)))
         ;; cash
         (dom/td {}
           (om/build cell {:value (:cash finances-data)
@@ -81,8 +85,9 @@
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
                 runway)))))
 
-(defn replace-row-in-data [owner finances-data row k v]
+(defn replace-row-in-data [owner data finances-data row k v]
   "Find and replace the edited row"
+  ((:change-finances-cb data) (update row k (fn[_]v)))
   (let [array-data (js->clj (to-array finances-data))
         new-row (update row k (fn[_]v))]
     (loop [idx 0]
@@ -92,7 +97,7 @@
                 runway-rows (utils/calc-burnrate-runway new-rows)
                 sort-pred (utils/sort-by-key-pred :period true)
                 sorted-rows (sort #(sort-pred %1 %2) runway-rows)]
-            (om/update-state! owner :data (fn [_] sorted-rows)))
+            (om/update-state! owner :sorted-data (fn [_] sorted-rows)))
           (recur (inc idx)))))))
 
 (defn next-period [data idx]
@@ -102,41 +107,54 @@
         (:period next-row))
       nil)))
 
+(defn sort-finances-data [data]
+  (let [data-vec (vec (vals data))
+        runway-rows (utils/calc-burnrate-runway data-vec)
+        sorter (utils/sort-by-key-pred :period true)]
+    (sort #(sorter %1 %2) runway-rows)))
+
+(defn get-12-months [last-period]
+  (vec
+    (for [idx (range 1 13)]
+      (let [prev-period (finances-utils/get-past-period last-period idx)]
+        {:period prev-period
+         :cash nil
+         :revenue nil
+         :costs nil
+         :burn-rate nil
+         :avg-burn-rate nil
+         :runway nil
+         :value nil
+         :new true}))))
+
+
+(defn more-12-month [owner]
+  (let [sorted-data (om/get-state owner :sorted-data)
+        last-data (last sorted-data)
+        last-period (:period last-data)
+        more-12 (get-12-months last-period)]
+    (om/set-state! owner :sorted-data (concat sorted-data more-12))))
+
 (defcomponent finances-edit [data owner]
-  
+
   (init-state [_]
-    ; add a new line if necessary
-    (let [finances-data (:section-data data)
-          initial-data (:data finances-data)
-          cur-period (utils/current-period)
-          init-state {:data initial-data
-                      :initial-data initial-data}]
-      (if-not (utils/period-exists cur-period initial-data)
-        (let [new-period {:period cur-period
-                          :cash nil
-                          :costs nil
-                          :revenue nil
-                          :new true}
-              new-data (into [new-period] initial-data)]
-          (update init-state :data (fn [_]new-data)))
-          init-state)))
-  
+    {:sorted-data (sort-finances-data (:finances-data data))})
+
   (render [_]
-    (let [finances-data (om/get-state owner :data)
+    (let [finances-data (om/get-state owner :sorted-data)
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
           show-burn (some #(pos? (:revenue %)) finances-data)
-          rows-data (into [] (map (fn [row]
-                           (let [v {:prefix cur-symbol
-                                    :show-burn show-burn
-                                    :change-cb (fn [k v]
-                                                 (replace-row-in-data owner finances-data row k v))
-                                    :cursor row}]
-                             v))
-                         finances-data))]
+          rows-data (vec (map (fn [row]
+                                (let [v {:prefix cur-symbol
+                                         :show-burn show-burn
+                                         :change-cb (fn [k v]
+                                                      (replace-row-in-data owner data finances-data row k v))
+                                         :cursor row}]
+                                  v))
+                              finances-data))]
       ; real component
       (dom/div {:class "finances"}
-        (dom/h2 {:class "finances-edit-title"} (:title (:finances (:company-data data))))
         (dom/div {:class "finances-body edit"}
           (dom/table {:class "table table-striped"}
             (dom/thead {}
@@ -152,5 +170,16 @@
               (for [idx (range (count rows-data))]
                 (let [row-data (get rows-data idx)
                       next-period (next-period finances-data idx)
-                      row (assoc row-data :next-period next-period)]
-                  (om/build finances-edit-row row))))))))))
+                      row (merge row-data {:next-period next-period
+                                           :needs-month (or (= idx 0)
+                                                            (= idx (dec (count rows-data))))})]
+                  (om/build finances-edit-row row)))
+              (dom/tr {}
+                (dom/td {}
+                  (dom/a {:on-click #(more-12-month owner)} "More..."))
+                (dom/td {})
+                (dom/td {})
+                (dom/td {})
+                (dom/td {})
+                (dom/td {})
+                (dom/td {})))))))))

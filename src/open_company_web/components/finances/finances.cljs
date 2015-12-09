@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
+            [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.finances.cash :refer (cash)]
             [open-company-web.components.finances.cash-flow :refer (cash-flow)]
             [open-company-web.components.finances.costs :refer (costs)]
@@ -30,7 +31,7 @@
   (let [section-data (:section-data data)
         notes-data (:notes section-data)]
     (om/set-state! owner :title (:title section-data))
-    (om/set-state! owner :finances-data (:data section-data))
+    (om/set-state! owner :finances-data (finances-utils/map-placeholder-data (:data section-data)))
     (om/set-state! owner :notes-body (:body notes-data))
     (om/set-state! owner :editing false)))
 
@@ -38,7 +39,7 @@
   (let [section-data (:section-data data)
         notes-data (:notes-data section-data)]
     (or (not= (:title section-data) (om/get-state owner :title))
-        (not= (:data section-data) (om/get-state owner :finances-data))
+        (not= (finances-utils/map-placeholder-data (:data section-data)) (om/get-state owner :finances-data))
         (not= (:body notes-data) (om/get-state owner :notes-body)))))
 
 (defn cancel-if-needed-cb [owner data]
@@ -53,14 +54,33 @@
     (om/set-state! owner :body-counter c))
   (om/set-state! owner k v))
 
+(defn change-finances-data-cb [owner row]
+  (let [period (:period row)
+        finances-data (om/get-state owner :finances-data)
+        fixed-data (assoc finances-data period row)]
+    (om/set-state! owner :finances-data fixed-data)))
+
+(defn clean-data [data]
+  (if (and (not (nil? (:cash data)))
+           (not (nil? (:costs data)))
+           (not (nil? (:revenue data)))
+           (not (nil? (:period data))))
+    (dissoc data :burn-rate :runway :avg-burn-rate :new :value)
+    nil))
+
+(defn clean-finances-data [finances-data]
+  (filter #(not (nil? %))
+          (vec (map (fn [[k v]] (clean-data v)) finances-data))))
+
 (defn save-cb [owner data]
   (when (or (has-changes owner data) ; when the section already exists
             (om/get-state owner :oc-editing)) ; when the section is new
     (let [title (om/get-state owner :title)
           notes-body (om/get-state owner :notes-body)
           finances-data (om/get-state owner :finances-data)
+          fixed-finances-data (clean-finances-data finances-data)
           section-data {:title title
-                        :data finances-data
+                        :data fixed-finances-data
                         :notes {:body notes-body}}]
       (if (om/get-state owner :oc-editing)
         ; save a new section
@@ -79,19 +99,20 @@
     {:focus (or (om/get-state owner :focus) "cash")
      :editing (or (not (not (:oc-editing section-data)))
                   (om/get-state owner :editing))
-     :finances-data (:data section-data)
+     :finances-data (finances-utils/map-placeholder-data (:data section-data))
      :title (:title section-data)
      :notes-body (:body (:notes section-data))
      :as-of (:updated-at section-data)}))
 
 (defcomponent finances [data owner]
-  
+
   (init-state [_]
     (let [section-data (:section-data data)
-          notes-data (:notes section-data)]
+          notes-data (:notes section-data)
+          finances-data (finances-utils/map-placeholder-data (:data section-data))]
       {:focus "cash"
        :editing (not (not (:oc-editing section-data)))
-       :finances-data (:data section-data)
+       :finances-data finances-data
        :title (:title section-data)
        :notes-body (:body (:notes section-data))
        :as-of (:updated-at section-data)}))
@@ -139,28 +160,31 @@
                                     :cancel-cb cancel-fn
                                     :cancel-if-needed-cb cancel-if-needed-fn
                                     :save-cb save-fn})
-          (dom/div {:class (utils/class-set {:link-bar true
-                                             :editable (not read-only)})}
-            (dom/a {:href "#"
-                    :class cash-classes
-                    :title "Cash"
-                    :data-tab "cash"
-                    :on-click #(subsection-click % owner)} "Cash")
-            (dom/a {:href "#"
-                    :class cash-flow-classes
-                    :title first-title
-                    :data-tab "cash-flow"
-                    :on-click #(subsection-click % owner)} first-title)
-            (when needs-runway
+          (when (not editing)
+            (dom/div {:class (utils/class-set {:link-bar true
+                                               :editable (not read-only)})}
               (dom/a {:href "#"
-                      :class runway-classes
-                      :title "Runway"
-                      :data-tab "runway"
-                      :on-click #(subsection-click % owner)} "Runway"))
-            (om/build editable-pen {:click-callback start-editing-fn}))
+                      :class cash-classes
+                      :title "Cash"
+                      :data-tab "cash"
+                      :on-click #(subsection-click % owner)} "Cash")
+              (dom/a {:href "#"
+                      :class cash-flow-classes
+                      :title first-title
+                      :data-tab "cash-flow"
+                      :on-click #(subsection-click % owner)} first-title)
+              (when needs-runway
+                (dom/a {:href "#"
+                        :class runway-classes
+                        :title "Runway"
+                        :data-tab "runway"
+                        :on-click #(subsection-click % owner)} "Runway"))
+              (om/build editable-pen {:click-callback start-editing-fn})))
           (dom/div {:class (utils/class-set {:composed-section-body true})}
             (if editing
-              (om/build finances-edit data)
+              (om/build finances-edit {:finances-data (om/get-state owner :finances-data)
+                                       :change-finances-cb (partial change-finances-data-cb owner)
+                                       :currency (:currency data)})
               (case focus
 
                 "cash"

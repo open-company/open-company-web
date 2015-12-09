@@ -153,94 +153,6 @@ nav.tab-navigation {
   margin-top: 10px;
 }
 
-div.report-list {
-  margin: 0;
-  margin-top: 10px;
-  background-color: white;
-}
-
-div.report-list div.report-list-left {
-  width: 330px;
-  float: left;
-  display: block;
-}
-
-div.chart-container {
-  width: 600px;
-  height: 290px;
-}
-
-div.report-list div.chart-container{
-  margin-top: 30px;
-}
-
-div.report-panel div.chart-container {
-  margin-left: -71px;
-  margin-top: 0px;
-}
-
-div.report-list span.num {
-  color: black;
-  font-weight: bold;
-}
-
-span.num.red {
-  color: red;
-}
-
-span.num.green {
-  color: green;
-}
-
-div.report-list span.label, div.report-list label.label {
-  color: black;
-}
-
-div.report-list label.comments-label {
-  margin: 10px 0px 0px;
-  padding: 0px;
-  color: black;
-}
-
-label.switch-vis {
-  margin: 0px 5px;
-}
-
-div.report-list input.editable-data, div.report-list input.editable-data:focus {
-  outline: 0;
-  border: 0px solid black;
-  border-bottom: 1px solid blue;
-  color: blue;
-  text-align: center;
-  width: 80px;
-  height: 23px;
-  margin: 0px 0px 5px 0px;
-  padding: 0px;
-}
-
-div.report-list label.editable-label {
-  width: 80px;
-  color: black;
-  border-bottom: 1px solid black;
-  text-align: center;
-  font-weight: normal;
-  height: 23px;
-  padding: 0px;
-  margin: 0px 0px 5px 0px;
-}
-
-div.report-list textarea.comment {
-  width: 200px;
-  border: 1px solid black;
-  padding: 5px;
-  margin-top: 10px;
-}
-
-span.label{
-  padding: 0;
-  margin: 0;
-}
-
 span img.user-icon {
   height: 24px;
   width: 24px;
@@ -1163,7 +1075,7 @@ div.section-animator-box {
 }
 
 div.section-animator-box div.section-box {
-  position: relative;
+  position: absolute;
   top: 0;
   left: 0;
   width: 600px;
@@ -1383,4 +1295,25 @@ div.new-section-popover-close{
   background-image: url("/img/close_popover.png");
   background-size: 24px 24px;
   background-position: 0 0;
+}
+
+div.finances-body.edit table {
+  margin-bottom: 0px;
+}
+
+div.charts {
+  height: 290px;
+  width: 650px;
+}
+
+div.charts div.chart-container {
+  height: 290px;
+  float: left;
+}
+
+div.charts div.values-navigator {
+  margin-top: 264px;
+  float: left;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.8);
 }

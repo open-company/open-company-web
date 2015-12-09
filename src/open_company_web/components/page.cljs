@@ -33,7 +33,9 @@
               (contains? @router/path :section)
               (let [section (keyword (:section @router/path))
                     section-data (section company-data)]
-                (om/build section-selector {:section-data section-data :section section}))
+                (om/build section-selector {:section-data section-data
+                                            :section section
+                                            :currency (:currency company-data)}))
 
               (utils/in? (:route @router/path) "profile")
               (om/build company-profile data)

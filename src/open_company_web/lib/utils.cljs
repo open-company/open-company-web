@@ -176,6 +176,10 @@
     "12" "DEC"
     ""))
 
+(defn get-month [period]
+  (let [[year month] (clojure.string/split period "-")]
+    (month-short-string month)))
+
 (defn period-string [period & flags]
   (let [force-year (in? flags :force-year)
         short-month-string (in? flags :short-month)
@@ -214,22 +218,24 @@
 (defn calc-burnrate-runway
   "Helper function that add burn-rate and runway to each update section"
   [finances-data]
-  (let [sort-pred (sort-by-key-pred :period)
-        sorted-data (into [] (sort #(sort-pred %1 %2) finances-data))]
-    (loop [idx 1
-           datas sorted-data]
-      (let [start (max 0 (- idx 3))
-            avg-burn-rate (calc-avg-burn-rate (subvec datas start idx))]
-        (let [period  (datas (dec idx))
-              runway (calc-runway (:cash period) avg-burn-rate) 
-              fixed-period (merge period {:runway runway
-                                          :avg-burn-rate avg-burn-rate
-                                          :burn-rate (calc-burn-rate (:revenue period) (:costs period))})
-              datas   (assoc datas (dec idx) fixed-period)]
-          (if (< idx (count sorted-data))
-            (recur (inc idx)
-                   datas)
-            datas))))))
+  (if (empty? finances-data)
+    finances-data
+    (let [sort-pred (sort-by-key-pred :period)
+          sorted-data (into [] (sort #(sort-pred %1 %2) finances-data))]
+      (loop [idx 1
+             datas sorted-data]
+        (let [start (max 0 (- idx 3))
+              avg-burn-rate (calc-avg-burn-rate (subvec datas start idx))]
+          (let [period  (datas (dec idx))
+                runway (calc-runway (:cash period) avg-burn-rate) 
+                fixed-period (merge period {:runway runway
+                                            :avg-burn-rate avg-burn-rate
+                                            :burn-rate (calc-burn-rate (:revenue period) (:costs period))})
+                datas   (assoc datas (dec idx) fixed-period)]
+            (if (< idx (count sorted-data))
+              (recur (inc idx)
+                     datas)
+              datas)))))))
 
 (defn camel-case-str [value]
   (let [upper-value (clojure.string/replace value #"^(\w)" #(clojure.string/upper-case (first %1)))]
@@ -486,3 +492,10 @@
 
 (defn update-page-title [title]
   (set! (.-title js/document) title))
+
+(defn periods-diff-in-months [first-period last-period]
+  (let [[first-year first-month] (clojure.string/split first-period "-")
+        [last-year last-month] (clojure.string/split last-period "-")
+        first-date (cljs-time/date-time (int first-year) (int first-month))
+        last-date (cljs-time/date-time (int last-year) (int last-month))]
+    (cljs-time/in-months (cljs-time/interval first-date last-date))))

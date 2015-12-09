@@ -9,8 +9,7 @@
 
 (defn chart-data-at-index [data prefix idx]
   (let [data (to-array data)
-        rev-idx (- (dec (min (count data) finances-utils/columns-num)) idx)
-        obj (get data rev-idx)
+        obj (get (vec (reverse data)) idx)
         cash-flow (:burn-rate obj)
         cash-flow-pos? (pos? cash-flow)
         abs-cash-flow (utils/abs cash-flow)]
@@ -20,13 +19,13 @@
      (str (utils/period-string (:period obj))
           " Revenue: "
           prefix
-          (.toLocaleString (:revenue obj)))
+          (.toLocaleString (or (:revenue obj) 0)))
      (:costs obj)
      (occ/fill-color :red)
      (str (utils/period-string (:period obj))
           " Costs: "
           prefix
-          (.toLocaleString (:costs obj)))
+          (.toLocaleString (or (:costs obj) 0)))
      abs-cash-flow
      (occ/fill-color (if cash-flow-pos? :green :red))
      (str (utils/period-string (:period obj))
@@ -37,9 +36,9 @@
 
 (defn- get-chart-data [data prefix]
   "Vector of max *columns elements of [:Label value]"
-  (let [fixed-data (finances-utils/placeholder-data data)
+  (let [fixed-data (finances-utils/chart-placeholder-data data)
         chart-data (partial chart-data-at-index fixed-data prefix)
-        placeholder-vect (range finances-utils/columns-num)]
+        placeholder-vect (range (count fixed-data))]
     { :prefix prefix
       :columns [["string" "Period"]
                 ["number" "Revenue"]
@@ -51,8 +50,9 @@
                 ["number" "Cash flow"]
                 #js {"type" "string" "role" "style"}
                 #js {"type" "string" "role" "tooltip"}]
-      :values (into [] (map chart-data placeholder-vect))
+      :values (vec (map chart-data placeholder-vect))
       :pattern "###,###.##"
+      :max-show finances-utils/columns-num
       :column-thickness "42"}))
 
 (defcomponent cash-flow [data owner]
@@ -82,5 +82,5 @@
                                                 :red (not (pos? cash-flow-val))})}
                                                (str cur-symbol (.toLocaleString (int cash-flow-val))))
               (dom/h3 {:class "actual-label gray"}
-                      (str "3 months avg " (utils/month-short-string month-3-fixed) " - " (utils/month-short-string month))))))
+                      (str "3 months avg. " (utils/month-string month-3-fixed) " to " (utils/month-string month))))))
         (om/build column-chart (get-chart-data sorted-finances cur-symbol))))))
