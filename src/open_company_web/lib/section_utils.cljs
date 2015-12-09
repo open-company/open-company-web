@@ -43,7 +43,6 @@
                                   (dissoc :note)
                                   (assoc :body-placeholder body-placeholder))
         with-title-placeholder (-> with-body-placeholder
-                                   (dissoc :title)
                                    (assoc :title-placeholder (:title with-body-placeholder)))
         new-section-kw (keyword new-section)
         new-categories (if (utils/in? (:categories company-data) new-category)
