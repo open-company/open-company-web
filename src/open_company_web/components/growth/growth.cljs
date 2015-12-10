@@ -33,10 +33,12 @@
     ; cancel editing
     (let [section-data (:section-data data)
           notes-data (:notes section-data)]
+      ; reset all the section fields to the initial values
       (om/set-state! owner :title (:title section-data))
       (om/set-state! owner :growth-data (:data section-data))
       (om/set-state! owner :growth-metrics (:metrics section-data))
       (om/set-state! owner :notes-body (:body notes-data))
+      ; and the editing state flags
       (om/set-state! owner :editing false)
       (om/set-state! owner :data-editing false))))
 
