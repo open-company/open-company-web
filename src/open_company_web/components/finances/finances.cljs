@@ -76,10 +76,11 @@
     (om/set-state! owner :finances-data fixed-data)))
 
 (defn clean-data [data]
-  (if (and (not (nil? (:cash data)))
-           (not (nil? (:costs data)))
-           (not (nil? (:revenue data)))
-           (not (nil? (:period data))))
+  ; a data entry is good if we have the period and one other value: cash, costs or revenue
+  (if (and (not (nil? (:period data)))
+           (or (not (nil? (:cash data)))
+               (not (nil? (:costs data)))
+               (not (nil? (:revenue data)))))
     (dissoc data :burn-rate :runway :avg-burn-rate :new :value)
     nil))
 
@@ -162,6 +163,7 @@
           sum-revenues (apply + (map #(:revenue %) finances-row-data))
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
           needs-runway (some #(and (contains? % :runway) (neg? (:runway %))) finances-row-data)
+          needs-cash-flow (not (every? #(and (zero? (int (:revenue %))) (zero? (int (:costs %)))) finances-row-data))
           editing (om/get-state owner :editing)
           data-editing (om/get-state owner :data-editing)
           cancel-fn #(cancel-cb owner data)
@@ -194,11 +196,12 @@
                       :title "Cash"
                       :data-tab "cash"
                       :on-click #(subsection-click % owner)} "Cash")
-              (dom/a {:href "#"
-                      :class cash-flow-classes
-                      :title first-title
-                      :data-tab "cash-flow"
-                      :on-click #(subsection-click % owner)} first-title)
+              (when needs-cash-flow
+                (dom/a {:href "#"
+                        :class cash-flow-classes
+                        :title first-title
+                        :data-tab "cash-flow"
+                        :on-click #(subsection-click % owner)} first-title))
               (when needs-runway
                 (dom/a {:href "#"
                         :class runway-classes
