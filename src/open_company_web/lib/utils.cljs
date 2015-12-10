@@ -422,20 +422,23 @@
         section-data
         (((keyword section) (slug @caches/revisions)) as-of)))))
 
-(defn get-scroll-top [id]
-  (let [section-el (.$ js/window (str "#" id))
+(defn scroll-top [selector]
+  (let [section-el (.$ js/window selector)
         section-offset (.offset section-el)]
     (.-top section-offset)))
 
+(defn scroll-top-with-id [id]
+  (scroll-top (str "#" id)))
+
 (defn scroll-to-id [id & [duration]]
-  (let [top (- (get-scroll-top id) 60)]
+  (let [top (- (scroll-top-with-id id) 60)]
     (.scrollTo js/$ #js {"top" (str top "px") "left" "0px"} (or duration 500))))
 
 (defn scroll-to-section [section-name]
   (scroll-to-id (str "section-" (name section-name))))
 
 (defn scroll-toc-to-id [id]
-  (let [top (get-scroll-top id)]
+  (let [top (scroll-top-with-id id)]
     (.scrollTo (.$ js/window ".table-of-contents-inner")
                #js {"top" (str top "px") "left" "0px"} 500)))
 
