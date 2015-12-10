@@ -52,26 +52,28 @@
     (swap! dispatcher/app-state assoc-in [slug :sections] new-sections)
     (swap! dispatcher/app-state assoc-in [slug :categories] new-categories)))
 
-(defn- remove-seciton-from-sections [sections section-name]
+(defn- remove-section-from-sections [sections section-name]
   (apply merge (map (fn [[k v]]
                       (hash-map k (utils/vec-dissoc v section-name)))
                     sections)))
 
-(defn remove-unsaved-section [section-name]
-  (let [section (keyword section-name)
+(defn remove-unsaved-section [section]
+  (let [section-name (name section)
+        section-kw (keyword section)
         slug (keyword (:slug @router/path))
         company-data (slug @dispatcher/app-state)
-        new-sections (remove-seciton-from-sections (:sections company-data) section-name)]
+        new-sections (remove-section-from-sections (:sections company-data) section-name)]
     ; remove the section body
-    (swap! dispatcher/app-state update-in [slug] dissoc section)
+    (swap! dispatcher/app-state update-in [slug] dissoc section-kw)
     ; remove the section from sections
     (swap! dispatcher/app-state assoc-in [slug :sections] new-sections)))
 
-(defn remove-section [section-name]
-  (let [section (keyword section-name)
+(defn remove-section [section]
+  (let [section-name (name section)
+        section-kw (keyword section)
         slug (keyword (:slug @router/path))
         company-data (slug @dispatcher/app-state)
-        section-data (section company-data)]
+        section-data (section-kw company-data)]
     (if (:oc-editing section-data)
       (remove-unsaved-section section-name)
       (api/remove-section section-name))))
