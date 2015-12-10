@@ -213,7 +213,8 @@
           start-data-editing-fn #(start-data-editing-cb owner data)
           subsection-data {:section-data section-data
                            :read-only read-only
-                           :currency (:currency data)}]
+                           :currency (:currency data)
+                           :start-editing-cb start-data-editing-fn}]
       (dom/div {:class "section-container" :id "section-finances"}
         (dom/div {:class "composed-section finances"}
           (om/build editable-title {:read-only read-only
