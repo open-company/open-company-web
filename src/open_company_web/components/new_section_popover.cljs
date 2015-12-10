@@ -38,19 +38,29 @@
   (when (.-svgcss js/window)
     (.setTimeout js/window #(.svgcss js/window) 1)))
 
+(defn scroll-to-category [selected-category]
+  (let [category-id (str "new-section-category-" selected-category)
+        top (utils/scroll-top-with-id category-id)
+        container-offset-top (utils/scroll-top ".new-section-container")
+        fixed-top (- top container-offset-top 20)]
+    (.scrollTo (.$ js/window ".new-section-container")
+               #js {"top" (str fixed-top "px") "left" "0px"} 500)))
+
 (defcomponent new-section-popover [data owner]
 
   (did-mount [_]
-    (replace-svg))
+    (replace-svg)
+    (.setTimeout js/window #(scroll-to-category (:selected-category data)) 200))
 
   (did-update [_ _ _]
-    (replace-svg))
+    (replace-svg)
+    (.setTimeout js/window #(scroll-to-category (:selected-category data)) 200))
 
   (render [_]
     (let [slug (keyword (:slug @router/path))
           company-data (slug @dispatcher/app-state)
           old-sections (:sections company-data)
-          sections (filter-categories old-sections (:categories data))]
+          sections (filter-categories old-sections (:categories (:new-sections data)))]
       (dom/div {:class "new-section-popover"}
         (dom/div {:class "new-section-popover-close"
                   :on-click #(put! (utils/get-channel "close-new-section-popover") {})})
@@ -60,7 +70,8 @@
           (dom/div {:class "gradient top-gradient"})
           (for [category sections]
             (when (pos? (count (:sections category)))
-              (dom/div {:class "new-section-category"}
+              (dom/div {:class "new-section-category"
+                        :id (str "new-section-category-" (:name category))}
                 (dom/h3 {} (:title category))
                 (dom/div {:class "new-section-category-sections"}
                   (for [section (:sections category)]
