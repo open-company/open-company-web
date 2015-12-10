@@ -56,6 +56,13 @@
     (or (not= (:title section-data) (om/get-state owner :title))
         (not= (:body notes-data) (om/get-state owner :notes-body)))))
 
+(defn has-not-zero-data [owner data]
+  (let [finances-data (om/get-state owner :finances-data)]
+    (not (every? #(and (zero? (int (:cash %)))
+                       (zero? (int (:revenue %)))
+                       (zero? (int (:costs %))))
+                 finances-data))))
+
 (defn cancel-if-needed-cb [owner data]
   (when (and (not (has-data-changes owner data))
              (not (has-changes owner data)))
@@ -89,9 +96,13 @@
           (vec (map (fn [[k v]] (clean-data v)) finances-data))))
 
 (defn save-cb [owner data]
-  (when (or (has-changes owner data) ; when the section already exists
-            (has-data-changes owner data)
-            (om/get-state owner :oc-editing)) ; when the section is new
+  (when (or (and (not (om/get-state owner :oc-editing))  ; when the section already exists
+                 (or (has-changes owner data)            ; there are changes to the title or notes
+                     (has-data-changes owner data)))     ; or there are changes to the data
+
+            (and (om/get-state owner :oc-editing)        ; when the section is new
+                 (has-data-changes owner data)           ; there are changes to the data
+                 (has-not-zero-data owner data)))        ; and there are at least some non-zero data
     (let [title (om/get-state owner :title)
           notes-body (om/get-state owner :notes-body)
           finances-data (om/get-state owner :finances-data)
