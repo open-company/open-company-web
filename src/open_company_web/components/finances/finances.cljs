@@ -35,12 +35,14 @@
   (if (om/get-state owner :oc-editing)
     ; remove an unsaved section
     (section-utils/remove-section (name (:section data)))
-    ; cancel editing
+    ; revert the edited data to the initial values
     (let [section-data (:section-data data)
           notes-data (:notes section-data)]
+      ; reset the growth fields to the initial values
       (om/set-state! owner :title (:title section-data))
       (om/set-state! owner :notes-body (:body notes-data))
       (om/set-state! owner :finances-data (finances-utils/map-placeholder-data (:data section-data)))
+      ; and the editing state flags
       (om/set-state! owner :editing false)
       (om/set-state! owner :data-editing false))))
 
@@ -55,7 +57,8 @@
         (not= (:body notes-data) (om/get-state owner :notes-body)))))
 
 (defn cancel-if-needed-cb [owner data]
-  (when (and (not (has-data-changes owner data)) (not (has-changes owner data)))
+  (when (and (not (has-data-changes owner data))
+             (not (has-changes owner data)))
     (cancel-cb owner data)))
 
 (defn change-cb [owner k v & [c]]
@@ -183,7 +186,7 @@
                                     :cancel-cb cancel-fn
                                     :cancel-if-needed-cb cancel-if-needed-fn
                                     :save-cb save-fn})
-          (when (not data-editing)
+          (when-not data-editing
             (dom/div {:class (utils/class-set {:link-bar true
                                                :editable (not read-only)})}
               (dom/a {:href "#"

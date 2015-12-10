@@ -30,10 +30,10 @@
   (if (om/get-state owner :oc-editing)
     ; remove an unsaved section
     (section-utils/remove-section (:section data))
-    ; cancel editing
+    ; revert the edited data to the initial values
     (let [section-data (:section-data data)
           notes-data (:notes section-data)]
-      ; reset all the section fields to the initial values
+      ; reset the finances fields to the initial values
       (om/set-state! owner :title (:title section-data))
       (om/set-state! owner :growth-data (:data section-data))
       (om/set-state! owner :growth-metrics (:metrics section-data))
@@ -54,7 +54,8 @@
         (not= (:body notes-data) (om/get-state owner :notes-body)))))
 
 (defn cancel-if-needed-cb [owner data]
-  (when (and (not (has-changes owner data)) (not (has-data-changes owner data)))
+  (when (and (not (has-changes owner data))
+             (not (has-data-changes owner data)))
     (cancel-cb owner data)))
 
 (defn change-cb [owner k v & [c]]
