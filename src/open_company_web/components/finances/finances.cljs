@@ -56,12 +56,16 @@
     (or (not= (:title section-data) (om/get-state owner :title))
         (not= (:body notes-data) (om/get-state owner :notes-body)))))
 
+(defn check-non-zero-value [v]
+  (and (not (zero? v))
+       (not (nil? v))))
+
 (defn has-not-zero-data [owner data]
   (let [finances-data (om/get-state owner :finances-data)]
-    (not (every? #(and (zero? (int (:cash %)))
-                       (zero? (int (:revenue %)))
-                       (zero? (int (:costs %))))
-                 finances-data))))
+    (some (fn [[k v]] (or (check-non-zero-value (:cash v))
+                          (check-non-zero-value (:revenue v))
+                          (check-non-zero-value (:costs v))))
+                 finances-data)))
 
 (defn cancel-if-needed-cb [owner data]
   (when (and (not (has-data-changes owner data))
@@ -76,10 +80,23 @@
     (om/set-state! owner :body-counter c))
   (om/set-state! owner k v))
 
+(defn get-finances-value [v]
+  (if (or (js/isNaN v)
+          (nil? v))
+    0
+    v))
+
+(defn fix-row [row]
+  (let [fixed-cash (assoc row :cash (get-finances-value (:cash row)))
+        fixed-revenue (assoc fixed-cash :revenue (get-finances-value (:revenue row)))
+        fixed-costs (assoc fixed-revenue :costs (get-finances-value (:costs row)))]
+    fixed-costs))
+
 (defn change-finances-data-cb [owner row]
-  (let [period (:period row)
+  (let [fixed-row (fix-row row)
+        period (:period fixed-row)
         finances-data (om/get-state owner :finances-data)
-        fixed-data (assoc finances-data period row)]
+        fixed-data (assoc finances-data period fixed-row)]
     (om/set-state! owner :finances-data fixed-data)))
 
 (defn clean-data [data]
@@ -264,6 +281,12 @@
             (if (or editing data-editing)
               (om/build section-footer {:editing (or editing data-editing)
                                         :cancel-cb cancel-fn
+                                        ; disable save until there are changes depending if the section is new
+                                        :save-disabled (or (and (not (om/get-state owner :oc-editing))
+                                                                (or (has-data-changes owner data)
+                                                                    (has-changes owner data)))
+                                                           (and (om/get-state owner :oc-editing)
+                                                                (not (has-not-zero-data owner data))))
                                         :is-new-section (om/get-state owner :oc-editing)
                                         :save-cb save-fn})
               (om/build revisions-navigator data))))))))
