@@ -111,7 +111,8 @@
   (let [section-data (:section-data data)
         notes-data (:notes section-data)]
     {:focus (or (om/get-state owner :focus) "cash")
-     :editing (om/get-state owner :editing)
+     :editing (or (not (not (:oc-editing section-data)))
+                  (om/get-state owner :editing))
      :data-editing (or (not (not (:oc-editing section-data)))
                        (om/get-state owner :data-editing))
      :finances-data (finances-utils/map-placeholder-data (:data section-data))
@@ -126,7 +127,7 @@
           notes-data (:notes section-data)
           finances-data (finances-utils/map-placeholder-data (:data section-data))]
       {:focus "cash"
-       :editing false
+       :editing (not (not (:oc-editing section-data)))
        :data-editing (not (not (:oc-editing section-data)))
        :oc-editing (:oc-editing section-data)
        :finances-data finances-data
