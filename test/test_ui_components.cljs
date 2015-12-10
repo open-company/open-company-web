@@ -11,7 +11,8 @@
             [test.open-company-web.components.update-footer]
             [test.open-company-web.components.utility-components]
             [test.open-company-web.components.section-footer]
-            [test.open-company-web.components.uncontrolled-content-editable]))
+            [test.open-company-web.components.uncontrolled-content-editable]
+            [test.open-company-web.components.popover]))
 
 (enable-console-print!)
 
@@ -30,4 +31,5 @@
   'test.open-company-web.components.update-footer
   'test.open-company-web.components.utility-components
   'test.open-company-web.components.section-footer
-  'test.open-company-web.components.uncontrolled-content-editable)
+  'test.open-company-web.components.uncontrolled-content-editable
+  'test.open-company-web.components.popover)
