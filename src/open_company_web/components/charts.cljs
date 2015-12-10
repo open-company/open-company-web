@@ -135,7 +135,9 @@
     (om/set-state! owner :max-value (get-max next-props)))
 
   (did-update [_ prev-props _]
+    ; if the values have changed
     (when (not= (:values prev-props) (:values chart-data))
+      ; we need to force the cahrt redraw
       (om/set-state! owner :animated false)
       (draw-chart-when-visible owner chart-data)))
 
