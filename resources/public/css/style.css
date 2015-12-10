@@ -402,7 +402,7 @@ div.fake-rich-editor[contenteditable=true]:empty:before{
 div.rich-editor-container div.rich-editor {
   color: #191919;
   border: 1px solid transparent;
-  min-height: 50px;
+  min-height: 50px !important;
 }
 
 div.rich-editor-container div.rich-editor:focus,
