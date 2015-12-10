@@ -166,7 +166,7 @@ span img.user-icon {
 }
 
 div.composed-section i.add-metric {
-  color: #707070;
+  color: #109DB7;
   opacity: 0;
   cursor: default;
 }
@@ -657,6 +657,7 @@ div.finances div.link-bar i.editable-pen {
   opacity: 0;
   margin-left: -20px;
   cursor: pointer;
+  color: #26C485;;
 }
 
 div.finances:hover div.link-bar.editable i.editable-pen {
