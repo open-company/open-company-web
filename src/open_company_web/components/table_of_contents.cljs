@@ -34,7 +34,7 @@
                                 (catch :default e)) 1500)
       (catch :default e))))
 
-(defn add-popover-container []
+(defn add-popover-container [selected-category]
   (when (.-$ js/window) ; avoid tests crash
     (let [popover (.$ js/window "<div id='new-section-popover-container'></div>")
           body (.$ js/window (.-body js/document))
@@ -46,13 +46,14 @@
       (when-not (pos? (.-length (.$ js/window "body div#new-section-popover-container div.new-section-popover")))
         (.setTimeout js/window
                      #(om/root new-section-popover
-                               (slug @caches/new-sections)
+                               {:new-sections (slug @caches/new-sections)
+                                :selected-category selected-category}
                                {:target (.getElementById js/document "new-section-popover-container")})
                      1)))))
 
 (defn show-popover [e category section]
   (when (.-$ js/window) ; avoid tests crash
-    (add-popover-container)
+    (add-popover-container category)
     (.css (.$ js/window "body") #js {"overflow" "hidden"})
     (let [$info (.$ js/window "#last-add-section-info")]
       (.data $info "category" category)
