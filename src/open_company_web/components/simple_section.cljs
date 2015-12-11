@@ -77,6 +77,12 @@
        :title (:title (:section-data data))
        :body (:body (:section-data data))}))
 
+  (did-mount [this]
+    (when (:oc-editing (:section-data data))
+      (let [selector (str "div#section-" (name (:section data)) " div.rich-editor")
+            rich-editor (.querySelector js/document selector)]
+        (.setTimeout js/window #(.focus rich-editor) 200))))
+
   (will-receive-props [_ next-props]
     ; this means the title or the body has changed from the API or at a upper lever of this component
     (when-not (= next-props (om/get-props owner))
@@ -111,7 +117,7 @@
                                   :save-cb save-fn})
 
         (dom/div {:class "simple-section-body"}
-          (om/build rich-editor {:body-editing body-editing
+          (om/build rich-editor {:editing body-editing
                                  :section section
                                  :body-counter (om/get-state owner :body-counter)
                                  :read-only (:read-only data)
