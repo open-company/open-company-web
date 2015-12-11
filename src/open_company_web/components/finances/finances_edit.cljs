@@ -37,9 +37,10 @@
                       (str burn-prefix (.toLocaleString (utils/abs burn))))
           runway-days (:runway finances-data)
           runway (cond
-                  (and is-new (zero? runway-days)) "calculated"
-                  (or (pos? runway-days) (zero? runway-days) (nil? runway-days)) "profitable"
-                  :else (str (.toLocaleString (utils/abs runway-days)) " days"))
+                   (nil? runway-days) "calculated"
+                   (zero? runway-days) "break-even"
+                   (pos? runway-days) "profitable"
+                   :else (str (.toLocaleString (utils/abs runway-days)) " days"))
           ref-prefix (str (:period finances-data) "-")
           period-month (utils/get-month period)
           needs-year (or (= period-month "JAN")
@@ -181,5 +182,6 @@
                 (dom/td {})
                 (dom/td {})
                 (dom/td {})
-                (dom/td {})
+                (when show-burn
+                  (dom/th {} ""))
                 (dom/td {})))))))))
