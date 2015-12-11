@@ -159,6 +159,9 @@
      :notes-body (:body (:notes section-data))
      :as-of (:updated-at section-data)}))
 
+(defn has-revenues-or-costs [finances-data]
+  (some #(or (not (zero? (:revenue %))) (not (zero? (:costs %)))) finances-data))
+
 (defcomponent finances [data owner]
 
   (init-state [_]
@@ -198,8 +201,8 @@
           finances-row-data (:data section-data)
           sum-revenues (apply + (map #(:revenue %) finances-row-data))
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
-          needs-runway (some #(and (contains? % :runway) (neg? (:runway %))) finances-row-data)
-          needs-cash-flow (not (every? #(and (zero? (int (:revenue %))) (zero? (int (:costs %)))) finances-row-data))
+          needs-runway (some #(neg? (:runway %)) finances-row-data)
+          needs-cash-flow (has-revenues-or-costs finances-row-data)
           title-editing (om/get-state owner :title-editing)
           notes-editing (om/get-state owner :notes-editing)
           data-editing (om/get-state owner :data-editing)
