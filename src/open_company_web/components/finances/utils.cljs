@@ -16,7 +16,7 @@
         value (keyw obj)
         label (if has-value
                 (if (and (= keyw :runway) (zero? value))
-                  "Profitable"
+                  "Break-even"
                   (str (utils/period-string (:period obj)) " " column-name ": " prefix (.toLocaleString (keyw obj)) suffix))
                 "N/A")
         period (utils/period-string (:period obj) :short-month)]
