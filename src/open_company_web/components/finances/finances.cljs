@@ -93,8 +93,10 @@
 (defn fix-row [row]
   (let [fixed-cash (assoc row :cash (get-finances-value (:cash row)))
         fixed-revenue (assoc fixed-cash :revenue (get-finances-value (:revenue row)))
-        fixed-costs (assoc fixed-revenue :costs (get-finances-value (:costs row)))]
-    fixed-costs))
+        fixed-costs (assoc fixed-revenue :costs (get-finances-value (:costs row)))
+        fixed-burnrate (assoc fixed-costs :burn-rate (utils/calc-burn-rate (:revenue fixed-costs) (:costs fixed-costs)))
+        fixed-runway (assoc fixed-burnrate :runway (utils/calc-runway (:cash fixed-burnrate) (:burn-rate fixed-burnrate)))]
+    fixed-runway))
 
 (defn change-finances-data-cb [owner row]
   (let [fixed-row (fix-row row)
@@ -119,7 +121,8 @@
 (defn save-cb [owner data]
   (when (or (and (not (om/get-state owner :oc-editing))  ; when the section already exists
                  (or (has-changes owner data)            ; there are changes to the title or notes
-                     (has-data-changes owner data)))     ; or there are changes to the data
+                     (has-data-changes owner data))      ; or there are changes to the data
+                 (has-not-zero-data owner data))         ; and the data are not all 0s
 
             (and (om/get-state owner :oc-editing)        ; when the section is new
                  (has-data-changes owner data)           ; there are changes to the data
