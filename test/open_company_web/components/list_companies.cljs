@@ -16,7 +16,7 @@
   :companies [
     {
       :symbol "OPEN"
-      :name "OpenCompany Inc."
+      :name "OPENcompany"
     }
     {
       :symbol "BUFF"
