@@ -10,11 +10,6 @@
     (let [editing (:editing data)]
       (dom/div {:class "section-footer"}
         (dom/div {:class "save-section"}
-          (dom/button {:class "oc-btn oc-cancel gray"
-                       :on-click (:cancel-cb data)}
-                      (if (:is-new-section data)
-                        "DELETE"
-                        "CANCEL"))
           (dom/button {:class (utils/class-set {:oc-btn true
                                                 :oc-success true
                                                 :disabled (:save-disabled data)
@@ -24,4 +19,9 @@
                                    ((:save-cb data)))}
                       (if (:is-new-section data)
                         "CREATE"
-                        "SAVE")))))))
+                        "SAVE"))
+          (dom/button {:class "oc-btn oc-cancel gray"
+             :on-click (:cancel-cb data)}
+            (if (:is-new-section data)
+              "DELETE"
+              "CANCEL")))))))

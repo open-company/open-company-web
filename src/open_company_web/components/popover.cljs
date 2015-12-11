@@ -14,10 +14,10 @@
       (dom/div {:class "message-container"}
         (dom/p {:class "message"} (:message data)))
       (dom/div {:class "buttons-container"}
-        (dom/button {:class "oc-btn oc-cancel"
-                     :on-click (:cancel-cb data)} (:cancel-title data))
         (dom/button {:class (str "oc-btn oc-success " (:success-color-class data))
-                     :on-click (:success-cb data)} (:success-title data))))))
+                     :on-click (:success-cb data)} (:success-title data))
+        (dom/button {:class "oc-btn oc-cancel"
+                     :on-click (:cancel-cb data)} (:cancel-title data))))))
 
 (defn hide-popover [e container-id]
   (when (.-$ js/window)
