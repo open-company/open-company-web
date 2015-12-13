@@ -130,42 +130,57 @@
   (cond
     ; new section
     (om/get-state owner :oc-editing)
+    ; finances has data and title is not empty
     (and (has-not-zero-data owner data)
          (> (count (om/get-state owner :title) 0)))
+
     ; title data and notes editing
     (and (om/get-state owner :title-editing)
          (om/get-state owner :data-editing)
          (om/get-state owner :notes-editing))
+    ; finances has data and at least one btw title data and notes has changes
     (and (has-not-zero-data owner data)
          (or (has-title-changes owner data)
              (has-data-changes owner data)
              (has-notes-changes owner data)))
+
     ; title and data editing
     (and (om/get-state owner :title-editing)
          (om/get-state owner :data-editing))
+    ; finances has data and title or data has changes
     (and (has-not-zero-data owner data)
          (or (has-title-changes owner data)
              (has-data-changes owner data)))
+
     ; title and notes editing
     (and (om/get-state owner :title-editing)
          (om/get-state owner :notes-editing))
-          (or (has-title-changes owner data)
-              (has-notes-changes owner data))
+    ; finances has data and title or data has changes
+    (or (has-title-changes owner data)
+        (has-notes-changes owner data))
+
     ; data and notes editing
     (and (om/get-state owner :data-editing)
          (om/get-state owner :notes-editing))
+    ; finances has data and data or notes has changes
     (and (has-not-zero-data owner data)
          (or (has-data-changes owner data)
              (has-notes-changes owner data)))
+
     ; title editing
     (om/get-state owner :title-editing)
+    ; title has changes
     (has-title-changes owner data)
+
     ; data editing
     (om/get-state owner :data-editing)
+    ; finances has data and changes
     (and (has-data-changes owner data)
          (has-not-zero-data owner data))
+
     ; notes editing
     (om/get-state owner :notes-editing)
+    ; notes has changes
     (has-notes-changes owner data)))
 
 (defn save-cb [owner data]
