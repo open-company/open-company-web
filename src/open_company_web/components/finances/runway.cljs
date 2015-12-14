@@ -70,7 +70,8 @@
           runway-string (if is-profitable
                           runway
                           (get-rounded-runway runway-value))]
-      (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))}
+      (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))
+                :on-click (:start-editing-cb data)}
         (dom/div {:class "chart-header-container"}
           (dom/div {:class "target-actual-container"}
             (dom/div {:class "actual-container"}

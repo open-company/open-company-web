@@ -42,7 +42,7 @@
 
 (defn chart-options [owner data column-thickness max-value startup]
   (clj->js {:title  ""
-            :width (min 600 (* 50 (count data)))
+            :width (min 600 (max (* 50 (count data)) 125))
             :height 290
             :animation #js {"startup" startup
                             "duration" 400
@@ -133,6 +133,13 @@
 
   (will-receive-props [_ next-props]
     (om/set-state! owner :max-value (get-max next-props)))
+
+  (did-update [_ prev-props _]
+    ; if the values have changed
+    (when (not= (:values prev-props) (:values chart-data))
+      ; we need to force the cahrt redraw
+      (om/set-state! owner :animated false)
+      (draw-chart-when-visible owner chart-data)))
 
   (render [_]
     (let [data-count (count (:values chart-data))

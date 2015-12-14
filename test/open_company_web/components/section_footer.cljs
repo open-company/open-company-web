@@ -28,7 +28,9 @@
           save-button (sel1 c [:button.oc-success])
           cancel-button (sel1 c [:button.oc-cancel])]
       (is (not (nil? save-button)))
+      (is (= (.-innerHTML save-button) "SAVE"))
       (is (not (nil? cancel-button)))
+      (is (= (.-innerHTML cancel-button) "CANCEL"))
       (tu/unmount! c)))
   (testing "Section footer component for new section"
     (let [c (tu/new-container!)
@@ -38,6 +40,8 @@
           save-button (sel1 c [:button.oc-success])
           cancel-button (sel1 c [:button.oc-cancel])]
       (is (not (nil? save-button)))
-      (is (.-disabled save-button))
-      (is (nil? cancel-button))
+      (is (true? (.-disabled save-button)))
+      (is (= (.-innerHTML save-button) "CREATE"))
+      (is (not (nil? cancel-button)))
+      (is (= (.-innerHTML cancel-button) "DELETE"))
       (tu/unmount! c))))

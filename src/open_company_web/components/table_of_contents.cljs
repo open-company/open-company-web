@@ -12,9 +12,9 @@
             [open-company-web.caches :as caches]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [open-company-web.api :as api]
-            [open-company-web.components.table-of-contents-item :refer (table-of-contents-item)]))
-
-(def first-sec-placeholder "firstsectionplaceholder")
+            [open-company-web.components.table-of-contents-item :refer (table-of-contents-item)]
+            [open-company-web.lib.section-utils :as section-utils]
+            [open-company-web.components.finances.utils :as finances-utils]))
 
 (defn get-category-section-info [e]
   (let [target (.-target e)
@@ -34,7 +34,7 @@
                                 (catch :default e)) 1500)
       (catch :default e))))
 
-(defn add-popover-container []
+(defn add-popover-container [selected-category]
   (when (.-$ js/window) ; avoid tests crash
     (let [popover (.$ js/window "<div id='new-section-popover-container'></div>")
           body (.$ js/window (.-body js/document))
@@ -46,13 +46,14 @@
       (when-not (pos? (.-length (.$ js/window "body div#new-section-popover-container div.new-section-popover")))
         (.setTimeout js/window
                      #(om/root new-section-popover
-                               (slug @caches/new-sections)
+                               {:new-sections (slug @caches/new-sections)
+                                :selected-category selected-category}
                                {:target (.getElementById js/document "new-section-popover-container")})
                      1)))))
 
 (defn show-popover [e category section]
   (when (.-$ js/window) ; avoid tests crash
-    (add-popover-container)
+    (add-popover-container category)
     (.css (.$ js/window "body") #js {"overflow" "hidden"})
     (let [$info (.$ js/window "#last-add-section-info")]
       (.data $info "category" category)
@@ -61,51 +62,14 @@
       (.click popover hide-popover)
       (.setTimeout js/window #(.fadeIn popover 400) 0))))
 
-(defn insert-section
-  [category-into section-after category-to-insert section-to-insert sections]
-  (let [category-kw (keyword category-to-insert)
-        category (category-kw sections)]
-    (cond
-      ; category doesn't exist, create it with the new section
-      (not (contains? sections category-kw))
-      (merge sections {category-kw [section-to-insert]})
-      ; categories are different, adding as last section
-      (not= category-into category-to-insert)
-      (merge sections {category-kw (conj (category-kw sections) section-to-insert)})
-      ; category exists, section is placeholder for first place
-      (= section-after first-sec-placeholder)
-      (let [new-category (concat [section-to-insert] (category-kw sections))]
-        (merge sections {category-kw (vec new-category)}))
-      ; category exists, adding section
-      :else
-      (let [idx (inc (.indexOf (to-array category) section-after))
-            [before after] (split-at idx category)
-            new-category (vec (concat before [section-to-insert] after))]
-        (merge sections {category-kw new-category})))))
-
 (defn handle-add-section-change [change]
   (let [$info (.$ js/window "#last-add-section-info")
         last-section (.data $info "section")
-        last-category (.data $info "category")
-        slug (keyword (:slug @router/path))
-        company-data (slug @dispatcher/app-state)
-        sections (:sections company-data)
-        new-sections (insert-section last-category last-section (:category change) (:section change) sections)
-        section-defaults (utils/fix-section (merge (:section-defaults change) {:oc-editing true
-                                                                               :updated-at (utils/as-of-now)})
-                                            (name (:section change)))
-        placeholder-section-defaults (assoc (dissoc section-defaults :body) :placeholder (:body (:section-defaults change)))
-        new-section-kw (keyword (:section change))
-        new-category (:category change)
-        new-categories (if (utils/in? (:categories company-data) new-category)
-                         (:categories company-data)
-                         (conj (:categories company-data) new-category))]
-    (swap! dispatcher/app-state assoc-in [slug] (merge (slug @dispatcher/app-state) {new-section-kw placeholder-section-defaults}))
-    (swap! dispatcher/app-state assoc-in [slug :sections] new-sections)
-    (swap! dispatcher/app-state assoc-in [slug :categories] new-categories)
+        last-category (.data $info "category")]
+    (section-utils/add-section last-category last-section (:category change) (:section change) (:section-defaults change))
     (.setTimeout js/window #(do
                               (utils/scroll-toc-to-id (str "section-sort--" (:section change)))
-                              (utils/scroll-to-section new-section-kw)) 1000)))
+                              (utils/scroll-to-section (:section change))) 1000)))
 
 (defcomponent add-section [data owner]
 
@@ -187,7 +151,7 @@
                                                    :empty (empty? sections)})}
                          (dom/h3 (utils/camel-case-str (name category))))
                 (om/build add-section {:category category
-                                       :section first-sec-placeholder})
+                                       :section finances-utils/first-section-placeholder})
                 (dom/div {:class "category-sections-container"}
                   (for [section sections]
                     (let [section-data ((keyword section) data)]
@@ -195,7 +159,7 @@
                         (om/build table-of-contents-item {
                                             :category category
                                             :section section
-                                            :title (:title section-data)
+                                            :title (or (:title section-data) (:title-placeholder section-data))
                                             :updated-at (:updated-at section-data)
                                             :show-popover #(show-popover % (name category) (:name section-data))})
                         (om/build add-section {:category (name category)

@@ -20,7 +20,8 @@
           cash-val (str cur-symbol (utils/format-value (:cash value-set)))]
       (dom/div {:class (utils/class-set {:section true
                                          :cash true
-                                         :read-only (:read-only data)})}
+                                         :read-only (:read-only data)})
+                :on-click (:start-editing-cb data)}
         (dom/div {:class "chart-header-container"}
           (dom/div {:class "target-actual-container"}
             (dom/div {:class "actual-container"}

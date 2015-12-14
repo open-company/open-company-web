@@ -73,7 +73,8 @@
           month-3-fixed (utils/add-zero (if (<= month-3 0) (- 12 month-3) month-3))]
       (dom/div {:class (utils/class-set {:section true
                                          :cash-flow true
-                                         :read-only (:read-only data)})}
+                                         :read-only (:read-only data)})
+                :on-click (:start-editing-cb data)}
         (dom/div {:class "chart-header-container"}
           (dom/div {:class "target-actual-container"}
             (dom/div {:class "actual-container"}

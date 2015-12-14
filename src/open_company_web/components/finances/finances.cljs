@@ -13,6 +13,7 @@
             [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.components.rich-editor :refer (rich-editor)]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.section-utils :as section-utils]
             [open-company-web.components.revisions-navigator :refer (revisions-navigator)]
             [open-company-web.api :as api]
             [open-company-web.components.editable-title :refer (editable-title)]
@@ -24,26 +25,63 @@
   (let [tab  (.. e -target -dataset -tab)]
     (om/update-state! owner :focus (fn [] tab))))
 
-(defn start-editing-cb [owner data]
-  (om/set-state! owner :editing true))
+(defn start-title-editing-cb [owner data]
+  (om/set-state! owner :title-editing true))
+
+(defn start-notes-editing-cb [owner data]
+  (om/set-state! owner :notes-editing true))
+
+(defn start-data-editing-cb [owner data]
+  (om/set-state! owner :data-editing true))
 
 (defn cancel-cb [owner data]
-  (let [section-data (:section-data data)
-        notes-data (:notes section-data)]
-    (om/set-state! owner :title (:title section-data))
-    (om/set-state! owner :finances-data (finances-utils/map-placeholder-data (:data section-data)))
-    (om/set-state! owner :notes-body (:body notes-data))
-    (om/set-state! owner :editing false)))
+  (if (om/get-state owner :oc-editing)
+    ; remove an unsaved section
+    (section-utils/remove-section (name (:section data)))
+    ; revert the edited data to the initial values
+    (let [section-data (:section-data data)
+          notes-data (:notes section-data)]
+      ; reset the growth fields to the initial values
+      (om/set-state! owner :title (:title section-data))
+      (om/set-state! owner :notes-body (:body notes-data))
+      (om/set-state! owner :finances-data (finances-utils/map-placeholder-data (:data section-data)))
+      ; and the editing state flags
+      (om/set-state! owner :title-editing false)
+      (om/set-state! owner :notes-editing false)
+      (om/set-state! owner :data-editing false))))
 
-(defn has-changes [owner data]
+(defn has-data-changes [owner data]
+  (let [section-data (:section-data data)]
+    (not= (finances-utils/map-placeholder-data (:data section-data)) (om/get-state owner :finances-data))))
+
+(defn has-title-changes [owner data]
+  (let [section-data (:section-data data)]
+    (and (not= (:title section-data) (om/get-state owner :title))
+         (> (count (om/get-state owner :title)) 0))))
+
+(defn has-notes-changes [owner data]
   (let [section-data (:section-data data)
         notes-data (:notes-data section-data)]
-    (or (not= (:title section-data) (om/get-state owner :title))
-        (not= (finances-utils/map-placeholder-data (:data section-data)) (om/get-state owner :finances-data))
-        (not= (:body notes-data) (om/get-state owner :notes-body)))))
+    (not= (:body notes-data) (om/get-state owner :notes-body))))
+
+(defn has-changes [owner data]
+  (or (has-title-changes owner data)
+      (has-notes-changes owner data)))
+
+(defn check-non-zero-value [v]
+  (and (not (zero? v))
+       (not (nil? v))))
+
+(defn has-not-zero-data [owner data]
+  (let [finances-data (om/get-state owner :finances-data)]
+    (some (fn [[k v]] (or (check-non-zero-value (:cash v))
+                          (check-non-zero-value (:revenue v))
+                          (check-non-zero-value (:costs v))))
+                 finances-data)))
 
 (defn cancel-if-needed-cb [owner data]
-  (when (not (has-changes owner data))
+  (when (and (not (has-data-changes owner data))
+             (not (has-changes owner data)))
     (cancel-cb owner data)))
 
 (defn change-cb [owner k v & [c]]
@@ -54,17 +92,33 @@
     (om/set-state! owner :body-counter c))
   (om/set-state! owner k v))
 
+(defn get-finances-value [v]
+  (if (or (js/isNaN v)
+          (nil? v))
+    0
+    v))
+
+(defn fix-row [row]
+  (let [fixed-cash (assoc row :cash (get-finances-value (:cash row)))
+        fixed-revenue (assoc fixed-cash :revenue (get-finances-value (:revenue row)))
+        fixed-costs (assoc fixed-revenue :costs (get-finances-value (:costs row)))
+        fixed-burnrate (assoc fixed-costs :burn-rate (utils/calc-burn-rate (:revenue fixed-costs) (:costs fixed-costs)))
+        fixed-runway (assoc fixed-burnrate :runway (utils/calc-runway (:cash fixed-burnrate) (:burn-rate fixed-burnrate)))]
+    fixed-runway))
+
 (defn change-finances-data-cb [owner row]
-  (let [period (:period row)
+  (let [fixed-row (fix-row row)
+        period (:period fixed-row)
         finances-data (om/get-state owner :finances-data)
-        fixed-data (assoc finances-data period row)]
+        fixed-data (assoc finances-data period fixed-row)]
     (om/set-state! owner :finances-data fixed-data)))
 
 (defn clean-data [data]
-  (if (and (not (nil? (:cash data)))
-           (not (nil? (:costs data)))
-           (not (nil? (:revenue data)))
-           (not (nil? (:period data))))
+  ; a data entry is good if we have the period and one other value: cash, costs or revenue
+  (if (and (not (nil? (:period data)))
+           (or (not (nil? (:cash data)))
+               (not (nil? (:costs data)))
+               (not (nil? (:revenue data)))))
     (dissoc data :burn-rate :runway :avg-burn-rate :new :value)
     nil))
 
@@ -72,9 +126,65 @@
   (filter #(not (nil? %))
           (vec (map (fn [[k v]] (clean-data v)) finances-data))))
 
+(defn can-save [owner data]
+  (cond
+    ; new section
+    (om/get-state owner :oc-editing)
+    ; finances has data and title is not empty
+    (and (has-not-zero-data owner data)
+         (> (count (om/get-state owner :title) 0)))
+
+    ; title data and notes editing
+    (and (om/get-state owner :title-editing)
+         (om/get-state owner :data-editing)
+         (om/get-state owner :notes-editing))
+    ; finances has data and at least one btw title data and notes has changes
+    (and (has-not-zero-data owner data)
+         (or (has-title-changes owner data)
+             (has-data-changes owner data)
+             (has-notes-changes owner data)))
+
+    ; title and data editing
+    (and (om/get-state owner :title-editing)
+         (om/get-state owner :data-editing))
+    ; finances has data and title or data has changes
+    (and (has-not-zero-data owner data)
+         (or (has-title-changes owner data)
+             (has-data-changes owner data)))
+
+    ; title and notes editing
+    (and (om/get-state owner :title-editing)
+         (om/get-state owner :notes-editing))
+    ; finances has data and title or data has changes
+    (or (has-title-changes owner data)
+        (has-notes-changes owner data))
+
+    ; data and notes editing
+    (and (om/get-state owner :data-editing)
+         (om/get-state owner :notes-editing))
+    ; finances has data and data or notes has changes
+    (and (has-not-zero-data owner data)
+         (or (has-data-changes owner data)
+             (has-notes-changes owner data)))
+
+    ; title editing
+    (om/get-state owner :title-editing)
+    ; title has changes
+    (has-title-changes owner data)
+
+    ; data editing
+    (om/get-state owner :data-editing)
+    ; finances has data and changes
+    (and (has-data-changes owner data)
+         (has-not-zero-data owner data))
+
+    ; notes editing
+    (om/get-state owner :notes-editing)
+    ; notes has changes
+    (has-notes-changes owner data)))
+
 (defn save-cb [owner data]
-  (when (or (has-changes owner data) ; when the section already exists
-            (om/get-state owner :oc-editing)) ; when the section is new
+  (when (can-save owner data)
     (let [title (om/get-state owner :title)
           notes-body (om/get-state owner :notes-body)
           finances-data (om/get-state owner :finances-data)
@@ -90,19 +200,28 @@
         ; save an existing section
         (api/save-or-create-section (merge section-data {:links (:links (:section-data data))
                                                          :section (:section data)}))))
-    (om/set-state! owner :editing false)
+    (om/set-state! owner :title-editing false)
+    (om/set-state! owner :notes-editing false)
+    (om/set-state! owner :data-editing false)
     (om/set-state! owner :oc-editing false)))
 
 (defn get-state [owner data]
   (let [section-data (:section-data data)
         notes-data (:notes section-data)]
     {:focus (or (om/get-state owner :focus) "cash")
-     :editing (or (not (not (:oc-editing section-data)))
-                  (om/get-state owner :editing))
+     :title-editing (or (not (not (:oc-editing section-data)))
+                        (om/get-state owner :title-editing))
+     :notes-editing (or (not (not (:oc-editing section-data)))
+                        (om/get-state owner :notes-editing))
+     :data-editing (or (not (not (:oc-editing section-data)))
+                       (om/get-state owner :data-editing))
      :finances-data (finances-utils/map-placeholder-data (:data section-data))
      :title (:title section-data)
      :notes-body (:body (:notes section-data))
      :as-of (:updated-at section-data)}))
+
+(defn has-revenues-or-costs [finances-data]
+  (some #(or (not (zero? (:revenue %))) (not (zero? (:costs %)))) finances-data))
 
 (defcomponent finances [data owner]
 
@@ -111,7 +230,10 @@
           notes-data (:notes section-data)
           finances-data (finances-utils/map-placeholder-data (:data section-data))]
       {:focus "cash"
-       :editing (not (not (:oc-editing section-data)))
+       :title-editing (not (not (:oc-editing section-data)))
+       :notes-editing (not (not (:oc-editing section-data)))
+       :data-editing (not (not (:oc-editing section-data)))
+       :oc-editing (:oc-editing section-data)
        :finances-data finances-data
        :title (:title section-data)
        :notes-body (:body (:notes section-data))
@@ -126,6 +248,8 @@
     (let [showing-revision (om/get-state owner :as-of)
           focus (om/get-state owner :focus)
           classes "composed-section-link"
+          section (:section data)
+          section-name (utils/camel-case-str (name section))
           section-data (:section-data data)
           notes-data (:notes section-data)
           cash-classes (str classes (when (= focus "cash") " active"))
@@ -138,29 +262,36 @@
           finances-row-data (:data section-data)
           sum-revenues (apply + (map #(:revenue %) finances-row-data))
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
-          needs-runway (some #(and (contains? % :runway) (neg? (:runway %))) finances-row-data)
-          editing (om/get-state owner :editing)
+          needs-runway (some #(neg? (:runway %)) finances-row-data)
+          needs-cash-flow (has-revenues-or-costs finances-row-data)
+          title-editing (om/get-state owner :title-editing)
+          notes-editing (om/get-state owner :notes-editing)
+          data-editing (om/get-state owner :data-editing)
           cancel-fn #(cancel-cb owner data)
           save-fn #(save-cb owner data)
           notes-body-change-fn (partial change-cb owner :notes-body)
           title-change-fn (partial change-cb owner :title)
           cancel-if-needed-fn #(cancel-if-needed-cb owner data)
-          start-editing-fn #(start-editing-cb owner data)
+          start-title-editing-fn #(start-title-editing-cb owner data)
+          start-notes-editing-fn #(start-notes-editing-cb owner data)
+          start-data-editing-fn #(start-data-editing-cb owner data)
           subsection-data {:section-data section-data
                            :read-only read-only
-                           :currency (:currency data)}]
+                           :currency (:currency data)
+                           :start-editing-cb start-data-editing-fn}]
       (dom/div {:class "section-container" :id "section-finances"}
         (dom/div {:class "composed-section finances"}
           (om/build editable-title {:read-only read-only
-                                    :editing editing
+                                    :editing title-editing
                                     :title (om/get-state owner :title)
-                                    :section (:section data)
-                                    :start-editing-cb start-editing-fn
+                                    :placeholder (or (:title-placeholder section-data) section-name)
+                                    :section section
+                                    :start-editing-cb start-title-editing-fn
                                     :change-cb title-change-fn
                                     :cancel-cb cancel-fn
                                     :cancel-if-needed-cb cancel-if-needed-fn
                                     :save-cb save-fn})
-          (when (not editing)
+          (when-not data-editing
             (dom/div {:class (utils/class-set {:link-bar true
                                                :editable (not read-only)})}
               (dom/a {:href "#"
@@ -168,20 +299,21 @@
                       :title "Cash"
                       :data-tab "cash"
                       :on-click #(subsection-click % owner)} "Cash")
-              (dom/a {:href "#"
-                      :class cash-flow-classes
-                      :title first-title
-                      :data-tab "cash-flow"
-                      :on-click #(subsection-click % owner)} first-title)
+              (when needs-cash-flow
+                (dom/a {:href "#"
+                        :class cash-flow-classes
+                        :title first-title
+                        :data-tab "cash-flow"
+                        :on-click #(subsection-click % owner)} first-title))
               (when needs-runway
                 (dom/a {:href "#"
                         :class runway-classes
                         :title "Runway"
                         :data-tab "runway"
                         :on-click #(subsection-click % owner)} "Runway"))
-              (om/build editable-pen {:click-callback start-editing-fn})))
+              (om/build editable-pen {:click-callback start-data-editing-fn})))
           (dom/div {:class (utils/class-set {:composed-section-body true})}
-            (if editing
+            (if data-editing
               (om/build finances-edit {:finances-data (om/get-state owner :finances-data)
                                        :change-finances-cb (partial change-finances-data-cb owner)
                                        :currency (:currency data)})
@@ -200,17 +332,17 @@
             (om/build update-footer {:updated-at (:updated-at section-data)
                                      :author (:author section-data)
                                      :section :finances
-                                     :editing editing
+                                     :editing (or title-editing notes-editing data-editing)
                                      :notes false})
             (when (or (not (empty? (:body notes-data)))
                       (not read-only))
-              (om/build rich-editor {:editing editing
+              (om/build rich-editor {:editing notes-editing
                                      :section :finances
                                      :body-counter (om/get-state owner :body-counter)
                                      :read-only (:read-only data)
                                      :body (om/get-state owner :notes-body)
-                                     :placeholder (str (utils/camel-case-str (name (:section data))) " notes here...")
-                                     :start-editing-cb start-editing-fn
+                                     :placeholder (or (:body-placeholder section-data) (str section-name " notes here..."))
+                                     :start-editing-cb start-notes-editing-fn
                                      :change-cb notes-body-change-fn
                                      :cancel-cb cancel-fn
                                      :cancel-if-needed-cb cancel-if-needed-fn
@@ -219,10 +351,13 @@
               (om/build update-footer {:author (:author notes-data)
                                        :updated-at (:updated-at notes-data)
                                        :section :finances
-                                       :editing editing
+                                       :editing (or title-editing notes-editing data-editing)
                                        :notes true}))
-            (if editing
-              (om/build section-footer {:edting editing
+            (if (or title-editing notes-editing data-editing)
+              (om/build section-footer {:editing (or title-editing notes-editing data-editing)
                                         :cancel-cb cancel-fn
+                                        ; disable save until there are changes depending if the section is new
+                                        :save-disabled (not (can-save owner data))
+                                        :is-new-section (om/get-state owner :oc-editing)
                                         :save-cb save-fn})
               (om/build revisions-navigator data))))))))

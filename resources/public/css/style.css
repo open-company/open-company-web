@@ -166,7 +166,7 @@ span img.user-icon {
 }
 
 div.composed-section i.add-metric {
-  color: #707070;
+  color: #109DB7;
   opacity: 0;
   cursor: default;
 }
@@ -402,13 +402,14 @@ div.fake-rich-editor[contenteditable=true]:empty:before{
 div.rich-editor-container div.rich-editor {
   color: #191919;
   border: 1px solid transparent;
-  min-height: 50px;
+  min-height: 50px !important;
 }
 
 div.rich-editor-container div.rich-editor:focus,
 div.rich-editor-container div.rich-editor.editing {
   outline: none;
   overflow: hidden;
+  cursor: text;
   border: 1px solid black;
 }
 
@@ -636,7 +637,6 @@ form.linkForm input#addlinkButton {
 
 div.finances div.finances-body.edit {
   position: relative;
-  border: 1px solid black;
   width: 650px;
 }
 
@@ -656,6 +656,7 @@ div.finances div.link-bar i.editable-pen {
   opacity: 0;
   margin-left: -20px;
   cursor: pointer;
+  color: #26C485;;
 }
 
 div.finances:hover div.link-bar.editable i.editable-pen {
@@ -869,10 +870,6 @@ button.oc-btn {
   border-radius: 4px;
   background-color: transparent;
   margin-top: 30px;
-}
-
-button.oc-btn.oc-success {
-  color: green;
 }
 
 button.oc-btn.oc-success.disabled {
@@ -1316,4 +1313,48 @@ div.charts div.values-navigator {
   float: left;
   cursor: pointer;
   color: rgba(0, 0, 0, 0.8);
+}
+
+div.oc-popover-container {
+  display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: transparent;
+  z-index: 1031;
+}
+
+div.oc-popover {
+  position: absolute;
+  width: 390px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  margin-top: -100px;
+  margin-left: -145px;
+  background-color: white;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  border-radius: 4px;
+  overflow: auto;
+  padding: 20px 0px 10px 10px;
+}
+
+/* OC Colors */
+.gray {
+  color: #ADADAD;
+}
+
+.green {
+  color: #26C485;
+}
+
+.red {
+  color: #d72a46;
+}
+
+.blue {
+  color: #109DB7;
 }
