@@ -6,7 +6,7 @@
 (defn columns-num [interval]
   (case interval
     "quarterly" 8
-    "montyly" 12
+    "monthly" 12
     "weekly" 8))
 
 (defn get-minus [diff interval]
@@ -21,3 +21,30 @@
         past-date (t/minus period-date (get-minus diff interval))
         formatter (utils/get-formatter interval)]
     (f/unparse formatter past-date)))
+
+(defn placeholder-data [period slug]
+  {:period period
+   :slug slug
+   :value nil
+   :target nil
+   :new true})
+
+(defn edit-placeholder-data [initial-data slug interval]
+  (let [tot-num (columns-num interval)
+        current-period (utils/current-period)
+        last-period (if (last initial-data)
+                      (:period (last initial-data))
+                      (get-past-period current-period 12 interval))
+        diff (utils/periods-diff last-period current-period interval)
+        data-count (max tot-num (inc diff))]
+    (let [fixed-data (for [idx (range 1 data-count)]
+                       (let [prev-period (get-past-period current-period idx interval)
+                             period-exists (utils/period-exists prev-period initial-data)]
+                         (if period-exists
+                           (some #(when (= (:period %) prev-period) %) initial-data)
+                           (placeholder-data prev-period slug))))]
+      (vec fixed-data))))
+
+(defn map-placeholder-data [data slug interval]
+  (let [fixed-data (edit-placeholder-data data slug interval)]
+    (apply merge (map #(hash-map (:period %) %) fixed-data))))
