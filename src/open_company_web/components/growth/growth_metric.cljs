@@ -6,6 +6,7 @@
             [open-company-web.components.charts :refer (column-chart)]
             [clojure.string :as clj-str]
             [open-company-web.lib.oc-colors :as occ]
+            [open-company-web.components.utility-components :refer (editable-pen)]
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
 
@@ -130,7 +131,8 @@
             (dom/div {:class "chart-header-container"}
               (dom/div {:class "target-actual-container"}
                 (dom/div {:class "actual-container"}
-                  (dom/h3 {:class "actual blue"} actual-with-label)
+                  (dom/h3 {:class "actual blue"} actual-with-label
+                    (om/build editable-pen {:click-callback (:start-data-editing-cb data)}))
                   (dom/h3 {:class "actual-label gray"} (str "as of " (utils/get-period-string (:period actual-set) interval))))))
             (om/build column-chart (get-chart-data sorted-metric
                                                    fixed-cur-unit
