@@ -54,11 +54,19 @@
   (let [section-data (:section-data data)]
     (not= (finances-utils/map-placeholder-data (:data section-data)) (om/get-state owner :finances-data))))
 
-(defn has-changes [owner data]
+(defn has-title-changes [owner data]
+  (let [section-data (:section-data data)]
+    (and (not= (:title section-data) (om/get-state owner :title))
+         (> (count (om/get-state owner :title)) 0))))
+
+(defn has-notes-changes [owner data]
   (let [section-data (:section-data data)
         notes-data (:notes-data section-data)]
-    (or (not= (:title section-data) (om/get-state owner :title))
-        (not= (:body notes-data) (om/get-state owner :notes-body)))))
+    (not= (:body notes-data) (om/get-state owner :notes-body))))
+
+(defn has-changes [owner data]
+  (or (has-title-changes owner data)
+      (has-notes-changes owner data)))
 
 (defn check-non-zero-value [v]
   (and (not (zero? v))
@@ -118,15 +126,65 @@
   (filter #(not (nil? %))
           (vec (map (fn [[k v]] (clean-data v)) finances-data))))
 
-(defn save-cb [owner data]
-  (when (or (and (not (om/get-state owner :oc-editing))  ; when the section already exists
-                 (or (has-changes owner data)            ; there are changes to the title or notes
-                     (has-data-changes owner data))      ; or there are changes to the data
-                 (has-not-zero-data owner data))         ; and the data are not all 0s
+(defn can-save [owner data]
+  (cond
+    ; new section
+    (om/get-state owner :oc-editing)
+    ; finances has data and title is not empty
+    (and (has-not-zero-data owner data)
+         (> (count (om/get-state owner :title) 0)))
 
-            (and (om/get-state owner :oc-editing)        ; when the section is new
-                 (has-data-changes owner data)           ; there are changes to the data
-                 (has-not-zero-data owner data)))        ; and there are at least some non-zero data
+    ; title data and notes editing
+    (and (om/get-state owner :title-editing)
+         (om/get-state owner :data-editing)
+         (om/get-state owner :notes-editing))
+    ; finances has data and at least one btw title data and notes has changes
+    (and (has-not-zero-data owner data)
+         (or (has-title-changes owner data)
+             (has-data-changes owner data)
+             (has-notes-changes owner data)))
+
+    ; title and data editing
+    (and (om/get-state owner :title-editing)
+         (om/get-state owner :data-editing))
+    ; finances has data and title or data has changes
+    (and (has-not-zero-data owner data)
+         (or (has-title-changes owner data)
+             (has-data-changes owner data)))
+
+    ; title and notes editing
+    (and (om/get-state owner :title-editing)
+         (om/get-state owner :notes-editing))
+    ; finances has data and title or data has changes
+    (or (has-title-changes owner data)
+        (has-notes-changes owner data))
+
+    ; data and notes editing
+    (and (om/get-state owner :data-editing)
+         (om/get-state owner :notes-editing))
+    ; finances has data and data or notes has changes
+    (and (has-not-zero-data owner data)
+         (or (has-data-changes owner data)
+             (has-notes-changes owner data)))
+
+    ; title editing
+    (om/get-state owner :title-editing)
+    ; title has changes
+    (has-title-changes owner data)
+
+    ; data editing
+    (om/get-state owner :data-editing)
+    ; finances has data and changes
+    (and (has-data-changes owner data)
+         (has-not-zero-data owner data))
+
+    ; notes editing
+    (om/get-state owner :notes-editing)
+    ; notes has changes
+    (has-notes-changes owner data)))
+
+(defn save-cb [owner data]
+  (when (can-save owner data)
     (let [title (om/get-state owner :title)
           notes-body (om/get-state owner :notes-body)
           finances-data (om/get-state owner :finances-data)
@@ -299,11 +357,7 @@
               (om/build section-footer {:editing (or title-editing notes-editing data-editing)
                                         :cancel-cb cancel-fn
                                         ; disable save until there are changes depending if the section is new
-                                        :save-disabled (or (and (not (om/get-state owner :oc-editing))
-                                                                (not (has-data-changes owner data))
-                                                                (not (has-changes owner data)))
-                                                           (and (om/get-state owner :oc-editing)
-                                                                (not (has-not-zero-data owner data))))
+                                        :save-disabled (not (can-save owner data))
                                         :is-new-section (om/get-state owner :oc-editing)
                                         :save-cb save-fn})
               (om/build revisions-navigator data))))))))
