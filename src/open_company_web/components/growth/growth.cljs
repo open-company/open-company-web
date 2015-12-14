@@ -20,7 +20,7 @@
 (defn subsection-click [e owner]
   (.preventDefault e)
   (let [tab  (.. e -target -dataset -tab)]
-    (om/update-state! owner :focus (fn [] tab))))
+    (om/set-state! owner :focus tab)))
 
 (defn start-title-editing-cb [owner data]
   (om/set-state! owner :title-editing true))
@@ -122,13 +122,18 @@
 (defn get-metric-info [metrics focus]
   (first (filter #(= (:slug %) focus) metrics)))
 
+(defn get-metric-data [all-data focus]
+  (filter #(= (:slug %) focus) all-data))
+
 (defn get-state [owner data]
   (let [section-data (:section-data data)
         notes-data (:notes section-data)
         metrics (:metrics section-data)
         focus (om/get-state owner :focus)
         current-metric (get-metric-info metrics focus)
-        growth-data (growth-utils/map-placeholder-data (:data section-data) focus (:interval current-metric))]
+        metric-data (get-metric-data (:data section-data) focus)
+        interval (:interval current-metric)
+        growth-data (growth-utils/map-placeholder-data metric-data focus interval)]
     {:focus (om/get-state owner :focus)
      :title-editing (or (not (not (:oc-editing section-data)))
                         (om/get-state owner :title-editing))
@@ -151,7 +156,9 @@
           metrics (:metrics section-data)
           focus (:slug (first metrics))
           current-metric (get-metric-info metrics focus)
-          growth-data (growth-utils/map-placeholder-data (:data section-data) focus (:interval current-metric))]
+          metric-data (get-metric-data (:data section-data) focus)
+          interval (:interval current-metric)
+          growth-data (growth-utils/map-placeholder-data metric-data focus interval)]
       {:focus focus
        :title-editing (not (not (:oc-editing section-data)))
        :notes-editing (not (not (:oc-editing section-data)))
@@ -182,7 +189,7 @@
           subsection-data {:metric-data focus-metric-data
                            :metric-info focus-metric-info
                            :read-only read-only
-                           :start-data-editing-cb #(start-data-editing-cb owner data)
+                           :start-editing-cb #(start-data-editing-cb owner data)
                            :total-metrics (count growth-metrics)}
           title-editing (om/get-state owner :title-editing)
           notes-editing (om/get-state owner :notes-editing)
@@ -211,7 +218,7 @@
             (om/build growth-edit {:section section
                                    :section-data section-data
                                    :metric-slug focus
-                                   :change-growth-cb #(change-growth-cb owner data)})
+                                   :change-growth-cb (partial change-growth-cb owner)})
             (dom/div {}
               (dom/div {:class "link-bar"}
                 (when (and focus (> (count growth-metrics) 1))
