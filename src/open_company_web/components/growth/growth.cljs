@@ -1,19 +1,20 @@
 (ns open-company-web.components.growth.growth
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.components.rich-editor :refer (rich-editor)]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.revisions-navigator :refer [revisions-navigator]]
+            [open-company-web.components.revisions-navigator :refer (revisions-navigator)]
             [open-company-web.api :as api]
-            [open-company-web.components.editable-title :refer [editable-title]]
-            [open-company-web.components.growth.growth-metric :refer [growth-metric]]
-            [open-company-web.components.utility-components :refer [add-metric]]
+            [open-company-web.components.editable-title :refer (editable-title)]
+            [open-company-web.components.growth.growth-metric :refer (growth-metric)]
+            [open-company-web.components.utility-components :refer (add-metric)]
             [open-company-web.components.section-footer :refer (section-footer)]
-            [open-company-web.lib.section-utils :as section-utils]))
+            [open-company-web.lib.section-utils :as section-utils]
+            [open-company-web.components.growth.growth-edit :refer (growth-edit)]))
 
 (defn subsection-click [e owner]
   (.preventDefault e)
@@ -70,6 +71,8 @@
     (om/set-state! owner :body-counter c))
   (om/set-state! owner k v))
 
+(defn change-growth-cb [owner data])
+
 (defn save-cb [owner data]
   (when (or (has-changes owner data) ; when the section already exists
             (has-data-changes owner data)
@@ -98,7 +101,7 @@
 (defn get-state [owner data]
   (let [section-data (:section-data data)
         notes-data (:notes section-data)]
-    {:focus (or (om/get-state owner :focus) "cash")
+    {:focus (om/get-state owner :focus)
      :title-editing (or (not (not (:oc-editing section-data)))
                         (om/get-state owner :title-editing))
      :notes-editing (or (not (not (:oc-editing section-data)))
@@ -147,6 +150,7 @@
           subsection-data {:metric-data focus-metric-data
                            :metric-info focus-metric-info
                            :read-only read-only
+                           :start-data-editing-cb #(start-data-editing-cb owner data)
                            :total-metrics (count growth-metrics)}
           title-editing (om/get-state owner :title-editing)
           notes-editing (om/get-state owner :notes-editing)
@@ -158,7 +162,7 @@
           cancel-if-needed-fn #(cancel-if-needed-cb owner data)
           start-title-editing-fn #(start-title-editing-cb owner data)
           start-notes-editing-fn #(start-notes-editing-cb owner data)]
-      (dom/div {:class "section-container" :id "section-growth"}
+      (dom/div {:class "section-container" :id "section-growth" :key (name section)}
         (dom/div {:class "composed-section growth"}
           (om/build editable-title {:read-only read-only
                                     :editing title-editing
@@ -171,23 +175,30 @@
                                     :cancel-cb cancel-fn
                                     :cancel-if-needed-cb cancel-if-needed-fn
                                     :save-cb save-fn})
-          (dom/div {:class "link-bar"}
-            (when (> (count growth-metrics) 1)
-              (for [metric growth-metrics]
-                (let [mslug (:slug metric)
-                      mname (:name metric)
-                      metric-classes (utils/class-set {:composed-section-link true
-                                                       mslug true
-                                                       :active (= focus mslug)})]
-                  (dom/a {:class metric-classes
-                          :title mname
-                          :data-tab mslug
-                          :on-click #(subsection-click % owner)} mname))))
-            (om/build add-metric {:click-callback nil :metrics-count (count growth-metrics)}))
-          (dom/div {:class (utils/class-set {:composed-section-body true
-                                             :editable (not read-only)})}
-            ;; growth metric currently shown
-            (om/build growth-metric subsection-data)
+          (if data-editing
+            (om/build growth-edit {:section section
+                                   :section-data section-data
+                                   :metric-slug focus
+                                   :change-growth-cb #(change-growth-cb owner data)})
+            (dom/div {}
+              (dom/div {:class "link-bar"}
+                (when (and focus (> (count growth-metrics) 1))
+                  (for [metric growth-metrics]
+                    (let [mslug (:slug metric)
+                          mname (:name metric)
+                          metric-classes (utils/class-set {:composed-section-link true
+                                                           mslug true
+                                                           :active (= focus mslug)})]
+                      (dom/a {:class metric-classes
+                              :title mname
+                              :data-tab mslug
+                              :on-click #(subsection-click % owner)} mname))))
+                (om/build add-metric {:click-callback nil :metrics-count (count growth-metrics)}))
+              (dom/div {:class (utils/class-set {:composed-section-body true
+                                                 :editable (not read-only)})}
+                ;; growth metric currently shown
+                (when focus
+                  (om/build growth-metric subsection-data)))))
             (om/build update-footer {:updated-at (:updated-at section-data)
                                      :author (:author section-data)
                                      :section :growth
@@ -218,4 +229,4 @@
                                         :cancel-cb cancel-fn
                                         :is-new-section (om/get-state owner :oc-editing)
                                         :save-cb save-fn})
-              (om/build revisions-navigator data))))))))
+              (om/build revisions-navigator data)))))))
