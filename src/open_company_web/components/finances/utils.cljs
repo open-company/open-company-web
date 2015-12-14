@@ -44,7 +44,7 @@
 (defn chart-placeholder-data [initial-data]
   (let [first-period (:period (last initial-data))
         last-period (:period (first initial-data))
-        months-diff (utils/periods-diff-in-months first-period last-period)]
+        months-diff (utils/periods-diff first-period last-period)]
     (vec
       (for [idx (range 0 (inc months-diff))]
         (let [prev-period (get-past-period last-period idx)
@@ -58,7 +58,7 @@
         last-period (if (last initial-data)
                       (:period (last initial-data))
                       (get-past-period current-period 12))
-        diff (utils/periods-diff-in-months last-period current-period)
+        diff (utils/periods-diff last-period current-period)
         data-count (max 13 (inc diff))]
     (let [fixed-data (for [idx (range 1 data-count)]
                        (let [prev-period (get-past-period current-period idx)
