@@ -513,3 +513,33 @@
         date (date-from-period period fixed-interval)
         month (add-zero (cljs-time/month date))]
     (month-short-string month)))
+
+(defn get-month-quarter [current-month]
+  (case
+    (and (> current-month 1)
+         (< current-month 4))
+    1
+    (and (> current-month 4)
+         (< current-month 7))
+    4
+    (and (> current-month 7)
+         (< current-month 9))
+    7
+    (> current-month 9)
+    10))
+
+(defn current-growth-period [interval]
+  (let [now (cljs-time/now)
+        year (cljs-time/year now)
+        month (cljs-time/month now)
+        day (cljs-time/day now)]
+    (case interval
+      "quarterly"
+      (str year "-" (add-zero (get-month-quarter month)))
+      "monthly"
+      (str year "-" (add-zero month))
+      "weekly"
+      (let [day-of-week (cljs-time/day-of-week now)
+            to-monday (dec day-of-week)
+            monday-date (cljs-time/minus now (cljs-time/days to-monday))]
+        (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (cljs-time/day monday-date))))))
