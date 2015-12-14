@@ -33,12 +33,13 @@
                           :period period
                           :key :target}))
         (dom/td {}
-          (om/build cell {:value value
-                          :placeholder "value"
-                          :cell-state cell-state
-                          :draft-cb #(change-cb :value %)
-                          :period period
-                          :key :value}))))))
+          (when (not (:is-last data))
+            (om/build cell {:value value
+                            :placeholder "value"
+                            :cell-state cell-state
+                            :draft-cb #(change-cb :value %)
+                            :period period
+                            :key :value})))))))
 
 (defn next-period [data idx]
   (let [data (to-array data)]
@@ -62,9 +63,7 @@
           (recur (inc idx)))))))
 
 (defn sort-growth-data [data]
-  (let [metric-slug (:metric-slug data)
-        all-data (:data (:section-data data))
-        metric-data (filter #(= (:slug %) metric-slug) all-data)
+  (let [metric-data (vec (vals (:growth-data data)))
         sorter (utils/sort-by-key-pred :period true)]
     (sort #(sorter %1 %2) metric-data)))
 
@@ -101,9 +100,7 @@
        :metric-info (first (filter #(= (:slug %) metric-slug) metrics))}))
 
   (render [_]
-    (let [{:keys [section-data metric-slug]} data
-          {metrics :metrics growth-data :data} section-data
-          metric-info (first (filter #(= (:slug %) metric-slug) metrics))
+    (let [metric-info (om/get-state owner :metric-info)
           metric-data (om/get-state owner :sorted-data)
           rows-data (vec (map (fn [row]
                                 (let [v {:prefix (:unit metric-info)
@@ -121,7 +118,7 @@
               (dom/th {} "Target")
               (dom/th {} "Value")))
           (dom/tbody {}
-            (for [idx (range (count rows-data))]
+            (for [idx (range (dec (count rows-data)))]
               (let [row-data (get rows-data idx)
                     next-period (next-period metric-data idx)
                     row (merge row-data {:next-period next-period
