@@ -508,6 +508,6 @@
 
 (defn get-month [period & [interval]]
   (let [fixed-interval (or interval "monthly")
-        date (date-from-period period interval)
+        date (date-from-period period fixed-interval)
         month (add-zero (cljs-time/month date))]
     (month-short-string month)))
