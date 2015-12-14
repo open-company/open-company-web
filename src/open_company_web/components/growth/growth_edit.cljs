@@ -27,16 +27,16 @@
           period-string)
         (dom/td {}
           (om/build cell {:value target
-                          :placeholder "Target for the interval"
+                          :placeholder "target"
                           :cell-state cell-state
                           :draft-cb #(change-cb :target %)
                           :period period
                           :key :target}))
         (dom/td {}
           (om/build cell {:value value
-                          :placeholder "Value for the interval"
+                          :placeholder "value"
                           :cell-state cell-state
-                          :draft-cb #(change-cb :target %)
+                          :draft-cb #(change-cb :value %)
                           :period period
                           :key :value}))))))
 
@@ -125,6 +125,7 @@
               (let [row-data (get rows-data idx)
                     next-period (next-period metric-data idx)
                     row (merge row-data {:next-period next-period
+                                         :is-last (= idx 0)
                                          :needs-year (or (= idx 0)
                                                           (= idx (dec (count rows-data))))})]
                 (om/build growth-edit-row row)))

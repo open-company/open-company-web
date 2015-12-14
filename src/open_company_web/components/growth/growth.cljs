@@ -215,9 +215,9 @@
                                     :cancel-if-needed-cb cancel-if-needed-fn
                                     :save-cb save-fn})
           (if data-editing
-            (om/build growth-edit {:section section
-                                   :section-data section-data
+            (om/build growth-edit {:growth-data (om/get-state owner :growth-data)
                                    :metric-slug focus
+                                   :metrics (om/get-state owner :metrics)
                                    :change-growth-cb (partial change-growth-cb owner)})
             (dom/div {}
               (dom/div {:class "link-bar"}
