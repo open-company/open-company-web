@@ -1,6 +1,6 @@
 (ns open-company-web.components.growth.growth
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros (defcomponent)]
+            [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
@@ -22,13 +22,13 @@
   (let [tab  (.. e -target -dataset -tab)]
     (om/set-state! owner :focus tab)))
 
-(defn start-title-editing-cb [owner data]
+(defn start-title-editing-cb [owner]
   (om/set-state! owner :title-editing true))
 
-(defn start-notes-editing-cb [owner data]
+(defn start-notes-editing-cb [owner]
   (om/set-state! owner :notes-editing true))
 
-(defn start-data-editing-cb [owner data]
+(defn start-data-editing-cb [owner]
   (om/set-state! owner :data-editing true))
 
 (defn cancel-cb [owner data]
@@ -79,12 +79,12 @@
 
 (defn fix-row [row]
   (let [fixed-value (assoc row :value (get-growth-value (:value row)))
-        fixed-target (assoc row :target (get-growth-value (:target row)))
+        fixed-target (assoc fixed-value :target (get-growth-value (:target row)))
         fixed-row (if (or (not (empty? (:value row)))
                           (not (empty? (:target row))))
                     (dissoc fixed-target :new)
                     (assoc fixed-target :new true))]
-    fixed-target))
+    fixed-row))
 
 (defn change-growth-cb [owner row]
   (let [fixed-row (fix-row row)
@@ -127,7 +127,6 @@
 
 (defn get-state [owner data]
   (let [section-data (:section-data data)
-        notes-data (:notes section-data)
         metrics (:metrics section-data)
         focus (om/get-state owner :focus)
         current-metric (get-metric-info metrics focus)
@@ -174,9 +173,7 @@
       (om/set-state! owner (get-state owner next-props))))
 
   (render [_]
-    (let [showing-revision (om/get-state owner :as-of)
-          focus (om/get-state owner :focus)
-          slug (:slug @router/path)
+    (let [focus (om/get-state owner :focus)
           section-data (:section-data data)
           section (:section data)
           section-name (utils/camel-case-str (name section))
@@ -189,7 +186,7 @@
           subsection-data {:metric-data focus-metric-data
                            :metric-info focus-metric-info
                            :read-only read-only
-                           :start-editing-cb #(start-data-editing-cb owner data)
+                           :start-editing-cb #(start-data-editing-cb owner)
                            :total-metrics (count growth-metrics)}
           title-editing (om/get-state owner :title-editing)
           notes-editing (om/get-state owner :notes-editing)
@@ -199,8 +196,8 @@
           notes-body-change-fn (partial change-cb owner :notes-body)
           title-change-fn (partial change-cb owner :title)
           cancel-if-needed-fn #(cancel-if-needed-cb owner data)
-          start-title-editing-fn #(start-title-editing-cb owner data)
-          start-notes-editing-fn #(start-notes-editing-cb owner data)]
+          start-title-editing-fn #(start-title-editing-cb owner)
+          start-notes-editing-fn #(start-notes-editing-cb owner)]
       (dom/div {:class "section-container" :id "section-growth" :key (name section)}
         (dom/div {:class "composed-section growth"}
           (om/build editable-title {:read-only read-only
