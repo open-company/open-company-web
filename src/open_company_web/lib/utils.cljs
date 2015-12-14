@@ -499,12 +499,14 @@
 (defn update-page-title [title]
   (set! (.-title js/document) title))
 
-(defn periods-diff-in-months [first-period last-period]
-  (let [[first-year first-month] (clojure.string/split first-period "-")
-        [last-year last-month] (clojure.string/split last-period "-")
-        first-date (cljs-time/date-time (int first-year) (int first-month))
-        last-date (cljs-time/date-time (int last-year) (int last-month))]
-    (cljs-time/in-months (cljs-time/interval first-date last-date))))
+(defn periods-diff [first-period last-period & [interval]]
+  (let [fixed-interval (or interval "monthly")
+        first-date (date-from-period first-period fixed-interval)
+        last-date (date-from-period last-period fixed-interval)]
+    (case fixed-interval
+      "quarterly" (/ (cljs-time/in-months (cljs-time/interval first-date last-date)) 3)
+      "monthly" (cljs-time/in-months (cljs-time/interval first-date last-date))
+      "weekly" (cljs-time/in-weeks (cljs-time/interval first-date last-date)))))
 
 (defn get-month [period & [interval]]
   (let [fixed-interval (or interval "monthly")
