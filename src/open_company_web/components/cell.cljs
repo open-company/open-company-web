@@ -68,7 +68,7 @@
           float-value (if (js/isNaN float-value) 0 float-value)
           formatted-value (format-value float-value)
           prefix-value (if (:prefix data) (str (:prefix data) formatted-value) formatted-value)
-          final-value (if (:suffix data) (str (:suffix data) prefix-value) prefix-value)
+          final-value (if (:suffix data) (str prefix-value " " (:suffix data)) prefix-value)
           state (om/get-state owner :cell-state)]
       (dom/div {:class "comp-cell"}
         (case state
