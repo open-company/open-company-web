@@ -528,6 +528,7 @@ div.rich-editor-container button.collapse-button {
 
 .comp-cell .comp-cell-int {
   width: 100%;
+  min-height: 24px;
 }
 
 .comp-cell .comp-cell-int span, .comp-cell .comp-cell-int input {
