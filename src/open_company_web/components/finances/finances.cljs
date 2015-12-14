@@ -93,8 +93,7 @@
   (om/set-state! owner k v))
 
 (defn get-finances-value [v]
-  (if (or (js/isNaN v)
-          (nil? v))
+  (if (js/isNaN v)
     0
     v))
 
