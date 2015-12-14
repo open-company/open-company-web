@@ -162,7 +162,7 @@
       {:focus focus
        :title-editing (not (not (:oc-editing section-data)))
        :notes-editing (not (not (:oc-editing section-data)))
-       :data-editing true ; DO NOT COMMIT ME!! (not (not (:oc-editing section-data)))
+       :data-editing (not (not (:oc-editing section-data)))
        :growth-data growth-data
        :growth-metrics metrics
        :title (:title section-data)
