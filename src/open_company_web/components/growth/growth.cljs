@@ -14,7 +14,8 @@
             [open-company-web.components.utility-components :refer (add-metric)]
             [open-company-web.components.section-footer :refer (section-footer)]
             [open-company-web.lib.section-utils :as section-utils]
-            [open-company-web.components.growth.growth-edit :refer (growth-edit)]))
+            [open-company-web.components.growth.growth-edit :refer (growth-edit)]
+            [open-company-web.components.growth.utils :as growth-utils]))
 
 (defn subsection-click [e owner]
   (.preventDefault e)
@@ -71,7 +72,27 @@
     (om/set-state! owner :body-counter c))
   (om/set-state! owner k v))
 
-(defn change-growth-cb [owner data])
+(defn get-growth-value [v]
+  (if (js/isNaN v)
+    0
+    v))
+
+(defn fix-row [row]
+  (let [fixed-value (assoc row :value (get-growth-value (:value row)))
+        fixed-target (assoc row :target (get-growth-value (:target row)))
+        fixed-row (if (or (not (empty? (:value row)))
+                          (not (empty? (:target row))))
+                    (dissoc fixed-target :new)
+                    (assoc fixed-target :new true))]
+    fixed-target))
+
+(defn change-growth-cb [owner row]
+  (let [fixed-row (fix-row row)
+        period (:period fixed-row)
+        slug (:slug fixed-row)
+        growth-data (om/get-state owner :growth-data)
+        fixed-data (assoc growth-data (str period slug) fixed-row)]
+    (om/set-state! owner :growth-data fixed-data)))
 
 (defn save-cb [owner data]
   (when (or (has-changes owner data) ; when the section already exists
@@ -98,9 +119,16 @@
     (om/set-state! owner :data-editing false)
     (om/set-state! owner :oc-editing false)))
 
+(defn get-metric-info [metrics focus]
+  (first (filter #(= (:slug %) focus) metrics)))
+
 (defn get-state [owner data]
   (let [section-data (:section-data data)
-        notes-data (:notes section-data)]
+        notes-data (:notes section-data)
+        metrics (:metrics section-data)
+        focus (om/get-state owner :focus)
+        current-metric (get-metric-info metrics focus)
+        growth-data (growth-utils/map-placeholder-data (:data section-data) focus (:interval current-metric))]
     {:focus (om/get-state owner :focus)
      :title-editing (or (not (not (:oc-editing section-data)))
                         (om/get-state owner :title-editing))
@@ -108,8 +136,8 @@
                         (om/get-state owner :notes-editing))
      :data-editing (or (not (not (:oc-editing section-data)))
                        (om/get-state owner :data-editing))
-     :growth-data (:data section-data)
-     :growth-metrics (:metrics section-data)
+     :growth-data growth-data
+     :growth-metrics metrics
      :oc-editing (:oc-editing section-data)
      :title (:title section-data)
      :notes-body (:body (:notes section-data))
@@ -119,15 +147,19 @@
 
   (init-state [_]
     (let [section-data (:section-data data)
-          growth-metrics (:metrics section-data)]
-      {:focus (:slug (first growth-metrics))
+          notes-data (:notes section-data)
+          metrics (:metrics section-data)
+          focus (:slug (first metrics))
+          current-metric (get-metric-info metrics focus)
+          growth-data (growth-utils/map-placeholder-data (:data section-data) focus (:interval current-metric))]
+      {:focus focus
        :title-editing (not (not (:oc-editing section-data)))
        :notes-editing (not (not (:oc-editing section-data)))
-       :data-editing (not (not (:oc-editing section-data)))
-       :growth-data (:data section-data)
-       :growth-metrics (:metrics section-data)
+       :data-editing true ; DO NOT COMMIT ME!! (not (not (:oc-editing section-data)))
+       :growth-data growth-data
+       :growth-metrics metrics
        :title (:title section-data)
-       :notes-body (:body (:notes section-data))}))
+       :notes-body (:body notes-data)}))
 
   (will-receive-props [_ next-props]
     ; this means the section datas have changed from the API or at a upper lever of this component
