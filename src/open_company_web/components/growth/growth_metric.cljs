@@ -125,7 +125,8 @@
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})
-                :key (:slug metric-info)}
+                :key (:slug metric-info)
+                :on-click (:start-editing-cb data)}
         (when (> (count metric-data) 0)
           (dom/div {}
             (dom/div {:class "chart-header-container"}
