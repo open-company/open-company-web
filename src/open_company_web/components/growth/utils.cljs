@@ -47,4 +47,4 @@
 
 (defn map-placeholder-data [data slug interval]
   (let [fixed-data (edit-placeholder-data data slug interval)]
-    (apply merge (map #(hash-map (:period %) %) fixed-data))))
+    (apply merge (map #(hash-map (str (:period %) slug) %) fixed-data))))
