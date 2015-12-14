@@ -1,8 +1,8 @@
 (ns open-company-web.lib.utils
     (:require [om.core :as om :include-macros true]
               [clojure.string]
-              [open-company-web.lib.iso4217 :refer [iso4217]]
-              [cljs.core.async :refer [put!]]
+              [open-company-web.lib.iso4217 :refer (iso4217)]
+              [cljs.core.async :refer (put!)]
               [open-company-web.router :as router]
               [open-company-web.caches :as caches]
               [cljs-time.format :as cljs-time-format]
@@ -46,7 +46,7 @@
         sym (if (and (contains? currency :symbol)
                      (> (count (:symbol currency)) 0))
               (:symbol currency)
-              "$")]
+              currency-code)]
     (or sym (:code currency))))
 
 (def channel-coll (atom {}))
@@ -174,10 +174,6 @@
     "11" "NOV"
     "12" "DEC"
     ""))
-
-(defn get-month [period]
-  (let [[year month] (clojure.string/split period "-")]
-    (month-short-string month)))
 
 (defn period-string [period & flags]
   (let [force-year (in? flags :force-year)
@@ -479,6 +475,14 @@
     :else
     weekly-input-format))
 
+(defn date-from-period [period & [interval]]
+  (let [fixed-interval (or interval "monthly")]
+    (cljs-time-format/parse (get-formatter interval) period)))
+
+(defn period-from-date [date & [interval]]
+  (let [fixed-interval (or interval "monthly")]
+    (cljs-time-format/unparse (get-formatter interval) date)))
+
 (defn get-period-string [period interval & [flags]]
   "Get descriptive string for the period by interval. Use :short as a flag to get
   the short formatted string."
@@ -501,3 +505,9 @@
         first-date (cljs-time/date-time (int first-year) (int first-month))
         last-date (cljs-time/date-time (int last-year) (int last-month))]
     (cljs-time/in-months (cljs-time/interval first-date last-date))))
+
+(defn get-month [period & [interval]]
+  (let [fixed-interval (or interval "monthly")
+        date (date-from-period period interval)
+        month (add-zero (cljs-time/month date))]
+    (month-short-string month)))
