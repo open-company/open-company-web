@@ -657,34 +657,45 @@ div.finances div.link-bar i.editable-pen {
   opacity: 0;
   margin-left: -20px;
   cursor: pointer;
-  color: #26C485;;
+  color: #26C485;
 }
 
 div.finances:hover div.link-bar.editable i.editable-pen {
   opacity: 1;
 }
 
-div.finances-body table.table td, div.finances-body table.table th {
+div.composed-section-edit i.editable-pen {
+  opacity: 0;
+  margin-left: 10px;
+  cursor: pointer;
+  color: #109DB7;
+}
+
+div.composed-section-edit:hover i.editable-pen {
+  opacity: 1;
+}
+
+div.composed-section-edit table.table td, div.composed-section-edit table.table th {
   text-align: right;
 }
 
-div.finances-body table.table td.no-cell {
+div.composed-section-edit table.table td.no-cell {
   padding-top: 12px;
 }
 
-div.finances-body table.table td.new-row-placeholder {
+div.composed-section-edit table.table td.new-row-placeholder {
   color: rgba(0, 0, 0, 0.4);
 }
 
-div.finances-body table.table td div.comp-cell {
+div.composed-section-edit table.table td div.comp-cell {
   float: right;
 }
 
-div.finances-body div.finances-edit-buttons {
+div.composed-section-edit div.finances-edit-buttons {
   margin-left: 234px;
 }
 
-div.finances-body div.finances-edit-buttons button.cancel {
+div.composed-section-edit div.finances-edit-buttons button.cancel {
   margin-left: 10px;
 }
 
