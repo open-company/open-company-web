@@ -21,26 +21,32 @@
     ; check if we are ready to initialize the widget and if we haven't aready done that
     (when (and req-libs-loaded did-mount (not select2-initialized))
       ; init name
-      (let [us (.$ js/window "select.metric-data#mtr-name")]
-        (.select2 us (clj->js {"placeholder" "Metric name"
-                               "templateResult" option-template
-                               "templateSelection" option-template})))
+      (let [name-input (.$ js/window "input.metric-data#mtr-name")
+            metrics (:metrics (om/get-state owner :presets))
+            metrics-list (vec (sort #(compare %1 %2) (map #(:name %) metrics)))]
+        (doto name-input
+          (.autocomplete (clj->js {"source" metrics-list
+                                   "minLength" 0}))
+          (.focus (fn [_]
+                    (this-as this
+                      (when (clojure.string/blank? (.-value this))
+                        (.trigger (.$ js/window this) "keydown.autocomplete")))))))
       ; init unit
-      (let [us (.$ js/window "select.metric-data#mtr-unit")]
-        (.select2 us (clj->js {"placeholder" "Metric unit"
-                               "templateResult" option-template
-                               "templateSelection" option-template})))
+      (let [select-unit (.$ js/window "select.metric-data#mtr-unit")]
+        (.select2 select-unit (clj->js {"placeholder" "Metric unit"
+                                        "templateResult" option-template
+                                        "templateSelection" option-template})))
       ; init goal
-      (let [us (.$ js/window "select.metric-data#mtr-goal")]
-        (.select2 us (clj->js {"placeholder" "Metric goal"
-                               "allowClear" true
-                               "templateResult" option-template
-                               "templateSelection" option-template})))
-      ; init name
-      (let [us (.$ js/window "select.metric-data#mtr-interval")]
-        (.select2 us (clj->js {"placeholder" "Metric interval"
-                               "templateResult" option-template
-                               "templateSelection" option-template})))
+      (let [select-goal (.$ js/window "select.metric-data#mtr-goal")]
+        (.select2 select-goal (clj->js {"placeholder" "Metric goal"
+                                        "allowClear" true
+                                        "templateResult" option-template
+                                        "templateSelection" option-template})))
+      ; init interval
+      (let [select-interval (.$ js/window "select.metric-data#mtr-interval")]
+        (.select2 select-interval (clj->js {"placeholder" "Metric interval"
+                                            "templateResult" option-template
+                                            "templateSelection" option-template})))
       ; save flag so we don't reinitialize the widget
       (om/update-state! owner :select2-initialized (fn [_]true)))))
 
@@ -60,7 +66,8 @@
     {:req-libs-loaded false
      :did-mount false
      :select2-initialized false
-     :presets (get-presets)})
+     :presets (get-presets)
+     :metric-name (:name (:metric-info data))})
 
   (did-mount [_]
     (om/set-state! owner :did-mount true))
@@ -68,8 +75,7 @@
   (will-mount [_]
               ; load needed resources
               (cdr/add-style! "/lib/select2/css/select2.css")
-              (cdr/add-scripts! [{:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"}
-                                 {:src "/lib/select2/js/select2.js"}]
+              (cdr/add-scripts! [{:src "/lib/select2/js/select2.js"}]
                                 (fn []
                                   (om/update-state! owner :req-libs-loaded (fn [] true))
                                   (init-select2 owner))))
@@ -81,14 +87,13 @@
         (dom/div {:class "growth-metric-edit-row group"}
           ; name
           (dom/div {:class "metric-data-container group"}
-            (dom/select {:class "metric-data metric-name"
-                         :value (:slug metric-info)
-                         :id "mtr-name"
-                         :placeholder "Metric name"
-                         :style {"width" "250px"}}
-              (dom/option {:value ""} "Name")
-              (for [metric metrics]
-                (dom/option {:value (:slug metric)} (:name metric)))))
+            (dom/input {:class "metric-data metric-name"
+                        :type "text"
+                        :value (om/get-state owner :metric-name)
+                        :on-change #(om/set-state! owner :metric-name (.. % -target -value))
+                        :id "mtr-name"
+                        :placeholder "Metric name"
+                        :style {"width" "250px"}}))
           ; unit
           (dom/div {:class "metric-data-container right group"}
             (dom/label {:for "mtr-unit"} "Measured in")
