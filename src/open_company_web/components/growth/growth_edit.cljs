@@ -5,6 +5,7 @@
             [open-company-web.components.cell :refer (cell)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.components.growth.growth-metric-edit :refer (growth-metric-edit)]
             [open-company-web.components.utility-components :refer (editable-pen)]
             [cljs.core.async :refer (put!)]))
 
@@ -113,7 +114,8 @@
           sorted-data (sort-growth-data data)]
       {:sorted-data sorted-data
        :metric-slug metric-slug
-       :metric-info (first (filter #(= (:slug %) metric-slug) metrics))}))
+       :metric-info (first (filter #(= (:slug %) metric-slug) metrics))
+       :metric-edit false}))
 
   (render [_]
     (let [metric-info (om/get-state owner :metric-info)
@@ -127,29 +129,32 @@
                                   v))
                               metric-data))]
       (dom/div {:class "composed-section-edit growth-body edit"}
-        (dom/div {:class "chart-header-container"}
-          (dom/div {:class "target-actual-container"}
-            (dom/div {:class "actual-container"}
-              (dom/h3 {:class "actual blue"} (str (:name metric-info) " ")
-                (om/build editable-pen {:click-callback #()}))
-              (dom/h3 {:class "actual-label gray"} (str (utils/camel-case-str (:interval metric-info)) " " (utils/camel-case-str (:unit metric-info)))))))
-        (dom/table {:class "table table-striped"}
-          (dom/thead {}
-            (dom/tr {}
-              (dom/th {} "")
-              (dom/th {} "Target")
-              (dom/th {} "Value")))
-          (dom/tbody {}
-            (for [idx (range (dec (count rows-data)))]
-              (let [row-data (get rows-data idx)
-                    next-period (next-period metric-data idx)
-                    row (merge row-data {:next-period next-period
-                                         :is-last (= idx 0)
-                                         :needs-year (or (= idx 0)
-                                                          (= idx (dec (count rows-data))))})]
-                (om/build growth-edit-row row)))
-            (dom/tr {}
-              (dom/td {}
-                (dom/a {:on-click #(more-months owner data)} "More..."))
-              (dom/td {})
-              (dom/td {}))))))))
+        (if (om/get-state owner :metric-edit)
+          (om/build growth-metric-edit {:metric-info metric-info})
+          (dom/div {}
+            (dom/div {:class "chart-header-container"}
+              (dom/div {:class "target-actual-container"}
+                (dom/div {:class "actual-container"}
+                  (dom/h3 {:class "actual blue"} (str (:name metric-info) " ")
+                    (om/build editable-pen {:click-callback #(om/set-state! owner :metric-edit true)}))
+                  (dom/h3 {:class "actual-label gray"} (str (utils/camel-case-str (:interval metric-info)) " " (utils/camel-case-str (:unit metric-info)))))))
+            (dom/table {:class "table table-striped"}
+              (dom/thead {}
+                (dom/tr {}
+                  (dom/th {} "")
+                  (dom/th {} "Target")
+                  (dom/th {} "Value")))
+              (dom/tbody {}
+                (for [idx (range (dec (count rows-data)))]
+                  (let [row-data (get rows-data idx)
+                        next-period (next-period metric-data idx)
+                        row (merge row-data {:next-period next-period
+                                             :is-last (= idx 0)
+                                             :needs-year (or (= idx 0)
+                                                              (= idx (dec (count rows-data))))})]
+                    (om/build growth-edit-row row)))
+                (dom/tr {}
+                  (dom/td {}
+                    (dom/a {:on-click #(more-months owner data)} "More..."))
+                  (dom/td {})
+                  (dom/td {}))))))))))
