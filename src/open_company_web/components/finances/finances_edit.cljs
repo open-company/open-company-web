@@ -21,7 +21,7 @@
           cell-state (if is-new :new :display)
           change-cb (:change-cb data)
           next-period (:next-period data)
-          tab-cb (fn [period k]
+          tab-cb (fn [_ k]
                    (cond
                      (= k :cash)
                      (signal-tab (:period finances-data) :revenue)
