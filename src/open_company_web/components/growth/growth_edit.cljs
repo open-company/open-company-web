@@ -4,24 +4,36 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.cell :refer (cell)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.components.growth.utils :as growth-utils]))
+            [open-company-web.components.growth.utils :as growth-utils]
+            [cljs.core.async :refer (put!)]))
 
-(defcomponent growth-edit-row [data owner]
+(defn signal-tab [period k]
+  (let [ch (utils/get-channel (str period k))]
+    (put! ch {:period period :key k})))
+
+(defcomponent growth-edit-row [data _]
   (render [_]
-    (let [prefix (:prefix data)
-          cursor (:cursor data)
-          is-new (:new cursor)
-          value (:value cursor)
-          target (:target cursor)
+    (let [growth-data (:cursor data)
+          is-new (:new growth-data)
+          value (:value growth-data)
+          target (:target growth-data)
           interval (:interval data)
-          period (:period cursor)
+          period (:period growth-data)
           period-month (utils/get-month period interval)
           needs-year (or (= period-month "JAN")
                          (= period-month "DEC")
                          (:needs-year data))
           period-string (utils/period-string period (when needs-year :force-year))
           cell-state (if is-new :new :display)
-          change-cb (:change-cb data)]
+          change-cb (:change-cb data)
+          next-period (:next-period data)
+          tab-cb (fn [_ k]
+                   (cond
+                     (= k :target)
+                     (signal-tab (:period growth-data) :value)
+                     (= k :value)
+                     (when next-period
+                       (signal-tab next-period :target))))]
       (dom/tr {:class "growth-edit-row"}
         (dom/td {:class "no-cell"}
           period-string)
@@ -31,7 +43,8 @@
                           :cell-state cell-state
                           :draft-cb #(change-cb :target %)
                           :period period
-                          :key :target}))
+                          :key :target
+                          :tab-cb tab-cb}))
         (dom/td {}
           (when (not (:is-last data))
             (om/build cell {:value value
@@ -39,7 +52,8 @@
                             :cell-state cell-state
                             :draft-cb #(change-cb :value %)
                             :period period
-                            :key :value})))))))
+                            :key :value
+                            :tab-cb tab-cb})))))))
 
 (defn next-period [data idx]
   (let [data (to-array data)]
@@ -94,8 +108,9 @@
 
   (init-state [_]
     (let [metric-slug (:metric-slug data)
-          metrics (:metrics (:section-data data))]
-      {:sorted-data (sort-growth-data data)
+          metrics (:metrics data)
+          sorted-data (sort-growth-data data)]
+      {:sorted-data sorted-data
        :metric-slug metric-slug
        :metric-info (first (filter #(= (:slug %) metric-slug) metrics))}))
 
