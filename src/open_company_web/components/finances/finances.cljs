@@ -20,6 +20,26 @@
             [open-company-web.components.utility-components :refer (editable-pen)]
             [open-company-web.components.section-footer :refer (section-footer)]))
 
+(defn get-state [owner data & [initial]]
+  (let [section-data (:section-data data)
+        notes-data (:notes section-data)]
+    {:focus (if initial
+              "cash"
+              (om/get-state owner :focus))
+     :title-editing (if initial
+                      (not (not (:oc-editing section-data)))
+                      (om/get-state owner :title-editing))
+     :notes-editing (if initial
+                      (not (not (:oc-editing section-data)))
+                      (om/get-state owner :notes-editing))
+     :data-editing (if initial
+                     (not (not (:oc-editing section-data)))
+                     (om/get-state owner :data-editing))
+     :finances-data (finances-utils/map-placeholder-data (:data section-data))
+     :title (:title section-data)
+     :notes-body (:body (:notes section-data))
+     :as-of (:updated-at section-data)}))
+
 (defn subsection-click [e owner]
   (.preventDefault e)
   (let [tab  (.. e -target -dataset -tab)]
@@ -39,12 +59,11 @@
     ; remove an unsaved section
     (section-utils/remove-section (name (:section data)))
     ; revert the edited data to the initial values
-    (let [section-data (:section-data data)
-          notes-data (:notes section-data)]
+    (let [state (get-state owner data)]
       ; reset the growth fields to the initial values
-      (om/set-state! owner :title (:title section-data))
-      (om/set-state! owner :notes-body (:body notes-data))
-      (om/set-state! owner :finances-data (finances-utils/map-placeholder-data (:data section-data)))
+      (om/set-state! owner :title (:title state))
+      (om/set-state! owner :notes-body (:notes-body state))
+      (om/set-state! owner :finances-data (:finances-data state))
       ; and the editing state flags
       (om/set-state! owner :title-editing false)
       (om/set-state! owner :notes-editing false)
@@ -204,39 +223,13 @@
     (om/set-state! owner :data-editing false)
     (om/set-state! owner :oc-editing false)))
 
-(defn get-state [owner data]
-  (let [section-data (:section-data data)
-        notes-data (:notes section-data)]
-    {:focus (or (om/get-state owner :focus) "cash")
-     :title-editing (or (not (not (:oc-editing section-data)))
-                        (om/get-state owner :title-editing))
-     :notes-editing (or (not (not (:oc-editing section-data)))
-                        (om/get-state owner :notes-editing))
-     :data-editing (or (not (not (:oc-editing section-data)))
-                       (om/get-state owner :data-editing))
-     :finances-data (finances-utils/map-placeholder-data (:data section-data))
-     :title (:title section-data)
-     :notes-body (:body (:notes section-data))
-     :as-of (:updated-at section-data)}))
-
 (defn has-revenues-or-costs [finances-data]
   (some #(or (not (zero? (:revenue %))) (not (zero? (:costs %)))) finances-data))
 
 (defcomponent finances [data owner]
 
   (init-state [_]
-    (let [section-data (:section-data data)
-          notes-data (:notes section-data)
-          finances-data (finances-utils/map-placeholder-data (:data section-data))]
-      {:focus "cash"
-       :title-editing (not (not (:oc-editing section-data)))
-       :notes-editing (not (not (:oc-editing section-data)))
-       :data-editing (not (not (:oc-editing section-data)))
-       :oc-editing (:oc-editing section-data)
-       :finances-data finances-data
-       :title (:title section-data)
-       :notes-body (:body (:notes section-data))
-       :as-of (:updated-at section-data)}))
+    (get-state owner data true))
 
   (will-receive-props [_ next-props]
     ; this means the section datas have changed from the API or at a upper lever of this component
