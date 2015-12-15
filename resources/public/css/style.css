@@ -664,14 +664,14 @@ div.finances:hover div.link-bar.editable i.editable-pen {
   opacity: 1;
 }
 
-div.composed-section-edit i.editable-pen {
+div.composed-section-edit div.chart-header-container i.editable-pen {
   opacity: 0;
   margin-left: 10px;
   cursor: pointer;
   color: #109DB7;
 }
 
-div.composed-section-edit:hover i.editable-pen {
+div.composed-section-edit div.chart-header-container:hover i.editable-pen {
   opacity: 1;
 }
 
@@ -1369,4 +1369,30 @@ div.oc-popover {
 
 .blue {
   color: #109DB7;
+}
+
+.growth-metric-edit-row {
+  width: 600px;
+  margin: 10px 0;
+}
+
+.growth-metric-edit-row textarea {
+  width: 300px;
+  height: 60px;
+}
+
+.metric-data-container {
+  width: 300px;
+}
+
+.metric-data-container{
+  float: left;
+}
+
+.metric-data-container label {
+  margin-right: 10px;
+}
+
+.metric-data-container.right{
+  float: right;
 }
