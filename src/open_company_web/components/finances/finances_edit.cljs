@@ -157,7 +157,7 @@
                               finances-data))]
       ; real component
       (dom/div {:class "finances"}
-        (dom/div {:class "finances-body edit"}
+        (dom/div {:class "composed-section-edit finances-body edit"}
           (dom/table {:class "table table-striped"}
             (dom/thead {}
               (dom/tr {}
