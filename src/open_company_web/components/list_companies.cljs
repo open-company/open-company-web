@@ -13,7 +13,7 @@
 
 (defcomponent list-companies [data owner]
   (render [_]
-    (utils/update-page-title "OPENcompany - Leadership with Transparency")
+    (utils/update-page-title "OPENcompany - Lead with Transparency")
     (let [company-list (:companies data)]
       (dom/div {:class "row-fluid"}
         (om/build navbar data)
