@@ -5,6 +5,7 @@
             [open-company-web.components.cell :refer (cell)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.components.utility-components :refer (editable-pen)]
             [cljs.core.async :refer (put!)]))
 
 (defn signal-tab [period k]
@@ -125,7 +126,13 @@
                                          :cursor row}]
                                   v))
                               metric-data))]
-      (dom/div {:class "growth-body finances-body edit"}
+      (dom/div {:class "composed-section-edit growth-body edit"}
+        (dom/div {:class "chart-header-container"}
+          (dom/div {:class "target-actual-container"}
+            (dom/div {:class "actual-container"}
+              (dom/h3 {:class "actual blue"} (str (:name metric-info) " ")
+                (om/build editable-pen {:click-callback #()}))
+              (dom/h3 {:class "actual-label gray"} (str (utils/camel-case-str (:interval metric-info)) " " (utils/camel-case-str (:unit metric-info)))))))
         (dom/table {:class "table table-striped"}
           (dom/thead {}
             (dom/tr {}
