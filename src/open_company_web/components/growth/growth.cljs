@@ -17,18 +17,52 @@
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.components.growth.utils :as growth-utils]))
 
+(defn get-metric-info [metrics focus]
+  (first (filter #(= (:slug %) focus) metrics)))
+
+(defn get-metric-data [all-data focus]
+  (filter #(= (:slug %) focus) all-data))
+
+(defn get-state [owner data & [initial]]
+  (let [section-data (:section-data data)
+        notes-data (:notes section-data)
+        metrics (:metrics section-data)
+        focus (if initial
+                (:slug (first metrics))
+                (om/get-state owner :focus))
+        current-metric (get-metric-info metrics focus)
+        metric-data (get-metric-data (:data section-data) focus)
+        interval (:interval current-metric)
+        growth-data (growth-utils/map-placeholder-data metric-data focus interval)]
+    {:focus focus
+     :title-editing (if initial
+                      (not (not (:oc-editing section-data)))
+                      (om/get-state owner :title-editing))
+     :notes-editing (if initial
+                      (not (not (:oc-editing section-data)))
+                      (om/get-state owner :notes-editing))
+     :data-editing (if initial
+                     (not (not (:oc-editing section-data)))
+                     (om/get-state owner :data-editing))
+     :growth-data growth-data
+     :growth-metrics metrics
+     :oc-editing (:oc-editing section-data)
+     :title (:title section-data)
+     :notes-body (:body notes-data)
+     :as-of (:updated-at section-data)}))
+
 (defn subsection-click [e owner]
   (.preventDefault e)
   (let [tab  (.. e -target -dataset -tab)]
     (om/set-state! owner :focus tab)))
 
-(defn start-title-editing-cb [owner data]
+(defn start-title-editing-cb [owner]
   (om/set-state! owner :title-editing true))
 
-(defn start-notes-editing-cb [owner data]
+(defn start-notes-editing-cb [owner]
   (om/set-state! owner :notes-editing true))
 
-(defn start-data-editing-cb [owner data]
+(defn start-data-editing-cb [owner]
   (om/set-state! owner :data-editing true))
 
 (defn cancel-cb [owner data]
@@ -36,13 +70,12 @@
     ; remove an unsaved section
     (section-utils/remove-section (:section data))
     ; revert the edited data to the initial values
-    (let [section-data (:section-data data)
-          notes-data (:notes section-data)]
+    (let [state (get-state owner data)]
       ; reset the finances fields to the initial values
-      (om/set-state! owner :title (:title section-data))
-      (om/set-state! owner :growth-data (:data section-data))
-      (om/set-state! owner :growth-metrics (:metrics section-data))
-      (om/set-state! owner :notes-body (:body notes-data))
+      (om/set-state! owner :title (:title state))
+      (om/set-state! owner :growth-data (:growth-data state))
+      (om/set-state! owner :growth-metrics (:growth-metrics state))
+      (om/set-state! owner :notes-body (:notes-body state))
       ; and the editing state flags
       (om/set-state! owner :title-editing false)
       (om/set-state! owner :notes-editing false)
@@ -79,12 +112,12 @@
 
 (defn fix-row [row]
   (let [fixed-value (assoc row :value (get-growth-value (:value row)))
-        fixed-target (assoc row :target (get-growth-value (:target row)))
-        fixed-row (if (or (not (empty? (:value row)))
-                          (not (empty? (:target row))))
+        fixed-target (assoc fixed-value :target (get-growth-value (:target row)))
+        fixed-row (if (or (not (clojure.string/blank? (:value row)))
+                          (not (clojure.string/blank? (:target row))))
                     (dissoc fixed-target :new)
                     (assoc fixed-target :new true))]
-    fixed-target))
+    fixed-row))
 
 (defn change-growth-cb [owner row]
   (let [fixed-row (fix-row row)
@@ -119,54 +152,10 @@
     (om/set-state! owner :data-editing false)
     (om/set-state! owner :oc-editing false)))
 
-(defn get-metric-info [metrics focus]
-  (first (filter #(= (:slug %) focus) metrics)))
-
-(defn get-metric-data [all-data focus]
-  (filter #(= (:slug %) focus) all-data))
-
-(defn get-state [owner data]
-  (let [section-data (:section-data data)
-        notes-data (:notes section-data)
-        metrics (:metrics section-data)
-        focus (om/get-state owner :focus)
-        current-metric (get-metric-info metrics focus)
-        metric-data (get-metric-data (:data section-data) focus)
-        interval (:interval current-metric)
-        growth-data (growth-utils/map-placeholder-data metric-data focus interval)]
-    {:focus (om/get-state owner :focus)
-     :title-editing (or (not (not (:oc-editing section-data)))
-                        (om/get-state owner :title-editing))
-     :notes-editing (or (not (not (:oc-editing section-data)))
-                        (om/get-state owner :notes-editing))
-     :data-editing (or (not (not (:oc-editing section-data)))
-                       (om/get-state owner :data-editing))
-     :growth-data growth-data
-     :growth-metrics metrics
-     :oc-editing (:oc-editing section-data)
-     :title (:title section-data)
-     :notes-body (:body (:notes section-data))
-     :as-of (:updated-at section-data)}))
-
 (defcomponent growth [data owner]
 
   (init-state [_]
-    (let [section-data (:section-data data)
-          notes-data (:notes section-data)
-          metrics (:metrics section-data)
-          focus (:slug (first metrics))
-          current-metric (get-metric-info metrics focus)
-          metric-data (get-metric-data (:data section-data) focus)
-          interval (:interval current-metric)
-          growth-data (growth-utils/map-placeholder-data metric-data focus interval)]
-      {:focus focus
-       :title-editing (not (not (:oc-editing section-data)))
-       :notes-editing (not (not (:oc-editing section-data)))
-       :data-editing (not (not (:oc-editing section-data)))
-       :growth-data growth-data
-       :growth-metrics metrics
-       :title (:title section-data)
-       :notes-body (:body notes-data)}))
+    (get-state owner data true))
 
   (will-receive-props [_ next-props]
     ; this means the section datas have changed from the API or at a upper lever of this component
@@ -174,9 +163,7 @@
       (om/set-state! owner (get-state owner next-props))))
 
   (render [_]
-    (let [showing-revision (om/get-state owner :as-of)
-          focus (om/get-state owner :focus)
-          slug (:slug @router/path)
+    (let [focus (om/get-state owner :focus)
           section-data (:section-data data)
           section (:section data)
           section-name (utils/camel-case-str (name section))
@@ -189,7 +176,7 @@
           subsection-data {:metric-data focus-metric-data
                            :metric-info focus-metric-info
                            :read-only read-only
-                           :start-editing-cb #(start-data-editing-cb owner data)
+                           :start-editing-cb #(start-data-editing-cb owner)
                            :total-metrics (count growth-metrics)}
           title-editing (om/get-state owner :title-editing)
           notes-editing (om/get-state owner :notes-editing)
@@ -199,8 +186,8 @@
           notes-body-change-fn (partial change-cb owner :notes-body)
           title-change-fn (partial change-cb owner :title)
           cancel-if-needed-fn #(cancel-if-needed-cb owner data)
-          start-title-editing-fn #(start-title-editing-cb owner data)
-          start-notes-editing-fn #(start-notes-editing-cb owner data)]
+          start-title-editing-fn #(start-title-editing-cb owner)
+          start-notes-editing-fn #(start-notes-editing-cb owner)]
       (dom/div {:class "section-container" :id "section-growth" :key (name section)}
         (dom/div {:class "composed-section growth"}
           (om/build editable-title {:read-only read-only
