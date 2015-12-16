@@ -1395,4 +1395,24 @@ div.oc-popover {
 
 .metric-data-container.right{
   float: right;
+  text-align: right;
+}
+
+.metric-data-container.right span {
+  text-align: left;
+}
+
+.growth-metric-edit-row input#mtr-name,
+.growth-metric-edit-row textarea {
+  background-color: #fff;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  width: 250px;
+  padding: 0px 8px;
+  color: #444;
+  font-size: 14px;
+}
+
+.growth-metric-edit-row input#mtr-name{
+  height: 28px;
 }
