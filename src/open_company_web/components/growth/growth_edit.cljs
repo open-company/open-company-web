@@ -136,7 +136,9 @@
             (dom/div {:class "chart-header-container"}
               (dom/div {:class "target-actual-container"}
                 (dom/div {:class "actual-container"}
-                  (dom/h3 {:class "actual blue"} (str (:name metric-info) " ")
+                  (dom/h3 {:class "actual blue"
+                           :on-click #(om/set-state! owner :metric-edit true)}
+                    (str (:name metric-info) " ")
                     (om/build editable-pen {:click-callback #(om/set-state! owner :metric-edit true)}))
                   (dom/h3 {:class "actual-label gray"} (str (utils/camel-case-str (:interval metric-info)) " " (utils/camel-case-str (:unit metric-info)))))))
             (dom/table {:class "table table-striped"}
