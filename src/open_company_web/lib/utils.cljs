@@ -15,23 +15,6 @@
     (fn [a b] (compare (k a) (k b)))
     (fn [a b] (compare (k b) (k a)))))
 
-(defn thousands-separator [number]
-  (let [parts (clojure.string/split (str number) "." 1)
-        int-part (first parts)
-        dec-part (get parts 1)
-        integer-string (clojure.string/replace int-part #"\B(?=(\d{3})+(?!\d))" ",")]
-    (if-not (= dec-part nil)
-      (str integer-string "." dec-part)
-      integer-string)))
-
-(defn thousands-separator-strip [number]
-  (let [num-str (str number)]
-    (clojure.string/replace num-str "," "")))
-
-(defn String->Number [str]
-  (let [n (js/parseFloat str)]
-    (if (js/isNaN n) 0 n)))
-
 (defn display [show]
   (if show
     #js {}
@@ -39,12 +22,14 @@
 
 (defn get-currency [currency-code]
   (let [kw (keyword currency-code)]
-    (get iso4217 kw)))
+    (if (contains? iso4217 kw)
+      (kw iso4217)
+      nil)))
 
 (defn get-symbol-for-currency-code [currency-code]
   (let [currency (get-currency currency-code)
         sym (if (and (contains? currency :symbol)
-                     (> (count (:symbol currency)) 0))
+                     (not (clojure.string/blank? (:symbol currency))))
               (:symbol currency)
               currency-code)]
     (or sym (:code currency))))
@@ -176,8 +161,7 @@
     ""))
 
 (defn period-string [period & flags]
-  (let [force-year (in? flags :force-year)
-        short-month-string (in? flags :short-month)
+  (let [short-month-string (in? flags :short-month)
         [year month] (clojure.string/split period "-")
         month-str (if short-month-string 
                     (month-short-string month)
@@ -185,10 +169,6 @@
     (if (or (in? flags :force-year) (= month "01") (= month "12"))
       (str month-str " " year)
       month-str)))
-
-(defn get-periods [prefix n]
- (let [r (range 1 (+ n 1))]
-    (into [] (for [a r] (str prefix a)))))
 
 (defn redirect! [loc]
   (set! (.-location js/window) loc))
@@ -271,8 +251,7 @@
         years-interval (.floor js/Math (/ seconds 31536000))
         months-interval (.floor js/Math (/ seconds 2592000))
         days-interval (.floor js/Math (/ seconds 86400))
-        hours-interval (.floor js/Math (/ seconds 3600))
-        minutes-interval (.floor js/Math (/ seconds 60))]
+        hours-interval (.floor js/Math (/ seconds 3600))]
     (cond
       (pos? years-interval)
       (date-string past-js-date true)
@@ -297,24 +276,6 @@
         lf (.-left bound-rect)
         from-left (- client-x lf)]
     from-left))
-
-(defn set-caret-position!
-  "Move the caret to the specified position of a certain element"
-  [elem caret-pos]
-  (when elem
-    (cond
-      (.-createTextRange elem)
-      (let [rg (.createTextRange elem)]
-        (.move rg "character" caret-pos)
-        (.select rg))
-
-      (.-selectionStart elem)
-      (do
-        (.focus elem)
-        (.setSelectionRange elem caret-pos caret-pos))
-
-      :else
-      (.focus elem))))
 
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
@@ -459,7 +420,7 @@
         "October - December"))))
 
 
-(def quarterly-input-format (cljs-time-format/formatter "MM-yyyy"))
+(def quarterly-input-format (cljs-time-format/formatter "yyyy-MM"))
 (def monthly-input-format (cljs-time-format/formatter "yyyy-MM"))
 (def weekly-input-format (cljs-time-format/formatter "yyyy-MM-dd"))
 
@@ -468,33 +429,28 @@
   (case interval
     "quarterly"
     quarterly-input-format
-    "monthly"
-    monthly-input-format
     "weekly"
     weekly-input-format
-    :else
-    weekly-input-format))
+    ; else
+    monthly-input-format))
 
 (defn date-from-period [period & [interval]]
-  (let [fixed-interval (or interval "monthly")]
-    (cljs-time-format/parse (get-formatter interval) period)))
+  (cljs-time-format/parse (get-formatter interval) period))
 
 (defn period-from-date [date & [interval]]
-  (let [fixed-interval (or interval "monthly")]
-    (cljs-time-format/unparse (get-formatter interval) date)))
+  (cljs-time-format/unparse (get-formatter interval) date))
 
 (defn get-period-string [period interval & [flags]]
   "Get descriptive string for the period by interval. Use :short as a flag to get
   the short formatted string."
-  (let [formatter (get-formatter interval)
-        date (cljs-time-format/parse formatter period)]
+  (let [parsed-date (date-from-period period interval)]
     (case interval
       "quarterly"
-      (str (get-quarter-from-month (cljs-time/month date) flags) " " (cljs-time/year date))
+      (str (get-quarter-from-month (cljs-time/month parsed-date) flags) " " (cljs-time/year parsed-date))
       "monthly"
-      (str (month-string-int (cljs-time/month date) flags))
+      (str (month-string-int (cljs-time/month parsed-date) flags))
       "weekly"
-      (str (month-string-int (cljs-time/month date) flags) " " (cljs-time/day date)))))
+      (str (month-string-int (cljs-time/month parsed-date) flags) " " (cljs-time/day parsed-date)))))
 
 (defn update-page-title [title]
   (set! (.-title js/document) title))
@@ -531,8 +487,7 @@
 (defn current-growth-period [interval]
   (let [now (cljs-time/now)
         year (cljs-time/year now)
-        month (cljs-time/month now)
-        day (cljs-time/day now)]
+        month (cljs-time/month now)]
     (case interval
       "quarterly"
       (str year "-" (add-zero (get-month-quarter month)))
