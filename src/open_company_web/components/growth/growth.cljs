@@ -182,7 +182,7 @@
           notes-data (:notes section-data)
           read-only (:read-only data)
           focus-metric-data (filter #(= (:slug %) focus) growth-data)
-          focus-metric-info (get growth-metrics focus) ;(first (filter #(= (:slug %) focus) growth-metrics))
+          focus-metric-info (get growth-metrics focus)
           subsection-data {:metric-data focus-metric-data
                            :metric-info focus-metric-info
                            :read-only read-only
