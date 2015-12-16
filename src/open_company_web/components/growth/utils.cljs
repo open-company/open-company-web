@@ -16,8 +16,7 @@
     "weekly" (t/weeks diff)))
 
 (defn- get-past-period [period diff interval]
-  (let [[year month] (clojure.string/split period "-")
-        period-date (t/date-time (int year) (int month))
+  (let [period-date (utils/date-from-period period interval)
         past-date (t/minus period-date (get-minus diff interval))
         formatter (utils/get-formatter interval)]
     (f/unparse formatter past-date)))
@@ -28,6 +27,18 @@
    :value nil
    :target nil
    :new true})
+
+(defn chart-placeholder-data [initial-data slug interval]
+  (let [first-period (:period (last initial-data))
+        last-period (:period (first initial-data))
+        period-diff (utils/periods-diff first-period last-period interval)]
+    (vec
+      (for [idx (range 0 (inc period-diff))]
+        (let [prev-period (get-past-period last-period idx interval)
+              period-exists (utils/period-exists prev-period initial-data)]
+          (if period-exists
+            (some #(when (= (:period %) prev-period) %) initial-data)
+            (placeholder-data prev-period slug)))))))
 
 (defn edit-placeholder-data [initial-data slug interval]
   (let [tot-num (columns-num interval)
