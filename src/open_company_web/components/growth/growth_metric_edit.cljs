@@ -6,6 +6,7 @@
             [cljs-dynamic-resources.core :as cdr]
             [open-company-web.caches :refer (new-sections)]
             [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.iso4217 :refer (sorted-iso4217)]))
 
 (defn option-template [state]
@@ -13,11 +14,21 @@
   (let [text (.-text state)]
     (js/jQuery (str "<span>" (.-text state) "</span>"))))
 
-(defn init-select2 [owner]
+(defn unit-option-template [state]
+  (if-not (.-id state) (.-text state))
+  (let [text (.-text state)
+        currency (utils/get-currency text)
+        fixed-text (if currency
+                     (utils/get-symbol-for-currency-code text)
+                     (utils/camel-case-str text))]
+    (js/jQuery (str "<span>" fixed-text "</span>"))))
+
+(defn init-select2 [owner data]
   ; get needed states
   (let [req-libs-loaded (om/get-state owner :req-libs-loaded)
         did-mount (om/get-state owner :did-mount)
-        select2-initialized (om/get-state owner :select2-initialized)]
+        select2-initialized (om/get-state owner :select2-initialized)
+        change-cb (:change-growth-metric-cb data)]
     ; check if we are ready to initialize the widget and if we haven't aready done that
     (when (and req-libs-loaded did-mount (not select2-initialized))
       ; init name
@@ -30,31 +41,42 @@
           (.focus (fn [_]
                     (this-as this
                       (when (clojure.string/blank? (.-value this))
-                        (.trigger (.$ js/window this) "keydown.autocomplete")))))))
-      ; init unit
-      (let [select-unit (.$ js/window "select.metric-data#mtr-unit")]
-        (doto select-unit
-          (.select2 (clj->js {"placeholder" "Metric unit"
-                              "templateResult" option-template
-                              "templateSelection" option-template}))
+                        (.trigger (.$ js/window this) "keydown.autocomplete")))))
           (.on "change" (fn [e]
-                          (om/set-state! owner :unit (.. e -target -value))))))
-      ; init currency picker
-      (let [select-cur (.$ js/window "select.metric-data#mtr-currency")]
-        (.select2 select-cur (clj->js {"placeholder" "Currency"
-                                        "templateResult" option-template
-                                        "templateSelection" option-template})))
+                          (let [name-value (.. e -target -value)
+                                slug (utils/slugify name-value)]
+                            (when-not (clojure.string/blank? name-value)
+                              (change-cb :name name-value)
+                              (change-cb :slug slug)
+                              (om/set-state! owner :metric-name name-value)))))))
+      ; init unit
+      (doto (.$ js/window "select#mtr-unit")
+        (.select2 (clj->js {"placeholder" "Metric unit"
+                            "templateResult" unit-option-template
+                            "templateSelection" unit-option-template}))
+        (.on "change" (fn [e]
+                        (let [unit-value (.. e -target -value)]
+                          (om/set-state! owner :unit unit-value)
+                          (change-cb :unit unit-value)))))
       ; init goal
-      (let [select-goal (.$ js/window "select.metric-data#mtr-goal")]
-        (.select2 select-goal (clj->js {"placeholder" "Metric goal"
-                                        "allowClear" true
-                                        "templateResult" option-template
-                                        "templateSelection" option-template})))
+      (doto (.$ js/window "select.metric-data#mtr-goal")
+        (.select2 (clj->js {"placeholder" "Metric goal"
+                            "allowClear" true
+                            "templateResult" option-template
+                            "templateSelection" option-template}))
+        (.on "change" (fn [e]
+                        (let [target-value (.. e -target -value)]
+                          (om/set-state! owner :target target-value)
+                          (change-cb :target target-value)))))
       ; init interval
-      (let [select-interval (.$ js/window "select.metric-data#mtr-interval")]
-        (.select2 select-interval (clj->js {"placeholder" "Metric interval"
-                                            "templateResult" option-template
-                                            "templateSelection" option-template})))
+      (doto (.$ js/window "select.metric-data#mtr-interval")
+        (.select2 (clj->js {"placeholder" "Metric interval"
+                            "templateResult" option-template
+                            "templateSelection" option-template}))
+        (.on "change" (fn [e]
+                        (let [interval-value (.. e -target -value)]
+                          (om/set-state! owner :interval interval-value)
+                          (change-cb :interval interval-value)))))
       ; save flag so we don't reinitialize the widget
       (om/update-state! owner :select2-initialized (fn [_]true)))))
 
@@ -65,28 +87,33 @@
         growth-defaults (first (filter #(= (:name %) "growth") all-sections))]
     {:intervals (:intervals growth-defaults)
      :units (:units growth-defaults)
-     :goal (:goal growth-defaults)
+     :target (:goal growth-defaults)
      :metrics (:metrics growth-defaults)}))
 
 (defcomponent growth-metric-edit [data owner]
 
   (init-state [_]
     (let [metric-info (:metric-info data)
-          currency (utils/get-currency (:unit metric-info))]
+          company-slug (keyword (:slug @router/path))
+          company-data (company-slug @dispatcher/app-state)
+          company-currency-code (:currency company-data)
+          presets (get-presets)
+          units (:units presets)
+          fixed-units (vec (map #(if (= % "currency") company-currency-code %) units))]
       {:req-libs-loaded false
        :did-mount false
        :select2-initialized false
-       :presets (get-presets)
+       :presets presets
        :metric-name (:name metric-info)
-       :unit (if currency
-               "currency"
-               (:unit metric-info))
+       :unit (:unit metric-info)
+       :units fixed-units
        :interval (:interval metric-info)
-       :goal (:goal metric-info)
-       :currency currency}))
+       :target (:target metric-info)
+       :currency company-currency-code}))
 
   (did-mount [_]
-    (om/set-state! owner :did-mount true))
+    (om/set-state! owner :did-mount true)
+    (init-select2 owner data))
 
   (will-mount [_]
               ; load needed resources
@@ -94,13 +121,11 @@
               (cdr/add-scripts! [{:src "/lib/select2/js/select2.js"}]
                                 (fn []
                                   (om/update-state! owner :req-libs-loaded (fn [] true))
-                                  (init-select2 owner))))
+                                  (init-select2 owner data))))
   (render [_]
     (let [metric-info (:metric-info data)
-          {:keys [metrics intervals goal units] :as presets} (om/get-state owner :presets)
-          currency (om/get-state owner :currency)
-          unit (om/get-state owner :unit)
-          show-currency-picker (= unit "currency")]
+          {:keys [metrics intervals target] :as presets} (om/get-state owner :presets)
+          units (om/get-state owner :units)]
       (dom/div {:class "growth-metric-edit"}
         ; name and unit
         (dom/div {:class "growth-metric-edit-row group"}
@@ -117,25 +142,15 @@
           (dom/div {:class "metric-data-container right group"}
             (dom/label {:for "mtr-unit"} "Measured in")
             (dom/select {:class "metric-data metric-unit"
-                         :value unit
+                         :value (om/get-state owner :unit)
                          :id "mtr-unit"
                          :placeholder "Metric unit"
                          :style {"width" "150px"}}
               (dom/option {:value ""} "Unit")
               (for [unit units]
-                (dom/option {:value unit} (utils/camel-case-str unit))))))
-        (dom/div {:class (utils/class-set {:growth-metric-edit-row true
-                                           :group true
-                                           :hide (not show-currency-picker)})}
-          (dom/div {:class "metric-data-container group"}
-            (dom/label {:for "mtr-currency"} "Currency picker")
-            (dom/select {:class "metric-data metric-unit"
-                         :value (or (:code currency) "USD")
-                         :id "mtr-currency"
-                         :placeholder "Currency"
-                         :style {"width" "150px"}}
-              (for [cur (sorted-iso4217)]
-                (dom/option {:value (:code cur)} (str (utils/get-symbol-for-currency-code (:code cur)) " " (:text cur)))))))
+                (dom/option {:value (if (= unit "currency")
+                                      (om/get-state owner :currency)
+                                      unit)} unit)))))
         ; textarea
         (dom/div {:class "growth-metric-edit-row group"}
           (dom/textarea {:class "metric-data metric-description"
@@ -146,12 +161,12 @@
           (dom/div {:class "metric-data-container group"}
             (dom/label {:for "mtr-goal"} "Goal:")
             (dom/select {:class "metric-data metric-goal"
-                         :value (om/get-state owner :goal)
+                         :value (om/get-state owner :target)
                          :id "mtr-goal"
                          :placeholder "Metric goal"
                          :style {"width" "150px"}}
               (dom/option {:value ""} "Goal")
-              (for [g goal]
+              (for [g target]
                 (dom/option {:value g} (utils/camel-case-str g)))))
           ; interval
           (dom/div {:class "metric-data-container right group"}
