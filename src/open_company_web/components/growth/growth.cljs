@@ -17,20 +17,23 @@
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.components.growth.utils :as growth-utils]))
 
-(defn get-metric-info [metrics focus]
-  (first (filter #(= (:slug %) focus) metrics)))
-
 (defn get-metric-data [all-data focus]
   (filter #(= (:slug %) focus) all-data))
+
+(defn metrics-map [metrics-coll]
+  (apply merge (map #(hash-map (:slug %) %) (reverse metrics-coll))))
+
+(defn metrics-order [metrics-coll]
+  (map #(:slug %) metrics-coll))
 
 (defn get-state [owner data & [initial]]
   (let [section-data (:section-data data)
         notes-data (:notes section-data)
-        metrics (:metrics section-data)
+        metrics (metrics-map (:metrics section-data))
         focus (if initial
-                (:slug (first metrics))
+                (:slug (first (:metrics section-data)))
                 (om/get-state owner :focus))
-        current-metric (get-metric-info metrics focus)
+        current-metric (get metrics focus)
         metric-data (get-metric-data (:data section-data) focus)
         interval (:interval current-metric)
         growth-data (growth-utils/map-placeholder-data metric-data focus interval)]
@@ -46,6 +49,7 @@
                      (om/get-state owner :data-editing))
      :growth-data growth-data
      :growth-metrics metrics
+     :growth-metric-slugs (metrics-order (:metrics section-data))
      :oc-editing (:oc-editing section-data)
      :title (:title section-data)
      :notes-body (:body notes-data)
@@ -84,7 +88,7 @@
 (defn has-data-changes [owner data]
   (let [section-data (:section-data data)]
     (or (not= (:data section-data) (om/get-state owner :section-data))
-        (not= (:metrics section-data) (om/get-state owner :growth-metrics)))))
+        (not= (metrics-map (:metrics section-data)) (om/get-state owner :growth-metrics)))))
 
 (defn has-changes [owner data]
   (let [section-data (:section-data data)
@@ -127,6 +131,12 @@
         fixed-data (assoc growth-data (str period slug) fixed-row)]
     (om/set-state! owner :growth-data fixed-data)))
 
+(defn change-growth-metric-cb [owner slug k v]
+  (let [metrics (om/get-state owner :growth-metrics)
+        metric (get metrics slug)
+        new-metrics (assoc metrics slug (assoc metric k v))]
+    (om/set-state! owner :growth-metrics new-metrics)))
+
 (defn save-cb [owner data]
   (when (or (has-changes owner data) ; when the section already exists
             (has-data-changes owner data)
@@ -137,7 +147,7 @@
           growth-metrics (om/get-state owner :growth-metrics)
           section-data {:title title
                         :data growth-data
-                        :metrics growth-metrics
+                        :metrics (vec (vals growth-metrics))
                         :notes {:body notes-body}}]
       (if (om/get-state owner :oc-editing)
         ; save a new section
@@ -167,12 +177,12 @@
           section-data (:section-data data)
           section (:section data)
           section-name (utils/camel-case-str (name section))
-          growth-metrics (:metrics section-data)
+          growth-metrics (om/get-state owner :growth-metrics)
           growth-data (:data section-data)
           notes-data (:notes section-data)
           read-only (:read-only data)
           focus-metric-data (filter #(= (:slug %) focus) growth-data)
-          focus-metric-info (first (filter #(= (:slug %) focus) growth-metrics))
+          focus-metric-info (get growth-metrics focus) ;(first (filter #(= (:slug %) focus) growth-metrics))
           subsection-data {:metric-data focus-metric-data
                            :metric-info focus-metric-info
                            :read-only read-only
@@ -205,21 +215,22 @@
             (om/build growth-edit {:growth-data (om/get-state owner :growth-data)
                                    :metric-slug focus
                                    :metrics (om/get-state owner :growth-metrics)
-                                   :change-growth-cb (partial change-growth-cb owner)})
+                                   :change-growth-cb (partial change-growth-cb owner)
+                                   :change-growth-metric-cb (partial change-growth-metric-cb owner focus)})
             (dom/div {}
               (dom/div {:class "link-bar"}
                 (when (and focus (> (count growth-metrics) 1))
-                  (for [metric growth-metrics]
-                    (let [mslug (:slug metric)
+                  (for [metric-slug (om/get-state owner :growth-metric-slugs)]
+                    (let [metric (get growth-metrics metric-slug)
                           mname (:name metric)
                           metric-classes (utils/class-set {:composed-section-link true
-                                                           mslug true
-                                                           :active (= focus mslug)})]
+                                                           metric-slug true
+                                                           :active (= focus metric-slug)})]
                       (dom/a {:class metric-classes
                               :title mname
-                              :data-tab mslug
-                              :on-click #(subsection-click % owner)} mname))))
-                (om/build add-metric {:click-callback nil :metrics-count (count growth-metrics)}))
+                              :data-tab metric-slug
+                              :on-click #(subsection-click % owner)} mname)))))
+                (om/build add-metric {:click-callback nil :metrics-count (count growth-metrics)})
               (dom/div {:class (utils/class-set {:composed-section-body true
                                                  :editable (not read-only)})}
                 ;; growth metric currently shown
