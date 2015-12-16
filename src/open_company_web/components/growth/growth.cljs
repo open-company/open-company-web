@@ -55,10 +55,17 @@
      :notes-body (:body notes-data)
      :as-of (:updated-at section-data)}))
 
-(defn subsection-click [e owner]
+(defn subsection-click [e owner data]
   (.preventDefault e)
-  (let [tab  (.. e -target -dataset -tab)]
-    (om/set-state! owner :focus tab)))
+  (let [focus  (.. e -target -dataset -tab)
+        section-data (:section-data data)
+        metrics (metrics-map (:metrics section-data))
+        current-metric (get metrics focus)
+        metric-data (get-metric-data (:data section-data) focus)
+        interval (:interval current-metric)
+        growth-data (growth-utils/map-placeholder-data metric-data focus interval)]
+    (om/set-state! owner :growth-data growth-data)
+    (om/set-state! owner :focus focus)))
 
 (defn start-title-editing-cb [owner]
   (om/set-state! owner :title-editing true))
@@ -229,7 +236,7 @@
                       (dom/a {:class metric-classes
                               :title mname
                               :data-tab metric-slug
-                              :on-click #(subsection-click % owner)} mname)))))
+                              :on-click #(subsection-click % owner data)} mname)))))
                 (om/build add-metric {:click-callback nil :metrics-count (count growth-metrics)})
               (dom/div {:class (utils/class-set {:composed-section-body true
                                                  :editable (not read-only)})}
