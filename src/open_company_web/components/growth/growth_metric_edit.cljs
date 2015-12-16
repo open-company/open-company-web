@@ -6,7 +6,7 @@
             [cljs-dynamic-resources.core :as cdr]
             [open-company-web.caches :refer (new-sections)]
             [open-company-web.router :as router]
-            [shodan.console :as console]))
+            [open-company-web.lib.iso4217 :refer (sorted-iso4217)]))
 
 (defn option-template [state]
   (if-not (.-id state) (.-text state))
@@ -33,7 +33,15 @@
                         (.trigger (.$ js/window this) "keydown.autocomplete")))))))
       ; init unit
       (let [select-unit (.$ js/window "select.metric-data#mtr-unit")]
-        (.select2 select-unit (clj->js {"placeholder" "Metric unit"
+        (doto select-unit
+          (.select2 (clj->js {"placeholder" "Metric unit"
+                              "templateResult" option-template
+                              "templateSelection" option-template}))
+          (.on "change" (fn [e]
+                          (om/set-state! owner :unit (.. e -target -value))))))
+      ; init currency picker
+      (let [select-cur (.$ js/window "select.metric-data#mtr-currency")]
+        (.select2 select-cur (clj->js {"placeholder" "Currency"
                                         "templateResult" option-template
                                         "templateSelection" option-template})))
       ; init goal
@@ -63,11 +71,19 @@
 (defcomponent growth-metric-edit [data owner]
 
   (init-state [_]
-    {:req-libs-loaded false
-     :did-mount false
-     :select2-initialized false
-     :presets (get-presets)
-     :metric-name (:name (:metric-info data))})
+    (let [metric-info (:metric-info data)
+          currency (utils/get-currency (:unit metric-info))]
+      {:req-libs-loaded false
+       :did-mount false
+       :select2-initialized false
+       :presets (get-presets)
+       :metric-name (:name metric-info)
+       :unit (if currency
+               "currency"
+               (:unit metric-info))
+       :interval (:interval metric-info)
+       :goal (:goal metric-info)
+       :currency currency}))
 
   (did-mount [_]
     (om/set-state! owner :did-mount true))
@@ -81,7 +97,10 @@
                                   (init-select2 owner))))
   (render [_]
     (let [metric-info (:metric-info data)
-          {:keys [metrics intervals goal units] :as presets} (om/get-state owner :presets)]
+          {:keys [metrics intervals goal units] :as presets} (om/get-state owner :presets)
+          currency (om/get-state owner :currency)
+          unit (om/get-state owner :unit)
+          show-currency-picker (= unit "currency")]
       (dom/div {:class "growth-metric-edit"}
         ; name and unit
         (dom/div {:class "growth-metric-edit-row group"}
@@ -98,13 +117,25 @@
           (dom/div {:class "metric-data-container right group"}
             (dom/label {:for "mtr-unit"} "Measured in")
             (dom/select {:class "metric-data metric-unit"
-                         :value (:unit metric-info)
+                         :value unit
                          :id "mtr-unit"
                          :placeholder "Metric unit"
                          :style {"width" "150px"}}
               (dom/option {:value ""} "Unit")
               (for [unit units]
                 (dom/option {:value unit} (utils/camel-case-str unit))))))
+        (dom/div {:class (utils/class-set {:growth-metric-edit-row true
+                                           :group true
+                                           :hide (not show-currency-picker)})}
+          (dom/div {:class "metric-data-container group"}
+            (dom/label {:for "mtr-currency"} "Currency picker")
+            (dom/select {:class "metric-data metric-unit"
+                         :value (or (:code currency) "USD")
+                         :id "mtr-currency"
+                         :placeholder "Currency"
+                         :style {"width" "150px"}}
+              (for [cur (sorted-iso4217)]
+                (dom/option {:value (:code cur)} (str (utils/get-symbol-for-currency-code (:code cur)) " " (:text cur)))))))
         ; textarea
         (dom/div {:class "growth-metric-edit-row group"}
           (dom/textarea {:class "metric-data metric-description"
@@ -115,7 +146,7 @@
           (dom/div {:class "metric-data-container group"}
             (dom/label {:for "mtr-goal"} "Goal:")
             (dom/select {:class "metric-data metric-goal"
-                         :value (:goal metric-info)
+                         :value (om/get-state owner :goal)
                          :id "mtr-goal"
                          :placeholder "Metric goal"
                          :style {"width" "150px"}}
@@ -126,7 +157,7 @@
           (dom/div {:class "metric-data-container right group"}
             (dom/label {:for "mtr-goal"} "Interval:")
             (dom/select {:class "metric-data metric-interval"
-                         :value (:interval metric-info)
+                         :value (om/get-state owner :interval)
                          :id "mtr-interval"
                          :placeholder "Metric interval"
                          :style {"width" "150px"}}
