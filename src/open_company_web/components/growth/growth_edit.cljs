@@ -114,7 +114,7 @@
           sorted-data (sort-growth-data data)]
       {:sorted-data sorted-data
        :metric-slug metric-slug
-       :metric-info (first (filter #(= (:slug %) metric-slug) metrics))
+       :metric-info (get metrics metric-slug)
        :metric-edit false}))
 
   (render [_]
@@ -130,7 +130,8 @@
                               metric-data))]
       (dom/div {:class "composed-section-edit growth-body edit"}
         (if (om/get-state owner :metric-edit)
-          (om/build growth-metric-edit {:metric-info metric-info})
+          (om/build growth-metric-edit {:metric-info metric-info
+                                        :change-growth-metric-cb (:change-growth-metric-cb data)})
           (dom/div {}
             (dom/div {:class "chart-header-container"}
               (dom/div {:class "target-actual-container"}
