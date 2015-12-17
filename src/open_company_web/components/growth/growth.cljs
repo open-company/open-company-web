@@ -289,7 +289,7 @@
               (dom/div {:class (utils/class-set {:composed-section-body true
                                                  :editable (not read-only)})}
                 ;; growth metric currently shown
-                (when focus
+                (when (and focus (not (empty? (:metric-data subsection-data))))
                   (om/build growth-metric subsection-data)))))
             (om/build update-footer {:updated-at (:updated-at section-data)
                                      :author (:author section-data)
