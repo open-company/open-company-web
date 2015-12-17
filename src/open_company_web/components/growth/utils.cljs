@@ -1,7 +1,10 @@
 (ns open-company-web.components.growth.utils
   (:require [open-company-web.lib.utils :as utils]
             [cljs-time.core :as t]
-            [cljs-time.format :as f]))
+            [cljs-time.format :as f]
+            [cuerdas.core :as s]))
+
+(def new-metric-slug-placeholder "new-metric-slug-placeholder")
 
 (defn columns-num [interval]
   (case interval
@@ -11,6 +14,26 @@
     8
     ;else
     12))
+
+(defn get-noise []
+  (int (* (rand 4) 1000)))
+
+(defn create-slug [presets metric-name & [add-noise]]
+  (let [metrics (:metrics presets)
+        metric (filter #(= (s/lower (:name %)) (s/lower metric-name)) metrics)
+        slug (if (empty? metric)
+               (s/slugify metric-name)
+               (:slug (first metric)))]
+    (if add-noise
+      (str slug "-" (get-noise))
+      slug)))
+
+(defn get-slug [slugs presets metric-name]
+  (let [slug-atom (atom "")]
+    (swap! slug-atom #(create-slug presets metric-name))
+    (while (utils/in? slugs @slug-atom)
+      (swap! slug-atom #(create-slug presets metric-name true)))
+    @slug-atom))
 
 (defn get-minus [diff interval]
   (case interval
