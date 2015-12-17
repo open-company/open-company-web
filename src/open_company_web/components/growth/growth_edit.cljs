@@ -14,6 +14,7 @@
     (put! ch {:period period :key k})))
 
 (defcomponent growth-edit-row [data _]
+
   (render [_]
     (let [growth-data (:cursor data)
           is-new (:new growth-data)
@@ -115,7 +116,7 @@
   (init-state [_]
     (let [sorted-data (sort-growth-data data)]
       {:sorted-data sorted-data
-       :metric-edit (:oc-editing data)}))
+       :metric-edit (:new-metric data)}))
 
   (will-receive-props [_ next-props]
     (let [sorted-data (sort-growth-data next-props)]
@@ -136,7 +137,8 @@
         (if (om/get-state owner :metric-edit)
           (om/build growth-metric-edit {:metric-info metric-info
                                         :metric-count (:metric-count data)
-                                        :new (:oc-editing data)
+                                        :metrics (:metrics data)
+                                        :new-metric (:new-metric data)
                                         :next-cb #(om/set-state! owner :metric-edit false)
                                         :cancel-cb #()
                                         :change-growth-metric-cb (:change-growth-metric-cb data)})
