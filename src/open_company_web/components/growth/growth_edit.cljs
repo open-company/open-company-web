@@ -97,28 +97,28 @@
          :target nil
          :new true}))))
 
+(defn get-current-metric-info [data]
+  (let [metric-slug (:metric-slug data)
+          metrics (:metrics data)]
+    (or (get metrics metric-slug) {})))
+
 (defn more-months [owner data]
   (let [sorted-data (om/get-state owner :sorted-data)
         last-data (last sorted-data)
         last-period (:period last-data)
-        interval (:interval (om/get-state owner :metric-info))
+        interval (:interval (get-current-metric-info data))
         more (get-more last-period interval)]
     (om/set-state! owner :sorted-data (concat sorted-data more))))
 
 (defcomponent growth-edit [data owner]
 
   (init-state [_]
-    (let [metric-slug (:metric-slug data)
-          metrics (:metrics data)
-          sorted-data (sort-growth-data data)
-          metric-info (or (get metrics metric-slug) growth-utils/metric-placeholder)]
+    (let [sorted-data (sort-growth-data data)]
       {:sorted-data sorted-data
-       :metric-slug metric-slug
-       :metric-info metric-info
-       :metric-edit false}))
+       :metric-edit (:oc-editing data)}))
 
   (render [_]
-    (let [metric-info (om/get-state owner :metric-info)
+    (let [metric-info (get-current-metric-info data)
           metric-data (om/get-state owner :sorted-data)
           rows-data (vec (map (fn [row]
                                 (let [v {:prefix (:unit metric-info)
@@ -129,10 +129,12 @@
                                   v))
                               metric-data))]
       (dom/div {:class "composed-section-edit growth-body edit"}
-        (if (or (om/get-state owner :metric-edit) (:oc-editing data))
+        (if (om/get-state owner :metric-edit)
           (om/build growth-metric-edit {:metric-info metric-info
                                         :metric-count (:metric-count data)
-                                        :oc-editing (:oc-editing data)
+                                        :new (:oc-editing data)
+                                        :next-cb #(om/set-state! owner :metric-edit false)
+                                        :cancel-cb #()
                                         :change-growth-metric-cb (:change-growth-metric-cb data)})
           (dom/div {}
             (dom/div {:class "chart-header-container"}
