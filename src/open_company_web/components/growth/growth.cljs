@@ -140,20 +140,29 @@
         fixed-data (assoc growth-data (str period slug) fixed-row)]
     (om/set-state! owner :growth-data fixed-data)))
 
-(defn change-growth-metric-cb [owner slug k v]
-  (let [metrics (or (om/get-state owner :growth-metrics) {})
+(defn change-growth-metric-cb [owner data slug properties-map]
+  (let [change-slug (and (contains? properties-map :slug) (not= (:slug properties-map) slug))
+        metrics (or (om/get-state owner :growth-metrics) {})
         metric (or (get metrics slug) {})
-        new-metric (assoc metric k v)
-        new-metrics (if (= k :slug) ; the slug has changed, change the key of the map too
+        new-metric (merge metric properties-map)
+        ; the slug has changed, change the key of the map too
+        new-metrics (if change-slug
                       (-> metrics
                           (dissoc slug)
-                          (assoc v new-metric))
+                          (assoc (:slug properties-map) new-metric))
                       (assoc metrics slug new-metric))
         focus (om/get-state owner :focus)]
     (when (or (empty? metrics)                    ; adding the first metric
-              (and (= focus slug) (= k :slug)))   ; or changing the slug of the current focused metric
+              (and (= focus slug)                 ; or changing the slug of the current focused metric
+                   change-slug))
       ; switch the focus on that
-      (om/set-state! owner :focus v))
+      (om/set-state! owner :focus (:slug properties-map)))
+    (when (or (contains? properties-map :interval)
+              change-slug)
+      (let [section-data (:section-data data)
+            metric-data (get-metric-data (:data section-data) focus)
+            growth-metric-data (growth-utils/map-placeholder-data metric-data focus (:interval new-metric))]
+        (om/set-state! owner :growth-data growth-metric-data)))
     (om/set-state! owner :growth-metrics new-metrics)))
 
 (defn save-cb [owner data]
@@ -237,7 +246,7 @@
                                    :metrics (om/get-state owner :growth-metrics)
                                    :metric-count (om/get-state owner :growth-metric-count)
                                    :change-growth-cb (partial change-growth-cb owner)
-                                   :change-growth-metric-cb (partial change-growth-metric-cb owner)})
+                                   :change-growth-metric-cb (partial change-growth-metric-cb owner data)})
             (dom/div {}
               (dom/div {:class "link-bar"}
                 (when (and focus (> (count growth-metrics) 1))
