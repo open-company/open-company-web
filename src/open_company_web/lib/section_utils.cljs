@@ -2,8 +2,9 @@
   (:require [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
-            [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.api :as api]))
+
+(def first-section-placeholder "firstsectionplaceholder")
 
 (defn insert-section
   [category-into section-after category-to-insert section-to-insert sections]
@@ -17,7 +18,7 @@
       (not= category-into category-to-insert)
       (merge sections {category-kw (conj (category-kw sections) section-to-insert)})
       ; category exists, section is placeholder for first place
-      (= section-after finances-utils/first-section-placeholder)
+      (= section-after first-section-placeholder)
       (let [new-category (concat [section-to-insert] (category-kw sections))]
         (merge sections {category-kw (vec new-category)}))
       ; category exists, adding section
@@ -44,11 +45,12 @@
                                   (assoc :body-placeholder body-placeholder))
         with-title-placeholder (-> with-body-placeholder
                                    (assoc :title-placeholder (:title with-body-placeholder)))
+        without-growth-metrics (dissoc with-title-placeholder :metrics)
         new-section-kw (keyword new-section)
         new-categories (if (utils/in? (:categories company-data) new-category)
                          (:categories company-data)
                          (conj (:categories company-data) new-category))]
-    (swap! dispatcher/app-state assoc-in [slug] (merge company-data {new-section-kw with-title-placeholder}))
+    (swap! dispatcher/app-state assoc-in [slug] (merge company-data {new-section-kw without-growth-metrics}))
     (swap! dispatcher/app-state assoc-in [slug :sections] new-sections)
     (swap! dispatcher/app-state assoc-in [slug :categories] new-categories)))
 
