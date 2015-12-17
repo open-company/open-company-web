@@ -35,6 +35,7 @@
                 (om/get-state owner :focus))
         current-metric (get metrics focus)
         metric-data (get-metric-data (:data section-data) focus)
+        metric-count (count metric-data)
         interval (:interval current-metric)
         growth-data (growth-utils/map-placeholder-data metric-data focus interval)]
     {:focus focus
@@ -48,6 +49,7 @@
                      (not (not (:oc-editing section-data)))
                      (om/get-state owner :data-editing))
      :growth-data growth-data
+     :growth-metric-count metric-count
      :growth-metrics metrics
      :growth-metric-slugs (metrics-order (:metrics section-data))
      :oc-editing (:oc-editing section-data)
@@ -221,7 +223,9 @@
           (if data-editing
             (om/build growth-edit {:growth-data (om/get-state owner :growth-data)
                                    :metric-slug focus
+                                   :oc-editing (om/get-state owner :oc-editing)
                                    :metrics (om/get-state owner :growth-metrics)
+                                   :metric-count (om/get-state owner :growth-metric-count)
                                    :change-growth-cb (partial change-growth-cb owner)
                                    :change-growth-metric-cb (partial change-growth-metric-cb owner focus)})
             (dom/div {}
@@ -268,7 +272,7 @@
                                        :section :growth
                                        :editing (or title-editing notes-editing data-editing)
                                        :notes true}))
-            (if (or title-editing notes-editing data-editing)
+            (if (and (or title-editing notes-editing data-editing) (pos? (count growth-metrics)))
               (om/build section-footer {:edting (or title-editing notes-editing data-editing)
                                         :cancel-cb cancel-fn
                                         :is-new-section (om/get-state owner :oc-editing)
