@@ -66,7 +66,7 @@
       (vec fixed-data))))
 
 (defn map-placeholder-data [data slug interval]
-  (if (empty? data)
-    {}
+  (if (and slug interval)
     (let [fixed-data (edit-placeholder-data data slug interval)]
-      (apply merge (map #(hash-map (str (:period %) slug) %) fixed-data)))))
+      (apply merge (map #(hash-map (str (:period %) slug) %) fixed-data)))
+    {}))
