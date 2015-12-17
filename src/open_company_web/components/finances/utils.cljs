@@ -17,9 +17,9 @@
         label (if has-value
                 (if (and (= keyw :runway) (zero? value))
                   "Break-even"
-                  (str (utils/period-string (:period obj)) " " column-name ": " prefix (.toLocaleString (keyw obj)) suffix))
+                  (str (utils/get-period-string (:period obj)) " " column-name ": " prefix (.toLocaleString (keyw obj)) suffix))
                 "N/A")
-        period (utils/period-string (:period obj) :short-month)]
+        period (utils/get-period-string (:period obj) "monthly" [:short-month])]
     [period
      value
      label]))
