@@ -17,7 +17,7 @@
                   "Break-even"
                   (str (utils/get-period-string (:period obj)) " " column-name ": " prefix (.toLocaleString (keyw obj)) suffix))
                 "N/A")
-        period (utils/get-period-string (:period obj) "monthly" [:short-month])]
+        period (utils/get-period-string (:period obj) "monthly" [:short])]
     [period
      value
      label]))

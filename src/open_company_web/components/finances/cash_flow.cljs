@@ -13,7 +13,7 @@
         cash-flow (:burn-rate obj)
         cash-flow-pos? (pos? cash-flow)
         abs-cash-flow (utils/abs cash-flow)]
-    [(utils/get-period-string (:period obj) "monthly" [:short-month])
+    [(utils/get-period-string (:period obj) "monthly" [:short])
      (:revenue obj)
      (occ/fill-color :green)
      (str (utils/get-period-string (:period obj))
