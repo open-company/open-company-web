@@ -25,15 +25,19 @@
 
 (defn change-name [owner data]
   (let [change-cb (:change-growth-metric-cb data)
-        name-value (.val (.$ js/window "input#mtr-name"))
+        name-value (clojure.string/trim (.val (.$ js/window "input#mtr-name")))
         slug (utils/slugify name-value)]
     (when-not (clojure.string/blank? name-value)
-      (change-cb :name name-value)
       ; change the slug only if it's a newly created metric
-      (when (:oc-editing data)
+      (when (:new data)
         (om/set-state! owner :metric-slug slug)
-        (change-cb :slug slug)))
-    (om/set-state! owner :metric-name name-value)))
+        (change-cb slug :slug slug)
+        (change-cb slug :description (om/get-state owner :description))
+        (change-cb slug :unit (om/get-state owner :unit))
+        (change-cb slug :target (om/get-state owner :target))
+        (change-cb slug :interval (om/get-state owner :interval)))
+      (om/set-state! owner :metric-name name-value)
+      (change-cb slug :name name-value))))
 
 (defn init-select2 [owner data]
   ; get needed states
@@ -61,9 +65,11 @@
                             "templateResult" unit-option-template
                             "templateSelection" unit-option-template}))
         (.on "change" (fn [e]
-                        (let [unit-value (.. e -target -value)]
+                        (let [unit-value (.. e -target -value)
+                              slug (om/get-state owner :metric-slug)]
                           (om/set-state! owner :unit unit-value)
-                          (change-cb :unit unit-value)))))
+                          (when slug
+                            (change-cb slug :unit unit-value))))))
       ; init goal
       (doto (.$ js/window "select.metric-data#mtr-goal")
         (.select2 (clj->js {"placeholder" "Metric goal"
@@ -71,18 +77,22 @@
                             "templateResult" option-template
                             "templateSelection" option-template}))
         (.on "change" (fn [e]
-                        (let [target-value (.. e -target -value)]
+                        (let [target-value (.. e -target -value)
+                              slug (om/get-state owner :metric-slug)]
                           (om/set-state! owner :target target-value)
-                          (change-cb :target target-value)))))
+                          (when slug
+                            (change-cb slug :target target-value))))))
       ; init interval
       (doto (.$ js/window "select.metric-data#mtr-interval")
         (.select2 (clj->js {"placeholder" "Metric interval"
                             "templateResult" option-template
                             "templateSelection" option-template}))
         (.on "change" (fn [e]
-                        (let [interval-value (.. e -target -value)]
+                        (let [interval-value (.. e -target -value)
+                              slug (om/get-state owner :metric-slug)]
                           (om/set-state! owner :interval interval-value)
-                          (change-cb :interval interval-value)))))
+                          (when slug
+                            (change-cb slug :interval interval-value))))))
       ; save flag so we don't reinitialize the widget
       (om/update-state! owner :select2-initialized (fn [_]true)))))
 
@@ -112,6 +122,7 @@
        :presets presets
        :metric-name (:name metric-info)
        :metric-slug (:slug metric-info)
+       :description (:description metric-info)
        :unit (:unit metric-info)
        :units fixed-units
        :interval (:interval metric-info)
@@ -161,7 +172,13 @@
         ; textarea
         (dom/div {:class "growth-metric-edit-row group"}
           (dom/textarea {:class "metric-data metric-description"
-                         :placeholder "Metric description"}))
+                         :on-change (fn [e]
+                                      (let [value (.. e -target -value)
+                                            slug (om/get-state owner :metric-slug)
+                                            change-cb (:change-growth-metric-cb data)]
+                                        (when slug
+                                          (change-cb slug :description value))))
+                         :placeholder "Metric description"} (om/get-state owner :description)))
         ; goal and interval
         (dom/div {:class "growth-metric-edit-row group"}
           ; goal
@@ -188,12 +205,12 @@
               (dom/option {:value ""} "Interval")
               (for [interval intervals]
                 (dom/option {:value interval} (utils/camel-case-str interval))))))
-        (when (:oc-editing data)
+        (when (:new data)
           (dom/div {:class "growth-metric-edit-row group"}
             (dom/button {:class "oc-btn oc-success green"
                          :disabled (or (not (om/get-state owner :metric-name))
                                        (not (om/get-state owner :metric-slug))
                                        (not (om/get-state owner :unit))
                                        (not (om/get-state owner :interval)))
-                         :on-click #()} "NEXT")
+                         :on-click #((:next-cb data))} "NEXT")
             (dom/button {:class "oc-btn oc-cancel gray"} "CANCEL")))))))
