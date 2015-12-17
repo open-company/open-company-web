@@ -165,6 +165,19 @@
         (om/set-state! owner :growth-data growth-metric-data)))
     (om/set-state! owner :growth-metrics new-metrics)))
 
+(defn clean-data [data]
+  ; a data entry is good if we have the period and one other value: cash, costs or revenue
+  (if (and (not (nil? (:period data)))
+           (not (nil? (:slug data)))
+           (or (not (nil? (:target data)))
+               (not (nil? (:value data)))))
+    (dissoc data :new)
+    nil))
+
+(defn clean-growth-data [growth-data]
+  (filter #(not (nil? %))
+          (vec (map (fn [[_ v]] (clean-data v)) growth-data))))
+
 (defn save-cb [owner data]
   (when (or (has-changes owner data) ; when the section already exists
             (has-data-changes owner data)
@@ -172,9 +185,10 @@
     (let [title (om/get-state owner :title)
           notes-body (om/get-state owner :notes-body)
           growth-data (om/get-state owner :growth-data)
+          fixed-growth-data (clean-growth-data growth-data)
           growth-metrics (om/get-state owner :growth-metrics)
           section-data {:title title
-                        :data growth-data
+                        :data fixed-growth-data
                         :metrics (vec (vals growth-metrics))
                         :notes {:body notes-body}}]
       (if (om/get-state owner :oc-editing)
