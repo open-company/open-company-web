@@ -5,9 +5,12 @@
 
 (defn columns-num [interval]
   (case interval
-    "quarterly" 8
-    "monthly" 12
-    "weekly" 8))
+    "quarterly"
+    8
+    "weekly"
+    8
+    ;else
+    12))
 
 (defn get-minus [diff interval]
   (case interval
@@ -20,6 +23,12 @@
         past-date (t/minus period-date (get-minus diff interval))
         formatter (utils/get-formatter interval)]
     (f/unparse formatter past-date)))
+
+(def metric-placeholder
+  {:slug nil
+   :name nil
+   :interval "monthly"
+   :goal nil})
 
 (defn placeholder-data [period slug]
   {:period period
@@ -57,5 +66,7 @@
       (vec fixed-data))))
 
 (defn map-placeholder-data [data slug interval]
-  (let [fixed-data (edit-placeholder-data data slug interval)]
-    (apply merge (map #(hash-map (str (:period %) slug) %) fixed-data))))
+  (if (empty? data)
+    {}
+    (let [fixed-data (edit-placeholder-data data slug interval)]
+      (apply merge (map #(hash-map (str (:period %) slug) %) fixed-data)))))
