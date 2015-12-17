@@ -7,7 +7,9 @@
             [open-company-web.caches :refer (new-sections)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
-            [open-company-web.lib.iso4217 :refer (sorted-iso4217)]))
+            [open-company-web.lib.iso4217 :refer (sorted-iso4217)]
+            [open-company-web.components.growth.utils :as growth-utils]
+            [cuerdas.core :as s]))
 
 (defn option-template [state]
   (if-not (.-id state) (.-text state))
@@ -25,15 +27,17 @@
 
 (defn change-name [owner data]
   (let [change-cb (:change-growth-metric-cb data)
-        name-value (clojure.string/trim (.val (.$ js/window "input#mtr-name")))
-        new-slug (utils/slugify name-value)
+        name-value (s/trim (.val (.$ js/window "input#mtr-name")))
         slug (om/get-state owner :metric-slug)]
-    (when-not (clojure.string/blank? name-value)
+    (when-not (s/blank? name-value)
       (om/set-state! owner :metric-name name-value)
       ; if it's a newly created metric
-      (if (:new data)
+      (if (:new-metric data)
         ; change the slug and update all the other fields
-        (do
+        (let [presets (om/get-state owner :presets)
+              metrics (:metrics data)
+              slugs (vec (map #(:slug %) (vals metrics)))
+              new-slug (growth-utils/get-slug slugs presets name-value)]
           (om/set-state! owner :metric-slug new-slug)
           (change-cb slug {:slug new-slug
                            :description (om/get-state owner :description)
@@ -101,15 +105,18 @@
       ; save flag so we don't reinitialize the widget
       (om/update-state! owner :select2-initialized (fn [_]true)))))
 
-(defn get-presets []
-  (let [slug (keyword (:slug @router/path))
+(defn get-presets [data]
+  (let [slugs (:slugs data)
+        slug (keyword (:slug @router/path))
         sections-map (:categories (slug @new-sections))
         all-sections (apply concat (map (fn [sec] (:sections sec)) sections-map))
-        growth-defaults (first (filter #(= (:name %) "growth") all-sections))]
+        growth-defaults (first (filter #(= (:name %) "growth") all-sections))
+        all-metrics (:metrics growth-defaults)
+        available-metrics (vec (filter #(not (utils/in? slugs (:slug %))) all-metrics))]
     {:intervals (:intervals growth-defaults)
      :units (:units growth-defaults)
      :target (:goal growth-defaults)
-     :metrics (:metrics growth-defaults)}))
+     :metrics available-metrics}))
 
 (defcomponent growth-metric-edit [data owner]
 
@@ -118,7 +125,7 @@
           company-slug (keyword (:slug @router/path))
           company-data (company-slug @dispatcher/app-state)
           company-currency-code (:currency company-data)
-          presets (get-presets)
+          presets (get-presets data)
           units (:units presets)
           fixed-units (vec (map #(if (= % "currency") company-currency-code %) units))]
       {:req-libs-loaded false
@@ -210,7 +217,7 @@
               (dom/option {:value ""} "Interval")
               (for [interval intervals]
                 (dom/option {:value interval} (utils/camel-case-str interval))))))
-        (when (:new data)
+        (when (:new-metric data)
           (dom/div {:class "growth-metric-edit-row group"}
             (dom/button {:class "oc-btn oc-success green"
                          :disabled (or (not (om/get-state owner :metric-name))
