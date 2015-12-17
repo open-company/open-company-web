@@ -26,18 +26,23 @@
 (defn change-name [owner data]
   (let [change-cb (:change-growth-metric-cb data)
         name-value (clojure.string/trim (.val (.$ js/window "input#mtr-name")))
-        slug (utils/slugify name-value)]
+        new-slug (utils/slugify name-value)
+        slug (om/get-state owner :metric-slug)]
     (when-not (clojure.string/blank? name-value)
-      ; change the slug only if it's a newly created metric
-      (when (:new data)
-        (om/set-state! owner :metric-slug slug)
-        (change-cb slug :slug slug)
-        (change-cb slug :description (om/get-state owner :description))
-        (change-cb slug :unit (om/get-state owner :unit))
-        (change-cb slug :target (om/get-state owner :target))
-        (change-cb slug :interval (om/get-state owner :interval)))
       (om/set-state! owner :metric-name name-value)
-      (change-cb slug :name name-value))))
+      ; if it's a newly created metric
+      (if (:new data)
+        ; change the slug and update all the other fields
+        (do
+          (om/set-state! owner :metric-slug new-slug)
+          (change-cb slug {:slug new-slug
+                           :description (om/get-state owner :description)
+                           :unit (om/get-state owner :unit)
+                           :target (om/get-state owner :target)
+                           :interval (om/get-state owner :interval)
+                           :name name-value}))
+        ; change only the name
+        (change-cb slug {:name name-value})))))
 
 (defn init-select2 [owner data]
   ; get needed states
@@ -69,7 +74,7 @@
                               slug (om/get-state owner :metric-slug)]
                           (om/set-state! owner :unit unit-value)
                           (when slug
-                            (change-cb slug :unit unit-value))))))
+                            (change-cb slug {:unit unit-value}))))))
       ; init goal
       (doto (.$ js/window "select.metric-data#mtr-goal")
         (.select2 (clj->js {"placeholder" "Metric goal"
@@ -81,7 +86,7 @@
                               slug (om/get-state owner :metric-slug)]
                           (om/set-state! owner :target target-value)
                           (when slug
-                            (change-cb slug :target target-value))))))
+                            (change-cb slug {:target target-value}))))))
       ; init interval
       (doto (.$ js/window "select.metric-data#mtr-interval")
         (.select2 (clj->js {"placeholder" "Metric interval"
@@ -92,7 +97,7 @@
                               slug (om/get-state owner :metric-slug)]
                           (om/set-state! owner :interval interval-value)
                           (when slug
-                            (change-cb slug :interval interval-value))))))
+                            (change-cb slug {:interval interval-value}))))))
       ; save flag so we don't reinitialize the widget
       (om/update-state! owner :select2-initialized (fn [_]true)))))
 
@@ -177,7 +182,7 @@
                                             slug (om/get-state owner :metric-slug)
                                             change-cb (:change-growth-metric-cb data)]
                                         (when slug
-                                          (change-cb slug :description value))))
+                                          (change-cb slug {:description value}))))
                          :placeholder "Metric description"} (om/get-state owner :description)))
         ; goal and interval
         (dom/div {:class "growth-metric-edit-row group"}
