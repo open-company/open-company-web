@@ -110,10 +110,11 @@
   (init-state [_]
     (let [metric-slug (:metric-slug data)
           metrics (:metrics data)
-          sorted-data (sort-growth-data data)]
+          sorted-data (sort-growth-data data)
+          metric-info (or (get metrics metric-slug) growth-utils/metric-placeholder)]
       {:sorted-data sorted-data
        :metric-slug metric-slug
-       :metric-info (get metrics metric-slug)
+       :metric-info metric-info
        :metric-edit false}))
 
   (render [_]
@@ -128,8 +129,10 @@
                                   v))
                               metric-data))]
       (dom/div {:class "composed-section-edit growth-body edit"}
-        (if (om/get-state owner :metric-edit)
+        (if (or (om/get-state owner :metric-edit) (:oc-editing data))
           (om/build growth-metric-edit {:metric-info metric-info
+                                        :metric-count (:metric-count data)
+                                        :oc-editing (:oc-editing data)
                                         :change-growth-metric-cb (:change-growth-metric-cb data)})
           (dom/div {}
             (dom/div {:class "chart-header-container"}
