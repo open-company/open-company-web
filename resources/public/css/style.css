@@ -884,7 +884,9 @@ button.oc-btn {
   margin-top: 30px;
 }
 
-button.oc-btn.oc-success.disabled {
+
+button.oc-btn.disabled,
+button.oc-btn[disabled] {
   opacity: 0.3;
 }
 
@@ -1372,17 +1374,12 @@ div.oc-popover {
 }
 
 .growth-metric-edit-row {
-  width: 600px;
+  width: 500px;
   margin: 10px 0;
 }
 
-.growth-metric-edit-row textarea {
-  width: 300px;
-  height: 60px;
-}
-
 .metric-data-container {
-  width: 300px;
+  width: 250px;
 }
 
 .metric-data-container{
@@ -1407,10 +1404,14 @@ div.oc-popover {
   background-color: #fff;
   border: 1px solid #aaa;
   border-radius: 4px;
-  width: 250px;
+  width: 240px;
   padding: 0px 8px;
   color: #444;
   font-size: 14px;
+}
+
+.growth-metric-edit-row textarea {
+  height: 60px;
 }
 
 .growth-metric-edit-row input#mtr-name{
