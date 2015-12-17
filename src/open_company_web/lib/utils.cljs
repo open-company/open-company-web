@@ -160,16 +160,6 @@
     "12" "DEC"
     ""))
 
-(defn period-string [period & flags]
-  (let [short-month-string (in? flags :short-month)
-        [year month] (clojure.string/split period "-")
-        month-str (if short-month-string 
-                    (month-short-string month)
-                    (month-string month))]
-    (if (or (in? flags :force-year) (= month "01") (= month "12"))
-      (str month-str " " year)
-      month-str)))
-
 (defn redirect! [loc]
   (set! (.-location js/window) loc))
 
@@ -440,17 +430,38 @@
 (defn period-from-date [date & [interval]]
   (cljs-time-format/unparse (get-formatter interval) date))
 
-(defn get-period-string [period interval & [flags]]
+(defn get-period-string [period & [interval flags]]
   "Get descriptive string for the period by interval. Use :short as a flag to get
   the short formatted string."
-  (let [parsed-date (date-from-period period interval)]
-    (case interval
+  (let [fixed-interval (or interval "monthly")
+        parsed-date (date-from-period period fixed-interval)
+        month (cljs-time/month parsed-date)
+        year (cljs-time/year parsed-date)
+        plus-one-week-year (cljs-time/year (cljs-time/plus parsed-date (cljs-time/days 7)))
+        minus-one-week-year (cljs-time/year (cljs-time/minus parsed-date (cljs-time/days 7)))
+        needs-year (or (in? flags :force-year)
+                       (case fixed-interval
+                         "weekly"
+                         (or (not= plus-one-week-year year) (not= minus-one-week-year year))
+                         "quarterly"
+                         (or (= month 1) (= month 10))
+                         ;else
+                         (or (= month 1) (= month 12))))]
+    (case fixed-interval
       "quarterly"
-      (str (get-quarter-from-month (cljs-time/month parsed-date) flags) " " (cljs-time/year parsed-date))
+      (str (get-quarter-from-month (cljs-time/month parsed-date) flags)
+           (when needs-year
+             (str " " (cljs-time/year parsed-date))))
       "monthly"
-      (str (month-string-int (cljs-time/month parsed-date) flags))
+      (str (month-string-int (cljs-time/month parsed-date) flags)
+           (when needs-year
+             (str " " (cljs-time/year parsed-date))))
       "weekly"
-      (str (month-string-int (cljs-time/month parsed-date) flags) " " (cljs-time/day parsed-date)))))
+      (str (month-string-int (cljs-time/month parsed-date) flags)
+           " "
+           (cljs-time/day parsed-date)
+           (when needs-year
+             (str ", " (cljs-time/year parsed-date)))))))
 
 (defn update-page-title [title]
   (set! (.-title js/document) title))
@@ -460,7 +471,7 @@
         first-date (date-from-period first-period fixed-interval)
         last-date (date-from-period last-period fixed-interval)]
     (case fixed-interval
-      "quarterly" (/ (cljs-time/in-months (cljs-time/interval first-date last-date)) 3)
+      "quarterly" (/ (cljs-time/in-months (cljs-time/interval first-date last-date)) 4)
       "monthly" (cljs-time/in-months (cljs-time/interval first-date last-date))
       "weekly" (cljs-time/in-weeks (cljs-time/interval first-date last-date)))))
 
@@ -468,7 +479,13 @@
   (let [fixed-interval (or interval "monthly")
         date (date-from-period period fixed-interval)
         month (add-zero (cljs-time/month date))]
-    (month-short-string month)))
+    (case interval
+      "quarterly"
+      (month-short-string month)
+      "weekly"
+      (month-short-string month)
+      ;else
+      (month-short-string month))))
 
 (defn get-month-quarter [current-month]
   (case
