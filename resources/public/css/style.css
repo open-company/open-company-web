@@ -1076,7 +1076,7 @@ div#new-section-popover-container {
   height: 100%;
   top: 0;
   left: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(255, 255, 255, 0.4);
   z-index: 1031;
 }
 
@@ -1336,7 +1336,7 @@ div.oc-popover-container {
   height: 100%;
   top: 0;
   left: 0;
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0.4);
   z-index: 1031;
 }
 
