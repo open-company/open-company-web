@@ -10,11 +10,6 @@
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
 
-(defn get-columns-num [interval]
-  (case interval
-    "monthly" 12
-    8))
-
 (defn get-graph-tooltip [label prefix value suffix]
   (str label
        ": "
@@ -79,7 +74,7 @@
         values (vec (map chart-data mapper))]
     { :prefix (if prefix prefix "")
       :columns columns
-      :max-show (get-columns-num interval)
+      :max-show (growth-utils/columns-num interval)
       :values values
       :pattern "###,###.##"
       :column-thickness (if has-target "28" "14")}))
