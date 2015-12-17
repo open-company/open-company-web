@@ -517,4 +517,4 @@
         (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (cljs-time/day monday-date))))))
 
 (defn slugify [n]
-  (clojure.string/replace n #"(\s)" "-"))
+  (clojure.string/replace (clojure.string/lower-case n) #"(\s)" "-"))
