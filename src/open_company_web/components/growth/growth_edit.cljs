@@ -22,10 +22,9 @@
           interval (:interval data)
           period (:period growth-data)
           period-month (utils/get-month period interval)
-          needs-year (or (= period-month "JAN")
-                         (= period-month "DEC")
-                         (:needs-year data))
-          period-string (utils/period-string period (when needs-year :force-year))
+          needs-year (:needs-year data)
+          flags [:short (when needs-year :force-year)]
+          period-string (utils/get-period-string period interval flags)
           cell-state (if is-new :new :display)
           change-cb (:change-cb data)
           next-period (:next-period data)
@@ -154,7 +153,7 @@
                         row (merge row-data {:next-period next-period
                                              :is-last (= idx 0)
                                              :needs-year (or (= idx 0)
-                                                              (= idx (dec (count rows-data))))})]
+                                                             (= idx (- (count rows-data) 2)))})]
                     (om/build growth-edit-row row)))
                 (dom/tr {}
                   (dom/td {}
