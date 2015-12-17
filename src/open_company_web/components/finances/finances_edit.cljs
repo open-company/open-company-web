@@ -48,7 +48,7 @@
                          (:needs-year data))]
       (dom/tr {}
         (dom/td {:class "no-cell"}
-          (utils/period-string (:period finances-data) (when needs-year :force-year)))
+          (utils/get-period-string (:period finances-data) "monthly" (when needs-year [:force-year])))
         ;; cash
         (dom/td {}
           (om/build cell {:value (:cash finances-data)
