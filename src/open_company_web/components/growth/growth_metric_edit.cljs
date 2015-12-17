@@ -23,6 +23,18 @@
                      (utils/camel-case-str text))]
     (js/jQuery (str "<span>" fixed-text "</span>"))))
 
+(defn change-name [owner data]
+  (let [change-cb (:change-growth-metric-cb data)
+        name-value (.val (.$ js/window "input#mtr-name"))
+        slug (utils/slugify name-value)]
+    (when-not (clojure.string/blank? name-value)
+      (change-cb :name name-value)
+      ; change the slug only if it's a newly created metric
+      (when (:oc-editing data)
+        (om/set-state! owner :metric-slug slug)
+        (change-cb :slug slug)))
+    (om/set-state! owner :metric-name name-value)))
+
 (defn init-select2 [owner data]
   ; get needed states
   (let [req-libs-loaded (om/get-state owner :req-libs-loaded)
@@ -32,23 +44,17 @@
     ; check if we are ready to initialize the widget and if we haven't aready done that
     (when (and req-libs-loaded did-mount (not select2-initialized))
       ; init name
-      (let [name-input (.$ js/window "input.metric-data#mtr-name")
+      (let [name-input (.$ js/window "input#mtr-name")
             metrics (:metrics (om/get-state owner :presets))
-            metrics-list (vec (sort #(compare %1 %2) (map #(:name %) metrics)))]
-        (doto name-input
-          (.autocomplete (clj->js {"source" metrics-list
-                                   "minLength" 0}))
-          (.focus (fn [_]
-                    (this-as this
-                      (when (clojure.string/blank? (.-value this))
-                        (.trigger (.$ js/window this) "keydown.autocomplete")))))
-          (.on "change" (fn [e]
-                          (let [name-value (.. e -target -value)
-                                slug (utils/slugify name-value)]
-                            (when-not (clojure.string/blank? name-value)
-                              (change-cb :name name-value)
-                              (change-cb :slug slug)
-                              (om/set-state! owner :metric-name name-value)))))))
+            metrics-list (vec (sort #(compare %1 %2) (map #(:name %) metrics)))
+            autocomplete (.autocomplete name-input (clj->js {"source" metrics-list
+                                                             "minLength" 0
+                                                             "change" #(change-name owner data)}))]
+        (.focus name-input (fn [_]
+                            (this-as this
+                              (when (clojure.string/blank? (.-value this))
+                                (.trigger (.$ js/window this) "keydown.autocomplete")))))
+        (.call (.autocomplete autocomplete "option" "change") autocomplete))
       ; init unit
       (doto (.$ js/window "select#mtr-unit")
         (.select2 (clj->js {"placeholder" "Metric unit"
@@ -105,6 +111,7 @@
        :select2-initialized false
        :presets presets
        :metric-name (:name metric-info)
+       :metric-slug (:slug metric-info)
        :unit (:unit metric-info)
        :units fixed-units
        :interval (:interval metric-info)
@@ -137,7 +144,7 @@
                         :on-change #(om/set-state! owner :metric-name (.. % -target -value))
                         :id "mtr-name"
                         :placeholder "Metric name"
-                        :style {"width" "250px"}}))
+                        :style {"width" "240px"}}))
           ; unit
           (dom/div {:class "metric-data-container right group"}
             (dom/label {:for "mtr-unit"} "Measured in")
@@ -174,8 +181,19 @@
             (dom/select {:class "metric-data metric-interval"
                          :value (om/get-state owner :interval)
                          :id "mtr-interval"
+                         ; if there are data the interval can't be changed
+                         :disabled (pos? (:metric-count data))
                          :placeholder "Metric interval"
                          :style {"width" "150px"}}
               (dom/option {:value ""} "Interval")
               (for [interval intervals]
-                (dom/option {:value interval} (utils/camel-case-str interval))))))))))
+                (dom/option {:value interval} (utils/camel-case-str interval))))))
+        (when (:oc-editing data)
+          (dom/div {:class "growth-metric-edit-row group"}
+            (dom/button {:class "oc-btn oc-success green"
+                         :disabled (or (not (om/get-state owner :metric-name))
+                                       (not (om/get-state owner :metric-slug))
+                                       (not (om/get-state owner :unit))
+                                       (not (om/get-state owner :interval)))
+                         :on-click #()} "NEXT")
+            (dom/button {:class "oc-btn oc-cancel gray"} "CANCEL")))))))
