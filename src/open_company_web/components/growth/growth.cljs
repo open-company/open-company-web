@@ -29,14 +29,16 @@
 (defn get-state [owner data & [initial]]
   (let [section-data (:section-data data)
         notes-data (:notes section-data)
-        metrics (metrics-map (:metrics section-data))
+        all-metrics (:metrics section-data)
+        metrics (metrics-map all-metrics)
         first-metric (:slug (first (:metrics section-data)))
         focus (if (and initial (:oc-editing data))
                 growth-utils/new-metric-slug-placeholder
                 (if initial
                   first-metric
                   (om/get-state owner :focus)))
-        growth-data (map-metric-data (:data section-data))]
+        growth-data (map-metric-data (:data section-data))
+        metric-slugs (metrics-order all-metrics)]
     {:focus focus
      :title-editing (if initial
                       (not (not (:oc-editing section-data)))
@@ -52,7 +54,7 @@
                    (om/get-state owner :new-metric))
      :growth-data growth-data
      :growth-metrics metrics
-     :growth-metric-slugs (metrics-order (:metrics section-data))
+     :growth-metric-slugs metric-slugs
      :oc-editing (:oc-editing section-data)
      :title (:title section-data)
      :notes-body (:body notes-data)
@@ -84,6 +86,7 @@
       (om/set-state! owner :title (:title state))
       (om/set-state! owner :growth-data (:growth-data state))
       (om/set-state! owner :growth-metrics (:growth-metrics state))
+      (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))
       (om/set-state! owner :notes-body (:notes-body state))
       (when (om/get-state owner :new-metric)
         (let [first-metric (get (first (om/get-state owner :growth-metrics)) 0)]
@@ -155,7 +158,11 @@
         focus (om/get-state owner :focus)]
     (when change-slug
       ; switch the focus to the new metric-slug
-      (om/set-state! owner :focus (:slug properties-map)))
+      (let [slugs (om/get-state owner :growth-metric-slugs)
+            remove-slug (vec (remove #(= % slug) slugs))
+            add-slug (conj remove-slug (:slug properties-map))]
+        (om/set-state! owner :growth-metric-slugs add-slug)
+        (om/set-state! owner :focus (:slug properties-map))))
     (om/set-state! owner :growth-metrics new-metrics)))
 
 (defn clean-data [data]
@@ -205,6 +212,24 @@
 (defn filter-growth-data [focus growth-data]
   (vec (filter #(= (:slug %) focus) (vals growth-data))))
 
+(defn reset-metrics-cb [owner data]
+  (let [state (get-state owner data)]
+    (om/set-state! owner :growth-metrics (:growth-metrics state))
+    (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))))
+
+(defn delete-metric-cb [owner data metric-slug]
+  (let [all-metrics (vals (om/get-state owner :growth-metrics))
+        new-metrics (vec (filter #(= (:slug %) metric-slug) all-metrics))
+        new-metrics-map (map-metric-data new-metrics)
+        all-data (vals (om/get-state owner :growth-data))
+        filtered-data (vec (filter #(= (:slug %) metric-slug) all-data))
+        new-data (metrics-map filtered-data)
+        metrics-order (metrics-order new-metrics)]
+    (om/set-state! owner :growth-metrics new-metrics-map)
+    (om/set-state! owner :growth-data new-data)
+    (om/set-state! owner :growth-metric-slugs metrics-order)
+    (save-cb owner data)))
+
 (defcomponent growth [data owner]
 
   (init-state [_]
@@ -240,7 +265,8 @@
           title-change-fn (partial change-cb owner :title)
           cancel-if-needed-fn #(cancel-if-needed-cb owner data)
           start-title-editing-fn #(start-title-editing-cb owner)
-          start-notes-editing-fn #(start-notes-editing-cb owner)]
+          start-notes-editing-fn #(start-notes-editing-cb owner)
+          slugs (om/get-state owner :growth-metric-slugs)]
       (dom/div {:class "section-container" :id "section-growth" :key (name section)}
         (dom/div {:class "composed-section growth"}
           (om/build editable-title {:read-only read-only
@@ -254,34 +280,38 @@
                                     :cancel-cb cancel-fn
                                     :cancel-if-needed-cb cancel-if-needed-fn
                                     :save-cb save-fn})
+          (dom/div {:class "link-bar"}
+            (when focus
+              (for [metric-slug slugs]
+                (let [metric (get growth-metrics metric-slug)
+                      mname (:name metric)
+                      metric-classes (utils/class-set {:composed-section-link true
+                                                       metric-slug true
+                                                       :active (= focus metric-slug)})]
+                  (dom/a {:class metric-classes
+                          :title (:description metric)
+                          :data-tab metric-slug
+                          :on-click #(subsection-click % owner data)} mname))))
+            (om/build add-metric {:click-callback #(new-metric owner)
+                                  :metrics-count (count growth-metrics)}))
           (if data-editing
+            ; editing growth metric's data and metric's metadata
             (om/build growth-edit {:growth-data focus-metric-data
                                    :metric-slug focus
                                    :new-metric (om/get-state owner :new-metric)
                                    :metrics growth-metrics
                                    :metric-count (count focus-metric-data)
                                    :change-growth-cb (partial change-growth-cb owner)
+                                   :cancel-cb cancel-fn
+                                   :delete-metric-cb (partial delete-metric-cb owner data)
+                                   :reset-metrics-cb #(reset-metrics-cb owner data)
                                    :change-growth-metric-cb (partial change-growth-metric-cb owner data)})
-            (dom/div {}
-              (dom/div {:class "link-bar"}
-                (when focus
-                  (for [metric-slug (om/get-state owner :growth-metric-slugs)]
-                    (let [metric (get growth-metrics metric-slug)
-                          mname (:name metric)
-                          metric-classes (utils/class-set {:composed-section-link true
-                                                           metric-slug true
-                                                           :active (= focus metric-slug)})]
-                      (dom/a {:class metric-classes
-                              :title (:description metric)
-                              :data-tab metric-slug
-                              :on-click #(subsection-click % owner data)} mname))))
-                (om/build add-metric {:click-callback #(new-metric owner)
-                                      :metrics-count (count growth-metrics)}))
-              (dom/div {:class (utils/class-set {:composed-section-body true
-                                                 :editable (not read-only)})}
-                ;; growth metric currently shown
-                (when (and focus (not (empty? (:metric-data subsection-data))))
-                  (om/build growth-metric subsection-data)))))
+            ; growth data chart
+            (dom/div {:class (utils/class-set {:composed-section-body true
+                                               :editable (not read-only)})}
+              ;; growth metric currently shown
+              (when (and focus (not (empty? (:metric-data subsection-data))))
+                (om/build growth-metric subsection-data))))
             (om/build update-footer {:updated-at (:updated-at section-data)
                                      :author (:author section-data)
                                      :section :growth
