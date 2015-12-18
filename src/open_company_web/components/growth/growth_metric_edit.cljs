@@ -15,7 +15,7 @@
 (defn show-delete-confirm-popover [owner data]
   (add-popover {:container-id "delete-metric-confirm"
                 :title (str "Delete " (om/get-state owner :metric-name))
-                :message "Are you sure you want to delete this metric?"
+                :message "Are you sure you want to delete this metric and all the associated data?"
                 :cancel-title "CANCEL"
                 :cancel-cb #(hide-popover nil "delete-metric-confirm")
                 :success-title "DELETE"
