@@ -142,7 +142,15 @@
                                         :metrics (:metrics data)
                                         :new-metric (:new-metric data)
                                         :next-cb #(om/set-state! owner :metric-edit false)
-                                        :cancel-cb #()
+                                        :delete-metric-cb (:delete-metric-cb data)
+                                        :cancel-cb (fn []
+                                                     (if (:new-metric data)
+                                                       ; if it's a new metric cancel all the edited data
+                                                       ((:cancel-cb data))
+                                                       ; else reset the metrics data only
+                                                        ((:reset-metrics-cb data)))
+                                                     ; exit the metric editing state
+                                                     (om/set-state! owner :metric-edit false))
                                         :change-growth-metric-cb (:change-growth-metric-cb data)})
           (dom/div {}
             (dom/div {:class "chart-header-container"}
