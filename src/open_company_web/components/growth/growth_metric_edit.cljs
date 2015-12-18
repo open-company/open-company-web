@@ -48,6 +48,12 @@
         ; change only the name
         (change-cb slug {:name name-value})))))
 
+(defn contains-slug? [slug present-metrics]
+  (filter (fn [[k _]] (= k slug)) present-metrics))
+
+(defn filter-metrics [preset-metrics present-metrics]
+  (vec (filter #(empty? (contains-slug? (:slug %) present-metrics)) preset-metrics)))
+
 (defn init-select2 [owner data]
   ; get needed states
   (let [req-libs-loaded (om/get-state owner :req-libs-loaded)
@@ -58,8 +64,10 @@
     (when (and req-libs-loaded did-mount (not select2-initialized))
       ; init name
       (let [name-input (.$ js/window "input#mtr-name")
-            metrics (:metrics (om/get-state owner :presets))
-            metrics-list (vec (sort #(compare %1 %2) (map #(:name %) metrics)))
+            present-metrics (:metrics data)
+            preset-metrics (:metrics (om/get-state owner :presets))
+            usable-metrics (filter-metrics preset-metrics present-metrics)
+            metrics-list (vec (sort #(compare %1 %2) (map #(:name %) usable-metrics)))
             autocomplete (.autocomplete name-input (clj->js {"source" metrics-list
                                                              "minLength" 0
                                                              "change" #(change-name owner data)}))]
