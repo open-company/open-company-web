@@ -87,9 +87,3 @@
                            (some #(when (= (:period %) prev-period) %) initial-data)
                            (placeholder-data prev-period slug))))]
       (vec fixed-data))))
-
-(defn map-placeholder-data [data slug interval]
-  (if (and slug interval)
-    (let [fixed-data (edit-placeholder-data data slug interval)]
-      (apply merge (map #(hash-map (str (:period %) slug) %) fixed-data)))
-    {}))
