@@ -211,7 +211,8 @@
                          :value (om/get-state owner :interval)
                          :id "mtr-interval"
                          ; if there are data the interval can't be changed
-                         :disabled (pos? (:metric-count data))
+                         :disabled (and (pos? (:metric-count data))
+                                        (not (:new-metric data)))
                          :placeholder "Metric interval"
                          :style {"width" "150px"}}
               (dom/option {:value ""} "Interval")
