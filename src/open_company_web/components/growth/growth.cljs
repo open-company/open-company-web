@@ -198,7 +198,6 @@
     (om/set-state! owner :oc-editing false)))
 
 (defn new-metric [owner]
-  (om/set-state! owner :growth-data {})
   (om/set-state! owner :new-metric true)
   (om/set-state! owner :focus growth-utils/new-metric-slug-placeholder)
   (om/set-state! owner :data-editing true))
@@ -265,7 +264,7 @@
                                    :change-growth-metric-cb (partial change-growth-metric-cb owner data)})
             (dom/div {}
               (dom/div {:class "link-bar"}
-                (when (and focus (> (count growth-metrics) 1))
+                (when focus
                   (for [metric-slug (om/get-state owner :growth-metric-slugs)]
                     (let [metric (get growth-metrics metric-slug)
                           mname (:name metric)
@@ -275,9 +274,9 @@
                       (dom/a {:class metric-classes
                               :title (:description metric)
                               :data-tab metric-slug
-                              :on-click #(subsection-click % owner data)} mname)))))
+                              :on-click #(subsection-click % owner data)} mname))))
                 (om/build add-metric {:click-callback #(new-metric owner)
-                                      :metrics-count (count growth-metrics)})
+                                      :metrics-count (count growth-metrics)}))
               (dom/div {:class (utils/class-set {:composed-section-body true
                                                  :editable (not read-only)})}
                 ;; growth metric currently shown
