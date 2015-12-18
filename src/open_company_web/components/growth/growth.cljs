@@ -17,27 +17,26 @@
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.components.growth.utils :as growth-utils]))
 
-(defn get-metric-data [all-data focus]
-  (filter #(= (:slug %) focus) all-data))
-
 (defn metrics-map [metrics-coll]
   (apply merge (map #(hash-map (:slug %) %) (reverse metrics-coll))))
 
 (defn metrics-order [metrics-coll]
   (map #(:slug %) metrics-coll))
 
+(defn map-metric-data [metric-data]
+  (apply merge (map #(hash-map (str (:period %) (:slug %)) %) metric-data)))
+
 (defn get-state [owner data & [initial]]
   (let [section-data (:section-data data)
         notes-data (:notes section-data)
         metrics (metrics-map (:metrics section-data))
-        focus (if initial
-                (:slug (first (:metrics section-data)))
-                (om/get-state owner :focus))
-        current-metric (get metrics focus)
-        metric-data (get-metric-data (:data section-data) focus)
-        metric-count (count metric-data)
-        interval (:interval current-metric)
-        growth-data (growth-utils/map-placeholder-data metric-data focus interval)]
+        first-metric (:slug (first (:metrics section-data)))
+        focus (if (and initial (:oc-editing data))
+                growth-utils/new-metric-slug-placeholder
+                (if initial
+                  first-metric
+                  (om/get-state owner :focus)))
+        growth-data (map-metric-data (:data section-data))]
     {:focus focus
      :title-editing (if initial
                       (not (not (:oc-editing section-data)))
@@ -52,7 +51,6 @@
                    (not (not (:oc-editing section-data)))
                    (om/get-state owner :new-metric))
      :growth-data growth-data
-     :growth-metric-count metric-count
      :growth-metrics metrics
      :growth-metric-slugs (metrics-order (:metrics section-data))
      :oc-editing (:oc-editing section-data)
@@ -64,12 +62,7 @@
   (.preventDefault e)
   (let [focus  (.. e -target -dataset -tab)
         section-data (:section-data data)
-        metrics (metrics-map (:metrics section-data))
-        current-metric (get metrics focus)
-        metric-data (get-metric-data (:data section-data) focus)
-        interval (:interval current-metric)
-        growth-data (growth-utils/map-placeholder-data metric-data focus interval)]
-    (om/set-state! owner :growth-data growth-data)
+        metrics (metrics-map (:metrics section-data))]
     (om/set-state! owner :focus focus)))
 
 (defn start-title-editing-cb [owner]
@@ -92,7 +85,11 @@
       (om/set-state! owner :growth-data (:growth-data state))
       (om/set-state! owner :growth-metrics (:growth-metrics state))
       (om/set-state! owner :notes-body (:notes-body state))
+      (when (om/get-state owner :new-metric)
+        (let [first-metric (get (first (om/get-state owner :growth-metrics)) 0)]
+          (om/set-state! owner :focus first-metric)))
       ; and the editing state flags
+      (om/set-state! owner :new-metric false)
       (om/set-state! owner :title-editing false)
       (om/set-state! owner :notes-editing false)
       (om/set-state! owner :data-editing false))))
@@ -156,18 +153,9 @@
                           (assoc (:slug properties-map) new-metric))
                       (assoc metrics slug new-metric))
         focus (om/get-state owner :focus)]
-    (when (or (empty? metrics)                    ; adding the first metric
-              (= slug growth-utils/new-metric-slug-placeholder) ; adding a new metric
-              (and (= focus slug)                 ; or changing the slug of the current focused metric
-                   change-slug))
-      ; switch the focus on that
+    (when change-slug
+      ; switch the focus to the new metric-slug
       (om/set-state! owner :focus (:slug properties-map)))
-    (when (or (contains? properties-map :interval)
-              change-slug)
-      (let [section-data (:section-data data)
-            metric-data (get-metric-data (:data section-data) focus)
-            growth-metric-data (growth-utils/map-placeholder-data metric-data focus (:interval new-metric))]
-        (om/set-state! owner :growth-data growth-metric-data)))
     (om/set-state! owner :growth-metrics new-metrics)))
 
 (defn clean-data [data]
@@ -210,9 +198,13 @@
     (om/set-state! owner :oc-editing false)))
 
 (defn new-metric [owner]
+  (om/set-state! owner :growth-data {})
   (om/set-state! owner :new-metric true)
   (om/set-state! owner :focus growth-utils/new-metric-slug-placeholder)
   (om/set-state! owner :data-editing true))
+
+(defn filter-growth-data [focus growth-data]
+  (vec (filter #(= (:slug %) focus) (vals growth-data))))
 
 (defcomponent growth [data owner]
 
@@ -230,10 +222,10 @@
           section (:section data)
           section-name (utils/camel-case-str (name section))
           growth-metrics (om/get-state owner :growth-metrics)
-          growth-data (:data section-data)
+          growth-data (om/get-state owner :growth-data)
           notes-data (:notes section-data)
           read-only (:read-only data)
-          focus-metric-data (filter #(= (:slug %) focus) growth-data)
+          focus-metric-data (filter-growth-data focus growth-data)
           focus-metric-info (get growth-metrics focus)
           subsection-data {:metric-data focus-metric-data
                            :metric-info focus-metric-info
@@ -264,11 +256,11 @@
                                     :cancel-if-needed-cb cancel-if-needed-fn
                                     :save-cb save-fn})
           (if data-editing
-            (om/build growth-edit {:growth-data (om/get-state owner :growth-data)
+            (om/build growth-edit {:growth-data focus-metric-data
                                    :metric-slug focus
                                    :new-metric (om/get-state owner :new-metric)
                                    :metrics growth-metrics
-                                   :metric-count (om/get-state owner :growth-metric-count)
+                                   :metric-count (count focus-metric-data)
                                    :change-growth-cb (partial change-growth-cb owner)
                                    :change-growth-metric-cb (partial change-growth-metric-cb owner data)})
             (dom/div {}
