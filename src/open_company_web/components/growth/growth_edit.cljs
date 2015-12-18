@@ -31,6 +31,8 @@
           next-period (:next-period data)
           tab-cb (fn [_ k]
                    (cond
+                     (and (= k :target) (:is-last data))
+                     (signal-tab next-period :target)
                      (= k :target)
                      (signal-tab (:period growth-data) :value)
                      (= k :value)
@@ -85,11 +87,14 @@
 
 (defn sort-growth-data [data]
   (let [metric-data (:growth-data data)
-        focus (:metric-slug data)
         metric-info (get-current-metric-info data)
-        placeholder-data (growth-utils/edit-placeholder-data metric-data focus (:interval metric-info))
-        sorter (utils/sort-by-key-pred :period true)]
-    (sort #(sorter %1 %2) placeholder-data)))
+        focus (:metric-slug data)]
+    (if (or (= focus growth-utils/new-metric-slug-placeholder)
+             (not (:interval metric-info)))
+      (vec [])
+      (let [placeholder-data (growth-utils/edit-placeholder-data metric-data focus (:interval metric-info))
+            sorter (utils/sort-by-key-pred :period true)]
+        (sort #(sorter %1 %2) placeholder-data)))))
 
 (defn get-interval-batch-size [interval]
   (case interval
