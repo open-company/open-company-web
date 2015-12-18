@@ -91,7 +91,7 @@
           sorted-metric (vec (sort #(sort-pred %1 %2) metric-data))
           actual-idx (get-actual sorted-metric)
           actual-set (sorted-metric actual-idx)
-          actual (.toLocaleString (:value actual-set))
+          actual (.toLocaleString (or (:value actual-set) 0))
           interval (:interval metric-info)
           period (utils/get-period-string (:period actual-set) interval)
           metric-unit (:unit metric-info)
