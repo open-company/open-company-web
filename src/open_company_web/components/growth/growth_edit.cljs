@@ -78,10 +78,18 @@
             (om/update-state! owner :sorted-data (fn [_] sorted-rows)))
           (recur (inc idx)))))))
 
+(defn get-current-metric-info [data]
+  (let [metric-slug (:metric-slug data)
+          metrics (:metrics data)]
+    (or (get metrics metric-slug) {})))
+
 (defn sort-growth-data [data]
-  (let [metric-data (vec (vals (:growth-data data)))
+  (let [metric-data (:growth-data data)
+        focus (:metric-slug data)
+        metric-info (get-current-metric-info data)
+        placeholder-data (growth-utils/edit-placeholder-data metric-data focus (:interval metric-info))
         sorter (utils/sort-by-key-pred :period true)]
-    (sort #(sorter %1 %2) metric-data)))
+    (sort #(sorter %1 %2) placeholder-data)))
 
 (defn get-interval-batch-size [interval]
   (case interval
@@ -98,11 +106,6 @@
          :target nil
          :new true}))))
 
-(defn get-current-metric-info [data]
-  (let [metric-slug (:metric-slug data)
-          metrics (:metrics data)]
-    (or (get metrics metric-slug) {})))
-
 (defn more-months [owner data]
   (let [sorted-data (om/get-state owner :sorted-data)
         last-data (last sorted-data)
@@ -114,17 +117,15 @@
 (defcomponent growth-edit [data owner]
 
   (init-state [_]
-    (let [sorted-data (sort-growth-data data)]
-      {:sorted-data sorted-data
-       :metric-edit (:new-metric data)}))
+    {:metric-edit (:new-metric data)})
 
-  (will-receive-props [_ next-props]
-    (let [sorted-data (sort-growth-data next-props)]
-      (om/set-state! owner :sorted-data sorted-data)))
+  ; (will-receive-props [_ next-props]
+  ;   (let [sorted-data (sort-growth-data next-props)]
+  ;     (om/set-state! owner :sorted-data sorted-data)))
 
   (render [_]
     (let [metric-info (get-current-metric-info data)
-          metric-data (om/get-state owner :sorted-data)
+          metric-data (sort-growth-data data)
           rows-data (vec (map (fn [row]
                                 (let [v {:prefix (:unit metric-info)
                                          :interval (:interval metric-info)
