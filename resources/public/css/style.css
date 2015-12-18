@@ -894,6 +894,19 @@ button.oc-btn.oc-cancel {
   color: rgba(0, 0, 0, 0.4);
 }
 
+button.oc-link {
+  border: 0px solid rgba(0, 0, 0, 0.4);
+  font-size: 10px;
+  margin-left: 0px;
+  margin-right: 20px;
+  height: 20px;
+  width: 60px;
+  border-radius: 0px;
+  background-color: transparent;
+  color: #109DB7;
+  margin-top: 30px;
+}
+
 div.sections-container {
   position: relative;
 }
@@ -1371,6 +1384,10 @@ div.oc-popover {
 
 .blue {
   color: #109DB7;
+}
+
+.black {
+  color: #000000;
 }
 
 .growth-metric-edit-row {
