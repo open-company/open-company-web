@@ -273,7 +273,7 @@
   (apply str (map #(str " " (name %)) (keys (filter #(second %) classes)))))
 
 (defn period-exists [period data]
-  (if (> (count (filter #(= (:period %) period) data)) 0)
+  (if (pos? (count (filter #(= (:period %) period) data)))
     true
     false))
 
