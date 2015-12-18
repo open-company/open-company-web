@@ -9,7 +9,18 @@
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.iso4217 :refer (sorted-iso4217)]
             [open-company-web.components.growth.utils :as growth-utils]
-            [cuerdas.core :as s]))
+            [cuerdas.core :as s]
+            [open-company-web.components.popover :refer (add-popover hide-popover)]))
+
+(defn show-delete-confirm-popover [owner data]
+  (add-popover {:container-id "delete-metric-confirm"
+                :title (str "Delete " (om/get-state owner :metric-name))
+                :message "Are you sure you want to delete this metric?"
+                :cancel-title "CANCEL"
+                :cancel-cb #(hide-popover nil "delete-metric-confirm")
+                :success-title "DELETE"
+                :success-cb #((:delete-metric-cb data) (om/get-state owner :metric-slug))
+                :success-color-class "red"}))
 
 (defn option-template [state]
   (if-not (.-id state) (.-text state))
@@ -226,12 +237,16 @@
               (dom/option {:value ""} "Interval")
               (for [interval intervals]
                 (dom/option {:value interval} (utils/camel-case-str interval))))))
-        (when (:new-metric data)
-          (dom/div {:class "growth-metric-edit-row group"}
-            (dom/button {:class "oc-btn oc-success green"
-                         :disabled (or (not (om/get-state owner :metric-name))
-                                       (not (om/get-state owner :metric-slug))
-                                       (not (om/get-state owner :unit))
-                                       (not (om/get-state owner :interval)))
-                         :on-click #((:next-cb data))} "NEXT")
-            (dom/button {:class "oc-btn oc-cancel gray"} "CANCEL")))))))
+        (dom/div {:class "growth-metric-edit-row group"}
+          (dom/button {:class "oc-btn oc-success green"
+                       :disabled (or (not (om/get-state owner :metric-name))
+                                     (not (om/get-state owner :metric-slug))
+                                     (not (om/get-state owner :unit))
+                                     (not (om/get-state owner :interval)))
+                       :on-click #((:next-cb data))} "NEXT")
+          (when (not (:new-metric data))
+            (dom/button {:class "oc-btn oc-cancel black"
+                         :title "Delete this metric"
+                         :on-click #(show-delete-confirm-popover owner data)} "DELTE"))
+          (dom/button {:class "oc-btn oc-link blue"
+                       :on-click (:cancel-cb data)} "CANCEL"))))))
