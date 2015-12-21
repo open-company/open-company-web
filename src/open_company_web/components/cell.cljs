@@ -81,7 +81,7 @@
           :new
           (dom/div {:class "comp-cell-int state-new"
                     :on-click #(to-state owner data :edit)}
-            (dom/span {} (:placeholder data)))
+            (dom/span {:class "placeholder"} (:placeholder data)))
 
           :display
           (dom/div {:class "comp-cell-int state-display"
