@@ -43,7 +43,7 @@
           period-string)
         (dom/td {}
           (om/build cell {:value target
-                          :placeholder "target"
+                          :placeholder "Target (optional)"
                           :cell-state cell-state
                           :draft-cb #(change-cb :target %)
                           :period period
@@ -52,7 +52,7 @@
         (dom/td {}
           (when (not (:is-last data))
             (om/build cell {:value value
-                            :placeholder "value"
+                            :placeholder "Value"
                             :cell-state cell-state
                             :draft-cb #(change-cb :value %)
                             :period period
@@ -145,13 +145,20 @@
                                         :metric-count (:metric-count data)
                                         :metrics (:metrics data)
                                         :new-metric (:new-metric data)
-                                        :next-cb #(set-metadata-edit owner data false)
+                                        :next-cb (fn []
+                                                   (set-metadata-edit owner data false)
+                                                   (when (:new-metric data)
+                                                     ; delay focus on the first target
+                                                     (.setTimeout js/window
+                                                                  #(signal-tab (:period (:cursor (get rows-data 0))) :target)
+                                                                  400)))
                                         :delete-metric-cb (:delete-metric-cb data)
                                         :cancel-cb (fn []
                                                      ; if it's a new metric cancel all the edited data
                                                      (when (not (:new-metric data))
-                                                      ((:reset-metrics-cb data)))
-                                                     (set-metadata-edit owner data false))
+                                                       ((:reset-metrics-cb data)))
+                                                     (when (not (clojure.string/blank? (:interval metric-info)))
+                                                       (set-metadata-edit owner data false)))
                                         :change-growth-metric-cb (:change-growth-metric-cb data)})
           (dom/div {}
             (dom/div {:class "chart-header-container"}
@@ -162,7 +169,7 @@
                     (str (:name metric-info) " ")
                     (om/build editable-pen {:click-callback #(set-metadata-edit owner data true)}))
                   (dom/h3 {:class "actual-label gray"} (str (utils/camel-case-str (:interval metric-info)) " " (utils/camel-case-str (:unit metric-info)))))))
-            (dom/table {:class "table table-striped"}
+            (dom/table {:class "table"}
               (dom/thead {}
                 (dom/tr {}
                   (dom/th {} "")
