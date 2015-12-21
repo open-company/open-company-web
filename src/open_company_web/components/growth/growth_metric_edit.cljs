@@ -148,7 +148,8 @@
           company-currency-code (:currency company-data)
           presets (get-presets data)
           units (:units presets)
-          fixed-units (vec (map #(if (= % "currency") company-currency-code %) units))]
+          fixed-units (vec (map #(if (= % "currency") company-currency-code %) units))
+          new-metric (:new-metric data)]
       {:req-libs-loaded false
        :did-mount false
        :select2-initialized false
@@ -156,10 +157,10 @@
        :metric-name (:name metric-info)
        :metric-slug (:slug metric-info)
        :description (:description metric-info)
-       :unit (or (:unit metric-info) company-currency-code)
+       :unit (if new-metric company-currency-code (:unit metric-info))
        :units fixed-units
-       :interval (or (:interval metric-info) "monthly")
-       :target (or (:target metric-info) "increase")
+       :interval (if new-metric "monthly" (:interval metric-info))
+       :target (if new-metric "increase" (:target metric-info))
        :currency company-currency-code}))
 
   (did-mount [_]
