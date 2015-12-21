@@ -37,7 +37,7 @@
 
 (defn get-minus [diff interval]
   (case interval
-    "quarterly" (t/months (* diff 4))
+    "quarterly" (t/months (* diff 3))
     "monthly" (t/months diff)
     "weekly" (t/weeks diff)))
 
