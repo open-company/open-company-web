@@ -471,7 +471,7 @@
         first-date (date-from-period first-period fixed-interval)
         last-date (date-from-period last-period fixed-interval)]
     (case fixed-interval
-      "quarterly" (/ (cljs-time/in-months (cljs-time/interval first-date last-date)) 4)
+      "quarterly" (/ (cljs-time/in-months (cljs-time/interval first-date last-date)) 3)
       "monthly" (cljs-time/in-months (cljs-time/interval first-date last-date))
       "weekly" (cljs-time/in-weeks (cljs-time/interval first-date last-date)))))
 
