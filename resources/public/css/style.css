@@ -541,8 +541,9 @@ div.rich-editor-container button.collapse-button {
   border: 2px solid black;
 }
 
-.comp-cell .state-new span {
+.comp-cell .state-new span.placeholder {
   color: rgba(0, 0, 0, 0.4);
+  font-size: 12px;
 }
 
 .comp-cell .state-display {
@@ -678,6 +679,11 @@ div.composed-section-edit div.chart-header-container:hover i.editable-pen {
 
 div.composed-section-edit table.table td, div.composed-section-edit table.table th {
   text-align: right;
+  padding: 2px;
+}
+
+div.composed-section-edit table.table>thead>tr>th {
+  border: 0px solid black;
 }
 
 div.composed-section-edit table.table td.no-cell {
