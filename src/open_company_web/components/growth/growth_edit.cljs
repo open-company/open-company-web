@@ -119,10 +119,14 @@
         more (get-more last-period interval)]
     (om/set-state! owner :sorted-data (concat sorted-data more))))
 
+(defn set-metadata-edit [owner data editing]
+  ((:metadata-edit-cb data) false)
+  (om/set-state! owner :metadata-edit editing))
+
 (defcomponent growth-edit [data owner]
 
   (init-state [_]
-    {:metric-edit (:new-metric data)})
+    {:metadata-edit (:new-metric data)})
 
   (render [_]
     (let [metric-info (get-current-metric-info data)
@@ -136,12 +140,12 @@
                                   v))
                               metric-data))]
       (dom/div {:class "composed-section-edit growth-body edit"}
-        (if (om/get-state owner :metric-edit)
+        (if (om/get-state owner :metadata-edit)
           (om/build growth-metric-edit {:metric-info metric-info
                                         :metric-count (:metric-count data)
                                         :metrics (:metrics data)
                                         :new-metric (:new-metric data)
-                                        :next-cb #(om/set-state! owner :metric-edit false)
+                                        :next-cb #(set-metadata-edit owner data false)
                                         :delete-metric-cb (:delete-metric-cb data)
                                         :cancel-cb (fn []
                                                      (if (:new-metric data)
@@ -149,17 +153,17 @@
                                                        ((:cancel-cb data))
                                                        ; else reset the metrics data only
                                                         ((:reset-metrics-cb data)))
-                                                     ; exit the metric editing state
-                                                     (om/set-state! owner :metric-edit false))
+                                                     ; exit the metadata editing state
+                                                     (set-metadata-edit owner data false))
                                         :change-growth-metric-cb (:change-growth-metric-cb data)})
           (dom/div {}
             (dom/div {:class "chart-header-container"}
               (dom/div {:class "target-actual-container"}
                 (dom/div {:class "actual-container"}
                   (dom/h3 {:class "actual blue"
-                           :on-click #(om/set-state! owner :metric-edit true)}
+                           :on-click #(set-metadata-edit owner data true)}
                     (str (:name metric-info) " ")
-                    (om/build editable-pen {:click-callback #(om/set-state! owner :metric-edit true)}))
+                    (om/build editable-pen {:click-callback #(set-metadata-edit owner data true)}))
                   (dom/h3 {:class "actual-label gray"} (str (utils/camel-case-str (:interval metric-info)) " " (utils/camel-case-str (:unit metric-info)))))))
             (dom/table {:class "table table-striped"}
               (dom/thead {}
