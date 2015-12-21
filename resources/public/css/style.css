@@ -885,6 +885,10 @@ button.oc-btn {
   margin-top: 30px;
 }
 
+button.oc-btn:active,
+button.oc-btn:focus {
+  outline: none;
+}
 
 button.oc-btn.disabled,
 button.oc-btn[disabled] {
