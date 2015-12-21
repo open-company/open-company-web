@@ -70,14 +70,17 @@
         metrics (metrics-map (:metrics section-data))]
     (om/set-state! owner :focus focus)))
 
-(defn start-title-editing-cb [owner]
-  (om/set-state! owner :title-editing true))
+(defn start-title-editing-cb [owner data]
+  (when-not (:read-only data)
+    (om/set-state! owner :title-editing true)))
 
-(defn start-notes-editing-cb [owner]
-  (om/set-state! owner :notes-editing true))
+(defn start-notes-editing-cb [owner data]
+  (when-not (:read-only data)
+    (om/set-state! owner :notes-editing true)))
 
-(defn start-data-editing-cb [owner]
-  (om/set-state! owner :data-editing true))
+(defn start-data-editing-cb [owner data]
+  (when-not (:read-only data)
+    (om/set-state! owner :data-editing true)))
 
 (defn cancel-cb [owner data]
   (if (om/get-state owner :oc-editing)
@@ -260,7 +263,7 @@
           subsection-data {:metric-data focus-metric-data
                            :metric-info focus-metric-info
                            :read-only read-only
-                           :start-editing-cb #(start-data-editing-cb owner)
+                           :start-editing-cb #(start-data-editing-cb owner data)
                            :total-metrics (count growth-metrics)}
           title-editing (om/get-state owner :title-editing)
           notes-editing (om/get-state owner :notes-editing)
@@ -271,8 +274,8 @@
           notes-body-change-fn (partial change-cb owner :notes-body)
           title-change-fn (partial change-cb owner :title)
           cancel-if-needed-fn #(cancel-if-needed-cb owner data)
-          start-title-editing-fn #(start-title-editing-cb owner)
-          start-notes-editing-fn #(start-notes-editing-cb owner)
+          start-title-editing-fn #(start-title-editing-cb owner data)
+          start-notes-editing-fn #(start-notes-editing-cb owner data)
           slugs (om/get-state owner :growth-metric-slugs)]
       (dom/div {:class "section-container" :id "section-growth" :key (name section)}
         (dom/div {:class "composed-section growth"}
@@ -301,8 +304,9 @@
                             :data-tab metric-slug
                             :on-click #(subsection-click % owner data)
                             } mname))))
-              (om/build add-metric {:click-callback #(new-metric owner)
-                                    :metrics-count (count growth-metrics)})))
+              (when-not read-only
+                (om/build add-metric {:click-callback #(new-metric owner)
+                                      :metrics-count (count growth-metrics)}))))
           (if data-editing
             ; editing growth metric's data and metric's metadata
             (om/build growth-edit {:growth-data focus-metric-data
