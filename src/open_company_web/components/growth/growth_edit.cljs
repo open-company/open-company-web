@@ -120,7 +120,7 @@
     (om/set-state! owner :sorted-data (concat sorted-data more))))
 
 (defn set-metadata-edit [owner data editing]
-  ((:metadata-edit-cb data) false)
+  ((:metadata-edit-cb data) editing)
   (om/set-state! owner :metadata-edit editing))
 
 (defcomponent growth-edit [data owner]
@@ -148,12 +148,9 @@
                                         :next-cb #(set-metadata-edit owner data false)
                                         :delete-metric-cb (:delete-metric-cb data)
                                         :cancel-cb (fn []
-                                                     (if (:new-metric data)
-                                                       ; if it's a new metric cancel all the edited data
-                                                       ((:cancel-cb data))
-                                                       ; else reset the metrics data only
-                                                        ((:reset-metrics-cb data)))
-                                                     ; exit the metadata editing state
+                                                     ; if it's a new metric cancel all the edited data
+                                                     (when (not (:new-metric data))
+                                                      ((:reset-metrics-cb data)))
                                                      (set-metadata-edit owner data false))
                                         :change-growth-metric-cb (:change-growth-metric-cb data)})
           (dom/div {}
