@@ -156,10 +156,10 @@
        :metric-name (:name metric-info)
        :metric-slug (:slug metric-info)
        :description (:description metric-info)
-       :unit (:unit metric-info)
+       :unit (or (:unit metric-info) company-currency-code)
        :units fixed-units
-       :interval (:interval metric-info)
-       :target (:target metric-info)
+       :interval (or (:interval metric-info) "monthly")
+       :target (or (:target metric-info) "increase")
        :currency company-currency-code}))
 
   (did-mount [_]
