@@ -86,7 +86,8 @@
                             (this-as this
                               (when (clojure.string/blank? (.-value this))
                                 (.trigger (.$ js/window this) "keydown.autocomplete")))))
-        (.call (.autocomplete autocomplete "option" "change") autocomplete))
+        (.call (.autocomplete autocomplete "option" "change") autocomplete)
+        (.setTimeout js/window #(.focus name-input) 200))
       ; init unit
       (doto (.$ js/window "select#mtr-unit")
         (.select2 (clj->js {"placeholder" "Metric unit"
