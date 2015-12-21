@@ -135,6 +135,7 @@
     {:intervals (:intervals growth-defaults)
      :units (:units growth-defaults)
      :target (:goal growth-defaults)
+     :prompt (:prompt growth-defaults)
      :metrics available-metrics}))
 
 (defcomponent growth-metric-edit [data owner]
@@ -173,9 +174,12 @@
                                   (init-select2 owner data))))
   (render [_]
     (let [metric-info (:metric-info data)
-          {:keys [metrics intervals target] :as presets} (om/get-state owner :presets)
+          {:keys [metrics intervals target prompt] :as presets} (om/get-state owner :presets)
           units (om/get-state owner :units)]
       (dom/div {:class "growth-metric-edit"}
+        (when (:new-metric data)
+          (dom/div {:class "growth-metric-edit-row group"}
+            (dom/p {} prompt)))
         ; name and unit
         (dom/div {:class "growth-metric-edit-row group"}
           ; name
