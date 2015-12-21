@@ -291,8 +291,11 @@
                   (dom/a {:class metric-classes
                           :title (:description metric)
                           :data-tab metric-slug
-                          :on-click #(subsection-click % owner data)} mname))))
-            (om/build add-metric {:click-callback #(new-metric owner)
+                          :on-click #(when-not data-editing
+                                       (subsection-click % owner data))
+                          } mname))))
+            (om/build add-metric {:click-callback #(when-not data-editing
+                                                     (new-metric owner))
                                   :metrics-count (count growth-metrics)}))
           (if data-editing
             ; editing growth metric's data and metric's metadata
