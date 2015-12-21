@@ -169,6 +169,7 @@ div.composed-section i.add-metric {
   color: #109DB7;
   opacity: 0;
   cursor: default;
+  font-size: 18px;
 }
 
 div.composed-section:hover i.add-metric {
