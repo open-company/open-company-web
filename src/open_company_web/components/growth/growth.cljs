@@ -40,6 +40,9 @@
         growth-data (map-metric-data (:data section-data))
         metric-slugs (metrics-order all-metrics)]
     {:focus focus
+     :metadata-editing (if initial
+                         (not (not (:oc-editing section-data)))
+                         (om/get-state owner :metadata-editing))
      :title-editing (if initial
                       (not (not (:oc-editing section-data)))
                       (om/get-state owner :title-editing))
@@ -230,6 +233,9 @@
     (om/set-state! owner :growth-metric-slugs metrics-order)
     (save-cb owner data)))
 
+(defn metadata-edit-cb [owner editing]
+  (om/set-state! owner :metadata-editing editing))
+
 (defcomponent growth [data owner]
 
   (init-state [_]
@@ -259,6 +265,7 @@
           title-editing (om/get-state owner :title-editing)
           notes-editing (om/get-state owner :notes-editing)
           data-editing (om/get-state owner :data-editing)
+          metadata-editing (om/get-state owner :metadata-editing)
           cancel-fn #(cancel-cb owner data)
           save-fn #(save-cb owner data)
           notes-body-change-fn (partial change-cb owner :notes-body)
@@ -300,6 +307,7 @@
             ; editing growth metric's data and metric's metadata
             (om/build growth-edit {:growth-data focus-metric-data
                                    :metric-slug focus
+                                   :metadata-edit-cb (partial metadata-edit-cb owner)
                                    :new-metric (om/get-state owner :new-metric)
                                    :metrics growth-metrics
                                    :metric-count (count focus-metric-data)
@@ -314,34 +322,36 @@
               ;; growth metric currently shown
               (when (and focus (not (empty? (:metric-data subsection-data))))
                 (om/build growth-metric subsection-data))))
-            (om/build update-footer {:updated-at (:updated-at section-data)
-                                     :author (:author section-data)
+          (om/build update-footer {:updated-at (:updated-at section-data)
+                                   :author (:author section-data)
+                                   :section :growth
+                                   :editing (or title-editing notes-editing data-editing)
+                                   :notes false})
+          (when-not (or (and (empty? (:body notes-data))  ; there aren't notes
+                             read-only)                   ; and it's read only
+                        metadata-editing)                 ; or is editing the metadata
+            (om/build rich-editor {:editing notes-editing
+                                   :section :growth
+                                   :body-counter (om/get-state owner :body-counter)
+                                   :read-only (:read-only data)
+                                   :body (om/get-state owner :notes-body)
+                                   :placeholder (or (:body-placeholder section-data)
+                                                    (str section-name " notes here..."))
+                                   :start-editing-cb start-notes-editing-fn
+                                   :change-cb notes-body-change-fn
+                                   :cancel-cb cancel-fn
+                                   :cancel-if-needed-cb cancel-if-needed-fn
+                                   :save-cb save-fn}))
+          (when (not (empty? (:author notes-data)))
+            (om/build update-footer {:author (:author notes-data)
+                                     :updated-at (:updated-at notes-data)
                                      :section :growth
                                      :editing (or title-editing notes-editing data-editing)
-                                     :notes false})
-            (when (or (not (empty? (:body notes-data)))
-                      (not read-only))
-              (om/build rich-editor {:editing notes-editing
-                                     :section :growth
-                                     :body-counter (om/get-state owner :body-counter)
-                                     :read-only (:read-only data)
-                                     :body (om/get-state owner :notes-body)
-                                     :placeholder (or (:body-placeholder section-data)
-                                                      (str section-name " notes here..."))
-                                     :start-editing-cb start-notes-editing-fn
-                                     :change-cb notes-body-change-fn
-                                     :cancel-cb cancel-fn
-                                     :cancel-if-needed-cb cancel-if-needed-fn
-                                     :save-cb save-fn}))
-            (when (not (empty? (:author notes-data)))
-              (om/build update-footer {:author (:author notes-data)
-                                       :updated-at (:updated-at notes-data)
-                                       :section :growth
-                                       :editing (or title-editing notes-editing data-editing)
-                                       :notes true}))
-            (if (and (or title-editing notes-editing data-editing) (pos? (count growth-metrics)))
-              (om/build section-footer {:edting (or title-editing notes-editing data-editing)
-                                        :cancel-cb cancel-fn
-                                        :is-new-section (om/get-state owner :oc-editing)
-                                        :save-cb save-fn})
-              (om/build revisions-navigator data)))))))
+                                     :notes true}))
+          (if (and (or title-editing notes-editing data-editing)
+                   (not metadata-editing))
+            (om/build section-footer {:edting (or title-editing notes-editing data-editing)
+                                      :cancel-cb cancel-fn
+                                      :is-new-section (om/get-state owner :oc-editing)
+                                      :save-cb save-fn})
+            (om/build revisions-navigator data)))))))
