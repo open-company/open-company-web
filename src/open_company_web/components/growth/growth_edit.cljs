@@ -82,7 +82,7 @@
 
 (defn get-current-metric-info [data]
   (let [metric-slug (:metric-slug data)
-          metrics (:metrics data)]
+        metrics (:metrics data)]
     (or (get metrics metric-slug) {})))
 
 (defn sort-growth-data [data]
