@@ -6,7 +6,8 @@
               [open-company-web.router :as router]
               [open-company-web.caches :as caches]
               [cljs-time.format :as cljs-time-format]
-              [cljs-time.core :as cljs-time]))
+              [cljs-time.core :as cljs-time]
+              [open-company-web.caches :refer (company-cache)]))
 
 (defn abs [n] (max n (- n)))
 
@@ -505,3 +506,10 @@
             to-monday (dec day-of-week)
             monday-date (cljs-time/minus now (cljs-time/days to-monday))]
         (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (cljs-time/day monday-date))))))
+
+(defn company-cache-key [k & [v]]
+  (let [slug (keyword (:slug @router/path))
+        cc (slug @company-cache)]
+    (when v
+      (swap! company-cache assoc-in [slug k] v))
+    (get cc k nil)))
