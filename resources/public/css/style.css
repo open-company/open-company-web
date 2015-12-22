@@ -255,10 +255,6 @@ div.composed-section div.section div.chart-footer-container div.target-actual-co
   margin-left: 225px;
 }
 
-div.growth div.section div.chart-header-container div.target-actual-container {
-  height: 110px;
-}
-
 div.composed-section div.section div.chart-footer-container div.target-actual-container.double {
   width: 300px;
   margin-left: 150px;
