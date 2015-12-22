@@ -327,7 +327,8 @@
                                    :cancel-cb cancel-fn
                                    :delete-metric-cb (partial delete-metric-cb owner data)
                                    :reset-metrics-cb #(reset-metrics-cb owner data)
-                                   :change-growth-metric-cb (partial change-growth-metric-cb owner data)})
+                                   :change-growth-metric-cb (partial change-growth-metric-cb owner data)
+                                   :new-growth-section (om/get-state owner :oc-editing)})
             ; growth data chart
             (dom/div {:class (utils/class-set {:composed-section-body true
                                                :editable (not read-only)})}
