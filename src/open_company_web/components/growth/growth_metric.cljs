@@ -10,19 +10,20 @@
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
 
-(defn get-graph-tooltip [label prefix value]
+(defn get-graph-tooltip [label prefix value suffix]
   (str label
        ": "
        (or prefix "")
-       (if value (.toLocaleString value) "")))
+       (if value (.toLocaleString value) "")
+       (if suffix (str " " suffix) "")))
 
-(defn chart-data-at-index [data column-name prefix has-target interval idx]
+(defn chart-data-at-index [data column-name prefix suffix has-target interval idx]
   (let [data (to-array data)
         obj (get (vec (reverse data)) idx)
         value (or (:value obj) 0)
         target (or (:target obj) 0)
-        label (get-graph-tooltip column-name prefix value)
-        target-label (get-graph-tooltip (str column-name " target") prefix (.toLocaleString target))
+        label (get-graph-tooltip column-name prefix value suffix)
+        target-label (get-graph-tooltip "target" prefix (.toLocaleString target) suffix)
         period (utils/get-period-string (:period obj) interval [:short])
         values (if has-target
                  [period
@@ -40,10 +41,10 @@
 
 (defn- get-chart-data
   "Vector of max *columns elements of [:Label value]"
-  [data prefix slug column-name interval]
+  [data prefix slug column-name tooltip-suffix interval]
   (let [fixed-data (growth-utils/chart-placeholder-data data slug interval)
         has-target (some #(:target %) data)
-        chart-data (partial chart-data-at-index fixed-data column-name prefix has-target interval)
+        chart-data (partial chart-data-at-index fixed-data column-name prefix tooltip-suffix has-target interval)
         columns (if has-target
                   [["string" column-name]
                    ["number" "target"]
@@ -85,9 +86,10 @@
           fixed-cur-unit (if (= cur-unit metric-unit)
                             nil
                             cur-unit)
-          actual-with-label (if fixed-cur-unit
-                              (str fixed-cur-unit actual)
-                              actual)]
+          unit (if (= metric-unit "%")
+                 "%"
+                 nil)
+          actual-with-label (str fixed-cur-unit actual unit)]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})
@@ -98,7 +100,6 @@
             (dom/div {:class "chart-header-container"}
               (dom/div {:class "target-actual-container"}
                 (dom/div {:class "actual-container"}
-                  (dom/h3 {:class "actual blue"} (:name metric-info))
                   (dom/h3 {:class "actual blue"} actual-with-label
                     (om/build editable-pen {:click-callback (:start-data-editing-cb data)}))
                   (dom/h3 {:class "actual-label gray"} (str "as of " period)))))
@@ -106,4 +107,5 @@
                                                    fixed-cur-unit
                                                    (:slug metric-info)
                                                    (:name metric-info)
+                                                   unit
                                                    interval))))))))
