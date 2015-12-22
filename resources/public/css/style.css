@@ -680,6 +680,7 @@ div.composed-section-edit div.chart-header-container:hover i.editable-pen {
 div.composed-section-edit table.table td, div.composed-section-edit table.table th {
   text-align: right;
   padding: 2px;
+  border: 0px;
 }
 
 div.composed-section-edit table.table>thead>tr>th {
@@ -687,7 +688,7 @@ div.composed-section-edit table.table>thead>tr>th {
 }
 
 div.composed-section-edit table.table td.no-cell {
-  padding-top: 12px;
+  padding-top: 6px;
 }
 
 div.composed-section-edit table.table td.new-row-placeholder {
