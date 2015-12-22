@@ -23,11 +23,9 @@
      label]))
 
 (defn- get-past-period [period diff]
-  (let [[year month] (clojure.string/split period "-")
-        period-date (t/date-time (int year) (int month))
-        past-date (t/minus period-date (t/months diff))
-        formatter (utils/get-formatter "monthly")]
-    (f/unparse formatter past-date)))
+  (let [period-date (utils/date-from-period period)
+        past-date (t/minus period-date (t/months diff))]
+    (utils/period-from-date past-date)))
 
 (defn placeholder-data [period]
   {:period period
@@ -86,9 +84,9 @@
       :pattern (if pattern pattern "###,###.##")}))
 
 (defn get-as-of-string [period]
-  (let [[year month] (clojure.string/split period "-")
-        month-name (utils/month-string month)]
-    (str month-name ", " year)))
+  (let [period-date (utils/date-from-period period)
+        month-name (utils/month-string (t/month period-date))]
+    (str month-name ", " (t/year period-date))))
 
 (defn map-placeholder-data [data]
   (let [fixed-data (edit-placeholder-data data)]
