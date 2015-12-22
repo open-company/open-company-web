@@ -85,12 +85,12 @@
         (.focus name-input (fn [_]
                             (this-as this
                               (when (clojure.string/blank? (.-value this))
-                                (.trigger (.$ js/window this) "keydown.autocomplete")))))
-        (.focus name-input)
-        (.setTimeout js/window #(.autocomplete name-input "search" (.val name-input)) 500))
+                                (.autocomplete name-input "search" (.val name-input))))))
+        (.focus name-input))
       ; init unit
       (doto (.$ js/window "select#mtr-unit")
         (.select2 (clj->js {"placeholder" "Metric unit"
+                            "minimumResultsForSearch" -1
                             "templateResult" unit-option-template
                             "templateSelection" unit-option-template}))
         (.on "change" (fn [e]
@@ -102,7 +102,7 @@
       ; init goal
       (doto (.$ js/window "select.metric-data#mtr-goal")
         (.select2 (clj->js {"placeholder" "Metric goal"
-                            "allowClear" true
+                            "minimumResultsForSearch" -1
                             "templateResult" option-template
                             "templateSelection" option-template}))
         (.on "change" (fn [e]
@@ -114,6 +114,7 @@
       ; init interval
       (doto (.$ js/window "select.metric-data#mtr-interval")
         (.select2 (clj->js {"placeholder" "Metric interval"
+                            "minimumResultsForSearch" -1
                             "templateResult" option-template
                             "templateSelection" option-template}))
         (.on "change" (fn [e]
@@ -148,7 +149,10 @@
           company-currency-code (:currency company-data)
           presets (get-presets data)
           units (:units presets)
-          fixed-units (vec (map #(if (= % "currency") company-currency-code %) units))
+          fixed-units (vec (map #(if (= (:unit %) "currency")
+                                   {:unit company-currency-code
+                                    :name (utils/get-symbol-for-currency-code company-currency-code)}
+                                   %) units))
           new-metric (:new-metric data)]
       {:req-libs-loaded false
        :did-mount false
@@ -175,7 +179,7 @@
                                   (om/update-state! owner :req-libs-loaded (fn [] true))
                                   (init-select2 owner data))))
   (render [_]
-    (let [metric-info (:metric-info data)
+    (let [{:keys [new-growth-section metric-info]} data
           {:keys [metrics intervals target prompt] :as presets} (om/get-state owner :presets)
           units (om/get-state owner :units)]
       (dom/div {:class "growth-metric-edit"}
@@ -197,7 +201,7 @@
                         :style {"width" "240px"}}))
           ; unit
           (dom/div {:class "metric-data-container right group"}
-            (dom/label {:for "mtr-unit"} "Measured in")
+            (dom/label {:for "mtr-unit"} "Measured as")
             (dom/select {:class "metric-data metric-unit"
                          :value (om/get-state owner :unit)
                          :id "mtr-unit"
@@ -205,9 +209,13 @@
                          :style {"width" "150px"}}
               (dom/option {:value ""} "Unit")
               (for [unit units]
-                (dom/option {:value (if (= unit "currency")
-                                      (om/get-state owner :currency)
-                                      unit)} unit)))))
+                (let [currency (om/get-state owner :currency)
+                      unit-value (:unit unit)
+                      unit-name (or (:name unit) )]
+                  (dom/option {:key unit-value
+                               :value (if (= unit-value "currency")
+                                        (om/get-state owner :currency)
+                                        unit-value)} unit-name))))))
         ; textarea
         (dom/div {:class "growth-metric-edit-row group"}
           (dom/textarea {:class "metric-data metric-description"
@@ -257,4 +265,7 @@
                          :title "Delete this metric"
                          :on-click #(show-delete-confirm-popover owner data)} "DELETE"))
           (dom/button {:class "oc-btn oc-link blue"
-                       :on-click (:cancel-cb data)} "CANCEL"))))))
+                       :on-click (:cancel-cb data)}
+                      (if new-growth-section
+                        "DELETE"
+                        "CANCEL")))))))
