@@ -86,8 +86,8 @@
                             (this-as this
                               (when (clojure.string/blank? (.-value this))
                                 (.trigger (.$ js/window this) "keydown.autocomplete")))))
-        (.call (.autocomplete autocomplete "option" "change") autocomplete)
-        (.setTimeout js/window #(.focus name-input) 200))
+        (.focus name-input)
+        (.setTimeout js/window #(.autocomplete name-input "search" (.val name-input)) 500))
       ; init unit
       (doto (.$ js/window "select#mtr-unit")
         (.select2 (clj->js {"placeholder" "Metric unit"
@@ -189,7 +189,9 @@
             (dom/input {:class "metric-data metric-name"
                         :type "text"
                         :value (om/get-state owner :metric-name)
-                        :on-change #(om/set-state! owner :metric-name (.. % -target -value))
+                        :on-change (fn [e]
+                                     (om/set-state! owner :metric-name (.. e -target -value))
+                                     (change-name owner data))
                         :id "mtr-name"
                         :placeholder "Metric name"
                         :style {"width" "240px"}}))
