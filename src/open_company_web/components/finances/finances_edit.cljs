@@ -158,7 +158,7 @@
       ; real component
       (dom/div {:class "finances"}
         (dom/div {:class "composed-section-edit finances-body edit"}
-          (dom/table {:class "table table-striped"}
+          (dom/table {:class "table"}
             (dom/thead {}
               (dom/tr {}
                 (dom/th {} "")
