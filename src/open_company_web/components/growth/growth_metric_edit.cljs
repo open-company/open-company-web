@@ -86,7 +86,8 @@
                             (this-as this
                               (when (clojure.string/blank? (.-value this))
                                 (.autocomplete name-input "search" (.val name-input))))))
-        (.focus name-input))
+        (.focus name-input)
+        (.val name-input (.val name-input)))
       ; init unit
       (doto (.$ js/window "select#mtr-unit")
         (.select2 (clj->js {"placeholder" "Metric unit"
