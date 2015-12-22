@@ -145,6 +145,7 @@
                                         :metric-count (:metric-count data)
                                         :metrics (:metrics data)
                                         :new-metric (:new-metric data)
+                                        :new-growth-section (:new-growth-section data)
                                         :next-cb (fn []
                                                    (set-metadata-edit owner data false)
                                                    (when (:new-metric data)
@@ -154,11 +155,20 @@
                                                                   400)))
                                         :delete-metric-cb (:delete-metric-cb data)
                                         :cancel-cb (fn []
-                                                     ; if it's a new metric cancel all the edited data
-                                                     (when (not (:new-metric data))
-                                                       ((:reset-metrics-cb data)))
-                                                     (when (not (clojure.string/blank? (:interval metric-info)))
-                                                       (set-metadata-edit owner data false)))
+                                                     ; 3 cases
+                                                     (if (or (:new-growth-section data) (:new-metric data))
+                                                       ; newly added growth section
+                                                       ;    - remove the seciton with (:delete-new-section-cb data)
+                                                       ; new metric:
+                                                       ;    - remove the new metric
+                                                       ;    - switch focus
+                                                       ((:cancel-cb data))
+                                                       ; existing metric
+                                                       (do
+                                                         ; - cancel the edited metadata only
+                                                         ((:reset-metrics-cb data))
+                                                         ; - exit the metadata edit state
+                                                         (set-metadata-edit owner data false))))
                                         :change-growth-metric-cb (:change-growth-metric-cb data)})
           (dom/div {}
             (dom/div {:class "chart-header-container"}
