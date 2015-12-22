@@ -1433,10 +1433,17 @@ div.oc-popover {
   background-color: #fff;
   border: 1px solid #aaa;
   border-radius: 4px;
-  width: 240px;
   padding: 0px 8px;
   color: #444;
   font-size: 14px;
+}
+
+.growth-metric-edit-row input#mtr-name {
+  width: 240px;
+}
+
+.growth-metric-edit-row textarea {
+  width: 500px;
 }
 
 .growth-metric-edit-row textarea {
