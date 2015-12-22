@@ -253,6 +253,6 @@
           (when (not (:new-metric data))
             (dom/button {:class "oc-btn oc-cancel black"
                          :title "Delete this metric"
-                         :on-click #(show-delete-confirm-popover owner data)} "DELTE"))
+                         :on-click #(show-delete-confirm-popover owner data)} "DELETE"))
           (dom/button {:class "oc-btn oc-link blue"
                        :on-click (:cancel-cb data)} "CANCEL"))))))
