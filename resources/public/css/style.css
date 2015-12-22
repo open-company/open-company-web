@@ -207,13 +207,16 @@ div.composed-section div.link-bar a.composed-section-link {
   display: inline-block;
 }
 
-div.finances div.link-bar a.composed-section-link.active {
+div.composed-section div.link-bar a.composed-section-link.active {
   text-decoration: none;
+  font-weight: bold;
+}
+
+div.finances div.link-bar a.composed-section-link.active {
   color: #26C485;
 }
 
 div.growth div.link-bar a.composed-section-link.active {
-  text-decoration: none;
   color: #109DB7;
 }
 
@@ -246,14 +249,14 @@ div.composed-section div.section div.period-container p {
   margin-bottom: 0px;
 }
 
-div.composed-section div.section div.chart-header-container div.target-actual-container{
-  height: 70px;
-}
-
 div.composed-section div.section div.chart-footer-container div.target-actual-container {
   width: 150px;
   height: 70px;
   margin-left: 225px;
+}
+
+div.growth div.section div.chart-header-container div.target-actual-container {
+  height: 110px;
 }
 
 div.composed-section div.section div.chart-footer-container div.target-actual-container.double {
