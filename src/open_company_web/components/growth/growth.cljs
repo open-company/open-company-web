@@ -15,12 +15,13 @@
             [open-company-web.components.section-footer :refer (section-footer)]
             [open-company-web.lib.section-utils :as section-utils]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
-            [open-company-web.components.growth.utils :as growth-utils]))
+            [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.caches :refer (company-cache)]))
 
-(def last-selected-metric (atom nil))
+(def focus-cache-key :last-selected-metric)
 
 (defn switch-focus [owner focus]
-  (reset! last-selected-metric focus)
+  (utils/company-cache-key focus-cache-key focus)
   (om/set-state! owner :focus focus))
 
 (defn metrics-map [metrics-coll]
@@ -38,12 +39,11 @@
         all-metrics (:metrics section-data)
         metrics (metrics-map all-metrics)
         first-metric (:slug (first (:metrics section-data)))
+        last-focus (utils/company-cache-key focus-cache-key)
         focus (if (and initial (:oc-editing data))
                 growth-utils/new-metric-slug-placeholder
                 (if initial
-                  (if (not (nil? @last-selected-metric))
-                    @last-selected-metric
-                    first-metric)
+                  (or last-focus first-metric)
                   (om/get-state owner :focus)))
         growth-data (map-metric-data (:data section-data))
         metric-slugs (metrics-order all-metrics)]
