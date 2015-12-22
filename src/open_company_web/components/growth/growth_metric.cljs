@@ -39,19 +39,6 @@
                   label])]
     values))
 
-(defn- monthly-past-period [period diff]
-  (let [[year month] (clojure.string/split period "-")
-          period-date (t/date-time (int year) (int month))
-          past-date (t/minus period-date (t/months diff))
-          formatter (utils/get-formatter "monthly")]
-      (f/unparse formatter past-date)))
-
-(defn- get-past-period [period diff interval]
-  (cond
-    ;; TODO: add get-past-period for weekly and quarterly
-    (= interval "monthly")
-    (monthly-past-period period diff)))
-
 (defn- get-chart-data
   "Vector of max *columns elements of [:Label value]"
   [data prefix slug column-name tooltip-suffix interval]
