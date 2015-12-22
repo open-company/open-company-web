@@ -340,19 +340,9 @@
   (let [sort-pred (sort-by-key-pred :updated-at)]
     (into [] (sort #(sort-pred %1 %2) revisions))))
 
-(defn as-of [date]
-  (let [year (.getFullYear date)
-        month (add-zero (inc (.getMonth date)))
-        day (add-zero (.getDate date))
-        hours (add-zero (.getHours date))
-        minutes (add-zero (.getMinutes date))
-        seconds (add-zero (.getSeconds date))
-        millis (add-zeros (.getMilliseconds date))]
-    (str year "-" month "-" day "T" hours ":" minutes ":" seconds "." millis "Z")))
-
 (defn as-of-now []
   (let [date (js-date)]
-    (as-of date)))
+    (.toISOString date)))
 
 (defn link-for
   ([links rel] (some #(if (= (:rel %) rel) % nil) links))
