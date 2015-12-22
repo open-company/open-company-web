@@ -199,7 +199,7 @@ div.composed-section div.link-bar {
 }
 
 div.composed-section div.link-bar a.composed-section-link {
-  text-decoration: none;
+  text-decoration: underline;
   color: #707070;
   margin-left: 0px;
   margin-right: 60px;
@@ -208,12 +208,12 @@ div.composed-section div.link-bar a.composed-section-link {
 }
 
 div.finances div.link-bar a.composed-section-link.active {
-  text-decoration: underline;
+  text-decoration: none;
   color: #26C485;
 }
 
 div.growth div.link-bar a.composed-section-link.active {
-  text-decoration: underline;
+  text-decoration: none;
   color: #109DB7;
 }
 
