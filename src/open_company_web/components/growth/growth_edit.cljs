@@ -126,11 +126,12 @@
 (defcomponent growth-edit [data owner]
 
   (init-state [_]
-    {:metadata-edit (:new-metric data)})
+    {:metadata-edit (:new-metric data)
+     :sorted-data (sort-growth-data data)})
 
   (render [_]
     (let [metric-info (get-current-metric-info data)
-          metric-data (sort-growth-data data)
+          metric-data (om/get-state owner :sorted-data)
           rows-data (vec (map (fn [row]
                                 (let [v {:prefix (:unit metric-info)
                                          :interval (:interval metric-info)
