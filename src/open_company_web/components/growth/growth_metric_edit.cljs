@@ -40,24 +40,23 @@
   (let [change-cb (:change-growth-metric-cb data)
         name-value (s/trim (.val (.$ js/window "input#mtr-name")))
         slug (om/get-state owner :metric-slug)]
-    (when-not (s/blank? name-value)
-      (om/set-state! owner :metric-name name-value)
-      ; if it's a newly created metric
-      (if (:new-metric data)
-        ; change the slug and update all the other fields
-        (let [presets (om/get-state owner :presets)
-              metrics (:metrics data)
-              slugs (vec (map #(:slug %) (vals metrics)))
-              new-slug (growth-utils/get-slug slugs presets name-value)]
-          (om/set-state! owner :metric-slug new-slug)
-          (change-cb slug {:slug new-slug
-                           :description (om/get-state owner :description)
-                           :unit (om/get-state owner :unit)
-                           :target (om/get-state owner :target)
-                           :interval (om/get-state owner :interval)
-                           :name name-value}))
-        ; change only the name
-        (change-cb slug {:name name-value})))))
+    (om/set-state! owner :metric-name name-value)
+    ; if it's a newly created metric
+    (if (:new-metric data)
+      ; change the slug and update all the other fields
+      (let [presets (om/get-state owner :presets)
+            metrics (:metrics data)
+            slugs (vec (map #(:slug %) (vals metrics)))
+            new-slug (growth-utils/get-slug slugs presets name-value)]
+        (om/set-state! owner :metric-slug new-slug)
+        (change-cb slug {:slug new-slug
+                         :description (om/get-state owner :description)
+                         :unit (om/get-state owner :unit)
+                         :target (om/get-state owner :target)
+                         :interval (om/get-state owner :interval)
+                         :name name-value}))
+      ; change only the name
+      (change-cb slug {:name name-value}))))
 
 (defn contains-slug? [slug present-metrics]
   (filter (fn [[k _]] (= k slug)) present-metrics))
@@ -262,10 +261,10 @@
                 (dom/option {:value interval} (utils/camel-case-str interval))))))
         (dom/div {:class "growth-metric-edit-row group"}
           (dom/button {:class "oc-btn oc-success green"
-                       :disabled (or (not (om/get-state owner :metric-name))
-                                     (not (om/get-state owner :metric-slug))
-                                     (not (om/get-state owner :unit))
-                                     (not (om/get-state owner :interval)))
+                       :disabled (or (s/blank? (om/get-state owner :metric-slug))
+                                     (s/blank? (om/get-state owner :metric-name))
+                                     (s/blank? (om/get-state owner :unit))
+                                     (s/blank? (om/get-state owner :interval)))
                        :on-click #((:next-cb data))} "NEXT")
           (when (not (:new-metric data))
             (dom/button {:class "oc-btn oc-cancel black"
