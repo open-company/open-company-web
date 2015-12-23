@@ -257,7 +257,8 @@
           revenue-classes (str classes (when (= focus "revenue") " active"))
           costs-classes (str classes (when (= focus "costs") " active"))
           runway-classes (str classes (when (= focus "runway") " active"))
-          read-only (:read-only data)
+          read-only-section (:read-only section-data)
+          read-only (or (:read-only data) read-only-section)
           cursor @dispatcher/app-state
           finances-row-data (:data section-data)
           sum-revenues (apply + (map #(:revenue %) finances-row-data))
@@ -311,7 +312,8 @@
                         :title "Runway"
                         :data-tab "runway"
                         :on-click #(subsection-click % owner)} "Runway"))
-              (om/build editable-pen {:click-callback start-data-editing-fn})))
+              (when-not read-only
+                (om/build editable-pen {:click-callback start-data-editing-fn}))))
           (dom/div {:class (utils/class-set {:composed-section-body true})}
             (if data-editing
               (om/build finances-edit {:finances-data (om/get-state owner :finances-data)
@@ -339,7 +341,7 @@
               (om/build rich-editor {:editing notes-editing
                                      :section :finances
                                      :body-counter (om/get-state owner :body-counter)
-                                     :read-only (:read-only data)
+                                     :read-only read-only
                                      :body (om/get-state owner :notes-body)
                                      :placeholder (or (:body-placeholder section-data) (str section-name " notes here..."))
                                      :start-editing-cb start-notes-editing-fn
