@@ -513,3 +513,6 @@
     (when v
       (swap! company-cache assoc-in [slug k] v))
     (get cc k nil)))
+
+(defn clean-company-caches []
+  (reset! company-cache {}))
