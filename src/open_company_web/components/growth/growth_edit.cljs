@@ -129,6 +129,10 @@
     {:metadata-edit (:new-metric data)
      :sorted-data (sort-growth-data data)})
 
+  (will-receive-props [_ next-props]
+    (when (not= (:metrics data) (:metrcs next-props))
+      (om/set-state! owner :sorted-data (sort-growth-data next-props))))
+
   (render [_]
     (let [metric-info (get-current-metric-info data)
           metric-data (om/get-state owner :sorted-data)
