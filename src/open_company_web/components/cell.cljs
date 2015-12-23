@@ -4,6 +4,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
+            [cuerdas.core :as s]
             [cljs.core.async :refer [chan <!]]))
 
 ;; Cell component
@@ -72,8 +73,12 @@
                         (.parseFloat js/window value))
           float-value (if (js/isNaN float-value) 0 float-value)
           formatted-value (format-value float-value)
-          prefix-value (if (:prefix data) (str (:prefix data) formatted-value) formatted-value)
-          final-value (if (:suffix data) (str prefix-value " " (:suffix data)) prefix-value)
+          prefix-value (if (and (not (s/blank? formatted-value)) (:prefix data))
+                         (str (:prefix data) formatted-value)
+                         formatted-value)
+          final-value (if (and (not (s/blank? formatted-value)) (:suffix data))
+                        (str prefix-value (:suffix data))
+                        prefix-value)
           state (om/get-state owner :cell-state)]
       (dom/div {:class "comp-cell"}
         (case state
