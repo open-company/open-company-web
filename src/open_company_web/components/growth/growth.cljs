@@ -103,8 +103,8 @@
       (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))
       (om/set-state! owner :notes-body (:notes-body state))
       (when (om/get-state owner :new-metric)
-        (let [first-metric (get (first (om/get-state owner :growth-metrics)) 0)]
-          (switch-focus owner first-metric)))
+        (let [focus (utils/company-cache-key focus-cache-key)]
+          (switch-focus owner focus)))
       ; and the editing state flags
       (om/set-state! owner :new-metric false)
       (om/set-state! owner :title-editing false)
@@ -176,7 +176,7 @@
             remove-slug (vec (remove #(= % slug) slugs))
             add-slug (conj remove-slug (:slug properties-map))]
         (om/set-state! owner :growth-metric-slugs add-slug)
-        (switch-focus owner (:slug properties-map))))
+        (om/set-state! owner :focus (:slug properties-map))))
     (om/set-state! owner :growth-metrics new-metrics)))
 
 (defn clean-data [data]
@@ -196,6 +196,8 @@
   (when (or (has-changes owner data) ; when the section already exists
             (has-data-changes owner data)
             (om/get-state owner :oc-editing)) ; when the section is new
+    ; save focus
+    (utils/company-cache-key focus-cache-key (om/get-state owner :focus))
     (let [title (om/get-state owner :title)
           notes-body (om/get-state owner :notes-body)
           growth-data (om/get-state owner :growth-data)
@@ -220,7 +222,7 @@
 
 (defn new-metric [owner]
   (om/set-state! owner :new-metric true)
-  (switch-focus owner growth-utils/new-metric-slug-placeholder)
+  (om/set-state! owner :focus growth-utils/new-metric-slug-placeholder)
   (om/set-state! owner :data-editing true))
 
 (defn filter-growth-data [focus growth-data]
