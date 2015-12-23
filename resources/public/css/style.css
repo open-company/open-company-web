@@ -937,8 +937,8 @@ div.table-of-contents div.category-section div.category-section-close {
   background-size: 20px 20px;
 }
 
-div.table-of-contents div.category-section:hover div.category-section-close,
-div.table-of-contents div.category-sortable.ui-draggable-dragging div.category-section-close{
+div.table-of-contents div.category-section:hover div.category-section-close:not(.read-only),
+div.table-of-contents div.category-sortable.ui-draggable-dragging div.category-section-close:not(.read-only) {
   opacity: 1;
 }
 
@@ -953,8 +953,8 @@ div.table-of-contents div.category-section div.category-section-sortable {
   background-size: 20px 30px;
 }
 
-div.table-of-contents div.category-section:hover div.category-section-sortable,
-div.table-of-contents div.category-section.ui-draggable-dragging div.category-section-sortable{
+div.table-of-contents div.category-section:hover div.category-section-sortable:not(.read-only),
+div.table-of-contents div.category-section.ui-draggable-dragging div.category-section-sortable:not(.read-only) {
 opacity: 1;
 }
 
