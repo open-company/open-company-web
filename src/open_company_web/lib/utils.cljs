@@ -354,6 +354,19 @@
 
 (def finances-empty-notes {:notes {:body ""}})
 
+(defn lowercase [string]
+  (clojure.string/lower-case string))
+
+(defn link-for
+  ([links rel] (some #(if (= (:rel %) rel) % nil) links))
+  ([links rel method] (some #(if (and (= (lowercase (:method %)) (lowercase method)) (= (:rel %) rel)) % nil) links)))
+
+(defn readonly? [links]
+  (let [update (link-for links "update" "PUT")
+        partial-update (link-for links "update" "PATCH")
+        delete (link-for links "delete" "DELETE")]
+    (or (nil? update) (nil? partial-update))))
+
 (defn fix-finances [section-body]
   (let [finances-data (if (contains? section-body :data) (:data section-body) [])
         fixed-finances (calc-burnrate-runway finances-data)
@@ -366,7 +379,7 @@
 (defn fix-section 
   "Add `:section` name, `:as-of` and `:read-only` keys to the section map"
   [section-body section-name & [read-only]]
-  (let [read-only (or read-only false)
+  (let [read-only (or read-only (readonly? (:links section-body)) false)
         with-read-only (-> section-body
                         (assoc :section (name section-name))
                         (assoc :as-of (:updated-at section-body))
@@ -377,12 +390,14 @@
 
 (defn fix-sections [company-data]
   "Add section name in each section and a section sorter"
-  (let [section-keys (get-section-keys company-data)]
-    (loop [body company-data
+  (let [links (:links company-data)
+        section-keys (get-section-keys company-data)
+        fixed-company-data (assoc company-data :read-only (readonly? links))]
+    (loop [body fixed-company-data
            idx  0]
       (if (< idx (count section-keys))
         (let [section-name (section-keys idx)
-              section-body (section-name company-data)
+              section-body (section-name body)
               fixed-section (fix-section section-body section-name)
               fixed-body (assoc body section-name fixed-section)]
           (recur fixed-body
@@ -406,10 +421,6 @@
 (defn as-of-now []
   (let [date (js-date)]
     (as-of date)))
-
-(defn link-for
-  ([links rel] (some #(if (= (:rel %) rel) % nil) links))
-  ([links rel method] (some #(if (and (= (:method %) method) (= (:rel %) rel)) % nil) links)))
 
 (defn px [n]
   (str n "px"))
