@@ -141,7 +141,8 @@
           growth-metrics (:metrics section-data)
           growth-data (:data section-data)
           notes-data (:notes section-data)
-          read-only (:read-only data)
+          read-only-section (:read-only section-data)
+          read-only (or (:read-only data) read-only-section)
           focus-metric-data (filter #(= (:slug %) focus) growth-data)
           focus-metric-info (first (filter #(= (:slug %) focus) growth-metrics))
           subsection-data {:metric-data focus-metric-data
@@ -183,7 +184,8 @@
                           :title mname
                           :data-tab mslug
                           :on-click #(subsection-click % owner)} mname))))
-            (om/build add-metric {:click-callback nil :metrics-count (count growth-metrics)}))
+            (when-not read-only
+              (om/build add-metric {:click-callback nil :metrics-count (count growth-metrics)})))
           (dom/div {:class (utils/class-set {:composed-section-body true
                                              :editable (not read-only)})}
             ;; growth metric currently shown
@@ -198,7 +200,7 @@
               (om/build rich-editor {:editing notes-editing
                                      :section :growth
                                      :body-counter (om/get-state owner :body-counter)
-                                     :read-only (:read-only data)
+                                     :read-only read-only
                                      :body (om/get-state owner :notes-body)
                                      :placeholder (or (:body-placeholder section-data)
                                                       (str section-name " notes here..."))
