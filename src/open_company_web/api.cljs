@@ -60,7 +60,7 @@
 
 (defn save-or-create-company[data]
   (when data
-    (let [company-data (dissoc data :headcount :finances :compensation :links)
+    (let [company-data (dissoc data :headcount :finances :compensation :links :read-only)
           json-data (cljs->json company-data)
           company-link (utils/link-for (:links data) "update")]
       (api-put (:href company-link)
@@ -137,7 +137,7 @@
   (when finances-data
     (let [links (:links finances-data)
           slug (:slug @router/path)
-          data {:data (map #(dissoc % :burn-rate :runway :avg-burn-rate :value :new) (:data finances-data))}
+          data {:data (map #(dissoc % :burn-rate :runway :avg-burn-rate :value :new :read-only) (:data finances-data))}
           json-data (cljs->json data)
           finances-link (utils/link-for links "partial-update" "PATCH")]
       (api-patch (:href finances-link)
