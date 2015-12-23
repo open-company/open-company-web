@@ -46,6 +46,8 @@
                           :placeholder "Target (optional)"
                           :cell-state cell-state
                           :draft-cb #(change-cb :target %)
+                          :prefix (:prefix data)
+                          :suffix (:suffix data)
                           :period period
                           :key :target
                           :tab-cb tab-cb}))
@@ -55,6 +57,8 @@
                             :placeholder "Value"
                             :cell-state cell-state
                             :draft-cb #(change-cb :value %)
+                            :prefix (:prefix data)
+                            :suffix (:suffix data)
                             :period period
                             :key :value
                             :tab-cb tab-cb})))))))
@@ -136,8 +140,11 @@
   (render [_]
     (let [metric-info (get-current-metric-info data)
           metric-data (om/get-state owner :sorted-data)
+          prefix (utils/get-symbol-for-currency-code (:unit metric-info))
+          suffix (when (= (:unit metric-info) "%") "%")
           rows-data (vec (map (fn [row]
-                                (let [v {:prefix (:unit metric-info)
+                                (let [v {:prefix prefix
+                                         :suffix suffix
                                          :interval (:interval metric-info)
                                          :change-cb (fn [k v]
                                                       (replace-row-in-data owner data metric-data row k v))
