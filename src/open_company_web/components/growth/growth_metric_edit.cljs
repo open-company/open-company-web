@@ -141,6 +141,11 @@
      :prompt (:prompt growth-defaults)
      :metrics available-metrics}))
 
+(def metric-defaults {
+  :unit "number"
+  :interval "monthly"
+  :target "increase"})
+
 (defcomponent growth-metric-edit [data owner]
 
   (init-state [_]
@@ -162,10 +167,10 @@
        :metric-name (:name metric-info)
        :metric-slug (:slug metric-info)
        :description (:description metric-info)
-       :unit (if new-metric company-currency-code (:unit metric-info))
+       :unit (if new-metric (:unit metric-defaults) (:unit metric-info))
        :units fixed-units
-       :interval (if new-metric "monthly" (:interval metric-info))
-       :target (if new-metric "increase" (:target metric-info))
+       :interval (if new-metric (:interval metric-defaults) (:interval metric-info))
+       :target (if new-metric (:target metric-defaults) (:target metric-info))
        :currency company-currency-code}))
 
   (did-mount [_]
@@ -179,6 +184,7 @@
                                 (fn []
                                   (om/update-state! owner :req-libs-loaded (fn [] true))
                                   (init-select2 owner data))))
+
   (render [_]
     (let [{:keys [new-growth-section metric-info]} data
           {:keys [metrics intervals target prompt] :as presets} (om/get-state owner :presets)
