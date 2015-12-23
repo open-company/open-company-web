@@ -19,21 +19,23 @@
                 :success-color-class "red"}))
 
 (defcomponent table-of-contents-item [data owner]
-  
-  (display-name [_] (str "table-of-contents-item" (:seciton data)))
-  
+
   (render [_]
     (let [category (:category data)
           section (:section data)]
       (dom/div {:class (str "category-sortable category-" category)
                 :id (str "section-sort--" (name section))}
         (dom/div {:class "category-section"}
-          (dom/div {:class "category-section-close"
-                    :on-click #(show-delete-confirm-popover (:title data) (name section))})
+          (dom/div {:class (utils/class-set {:category-section-close true
+                                             :read-only (:read-only data)})
+                    :on-click (fn [e]
+                                (when-not (:read-only data)
+                                  (show-delete-confirm-popover (:title data) (name section))))})
           (dom/a {:href "#"
                   :on-click (fn [e]
                               (.preventDefault e)
                               (utils/scroll-to-section (name section)))}
             (dom/span {:class "section-title"} (:title data))
             (dom/span {:class "section-date"} (utils/time-since (:updated-at data))))
-          (dom/div {:class "category-section-sortable"}))))))
+          (dom/div {:class (utils/class-set {:category-section-sortable true
+                                             :read-only (:read-only data)})}))))))

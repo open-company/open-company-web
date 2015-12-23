@@ -115,7 +115,8 @@
     {:new-sections-requested false})
 
   (did-mount [_]
-    (setup-sortable (:categories data))
+    (when-not (:read-only data)
+      (setup-sortable (:categories data)))
     (get-new-sections-if-needed owner)
     (let [add-section-chan (chan)]
       (utils/add-channel "add-section" add-section-chan)
@@ -132,11 +133,13 @@
 
   (did-update [_ _ _]
     (get-new-sections-if-needed owner)
-    (setup-sortable (:categories data)))
+    (when-not (:read-only data)
+      (setup-sortable (:categories data))))
 
   (render [_]
     (let [sections (:sections data)
-          categories (:categories data)]
+          categories (:categories data)
+          readonly-company (:read-only data)]
       (dom/div #js {:className "table-of-contents" :ref "table-of-contents"}
         (dom/div {:id "last-add-section-info"
                   :data-category ""
@@ -150,8 +153,9 @@
                 (dom/div {:class (utils/class-set {:category true
                                                    :empty (empty? sections)})}
                          (dom/h3 (utils/camel-case-str (name category))))
-                (om/build add-section {:category category
-                                       :section finances-utils/first-section-placeholder})
+                (when-not readonly-company
+                  (om/build add-section {:category category
+                                         :section finances-utils/first-section-placeholder}))
                 (dom/div {:class "category-sections-container"}
                   (for [section sections]
                     (let [section-data ((keyword section) data)]
@@ -159,8 +163,10 @@
                         (om/build table-of-contents-item {
                                             :category category
                                             :section section
+                                            :read-only readonly-company
                                             :title (or (:title section-data) (:title-placeholder section-data))
                                             :updated-at (:updated-at section-data)
                                             :show-popover #(show-popover % (name category) (:name section-data))})
-                        (om/build add-section {:category (name category)
-                                               :section (:section section-data)})))))))))))))
+                        (when-not readonly-company
+                          (om/build add-section {:category (name category)
+                                                 :section (:section section-data)}))))))))))))))
