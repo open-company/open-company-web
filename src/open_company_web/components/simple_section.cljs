@@ -101,12 +101,14 @@
           body-change-fn (partial change-cb owner :body)
           cancel-fn #(cancel-cb owner data)
           cancel-if-needed-fn #(cancel-if-needed-cb owner data)
-          save-fn #(save-cb owner data)]
+          save-fn #(save-cb owner data)
+          read-only-section (:read-only section-data)
+          read-only (or (:read-only data) read-only-section)]
       (dom/div {:class "simple-section section-container"
                 :id (str "section-" (name section))}
 
         (om/build editable-title {:editing title-editing
-                                  :read-only (:read-only data)
+                                  :read-only read-only
                                   :title (om/get-state owner :title)
                                   :placeholder (or (:title-placeholder section-data) section-name)
                                   :section (:section data)
@@ -120,7 +122,7 @@
           (om/build rich-editor {:editing body-editing
                                  :section section
                                  :body-counter (om/get-state owner :body-counter)
-                                 :read-only (:read-only data)
+                                 :read-only read-only
                                  :body (om/get-state owner :body)
                                  :placeholder (or (:body-placeholder section-data)
                                                   (str section-name " notes here..."))
