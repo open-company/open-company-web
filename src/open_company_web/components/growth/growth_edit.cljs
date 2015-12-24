@@ -7,6 +7,8 @@
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.components.growth.growth-metric-edit :refer (growth-metric-edit)]
             [open-company-web.components.utility-components :refer (editable-pen)]
+            [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dispatcher]
             [cljs.core.async :refer (put!)]))
 
 (defn signal-tab [period k]
@@ -140,7 +142,11 @@
   (render [_]
     (let [metric-info (get-current-metric-info data)
           metric-data (om/get-state owner :sorted-data)
-          prefix (utils/get-symbol-for-currency-code (:unit metric-info))
+          slug (keyword (:slug @router/path))
+          company-data (slug @dispatcher/app-state)
+          prefix (if (= (:unit metric-info) "currency")
+                   (utils/get-symbol-for-currency-code (:currency company-data))
+                   "")
           suffix (when (= (:unit metric-info) "%") "%")
           rows-data (vec (map (fn [row]
                                 (let [v {:prefix prefix
