@@ -212,9 +212,11 @@
           growth-data (om/get-state owner :growth-data)
           fixed-growth-data (clean-growth-data growth-data)
           growth-metrics (om/get-state owner :growth-metrics)
+          growth-metric-slugs (om/get-state owner :growth-metric-slugs)
+          metrics-vec (vec (map #(get growth-metrics %) growth-metric-slugs))
           section-data {:title title
                         :data fixed-growth-data
-                        :metrics (vec (vals growth-metrics))
+                        :metrics metrics-vec
                         :notes {:body notes-body}}]
       (if (om/get-state owner :oc-editing)
         ; save a new section
