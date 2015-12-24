@@ -16,7 +16,8 @@
             [open-company-web.lib.section-utils :as section-utils]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.components.growth.utils :as growth-utils]
-            [open-company-web.caches :refer (company-cache)]))
+            [open-company-web.caches :refer (company-cache)]
+            [cuerdas.core :as s]))
 
 (def focus-cache-key :last-selected-metric)
 
@@ -136,25 +137,32 @@
   (om/set-state! owner k v))
 
 (defn get-growth-value [v]
-  (if (js/isNaN v)
-    0
-    v))
+  (if (s/blank? v)
+    ""
+    (if (js/isNaN v)
+      0
+      v)))
 
 (defn fix-row [row]
-  (let [fixed-value (assoc row :value (get-growth-value (:value row)))
-        fixed-target (assoc fixed-value :target (get-growth-value (:target row)))
-        fixed-row (if (or (not (clojure.string/blank? (:value row)))
-                          (not (clojure.string/blank? (:target row))))
-                    (dissoc fixed-target :new)
-                    (assoc fixed-target :new true))]
-    fixed-row))
+  (let [fixed-value (get-growth-value (:value row))
+        with-fixed-value (if (s/blank? fixed-value)
+                           (dissoc row :value)
+                           (assoc row :value fixed-value))
+        fixed-target (get-growth-value (:target with-fixed-value))
+        with-fixed-target (if (s/blank? fixed-target)
+                           (dissoc with-fixed-value :target)
+                           (assoc with-fixed-value :target fixed-target))]
+    with-fixed-target))
 
 (defn change-growth-cb [owner row]
   (let [fixed-row (fix-row row)
         period (:period fixed-row)
         slug (:slug fixed-row)
         growth-data (om/get-state owner :growth-data)
-        fixed-data (assoc growth-data (str period slug) fixed-row)]
+        fixed-data (if (and (not (:target fixed-row))
+                            (not (:value fixed-row)))
+                     (dissoc growth-data (str period slug))
+                     (assoc growth-data (str period slug) fixed-row))]
     (om/set-state! owner :growth-data fixed-data)))
 
 (defn change-growth-metric-cb [owner data slug properties-map]
@@ -171,12 +179,13 @@
                       (assoc metrics slug new-metric))
         focus (om/get-state owner :focus)]
     (when change-slug
-      ; switch the focus to the new metric-slug
       (let [slugs (om/get-state owner :growth-metric-slugs)
             remove-slug (vec (remove #(= % slug) slugs))
             add-slug (conj remove-slug (:slug properties-map))]
-        (om/set-state! owner :growth-metric-slugs add-slug)
-        (om/set-state! owner :focus (:slug properties-map))))
+        ; switch the focus to the new metric-slug
+        (om/set-state! owner :focus (:slug properties-map))
+        ; save the new metrics list
+        (om/set-state! owner :growth-metric-slugs add-slug)))
     (om/set-state! owner :growth-metrics new-metrics)))
 
 (defn clean-data [data]
