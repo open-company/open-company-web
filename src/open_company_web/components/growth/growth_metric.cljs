@@ -7,6 +7,8 @@
             [open-company-web.lib.oc-colors :as occ]
             [open-company-web.components.utility-components :refer (editable-pen)]
             [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dispatcher]
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
 
@@ -23,7 +25,7 @@
         value (or (:value obj) 0)
         target (or (:target obj) 0)
         label (get-graph-tooltip column-name prefix value suffix)
-        target-label (get-graph-tooltip "target" prefix (.toLocaleString target) suffix)
+        target-label (get-graph-tooltip (str column-name " target") prefix (.toLocaleString target) suffix)
         period (utils/get-period-string (:period obj) interval [:short])
         values (if has-target
                  [period
@@ -72,7 +74,9 @@
 (defcomponent growth-metric [data owner]
 
   (render [_]
-    (let [metric-info (:metric-info data)
+    (let [slug (keyword (:slug @router/path))
+          company-data (slug @dispatcher/app-state)
+          metric-info (:metric-info data)
           metric-data (:metric-data data)
           sort-pred (utils/sort-by-key-pred :period true)
           sorted-metric (vec (sort #(sort-pred %1 %2) metric-data))
@@ -82,10 +86,9 @@
           interval (:interval metric-info)
           period (utils/get-period-string (:period actual-set) interval)
           metric-unit (:unit metric-info)
-          cur-unit (utils/get-symbol-for-currency-code metric-unit)
-          fixed-cur-unit (if (= cur-unit metric-unit)
-                            nil
-                            cur-unit)
+          fixed-cur-unit (if (= metric-unit "currency")
+                           (utils/get-symbol-for-currency-code (:currency company-data))
+                           nil)
           unit (if (= metric-unit "%")
                  "%"
                  nil)
