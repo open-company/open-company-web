@@ -104,7 +104,9 @@
       (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))
       (om/set-state! owner :notes-body (:notes-body state))
       (when (om/get-state owner :new-metric)
-        (let [focus (utils/company-cache-key focus-cache-key)]
+        (let [section-data (:section-data data)
+              first-metric (:slug (first (:metrics section-data)))
+              focus (or (utils/company-cache-key focus-cache-key) first-metric)]
           (switch-focus owner focus)))
       ; and the editing state flags
       (om/set-state! owner :new-metric false)
