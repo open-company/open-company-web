@@ -28,6 +28,7 @@
   (do
 
     (defroute login-route "/login" {:keys [query-params]}
+      (utils/clean-company-caches)
       (if (contains? query-params :jwt)
         (do ; contains :jwt so auth went well
           (cook/set-cookie! :jwt (:jwt query-params) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
@@ -55,6 +56,8 @@
           (om/root login app-state {:target target}))))
 
     (defn home-handler []
+      ; clean the caches
+      (utils/clean-company-caches)
       ; save route
       (router/set-route! ["companies"] {})
       ; load data from api
@@ -75,6 +78,7 @@
       (home-handler))
 
     (defroute company-profile-route "/companies/:slug/profile" {:as params}
+      (utils/clean-company-caches)
       (let [slug (:slug (:params params))
             query-params (:query-params params)]
         ; save route
@@ -86,6 +90,7 @@
         (om/root company app-state {:target target})))
 
     (defroute company-route "/companies/:slug" {:as params}
+      (utils/clean-company-caches)
       (let [slug (:slug (:params params))
             query-params (:query-params params)]
         ; save route
@@ -99,6 +104,7 @@
         (om/root company app-state {:target target})))
 
     (defn section-handler [slug section]
+      (utils/clean-company-caches)
       ; if there are no company data
       (when-not (contains? @app-state (keyword slug))
         ; load data from api
@@ -118,6 +124,7 @@
         (section-handler slug section)))
 
     (defroute user-profile-route "/profile" {:as params}
+      (utils/clean-company-caches)
       (om/root user-profile app-state {:target target}))
 
     (defroute not-found-route "*" []

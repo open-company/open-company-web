@@ -1,12 +1,13 @@
 (ns open-company-web.lib.utils
     (:require [om.core :as om :include-macros true]
               [clojure.string]
-              [open-company-web.lib.iso4217 :refer [iso4217]]
-              [cljs.core.async :refer [put!]]
+              [open-company-web.lib.iso4217 :refer (iso4217)]
+              [cljs.core.async :refer (put!)]
               [open-company-web.router :as router]
               [open-company-web.caches :as caches]
               [cljs-time.format :as cljs-time-format]
-              [cljs-time.core :as cljs-time]))
+              [cljs-time.core :as cljs-time]
+              [open-company-web.caches :refer (company-cache)]))
 
 (defn abs [n] (max n (- n)))
 
@@ -15,23 +16,6 @@
     (fn [a b] (compare (k a) (k b)))
     (fn [a b] (compare (k b) (k a)))))
 
-(defn thousands-separator [number]
-  (let [parts (clojure.string/split (str number) "." 1)
-        int-part (first parts)
-        dec-part (get parts 1)
-        integer-string (clojure.string/replace int-part #"\B(?=(\d{3})+(?!\d))" ",")]
-    (if-not (= dec-part nil)
-      (str integer-string "." dec-part)
-      integer-string)))
-
-(defn thousands-separator-strip [number]
-  (let [num-str (str number)]
-    (clojure.string/replace num-str "," "")))
-
-(defn String->Number [str]
-  (let [n (js/parseFloat str)]
-    (if (js/isNaN n) 0 n)))
-
 (defn display [show]
   (if show
     #js {}
@@ -39,14 +23,16 @@
 
 (defn get-currency [currency-code]
   (let [kw (keyword currency-code)]
-    (get iso4217 kw)))
+    (if (contains? iso4217 kw)
+      (kw iso4217)
+      nil)))
 
 (defn get-symbol-for-currency-code [currency-code]
   (let [currency (get-currency currency-code)
         sym (if (and (contains? currency :symbol)
-                     (> (count (:symbol currency)) 0))
+                     (not (clojure.string/blank? (:symbol currency))))
               (:symbol currency)
-              "$")]
+              currency-code)]
     (or sym (:code currency))))
 
 (def channel-coll (atom {}))
@@ -175,25 +161,6 @@
     "12" "DEC"
     ""))
 
-(defn get-month [period]
-  (let [[year month] (clojure.string/split period "-")]
-    (month-short-string month)))
-
-(defn period-string [period & flags]
-  (let [force-year (in? flags :force-year)
-        short-month-string (in? flags :short-month)
-        [year month] (clojure.string/split period "-")
-        month-str (if short-month-string 
-                    (month-short-string month)
-                    (month-string month))]
-    (if (or (in? flags :force-year) (= month "01") (= month "12"))
-      (str month-str " " year)
-      month-str)))
-
-(defn get-periods [prefix n]
- (let [r (range 1 (+ n 1))]
-    (into [] (for [a r] (str prefix a)))))
-
 (defn redirect! [loc]
   (set! (.-location js/window) loc))
 
@@ -275,8 +242,7 @@
         years-interval (.floor js/Math (/ seconds 31536000))
         months-interval (.floor js/Math (/ seconds 2592000))
         days-interval (.floor js/Math (/ seconds 86400))
-        hours-interval (.floor js/Math (/ seconds 3600))
-        minutes-interval (.floor js/Math (/ seconds 60))]
+        hours-interval (.floor js/Math (/ seconds 3600))]
     (cond
       (pos? years-interval)
       (date-string past-js-date true)
@@ -302,31 +268,13 @@
         from-left (- client-x lf)]
     from-left))
 
-(defn set-caret-position!
-  "Move the caret to the specified position of a certain element"
-  [elem caret-pos]
-  (when elem
-    (cond
-      (.-createTextRange elem)
-      (let [rg (.createTextRange elem)]
-        (.move rg "character" caret-pos)
-        (.select rg))
-
-      (.-selectionStart elem)
-      (do
-        (.focus elem)
-        (.setSelectionRange elem caret-pos caret-pos))
-
-      :else
-      (.focus elem))))
-
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
   [classes]
   (apply str (map #(str " " (name %)) (keys (filter #(second %) classes)))))
 
 (defn period-exists [period data]
-  (if (> (count (filter #(= (:period %) period) data)) 0)
+  (if (pos? (count (filter #(= (:period %) period) data)))
     true
     false))
 
@@ -393,19 +341,9 @@
   (let [sort-pred (sort-by-key-pred :updated-at)]
     (into [] (sort #(sort-pred %1 %2) revisions))))
 
-(defn as-of [date]
-  (let [year (.getFullYear date)
-        month (add-zero (inc (.getMonth date)))
-        day (add-zero (.getDate date))
-        hours (add-zero (.getHours date))
-        minutes (add-zero (.getMinutes date))
-        seconds (add-zero (.getSeconds date))
-        millis (add-zeros (.getMilliseconds date))]
-    (str year "-" month "-" day "T" hours ":" minutes ":" seconds "." millis "Z")))
-
 (defn as-of-now []
   (let [date (js-date)]
-    (as-of date)))
+    (.toISOString date)))
 
 (defn link-for
   ([links rel] (some #(if (= (:rel %) rel) % nil) links))
@@ -463,7 +401,7 @@
         "October - December"))))
 
 
-(def quarterly-input-format (cljs-time-format/formatter "MM-yyyy"))
+(def quarterly-input-format (cljs-time-format/formatter "yyyy-MM"))
 (def monthly-input-format (cljs-time-format/formatter "yyyy-MM"))
 (def weekly-input-format (cljs-time-format/formatter "yyyy-MM-dd"))
 
@@ -472,32 +410,109 @@
   (case interval
     "quarterly"
     quarterly-input-format
-    "monthly"
-    monthly-input-format
     "weekly"
     weekly-input-format
-    :else
-    weekly-input-format))
+    ; else
+    monthly-input-format))
 
-(defn get-period-string [period interval & [flags]]
+(defn date-from-period [period & [interval]]
+  (cljs-time-format/parse (get-formatter interval) period))
+
+(defn period-from-date [date & [interval]]
+  (cljs-time-format/unparse (get-formatter interval) date))
+
+(defn get-period-string [period & [interval flags]]
   "Get descriptive string for the period by interval. Use :short as a flag to get
   the short formatted string."
-  (let [formatter (get-formatter interval)
-        date (cljs-time-format/parse formatter period)]
-    (case interval
+  (let [fixed-interval (or interval "monthly")
+        parsed-date (date-from-period period fixed-interval)
+        month (cljs-time/month parsed-date)
+        year (cljs-time/year parsed-date)
+        plus-one-week-year (cljs-time/year (cljs-time/plus parsed-date (cljs-time/days 7)))
+        minus-one-week-year (cljs-time/year (cljs-time/minus parsed-date (cljs-time/days 7)))
+        needs-year (or (in? flags :force-year)
+                       (case fixed-interval
+                         "weekly"
+                         (or (not= plus-one-week-year year) (not= minus-one-week-year year))
+                         "quarterly"
+                         (or (= month 1) (= month 10))
+                         ;else
+                         (or (= month 1) (= month 12))))]
+    (case fixed-interval
       "quarterly"
-      (str (get-quarter-from-month (cljs-time/month date) flags) " " (cljs-time/year date))
+      (str (get-quarter-from-month (cljs-time/month parsed-date) flags)
+           (when needs-year
+             (str " " (cljs-time/year parsed-date))))
       "monthly"
-      (str (month-string-int (cljs-time/month date) flags))
+      (str (month-string-int (cljs-time/month parsed-date) flags)
+           (when needs-year
+             (str " " (cljs-time/year parsed-date))))
       "weekly"
-      (str (month-string-int (cljs-time/month date) flags) " " (cljs-time/day date)))))
+      (str (month-string-int (cljs-time/month parsed-date) flags)
+           " "
+           (cljs-time/day parsed-date)
+           (when needs-year
+             (str ", " (cljs-time/year parsed-date)))))))
 
 (defn update-page-title [title]
   (set! (.-title js/document) title))
 
-(defn periods-diff-in-months [first-period last-period]
-  (let [[first-year first-month] (clojure.string/split first-period "-")
-        [last-year last-month] (clojure.string/split last-period "-")
-        first-date (cljs-time/date-time (int first-year) (int first-month))
-        last-date (cljs-time/date-time (int last-year) (int last-month))]
-    (cljs-time/in-months (cljs-time/interval first-date last-date))))
+(defn periods-diff [first-period last-period & [interval]]
+  (let [fixed-interval (or interval "monthly")
+        first-date (date-from-period first-period fixed-interval)
+        last-date (date-from-period last-period fixed-interval)]
+    (case fixed-interval
+      "quarterly" (/ (cljs-time/in-months (cljs-time/interval first-date last-date)) 3)
+      "monthly" (cljs-time/in-months (cljs-time/interval first-date last-date))
+      "weekly" (cljs-time/in-weeks (cljs-time/interval first-date last-date)))))
+
+(defn get-month [period & [interval]]
+  (let [fixed-interval (or interval "monthly")
+        date (date-from-period period fixed-interval)
+        month (add-zero (cljs-time/month date))]
+    (case interval
+      "quarterly"
+      (month-short-string month)
+      "weekly"
+      (month-short-string month)
+      ;else
+      (month-short-string month))))
+
+(defn get-month-quarter [current-month]
+  (case
+    (and (> current-month 1)
+         (< current-month 4))
+    1
+    (and (> current-month 4)
+         (< current-month 7))
+    4
+    (and (> current-month 7)
+         (< current-month 9))
+    7
+    (> current-month 9)
+    10))
+
+(defn current-growth-period [interval]
+  (let [now (cljs-time/now)
+        year (cljs-time/year now)
+        month (cljs-time/month now)]
+    (case interval
+      "quarterly"
+      (str year "-" (add-zero (get-month-quarter month)))
+      "monthly"
+      (str year "-" (add-zero month))
+      "weekly"
+      (let [day-of-week (cljs-time/day-of-week now)
+            to-monday (dec day-of-week)
+            monday-date (cljs-time/minus now (cljs-time/days to-monday))]
+        (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (cljs-time/day monday-date))))))
+
+(defn company-cache-key [k & [v]]
+  (let [slug (keyword (:slug @router/path))
+        cc (slug @company-cache)]
+    (when v
+      (swap! company-cache assoc-in [slug k] v))
+    (get cc k nil)))
+
+(defn clean-company-caches []
+  (reset! company-cache {}))

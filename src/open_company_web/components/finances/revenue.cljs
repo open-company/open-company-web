@@ -12,7 +12,6 @@
   (render [_]
     (let [finances-data (:data (:section-data data))
           value-set (first finances-data)
-          period (utils/period-string (:period value-set))
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code (:currency (:company-data data)))
           revenue-val (str cur-symbol (utils/format-value (:revenue value-set)))]

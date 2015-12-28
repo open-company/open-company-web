@@ -4,6 +4,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
+            [cuerdas.core :as s]
             [cljs.core.async :refer [chan <!]]))
 
 ;; Cell component
@@ -19,9 +20,7 @@
   (.toLocaleString value))
 
 (defn- to-state [owner data state]
-  (when (or (= state :draft) (= state :display) (= state :new))
-    ((:draft-cb data) (.parseFloat js/window (.. (om/get-ref owner "edit-field") getDOMNode -value))))
-  (om/update-state! owner :cell-state (fn [_] state))
+  (om/set-state! owner :cell-state state)
   (when (= state :edit)
     (.setTimeout js/window #(let [input (om/get-ref owner "edit-field")]
                               (when input
@@ -38,17 +37,33 @@
       :display
       :new))))
 
+(defn check-value [current initial]
+  (or (= current initial) (and (s/blank? initial) (s/blank? current))))
+
 (defn exit-cell [e owner data]
-  (let [value (.parseFloat js/window (.. e -target -value))
+  (let [raw-value (.. e -target -value)
+        parsed-value (if (s/blank? raw-value)
+                       raw-value
+                       (.parseFloat js/window raw-value))
         init-value (om/get-state owner :inital-value)
         ; if the value is the same as it was at the start
         ; go to the :display state, else go to :draft
-        state (if (= value init-value) :display :draft)
+        state (if (check-value parsed-value init-value)
+                :display
+                :draft)
         ; if the value is empty and it was empty got to the :new state
-        state (if (and (= state :display) (= value "")) :new state)]
+        state (if (and (= state :display)
+                       (s/blank? parsed-value))
+                :new
+                state)]
+    (when (or (= state :draft)
+            (= state :display)
+            (= state :new))
+      ((:draft-cb data) parsed-value))
     (to-state owner data state)))
 
 (defcomponent cell [data owner]
+
   (init-state [_]
     (utils/add-channel (str (:period data) (:key data)) (chan))
     (let [parsed-value (.parseFloat js/window (:value data))
@@ -56,19 +71,27 @@
       {:cell-state (initial-cell-state data)
        :inital-value (:value data)
        :value value}))
+
   (did-mount [_]
     (go (loop []
       (let [ch (utils/get-channel (str (:period data) (:key data)))
             signal (<! ch)]
         (.setTimeout js/window #(to-state owner data :edit) 100)
         (recur)))))
+
   (render [_]
     (let [value (om/get-state owner :value)
-          float-value (.parseFloat js/window value)
+          float-value (if (s/blank? value)
+                        value
+                        (.parseFloat js/window value))
           float-value (if (js/isNaN float-value) 0 float-value)
           formatted-value (format-value float-value)
-          prefix-value (if (:prefix data) (str (:prefix data) formatted-value) formatted-value)
-          final-value (if (:suffix data) (str (:suffix data) prefix-value) prefix-value)
+          prefix-value (if (and (not (s/blank? formatted-value)) (:prefix data))
+                         (str (:prefix data) formatted-value)
+                         formatted-value)
+          final-value (if (and (not (s/blank? formatted-value)) (:suffix data))
+                        (str prefix-value (:suffix data))
+                        prefix-value)
           state (om/get-state owner :cell-state)]
       (dom/div {:class "comp-cell"}
         (case state
@@ -76,7 +99,7 @@
           :new
           (dom/div {:class "comp-cell-int state-new"
                     :on-click #(to-state owner data :edit)}
-            (dom/span {} (:placeholder data)))
+            (dom/span {:class "placeholder"} (:placeholder data)))
 
           :display
           (dom/div {:class "comp-cell-int state-display"
@@ -95,7 +118,7 @@
                        :value value
                        :onFocus #(let [input (.getDOMNode (om/get-ref owner "edit-field"))]
                                    (set! (.-value input) (.-value input)))
-                       :onChange #(om/update-state! owner :value (fn [_] (.. % -target -value)))
+                       :onChange #(om/set-state! owner :value (.. % -target -value))
                        :onBlur #(exit-cell % owner data)
                        :onKeyDown #(cond
 

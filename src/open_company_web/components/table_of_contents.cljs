@@ -151,7 +151,7 @@
                                                    :empty (empty? sections)})}
                          (dom/h3 (utils/camel-case-str (name category))))
                 (om/build add-section {:category category
-                                       :section finances-utils/first-section-placeholder})
+                                       :section section-utils/first-section-placeholder})
                 (dom/div {:class "category-sections-container"}
                   (for [section sections]
                     (let [section-data ((keyword section) data)]

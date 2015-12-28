@@ -1,11 +1,11 @@
 (ns open-company-web.components.finances.finances-edit
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.cell :refer [cell]]
+            [open-company-web.components.cell :refer (cell)]
             [open-company-web.components.finances.utils :as finances-utils]
-            [cljs.core.async :refer [put!]]))
+            [cljs.core.async :refer (put!)]))
 
 (defn signal-tab [period k]
   (let [ch (utils/get-channel (str period k))]
@@ -21,7 +21,7 @@
           cell-state (if is-new :new :display)
           change-cb (:change-cb data)
           next-period (:next-period data)
-          tab-cb (fn [period k]
+          tab-cb (fn [_ k]
                    (cond
                      (= k :cash)
                      (signal-tab (:period finances-data) :revenue)
@@ -45,9 +45,10 @@
           period-month (utils/get-month period)
           needs-year (or (= period-month "JAN")
                          (= period-month "DEC")
-                         (:needs-month data))]
+                         (:needs-year data))]
       (dom/tr {}
-        (dom/td {:class "no-cell"} (utils/period-string (:period finances-data) (when needs-year :force-year)))
+        (dom/td {:class "no-cell"}
+          (utils/get-period-string (:period finances-data) "monthly" (when needs-year [:force-year])))
         ;; cash
         (dom/td {}
           (om/build cell {:value (:cash finances-data)
@@ -88,9 +89,9 @@
 
 (defn replace-row-in-data [owner data finances-data row k v]
   "Find and replace the edited row"
-  ((:change-finances-cb data) (update row k (fn[_]v)))
   (let [array-data (js->clj (to-array finances-data))
         new-row (update row k (fn[_]v))]
+    ((:change-finances-cb data) new-row)
     (loop [idx 0]
       (let [cur-row (get array-data idx)]
         (if (= (:period cur-row) (:period new-row))
@@ -156,8 +157,8 @@
                               finances-data))]
       ; real component
       (dom/div {:class "finances"}
-        (dom/div {:class "finances-body edit"}
-          (dom/table {:class "table table-striped"}
+        (dom/div {:class "composed-section-edit finances-body edit"}
+          (dom/table {:class "table"}
             (dom/thead {}
               (dom/tr {}
                 (dom/th {} "")
@@ -172,7 +173,7 @@
                 (let [row-data (get rows-data idx)
                       next-period (next-period finances-data idx)
                       row (merge row-data {:next-period next-period
-                                           :needs-month (or (= idx 0)
+                                           :needs-year (or (= idx 0)
                                                             (= idx (dec (count rows-data))))})]
                   (om/build finances-edit-row row)))
               (dom/tr {}

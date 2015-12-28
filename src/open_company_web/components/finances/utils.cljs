@@ -7,8 +7,6 @@
 
 (def columns-num 12)
 
-(def first-section-placeholder "firstsectionplaceholder")
-
 (defn chart-data-at-index [data keyw column-name prefix suffix idx]
   (let [data (to-array data)
         obj (get (vec (reverse data)) idx)
@@ -17,19 +15,17 @@
         label (if has-value
                 (if (and (= keyw :runway) (zero? value))
                   "Break-even"
-                  (str (utils/period-string (:period obj)) " " column-name ": " prefix (.toLocaleString (keyw obj)) suffix))
+                  (str (utils/get-period-string (:period obj)) " " column-name ": " prefix (.toLocaleString (keyw obj)) suffix))
                 "N/A")
-        period (utils/period-string (:period obj) :short-month)]
+        period (utils/get-period-string (:period obj) "monthly" [:short])]
     [period
      value
      label]))
 
 (defn- get-past-period [period diff]
-  (let [[year month] (clojure.string/split period "-")
-        period-date (t/date-time (int year) (int month))
-        past-date (t/minus period-date (t/months diff))
-        formatter (utils/get-formatter "monthly")]
-    (f/unparse formatter past-date)))
+  (let [period-date (utils/date-from-period period)
+        past-date (t/minus period-date (t/months diff))]
+    (utils/period-from-date past-date)))
 
 (defn placeholder-data [period]
   {:period period
@@ -44,7 +40,7 @@
 (defn chart-placeholder-data [initial-data]
   (let [first-period (:period (last initial-data))
         last-period (:period (first initial-data))
-        months-diff (utils/periods-diff-in-months first-period last-period)]
+        months-diff (utils/periods-diff first-period last-period)]
     (vec
       (for [idx (range 0 (inc months-diff))]
         (let [prev-period (get-past-period last-period idx)
@@ -58,7 +54,7 @@
         last-period (if (last initial-data)
                       (:period (last initial-data))
                       (get-past-period current-period 12))
-        diff (utils/periods-diff-in-months last-period current-period)
+        diff (utils/periods-diff last-period current-period)
         data-count (max 13 (inc diff))]
     (let [fixed-data (for [idx (range 1 data-count)]
                        (let [prev-period (get-past-period current-period idx)
@@ -88,9 +84,9 @@
       :pattern (if pattern pattern "###,###.##")}))
 
 (defn get-as-of-string [period]
-  (let [[year month] (clojure.string/split period "-")
-        month-name (utils/month-string month)]
-    (str month-name ", " year)))
+  (let [period-date (utils/date-from-period period)
+        month-name (utils/month-string (t/month period-date))]
+    (str month-name ", " (t/year period-date))))
 
 (defn map-placeholder-data [data]
   (let [fixed-data (edit-placeholder-data data)]
