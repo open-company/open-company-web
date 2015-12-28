@@ -360,7 +360,7 @@
 
 (defn readonly? [links]
   (let [update (link-for links "update" "PUT")
-        partial-update (link-for links "update" "PATCH")
+        partial-update (link-for links "partial-update" "PATCH")
         delete (link-for links "delete" "DELETE")]
     (or (nil? update) (nil? partial-update))))
 
@@ -389,7 +389,8 @@
   "Add section name in each section and a section sorter"
   (let [links (:links company-data)
         section-keys (get-section-keys company-data)
-        fixed-company-data (assoc company-data :read-only (readonly? links))]
+        read-only (readonly? links)
+        fixed-company-data (assoc company-data :read-only read-only)]
     (loop [body fixed-company-data
            idx  0]
       (if (< idx (count section-keys))
