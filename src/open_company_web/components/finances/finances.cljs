@@ -273,9 +273,12 @@
           notes-body-change-fn (partial change-cb owner :notes-body)
           title-change-fn (partial change-cb owner :title)
           cancel-if-needed-fn #(cancel-if-needed-cb owner data)
-          start-title-editing-fn #(start-title-editing-cb owner data)
-          start-notes-editing-fn #(start-notes-editing-cb owner data)
-          start-data-editing-fn #(start-data-editing-cb owner data)
+          start-title-editing-fn #(when-not read-only
+                                    (start-title-editing-cb owner data))
+          start-notes-editing-fn #(when-not read-only
+                                    (start-notes-editing-cb owner data))
+          start-data-editing-fn #(when-not read-only
+                                   (start-data-editing-cb owner data))
           subsection-data {:section-data section-data
                            :read-only read-only
                            :currency (:currency data)

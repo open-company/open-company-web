@@ -354,12 +354,9 @@
 
 (def finances-empty-notes {:notes {:body ""}})
 
-(defn lowercase [string]
-  (clojure.string/lower-case string))
-
 (defn link-for
   ([links rel] (some #(if (= (:rel %) rel) % nil) links))
-  ([links rel method] (some #(if (and (= (lowercase (:method %)) (lowercase method)) (= (:rel %) rel)) % nil) links)))
+  ([links rel method] (some #(if (and (= (:method %) method) (= (:rel %) rel)) % nil) links)))
 
 (defn readonly? [links]
   (let [update (link-for links "update" "PUT")
