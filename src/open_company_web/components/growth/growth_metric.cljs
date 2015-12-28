@@ -1,20 +1,18 @@
 (ns open-company-web.components.growth.growth-metric
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros (defcomponent)]
+            [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.charts :refer (column-chart)]
-            [clojure.string :as clj-str]
             [open-company-web.lib.oc-colors :as occ]
+            [open-company-web.components.utility-components :refer (editable-pen)]
+            [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dispatcher]
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
 
-(defn get-columns-num [interval]
-  (case interval
-    "monthly" 12
-    8))
-
-(defn get-graph-tooltip [period label prefix value suffix]
+(defn get-graph-tooltip [label prefix value suffix]
   (str label
        ": "
        (or prefix "")
@@ -24,10 +22,10 @@
 (defn chart-data-at-index [data column-name prefix suffix has-target interval idx]
   (let [data (to-array data)
         obj (get (vec (reverse data)) idx)
-        value (:value obj)
+        value (or (:value obj) 0)
         target (or (:target obj) 0)
-        label (get-graph-tooltip (:period obj) column-name prefix value suffix)
-        target-label (get-graph-tooltip (:period obj) "target" prefix (.toLocaleString target) suffix)
+        label (get-graph-tooltip column-name prefix value suffix)
+        target-label (get-graph-tooltip (str column-name " target") prefix (.toLocaleString target) suffix)
         period (utils/get-period-string (:period obj) interval [:short])
         values (if has-target
                  [period
@@ -43,37 +41,10 @@
                   label])]
     values))
 
-(defn- monthly-past-period [period diff]
-  (let [[year month] (clojure.string/split period "-")
-          period-date (t/date-time (int year) (int month))
-          past-date (t/minus period-date (t/months diff))
-          formatter (utils/get-formatter "monthly")]
-      (f/unparse formatter past-date)))
-
-(defn- get-past-period [period diff interval]
-  (cond
-    ;; TODO: add get-past-period for weekly and quarterly
-    (= interval "monthly")
-    (monthly-past-period period diff)))
-
-(defn chart-placeholder-data [initial-data interval]
-  (let [first-period (:period (last initial-data))
-        last-period (:period (first initial-data))
-        months-diff (utils/periods-diff-in-months first-period last-period)]
-    (vec
-      (for [idx (range 0 (inc months-diff))]
-        (let [prev-period (get-past-period last-period idx interval)
-              period-exists (utils/period-exists prev-period initial-data)]
-          (if period-exists
-            (some #(when (= (:period %) prev-period) %) initial-data)
-            {:period prev-period
-             :slug (:slug first-period)
-             :value nil}))))))
-
 (defn- get-chart-data
   "Vector of max *columns elements of [:Label value]"
-  [data prefix column-name tooltip-suffix interval]
-  (let [fixed-data (chart-placeholder-data data interval)
+  [data prefix slug column-name tooltip-suffix interval]
+  (let [fixed-data (growth-utils/chart-placeholder-data data slug interval)
         has-target (some #(:target %) data)
         chart-data (partial chart-data-at-index fixed-data column-name prefix tooltip-suffix has-target interval)
         columns (if has-target
@@ -92,7 +63,7 @@
         values (vec (map chart-data mapper))]
     { :prefix (if prefix prefix "")
       :columns columns
-      :max-show (get-columns-num interval)
+      :max-show (growth-utils/columns-num interval)
       :values values
       :pattern "###,###.##"
       :column-thickness (if has-target "28" "14")}))
@@ -103,37 +74,41 @@
 (defcomponent growth-metric [data owner]
 
   (render [_]
-    (let [metric-info (:metric-info data)
+    (let [slug (keyword (:slug @router/path))
+          company-data (slug @dispatcher/app-state)
+          metric-info (:metric-info data)
           metric-data (:metric-data data)
           sort-pred (utils/sort-by-key-pred :period true)
           sorted-metric (vec (sort #(sort-pred %1 %2) metric-data))
           actual-idx (get-actual sorted-metric)
           actual-set (sorted-metric actual-idx)
-          actual (.toLocaleString (:value actual-set))
+          actual (.toLocaleString (or (:value actual-set) 0))
           interval (:interval metric-info)
           period (utils/get-period-string (:period actual-set) interval)
           metric-unit (:unit metric-info)
-          cur-unit (utils/get-symbol-for-currency-code metric-unit)
-          fixed-cur-unit (if (= cur-unit metric-unit)
-                            nil
-                            cur-unit)
-          unit (if fixed-cur-unit nil (utils/camel-case-str metric-unit))
-          actual-with-label (if fixed-cur-unit
-                              (str fixed-cur-unit actual)
-                              (str actual (if (= unit "%") "" " ") unit))]
+          fixed-cur-unit (if (= metric-unit "currency")
+                           (utils/get-symbol-for-currency-code (:currency company-data))
+                           nil)
+          unit (if (= metric-unit "%")
+                 "%"
+                 nil)
+          actual-with-label (str fixed-cur-unit actual unit)]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})
-                :key (:slug metric-info)}
+                :key (:slug metric-info)
+                :on-click (:start-editing-cb data)}
         (when (> (count metric-data) 0)
           (dom/div {}
             (dom/div {:class "chart-header-container"}
               (dom/div {:class "target-actual-container"}
                 (dom/div {:class "actual-container"}
-                  (dom/h3 {:class "actual blue"} actual-with-label)
-                  (dom/h3 {:class "actual-label gray"} (str "as of " (utils/get-period-string (:period actual-set) interval))))))
+                  (dom/h3 {:class "actual blue"} actual-with-label
+                    (om/build editable-pen {:click-callback (:start-data-editing-cb data)}))
+                  (dom/h3 {:class "actual-label gray"} (str "as of " period)))))
             (om/build column-chart (get-chart-data sorted-metric
                                                    fixed-cur-unit
+                                                   (:slug metric-info)
                                                    (:name metric-info)
                                                    unit
                                                    interval))))))))

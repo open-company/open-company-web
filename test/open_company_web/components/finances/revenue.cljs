@@ -6,17 +6,24 @@
               [dommy.core :as dommy :refer-macros [sel1 sel]]
               [open-company-web.components.finances.revenue :refer [revenue]]
               [om.dom :as dom :include-macros true]
-              [open-company-web.data.company :refer (company)]))
+              [open-company-web.data.company :refer (company)]
+              [open-company-web.lib.utils :as utils]))
 
 (enable-console-print!)
 
 ; dynamic mount point for components
 (def ^:dynamic c)
 
+(def test-atom {
+  :section-data (:finances (utils/fix-sections company))
+  :read-only false
+  :currency "USD"
+  :start-editing-cb #()})
+
 (deftest test-revenue-component
   (testing "Revenue component"
     (let [c (tu/new-container!)
-          app-state (atom company)
+          app-state (atom test-atom)
           _ (om/root revenue app-state {:target c})
           chart-node (sel1 c [:div.section.revenue])]
       (is (not (nil? chart-node)))

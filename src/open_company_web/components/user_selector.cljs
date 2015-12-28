@@ -41,8 +41,7 @@
   (will-mount [_]
     ; load needed resources
     (cdr/add-style! "/lib/select2/css/select2.css")
-    (cdr/add-scripts! [{:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"}
-                       {:src "/lib/select2/js/select2.js"}]
+    (cdr/add-scripts! [{:src "/lib/select2/js/select2.js"}]
                       (fn []
                         (om/update-state! owner :req-libs-loaded (fn [] true))
                         (init-select2 owner))))

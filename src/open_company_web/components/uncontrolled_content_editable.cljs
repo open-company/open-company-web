@@ -83,7 +83,6 @@
       ; add dependencies:
       ; jQuery UI
       (cdr/add-style! "/lib/jquery-ui/jquery-ui.structure.min.css")
-      (cdr/add-style! "/lib/jquery-ui/jquery-ui.min.css")
       ; Add js synchronously: jquery ui, rangy and hallo
       (cdr/add-scripts! [{:src "/lib/rangy/rangy-core.min.js"}
                          {:src "/lib/hallo/hallo.js"}]

@@ -169,6 +169,7 @@ div.composed-section i.add-metric {
   color: #109DB7;
   opacity: 0;
   cursor: default;
+  font-size: 18px;
 }
 
 div.composed-section:hover i.add-metric {
@@ -206,13 +207,16 @@ div.composed-section div.link-bar a.composed-section-link {
   display: inline-block;
 }
 
-div.finances div.link-bar a.composed-section-link.active {
+div.composed-section div.link-bar a.composed-section-link.active {
   text-decoration: none;
+  font-weight: bold;
+}
+
+div.finances div.link-bar a.composed-section-link.active {
   color: #26C485;
 }
 
 div.growth div.link-bar a.composed-section-link.active {
-  text-decoration: none;
   color: #109DB7;
 }
 
@@ -243,10 +247,6 @@ div.composed-section div.section div.chart-footer-container h3, {
 div.composed-section div.section div.period-container p {
   margin-top: 10px;
   margin-bottom: 0px;
-}
-
-div.composed-section div.section div.chart-header-container div.target-actual-container{
-  height: 70px;
 }
 
 div.composed-section div.section div.chart-footer-container div.target-actual-container {
@@ -528,6 +528,7 @@ div.rich-editor-container button.collapse-button {
 
 .comp-cell .comp-cell-int {
   width: 100%;
+  min-height: 24px;
 }
 
 .comp-cell .comp-cell-int span, .comp-cell .comp-cell-int input {
@@ -539,8 +540,9 @@ div.rich-editor-container button.collapse-button {
   border: 2px solid black;
 }
 
-.comp-cell .state-new span {
+.comp-cell .state-new span.placeholder {
   color: rgba(0, 0, 0, 0.4);
+  font-size: 12px;
 }
 
 .comp-cell .state-display {
@@ -656,34 +658,51 @@ div.finances div.link-bar i.editable-pen {
   opacity: 0;
   margin-left: -20px;
   cursor: pointer;
-  color: #26C485;;
+  color: #26C485;
 }
 
 div.finances:hover div.link-bar.editable i.editable-pen {
   opacity: 1;
 }
 
-div.finances-body table.table td, div.finances-body table.table th {
+div.composed-section-edit div.chart-header-container i.editable-pen {
+  opacity: 0;
+  margin-left: 10px;
+  cursor: pointer;
+  color: #109DB7;
+}
+
+div.composed-section-edit div.chart-header-container:hover i.editable-pen {
+  opacity: 1;
+}
+
+div.composed-section-edit table.table td, div.composed-section-edit table.table th {
   text-align: right;
+  padding: 2px;
+  border: 0px;
 }
 
-div.finances-body table.table td.no-cell {
-  padding-top: 12px;
+div.composed-section-edit table.table>thead>tr>th {
+  border: 0px solid black;
 }
 
-div.finances-body table.table td.new-row-placeholder {
+div.composed-section-edit table.table td.no-cell {
+  padding-top: 6px;
+}
+
+div.composed-section-edit table.table td.new-row-placeholder {
   color: rgba(0, 0, 0, 0.4);
 }
 
-div.finances-body table.table td div.comp-cell {
+div.composed-section-edit table.table td div.comp-cell {
   float: right;
 }
 
-div.finances-body div.finances-edit-buttons {
+div.composed-section-edit div.finances-edit-buttons {
   margin-left: 234px;
 }
 
-div.finances-body div.finances-edit-buttons button.cancel {
+div.composed-section-edit div.finances-edit-buttons button.cancel {
   margin-left: 10px;
 }
 
@@ -872,12 +891,31 @@ button.oc-btn {
   margin-top: 30px;
 }
 
-button.oc-btn.oc-success.disabled {
+button.oc-btn:active,
+button.oc-btn:focus {
+  outline: none;
+}
+
+button.oc-btn.disabled,
+button.oc-btn[disabled] {
   opacity: 0.3;
 }
 
 button.oc-btn.oc-cancel {
   color: rgba(0, 0, 0, 0.4);
+}
+
+button.oc-link {
+  border: 0px solid rgba(0, 0, 0, 0.4);
+  font-size: 10px;
+  margin-left: 0px;
+  margin-right: 20px;
+  height: 20px;
+  width: 60px;
+  border-radius: 0px;
+  background-color: transparent;
+  color: #109DB7;
+  margin-top: 30px;
 }
 
 div.sections-container {
@@ -1062,7 +1100,7 @@ div#new-section-popover-container {
   height: 100%;
   top: 0;
   left: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(255, 255, 255, 0.4);
   z-index: 1031;
 }
 
@@ -1322,7 +1360,7 @@ div.oc-popover-container {
   height: 100%;
   top: 0;
   left: 0;
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0.4);
   z-index: 1031;
 }
 
@@ -1357,4 +1395,60 @@ div.oc-popover {
 
 .blue {
   color: #109DB7;
+}
+
+.black {
+  color: #000000;
+}
+
+.growth-metric-edit-row {
+  width: 500px;
+  margin: 10px 0;
+}
+
+.metric-data-container {
+  width: 250px;
+}
+
+.metric-data-container{
+  float: left;
+}
+
+.metric-data-container label {
+  margin-right: 10px;
+}
+
+.metric-data-container.right{
+  float: right;
+  text-align: right;
+}
+
+.metric-data-container.right span {
+  text-align: left;
+}
+
+.growth-metric-edit-row input#mtr-name,
+.growth-metric-edit-row textarea {
+  background-color: #fff;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  padding: 0px 8px;
+  color: #444;
+  font-size: 14px;
+}
+
+.growth-metric-edit-row input#mtr-name {
+  width: 240px;
+}
+
+.growth-metric-edit-row textarea {
+  width: 500px;
+}
+
+.growth-metric-edit-row textarea {
+  height: 60px;
+}
+
+.growth-metric-edit-row input#mtr-name{
+  height: 28px;
 }

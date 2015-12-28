@@ -150,11 +150,15 @@
         (dom/div {:class (utils/class-set {:prev-values true
                                            :values-navigator true
                                            :hidden (not (> data-count (+ (* page max-show) max-show)))})
-                  :on-click #(previous-values owner chart-data)}
+                  :on-click (fn [e]
+                              (previous-values owner chart-data)
+                              (.stopPropagation e))}
           (dom/i {:class "fa fa-caret-left"}))
         (dom/div #js {:className "chart-container column-chart" :ref "column-chart" })
         (dom/div {:class (utils/class-set {:next-values true
                                            :values-navigator true
                                            :hidden (zero? (om/get-state owner :page))})
-                  :on-click #(next-values owner chart-data)}
+                  :on-click (fn [e]
+                              (next-values owner chart-data)
+                              (.stopPropagation e))}
           (dom/i {:class "fa fa-caret-right"}))))))

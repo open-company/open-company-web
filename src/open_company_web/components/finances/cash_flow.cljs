@@ -13,22 +13,22 @@
         cash-flow (:burn-rate obj)
         cash-flow-pos? (pos? cash-flow)
         abs-cash-flow (utils/abs cash-flow)]
-    [(utils/period-string (:period obj) :short-month)
+    [(utils/get-period-string (:period obj) "monthly" [:short])
      (:revenue obj)
      (occ/fill-color :green)
-     (str (utils/period-string (:period obj))
+     (str (utils/get-period-string (:period obj))
           " Revenue: "
           prefix
           (.toLocaleString (or (:revenue obj) 0)))
      (:costs obj)
      (occ/fill-color :red)
-     (str (utils/period-string (:period obj))
+     (str (utils/get-period-string (:period obj))
           " Costs: "
           prefix
           (.toLocaleString (or (:costs obj) 0)))
      abs-cash-flow
      (occ/fill-color (if cash-flow-pos? :green :red))
-     (str (utils/period-string (:period obj))
+     (str (utils/get-period-string (:period obj))
           " Cash flow: "
           (when (neg? cash-flow) "-")
           prefix
@@ -62,7 +62,6 @@
           sort-pred (utils/sort-by-key-pred :period true)
           sorted-finances (sort #(sort-pred %1 %2) finances-data)
           value-set (first sorted-finances)
-          period (utils/period-string (:period value-set))
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
           cash-val (str cur-symbol (utils/format-value (:cash value-set)))
