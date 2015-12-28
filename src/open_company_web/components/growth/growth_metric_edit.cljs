@@ -155,7 +155,7 @@
           presets (get-presets data)
           units (:units presets)
           fixed-units (vec (map #(if (= (:unit %) "currency")
-                                   {:unit company-currency-code
+                                   {:unit "currency"
                                     :name (utils/get-symbol-for-currency-code company-currency-code)}
                                    %) units))
           new-metric (:new-metric data)]
@@ -213,15 +213,12 @@
                          :id "mtr-unit"
                          :placeholder "Metric unit"
                          :style {"width" "150px"}}
-              (dom/option {:value ""} "Unit")
               (for [unit units]
                 (let [currency (om/get-state owner :currency)
                       unit-value (:unit unit)
-                      unit-name (or (:name unit) )]
+                      unit-name (:name unit)]
                   (dom/option {:key unit-value
-                               :value (if (= unit-value "currency")
-                                        (om/get-state owner :currency)
-                                        unit-value)} unit-name))))))
+                               :value unit-value} unit-name))))))
         ; textarea
         (dom/div {:class "growth-metric-edit-row group"}
           (dom/textarea {:class "metric-data metric-description"
@@ -256,7 +253,6 @@
                                         (not (:new-metric data)))
                          :placeholder "Metric interval"
                          :style {"width" "150px"}}
-              (dom/option {:value ""} "Interval")
               (for [interval intervals]
                 (dom/option {:value interval} (utils/camel-case-str interval))))))
         (dom/div {:class "growth-metric-edit-row group"}
