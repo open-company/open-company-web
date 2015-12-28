@@ -13,8 +13,7 @@
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [open-company-web.api :as api]
             [open-company-web.components.table-of-contents-item :refer (table-of-contents-item)]
-            [open-company-web.lib.section-utils :as section-utils]
-            [open-company-web.components.finances.utils :as finances-utils]))
+            [open-company-web.lib.section-utils :as section-utils]))
 
 (defn get-category-section-info [e]
   (let [target (.-target e)
@@ -155,7 +154,7 @@
                          (dom/h3 (utils/camel-case-str (name category))))
                 (when-not readonly-company
                   (om/build add-section {:category category
-                                         :section finances-utils/first-section-placeholder}))
+                                         :section section-utils/first-section-placeholder}))
                 (dom/div {:class "category-sections-container"}
                   (for [section sections]
                     (let [section-data ((keyword section) data)]
