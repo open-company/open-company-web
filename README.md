@@ -144,4 +144,4 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 Distributed under the [Mozilla Public License v2.0](http://www.mozilla.org/MPL/2.0/).
 
-Copyright © 2015 Transparency, LLC
+Copyright © 2015-2016 Transparency, LLC
