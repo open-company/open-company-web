@@ -25,7 +25,7 @@
     [racehub/om-bootstrap "0.5.3"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
     [noencore "0.2.0"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
-    [com.andrewmcveigh/cljs-time "0.3.14"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
+    [com.andrewmcveigh/cljs-time "0.4.0"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     [funcool/cuerdas "0.7.1"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
   ]
 
@@ -47,7 +47,7 @@
     }
     :devcards [:dev {
       :dependencies [
-      ; --- DO NOT UPDATE DEVCARDS, the 0.2.1-2 code results in an error: Uncaught TypeError: Cannot read property 'render' of undefined
+        ; --- DO NOT UPDATE DEVCARDS, the 0.2.1 code results in an error: Uncaught TypeError: Cannot read property 'render' of undefined
         [devcards "0.2.0-8"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
       ]
     }]
