@@ -16,33 +16,41 @@
   (render [_]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)]
+
       (utils/update-page-title (str "OPENcompany - " (:name company-data)))
+      
       (dom/div {:class "company-container container"}
+
+        ; Company / user header
         (om/build navbar company-data)
+
         (dom/div {:class "container-fluid"}
+        
+          ; ToC
           (dom/div {:class "col-md-3 toc"}
             (om/build table-of-contents company-data))
+        
+          ; White space
           (dom/div {:class "col-md-1"})
+
+          ; Body
           (dom/div {:class "col-md-7 main"}
             (cond
 
+              ; data is loading
               (:loading data)
-              (dom/div
-                (dom/h4 "Loading data..."))
+                (dom/div
+                  (dom/h4 "Loading data..."))
 
-              (contains? @router/path :section)
-              (let [section (keyword (:section @router/path))
-                    section-data (section company-data)]
-                (om/build section-selector {:section-data section-data
-                                            :section section
-                                            :currency (:currency company-data)}))
-
+              ; company profile
               (utils/in? (:route @router/path) "profile")
-              (om/build company-profile data)
+                (om/build company-profile data)
 
+              ; all sections
               (and (not (contains? data :loading)) (contains? data (keyword slug)))
-              (om/build all-sections data)
+                (om/build all-sections data)
 
+              ; error fallback
               :else
               (dom/div
                 (dom/h2 (str (:slug @router/path) " not found"))

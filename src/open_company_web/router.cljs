@@ -1,7 +1,6 @@
 (ns open-company-web.router
   (:require [secretary.core :as secretary]
             [goog.history.Html5History :as history5]))
-  ; (:import [goog.history Html5History]))
 
 (enable-console-print!)
 

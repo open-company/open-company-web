@@ -7,7 +7,6 @@
 
 (defonce app-state (atom {}))
 
-
 (def companies (flux/dispatcher))
 
 (def company (flux/dispatcher))
