@@ -1452,3 +1452,7 @@ div.oc-popover {
 .growth-metric-edit-row input#mtr-name{
   height: 28px;
 }
+
+.navbar-inverse .navbar-nav>li>a{
+  padding: 5px;
+}
