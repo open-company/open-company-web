@@ -20,4 +20,4 @@
       (dom/div {:id "navbar" :class "navbar-collapse collapse"}
         (dom/ul {:class "nav navbar-nav navbar-right"}
           (dom/li {}
-            (om/build user-avatar {})))))))
+            (om/build user-avatar data)))))))
