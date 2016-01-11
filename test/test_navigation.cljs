@@ -5,7 +5,8 @@
             [test.open-company-web.components.list-companies]
             [test.open-company-web.components.navbar]
             [test.open-company-web.components.sidebar]
-            [test.open-company-web.components.section-selector]))
+            [test.open-company-web.components.section-selector]
+            [test.open-company-web.components.ui.new-section-popover]))
 
 (enable-console-print!)
 
@@ -18,4 +19,5 @@
   'test.open-company-web.components.list-companies
   'test.open-company-web.components.navbar
   'test.open-company-web.components.sidebar
-  'test.open-company-web.components.section-selector)
+  'test.open-company-web.components.section-selector
+  'test.open-company-web.components.ui.new-section-popover)

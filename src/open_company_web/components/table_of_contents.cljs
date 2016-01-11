@@ -8,7 +8,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.api :as api]
             [open-company-web.dispatcher :as dispatcher]
-            [open-company-web.components.new-section-popover :refer (new-section-popover)]
+            [open-company-web.components.ui.new-section-popover :refer (new-section-popover)]
             [open-company-web.caches :as caches]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [open-company-web.api :as api]

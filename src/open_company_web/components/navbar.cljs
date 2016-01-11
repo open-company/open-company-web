@@ -1,10 +1,10 @@
 (ns open-company-web.components.navbar
     (:require [om.core :as om :include-macros true]
-              [om-tools.core :as om-core :refer-macros [defcomponent]]
+              [om-tools.core :as om-core :refer-macros (defcomponent)]
               [om-tools.dom :as dom :include-macros true]
-              [open-company-web.components.link :refer [link]]
-              [open-company-web.components.user-avatar :refer [user-avatar]]
-              [open-company-web.components.company-avatar :refer [company-avatar]]
+              [open-company-web.components.ui.link :refer (link)]
+              [open-company-web.components.ui.user-avatar :refer (user-avatar)]
+              [open-company-web.components.ui.company-avatar :refer (company-avatar)]
               [om-bootstrap.nav :as n]
               [open-company-web.router :as router]))
 

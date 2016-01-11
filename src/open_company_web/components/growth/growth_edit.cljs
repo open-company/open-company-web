@@ -2,11 +2,11 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.cell :refer (cell)]
+            [open-company-web.components.ui.cell :refer (cell)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.components.growth.growth-metric-edit :refer (growth-metric-edit)]
-            [open-company-web.components.utility-components :refer (editable-pen)]
+            [open-company-web.components.ui.utility-components :refer (editable-pen)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [cljs.core.async :refer (put!)]))

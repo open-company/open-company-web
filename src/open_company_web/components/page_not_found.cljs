@@ -1,8 +1,8 @@
 (ns open-company-web.components.page-not-found
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.components.link :refer [link]]))
+            [open-company-web.components.ui.link :refer (link)]))
 
 (defcomponent page-not-found [data owner]
   (render [_]
