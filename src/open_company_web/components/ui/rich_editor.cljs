@@ -1,9 +1,9 @@
-(ns open-company-web.components.rich-editor
+(ns open-company-web.components.ui.rich-editor
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.uncontrolled-content-editable :refer [uncontrolled-content-editable]]))
+            [open-company-web.components.ui.uncontrolled-content-editable :refer (uncontrolled-content-editable)]))
 
 (defn set-state! [owner k v]
   (om/update-state! owner k (fn [_]v)))

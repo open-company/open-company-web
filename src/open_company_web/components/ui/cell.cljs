@@ -1,4 +1,4 @@
-(ns open-company-web.components.cell
+(ns open-company-web.components.ui.cell
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om]
             [om-tools.core :as om-core :refer-macros [defcomponent]]

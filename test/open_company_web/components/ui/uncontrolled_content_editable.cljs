@@ -1,10 +1,10 @@
-(ns test.open-company-web.components.uncontrolled-content-editable
+(ns test.open-company-web.components.ui.uncontrolled-content-editable
   (:require [cljs.test :refer-macros (deftest async testing is are use-fixtures)]
             [cljs-react-test.simulate :as sim]
             [cljs-react-test.utils :as tu]
             [om.core :as om :include-macros true]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
-            [open-company-web.components.uncontrolled-content-editable :refer (uncontrolled-content-editable)]
+            [open-company-web.components.ui.uncontrolled-content-editable :refer (uncontrolled-content-editable)]
             [om.dom :as dom :include-macros true]))
 
 (enable-console-print!)
