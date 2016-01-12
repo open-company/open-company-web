@@ -22,6 +22,6 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root login-button app-state {:target c})
-          login-button-node (sel1 c [:a])]
+          login-button-node (sel1 c [:button])]
       (is (not (nil? login-button-node)))
       (tu/unmount! c))))
