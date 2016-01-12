@@ -863,8 +863,12 @@ div.company-avatar a, div.company-avatar a:hover {
 div.company-avatar div.company-avatar-img {
   border: 1px solid black;
   margin-top: -10px;
-  padding: 9px;
   float: left;
+  overflow: hidden;
+}
+
+div.company-avatar div.company-avatar-img.no-image{
+  padding: 9px 11px;
 }
 
 div.company-avatar div.company-avatar-img span.company-avatar-initial {
