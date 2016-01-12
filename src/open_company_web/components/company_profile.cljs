@@ -8,7 +8,7 @@
             [om-bootstrap.panel :as p]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :refer [add-channel get-channel change-value save-values]]
-            [open-company-web.api :refer [save-or-create-company]]
+            [open-company-web.api :as api]
             [cljs.core.async :refer [put! chan <!]]
             [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.lib.iso4217 :refer [iso4217 sorted-iso4217]]))
@@ -31,7 +31,10 @@
           (let [change (<! save-change)
                 slug (:slug @router/path)
                 company-data ((keyword slug) @app-state)]
-            (save-or-create-company company-data)
+            (api/patch-company slug {:name (:name company-data)
+                                     :slug slug
+                                     :currency (:currency company-data)
+                                     :logo (:logo company-data)})
             (recur))))))
   (render [_]
     (let [slug (:slug @router/path)
@@ -66,10 +69,7 @@
                       :value (:slug company-data)
                       :id "slug"
                       :class "form-control"
-                      :maxLength 5
-                      :on-change #(change-value company-data % :slug)
-                      :on-blur #(save-values "save-company")
-                      :placeholder ""}))
+                      :disabled true}))
                   (dom/p {:class "help-block"} "1 to 5 alpha-numeric characters, eg. OPEN, BUFFR, 2XTR"))
 
                 ;; Currency
