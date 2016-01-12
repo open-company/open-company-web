@@ -15,13 +15,15 @@
 (defcomponent company [data owner]
   (render [_]
     (let [slug (:slug @router/path)
-          company-data ((keyword slug) data)]
+          company-data ((keyword slug) data)
+          profile-page (utils/in? (:route @router/path) "profile")]
       (utils/update-page-title (str "OPENcompany - " (:name company-data)))
       (dom/div {:class "company-container container"}
         (om/build navbar company-data)
         (dom/div {:class "container-fluid"}
-          (dom/div {:class "col-md-3 toc"}
-            (om/build table-of-contents company-data))
+          (when-not profile-page
+            (dom/div {:class "col-md-3 toc"}
+              (om/build table-of-contents company-data)))
           (dom/div {:class "col-md-1"})
           (dom/div {:class "col-md-7 main"}
             (cond
@@ -37,7 +39,7 @@
                                             :section section
                                             :currency (:currency company-data)}))
 
-              (utils/in? (:route @router/path) "profile")
+              profile-page
               (om/build company-profile data)
 
               (and (not (contains? data :loading)) (contains? data (keyword slug)))
