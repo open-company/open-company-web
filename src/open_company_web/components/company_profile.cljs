@@ -7,11 +7,31 @@
             [om-bootstrap.nav :as n]
             [om-bootstrap.panel :as p]
             [open-company-web.router :as router]
-            [open-company-web.lib.utils :refer [add-channel get-channel change-value save-values]]
+            [open-company-web.lib.utils :as utils]
             [open-company-web.api :as api]
             [cljs.core.async :refer [put! chan <!]]
             [open-company-web.dispatcher :refer [app-state]]
             [open-company-web.lib.iso4217 :refer [iso4217 sorted-iso4217]]))
+
+(defn- save-company-data [company-data logo]
+  (let [slug (:slug @router/path)]
+    (api/patch-company slug {:name (:name company-data)
+                             :slug slug
+                             :currency (:currency company-data)
+                             :logo logo})))
+
+(defn- check-image [url owner cb]
+  (let [img (new js/Image)]
+    (set! (.-onload img) (fn [e] (cb owner true)))
+    (set! (.-onerror img) (fn [e] (cb owner false)))
+    (set! (.-src img) url)))
+
+(defn- check-img-cb [owner result]
+  (let [slug (:slug @router/path)
+        company-data ((keyword slug) @app-state)]
+    (if result
+      (save-company-data company-data (om/get-state owner :logo))
+      (js/alert "Invalid image url"))))
 
 (defcomponent currency-option [data owner]
   (render [_]
@@ -21,21 +41,35 @@
       (:text data))))
 
 (defcomponent company-profile [data owner]
+
   (init-state [_]
     (let [save-chan (chan)]
-      (add-channel "save-company" save-chan)))
+      (utils/add-channel "save-company" save-chan))
+    (let [slug (:slug @router/path)
+          company-data ((keyword slug) data)]
+      {:initial-logo (:logo company-data)
+       :logo (:logo company-data)}))
+
+  (will-receive-props [_ next-props]
+    (let [slug (:slug @router/path)
+          company-data ((keyword slug) next-props)]
+      (om/set-state! owner :initial-logo (:logo company-data))))
+
   (will-mount [_]
     (om/set-state! owner :selected-tab 1)
-    (let [save-change (get-channel "save-company")]
+    (let [save-change (utils/get-channel "save-company")]
         (go (loop []
-          (let [change (<! save-change)
-                slug (:slug @router/path)
-                company-data ((keyword slug) @app-state)]
-            (api/patch-company slug {:name (:name company-data)
-                                     :slug slug
-                                     :currency (:currency company-data)
-                                     :logo (:logo company-data)})
-            (recur))))))
+          (let [change (<! save-change)]
+            (let [slug (:slug @router/path)
+                  company-data ((keyword slug) data)
+                  logo (om/get-state owner :logo)]
+              (if (not= logo (om/get-state owner :initial-logo))
+                (if (clojure.string/blank? logo)
+                  (save-company-data company-data "")
+                  (check-image logo owner check-img-cb))
+                (save-company-data company-data (:logo company-data)))
+              (recur)))))))
+
   (render [_]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)]
@@ -55,8 +89,8 @@
                       :type "text"
                       :id "name"
                       :value (:name company-data)
-                      :on-change #(change-value company-data % :name)
-                      :on-blur #(save-values "save-company")
+                      :on-change #(utils/change-value company-data % :name)
+                      :on-blur #(utils/save-values "save-company")
                       :class "form-control"}))
                   (dom/p {:class "help-block"} "Casual company name (leave out Inc., LLC, etc.)"))
 
@@ -80,7 +114,7 @@
                       :type "file"
                       :id "currency"
                       :value (:currency company-data)
-                      :on-change (fn [e] (change-value company-data e :currency) (save-values "save-company"))
+                      :on-change (fn [e] (utils/change-value company-data e :currency) (utils/save-values "save-company"))
                       :class "form-control"}
                         (for [currency (sorted-iso4217)]
                           (let [symbol (:symbol currency)
@@ -95,11 +129,11 @@
                   (dom/div {:class "col-sm-5"}
                     (dom/input {
                       :type "text"
-                      :value (:logo company-data)
+                      :value (om/get-state owner :logo)
                       :id "logo"
                       :class "form-control"
                       :maxLength 255
-                      :on-change #(change-value company-data % :logo)
-                      :on-blur #(save-values "save-company")
+                      :on-change #(om/set-state! owner :logo (.. % -target -value))
+                      :on-blur #(utils/save-values "save-company")
                       :placeholder "http://example.com/logo.png"}))
                   (dom/p {:class "help-block"} "Company logo url"))))))))
