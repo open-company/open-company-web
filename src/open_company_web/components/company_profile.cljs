@@ -1,17 +1,17 @@
 (ns open-company-web.components.company-profile
-  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require-macros [cljs.core.async.macros :refer (go)])
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.components.link :refer [link]]
+            [open-company-web.components.ui.link :refer (link)]
             [om-bootstrap.nav :as n]
             [om-bootstrap.panel :as p]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
             [open-company-web.api :as api]
-            [cljs.core.async :refer [put! chan <!]]
-            [open-company-web.dispatcher :refer [app-state]]
-            [open-company-web.lib.iso4217 :refer [iso4217 sorted-iso4217]]))
+            [cljs.core.async :refer (put! chan <!)]
+            [open-company-web.dispatcher :refer (app-state)]
+            [open-company-web.lib.iso4217 :refer (iso4217 sorted-iso4217)]))
 
 (defn- save-company-data [company-data logo]
   (let [slug (:slug @router/path)]

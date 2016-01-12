@@ -1,14 +1,14 @@
 (ns open-company-web.components.page
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.components.navbar :refer [navbar]]
-            [open-company-web.components.link :refer [link]]
-            [open-company-web.components.company-profile :refer [company-profile]]
+            [open-company-web.components.navbar :refer (navbar)]
+            [open-company-web.components.ui.link :refer (link)]
+            [open-company-web.components.company-profile :refer (company-profile)]
             [open-company-web.router :as router]
-            [open-company-web.components.section-selector :refer [section-selector]]
-            [open-company-web.components.all-sections :refer [all-sections]]
-            [open-company-web.components.table-of-contents :refer [table-of-contents]]
+            [open-company-web.components.section-selector :refer (section-selector)]
+            [open-company-web.components.all-sections :refer (all-sections)]
+            [open-company-web.components.table-of-contents :refer (table-of-contents)]
             [clojure.string :as str]
             [open-company-web.lib.utils :as utils]))
 
