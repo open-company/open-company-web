@@ -60,7 +60,7 @@
                 ; Slug
                 (dom/div {:class "form-group"}
                   (dom/label {:for "slug" :class "col-sm-2 control-label"} "Company slug")
-                  (dom/div {:class "col-sm-1"}
+                  (dom/div {:class "col-sm-2"}
                     (dom/input {
                       :type "text"
                       :value (:slug company-data)
@@ -87,4 +87,19 @@
                                 display-symbol (or symbol (:code currency))
                                 label (str (:text currency) " " display-symbol)]
                             (om/build currency-option {:value (:code currency) :text label})))))
-                  (dom/p {:class "help-block"} "Currency business uses for its finances")))))))))
+                  (dom/p {:class "help-block"} "Currency business uses for its finances")))
+
+                ;; Company logo
+                (dom/div {:class "form-group"}
+                  (dom/label {:for "logo" :class "col-sm-2 control-label"} "Logo")
+                  (dom/div {:class "col-sm-5"}
+                    (dom/input {
+                      :type "text"
+                      :value (:logo company-data)
+                      :id "logo"
+                      :class "form-control"
+                      :maxLength 255
+                      :on-change #(change-value company-data % :logo)
+                      :on-blur #(save-values "save-company")
+                      :placeholder "http://example.com/logo.png"}))
+                  (dom/p {:class "help-block"} "Company logo url"))))))))
