@@ -103,7 +103,7 @@
         :compiler {
           :main "test.test-navigation"
           :output-to "target/testable-navigation.js"
-          :source-map "target/testable-navigation.js.map"
+          :source-map false
           :optimizations :none}}
 
       :test-company {
@@ -112,7 +112,7 @@
         :compiler {
           :main "test.test-company"
           :output-to "target/testable-company.js"
-          :source-map "target/testable-company.js.map"
+          :source-map false
           :optimizations :none}}
 
       :test-ui-components {
@@ -121,7 +121,7 @@
         :compiler {
           :main "test.test-ui-components"
           :output-to "target/testable-components.js"
-          :source-map "target/testable-components.js.map"
+          :source-map false
           :optimizations :none}}
   }}
 
