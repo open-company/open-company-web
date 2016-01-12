@@ -11,13 +11,13 @@
             [open-company-web.components.finances.runway :refer (runway)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.update-footer :refer (update-footer)]
-            [open-company-web.components.rich-editor :refer (rich-editor)]
+            [open-company-web.components.ui.rich-editor :refer (rich-editor)]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.section-utils :as section-utils]
             [open-company-web.components.revisions-navigator :refer (revisions-navigator)]
             [open-company-web.api :as api]
-            [open-company-web.components.editable-title :refer (editable-title)]
-            [open-company-web.components.utility-components :refer (editable-pen)]
+            [open-company-web.components.ui.editable-title :refer (editable-title)]
+            [open-company-web.components.ui.utility-components :refer (editable-pen)]
             [open-company-web.components.section-footer :refer (section-footer)]))
 
 (defn get-state [owner data & [initial]]

@@ -1,4 +1,4 @@
-(ns open-company-web.components.uncontrolled-content-editable
+(ns open-company-web.components.ui.uncontrolled-content-editable
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
