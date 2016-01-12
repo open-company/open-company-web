@@ -1,4 +1,4 @@
-(ns open-company-web.components.login-button
+(ns open-company-web.components.ui.login-button
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
