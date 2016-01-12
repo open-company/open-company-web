@@ -46,6 +46,10 @@ a:hover, a:hover *{
     border: 0;
 }
 
+button.login-button {
+  margin-top: 8px;
+}
+
 /* Hide for mobile, show later */
  .sidebar {
     display: none;
