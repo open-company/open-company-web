@@ -1384,6 +1384,12 @@ div.oc-popover {
   padding: 20px 0px 10px 10px;
 }
 
+/* Company profile */
+
+div.profile-container {
+  padding-top: 25px;
+}
+
 /* OC Colors */
 .gray {
   color: #ADADAD;

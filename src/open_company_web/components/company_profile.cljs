@@ -79,11 +79,10 @@
           ;; Company
           1 (dom/div {:class "row"}
               (dom/form {:class "form-horizontal"}
-                (dom/h2 {} (:name company-data))
 
                 ;; Company name
                 (dom/div {:class "form-group"}
-                  (dom/label {:for "name" :class "col-sm-2 control-label"} "Company name")
+                  (dom/label {:for "name" :class "col-sm-3 control-label"} "Company name")
                   (dom/div {:class "col-sm-3"}
                     (dom/input {
                       :type "text"
@@ -96,20 +95,20 @@
 
                 ; Slug
                 (dom/div {:class "form-group"}
-                  (dom/label {:for "slug" :class "col-sm-2 control-label"} "Company slug")
-                  (dom/div {:class "col-sm-2"}
+                  (dom/label {:for "slug" :class "col-sm-3 control-label"} "Company slug")
+                  (dom/div {:class "col-sm-3"}
                     (dom/input {
                       :type "text"
                       :value (:slug company-data)
                       :id "slug"
                       :class "form-control"
                       :disabled true}))
-                  (dom/p {:class "help-block"} "1 to 5 alpha-numeric characters, eg. OPEN, BUFFR, 2XTR"))
+                  (dom/p {:class "help-block"} ""))
 
                 ;; Currency
                 (dom/div {:class "form-group"}
-                  (dom/label {:for "currency" :class "col-sm-2 control-label"} "Currency")
-                  (dom/div {:class "col-sm-2"}
+                  (dom/label {:for "currency" :class "col-sm-3 control-label"} "Currency")
+                  (dom/div {:class "col-sm-5"}
                     (dom/select {
                       :type "file"
                       :id "currency"
@@ -121,11 +120,11 @@
                                 display-symbol (or symbol (:code currency))
                                 label (str (:text currency) " " display-symbol)]
                             (om/build currency-option {:value (:code currency) :text label})))))
-                  (dom/p {:class "help-block"} "Currency business uses for its finances")))
+                  (dom/p {:class "help-block"} "Currency for company finances"))
 
                 ;; Company logo
                 (dom/div {:class "form-group"}
-                  (dom/label {:for "logo" :class "col-sm-2 control-label"} "Logo")
+                  (dom/label {:for "logo" :class "col-sm-3 control-label"} "Logo")
                   (dom/div {:class "col-sm-5"}
                     (dom/input {
                       :type "text"
@@ -136,4 +135,4 @@
                       :on-change #(om/set-state! owner :logo (.. % -target -value))
                       :on-blur #(utils/save-values "save-company")
                       :placeholder "http://example.com/logo.png"}))
-                  (dom/p {:class "help-block"} "Company logo url"))))))))
+                  (dom/p {:class "help-block"} "URL to company logo")))))))))
