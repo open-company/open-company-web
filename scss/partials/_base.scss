@@ -1,0 +1,35 @@
+@import "../modules/_colors";
+
+html, body {
+  font-family: "proxima-nova", sans-serif;
+  height: 100%;
+}
+
+a {
+  cursor: pointer;
+}
+
+a:hover, a:hover *{
+  text-decoration: none;
+}
+
+.group:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/*
+ * Global add-ons
+ */
+ .sub-header {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+/*
+ * Top navigation
+ * Hide default border to remove 1px line.
+ */
+ .navbar-fixed-top {
+    border: 0;
+}
