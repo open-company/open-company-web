@@ -18,7 +18,7 @@
           company-data ((keyword slug) data)]
       (utils/update-page-title (str "OPENcompany - " (:name company-data)))
       (dom/div {:class "company-container container"}
-        (om/build navbar company-data)
+        (om/build navbar data)
         (dom/div {:class "container-fluid"}
           (dom/div {:class "col-md-3 toc"}
             (om/build table-of-contents company-data))

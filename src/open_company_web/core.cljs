@@ -48,7 +48,6 @@
           (router/set-route! ["login"] {})
           ; load data from api
           (swap! app-state assoc :loading true)
-          (api/get-auth-settings)
           (when (contains? query-params :access)
             ;login went bad, add the error message to the app-state
             (swap! app-state assoc :access (:access query-params)))
@@ -144,11 +143,11 @@
                                  not-found-route]))
 
     (defn login-wall []
-      (let [token (router/get-token)]
-        (when-not (.startsWith token "/login")
-          (if (cook/get-cookie :jwt)
-            true
-            (utils/redirect! (str "/login?login-redirect=" (router/get-token)))))))
+      ; load the login settings from auth server
+      ; if the user is not logged in yet
+      (when-not (or (jwt/jwt)
+                    (contains? @app-state :auth-settings))
+        (api/get-auth-settings)))
 
     (defn handle-url-change [e]
       ;; we are checking if this event is due to user action,

@@ -1,12 +1,13 @@
 (ns open-company-web.components.navbar
-    (:require [om.core :as om :include-macros true]
-              [om-tools.core :as om-core :refer-macros (defcomponent)]
-              [om-tools.dom :as dom :include-macros true]
-              [open-company-web.components.ui.link :refer (link)]
-              [open-company-web.components.ui.user-avatar :refer (user-avatar)]
-              [open-company-web.components.ui.company-avatar :refer (company-avatar)]
-              [om-bootstrap.nav :as n]
-              [open-company-web.router :as router]))
+  (:require [om.core :as om :include-macros true]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
+            [om-tools.dom :as dom :include-macros true]
+            [open-company-web.components.ui.user-avatar :refer (user-avatar)]
+            [open-company-web.components.ui.company-avatar :refer (company-avatar)]
+            [open-company-web.components.ui.login-button :refer (login-button)]
+            [om-bootstrap.nav :as n]
+            [open-company-web.router :as router]
+            [open-company-web.lib.jwt :as jwt]))
 
 (defn company-title [data]
   (str (:name data)))
@@ -20,4 +21,6 @@
       (dom/div {:id "navbar" :class "navbar-collapse collapse"}
         (dom/ul {:class "nav navbar-nav navbar-right"}
           (dom/li {}
-            (om/build user-avatar {})))))))
+            (if (jwt/jwt)
+              (om/build user-avatar {})
+              (om/build login-button data))))))))

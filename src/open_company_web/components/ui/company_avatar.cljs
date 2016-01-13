@@ -31,8 +31,6 @@
             (dom/div {:class "company-avatar-img"
                       :style {:width px-size
                               :height px-size
-                              :border-radius bd-radius}
-                      :src (jwt/get-key :avatar)
-                      :title (jwt/get-key :real-name)}
+                              :border-radius bd-radius}}
               (dom/span {:class "company-avatar-initial"} (clojure.string/upper-case first-letter)))
             (dom/div {:class "company-avatar-name"} company-name)))))))

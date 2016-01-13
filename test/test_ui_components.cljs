@@ -5,6 +5,7 @@
             [test.open-company-web.components.ui.charts]
             [test.open-company-web.components.ui.user-selector]
             [test.open-company-web.components.login]
+            [test.open-company-web.components.ui.login-button]
             [test.open-company-web.components.ui.editable-title]
             [test.open-company-web.components.ui.cell]
             [test.open-company-web.components.ui.rich-editor]
@@ -25,6 +26,7 @@
   'test.open-company-web.components.ui.charts
   'test.open-company-web.components.ui.user-selector
   'test.open-company-web.components.login
+  'test.open-company-web.components.ui.login-button
   'test.open-company-web.components.ui.editable-title
   'test.open-company-web.components.ui.cell
   'test.open-company-web.components.ui.rich-editor
