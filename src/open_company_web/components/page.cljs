@@ -19,7 +19,7 @@
           profile-page (utils/in? (:route @router/path) "profile")]
       (utils/update-page-title (str "OPENcompany - " (:name company-data)))
       (dom/div {:class "company-container container"}
-        (om/build navbar company-data)
+        (om/build navbar data)
         (dom/div {:class "container-fluid"}
           (when-not profile-page
             (dom/div {:class "col-md-3 toc"}
