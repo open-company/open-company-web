@@ -18,5 +18,8 @@
 (defn get-cookie [c-name]
   (.get cookies-static-obj (name c-name)))
 
-(defn remove-cookie! [c-name]
-  (.remove cookies-static-obj (name c-name)))
+(defn remove-cookie!
+  ([c-name]
+    (remove-cookie! (name c-name) "/"))
+  ([c-name opt-path]
+    (.remove cookies-static-obj (name c-name) opt-path)))
