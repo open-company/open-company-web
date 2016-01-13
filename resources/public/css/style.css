@@ -860,6 +860,12 @@ div.company-avatar a, div.company-avatar a:hover {
   text-decoration: none;
 }
 
+div.company-avatar img.company-avatar-img{
+  float: left;
+  margin-top: -10px;
+  height: 35px;
+}
+
 div.company-avatar div.company-avatar-img {
   border: 1px solid black;
   margin-top: -10px;
