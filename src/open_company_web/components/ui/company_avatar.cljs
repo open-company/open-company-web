@@ -30,14 +30,14 @@
                   :on-click (fn [e]
                               (.preventDefault e)
                               (router/nav! company-home))}
-            (dom/div {:class (utils/class-set {:company-avatar-img true
-                                               :no-image (clojure.string/blank? company-logo)})
-                      :style {:width px-size
-                              :height px-size
-                              :border-radius bd-radius}}
-              (if-not (clojure.string/blank? company-logo)
-                (dom/img {:src company-logo
-                          :title company-name
-                          :height px-size})
+            (if-not (clojure.string/blank? company-logo)
+              (dom/img {:src company-logo
+                        :class "company-avatar-img"
+                        :title company-name})
+              (dom/div {:class (utils/class-set {:company-avatar-img true
+                                                 :no-image (clojure.string/blank? company-logo)})
+                        :style {:width px-size
+                                :height px-size
+                                :border-radius bd-radius}}
                 (dom/span {:class "company-avatar-initial"} (clojure.string/upper-case first-letter))))
             (dom/div {:class "company-avatar-name"} company-name)))))))
