@@ -56,12 +56,11 @@
       (om/set-state! owner :initial-logo (:logo company-data))))
 
   (will-mount [_]
-    (om/set-state! owner :selected-tab 1)
     (let [save-change (utils/get-channel "save-company")]
         (go (loop []
           (let [change (<! save-change)]
             (let [slug (:slug @router/path)
-                  company-data ((keyword slug) data)
+                  company-data ((keyword slug) @app-state)
                   logo (om/get-state owner :logo)]
               (if (not= logo (om/get-state owner :initial-logo))
                 (if (clojure.string/blank? logo)
@@ -74,65 +73,64 @@
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)]
       (dom/div {:class "profile-container"}
-        (case (om/get-state owner :selected-tab)
+        ;; Company
+        (dom/div {:class "row"}
+          (dom/form {:class "form-horizontal"}
 
-          ;; Company
-          1 (dom/div {:class "row"}
-              (dom/form {:class "form-horizontal"}
+            ;; Company name
+            (dom/div {:class "form-group"}
+              (dom/label {:for "name" :class "col-sm-3 control-label"} "Company name")
+              (dom/div {:class "col-sm-3"}
+                (dom/input {
+                  :type "text"
+                  :id "name"
+                  :value (:name company-data)
+                  :on-change #(utils/change-value company-data % :name)
+                  :on-blur #(utils/save-values "save-company")
+                  :class "form-control"}))
+              (dom/p {:class "help-block"} "Casual company name (leave out Inc., LLC, etc.)"))
 
-                ;; Company name
-                (dom/div {:class "form-group"}
-                  (dom/label {:for "name" :class "col-sm-3 control-label"} "Company name")
-                  (dom/div {:class "col-sm-3"}
-                    (dom/input {
-                      :type "text"
-                      :id "name"
-                      :value (:name company-data)
-                      :on-change #(utils/change-value company-data % :name)
-                      :on-blur #(utils/save-values "save-company")
-                      :class "form-control"}))
-                  (dom/p {:class "help-block"} "Casual company name (leave out Inc., LLC, etc.)"))
+            ; Slug
+            (dom/div {:class "form-group"}
+              (dom/label {:for "slug" :class "col-sm-3 control-label"} "Company slug")
+              (dom/div {:class "col-sm-3"}
+                (dom/input {
+                  :type "text"
+                  :value (:slug company-data)
+                  :id "slug"
+                  :class "form-control"
+                  :disabled true}))
+              (dom/p {:class "help-block"} ""))
 
-                ; Slug
-                (dom/div {:class "form-group"}
-                  (dom/label {:for "slug" :class "col-sm-3 control-label"} "Company slug")
-                  (dom/div {:class "col-sm-3"}
-                    (dom/input {
-                      :type "text"
-                      :value (:slug company-data)
-                      :id "slug"
-                      :class "form-control"
-                      :disabled true}))
-                  (dom/p {:class "help-block"} ""))
+            ;; Currency
+            (dom/div {:class "form-group"}
+              (dom/label {:for "currency" :class "col-sm-3 control-label"} "Currency")
+              (dom/div {:class "col-sm-5"}
+                (dom/select {
+                  :type "file"
+                  :id "currency"
+                  :value (:currency company-data)
+                  :on-change (fn [e] (utils/change-value company-data e :currency)
+                               (utils/save-values "save-company"))
+                  :class "form-control"}
+                    (for [currency (sorted-iso4217)]
+                      (let [symbol (:symbol currency)
+                            display-symbol (or symbol (:code currency))
+                            label (str (:text currency) " " display-symbol)]
+                        (om/build currency-option {:value (:code currency) :text label})))))
+              (dom/p {:class "help-block"} "Currency for company finances"))
 
-                ;; Currency
-                (dom/div {:class "form-group"}
-                  (dom/label {:for "currency" :class "col-sm-3 control-label"} "Currency")
-                  (dom/div {:class "col-sm-5"}
-                    (dom/select {
-                      :type "file"
-                      :id "currency"
-                      :value (:currency company-data)
-                      :on-change (fn [e] (utils/change-value company-data e :currency) (utils/save-values "save-company"))
-                      :class "form-control"}
-                        (for [currency (sorted-iso4217)]
-                          (let [symbol (:symbol currency)
-                                display-symbol (or symbol (:code currency))
-                                label (str (:text currency) " " display-symbol)]
-                            (om/build currency-option {:value (:code currency) :text label})))))
-                  (dom/p {:class "help-block"} "Currency for company finances"))
-
-                ;; Company logo
-                (dom/div {:class "form-group"}
-                  (dom/label {:for "logo" :class "col-sm-3 control-label"} "Logo")
-                  (dom/div {:class "col-sm-5"}
-                    (dom/input {
-                      :type "text"
-                      :value (om/get-state owner :logo)
-                      :id "logo"
-                      :class "form-control"
-                      :maxLength 255
-                      :on-change #(om/set-state! owner :logo (.. % -target -value))
-                      :on-blur #(utils/save-values "save-company")
-                      :placeholder "http://example.com/logo.png"}))
-                  (dom/p {:class "help-block"} "URL to company logo")))))))))
+            ;; Company logo
+            (dom/div {:class "form-group"}
+              (dom/label {:for "logo" :class "col-sm-3 control-label"} "Logo")
+              (dom/div {:class "col-sm-5"}
+                (dom/input {
+                  :type "text"
+                  :value (om/get-state owner :logo)
+                  :id "logo"
+                  :class "form-control"
+                  :maxLength 255
+                  :on-change #(om/set-state! owner :logo (.. % -target -value))
+                  :on-blur #(utils/save-values "save-company")
+                  :placeholder "http://example.com/logo.png"}))
+              (dom/p {:class "help-block"} "URL to company logo"))))))))
