@@ -75,6 +75,24 @@
           (let [body (if (:success response) (json->cljs (:body response)) {})]
             (flux/dispatch dispatcher/company body)))))))
 
+(defn patch-company [slug data]
+  (when data
+    (let [company-data (dissoc data :links :read-only :revisions)
+          json-data (cljs->json company-data)
+          links (:links ((keyword slug) @dispatcher/app-state))
+          company-link (utils/link-for links "partial-update" "PATCH")]
+      (api-patch (:href company-link)
+        { :json-params json-data
+          :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (:type company-link)
+          }}
+        (fn [response]
+          (let [body (if (:success response) (json->cljs (:body response)) {})]
+            (flux/dispatch dispatcher/company body)))))))
+
 (defn get-auth-settings []
   (auth-get "/auth-settings" {
         :headers {

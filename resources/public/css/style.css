@@ -864,11 +864,21 @@ div.company-avatar a, div.company-avatar a:hover {
   text-decoration: none;
 }
 
+div.company-avatar img.company-avatar-img{
+  float: left;
+  margin-top: -10px;
+  height: 35px;
+}
+
 div.company-avatar div.company-avatar-img {
   border: 1px solid black;
   margin-top: -10px;
-  padding: 9px;
   float: left;
+  overflow: hidden;
+}
+
+div.company-avatar div.company-avatar-img.no-image{
+  padding: 9px 11px;
 }
 
 div.company-avatar div.company-avatar-img span.company-avatar-initial {
@@ -1382,6 +1392,12 @@ div.oc-popover {
   border-radius: 4px;
   overflow: auto;
   padding: 20px 0px 10px 10px;
+}
+
+/* Company profile */
+
+div.profile-container {
+  padding-top: 25px;
 }
 
 /* OC Colors */

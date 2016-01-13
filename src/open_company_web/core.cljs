@@ -81,7 +81,7 @@
       (let [slug (:slug (:params params))
             query-params (:query-params params)]
         ; save route
-        (router/set-route! ["companies" slug] {:slug slug :query-params query-params})
+        (router/set-route! ["companies" slug "profile"] {:slug slug :query-params query-params})
         ; load data from api
         (api/get-company slug)
         (swap! app-state assoc :loading true)

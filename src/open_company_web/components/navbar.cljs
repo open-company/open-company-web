@@ -17,7 +17,8 @@
     (n/navbar {:inverse? true :fixed-top? true :fluid true :collapse? true}
       (dom/div {:class "navbar-header"}
         (when (contains? @router/path :slug)
-          (om/build company-avatar {:company-data data :navbar-brand true})))
+          (let [slug (keyword (:slug @router/path))]
+            (om/build company-avatar {:company-data (slug data) :navbar-brand true}))))
       (dom/div {:id "navbar" :class "navbar-collapse collapse"}
         (dom/ul {:class "nav navbar-nav navbar-right"}
           (dom/li {}
