@@ -13,3 +13,4 @@ pom.xml
 *.sublime-*
 .idea*
 open-company-web.iml
+.sass-cache/
