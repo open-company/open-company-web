@@ -175,7 +175,6 @@
     "build!" ["cljsbuild" "once" "min"]
     "watch-scss" ["sass" "watch"]
     "figwheel!" ["with-profile" "+devcards" "figwheel"]
-    "develop" ["do" "watch-scss," "figwheel!"]
     "devcards!" ["with-profile" "+devcards" "figwheel" "devcards"]
     "test-navigation!" ["with-profile" "+devcards" "doo" "phantom" "test-navigation" "once"]
     "test-company!" ["with-profile" "+devcards" "doo" "phantom" "test-company" "once"]
