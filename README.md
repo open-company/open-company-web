@@ -35,6 +35,7 @@ Most of the dependencies are internal, meaning [Leiningen](https://github.com/te
 
 * [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) - a Java 8 JRE is needed to run Clojure
 * [Leiningen](https://github.com/technomancy/leiningen) - Clojure's build and dependency management tool
+* [SASS](http://sass-lang.com/install) - CSS with superpowers
 
 Chances are your system already has Java 8 installed. You can verify this with:
 
