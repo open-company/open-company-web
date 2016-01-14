@@ -8,6 +8,7 @@ before_install:
   - tar -xjf phantomjs-2.0.0-ubuntu-12.04.tar.bz2    
   - sudo rm -rf /usr/local/phantomjs/bin/phantomjs   
   - sudo mv phantomjs /usr/local/phantomjs/bin/phantomjs
+  - gem install sass
 before_script:
   - export JAVA_OPTS="-Xms256m -Xmx2048m"
   - echo $JAVA_OPTS
@@ -16,6 +17,7 @@ script:
   - lein2 test-navigation!
   - lein2 test-company!
   - lein2 test-ui-components!
+  - "script/sass-test.rb"
 cache:
   directories:
   - "$HOME/.m2"
