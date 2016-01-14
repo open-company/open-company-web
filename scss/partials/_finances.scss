@@ -1,0 +1,20 @@
+div.finances {
+
+  div.link-bar {
+    a.composed-section-link.active {
+      color: $oc_green;
+    }
+  }
+
+  div.finances-body {
+    div.section {
+      h3 {
+        margin-bottom: 0px;
+      }
+
+      div.chart-container {
+        position: relative;
+      }
+    }
+  }
+}

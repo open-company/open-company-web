@@ -1,0 +1,59 @@
+div.target-actual-container {
+  div.target-container h3 {
+    text-align: right;
+    margin-right: 15px;
+  }
+
+  &.double div.actual-container h3 {
+    text-align: left;
+    margin-left: 15px;
+  }
+}
+
+div.target-actual-container
+
+div.chart-header-container {
+  div.actual-container {
+
+    h3.actual {
+      margin-bottom: 10px;
+    }
+
+    h3.actual-label {
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: normal;
+    }
+  }
+}
+
+div.actual-container{
+  h3.actual {
+    color: $oc_blue;
+  }
+
+  h3.actual.gray {
+    color: $oc_gray;
+  }
+
+  h3.actual.green {
+    color: $oc_green;
+  }
+
+  h3.actual.red {
+    color: $oc_red;
+  }
+
+  h3.actual.blue {
+    color: $oc_blue;
+  }
+
+  h3.actual-label {
+    font-size: 12px;
+    font-weight: 700;
+
+    &.gray {
+      color: $oc_gray;
+    }
+  }
+}
