@@ -14,3 +14,4 @@ pom.xml
 .idea*
 open-company-web.iml
 .sass-cache/
+resources/public/css/main.css
