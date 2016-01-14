@@ -173,7 +173,7 @@
     "ancient" ["ancient" ":all" ":allow-qualified"] ; check for out of date dependencies
     "build" ["cljsbuild" "once" "dev"]
     "build!" ["cljsbuild" "once" "min"]
-    "watch-scss" ["sass" "watch"]
+    "scss!" ["sass" "watch"]
     "figwheel!" ["with-profile" "+devcards" "figwheel"]
     "devcards!" ["with-profile" "+devcards" "figwheel" "devcards"]
     "test-navigation!" ["with-profile" "+devcards" "doo" "phantom" "test-navigation" "once"]

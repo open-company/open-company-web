@@ -79,7 +79,7 @@ lein figwheel!
 To start the sass whatcher run:
 
 ```console
-lein watch-scss
+lein scss!
 ```
 
 Open your browser to [http://localhost:3449/](http://localhost:3449/).
