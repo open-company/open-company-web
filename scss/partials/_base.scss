@@ -1,5 +1,19 @@
 @import "../modules/_colors";
 
+/*
+Comment font-weight to font name mapping: https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
+
+100 Thin (Hairline)
+200 Extra Light (Ultra Light)
+300 Light
+400 Normal
+500 Medium
+600 Semi Bold (Demi Bold)
+700 Bold 
+800 Extra Bold (Ultra Bold)
+900 Black (Heavy)
+*/
+
 html, body {
   font-family: "proxima-nova", sans-serif;
   height: 100%;
@@ -26,10 +40,49 @@ a:hover, a:hover *{
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
 }
+
+div#app {
+  margin-top: 50px;
+}
+
+
 /*
- * Top navigation
- * Hide default border to remove 1px line.
+ * Main content
  */
- .navbar-fixed-top {
-    border: 0;
+ .main {
+    padding: 0px !important;
+}
+@media (min-width: 768px) {
+    .main {
+        padding-right: 40px;
+        padding-left: 40px;
+    }
+}
+.main .page-header {
+    margin-top: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+span img.user-icon {
+  height: 24px;
+  width: 24px;
+  margin-right: 5px;
+}
+
+span.num.red {
+  color: red;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+/* Reset bootstrap 3.3.5 help block overflow */
+.input-group[class*=col-] {
+  float: left;
+  padding-left: 15px;
+  padding-right: 15px;
 }
