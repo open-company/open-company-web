@@ -76,6 +76,12 @@ To get an interactive web development environment run:
 lein figwheel!
 ```
 
+To start the sass whatcher run:
+
+```console
+lein watch-scss
+```
+
 Open your browser to [http://localhost:3449/](http://localhost:3449/).
 
 This will auto compile and send all changes to the browser without the
