@@ -12,8 +12,8 @@
   [revisions as-of]
   (when (pos? (count revisions))
     (let [rev (first
-                (filter
-                  #(not (nil? %))
+                (remove
+                  nil?
                   (map
                     (fn [r]
                       (when (= (:updated-at r) as-of)
@@ -34,8 +34,8 @@
   [revisions as-of]
   (when (pos? (count revisions))
     (let [rev (first
-                (filter
-                  #(not (nil? %))
+                (remove
+                  nil?
                   (map
                     (fn [r]
                       (when (= (:updated-at r) as-of)
