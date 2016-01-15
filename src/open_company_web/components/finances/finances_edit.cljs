@@ -89,18 +89,17 @@
 
 (defn replace-row-in-data [owner data finances-data row k v]
   "Find and replace the edited row"
-  (let [array-data (js->clj (to-array finances-data))
+  (let [array-data (vec (js->clj finances-data))
         new-row (update row k (fn[_]v))]
     ((:change-finances-cb data) new-row)
-    (loop [idx 0]
-      (let [cur-row (get array-data idx)]
-        (if (= (:period cur-row) (:period new-row))
-          (let [new-rows (assoc array-data idx new-row)
-                runway-rows (utils/calc-burnrate-runway new-rows)
-                sort-pred (utils/sort-by-key-pred :period true)
-                sorted-rows (sort sort-pred runway-rows)]
-            (om/update-state! owner :sorted-data (fn [_] sorted-rows)))
-          (recur (inc idx)))))))
+    (doseq [cur-row array-data]
+      (when (= (:period cur-row) (:period new-row))
+        (let [idx (.indexOf (to-array array-data) cur-row)
+              new-rows (assoc array-data idx new-row)
+              runway-rows (utils/calc-burnrate-runway new-rows)
+              sort-pred (utils/sort-by-key-pred :period true)
+              sorted-rows (sort sort-pred runway-rows)]
+          (om/update-state! owner :sorted-data (fn [_] sorted-rows)))))))
 
 (defn next-period [data idx]
   (let [data (to-array data)]
@@ -112,7 +111,7 @@
   (let [data-vec (vec (vals data))
         runway-rows (utils/calc-burnrate-runway data-vec)
         sorter (utils/sort-by-key-pred :period true)]
-    (sort sorter runway-rows)))
+    (vec (sort sorter runway-rows))))
 
 (defn get-12-months [last-period]
   (vec
