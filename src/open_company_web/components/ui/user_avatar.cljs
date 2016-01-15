@@ -1,6 +1,6 @@
 (ns open-company-web.components.ui.user-avatar
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]

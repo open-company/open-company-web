@@ -1,8 +1,8 @@
 (ns open-company-web.components.all-sections
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.components.section-selector :refer [section-selector]]
+            [open-company-web.components.section-selector :refer (section-selector)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
 
