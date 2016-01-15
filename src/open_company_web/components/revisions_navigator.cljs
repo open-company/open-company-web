@@ -11,15 +11,16 @@
   "Return the first future revision"
   [revisions as-of]
   (when (pos? (count revisions))
-    (loop [idx (dec (count revisions))
-           next-rev nil]
-      (let [rev (get revisions idx)]
-        (if (<= (compare (:updated-at rev) as-of) 0)
-          next-rev
-          (if (zero? idx)
-            rev
-            (recur (dec idx)
-                   rev)))))))
+    (let [rev (first
+                (filter
+                  #(not (nil? %))
+                  (map
+                    (fn [r]
+                      (when (= (:updated-at r) as-of)
+                        (let [idx (.indexOf (to-array revisions) r)]
+                          (get revisions (inc idx)))))
+                    revisions)))]
+      rev)))
 
 (defn revision-last [revisions as-of]
   (let [last-revision (last revisions)]
@@ -32,15 +33,16 @@
   "Return the first future revision"
   [revisions as-of]
   (when (pos? (count revisions))
-    (loop [idx 0
-           prev-rev nil]
-      (let [rev (get revisions idx)]
-        (if (>= (compare (:updated-at rev) as-of) 0)
-          prev-rev
-          (if (= idx (dec (count revisions)))
-            rev ;return the last possible value as it's past
-            (recur (inc idx)
-                   rev)))))))
+    (let [rev (first
+                (filter
+                  #(not (nil? %))
+                  (map
+                    (fn [r]
+                      (when (= (:updated-at r) as-of)
+                        (let [idx (.indexOf (to-array revisions) r)]
+                          (get revisions (dec idx)))))
+                    revisions)))]
+      rev)))
 
 (defn revision-first [revisions as-of]
   (let [rev (first revisions)]
