@@ -54,23 +54,23 @@
                           :key :target
                           :tab-cb tab-cb}))
         (dom/td {}
-          (when (not (:is-last data))
-            (om/build cell {:value value
-                            :placeholder "Value"
-                            :cell-state cell-state
-                            :draft-cb #(change-cb :value %)
-                            :prefix (:prefix data)
-                            :suffix (:suffix data)
-                            :period period
-                            :key :value
-                            :tab-cb tab-cb})))))))
+          (when-not (:is-last data)
+            (om/build
+              cell
+              {:value value
+               :placeholder "Value"
+               :cell-state cell-state
+               :draft-cb #(change-cb :value %)
+               :prefix (:prefix data)
+               :suffix (:suffix data)
+               :period period
+               :key :value
+               :tab-cb tab-cb})))))))
 
 (defn next-period [data idx]
   (let [data (to-array data)]
-    (if (< idx (dec (count data)))
-      (let [next-row (get data (inc idx))]
-        (:period next-row))
-      nil)))
+    (when (< idx (dec (count data)))
+      (let [next-row (get data (inc idx))] (:period next-row)))))
 
 (defn replace-row-in-data [owner data metric-data row k v]
   "Find and replace the edited row"
@@ -82,7 +82,7 @@
         (if (= (:period cur-row) (:period new-row))
           (let [new-rows (assoc array-data idx new-row)
                 sort-pred (utils/sort-by-key-pred :period true)
-                sorted-rows (sort #(sort-pred %1 %2) new-rows)]
+                sorted-rows (sort sort-pred new-rows)]
             (om/update-state! owner :sorted-data (fn [_] sorted-rows)))
           (recur (inc idx)))))))
 
@@ -100,7 +100,7 @@
       (vec [])
       (let [placeholder-data (growth-utils/edit-placeholder-data metric-data focus (:interval metric-info))
             sorter (utils/sort-by-key-pred :period true)]
-        (sort #(sorter %1 %2) placeholder-data)))))
+        (sort sorter placeholder-data)))))
 
 (defn get-interval-batch-size [interval]
   (case interval

@@ -98,22 +98,21 @@
           (let [new-rows (assoc array-data idx new-row)
                 runway-rows (utils/calc-burnrate-runway new-rows)
                 sort-pred (utils/sort-by-key-pred :period true)
-                sorted-rows (sort #(sort-pred %1 %2) runway-rows)]
+                sorted-rows (sort sort-pred runway-rows)]
             (om/update-state! owner :sorted-data (fn [_] sorted-rows)))
           (recur (inc idx)))))))
 
 (defn next-period [data idx]
   (let [data (to-array data)]
-    (if (< idx (dec (count data)))
+    (when (< idx (dec (count data)))
       (let [next-row (get data (inc idx))]
-        (:period next-row))
-      nil)))
+        (:period next-row)))))
 
 (defn sort-finances-data [data]
   (let [data-vec (vec (vals data))
         runway-rows (utils/calc-burnrate-runway data-vec)
         sorter (utils/sort-by-key-pred :period true)]
-    (sort #(sorter %1 %2) runway-rows)))
+    (sort sorter runway-rows)))
 
 (defn get-12-months [last-period]
   (vec

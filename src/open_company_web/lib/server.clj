@@ -21,8 +21,7 @@
   (route/files "/img/*" {:root "resources/public"}))
 
 (defn request-handler [routes]
- (fn [request]
-   (routes request)))
+ routes)
 
 (def handler
   (request-handler resources))

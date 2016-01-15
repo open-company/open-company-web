@@ -10,30 +10,28 @@
 (defn revision-next
   "Return the first future revision"
   [revisions as-of]
-  (if (> (count revisions) 0)
+  (when (pos? (count revisions))
     (loop [idx (dec (count revisions))
            next-rev nil]
       (let [rev (get revisions idx)]
         (if (<= (compare (:updated-at rev) as-of) 0)
           next-rev
-          (if (= idx 0)
+          (if (zero? idx)
             rev
             (recur (dec idx)
-                   rev)))))
-    nil))
+                   rev)))))))
 
 (defn revision-last [revisions as-of]
   (let [last-revision (last revisions)]
-    (if (and
-          last-revision
-          (not= last-revision (revision-next revisions as-of)))
-      last-revision
-      nil)))
+    (when (and
+            last-revision
+            (not= last-revision (revision-next revisions as-of)))
+      last-revision)))
 
 (defn revision-prev
   "Return the first future revision"
   [revisions as-of]
-  (if (> (count revisions) 0)
+  (when (pos? (count revisions))
     (loop [idx 0
            prev-rev nil]
       (let [rev (get revisions idx)]
@@ -42,13 +40,12 @@
           (if (= idx (dec (count revisions)))
             rev ;return the last possible value as it's past
             (recur (inc idx)
-                   rev)))))
-      nil))
+                   rev)))))))
 
 (defn revision-first [revisions as-of]
   (let [rev (first revisions)]
     (if (and rev
-             (< (compare (:updated-at rev) as-of) 0)
+             (neg? (compare (:updated-at rev) as-of))
              (not= rev (revision-prev revisions as-of)))
       rev
       false)))
@@ -66,10 +63,10 @@
           rev-first (revision-first revisions as-of)
           rev-prev  (revision-prev revisions as-of)
           rev-next  (revision-next revisions as-of)
-          rev-last  (if rev-next (revision-last revisions as-of) nil)
+          rev-last  (when rev-next (revision-last revisions as-of))
           section (:section data)
           latest? (= (:updated-at last-revision) as-of)
-          rev-first (if latest? nil rev-first)
+          rev-first (when-not latest? rev-first)
           first-date (utils/date-string (utils/js-date (:updated-at rev-first)))
           prev-date  (utils/date-string (utils/js-date (:updated-at rev-prev)))
           next-date  (utils/date-string (utils/js-date (:updated-at rev-next)))
@@ -84,7 +81,7 @@
       (when (and rev-first (not (contains? revisions-list (:updated-at rev-first))))
         (api/load-revision rev-first slug section))
       ; preload next revision as it can be that it's missing (ie: user jumped to the first rev then went forward)
-      (when (and (not (= (:updated-at rev-next) (:actual-as-of data))) rev-next (not (contains? revisions-list (:updated-at rev-next))))
+      (when (and (not= (:updated-at rev-next) (:actual-as-of data)) rev-next (not (contains? revisions-list (:updated-at rev-next))))
         (api/load-revision rev-next slug section))
       (when (or rev-first rev-prev rev-next rev-last)
         (dom/div {:class "revisions-navigator"}

@@ -10,9 +10,7 @@
 
 (defcomponent user-avatar [data owner]
   (render [_]
-    (let [av-size (if (:size data)
-                    (:size data)
-                    df-user-avatar-size)
+    (let [av-size (or (:size data) df-user-avatar-size)
           px-size (utils/px av-size)
           bd-radius (utils/px (int (/ av-size 2)))]
       (dom/div {:class "user-avatar"}

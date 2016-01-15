@@ -18,9 +18,7 @@
                            (utils/camel-case-str slug))
             first-letter (first (clojure.string/upper-case company-name))
             company-home (str "/companies/" slug "/profile")
-            av-size (if (:size data)
-                      (:size data)
-                      df-company-avatar-size)
+            av-size (or (:size data) df-company-avatar-size)
             px-size (utils/px av-size)
             bd-radius (utils/px (int (/ av-size 2)))
             company-logo (:logo company-data)]

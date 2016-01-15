@@ -24,7 +24,7 @@
 
 ; Routes - Do not define routes when js/document#app
 ; is undefined because it breaks tests
-(if-let [target (. js/document (getElementById "app"))]
+(if-let [target (.getElementById js/document "app")]
   (do
 
     (defroute login-route "/login" {:keys [query-params]}
@@ -166,7 +166,7 @@
   (doto (router/make-history)
     (events/listen EventType.NAVIGATE
       ;; wrap in a fn to allow live reloading
-      #(handle-url-change %))
+      handle-url-change)
     (.setEnabled true)))
 
 (defn on-js-reload []

@@ -23,9 +23,7 @@
 
 (defn get-currency [currency-code]
   (let [kw (keyword currency-code)]
-    (if (contains? iso4217 kw)
-      (kw iso4217)
-      nil)))
+    (when (contains? iso4217 kw) (kw iso4217))))
 
 (defn get-symbol-for-currency-code [currency-code]
   (let [currency (get-currency currency-code)
@@ -61,7 +59,7 @@
   (some #(= elm %) coll))
 
 (defn vec-dissoc [coll elem]
-  (vec (filter #(not (= elem %)) coll)))
+  (vec (filter #(not= elem %) coll)))
 
 (defn month-string [month & [flags]]
   (let [short-month (in? flags :short)]
@@ -187,7 +185,7 @@
   (if (empty? finances-data)
     finances-data
     (let [sort-pred (sort-by-key-pred :period)
-          sorted-data (into [] (sort #(sort-pred %1 %2) finances-data))]
+          sorted-data (vec (sort sort-pred finances-data))]
       (loop [idx 1
              datas sorted-data]
         (let [start (max 0 (- idx 3))
@@ -271,7 +269,7 @@
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
   [classes]
-  (apply str (map #(str " " (name %)) (keys (filter #(second %) classes)))))
+  (clojure.string/join (map #(str " " (name %)) (keys (filter second classes)))))
 
 (defn period-exists [period data]
   (if (pos? (count (filter #(= (:period %) period) data)))
@@ -280,7 +278,7 @@
 
 (defn current-period []
   (let [date (js/Date.)
-        month (+ (.getMonth date) 1)
+        month (inc (.getMonth date))
         month-str (str (when (< month 10) "0") month)
         cur-period (str (.getFullYear date) "-" month-str)]
     cur-period))
@@ -292,19 +290,18 @@
 (defn get-sections [section-keys company-data]
   (loop [ks section-keys
          sections []]
-    (if (> (count ks) 0)
-      (do
-        (let [k (first ks)
-              section (k company-data)]
-          (recur (subvec ks 1)
-                 (conj sections section))))
-      sections)))
+    (if (pos? (count ks))
+      (let [k (first ks)
+            section (k company-data)]
+        (recur (subvec ks 1)
+               (conj sections section))))
+    sections))
 
 (def finances-empty-notes {:notes {:body ""}})
 
 (defn link-for
-  ([links rel] (some #(if (= (:rel %) rel) % nil) links))
-  ([links rel method] (some #(if (and (= (:method %) method) (= (:rel %) rel)) % nil) links)))
+  ([links rel] (some #(when (= (:rel %) rel) %) links))
+  ([links rel method] (some #(when (and (= (:method %) method) (= (:rel %) rel)) %) links)))
 
 (defn readonly? [links]
   (let [update (link-for links "update" "PUT")
@@ -316,7 +313,7 @@
   (let [finances-data (if (contains? section-body :data) (:data section-body) [])
         fixed-finances (calc-burnrate-runway finances-data)
         sort-pred (sort-by-key-pred :period true)
-        sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
+        sorted-finances (sort sort-pred fixed-finances)
         fixed-section (assoc section-body :data sorted-finances)
         section-with-notes (merge finances-empty-notes fixed-section)]
     section-with-notes))
@@ -354,7 +351,7 @@
 
 (defn sort-revisions [revisions]
   (let [sort-pred (sort-by-key-pred :updated-at)]
-    (into [] (sort #(sort-pred %1 %2) revisions))))
+    (vec (sort sort-pred revisions))))
 
 (defn as-of-now []
   (let [date (js-date)]
