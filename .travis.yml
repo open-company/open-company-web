@@ -13,6 +13,7 @@ before_script:
   - export JAVA_OPTS="-Xms256m -Xmx2048m"
   - echo $JAVA_OPTS
   - lein2 clean
+  - chmod +x script/sass-test.rb
 script:
   - lein2 test-navigation!
   - lein2 test-company!
