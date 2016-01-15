@@ -294,8 +294,8 @@
       (let [k (first ks)
             section (k company-data)]
         (recur (subvec ks 1)
-               (conj sections section))))
-    sections))
+               (conj sections section)))
+      sections)))
 
 (def finances-empty-notes {:notes {:body ""}})
 
