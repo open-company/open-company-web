@@ -74,17 +74,16 @@
 
 (defn replace-row-in-data [owner data metric-data row k v]
   "Find and replace the edited row"
-  (let [array-data (js->clj (to-array metric-data))
+  (let [array-data (vec (js->clj metric-data))
         new-row (update row k (fn[_]v))]
     ((:change-growth-cb data) new-row)
-    (loop [idx 0]
-      (let [cur-row (get array-data idx)]
-        (if (= (:period cur-row) (:period new-row))
-          (let [new-rows (assoc array-data idx new-row)
-                sort-pred (utils/sort-by-key-pred :period true)
-                sorted-rows (sort sort-pred new-rows)]
-            (om/update-state! owner :sorted-data (fn [_] sorted-rows)))
-          (recur (inc idx)))))))
+    (doseq [cur-row array-data]
+      (when (= (:period cur-row) (:period new-row))
+        (let [idx (.indexOf (to-array array-data) cur-row)
+              new-rows (assoc array-data idx new-row)
+              sort-pred (utils/sort-by-key-pred :period true)
+              sorted-rows (sort sort-pred new-rows)]
+          (om/update-state! owner :sorted-data (fn [_] sorted-rows)))))))
 
 (defn get-current-metric-info [data]
   (let [metric-slug (:metric-slug data)
@@ -100,7 +99,7 @@
       (vec [])
       (let [placeholder-data (growth-utils/edit-placeholder-data metric-data focus (:interval metric-info))
             sorter (utils/sort-by-key-pred :period true)]
-        (sort sorter placeholder-data)))))
+        (vec (sort sorter placeholder-data))))))
 
 (defn get-interval-batch-size [interval]
   (case interval
