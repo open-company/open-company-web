@@ -8,7 +8,7 @@
 
 (defn get-key-from-sections [sections]
   (clojure.string/join
-    (map #(str (name (get % 0)) (cljure.string/join (get % 1))) sections)))
+    (map #(str (name (get % 0)) (clojure.string/join (get % 1))) sections)))
 
 (defcomponent all-sections [data owner]
   (render [_]
