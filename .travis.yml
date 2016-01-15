@@ -16,6 +16,7 @@ script:
   - lein2 test-navigation!
   - lein2 test-company!
   - lein2 test-ui-components!
+  - lein2 kibit
 cache:
   directories:
   - "$HOME/.m2"
