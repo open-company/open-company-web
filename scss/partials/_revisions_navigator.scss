@@ -1,0 +1,75 @@
+$revisions_gray: #5B5B5B;
+
+div.revisions-navigator {
+  width: 100%;
+  height: 34px;
+  margin-top: 30px;
+  font-family: "proxima-nova", sans-serif;
+
+  div.revisions-navigator-left {
+    float: left;
+
+    div.single-prev,
+    div.double-prev {
+      color: $revisions_gray;
+      float: left;
+    }
+
+    div.single-prev {
+      margin: 5px 0px 0px 8px;
+      float: left;
+
+      i {
+        font-size: 28px;
+        float:left;
+      }
+
+      p {
+        margin: 5px 0px 0px 8px;
+        float: left;
+      }
+    }
+
+    div.double-prev {
+      font-size: 20px;
+      margin-top: 6px;
+      margin-right: 10px;
+    }
+  }
+
+  div.revisions-navigator-right {
+    float: right;
+
+    div.single-next,
+    div.double-next {
+      color: $revisions_gray;
+      float: right;
+    }
+
+    div.single-next {
+      margin-top: 5px;
+
+      i {
+        font-size: 28px;
+        float:right;
+      }
+
+      p {
+        margin: 5px 8px 0px 0px;
+        float: right;
+      }
+    }
+
+    div.double-next {
+      font-size: 20px;
+      margin-top: 6px;
+      margin-left: 10px;
+    }
+  }
+
+  p.rev-nav-label {
+    color: $revisions_gray;
+    font-size: 16px;
+    font-weight: normal;
+  }
+}

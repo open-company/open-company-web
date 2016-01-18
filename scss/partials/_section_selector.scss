@@ -1,0 +1,11 @@
+div.section-animator-box {
+  position: relative;
+  margin-bottom: 30px;
+
+  div.section-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 600px;
+  }
+}

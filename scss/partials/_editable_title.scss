@@ -1,0 +1,67 @@
+div.editable-title-container{
+  margin-top: 30px;
+  margin-bottom: 10px;
+
+  h2 {
+    cursor: text;
+  }
+
+  h2.read-only {
+    cursor: text;
+  }
+
+  div.hidden-span-container {
+    z-index: -1;
+    opacity: 0;
+    text-align: left;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 600px;
+  }
+
+  textarea {
+    text-align: left;
+    color: #2D2D2D !important;
+    font-size: 36px;
+    font-family: "proxima-nova", sans-serif;
+    font-weight: 600;
+    line-height: 1.1;
+    color: inherit;
+    padding: 10px 0;
+    margin: 0px;
+    width: 500px;
+    min-height: 35px;
+    box-sizing: border-box;
+  }
+
+  textarea.editable-title {
+    border: 1px solid white;
+    outline: none;
+    resize: none;
+
+    &.edit {
+      border: 1px solid black;
+      outline: none;
+    }
+  }
+
+  span.hidden-span {
+    opacity: 0;
+  }
+}
+
+div.hidden-autogrow-div {
+  text-align: left;
+  color: #2D2D2D !important;
+  font-size: 36px;
+  font-family: "proxima-nova", sans-serif;
+  font-weight: 600;
+  line-height: 1.1;
+  color: inherit;
+  padding: 10px 0;
+  margin: 0px;
+  width: 500px;
+  min-height: 35px;
+  box-sizing: border-box;
+}

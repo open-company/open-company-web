@@ -1,0 +1,53 @@
+.comp-cell {
+  border: 2px solid transparent;
+  width: 100px;
+  height: 30px;
+
+  .comp-cell-int {
+    width: 100%;
+    min-height: 24px;
+
+    span, input {
+      width: 100%;
+      text-align: right;
+    }
+  }
+
+  .state-new {
+    border: 2px solid black;
+
+    span.placeholder {
+      color: rgba(0, 0, 0, 0.4);
+      font-size: 12px;
+    }
+  }
+
+  .state-display {
+    border: 2px solid transparent;
+
+    span {
+      color: black;
+    }
+  }
+
+  .state-draft {
+    border: 2px solid transparent;
+    border-bottom: 2px solid black;
+
+    span {
+      color: black;
+    }
+  }
+
+  .state-edit {
+    border: 2px solid blue;
+
+    input {
+      color: black;
+      border: 0px solid black;
+      outline: none;
+      text-align: left;
+    }
+  }
+
+}

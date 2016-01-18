@@ -1,0 +1,56 @@
+
+div.composed-section-body {
+  i.editable-pen {
+    opacity: 0;
+    margin-left: 10px;
+    cursor: default;
+  }
+}
+
+div.composed-section-body.editable:hover {
+  i.editable-pen {
+    opacity: 1;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+}
+
+div.composed-section-edit {
+  div.chart-header-container { 
+    i.editable-pen {
+      opacity: 0;
+      margin-left: 10px;
+      cursor: pointer;
+      color: #109DB7;
+    }
+
+    &:hover i.editable-pen {
+      opacity: 1;
+    }
+  }
+
+  table.table {
+    td, th {
+      text-align: right;
+      padding: 2px;
+      border: 0px;
+    }
+
+    >thead>tr>th {
+      border: 0px solid black;
+    }
+
+    td.no-cell {
+      padding-top: 6px;
+    }
+
+    td.new-row-placeholder {
+      color: rgba(0, 0, 0, 0.4);
+    }
+
+    td div.comp-cell {
+      float: right;
+    }
+
+  }
+}
