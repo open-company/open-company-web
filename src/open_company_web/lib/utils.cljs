@@ -171,10 +171,11 @@
   (- revenue costs))
 
 (defn calc-avg-burn-rate [periods]
-  (let [burn-rates (map #(calc-burn-rate (:revenue %) (:costs %)) periods)
-        tot (count burn-rates)]
-    (apply (fn [& items]
-             (/ (apply + items) tot)) burn-rates)))
+  (when (pos? (count periods))
+    (let [burn-rates (map #(calc-burn-rate (:revenue %) (:costs %)) periods)
+          tot (count burn-rates)]
+      (apply (fn [& items]
+               (/ (apply + items) tot)) burn-rates))))
 
 (defn calc-runway [cash burn-rate]
   (int (* (/ cash burn-rate) 30)))
@@ -186,20 +187,17 @@
     finances-data
     (let [sort-pred (sort-by-key-pred :period)
           sorted-data (vec (sort sort-pred finances-data))]
-      (loop [idx 1
-             datas sorted-data]
-        (let [start (max 0 (- idx 3))
-              avg-burn-rate (calc-avg-burn-rate (subvec datas start idx))]
-          (let [period  (datas (dec idx))
-                runway (calc-runway (:cash period) avg-burn-rate) 
-                fixed-period (merge period {:runway runway
-                                            :avg-burn-rate avg-burn-rate
-                                            :burn-rate (calc-burn-rate (:revenue period) (:costs period))})
-                datas   (assoc datas (dec idx) fixed-period)]
-            (if (< idx (count sorted-data))
-              (recur (inc idx)
-                     datas)
-              datas)))))))
+      (vec (map
+              (fn [data]
+                (let [idx (inc (.indexOf (to-array sorted-data) data))
+                      start (max 0 (- idx 3))
+                      sub-data (subvec sorted-data start idx)
+                      avg-burn-rate (calc-avg-burn-rate sub-data)
+                      runway (calc-runway (:cash data) avg-burn-rate)]
+                  (merge data {:runway runway
+                               :avg-burn-rate avg-burn-rate
+                               :burn-rate (calc-burn-rate (:revenue data) (:costs data))})))
+              sorted-data)))))
 
 (defn camel-case-str [value]
   (let [upper-value (clojure.string/replace value #"^(\w)" #(clojure.string/upper-case (first %1)))]
@@ -287,16 +285,6 @@
   "Get the section names, as a vector of keywords, in category order and order in the category."
   (vec (map keyword (flatten (remove nil? (map #(get-in company-data [:sections (keyword %)]) (:categories company-data)))))))
 
-(defn get-sections [section-keys company-data]
-  (loop [ks section-keys
-         sections []]
-    (if (pos? (count ks))
-      (let [k (first ks)
-            section (k company-data)]
-        (recur (subvec ks 1)
-               (conj sections section)))
-      sections)))
-
 (def finances-empty-notes {:notes {:body ""}})
 
 (defn link-for
@@ -337,17 +325,17 @@
   (let [links (:links company-data)
         section-keys (get-section-keys company-data)
         read-only (readonly? links)
-        fixed-company-data (assoc company-data :read-only read-only)]
-    (loop [body fixed-company-data
-           idx  0]
-      (if (< idx (count section-keys))
-        (let [section-name (section-keys idx)
-              section-body (section-name body)
-              fixed-section (fix-section section-body section-name)
-              fixed-body (assoc body section-name fixed-section)]
-          (recur fixed-body
-                 (inc idx)))
-        body))))
+        without-sections (apply dissoc company-data section-keys)
+        with-read-only (assoc without-sections :read-only read-only)
+        sections (apply merge
+                        (map
+                          (fn [section-name]
+                            (let [section-body (section-name company-data)
+                                  fixed-section-body (fix-section section-body section-name)]
+                              (hash-map section-name fixed-section-body)))
+                          section-keys))
+        with-fixed-sections (merge with-read-only sections)]
+    with-fixed-sections))
 
 (defn sort-revisions [revisions]
   (let [sort-pred (sort-by-key-pred :updated-at)]
