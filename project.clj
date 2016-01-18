@@ -35,6 +35,7 @@
     [lein-ancient "0.6.8"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
     [lein-doo "0.1.6"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
     [lein-deps-tree "0.1.2"] ; Print a tree of project dependencies https://github.com/the-kenny/lein-deps-tree
+    [lein-sassy "1.0.7"] ; Leiningen plugin to compile haml files https://github.com/101loops/lein-sass
   ]
 
   :profiles {
@@ -157,10 +158,22 @@
     ;; :server-logfile "tmp/logs/figwheel-logfile.log"
   }
 
+  :sass {
+    :src "scss"
+    :dst "resources/public/css"
+
+    ;; other options (provided are default values):
+    ; :delete-output-dir false
+    ; :source-maps true
+    :style :nested
+    :syntax :scss
+    }
+
   :aliases {
     "ancient" ["ancient" ":all" ":allow-qualified"] ; check for out of date dependencies
     "build" ["cljsbuild" "once" "dev"]
     "build!" ["cljsbuild" "once" "min"]
+    "scss!" ["sass" "watch"]
     "figwheel!" ["with-profile" "+devcards" "figwheel"]
     "devcards!" ["with-profile" "+devcards" "figwheel" "devcards"]
     "test-navigation!" ["with-profile" "+devcards" "doo" "phantom" "test-navigation" "once"]
@@ -168,4 +181,5 @@
     "test-ui-components!" ["with-profile" "+devcards" "doo" "phantom" "test-ui-components" "once"]
     "test-all!" ["do" "test-navigation!," "test-company!," "test-ui-components!"] ; don't use in CI
   }
+
 )

@@ -1,0 +1,38 @@
+button.oc-btn {
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  font-size: 10px;
+  margin-left: 0px;
+  margin-right: 20px;
+  height: 20px;
+  width: 60px;
+  border-radius: 4px;
+  background-color: transparent;
+  margin-top: 30px;
+}
+
+button.oc-btn:active,
+button.oc-btn:focus {
+  outline: none;
+}
+
+button.oc-btn.disabled,
+button.oc-btn[disabled] {
+  opacity: 0.3;
+}
+
+button.oc-btn.oc-cancel {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+button.oc-link {
+  border: 0px solid rgba(0, 0, 0, 0.4);
+  font-size: 10px;
+  margin-left: 0px;
+  margin-right: 20px;
+  height: 20px;
+  width: 60px;
+  border-radius: 0px;
+  background-color: transparent;
+  color: #109DB7;
+  margin-top: 30px;
+}

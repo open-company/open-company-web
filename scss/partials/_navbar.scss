@@ -1,0 +1,28 @@
+.navbar-inverse .navbar-nav>li>a{
+  padding: 5px;
+}
+
+/*
+ * Top navigation
+ * Hide default border to remove 1px line.
+ */
+ .navbar-fixed-top {
+    border: 0;
+}
+
+@media (min-width: 960px) {
+  nav.navbar > div {
+    width: 1170px;
+    padding-left: 85px;
+    padding-right: 85px;
+  }
+}
+
+nav.navbar {
+  background-color: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+}
+
+nav.tab-navigation {
+  margin-top: 10px;
+}

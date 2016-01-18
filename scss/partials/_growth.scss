@@ -1,0 +1,48 @@
+div.growth {
+  div.link-bar {
+    a.composed-section-link.active {
+      color: #109DB7;
+    }
+  }
+}
+
+.metric-data-container {
+  width: 250px;
+  float: left;
+  label {
+    margin-right: 10px;  
+  }
+}
+
+
+.metric-data-container.right{
+  float: right;
+  text-align: right;
+  span {
+    text-align: left;
+  }
+}
+
+.growth-metric-edit-row {
+  width: 500px;
+  margin: 10px 0;
+
+  input#mtr-name, textarea {
+    background-color: #fff;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    padding: 0px 8px;
+    color: #444;
+    font-size: 14px;  
+  }
+
+  input#mtr-name {
+    width: 240px;
+    height: 28px;
+  }
+
+  textarea {
+    width: 500px;
+    height: 60px;
+  }
+}

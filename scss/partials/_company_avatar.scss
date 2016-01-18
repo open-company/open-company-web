@@ -1,0 +1,36 @@
+div.company-avatar {
+  a, 
+  a:hover {
+    text-decoration: none;
+  }
+
+  img.company-avatar-img{
+    float: left;
+    margin-top: -10px;
+    height: 35px;
+  }
+
+  div.company-avatar-img {
+    border: 1px solid black;
+    margin-top: -10px;
+    float: left;
+    overflow: hidden;
+
+    span.company-avatar-initial {
+      font-size: 28px;
+      color: black;
+    }
+  }
+
+  div.company-avatar-img.no-image{
+    padding: 9px 11px;
+  }
+
+  div.company-avatar-name {
+    float: left;
+    font-size: 16px;
+    margin-left: 10px;
+    color: black;
+  }
+
+}
