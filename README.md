@@ -60,6 +60,14 @@ cd open-company-web
 lein deps
 ```
 
+The other dependency is a [Sass](http://sass-lang.com/) compiler. You can follow the [installation steps](http://sass-lang.com/) if you don't already have Sass on your system.
+
+On a Mac, it's as easy as:
+
+```console
+gem install sass
+sass -v
+```
 
 ## Usage
 
@@ -71,17 +79,19 @@ Local usage requires you to run 2 services, the [API service](https://github.com
 lein start
 ```
 
-To get an interactive web development environment run:
+To get an interactive web development environment, start Figwheel in this repository:
 
 ```console
 lein figwheel!
 ```
 
-To start the sass whatcher run:
+You'll also need to start the Sass watcher in this repository:
 
 ```console
 lein scss!
 ```
+
+If you've done it right, you'll have 4 terminal sessions running: API, Auth, Figwheel, and Sass.
 
 Open your browser to [http://localhost:3449/](http://localhost:3449/).
 
