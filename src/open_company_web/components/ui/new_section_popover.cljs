@@ -64,7 +64,7 @@
       (dom/div {:class "new-section-popover"}
         (dom/div {:class "new-section-popover-close"
                   :on-click #(put! (utils/get-channel "close-new-section-popover") {})})
-        (dom/img {:src "/img/add_new_section_icon.png" :width "80" :height "82"})
+        (dom/div {:class "new-section-popover-img"})
         (dom/h4 {} "Add a new section")
         (dom/div {:class "new-section-container"}
           (dom/div {:class "gradient top-gradient"})
