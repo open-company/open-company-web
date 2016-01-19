@@ -59,6 +59,7 @@
       (utils/clean-company-caches)
       ; save route
       (router/set-route! ["companies"] {})
+      (swap! app-state assoc :loading true)
       ; load data from api
       (api/get-companies)
       ; render component
