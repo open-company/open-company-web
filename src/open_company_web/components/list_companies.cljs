@@ -21,4 +21,6 @@
         (if (pos? (count company-list))
           (dom/ul
             (om/build-all list-page-item company-list))
-          (dom/h2 "No companies found."))))))
+          (if (:loading data)
+            (dom/h4 "Loading companies...")
+            (dom/h2 "No companies found.")))))))
