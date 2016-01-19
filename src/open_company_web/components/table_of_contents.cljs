@@ -84,10 +84,10 @@
           (dom/i {:class "fa fa-plus"}))))))
 
 (defn get-new-sections-if-needed [owner]
-  (when (not (om/get-state owner :new-sections-requested))
+  (when-not (om/get-state owner :new-sections-requested)
     (let [slug (keyword (:slug @router/path))
           company-data (slug @dispatcher/app-state)]
-      (when (and (empty? (slug @caches/new-sections)) (not (empty? company-data)))
+      (when (and (empty? (slug @caches/new-sections)) (seq company-data))
         (om/update-state! owner :new-sections-requested not)
         (api/get-new-sections)))))
 
@@ -99,7 +99,7 @@
                                 (sel (str "div.category-sortable.category-" category))))})
 
 (defn sort-end [event ui categories]
-  (let [sections (apply merge (map #(resort-category %) categories))]
+  (let [sections (apply merge (map resort-category categories))]
     (api/patch-sections sections)))
 
 (defn setup-sortable [categories]
@@ -146,7 +146,7 @@
         (dom/div {:class "table-of-contents-inner"}
           (for [category categories]
             (let [sections ((keyword category) sections)
-                  sections-key (str (name category) (apply str sections))]
+                  sections-key (str (name category) (clojure.string/join sections))]
               (dom/div {:class "category-container"
                         :key sections-key}
                 (dom/div {:class (utils/class-set {:category true

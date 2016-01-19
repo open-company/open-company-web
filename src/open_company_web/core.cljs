@@ -1,15 +1,15 @@
 (ns ^:figwheel-always open-company-web.core
   (:require [om.core :as om :include-macros true]
-            [secretary.core :as secretary :refer-macros [defroute]]
+            [secretary.core :as secretary :refer-macros (defroute)]
             [open-company-web.router :as router]
-            [open-company-web.components.page :refer [company]]
-            [open-company-web.components.list-companies :refer [list-companies]]
-            [open-company-web.components.page-not-found :refer [page-not-found]]
-            [open-company-web.components.user-profile :refer [user-profile]]
-            [open-company-web.components.login :refer [login]]
-            [open-company-web.lib.raven :refer [raven-setup]]
+            [open-company-web.components.page :refer (company)]
+            [open-company-web.components.list-companies :refer (list-companies)]
+            [open-company-web.components.page-not-found :refer (page-not-found)]
+            [open-company-web.components.user-profile :refer (user-profile)]
+            [open-company-web.components.login :refer (login)]
+            [open-company-web.lib.raven :refer (raven-setup)]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.dispatcher :refer [app-state]]
+            [open-company-web.dispatcher :refer (app-state)]
             [open-company-web.api :as api]
             [goog.events :as events]
             [open-company-web.lib.cookies :as cook]
@@ -24,7 +24,7 @@
 
 ; Routes - Do not define routes when js/document#app
 ; is undefined because it breaks tests
-(if-let [target (. js/document (getElementById "app"))]
+(if-let [target (.getElementById js/document "app")]
   (do
 
     (defroute login-route "/login" {:keys [query-params]}
@@ -166,7 +166,7 @@
   (doto (router/make-history)
     (events/listen EventType.NAVIGATE
       ;; wrap in a fn to allow live reloading
-      #(handle-url-change %))
+      handle-url-change)
     (.setEnabled true)))
 
 (defn on-js-reload []

@@ -60,7 +60,7 @@
   (render [_]
     (let [finances-data (:data (:section-data data))
           sort-pred (utils/sort-by-key-pred :period true)
-          sorted-finances (sort #(sort-pred %1 %2) finances-data)
+          sorted-finances (sort sort-pred finances-data)
           value-set (first sorted-finances)
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)

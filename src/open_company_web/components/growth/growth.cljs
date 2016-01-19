@@ -29,7 +29,7 @@
   (apply merge (map #(hash-map (:slug %) %) (reverse metrics-coll))))
 
 (defn metrics-order [metrics-coll]
-  (map #(:slug %) metrics-coll))
+  (map :slug metrics-coll))
 
 (defn map-metric-data [metric-data]
   (apply merge (map #(hash-map (str (:period %) (:slug %)) %) metric-data)))
@@ -189,16 +189,14 @@
 
 (defn clean-data [data]
   ; a data entry is good if we have the period and one other value: cash, costs or revenue
-  (if (and (not (nil? (:period data)))
-           (not (nil? (:slug data)))
-           (or (not (nil? (:target data)))
-               (not (nil? (:value data)))))
-    (dissoc data :new)
-    nil))
+  (when (and (not (nil? (:period data)))
+             (not (nil? (:slug data)))
+             (or (not (nil? (:target data)))
+                 (not (nil? (:value data)))))
+    (dissoc data :new)))
 
 (defn clean-growth-data [growth-data]
-  (filter #(not (nil? %))
-          (vec (map (fn [[_ v]] (clean-data v)) growth-data))))
+  (remove nil? (vec (map (fn [[_ v]] (clean-data v)) growth-data))))
 
 (defn save-cb [owner data]
   (when (or (has-changes owner data) ; when the section already exists
@@ -315,7 +313,7 @@
                                     :cancel-cb cancel-fn
                                     :cancel-if-needed-cb cancel-if-needed-fn
                                     :save-cb save-fn})
-          (when (not data-editing)
+          (when-not data-editing
             (dom/div {:class "link-bar"}
               (when focus
                 (for [metric-slug slugs]
@@ -350,7 +348,7 @@
             (dom/div {:class (utils/class-set {:composed-section-body true
                                                :editable (not read-only)})}
               ;; growth metric currently shown
-              (when (and focus (not (empty? (:metric-data subsection-data))))
+              (when (and focus (seq (:metric-data subsection-data)))
                 (om/build growth-metric subsection-data))))
           (om/build update-footer {:updated-at (:updated-at section-data)
                                    :author (:author section-data)
@@ -372,16 +370,20 @@
                                    :cancel-cb cancel-fn
                                    :cancel-if-needed-cb cancel-if-needed-fn
                                    :save-cb save-fn}))
-          (when (not (empty? (:author notes-data)))
-            (om/build update-footer {:author (:author notes-data)
-                                     :updated-at (:updated-at notes-data)
-                                     :section :growth
-                                     :editing (or title-editing notes-editing data-editing)
-                                     :notes true}))
+          (when (seq (:author notes-data))
+            (om/build
+              update-footer
+              {:author (:author notes-data)
+               :updated-at (:updated-at notes-data)
+               :section :growth
+               :editing (or title-editing notes-editing data-editing)
+               :notes true}))
           (if (and (or title-editing notes-editing data-editing)
                    (not metadata-editing))
-            (om/build section-footer {:edting (or title-editing notes-editing data-editing)
-                                      :cancel-cb cancel-fn
-                                      :is-new-section (om/get-state owner :oc-editing)
-                                      :save-cb save-fn})
+            (om/build
+              section-footer
+              {:edting (or title-editing notes-editing data-editing)
+               :cancel-cb cancel-fn
+               :is-new-section (om/get-state owner :oc-editing)
+               :save-cb save-fn})
             (om/build revisions-navigator data)))))))
