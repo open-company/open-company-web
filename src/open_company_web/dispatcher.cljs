@@ -25,7 +25,9 @@
     companies
     (fn [body]
       (when body
-        (swap! app-state assoc :companies (:companies (:collection body)))))))
+        (swap! app-state assoc :companies (:companies (:collection body)))
+        ; remove loading key
+        (swap! app-state dissoc :loading)))))
 
 (def company-dispatch
   (flux/register
