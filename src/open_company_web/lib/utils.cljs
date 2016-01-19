@@ -23,9 +23,7 @@
 
 (defn get-currency [currency-code]
   (let [kw (keyword currency-code)]
-    (if (contains? iso4217 kw)
-      (kw iso4217)
-      nil)))
+    (when (contains? iso4217 kw) (kw iso4217))))
 
 (defn get-symbol-for-currency-code [currency-code]
   (let [currency (get-currency currency-code)
@@ -61,7 +59,7 @@
   (some #(= elm %) coll))
 
 (defn vec-dissoc [coll elem]
-  (vec (filter #(not (= elem %)) coll)))
+  (vec (filter #(not= elem %) coll)))
 
 (defn month-string [month & [flags]]
   (let [short-month (in? flags :short)]
@@ -173,10 +171,11 @@
   (- revenue costs))
 
 (defn calc-avg-burn-rate [periods]
-  (let [burn-rates (map #(calc-burn-rate (:revenue %) (:costs %)) periods)
-        tot (count burn-rates)]
-    (apply (fn [& items]
-             (/ (apply + items) tot)) burn-rates)))
+  (when (pos? (count periods))
+    (let [burn-rates (map #(calc-burn-rate (:revenue %) (:costs %)) periods)
+          tot (count burn-rates)]
+      (apply (fn [& items]
+               (/ (apply + items) tot)) burn-rates))))
 
 (defn calc-runway [cash burn-rate]
   (int (* (/ cash burn-rate) 30)))
@@ -187,21 +186,18 @@
   (if (empty? finances-data)
     finances-data
     (let [sort-pred (sort-by-key-pred :period)
-          sorted-data (into [] (sort #(sort-pred %1 %2) finances-data))]
-      (loop [idx 1
-             datas sorted-data]
-        (let [start (max 0 (- idx 3))
-              avg-burn-rate (calc-avg-burn-rate (subvec datas start idx))]
-          (let [period  (datas (dec idx))
-                runway (calc-runway (:cash period) avg-burn-rate) 
-                fixed-period (merge period {:runway runway
-                                            :avg-burn-rate avg-burn-rate
-                                            :burn-rate (calc-burn-rate (:revenue period) (:costs period))})
-                datas   (assoc datas (dec idx) fixed-period)]
-            (if (< idx (count sorted-data))
-              (recur (inc idx)
-                     datas)
-              datas)))))))
+          sorted-data (vec (sort sort-pred finances-data))]
+      (vec (map
+              (fn [data]
+                (let [idx (inc (.indexOf (to-array sorted-data) data))
+                      start (max 0 (- idx 3))
+                      sub-data (subvec sorted-data start idx)
+                      avg-burn-rate (calc-avg-burn-rate sub-data)
+                      runway (calc-runway (:cash data) avg-burn-rate)]
+                  (merge data {:runway runway
+                               :avg-burn-rate avg-burn-rate
+                               :burn-rate (calc-burn-rate (:revenue data) (:costs data))})))
+              sorted-data)))))
 
 (defn camel-case-str [value]
   (let [upper-value (clojure.string/replace value #"^(\w)" #(clojure.string/upper-case (first %1)))]
@@ -271,7 +267,7 @@
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
   [classes]
-  (apply str (map #(str " " (name %)) (keys (filter #(second %) classes)))))
+  (clojure.string/join (map #(str " " (name %)) (keys (filter second classes)))))
 
 (defn period-exists [period data]
   (if (pos? (count (filter #(= (:period %) period) data)))
@@ -280,7 +276,7 @@
 
 (defn current-period []
   (let [date (js/Date.)
-        month (+ (.getMonth date) 1)
+        month (inc (.getMonth date))
         month-str (str (when (< month 10) "0") month)
         cur-period (str (.getFullYear date) "-" month-str)]
     cur-period))
@@ -289,22 +285,11 @@
   "Get the section names, as a vector of keywords, in category order and order in the category."
   (vec (map keyword (flatten (remove nil? (map #(get-in company-data [:sections (keyword %)]) (:categories company-data)))))))
 
-(defn get-sections [section-keys company-data]
-  (loop [ks section-keys
-         sections []]
-    (if (> (count ks) 0)
-      (do
-        (let [k (first ks)
-              section (k company-data)]
-          (recur (subvec ks 1)
-                 (conj sections section))))
-      sections)))
-
 (def finances-empty-notes {:notes {:body ""}})
 
 (defn link-for
-  ([links rel] (some #(if (= (:rel %) rel) % nil) links))
-  ([links rel method] (some #(if (and (= (:method %) method) (= (:rel %) rel)) % nil) links)))
+  ([links rel] (some #(when (= (:rel %) rel) %) links))
+  ([links rel method] (some #(when (and (= (:method %) method) (= (:rel %) rel)) %) links)))
 
 (defn readonly? [links]
   (let [update (link-for links "update" "PUT")
@@ -316,7 +301,7 @@
   (let [finances-data (if (contains? section-body :data) (:data section-body) [])
         fixed-finances (calc-burnrate-runway finances-data)
         sort-pred (sort-by-key-pred :period true)
-        sorted-finances (sort #(sort-pred %1 %2) fixed-finances)
+        sorted-finances (sort sort-pred fixed-finances)
         fixed-section (assoc section-body :data sorted-finances)
         section-with-notes (merge finances-empty-notes fixed-section)]
     section-with-notes))
@@ -340,21 +325,21 @@
   (let [links (:links company-data)
         section-keys (get-section-keys company-data)
         read-only (readonly? links)
-        fixed-company-data (assoc company-data :read-only read-only)]
-    (loop [body fixed-company-data
-           idx  0]
-      (if (< idx (count section-keys))
-        (let [section-name (section-keys idx)
-              section-body (section-name body)
-              fixed-section (fix-section section-body section-name)
-              fixed-body (assoc body section-name fixed-section)]
-          (recur fixed-body
-                 (inc idx)))
-        body))))
+        without-sections (apply dissoc company-data section-keys)
+        with-read-only (assoc without-sections :read-only read-only)
+        sections (apply merge
+                        (map
+                          (fn [section-name]
+                            (let [section-body (section-name company-data)
+                                  fixed-section-body (fix-section section-body section-name)]
+                              (hash-map section-name fixed-section-body)))
+                          section-keys))
+        with-fixed-sections (merge with-read-only sections)]
+    with-fixed-sections))
 
 (defn sort-revisions [revisions]
   (let [sort-pred (sort-by-key-pred :updated-at)]
-    (into [] (sort #(sort-pred %1 %2) revisions))))
+    (vec (sort sort-pred revisions))))
 
 (defn as-of-now []
   (let [date (js-date)]

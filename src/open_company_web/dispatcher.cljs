@@ -1,9 +1,8 @@
 (ns open-company-web.dispatcher
   (:require [cljs-flux.dispatcher :as flux]
-            [no.en.core :refer [deep-merge]]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.caches :refer [revisions new-sections]]))
+            [open-company-web.caches :refer (revisions new-sections)]))
 
 (defonce app-state (atom {}))
 
