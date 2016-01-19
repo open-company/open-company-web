@@ -29,13 +29,16 @@
         (merge sections {category-kw new-category})))))
 
 (defn add-section [last-category last-section new-category new-section section-defaults]
+  (println "add-section" new-section section-defaults)
   (let [slug (keyword (:slug @router/path))
         company-data (slug @dispatcher/app-state)
         sections (:sections company-data)
         new-sections (insert-section last-category last-section new-category new-section sections)
         section-defaults (utils/fix-section (merge section-defaults {:oc-editing true
                                                                      :updated-at (utils/as-of-now)})
-                                            (name new-section))
+                                            (name new-section)
+                                            false
+                                            true)
         body-placeholder (if (contains? section-defaults :note)
                            (:note section-defaults)
                            (:body section-defaults))

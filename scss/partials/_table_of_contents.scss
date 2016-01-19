@@ -1,0 +1,170 @@
+div.table-of-contents {
+  position: fixed;
+  top: 50px;
+  overflow-y: auto;
+  height: 90%;
+  padding: 10px;
+  color: #2D2D2D;
+  width: 241px;
+}
+
+@media (max-width: 1024px) {
+  div.table-of-contents {
+    display: none;
+  }
+}
+
+div.table-of-contents div.table-of-contents-inner{
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+div.table-of-contents div.table-of-contents-inner div.category {
+  margin-left: 30px;
+}
+
+div.table-of-contents div.table-of-contents-inner div.category.empty {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+div.table-of-contents div.table-of-contents-inner div.category h3 {
+  font-size: 16px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+div.table-of-contents div.table-of-contents-inner div.category-section {
+  height: 57px;
+  width: 195px;
+  padding: 10px 0px 10px 10px;
+}
+
+div.table-of-contents div.category-section div.category-section-close {
+  float: left;
+  opacity: 0;
+  cursor: pointer;
+  margin-top: 9px;
+  background-image: url("/img/remove_section.png");
+  width: 20px;
+  height: 20px;
+  background-size: 20px 20px;
+}
+
+div.table-of-contents div.category-section:hover div.category-section-close:not(.read-only),
+div.table-of-contents div.category-sortable.ui-draggable-dragging div.category-section-close:not(.read-only) {
+  opacity: 1;
+}
+
+div.table-of-contents div.category-section div.category-section-sortable {
+  float: right;
+  opacity: 0;
+  cursor: hand;
+  margin-top: 6px;
+  background-image: url("/img/draggable.png");
+  width: 20px;
+  height: 30px;
+  background-size: 20px 30px;
+}
+
+div.table-of-contents div.category-section:hover div.category-section-sortable:not(.read-only),
+div.table-of-contents div.category-section.ui-draggable-dragging div.category-section-sortable:not(.read-only) {
+opacity: 1;
+}
+
+div.table-of-contents div.table-of-contents-inner div.category-section a {
+  margin: 0 0 0 10px;
+  width: 135px;
+  float: left;
+  overflow: hidden;
+}
+
+div.table-of-contents div.table-of-contents-inner div.category-section:hover,
+div.table-of-contents div.table-of-contents-inner div.category-section.ui-draggable-dragging{
+  background-color: rgba(0, 0, 0, 0.07);
+}
+
+div.table-of-contents div.table-of-contents-inner div.new-section {
+  height: 8px;
+  margin-right: 14px;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+div.table-of-contents div.table-of-contents-inner div.new-section div.new-section-internal {
+  height: 1px;
+  position: relative;
+  top: 4px;
+  left: 0px;
+  width: 178px;
+  background-color: rgba(0, 0, 0, 0.1);
+  display: none;
+}
+
+div.table-of-contents div.table-of-contents-inner div.new-section:hover div.new-section-internal {
+  display: block;
+}
+
+div.table-of-contents div.table-of-contents-inner div.new-section div.add-section {
+  width: 20px;
+  height: 20px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  position: relative;
+  left: 181px;
+  top: -6px;
+  display: none;
+  padding: 2px 0 0 4px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+div.table-of-contents div.table-of-contents-inner div.new-section:hover div.add-section {
+  display: block;
+}
+
+div.table-of-contents div.add-section:after {
+  right: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-color: rgba(0, 0, 0, 0);
+  border-right-color: rgba(0, 0, 0, 0.1);
+  border-width: 4px;
+  margin-top: -4px;
+}
+
+div.table-of-contents div.add-section.show {
+  display: block;
+}
+
+div.table-of-contents div.table-of-contents-inner div.category-section a,
+div.table-of-contents div.table-of-contents-inner div.category-section a:hover,
+div.table-of-contents div.table-of-contents-inner div.category-section a:active,
+div.table-of-contents div.table-of-contents-inner div.category-section a:visited {
+  text-decoration: none;
+}
+
+div.table-of-contents div.table-of-contents-inner div.category-section a span.section-title {
+  color: #2D2D2D;
+  font-size: 16px;
+  margin-bottom: 0px;
+  white-space: nowrap;
+  display: block;
+  word-wrap: break-word;
+  width: 100%;
+}
+
+div.table-of-contents div.table-of-contents-inner div.category-section a span.section-date {
+  color: #5B5B5B;
+  font-weight: lighter;
+  font-size: 11px;
+  margin-bottom: 0px;
+  width: 100%;
+}

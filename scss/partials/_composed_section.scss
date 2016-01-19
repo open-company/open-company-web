@@ -1,0 +1,99 @@
+div.composed-section {
+
+  div.link-bar {
+    text-align: left;
+    z-index: 1;
+    position: relative;
+    font-family: "proxima-nova", sans-serif;
+
+    a.composed-section-link {
+      text-decoration: underline;
+      color: #707070;
+      margin-left: 0px;
+      margin-right: 60px;
+      font-size: 16px;
+      display: inline-block;
+
+      &.active {
+        text-decoration: none;
+        font-weight: bold;
+      }
+    }
+  }
+
+  div.composed-section-body{
+    position: relative;
+
+    div.section {
+      text-align: left;
+
+      div.chart-header-container, div.chart-footer-container {
+        h3 {
+          margin-top: 10px;
+          margin-bottom: 0px;
+        }
+      }
+
+      div.chart-header-container {
+        text-align: left;
+        font-family: "proxima-nova", sans-serif;
+      }
+
+      div.chart-footer-container {
+        text-align: center;
+        font-family: "proxima-nova", sans-serif;
+
+        div.actual-container {
+          width: 150px;
+          float: right;
+        }
+
+        div.target-actual-container {
+          width: 150px;
+          height: 70px;
+          margin-left: 225px;
+
+          &.double {
+            width: 300px;
+            margin-left: 150px;
+          }
+        }
+      }
+
+      div.period-container p {
+        margin-top: 10px;
+        margin-bottom: 0px;
+      }
+
+      div.chart-header-container.chart-header div.actual-container,
+      div.chart-footer-container.chart-header div.actual-container {
+        float: none;
+      }
+    }
+  }
+
+  i.add-metric {
+    color: #109DB7;
+    opacity: 0;
+    cursor: default;
+    font-size: 18px;
+  }
+
+  &:hover i.add-metric {
+    opacity: 1;
+    margin-left: -30px;
+    cursor: pointer;
+
+    &.no-links {
+      margin-left: 5px;
+    }
+  }
+
+  h2{
+    text-align: left;
+  }
+
+  h2.finances-edit-title {
+    position: relative;
+  }
+}

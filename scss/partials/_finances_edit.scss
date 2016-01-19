@@ -1,0 +1,31 @@
+div.finances {
+  div.finances-body.edit {
+    position: relative;
+    width: 650px;
+
+    table {
+      margin-bottom: 0px;
+    }
+  }
+
+  div.link-bar i.editable-pen {
+    opacity: 0;
+    margin-left: -20px;
+    cursor: pointer;
+    color: #26C485;
+  }
+}
+
+div.finances:hover div.link-bar.editable i.editable-pen {
+  opacity: 1;
+}
+
+div.composed-section-edit{
+  div.finances-edit-buttons {
+    margin-left: 234px;
+
+    button.cancel {
+      margin-left: 10px;
+    }
+  }
+}

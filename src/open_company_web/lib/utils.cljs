@@ -323,8 +323,10 @@
 
 (defn fix-section 
   "Add `:section` name, `:as-of` and `:read-only` keys to the section map"
-  [section-body section-name & [read-only]]
-  (let [read-only (or read-only (readonly? (:links section-body)) false)
+  [section-body section-name & [read-only force-write]]
+  (let [read-only (if force-write
+                    false
+                    (or read-only (readonly? (:links section-body)) false))
         with-read-only (-> section-body
                         (assoc :section (name section-name))
                         (assoc :as-of (:updated-at section-body))

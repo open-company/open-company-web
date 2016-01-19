@@ -23,6 +23,17 @@
 ;; setup Sentry error reporting
 (defonce raven (raven-setup))
 
+;; Company list
+(defn home-handler [target]
+  ;; clean the caches
+  (utils/clean-company-caches)
+  ;; save route
+  (router/set-route! ["companies"] {})
+  ;; load data from api
+  (api/get-companies)
+  ;; render component
+  (om/root list-companies app-state {:target target}))
+
 ;; Handle successful and unsuccessful logins
 (defn login-handler [target query-params]
   (utils/clean-company-caches)
@@ -45,56 +56,42 @@
       (router/set-route! ["login"] {})
       ; load data from api
       (swap! app-state assoc :loading true)
-      (api/get-auth-settings)
       (when (contains? query-params :access)
         ;login went bad, add the error message to the app-state
         (swap! app-state assoc :access (:access query-params)))
       ; render component
       (om/root login app-state {:target target}))))
 
-;; Company list
-(defn home-handler [target]
-  (utils/clean-company-caches)
-  ; save the route
-  (router/set-route! ["companies"] {})
-  ; load the company list from the API
-  (api/get-companies)
-  ; render component
-  (om/root list-companies app-state {:target target}))
-
 ;; Component specific to a company
 (defn company-handler [route target component params]
   (utils/clean-company-caches)
   (let [slug (:slug (:params params))
         query-params (:query-params params)]
-    ; save the route
+    ;; save the route
     (router/set-route! ["companies" slug route] {:slug slug :query-params query-params})
-    ; do we have the company data already?
+    ;; do we have the company data already?
     (when-not (contains? @app-state (keyword slug))
       ; load the company data from the API
       (api/get-company slug)
       (swap! app-state assoc :loading true))
-    ; render component
+    ;; render component
     (om/root component app-state {:target target})))
 
-; Routes - Do not define routes when js/document#app
-; is undefined because it breaks tests
+;; Routes - Do not define routes when js/document#app
+;; is undefined because it breaks tests
 (if-let [target (. js/document (getElementById "app"))]
   (do
 
     (defroute login-route "/login" {:keys [query-params]}
       (login-handler target query-params))
 
-    (defroute home-page-route-slash "/" []
-      (home-handler target))
-
     (defroute home-page-route "/" []
       (home-handler target))
 
-    (defroute list-page-route-slash "/companies/" []
+    (defroute list-page-route "/companies" []
       (home-handler target))
 
-    (defroute list-page-route "/companies" []
+    (defroute list-page-route-slash "/companies/" []
       (home-handler target))
 
     (defroute company-route "/companies/:slug" {:as params}
@@ -116,7 +113,6 @@
 
     (def dispatch!
       (secretary/uri-dispatcher [login-route
-                                 home-page-route-slash
                                  home-page-route
                                  list-page-route-slash
                                  list-page-route
@@ -127,11 +123,11 @@
                                  not-found-route]))
 
     (defn login-wall []
-      (let [token (router/get-token)]
-        (when-not (.startsWith token "/login")
-          (if (cook/get-cookie :jwt)
-            true
-            (utils/redirect! (str "/login?login-redirect=" (router/get-token)))))))
+      ;; load the login settings from auth server
+      ;; if the user is not logged in yet
+      (when-not (or (jwt/jwt)
+                    (contains? @app-state :auth-settings))
+        (api/get-auth-settings)))
 
     (defn handle-url-change [e]
       ;; we are checking if this event is due to user action,

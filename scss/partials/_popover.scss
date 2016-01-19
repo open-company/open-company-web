@@ -1,0 +1,26 @@
+div.oc-popover-container {
+  display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.4);
+  z-index: 1031;
+
+  div.oc-popover {
+    position: absolute;
+    width: 390px;
+    height: 200px;
+    top: 50%;
+    left: 50%;
+    margin-top: -100px;
+    margin-left: -145px;
+    background-color: white;
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    border-radius: 4px;
+    overflow: auto;
+    padding: 20px 0px 10px 10px;
+  }
+}
