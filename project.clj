@@ -27,6 +27,8 @@
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
     [com.andrewmcveigh/cljs-time "0.4.0"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     [funcool/cuerdas "0.7.1"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
+    [com.facebook/react "0.12.2.4"]
+    [cljsjs/react-dom "0.14.3-1"]
   ]
 
   :plugins [
@@ -49,7 +51,7 @@
     :devcards [:dev {
       :dependencies [
         ; --- DO NOT UPDATE DEVCARDS, the 0.2.1 code results in an error: Uncaught TypeError: Cannot read property 'render' of undefined
-        [devcards "0.2.0-8"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
+        [devcards "0.2.1-5"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
       ]
     }]
   }
