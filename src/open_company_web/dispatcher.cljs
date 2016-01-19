@@ -23,49 +23,51 @@
     companies
     (fn [body]
       (when body
-        (swap! app-state assoc :companies (:companies (:collection body)))))))
+        (swap! app-state assoc :companies (:companies (:collection body)))
+        ; remove loading key
+        (swap! app-state dissoc :loading)))))
 
 (def company-dispatch
   (flux/register
     company
     (fn [body]
       (when body
-        ; remove loading key
-        (swap! app-state dissoc :loading)
         ; add section name inside each section
         (let [updated-body (utils/fix-sections body)]
-          (swap! app-state assoc (keyword (:slug updated-body)) updated-body))))))
+          (swap! app-state assoc (keyword (:slug updated-body)) updated-body)
+          ; remove loading key
+          (swap! app-state dissoc :loading))))))
 
 (def section-dispatch
   (flux/register
     section
     (fn [body]
       (when body
-        ; remove loading key
-        (swap! app-state dissoc :loading)
         (let [fixed-section (utils/fix-section (:body body) (:section body))]
-          (swap! app-state assoc-in [(:slug body) (:section body)] fixed-section))))))
+          (swap! app-state assoc-in [(:slug body) (:section body)] fixed-section)
+          ; remove loading key
+          (swap! app-state dissoc :loading))))))
 
 (def revision-dispatch
   (flux/register
     revision
     (fn [body]
       (when body
-        ; remove loading key
-        (swap! app-state dissoc :loading)
         (let [fixed-section (utils/fix-section (:body body) (:section body) true)
               assoc-in-coll [(:slug body) (:section body) (:updated-at fixed-section)]]
-          (swap! revisions assoc-in assoc-in-coll fixed-section))))))
+          (swap! revisions assoc-in assoc-in-coll fixed-section)
+          ; remove loading key
+          (swap! app-state dissoc :loading))))))
 
 (def auth-settings-dispatch
   (flux/register
     auth-settings
     (fn [body]
       (when body
-        ; remove loading key
-        (swap! app-state dissoc :loading)
         ; add auth-settings data
-        (swap! app-state assoc :auth-settings body)))))
+        (swap! app-state assoc :auth-settings body)
+        ; remove loading key
+        (swap! app-state dissoc :loading)))))
 
 (def new-section-dispatch
   (flux/register
