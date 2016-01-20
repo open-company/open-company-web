@@ -7,7 +7,7 @@
 
 (defn get-name [user]
   (let [real-name (:real_name user)]
-    (if (> (count real-name) 0)
+    (if (pos? (count real-name))
       real-name
       (:name user))))
 

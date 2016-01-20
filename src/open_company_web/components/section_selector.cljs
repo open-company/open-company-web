@@ -22,7 +22,7 @@
 
 (defn revisions-navigation-cb [owner section-name as-of]
   (let [showing-revision (om/get-state owner :as-of)]
-    (when (not (= as-of showing-revision))
+    (when-not (= as-of showing-revision)
       (om/update-state! owner :animating (fn [_]true))))
   (om/update-state! owner :next-as-of (fn [_]as-of)))
 
@@ -63,17 +63,21 @@
     (utils/scroll-to-id (str "sec-box-" section-name) anim-d)))
 
 (defn setup-box-height [section-name owner]
-  (when (not (om/get-state owner :animating))
+  (when-not (om/get-state owner :animating)
     (let [container-id (str "#sec-box-" section-name)
           height (actual-box-height owner section-name)]
       (.css (.$ js/window container-id) "height" (str height "px")))))
 
 (defn calc-height-imgs-onload [section-name owner]
-  (-> (.$ js/window (str "#sec-box-" section-name))
-      (.bind "DOMSubtreeModified"
-             (fn [] (setup-box-height section-name owner)
-                    (-> (.$ js/window (str "#sec-box-" section-name " img"))
-                        (.bind "load" #(setup-box-height section-name owner)))))))
+  (.bind
+    (.$ js/window (str "#sec-box-" section-name))
+    "DOMSubtreeModified"
+    (fn []
+      (setup-box-height section-name owner)
+      (.bind
+        (.$ js/window (str "#sec-box-" section-name " img"))
+        "load"
+        #(setup-box-height section-name owner)))))
 
 (defcomponent section-selector [data owner]
 
@@ -102,12 +106,12 @@
           actual-data (:section-data data)
           section-data (utils/select-section-data actual-data section showing-revision)
           next-section-data (utils/select-section-data actual-data section next-revision)
-          animating (and next-revision (not (= showing-revision next-revision)))
+          animating (and next-revision (not= showing-revision next-revision))
           first-box (om/get-state owner :first-box)
           a-section-data (if first-box section-data next-section-data)
           b-section-data (if first-box next-section-data section-data)
-          a-read-only (not (= (:updated-at a-section-data) (:updated-at actual-data)))
-          b-read-only (not (= (:updated-at b-section-data) (:updated-at actual-data)))]
+          a-read-only (not= (:updated-at a-section-data) (:updated-at actual-data))
+          b-read-only (not= (:updated-at b-section-data) (:updated-at actual-data))]
       (dom/div #js {:className "section-selector" :ref "section-selector"}
         (dom/div {:class "section-animator-box" :id (str "sec-box-" (name section))}
           (when a-section-data

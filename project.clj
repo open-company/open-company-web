@@ -6,10 +6,10 @@
     :url "http://www.mozilla.org/MPL/2.0/"
   }
 
-  :min-lein-version "2.5.1" ; highest version supported by Travis-CI as of 7/5/2015
+  :min-lein-version "2.5.3" ; highest version supported by Travis-CI as of 1/19/2016
 
   :dependencies [
-    [org.clojure/clojure "1.8.0-RC5"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojure "1.8.0"] ; Lisp on the JVM http://clojure.org/documentation
     [org.clojure/clojurescript "1.7.228"] ; ClojureScript compiler https://github.com/clojure/clojurescript
     ; --- DO NOT UPDATE OM, the 1.x.x code is Om Next and requires changes on our part https://github.com/omcljs/om/wiki/Quick-Start-(om.next)
     [org.omcljs/om "0.9.0" :exclusions [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
@@ -35,6 +35,7 @@
     [lein-ancient "0.6.8"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
     [lein-doo "0.1.6"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
     [lein-deps-tree "0.1.2"] ; Print a tree of project dependencies https://github.com/the-kenny/lein-deps-tree
+    [lein-kibit "0.1.2"] ; Static code analyzer https://github.com/jonase/kibit
     [lein-sassy "1.0.7"] ; Leiningen plugin to compile haml files https://github.com/101loops/lein-sass
   ]
 

@@ -23,7 +23,7 @@
 })
 
 (defn init-hallo! [owner data]
-  (when (not (om/get-state owner :hallo-initialized))
+  (when-not (om/get-state owner :hallo-initialized)
     (let [hallo-loaded (om/get-state owner :hallo-loaded)
           did-mount (om/get-state owner :did-mount)]
       (when (and hallo-loaded did-mount)
@@ -67,7 +67,7 @@
           (reset! last-html html))))))
 
 (defn trim [v]
-  (when (not (nil? v))
+  (when-not (nil? v)
     (clojure.string/trim v)))
 
 (defcomponent uncontrolled-content-editable [data owner]
@@ -110,7 +110,7 @@
   (render [_]
     (dom/div #js {:className (:class data)
                   :onInput #(emit-change owner data :on-change %)
-                  :onFocus #(when (not (:read-only data))
+                  :onFocus #(when-not (:read-only data)
                               (emit-change owner data :on-focus %))
                   :onBlur #(emit-change owner data :on-blur %)
                   :placeholder (:placeholder data)

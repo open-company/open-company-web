@@ -46,7 +46,7 @@
       ; change the slug and update all the other fields
       (let [presets (om/get-state owner :presets)
             metrics (:metrics data)
-            slugs (vec (map #(:slug %) (vals metrics)))
+            slugs (vec (map :slug (vals metrics)))
             new-slug (growth-utils/get-slug slugs presets name-value)]
         (om/set-state! owner :metric-slug new-slug)
         (change-cb slug {:slug new-slug
@@ -77,7 +77,7 @@
             present-metrics (:metrics data)
             preset-metrics (:metrics (om/get-state owner :presets))
             usable-metrics (filter-metrics preset-metrics present-metrics)
-            metrics-list (vec (sort #(compare %1 %2) (map #(:name %) usable-metrics)))
+            metrics-list (vec (sort compare (map :name usable-metrics)))
             autocomplete (.autocomplete name-input (clj->js {"source" metrics-list
                                                              "minLength" 0
                                                              "change" #(change-name owner data)}))]
@@ -130,7 +130,7 @@
   (let [slugs (:slugs data)
         slug (keyword (:slug @router/path))
         sections-map (:categories (slug @new-sections))
-        all-sections (apply concat (map (fn [sec] (:sections sec)) sections-map))
+        all-sections (mapcat :sections sections-map)
         growth-defaults (first (filter #(= (:name %) "growth") all-sections))
         all-metrics (:metrics growth-defaults)
         available-metrics (vec (filter #(not (utils/in? slugs (:slug %))) all-metrics))]
@@ -262,7 +262,7 @@
                                      (s/blank? (om/get-state owner :unit))
                                      (s/blank? (om/get-state owner :interval)))
                        :on-click #((:next-cb data))} "NEXT")
-          (when (not (:new-metric data))
+          (when-not (:new-metric data)
             (dom/button {:class "oc-btn oc-cancel black"
                          :title "Delete this metric"
                          :on-click #(show-delete-confirm-popover owner data)} "DELETE"))

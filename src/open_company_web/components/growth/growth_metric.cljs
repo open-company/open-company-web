@@ -45,7 +45,7 @@
   "Vector of max *columns elements of [:Label value]"
   [data prefix slug column-name tooltip-suffix interval]
   (let [fixed-data (growth-utils/chart-placeholder-data data slug interval)
-        has-target (some #(:target %) data)
+        has-target (some :target data)
         chart-data (partial chart-data-at-index fixed-data column-name prefix tooltip-suffix has-target interval)
         columns (if has-target
                   [["string" column-name]
@@ -79,26 +79,23 @@
           metric-info (:metric-info data)
           metric-data (:metric-data data)
           sort-pred (utils/sort-by-key-pred :period true)
-          sorted-metric (vec (sort #(sort-pred %1 %2) metric-data))
+          sorted-metric (vec (sort sort-pred metric-data))
           actual-idx (get-actual sorted-metric)
           actual-set (sorted-metric actual-idx)
           actual (.toLocaleString (or (:value actual-set) 0))
           interval (:interval metric-info)
           period (utils/get-period-string (:period actual-set) interval)
           metric-unit (:unit metric-info)
-          fixed-cur-unit (if (= metric-unit "currency")
-                           (utils/get-symbol-for-currency-code (:currency company-data))
-                           nil)
-          unit (if (= metric-unit "%")
-                 "%"
-                 nil)
+          fixed-cur-unit (when (= metric-unit "currency")
+                           (utils/get-symbol-for-currency-code (:currency company-data)))
+          unit (when (= metric-unit "%") "%")
           actual-with-label (str fixed-cur-unit actual unit)]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})
                 :key (:slug metric-info)
                 :on-click (:start-editing-cb data)}
-        (when (> (count metric-data) 0)
+        (when (pos? (count metric-data))
           (dom/div {}
             (dom/div {:class "chart-header-container"}
               (dom/div {:class "target-actual-container"}
