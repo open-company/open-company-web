@@ -8,7 +8,13 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.data.company :as company-data]
             [open-company-web.caches :as caches]
-            [open-company-web.router :as router]))
+            [open-company-web.router :as router]
+            [cljsjs.react :as react]
+            [cljsjs.react.dom :as react-dom]
+            [cljsjs.react.dom.server :as react-dom-server]
+            [sablono.core :as sablono]))
+
+(enable-console-print!)
 
 (router/set-route! ["companies" "buffer"] {:slug "buffer"})
 
