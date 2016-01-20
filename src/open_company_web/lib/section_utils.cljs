@@ -29,7 +29,6 @@
         (merge sections {category-kw new-category})))))
 
 (defn add-section [last-category last-section new-category new-section section-defaults]
-  (println "add-section" new-section section-defaults)
   (let [slug (keyword (:slug @router/path))
         company-data (slug @dispatcher/app-state)
         sections (:sections company-data)
