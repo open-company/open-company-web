@@ -5,6 +5,6 @@
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
 
-(defcomponent topic-list [data owner]
+(defcomponent topic-list [data owner options]
   (render [_]
     (dom/h4 "topics")))

@@ -6,7 +6,7 @@
             [open-company-web.components.category-nav :refer (category-nav)]
             [open-company-web.router :as router]))
 
-(defcomponent company-header [data owner]
+(defcomponent company-header [data owner options]
   (render [_]
     (let [company-data (:company-data data)]
       (dom/nav {:class "navbar navbar-fixed-top company-header"}
@@ -34,4 +34,5 @@
         
         ;; Category navigation
         (om/build category-nav {:loading (:loading data)
-                                :company-data company-data})))))
+                                :company-data company-data}
+                               {:opts options})))))
