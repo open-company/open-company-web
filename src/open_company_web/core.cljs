@@ -3,7 +3,7 @@
             [secretary.core :as secretary :refer-macros (defroute)]
             [open-company-web.router :as router]
             [open-company-web.components.page :refer (company)]
-            [open-company-web.components.dashboard :refer (dashboard)]
+            [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
@@ -101,7 +101,7 @@
       (company-handler "profile" target company params))
 
     (defroute company-dashboard-route "/companies/:slug/dashboard" {:as params}
-      (company-handler "dashboard" target dashboard params))
+      (company-handler "dashboard" target company-dashboard params))
 
     (defroute user-profile-route "/profile" {:as params}
       (utils/clean-company-caches)
