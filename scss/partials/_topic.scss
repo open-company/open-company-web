@@ -1,0 +1,24 @@
+div.topic-list {
+
+  div.topic {
+    min-height: 100px;
+    border-bottom: 1px solid #DFDFDF; /* gray */
+  }
+
+  div.topic div.topic-title {
+    padding-top: 20px;
+    font-size: 18px;
+  }
+
+  div.topic div.topic-headline {
+    font-size: 16px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  div.topic div.topic-date {
+    font-size: 12px;
+    font-style: italic;
+    color: #A6A6A3; /* gray */  
+  }
+}
