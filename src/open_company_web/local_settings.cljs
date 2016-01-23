@@ -4,9 +4,6 @@
 (def local-dsn nil) ; insert your Sentry public dsn here
 (def local-whitelist-array ["locahost" "127.0.0.1"])
 
-;; Web server
-(def ui-server-domain "http://localhost:3449")
-
 ;; API
 (def api-server-domain "http://localhost:3000")
 
