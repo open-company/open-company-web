@@ -6,7 +6,7 @@
     :url "http://www.mozilla.org/MPL/2.0/"
   }
 
-  :min-lein-version "2.5.3" ; highest version supported by Travis-CI as of 1/19/2016
+  :min-lein-version "2.5.1" ; highest version supported by Travis-CI as of 1/19/2016
 
   :dependencies [
     [org.clojure/clojure "1.8.0"] ; Lisp on the JVM http://clojure.org/documentation
@@ -18,7 +18,6 @@
     [prismatic/plumbing "0.5.2"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [prismatic/om-tools "0.4.0"] ; Tools for Om https://github.com/Prismatic/om-tools
     [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
-    [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; React test utilities https://github.com/bensu/cljs-react-test
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     [com.cognitect/transit-cljs "0.8.237"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
@@ -49,8 +48,12 @@
     }
     :devcards [:dev {
       :dependencies [
-        ; --- DO NOT UPDATE DEVCARDS, the 0.2.1 code results in an error: Uncaught TypeError: Cannot read property 'render' of undefined
-        [devcards "0.2.0-8"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
+        [devcards "0.2.1-4"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
+      ]
+    }]
+    :tests [:devcards {
+      :dependencies [
+        [cljs-react-test "0.1.3-SNAPSHOT"] ; React test utilities https://github.com/bensu/cljs-react-test
       ]
     }]
   }
@@ -177,9 +180,9 @@
     "scss!" ["sass" "watch"]
     "figwheel!" ["with-profile" "+devcards" "figwheel"]
     "devcards!" ["with-profile" "+devcards" "figwheel" "devcards"]
-    "test-navigation!" ["with-profile" "+devcards" "doo" "phantom" "test-navigation" "once"]
-    "test-company!" ["with-profile" "+devcards" "doo" "phantom" "test-company" "once"]
-    "test-ui-components!" ["with-profile" "+devcards" "doo" "phantom" "test-ui-components" "once"]
+    "test-navigation!" ["with-profile" "+tests" "doo" "phantom" "test-navigation" "once"]
+    "test-company!" ["with-profile" "+tests" "doo" "phantom" "test-company" "once"]
+    "test-ui-components!" ["with-profile" "+tests" "doo" "phantom" "test-ui-components" "once"]
     "test-all!" ["do" "test-navigation!," "test-company!," "test-ui-components!"] ; don't use in CI
   }
 
