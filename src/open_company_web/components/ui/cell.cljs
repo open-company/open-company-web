@@ -1,11 +1,11 @@
 (ns open-company-web.components.ui.cell
-  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require-macros [cljs.core.async.macros :refer (go)])
   (:require [om.core :as om]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [cuerdas.core :as s]
-            [cljs.core.async :refer [chan <!]]))
+            [cljs.core.async :refer (chan <!)]))
 
 ;; Cell component
 ;; props: 

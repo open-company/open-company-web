@@ -1,7 +1,7 @@
 (ns open-company-web.lib.server
   "Development-time server. This role is played by an nginx proxy in production."
-  (:require [ring.util.response :refer [file-response]]
-            [compojure.core :refer [defroutes GET PUT POST]]
+  (:require [ring.util.response :refer (file-response)]
+            [compojure.core :refer (defroutes GET PUT POST)]
             [compojure.route :as route]))
 
 (defn index []
@@ -21,8 +21,7 @@
   (route/files "/img/*" {:root "resources/public"}))
 
 (defn request-handler [routes]
- (fn [request]
-   (routes request)))
+ routes)
 
 (def handler
   (request-handler resources))

@@ -45,8 +45,7 @@
                                   (dissoc :body)
                                   (dissoc :note)
                                   (assoc :body-placeholder body-placeholder))
-        with-title-placeholder (-> with-body-placeholder
-                                   (assoc :title-placeholder (:title with-body-placeholder)))
+        with-title-placeholder (assoc with-body-placeholder :title-placeholder (:title with-body-placeholder))
         without-growth-metrics (assoc with-title-placeholder :metrics {})
         new-section-kw (keyword new-section)
         new-categories (if (utils/in? (:categories company-data) new-category)
