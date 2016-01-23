@@ -6,6 +6,11 @@
 
 (defonce app-state (atom {}))
 
+(defn- delay-remove-loading []
+  (.setTimeout js/window
+               #(swap! app-state dissoc :loading)
+               100))
+
 
 (def companies (flux/dispatcher))
 
@@ -37,7 +42,7 @@
         (let [updated-body (utils/fix-sections body)]
           (swap! app-state assoc (keyword (:slug updated-body)) updated-body)
           ; remove loading key
-          (swap! app-state dissoc :loading))))))
+          (delay-remove-loading))))))
 
 (def section-dispatch
   (flux/register
@@ -47,7 +52,7 @@
         (let [fixed-section (utils/fix-section (:body body) (:section body))]
           (swap! app-state assoc-in [(:slug body) (:section body)] fixed-section)
           ; remove loading key
-          (swap! app-state dissoc :loading))))))
+          (delay-remove-loading))))))
 
 (def revision-dispatch
   (flux/register
@@ -58,7 +63,7 @@
               assoc-in-coll [(:slug body) (:section body) (:updated-at fixed-section)]]
           (swap! revisions assoc-in assoc-in-coll fixed-section)
           ; remove loading key
-          (swap! app-state dissoc :loading))))))
+          (delay-remove-loading))))))
 
 (def auth-settings-dispatch
   (flux/register
@@ -68,7 +73,7 @@
         ; add auth-settings data
         (swap! app-state assoc :auth-settings body)
         ; remove loading key
-        (swap! app-state dissoc :loading)))))
+        (delay-remove-loading)))))
 
 (def new-section-dispatch
   (flux/register
