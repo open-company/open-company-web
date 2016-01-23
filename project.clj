@@ -18,7 +18,7 @@
     [prismatic/plumbing "0.5.2"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [prismatic/om-tools "0.4.0"] ; Tools for Om https://github.com/Prismatic/om-tools
     [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
-    [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; React test utilities https://github.com/bensu/cljs-react-test
+    [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react-with-addons]] ; React test utilities https://github.com/bensu/cljs-react-test
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     [com.cognitect/transit-cljs "0.8.237"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
@@ -50,11 +50,6 @@
       :dependencies [
         ; --- DO NOT UPDATE DEVCARDS, the 0.2.1 code results in an error: Uncaught TypeError: Cannot read property 'render' of undefined
         [devcards "0.2.1-4"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
-        ; explicitly include react react-dom react-dom-server sablono
-        [cljsjs/react "0.14.3-0"]
-        [cljsjs/react-dom "0.14.3-1"]
-        [cljsjs/react-dom-server "0.14.3-0"]
-        [sablono "0.5.3"]
       ]
     }]
   }
