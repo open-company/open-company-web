@@ -75,9 +75,8 @@
 
 (defn check-scrolls-and-draw [owner chart-data initial-check]
   (when-not (om/get-state owner :animated)
-    (when-let [chart-ref (om/get-ref owner "charts")]
-      (let [chart-node (.getDOMNode chart-ref)
-            $chart-node (.$ js/window chart-node)
+    (when-let [chart-node (om/get-ref owner "charts")]
+      (let [$chart-node (.$ js/window chart-node)
             chart-offset-top (.-top (.offset $chart-node))
             $window (.$ js/window js/window)
             window-scroll-top (.scrollTop $window)
@@ -91,7 +90,7 @@
                       (:pattern chart-data)
                       (:values chart-data)
                       (get-column-thickness chart-data)
-                      (.getDOMNode (om/get-ref owner "column-chart")))
+                      (om/get-ref owner "column-chart"))
           (om/set-state! owner :animated true))))))
 
 (defn draw-chart-when-visible [owner chart-data]
