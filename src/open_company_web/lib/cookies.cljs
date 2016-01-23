@@ -23,4 +23,4 @@
   ([c-name]
     (remove-cookie! (name c-name) "/"))
   ([c-name opt-path]
-    (.remove cookies-static-obj (name c-name) opt-path ls/ui-server-domain)))
+    (.remove cookies-static-obj (name c-name) opt-path ls/jwt-cookie-domain)))
