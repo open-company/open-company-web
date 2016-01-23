@@ -1,5 +1,6 @@
 (ns open-company-web.lib.cookies
-  (:require [goog.net.cookies :as cks]))
+  (:require [goog.net.cookies :as cks]
+            [open-company-web.local-settings :as ls]))
 
 (def cookies-static-obj (goog.net.Cookies. js/document))
 
@@ -22,4 +23,4 @@
   ([c-name]
     (remove-cookie! (name c-name) "/"))
   ([c-name opt-path]
-    (.remove cookies-static-obj (name c-name) opt-path)))
+    (.remove cookies-static-obj (name c-name) opt-path ls/ui-server-domain)))
