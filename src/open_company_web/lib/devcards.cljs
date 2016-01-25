@@ -10,6 +10,8 @@
             [open-company-web.caches :as caches]
             [open-company-web.router :as router]))
 
+(enable-console-print!)
+
 (router/set-route! ["companies" "buffer"] {:slug "buffer"})
 
 (def fixed-company-data (utils/fix-sections company-data/company))
