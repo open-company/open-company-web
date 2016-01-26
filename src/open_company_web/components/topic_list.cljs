@@ -11,6 +11,8 @@
         (let [company-data (:company-data data)
               active-category (keyword (:active-category options))
               active-sections (get-in company-data [:sections active-category])]
-        (dom/div {:class "row"}
-          (str active-sections)))))))
-;          (om/build topic {:topic data}))))))
+          (for [section-name active-sections]
+            (dom/div {:class "row"}
+              (om/build topic {:loading (:loading company-data)
+                               :company-data company-data}
+                               {:opts {:section-name section-name}}))))))))
