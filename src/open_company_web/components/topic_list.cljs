@@ -6,6 +6,7 @@
 
 (defcomponent topic-list [data owner options]
   (render [_]
+    (.log js/console "render topic list")
     (dom/div {:class "container"}
       (dom/div {:class "topic-list"}
         (let [company-data (:company-data data)
