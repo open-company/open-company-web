@@ -10,6 +10,7 @@
     (put! ch category-name)))
 
 (defcomponent category-nav [data owner]
+
   (render [_]
     (let [company-data (:company-data data)
           categories (:categories company-data)

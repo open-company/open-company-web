@@ -14,15 +14,14 @@
 (defcomponent company-dashboard [data owner]
 
   (init-state [_]
+    ;; Create an async channel to receive changes to the active category
     (let [category-chan (chan)]
       (utils/add-channel "change-category" category-chan))
-    (let [slug (:slug @router/path)
-          company-data ((keyword slug) data)
-          categories (:categories company-data)
-          active-category (or (some #{default-category} categories) (first categories))] ; default unless it's not there
-      {:active-category active-category}))
+    ;; Initial active category as the default
+    {:active-category default-category})
 
   (will-mount [_]
+    ;; Update the active category state when we get a change event
     (let [change-category (utils/get-channel "change-category")]
       (go (loop []
         (let [category (<! change-category)]

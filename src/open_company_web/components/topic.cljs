@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]))
 
 (defcomponent topic [data owner options]
+
   (render [_]
     (let [company-data (:company-data data)
           section (keyword (:section-name options))

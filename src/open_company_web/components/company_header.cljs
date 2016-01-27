@@ -7,6 +7,7 @@
             [open-company-web.router :as router]))
 
 (defcomponent company-header [data owner]
+ 
   (render [_]
     (let [company-data (:company-data data)]
       (dom/nav {:class "navbar navbar-fixed-top company-header"}
