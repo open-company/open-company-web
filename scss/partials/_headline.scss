@@ -1,0 +1,24 @@
+div.headline {
+
+  textarea.headline-textarea {
+    text-align: left;
+    color: #2D2D2D !important;
+    font-size: 18px;
+    font-family: "proxima-nova", sans-serif;
+    font-weight: normal;
+    color: inherit;
+    padding: 10px 0;
+    margin: 0px;
+    width: 500px;
+    min-height: 35px;
+    box-sizing: border-box;
+    border: 1px solid white;
+    outline: none;
+    resize: none;
+
+    &.edit {
+      border: 1px solid black;
+      outline: none;
+    }
+  }
+}
