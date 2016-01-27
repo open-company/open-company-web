@@ -5,6 +5,7 @@
             [open-company-web.router :as router]
             [open-company-web.components.ui.rich-editor :refer (rich-editor)]
             [open-company-web.components.ui.editable-title :refer (editable-title)]
+            [open-company-web.components.ui.headline :refer (headline)]
             [open-company-web.api :refer (save-or-create-section)]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.revisions-navigator :refer (revisions-navigator)]
@@ -21,12 +22,15 @@
     ; cancel editing
     (do
       (om/set-state! owner :title (:title (:section-data data)))
+      (om/set-state! owner :headline (:headline (:section-data data)))
       (om/set-state! owner :body (:body (:section-data data)))
       (om/set-state! owner :title-editing false)
+      (om/set-state! owner :headline-editing false)
       (om/set-state! owner :body-editing false))))
 
 (defn has-changes [owner data]
   (or (not= (:title (:section-data data)) (om/get-state owner :title))
+      (not= (:headline (:section-data data)) (om/get-state owner :headline))
       (not= (:body (:section-data data)) (om/get-state owner :body))))
 
 (defn cancel-if-needed-cb [owner data]
@@ -38,8 +42,10 @@
   (when (or (has-changes owner data) ; when the section already exists
             (om/get-state owner :oc-editing)) ; when the section is new
     (let [title (om/get-state owner :title)
+          headline (om/get-state owner :headline)
           body (om/get-state owner :body)
           section-data {:title title
+                        :headline headline
                         :body body}]
       (if (om/get-state owner :oc-editing)
         ; save a new section
@@ -50,11 +56,15 @@
         (api/save-or-create-section (merge section-data {:links (:links (:section-data data))
                                                          :section (:section data)}))))
     (om/set-state! owner :title-editing false)
+    (om/set-state! owner :headline-editing false)
     (om/set-state! owner :body-editing false)
     (om/set-state! owner :oc-editing false)))
 
 (defn start-title-editing-cb [owner data]
   (om/set-state! owner :title-editing true))
+
+(defn start-headline-editing-cb [owner data]
+  (om/set-state! owner :headline-editing true))
 
 (defn start-body-editing-cb [owner data]
   (om/set-state! owner :body-editing true))
@@ -72,9 +82,11 @@
   (init-state [_]
     (let [new-added-section (:oc-editing (:section-data data))]
       {:title-editing new-added-section
+       :headline-editing new-added-section
        :body-editing new-added-section
        :oc-editing new-added-section
        :title (:title (:section-data data))
+       :headline (:headline (:section-data data))
        :body (:body (:section-data data))}))
 
   (did-mount [this]
@@ -87,6 +99,7 @@
     ; this means the title or the body has changed from the API or at a upper lever of this component
     (when-not (= next-props (om/get-props owner))
       (om/set-state! owner :title (:title (:section-data next-props)))
+      (om/set-state! owner :headline (:headline (:section-data next-props)))
       (om/set-state! owner :body (:body (:section-data next-props)))))
 
   (render [_]
@@ -94,10 +107,13 @@
           section-name (utils/camel-case-str (name section))
           section-data (:section-data data)
           title-editing (om/get-state owner :title-editing)
+          headline-editing (om/get-state owner :headline-editing)
           body-editing (om/get-state owner :body-editing)
           start-title-editing-fn #(start-title-editing-cb owner data)
+          start-headline-editing-fn #(start-headline-editing-cb owner data)
           start-body-editing-fn #(start-body-editing-cb owner data)
           title-change-fn (partial change-cb owner :title)
+          headline-change-fn (partial change-cb owner :headline)
           body-change-fn (partial change-cb owner :body)
           cancel-fn #(cancel-cb owner data)
           cancel-if-needed-fn #(cancel-if-needed-cb owner data)
@@ -118,6 +134,17 @@
                                   :cancel-if-needed-cb cancel-if-needed-fn
                                   :save-cb save-fn})
 
+        (om/build headline {:editing headline-editing
+                            :read-only read-only
+                            :headline (om/get-state owner :headline)
+                            :placeholder "Headline"
+                            :section (:section data)
+                            :start-editing-cb start-headline-editing-fn
+                            :change-cb headline-change-fn
+                            :cancel-cb cancel-fn
+                            :cancel-if-needed-cb cancel-if-needed-fn
+                            :save-cb save-fn})
+
         (dom/div {:class "simple-section-body"}
           (om/build rich-editor {:editing body-editing
                                  :section section
@@ -135,11 +162,11 @@
         (om/build update-footer {:author (:author section-data)
                                  :updated-at (:updated-at section-data)
                                  :section section
-                                 :editing (or title-editing body-editing)
+                                 :editing (or title-editing headline-editing body-editing)
                                  :notes false})
         (dom/div {:class "simple-section-footer"}
-          (if (or title-editing body-editing)
-            (om/build section-footer {:edting (or title-editing body-editing)
+          (if (or title-editing headline-editing body-editing)
+            (om/build section-footer {:edting (or title-editing headline-editing body-editing)
                                       :cancel-cb cancel-fn
                                       :save-cb save-fn
                                       :is-new-section (om/get-state owner :oc-editing)
