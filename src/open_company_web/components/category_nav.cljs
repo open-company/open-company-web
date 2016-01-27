@@ -10,12 +10,11 @@
   (let [ch (utils/get-channel "change-category")]
     (put! ch category-name)))
 
-(defcomponent category-nav [data owner options]
+(defcomponent category-nav [data owner]
   (render [_]
     (let [company-data (:company-data data)
           categories (:categories company-data)
-          active-category (:active-category options)
-          set-active-category (:set-active-category options)]
+          active-category (:active-category data)]
       (dom/div {:class "row category-nav"}
         (for [category categories]
           (let [category-name (name category)
