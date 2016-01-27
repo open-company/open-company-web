@@ -1,4 +1,18 @@
 div.headline {
+  width: 500px;
+  margin-top: -10px;
+
+  label.headline-counter{
+    float: right;
+    font-size: 14px;
+    color: lightgray;
+    opacity: 0;
+    margin-bottom: 0px;
+
+    &.edit {
+      opacity: 1;
+    }
+  }
 
   textarea.headline-textarea {
     text-align: left;

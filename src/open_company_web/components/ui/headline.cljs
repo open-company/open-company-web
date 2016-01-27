@@ -7,9 +7,17 @@
             [cljs-dynamic-resources.core :as cdr]))
 
 (defcomponent headline [data owner]
+  (init-state [_]
+    {:char-count 100})
+
+  (will-receive-props [_ next-props]
+    (om/set-state! owner :char-count (- 100 (count (:headline next-props)))))
+
   (render [_]
     (let [headline (:headline data)]
       (dom/div {:class "headline"}
+        (dom/label {:class (utils/class-set {:headline-counter true
+                                             :edit (:editing data)})} (om/get-state owner :char-count))
         (dom/textarea #js {:ref "headline-textarea"
                            :id (str "headline-" (name (:section data)))
                            :className (utils/class-set {:headline-textarea true
