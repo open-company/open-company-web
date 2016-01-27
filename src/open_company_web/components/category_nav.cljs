@@ -6,7 +6,6 @@
             [open-company-web.lib.utils :as utils]))
 
 (defn change-category [category-name]
-  (.log js/console (str "sending: " category-name))
   (let [ch (utils/get-channel "change-category")]
     (put! ch category-name)))
 

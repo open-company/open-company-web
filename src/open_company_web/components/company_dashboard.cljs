@@ -26,13 +26,10 @@
     (let [change-category (utils/get-channel "change-category")]
       (go (loop []
         (let [category (<! change-category)]
-          (.log js/console (str "received: " category))
           (om/set-state! owner :active-category category)
           (recur))))))
 
   (render-state [_ state]
-    (.log js/console "render dashboard")
-    (.log js/console (str "active: " (:active-category state)))
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)]
       (dom/div {:class "company-dashboard"}
