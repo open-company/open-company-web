@@ -1,0 +1,30 @@
+div.company-dashboard {
+
+  div.category-nav {
+    border-top: 1px solid #DFDFDF; /* gray */
+    border-bottom: 1px solid #DFDFDF; /* gray */
+  }
+
+  div.category {
+    min-height: 40px;
+    /* vertically center the text */
+    padding-top: 10px;
+    vertical-align: middle;
+    /* horizontally center the text */
+    text-align: center;
+  }
+
+  div.category-label {
+    font-size: 16px;
+    padding-left: 5px;
+    padding-right: 5px;
+    display: inline-block;
+    color: #A6A6A3; /* gray */
+    min-height: 30px;
+  }
+
+  div.category.active div.category-label {
+    color: black;
+    border-bottom: 3px solid black;
+  }
+}
