@@ -3,6 +3,9 @@ div.company-dashboard {
   div.category-nav {
     border-top: 1px solid #DFDFDF; /* gray */
     border-bottom: 1px solid #DFDFDF; /* gray */
+    background-color: white;
+    width: 100%;
+    z-index: 1;
   }
 
   div.category {
