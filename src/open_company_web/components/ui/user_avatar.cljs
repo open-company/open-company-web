@@ -1,6 +1,6 @@
 (ns open-company-web.components.ui.user-avatar
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
@@ -10,9 +10,7 @@
 
 (defcomponent user-avatar [data owner]
   (render [_]
-    (let [av-size (if (:size data)
-                    (:size data)
-                    df-user-avatar-size)
+    (let [av-size (or (:size data) df-user-avatar-size)
           px-size (utils/px av-size)
           bd-radius (utils/px (int (/ av-size 2)))]
       (dom/div {:class "user-avatar"}

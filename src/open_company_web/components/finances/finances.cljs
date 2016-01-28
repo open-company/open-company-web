@@ -76,7 +76,7 @@
 (defn has-title-changes [owner data]
   (let [section-data (:section-data data)]
     (and (not= (:title section-data) (om/get-state owner :title))
-         (> (count (om/get-state owner :title)) 0))))
+         (pos? (count (om/get-state owner :title))))))
 
 (defn has-notes-changes [owner data]
   (let [section-data (:section-data data)
@@ -117,7 +117,7 @@
     v))
 
 (defn fix-row [row]
-  (let [fixed-cash (assoc row :cash (get-finances-value (:cash row)))
+  (let [fixed-cash (update-in row [:cash] get-finances-value)
         fixed-revenue (assoc fixed-cash :revenue (get-finances-value (:revenue row)))
         fixed-costs (assoc fixed-revenue :costs (get-finances-value (:costs row)))
         fixed-burnrate (assoc fixed-costs :burn-rate (utils/calc-burn-rate (:revenue fixed-costs) (:costs fixed-costs)))
@@ -133,16 +133,14 @@
 
 (defn clean-data [data]
   ; a data entry is good if we have the period and one other value: cash, costs or revenue
-  (if (and (not (nil? (:period data)))
-           (or (not (nil? (:cash data)))
-               (not (nil? (:costs data)))
-               (not (nil? (:revenue data)))))
-    (dissoc data :burn-rate :runway :avg-burn-rate :new :value)
-    nil))
+  (when (and (not (nil? (:period data)))
+             (or (not (nil? (:cash data)))
+                 (not (nil? (:costs data)))
+                 (not (nil? (:revenue data)))))
+    (dissoc data :burn-rate :runway :avg-burn-rate :new :value)))
 
 (defn clean-finances-data [finances-data]
-  (filter #(not (nil? %))
-          (vec (map (fn [[_ v]] (clean-data v)) finances-data))))
+  (remove nil? (vec (map (fn [[_ v]] (clean-data v)) finances-data))))
 
 (defn can-save [owner data]
   (cond
@@ -150,7 +148,7 @@
     (om/get-state owner :oc-editing)
     ; finances has data and title is not empty
     (and (has-not-zero-data owner)
-         (> (count (om/get-state owner :title)) 0))
+         (pos? (count (om/get-state owner :title))))
 
     ; title data and notes editing
     (and (om/get-state owner :title-editing)
@@ -249,7 +247,7 @@
           read-only-section (:read-only section-data)
           read-only (or (:read-only data) read-only-section)
           finances-row-data (:data section-data)
-          sum-revenues (apply + (map #(:revenue %) finances-row-data))
+          sum-revenues (apply + (map :revenue finances-row-data))
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
           needs-runway (some #(neg? (:runway %)) finances-row-data)
           needs-cash-flow (has-revenues-or-costs finances-row-data)
@@ -327,7 +325,7 @@
                                      :section :finances
                                      :editing (or title-editing notes-editing data-editing)
                                      :notes false})
-            (when (or (not (empty? (:body notes-data)))
+            (when (or (seq (:body notes-data))
                       (not read-only))
               (om/build rich-editor {:editing notes-editing
                                      :section :finances
@@ -340,12 +338,14 @@
                                      :cancel-cb cancel-fn
                                      :cancel-if-needed-cb cancel-if-needed-fn
                                      :save-cb save-fn}))
-            (when (not (empty? (:author notes-data)))
-              (om/build update-footer {:author (:author notes-data)
-                                       :updated-at (:updated-at notes-data)
-                                       :section :finances
-                                       :editing (or title-editing notes-editing data-editing)
-                                       :notes true}))
+            (when (seq (:author notes-data))
+              (om/build
+                update-footer
+                  {:author (:author notes-data)
+                   :updated-at (:updated-at notes-data)
+                   :section :finances
+                   :editing (or title-editing notes-editing data-editing)
+                   :notes true}))
             (if (or title-editing notes-editing data-editing)
               (om/build section-footer {:editing (or title-editing notes-editing data-editing)
                                         :cancel-cb cancel-fn

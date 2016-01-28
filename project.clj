@@ -6,19 +6,18 @@
     :url "http://www.mozilla.org/MPL/2.0/"
   }
 
-  :min-lein-version "2.5.1" ; highest version supported by Travis-CI as of 7/5/2015
+  :min-lein-version "2.5.1" ; highest version supported by Travis-CI as of 1/19/2016
 
   :dependencies [
-    [org.clojure/clojure "1.8.0-RC5"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojure "1.8.0"] ; Lisp on the JVM http://clojure.org/documentation
     [org.clojure/clojurescript "1.7.228"] ; ClojureScript compiler https://github.com/clojure/clojurescript
     ; --- DO NOT UPDATE OM, the 1.x.x code is Om Next and requires changes on our part https://github.com/omcljs/om/wiki/Quick-Start-(om.next)
-    [org.omcljs/om "0.9.0" :exclusions [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
+    [org.omcljs/om "0.9.0" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
     [cljs-http "0.1.39"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/schema "1.0.4"] ; Dependency of om-tools https://github.com/Prismatic/schema
     [prismatic/plumbing "0.5.2"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [prismatic/om-tools "0.4.0"] ; Tools for Om https://github.com/Prismatic/om-tools
     [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
-    [cljs-react-test "0.1.3-SNAPSHOT" :exclusions [cljsjs/react]] ; React test utilities https://github.com/bensu/cljs-react-test
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     [com.cognitect/transit-cljs "0.8.237"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
@@ -27,6 +26,7 @@
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
     [com.andrewmcveigh/cljs-time "0.4.0"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     [funcool/cuerdas "0.7.1"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
+    [cljsjs/react "0.14.3-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
   ]
 
   :plugins [
@@ -35,6 +35,7 @@
     [lein-ancient "0.6.8"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
     [lein-doo "0.1.6"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo
     [lein-deps-tree "0.1.2"] ; Print a tree of project dependencies https://github.com/the-kenny/lein-deps-tree
+    [lein-kibit "0.1.2"] ; Static code analyzer https://github.com/jonase/kibit
     [lein-sassy "1.0.7"] ; Leiningen plugin to compile haml files https://github.com/101loops/lein-sass
   ]
 
@@ -48,8 +49,12 @@
     }
     :devcards [:dev {
       :dependencies [
-        ; --- DO NOT UPDATE DEVCARDS, the 0.2.1 code results in an error: Uncaught TypeError: Cannot read property 'render' of undefined
-        [devcards "0.2.0-8"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
+        [devcards "0.2.1-4"] ; Devcards aims to provide a visual REPL experience for ClojureScript https://github.com/bhauman/devcards
+      ]
+    }]
+    :tests [:devcards {
+      :dependencies [
+        [cljs-react-test "0.1.3-SNAPSHOT"] ; React test utilities https://github.com/bensu/cljs-react-test
       ]
     }]
   }
@@ -176,9 +181,9 @@
     "scss!" ["sass" "watch"]
     "figwheel!" ["with-profile" "+devcards" "figwheel"]
     "devcards!" ["with-profile" "+devcards" "figwheel" "devcards"]
-    "test-navigation!" ["with-profile" "+devcards" "doo" "phantom" "test-navigation" "once"]
-    "test-company!" ["with-profile" "+devcards" "doo" "phantom" "test-company" "once"]
-    "test-ui-components!" ["with-profile" "+devcards" "doo" "phantom" "test-ui-components" "once"]
+    "test-navigation!" ["with-profile" "+tests" "doo" "phantom" "test-navigation" "once"]
+    "test-company!" ["with-profile" "+tests" "doo" "phantom" "test-company" "once"]
+    "test-ui-components!" ["with-profile" "+tests" "doo" "phantom" "test-ui-components" "once"]
     "test-all!" ["do" "test-navigation!," "test-company!," "test-ui-components!"] ; don't use in CI
   }
 

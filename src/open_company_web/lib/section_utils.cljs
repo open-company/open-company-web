@@ -29,7 +29,6 @@
         (merge sections {category-kw new-category})))))
 
 (defn add-section [last-category last-section new-category new-section section-defaults]
-  (println "add-section" new-section section-defaults)
   (let [slug (keyword (:slug @router/path))
         company-data (slug @dispatcher/app-state)
         sections (:sections company-data)
@@ -46,8 +45,7 @@
                                   (dissoc :body)
                                   (dissoc :note)
                                   (assoc :body-placeholder body-placeholder))
-        with-title-placeholder (-> with-body-placeholder
-                                   (assoc :title-placeholder (:title with-body-placeholder)))
+        with-title-placeholder (assoc with-body-placeholder :title-placeholder (:title with-body-placeholder))
         without-growth-metrics (assoc with-title-placeholder :metrics {})
         new-section-kw (keyword new-section)
         new-categories (if (utils/in? (:categories company-data) new-category)

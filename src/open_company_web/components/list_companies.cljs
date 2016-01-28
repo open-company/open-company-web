@@ -18,7 +18,9 @@
       (dom/div {:class "row-fluid"}
         (om/build navbar data)
         (dom/h1 "Companies:")
-        (if (> (count company-list) 0)
+        (if (pos? (count company-list))
           (dom/ul
             (om/build-all list-page-item company-list))
-          (dom/h2 "No companies found."))))))
+          (if (:loading data)
+            (dom/h4 "Loading companies...")
+            (dom/h2 "No companies found.")))))))

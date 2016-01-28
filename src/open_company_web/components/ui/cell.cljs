@@ -1,11 +1,11 @@
 (ns open-company-web.components.ui.cell
-  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require-macros [cljs.core.async.macros :refer (go)])
   (:require [om.core :as om]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [cuerdas.core :as s]
-            [cljs.core.async :refer [chan <!]]))
+            [cljs.core.async :refer (chan <!)]))
 
 ;; Cell component
 ;; props: 
@@ -24,7 +24,7 @@
   (when (= state :edit)
     (.setTimeout js/window #(let [input (om/get-ref owner "edit-field")]
                               (when input
-                                (.focus (.getDOMNode input)))) 10)))
+                                (.focus input))) 10)))
 
 (defn- initial-cell-state
   "Get the initial state for the cell.
@@ -116,7 +116,7 @@
             (dom/input #js {
                        :ref "edit-field"
                        :value value
-                       :onFocus #(let [input (.getDOMNode (om/get-ref owner "edit-field"))]
+                       :onFocus #(let [input (om/get-ref owner "edit-field")]
                                    (set! (.-value input) (.-value input)))
                        :onChange #(om/set-state! owner :value (.. % -target -value))
                        :onBlur #(exit-cell % owner data)

@@ -18,6 +18,7 @@
     (api/patch-company slug {:name (:name company-data)
                              :slug slug
                              :currency (:currency company-data)
+                             :description (:description company-data)
                              :logo logo})))
 
 (defn- check-image [url owner cb]
@@ -48,7 +49,9 @@
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)]
       {:initial-logo (:logo company-data)
-       :logo (:logo company-data)}))
+       :logo (:logo company-data)
+       :name (:name company-data)
+       :description (:description company-data)}))
 
   (will-receive-props [_ next-props]
     (let [slug (:slug @router/path)
@@ -72,6 +75,8 @@
   (render [_]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)]
+      (when (:read-only company-data)
+        (utils/redirect! (str "/companies/" (name slug))))
       (dom/div {:class "profile-container"}
         ;; Company
         (dom/div {:class "row"}
@@ -84,9 +89,11 @@
                 (dom/input {
                   :type "text"
                   :id "name"
-                  :value (:name company-data)
-                  :on-change #(utils/change-value company-data % :name)
-                  :on-blur #(utils/save-values "save-company")
+                  :value (om/get-state owner :name)
+                  :on-change #(om/set-state! owner :name (.. % -target -value))
+                  :on-blur (fn [e]
+                             (utils/handle-change company-data (om/get-state owner :name) :name)
+                             (utils/save-values "save-company"))
                   :class "form-control"}))
               (dom/p {:class "help-block"} "Casual company name (leave out Inc., LLC, etc.)"))
 
@@ -110,7 +117,8 @@
                   :type "file"
                   :id "currency"
                   :value (:currency company-data)
-                  :on-change (fn [e] (utils/change-value company-data e :currency)
+                  :on-change (fn [e]
+                               (utils/change-value company-data e :currency)
                                (utils/save-values "save-company"))
                   :class "form-control"}
                     (for [currency (sorted-iso4217)]
@@ -133,4 +141,18 @@
                   :on-change #(om/set-state! owner :logo (.. % -target -value))
                   :on-blur #(utils/save-values "save-company")
                   :placeholder "http://example.com/logo.png"}))
-              (dom/p {:class "help-block"} "URL to company logo"))))))))
+              (dom/p {:class "help-block"} "URL to company logo"))
+
+            ;; Company description
+            (dom/div {:class "form-group"}
+              (dom/label {:for "logo" :class "col-sm-3 control-label"} "Description")
+              (dom/div {:class "col-sm-5"}
+                (dom/textarea {
+                  :value (om/get-state owner :description)
+                  :id "description"
+                  :class "form-control"
+                  :on-change #(om/set-state! owner :description (.. % -target -value))
+                  :on-blur (fn [e]
+                             (utils/handle-change company-data (om/get-state owner :description) :description)
+                             (utils/save-values "save-company"))}))
+              (dom/p {:class "help-block"} "Description of the company"))))))))

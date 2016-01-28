@@ -18,6 +18,7 @@ script:
   - lein2 test-navigation!
   - lein2 test-company!
   - lein2 test-ui-components!
+  - lein2 kibit
   - "script/sass-test.rb"
 cache:
   directories:
