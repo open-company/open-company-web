@@ -57,7 +57,7 @@
     (let [finances-data (:data (:section-data data))
           sort-pred (utils/sort-by-key-pred :period true)
           sorted-finances (sort sort-pred finances-data)
-          fixed-runway-finances (map #(assoc-in % [:runway] fix-runway) sorted-finances)
+          fixed-runway-finances (map #(update-in % [:runway] fix-runway) sorted-finances)
           value-set (first fixed-runway-finances)
           runway-value (:runway value-set)
           is-profitable (pos? (:runway (first sorted-finances)))

@@ -11,7 +11,6 @@
                #(swap! app-state dissoc :loading)
                100))
 
-
 (def companies (flux/dispatcher))
 
 (def company (flux/dispatcher))
