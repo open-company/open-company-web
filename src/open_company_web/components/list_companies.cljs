@@ -9,7 +9,9 @@
 (defcomponent list-page-item [data owner]
   (render [_]
     (dom/li
-      (om/build link {:href (str "/companies/" (:slug data)) :name (:name data)}))))
+      (om/build link {:href (str "/companies/" (:slug data)) :name (:name data)})
+      (dom/label {:style {:margin "0px 5px"}} " - ")
+      (om/build link {:href (str "/companies/" (:slug data) "/dashboard") :name "Dashboard"}))))
 
 (defcomponent list-companies [data owner]
   (render [_]
