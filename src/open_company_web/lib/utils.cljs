@@ -63,44 +63,43 @@
 
 (defn month-string [month & [flags]]
   (let [short-month (in? flags :short)]
-    (case month
-      "01" (if short-month
+    (case (.parseInt js/window month 10)
+      1 (if short-month
              "JAN"
              "January")
-      "02" (if short-month
+      2 (if short-month
              "FEB"
              "February")
-      "03" (if short-month
+      3 (if short-month
              "MAR"
              "March")
-      "04" (if short-month
+      4 (if short-month
              "APR"
              "April")
-      "05" (if short-month
+      5 (if short-month
              "MAY"
              "May")
-      "06" (if short-month
+      6 (if short-month
              "JUN"
              "June")
-      "07" (if short-month
+      7 (if short-month
              "JUL"
              "July")
-      "08" (if short-month
+      8 (if short-month
              "AUG"
              "August")
-      "09" (if short-month
+      9 (if short-month
              "SEP"
              "September")
-      "10" (if short-month
+      10 (if short-month
              "OCT"
              "October")
-      "11" (if short-month
+      11 (if short-month
              "NOV"
              "November")
-      "12" (if short-month
+      12 (if short-month
              "DEC"
-             "December")
-      "")))
+             "December"))))
 
 (defn month-string-int [month & [flags]]
   (let [short-month (in? flags :short)]
