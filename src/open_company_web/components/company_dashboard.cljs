@@ -35,7 +35,7 @@
       (dom/div {:class "company-dashboard row-fluid"}
 
         ;; navbar
-        (om/build navbar data)
+        (om/build navbar (assoc data :show-share true))
 
         ;; company header
         (om/build company-header {:loading (:loading company-data)

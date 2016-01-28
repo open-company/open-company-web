@@ -22,6 +22,8 @@
       (dom/div {:id "navbar" :class "navbar-collapse collapse"}
         (dom/ul {:class "nav navbar-nav navbar-right"}
           (dom/li {}
-            (if (jwt/jwt)
-              (om/build user-avatar {})
-              (om/build login-button data))))))))
+            (if (:show-share data)
+              (dom/button {:type "button" :class "btn btn-default round share-button"} "Share")
+              (if (jwt/jwt)
+                (om/build user-avatar {})
+                (om/build login-button data)))))))))
