@@ -32,9 +32,7 @@
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)]
       (dom/div {:class "company-dashboard"}
-        (om/build company-header {:loading (:loading company-data)
-                                  :company-data company-data
-                                  :active-category (:active-category state)})
+        (om/build company-header (assoc data :active-category (:active-category state)))
         (om/build topic-list {:loading (:loading company-data)
                               :company-data company-data
                               :active-category (:active-category state)})))))

@@ -10,7 +10,8 @@
 (defcomponent company-header [data owner]
  
   (render [_]
-    (let [company-data (:company-data data)]
+    (let [slug (:slug @router/path)
+          company-data ((keyword slug) data)]
       (dom/div {:class "company-header row-fluid"}
 
         ;; navbar
