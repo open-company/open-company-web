@@ -41,12 +41,13 @@ nav.navbar {
   }
 
   button.share-button{
-    margin-top: 7px;
-    font-size: 18px;
-    color: black;
+    margin-top: 4px;
+    img {
+      // width: 20px;
+      height: 30px;
+    }
 
     &:hover, &:active, &:focus {
-      color: black;
       outline: none;
     }
   }
@@ -54,12 +55,11 @@ nav.navbar {
   button.digest-button{
     margin-top: 4px;
     img {
-      width: 20px;
+      // width: 20px;
       height: 20px;
     }
 
     &:hover, &:active, &:focus {
-      color: black;
       outline: none;
     }
   }

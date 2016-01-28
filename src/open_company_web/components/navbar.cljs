@@ -26,7 +26,7 @@
                 (dom/button {:type "button" :class "btn btn-link digest-button"}
                             (dom/img {:src "/img/digest.svg"}))
                 (dom/button {:type "button" :class "btn btn-link share-button"}
-                            (dom/i {:class "fa fa-share-alt"})))
+                            (dom/img {:src "/img/share.svg"})))
               (if (jwt/jwt)
                 (om/build user-avatar {})
                 (om/build login-button data))))))
