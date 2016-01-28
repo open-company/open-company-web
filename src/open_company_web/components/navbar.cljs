@@ -18,12 +18,16 @@
       (dom/div {:class "navbar-header"}
         (when (contains? @router/path :slug)
           (let [slug (keyword (:slug @router/path))]
-            (om/build company-avatar {:company-data (slug data) :navbar-brand true}))))
-      (dom/div {:id "navbar" :class "navbar-collapse collapse"}
+            (om/build company-avatar {:company-data (slug data) :navbar-brand true})))
         (dom/ul {:class "nav navbar-nav navbar-right"}
           (dom/li {}
             (if (:show-share data)
-              (dom/button {:type "button" :class "btn btn-default round share-button"} "Share")
+              (dom/div {}
+                (dom/button {:type "button" :class "btn btn-link digest-button"}
+                            (dom/img {:src "/img/digest.svg"}))
+                (dom/button {:type "button" :class "btn btn-link share-button"}
+                            (dom/i {:class "fa fa-share-alt"})))
               (if (jwt/jwt)
                 (om/build user-avatar {})
-                (om/build login-button data)))))))))
+                (om/build login-button data))))))
+      (dom/div {:id "navbar" :class "navbar-collapse collapse container-fluid"}))))

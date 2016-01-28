@@ -11,10 +11,24 @@
 }
 
 @media (min-width: 960px) {
+  nav.navbar {
+    width: auto;
+  }
   nav.navbar > div {
-    width: 1170px;
+    width: auto;
     padding-left: 85px;
     padding-right: 85px;
+  }
+}
+
+@media (max-width: 960px) {
+  nav.navbar {
+    width: auto;
+
+    div#navbar {
+      width: auto;
+      padding-right: 230px;
+    }
   }
 }
 
@@ -22,8 +36,37 @@ nav.navbar {
   background-color: white;
   border-bottom: 1px solid rgba(0, 0, 0, 0.6);
 
+  div.navbar-header {
+    width: 100%;
+  }
+
   button.share-button{
     margin-top: 7px;
+    font-size: 18px;
+    color: black;
+
+    &:hover, &:active, &:focus {
+      color: black;
+      outline: none;
+    }
+  }
+
+  button.digest-button{
+    margin-top: 4px;
+    img {
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover, &:active, &:focus {
+      color: black;
+      outline: none;
+    }
+  }
+
+  ul.navbar-right {
+    float: right;
+    margin-right: 50px;
   }
 }
 
