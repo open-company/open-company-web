@@ -6,6 +6,7 @@
             [cljs.core.async :refer (chan <!)]
             [open-company-web.components.company-header :refer [company-header]]
             [open-company-web.components.topic-list :refer [topic-list]]
+            [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
 
@@ -31,8 +32,17 @@
   (render-state [_ state]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)]
-      (dom/div {:class "company-dashboard"}
-        (om/build company-header (assoc data :active-category (:active-category state)))
+      (dom/div {:class "company-dashboard row-fluid"}
+
+        ;; navbar
+        (om/build navbar data)
+
+        ;; company header
+        (om/build company-header {:loading (:loading company-data)
+                                  :company-data company-data
+                                  :active-category (:active-category state)})
+
+        ;; topic list
         (om/build topic-list {:loading (:loading company-data)
                               :company-data company-data
                               :active-category (:active-category state)})))))
