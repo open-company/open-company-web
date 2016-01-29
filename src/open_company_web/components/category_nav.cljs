@@ -17,6 +17,7 @@
           nav-height (.height $nav)
           $win (.$ js/window js/window)
           max-scroll-top (- initial-offset-top nav-height)]
+      (.alert js/window (str "initial-offset-top:" initial-offset-top " nav-height:" nav-height "=>" max-scroll-top))
       (.scroll $win (fn [e]
                       (let [scroll-top (.scrollTop $win)]
                         (if (>= scroll-top max-scroll-top)
