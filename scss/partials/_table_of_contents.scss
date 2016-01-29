@@ -8,7 +8,7 @@ div.table-of-contents {
   width: 241px;
 }
 
-@media (max-width: 1024px) {
+@media screen and (max-width: 1024px) {
   div.table-of-contents {
     display: none;
   }
