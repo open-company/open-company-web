@@ -24,7 +24,6 @@
                            nav-height (.height $nav)
                            tmp-scroll-top (- initial-offset-top nav-height)]
                        (reset! max-scroll-top tmp-scroll-top)))
-                   (println "max-scroll-top:" @max-scroll-top)
                    (if (>= scroll-top @max-scroll-top)
                      ;; top scroll reached, fix the bar and don't let it scroll
                      (do
