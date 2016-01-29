@@ -14,7 +14,7 @@
           section (keyword (:section-name options))
           section-data (company-data section)
           expanded (om/get-state owner :expanded)]
-      (dom/div {:class "col-xs-12 topic"
+      (dom/div {:class "topic"
                 :on-click #(om/set-state! owner :expanded (not expanded))}
         (dom/div {:class "topic-title"} (:title section-data))
         (dom/div {:class "topic-headline"} (:headline section-data))

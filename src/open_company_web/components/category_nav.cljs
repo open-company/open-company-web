@@ -9,7 +9,7 @@
   (let [ch (utils/get-channel "change-category")]
     (put! ch category-name)))
 
-(def max-scroll-top 115)
+(def max-scroll-top 88)
 
 (defn check-scroll [owner]
   (when-let [cat-node (om/get-ref owner "category-nav")]
