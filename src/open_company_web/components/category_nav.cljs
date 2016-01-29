@@ -10,16 +10,15 @@
     (put! ch category-name)))
 
 (defn check-scroll [owner]
-  (when-let [cat-node (om/get-ref owner "category-nav")]
-    (let [$cat-node (.$ js/window cat-node)
-          $nav (.$ js/window "nav.navbar")
-          initial-offset-top (.-top (.offset $cat-node))
-          nav-height (.height $nav)
-          $win (.$ js/window js/window)
-          max-scroll-top (- initial-offset-top nav-height)]
-      (.alert js/window (str "initial-offset-top:" initial-offset-top " nav-height:" nav-height "=>" max-scroll-top))
-      (.scroll $win (fn [e]
-                      (let [scroll-top (.scrollTop $win)]
+  (let [$win (.$ js/window js/window)]
+    (.scroll $win (fn [e]
+                    (when-let [cat-node (om/get-ref owner "category-nav")]
+                      (let [$cat-node (.$ js/window cat-node)
+                            $nav (.$ js/window "nav.navbar")
+                            initial-offset-top (.-top (.offset $cat-node))
+                            nav-height (.height $nav)
+                            scroll-top (.scrollTop $win)
+                            max-scroll-top (- initial-offset-top nav-height)]
                         (if (>= scroll-top max-scroll-top)
                           ;; top scroll reached, fix the bar and don't let it scroll
                           (do
