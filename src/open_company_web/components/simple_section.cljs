@@ -137,7 +137,7 @@
         (om/build headline {:editing headline-editing
                             :read-only read-only
                             :headline (om/get-state owner :headline)
-                            :placeholder "Headline"
+                            :placeholder "A headline of 100 characters or less."
                             :section (:section data)
                             :start-editing-cb start-headline-editing-fn
                             :change-cb headline-change-fn
