@@ -20,9 +20,9 @@
       (dom/div {:class "row-fluid"}
         (om/build navbar data)
         (dom/h1 "Companies:")
-        (if (pos? (count company-list))
-          (dom/ul
-            (om/build-all list-page-item company-list))
-          (if (:loading data)
-            (dom/h4 "Loading companies...")
+        (if (:loading data)
+          (dom/h4 "Loading companies...")
+          (if (pos? (count company-list))
+            (dom/ul
+              (om/build-all list-page-item company-list))
             (dom/h2 "No companies found.")))))))
