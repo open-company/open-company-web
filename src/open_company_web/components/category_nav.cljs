@@ -33,7 +33,7 @@
 (defcomponent category-nav [data owner]
 
   (did-mount [_]
-    (.setTimeout js/window #(check-scroll owner) 500))
+    (.setTimeout js/window #(check-scroll owner) 1000))
 
   (render [_]
     (let [company-data (:company-data data)
