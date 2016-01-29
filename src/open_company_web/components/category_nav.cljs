@@ -19,9 +19,13 @@
                       (let [scroll-top (.scrollTop $win)]
                         (if (>= scroll-top max-scroll-top)
                           ;; top scroll reached, fix the bar and don't let it scroll
-                          (.css $cat-node #js {"position" "fixed" "top" "50px"})
+                          (do
+                            (.css (.$ js/window ".topic-list") #js {"margin-top" "44px"})
+                            (.css $cat-node #js {"position" "fixed" "top" "50px"}))
                           ;; let the bar move free with the scroller
-                          (.css $cat-node #js {"position" "relative" "top" "0px"}))))))))
+                          (do
+                            (.css $cat-node #js {"position" "relative" "top" "0px"})
+                            (.css (.$ js/window ".topic-list") #js {"margin-top" "0px"})))))))))
 
 (defcomponent category-nav [data owner]
 
