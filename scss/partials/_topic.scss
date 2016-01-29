@@ -16,6 +16,34 @@ div.topic-list {
       font-size: 17px;
       padding-top: 5px;
       padding-bottom: 5px;
+      width: 100%;
+
+      &.chart-header-container {
+        div.actual-container {
+          h3 {
+            margin: 5px 0;
+          }
+        }
+      }
+
+      &.topic-headline-growth {
+
+        div.chart-header-container {
+          h3.actual {
+            margin: 0px;
+          }
+        }
+
+        div.charts {
+          height: 50px;
+          width: 400px;
+
+          div.chart-container.column-chart {
+            height: 50px;
+            width: 100%;
+          }
+        }
+      }
     }
 
     div.topic-date {
