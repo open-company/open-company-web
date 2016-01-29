@@ -9,12 +9,14 @@
   (let [ch (utils/get-channel "change-category")]
     (put! ch category-name)))
 
-(def max-scroll-top 88)
-
 (defn check-scroll [owner]
   (when-let [cat-node (om/get-ref owner "category-nav")]
     (let [$cat-node (.$ js/window cat-node)
-          $win (.$ js/window js/window)]
+          $nav (.$ js/window "nav.navbar")
+          initial-offset-top (.-top (.offset $cat-node))
+          nav-height (.height $nav)
+          $win (.$ js/window js/window)
+          max-scroll-top (- initial-offset-top nav-height)]
       (.scroll $win (fn [e]
                       (let [scroll-top (.scrollTop $win)]
                         (if (>= scroll-top max-scroll-top)
@@ -30,7 +32,7 @@
 (defcomponent category-nav [data owner]
 
   (did-mount [_]
-    (check-scroll owner))
+    (.setTimeout js/window #(check-scroll owner) 100))
 
   (render [_]
     (let [company-data (:company-data data)
