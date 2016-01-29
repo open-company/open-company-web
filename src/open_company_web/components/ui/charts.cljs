@@ -83,7 +83,7 @@
             window-outer-height (.innerHeight $window)
             win-scroll  (+ window-scroll-top window-outer-height)]
         (when (and (> chart-offset-top window-scroll-top)
-                   (< (+ chart-offset-top chart-height chart-width) win-scroll))
+                   (< (+ chart-offset-top chart-height) win-scroll))
           (draw-chart owner
                       (:prefix chart-data)
                       (:columns chart-data)
