@@ -3,11 +3,12 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [cljs.core.async :refer (put!)]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.router :as router]))
 
 (defn change-category [category-name]
-  (let [ch (utils/get-channel "change-category")]
-    (put! ch category-name)))
+  (let [slug (:slug @router/path)]
+    (.setToken open-company-web.core/history (str "/companies/" slug "/dashboard#" category-name))))
 
 (def max-scroll-top (atom -1))
 
