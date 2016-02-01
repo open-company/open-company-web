@@ -19,21 +19,29 @@
                (when-let [cat-node (om/get-ref owner "category-nav")]
                  (let [$cat-node (.$ js/window cat-node)
                        $nav (.$ js/window "nav.navbar")
-                       scroll-top (.scrollTop $win)]
+                       scroll-top (.scrollTop $win)
+                       $topic-list (.$ js/window ".topic-list")]
                    (when (= @max-scroll-top -1)
                      (let [initial-offset-top (.-top (.offset $cat-node))
                            nav-height (.height $nav)
                            tmp-scroll-top (- initial-offset-top nav-height)]
                        (reset! max-scroll-top tmp-scroll-top)))
-                   (if (>= scroll-top @max-scroll-top)
-                     ;; top scroll reached, fix the bar and don't let it scroll
-                     (do
-                       (.css (.$ js/window ".topic-list") #js {"margin-top" "44px"})
-                       (.css $cat-node #js {"position" "fixed" "top" "50px"}))
-                     ;; let the bar move free with the scroller
-                     (do
-                       (.css $cat-node #js {"position" "relative" "top" "0px"})
-                       (.css (.$ js/window ".topic-list") #js {"margin-top" "0px"})))))))))
+                   (let [actual-position (.-position (.-style cat-node))
+                         next-position (if (>= scroll-top @max-scroll-top) "fixed" "relative")
+                         will-change (not= actual-position next-position)]
+                     (if (>= scroll-top @max-scroll-top)
+                       ;; top scroll reached, fix the bar and don't let it scroll
+                       (do
+                         (.css $topic-list #js {"margin-top" "44px"})
+                         (.css $cat-node #js {"position" "fixed" "top" "50px"}))
+                       ;; let the bar move free with the scroller
+                       (do
+                         (.css $cat-node #js {"position" "relative" "top" "0px"})
+                         (.css $topic-list #js {"margin-top" "0px"})))
+                     (when will-change
+                       (set! (.-display (.-style cat-node)) "none")
+                       (.-offsetHeight cat-node)
+                       (set! (.-display (.-style cat-node)) "")))))))))
 
 (defcomponent category-nav [data owner]
 
