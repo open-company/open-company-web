@@ -38,10 +38,9 @@
                        (do
                          (.css $cat-node #js {"position" "relative" "top" "0px"})
                          (.css $topic-list #js {"margin-top" "0px"})))
+                     ;; Fix for safari mobile: http://stackoverflow.com/a/32891079
                      (when will-change
-                       (set! (.-display (.-style cat-node)) "none")
-                       (.-offsetHeight cat-node)
-                       (set! (.-display (.-style cat-node)) "")))))))))
+                       (set! (.-transform (.-style cat-node)) "translate3d(0px,0px,0px)")))))))))
 
 (defcomponent category-nav [data owner]
 
