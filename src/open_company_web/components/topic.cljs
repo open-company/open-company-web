@@ -58,7 +58,7 @@
                                                (:name metric-info)
                                                unit
                                                interval)
-                  {:opts {:chart-height 50 :chart-width 300}})))))
+                  {:opts {:chart-height 50 :chart-width 300 :chart-navigation false}})))))
 
 (defcomponent topic [data owner options]
 

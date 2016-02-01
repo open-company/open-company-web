@@ -147,21 +147,26 @@
   (render [_]
     (let [data-count (count (:values chart-data))
           page (om/get-state owner :page)
-          max-show (:max-show chart-data)]
+          max-show (:max-show chart-data)
+          chart-navigation (if (contains? options :chart-navigation)
+                             (:chart-navigation options)
+                             true)]
       (dom/div #js {:className "charts"
                     :ref "charts"}
-        (dom/div {:class (utils/class-set {:prev-values true
-                                           :values-navigator true
-                                           :hidden (not (> data-count (+ (* page max-show) max-show)))})
-                  :on-click (fn [e]
-                              (previous-values owner chart-data (:chart-height options) (:chart-width options))
-                              (.stopPropagation e))}
-          (dom/i {:class "fa fa-caret-left"}))
+        (when chart-navigation
+          (dom/div {:class (utils/class-set {:prev-values true
+                                             :values-navigator true
+                                             :hidden (not (> data-count (+ (* page max-show) max-show)))})
+                    :on-click (fn [e]
+                                (previous-values owner chart-data (:chart-height options) (:chart-width options))
+                                (.stopPropagation e))}
+            (dom/i {:class "fa fa-caret-left"})))
         (dom/div #js {:className "chart-container column-chart" :ref "column-chart" })
-        (dom/div {:class (utils/class-set {:next-values true
-                                           :values-navigator true
-                                           :hidden (zero? (om/get-state owner :page))})
-                  :on-click (fn [e]
-                              (next-values owner chart-data (:chart-height options) (:chart-width options))
-                              (.stopPropagation e))}
-          (dom/i {:class "fa fa-caret-right"}))))))
+        (when chart-navigation
+          (dom/div {:class (utils/class-set {:next-values true
+                                             :values-navigator true
+                                             :hidden (zero? (om/get-state owner :page))})
+                    :on-click (fn [e]
+                                (next-values owner chart-data (:chart-height options) (:chart-width options))
+                                (.stopPropagation e))}
+            (dom/i {:class "fa fa-caret-right"})))))))
