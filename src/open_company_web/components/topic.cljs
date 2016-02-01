@@ -74,9 +74,19 @@
           section-data (company-data section)
           expanded (om/get-state owner :expanded)
           section-body (get-body section-data section)]
-      (dom/div {:class "topic"
-                ; :key (str "topic-" (name section))
-                :on-click #(om/set-state! owner :expanded (not expanded))}
+      (dom/div #js {:className "topic"
+                    :onClick #(let [$topic-date-author (.$ js/window (om/get-ref owner "topic-date-author"))
+                                    $body-node (.$ js/window (om/get-ref owner "topic-body"))]
+                                (.css $body-node "height" "auto")
+                                (let [body-height (.height $body-node)]
+                                  (.css $body-node "height" (if expanded "auto" "0"))
+                                  (.animate $topic-date-author
+                                            #js {"opacity" (if expanded "0" "1")}
+                                            #js {"duration" 500})
+                                  (.animate $body-node
+                                            #js {"height" (if expanded "0" body-height)}
+                                            #js {"duration" 500
+                                                 "complete" (fn [](om/update-state! owner :expanded not))})))}
 
         ;; Topic title
         (dom/div {:class "topic-title"} (:title section-data))
@@ -93,9 +103,14 @@
           (om/build topic-headline section-data))
 
         ;; Topic date
-        (dom/div {:class "topic-date"} (utils/time-since (:updated-at section-data)))
+        (dom/div {:class "topic-date"}
+                 (str (utils/time-since (:updated-at section-data)) " ")
+                 (dom/label #js {:style #js {"opacity" (if expanded "1" "0")}
+                                 :ref "topic-date-author"}
+                            (str " by " (:name (:author section-data)))))
 
         ;; Topic body
-        (dom/div #js {:className (utils/class-set {:topic-body true
-                                                   :expanded expanded})
+        (dom/div #js {:className "topic-body"
+                      :ref "topic-body"
+                      :style #js {"height" (if expanded "auto" "0")}
                       :dangerouslySetInnerHTML (clj->js {"__html" section-body})})))))
