@@ -43,7 +43,8 @@
 (defn subsection-click [e owner]
   (.preventDefault e)
   (let [tab  (.. e -target -dataset -tab)]
-    (om/update-state! owner :focus (fn [] tab))))
+    (om/update-state! owner :focus (fn [] tab)))
+  (.stopPropagation e))
 
 (defn start-title-editing-cb [owner]
   (om/set-state! owner :title-editing true))

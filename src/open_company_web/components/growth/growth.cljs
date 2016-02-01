@@ -77,7 +77,8 @@
   (let [focus  (.. e -target -dataset -tab)
         section-data (:section-data data)
         metrics (metrics-map (:metrics section-data))]
-    (switch-focus owner focus)))
+    (switch-focus owner focus))
+  (.stopPropagation e))
 
 (defn start-title-editing-cb [owner data]
   (om/set-state! owner :title-editing true))
