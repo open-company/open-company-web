@@ -6,7 +6,8 @@
             [open-company-web.api :as api]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
-            [cljs.core.async :refer (put!)]))
+            [cljs.core.async :refer (put!)]
+            [open-company-web.local-settings :as ls]))
 
 (defn add-section [e category section section-body]
   (.preventDefault e)
@@ -23,7 +24,7 @@
            (merge category
                   {:sections (filter-sections (category-kw old-categories) (:sections category))})))))
 
-(def placeholder-icon "/img/section-icons/placeholder.svg")
+(def placeholder-icon (str "/img/section-icons/placeholder.svg" ls/deploy-key))
 
 (def class-counter (atom -1))
 
@@ -91,7 +92,7 @@
                                                                color-class true
                                                                :icon-placeholder (= section-icon placeholder-icon)})}
                               (dom/img {:class (str "section-placeholder svg " section-img-class)
-                                        :src section-icon})))
+                                        :src (str section-icon "?" ls/deploy-key)})))
                           (dom/div {:class "section-details"}
                             (dom/h4 {:class "section-title"} (:title section))
                             (dom/p {:class "section-description"} (:description section))))))))))))
