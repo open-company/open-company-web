@@ -22,17 +22,20 @@
   (render [_]
     (dom/div {:class "topic-headline"} (:headline data))))
 
-(defcomponent topic-headline-finances [data owner]
+(defcomponent topic-headline-finances [data owner options]
   (render [_]
     (let [data (:data data)
           sorter (utils/sort-by-key-pred :period true)
           sorted-data (sort sorter data)
           actual (last sorted-data)
+          currency (:currency options)
+          cur-symbol (utils/get-symbol-for-currency-code currency)
+          cash-val (str cur-symbol (utils/format-value (:cash actual)))
           actual-label (str "as of " (finances-utils/get-as-of-string (:period actual)))]
       (dom/div {:class "topic-headline chart-header-container"}
         (dom/div {:class "target-actual-container"}
           (dom/div {:class "actual-container"}
-            (dom/h3 {:class "actual green"} (:cash actual))
+            (dom/h3 {:class "actual green"} cash-val)
             (dom/h3 {:class "actual-label gray"} actual-label)))))))
 
 (defcomponent topic-headline-growth [data owner options]
@@ -81,7 +84,7 @@
         ;; Topic headline
         (cond
           (= section :finances)
-          (om/build topic-headline-finances section-data)
+          (om/build topic-headline-finances section-data {:opts {:currency (:currency company-data)}})
 
           (= section :growth)
           (om/build topic-headline-growth section-data {:opts {:currency (:currency company-data)}})
