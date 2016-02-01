@@ -300,7 +300,9 @@
                            :read-only read-only
                            :start-editing-cb start-data-editing-fn
                            :total-metrics (count growth-metrics)}
-          show-title (if (contains? options :show-title) (:show-title options) true)]
+          show-title (if (contains? options :show-title) (:show-title options) true)
+          show-revisions-navigation (if (contains? options :show-revisions-navigation) (:show-revisions-navigation options) true)
+          show-update-footer (if (contains? options :show-update-footer) true)]
       (dom/div {:class "section-container" :id "section-growth" :key (name section)}
         (dom/div {:class "composed-section growth"}
           (when show-title
@@ -372,7 +374,7 @@
                                    :cancel-cb cancel-fn
                                    :cancel-if-needed-cb cancel-if-needed-fn
                                    :save-cb save-fn}))
-          (when (seq (:author notes-data))
+          (when (and show-update-footer (seq (:author notes-data)))
             (om/build
               update-footer
               {:author (:author notes-data)
@@ -388,4 +390,5 @@
                :cancel-cb cancel-fn
                :is-new-section (om/get-state owner :oc-editing)
                :save-cb save-fn})
-            (om/build revisions-navigator data)))))))
+            (when show-revisions-navigation
+              (om/build revisions-navigator data))))))))

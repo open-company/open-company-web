@@ -126,6 +126,7 @@
                                  :ref "topic-date-author"}
                             (str " by " (:name (:author section-data)))))
 
+        ;; Topic body
         (dom/div #js {:className "topic-body"
                       :ref "topic-body"
                       :style #js {"height" (if expanded "auto" "0")}}
@@ -136,7 +137,8 @@
                               :currency (:currency company-data)
                               :actual-as-of (:updated-at section-data)
                               :read-only true}
-                             {:opts {:show-title false}})
+                             {:opts {:show-title false
+                                     :show-revisions-navigation false}})
 
             (= section :finances)
             (om/build finances {:section-data section-data
@@ -144,8 +146,10 @@
                                 :currency (:currency company-data)
                                 :actual-as-of (:updated-at section-data)
                                 :read-only true}
-                               {:opts {:show-title false}}))
+                               {:opts {:show-title false
+                                       :show-revisions-navigation false}})
 
-          ;; Topic body
-          (dom/div #js {:className "topic-body-inner"
-                        :dangerouslySetInnerHTML (clj->js {"__html" section-body})}))))))
+            :else
+            (dom/div #js {:className "topic-body-inner"
+                          :dangerouslySetInnerHTML (clj->js {"__html" section-body})})))))))
+

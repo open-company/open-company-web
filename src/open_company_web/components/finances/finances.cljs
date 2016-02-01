@@ -269,7 +269,9 @@
                            :read-only read-only
                            :currency (:currency data)
                            :start-editing-cb start-data-editing-fn}
-          show-title (if (contains? options :show-title) (:show-title options) true)]
+          show-title (if (contains? options :show-title) (:show-title options) true)
+          show-revisions-navigation (if (contains? options :show-revisions-navigation) (:show-revisions-navigation options) true)
+          show-update-footer (if (contains? options :show-update-footer) true)]
       (dom/div {:class "section-container" :id "section-finances"}
         (dom/div {:class "composed-section finances"}
           (when show-title
@@ -340,7 +342,7 @@
                                      :cancel-cb cancel-fn
                                      :cancel-if-needed-cb cancel-if-needed-fn
                                      :save-cb save-fn}))
-            (when (seq (:author notes-data))
+            (when (and show-update-footer (seq (:author notes-data)))
               (om/build
                 update-footer
                   {:author (:author notes-data)
@@ -355,4 +357,5 @@
                                         :save-disabled (not (can-save owner data))
                                         :is-new-section (om/get-state owner :oc-editing)
                                         :save-cb save-fn})
-              (om/build revisions-navigator data))))))))
+              (when show-revisions-navigation
+                (om/build revisions-navigator data)))))))))
