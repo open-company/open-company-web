@@ -5,7 +5,9 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.growth.utils :as growth-utils]
-            [open-company-web.components.ui.charts :refer (column-chart)]))
+            [open-company-web.components.ui.charts :refer (column-chart)]
+            [open-company-web.components.finances.finances :refer (finances)]
+            [open-company-web.components.growth.growth :refer (growth)]))
 
 (defn- get-body [section-data section]
   (cond
@@ -32,7 +34,10 @@
           cur-symbol (utils/get-symbol-for-currency-code currency)
           cash-val (str cur-symbol (utils/format-value (:cash actual)))
           actual-label (str "as of " (finances-utils/get-as-of-string (:period actual)))]
-      (dom/div {:class "topic-headline chart-header-container"}
+      (dom/div {:class (utils/class-set {:topic-headline true
+                                         :topic-headline-finances true
+                                         :group true
+                                         :collapse (:expanded data)})}
         (dom/div {:class "target-actual-container"}
           (dom/div {:class "actual-container"}
             (dom/h3 {:class "actual green"} cash-val)
@@ -49,7 +54,10 @@
           fixed-cur-unit (when (= metric-unit "currency")
                            (utils/get-symbol-for-currency-code (:currency options)))
           unit (when (= metric-unit "%") "%")]
-      (dom/div {:class "topic-headline topic-headline-growth group"}
+      (dom/div {:class (utils/class-set {:topic-headline true
+                                         :topic-headline-growth true
+                                         :group true
+                                         :collapse (:expanded data)})}
         (dom/div {:class "chart-header-container"}
           (dom/div {:class "target-actual-container"}
             (dom/div {:class "actual-container"}
@@ -75,11 +83,19 @@
           expanded (om/get-state owner :expanded)
           section-body (get-body section-data section)]
       (dom/div #js {:className "topic"
-                    :onClick #(let [$topic-date-author (.$ js/window (om/get-ref owner "topic-date-author"))
+                    :ref "topic"
+                    :onClick #(let [$topic (.$ js/window (om/get-ref owner "topic"))
+                                    $topic-date-author (.$ js/window (om/get-ref owner "topic-date-author"))
                                     $body-node (.$ js/window (om/get-ref owner "topic-body"))]
                                 (.css $body-node "height" "auto")
                                 (let [body-height (.height $body-node)]
                                   (.css $body-node "height" (if expanded "auto" "0"))
+                                  (when-let [$finances-headtitle (.find $topic ".topic-headline-finances")]
+                                    (.animate $finances-headtitle #js {"height" (if expanded "100" "0")
+                                                                       "opacity" (if expanded "1" "0")} 500))
+                                  (when-let [$growth-headtitle (.find $topic ".topic-headline-growth")]
+                                    (.animate $growth-headtitle #js {"height" (if expanded "100" "0")
+                                                                     "opacity" (if expanded "1" "0")} 500))
                                   (.animate $topic-date-author
                                             #js {"opacity" (if expanded "0" "1")}
                                             #js {"duration" 500})
@@ -92,15 +108,16 @@
         (dom/div {:class "topic-title"} (:title section-data))
 
         ;; Topic headline
-        (cond
-          (= section :finances)
-          (om/build topic-headline-finances section-data {:opts {:currency (:currency company-data)}})
+        (dom/div {:class "topic-headline"}
+          (cond
+            (= section :finances)
+            (om/build topic-headline-finances (assoc section-data :expanded expanded) {:opts {:currency (:currency company-data)}})
 
-          (= section :growth)
-          (om/build topic-headline-growth section-data {:opts {:currency (:currency company-data)}})
+            (= section :growth)
+            (om/build topic-headline-growth (assoc section-data :expanded expanded) {:opts {:currency (:currency company-data)}})
 
-          :else
-          (om/build topic-headline section-data))
+            :else
+            (om/build topic-headline section-data)))
 
         ;; Topic date
         (dom/div {:class "topic-date"}
@@ -109,8 +126,26 @@
                                  :ref "topic-date-author"}
                             (str " by " (:name (:author section-data)))))
 
-        ;; Topic body
         (dom/div #js {:className "topic-body"
                       :ref "topic-body"
-                      :style #js {"height" (if expanded "auto" "0")}
-                      :dangerouslySetInnerHTML (clj->js {"__html" section-body})})))))
+                      :style #js {"height" (if expanded "auto" "0")}}
+          (cond
+            (= section :growth)
+            (om/build growth {:section-data section-data
+                              :section section
+                              :currency (:currency company-data)
+                              :actual-as-of (:updated-at section-data)
+                              :read-only true}
+                             {:opts {:show-title false}})
+
+            (= section :finances)
+            (om/build finances {:section-data section-data
+                                :section section
+                                :currency (:currency company-data)
+                                :actual-as-of (:updated-at section-data)
+                                :read-only true}
+                               {:opts {:show-title false}}))
+
+          ;; Topic body
+          (dom/div #js {:className "topic-body-inner"
+                        :dangerouslySetInnerHTML (clj->js {"__html" section-body})}))))))

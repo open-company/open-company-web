@@ -18,6 +18,10 @@ div.topic-list {
       padding-bottom: 5px;
       width: 100%;
 
+      &.collapse {
+        height: 0px;
+      }
+
       &.chart-header-container {
         div.actual-container {
           h3 {
@@ -53,6 +57,7 @@ div.topic-list {
 
       label {
         margin: 0px;
+        font-weight: normal;
       }
     }
 

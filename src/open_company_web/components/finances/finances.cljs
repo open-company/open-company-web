@@ -224,7 +224,7 @@
 (defn has-revenues-or-costs [finances-data]
   (some #(or (not (zero? (:revenue %))) (not (zero? (:costs %)))) finances-data))
 
-(defcomponent finances [data owner]
+(defcomponent finances [data owner options]
 
   (init-state [_]
     (get-state owner data true))
@@ -268,19 +268,21 @@
           subsection-data {:section-data section-data
                            :read-only read-only
                            :currency (:currency data)
-                           :start-editing-cb start-data-editing-fn}]
+                           :start-editing-cb start-data-editing-fn}
+          show-title (if (contains? options :show-title) (:show-title options) true)]
       (dom/div {:class "section-container" :id "section-finances"}
         (dom/div {:class "composed-section finances"}
-          (om/build editable-title {:read-only read-only
-                                    :editing title-editing
-                                    :title (om/get-state owner :title)
-                                    :placeholder (or (:title-placeholder section-data) section-name)
-                                    :section section
-                                    :start-editing-cb start-title-editing-fn
-                                    :change-cb title-change-fn
-                                    :cancel-cb cancel-fn
-                                    :cancel-if-needed-cb cancel-if-needed-fn
-                                    :save-cb save-fn})
+          (when show-title
+            (om/build editable-title {:read-only read-only
+                                      :editing title-editing
+                                      :title (om/get-state owner :title)
+                                      :placeholder (or (:title-placeholder section-data) section-name)
+                                      :section section
+                                      :start-editing-cb start-title-editing-fn
+                                      :change-cb title-change-fn
+                                      :cancel-cb cancel-fn
+                                      :cancel-if-needed-cb cancel-if-needed-fn
+                                      :save-cb save-fn}))
           (when-not data-editing
             (dom/div {:class (utils/class-set {:link-bar true
                                                :editable (not read-only)})}

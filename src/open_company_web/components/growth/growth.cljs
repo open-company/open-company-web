@@ -257,7 +257,7 @@
 (defn metadata-edit-cb [owner editing]
   (om/set-state! owner :metadata-editing editing))
 
-(defcomponent growth [data owner]
+(defcomponent growth [data owner options]
 
   (init-state [_]
     (get-state owner data true))
@@ -299,20 +299,22 @@
                            :metric-info focus-metric-info
                            :read-only read-only
                            :start-editing-cb start-data-editing-fn
-                           :total-metrics (count growth-metrics)}]
+                           :total-metrics (count growth-metrics)}
+          show-title (if (contains? options :show-title) (:show-title options) true)]
       (dom/div {:class "section-container" :id "section-growth" :key (name section)}
         (dom/div {:class "composed-section growth"}
-          (om/build editable-title {:read-only read-only
-                                    :editing title-editing
-                                    :title (om/get-state owner :title)
-                                    :placeholder (or (:title-placeholder section-data)
-                                                     section-name)
-                                    :section (:section data)
-                                    :start-editing-cb start-title-editing-fn
-                                    :change-cb title-change-fn
-                                    :cancel-cb cancel-fn
-                                    :cancel-if-needed-cb cancel-if-needed-fn
-                                    :save-cb save-fn})
+          (when show-title
+            (om/build editable-title {:read-only read-only
+                                      :editing title-editing
+                                      :title (om/get-state owner :title)
+                                      :placeholder (or (:title-placeholder section-data)
+                                                       section-name)
+                                      :section (:section data)
+                                      :start-editing-cb start-title-editing-fn
+                                      :change-cb title-change-fn
+                                      :cancel-cb cancel-fn
+                                      :cancel-if-needed-cb cancel-if-needed-fn
+                                      :save-cb save-fn}))
           (when-not data-editing
             (dom/div {:class "link-bar"}
               (when focus
