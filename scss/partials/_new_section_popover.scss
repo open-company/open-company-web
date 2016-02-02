@@ -1,3 +1,5 @@
+@import "../modules/_deploy";
+
 div.new-section-popover {
   position: absolute;
   width: 390px;
@@ -13,7 +15,17 @@ div.new-section-popover {
   overflow: auto;
   padding: 20px 0px 10px 10px;
 
-  > h4{
+  div.new-section-popover-img{
+    background: url("/img/add_new_section_icon.png?#{$deploy_key}");
+    background-size: 80px 82px;
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+    width: 80px;
+    height: 82px;
+    margin-left: 150px;
+  }
+
+  &> h4{
     font-size: 16px;
     margin-top: 10px;
     margin-bottom: 29px;
@@ -169,7 +181,7 @@ div.new-section-popover-close{
   left: 8px;
   width: 24px;
   height: 24px;
-  background-image: url("/img/close_popover.png");
+  background-image: url("/img/close_popover.png?#{$deploy_key}");
   background-size: 24px 24px;
   background-position: 0 0;
 }

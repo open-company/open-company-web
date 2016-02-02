@@ -1,3 +1,5 @@
+@import "../modules/_deploy";
+
 div.table-of-contents {
   position: fixed;
   top: 50px;
@@ -45,7 +47,7 @@ div.table-of-contents div.category-section div.category-section-close {
   opacity: 0;
   cursor: pointer;
   margin-top: 9px;
-  background-image: url("/img/remove_section.png");
+  background-image: url("/img/remove_section.png?#{$deploy_key}");
   width: 20px;
   height: 20px;
   background-size: 20px 20px;
@@ -61,7 +63,7 @@ div.table-of-contents div.category-section div.category-section-sortable {
   opacity: 0;
   cursor: hand;
   margin-top: 6px;
-  background-image: url("/img/draggable.png");
+  background-image: url("/img/draggable.png?#{$deploy_key}");
   width: 20px;
   height: 30px;
   background-size: 20px 30px;
