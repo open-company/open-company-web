@@ -132,7 +132,7 @@
         (api/get-auth-settings)))
 
     (defn handle-url-change [e]
-      (when (not @prevent-route-dispatch)
+      (when-not @prevent-route-dispatch
         ;; we are checking if this event is due to user action,
         ;; such as click a link, a back button, etc.
         ;; as opposed to programmatically setting the URL with the API
