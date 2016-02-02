@@ -20,6 +20,8 @@
 
 (enable-console-print!)
 
+(defonce prevent-route-dispatch (atom false))
+
 ;; setup Sentry error reporting
 (defonce raven (raven-setup))
 
@@ -64,6 +66,7 @@
 
 ;; Component specific to a company
 (defn company-handler [route target component params]
+  (println "RENDERING COMPANY ROUTE!")
   (utils/clean-company-caches)
   (let [slug (:slug (:params params))
         query-params (:query-params params)]
@@ -130,17 +133,19 @@
         (api/get-auth-settings)))
 
     (defn handle-url-change [e]
-      ;; we are checking if this event is due to user action,
-      ;; such as click a link, a back button, etc.
-      ;; as opposed to programmatically setting the URL with the API
-      (when-not (.-isNavigation e)
-        ;; in this case, we're setting it so
-        ;; let's scroll to the top to simulate a navigation
-        (js/window.scrollTo 0 0))
-      ; check if the user is logged in
-      (login-wall)
-      ;; dispatch on the token
-      (dispatch! (router/get-token)))))
+      (when (not @prevent-route-dispatch)
+        ;; we are checking if this event is due to user action,
+        ;; such as click a link, a back button, etc.
+        ;; as opposed to programmatically setting the URL with the API
+        (when-not (.-isNavigation e)
+          ;; in this case, we're setting it so
+          ;; let's scroll to the top to simulate a navigation
+          ; (js/window.scrollTo 0 0)
+          )
+        ; check if the user is logged in
+        (login-wall)
+        ;; dispatch on the token
+        (dispatch! (router/get-token))))))
 
 (defonce history
   (doto (router/make-history)

@@ -12,6 +12,9 @@
 
 (defonce default-category "progress")
 
+(defn switch-tab-cb [owner new-tab]
+  (om/set-state! owner :active-category new-tab))
+
 (defcomponent company-dashboard [data owner]
 
   (init-state [_]
@@ -33,6 +36,7 @@
         ;; company header
         (om/build company-header {:loading (:loading company-data)
                                   :company-data company-data
+                                  :switch-tab-cb (partial switch-tab-cb owner)
                                   :active-category (:active-category state)})
 
         ;; topic list

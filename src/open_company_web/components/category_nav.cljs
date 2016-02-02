@@ -38,6 +38,22 @@
                      (when will-change
                        (set! (.-transform (.-style cat-node)) "translate3d(0px,0px,0px)")))))))))
 
+(defn category-click [data category-name e]
+  ;; prevent the route reload
+  (reset! open-company-web.core/prevent-route-dispatch true)
+  ;; call the switch tab callback
+  ((:switch-tab-cb data) category-name)
+  ;; prevent the anchor element from reload the route
+  (.preventDefault e)
+  ;; change the window.location.hash
+  (set! (.-hash (.-location js/window)) category-name)
+  ;; fix the scroll to the first section if necessary
+  (when (and (not= @max-scroll-top -1)
+             (>= (.scrollTop (.$ js/window js/window)) @max-scroll-top))
+    (.scrollTop (.$ js/window js/window) @max-scroll-top))
+  ;; reactivate the url change handler
+  (reset! open-company-web.core/prevent-route-dispatch false))
+
 (defcomponent category-nav [data owner]
 
   (did-mount [_]
@@ -48,11 +64,13 @@
           company-data (:company-data data)
           categories (:categories company-data)
           active-category (:active-category data)]
+      (.css (.$ js/window (.-body js/document)) "min-height" (.height (.$ js/window "#app")))
       (dom/div #js {:className "row category-nav" :ref "category-nav"}
         (for [category categories]
           (let [category-name (name category)
                 category-class (str "col-xs-4 category" (if (= active-category category-name) " active" ""))]
-            (dom/a {:href (str "/companies/" slug "/dashboard#" category-name)}
+            (dom/a {:href (str "/companies/" slug "/dashboard#" category-name)
+                    :on-click (partial category-click data category-name)}
               (dom/div {:class category-class}
                 (dom/div {:class "category-label"}
                   (utils/camel-case-str category-name))))))))))
