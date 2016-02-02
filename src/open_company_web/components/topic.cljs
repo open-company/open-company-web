@@ -67,7 +67,7 @@
 
 (def animation-duration 500)
 
-(defn topic-click []
+(defn topic-click [owner expanded]
   (let [$topic (.$ js/window (om/get-ref owner "topic"))
         $topic-date-author (.$ js/window (om/get-ref owner "topic-date-author"))
         $body-node (.$ js/window (om/get-ref owner "topic-body"))]
@@ -101,7 +101,7 @@
           section-body (get-body section-data section)]
       (dom/div #js {:className "topic"
                     :ref "topic"
-                    :onClick topic-click}
+                    :onClick #(topic-click owner expanded)}
 
         ;; Topic title
         (dom/div {:class "topic-title"} (:title section-data))
