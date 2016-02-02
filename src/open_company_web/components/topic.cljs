@@ -10,14 +10,8 @@
             [open-company-web.components.growth.growth :refer (growth)]))
 
 (defn- get-body [section-data section]
-  (cond
-    (= section :finances)
-    (:body (:notes section-data))
-
-    (= section :growth)
-    (:body (:notes section-data))
-
-    :else
+  (if (#{:finances :growth} section)
+    (get-in section-data [:body :notes])
     (:body section-data)))
 
 (defcomponent topic-headline [data owner]
@@ -71,6 +65,29 @@
                                                interval)
                   {:opts {:chart-height 50 :chart-width 300 :chart-navigation false}})))))
 
+(def animation-duration 500)
+
+(defn topic-click []
+  (let [$topic (.$ js/window (om/get-ref owner "topic"))
+        $topic-date-author (.$ js/window (om/get-ref owner "topic-date-author"))
+        $body-node (.$ js/window (om/get-ref owner "topic-body"))]
+    (.css $body-node "height" "auto")
+    (let [body-height (.height $body-node)]
+      (.css $body-node "height" (if expanded "auto" "0"))
+      (when-let [$finances-headtitle (.find $topic ".topic-headline-finances")]
+        (.animate $finances-headtitle #js {"height" (if expanded "100" "0")
+                                           "opacity" (if expanded "1" "0")} animation-duration))
+      (when-let [$growth-headtitle (.find $topic ".topic-headline-growth")]
+        (.animate $growth-headtitle #js {"height" (if expanded "100" "0")
+                                         "opacity" (if expanded "1" "0")} animation-duration))
+      (.animate $topic-date-author
+                #js {"opacity" (if expanded "0" "1")}
+                #js {"duration" animation-duration})
+      (.animate $body-node
+                #js {"height" (if expanded "0" body-height)}
+                #js {"duration" animation-duration
+                     "complete" (fn [](om/update-state! owner :expanded not))}))))
+
 (defcomponent topic [data owner options]
 
   (init-state [_]
@@ -84,25 +101,7 @@
           section-body (get-body section-data section)]
       (dom/div #js {:className "topic"
                     :ref "topic"
-                    :onClick #(let [$topic (.$ js/window (om/get-ref owner "topic"))
-                                    $topic-date-author (.$ js/window (om/get-ref owner "topic-date-author"))
-                                    $body-node (.$ js/window (om/get-ref owner "topic-body"))]
-                                (.css $body-node "height" "auto")
-                                (let [body-height (.height $body-node)]
-                                  (.css $body-node "height" (if expanded "auto" "0"))
-                                  (when-let [$finances-headtitle (.find $topic ".topic-headline-finances")]
-                                    (.animate $finances-headtitle #js {"height" (if expanded "100" "0")
-                                                                       "opacity" (if expanded "1" "0")} 500))
-                                  (when-let [$growth-headtitle (.find $topic ".topic-headline-growth")]
-                                    (.animate $growth-headtitle #js {"height" (if expanded "100" "0")
-                                                                     "opacity" (if expanded "1" "0")} 500))
-                                  (.animate $topic-date-author
-                                            #js {"opacity" (if expanded "0" "1")}
-                                            #js {"duration" 500})
-                                  (.animate $body-node
-                                            #js {"height" (if expanded "0" body-height)}
-                                            #js {"duration" 500
-                                                 "complete" (fn [](om/update-state! owner :expanded not))})))}
+                    :onClick topic-click}
 
         ;; Topic title
         (dom/div {:class "topic-title"} (:title section-data))
