@@ -156,7 +156,7 @@
         (when chart-navigation
           (dom/div {:class (utils/class-set {:prev-values true
                                              :values-navigator true
-                                             :hidden (not (> data-count (+ (* page max-show) max-show)))})
+                                             :hidden (<= data-count (+ (* page max-show) max-show))})
                     :on-click (fn [e]
                                 (previous-values owner chart-data (:chart-height options) (:chart-width options))
                                 (.stopPropagation e))}
