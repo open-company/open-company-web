@@ -13,3 +13,6 @@
 ;; JWT
 (def jwt-cookie-domain "localhost")
 (def jwt-cookie-secure false)
+
+;; Deploy key
+(def deploy-key "")
