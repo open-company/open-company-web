@@ -6,10 +6,6 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]))
 
-(defn change-category [category-name]
-  (let [slug (:slug @router/path)]
-    (.setToken open-company-web.core/history (str "/companies/" slug "/dashboard#" category-name))))
-
 (def max-scroll-top (atom -1))
 
 (defn check-scroll [owner]
@@ -48,14 +44,15 @@
     (.setTimeout js/window #(check-scroll owner) 1000))
 
   (render [_]
-    (let [company-data (:company-data data)
+    (let [slug (:slug @router/path)
+          company-data (:company-data data)
           categories (:categories company-data)
           active-category (:active-category data)]
       (dom/div #js {:className "row category-nav" :ref "category-nav"}
         (for [category categories]
           (let [category-name (name category)
                 category-class (str "col-xs-4 category" (if (= active-category category-name) " active" ""))]
-            (dom/a {:on-click #(change-category category-name)}
+            (dom/a {:href (str "/companies/" slug "/dashboard#" category-name)}
               (dom/div {:class category-class}
                 (dom/div {:class "category-label"}
                   (utils/camel-case-str category-name))))))))))
