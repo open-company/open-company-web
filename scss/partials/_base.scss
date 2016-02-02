@@ -1,4 +1,5 @@
 @import "../modules/_colors";
+@import "../modules/_fonts";
 
 /*
 Comment font-weight to font name mapping: https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
@@ -15,8 +16,12 @@ Comment font-weight to font name mapping: https://developer.mozilla.org/en-US/do
 */
 
 html, body {
-  font-family: "proxima-nova", sans-serif;
+  font-family: $oc_main_font;
   height: 100%;
+}
+
+h1, h2, h3, h4, h5, h6, .oc-header {
+  font-family: $oc_headers_font;
 }
 
 a {

@@ -1,3 +1,5 @@
+@import "../modules/_fonts";
+
 div.update-footer.section-editing {
   opacity: 0.2;
 }
@@ -8,7 +10,7 @@ div.update-footer {
   height: 24px;
   vertical-align: middle;
   cursor: default;
-  font-family: "proxima-nova", sans-serif;
+  font-family: $oc_main_font;
 
   div {
     margin: 0px;

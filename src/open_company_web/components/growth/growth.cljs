@@ -326,6 +326,7 @@
                         mname (:name metric)
                         metric-classes (utils/class-set {:composed-section-link true
                                                          metric-slug true
+                                                         :oc-header true
                                                          :active (= focus metric-slug)})]
                     (dom/a {:class metric-classes
                             :title (:description metric)

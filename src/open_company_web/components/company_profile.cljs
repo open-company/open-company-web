@@ -84,7 +84,7 @@
 
             ;; Company name
             (dom/div {:class "form-group"}
-              (dom/label {:for "name" :class "col-sm-3 control-label"} "Company name")
+              (dom/label {:for "name" :class "col-sm-3 control-label oc-header"} "Company name")
               (dom/div {:class "col-sm-3"}
                 (dom/input {
                   :type "text"
@@ -99,7 +99,7 @@
 
             ; Slug
             (dom/div {:class "form-group"}
-              (dom/label {:for "slug" :class "col-sm-3 control-label"} "Company slug")
+              (dom/label {:for "slug" :class "col-sm-3 control-label oc-header"} "Company slug")
               (dom/div {:class "col-sm-3"}
                 (dom/input {
                   :type "text"
@@ -111,7 +111,7 @@
 
             ;; Currency
             (dom/div {:class "form-group"}
-              (dom/label {:for "currency" :class "col-sm-3 control-label"} "Currency")
+              (dom/label {:for "currency" :class "col-sm-3 control-label oc-header"} "Currency")
               (dom/div {:class "col-sm-5"}
                 (dom/select {
                   :type "file"
@@ -130,7 +130,7 @@
 
             ;; Company logo
             (dom/div {:class "form-group"}
-              (dom/label {:for "logo" :class "col-sm-3 control-label"} "Logo")
+              (dom/label {:for "logo" :class "col-sm-3 control-label oc-header"} "Logo")
               (dom/div {:class "col-sm-5"}
                 (dom/input {
                   :type "text"
@@ -145,7 +145,7 @@
 
             ;; Company description
             (dom/div {:class "form-group"}
-              (dom/label {:for "logo" :class "col-sm-3 control-label"} "Description")
+              (dom/label {:for "logo" :class "col-sm-3 control-label oc-header"} "Description")
               (dom/div {:class "col-sm-5"}
                 (dom/textarea {
                   :value (om/get-state owner :description)

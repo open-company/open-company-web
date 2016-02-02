@@ -46,6 +46,7 @@
         (dom/textarea #js {:ref "editable-title-textarea"
                            :id (str "editable-title-" (name (:section data)))
                            :className (utils/class-set {:editable-title true
+                                                        :oc-header true
                                                         :edit (:editing data)})
                            :placeholder (:placeholder data)
                            :disabled (:read-only data)

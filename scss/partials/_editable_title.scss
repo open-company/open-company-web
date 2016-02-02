@@ -1,3 +1,5 @@
+@import "../modules/_fonts";
+
 div.editable-title-container{
   margin-top: 30px;
   margin-bottom: 10px;
@@ -24,7 +26,7 @@ div.editable-title-container{
     text-align: left;
     color: #2D2D2D !important;
     font-size: 36px;
-    font-family: "proxima-nova", sans-serif;
+    font-family: $oc_headers_font;
     font-weight: 600;
     line-height: 1.1;
     color: inherit;
@@ -56,7 +58,7 @@ div.hidden-autogrow-div {
   text-align: left;
   color: #2D2D2D !important;
   font-size: 36px;
-  font-family: "proxima-nova", sans-serif;
+  font-family: $oc_headers_font;
   font-weight: 600;
   line-height: 1.1;
   color: inherit;

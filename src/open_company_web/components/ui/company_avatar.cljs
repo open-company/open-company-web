@@ -41,4 +41,4 @@
                                   :height px-size
                                   :border-radius bd-radius}}
                   (dom/span {:class "company-avatar-initial"} (clojure.string/upper-case first-letter)))
-                (dom/div {:class "company-avatar-name"} company-name)))))))))
+                (dom/div {:class "company-avatar-name oc-header"} company-name)))))))))

@@ -1,10 +1,11 @@
+@import "../modules/_fonts";
 $revisions_gray: #5B5B5B;
 
 div.revisions-navigator {
   width: 100%;
   height: 34px;
   margin-top: 30px;
-  font-family: "proxima-nova", sans-serif;
+  font-family: $oc_main_font;
 
   div.revisions-navigator-left {
     float: left;

@@ -1,10 +1,12 @@
+@import "../modules/_fonts";
+
 div.composed-section {
 
   div.link-bar {
     text-align: left;
     z-index: 1;
     position: relative;
-    font-family: "proxima-nova", sans-serif;
+    font-family: $oc_main_font;
 
     a.composed-section-link {
       text-decoration: underline;
@@ -36,12 +38,12 @@ div.composed-section {
 
       div.chart-header-container {
         text-align: left;
-        font-family: "proxima-nova", sans-serif;
+        font-family: $oc_main_font;
       }
 
       div.chart-footer-container {
         text-align: center;
-        font-family: "proxima-nova", sans-serif;
+        font-family: $oc_main_font;
 
         div.actual-container {
           width: 150px;

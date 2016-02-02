@@ -237,7 +237,7 @@
 
   (render [_]
     (let [focus (om/get-state owner :focus)
-          classes "composed-section-link"
+          classes "composed-section-link oc-header"
           section (:section data)
           section-name (utils/camel-case-str (name section))
           section-data (:section-data data)

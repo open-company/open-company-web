@@ -26,7 +26,7 @@
           actual (last sorted-data)
           currency (:currency options)
           cur-symbol (utils/get-symbol-for-currency-code currency)
-          cash-val (str cur-symbol (utils/format-value (:cash actual)))
+          cash-val (str cur-symbol (utils/thousands-separator (:cash actual)))
           actual-label (str "as of " (finances-utils/get-as-of-string (:period actual)))]
       (dom/div {:class (utils/class-set {:topic-headline true
                                          :topic-headline-finances true
@@ -104,7 +104,7 @@
                     :onClick #(topic-click owner expanded)}
 
         ;; Topic title
-        (dom/div {:class "topic-title"} (:title section-data))
+        (dom/div {:class "topic-title oc-header"} (:title section-data))
 
         ;; Topic headline
         (dom/div {:class "topic-headline"}

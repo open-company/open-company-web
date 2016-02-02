@@ -1,3 +1,5 @@
+@import "../modules/_fonts";
+
 div.rich-editor[contenteditable=true]:empty:before,
 div.fake-rich-editor[contenteditable=true]:empty:before{
   content: attr(placeholder);
@@ -8,7 +10,7 @@ div.fake-rich-editor[contenteditable=true]:empty:before{
 div.rich-editor-container {
   position: relative;
   margin-top: 30px;
-  font-family: "proxima-nova", sans-serif;
+  font-family: $oc_main_font;
 
   div.rich-editor {
     color: #191919;
@@ -17,6 +19,10 @@ div.rich-editor-container {
     font-weight: normal;
     font-size: 19px;
     width: 500px;
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: $oc_headers_font;
+    }
 
     &:focus,
     &.editing {

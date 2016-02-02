@@ -150,6 +150,7 @@
               (dom/div {:class "category-container"
                         :key sections-key}
                 (dom/div {:class (utils/class-set {:category true
+                                                   :oc-header true
                                                    :empty (empty? sections)})}
                          (dom/h3 (utils/camel-case-str (name category))))
                 (when-not readonly-company

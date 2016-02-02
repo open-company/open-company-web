@@ -13,11 +13,11 @@
       (dom/div {:class "company-header"}
         
         ;; Company name
-        (dom/div {:class "container"}
+        (dom/div {:class "container oc-header"}
           (dom/div {:class "col-xs-12 company-name"} (:name company-data)))
         
         ;; Company description
-        (dom/div {:class "container"}
+        (dom/div {:class "container oc-header"}
           (dom/div {:class "col-xs-12 company-description"} (:description company-data)))
         
         ;; Category navigation

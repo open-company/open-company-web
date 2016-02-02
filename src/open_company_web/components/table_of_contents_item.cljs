@@ -35,7 +35,7 @@
                   :on-click (fn [e]
                               (.preventDefault e)
                               (utils/scroll-to-section (name section)))}
-            (dom/span {:class "section-title"} (:title data))
+            (dom/span {:class "section-title oc-header"} (:title data))
             (dom/span {:class "section-date"} (utils/time-since (:updated-at data))))
           (dom/div {:class (utils/class-set {:category-section-sortable true
                                              :read-only (:read-only data)})}))))))

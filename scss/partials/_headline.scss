@@ -1,3 +1,5 @@
+@import "../modules/_fonts";
+
 div.headline {
   width: 500px;
   margin-top: -10px;
@@ -18,7 +20,7 @@ div.headline {
     text-align: left;
     color: #2D2D2D !important;
     font-size: 18px;
-    font-family: "proxima-nova", sans-serif;
+    font-family: $oc_main_font;
     font-weight: normal;
     color: inherit;
     padding: 10px 0;

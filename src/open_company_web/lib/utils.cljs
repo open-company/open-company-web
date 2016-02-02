@@ -511,3 +511,12 @@
 
 (defn clean-company-caches []
   (reset! company-cache {}))
+
+(defn thousands-separator [number]
+  (let [parts (clojure.string/split (str number) "." 1)
+        int-part (first parts)
+        dec-part (get parts 1)
+        integer-string (clojure.string/replace int-part #"\B(?=(\d{3})+(?!\d))" ",")]
+    (if-not (= dec-part nil)
+      (str integer-string "." dec-part)
+      integer-string)))

@@ -71,7 +71,8 @@
         (for [category categories]
           (let [category-name (name category)
                 category-class (str "col-xs-4 category" (if (= active-category category-name) " active" ""))]
-            (dom/a {:href (str "/companies/" slug "/dashboard#" category-name)
+            (dom/a {:class "oc-header"
+                    :href (str "/companies/" slug "/dashboard#" category-name)
                     :on-click (partial category-click data category-name)}
               (dom/div {:class category-class}
                 (dom/div {:class "category-label"}
