@@ -66,7 +66,6 @@
 
 ;; Component specific to a company
 (defn company-handler [route target component params]
-  (println "RENDERING COMPANY ROUTE!")
   (utils/clean-company-caches)
   (let [slug (:slug (:params params))
         query-params (:query-params params)]
