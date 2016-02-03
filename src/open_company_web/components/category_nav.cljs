@@ -16,7 +16,8 @@
                  (let [$cat-node (.$ js/window cat-node)
                        $nav (.$ js/window "nav.navbar")
                        scroll-top (.scrollTop $win)
-                       $topic-list (.$ js/window ".topic-list")]
+                       $topic-list (.$ js/window ".topic-list")
+                       $win-width (.width $win)]
                    (when (= @max-scroll-top -1)
                      (let [initial-offset-top (.-top (.offset $cat-node))
                            nav-height (.height $nav)
@@ -29,10 +30,10 @@
                        ;; top scroll reached, fix the bar and don't let it scroll
                        (do
                          (.css $topic-list #js {"margin-top" "44px"})
-                         (.css $cat-node #js {"position" "fixed" "top" "50px"}))
+                         (.css $cat-node #js {"position" "fixed" "top" "50px" "width" (str $win-width "px")}))
                        ;; let the bar move free with the scroller
                        (do
-                         (.css $cat-node #js {"position" "relative" "top" "0px"})
+                         (.css $cat-node #js {"position" "relative" "top" "0px" "width" (str $win-width "px")})
                          (.css $topic-list #js {"margin-top" "0px"})))
                      ;; Fix for safari mobile: http://stackoverflow.com/a/32891079
                      (when will-change
@@ -77,7 +78,8 @@
       (dom/div #js {:className "row category-nav" :ref "category-nav"}
         (for [category categories]
           (let [category-name (name category)
-                category-class (str "col-xs-4 category" (if (= active-category category-name) " active" ""))]
+                category-class (utils/class-set {:category true
+                                                 :active (= active-category category-name)})]
             (dom/a {:class "oc-header"
                     :href (str "/companies/" slug "/dashboard#" category-name)
                     :on-click (partial category-click data category-name)}
