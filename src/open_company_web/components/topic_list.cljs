@@ -3,7 +3,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.topic :refer (topic)]
-            [open-company-web.components.add-topic :refer (add-topic)]))
+            [open-company-web.components.manage-topic :refer (manage-topic)]))
 
 (defcomponent topic-list [data owner]
 
@@ -20,5 +20,5 @@
                              :active-category active-category}
                              {:opts {:section-name section-name}})))
         (when-not (:read-only company-data)
-          (om/build add-topic {} {:opts {:add-topic-cb #(println "add topic click!")}}))
+          (om/build manage-topic {} {:opts {:manage-topic-cb #(println "manage topic click!")}}))
         ))))
