@@ -93,7 +93,7 @@
   (str label
        ": "
        (or prefix "")
-       (if value (.toLocaleString value) "")
+       (if value (utils/thousands-separator value) "")
        (if suffix (str " " suffix) "")))
 
 (defn chart-data-at-index [data column-name prefix suffix has-target interval idx]
@@ -102,7 +102,7 @@
         value (or (:value obj) 0)
         target (or (:target obj) 0)
         label (get-graph-tooltip column-name prefix value suffix)
-        target-label (get-graph-tooltip (str column-name " target") prefix (.toLocaleString target) suffix)
+        target-label (get-graph-tooltip (str column-name " target") prefix (utils/thousands-separator target) suffix)
         period (utils/get-period-string (:period obj) interval [:short])
         values (if has-target
                  [period

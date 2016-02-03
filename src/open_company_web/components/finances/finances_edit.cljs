@@ -34,13 +34,13 @@
           burn-prefix (if (neg? burn) (str "-" prefix) prefix)
           burn-rate (if (js/isNaN burn)
                       "calculated"
-                      (str burn-prefix (.toLocaleString (utils/abs burn))))
+                      (str burn-prefix (utils/thousands-separator (utils/abs burn))))
           runway-days (:runway finances-data)
           runway (cond
                    (nil? runway-days) "calculated"
                    (zero? runway-days) "break-even"
                    (pos? runway-days) "profitable"
-                   :else (str (.toLocaleString (utils/abs runway-days)) " days"))
+                   :else (str (utils/thousands-separator (utils/abs runway-days)) " days"))
           ref-prefix (str (:period finances-data) "-")
           period-month (utils/get-month period)
           needs-year (or (= period-month "JAN")

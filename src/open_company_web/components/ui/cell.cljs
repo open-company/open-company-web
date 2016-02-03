@@ -16,9 +16,6 @@
 ;; - :cell-state (optional) an initial state for the component
 
 
-(defn- format-value [value]
-  (.toLocaleString value))
-
 (defn- to-state [owner data state]
   (om/set-state! owner :cell-state state)
   (when (= state :edit)
@@ -85,7 +82,7 @@
                         value
                         (.parseFloat js/window value))
           float-value (if (js/isNaN float-value) 0 float-value)
-          formatted-value (format-value float-value)
+          formatted-value (utils/thousands-separator float-value)
           prefix-value (if (and (not (s/blank? formatted-value)) (:prefix data))
                          (str (:prefix data) formatted-value)
                          formatted-value)

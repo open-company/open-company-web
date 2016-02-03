@@ -40,9 +40,9 @@
       (str (quot runway-days (* 30 12)) " years"))))
 
 (defn get-runway-subtitle [cash avg-burn-rate runway-days cur-symbol]
-  (str cur-symbol (.toLocaleString (or cash 0))
+  (str cur-symbol (utils/thousands-separator (or cash 0))
        " ÷ a 3-month avg. burn of "
-       cur-symbol (.toLocaleString (utils/abs (or (int avg-burn-rate) 0)))
+       cur-symbol (utils/thousands-separator (utils/abs (or (int avg-burn-rate) 0)))
        " ≅ "
        (str (get-rounded-runway runway-days [:round :remove-trailing-zero]))))
 
@@ -63,7 +63,7 @@
           is-profitable (pos? (:runway (first sorted-finances)))
           runway (if is-profitable
                     "Profitable"
-                    (str (utils/format-value (utils/abs runway-value)) " days"))
+                    (str (utils/thousands-separator (utils/abs runway-value)) " days"))
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))
           runway-string (if is-profitable

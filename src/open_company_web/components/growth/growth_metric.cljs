@@ -22,7 +22,7 @@
           sorted-metric (vec (sort sort-pred metric-data))
           actual-idx (growth-utils/get-actual sorted-metric)
           actual-set (sorted-metric actual-idx)
-          actual (.toLocaleString (or (:value actual-set) 0))
+          actual (utils/thousands-separator (or (:value actual-set) 0))
           interval (:interval metric-info)
           period (utils/get-period-string (:period actual-set) interval)
           metric-unit (:unit metric-info)

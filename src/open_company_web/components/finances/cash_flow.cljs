@@ -19,20 +19,20 @@
      (str (utils/get-period-string (:period obj))
           " Revenue: "
           prefix
-          (.toLocaleString (or (:revenue obj) 0)))
+          (utils/thousands-separator (or (:revenue obj) 0)))
      (:costs obj)
      (occ/fill-color :red)
      (str (utils/get-period-string (:period obj))
           " Costs: "
           prefix
-          (.toLocaleString (or (:costs obj) 0)))
+          (utils/thousands-separator (or (:costs obj) 0)))
      abs-cash-flow
      (occ/fill-color (if cash-flow-pos? :green :red))
      (str (utils/get-period-string (:period obj))
           " Cash flow: "
           (when (neg? cash-flow) "-")
           prefix
-          (.toLocaleString abs-cash-flow))]))
+          (utils/thousands-separator abs-cash-flow))]))
 
 (defn- get-chart-data [data prefix]
   "Vector of max *columns elements of [:Label value]"
@@ -64,7 +64,7 @@
           value-set (first sorted-finances)
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
-          cash-val (str cur-symbol (utils/format-value (:cash value-set)))
+          cash-val (str cur-symbol (utils/thousands-separator (:cash value-set)))
           cash-flow-val (or (:avg-burn-rate value-set) 0)
           [year month] (clojure.string/split (:period value-set) "-")
           int-month (int month)
@@ -80,7 +80,7 @@
               (dom/h3 {:class (utils/class-set {:actual true
                                                 :green (pos? cash-flow-val)
                                                 :red (not (pos? cash-flow-val))})}
-                                               (str cur-symbol (.toLocaleString (int cash-flow-val))))
+                                               (str cur-symbol (utils/thousands-separator (int cash-flow-val))))
               (dom/h3 {:class "actual-label gray"}
                       (str "3 months avg. " (utils/month-string month-3-fixed) " to " (utils/month-string month))))))
         (om/build column-chart (get-chart-data sorted-finances cur-symbol))))))
