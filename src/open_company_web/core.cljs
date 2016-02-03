@@ -139,8 +139,7 @@
         (when-not (.-isNavigation e)
           ;; in this case, we're setting it so
           ;; let's scroll to the top to simulate a navigation
-          ; (js/window.scrollTo 0 0)
-          )
+          (js/window.scrollTo 0 0))
         ; check if the user is logged in
         (login-wall)
         ;; dispatch on the token
