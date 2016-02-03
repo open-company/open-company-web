@@ -55,6 +55,14 @@
     ;; reactivate the url change handler
     (reset! open-company-web.core/prevent-route-dispatch false)))
 
+(defn setup-body-min-height []
+  (when (.-$ js/window)
+    (let [$body (.$ js/window(.-body js/document))
+          app-height (.height (.$ js/window "#app"))
+          cur-min-height (.parseInt js/window (.css $body "min-height"))]
+      (when (> app-height cur-min-height)
+        (.css $body "min-height" app-height)))))
+
 (defcomponent category-nav [data owner]
 
   (did-mount [_]
@@ -65,8 +73,7 @@
           company-data (:company-data data)
           categories (:categories company-data)
           active-category (:active-category data)]
-      (when (.-$ js/window)
-        (.css (.$ js/window (.-body js/document)) "min-height" (.height (.$ js/window "#app"))))
+      (setup-body-min-height)
       (dom/div #js {:className "row category-nav" :ref "category-nav"}
         (for [category categories]
           (let [category-name (name category)
