@@ -517,6 +517,6 @@
         int-part (first parts)
         dec-part (get parts 1)
         integer-string (clojure.string/replace int-part #"\B(?=(\d{3})+(?!\d))" ",")]
-    (if-not (= dec-part nil)
+    (if-not (nil? dec-part)
       (str integer-string "." dec-part)
       integer-string)))
