@@ -29,5 +29,5 @@
           topic-list-node (sel1 c [:div.topic-list])
           topic-row-nodes (sel c [:div.topic-row])]
       (is (not (nil? topic-list-node)))
-      (is (= (count (:progress (:sections (:company-data test-atom)))) (count topic-row-nodes)))
+      (is (= (count (:progress (:sections (:company-data test-atom)))) (dec (count topic-row-nodes))))
       (tu/unmount! c))))
