@@ -23,7 +23,7 @@
     (let [data (:data data)
           sorter (utils/sort-by-key-pred :period true)
           sorted-data (sort sorter data)
-          actual (last sorted-data)
+          actual (first sorted-data)
           currency (:currency options)
           cur-symbol (utils/get-symbol-for-currency-code currency)
           cash-val (str cur-symbol (utils/thousands-separator (:cash actual)))
