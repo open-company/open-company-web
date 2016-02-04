@@ -11,10 +11,11 @@
       (let [company-data (:company-data data)
             active-category (keyword (:active-category data))
             active-sections (get-in company-data [:sections active-category])]
-        (for [section-name active-sections]
+        (for [section-name active-sections
+              :let [sd (->> section-name keyword (get company-data))]]
           (dom/div {:class "topic-row"
                     :key (str "topic-row-" (name section-name))}
-            (om/build topic {:loading (:loading company-data)
-                             :company-data company-data
-                             :active-category active-category}
-                             {:opts {:section-name section-name}})))))))
+            (when-not (and (:read-only company-data) (:placeholder sd))
+              (om/build topic {:section-data sd
+                               :section-name section-name
+                               :currency (:currency company-data)}))))))))
