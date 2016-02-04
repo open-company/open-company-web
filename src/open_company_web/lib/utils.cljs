@@ -226,7 +226,7 @@
   (if (pos? n)
     (str string "s")
     string))
-  
+
 (defn time-since
   "Get a string representing the elapsed time from a date in the past"
   [past-date]
@@ -326,13 +326,9 @@
         read-only (readonly? links)
         without-sections (apply dissoc company-data section-keys)
         with-read-only (assoc without-sections :read-only read-only)
-        sections (apply merge
-                        (map
-                          (fn [section-name]
-                            (let [section-body (section-name company-data)
-                                  fixed-section-body (fix-section section-body section-name)]
-                              (hash-map section-name fixed-section-body)))
-                          section-keys))
+        sections (into {} (map
+                           #(fn [sn] [sn (fix-section (sn company-data) sn)])
+                           section-keys))
         with-fixed-sections (merge with-read-only sections)]
     with-fixed-sections))
 
