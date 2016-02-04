@@ -30,11 +30,12 @@ div.topic-list-edit{
 
       div.topic-edit-labels{
         float: left;
+        width: 80%;
 
         h3.topic-title {
-          margin-top: 12px;
           font-size: 15px;
           font-weight: bold;
+          margin: 10px 0px 5px 0px;
         }
 
         label.topic-description {
