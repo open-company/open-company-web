@@ -5,6 +5,7 @@
             [open-company-web.api :as api]
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
+            [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.manage-topic :refer (manage-topic)]))
 
@@ -13,7 +14,7 @@
   (init-state [_]
     (when (empty? @caches/new-sections)
       (api/get-new-sections))
-    {:active-topics (:active-topics data)})
+    {:active-topics (get-in (:company-data data) [:sections (keyword (:active-category data))])})
 
   (render [_]
     (if (empty? @caches/new-sections)
@@ -21,12 +22,17 @@
     (let [active-category (:active-category options)
           all-sections (:new-sections options)
           category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
-          company-data (:company-data data)
-          active-category (keyword (:active-category data))
-          active-sections (get-in company-data [:sections active-category])]
+          active-sections (om/get-state owner :active-topics)]
       (dom/div {:class "topic-list-edit fix-top-margin-scrolling group"}
         (for [section category-sections]
-          (dom/div {:class "topic-edit group"
-                    :key (str "topic-edit-" (:name section))}
-            (dom/div {:class "topic-edit-internal"}
-              (dom/h3 {} (:title section))))))))))
+          (let [active (utils/in? active-sections (:name section))]
+            (dom/div {:class (utils/class-set {:topic-edit true
+                                               :group true
+                                               :active active})
+                      :on-click (fn []
+                                  (if active
+                                    (om/set-state! owner :active-topics (utils/vec-dissoc active-sections (:name section)))
+                                    (om/set-state! owner :active-topics (concat active-sections [(:name section)]))))
+                      :key (str "topic-edit-" (:name section))}
+              (dom/div {:class "topic-edit-internal"}
+                (dom/h3 {} (:title section)))))))))))
