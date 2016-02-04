@@ -1,0 +1,19 @@
+div.topic-list-edit{
+  div.topic-edit {
+    min-height: 50px;
+    padding-top: 10px;
+
+    div.topic-edit-internal{
+      margin: 0px 10px 0px 10px;
+      min-height: 40px;
+      border: 1px solid black;
+      background-color: rgba(0, 0, 0, 0.1);
+      vertical-align: middle;
+
+      h3 {
+        margin-top: 12px;
+        font-size: 15px;
+      }
+    }
+  }
+}
