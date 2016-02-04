@@ -165,6 +165,7 @@
                                             :section section
                                             :read-only readonly-company
                                             :title (or (:title section-data) (:title-placeholder section-data))
+                                            :placeholder (:placeholder section-data)
                                             :updated-at (:updated-at section-data)
                                             :show-popover #(show-popover % (name category) (:name section-data))})
                         (when-not readonly-company

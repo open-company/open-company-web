@@ -159,11 +159,12 @@
                                  :cancel-if-needed-cb cancel-if-needed-fn
                                  :save-cb save-fn}))
 
-        (om/build update-footer {:author (:author section-data)
-                                 :updated-at (:updated-at section-data)
-                                 :section section
-                                 :editing (or title-editing headline-editing body-editing)
-                                 :notes false})
+        (when-not (:placeholder section-data)
+          (om/build update-footer {:author (:author section-data)
+                                   :updated-at (:updated-at section-data)
+                                   :section section
+                                   :editing (or title-editing headline-editing body-editing)
+                                   :notes false}))
         (dom/div {:class "simple-section-footer"}
           (if (or title-editing headline-editing body-editing)
             (om/build section-footer {:edting (or title-editing headline-editing body-editing)
