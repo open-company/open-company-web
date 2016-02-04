@@ -12,6 +12,9 @@
 
 (defonce default-category "progress")
 
+(defn set-navbar-editing [owner editing]
+  (om/set-state! owner :navbar-editing editing))
+
 (defn switch-tab-cb [owner new-tab]
   (om/set-state! owner :active-category new-tab))
 
@@ -23,7 +26,8 @@
           active-tab (if (pos? (count url-tab))
                        url-tab
                        default-category)]
-      {:active-category active-tab}))
+      {:active-category active-tab
+       :navbar-editing false}))
 
   (render-state [_ state]
     (let [slug (:slug @router/path)
@@ -31,7 +35,7 @@
       (dom/div {:class "company-dashboard row-fluid"}
 
         ;; navbar
-        (om/build navbar (assoc data :show-share true))
+        (om/build navbar (merge data {:show-share true :edit-mode (om/get-state owner :navbar-editing)}))
 
         ;; company header
         (om/build company-header {:loading (:loading company-data)
@@ -40,6 +44,8 @@
                                   :active-category (:active-category state)})
 
         ;; topic list
-        (om/build topic-list {:loading (:loading company-data)
-                              :company-data company-data
-                              :active-category (:active-category state)})))))
+        (om/build topic-list
+                  {:loading (:loading company-data)
+                   :company-data company-data
+                   :active-category (:active-category state)}
+                  {:opts {:navbar-editing-cb (partial set-navbar-editing owner)}})))))
