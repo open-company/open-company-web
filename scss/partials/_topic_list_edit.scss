@@ -1,5 +1,6 @@
 div.topic-list-edit{
   background-color: rgb(250, 250, 250);
+  margin-bottom: 10px;
 
   div.topic-edit {
     min-height: 50px;
@@ -18,7 +19,7 @@ div.topic-list-edit{
       border: 1px solid rgba(0, 0, 0, 0.1);
       background-color: rgb(252, 252, 252);
       vertical-align: middle;
-      background-image: url("/img/draggable_transparent.png");
+      background-image: url("/img/draggable_transparent.png?#{$deploy_key}");
       background-size: 20px 20px;
       background-position: center left;
       background-repeat: no-repeat;
