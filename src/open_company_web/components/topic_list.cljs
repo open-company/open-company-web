@@ -18,7 +18,7 @@
         (om/update-state! owner :new-sections-requested not)
         (api/get-new-sections)))))
 
-(defcomponent topic-list [data owner]
+(defcomponent topic-list [data owner options]
 
   (init-state [_]
     {:editing false
@@ -37,7 +37,10 @@
           editing (om/get-state owner :editing)]
       (if editing
         (om/build topic-list-edit data {:opts {:new-sections (slug @caches/new-sections)
-                                               :active-category (:active-category data)}})
+                                               :active-category (:active-category data)
+                                               :cancel-editing-cb (fn []
+                                                                    (om/set-state! owner :editing false)
+                                                                    ((:navbar-editing-cb options) false))}})
         (let [company-data (:company-data data)
               active-category (keyword (:active-category data))
               active-sections (get-in company-data [:sections active-category])]
@@ -52,5 +55,6 @@
             (when-not (:read-only company-data)
               (om/build manage-topic {} {:opts {:manage-topic-cb #(do
                                                                     (om/set-state! owner :editing true)
+                                                                    ((:navbar-editing-cb options) true)
                                                                     (.animate (.$ js/window js/window) #js {"scrollTop" "0px"}))}}))
             ))))))
