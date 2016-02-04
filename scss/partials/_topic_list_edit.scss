@@ -24,14 +24,29 @@ div.topic-list-edit{
       background-repeat: no-repeat;
       padding-left: 30px;
 
-      h3 {
-        margin-top: 12px;
-        font-size: 15px;
+      &:hover{
+        background-color: rgb(253, 253, 253);
+      }
+
+      div.topic-edit-labels{
+        float: left;
+
+        h3.topic-title {
+          margin-top: 12px;
+          font-size: 15px;
+          font-weight: bold;
+        }
+
+        label.topic-description {
+          font-weight: normal;
+          font-size: 14px;
+          font-family: $oc_main_font;
+        }
       }
 
       img.check {
         float: right;
-        margin: -7px 10px 0 0;
+        margin: 15px 10px 0 0;
         width: 30px;
         height: 30px;
       }
