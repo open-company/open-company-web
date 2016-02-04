@@ -47,7 +47,9 @@
           metric-unit (:unit metric-info)
           fixed-cur-unit (when (= metric-unit "currency")
                            (utils/get-symbol-for-currency-code (:currency options)))
-          unit (when (= metric-unit "%") "%")]
+          unit (when (= metric-unit "%") "%")
+          last-value (utils/thousands-separator (:value (first metric-data)))
+          last-value-label (str fixed-cur-unit last-value unit)]
       (dom/div {:class (utils/class-set {:topic-headline true
                                          :topic-headline-growth true
                                          :group true
@@ -55,15 +57,8 @@
         (dom/div {:class "chart-header-container"}
           (dom/div {:class "target-actual-container"}
             (dom/div {:class "actual-container"}
-              (dom/h3 {:class "actual blue"} (:name metric-info)))))
-        (om/build column-chart
-                  (growth-utils/get-chart-data sorted-metric
-                                               fixed-cur-unit
-                                               (:slug metric-info)
-                                               (:name metric-info)
-                                               unit
-                                               interval)
-                  {:opts {:chart-height 50 :chart-width 300 :chart-navigation false}})))))
+              (dom/h3 {:class "actual blue"} (:name metric-info))
+              (dom/h3 {:class "actual blue"} last-value-label))))))))
 
 (def animation-duration 500)
 

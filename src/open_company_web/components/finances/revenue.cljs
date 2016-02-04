@@ -14,7 +14,7 @@
           value-set (first finances-data)
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code (:currency (:company-data data)))
-          revenue-val (str cur-symbol (utils/format-value (:revenue value-set)))]
+          revenue-val (str cur-symbol (utils/thousands-separator (:revenue value-set)))]
       (dom/div {:class (utils/class-set {:section true
                                          :revenue true
                                          :read-only (:read-only data)})

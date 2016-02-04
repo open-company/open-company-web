@@ -14,7 +14,7 @@
           value-set (first finances-data)
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
-          burn-rate-val (str cur-symbol (utils/format-value (:burn-rate value-set)))]
+          burn-rate-val (str cur-symbol (utils/thousands-separator (:burn-rate value-set)))]
       (dom/div {:class (utils/class-set {:section true
                                          :burn-rate true
                                          :read-only (:read-only data)})

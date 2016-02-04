@@ -16,7 +16,7 @@
           value-set (first sorted-finances)
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
-          costs-val (str cur-symbol (utils/format-value (:costs value-set)))]
+          costs-val (str cur-symbol (utils/thousands-separator (:costs value-set)))]
       (dom/div {:class (utils/class-set {:section true
                                          :costs true
                                          :read-only (:read-only data)})
