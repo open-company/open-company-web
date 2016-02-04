@@ -327,7 +327,7 @@
         without-sections (apply dissoc company-data section-keys)
         with-read-only (assoc without-sections :read-only read-only)
         sections (into {} (map
-                           #(fn [sn] [sn (fix-section (sn company-data) sn)])
+                           (fn [sn] [sn (fix-section (sn company-data) sn)])
                            section-keys))
         with-fixed-sections (merge with-read-only sections)]
     with-fixed-sections))
