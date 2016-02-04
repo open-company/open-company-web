@@ -11,33 +11,33 @@
 (defn check-scroll [owner]
   (let [$win (.$ js/window js/window)]
     (.scroll $win
-             (fn [e]
-               (when-let [cat-node (om/get-ref owner "category-nav")]
-                 (let [$cat-node (.$ js/window cat-node)
-                       $nav (.$ js/window "nav.navbar")
-                       scroll-top (.scrollTop $win)
-                       $topic-list (.$ js/window ".topic-list")
-                       $win-width (.width $win)]
-                   (when (= @max-scroll-top -1)
-                     (let [initial-offset-top (.-top (.offset $cat-node))
-                           nav-height (.height $nav)
-                           tmp-scroll-top (- initial-offset-top nav-height)]
-                       (reset! max-scroll-top tmp-scroll-top)))
-                   (let [actual-position (.-position (.-style cat-node))
-                         next-position (if (>= scroll-top @max-scroll-top) "fixed" "relative")
-                         will-change (not= actual-position next-position)]
-                     (if (>= scroll-top @max-scroll-top)
-                       ;; top scroll reached, fix the bar and don't let it scroll
-                       (do
-                         (.css $topic-list #js {"margin-top" "44px"})
-                         (.css $cat-node #js {"position" "fixed" "top" "50px" "width" (str $win-width "px")}))
-                       ;; let the bar move free with the scroller
-                       (do
-                         (.css $cat-node #js {"position" "relative" "top" "0px" "width" (str $win-width "px")})
-                         (.css $topic-list #js {"margin-top" "0px"})))
-                     ;; Fix for safari mobile: http://stackoverflow.com/a/32891079
-                     (when will-change
-                       (set! (.-transform (.-style cat-node)) "translate3d(0px,0px,0px)")))))))))
+      (fn [e]
+        (when-let [cat-node (om/get-ref owner "category-nav")]
+          (let [$cat-node (.$ js/window cat-node)
+                $nav (.$ js/window "nav.navbar")
+                scroll-top (.scrollTop $win)
+                $topic-list (.$ js/window ".topic-list")
+                $win-width (.width $win)]
+            (when (= @max-scroll-top -1)
+              (let [initial-offset-top (.-top (.offset $cat-node))
+                    nav-height (.height $nav)
+                    tmp-scroll-top (- initial-offset-top nav-height)]
+                (reset! max-scroll-top tmp-scroll-top)))
+            (let [actual-position (.-position (.-style cat-node))
+                  next-position (if (>= scroll-top @max-scroll-top) "fixed" "relative")
+                  will-change (not= actual-position next-position)]
+              (if (>= scroll-top @max-scroll-top)
+                ;; top scroll reached, fix the bar and don't let it scroll
+                (do
+                  (.css $topic-list #js {"margin-top" "44px"})
+                  (.css $cat-node #js {"position" "fixed" "top" "50px" "width" (str $win-width "px")}))
+                ;; let the bar move free with the scroller
+                (do
+                  (.css $cat-node #js {"position" "relative" "top" "0px" "width" (str $win-width "px")})
+                  (.css $topic-list #js {"margin-top" "0px"})))
+              ;; Fix for safari mobile: http://stackoverflow.com/a/32891079
+              (when will-change
+                (set! (.-transform (.-style cat-node)) "translate3d(0px,0px,0px)")))))))))
 
 (defn category-click [data category-name e]
   (when (.-$ js/window)
