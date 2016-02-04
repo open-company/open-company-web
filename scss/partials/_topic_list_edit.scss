@@ -3,6 +3,12 @@ div.topic-list-edit{
     min-height: 50px;
     padding-top: 10px;
 
+    &.active{
+      div.topic-edit-internal{
+        background-color: rgba(255, 0, 0, 0.1);
+      }
+    }
+
     div.topic-edit-internal{
       margin: 0px 10px 0px 10px;
       min-height: 40px;
