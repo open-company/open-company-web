@@ -344,7 +344,7 @@
   (str n "px"))
 
 (defn select-section-data [section-data section as-of]
-  (when as-of
+  (when (or as-of (:placeholder section-data))
     (let [slug (keyword (:slug @router/path))]
       (if (or (not (contains? (slug @caches/revisions) section))
               (= as-of (:updated-at section-data)))
