@@ -37,6 +37,27 @@ nav.navbar {
     margin: 0px;
     padding: 0px;
 
+    &.editing-mode {
+
+      div.left-button {
+        float: left;
+
+        button.cancel-bt {
+          font-size: 15px;
+          margin: 15px 0px;
+        }
+      }
+
+      div.right-button {
+        float: right;
+
+        button.save-bt {
+          font-size: 15px;
+          margin: 15px 0px;
+        }
+      }
+    }
+
     button.share-button{
       margin-top: 4px;
       img {
