@@ -41,7 +41,7 @@
         (let [company-data (:company-data data)
               active-category (keyword (:active-category data))
               active-sections (get-in company-data [:sections active-category])]
-          (dom/div {:class "topic-list"}
+          (dom/div {:class "topic-list fix-top-margin-scrolling"}
             (for [section-name active-sections]
               (dom/div {:class "topic-row"
                         :key (str "topic-row-" (name section-name))}

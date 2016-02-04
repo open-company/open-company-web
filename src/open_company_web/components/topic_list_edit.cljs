@@ -24,7 +24,7 @@
           company-data (:company-data data)
           active-category (keyword (:active-category data))
           active-sections (get-in company-data [:sections active-category])]
-      (dom/div {:class "topic-list-edit group"}
+      (dom/div {:class "topic-list-edit fix-top-margin-scrolling group"}
         (for [section category-sections]
           (dom/div {:class "topic-edit group"
                     :key (str "topic-edit-" (:name section))}
