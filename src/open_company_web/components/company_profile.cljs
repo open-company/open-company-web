@@ -60,17 +60,17 @@
 
   (will-mount [_]
     (let [save-change (utils/get-channel "save-company")]
-        (go (loop []
-          (let [change (<! save-change)]
-            (let [slug (:slug @router/path)
-                  company-data ((keyword slug) @app-state)
-                  logo (om/get-state owner :logo)]
-              (if (not= logo (om/get-state owner :initial-logo))
-                (if (clojure.string/blank? logo)
-                  (save-company-data company-data "")
-                  (check-image logo owner check-img-cb))
-                (save-company-data company-data (:logo company-data)))
-              (recur)))))))
+      (go (loop []
+        (let [change (<! save-change)]
+          (let [slug (:slug @router/path)
+                company-data ((keyword slug) @app-state)
+                logo (om/get-state owner :logo)]
+            (if (not= logo (om/get-state owner :initial-logo))
+              (if (clojure.string/blank? logo)
+                (save-company-data company-data "")
+                (check-image logo owner check-img-cb))
+              (save-company-data company-data (:logo company-data)))
+            (recur)))))))
 
   (render [_]
     (let [slug (:slug @router/path)
