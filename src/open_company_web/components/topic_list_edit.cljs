@@ -19,22 +19,24 @@
   (render [_]
     (if (empty? @caches/new-sections)
       (dom/h2 {} "Loading sections...")
-    (let [active-category (:active-category options)
-          all-sections (:new-sections options)
-          category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
-          active-sections (om/get-state owner :active-topics)]
-      (dom/div {:class "topic-list-edit fix-top-margin-scrolling group"}
-        (for [section category-sections]
-          (let [active (utils/in? active-sections (:name section))
-                check-src (if active "/img/check_checked.png" "/img/check_empty.png")]
-            (dom/div {:class (utils/class-set {:topic-edit true
-                                               :group true
-                                               :active active})
-                      :on-click (fn []
-                                  (if active
-                                    (om/set-state! owner :active-topics (utils/vec-dissoc active-sections (:name section)))
-                                    (om/set-state! owner :active-topics (concat active-sections [(:name section)]))))
-                      :key (str "topic-edit-" (:name section))}
-              (dom/div {:class "topic-edit-internal"}
-                (dom/h3 {} (:title section)
-                (dom/img {:class "check" :src check-src})))))))))))
+      (let [active-category (:active-category options)
+            all-sections (:new-sections options)
+            category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
+            active-sections (om/get-state owner :active-topics)]
+        (dom/div {:class "topic-list-edit fix-top-margin-scrolling group"}
+          (for [section category-sections]
+            (let [active (utils/in? active-sections (:name section))
+                  check-src (if active "/img/check_checked.png" "/img/check_empty.png")]
+              (dom/div {:class (utils/class-set {:topic-edit true
+                                                 :group true
+                                                 :active active})
+                        :on-click (fn []
+                                    (if active
+                                      (om/set-state! owner :active-topics (utils/vec-dissoc active-sections (:name section)))
+                                      (om/set-state! owner :active-topics (concat active-sections [(:name section)]))))
+                        :key (str "topic-edit-" (:name section))}
+                (dom/div {:class "topic-edit-internal group"}
+                  (dom/div {:class "topic-edit-labels"}
+                    (dom/h3 {:class "topic-title oc-header"} (:title section))
+                    (dom/label {:class "topic-description"} (:description section)))
+                  (dom/img {:class "check" :src check-src}))))))))))
