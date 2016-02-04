@@ -50,5 +50,7 @@
                                  :active-category active-category}
                                  {:opts {:section-name section-name}})))
             (when-not (:read-only company-data)
-              (om/build manage-topic {} {:opts {:manage-topic-cb #(om/set-state! owner :editing true)}}))
+              (om/build manage-topic {} {:opts {:manage-topic-cb #(do
+                                                                    (om/set-state! owner :editing true)
+                                                                    (.animate (.$ js/window js/window) #js {"scrollTop" "0px"}))}}))
             ))))))
