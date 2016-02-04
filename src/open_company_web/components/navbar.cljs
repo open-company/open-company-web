@@ -7,27 +7,45 @@
             [open-company-web.components.ui.login-button :refer (login-button)]
             [om-bootstrap.nav :as n]
             [open-company-web.router :as router]
-            [open-company-web.lib.jwt :as jwt]))
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.jwt :as jwt]
+            [cljs.core.async :refer (put!)]))
 
 (defn company-title [data]
   (str (:name data)))
 
 (defcomponent navbar [data owner]
+
   (render [_]
-    (n/navbar {:inverse? true :fixed-top? true :fluid true :collapse? true}
-      (dom/div {:class "navbar-header"}
-        (when (contains? @router/path :slug)
-          (let [slug (keyword (:slug @router/path))]
-            (om/build company-avatar {:company-data (slug data) :navbar-brand true})))
-        (dom/ul {:class "nav navbar-nav navbar-right"}
-          (dom/li {}
-            (if (:show-share data)
-              (dom/div {}
-                (dom/button {:type "button" :class "btn btn-link digest-button"}
-                            (dom/img {:src "/img/digest.svg"}))
-                (dom/button {:type "button" :class "btn btn-link share-button"}
-                            (dom/img {:src "/img/share.svg"})))
-              (if (jwt/jwt)
-                (om/build user-avatar {})
-                (om/build login-button data))))))
-      (dom/div {:id "navbar" :class "navbar-collapse collapse container-fluid"}))))
+    (let [edit-mode (:edit-mode data)]
+      (if edit-mode
+        (n/navbar {:inverse? true :fixed-top? true :fluid true :collapse? true}
+          (dom/div {:class "navbar-header editing-mode"}
+            (dom/div {:class "left-button"}
+              (dom/button {:class "cancel-bt oc-btn oc-link"
+                           :on-click (fn [e]
+                                       (let [ch (utils/get-channel "cancel-bt-navbar")]
+                                         (put! ch {:click true :event e})))} "Cancel"))
+            (dom/div {:class "right-button"}
+              (dom/button {:class "save-bt oc-btn oc-link"
+                           :on-click (fn [e]
+                                       (let [ch (utils/get-channel "save-bt-navbar")]
+                                         (put! ch {:click true :event e})))} "Save"))))
+        (n/navbar {:inverse? true :fixed-top? true :fluid true :collapse? true}
+          (dom/div {:class "navbar-header"}
+            (when (contains? @router/path :slug)
+              (let [slug (keyword (:slug @router/path))]
+                (om/build company-avatar {:company-data (slug data) :navbar-brand true})))
+            (dom/ul {:class "nav navbar-nav navbar-right"}
+              (dom/li {}
+                (if (:show-share data)
+                  (dom/div {}
+                    (dom/button {:type "button" :class "btn btn-link digest-button"}
+                                (dom/img {:src "/img/digest.svg"}))
+                    (dom/button {:type "button" :class "btn btn-link share-button"}
+                                (dom/img {:src "/img/share.svg"})))
+                  (if (jwt/jwt)
+                    (om/build user-avatar {})
+                    (om/build login-button data))))))
+          (dom/div {:id "navbar" :class "navbar-collapse collapse container-fluid"}))
+        ))))
