@@ -25,7 +25,8 @@
           active-sections (om/get-state owner :active-topics)]
       (dom/div {:class "topic-list-edit fix-top-margin-scrolling group"}
         (for [section category-sections]
-          (let [active (utils/in? active-sections (:name section))]
+          (let [active (utils/in? active-sections (:name section))
+                check-src (if active "/img/check_checked.png" "/img/check_empty.png")]
             (dom/div {:class (utils/class-set {:topic-edit true
                                                :group true
                                                :active active})
@@ -35,4 +36,5 @@
                                     (om/set-state! owner :active-topics (concat active-sections [(:name section)]))))
                       :key (str "topic-edit-" (:name section))}
               (dom/div {:class "topic-edit-internal"}
-                (dom/h3 {} (:title section)))))))))))
+                (dom/h3 {} (:title section)
+                (dom/img {:class "check" :src check-src})))))))))))

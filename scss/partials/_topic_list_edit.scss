@@ -1,24 +1,39 @@
 div.topic-list-edit{
+  background-color: rgb(250, 250, 250);
+
   div.topic-edit {
     min-height: 50px;
     padding-top: 10px;
 
     &.active{
       div.topic-edit-internal{
-        background-color: rgba(255, 0, 0, 0.1);
+        background-color: rgb(255, 255, 255);
+        border: 1px solid rgba(0, 0, 0, 0.2);
       }
     }
 
     div.topic-edit-internal{
       margin: 0px 10px 0px 10px;
       min-height: 40px;
-      border: 1px solid black;
-      background-color: rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background-color: rgb(252, 252, 252);
       vertical-align: middle;
+      background-image: url("/img/draggable_transparent.png");
+      background-size: 20px 20px;
+      background-position: center left;
+      background-repeat: no-repeat;
+      padding-left: 30px;
 
       h3 {
         margin-top: 12px;
         font-size: 15px;
+      }
+
+      img.check {
+        float: right;
+        margin: -7px 10px 0 0;
+        width: 30px;
+        height: 30px;
       }
     }
   }
