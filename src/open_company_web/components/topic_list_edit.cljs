@@ -1,9 +1,10 @@
 (ns open-company-web.components.topic-list-edit
   (:require-macros [cljs.core.async.macros :refer (go)])
-  (:require [om.core :as om :include-macros true]
+  (:require [cljs.core.async :refer (chan <!)]
+            [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
-            [cljs.core.async :refer (chan <!)]
+            [dommy.core :as dommy :refer-macros (sel1 sel)]
             [open-company-web.api :as api]
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
@@ -11,6 +12,18 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.manage-topic :refer (manage-topic)]))
+
+(defn sort-end [owner]
+  (let [all-active-topic-div (sel :div.topic-sortable.active)
+        resorted-sections (map #(.-sectionname (.-dataset %)) all-active-topic-div)]
+    (om/set-state! owner :active-topics (vec resorted-sections))))
+
+(defn setup-sortable [owner]
+  (when (.-$ js/window)
+    (.sortable (.$ js/window "div.topic-list-edit")
+               #js {"axis" "y"
+                    "start" #(.addClass (.-item %2) "active")
+                    "stop" #(sort-end owner)})))
 
 (defcomponent topic-list-edit [data owner options]
 
@@ -24,6 +37,9 @@
     {:active-topics (get-in (:company-data data) [:sections (keyword (:active-category data))])})
 
   (did-mount [_]
+    (when-not (:read-only (:company-data data))
+      (let [category-sections (om/get-state owner :active-topics)]
+        (setup-sortable owner)))
     (let [save-ch (utils/get-channel "save-bt-navbar")]
       (go (loop []
         (let [change (<! save-ch)]
@@ -46,7 +62,10 @@
                   check-src (str "/img/check_" (if active "checked" "empty") ".png?" ls/deploy-key)]
               (dom/div {:class (utils/class-set {:topic-edit true
                                                  :group true
+                                                 :topic-sortable true
+                                                 (str "topic-" (:name section)) true
                                                  :active active})
+                        :data-sectionname (:name section)
                         :on-click (fn []
                                     (if active
                                       (om/set-state! owner :active-topics (utils/vec-dissoc active-sections (:name section)))
