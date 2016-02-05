@@ -35,6 +35,7 @@ $.append = function(){};
 $.sortable = function(){};
 $.get = function(){};
 $.autogrow = function(){};
+$.addClass = function(){};
 // svgcss
 var svgcss = function(){};
 // Hallo
