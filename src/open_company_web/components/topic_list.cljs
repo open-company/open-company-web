@@ -6,6 +6,7 @@
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.caches :as caches]
             [open-company-web.api :as api]
+            [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.topic-list-edit :refer (topic-list-edit)]
             [open-company-web.components.manage-topic :refer (manage-topic)]))
@@ -17,6 +18,19 @@
       (when (and (empty? (slug @caches/new-sections)) (seq company-data))
         (om/update-state! owner :new-sections-requested not)
         (api/get-new-sections)))))
+
+(defn save-sections-cb [owner data new-sections]
+  (let [company-data (:company-data data)
+        categories (:categories company-data)
+        active-category (keyword (:active-category data))
+        old-active-sections (get-in company-data [:sections active-category])
+        remaining-categories (utils/vec-dissoc categories (name active-category))
+        remaining-sections (apply merge
+                                  (map #(hash-map (keyword %) ((keyword %) (:sections company-data)))
+                                       remaining-categories))
+        all-sections (assoc remaining-sections active-category new-sections)]
+    (api/patch-sections all-sections)
+    (om/set-state! owner :editing false)))
 
 (defcomponent topic-list [data owner options]
 
@@ -38,6 +52,7 @@
       (if editing
         (om/build topic-list-edit data {:opts {:new-sections (slug @caches/new-sections)
                                                :active-category (:active-category data)
+                                               :save-sections-cb (partial save-sections-cb owner data)
                                                :cancel-editing-cb (fn []
                                                                     (om/set-state! owner :editing false)
                                                                     ((:navbar-editing-cb options) false))}})
