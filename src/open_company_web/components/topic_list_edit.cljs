@@ -43,7 +43,8 @@
     (let [save-ch (utils/get-channel "save-bt-navbar")]
       (go (loop []
         (let [change (<! save-ch)]
-          (println "save ch!" change)))))
+          (let [new-topics (om/get-state owner :active-topics)]
+            ((:save-sections-cb options) new-topics))))))
     (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
       (go (loop []
         (let [change (<! cancel-ch)]
