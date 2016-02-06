@@ -63,7 +63,9 @@
 (def animation-duration 500)
 
 (defn topic-click [owner expanded]
-  (let [$topic (.$ js/window (om/get-ref owner "topic"))
+  (let [$win (.$ js/window js/window)
+        $topic (.$ js/window (om/get-ref owner "topic"))
+        topic-offset-top (.-top (.offset $topic))
         $topic-date-author (.$ js/window (om/get-ref owner "topic-date-author"))
         $body-node (.$ js/window (om/get-ref owner "topic-body"))]
     (.css $body-node "height" "auto")
@@ -81,7 +83,9 @@
       (.animate $body-node
                 #js {"height" (if expanded "0" body-height)}
                 #js {"duration" animation-duration
-                     "complete" (fn [](om/update-state! owner :expanded not))}))))
+                     "complete" (fn [](om/update-state! owner :expanded not))})
+      (when expanded
+        (.animate $win #js {"scrollTop" (- topic-offset-top 90)})))))
 
 (defcomponent topic [data owner options]
 
