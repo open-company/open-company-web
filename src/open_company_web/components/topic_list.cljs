@@ -19,7 +19,7 @@
         (om/update-state! owner :new-sections-requested not)
         (api/get-new-sections)))))
 
-(defn save-sections-cb [owner data new-sections]
+(defn save-sections-cb [owner data options new-sections]
   (let [company-data (:company-data data)
         categories (:categories company-data)
         active-category (keyword (:active-category data))
@@ -30,6 +30,7 @@
                                        remaining-categories))
         all-sections (assoc remaining-sections active-category new-sections)]
     (api/patch-sections all-sections)
+    ((:navbar-editing-cb options) false)
     (om/set-state! owner :editing false)))
 
 (defcomponent topic-list [data owner options]
@@ -52,7 +53,7 @@
       (if editing
         (om/build topic-list-edit data {:opts {:new-sections (slug @caches/new-sections)
                                                :active-category (:active-category data)
-                                               :save-sections-cb (partial save-sections-cb owner data)
+                                               :save-sections-cb (partial save-sections-cb owner data options)
                                                :cancel-editing-cb (fn []
                                                                     (om/set-state! owner :editing false)
                                                                     ((:navbar-editing-cb options) false))}})
@@ -71,5 +72,4 @@
               (om/build manage-topic {} {:opts {:manage-topic-cb #(do
                                                                     (om/set-state! owner :editing true)
                                                                     ((:navbar-editing-cb options) true)
-                                                                    (.animate (.$ js/window js/window) #js {"scrollTop" "0px"}))}}))
-            ))))))
+                                                                    (.animate (.$ js/window js/window) #js {"scrollTop" "0px"}))}}))))))))
