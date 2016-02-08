@@ -10,6 +10,9 @@
               [open-company-web.caches :refer (company-cache)]
               [goog.fx.dom :refer (Scroll)]))
 
+(defn by-id [id]
+  (.getElementById js/document id))
+
 (defn abs [n] (max n (- n)))
 
 (defn sort-by-key-pred [k & invert]
@@ -519,10 +522,11 @@
     (scroll-to-y elem-scroll-top)))
 
 (defn scroll-top-with-id [id]
-  (offset-top (.querySelector js/document (str "div#" id))))
+  (offset-top (by-id id)))
 
 (defn scroll-to-id [id & [duration]]
-  (let [top (- (scroll-top-with-id id) 60)]
+  (let [body-scroll-top (.-scrollTop (.-body js/document))
+        top (- (+ (scroll-top-with-id id) body-scroll-top) 50)]
     (scroll-to-y top (or duration 500))))
 
 (defn scroll-to-section [section-name]
