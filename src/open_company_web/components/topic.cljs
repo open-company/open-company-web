@@ -7,7 +7,11 @@
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.components.ui.charts :refer (column-chart)]
             [open-company-web.components.finances.finances :refer (finances)]
-            [open-company-web.components.growth.growth :refer (growth)]))
+            [open-company-web.components.growth.growth :refer (growth)]
+            [goog.fx.dom :refer (Fade)]
+            [goog.fx.dom :refer (Resize)]
+            [goog.fx.Animation.EventType :as EventType]
+            [goog.events :as events]))
 
 (defn- get-body [section-data section]
   (if (#{:finances :growth} section)
@@ -63,27 +67,62 @@
 (def animation-duration 500)
 
 (defn topic-click [owner expanded]
-  (let [$win (.$ js/window js/window)
-        $topic (.$ js/window (om/get-ref owner "topic"))
-        topic-offset-top (.-top (.offset $topic))
-        $topic-date-author (.$ js/window (om/get-ref owner "topic-date-author"))
-        $body-node (.$ js/window (om/get-ref owner "topic-body"))]
-    (.css $body-node "height" "auto")
-    (let [body-height (.height $body-node)]
-      (.css $body-node "height" (if expanded "auto" "0"))
-      (when-let [$finances-headtitle (.find $topic ".topic-headline-finances")]
-        (.animate $finances-headtitle #js {"height" (if expanded "100" "0")
-                                           "opacity" (if expanded "1" "0")} animation-duration))
-      (when-let [$growth-headtitle (.find $topic ".topic-headline-growth")]
-        (.animate $growth-headtitle #js {"height" (if expanded "100" "0")
-                                         "opacity" (if expanded "1" "0")} animation-duration))
-      (.animate $topic-date-author
-                #js {"opacity" (if expanded "0" "1")}
-                #js {"duration" animation-duration})
-      (.animate $body-node
-                #js {"height" (if expanded "0" body-height)}
-                #js {"duration" animation-duration
-                     "complete" (fn [](om/update-state! owner :expanded not))})
+  (let [topic (om/get-ref owner "topic")
+        topic-date-author (om/get-ref owner "topic-date-author")
+        body-node (om/get-ref owner "topic-body")]
+    (set! (.-height (.-style body-node)) "auto")
+    (let [body-height (.-offsetHeight body-node)
+          body-width (.-offsetWidth body-node)]
+      (set! (.-height (.-style body-node)) (if expanded "auto" "0"))
+
+      ; animate finances headtitle
+      (when-let [finances-children (.querySelector topic ":scope > div.topic-headline > div.topic-headline-finances")]
+        (let [finances-resize (new Resize
+                                   finances-children
+                                   (new js/Array body-width (if expanded 0 100))
+                                   (new js/Array body-width (if expanded 100 0))
+                                   500)
+              finances-fade (new Fade
+                                 finances-children
+                                 (if expanded 0 1)
+                                 (if expanded 1 0)
+                                 500)]
+          (.play finances-resize)
+          (.play finances-fade)))
+
+      ; animate growth headtitle
+      (when-let [growth-children (.querySelector topic ":scope > div.topic-headline > div.topic-headline-growth")]
+        (let [growth-resize (new Resize
+                                 growth-children
+                                 (new js/Array body-width (if expanded 0 100))
+                                 (new js/Array body-width (if expanded 100 0))
+                                 500)
+              growth-fade (new Fade
+                               growth-children
+                               (if expanded 0 1)
+                               (if expanded 1 0)
+                               500)]
+            (.play growth-resize)
+            (.play growth-fade)))
+
+      ; fade in/out author
+      (.play
+        (new Fade
+             topic-date-author
+             (if expanded 1 0)
+             (if expanded 0 1)
+             500))
+      (let [height-animation (new Resize
+                                  body-node
+                                  (new js/Array body-width (if expanded body-height 0))
+                                  (new js/Array body-width (if expanded 0 body-height))
+                                  500)]
+        (events/listen height-animation
+                       EventType/FINISH
+                       #(om/update-state! owner :expanded not))
+        ; animate height
+        (.play height-animation))
+
       (let [topic (om/get-ref owner "topic")
             body-scroll (.-scrollTop (.-body js/document))
             topic-scroll-top (utils/offset-top topic)]
