@@ -7,7 +7,8 @@
               [open-company-web.caches :as caches]
               [cljs-time.format :as cljs-time-format]
               [cljs-time.core :as cljs-time]
-              [open-company-web.caches :refer (company-cache)]))
+              [open-company-web.caches :refer (company-cache)]
+              [goog.fx.dom :refer (Scroll)]))
 
 (defn abs [n] (max n (- n)))
 
@@ -520,3 +521,19 @@
     (if-not (nil? dec-part)
       (str integer-string "." dec-part)
       integer-string)))
+
+(defn offset-top [elem]
+  (let [bound-rect (.getBoundingClientRect elem)]
+    (.-top bound-rect)))
+
+(defn scroll-to-y [scroll-y]
+  (.play
+    (new Scroll
+         (.-body js/document)
+         (new js/Array 0 (.-scrollTop (.-body js/document)))
+         (new js/Array 0 scroll-y)
+         500)))
+
+(defn scroll-to-element [elem]
+  (let [elem-scroll-top (offset-top elem)]
+    (scroll-to-y elem-scroll-top)))
