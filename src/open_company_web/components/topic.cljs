@@ -84,7 +84,10 @@
                 #js {"height" (if expanded "0" body-height)}
                 #js {"duration" animation-duration
                      "complete" (fn [](om/update-state! owner :expanded not))})
-      (.animate $win #js {"scrollTop" (- topic-offset-top 90)}))))
+      (let [topic (om/get-ref owner "topic")
+            body-scroll (.-scrollTop (.-body js/document))
+            topic-scroll-top (utils/offset-top topic)]
+        (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))))
 
 (defcomponent topic [data owner options]
 
