@@ -10,7 +10,8 @@
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.topic-list-edit :refer (topic-list-edit)]
             [open-company-web.components.manage-topic :refer (manage-topic)]
-            [goog.fx.dom :refer (Scroll)]))
+            [goog.fx.dom :refer (Scroll)]
+            [goog.fx.easing :as easing]))
 
 (defn get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
@@ -37,12 +38,13 @@
 (defn manage-topic-cb [owner options]
   (om/set-state! owner :editing true)
   ((:navbar-editing-cb options) true)
-  (new Scroll
-    js/window
-    (new js/Array 0 (.-scrollY js/window))
-    (new js/Array 0 0)
-    2000
-    nil))
+  (.play
+    (new Scroll
+      js/window
+      (new js/Array 0 (.-scrollY js/window))
+      (new js/Array 0 0)
+      2000
+      goog.fx.easing/easeOut)))
 
 (defcomponent topic-list [data owner options]
 
