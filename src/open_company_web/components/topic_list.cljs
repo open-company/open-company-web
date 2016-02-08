@@ -9,7 +9,8 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.topic-list-edit :refer (topic-list-edit)]
-            [open-company-web.components.manage-topic :refer (manage-topic)]))
+            [open-company-web.components.manage-topic :refer (manage-topic)]
+            [goog.fx.dom :refer (Scroll)]))
 
 (defn get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
@@ -32,6 +33,16 @@
     (api/patch-sections all-sections)
     ((:navbar-editing-cb options) false)
     (om/set-state! owner :editing false)))
+
+(defn manage-topic-cb [owner options]
+  (om/set-state! owner :editing true)
+  ((:navbar-editing-cb options) true)
+  (new Scroll
+    js/window
+    (new js/Array 0 (.-scrollY js/window))
+    (new js/Array 0 0)
+    2000
+    nil))
 
 (defcomponent topic-list [data owner options]
 
@@ -69,7 +80,4 @@
                                  :active-category active-category}
                                  {:opts {:section-name section-name}})))
             (when-not (:read-only company-data)
-              (om/build manage-topic {} {:opts {:manage-topic-cb #(do
-                                                                    (om/set-state! owner :editing true)
-                                                                    ((:navbar-editing-cb options) true)
-                                                                    (.animate (.$ js/window js/window) #js {"scrollTop" "0px"}))}}))))))))
+              (om/build manage-topic {} {:opts {:manage-topic-cb #(manage-topic-cb owner options)}}))))))))
