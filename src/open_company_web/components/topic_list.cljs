@@ -40,11 +40,10 @@
   ((:navbar-editing-cb options) true)
   (.play
     (new Scroll
-      js/window
+      (.-body js/document)
       (new js/Array 0 (.-scrollY js/window))
       (new js/Array 0 0)
-      2000
-      goog.fx.easing/easeOut)))
+      500)))
 
 (defcomponent topic-list [data owner options]
 
