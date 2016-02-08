@@ -191,4 +191,3 @@
             :else
             (dom/div #js {:className "topic-body-inner"
                           :dangerouslySetInnerHTML (clj->js {"__html" section-body})})))))))
-
