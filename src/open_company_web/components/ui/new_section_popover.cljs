@@ -42,7 +42,7 @@
 (defn scroll-to-category [selected-category]
   (let [category-id (str "new-section-category-" selected-category)
         top (utils/scroll-top-with-id category-id)
-        container-offset-top (utils/scroll-top ".new-section-container")
+        container-offset-top (utils/offset-top (.querySelector js/window (str "div.new-section-container")))
         fixed-top (- top container-offset-top 20)]
     (.scrollTo (.$ js/window ".new-section-container")
                #js {"top" (str fixed-top "px") "left" "0px"} 500)))
