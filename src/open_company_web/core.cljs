@@ -81,7 +81,7 @@
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
-(if-let [target (.getElementById js/document "app")]
+(if-let [target (utils/by-id "app")]
   (do
 
     (defroute login-route "/login" {:keys [query-params]}
