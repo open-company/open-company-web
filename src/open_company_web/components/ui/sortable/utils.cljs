@@ -61,17 +61,16 @@
            :location (vec (map + drag-start drag-offset))})))))
 
 (defn drag-stop [e item owner]
-  (when (dragging? owner)
-    (let [state (om/get-state owner)]
-      (when (:dragging state)
-        (om/set-state! owner :dragging false))
-      ;; rendering order issues otherwise
-      (when-not (:delegate state)
-        (doto owner
-          (om/set-state! :location nil)
-          (om/set-state! :drag-offset nil)))
-      (when-let [c (:chan state)]
-        (put! c {:event :drag-stop :id (:id item)})))))
+  (let [state (om/get-state owner)]
+    (when (:dragging state)
+      (om/set-state! owner :dragging false))
+    ;; rendering order issues otherwise
+    (when-not (:delegate state)
+      (doto owner
+        (om/set-state! :location nil)
+        (om/set-state! :drag-offset nil)))
+    (when-let [c (:chan state)]
+      (put! c {:event :drag-stop :id (:id item)}))))
 
 (defn drag [e item owner]
   (let [state (om/get-state owner)]
