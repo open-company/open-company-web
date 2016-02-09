@@ -92,12 +92,10 @@
         (su/element-offset (om/get-ref owner "sortable")))))
 
   (render-state [_ state]
-    (println "sortable render-state")
     (apply dom/ul #js {:className (str container-classes " sortable")
                        :ref "sortable"}
       (map
         (fn [id]
-          (println "   map:" (keyword id))
           (if-not (= id ::spacer)
             (om/build draggable {:section-data ((keyword id) (:sections data))
                                  :active-sections (:active-sections data)
@@ -113,22 +111,3 @@
                          :dragging  (= id (:sorting state))}}))
             (su/sortable-spacer (second (:cell-dimensions state)))))
         (:sort state)))))
-
-;; =============================================================================
-;; Example
-
-; (defn item [the-item owner]
-;   (om/component (dom/span nil (str "Item " (:title the-item)))))
-
-; (def app-state
-;   (let [items (->> (take 10 (map vector (repeatedly su/guid) (range)))
-;                 (map (fn [[id n]] [id {:id id :title n :item item}]))
-;                 (into {}))]
-;     (atom {:items items
-;            :sort (into [] (keys items))})))
-
-; (defn sortable-view [app owner]
-;   (om/component
-;     (dom/div nil
-;       (dom/h2 nil "Sortable example")
-;       (om/build sortable app))))
