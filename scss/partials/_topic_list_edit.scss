@@ -2,6 +2,16 @@ div.topic-list-edit{
   background-color: rgb(250, 250, 250);
   margin-bottom: 10px;
 
+  ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    li {
+      padding: 0px;
+      margin: 0px;
+    }
+  }
+
   div.topic-edit {
     min-height: 50px;
     padding-top: 10px;
