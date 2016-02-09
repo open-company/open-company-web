@@ -1,4 +1,4 @@
-(ns open-company-web.components.sortable.sortable
+(ns open-company-web.components.ui.sortable.sortable
   (:require-macros [cljs.core.async.macros :refer (go alt!)])
   (:require [cljs.core.async :as async :refer (put! chan dropping-buffer)]
             [om.core :as om :include-macros true]
@@ -6,10 +6,10 @@
             [om-tools.dom :as dom :include-macros true]
             [goog.events :as events]
             [goog.style :as gstyle]
-            [open-company-web.components.sortable.utils :as su])
+            [open-company-web.components.ui.sortable.utils :as su])
   (:import [goog.events EventType]))
 
-(defcomponent draggable [data owner]
+(defcomponent draggable [data owner options]
 
   (did-mount [_]
     ;; capture the cell dimensions when it becomes available
@@ -23,8 +23,8 @@
   (will-update [_ next-props next-state]
     ;; begin dragging, need to track events on window
     (when (or (su/to? owner next-props next-state :dragging))
-      (let [mouse-up   #(su/drag-stop % @next-props owner)
-            mouse-move #(su/drag % @next-props owner)]
+      (let [mouse-up   #(su/drag-stop % next-props owner)
+            mouse-move #(su/drag % next-props owner)]
         (om/set-state! owner :window-listeners
           [mouse-up mouse-move])
         (doto js/window
@@ -55,9 +55,9 @@
              :onMouseDown #(su/drag-start % data owner)
              :onMouseUp   #(su/drag-stop % data owner)
              :onMouseMove #(su/drag % data owner)}
-        (om/build (:item data) data)))))
+        (om/build (:item data) (dissoc data :item) {:opts options})))))
 
-(defcomponent sortable [{:keys [items sort container-classes] :as data} owner]
+(defcomponent sortable [{:keys [items sort container-classes] :as data} owner options]
 
   (init-state [_]
     {:sort (om/value sort)})
@@ -92,17 +92,23 @@
         (su/element-offset (om/get-ref owner "sortable")))))
 
   (render-state [_ state]
+    (println "sortable render-state")
     (apply dom/ul #js {:className (str container-classes " sortable")
                        :ref "sortable"}
       (map
         (fn [id]
+          (println "   map:" (keyword id))
           (if-not (= id ::spacer)
-            (om/build draggable (items id)
+            (om/build draggable {:section-data ((keyword id) (:sections data))
+                                 :active-sections (:active-sections data)
+                                 :item (:item data)
+                                 :id id}
               (let [{:keys [constrain chans]} state]
                 {:key :id
                  :init-state {:chan      (:drag-chan chans)
                               :dims-chan (:dims-chan chans)
                               :delegate  true}
+                 :opts options
                  :state {:constrain constrain
                          :dragging  (= id (:sorting state))}}))
             (su/sortable-spacer (second (:cell-dimensions state)))))
@@ -111,18 +117,18 @@
 ;; =============================================================================
 ;; Example
 
-(defn item [the-item owner]
-  (om/component (dom/span nil (str "Item " (:title the-item)))))
+; (defn item [the-item owner]
+;   (om/component (dom/span nil (str "Item " (:title the-item)))))
 
-(def app-state
-  (let [items (->> (take 10 (map vector (repeatedly su/guid) (range)))
-                (map (fn [[id n]] [id {:id id :title n :item item}]))
-                (into {}))]
-    (atom {:items items
-           :sort (into [] (keys items))})))
+; (def app-state
+;   (let [items (->> (take 10 (map vector (repeatedly su/guid) (range)))
+;                 (map (fn [[id n]] [id {:id id :title n :item item}]))
+;                 (into {}))]
+;     (atom {:items items
+;            :sort (into [] (keys items))})))
 
-(defn sortable-view [app owner]
-  (om/component
-    (dom/div nil
-      (dom/h2 nil "Sortable example")
-      (om/build sortable app))))
+; (defn sortable-view [app owner]
+;   (om/component
+;     (dom/div nil
+;       (dom/h2 nil "Sortable example")
+;       (om/build sortable app))))

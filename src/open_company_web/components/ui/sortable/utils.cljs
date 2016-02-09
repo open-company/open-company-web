@@ -1,4 +1,4 @@
-(ns open-company-web.components.sortable.utils
+(ns open-company-web.components.ui.sortable.utils
   (:require [cljs.core.async :as async :refer (put!)]
             [om.core :as om :include-macros true]
             [om-tools.dom :as dom :include-macros true]
