@@ -84,36 +84,6 @@
                      :active-sections active-sections
                      :sections (get-sections-data category-sections)}
                     {:opts (merge options {:add-section (fn [e section]
-                                                          (om/set-state! owner :active-topics (concat active-sections [(name section)]))
-                                                          ; (.preventDefault e)
-                                                          ; (.stopPropagation e)
-                                                          )
+                                                          (om/set-state! owner :active-topics (concat active-sections [(name section)])))
                                            :remove-section (fn [e section]
-                                                             (om/set-state! owner :active-topics (utils/vec-dissoc active-sections (name section)))
-                                                             ; (.preventDefault e)
-                                                             ; (.stopPropagation e)
-                                                             )})}))))))
-          
-          
-          
-          
-          ; (for [section category-sections]
-          ;   (let [active (utils/in? active-sections (:name section))
-          ;         check-src (str "/img/check_" (if active "checked" "empty") ".png?" ls/deploy-key)]
-          ;     (dom/div {:class (utils/class-set {:topic-edit true
-          ;                                        :group true
-          ;                                        :topic-sortable true
-          ;                                        (str "topic-" (:name section)) true
-          ;                                        :active active})
-          ;               :data-sectionname (:name section)
-          ;               :on-click (fn []
-          ;                           (if active
-          ;                             (om/set-state! owner :active-topics (utils/vec-dissoc active-sections (:name section)))
-          ;                             (om/set-state! owner :active-topics (concat active-sections [(:name section)]))))
-          ;               :key (str "topic-edit-" (:name section))}
-          ;       (dom/div {:class "topic-edit-internal group"}
-          ;         (dom/div {:class "topic-edit-labels"}
-          ;           (dom/h3 {:class "topic-title oc-header"} (:title section))
-          ;           (dom/label {:class "topic-description"} (:description section)))
-          ;         (dom/img {:class "check" :src check-src}))))))))))
-
+                                                             (om/set-state! owner :active-topics (utils/vec-dissoc active-sections (name section))))})}))))))
