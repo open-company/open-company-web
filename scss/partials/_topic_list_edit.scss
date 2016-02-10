@@ -2,14 +2,8 @@ div.topic-list-edit{
   background-color: rgb(250, 250, 250);
   margin-bottom: 10px;
 
-  ul {
-    list-style: none;
-    margin: 0px;
-    padding: 0px;
-    li {
-      padding: 0px;
-      margin: 0px;
-    }
+  & * {
+    @include no-user-select();
   }
 
   div.topic-edit {
