@@ -87,4 +87,7 @@
                     {:opts (merge options {:add-section (fn [e section]
                                                           (om/set-state! owner :active-topics (concat active-sections [(name section)])))
                                            :remove-section (fn [e section]
-                                                             (om/set-state! owner :active-topics (utils/vec-dissoc active-sections (name section))))})}))))))
+                                                             (om/set-state! owner :active-topics (utils/vec-dissoc active-sections (name section))))
+                                           :will-start-drag (fn [e id]
+                                                              (when-not (utils/in? active-sections id)
+                                                                (om/set-state! owner :active-topics (concat active-sections [id]))))})}))))))
