@@ -13,7 +13,6 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.caches :refer (revisions)]))
 
-
 (def ^:private api-endpoint ls/api-server-domain)
 
 (def ^:private auth-endpoint ls/auth-server-domain)
@@ -30,14 +29,14 @@
     (clj->js stringified-coll)))
 
 (defn- req [endpoint method path params on-complete]
-  (go
-    (let [jwt (j/jwt)
-          allow-params (assoc-in params [:headers "Access-Control-Allow-Headers"] "Content-Type, Authorization")
-          jwt-params (when jwt (assoc-in allow-params [:headers "Authorization"] (str "Bearer " jwt)))
-          initial-data {:with-credentials? false}
-          data (when jwt-params (merge initial-data jwt-params))
-          response (<! (method (str endpoint path) data))]
-      (on-complete response))))
+  (let [jwt (j/jwt)
+        allow-params (assoc-in params [:headers "Access-Control-Allow-Headers"] "Content-Type, Authorization")
+        jwt-params (when jwt (assoc-in allow-params [:headers "Authorization"] (str "Bearer " jwt)))
+        initial-data {:with-credentials? false}
+        data (when jwt-params (merge initial-data jwt-params))]
+    (go
+      (let [response (<! (method (str endpoint path) data))]
+        (on-complete response)))))
 
 (def ^:private api-get (partial req api-endpoint http/get))
 (def ^:private api-post (partial req api-endpoint http/post))
