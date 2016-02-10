@@ -8,6 +8,8 @@
 ;; =============================================================================
 ;; Utilities
 
+(def spacer ::spacer)
+
 (defn guid []
   (.getNextUniqueId (.getInstance IdGenerator)))
 
@@ -123,15 +125,15 @@
       (om/set-state! :sorting (:id e))
       (om/set-state! :real-sort sort)
       (om/set-state! :drop-index idx)
-      (om/set-state! :sort (insert-at ::spacer idx (:id e) sort)))))
+      (om/set-state! :sort (insert-at spacer idx (:id e) sort)))))
 
 (defn handle-drop [owner e]
   (when (sorting? owner)
     (let [{:keys [sort drop-index]} (om/get-state owner)
-           idx (index-of ::spacer sort)
+           idx (index-of spacer sort)
            sort (->> sort
                   (remove #{(:id e)})
-                  (replace {::spacer (:id e)})
+                  (replace {spacer (:id e)})
                   vec)]
       (doto owner
         (om/set-state! :sorting nil)
@@ -150,7 +152,7 @@
         (doto owner
           (om/set-state! :drop-index drop-index)
           (om/set-state! :sort
-            (insert-at ::spacer drop-index (:id e) (:real-sort state))))))))
+            (insert-at spacer drop-index (:id e) (:real-sort state))))))))
 
 (defn bound [n lb ub]
   (cond

@@ -49,7 +49,7 @@
                   :else
                   #js {:position "static" :zIndex 0})]
       (dom/li
-        #js {:className (when (su/dragging? owner) "dragging")
+        #js {:className (str "no-select " (when (su/dragging? owner) "dragging"))
              :style style
              :ref "draggable"
              :onMouseDown #(su/drag-start % data owner)
@@ -92,15 +92,14 @@
         (su/element-offset (om/get-ref owner "sortable")))))
 
   (render-state [_ state]
-    (apply dom/ul #js {:className (str container-classes " sortable")
+    (apply dom/ul #js {:className (str container-classes " no-select sortable")
                        :ref "sortable"}
       (map
         (fn [id]
-          (if-not (= id ::spacer)
-            (om/build draggable {:section-data ((keyword id) (:sections data))
-                                 :active-sections (:active-sections data)
-                                 :item (:item data)
-                                 :id id}
+          (if-not (= id su/spacer)
+            (om/build draggable (merge (:to-item data) {:item-data ((keyword id) (:items data))
+                                                        :item (:item data)
+                                                        :id id})
               (let [{:keys [constrain chans]} state]
                 {:key :id
                  :init-state {:chan      (:drag-chan chans)
