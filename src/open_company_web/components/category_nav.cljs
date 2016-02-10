@@ -44,29 +44,27 @@
               (gstyle/setStyle cat-node #js {:transform "translate3d(0px,0px,0px)"}))))))))
 
 (defn category-click [data category-name e]
-  (when (.-$ js/window)
-    ;; prevent the route reload
-    (reset! open-company-web.core/prevent-route-dispatch true)
-    ;; call the switch tab callback
-    ((:switch-tab-cb data) category-name)
-    ;; prevent the anchor element from reload the route
-    (.preventDefault e)
-    ;; change the window.location.hash
-    (set! (.-hash (.-location js/window)) category-name)
-    ;; fix the scroll to the first section if necessary
-    (when (and (not= @max-scroll-top -1)
-               (>= (.scrollTop (.$ js/window js/window)) @max-scroll-top))
-      (.scrollTop (.$ js/window js/window) @max-scroll-top))
-    ;; reactivate the url change handler
-    (reset! open-company-web.core/prevent-route-dispatch false)))
+  ;; prevent the route reload
+  (reset! open-company-web.core/prevent-route-dispatch true)
+  ;; call the switch tab callback
+  ((:switch-tab-cb data) category-name)
+  ;; prevent the anchor element from reload the route
+  (.preventDefault e)
+  ;; change the window.location.hash
+  (set! (.-hash (.-location js/window)) category-name)
+  ;; fix the scroll to the first section if necessary
+  (when (and (not= @max-scroll-top -1)
+             (>= (.-scrollTop utils/document-body) @max-scroll-top))
+    (set! (.-scrollTop utils/document-body) @max-scroll-top))
+  ;; reactivate the url change handler
+  (reset! open-company-web.core/prevent-route-dispatch false))
 
 (defn setup-body-min-height []
-  (when (.-$ js/window)
-    (let [$body (.$ js/window(.-body js/document))
-          app-height (.height (.$ js/window "#app"))
-          cur-min-height (.parseInt js/window (.css $body "min-height"))]
-      (when (> app-height cur-min-height)
-        (.css $body "min-height" app-height)))))
+  (let [app-height (.-offsetHeight (utils/by-id "app"))
+        cur-min-height (.parseInt js/window (.-minHeight (.-style utils/document-body)))
+        fix-cur-min-height (if (js/isNaN cur-min-height) 0 cur-min-height)]
+    (when (> app-height fix-cur-min-height)
+      (gstyle/setStyle utils/document-body #js {:minHeight (str app-height "px")}))))
 
 (defcomponent category-nav [data owner]
 
