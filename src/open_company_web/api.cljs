@@ -4,7 +4,6 @@
             [cljs-http.client :as http]
             [clojure.string :refer (join)]
             [open-company-web.dispatcher :as dispatcher]
-            [cljs-flux.dispatcher :as flux]
             [cognitect.transit :as t]
             [clojure.walk :refer (keywordize-keys stringify-keys)]
             [open-company-web.local-settings :as ls]
@@ -45,19 +44,18 @@
 
 (def ^:private auth-get (partial req auth-endpoint http/get))
 
+(defn dispatch-body [action response]
+  (let [body (if (:success response) (json->cljs (:body response)) {})]
+    (dispatcher/dispatch! [action body])))
+
 (defn get-companies []
-  (api-get "/companies" nil (fn [response]
-      (let [body (if (:success response) (json->cljs (:body response)) {})]
-        (flux/dispatch dispatcher/companies body)))))
+  (api-get "/companies" nil #(dispatch-body :companies %)))
 
 (defn get-company [slug]
   (when slug
-    (api-get (str "/companies/" slug) nil
-      (fn [response]
-        (let [body (if (:success response) (json->cljs (:body response)) {})]
-          (flux/dispatch dispatcher/company body))))))
+    (api-get (str "/companies/" slug) nil #(dispatch-body :company %))))
 
-(defn save-or-create-company[data]
+(defn save-or-create-company [data]
   (when data
     (let [company-data (dissoc data :headcount :finances :compensation :links :read-only)
           json-data (cljs->json company-data)
@@ -70,9 +68,7 @@
             ; custom content type
             "content-type" (:type company-link)
           }}
-        (fn [response]
-          (let [body (if (:success response) (json->cljs (:body response)) {})]
-            (flux/dispatch dispatcher/company body)))))))
+        #(dispatch-body :company %)))))
 
 (defn patch-company [slug data]
   (when data
@@ -88,19 +84,14 @@
             ; custom content type
             "content-type" (:type company-link)
           }}
-        (fn [response]
-          (let [body (if (:success response) (json->cljs (:body response)) {})]
-            (flux/dispatch dispatcher/company body)))))))
+        #(dispatch-body :company %)))))
 
 (defn get-auth-settings []
-  (auth-get "/auth-settings" {
-        :headers {
-          "content-type" "application/json"
-        }
-      }
-  (fn [response]
-    (let [body (if (:success response) (:body response) {})]
-      (flux/dispatch dispatcher/auth-settings body)))))
+  (auth-get "/auth-settings"
+            {:headers {"content-type" "application/json"}}
+            (fn [response]
+              (let [body (if (:success response) (:body response) {})]
+                (dispatcher/dispatch! [:auth-settings body])))))
 
 (defn save-or-create-section[section-data]
   (when section-data
@@ -131,7 +122,7 @@
           }}
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})]
-            (flux/dispatch dispatcher/section {:body body :section section :slug (keyword slug)})))))))
+            (dispatcher/dispatch! [:section {:body body :section section :slug (keyword slug)}])))))))
 
 (defn load-revision
   [revision slug section]
@@ -148,7 +139,7 @@
                 dispatch-body {:body body
                                :section section
                                :slug (keyword slug)}]
-            (flux/dispatch dispatcher/revision dispatch-body))))))
+            (dispatcher/dispatch! [:revision dispatch-body]))))))
 
 (defn update-finances-data[finances-data]
   (when finances-data
@@ -169,7 +160,7 @@
                 dispatch-body {:body (merge {:section :finances} body)
                                :section :finances
                                :slug (keyword slug)}]
-            (flux/dispatch dispatcher/section dispatch-body)))))))
+            (dispatcher/dispatch! [:section dispatch-body])))))))
 
 (defn patch-section-notes [notes-data links section]
   (when notes-data
@@ -189,7 +180,7 @@
                 dispatch-body {:body (merge {:section section} body)
                                :section section
                                :slug (keyword slug)}]
-            (flux/dispatch dispatcher/section dispatch-body)))))))
+            (dispatcher/dispatch! [:section dispatch-body])))))))
 
 (defn patch-sections [sections & [new-section section-name]]
   (when sections
@@ -208,9 +199,7 @@
             "Access-Control-Allow-Headers" "Content-Type"
             ; custom content type
             "content-type" (:type company-patch-link)}}
-        (fn [response]
-          (let [body (if (:success response) (json->cljs (:body response)) {})]
-            (flux/dispatch dispatcher/company body)))))))
+        #(dispatch-body :company %)))))
 
 (defn remove-section [section-name]
   (when (and section-name)
@@ -236,4 +225,4 @@
             "content-type" (:type add-section-link)}}
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})]
-            (flux/dispatch dispatcher/new-section {:response body :slug slug})))))))
+            (dispatcher/dispatch! [:new-section {:response body :slug slug}])))))))
