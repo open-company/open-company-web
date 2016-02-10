@@ -4,40 +4,44 @@
             [om-tools.dom :as dom :include-macros true]
             [cljs.core.async :refer (put!)]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.router :as router]))
+            [open-company-web.router :as router]
+            [goog.events :as events]
+            [goog.style :as gstyle])
+  (:import [goog.events EventType]))
 
 (def max-scroll-top (atom -1))
 
 (defn check-scroll [owner]
-  (let [$win (.$ js/window js/window)]
-    (.scroll $win
-      (fn [e]
-        (when-let [cat-node (om/get-ref owner "category-nav")]
-          (let [$cat-node (.$ js/window cat-node)
-                $nav (.$ js/window "nav.navbar")
-                scroll-top (.scrollTop $win)
-                $fix-top-margin-scrolling (.$ js/window ".fix-top-margin-scrolling")
-                $win-width (.width $win)]
-            (when (= @max-scroll-top -1)
-              (let [initial-offset-top (.-top (.offset $cat-node))
-                    nav-height (.height $nav)
-                    tmp-scroll-top (- initial-offset-top nav-height)]
-                (reset! max-scroll-top tmp-scroll-top)))
-            (let [actual-position (.-position (.-style cat-node))
-                  next-position (if (>= scroll-top @max-scroll-top) "fixed" "relative")
-                  will-change (not= actual-position next-position)]
-              (if (>= scroll-top @max-scroll-top)
-                ;; top scroll reached, fix the bar and don't let it scroll
-                (do
-                  (.css $fix-top-margin-scrolling #js {"margin-top" "44px"})
-                  (.css $cat-node #js {"position" "fixed" "top" "50px" "width" (str $win-width "px")}))
-                ;; let the bar move free with the scroller
-                (do
-                  (.css $cat-node #js {"position" "relative" "top" "0px" "width" (str $win-width "px")})
-                  (.css $fix-top-margin-scrolling #js {"margin-top" "0px"})))
-              ;; Fix for safari mobile: http://stackoverflow.com/a/32891079
-              (when will-change
-                (set! (.-transform (.-style cat-node)) "translate3d(0px,0px,0px)")))))))))
+  (events/listen
+    js/window
+    EventType.SCROLL
+    (fn[e]
+      (when-let [cat-node (om/get-ref owner "category-nav")]
+        (let [nav (utils/query-selector "nav.navbar")
+              scroll-top (.-scrollTop utils/document-body)
+              fix-top-margin-scrolling (utils/query-selector ".fix-top-margin-scrolling")
+              win-width (.-offsetWidth js/window)]
+          (when (= @max-scroll-top -1)
+            (let [initial-offset-top (utils/offset-top cat-node)
+                  nav-height (.-offsetHeight nav)]
+              (reset! max-scroll-top (- initial-offset-top nav-height))))
+          (let [actual-position (.-position (.-style cat-node))
+                next-position (if (>= scroll-top @max-scroll-top) "fixed" "relative")
+                will-change (not= actual-position next-position)
+                cat-node-style (.-style cat-node)]
+            (if (>= scroll-top @max-scroll-top)
+              (do
+                (gstyle/setStyle fix-top-margin-scrolling #js {:margin-top "44px"})
+                (gstyle/setStyle cat-node #js {:position "fixed"
+                                               :top "50px"
+                                               :width (str win-width "px")}))
+              (do
+                (gstyle/setStyle fix-top-margin-scrolling #js {:margin-top "0px"})
+                (gstyle/setStyle cat-node #js {:position "relative"
+                                               :top "0px"
+                                               :width (str win-width "px")})))
+            (when will-change
+              (gstyle/setStyle cat-node #js {:transform "translate3d(0px,0px,0px)"}))))))))
 
 (defn category-click [data category-name e]
   (when (.-$ js/window)
