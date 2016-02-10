@@ -17,7 +17,7 @@
 (defcomponent item [data owner options]
   (render [_]
     (let [section (keyword (:id data))
-          section-data (:section-data data)
+          section-data (:item-data data)
           active-sections (:active-sections data)
           active (utils/in? active-sections (name section))
           section-name (or (:name section-data) (utils/camel-case-str (name section)))
@@ -77,12 +77,13 @@
             sections-list (vec (map #(:name %) category-sections))
             active-sections (om/get-state owner :active-topics)
             company-data (:company-data data)]
-        (dom/div {:class "topic-list-edit fix-top-margin-scrolling group"}
+        (dom/div {:class "topic-list-edit fix-top-margin-scrolling group no-select"}
           (om/build sortable
                     {:sort sections-list
                      :item item
-                     :active-sections active-sections
-                     :sections (get-sections-data category-sections)}
+                     :to-item {
+                        :active-sections active-sections}
+                     :items (get-sections-data category-sections)}
                     {:opts (merge options {:add-section (fn [e section]
                                                           (om/set-state! owner :active-topics (concat active-sections [(name section)])))
                                            :remove-section (fn [e section]
