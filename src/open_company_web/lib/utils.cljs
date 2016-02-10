@@ -1,17 +1,25 @@
 (ns open-company-web.lib.utils
-    (:require [om.core :as om :include-macros true]
-              [clojure.string]
-              [open-company-web.lib.iso4217 :refer (iso4217)]
-              [cljs.core.async :refer (put!)]
-              [open-company-web.router :as router]
-              [open-company-web.caches :as caches]
-              [cljs-time.format :as cljs-time-format]
-              [cljs-time.core :as cljs-time]
-              [open-company-web.caches :refer (company-cache)]
-              [goog.fx.dom :refer (Scroll)]))
+  (:require [om.core :as om :include-macros true]
+            [clojure.string]
+            [open-company-web.lib.iso4217 :refer (iso4217)]
+            [cljs.core.async :refer (put!)]
+            [open-company-web.router :as router]
+            [open-company-web.caches :as caches]
+            [cljs-time.format :as cljs-time-format]
+            [cljs-time.core :as cljs-time]
+            [open-company-web.caches :refer (company-cache)]
+            [goog.fx.dom :refer (Scroll)]))
 
 (defn by-id [id]
   (.getElementById js/document id))
+
+(def document-body (.-body js/document))
+
+(defn query-selector [sel]
+  (.querySelector js/document sel))
+
+(defn query-selector-all [sel]
+  (.querySelectorAll js/document sel))
 
 (defn abs [n] (max n (- n)))
 
