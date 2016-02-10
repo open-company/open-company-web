@@ -1,14 +1,18 @@
 (ns open-company-web.lib.server
   "Development-time server. This role is played by an nginx proxy in production."
-  (:require [ring.util.response :refer (file-response)]
+  (:require [ring.util.response :refer (file-response resource-response)]
+            [ring.middleware.resource :refer [wrap-resource]]
             [compojure.core :refer (defroutes GET PUT POST)]
             [compojure.route :as route]))
 
+(defn as-html [resp]
+  (assoc-in resp [:headers "Content-Type"] "text/html;charset=UTF-0"))
+
 (defn index []
-  (file-response "public/index.html" {:root "resources"}))
+  (as-html (resource-response "/index.html" {:root "public"})))
 
 (defn devcards []
-  (file-response "public/devcards.html" {:root "resources"}))
+  (as-html (resource-response "/devcards.html" {:root "public"})))
 
 (defroutes resources
   ; serve the react app for all requests
@@ -25,3 +29,12 @@
 
 (def handler
   (request-handler resources))
+
+;; Boot
+
+(defroutes boot-resources
+  (GET "/devcards" [] (devcards))
+  (GET "*" [] (index)))
+
+(def boot-handler
+  (-> boot-resources (wrap-resource "public")))
