@@ -37,4 +37,4 @@
   (GET "*" [] (index)))
 
 (def boot-handler
-  (-> boot-resources (wrap-resource "public")))
+  (wrap-resource boot-resources  "public"))
