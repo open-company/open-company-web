@@ -15,6 +15,7 @@
     ;; capture the cell dimensions when it becomes available
     (let [dims (-> (om/get-ref owner "draggable")
                    gstyle/getSize su/gsize->vec)]
+      (println "cell dims:" dims)
       (om/set-state! owner :dimensions dims)
       ;; let cell dimension listeners know
       (when-let [dims-chan (:dims-chan (om/get-state owner))]
@@ -52,24 +53,9 @@
         #js {:className (str "no-select " (when (su/dragging? owner) "dragging"))
              :style style
              :ref "draggable"
-             :onMouseDown (fn [e]
-                            (when (contains? options :will-start-drag)
-                              ((:will-start-drag options) e (:id data)))
-                            (su/drag-start e data owner)
-                            (when (contains? options :did-start-drag)
-                              ((:did-start-drag options) e (:id data))))
-             :onMouseUp   (fn [e]
-                            (when (contains? options :will-stop-drag)
-                              ((:will-stop-drag options) e (:id data)))
-                            (su/drag-stop e data owner)
-                            (when (contains? options :did-stop-drag)
-                              ((:did-stop-drag options) e (:id data))))
-             :onMouseMove (fn [e]
-                            (when (contains? options :will-drag)
-                              ((:will-drag options) e (:id data)))
-                            (su/drag e data owner)
-                            (when (contains? options :did-drag)
-                              ((:did-drag options) e (:id data))))}
+             :onMouseDown #(su/drag-start % data owner)
+             :onMouseUp   #(su/drag-stop % data owner)
+             :onMouseMove #(su/drag % data owner)}
         (om/build (:item data) (dissoc data :item) {:opts options})))))
 
 (defcomponent sortable [{:keys [items sort container-classes] :as data} owner options]
