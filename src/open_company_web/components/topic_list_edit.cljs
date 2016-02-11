@@ -18,8 +18,8 @@
   (render [_]
     (let [section (keyword (:id data))
           section-data (:item-data data)
-          active-sections (:active-sections data)
-          active (utils/in? active-sections (name section))
+          active-topics (:active-topics data)
+          active (utils/in? active-topics (name section))
           section-name (or (:name section-data) (utils/camel-case-str (name section)))
           section-title (or (:title section-data) section-name)
           section-description (or (:description section-data) "")]
@@ -45,6 +45,17 @@
                 (let [section-name (:name section-data)]
                   (hash-map (keyword section-name) section-data)))
               category-sections)))
+
+(defn ordered-sections [active-sections all-sections]
+  (loop [ret active-sections
+         secs all-sections]
+    (if (zero? (count secs))
+      ret
+      (let [new-el (first secs)
+            new-ret (if (utils/in? ret new-el)
+                      ret
+                      (conj ret new-el))]
+       (recur new-ret (next secs))))))
 
 (defcomponent topic-list-edit [data owner options]
 
@@ -75,17 +86,24 @@
             all-sections (:new-sections options)
             category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
             sections-list (vec (map #(:name %) category-sections))
-            active-sections (om/get-state owner :active-topics)
-            company-data (:company-data data)]
+            active-topics (om/get-state owner :active-topics)
+            company-data (:company-data data)
+            cleaned-sections (ordered-sections active-topics sections-list)]
         (dom/div {:class "topic-list-edit fix-top-margin-scrolling group no-select"}
           (om/build sortable-list
-                    {:sort sections-list
+                    {:sort cleaned-sections
                      :items (get-sections-data category-sections)
                      :item item
                      :to-item {
-                       :active-sections active-sections}}
-                    {:opts (merge options {:height 68
-                                           :add-section (fn [section]
-                                                          (om/set-state! owner :active-topics (concat active-sections [(name section)])))
-                                           :remove-section (fn [section]
-                                                             (om/set-state! owner :active-topics (utils/vec-dissoc active-sections (name section))))})}))))))
+                       :active-topics active-topics}}
+                    {:opts
+                     (merge options {:height 68
+                                     :did-change-sort
+                                     (fn [items]
+                                       (om/set-state! owner :active-topics items))
+                                     :add-section
+                                     (fn [section]
+                                       (om/set-state! owner :active-topics (concat active-topics [(name section)])))
+                                     :remove-section
+                                     (fn [section]
+                                       (om/set-state! owner :active-topics (utils/vec-dissoc active-topics (name section))))})}))))))
