@@ -48,12 +48,20 @@
   (let [body (if (:success response) (json->cljs (:body response)) {})]
     (dispatcher/dispatch! [action body])))
 
+(defn get-entry-point []
+  (api-get "/" nil (fn [response]
+                     (let [body (if (:success response) (:body response) {})]
+                       (dispatcher/dispatch! [:entry body])))))
+
 (defn get-companies []
   (api-get "/companies" nil #(dispatch-body :companies %)))
 
 (defn get-company [slug]
   (when slug
     (api-get (str "/companies/" slug) nil #(dispatch-body :company %))))
+
+(defn post-company [data]
+  (api-post "/companies" {:json-params data} #(dispatch-body :company-created %)))
 
 (defn save-or-create-company [data]
   (when data
