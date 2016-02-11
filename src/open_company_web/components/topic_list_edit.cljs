@@ -30,8 +30,8 @@
                                          :active active})
                 :data-sectionname section-name
                 :on-click #(if active
-                             ((:remove-section options) e section-name)
-                             ((:add-section options) e section-name))
+                             ((:remove-section options) section-name)
+                             ((:add-section options) section-name))
                 :key (str "topic-edit-" section-name)}
         (dom/div {:class "topic-edit-internal group"}
           (dom/div {:class "topic-edit-labels"}
@@ -85,7 +85,7 @@
                      :to-item {
                        :active-sections active-sections}}
                     {:opts (merge options {:height 68
-                                           :add-section (fn [e section]
+                                           :add-section (fn [section]
                                                           (om/set-state! owner :active-topics (concat active-sections [(name section)])))
-                                           :remove-section (fn [e section]
+                                           :remove-section (fn [section]
                                                              (om/set-state! owner :active-topics (utils/vec-dissoc active-sections (name section))))})}))))))
