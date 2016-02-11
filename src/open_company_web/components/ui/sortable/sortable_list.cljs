@@ -1,4 +1,4 @@
-(ns open-company-web.components.ui.sortable.sortable-b
+(ns open-company-web.components.ui.sortable.sortable-list
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]))
@@ -18,80 +18,67 @@
     (concat before [item] after)))
 
 (defn drag-start [e owner]
-  (println "drag-start" e)
+  (println "drag-start" (.-id (.-dataset (.-currentTarget e))))
   (om/set-state! owner :dragged (.-currentTarget e))
   (set! (.-effectAllowed (.-dataTransfer e)) "move")
   
   ; Firenfox fix
-  (.setData (.-dataTransfer e) "text/html" (.-currentTarget e))
-  
-  ; this.dragged = e.currentTarget
-  ; e.dataTransfer.effectAllowed = 'move';
-
-  ;  // Firefox requires calling dataTransfer.setData
-  ;  // for the drag to properly work
-  ;  e.dataTransfer.setData("text/html", e.currentTarget)
-)
+  (.setData (.-dataTransfer e) "text/html" (.-currentTarget e)))
 
 (defn drag-end [e owner]
   (let [dragged (om/get-state owner :dragged)]
     (set! (.-display (.-style dragged)) "block")
-    ; (.removeChild (.-parentNode dragged) (placeholder))
-  
     (let [dragged-id (.-id (.-dataset dragged))
-          items (om/get-state owner :items)
+          items (om/get-state owner :sort)
           plc-idx (.indexOf (to-array items) "placeholder")
           new-items (insert-at-index items dragged-id plc-idx)]
       (println "drag-end" new-items)
       (doto owner
-        (om/set-state! :items new-items)
+        (om/set-state! :sort new-items)
         (om/set-state! :dragged nil)))))
 
-  ;// Update state
-  ;var data = this.state.data;
-  ; this.dragged.style.display = "block"
-  ; this.dragged.parentNode.removeChild(placeholder)
-  ; var from = Number(this.dragged.dataset.id);
-  ; var to = Number(this.over.dataset.id);
-  ; if(from < to) to--;
-  ; data.splice(to, 0, data.splice(from, 1)[0]);
-  ; this.setState({data: data});)
+(defn get-li-parent [el]
+  (if (= (.-tagName el) "LI")
+    el
+    (get-li-parent (.-parentNode el))))
   
 (defn drag-over [e owner]
   (.preventDefault e)
   (set! (.-display (.-style (om/get-state owner :dragged))) "none")
-  (when-not (= (.-className (.-target e)) "placeholder")
-    (let [over (.-id (.-dataset (.-target e)))]
-      (when (= over "placeholder") (println "over placeholder"))
+  (println "target: " (get-li-parent (.-target e)))
+  (when-not (= (.-className (get-li-parent (.-target e))) "placeholder")
+    (let [over (.-id (.-dataset (get-li-parent (.-target e))))]
       (when-not (= over "placeholder")
-        (let [items (om/get-state owner :items)
+        (let [items (om/get-state owner :sort)
               plc-idx (.indexOf (to-array items) "placeholder")
               over-idx (.indexOf (to-array items) over)
               new-items (if (neg? plc-idx) items (insert-at-index items over plc-idx))
               new-items (insert-at-index new-items "placeholder" over-idx)]
-          (println "drag-over" new-items)
-          (om/set-state! owner :items new-items)
-        
-          ; (.insertBefore (.-parentNode (.-target e)) (placeholder) (.-target e))
-          )))))
-  ; e.preventDefault();
-  ; this.dragged.style.display = "none";
-  ; if(e.target.className == "placeholder") return;
-  ; this.over = e.target;
-  ; e.target.parentNode.insertBefore(placeholder, e.target);)
+          (println "drag-over" over items plc-idx over-idx "->" new-items)
+          (om/set-state! owner :sort new-items))))))
 
-(defcomponent sortable-list [data owner]
+(defcomponent sortable-list [data owner options]
 
   (init-state [_]
-    {:items (take 5 (:items data))})
+    {:sort (:sort data)})
 
   (render [_]
+    (println "sort: " (:sort data))
     (dom/ul #js {:onDragOver #(drag-over % owner)
                  :onDrop #(drag-end % owner)}
-      (for [item (om/get-state owner :items)]
-        (dom/li #js {:data-id item
-                     :key item
-                     :draggable true
-                     :onDragStart #(drag-start % owner)
-                     :style #js {:display "block"}} item)))))
+      (for [item (om/get-state owner :sort)]
+        (if (= item "placeholder")
+          (dom/li #js {:data-id "placeholder"
+                       :className "placeholder"
+                       :key "placeholder"})
+          (let [items (:items data)
+                item-data ((keyword item) items)]
+            (dom/li #js {:data-id item
+                         :key (:name item-data)
+                         :draggable true
+                         :onDragStart #(drag-start % owner)
+                         :style #js {:display "block"}}
+              (om/build (:item data) (merge {:id (:name item-data)
+                                             :item-data item} (:to-item data))
+                        {:opts options}))))))))
 
