@@ -12,7 +12,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.manage-topic :refer (manage-topic)]
-            [open-company-web.components.ui.sortable.sortable :refer (sortable)]))
+            [open-company-web.components.ui.sortable.sortable-list :refer (sortable-list)]))
 
 (defcomponent item [data owner options]
   (render [_]
@@ -29,9 +29,10 @@
                                          (str "topic-" section-name) true
                                          :active active})
                 :data-sectionname section-name
-                :on-click #(if active
-                             ((:remove-section options) % section-name)
-                             ((:add-section options) % section-name))
+                :on-click (fn [e](println "item click!" section-name)
+                            (if active
+                              ((:remove-section options) e section-name)
+                              ((:add-section options) e section-name)))
                 :key (str "topic-edit-" section-name)}
         (dom/div {:class "topic-edit-internal group"}
           (dom/div {:class "topic-edit-labels"}
@@ -78,16 +79,14 @@
             active-sections (om/get-state owner :active-topics)
             company-data (:company-data data)]
         (dom/div {:class "topic-list-edit fix-top-margin-scrolling group no-select"}
-          (om/build sortable
+          (om/build sortable-list
                     {:sort sections-list
+                     :items (get-sections-data category-sections)
                      :item item
                      :to-item {
-                        :active-sections active-sections}
-                     :items (get-sections-data category-sections)}
-                    {:opts (merge options {:add-section (fn [e section]
+                       :active-sections active-sections}}
+                    {:opts (merge options {:height 68
+                                           :add-section (fn [e section]
                                                           (om/set-state! owner :active-topics (concat active-sections [(name section)])))
                                            :remove-section (fn [e section]
-                                                             (om/set-state! owner :active-topics (utils/vec-dissoc active-sections (name section))))
-                                           :will-start-drag (fn [e id]
-                                                              (when-not (utils/in? active-sections id)
-                                                                (om/set-state! owner :active-topics (concat active-sections [id]))))})}))))))
+                                                             (om/set-state! owner :active-topics (utils/vec-dissoc active-sections (name section))))})}))))))
