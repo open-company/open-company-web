@@ -5,6 +5,13 @@ div.topic-list-edit{
   & * {
     @include no-user-select();
   }
+  ul, li{
+    padding: 0px;
+    margin: 0px;
+  }
+  li.placeholder {
+    height: 68px;
+  }
 
   div.topic-edit {
     min-height: 50px;
