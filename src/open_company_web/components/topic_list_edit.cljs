@@ -29,9 +29,7 @@
                                          (str "topic-" section-name) true
                                          :active active})
                 :data-sectionname section-name
-                :on-click #(if active
-                             ((:remove-section options) section-name)
-                             ((:add-section options) section-name))
+                :on-click #((:item-click options) section-name)
                 :key (str "topic-edit-" section-name)}
         (dom/div {:class "topic-edit-internal group"}
           (dom/div {:class "topic-edit-labels"}
@@ -57,6 +55,17 @@
                       (conj ret new-el))]
        (recur new-ret (next secs))))))
 
+(defn sorted-active-topics [sorted-sections active-topics]
+  (loop [ret []
+         sections sorted-sections]
+    (let [section (first sections)
+          next-ret (if (utils/in? active-topics section)
+                     (conj ret section)
+                     ret)]
+      (if (zero? (count sections))
+        next-ret
+        (recur next-ret (next sections))))))
+
 (defcomponent topic-list-edit [data owner options]
 
   (init-state [_]
@@ -66,14 +75,23 @@
       (utils/add-channel "cancel-bt-navbar" cancel-ch))
     (when (empty? @caches/new-sections)
       (api/get-new-sections))
-    {:active-topics (get-in (:company-data data) [:sections (keyword (:active-category data))])})
+    (let [active-category (:active-category options)
+          active-topics (get-in (:company-data data) [:sections (keyword active-category)])
+          all-sections (:new-sections options)
+          category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
+          sections-list (vec (map #(:name %) category-sections))
+          cleaned-sections (ordered-sections active-topics sections-list)]
+      {:active-topics active-topics
+       :sorted-sections cleaned-sections}))
 
   (did-mount [_]
     (let [save-ch (utils/get-channel "save-bt-navbar")]
       (go (loop []
         (let [change (<! save-ch)]
-          (let [new-topics (om/get-state owner :active-topics)]
-            ((:save-sections-cb options) new-topics))))))
+          (let [sorted-sections (om/get-state owner :sorted-sections)
+                active-topics (om/get-state owner :active-topics)]
+            (println "going to save: " (sorted-active-topics sorted-sections active-topics))
+            ((:save-sections-cb options) (sorted-active-topics sorted-sections active-topics)))))))
     (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
       (go (loop []
         (let [change (<! cancel-ch)]
@@ -85,13 +103,10 @@
       (let [active-category (:active-category options)
             all-sections (:new-sections options)
             category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
-            sections-list (vec (map #(:name %) category-sections))
-            active-topics (om/get-state owner :active-topics)
-            company-data (:company-data data)
-            cleaned-sections (ordered-sections active-topics sections-list)]
+            active-topics (om/get-state owner :active-topics)]
         (dom/div {:class "topic-list-edit fix-top-margin-scrolling group no-select"}
           (om/build sortable-list
-                    {:sort cleaned-sections
+                    {:sort (om/get-state owner :sorted-sections)
                      :items (get-sections-data category-sections)
                      :item item
                      :to-item {
@@ -100,10 +115,9 @@
                      (merge options {:height 68
                                      :did-change-sort
                                      (fn [items]
-                                       (om/set-state! owner :active-topics items))
-                                     :add-section
+                                       (om/set-state! owner :sorted-sections items))
+                                     :item-click
                                      (fn [section]
-                                       (om/set-state! owner :active-topics (concat active-topics [(name section)])))
-                                     :remove-section
-                                     (fn [section]
-                                       (om/set-state! owner :active-topics (utils/vec-dissoc active-topics (name section))))})}))))))
+                                       (if (utils/in? active-topics section)
+                                         (om/set-state! owner :active-topics (utils/vec-dissoc active-topics (name section)))
+                                         (om/set-state! owner :active-topics (concat active-topics [(name section)]))))})}))))))
