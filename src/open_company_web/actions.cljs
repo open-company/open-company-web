@@ -17,8 +17,30 @@
 ;; The extended multimethod `action` is defined in the dispatcher
 ;; namespace to avoid cyclical dependencies between namespaces
 
-(defmethod action :default [_ payload]
-  (js/console.warn "No handler defined for" (first payload)))
+(defmethod action :default [db payload]
+  (js/console.warn "No handler defined for" (str (first payload)))
+  (js/console.log "Full event: " (pr-str payload))
+  db)
+
+(defmethod action :input [db [_ path value]]
+  (assoc-in db path value))
+
+(defmethod action :entry [db [_ {:keys [links]}]]
+  (if-let [co (med/find-first #(= (:rel %) "company") links)]
+    (router/nav! (str (:href co) "/dashboard"))
+    (if (med/find-first #(= (:rel %) "create-company") links)
+      (router/nav! "/create-company")))
+  db)
+
+(defmethod action :company-submit [db _]
+  (api/post-company (:company-editor db))
+  db)
+
+(defmethod action :company-created [db [_ body]]
+  (let [updated (utils/fix-sections body)
+        link (:href (med/find-first #(= "self" (:rel %)) (:links body)))]
+    (router/nav! (str link "/dashboard"))
+    (assoc db (keyword (:slug updated)) updated)))
 
 (defmethod action :new-section [db [_ body]]
   (when body

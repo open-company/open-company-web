@@ -3,6 +3,7 @@
             [secretary.core :as secretary :refer-macros (defroute)]
             [open-company-web.router :as router]
             [open-company-web.components.page :refer (company)]
+            [open-company-web.components.company-editor :refer (company-editor)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
@@ -34,6 +35,7 @@
   (router/set-route! ["companies"] {})
   ;; load data from api
   (swap! app-state assoc :loading true)
+  (api/get-entry-point)
   (api/get-companies)
   ;; render component
   (om/root list-companies app-state {:target target}))
@@ -91,6 +93,9 @@
     (defroute home-page-route "/" []
       (home-handler target))
 
+    (defroute company-create-route "/create-company" []
+      (om/root company-editor app-state {:target target}))
+
     (defroute list-page-route "/companies" []
       (home-handler target))
 
@@ -120,6 +125,7 @@
                                  list-page-route-slash
                                  list-page-route
                                  company-route
+                                 company-create-route
                                  company-profile-route
                                  company-dashboard-route
                                  user-profile-route
