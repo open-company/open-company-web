@@ -29,10 +29,9 @@
                                          (str "topic-" section-name) true
                                          :active active})
                 :data-sectionname section-name
-                :on-click (fn [e](println "item click!" section-name)
-                            (if active
-                              ((:remove-section options) e section-name)
-                              ((:add-section options) e section-name)))
+                :on-click #(if active
+                             ((:remove-section options) e section-name)
+                             ((:add-section options) e section-name))
                 :key (str "topic-edit-" section-name)}
         (dom/div {:class "topic-edit-internal group"}
           (dom/div {:class "topic-edit-labels"}
