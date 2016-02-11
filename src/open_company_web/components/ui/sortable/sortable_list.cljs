@@ -1,7 +1,8 @@
 (ns open-company-web.components.ui.sortable.sortable-list
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
-            [om-tools.dom :as dom :include-macros true]))
+            [om-tools.dom :as dom :include-macros true]
+            [open-company-web.lib.utils :as utils]))
 
 (defn replace-item-in-vec [coll old-item new-item]
   (let [fix-coll (to-array coll)
@@ -18,44 +19,41 @@
     (concat before [item] after)))
 
 (defn drag-start [e owner]
-  (println "drag-start" (.-id (.-dataset (.-currentTarget e))))
   (om/set-state! owner :dragged (.-currentTarget e))
   (set! (.-effectAllowed (.-dataTransfer e)) "move")
   
   ; Firenfox fix
   (.setData (.-dataTransfer e) "text/html" (.-currentTarget e)))
 
-(defn drag-end [e owner]
+(defn drag-end [e owner options]
   (let [dragged (om/get-state owner :dragged)]
     (set! (.-display (.-style dragged)) "block")
     (let [dragged-id (.-id (.-dataset dragged))
           items (om/get-state owner :sort)
           plc-idx (.indexOf (to-array items) "placeholder")
           new-items (insert-at-index items dragged-id plc-idx)]
-      (println "drag-end" new-items)
+      (om/set-state! owner :sort new-items)
+      (when (contains? options :did-change-sort)
+        ((:did-change-sort options) new-items))
       (doto owner
-        (om/set-state! :sort new-items)
         (om/set-state! :dragged nil)))))
 
-(defn get-li-parent [el]
+(defn get-parent-li [el]
   (if (= (.-tagName el) "LI")
     el
-    (get-li-parent (.-parentNode el))))
+    (get-parent-li (.-parentNode el))))
   
 (defn drag-over [e owner]
   (.preventDefault e)
   (set! (.-display (.-style (om/get-state owner :dragged))) "none")
-  (println "target: " (get-li-parent (.-target e)))
-  (when-not (= (.-className (get-li-parent (.-target e))) "placeholder")
-    (let [over (.-id (.-dataset (get-li-parent (.-target e))))]
+  (when-not (= (.-className (get-parent-li (.-target e))) "placeholder")
+    (let [over (.-id (.-dataset (get-parent-li (.-target e))))]
       (when-not (= over "placeholder")
         (let [items (om/get-state owner :sort)
               plc-idx (.indexOf (to-array items) "placeholder")
               over-idx (.indexOf (to-array items) over)
-              new-items (if (neg? plc-idx) items (insert-at-index items over plc-idx))
-              new-items (insert-at-index new-items "placeholder" over-idx)]
-          (println "drag-over" over items plc-idx over-idx "->" new-items)
-          (om/set-state! owner :sort new-items))))))
+              new-items (if (neg? plc-idx) items (insert-at-index items over plc-idx))]
+          (om/set-state! owner :sort (insert-at-index new-items "placeholder" over-idx)))))))
 
 (defcomponent sortable-list [data owner options]
 
@@ -63,9 +61,8 @@
     {:sort (:sort data)})
 
   (render [_]
-    (println "sort: " (:sort data))
     (dom/ul #js {:onDragOver #(drag-over % owner)
-                 :onDrop #(drag-end % owner)}
+                 :onDrop #(drag-end % owner options)}
       (for [item (om/get-state owner :sort)]
         (if (= item "placeholder")
           (dom/li #js {:data-id "placeholder"
