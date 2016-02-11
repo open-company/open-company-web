@@ -75,7 +75,7 @@
                          :draggable true
                          :onDragStart #(drag-start % owner)
                          :style #js {:display "block"}}
-              (om/build (:item data) (merge {:id (:name item-data)
-                                             :item-data item} (:to-item data))
+              (om/build (:item data) (merge {:id item
+                                             :item-data item-data}
+                                            (:to-item data))
                         {:opts options}))))))))
-
