@@ -24,13 +24,14 @@
             (dom/div {:class "left-button"}
               (dom/button {:class "cancel-bt oc-btn oc-link"
                            :on-click (fn [e]
-                                       (let [ch (utils/get-channel "cancel-bt-navbar")]
+                                       (when-let [ch (utils/get-channel "cancel-bt-navbar")]
                                          (put! ch {:click true :event e})))} "Cancel"))
             (dom/div {:class "right-button"}
               (dom/button {:class "save-bt oc-btn oc-link"
                            :on-click (fn [e]
-                                       (let [ch (utils/get-channel "save-bt-navbar")]
-                                         (put! ch {:click true :event e})))} "Save"))))
+                                       (when-let [ch (utils/get-channel "save-bt-navbar")]
+                                         (put! ch {:click true :event e})))} "Save"))
+            (dom/div {:class "editing-title oc-title"} (:edit-title data))))
         (n/navbar {:inverse? true :fixed-top? true :fluid true :collapse? true}
           (dom/div {:class "navbar-header"}
             (when (contains? @router/path :slug)
