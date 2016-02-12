@@ -66,12 +66,13 @@
               active-category (keyword (:active-category data))
               active-sections (get-in company-data [:sections active-category])]
           (dom/div {:class "topic-list fix-top-margin-scrolling"}
-            (for [section-name active-sections]
-              (dom/div {:class "topic-row"
-                        :key (str "topic-row-" (name section-name))}
-                (om/build topic {:loading (:loading company-data)
-                                 :company-data company-data
-                                 :active-category active-category}
-                                 {:opts {:section-name section-name}})))
+            (dom/div {:class "topic-list-internal"}
+              (for [section-name active-sections]
+                (dom/div {:class "topic-row"
+                          :key (str "topic-row-" (name section-name))}
+                  (om/build topic {:loading (:loading company-data)
+                                   :company-data company-data
+                                   :active-category active-category}
+                                   {:opts {:section-name section-name}}))))
             (when-not (:read-only company-data)
               (om/build manage-topic {} {:opts {:manage-topic-cb #(manage-topic-cb owner options)}}))))))))
