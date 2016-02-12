@@ -37,10 +37,12 @@
   db)
 
 (defmethod action :company-created [db [_ body]]
-  (let [updated (utils/fix-sections body)
-        link (:href (med/find-first #(= "self" (:rel %)) (:links body)))]
-    (router/nav! (str link "/dashboard"))
-    (assoc db (keyword (:slug updated)) updated)))
+  (if (:links body)
+    (let [updated (utils/fix-sections body)
+          link (:href (med/find-first #(= "self" (:rel %)) (:links body)))]
+      (router/nav! (str link "/dashboard"))
+      (assoc db (keyword (:slug updated)) updated))
+    db))
 
 (defmethod action :new-section [db [_ body]]
   (when body
@@ -60,8 +62,7 @@
     (let [fixed-section (utils/fix-section (:body body) (:section body) true)
           assoc-in-coll [(:slug body) (:section body) (:updated-at fixed-section)]]
       (swap! cache/revisions assoc-in assoc-in-coll fixed-section)
-      ;; remove loading key
-      (delay-remove-loading)))
+      (delay-remove-loading))) ; remove loading key
   db)
 
 (defmethod action :section [db [_ body]]
