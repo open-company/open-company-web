@@ -12,7 +12,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.manage-topic :refer (manage-topic)]
-            [open-company-web.components.ui.sortable.sortable-list :refer (sortable-list)]))
+            [open-company-web.components.ui.sortable-list :refer (sortable-list)]))
 
 (defcomponent item [data owner options]
   (render [_]
