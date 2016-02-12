@@ -1,0 +1,18 @@
+div.topic-row.edit-topic-button{
+
+  div.edit-topic-button-internal {
+    margin: 10px;
+    border: 1px dotted black;
+    height: 50px;
+    vertical-align: middle;
+    text-align: center;
+
+    div.edit-topic-button-cta{
+      padding: 0;
+      margin: 8px 0;
+      font-size: 19px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  }
+}
