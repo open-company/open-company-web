@@ -147,7 +147,7 @@ phantomjs -v
 Then run:
 
 ```console
-lein test!
+lein test-all!
 ```
 
 For more info on testing:
