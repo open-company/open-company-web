@@ -38,7 +38,7 @@
   ((:navbar-editing-cb options) true)
   (utils/scroll-to-y 0))
 
-(defcomponent topic-list [data owner options]
+(defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
 
   (init-state [_]
     {:editing false
@@ -61,7 +61,7 @@
                                                :save-sections-cb (partial save-sections-cb owner data options)
                                                :cancel-editing-cb (fn []
                                                                     (om/set-state! owner :editing false)
-                                                                    ((:navbar-editing-cb options) false))}})
+                                                                    (navbar-editing-cb false))}})
         (let [company-data (:company-data data)
               active-category (keyword (:active-category data))
               active-sections (get-in company-data [:sections active-category])]
@@ -73,6 +73,7 @@
                   (om/build topic {:loading (:loading company-data)
                                    :company-data company-data
                                    :active-category active-category}
-                                   {:opts {:section-name section-name}}))))
+                                   {:opts {:section-name section-name
+                                           :navbar-editing-cb navbar-editing-cb}}))))
             (when-not (:read-only company-data)
               (om/build manage-topic {} {:opts {:manage-topic-cb #(manage-topic-cb owner options)}}))))))))
