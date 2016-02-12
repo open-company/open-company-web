@@ -38,7 +38,7 @@
                :reload true
                :port 3449)
         (watch)
-        (reload :asset-path "/public")
+        (reload :asset-path "/public"
+                :on-jsload 'open-company-web.core/on-js-reload)
         (sass)
-        (cljs)
-        ))
+        (cljs)))

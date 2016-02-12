@@ -93,7 +93,7 @@ lein scss!
 
 > **Note:** Alternatively you may try using `boot dev` instead of
 > these two commands. This requires [boot](http://boot-clj.com) to be
-> installed on your system.
+> installed on your system. (Consider this alpha.)
 
 If you've done it right, you'll have 4 terminal sessions running: API, Auth, Figwheel, and Sass.
 
