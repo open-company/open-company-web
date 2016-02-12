@@ -12,8 +12,10 @@
 
 (defonce default-category "progress")
 
-(defn set-navbar-editing [owner editing]
-  (om/set-state! owner :navbar-editing editing))
+(defn set-navbar-editing [owner editing & [title]]
+  (let [fixed-title (or title "")]
+    (om/set-state! owner :navbar-editing editing)
+    (om/set-state! owner :navbar-title fixed-title)))
 
 (defn switch-tab-cb [owner new-tab]
   (om/set-state! owner :active-category new-tab))
@@ -35,7 +37,9 @@
       (dom/div {:class "company-dashboard row-fluid"}
 
         ;; navbar
-        (om/build navbar (merge data {:show-share true :edit-mode (om/get-state owner :navbar-editing)}))
+        (om/build navbar (merge data {:show-share true
+                                      :edit-mode (:navbar-editing state)
+                                      :edit-title (:navbar-title state)}))
 
         ;; company header
         (om/build company-header {:loading (:loading company-data)
