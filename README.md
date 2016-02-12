@@ -91,6 +91,10 @@ You'll also need to start the Sass watcher in this repository:
 lein scss!
 ```
 
+> **Note:** Alternatively you may try using `boot dev` instead of
+> these two commands. This requires [boot](http://boot-clj.com) to be
+> installed on your system.
+
 If you've done it right, you'll have 4 terminal sessions running: API, Auth, Figwheel, and Sass.
 
 Open your browser to [http://localhost:3449/](http://localhost:3449/).
