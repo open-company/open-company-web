@@ -1,4 +1,4 @@
-(ns open-company-web.components.ui.sortable.sortable-list
+(ns open-company-web.components.ui.sortable-list
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -61,7 +61,8 @@
     {:sort (:sort data)})
 
   (render [_]
-    (dom/ul #js {:onDragOver #(drag-over % owner)
+    (dom/ul #js {:className "sortable"
+                 :onDragOver #(drag-over % owner)
                  :onDrop #(drag-end % owner options)}
       (for [item (om/get-state owner :sort)]
         (if (= item "placeholder")
@@ -71,7 +72,7 @@
           (let [items (:items data)
                 item-data ((keyword item) items)]
             (dom/li #js {:data-id item
-                         :key (:name item-data)
+                         :key (str "sortable-list-li" (name item))
                          :draggable true
                          :onDragStart #(drag-start % owner)
                          :style #js {:display "block"}}
