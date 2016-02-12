@@ -79,7 +79,7 @@
           active-topics (get-in (:company-data data) [:sections (keyword active-category)])
           all-sections (:new-sections options)
           category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
-          sections-list (vec (map #(:name %) category-sections))
+          sections-list (vec (map :name category-sections))
           cleaned-sections (ordered-sections active-topics sections-list)]
       {:active-topics active-topics
        :sorted-sections cleaned-sections}))

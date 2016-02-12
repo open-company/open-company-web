@@ -1,25 +1,15 @@
 (ns open-company-web.lib.utils
   (:require [om.core :as om :include-macros true]
             [clojure.string]
-            [open-company-web.lib.iso4217 :refer (iso4217)]
+            [dommy.core :refer-macros (sel1)]
             [cljs.core.async :refer (put!)]
-            [open-company-web.router :as router]
-            [open-company-web.caches :as caches]
             [cljs-time.format :as cljs-time-format]
             [cljs-time.core :as cljs-time]
-            [open-company-web.caches :refer (company-cache)]
-            [goog.fx.dom :refer (Scroll)]))
-
-(defn by-id [id]
-  (.getElementById js/document id))
-
-(def document-body (.-body js/document))
-
-(defn query-selector [sel]
-  (.querySelector js/document sel))
-
-(defn query-selector-all [sel]
-  (.querySelectorAll js/document sel))
+            [goog.fx.dom :refer (Scroll)]
+            [open-company-web.router :as router]
+            [open-company-web.caches :as caches]
+            [open-company-web.lib.iso4217 :refer (iso4217)]
+            [open-company-web.caches :refer (company-cache)]))
 
 (defn abs [n] (max n (- n)))
 
@@ -530,7 +520,7 @@
     (scroll-to-y elem-scroll-top)))
 
 (defn scroll-top-with-id [id]
-  (offset-top (by-id id)))
+  (offset-top (sel1 (str "#" id))))
 
 (defn scroll-to-id [id & [duration]]
   (let [body-scroll-top (.-scrollTop (.-body js/document))

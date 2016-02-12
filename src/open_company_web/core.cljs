@@ -1,6 +1,7 @@
 (ns ^:figwheel-always open-company-web.core
   (:require [om.core :as om :include-macros true]
             [secretary.core :as secretary :refer-macros (defroute)]
+            [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.components.page :refer (company)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
@@ -81,7 +82,7 @@
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
-(if-let [target (utils/by-id "app")]
+(if-let [target (sel1 :div#app)]
   (do
 
     (defroute login-route "/login" {:keys [query-params]}

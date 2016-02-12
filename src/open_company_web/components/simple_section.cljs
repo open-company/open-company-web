@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.components.ui.rich-editor :refer (rich-editor)]
             [open-company-web.components.ui.editable-title :refer (editable-title)]
@@ -92,7 +93,7 @@
   (did-mount [this]
     (when (:oc-editing (:section-data data))
       (let [selector (str "div#section-" (name (:section data)) " div.rich-editor")
-            rich-editor (.querySelector js/document selector)]
+            rich-editor (sel1 selector)]
         (.setTimeout js/window #(.focus rich-editor) 200))))
 
   (will-receive-props [_ next-props]

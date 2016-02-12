@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel1)]
             [cljs.core.async :refer (put!)]
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
@@ -17,9 +18,9 @@
     EventType.SCROLL
     (fn[e]
       (when-let [cat-node (om/get-ref owner "category-nav")]
-        (let [nav (utils/query-selector "nav.navbar")
-              scroll-top (.-scrollTop utils/document-body)
-              fix-top-margin-scrolling (utils/query-selector ".fix-top-margin-scrolling")
+        (let [nav (sel1 :nav.navbar)
+              scroll-top (.-scrollTop (sel1 :body))
+              fix-top-margin-scrolling (sel1 :.fix-top-margin-scrolling)
               win-width (.-offsetWidth js/window)]
           (when (= @max-scroll-top -1)
             (let [initial-offset-top (utils/offset-top cat-node)
@@ -54,17 +55,18 @@
   (set! (.-hash (.-location js/window)) category-name)
   ;; fix the scroll to the first section if necessary
   (when (and (not= @max-scroll-top -1)
-             (>= (.-scrollTop utils/document-body) @max-scroll-top))
-    (set! (.-scrollTop utils/document-body) @max-scroll-top))
+             (>= (.-scrollTop (sel1 :body)) @max-scroll-top))
+    (set! (.-scrollTop (sel1 :body)) @max-scroll-top))
   ;; reactivate the url change handler
   (reset! open-company-web.core/prevent-route-dispatch false))
 
 (defn setup-body-min-height []
-  (let [app-height (.-offsetHeight (utils/by-id "app"))
-        cur-min-height (.parseInt js/window (.-minHeight (.-style utils/document-body)))
-        fix-cur-min-height (if (js/isNaN cur-min-height) 0 cur-min-height)]
-    (when (> app-height fix-cur-min-height)
-      (gstyle/setStyle utils/document-body #js {:minHeight (str app-height "px")}))))
+  (when-let [app-div (sel1 :div#app)]
+    (let [app-height (.-offsetHeight app-div)
+          cur-min-height (.parseInt js/window (.-minHeight (.-style (sel1 :body))))
+          fix-cur-min-height (if (js/isNaN cur-min-height) 0 cur-min-height)]
+      (when (> app-height fix-cur-min-height)
+        (gstyle/setStyle (sel1 :body) #js {:minHeight (str app-height "px")})))))
 
 (defcomponent category-nav [data owner]
 

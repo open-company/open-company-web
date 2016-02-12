@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.components.finances.finances :refer (finances)]
             [open-company-web.components.growth.growth :refer (growth)]
@@ -33,7 +34,7 @@
 (def anim-d 800)
 
 (defn box-height [box-id]
-  (if-let [box (utils/by-id box-id)]
+  (if-let [box (sel1 (str "#" box-id))]
     (.-offsetHeight box)
     0))
 
@@ -51,10 +52,10 @@
 
 (defn animate-section-translation [owner section-name]
   (let [first-box (om/get-state owner :first-box)
-        a-box (utils/by-id (str "sec-box-a-" section-name))
-        b-box (utils/by-id (str "sec-box-b-" section-name))
+        a-box (sel1 (str "#sec-box-a-" section-name))
+        b-box (sel1 (str "#sec-box-b-" section-name))
         next-box-height (min 724 (next-box-height owner section-name))
-        box (utils/by-id (str "sec-box-" section-name))]
+        box (sel1 (str "#sec-box-" section-name))]
     (.play
       (new Resize
            box

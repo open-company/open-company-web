@@ -29,7 +29,7 @@
       (let [popover (.$ js/window "#new-section-popover-container")]
         (.fadeOut popover 400 #(.css popover #js {"display" "none"})))
       (.setTimeout js/window #(try
-                                (om/detach-root (utils/by-id "new-section-popover-container"))
+                                (om/detach-root (sel1 :#new-section-popover-container))
                                 (catch :default e)) 1500)
       (catch :default e))))
 
@@ -47,7 +47,7 @@
                      #(om/root new-section-popover
                                {:new-sections (slug @caches/new-sections)
                                 :selected-category selected-category}
-                               {:target (utils/by-id "new-section-popover-container")})
+                               {:target (sel1 :#new-section-popover-container)})
                      1)))))
 
 (defn show-popover [e category section]

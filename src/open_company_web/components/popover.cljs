@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
 
@@ -27,7 +28,7 @@
       (let [popover-ct (.$ js/window (str "#" container-id))]
         (.fadeOut popover-ct 400 #(.css popover-ct #js {"display" "none"})))
       (.setTimeout js/window #(try
-                                (let [container (utils/by-id container-id)
+                                (let [container (sel1 (str "#" container-id))
                                       $container (.$ js/window container)] 
                                   (om/detach-root container)
                                   (.remove $container))
@@ -46,11 +47,9 @@
         (.setTimeout js/window
                      (fn []
                        ; render the popover component
-                       (om/root popover data {:target (utils/by-id container-id)})
+                       (om/root popover data {:target (sel1 (str "#" container-id))})
                        ; add the close action
                        (.click popover-ct #(hide-popover % container-id))
                        ; show the popover
                        (.setTimeout js/window #(.fadeIn popover-ct 400) 0))
                      1)))))
-
-

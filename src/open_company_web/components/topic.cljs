@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel1)]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.growth.utils :as growth-utils]
@@ -76,7 +77,7 @@
       (set! (.-height (.-style body-node)) (if expanded "auto" "0"))
 
       ; animate finances headtitle
-      (when-let [finances-children (.querySelector topic ":scope > div.topic-headline > div.topic-headline-finances")]
+      (when-let [finances-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-finances")] ; (.querySelector topic ":scope > div.topic-headline > div.topic-headline-finances")]
         (let [finances-resize (new Resize
                                    finances-children
                                    (new js/Array body-width (if expanded 0 100))
@@ -91,7 +92,7 @@
           (.play finances-fade)))
 
       ; animate growth headtitle
-      (when-let [growth-children (.querySelector topic ":scope > div.topic-headline > div.topic-headline-growth")]
+      (when-let [growth-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-growth")] ;(.querySelector topic ":scope > div.topic-headline > div.topic-headline-growth")]
         (let [growth-resize (new Resize
                                  growth-children
                                  (new js/Array body-width (if expanded 0 100))
