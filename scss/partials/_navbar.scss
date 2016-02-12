@@ -39,6 +39,17 @@ nav.navbar {
 
     &.editing-mode {
 
+      div.editing-title {
+        position: relative;
+        width: 250px;
+        height: 50px;
+        padding-top: 8px;
+        margin: 0 auto;
+        text-align: center;
+        font-size: 22px;
+        text-transform: capitalize;
+      }
+
       div.left-button {
         float: left;
 
