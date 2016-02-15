@@ -14,7 +14,7 @@
             [goog.fx.dom :refer (Fade)]
             [goog.fx.Animation.EventType :as EventType]
             [goog.events :as events]
-            [goog.style :refer (setStyle)]))
+            [goog.style :refer (getStyle setStyle)]))
 
 (defn get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
@@ -43,23 +43,28 @@
   ((:navbar-editing-cb options) true)
   (utils/scroll-to-y 0))
 
-(defn show-hide-edit-topic-button [owner show section-name]
+(defn toggle-edit-topic-button [owner show section-name]
   (om/set-state! owner :last-expanded-section (if show section-name nil))
-  (when-let [edit-topic-button (om/get-ref owner "edit-topic-button")]
-    (setStyle edit-topic-button "display" "inline")
-    (let [start (if show 0 1)
-          end   (if show 1 0)
-          fade-anim (new Fade
-                        edit-topic-button
-                        start
-                        end
-                        utils/oc-animation-duration)]
-      (doto fade-anim
-        (events/listen
-          EventType/FINISH
-          (fn [_]
-            (om/set-state! owner :show-topic-edit-button show)))
-        (.play)))))
+  ; avoid to do animate if it's not needed
+  (when-not (= show (om/get-state owner :show-topic-edit-button))
+    (when-let [edit-topic-button (om/get-ref owner "edit-topic-button")]
+      (let [current-display (getStyle edit-topic-button "display")]
+        (when show
+          ; reset display rule if going to show
+          (setStyle edit-topic-button "display" "inline"))
+        (let [start (if (= current-display "none") 0 1)
+              end   (if (= current-display "none") 1 0)
+              fade-anim (new Fade
+                            edit-topic-button
+                            start
+                            end
+                            utils/oc-animation-duration)]
+          (doto fade-anim
+            (events/listen
+              EventType/FINISH
+              (fn [_]
+                (om/set-state! owner :show-topic-edit-button show)))
+            (.play)))))))
 
 (defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
 
@@ -99,7 +104,7 @@
                                    :active-category active-category}
                                    {:opts {:section-name section-name
                                            :navbar-editing-cb navbar-editing-cb
-                                           :show-hide-edit-topic-cb (partial show-hide-edit-topic-button owner)}}))))
+                                           :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)}}))))
             (when-not (:read-only company-data)
               (om/build manage-topics {} {:opts {:manage-topics-cb #(manage-topics-cb owner options)}}))
             (when-not (:read-only company-data)
