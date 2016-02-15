@@ -69,10 +69,6 @@
 (defcomponent topic-list-edit [data owner options]
 
   (init-state [_]
-    (let [save-ch (chan)
-          cancel-ch (chan)]
-      (utils/add-channel "save-bt-navbar" save-ch)
-      (utils/add-channel "cancel-bt-navbar" cancel-ch))
     (when (empty? @caches/new-sections)
       (api/get-new-sections))
     (let [active-category (:active-category options)
@@ -83,6 +79,16 @@
           cleaned-sections (ordered-sections active-topics sections-list)]
       {:active-topics active-topics
        :sorted-sections cleaned-sections}))
+
+  (will-mount [_]
+    (let [save-ch (chan)
+          cancel-ch (chan)]
+      (utils/add-channel "save-bt-navbar" save-ch)
+      (utils/add-channel "cancel-bt-navbar" cancel-ch)))
+
+  (will-unmount [_]
+    (utils/remove-channel "save-bt-navbar")
+    (utils/remove-channel "cancel-bt-navbar"))
 
   (did-mount [_]
     (let [save-ch (utils/get-channel "save-bt-navbar")]
