@@ -161,38 +161,47 @@
 
   (render-state [_ {:keys [editing expanded show-edit-button] :as state}]
     (let [section (keyword section-name)
-          section-data (company-data section)]
-      (let [expanded (om/get-state owner :expanded)
-            section-body (get-body section-data section)
-            headline-options {:opts {:currency (:currency company-data)}}
-            headline-data (assoc section-data :expanded expanded)]
-        (dom/div #js {:className "topic"
-                      :ref "topic"
-                      :onClick #(topic-click owner options expanded)}
+          section-data (company-data section)
+          expanded (om/get-state owner :expanded)
+          section-body (get-body section-data section)
+          headline-options {:opts {:currency (:currency company-data)}}
+          headline-data (assoc section-data :expanded expanded)]
+      (dom/div #js {:className "topic"
+                    :ref "topic"
+                    :onClick #(topic-click owner options expanded)}
 
-          ;; Topic title
-          (dom/div {:class "topic-title oc-header"} (:title section-data))
+        ;; Topic title
+        (dom/div {:class "topic-title oc-header"} (:title section-data))
 
-          ;; Topic headline
-          (dom/div {:class "topic-headline"}
-            (om/build (headline-component section) headline-data headline-options))
+        ;; Topic headline
+        (dom/div {:class "topic-headline"}
+          (om/build (headline-component section) headline-data headline-options))
 
-          ;; Topic date
-          (dom/div {:class "topic-date"}
-            (str (utils/time-since (:updated-at section-data)) " ")
-            (dom/label #js {:style #js {"opacity" (if expanded "1" "0")}
-                            :ref "topic-date-author"}
-              (str " by " (:name (:author section-data)))))
+        ;; Topic date
+        (dom/div {:class "topic-date"}
+          (str (utils/time-since (:updated-at section-data)) " ")
+          (dom/label #js {:style #js {"opacity" (if expanded "1" "0")}
+                          :ref "topic-date-author"}
+            (str " by " (:name (:author section-data)))))
 
-          ;; Topic body
-          (dom/div #js {:className "topic-body"
-                        :ref "topic-body"
-                        :onClick #(when-not (:read-only section-data)
-                                    (topic-body-click % owner options show-edit-button))
-                        :style #js {"height" (if expanded "auto" "0")}}
-            (cond
-              (= section :growth)
-              (om/build growth {:section-data section-data
+        ;; Topic body
+        (dom/div #js {:className "topic-body"
+                      :ref "topic-body"
+                      :onClick #(when-not (:read-only section-data)
+                                  (topic-body-click % owner options show-edit-button))
+                      :style #js {"height" (if expanded "auto" "0")}}
+          (cond
+            (= section :growth)
+            (om/build growth {:section-data section-data
+                              :section section
+                              :currency (:currency company-data)
+                              :actual-as-of (:updated-at section-data)
+                              :read-only true}
+                             {:opts {:show-title false
+                                     :show-revisions-navigation false}})
+
+            (= section :finances)
+            (om/build finances {:section-data section-data
                                 :section section
                                 :currency (:currency company-data)
                                 :actual-as-of (:updated-at section-data)
@@ -200,15 +209,6 @@
                                {:opts {:show-title false
                                        :show-revisions-navigation false}})
 
-              (= section :finances)
-              (om/build finances {:section-data section-data
-                                  :section section
-                                  :currency (:currency company-data)
-                                  :actual-as-of (:updated-at section-data)
-                                  :read-only true}
-                                 {:opts {:show-title false
-                                         :show-revisions-navigation false}})
-
-              :else
-              (dom/div #js {:className "topic-body-inner"
-                            :dangerouslySetInnerHTML (clj->js {"__html" section-body})}))))))))
+            :else
+            (dom/div #js {:className "topic-body-inner"
+                          :dangerouslySetInnerHTML (clj->js {"__html" section-body})})))))))
