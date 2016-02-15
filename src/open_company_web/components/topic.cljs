@@ -9,8 +9,6 @@
             [open-company-web.components.ui.charts :refer (column-chart)]
             [open-company-web.components.finances.finances :refer (finances)]
             [open-company-web.components.growth.growth :refer (growth)]
-            [open-company-web.components.ui.edit-topic-button :refer (edit-topic-button)]
-            [open-company-web.components.edit-topic :refer (edit-topic)]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as EventType]
@@ -67,9 +65,13 @@
               (dom/h3 {:class "actual blue"} (:name metric-info))
               (dom/h3 {:class "actual blue"} last-value-label))))))))
 
-(def animation-duration 500)
+(defn topic-body-click [e owner options show-edit-button]
+  (when e
+    (.stopPropagation e))
+  ((:show-hide-edit-topic-cb options) (not show-edit-button) (:section-name options))
+  (om/update-state! owner :show-edit-button not))
 
-(defn topic-click [owner expanded]
+(defn topic-click [owner options expanded]
   (let [topic (om/get-ref owner "topic")
         topic-date-author (om/get-ref owner "topic-date-author")
         body-node (om/get-ref owner "topic-body")]
@@ -84,12 +86,12 @@
                                    finances-children
                                    (new js/Array body-width (if expanded 0 100))
                                    (new js/Array body-width (if expanded 100 0))
-                                   500)
+                                   utils/oc-animation-duration)
               finances-fade (new Fade
                                  finances-children
                                  (if expanded 0 1)
                                  (if expanded 1 0)
-                                 500)]
+                                 utils/oc-animation-duration)]
           (.play finances-resize)
           (.play finances-fade)))
 
@@ -99,12 +101,12 @@
                                  growth-children
                                  (new js/Array body-width (if expanded 0 100))
                                  (new js/Array body-width (if expanded 100 0))
-                                 500)
+                                 utils/oc-animation-duration)
               growth-fade (new Fade
                                growth-children
                                (if expanded 0 1)
                                (if expanded 1 0)
-                               500)]
+                               utils/oc-animation-duration)]
             (.play growth-resize)
             (.play growth-fade)))
 
@@ -114,25 +116,30 @@
              topic-date-author
              (if expanded 1 0)
              (if expanded 0 1)
-             500))
+             utils/oc-animation-duration))
+
+      ; animate height
       (let [height-animation (new Resize
                                   body-node
                                   (new js/Array body-width (if expanded body-height 0))
                                   (new js/Array body-width (if expanded 0 body-height))
-                                  500)]
+                                  utils/oc-animation-duration)]
         (events/listen height-animation
                        EventType/FINISH
                        (fn []
                          (om/update-state! owner :expanded not)
                          (when expanded
                            (om/set-state! owner :show-edit-button false))))
-        ; animate height
         (.play height-animation))
 
       (let [topic (om/get-ref owner "topic")
             body-scroll (.-scrollTop (.-body js/document))
             topic-scroll-top (utils/offset-top topic)]
-        (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))))
+        (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90)))
+
+      ;; hide the edit button if necessary
+      (when (and (om/get-state owner :show-edit-button) expanded)
+        (topic-body-click nil owner options true)))))
 
 (defn headline-component [section]
   (cond
@@ -146,66 +153,55 @@
     :else
     topic-headline))
 
-(defn topic-body-click [e owner show-edit-button]
-  (.stopPropagation e)
-  (when-let [edit-bt (om/get-ref owner "edit-button")]
-    (set! (.-height (.-style edit-bt)) "auto")
-    (let [height (.-offsetHeight edit-bt)
-          width (.-offsetWidth edit-bt)
-          height-anim (new Resize
-                         edit-bt
-                         (new js/Array width (if show-edit-button height 0))
-                         (new js/Array width (if show-edit-button 0 height))
-                         500)]
-      (doto height-anim
-        (events/listen
-          EventType/FINISH
-          #(om/set-state! owner :show-edit-button (not show-edit-button)))
-        (.play)))))
-
 (defcomponent topic [{:keys [company-data] :as data} owner {:keys [section-name navbar-editing-cb] :as options}]
 
   (init-state [_]
     {:expanded false
-     :editing false
      :show-edit-button false})
 
   (render-state [_ {:keys [editing expanded show-edit-button] :as state}]
     (let [section (keyword section-name)
           section-data (company-data section)]
-      (if editing
-        (om/build edit-topic {:section section :section-data section-data})
-        (let [expanded (om/get-state owner :expanded)
-              section-body (get-body section-data section)
-              headline-options {:opts {:currency (:currency company-data)}}
-              headline-data (assoc section-data :expanded expanded)]
-          (dom/div #js {:className "topic"
-                        :ref "topic"
-                        :onClick #(topic-click owner expanded)}
+      (let [expanded (om/get-state owner :expanded)
+            section-body (get-body section-data section)
+            headline-options {:opts {:currency (:currency company-data)}}
+            headline-data (assoc section-data :expanded expanded)]
+        (dom/div #js {:className "topic"
+                      :ref "topic"
+                      :onClick #(topic-click owner options expanded)}
 
-            ;; Topic title
-            (dom/div {:class "topic-title oc-header"} (:title section-data))
+          ;; Topic title
+          (dom/div {:class "topic-title oc-header"} (:title section-data))
 
-            ;; Topic headline
-            (dom/div {:class "topic-headline"}
-              (om/build (headline-component section) headline-data headline-options))
+          ;; Topic headline
+          (dom/div {:class "topic-headline"}
+            (om/build (headline-component section) headline-data headline-options))
 
-            ;; Topic date
-            (dom/div {:class "topic-date"}
-              (str (utils/time-since (:updated-at section-data)) " ")
-              (dom/label #js {:style #js {"opacity" (if expanded "1" "0")}
-                              :ref "topic-date-author"}
-                (str " by " (:name (:author section-data)))))
+          ;; Topic date
+          (dom/div {:class "topic-date"}
+            (str (utils/time-since (:updated-at section-data)) " ")
+            (dom/label #js {:style #js {"opacity" (if expanded "1" "0")}
+                            :ref "topic-date-author"}
+              (str " by " (:name (:author section-data)))))
 
-            ;; Topic body
-            (dom/div #js {:className "topic-body"
-                          :ref "topic-body"
-                          :onClick #(when-not (:read-only section-data)
-                                      (topic-body-click % owner show-edit-button))
-                          :style #js {"height" (if expanded "auto" "0")}}
-              (cond
-                (= section :growth)
-                (om/build growth {:section-data section-data
+          ;; Topic body
+          (dom/div #js {:className "topic-body"
+                        :ref "topic-body"
+                        :onClick #(when-not (:read-only section-data)
+                                    (topic-body-click % owner options show-edit-button))
+                        :style #js {"height" (if expanded "auto" "0")}}
+            (cond
+              (= section :growth)
+              (om/build growth {:section-data section-data
+                                :section section
+                                :currency (:currency company-data)
+                                :actual-as-of (:updated-at section-data)
+                                :read-only true}
+                               {:opts {:show-title false
+                                       :show-revisions-navigation false}})
+
+              (= section :finances)
+              (om/build finances {:section-data section-data
                                   :section section
                                   :currency (:currency company-data)
                                   :actual-as-of (:updated-at section-data)
@@ -213,23 +209,6 @@
                                  {:opts {:show-title false
                                          :show-revisions-navigation false}})
 
-                (= section :finances)
-                (om/build finances {:section-data section-data
-                                    :section section
-                                    :currency (:currency company-data)
-                                    :actual-as-of (:updated-at section-data)
-                                    :read-only true}
-                                   {:opts {:show-title false
-                                           :show-revisions-navigation false}})
-
-                :else
-                (dom/div #js {:className "topic-body-inner"
-                              :dangerouslySetInnerHTML (clj->js {"__html" section-body})}))
-              (dom/div #js {:style #js {:height (if (and (not (:read-only section-data)) show-edit-button)
-                                                  "auto"
-                                                  "0")}
-                            :ref "edit-button"}
-                (om/build edit-topic-button
-                          nil
-                          {:opts {:edit-topic-cb
-                                  #((:topic-edit-cb options) section)}})))))))))
+              :else
+              (dom/div #js {:className "topic-body-inner"
+                            :dangerouslySetInnerHTML (clj->js {"__html" section-body})}))))))))
