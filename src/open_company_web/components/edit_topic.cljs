@@ -34,8 +34,8 @@
 (defcomponent edit-topic [{:keys [section section-data] :as data} owner options]
 
   (init-state [_]
-    (cdr/add-style! "/lib/medium-editor/css/medium-editor.css")
-    (cdr/add-style! "/lib/medium-editor/css/themes/beagle.css")
+    (cdr/add-style! "/css/medium-editor/medium-editor.min.css")
+    (cdr/add-style! "/css/medium-editor/beagle.min.css")
     {:title (:title section-data)
      :headline (:headline section-data)
      :body (:body section-data)
