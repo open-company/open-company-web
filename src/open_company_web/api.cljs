@@ -134,6 +134,25 @@
           (let [body (if (:success response) (json->cljs (:body response)) {})]
             (flux/dispatch dispatcher/section {:body body :section section :slug (keyword slug)})))))))
 
+(defn partial-update-section [section partial-section-data]
+  (when (and section partial-section-data)
+    (let [slug (:slug @router/path)
+          company-data (get @dispatcher/app-state (keyword slug))
+          section-data (get company-data section)
+          json-data (cljs->json partial-section-data)
+          partial-update-link (utils/link-for (:links section-data) "partial-update" "PATCH")]
+      (api-patch (:href partial-update-link)
+        { :json-params json-data
+          :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (:type partial-update-link)
+          }}
+        (fn [response]
+          (let [body (if (:success response) (json->cljs (:body response)) {})]
+            (flux/dispatch dispatcher/section {:body body :section section :slug (keyword slug)})))))))
+
 (defn load-revision
   [revision slug section]
     (when revision
