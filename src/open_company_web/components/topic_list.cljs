@@ -74,6 +74,7 @@
                                    :company-data company-data
                                    :active-category active-category}
                                    {:opts {:section-name section-name
-                                           :navbar-editing-cb navbar-editing-cb}}))))
+                                           :navbar-editing-cb navbar-editing-cb
+                                           :topic-edit-cb (:topic-edit-cb options)}}))))
             (when-not (:read-only company-data)
               (om/build manage-topic {} {:opts {:manage-topic-cb #(manage-topic-cb owner options)}}))))))))
