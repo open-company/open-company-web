@@ -9,7 +9,12 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.topic-list-edit :refer (topic-list-edit)]
-            [open-company-web.components.ui.manage-topics :refer (manage-topics)]))
+            [open-company-web.components.ui.manage-topics :refer (manage-topics)]
+            [open-company-web.components.ui.edit-topic-button :refer (edit-topic-button)]
+            [goog.fx.dom :refer (Fade)]
+            [goog.fx.Animation.EventType :as EventType]
+            [goog.events :as events]
+            [goog.style :refer (setStyle)]))
 
 (defn get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
@@ -38,11 +43,31 @@
   ((:navbar-editing-cb options) true)
   (utils/scroll-to-y 0))
 
+(defn show-hide-edit-topic-button [owner show section-name]
+  (om/set-state! owner :last-expanded-section (if show section-name nil))
+  (when-let [edit-topic-button (om/get-ref owner "edit-topic-button")]
+    (setStyle edit-topic-button "display" "inline")
+    (let [start (if show 0 1)
+          end   (if show 1 0)
+          fade-anim (new Fade
+                        edit-topic-button
+                        start
+                        end
+                        utils/oc-animation-duration)]
+      (doto fade-anim
+        (events/listen
+          EventType/FINISH
+          (fn [_]
+            (om/set-state! owner :show-topic-edit-button show)))
+        (.play)))))
+
 (defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
 
   (init-state [_]
     {:editing false
-     :new-sections-requested false})
+     :new-sections-requested false
+     :show-topic-edit-button false
+     :last-expanded-section nil})
 
   (did-mount [_]
     (when-not (:read-only (:company-data data))
@@ -52,9 +77,8 @@
     (when-not (:read-only (:company-data data))
       (get-new-sections-if-needed owner)))
 
-  (render [_]
-    (let [slug (keyword (:slug @router/path))
-          editing (om/get-state owner :editing)]
+  (render-state [_ {:keys [show-topic-edit-button editing] :as state}]
+    (let [slug (keyword (:slug @router/path))]
       (if editing
         (om/build topic-list-edit data {:opts {:new-sections (slug @caches/new-sections)
                                                :active-category (:active-category data)
@@ -75,6 +99,15 @@
                                    :active-category active-category}
                                    {:opts {:section-name section-name
                                            :navbar-editing-cb navbar-editing-cb
-                                           :topic-edit-cb (:topic-edit-cb options)}}))))
+                                           :show-hide-edit-topic-cb (partial show-hide-edit-topic-button owner)}}))))
             (when-not (:read-only company-data)
-              (om/build manage-topics {} {:opts {:manage-topics-cb #(manage-topics-cb owner options)}}))))))))
+              (om/build manage-topics {} {:opts {:manage-topics-cb #(manage-topics-cb owner options)}}))
+            (when-not (:read-only company-data)
+              (dom/div #js {:className "topic-row floating-edit-topic-button"
+                            :ref "edit-topic-button"
+                            :style #js {:opacity (if show-topic-edit-button "1" "0")
+                                        :display (if show-topic-edit-button "inline" "none")}}
+                (om/build edit-topic-button
+                          nil
+                          {:opts
+                           {:edit-topic-cb #((:topic-edit-cb options) (om/get-state owner :last-expanded-section))}})))))))))
