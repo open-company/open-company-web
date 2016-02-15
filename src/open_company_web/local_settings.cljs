@@ -16,6 +16,3 @@
 
 ;; Deploy key
 (def deploy-key "")
-
-;; Default animation duration
-(def animation-duration 500)
