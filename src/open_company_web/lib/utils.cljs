@@ -43,6 +43,9 @@
 (defn get-channel [channel-name]
   (@channel-coll channel-name))
 
+(defn remove-channel [channel-name]
+  (swap! channel-coll dissoc channel-name))
+
 (defn handle-change [cursor value key]
   (if (array? key)
     (om/transact! cursor assoc-in key (fn [_] value))
