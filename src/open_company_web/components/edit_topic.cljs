@@ -5,7 +5,8 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.api :as api]))
 
 (defn add-navbar-channels []
   (let [save-ch (chan)
@@ -20,7 +21,9 @@
 (defcomponent edit-topic [{:keys [section section-data] :as data} owner options]
 
   (init-state [_]
-    {})
+    {:title (:title section-data)
+     :headline (:headline section-data)
+     :body (:body section-data)})
 
   (will-mount [_]
     ((:navbar-editing-cb options) true "Edit")
@@ -33,23 +36,29 @@
     (let [save-ch (utils/get-channel "save-bt-navbar")]
       (go (loop []
         (let [change (<! save-ch)]
-          (println "save-ch change!!")))))
+          (let [section-data {:title (om/get-state owner :title)
+                              :headline (om/get-state owner :headline)
+                              :body (.-innerHTML (om/get-ref owner "topic-body"))}]
+            (api/partial-update-section section section-data)
+            ((:dismiss-topic-editing-cb options) true))))))
     (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
       (go (loop []
         (let [change (<! cancel-ch)]
-          ((:dismiss-topic-editing-cb options)))))))
+          ((:dismiss-topic-editing-cb options) false))))))
 
-  (render [_]
+  (render-state [_ {:keys [title headline body]}]
     (dom/div {:class "edit-topic"}
       (dom/div {:class "edit-topic-title"}
         (dom/input #js {:ref "topic-title"
-                        :maxLength 256
-                        :value (:title section-data)}))
+                        :maxLength 100
+                        :value title
+                        :onChange #(om/set-state! owner :title (.. % -target -value))}))
       (dom/div {:class "edit-topic-headline"}
         (dom/input #js {:ref "topic-headline"
-                        :maxLength 256
-                        :value (:headline section-data)}))
+                        :maxLength 100
+                        :value headline
+                        :onChange #(om/set-state! owner :headline (.. % -target -value))}))
       (dom/div {:class "edit-topic-body"}
         (dom/div #js {:ref "topic-body"
                       :contentEditable true
-                      :dangerouslySetInnerHTML (clj->js {"__html" (:body section-data)})})))))
+                      :dangerouslySetInnerHTML (clj->js {"__html" body})})))))
