@@ -122,7 +122,10 @@
                                   500)]
         (events/listen height-animation
                        EventType/FINISH
-                       #(om/update-state! owner :expanded not))
+                       (fn []
+                         (om/update-state! owner :expanded not)
+                         (when expanded
+                           (om/set-state! owner :show-edit-button false))))
         ; animate height
         (.play height-animation))
 
@@ -143,13 +146,31 @@
     :else
     topic-headline))
 
+(defn topic-body-click [e owner show-edit-button]
+  (.stopPropagation e)
+  (when-let [edit-bt (om/get-ref owner "edit-button")]
+    (set! (.-height (.-style edit-bt)) "auto")
+    (let [height (.-offsetHeight edit-bt)
+          width (.-offsetWidth edit-bt)
+          height-anim (new Resize
+                         edit-bt
+                         (new js/Array width (if show-edit-button height 0))
+                         (new js/Array width (if show-edit-button 0 height))
+                         500)]
+      (doto height-anim
+        (events/listen
+          EventType/FINISH
+          #(om/set-state! owner :show-edit-button (not show-edit-button)))
+        (.play)))))
+
 (defcomponent topic [{:keys [company-data] :as data} owner {:keys [section-name navbar-editing-cb] :as options}]
 
   (init-state [_]
     {:expanded false
-     :editing false})
+     :editing false
+     :show-edit-button false})
 
-  (render-state [_ {:keys [editing expanded] :as state}]
+  (render-state [_ {:keys [editing expanded show-edit-button] :as state}]
     (let [section (keyword section-name)
           section-data (company-data section)]
       (if editing
@@ -179,6 +200,8 @@
             ;; Topic body
             (dom/div #js {:className "topic-body"
                           :ref "topic-body"
+                          :onClick #(when-not (:read-only section-data)
+                                      (topic-body-click % owner show-edit-button))
                           :style #js {"height" (if expanded "auto" "0")}}
               (cond
                 (= section :growth)
@@ -202,8 +225,12 @@
                 :else
                 (dom/div #js {:className "topic-body-inner"
                               :dangerouslySetInnerHTML (clj->js {"__html" section-body})}))
-              (when-not (:read-only section-data)
-                (om/build edit-topic-button nil {:opts {:edit-topic-cb
-                                                        (fn []
-                                                          (println "Edit topic click")
-                                                          (navbar-editing-cb true "Edit"))}})))))))))
+              (dom/div #js {:style #js {:height (if (and (not (:read-only section-data)) show-edit-button)
+                                                  "auto"
+                                                  "0")}
+                            :ref "edit-button"}
+                (om/build edit-topic-button
+                          nil
+                          {:opts {:edit-topic-cb
+                                  (fn []
+                                    (navbar-editing-cb true "Edit"))}})))))))))
