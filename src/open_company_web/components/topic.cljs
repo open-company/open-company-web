@@ -68,10 +68,10 @@
 (defn topic-body-click [e owner options show-edit-button]
   (when e
     (.stopPropagation e))
-  ((:show-hide-edit-topic-cb options) (not show-edit-button) (:section-name options))
+  ((:toggle-edit-topic-cb options) (not show-edit-button) (:section-name options))
   (om/update-state! owner :show-edit-button not))
 
-(defn topic-click [owner options expanded]
+(defn topic-click [data owner options expanded]
   (let [topic (om/get-ref owner "topic")
         topic-date-author (om/get-ref owner "topic-date-author")
         body-node (om/get-ref owner "topic-body")]
@@ -137,9 +137,15 @@
             topic-scroll-top (utils/offset-top topic)]
         (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90)))
 
-      ;; hide the edit button if necessary
-      (when (and (om/get-state owner :show-edit-button) expanded)
-        (topic-body-click nil owner options true)))))
+      (if-not expanded
+        ;; show the edit button if the topic body is empty
+        (let [section (keyword (:section options))
+              section-data (get (:company-data data) section)]
+          (when (clojure.string/blank? (:body section-data))
+            (topic-body-click nil owner options false)))
+        ;; hide the edit button if necessary
+        (when (om/get-state owner :show-edit-button)
+          (topic-body-click nil owner options true))))))
 
 (defn headline-component [section]
   (cond
@@ -161,14 +167,14 @@
 
   (render-state [_ {:keys [editing expanded show-edit-button] :as state}]
     (let [section (keyword section-name)
-          section-data (company-data section)
+          section-data (get company-data section)
           expanded (om/get-state owner :expanded)
           section-body (get-body section-data section)
           headline-options {:opts {:currency (:currency company-data)}}
           headline-data (assoc section-data :expanded expanded)]
       (dom/div #js {:className "topic"
                     :ref "topic"
-                    :onClick #(topic-click owner options expanded)}
+                    :onClick #(topic-click data owner options expanded)}
 
         ;; Topic title
         (dom/div {:class "topic-title oc-header"} (:title section-data))
