@@ -1,0 +1,46 @@
+div.edit-topic {
+  margin: 10px;
+
+  & > div {
+    padding-top: 10px;
+  }
+
+  div.edit-topic-title {
+    input {
+      border: 1px solid transparent;
+      font-size: 18px;
+      width: 100%;
+
+      &:focus {
+        border: 1px solid black;
+        outline: none;
+      }
+    }
+  }
+
+  div.edit-topic-headline {
+    input {
+      border: 1px solid transparent;
+      font-size: 14px;
+      width: 100%;
+
+      &:focus {
+        border: 1px solid black;
+        outline: none;
+      }
+    }
+  }
+
+  div.edit-topic-body {
+    div {
+      border: 1px solid transparent;
+      font-size: 14px;
+      outline: none;
+
+      &:focus {
+        border: 1px solid black;
+        outline: none;
+      }
+    }
+  }
+}
