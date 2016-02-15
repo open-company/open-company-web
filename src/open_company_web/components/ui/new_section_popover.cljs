@@ -45,7 +45,7 @@
         container-offset-top (utils/offset-top (.querySelector js/document "div.new-section-container"))
         fixed-top (- top container-offset-top 20)]
     (.scrollTo (.$ js/window ".new-section-container")
-               #js {"top" (str fixed-top "px") "left" "0px"} 500)))
+               #js {"top" (str fixed-top "px") "left" "0px"} utils/oc-animation-duration)))
 
 (defcomponent new-section-popover [data owner]
 
