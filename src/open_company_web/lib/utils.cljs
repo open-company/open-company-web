@@ -9,9 +9,12 @@
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
             [open-company-web.lib.iso4217 :refer (iso4217)]
-            [open-company-web.caches :refer (company-cache)]))
+            [open-company-web.caches :refer (company-cache)]
+            [open-company-web.local-settings :as ls]))
 
 (defn abs [n] (max n (- n)))
+
+(def oc-animation-duration (or ls/animation-duration 500))
 
 (defn sort-by-key-pred [k & invert]
   (if-not (first invert)
@@ -516,7 +519,7 @@
          (.-body js/document)
          (new js/Array 0 (.-scrollTop (.-body js/document)))
          (new js/Array 0 scroll-y)
-         (or duration 500))))
+         (or duration oc-animation-duration))))
 
 (defn scroll-to-element [elem]
   (let [elem-scroll-top (offset-top elem)]
@@ -528,7 +531,7 @@
 (defn scroll-to-id [id & [duration]]
   (let [body-scroll-top (.-scrollTop (.-body js/document))
         top (- (+ (scroll-top-with-id id) body-scroll-top) 50)]
-    (scroll-to-y top (or duration 500))))
+    (scroll-to-y top (or duration oc-animation-duration))))
 
 (defn scroll-to-section [section-name]
   (scroll-to-id (str "section-" (name section-name))))
@@ -541,4 +544,4 @@
            toc
            (new js/Array 0 (.-scrollTop toc))
            (new js/Array 0 top)
-           500))))
+           oc-animation-duration))))
