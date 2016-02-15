@@ -9,7 +9,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.topic-list-edit :refer (topic-list-edit)]
-            [open-company-web.components.manage-topic :refer (manage-topic)]))
+            [open-company-web.components.ui.manage-topics :refer (manage-topics)]))
 
 (defn get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
@@ -33,7 +33,7 @@
     ((:navbar-editing-cb options) false)
     (om/set-state! owner :editing false)))
 
-(defn manage-topic-cb [owner options]
+(defn manage-topics-cb [owner options]
   (om/set-state! owner :editing true)
   ((:navbar-editing-cb options) true)
   (utils/scroll-to-y 0))
@@ -77,4 +77,4 @@
                                            :navbar-editing-cb navbar-editing-cb
                                            :topic-edit-cb (:topic-edit-cb options)}}))))
             (when-not (:read-only company-data)
-              (om/build manage-topic {} {:opts {:manage-topic-cb #(manage-topic-cb owner options)}}))))))))
+              (om/build manage-topics {} {:opts {:manage-topics-cb #(manage-topics-cb owner options)}}))))))))

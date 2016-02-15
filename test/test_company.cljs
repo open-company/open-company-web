@@ -25,8 +25,7 @@
             [test.open-company-web.components.company-header]
             [test.open-company-web.components.category-nav]
             [test.open-company-web.components.topic-list]
-            [test.open-company-web.components.topic]
-            [test.open-company-web.components.manage-topic]))
+            [test.open-company-web.components.topic]))
 
 (enable-console-print!)
 
@@ -59,5 +58,4 @@
   'test.open-company-web.components.company-header
   'test.open-company-web.components.category-nav
   'test.open-company-web.components.topic-list
-  'test.open-company-web.components.topic
-  'test.open-company-web.components.manage-topic)
+  'test.open-company-web.components.topic)

@@ -15,7 +15,8 @@
             [test.open-company-web.components.ui.uncontrolled-content-editable]
             [test.open-company-web.components.popover]
             [test.open-company-web.components.ui.headline]
-            [test.open-company-web.components.ui.sortable-list]))
+            [test.open-company-web.components.ui.sortable-list]
+            [test.open-company-web.components.ui.manage-topics]))
 
 (enable-console-print!)
 
@@ -38,4 +39,5 @@
   'test.open-company-web.components.ui.uncontrolled-content-editable
   'test.open-company-web.components.popover
   'test.open-company-web.components.ui.headline
-  'test.open-company-web.components.ui.sortable-list)
+  'test.open-company-web.components.ui.sortable-list
+  'test.open-company-web.components.ui.manage-topics)
