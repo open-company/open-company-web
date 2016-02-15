@@ -96,7 +96,6 @@
         (let [change (<! save-ch)]
           (let [sorted-sections (om/get-state owner :sorted-sections)
                 active-topics (om/get-state owner :active-topics)]
-            (println "going to save: " (sorted-active-topics sorted-sections active-topics))
             ((:save-sections-cb options) (sorted-active-topics sorted-sections active-topics)))))))
     (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
       (go (loop []
