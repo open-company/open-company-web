@@ -232,5 +232,4 @@
                 (om/build edit-topic-button
                           nil
                           {:opts {:edit-topic-cb
-                                  (fn []
-                                    (navbar-editing-cb true "Edit"))}})))))))))
+                                  #((:topic-edit-cb options) section)}})))))))))
