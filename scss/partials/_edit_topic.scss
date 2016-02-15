@@ -4,46 +4,35 @@ div.edit-topic {
   & > div {
     padding-top: 10px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.3);
-  }
 
-  div.edit-topic-title {
-    input {
-      font-family: "#{$oc_headers_font}";
+    & > input, & > textarea {
       border: 1px solid transparent;
-      font-size: 20px;
       width: 100%;
 
       &:focus {
         border: 1px solid black;
         outline: none;
       }
+    }
+  }
+
+  div.edit-topic-title {
+    input {
+      font-family: "#{$oc_headers_font}";
+      font-size: 20px;
     }
   }
 
   div.edit-topic-headline {
     input {
       font-family: "#{$oc_headers_font}";
-      border: 1px solid transparent;
       font-size: 18px;
-      width: 100%;
-
-      &:focus {
-        border: 1px solid black;
-        outline: none;
-      }
     }
   }
 
   div.edit-topic-body {
-    div {
-      border: 1px solid transparent;
+    textarea {
       font-size: 14px;
-      outline: none;
-
-      &:focus {
-        border: 1px solid black;
-        outline: none;
-      }
     }
   }
 }
