@@ -1,7 +1,6 @@
 (ns open-company-web.components.edit-topic
   (:require-macros [cljs.core.async.macros :refer (go)])
-  (:require [cljsjs.medium-editor]
-            [cljs.core.async :refer (chan <!)]
+  (:require [cljs.core.async :refer (chan <!)]
             [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
@@ -9,13 +8,6 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.api :as api]
             [cljs-dynamic-resources.core :as cdr]))
-
-(def editor-options #js {
-  :toolbar #js {
-    :static true
-    :align "left"
-    ; :sticky true
-    :buttons #js ["bold" "italic" "underline" "anchor" "h2" "quote"]}})
 
 (defn add-navbar-channels []
   (let [save-ch (chan)
@@ -27,19 +19,43 @@
   (utils/remove-channel "save-bt-navbar")
   (utils/remove-channel "cancel-bt-navbar"))
 
+(def medium-options (clj->js {
+    "toolbar" #js {
+      "buttons" #js ["bold"
+                     "italic"
+                     "underline"
+                     "anchor"
+                     "image"
+                     "quote"
+                     "orderedlist"
+                     "unorderedlist"
+                     "h1"
+                     "removeFormat"]
+      "static" true
+      "align" "left"
+      "sticky" true}}))
+
 (defn setup-medium-editor [owner]
-  (let [editor (new js/MediumEditor "textarea.body-editor" (clj->js editor-options))]
-    (om/set-state! owner :medium-editor editor)))
+  (when (and (om/get-state owner :did-mount)
+             (om/get-state owner :did-load-resources))
+    (let [editor (new js/MediumEditor "textarea.body-editor" medium-options)]
+      (om/set-state! owner :medium-editor editor))))
 
 (defcomponent edit-topic [{:keys [section section-data] :as data} owner options]
 
   (init-state [_]
-    (cdr/add-style! "/css/medium-editor/medium-editor.min.css")
-    (cdr/add-style! "/css/medium-editor/beagle.min.css")
+    (cdr/add-style! "/lib/medium-editor/css/medium-editor.min.css")
+    (cdr/add-style! "/lib/medium-editor/css/themes/beagle.min.css")
+    (cdr/add-script! "/lib/medium-editor/js/medium-editor.js"
+                      (fn []
+                        (om/set-state! owner :did-load-resources true)
+                        (setup-medium-editor owner)))
     {:title (:title section-data)
      :headline (:headline section-data)
      :body (:body section-data)
-     :medium-editor nil})
+     :medium-editor nil
+     :did-mount false
+     :did-load-resources false})
 
   (will-mount [_]
     ((:navbar-editing-cb options) true "Edit")
@@ -49,6 +65,7 @@
     (remove-navbar-channels))
 
   (did-mount [_]
+    (om/set-state! owner :did-mount true)
     (setup-medium-editor owner)
     (let [save-ch (utils/get-channel "save-bt-navbar")]
       (go (loop []
@@ -79,4 +96,6 @@
         (dom/textarea #js {:ref "topic-body"
                            :className "body-editor"
                            :value body
-                           :onChange #(om/set-state! owner :body (.. % -target -value))})))))
+                           :onChange (fn [e]
+                                       (println "onChange body:" (.. e -target -value))
+                                       (om/set-state! owner :body (.. e -target -value)))})))))
