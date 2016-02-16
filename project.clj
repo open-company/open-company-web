@@ -27,7 +27,6 @@
     [com.andrewmcveigh/cljs-time "0.4.0"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     [funcool/cuerdas "0.7.1"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
     [cljsjs/react "0.14.3-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
-    [cljsjs/medium-editor "4.8.0-0"] ; React port of the medium-editor https://github.com/yabwe/medium-editor
   ]
 
   :plugins [
