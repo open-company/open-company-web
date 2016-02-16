@@ -19,33 +19,36 @@
   (utils/remove-channel "save-bt-navbar")
   (utils/remove-channel "cancel-bt-navbar"))
 
-(def medium-options (clj->js {
+(defn medium-options [owner]
+  (clj->js {
     "toolbar" #js {
       "buttons" #js ["bold"
                      "italic"
                      "underline"
-                     "anchor"
-                     "image"
-                     "quote"
-                     "orderedlist"
-                     "unorderedlist"
+                     "strikethrough"
                      "h1"
+                     "unorderedlist"
+                     "orderedlist"
+                     "orderedlist"
+                     "anchor"
                      "removeFormat"]
+      "relativeContainer" (sel1 [:div.toolbar-container])
       "static" true
       "align" "left"
-      "sticky" true}}))
+      "updateOnEmptySelection" true
+      }}))
 
 (defn setup-medium-editor [owner]
   (when (and (om/get-state owner :did-mount)
              (om/get-state owner :did-load-resources))
-    (let [editor (new js/MediumEditor "textarea.body-editor" medium-options)]
+    (let [editor (new js/MediumEditor "div.body-editor" (medium-options owner))]
       (om/set-state! owner :medium-editor editor))))
 
 (defcomponent edit-topic [{:keys [section section-data] :as data} owner options]
 
   (init-state [_]
     (cdr/add-style! "/lib/medium-editor/css/medium-editor.min.css")
-    (cdr/add-style! "/lib/medium-editor/css/themes/beagle.min.css")
+    (cdr/add-style! "/lib/medium-editor/css/themes/tim.min.css")
     (cdr/add-script! "/lib/medium-editor/js/medium-editor.js"
                       (fn []
                         (om/set-state! owner :did-load-resources true)
@@ -72,7 +75,7 @@
         (let [change (<! save-ch)]
           (let [section-data {:title (om/get-state owner :title)
                               :headline (om/get-state owner :headline)
-                              :body (.-innerHTML (om/get-ref owner "topic-body"))}]
+                              :body (.-innerHTML (sel1 [:div.body-editor]))}]
             (api/partial-update-section section section-data)
             ((:dismiss-topic-editing-cb options) true))))))
     (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
@@ -93,9 +96,10 @@
                         :value headline
                         :onChange #(om/set-state! owner :headline (.. % -target -value))}))
       (dom/div {:class "edit-topic-body"}
-        (dom/textarea #js {:ref "topic-body"
-                           :className "body-editor"
-                           :value body
-                           :onChange (fn [e]
-                                       (println "onChange body:" (.. e -target -value))
-                                       (om/set-state! owner :body (.. e -target -value)))})))))
+        (dom/div #js {:ref "topic-body"
+                      :className "body-editor"
+                      :dangerouslySetInnerHTML (clj->js {"__html" body})
+                      :onChange (fn [e]
+                                  (om/set-state! owner :body (.. e -target -value)))})
+        (dom/div #js {:className "toolbar-container"
+                      :ref "toolbar-container"})))))

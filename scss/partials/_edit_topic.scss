@@ -31,7 +31,18 @@ div.edit-topic {
   }
 
   div.edit-topic-body {
-    textarea {
+    border-bottom: 0px solid black;
+
+    div.toolbar-container {
+      height: 40px;
+      max-width: 542px;
+
+      div.medium-editor-toolbar{
+        position: relative !important;
+      }
+    }
+    div.body-editor {
+      margin-bottom: 15px;
       font-size: 14px;
     }
   }
