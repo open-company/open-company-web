@@ -22,8 +22,8 @@
 (def tinymce-options #js {
   :selector "div.body-editor"
   :theme "advanced"
-  :toolbar "bold,italic,underline,separator,strikethrough,style-h1, bullist,numlist,link,unlink"
-  :plugins "link,stylebuttons"
+  :toolbar "bold,italic,underline,separator,strikethrough,style-h1, bullist,numlist,link,unlink,image"
+  :plugins "link,image,stylebuttons"
   :menubar false
   :statusbar false
   :theme_advanced_buttons1 ""
