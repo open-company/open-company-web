@@ -1,10 +1,14 @@
 div.topic-list {
 
   div.topic {
+    margin-left: 10px;
+    margin-right: 10px;
     padding-left: 10px;
     padding-right: 10px;
+    margin-bottom: 10px;
     min-height: 100px;
     border-bottom: 1px solid #DFDFDF; /* gray */
+    background-color: white;
 
     div.topic-title {
       padding-top: 20px;

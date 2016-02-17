@@ -5,7 +5,7 @@
 
 (defcomponent manage-topics [data owner options]
   (render [_]
-    (dom/div {:class "topic-row manage-topics"
+    (dom/div {:class "topic-row manage-topics group"
               :key "topic-row-manage-topics"}
       (dom/div {:class "manage-topics-internal"
                 :on-click (:manage-topics-cb options)}
