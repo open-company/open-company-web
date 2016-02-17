@@ -34,14 +34,14 @@
          '[deraen.boot-sass :refer [sass]])
 
 (deftask dev []
-  (comp (sift :include #{#"^public/js/compiled/devcards"
+  (comp (serve :handler 'open-company-web.lib.server/boot-handler
+               :reload true
+               :port 3449)
+        (sift :include #{#"^public/js/compiled/devcards"
+                         #"^public/js/compiled/out_devcards"
                          #"^public/js/compiled/out"
                          #"^public/js/compiled/open_company.js"}
               :invert true)
-        (show :fileset true)
-        (serve :handler 'open-company-web.lib.server/boot-handler
-               :reload true
-               :port 3449)
         (watch)
         (reload :asset-path "/public"
                 :on-jsload 'open-company-web.core/on-js-reload)
