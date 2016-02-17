@@ -8,7 +8,7 @@
   (render [_]
     (dom/div {:class "row"}
       (dom/div {:class "login-container col-md-5 col-md-offset-1"}
-        (dom/h1 "OPENcompany login with Slack:")
+        (dom/h1 "OpenCompany login with Slack:")
         (case
 
           (:loading data)
@@ -18,7 +18,7 @@
           (dom/div {}
             (if-let [access (:access data)]
               (let [msg (if (= access "denied")
-                "OPENcompany requires verification with your Slack team. Please allow access."
+                "OpenCompany requires verification with your Slack team. Please allow access."
                 "There is a temporary error validating with Slack. Please try again later.")]
                 (dom/h4 {:class "login-error-message"} msg)))
             (om/build login-button data)))))))
