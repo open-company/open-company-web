@@ -25,7 +25,7 @@
 (defmethod action :entry [db [_ {:keys [links]}]]
   (if-let [co (med/find-first #(= (:rel %) "company") links)]
     (router/nav! (str (:href co) "/dashboard"))
-    (if (med/find-first #(= (:rel %) "create-company") links)
+    (if (med/find-first #(= (:rel %) "company-create") links)
       (router/nav! "/create-company")))
   db)
 
