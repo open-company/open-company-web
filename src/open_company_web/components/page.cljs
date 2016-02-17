@@ -18,7 +18,7 @@
           company-data (get data slug)
           profile-page (utils/in? (:route @router/path) "profile")]
 
-      (utils/update-page-title (str "OPENcompany - " (:name company-data)))
+      (utils/update-page-title (str "OpenCompany - " (:name company-data)))
 
       (dom/div {:class "company-container container"}
 
