@@ -74,5 +74,5 @@
                                    :company-data company-data
                                    :active-category active-category}
                                    {:opts {:section-name section-name}}))))
-            (when-not (:read-only company-data)
+            (when (and (not (:read-only company-data)) (pos? (count active-sections)))
               (om/build manage-topic {} {:opts {:manage-topic-cb #(manage-topic-cb owner options)}}))))))))
