@@ -48,17 +48,18 @@
 
   (render-state [_ {:keys [title headline body]}]
     (dom/div {:class "edit-topic"}
-      (dom/div {:class "edit-topic-title"}
-        (dom/input #js {:ref "topic-title"
-                        :maxLength 100
-                        :value title
-                        :onChange #(om/set-state! owner :title (.. % -target -value))}))
-      (dom/div {:class "edit-topic-headline"}
-        (dom/input #js {:ref "topic-headline"
-                        :maxLength 100
-                        :value headline
-                        :onChange #(om/set-state! owner :headline (.. % -target -value))}))
-      (dom/div {:class "edit-topic-body"}
-        (dom/div #js {:ref "topic-body"
-                      :contentEditable true
-                      :dangerouslySetInnerHTML (clj->js {"__html" body})})))))
+      (dom/div {:class "edit-topic-internal group"}
+        (dom/div {:class "edit-topic-title"}
+          (dom/input #js {:ref "topic-title"
+                          :maxLength 100
+                          :value title
+                          :onChange #(om/set-state! owner :title (.. % -target -value))}))
+        (dom/div {:class "edit-topic-headline"}
+          (dom/input #js {:ref "topic-headline"
+                          :maxLength 100
+                          :value headline
+                          :onChange #(om/set-state! owner :headline (.. % -target -value))}))
+        (dom/div {:class "edit-topic-body"}
+          (dom/div #js {:ref "topic-body"
+                        :contentEditable true
+                        :dangerouslySetInnerHTML (clj->js {"__html" body})}))))))
