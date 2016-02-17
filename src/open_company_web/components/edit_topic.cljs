@@ -19,10 +19,21 @@
   (utils/remove-channel "save-bt-navbar")
   (utils/remove-channel "cancel-bt-navbar"))
 
+(def tinymce-options #js {
+  :selector "div.body-editor"
+  :theme "advanced"
+  :toolbar "bold,italic,underline,separator,strikethrough,style-h1, bullist,numlist,link,unlink"
+  :plugins "link,stylebuttons"
+  :menubar false
+  :statusbar false
+  :theme_advanced_buttons1 ""
+  :theme_advanced_buttons2 ""
+  :theme_advanced_buttons3 ""})
+
 (defn setup-medium-editor [owner]
   (when (and (om/get-state owner :did-mount)
              (om/get-state owner :did-load-resources))
-    (let [tinymce-editor (.init js/tinymce #js {:selector "div.body-editor"})]
+    (let [tinymce-editor (.init js/tinymce (clj->js tinymce-options))]
       (om/set-state! owner :tinymce-editor tinymce-editor))))
 
 (defcomponent edit-topic [{:keys [section section-data] :as data} owner options]
