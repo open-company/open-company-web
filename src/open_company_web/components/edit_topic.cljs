@@ -19,37 +19,16 @@
   (utils/remove-channel "save-bt-navbar")
   (utils/remove-channel "cancel-bt-navbar"))
 
-(defn medium-options [owner]
-  (clj->js {
-    "toolbar" #js {
-      "buttons" #js ["bold"
-                     "italic"
-                     "underline"
-                     "strikethrough"
-                     "h1"
-                     "unorderedlist"
-                     "orderedlist"
-                     "orderedlist"
-                     "anchor"
-                     "removeFormat"]
-      "relativeContainer" (sel1 [:div.toolbar-container])
-      "static" true
-      "align" "left"
-      "updateOnEmptySelection" true
-      }}))
-
 (defn setup-medium-editor [owner]
   (when (and (om/get-state owner :did-mount)
              (om/get-state owner :did-load-resources))
-    (let [editor (new js/MediumEditor "div.body-editor" (medium-options owner))]
-      (om/set-state! owner :medium-editor editor))))
+    (let [tinymce-editor (.init js/tinymce #js {:selector "div.body-editor"})]
+      (om/set-state! owner :tinymce-editor tinymce-editor))))
 
 (defcomponent edit-topic [{:keys [section section-data] :as data} owner options]
 
   (init-state [_]
-    (cdr/add-style! "/lib/medium-editor/css/medium-editor.min.css")
-    (cdr/add-style! "/lib/medium-editor/css/themes/tim.min.css")
-    (cdr/add-script! "/lib/medium-editor/js/medium-editor.js"
+    (cdr/add-script! "/lib/tinymce/tinymce.min.js"
                       (fn []
                         (om/set-state! owner :did-load-resources true)
                         (setup-medium-editor owner)))
@@ -57,6 +36,7 @@
      :headline (:headline section-data)
      :body (:body section-data)
      :medium-editor nil
+     :tinymce-editor nil
      :did-mount false
      :did-load-resources false})
 
