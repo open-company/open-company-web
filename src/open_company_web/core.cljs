@@ -54,7 +54,7 @@
         (utils/redirect! "/")))
     (do
       (when (contains? query-params :login-redirect)
-        (cook/set-cookie! :login-redirect (:login-redirect query-params)))
+        (cook/set-cookie! :login-redirect (:login-redirect query-params) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
       ;; save route
       (router/set-route! ["login"] {})
       (swap! app-state assoc :loading true)
