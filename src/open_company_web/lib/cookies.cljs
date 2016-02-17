@@ -10,11 +10,9 @@
   ([c-name c-value expiracy]
     (set-cookie! c-name c-value expiracy "/"))
   ([c-name c-value expiracy c-path]
-    (.set cookies-static-obj (name c-name) c-value expiracy c-path))
+    (set-cookie! c-name c-value expiracy c-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
   ([c-name c-value expiracy c-path c-domain c-secure]
-    (if (= c-domain "localhost")
-      (.set cookies-static-obj (name c-name) c-value expiracy c-path)
-      (.set cookies-static-obj (name c-name) c-value expiracy c-path c-domain c-secure))))
+    (.set cookies-static-obj (name c-name) c-value expiracy c-path c-domain c-secure)))
 
 (defn get-cookie [c-name]
   (.get cookies-static-obj (name c-name)))
