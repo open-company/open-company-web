@@ -53,7 +53,7 @@
             new-ret (if (utils/in? ret new-el)
                       ret
                       (conj ret new-el))]
-       (recur new-ret (next secs))))))
+        (recur new-ret (next secs))))))
 
 (defn sorted-active-topics [sorted-sections active-topics]
   (loop [ret []
@@ -79,7 +79,7 @@
           active-topics (get-in (:company-data data) [:sections (keyword active-category)])
           all-sections (:new-sections options)
           category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
-          sections-list (vec (map :name category-sections))
+          sections-list (vec (map :section-name category-sections))
           cleaned-sections (ordered-sections active-topics sections-list)]
       {:active-topics active-topics
        :sorted-sections cleaned-sections}))
@@ -90,7 +90,6 @@
         (let [change (<! save-ch)]
           (let [sorted-sections (om/get-state owner :sorted-sections)
                 active-topics (om/get-state owner :active-topics)]
-            (println "going to save: " (sorted-active-topics sorted-sections active-topics))
             ((:save-sections-cb options) (sorted-active-topics sorted-sections active-topics)))))))
     (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
       (go (loop []
