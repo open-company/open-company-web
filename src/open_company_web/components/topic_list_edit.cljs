@@ -52,7 +52,7 @@
             new-ret (if (utils/in? ret new-el)
                       ret
                       (conj ret new-el))]
-       (recur new-ret (next secs))))))
+        (recur new-ret (next secs))))))
 
 (defn sorted-active-topics [sorted-sections active-topics]
   (loop [ret []
@@ -74,7 +74,7 @@
           active-topics (get-in (:company-data data) [:sections (keyword active-category)])
           all-sections (:new-sections options)
           category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
-          sections-list (vec (map :name category-sections))
+          sections-list (vec (map :section-name category-sections))
           cleaned-sections (ordered-sections active-topics sections-list)]
       {:active-topics active-topics
        :sorted-sections cleaned-sections}))

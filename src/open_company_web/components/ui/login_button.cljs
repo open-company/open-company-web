@@ -4,7 +4,8 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.api :as api]
             [open-company-web.lib.cookies :as cook]
-            [open-company-web.router :as router]))
+            [open-company-web.router :as router]
+            [open-company-web.local-settings :as ls]))
 
 (defcomponent login-button [data owner]
   (render [_]
@@ -14,6 +15,6 @@
                    :on-click (fn [e]
                     (.preventDefault e)
                     (when-not (.startsWith current-token "/login")
-                      (cook/set-cookie! :login-redirect current-token))
+                      (cook/set-cookie! :login-redirect current-token (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
                     (set! (.-location js/window) full-url))}
         "Sign in / Sign up"))))

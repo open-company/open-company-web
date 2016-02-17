@@ -32,12 +32,14 @@
                 cat-node-style (.-style cat-node)]
             (if (>= scroll-top @max-scroll-top)
               (do
-                (gstyle/setStyle fix-top-margin-scrolling #js {:margin-top "44px"})
+                (when fix-top-margin-scrolling
+                  (gstyle/setStyle fix-top-margin-scrolling #js {:margin-top "44px"}))
                 (gstyle/setStyle cat-node #js {:position "fixed"
                                                :top "50px"
                                                :width (str win-width "px")}))
               (do
-                (gstyle/setStyle fix-top-margin-scrolling #js {:margin-top "0px"})
+                (when fix-top-margin-scrolling
+                  (gstyle/setStyle fix-top-margin-scrolling #js {:margin-top "0px"}))
                 (gstyle/setStyle cat-node #js {:position "relative"
                                                :top "0px"
                                                :width (str win-width "px")})))

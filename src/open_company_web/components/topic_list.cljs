@@ -100,7 +100,7 @@
                                    {:opts {:section-name section-name
                                            :navbar-editing-cb navbar-editing-cb
                                            :show-hide-edit-topic-cb (partial show-hide-edit-topic-button owner)}}))))
-            (when-not (:read-only company-data)
+            (when (and (not (:read-only company-data)) (pos? (count active-sections)))
               (om/build manage-topics {} {:opts {:manage-topics-cb #(manage-topics-cb owner options)}}))
             (when-not (:read-only company-data)
               (dom/div #js {:className "topic-row floating-edit-topic-button"
