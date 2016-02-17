@@ -1,2 +1,0 @@
-{:require [open-company-web.core]
- :compiler-options {:asset-path "/js/compiled/open_company.out"}}

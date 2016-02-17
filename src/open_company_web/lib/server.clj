@@ -29,12 +29,3 @@
 
 (def handler
   (request-handler resources))
-
-;; Boot
-
-(defroutes boot-resources
-  (GET "/devcards" [] (devcards))
-  (GET "*" [] (index)))
-
-(def boot-handler
-  (wrap-resource boot-resources  "public"))
