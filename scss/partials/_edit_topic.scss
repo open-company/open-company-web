@@ -1,46 +1,69 @@
 div.edit-topic {
-  margin: 10px;
+  background-color: transparent;
+  padding: 10px;
 
-  & > div {
-    padding-top: 10px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  div.edit-topic-internal{
+    background-color: white;
+    min-height: 200px;
+    padding: 10px;
 
-    & > input, & > textarea {
-      border: 1px solid transparent;
-      width: 100%;
+    & > div {
+      padding-top: 10px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+      & > input, & > textarea {
+        border: 1px solid transparent;
+        width: 100%;
+      }
+    }
 
-      &:focus {
-        border: 1px solid black;
+    div.edit-topic-title {
+      input {
+        font-family: "#{$oc_headers_font}";
+        border: 1px solid transparent;
+        font-size: 20px;
+        width: 100%;
+
+        &:focus {
+          border: 1px solid black;
+          outline: none;
+        }
+      }
+    }
+
+    div.edit-topic-title {
+      input {
+        font-family: "#{$oc_headers_font}";
+        font-size: 20px;
+      }
+    }
+
+    div.edit-topic-headline {
+      input {
+        font-family: "#{$oc_headers_font}";
+        border: 1px solid transparent;
+        font-size: 18px;
+        width: 100%;
+
+        &:focus {
+          border: 1px solid black;
+          outline: none;
+        }
+      }
+    }
+
+    div.edit-topic-body {
+      div {
+        border: 1px solid transparent;
+        font-size: 14px;
         outline: none;
+
+        &:focus {
+          border: 1px solid black;
+          outline: none;
+        }
       }
     }
-  }
 
-  div.edit-topic-title {
-    input {
-      font-family: "#{$oc_headers_font}";
-      font-size: 20px;
-    }
-  }
-
-  div.edit-topic-headline {
-    input {
-      font-family: "#{$oc_headers_font}";
-      font-size: 18px;
-    }
-  }
-
-  div.edit-topic-body {
-    border-bottom: 0px solid black;
-
-    div.toolbar-container {
-      height: 40px;
-      max-width: 542px;
-
-      div.medium-editor-toolbar{
-        position: relative !important;
-      }
-    }
     div.body-editor {
       margin-bottom: 15px;
       font-size: 14px;
