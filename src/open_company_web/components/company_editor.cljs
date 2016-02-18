@@ -8,7 +8,7 @@
 
 (defcomponent company-editor [data owner]
   (render [_]
-    (utils/update-page-title "OPENcompany - Setup Your Company")
+    (utils/update-page-title "OpenCompany - Setup Your Company")
     (dom/div {:class "company-editor container"}
       (om/build navbar data)
       (dom/div {:class "container-fluid"}
