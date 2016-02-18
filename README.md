@@ -93,11 +93,6 @@ lein scss!
 
 If you've done it right, you'll have 4 terminal sessions running: API, Auth, Figwheel, and Sass.
 
-> **Note:** Alternatively you may try using `boot dev` instead of
-> the Figwheel and Sass commands. This requires [boot](http://boot-clj.com) to be
-> installed on your system. Consider this to not be the standard way to run Figwheel and Sass,
-> and if you run into issues, try lein.
-
 Open your browser to [http://localhost:3449/](http://localhost:3449/).
 
 This will auto compile and send all changes to the browser without the
