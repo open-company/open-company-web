@@ -158,15 +158,18 @@
                                          :section section-utils/first-section-placeholder}))
                 (dom/div {:class "category-sections-container"}
                   (for [section sections]
-                    (let [section-data ((keyword section) data)]
-                      (dom/div {}
-                        (om/build table-of-contents-item {
-                                            :category category
-                                            :section section
-                                            :read-only readonly-company
-                                            :title (or (:title section-data) (:title-placeholder section-data))
-                                            :updated-at (:updated-at section-data)
-                                            :show-popover #(show-popover % (name category) (:name section-data))})
-                        (when-not readonly-company
-                          (om/build add-section {:category (name category)
-                                                 :section (:section section-data)}))))))))))))))
+                    (let [section-data ((keyword section) data)
+                          placeholder? (:placeholder section-data)]
+                      (when-not (and readonly-company placeholder?)
+                        (dom/div {}
+                          (om/build table-of-contents-item
+                                  {:category category
+                                  :section section
+                                  :read-only readonly-company
+                                  :title (or (:title section-data) (:title-placeholder section-data))
+                                  :placeholder placeholder?
+                                  :updated-at (:updated-at section-data)
+                                  :show-popover #(show-popover % (name category) (:name section-data))})
+                          (when-not readonly-company
+                            (om/build add-section {:category (name category)
+                                                   :section (:section section-data)})))))))))))))))

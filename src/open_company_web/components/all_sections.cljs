@@ -20,10 +20,11 @@
                 :key all-sections-key}
         (for [section section-keys]
           (let [section-data (section company-data)]
-            (dom/div {}
-              (om/build section-selector {:section-data section-data
-                                          :section section
-                                          :currency (:currency company-data)
-                                          :loading (:loading company-data)})
-              (when (not= section (last section-keys))
-                (dom/hr {:class "section-separator" :size "0"})))))))))
+            (when-not (and (:read-only section-data) (:placeholder section-data))
+              (dom/div {}
+                (om/build section-selector {:section-data section-data
+                                            :section section
+                                            :currency (:currency company-data)
+                                            :loading (:loading company-data)})
+                (when (not= section (last section-keys))
+                    (dom/hr {:class "section-separator" :size "0"}))))))))))

@@ -129,15 +129,15 @@
             topic-scroll-top (utils/offset-top topic)]
         (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))))
 
-(defcomponent topic [data owner options]
+(defcomponent topic [data owner]
 
   (init-state [_]
     {:expanded false})
 
   (render [_]
-    (let [company-data (:company-data data)
-          section (keyword (:section-name options))
-          section-data (company-data section)
+    (let [currency (:currency data)
+          section (:section-name data)
+          section-data (:section-data data)
           expanded (om/get-state owner :expanded)
           section-body (get-body section-data section)]
       (dom/div #js {:className "topic"
@@ -151,20 +151,21 @@
         (dom/div {:class "topic-headline"}
           (cond
             (= section :finances)
-            (om/build topic-headline-finances (assoc section-data :expanded expanded) {:opts {:currency (:currency company-data)}})
+            (om/build topic-headline-finances (assoc section-data :expanded expanded) {:opts {:currency currency}})
 
             (= section :growth)
-            (om/build topic-headline-growth (assoc section-data :expanded expanded) {:opts {:currency (:currency company-data)}})
+            (om/build topic-headline-growth (assoc section-data :expanded expanded) {:opts {:currency currency}})
 
             :else
             (om/build topic-headline section-data)))
 
         ;; Topic date
-        (dom/div {:class "topic-date"}
-                 (str (utils/time-since (:updated-at section-data)) " ")
-                 (dom/label #js {:style #js {"opacity" (if expanded "1" "0")}
-                                 :ref "topic-date-author"}
-                            (str " by " (:name (:author section-data)))))
+        (when-not (:placeholder section-data)
+          (dom/div {:class "topic-date"}
+                   (str (utils/time-since (:updated-at section-data)) " ")
+                   (dom/label #js {:style #js {"opacity" (if expanded "1" "0")}
+                                   :ref "topic-date-author"}
+                              (str " by " (:name (:author section-data))))))
 
         ;; Topic body
         (dom/div #js {:className "topic-body"
@@ -174,7 +175,7 @@
             (= section :growth)
             (om/build growth {:section-data section-data
                               :section section
-                              :currency (:currency company-data)
+                              :currency currency
                               :actual-as-of (:updated-at section-data)
                               :read-only true}
                              {:opts {:show-title false
@@ -183,7 +184,7 @@
             (= section :finances)
             (om/build finances {:section-data section-data
                                 :section section
-                                :currency (:currency company-data)
+                                :currency currency
                                 :actual-as-of (:updated-at section-data)
                                 :read-only true}
                                {:opts {:show-title false

@@ -14,8 +14,8 @@
 
 (defcomponent company [data owner]
   (render [_]
-    (let [slug (:slug @router/path)
-          company-data ((keyword slug) data)
+    (let [slug         (keyword (:slug @router/path))
+          company-data (get data slug)
           profile-page (utils/in? (:route @router/path) "profile")]
 
       (utils/update-page-title (str "OpenCompany - " (:name company-data)))
@@ -48,11 +48,11 @@
               profile-page (om/build company-profile data)
 
               ;; All sections
-              (and (not (contains? data :loading)) (contains? data (keyword slug)))
+              (and (not (contains? data :loading)) (contains? data slug))
                 (om/build all-sections data)
 
               ;; Error fallback
               :else
               (dom/div
-                (dom/h2 (str (:slug @router/path) " not found"))
+                (dom/h2 (str (name slug) " not found"))
                 (om/build link {:href "/" :name "Back home"})))))))))

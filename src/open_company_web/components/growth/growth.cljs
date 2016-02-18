@@ -356,11 +356,12 @@
               ;; growth metric currently shown
               (when (and focus (seq (:metric-data subsection-data)))
                 (om/build growth-metric subsection-data))))
-          (om/build update-footer {:updated-at (:updated-at section-data)
-                                   :author (:author section-data)
-                                   :section :growth
-                                   :editing (or title-editing notes-editing data-editing)
-                                   :notes false})
+          (when-not (:placeholder section-data)
+            (om/build update-footer {:updated-at (:updated-at section-data)
+                                     :author (:author section-data)
+                                     :section :growth
+                                     :editing (or title-editing notes-editing data-editing)
+                                     :notes false}))
           (when-not (or (and (empty? (:body notes-data))  ; there aren't notes
                              read-only)                   ; and it's read only
                         metadata-editing)                 ; or is editing the metadata

@@ -67,12 +67,14 @@
               active-sections (get-in company-data [:sections active-category])]
           (dom/div {:class "topic-list fix-top-margin-scrolling"}
             (dom/div {:class "topic-list-internal"}
-              (for [section-name active-sections]
+              (for [section-name active-sections
+                    :let [sd (->> section-name keyword (get company-data))]]
                 (dom/div {:class "topic-row"
                           :key (str "topic-row-" (name section-name))}
-                  (om/build topic {:loading (:loading company-data)
-                                   :company-data company-data
-                                   :active-category active-category}
-                                   {:opts {:section-name section-name}}))))
+                  (when-not (and (:read-only company-data) (:placeholder sd))
+                    (om/build topic {:loading (:loading company-data)
+                                     :company-data company-data
+                                     :active-category active-category}
+                                     {:opts {:section-name section-name}})))))
             (when (and (not (:read-only company-data)) (pos? (count active-sections)))
               (om/build manage-topic {} {:opts {:manage-topic-cb #(manage-topic-cb owner options)}}))))))))
