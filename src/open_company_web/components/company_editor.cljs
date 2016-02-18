@@ -8,7 +8,7 @@
 
 (defcomponent company-editor [data owner]
   (render [_]
-    (utils/update-page-title "OPENcompany - Create your company")
+    (utils/update-page-title "OPENcompany - Setup Your Company")
     (dom/div {:class "company-editor container"}
       (om/build navbar data)
       (dom/div {:class "container-fluid"}
@@ -18,16 +18,16 @@
               (dom/label "Company Name")
               (dom/input {:type "text"
                           :class "form-control"
-                          :placeholder "e.g. Apple"
+                          :placeholder "Simple name without the Inc., LLC, etc. (e.g. Apple)"
                           :value (-> data :company-editor :name)
                           :on-change #(dis/dispatch! [:input [:company-editor :name] (.. % -target -value)])}))
             (dom/div {:class "form-group"}
-              (dom/label {:class "col"} "Tagline")
+              (dom/label {:class "col"} "Description")
               (dom/input {:type "text"
                           :class "form-control"
-                          :placeholder "e.g. Think different."
+                          :placeholder "Simple company description or tagline (e.g. 'A messaging app for teams')"
                           :value (-> data :company-editor :description)
                           :on-change #(dis/dispatch! [:input [:company-editor :description] (.. % -target -value)])}))
             (dom/button {:class "btn btn-primary"
                          :on-click #(do (.preventDefault %) (dis/dispatch! [:company-submit]))}
-                        "Create Company")))))))
+                        "Setup Your Company")))))))
