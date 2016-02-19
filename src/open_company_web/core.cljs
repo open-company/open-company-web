@@ -4,6 +4,7 @@
             [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.components.page :refer (company)]
+            [open-company-web.components.company-editor :refer (company-editor)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
@@ -11,6 +12,7 @@
             [open-company-web.components.login :refer (login)]
             [open-company-web.lib.raven :refer (raven-setup)]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.actions]
             [open-company-web.dispatcher :refer (app-state)]
             [open-company-web.api :as api]
             [goog.events :as events]
@@ -34,6 +36,7 @@
   (router/set-route! ["companies"] {})
   ;; load data from api
   (swap! app-state assoc :loading true)
+  (api/get-entry-point)
   (api/get-companies)
   ;; render component
   (om/root list-companies app-state {:target target}))
@@ -91,6 +94,9 @@
     (defroute home-page-route "/" []
       (home-handler target))
 
+    (defroute company-create-route "/create-company" []
+      (om/root company-editor app-state {:target target}))
+
     (defroute list-page-route "/companies" []
       (home-handler target))
 
@@ -114,12 +120,13 @@
       ;; render component
       (om/root page-not-found app-state {:target target}))
 
-    (def dispatch!
+    (def route-dispatch!
       (secretary/uri-dispatcher [login-route
                                  home-page-route
                                  list-page-route-slash
                                  list-page-route
                                  company-route
+                                 company-create-route
                                  company-profile-route
                                  company-dashboard-route
                                  user-profile-route
@@ -144,7 +151,7 @@
         ; check if the user is logged in
         (login-wall)
         ;; dispatch on the token
-        (dispatch! (router/get-token))))))
+        (route-dispatch! (router/get-token))))))
 
 (defonce history
   (doto (router/make-history)
@@ -158,4 +165,4 @@
   ;; your application
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
   (.clear js/console)
-  (dispatch! (router/get-token)))
+  (route-dispatch! (router/get-token)))

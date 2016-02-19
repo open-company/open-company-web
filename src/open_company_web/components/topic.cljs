@@ -168,9 +168,9 @@
   (render-state [_ {:keys [editing expanded show-edit-button] :as state}]
     (let [section (keyword section-name)
           section-data (get company-data section)
-          expanded (om/get-state owner :expanded)
           section-body (get-body section-data section)
-          headline-options {:opts {:currency (:currency company-data)}}
+          currency (:currency company-data)
+          headline-options {:opts {:currency currency}}
           headline-data (assoc section-data :expanded expanded)]
       (dom/div #js {:className "topic"
                     :ref "topic"
@@ -181,14 +181,23 @@
 
         ;; Topic headline
         (dom/div {:class "topic-headline"}
-          (om/build (headline-component section) headline-data headline-options))
+          (cond
+            (= section :finances)
+            (om/build topic-headline-finances headline-data headline-options)
+
+            (= section :growth)
+            (om/build topic-headline-growth headline-data headline-options)
+
+            :else
+            (om/build topic-headline section-data)))
 
         ;; Topic date
-        (dom/div {:class "topic-date"}
-          (str (utils/time-since (:updated-at section-data)) " ")
-          (dom/label #js {:style #js {"opacity" (if expanded "1" "0")}
-                          :ref "topic-date-author"}
-            (str " by " (:name (:author section-data)))))
+        (when-not (:placeholder section-data)
+          (dom/div {:class "topic-date"}
+                   (str (utils/time-since (:updated-at section-data)) " ")
+                   (dom/label #js {:style #js {"opacity" (if expanded "1" "0")}
+                                   :ref "topic-date-author"}
+                              (str " by " (:name (:author section-data))))))
 
         ;; Topic body
         (dom/div #js {:className "topic-body"
@@ -200,7 +209,7 @@
             (= section :growth)
             (om/build growth {:section-data section-data
                               :section section
-                              :currency (:currency company-data)
+                              :currency currency
                               :actual-as-of (:updated-at section-data)
                               :read-only true}
                              {:opts {:show-title false
@@ -209,7 +218,7 @@
             (= section :finances)
             (om/build finances {:section-data section-data
                                 :section section
-                                :currency (:currency company-data)
+                                :currency currency
                                 :actual-as-of (:updated-at section-data)
                                 :read-only true}
                                {:opts {:show-title false

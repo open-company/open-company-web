@@ -325,11 +325,12 @@
 
                 "runway"
                 (om/build runway subsection-data)))
-            (om/build update-footer {:updated-at (:updated-at section-data)
-                                     :author (:author section-data)
-                                     :section :finances
-                                     :editing (or title-editing notes-editing data-editing)
-                                     :notes false})
+            (when-not (:placeholder section-data)
+              (om/build update-footer {:updated-at (:updated-at section-data)
+                                       :author (:author section-data)
+                                       :section :finances
+                                       :editing (or title-editing notes-editing data-editing)
+                                       :notes false}))
             (when (or (seq (:body notes-data))
                       (not read-only))
               (om/build rich-editor {:editing notes-editing

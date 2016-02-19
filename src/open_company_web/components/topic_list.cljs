@@ -96,15 +96,17 @@
               active-sections (get-in company-data [:sections active-category])]
           (dom/div {:class "topic-list fix-top-margin-scrolling"}
             (dom/div {:class "topic-list-internal"}
-              (for [section-name active-sections]
+              (for [section-name active-sections
+                    :let [sd (->> section-name keyword (get company-data))]]
                 (dom/div {:class "topic-row"
                           :key (str "topic-row-" (name section-name))}
-                  (om/build topic {:loading (:loading company-data)
-                                   :company-data company-data
-                                   :active-category active-category}
-                                   {:opts {:section-name section-name
-                                           :navbar-editing-cb navbar-editing-cb
-                                           :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)}}))))
+                  (when-not (and (:read-only company-data) (:placeholder sd))
+                    (om/build topic {:loading (:loading company-data)
+                                     :company-data company-data
+                                     :active-category active-category}
+                                     {:opts {:section-name section-name
+                                             :navbar-editing-cb navbar-editing-cb
+                                             :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)}})))))
             (when (and (not (:read-only company-data)) (pos? (count active-sections)))
               (om/build manage-topics {} {:opts {:manage-topics-cb #(manage-topics-cb owner options)}}))
             (when-not (:read-only company-data)
