@@ -1,6 +1,7 @@
 (ns ^:figwheel-always open-company-web.core
   (:require [om.core :as om :include-macros true]
             [secretary.core :as secretary :refer-macros (defroute)]
+            [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.components.page :refer (company)]
             [open-company-web.components.company-editor :refer (company-editor)]
@@ -9,6 +10,7 @@
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
             [open-company-web.components.login :refer (login)]
+            [open-company-web.components.ui.loading :refer (loading)]
             [open-company-web.lib.raven :refer (raven-setup)]
             [open-company-web.lib.utils :as utils]
             [open-company-web.actions]
@@ -27,8 +29,13 @@
 ;; setup Sentry error reporting
 (defonce raven (raven-setup))
 
+(defn inject-loading []
+  (let [target (sel1 [:div#oc-loading])]
+    (om/root loading app-state {:target target})))
+
 ;; Company list
 (defn home-handler [target]
+  (inject-loading)
   ;; clean the caches
   (utils/clean-company-caches)
   ;; save route
@@ -42,6 +49,7 @@
 
 ;; Handle successful and unsuccessful logins
 (defn login-handler [target query-params]
+  (inject-loading)
   (utils/clean-company-caches)
   (if (contains? query-params :jwt)
     (do ; contains :jwt so auth went well
@@ -69,6 +77,7 @@
 
 ;; Component specific to a company
 (defn company-handler [route target component params]
+  (inject-loading)
   (utils/clean-company-caches)
   (let [slug (:slug (:params params))
         query-params (:query-params params)]
@@ -84,7 +93,7 @@
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
-(if-let [target (.getElementById js/document "app")]
+(if-let [target (sel1 [:div#app])]
   (do
 
     (defroute login-route "/login" {:keys [query-params]}
