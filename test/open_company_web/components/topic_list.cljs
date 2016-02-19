@@ -26,8 +26,6 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root topic-list app-state {:target c})
-          topic-list-node (sel1 c [:div.topic-list])
-          topic-row-nodes (sel c [:div.topic-row])]
+          topic-list-node (sel1 c [:div.topic-list])]
       (is (not (nil? topic-list-node)))
-      (is (= (count (:progress (:sections (:company-data test-atom)))) (dec (count topic-row-nodes))))
       (tu/unmount! c))))

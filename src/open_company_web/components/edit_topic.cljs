@@ -48,7 +48,6 @@
     {:title (:title section-data)
      :headline (:headline section-data)
      :body (:body section-data)
-     :medium-editor nil
      :tinymce-editor nil
      :did-mount false
      :did-load-resources false})
@@ -81,11 +80,13 @@
       (dom/div {:class "edit-topic-internal group"}
         (dom/div {:class "edit-topic-title"}
           (dom/input #js {:ref "topic-title"
+                          :className "edit-topic-title-input"
                           :maxLength 100
                           :value title
                           :onChange #(om/set-state! owner :title (.. % -target -value))}))
         (dom/div {:class "edit-topic-headline"}
           (dom/input #js {:ref "topic-headline"
+                          :className "edit-topic-headline-input"
                           :maxLength 100
                           :value headline
                           :onChange #(om/set-state! owner :headline (.. % -target -value))}))
