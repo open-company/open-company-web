@@ -139,7 +139,7 @@
 
       (if-not expanded
         ;; show the edit button if the topic body is empty
-        (let [section (keyword (:section options))
+        (let [section (keyword (:section-name options))
               section-data (get (:company-data data) section)]
           (when (clojure.string/blank? (:body section-data))
             (topic-body-click nil owner options false)))
