@@ -44,7 +44,7 @@
   (utils/scroll-to-y 0))
 
 (defn toggle-edit-topic-button [owner show section-name]
-  (om/set-state! owner :last-expanded-section (if show section-name nil))
+  (om/set-state! owner :last-expanded-section (when show section-name))
   ; avoid to do animate if it's not needed
   (when-not (= show (om/get-state owner :show-topic-edit-button))
     (when-let [edit-topic-button (om/get-ref owner "edit-topic-button")]
