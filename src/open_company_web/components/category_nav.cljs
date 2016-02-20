@@ -13,38 +13,12 @@
 (def max-scroll-top (atom -1))
 
 (defn check-scroll [owner]
-  (events/listen
-    js/window
-    EventType.SCROLL
-    (fn[e]
-      (when-let [cat-node (om/get-ref owner "category-nav")]
-        (let [nav (sel1 :nav.navbar)
-              scroll-top (.-scrollTop (sel1 :body))
-              fix-top-margin-scrolling (sel1 :.fix-top-margin-scrolling)
-              win-width (.-offsetWidth js/window)]
-          (when (= @max-scroll-top -1)
-            (let [initial-offset-top (utils/offset-top cat-node)
-                  nav-height (.-offsetHeight nav)]
-              (reset! max-scroll-top (- initial-offset-top nav-height))))
-          (let [actual-position (.-position (.-style cat-node))
-                next-position (if (>= scroll-top @max-scroll-top) "fixed" "relative")
-                will-change (not= actual-position next-position)
-                cat-node-style (.-style cat-node)]
-            (if (>= scroll-top @max-scroll-top)
-              (do
-                (when fix-top-margin-scrolling
-                  (gstyle/setStyle fix-top-margin-scrolling #js {:margin-top "44px"}))
-                (gstyle/setStyle cat-node #js {:position "fixed"
-                                               :top "50px"
-                                               :width (str win-width "px")}))
-              (do
-                (when fix-top-margin-scrolling
-                  (gstyle/setStyle fix-top-margin-scrolling #js {:margin-top "0px"}))
-                (gstyle/setStyle cat-node #js {:position "relative"
-                                               :top "0px"
-                                               :width (str win-width "px")})))
-            (when will-change
-              (gstyle/setStyle cat-node #js {:transform "translate3d(0px,0px,0px)"}))))))))
+  (when-let [cat-node (om/get-ref owner "category-nav")]
+    (let [nav (sel1 :nav.navbar)]
+      (when (= @max-scroll-top -1)
+        (let [initial-offset-top (utils/offset-top cat-node)
+              nav-height (if nav (.-offsetHeight nav) 0)]
+          (reset! max-scroll-top (- initial-offset-top nav-height)))))))
 
 (defn category-click [data category-name e]
   ;; prevent the route reload
@@ -64,7 +38,7 @@
 
 (defn setup-body-min-height []
   (when-let [app-div (sel1 :div#app)]
-    (let [app-height (.-offsetHeight app-div)
+    (let [app-height (if app-div (.-offsetHeight app-div) 0)
           cur-min-height (.parseInt js/window (.-minHeight (.-style (sel1 :body))))
           fix-cur-min-height (if (js/isNaN cur-min-height) 0 cur-min-height)]
       (when (> app-height fix-cur-min-height)
