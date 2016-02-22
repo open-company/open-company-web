@@ -8,7 +8,8 @@
             [open-company-web.router :as router]
             [open-company-web.local-settings :as ls]
             [goog.events :as events]
-            [goog.style :as gstyle])
+            [goog.style :as gstyle]
+            [goog.events.EventType :as EventType])
   (:import [goog.events EventType]))
 
 (defonce company-header-pt (atom 0))
@@ -22,7 +23,7 @@
           company-name-offset-top (.-offsetTop company-name-container)]
       (events/listen
         js/window
-        EventType.SCROLL
+        EventType/SCROLL
         (fn [e]
           (let [scroll-top (.-scrollTop (.-body js/document))]
             (when (zero? @company-header-pt)
