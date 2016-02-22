@@ -73,7 +73,9 @@
                           :key (str "topic-row-" (name section-name))}
                   (when-not (and (:read-only company-data) (:placeholder sd))
                     (om/build topic {:loading (:loading company-data)
-                                     :company-data company-data
+                                     :section section-name
+                                     :section-data (get company-data (keyword section-name))
+                                     :currency (:currency company-data)
                                      :active-category active-category}
                                      {:opts {:section-name section-name}})))))
             (when (and (not (:read-only company-data)) (pos? (count active-sections)))
