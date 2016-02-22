@@ -38,6 +38,9 @@
     (let [tinymce-editor (.init js/tinymce (clj->js tinymce-options))]
       (om/set-state! owner :tinymce-editor tinymce-editor))))
 
+(defn body-content []
+  (.getContent (.-activeEditor js/tinymce)))
+
 (defcomponent edit-topic [{:keys [section section-data] :as data} owner options]
 
   (init-state [_]
@@ -67,7 +70,7 @@
         (let [change (<! save-ch)]
           (let [section-data {:title (om/get-state owner :title)
                               :headline (om/get-state owner :headline)
-                              :body (.-innerHTML (sel1 [:div.body-editor]))}]
+                              :body (body-content)}]
             (api/partial-update-section section section-data)
             ((:dismiss-topic-editing-cb options) true))))))
     (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]

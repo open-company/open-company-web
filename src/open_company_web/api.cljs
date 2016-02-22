@@ -153,7 +153,7 @@
                 dispatch-body {:body body
                                :section section-kw
                                :slug slug}]
-            (dispatcher/dispatch! [:revision dispatch-body])))))))
+            (dispatcher/dispatch! [:section dispatch-body])))))))
 
 (defn load-revision
   [revision slug section]

@@ -57,3 +57,5 @@ var jwt_decode = function(){};
 // TimyMCE
 var tinymce = function(){};
 tinymce.init = function(){};
+tinymce.activeEditor = {};
+tinymce.activeEditor.getContent = function(){};
