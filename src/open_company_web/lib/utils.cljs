@@ -541,3 +541,7 @@
            (new js/Array 0 (.-scrollTop toc))
            (new js/Array 0 top)
            oc-animation-duration))))
+
+(defn replace-svg []
+  (when (.-svgcss js/window)
+    (.setTimeout js/window #(.svgcss js/window) 1)))

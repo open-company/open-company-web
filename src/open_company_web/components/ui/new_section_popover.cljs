@@ -35,10 +35,6 @@
     1 "darkblue"
     2 "lightblue"))
 
-(defn replace-svg []
-  (when (.-svgcss js/window)
-    (.setTimeout js/window #(.svgcss js/window) 1)))
-
 (defn scroll-to-category [selected-category]
   (let [category-id (str "new-section-category-" selected-category)
         top (utils/scroll-top-with-id category-id)
@@ -50,11 +46,11 @@
 (defcomponent new-section-popover [data owner]
 
   (did-mount [_]
-    (replace-svg)
+    (utils/replace-svg)
     (.setTimeout js/window #(scroll-to-category (:selected-category data)) 200))
 
   (did-update [_ _ _]
-    (replace-svg)
+    (utils/replace-svg)
     (.setTimeout js/window #(scroll-to-category (:selected-category data)) 200))
 
   (render [_]
