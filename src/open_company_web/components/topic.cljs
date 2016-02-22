@@ -9,6 +9,7 @@
             [open-company-web.components.ui.charts :refer (column-chart)]
             [open-company-web.components.finances.finances :refer (finances)]
             [open-company-web.components.growth.growth :refer (growth)]
+            [open-company-web.local-settings :as ls]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as EventType]
@@ -73,7 +74,7 @@
 
 (defn topic-click [data owner options expanded]
   (let [topic (om/get-ref owner "topic")
-        topic-date-author (om/get-ref owner "topic-date-author")
+        topic-more (om/get-ref owner "topic-more")
         body-node (om/get-ref owner "topic-body")]
     (set! (.-height (.-style body-node)) "auto")
     (let [body-height (.-offsetHeight body-node)
@@ -110,12 +111,12 @@
             (.play growth-resize)
             (.play growth-fade)))
 
-      ; fade in/out author
+      ; Fade in/out 3 horizontal dots
       (.play
         (new Fade
-             topic-date-author
-             (if expanded 1 0)
+             topic-more
              (if expanded 0 1)
+             (if expanded 1 0)
              utils/oc-animation-duration))
 
       ; animate height
@@ -165,6 +166,12 @@
     {:expanded false
      :show-edit-button false})
 
+  (did-mount [_]
+    (utils/replace-svg))
+
+  (did-update [_ _ _]
+    (utils/replace-svg))
+
   (render-state [_ {:keys [editing expanded show-edit-button] :as state}]
     (let [section (keyword section-name)
           section-data (get company-data section)
@@ -177,7 +184,10 @@
                     :onClick #(topic-click data owner options expanded)}
 
         ;; Topic title
-        (dom/div {:class "topic-title oc-header"} (:title section-data))
+        (dom/div {:class "topic-header group"}
+          (dom/img {:class (str "topic-image svg")
+                    :src (str (:image section-data) "?" ls/deploy-key)})
+          (dom/div {:class "topic-title oc-header"} (:title section-data)))
 
         ;; Topic headline
         (dom/div {:class "topic-headline"}
@@ -191,13 +201,10 @@
             :else
             (om/build topic-headline section-data)))
 
-        ;; Topic date
-        (when-not (:placeholder section-data)
-          (dom/div {:class "topic-date"}
-                   (str (utils/time-since (:updated-at section-data)) " ")
-                   (dom/label #js {:style #js {"opacity" (if expanded "1" "0")}
-                                   :ref "topic-date-author"}
-                              (str " by " (:name (:author section-data))))))
+        (dom/div #js {:className "topic-more"
+                      :ref "topic-more"
+                      :style #js {:opacity (if expanded 0 1)}}
+          (dom/img {:src "/img/3dots-horizontal.png"}))
 
         ;; Topic body
         (dom/div #js {:className "topic-body"

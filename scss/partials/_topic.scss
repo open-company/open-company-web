@@ -10,10 +10,20 @@ div.topic-list {
     border-bottom: 1px solid #DFDFDF; /* gray */
     background-color: white;
 
-    div.topic-title {
+    div.topic-header {
       padding-top: 20px;
-      font-size: 19px;
-      font-weight: bold;
+
+      img.topic-image {
+        width: 30px;
+        height: 30px;
+        float: left;
+      }
+
+      div.topic-title {
+        float: left;
+        font-size: 19px;
+        font-weight: bold;
+      }
     }
 
     div.topic-headline {
@@ -51,6 +61,15 @@ div.topic-list {
             width: 100%;
           }
         }
+      }
+    }
+
+    div.topic-more {
+      text-align: center;
+
+      img {
+        width: 20px;
+        height: 20px;
       }
     }
 
