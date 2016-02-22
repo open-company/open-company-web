@@ -12,8 +12,9 @@
             [open-company-web.components.ui.manage-topics :refer (manage-topics)]
             [open-company-web.components.ui.edit-topic-button :refer (edit-topic-button)]
             [goog.fx.dom :refer (Fade)]
-            [goog.fx.Animation.EventType :as EventType]
+            [goog.fx.Animation.EventType :as AnimationEventType]
             [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [goog.style :refer (getStyle setStyle)]))
 
 (defn get-new-sections-if-needed [owner]
@@ -43,28 +44,35 @@
   ((:navbar-editing-cb options) true)
   (utils/scroll-to-y 0))
 
-(defn toggle-edit-topic-button [owner show section-name]
-  (om/set-state! owner :last-expanded-section (when show section-name))
+(defn toggle-edit-topic-button [owner & [section-name]]
+  (om/set-state! owner :last-expanded-section section-name)
   ; avoid to do animate if it's not needed
-  (when-not (= show (om/get-state owner :show-topic-edit-button))
-    (when-let [edit-topic-button (om/get-ref owner "edit-topic-button")]
-      (let [current-display (getStyle edit-topic-button "display")]
-        (when show
-          ; reset display rule if going to show
-          (setStyle edit-topic-button "display" "inline"))
-        (let [start (if (= current-display "none") 0 1)
-              end   (if (= current-display "none") 1 0)
-              fade-anim (new Fade
-                            edit-topic-button
-                            start
-                            end
-                            utils/oc-animation-duration)]
-          (doto fade-anim
-            (events/listen
-              EventType/FINISH
-              (fn [_]
-                (om/set-state! owner :show-topic-edit-button show)))
-            (.play)))))))
+  (when-let [edit-topic-button (om/get-ref owner "edit-topic-button")]
+    (let [is-showing (om/get-state owner :show-topic-edit-button)
+          current-display (getStyle edit-topic-button "display")]
+      (when-not is-showing
+        ; reset display rule if going to show
+        (setStyle edit-topic-button "display" "inline"))
+      (let [start (if (= current-display "none") 0 1)
+            end   (if (= current-display "none") 1 0)
+            fade-anim (new Fade
+                          edit-topic-button
+                          start
+                          end
+                          utils/oc-animation-duration)]
+        (doto fade-anim
+          (events/listen
+            AnimationEventType/FINISH
+            (fn [_]
+              (om/update-state! owner :show-topic-edit-button not)))
+          (.play))))))
+
+(defn force-edit-button [owner show & [section-name]]
+  (let [showing (om/get-state owner :show-topic-edit-button)]
+    (if (= show showing)
+      (when section-name
+        (om/set-state! owner :last-expanded-section section-name))
+      (toggle-edit-topic-button owner section-name))))
 
 (defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
 
@@ -106,6 +114,7 @@
                                      :active-category active-category}
                                      {:opts {:section-name section-name
                                              :navbar-editing-cb navbar-editing-cb
+                                             :force-edit-cb (partial force-edit-button owner)
                                              :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)}})))))
             (when (and (not (:read-only company-data)) (pos? (count active-sections)))
               (om/build manage-topics {} {:opts {:manage-topics-cb #(manage-topics-cb owner options)}}))
