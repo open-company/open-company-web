@@ -12,7 +12,7 @@
 
 (def company-header-default-height 50)
 
-(defn scroll-watch [owner]
+(defn watch-scroll [owner]
   (when-let [company-name-container (om/get-ref owner "company-name-container")]
     (let [category-nav (sel1 [:div.category-nav])
           company-header (om/get-ref owner "company-header")
@@ -20,14 +20,14 @@
           topic-list (sel1 [:div.topic-list])
           company-name-offset-top (.-offsetTop company-name-container)
           company-header-height (.-clientHeight company-header)
-          category-nav-height (.-clientHeight category-nav)
-          company-name-container-height (.-clientHeight company-name-container)
-          category-nav-pivot (- company-header-height category-nav-height company-name-container-height)]
+          company-name-container-height (.-clientHeight company-name-container)]
       (events/listen
         js/window
         EventType.SCROLL
         (fn [e]
-          (let [scroll-top (.-scrollTop (.-body js/document))]
+          (let [scroll-top (.-scrollTop (.-body js/document))
+                category-nav-height (.-clientHeight category-nav)
+                category-nav-pivot (+ (- company-header-height category-nav-height company-name-container-height) 7)]
             (if (> scroll-top company-name-offset-top)
               (do
                 (gstyle/setStyle company-name-container #js {:position "fixed"})
@@ -51,7 +51,7 @@
 (defcomponent company-header [data owner]
 
   (did-mount [_]
-    (scroll-watch owner))
+    (watch-scroll owner))
  
   (render [_]
     (let [company-data (:company-data data)]
