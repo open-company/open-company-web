@@ -15,15 +15,15 @@ div.oc-loading {
 
   div.oc-loading-internal {
     background: url("/img/loading.gif") no-repeat;
-    background-size: 64px 64px;
-    width: 64px;
-    height: 64px;
+    background-size: 102px 34px;
+    width: 102px;
+    height: 34px;
     position: relative;
     top: 50%;
     left: 50%;
-    margin-left: -32px;
-    margin-top: -32px;
+    margin-left: -51px;
+    margin-top: -17px;
 
-    @include image-2x("/img/loading@2x.gif", 64px, 64px);
+    @include image-2x("/img/loading@2x.gif", 102px, 34px);
   }
 }
