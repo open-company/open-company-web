@@ -1,7 +1,7 @@
 (ns open-company-web.dispatcher
   (:require [cljs-flux.dispatcher :as flux]))
 
-(defonce app-state (atom {}))
+(defonce app-state (atom {:loading false}))
 
 (defmulti action (fn [db [action-type & _]] action-type))
 
