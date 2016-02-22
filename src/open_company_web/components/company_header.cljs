@@ -11,20 +11,20 @@
             [goog.style :as gstyle])
   (:import [goog.events EventType]))
 
-(def company-header-pt (atom 0))
+(defonce company-header-pt (atom 0))
 
 (defn watch-scroll [owner]
   (when-let [company-name-container (om/get-ref owner "company-name-container")]
     (let [category-nav (sel1 [:div.category-nav])
           company-header (om/get-ref owner "company-header")
           company-description-container (om/get-ref owner "company-description-container")
-          topic-list (sel1 [:div.topic-list])]
+          topic-list (sel1 [:div.topic-list])
+          company-name-offset-top (.-offsetTop company-name-container)]
       (events/listen
         js/window
         EventType.SCROLL
         (fn [e]
-          (let [company-name-offset-top (.-offsetTop company-name-container)
-                scroll-top (.-scrollTop (.-body js/document))]
+          (let [scroll-top (.-scrollTop (.-body js/document))]
             (when (zero? @company-header-pt)
               (let [company-name-container-height (.-clientHeight company-name-container)
                     category-nav-height (.-clientHeight category-nav)
@@ -50,7 +50,8 @@
                                                    :left "0"})
                 (gstyle/setStyle topic-list #js {:margin-top "0px"})))
             (gstyle/setStyle category-nav #js {:webkitTransform "translate3d(0,0,0)"})
-            (gstyle/setStyle company-name-container #js {:webkitTransform "translate3d(0,0,0)"})))))))
+            (gstyle/setStyle company-name-container #js {:webkitTransform "translate3d(0,0,0)"})
+            (gstyle/setStyle company-description-container #js {:webkitTransform "translate3d(0,0,0)"})))))))
 
 (defcomponent company-header [data owner]
 
