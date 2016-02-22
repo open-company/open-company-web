@@ -10,24 +10,26 @@
             [goog.style :as gstyle])
   (:import [goog.events EventType]))
 
-(def company-header-default-height 50)
+(def company-header-pt (atom 0))
 
 (defn watch-scroll [owner]
   (when-let [company-name-container (om/get-ref owner "company-name-container")]
     (let [category-nav (sel1 [:div.category-nav])
           company-header (om/get-ref owner "company-header")
           company-description-container (om/get-ref owner "company-description-container")
-          topic-list (sel1 [:div.topic-list])
-          company-name-offset-top (.-offsetTop company-name-container)
-          company-header-height (.-clientHeight company-header)
-          company-name-container-height (.-clientHeight company-name-container)]
+          topic-list (sel1 [:div.topic-list])]
       (events/listen
         js/window
         EventType.SCROLL
         (fn [e]
-          (let [scroll-top (.-scrollTop (.-body js/document))
-                category-nav-height (.-clientHeight category-nav)
-                category-nav-pivot (+ (- company-header-height category-nav-height company-name-container-height) 7)]
+          (let [company-name-offset-top (.-offsetTop company-name-container)
+                scroll-top (.-scrollTop (.-body js/document))]
+            (when (zero? @company-header-pt)
+              (let [company-name-container-height (.-clientHeight company-name-container)
+                    category-nav-height (.-clientHeight category-nav)
+                    company-header-height (.-clientHeight company-header)
+                    category-nav-pivot (+ (- company-header-height category-nav-height company-name-container-height) 7)]
+                (reset! company-header-pt category-nav-pivot)))
             (if (> scroll-top company-name-offset-top)
               (do
                 (gstyle/setStyle company-name-container #js {:position "fixed"})
@@ -35,7 +37,7 @@
               (do
                 (gstyle/setStyle company-name-container #js {:position "relative"})
                 (gstyle/setStyle company-description-container #js {:marginTop "0px"})))
-            (if (> scroll-top category-nav-pivot)
+            (if (> scroll-top @company-header-pt)
               (do
                 (gstyle/setStyle category-nav #js {:position "fixed"
                                                    :top "50px"
@@ -46,12 +48,13 @@
                                                    :top "0"
                                                    :left "0"})
                 (gstyle/setStyle topic-list #js {:margin-top "0px"})))
-            ))))))
+            (gstyle/setStyle category-nav #js {:webkitTransform "translate3d(0,0,0)"})
+            (gstyle/setStyle company-name-container #js {:webkitTransform "translate3d(0,0,0)"})))))))
 
 (defcomponent company-header [data owner]
 
   (did-mount [_]
-    (watch-scroll owner))
+    (.setTimeout js/window #(watch-scroll owner) 500))
  
   (render [_]
     (let [company-data (:company-data data)]
