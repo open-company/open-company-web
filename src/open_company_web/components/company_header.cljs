@@ -6,6 +6,7 @@
             [open-company-web.components.ui.company-avatar :refer (company-avatar)]
             [open-company-web.components.category-nav :refer (category-nav)]
             [open-company-web.router :as router]
+            [open-company-web.local-settings :as ls]
             [goog.events :as events]
             [goog.style :as gstyle])
   (:import [goog.events EventType]))
@@ -61,11 +62,18 @@
       (dom/div #js {:className "company-header"
                     :ref "company-header"}
 
-        ;; Company logo
-        (dom/div {:class "container"}
-          (dom/img {:src (:logo company-data)
-                    :class "company-logo"
-                    :title (:name company-data)}))
+        (dom/div #js {:className "company-header-top group"}
+          ;; Company logo
+          (dom/div {:class "company-logo-container"}
+            (dom/img {:src (:logo company-data)
+                      :class "company-logo"
+                      :title (:name company-data)}))
+          ;; Buttons
+          (dom/div {:class "buttons-container"}
+            (dom/button {:class "oc-btn bullhorn"}
+              (dom/img {:src (str "/img/bullhorn.png?" ls/deploy-key)}))
+            (dom/button {:class "oc-btn 3dots"}
+              (dom/img {:src (str "/img/3dots.png?" ls/deploy-key)}))))
 
         ;; Company name
         (dom/div #js {:className "company-name-container oc-header"

@@ -1,9 +1,44 @@
 div.company-header{
   background-color: white;
 
-  img.company-logo {
-    width: auto;
-    height: 50px;
+  div.company-header-top {
+
+    div.company-logo-container{
+      padding-left: 15px;
+      width: 150px;
+      float: left;
+
+      img.company-logo {
+        width: auto;
+        height: 50px;
+      }
+    }
+
+    div.buttons-container {
+      padding-right: 15px;
+      width: 150px;
+      float: right;
+      text-align: right;
+
+      button.oc-btn {
+        width: 30px;
+        height: 30px;
+        margin-top: 15px;
+        margin-right: 0px;
+        margin-left: 10px;
+        border: 0px;
+        outline: none;
+
+        & img {
+          width: 30px;
+          height: 30px;
+        }
+
+        &:focus, &:active{
+          outline: none;
+        }
+      }
+    }
   }
 
   div.company-name-container {
