@@ -17,7 +17,7 @@
 
 (defn- get-body [section-data section]
   (if (#{:finances :growth} section)
-    (get-in section-data [:body :notes])
+    (get-in section-data [:notes :body])
     (:body section-data)))
 
 (defcomponent topic-headline [data owner]
@@ -69,8 +69,7 @@
 (defn topic-body-click [e owner options show-edit-button]
   (when e
     (.stopPropagation e))
-  ((:toggle-edit-topic-cb options) (not show-edit-button) (:section-name options))
-  (om/update-state! owner :show-edit-button not))
+  ((:toggle-edit-topic-cb options) (not show-edit-button) (:section-name options)))
 
 (defn topic-click [data owner options expanded]
   (let [topic (om/get-ref owner "topic")
@@ -81,8 +80,8 @@
           body-width (.-offsetWidth body-node)]
       (set! (.-height (.-style body-node)) (if expanded "auto" "0"))
 
-      ; animate finances headtitle
-      (when-let [finances-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-finances")] ; (.querySelector topic ":scope > div.topic-headline > div.topic-headline-finances")]
+      ;; animate finances headtitle
+      (when-let [finances-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-finances")]
         (let [finances-resize (new Resize
                                    finances-children
                                    (new js/Array body-width (if expanded 0 100))
@@ -96,8 +95,8 @@
           (.play finances-resize)
           (.play finances-fade)))
 
-      ; animate growth headtitle
-      (when-let [growth-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-growth")] ;(.querySelector topic ":scope > div.topic-headline > div.topic-headline-growth")]
+      ;; animate growth headtitle
+      (when-let [growth-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-growth")]
         (let [growth-resize (new Resize
                                  growth-children
                                  (new js/Array body-width (if expanded 0 100))
@@ -111,15 +110,22 @@
             (.play growth-resize)
             (.play growth-fade)))
 
-      ; Fade in/out 3 horizontal dots
+      ;; Fade in/out 3 horizontal dots
       (.play
         (new Fade
              topic-more
              (if expanded 0 1)
              (if expanded 1 0)
              utils/oc-animation-duration))
+      ;; Collapse the more dots
+      (.play
+        (new Resize
+             topic-more
+             (new js/Array body-width (if expanded 0 21))
+             (new js/Array body-width (if expanded 21 0))
+             utils/oc-animation-duration))
 
-      ; animate height
+      ;; animate height
       (let [height-animation (new Resize
                                   body-node
                                   (new js/Array body-width (if expanded body-height 0))
@@ -127,10 +133,7 @@
                                   utils/oc-animation-duration)]
         (events/listen height-animation
                        EventType/FINISH
-                       (fn []
-                         (om/update-state! owner :expanded not)
-                         (when expanded
-                           (om/set-state! owner :show-edit-button false))))
+                       #(om/update-state! owner :expanded not))
         (.play height-animation))
 
       (let [topic (om/get-ref owner "topic")
@@ -141,12 +144,12 @@
       (if-not expanded
         ;; show the edit button if the topic body is empty
         (let [section (keyword (:section-name options))
-              section-data (get (:company-data data) section)]
-          (when (clojure.string/blank? (:body section-data))
-            (topic-body-click nil owner options false)))
+              section-data (get (:company-data data) section)
+              body (get-body section-data section)]
+          (when (clojure.string/blank? body)
+            ((:force-edit-cb options) true)))
         ;; hide the edit button if necessary
-        (when (om/get-state owner :show-edit-button)
-          (topic-body-click nil owner options true))))))
+        ((:force-edit-cb options) false)))))
 
 (defn headline-component [section]
   (cond
@@ -163,8 +166,7 @@
 (defcomponent topic [{:keys [company-data] :as data} owner {:keys [section-name navbar-editing-cb] :as options}]
 
   (init-state [_]
-    {:expanded false
-     :show-edit-button false})
+    {:expanded false})
 
   (did-mount [_]
     (utils/replace-svg))
@@ -203,7 +205,8 @@
 
         (dom/div #js {:className "topic-more"
                       :ref "topic-more"
-                      :style #js {:opacity (if expanded 0 1)}}
+                      :style #js {:opacity (if expanded 0 1)
+                                  :height (if expanded "0px" "21px")}}
           (dom/img {:src "/img/3dots-horizontal.png"}))
 
         ;; Topic body
