@@ -68,8 +68,7 @@
 (defn setup-sortable [owner]
   (when (and (om/get-state owner :did-mount) (om/get-state owner :sortable-loaded))
     (let [ul-node (sel1 :ul.topic-list-sortable)]
-      (.create js/Sortable ul-node (clj->js {:onEnd #(println "onEnd" %)
-                                             :onSort (fn [_]
+      (.create js/Sortable ul-node (clj->js {:onSort (fn [_]
                                                          (let [li-elements (sel [:ul.topic-list-sortable :li])
                                                                items (map #(.-itemname (.-dataset %)) li-elements)]
                                                            (om/set-state! owner :sorted-sections items)))})))))
@@ -113,7 +112,6 @@
           ((:cancel-editing-cb options)))))))
 
   (render-state [_ {:keys [sorted-sections active-topics]}]
-    (println "topic-list-edit render" (om/get-state owner :sorted-sections))
     (if (empty? @caches/new-sections)
       (dom/h2 {} "Loading sections...")
       (let [active-category (:active-category options)
