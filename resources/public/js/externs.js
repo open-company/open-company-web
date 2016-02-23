@@ -59,3 +59,6 @@ var tinymce = function(){};
 tinymce.init = function(){};
 tinymce.activeEditor = {};
 tinymce.activeEditor.getContent = function(){};
+// Sortable.js
+var Sortable = function(){};
+Sortable.create = function(){};
