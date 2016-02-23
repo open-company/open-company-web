@@ -137,12 +137,3 @@
                           (om/build item {:id item-name
                                           :item-data (get items (keyword item-name))
                                           :active-topics active-topics}))) sorted-sections)))))))
-
-
-
-
-
-
-
-
-
