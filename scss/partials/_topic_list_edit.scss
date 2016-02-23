@@ -6,6 +6,16 @@ div.topic-list-edit{
     @include no-user-select();
   }
 
+  ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+  }
+  ul li{
+    margin: 0px;
+    padding: 0px;
+  }
+
   li.placeholder {
     height: 68px;
   }
