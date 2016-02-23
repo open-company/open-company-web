@@ -15,11 +15,11 @@
 
 (defcomponent item [data owner options]
   (render [_]
-    (let [section (keyword (:id data))
+    (let [section (:id data)
           section-data (:item-data data)
           active-topics (:active-topics data)
-          active (utils/in? active-topics (name section))
-          section-name (or (:name section-data) (utils/camel-case-str (name section)))
+          active (utils/in? active-topics section)
+          section-name (or (:name section-data) (utils/camel-case-str section))
           section-title (or (:title section-data) section-name)
           section-description (or (:description section-data) "")]
       (dom/div {:class (utils/class-set {:topic-edit true
@@ -28,7 +28,7 @@
                                          (str "topic-" section-name) true
                                          :active active})
                 :data-sectionname section-name
-                :on-click #((:item-click options) section-name)
+                :on-click #((:item-click options) (:id data))
                 :key (str "topic-edit-" section-name)}
         (dom/div {:class "topic-edit-internal group"}
           (dom/div {:class "topic-edit-labels"}
@@ -39,7 +39,7 @@
 (defn get-sections-data [category-sections]
   (apply merge
          (map (fn [section-data]
-                (let [section-name (:name section-data)]
+                (let [section-name (:section-name section-data)]
                   (hash-map (keyword section-name) section-data)))
               category-sections)))
 
