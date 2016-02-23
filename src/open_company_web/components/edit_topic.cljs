@@ -31,7 +31,7 @@
   :theme_advanced_buttons2 ""
   :theme_advanced_buttons3 ""})
 
-(defn setup-medium-editor [owner]
+(defn setup-editor [owner]
   (when (and (om/get-state owner :did-mount)
              (om/get-state owner :did-load-resources))
     (let [tinymce-editor (.init js/tinymce (clj->js tinymce-options))]
@@ -46,7 +46,7 @@
     (cdr/add-script! "/lib/tinymce/tinymce.min.js"
                       (fn []
                         (om/set-state! owner :did-load-resources true)
-                        (setup-medium-editor owner)))
+                        (setup-editor owner)))
     {:title (:title section-data)
      :headline (:headline section-data)
      :body (:body section-data)
@@ -63,7 +63,7 @@
 
   (did-mount [_]
     (om/set-state! owner :did-mount true)
-    (setup-medium-editor owner)
+    (setup-editor owner)
     (let [save-ch (utils/get-channel "save-bt-navbar")]
       (go (loop []
         (let [change (<! save-ch)]
