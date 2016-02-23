@@ -54,3 +54,6 @@ google.visualization.ColumnChart = {};
 google.visualization.ColumnChart.draw = function(){};
 // jwt
 var jwt_decode = function(){};
+// Sortable.js
+var Sortable = function(){};
+Sortable.create = function(){};
