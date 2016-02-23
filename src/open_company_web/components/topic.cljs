@@ -159,17 +159,15 @@
     :else
     topic-headline))
 
-(defcomponent topic [{:keys [company-data] :as data} owner {:keys [section-name navbar-editing-cb] :as options}]
+(defcomponent topic [{:keys [section-data section currency] :as data} owner {:keys [section-name navbar-editing-cb] :as options}]
 
   (init-state [_]
     {:expanded false
      :show-edit-button false})
 
   (render-state [_ {:keys [editing expanded show-edit-button] :as state}]
-    (let [section (keyword section-name)
-          section-data (get company-data section)
+    (let [section (keyword section)
           section-body (get-body section-data section)
-          currency (:currency company-data)
           headline-options {:opts {:currency currency}}
           headline-data (assoc section-data :expanded expanded)]
       (dom/div #js {:className "topic"
