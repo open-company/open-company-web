@@ -57,6 +57,10 @@ div.edit-topic {
         font-size: 14px;
         outline: none;
 
+        .mce-btn button {
+          padding: 4px 6px;
+        }
+
         &:focus {
           border: 1px solid black;
           outline: none;
