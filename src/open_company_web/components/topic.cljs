@@ -142,7 +142,6 @@
         (let [section (keyword (:section data))
               section-data (:section-data data)
               body (get-body section-data section)]
-          (println "show edit bt:" body (clojure.string/blank? body))
           (when (clojure.string/blank? body)
             (topic-body-click nil owner options false)))
         ;; hide the edit button if necessary
