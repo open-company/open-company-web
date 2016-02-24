@@ -16,7 +16,7 @@
 
 (defn- get-body [section-data section]
   (if (#{:finances :growth} section)
-    (get-in section-data [:body :notes])
+    (get-in section-data [:notes :body])
     (:body section-data)))
 
 (defcomponent topic-headline [data owner]
@@ -139,9 +139,11 @@
 
       (if-not expanded
         ;; show the edit button if the topic body is empty
-        (let [section (keyword (:section-name options))
-              section-data (get (:company-data data) section)]
-          (when (clojure.string/blank? (:body section-data))
+        (let [section (keyword (:section data))
+              section-data (:section-data data)
+              body (get-body section-data section)]
+          (println "show edit bt:" body (clojure.string/blank? body))
+          (when (clojure.string/blank? body)
             (topic-body-click nil owner options false)))
         ;; hide the edit button if necessary
         (when (om/get-state owner :show-edit-button)
@@ -166,8 +168,8 @@
      :show-edit-button false})
 
   (render-state [_ {:keys [editing expanded show-edit-button] :as state}]
-    (let [section (keyword section)
-          section-body (get-body section-data section)
+    (let [section-kw (keyword section)
+          section-body (get-body section-data section-kw)
           headline-options {:opts {:currency currency}}
           headline-data (assoc section-data :expanded expanded)]
       (dom/div #js {:className "topic"
@@ -180,10 +182,10 @@
         ;; Topic headline
         (dom/div {:class "topic-headline"}
           (cond
-            (= section :finances)
+            (= section-kw :finances)
             (om/build topic-headline-finances headline-data headline-options)
 
-            (= section :growth)
+            (= section-kw :growth)
             (om/build topic-headline-growth headline-data headline-options)
 
             :else
@@ -204,18 +206,18 @@
                                   (topic-body-click % owner options show-edit-button))
                       :style #js {"height" (if expanded "auto" "0")}}
           (cond
-            (= section :growth)
+            (= section-kw :growth)
             (om/build growth {:section-data section-data
-                              :section section
+                              :section section-kw
                               :currency currency
                               :actual-as-of (:updated-at section-data)
                               :read-only true}
                              {:opts {:show-title false
                                      :show-revisions-navigation false}})
 
-            (= section :finances)
+            (= section-kw :finances)
             (om/build finances {:section-data section-data
-                                :section section
+                                :section section-kw
                                 :currency currency
                                 :actual-as-of (:updated-at section-data)
                                 :read-only true}
