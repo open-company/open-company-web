@@ -29,17 +29,19 @@
       {:active-category active-tab
        :navbar-editing false}))
 
-  (render-state [_ state]
+  (render-state [_ {:keys [navbar-editing] :as state}]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)]
       (dom/div {:class "company-dashboard row-fluid"}
 
         ;; navbar
-        (om/build navbar (merge data {:show-share true :edit-mode (om/get-state owner :navbar-editing)}))
+        (om/build navbar (merge data {:show-share true
+                                      :edit-mode (om/get-state owner :navbar-editing)}))
 
         ;; company header
         (om/build company-header {:loading (:loading company-data)
                                   :company-data company-data
+                                  :navbar-editing navbar-editing
                                   :switch-tab-cb (partial switch-tab-cb owner)
                                   :active-category (:active-category state)})
 
