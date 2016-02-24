@@ -11,7 +11,7 @@
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
-            [open-company-web.components.manage-topics :refer (manage-topics)]
+            [open-company-web.components.ui.manage-topics :refer (manage-topics)]
             [cljs-dynamic-resources.core :as cdr]))
 
 (defcomponent item [data owner options]
