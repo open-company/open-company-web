@@ -12,7 +12,8 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.manage-topic :refer (manage-topic)]
-            [cljs-dynamic-resources.core :as cdr]))
+            [cljs-dynamic-resources.core :as cdr]
+            [shodan.console :as console]))
 
 (defcomponent item [data owner options]
   (render [_]
@@ -65,10 +66,16 @@
         next-ret
         (recur next-ret (next sections))))))
 
-(defn setup-sortable [owner]
+(defn setup-sortable [owner options]
   (when (and (om/get-state owner :did-mount) (om/get-state owner :sortable-loaded))
     (let [ul-node (sel1 :ul.topic-list-sortable)]
-      (.create js/Sortable ul-node (clj->js {:onSort (fn [_]
+      (.create js/Sortable ul-node (clj->js {:onStart (fn [e]
+                                                        (let [item (.-itemname (.-dataset (.-item e)))
+                                                              active-topics (om/get-state owner :active-topics)]
+                                                          (when-not (utils/in? active-topics item)
+                                                            (om/set-state! owner :active-topics (concat active-topics [item]))
+                                                            ((:save-bt-active-cb options) true))))
+                                             :onSort (fn [_]
                                                          (let [li-elements (sel [:ul.topic-list-sortable :li])
                                                                items (map #(.-itemname (.-dataset %)) li-elements)]
                                                            (om/set-state! owner :sorted-sections items)))})))))
@@ -79,7 +86,7 @@
     (cdr/add-script! "/lib/Sortable.js/Sortable.js"
                      (fn []
                        (om/set-state! owner :sortable-loaded true)
-                       (setup-sortable owner)))
+                       (setup-sortable owner options)))
     (let [save-ch (chan)
           cancel-ch (chan)]
       (utils/add-channel "save-bt-navbar" save-ch)
@@ -99,7 +106,7 @@
 
   (did-mount [_]
     (om/set-state! owner :did-mount true)
-    (setup-sortable owner)
+    (setup-sortable owner options)
     (let [save-ch (utils/get-channel "save-bt-navbar")]
       (go (loop []
         (let [change (<! save-ch)]
@@ -131,7 +138,8 @@
                                              (let [new-active-topics (if (utils/in? active-topics item-name)
                                                                        (utils/vec-dissoc active-topics item-name)
                                                                        (concat active-topics [item-name]))]
-                                               (om/set-state! owner :active-topics new-active-topics)))}
+                                               (om/set-state! owner :active-topics new-active-topics)
+                                               ((:save-bt-active-cb options) true)))}
                           (om/build item {:id item-name
                                           :item-data (get items (keyword item-name))
                                           :active-topics active-topics}))) sorted-sections)))))))

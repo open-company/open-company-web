@@ -59,6 +59,7 @@
         (om/build topic-list-edit data {:opts {:new-sections (slug @caches/new-sections)
                                                :active-category (:active-category data)
                                                :save-sections-cb (partial save-sections-cb owner data options)
+                                               :save-bt-active-cb (:save-bt-active-cb options)
                                                :cancel-editing-cb (fn []
                                                                     (om/set-state! owner :editing false)
                                                                     ((:navbar-editing-cb options) false))}})
