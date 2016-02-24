@@ -12,9 +12,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.manage-topic :refer (manage-topic)]
-            [cljs-dynamic-resources.core :as cdr]
-            [shodan.console :as console]
-            [shodan.inspection :refer (inspect)]))
+            [cljs-dynamic-resources.core :as cdr]))
 
 (defcomponent item [data owner options]
   (render [_]
