@@ -12,7 +12,12 @@
 
 (defonce default-category "progress")
 
+(defn set-save-bt-active [owner active]
+  (om/set-state! owner :save-bt-active active))
+
 (defn set-navbar-editing [owner editing]
+  (when-not editing
+    (set-save-bt-active owner false))
   (om/set-state! owner :navbar-editing editing))
 
 (defn switch-tab-cb [owner new-tab]
@@ -27,7 +32,8 @@
                        url-tab
                        default-category)]
       {:active-category active-tab
-       :navbar-editing false}))
+       :navbar-editing false
+       :save-bt-active false}))
 
   (render-state [_ {:keys [navbar-editing] :as state}]
     (let [slug (:slug @router/path)
@@ -36,6 +42,7 @@
 
         ;; navbar
         (om/build navbar (merge data {:show-share true
+                                      :save-bt-active (om/get-state owner :save-bt-active)
                                       :edit-mode (om/get-state owner :navbar-editing)}))
 
         ;; company header
@@ -50,4 +57,5 @@
                   {:loading (:loading company-data)
                    :company-data company-data
                    :active-category (:active-category state)}
-                  {:opts {:navbar-editing-cb (partial set-navbar-editing owner)}})))))
+                  {:opts {:navbar-editing-cb (partial set-navbar-editing owner)
+                          :save-bt-active-cb (partial set-save-bt-active owner)}})))))
