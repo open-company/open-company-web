@@ -73,6 +73,7 @@
 (defcomponent category-nav [data owner]
 
   (did-mount [_]
+    (utils/scroll-to-y 0 0)
     (.setTimeout js/window #(check-scroll owner) 1000))
 
   (render [_]

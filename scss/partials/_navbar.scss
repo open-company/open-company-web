@@ -56,15 +56,25 @@ nav.navbar {
         button.cancel-bt {
           font-size: 15px;
           margin: 15px 0px;
+          color: $oc_blue;
+
+          &:disabled {
+            opacity: 0.4;
+          }
         }
       }
 
       div.right-button {
         float: right;
+        color: $oc_blue;
 
         button.save-bt {
           font-size: 15px;
           margin: 15px 0px;
+
+          &:disabled {
+            opacity: 0.4;
+          }
         }
       }
     }
