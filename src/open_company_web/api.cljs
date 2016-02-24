@@ -63,21 +63,6 @@
 (defn post-company [data]
   (api-post "/companies" {:json-params data} #(dispatch-body :company-created %)))
 
-(defn save-or-create-company [data]
-  (when data
-    (let [company-data (dissoc data :headcount :finances :compensation :links :read-only)
-          json-data (cljs->json company-data)
-          company-link (utils/link-for (:links data) "update")]
-      (api-put (:href company-link)
-        { :json-params json-data
-          :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (:type company-link)
-          }}
-        #(dispatch-body :company %)))))
-
 (defn patch-company [slug data]
   (when data
     (let [company-data (dissoc data :links :read-only :revisions)
