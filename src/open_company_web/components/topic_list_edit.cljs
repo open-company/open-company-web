@@ -13,7 +13,8 @@
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.manage-topic :refer (manage-topic)]
             [cljs-dynamic-resources.core :as cdr]
-            [shodan.console :as console]))
+            [shodan.console :as console]
+            [shodan.inspection :refer (inspect)]))
 
 (defcomponent item [data owner options]
   (render [_]
@@ -44,17 +45,6 @@
                   (hash-map (keyword section-name) section-data)))
               category-sections)))
 
-(defn ordered-sections [active-sections all-sections]
-  (loop [ret active-sections
-         secs all-sections]
-    (if (zero? (count secs))
-      ret
-      (let [new-el (first secs)
-            new-ret (if (utils/in? ret new-el)
-                      ret
-                      (conj ret new-el))]
-        (recur new-ret (next secs))))))
-
 (defn sorted-active-topics [sorted-sections active-topics]
   (loop [ret []
          sections sorted-sections]
@@ -78,7 +68,22 @@
                                              :onSort (fn [_]
                                                          (let [li-elements (sel [:ul.topic-list-sortable :li])
                                                                items (map #(.-itemname (.-dataset %)) li-elements)]
-                                                           (om/set-state! owner :sorted-sections items)))})))))
+                                                           (om/set-state! owner :active-topics items)
+                                                           ((:save-bt-active-cb options) true)))})))))
+
+(defn topic-on-click [item-name owner save-bt-active-cb]
+  (let [active-topics (om/get-state owner :active-topics)
+        unactive-topics (om/get-state owner :unactive-topics)
+        is-active (utils/in? active-topics item-name)
+        new-active-topics (if is-active
+                            (utils/vec-dissoc active-topics item-name)
+                            (concat active-topics [item-name]))
+        new-unactive-topics (if is-active
+                              (concat [item-name] unactive-topics)
+                              (utils/vec-dissoc unactive-topics item-name))]
+    (om/set-state! owner :active-topics (vec new-active-topics))
+    (om/set-state! owner :unactive-topics (vec new-unactive-topics))
+    (save-bt-active-cb (not= active-topics (om/get-state owner :initial-active-topics)))))
 
 (defcomponent topic-list-edit [data owner options]
 
@@ -98,9 +103,10 @@
           all-sections (:new-sections options)
           category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
           sections-list (vec (map :section-name category-sections))
-          cleaned-sections (ordered-sections active-topics sections-list)]
-      {:active-topics active-topics
-       :sorted-sections cleaned-sections
+          unactive-topics (reduce utils/vec-dissoc sections-list active-topics)]
+      {:initial-active-topics active-topics
+       :active-topics active-topics
+       :unactive-topics unactive-topics
        :sortable-loaded false
        :did-mount false}))
 
@@ -110,36 +116,42 @@
     (let [save-ch (utils/get-channel "save-bt-navbar")]
       (go (loop []
         (let [change (<! save-ch)]
-          (let [sorted-sections (om/get-state owner :sorted-sections)
-                active-topics (om/get-state owner :active-topics)]
-            ((:save-sections-cb options) (sorted-active-topics sorted-sections active-topics)))))))
+          (let [active-topics (om/get-state owner :active-topics)]
+            ((:save-sections-cb options) active-topics))))))
     (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
       (go (loop []
         (let [change (<! cancel-ch)]
           ((:cancel-editing-cb options)))))))
 
-  (render-state [_ {:keys [sorted-sections active-topics]}]
+  (render-state [_ {:keys [unactive-topics active-topics]}]
     (if (empty? @caches/new-sections)
       (dom/h2 {} "Loading sections...")
       (let [active-category (:active-category options)
             all-sections (:new-sections options)
             category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
             items (get-sections-data category-sections)]
-        (dom/div {:class "topic-list-edit fix-top-margin-scrolling group no-select"}
-          (apply dom/ul
-                 ; props
-                 {:class "topic-list-sortable"
-                  :key "topic-list-edit"}
-                 ; childrens
-                 (map (fn [item-name]
-                        (dom/li {:data-itemname item-name
-                                 :key (str item-name (rand 5))
-                                 :on-click (fn []
-                                             (let [new-active-topics (if (utils/in? active-topics item-name)
-                                                                       (utils/vec-dissoc active-topics item-name)
-                                                                       (concat active-topics [item-name]))]
-                                               (om/set-state! owner :active-topics new-active-topics)
-                                               ((:save-bt-active-cb options) true)))}
-                          (om/build item {:id item-name
-                                          :item-data (get items (keyword item-name))
-                                          :active-topics active-topics}))) sorted-sections)))))))
+        (dom/div {:class "topic-list-edit group no-select"}
+          (dom/div {}
+            (apply dom/ul
+                   ; props
+                   {:class "topic-list-sortable"
+                    :key "topic-list-edit"}
+                   ; childrens
+                   (map (fn [item-name]
+                          (dom/li {:data-itemname item-name
+                                   :key item-name
+                                   :on-click #(topic-on-click item-name owner (:save-bt-active-cb options))}
+                            (om/build item {:id item-name
+                                            :item-data (get items (keyword item-name))
+                                            :active-topics active-topics}))) active-topics)))
+          (dom/div {}
+            (apply dom/ul
+                   {:class "topic-list-unactive"
+                    :key "topic-list-unactive"}
+                   (map (fn [item-name]
+                          (dom/li {:data-itemname item-name
+                                   :key item-name
+                                   :on-click #(topic-on-click item-name owner (:save-bt-active-cb options))}
+                            (om/build item {:id item-name
+                                            :item-data (get items (keyword item-name))
+                                            :active-topics active-topics}))) unactive-topics))))))))
