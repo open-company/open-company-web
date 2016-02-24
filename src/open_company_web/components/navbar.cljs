@@ -17,7 +17,8 @@
 (defcomponent navbar [data owner]
 
   (render [_]
-    (let [edit-mode (:edit-mode data)]
+    (let [edit-mode (:edit-mode data)
+          save-bt-active (:save-bt-active data)]
       (if edit-mode
         (n/navbar {:inverse? true :fixed-top? true :fluid true :collapse? true}
           (dom/div {:class "navbar-header editing-mode"}
@@ -28,6 +29,7 @@
                                          (put! ch {:click true :event e})))} "Cancel"))
             (dom/div {:class "right-button"}
               (dom/button {:class "save-bt oc-btn oc-link"
+                           :disabled (not save-bt-active)
                            :on-click (fn [e]
                                        (let [ch (utils/get-channel "save-bt-navbar")]
                                          (put! ch {:click true :event e})))} "Save"))))
