@@ -12,13 +12,15 @@
     (let [company-data (:company-data data)]
       (dom/div {:class "company-header"}
         
-        ;; Company name
-        (dom/div {:class "container oc-header"}
-          (dom/div {:class "col-xs-12 company-name"} (:name company-data)))
-        
-        ;; Company description
-        (dom/div {:class "container oc-header"}
-          (dom/div {:class "col-xs-12 company-description"} (:description company-data)))
+        (when-not (:navbar-editing data)
+          (dom/div {}
+            ;; Company name
+            (dom/div {:class "container oc-header"}
+              (dom/div {:class "col-xs-12 company-name"} (:name company-data)))
+            
+            ;; Company description
+            (dom/div {:class "container oc-header"}
+              (dom/div {:class "col-xs-12 company-description"} (:description company-data)))))
         
         ;; Category navigation
         (om/build category-nav data)))))

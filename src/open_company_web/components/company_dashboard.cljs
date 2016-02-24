@@ -42,7 +42,7 @@
        :navbar-editing false
        :editing-topic false}))
 
-  (render-state [_ {:keys [editing-topic] :as state}]
+  (render-state [_ {:keys [editing-topic navbar-editing] :as state}]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)
           navbar-editing-cb (partial set-navbar-editing owner)]
