@@ -134,7 +134,8 @@
             all-sections (:new-sections options)
             category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
             items (get-sections-data category-sections)]
-        (dom/div {:class "topic-list-edit group no-select"}
+        (dom/div {:class "topic-list-edit group no-select"
+                  :style #js {:display (if (:active data) "inline" "none")}}
           (dom/div {}
             (apply dom/ul
                    ; props
