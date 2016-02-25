@@ -112,12 +112,13 @@
             (.play growth-fade)))
 
       ; fade in/out author
-      (.play
-        (new Fade
-             topic-date-author
-             (if expanded 1 0)
-             (if expanded 0 1)
-             utils/oc-animation-duration))
+      (when topic-date-author
+        (.play
+          (new Fade
+               topic-date-author
+               (if expanded 1 0)
+               (if expanded 0 1)
+               utils/oc-animation-duration)))
 
       ; animate height
       (let [height-animation (new Resize
