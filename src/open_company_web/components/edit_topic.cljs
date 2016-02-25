@@ -79,7 +79,7 @@
         (let [change (<! cancel-ch)]
           ((:dismiss-topic-editing-cb options) false))))))
 
-  (render-state [_ {:keys [title headline body]}]
+  (render-state [_ {:keys [title headline]}]
     (dom/div {:class "edit-topic"}
       (dom/div {:class "edit-topic-internal group"}
         (dom/div {:class "edit-topic-title"}
@@ -101,6 +101,6 @@
         (dom/div {:class "edit-topic-body"}
           (dom/div #js {:ref "topic-body"
                         :className "body-editor"
-                        :dangerouslySetInnerHTML (clj->js {"__html" body})})
+                        :dangerouslySetInnerHTML (clj->js {"__html" (:body section-data)})})
           (dom/div #js {:className "toolbar-container"
                         :ref "toolbar-container"}))))))
