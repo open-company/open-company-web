@@ -108,12 +108,13 @@
             (.play growth-fade)))
 
       ; fade in/out author
-      (.play
-        (new Fade
-             topic-date-author
-             (if expanded 1 0)
-             (if expanded 0 1)
-             500))
+      (when topic-date-author
+        (.play
+          (new Fade
+               topic-date-author
+               (if expanded 1 0)
+               (if expanded 0 1)
+               500)))
       (let [height-animation (new Resize
                                   body-node
                                   (new js/Array body-width (if expanded body-height 0))
