@@ -56,13 +56,18 @@
     (let [slug (keyword (:slug @router/path))
           editing (om/get-state owner :editing)]
       (if editing
-        (om/build topic-list-edit data {:opts {:new-sections (slug @caches/new-sections)
-                                               :active-category (:active-category data)
-                                               :save-sections-cb (partial save-sections-cb owner data options)
-                                               :save-bt-active-cb (:save-bt-active-cb options)
-                                               :cancel-editing-cb (fn []
-                                                                    (om/set-state! owner :editing false)
-                                                                    ((:navbar-editing-cb options) false))}})
+        (let [categories (vec (map :name (:categories (slug @caches/new-sections))))]
+          (dom/div {:class "topic-list-edit-container"}
+            (for [cat categories]
+              (om/build topic-list-edit (assoc data :active (= cat (:active-category data)))
+                        {:key cat
+                         :opts {:new-sections (slug @caches/new-sections)
+                                :active-category cat
+                                :save-sections-cb (partial save-sections-cb owner data options)
+                                :save-bt-active-cb (:save-bt-active-cb options)
+                                :cancel-editing-cb (fn []
+                                                     (om/set-state! owner :editing false)
+                                                     ((:navbar-editing-cb options) false))}}))))
         (let [company-data (:company-data data)
               active-category (keyword (:active-category data))
               active-sections (get-in company-data [:sections active-category])]
