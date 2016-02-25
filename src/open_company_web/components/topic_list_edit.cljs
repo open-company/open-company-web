@@ -12,7 +12,8 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.ui.manage-topics :refer (manage-topics)]
-            [cljs-dynamic-resources.core :as cdr]))
+            [cljs-dynamic-resources.core :as cdr]
+            [goog.style :refer (setStyle)]))
 
 (defcomponent item [data owner options]
   (render [_]
@@ -54,6 +55,13 @@
       (if (zero? (count sections))
         next-ret
         (recur next-ret (next sections))))))
+
+(defn resize-handles []
+  (let [sortable (sel1 [:ul.topic-list-sortable])
+        handles (sel sortable [:div.topic-edit-handle])
+        height (.-offsetHeight (sel1 [:div.topic-edit-internal]))]
+    (doseq [el handles]
+      (setStyle el #js {:height (str height "px")}))))
 
 (defn setup-sortable [owner options]
   (when (and (om/get-state owner :did-mount) (om/get-state owner :sortable-loaded))
@@ -128,6 +136,8 @@
           ((:cancel-editing-cb options)))))))
 
   (render-state [_ {:keys [unactive-topics active-topics]}]
+    ; resize the handles after each render
+    (.setTimeout js/window #(resize-handles) 100)
     (if (empty? @caches/new-sections)
       (dom/h2 {} "Loading sections...")
       (let [active-category (:active-category options)
