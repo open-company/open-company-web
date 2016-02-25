@@ -85,7 +85,7 @@
                               (utils/vec-dissoc unactive-topics item-name))]
     (om/set-state! owner :active-topics (vec new-active-topics))
     (om/set-state! owner :unactive-topics (vec new-unactive-topics))
-    (save-bt-active-cb (not= active-topics (om/get-state owner :initial-active-topics)))))
+    (save-bt-active-cb (not= new-active-topics (om/get-state owner :initial-active-topics)))))
 
 (defcomponent topic-list-edit [data owner options]
 
