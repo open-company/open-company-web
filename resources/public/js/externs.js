@@ -64,3 +64,4 @@ var Sortable = function(){};
 Sortable.create = function(){};
 Sortable.handle = {};
 Sortable.onSort = function(){};
+Sortable.on = function(){};
