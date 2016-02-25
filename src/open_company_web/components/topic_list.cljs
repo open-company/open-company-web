@@ -79,5 +79,5 @@
                                      :currency (:currency company-data)
                                      :active-category active-category}
                                      {:opts {:section-name section-name}})))))
-            (when (and (not (:read-only company-data)) (not (empty? company-data)))
+            (when (and (not (:read-only company-data)) (seq company-data))
               (om/build manage-topic {} {:opts {:manage-topic-cb #(manage-topic-cb owner options)}}))))))))
