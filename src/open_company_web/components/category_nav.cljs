@@ -12,6 +12,8 @@
 
 (def max-scroll-top (atom -1))
 
+(def scroll-listener-key (atom nil))
+
 (defn scroll-listener [owner e]
   (when-let [cat-node (om/get-ref owner "category-nav")]
     (let [nav (sel1 :nav.navbar)
@@ -44,13 +46,12 @@
 
 (defn listen-scroll [owner]
   (utils/scroll-to-y 0 0)
-  (om/set-state! owner :listener-key
+  (reset! scroll-listener-key
     (events/listen js/window EventType.SCROLL (partial scroll-listener owner))))
 
 (defn unlisten-scroll [owner]
-  (let [listener-key (om/get-state owner :listener-key)]
-    (when listener-key
-      (events/unlistenByKey listener-key))))
+  (when @scroll-listener-key
+    (events/unlistenByKey @scroll-listener-key)))
 
 (defn category-click [data category-name e]
   ;; prevent the route reload
@@ -77,9 +78,6 @@
         (gstyle/setStyle (sel1 :body) #js {:minHeight (str app-height "px")})))))
 
 (defcomponent category-nav [data owner]
-
-  (init-state [_]
-    {:listener-key nil})
 
   (render [_]
     (let [navbar-editing (:navbar-editing data)
