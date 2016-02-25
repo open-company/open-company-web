@@ -84,9 +84,10 @@
       :pattern (if pattern pattern "###,###.##")}))
 
 (defn get-as-of-string [period]
-  (let [period-date (utils/date-from-period period)
-        month-name (utils/month-string (t/month period-date))]
-    (str month-name ", " (t/year period-date))))
+  (when period
+    (let [period-date (utils/date-from-period period)
+          month-name (utils/month-string (t/month period-date))]
+      (str month-name ", " (t/year period-date)))))
 
 (defn map-placeholder-data [data]
   (let [fixed-data (edit-placeholder-data data)]
