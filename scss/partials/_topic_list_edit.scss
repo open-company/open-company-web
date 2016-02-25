@@ -45,6 +45,7 @@ div.topic-list-edit{
       div.topic-edit-handle {
         float: left;
         min-height: 50px;
+        height: 100%;
         width: 30px;
       }
 
@@ -53,8 +54,8 @@ div.topic-list-edit{
       }
 
       div.topic-edit-labels{
-        float: left;
-        width: 80%;
+        float: center;
+        overflow: hidden;
 
         h3.topic-title {
           font-size: 15px;
