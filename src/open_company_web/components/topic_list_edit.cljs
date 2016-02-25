@@ -31,6 +31,7 @@
                                          :active active})
                 :key (str "topic-edit-" section-name)}
         (dom/div {:class "topic-edit-internal group"}
+          (dom/div {:class "topic-edit-handle"})
           (dom/div {:class "topic-edit-labels"}
             (dom/h3 {:class "topic-title oc-header"} section-title)
             (dom/label {:class "topic-description"} section-description))
@@ -57,7 +58,8 @@
 (defn setup-sortable [owner options]
   (when (and (om/get-state owner :did-mount) (om/get-state owner :sortable-loaded))
     (let [ul-node (sel1 :ul.topic-list-sortable)]
-      (.create js/Sortable ul-node (clj->js {:onStart (fn [e]
+      (.create js/Sortable ul-node (clj->js {:handle ".topic-edit-handle"
+                                             :onStart (fn [e]
                                                         (let [item (.-itemname (.-dataset (.-item e)))
                                                               active-topics (om/get-state owner :active-topics)]
                                                           (when-not (utils/in? active-topics item)
