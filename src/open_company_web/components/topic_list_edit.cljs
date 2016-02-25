@@ -1,7 +1,5 @@
 (ns open-company-web.components.topic-list-edit
-  (:require-macros [cljs.core.async.macros :refer (go)])
-  (:require [cljs.core.async :refer (chan <!)]
-            [om.core :as om :include-macros true]
+  (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
@@ -94,10 +92,6 @@
                      (fn []
                        (om/set-state! owner :sortable-loaded true)
                        (setup-sortable owner options)))
-    (let [save-ch (chan)
-          cancel-ch (chan)]
-      (utils/add-channel "save-bt-navbar" save-ch)
-      (utils/add-channel "cancel-bt-navbar" cancel-ch))
     (when (empty? @caches/new-sections)
       (api/get-new-sections))
     (let [active-category (:active-category options)
@@ -114,16 +108,7 @@
 
   (did-mount [_]
     (om/set-state! owner :did-mount true)
-    (setup-sortable owner options)
-    (let [save-ch (utils/get-channel "save-bt-navbar")]
-      (go (loop []
-        (let [change (<! save-ch)]
-          (let [active-topics (om/get-state owner :active-topics)]
-            ((:save-sections-cb options) active-topics))))))
-    (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
-      (go (loop []
-        (let [change (<! cancel-ch)]
-          ((:cancel-editing-cb options)))))))
+    (setup-sortable owner options))
 
   (render-state [_ {:keys [unactive-topics active-topics]}]
     ; resize the handles after each render
