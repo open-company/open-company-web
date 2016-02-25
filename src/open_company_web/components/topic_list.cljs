@@ -110,7 +110,7 @@
                                      {:opts {:section-name section-name
                                              :navbar-editing-cb navbar-editing-cb
                                              :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)}})))))
-            (when (and (not (:read-only company-data)) (pos? (count active-sections)))
+            (when (and (not (:read-only company-data)) (not (empty? company-data)))
               (dom/div #js {:className "manage-topics-container"
                             :style #js {:opacity (if (om/get-state owner :show-topic-edit-button) "0" "1")}}
                 (om/build manage-topics
