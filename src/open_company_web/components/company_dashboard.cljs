@@ -80,4 +80,5 @@
           (om/build edit-topic {:section editing-topic
                                 :section-data (get company-data (keyword editing-topic))}
                     {:opts {:navbar-editing-cb navbar-editing-cb
+                            :save-bt-active-cb (partial set-save-bt-active owner)
                             :dismiss-topic-editing-cb (partial dismiss-topic-editing-cb owner)}}))))))

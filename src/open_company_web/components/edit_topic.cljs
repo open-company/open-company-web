@@ -85,18 +85,23 @@
                           :className "edit-topic-title-input"
                           :maxLength 100
                           :value title
-                          :onChange #(om/set-state! owner :title (.. % -target -value))}))
+                          :onChange (fn [e]
+                                      (om/set-state! owner :title (.. e -target -value))
+                                      ((:save-bt-active-cb options) true))}))
         (dom/div {:class "edit-topic-headline"}
           (dom/input #js {:ref "topic-headline"
                           :className "edit-topic-headline-input"
                           :maxLength 100
                           :value headline
-                          :onChange #(om/set-state! owner :headline (.. % -target -value))}))
+                          :onChange (fn [e]
+                                      (om/set-state! owner :headline (.. e -target -value))
+                                      ((:save-bt-active-cb options) true))}))
         (dom/div {:class "edit-topic-body"}
           (dom/div #js {:ref "topic-body"
                         :className "body-editor"
                         :dangerouslySetInnerHTML (clj->js {"__html" body})
                         :onChange (fn [e]
-                                    (om/set-state! owner :body (.. e -target -value)))})
+                                    (om/set-state! owner :body (.. e -target -value))
+                                    ((:save-bt-active-cb options) true))})
           (dom/div #js {:className "toolbar-container"
                         :ref "toolbar-container"}))))))
