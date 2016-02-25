@@ -12,7 +12,8 @@
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as EventType]
-            [goog.events :as events]))
+            [goog.events :as events]
+            [goog.style :refer (setStyle)]))
 
 (defn- get-body [section-data section]
   (if (#{:finances :growth} section)
@@ -71,10 +72,10 @@
   (let [topic (om/get-ref owner "topic")
         topic-date-author (om/get-ref owner "topic-date-author")
         body-node (om/get-ref owner "topic-body")]
-    (set! (.-height (.-style body-node)) "auto")
+    (setStyle body-node #js {:height "auto"})
     (let [body-height (.-offsetHeight body-node)
           body-width (.-offsetWidth body-node)]
-      (set! (.-height (.-style body-node)) (if expanded "auto" "0"))
+      (setStyle body-node #js {:height (if expanded "auto" "0")})
 
       ; animate finances headtitle
       (when-let [finances-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-finances")] ; (.querySelector topic ":scope > div.topic-headline > div.topic-headline-finances")]
