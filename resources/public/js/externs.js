@@ -62,3 +62,5 @@ tinymce.activeEditor.getContent = function(){};
 // Sortable.js
 var Sortable = function(){};
 Sortable.create = function(){};
+Sortable.handle = {};
+Sortable.onSort = function(){};

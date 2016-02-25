@@ -31,11 +31,11 @@
                                          :active active})
                 :key (str "topic-edit-" section-name)}
         (dom/div {:class "topic-edit-internal group"}
-          (dom/div {:class "topic-edit-handle"})
+          (dom/img {:class "check" :src check-img})
+          (dom/div {:class "topic-edit-handle group"})
           (dom/div {:class "topic-edit-labels"}
             (dom/h3 {:class "topic-title oc-header"} section-title)
-            (dom/label {:class "topic-description"} section-description))
-          (dom/img {:class "check" :src check-img}))))))
+            (dom/label {:class "topic-description"} section-description)))))))
 
 (defn get-sections-data [category-sections]
   (apply merge
@@ -59,15 +59,9 @@
   (when (and (om/get-state owner :did-mount) (om/get-state owner :sortable-loaded))
     (let [ul-node (sel1 :ul.topic-list-sortable)]
       (.create js/Sortable ul-node (clj->js {:handle ".topic-edit-handle"
-                                             :onStart (fn [e]
-                                                        (let [item (.-itemname (.-dataset (.-item e)))
-                                                              active-topics (om/get-state owner :active-topics)]
-                                                          (when-not (utils/in? active-topics item)
-                                                            (om/set-state! owner :active-topics (concat active-topics [item]))
-                                                            ((:save-bt-active-cb options) true))))
                                              :onSort (fn [_]
                                                          (let [li-elements (sel [:ul.topic-list-sortable :li])
-                                                               items (map #(.-itemname (.-dataset %)) li-elements)]
+                                                               items (vec (map #(.-itemname (.-dataset %)) li-elements))]
                                                            (om/set-state! owner :active-topics items)
                                                            ((:save-bt-active-cb options) true)))})))))
 
