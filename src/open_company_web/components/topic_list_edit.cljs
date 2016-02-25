@@ -137,7 +137,7 @@
 
   (render-state [_ {:keys [unactive-topics active-topics]}]
     ; resize the handles after each render
-    (.setTimeout js/window #(resize-handles) 100)
+    (.setTimeout js/window resize-handles 100)
     (if (empty? @caches/new-sections)
       (dom/h2 {} "Loading sections...")
       (let [active-category (:active-category options)
