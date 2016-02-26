@@ -13,12 +13,7 @@ div.topic-list {
     div.topic-header {
       padding-top: 20px;
 
-      img.topic-image {
-        width: 30px;
-        height: 30px;
-        float: left;
-      }
-      svg {
+      .topic-image {
         width: 30px;
         height: 30px;
         float: left;
