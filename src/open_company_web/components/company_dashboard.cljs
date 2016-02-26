@@ -54,11 +54,6 @@
           navbar-editing-cb (partial set-navbar-editing owner)]
       (dom/div {:class "company-dashboard row-fluid"}
 
-        ; ;; navbar
-        ; (om/build navbar (merge data {:show-share true
-        ;                               :edit-mode (:navbar-editing state)
-        ;                               :edit-title (:navbar-title state)
-        ;                               :save-bt-active (om/get-state owner :save-bt-active)}))
         (if-not editing-topic
           (dom/div {}
             ;; company header
