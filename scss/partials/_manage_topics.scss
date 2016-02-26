@@ -1,19 +1,26 @@
-div.topic-row.manage-topics{
+div.manage-topics{
+  padding: 0px;
+  margin: 0px;
+  width: 100%;
 
   div.manage-topics-internal {
-    margin: 10px;
-    border: 1px solid rgb(237, 237, 237);
-    background-color: white;
-    height: 50px;
+    background-color: transparent;
+    color: #8c8c8c;
+    height: 30px;
     vertical-align: middle;
-    text-align: center;
+    text-align: left;
+
+    &:hover {
+      background-color: rgb(207, 207, 207);
+      text-decoration: underline;
+    }
 
     div.manage-topics-cta{
-      padding: 0;
-      margin: 12px 0;
-      font-size: 19px;
-      font-weight: bold;
+      padding: 5px 0 0 0;
+      margin: 0;
+      font-size: 14px;
       cursor: pointer;
+      margin-left: 10px;
     }
   }
 }
