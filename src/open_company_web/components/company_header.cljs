@@ -17,44 +17,53 @@
 (defonce company-header-pt (atom 0))
 
 (defn watch-scroll [owner]
-  (when-let [company-name-container (om/get-ref owner "company-name-container")]
-    (let [category-nav (sel1 [:div.category-nav])
-          company-header (om/get-ref owner "company-header")
-          company-description-container (om/get-ref owner "company-description-container")
-          topic-list (sel1 [:div.topic-list])
-          company-name-offset-top (.-offsetTop company-name-container)]
+  (when-let [company-header (om/get-ref owner "company-header")]
+    (let [company-name-offset-top (.-offsetTop (om/get-ref owner "company-name-container"))
+          category-nav (sel1 [:div.category-nav])
+          topic-list (sel1 [:div.topic-list])]
       (events/listen
         js/window
         EventType/SCROLL
         (fn [e]
-          (let [scroll-top (.-scrollTop (.-body js/document))]
+          (let [scroll-top (.-scrollTop (.-body js/document))
+                company-name-container (om/get-ref owner "company-name-container")
+                company-description-container (om/get-ref owner "company-description-container")]
             (when (zero? @company-header-pt)
               (let [company-name-container-height (.-clientHeight company-name-container)
                     category-nav-height (.-clientHeight category-nav)
                     company-header-height (.-clientHeight company-header)
-                    category-nav-pivot (+ (- company-header-height category-nav-height company-name-container-height) 7)]
+                    category-nav-pivot (+ (- company-header-height category-nav-height company-name-container-height) 0)]
                 (reset! company-header-pt category-nav-pivot)))
-            (if (> scroll-top company-name-offset-top)
-              (do
-                (gstyle/setStyle company-name-container #js {:position "fixed"})
-                (gstyle/setStyle company-description-container #js {:marginTop "50px"}))
-              (do
-                (gstyle/setStyle company-name-container #js {:position "relative"})
-                (gstyle/setStyle company-description-container #js {:marginTop "0px"})))
-            (if (> scroll-top @company-header-pt)
-              (do
-                (gstyle/setStyle category-nav #js {:position "fixed"
-                                                   :top "50px"
-                                                   :left "0"})
-                (gstyle/setStyle topic-list #js {:margin-top "50px"}))
-              (do
-                (gstyle/setStyle category-nav #js {:position "relative"
-                                                   :top "0"
-                                                   :left "0"})
-                (gstyle/setStyle topic-list #js {:margin-top "0px"})))
-            (gstyle/setStyle category-nav #js {:webkitTransform "translate3d(0,0,0)"})
-            (gstyle/setStyle company-name-container #js {:webkitTransform "translate3d(0,0,0)"})
-            (gstyle/setStyle company-description-container #js {:webkitTransform "translate3d(0,0,0)"})))))))
+            ; fix company name and move the company description relatively when
+            ; the scroll hit the company name
+            (when (and company-name-container company-description-container)
+              (if (> scroll-top company-name-offset-top)
+                (do
+                  (gstyle/setStyle company-name-container #js {:position "fixed"})
+                  (gstyle/setStyle company-description-container #js {:marginTop "50px"}))
+                (do
+                  (gstyle/setStyle company-name-container #js {:position "relative"})
+                  (gstyle/setStyle company-description-container #js {:marginTop "0px"}))))
+            ; fix the category navigation bar and move the topic list relatively when
+            ; the scroll hit the category navigation max top
+            (when (and category-nav topic-list)
+              (if (> scroll-top @company-header-pt)
+                (do
+                  (gstyle/setStyle category-nav #js {:position "fixed"
+                                                     :top "50px"
+                                                     :left "0"})
+                  (gstyle/setStyle topic-list #js {:marginTop "50px"}))
+                (do
+                  (gstyle/setStyle category-nav #js {:position "relative"
+                                                     :top "0"
+                                                     :left "0"})
+                  (gstyle/setStyle topic-list #js {:marginTop "0px"}))))
+            (when category-nav
+              (gstyle/setStyle category-nav #js {:webkitTransform "translate3d(0,0,0)"}))
+            (when company-name-container
+              (gstyle/setStyle company-name-container #js {:webkitTransform "translate3d(0,0,0)"}))
+            (when company-description-container
+              (gstyle/setStyle company-description-container #js {:webkitTransform "translate3d(0,0,0)"}))))))))
 
 (defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner]
 
@@ -66,7 +75,9 @@
       (dom/div #js {:className "company-header"
                     :ref "company-header"}
         (if navbar-editing
-          (dom/div #js {:className "navbar-editing"}
+
+          (dom/div {:class "navbar-editing"
+                    :key "navbar-editing"}
             (dom/button {:class "save-bt oc-btn oc-link"
                          :on-click (fn [e]
                                     (when-let [ch (utils/get-channel "save-bt-navbar")]
@@ -76,7 +87,8 @@
                                     (when-let [ch (utils/get-channel "cancel-bt-navbar")]
                                      (put! ch {:click true :event e})))} "Cancel"))
 
-          (dom/div {:class ""}
+          (dom/div {:class "company-header-internal"
+                    :key "company-header-internal"}
             (dom/div #js {:className "company-header-top group"}
               ;; Company logo
               (dom/div {:class "company-logo-container"}
@@ -96,7 +108,7 @@
               (dom/div {:class "company-name"} (:name company-data)))
 
             ;; Company description
-            (dom/div #js {:className "oc-header"
+            (dom/div #js {:className "company-description-container oc-header"
                           :ref "company-description-container"}
               (dom/div {:class "company-description"} (:description company-data)))))
 
