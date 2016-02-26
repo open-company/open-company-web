@@ -63,7 +63,6 @@ div.company-header{
 
   div.company-name-container {
     width: 100%;
-    position: relative;
     top: 0px;
     left: 0px;
     z-index: 2;
@@ -80,9 +79,15 @@ div.company-header{
     }
   }
 
-  div.company-description {
-    text-align: left;
-    font-size: 18px;
-    margin: 10px 0 10px 15px;
+  div.company-description-container {
+    width: 100%;
+
+    div.company-description {
+      text-align: left;
+      font-size: 18px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      margin-left: 15px;
+    }
   }
 }
