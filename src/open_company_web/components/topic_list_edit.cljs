@@ -106,16 +106,6 @@
        :sortable-loaded false
        :did-mount false}))
 
-  (will-mount [_]
-    (let [save-ch (chan)
-          cancel-ch (chan)]
-      (utils/add-channel "save-bt-navbar" save-ch)
-      (utils/add-channel "cancel-bt-navbar" cancel-ch)))
-
-  (will-unmount [_]
-    (utils/remove-channel "save-bt-navbar")
-    (utils/remove-channel "cancel-bt-navbar"))
-
   (did-mount [_]
     (om/set-state! owner :did-mount true)
     (setup-sortable owner options))
