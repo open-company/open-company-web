@@ -12,25 +12,6 @@
 
 (def max-scroll-top (atom -1))
 
-(def scroll-listener-key (atom nil))
-
-(defn scroll-listener [owner]
-  (when-let [cat-node (om/get-ref owner "category-nav")]
-    (let [nav (sel1 :nav.navbar)]
-      (when (= @max-scroll-top -1)
-        (let [initial-offset-top (utils/offset-top cat-node)
-              nav-height (if nav (.-offsetHeight nav) 0)]
-          (reset! max-scroll-top (- initial-offset-top nav-height)))))))
-
-(defn listen-scroll [owner]
-  (utils/scroll-to-y 0 0)
-  (reset! scroll-listener-key
-    (events/listen js/window EventType.SCROLL (partial scroll-listener owner))))
-
-(defn unlisten-scroll [owner]
-  (when @scroll-listener-key
-    (events/unlistenByKey @scroll-listener-key)))
-
 (defn category-click [data category-name e]
   ;; prevent the route reload
   (reset! open-company-web.core/prevent-route-dispatch true)
@@ -72,13 +53,11 @@
                               :top "50px"}
                          #js {:position "relative"
                               :top "0px"})]
-      (unlisten-scroll owner)
-      (when-not (:navbar-editing data)
-        (listen-scroll owner))
       (setup-body-min-height)
       (dom/div #js {:className "row category-nav"
                     :ref "category-nav"
-                    :style navbar-style}
+                    ; :style navbar-style
+                  }
         (for [category categories]
           (let [category-name (name category)
                 category-class (utils/class-set {:category true
