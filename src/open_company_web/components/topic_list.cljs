@@ -65,11 +65,11 @@
       (get-new-sections-if-needed owner))
     ; save all the changes....
     (let [save-ch (utils/get-channel "save-bt-navbar")]
-      (go (loop []
+      (go (while true
         (let [change (<! save-ch)]
           (save-sections-cb owner options)))))
     (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
-      (go (loop []
+      (go (while true
         (let [change (<! cancel-ch)]
           ((:navbar-editing-cb options) false)
           (om/set-state! owner :editing false))))))
