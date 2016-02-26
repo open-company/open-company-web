@@ -96,7 +96,7 @@
           cancel-ch (chan)]
       (utils/add-channel "save-bt-navbar" save-ch)
       (utils/add-channel "cancel-bt-navbar" cancel-ch))
-    (get-state owner nil))
+    (get-state data nil))
 
   (did-mount [_]
     (when-not (:read-only (:company-data data))
