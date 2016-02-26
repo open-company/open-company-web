@@ -190,7 +190,7 @@
                     :width 30
                     :height 30
                     :src (str (:image section-data) "?" ls/deploy-key)})
-          (dom/div {:class "topic-title oc-header"} (:title section-data)))
+          (dom/div {:class "topic-title"} (:title section-data)))
 
         ;; Topic headline
         (dom/div {:class "topic-headline"}

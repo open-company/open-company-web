@@ -103,12 +103,12 @@
                   (dom/img {:src (str "/img/3dots.png?" ls/deploy-key)}))))
 
             ;; Company name
-            (dom/div #js {:className "company-name-container oc-header"
+            (dom/div #js {:className "company-name-container"
                           :ref "company-name-container"}
               (dom/div {:class "company-name"} (:name company-data)))
 
             ;; Company description
-            (dom/div #js {:className "company-description-container oc-header"
+            (dom/div #js {:className "company-description-container"
                           :ref "company-description-container"}
               (dom/div {:class "company-description"} (:description company-data)))))
 
