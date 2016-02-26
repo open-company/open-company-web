@@ -3,10 +3,12 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
+            [cljs.core.async :refer (put!)]
             [open-company-web.components.ui.company-avatar :refer (company-avatar)]
             [open-company-web.components.category-nav :refer (category-nav)]
             [open-company-web.router :as router]
             [open-company-web.local-settings :as ls]
+            [open-company-web.lib.utils :as utils]
             [goog.events :as events]
             [goog.style :as gstyle]
             [goog.events.EventType :as EventType])
@@ -63,29 +65,38 @@
     (let [company-data (:company-data data)]
       (dom/div #js {:className "company-header"
                     :ref "company-header"}
+        (if navbar-editing
+          (dom/div #js {:className "navbar-editing"}
+            (dom/button {:class "save-bt oc-btn oc-link"
+                         :on-click (fn [e]
+                                    (when-let [ch (utils/get-channel "save-bt-navbar")]
+                                     (put! ch {:click true :event e})))} "Save")
+            (dom/button {:class "cancel-bt oc-btn oc-link"
+                         :on-click (fn [e]
+                                    (when-let [ch (utils/get-channel "cancel-bt-navbar")]
+                                     (put! ch {:click true :event e})))} "Cancel"))
 
-        (dom/div #js {:className "company-header-top group"}
-          ;; Company logo
-          (dom/div {:class "company-logo-container"}
-            (dom/img {:src (:logo company-data)
-                      :class "company-logo"
-                      :title (:name company-data)}))
-          ;; Buttons
-          (dom/div {:class "buttons-container"}
-            (dom/button {:class "oc-btn bullhorn"}
-              (dom/img {:src (str "/img/bullhorn.png?" ls/deploy-key)}))
-            (dom/button {:class "oc-btn 3dots"}
-              (dom/img {:src (str "/img/3dots.png?" ls/deploy-key)}))))
+          (dom/div {:class ""}
+            (dom/div #js {:className "company-header-top group"}
+              ;; Company logo
+              (dom/div {:class "company-logo-container"}
+                (dom/img {:src (:logo company-data)
+                          :class "company-logo"
+                          :title (:name company-data)}))
+              ;; Buttons
+              (dom/div {:class "buttons-container"}
+                (dom/button {:class "oc-btn bullhorn"}
+                  (dom/img {:src (str "/img/bullhorn.png?" ls/deploy-key)}))
+                (dom/button {:class "oc-btn 3dots"}
+                  (dom/img {:src (str "/img/3dots.png?" ls/deploy-key)}))))
 
-        (when-not navbar-editing
-          (dom/div {}
             ;; Company name
             (dom/div #js {:className "company-name-container oc-header"
                           :ref "company-name-container"}
               (dom/div {:class "company-name"} (:name company-data)))
 
             ;; Company description
-            (dom/div #js {:className "container oc-header"
+            (dom/div #js {:className "oc-header"
                           :ref "company-description-container"}
               (dom/div {:class "company-description"} (:description company-data)))))
 
