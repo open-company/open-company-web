@@ -7,8 +7,6 @@ div.topic-list{
   content: "";
 
   div.topic-list-internal {
-    margin-top: 10px;
-
     &:empty {
       text-align: center;
       font-size: 18px;
