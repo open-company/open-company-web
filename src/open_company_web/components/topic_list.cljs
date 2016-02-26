@@ -1,5 +1,7 @@
 (ns open-company-web.components.topic-list
-  (:require [om.core :as om :include-macros true]
+  (:require-macros [cljs.core.async.macros :refer (go)])
+  (:require [cljs.core.async :refer (chan <!)]
+            [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
@@ -25,19 +27,10 @@
         (om/update-state! owner :new-sections-requested not)
         (api/get-new-sections)))))
 
-(defn save-sections-cb [owner data options new-sections]
-  (let [company-data (:company-data data)
-        categories (:categories company-data)
-        active-category (keyword (:active-category data))
-        old-active-sections (get-in company-data [:sections active-category])
-        remaining-categories (utils/vec-dissoc categories (name active-category))
-        remaining-sections (apply merge
-                                  (map #(hash-map (keyword %) ((keyword %) (:sections company-data)))
-                                       remaining-categories))
-        all-sections (assoc remaining-sections active-category new-sections)]
-    (api/patch-sections all-sections)
-    ((:navbar-editing-cb options) false)
-    (om/set-state! owner :editing false)))
+(defn save-sections-cb [owner options]
+  (api/patch-sections (om/get-state owner :active-topics))
+  ((:navbar-editing-cb options) false)
+  (om/set-state! owner :editing false))
 
 (defn manage-topics-cb [owner options]
   (om/set-state! owner :editing true)
@@ -74,50 +67,102 @@
         (om/set-state! owner :last-expanded-section section-name))
       (toggle-edit-topic-button owner section-name))))
 
+(defn get-active-topics [company-data category]
+  (get-in company-data [:sections (keyword category)]))
+
+(defn update-active-topics [owner options category new-active-topics]
+  (let [old-active-categories (om/get-state owner :active-topics)
+        new-active-categories (assoc old-active-categories category new-active-topics)]
+    (om/set-state! owner :active-topics new-active-categories)
+    ; enable/disable save button
+    ((:save-bt-active-cb options) (not= new-active-topics (om/get-state owner :initial-active-topics)))))
+
+(defn get-state [data current-state]
+  (let [company-data (:company-data data)
+        categories (:categories company-data)
+        active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))]
+    {:editing (or (:editing current-state) false)
+     :initial-active-topics active-topics
+     :active-topics active-topics
+     :new-sections-requested (or (:new-sections-requested current-state) false)
+     :save-bt-active (or (:save-bt-active current-state) false)
+     :show-topic-edit-button (or (:show-topic-edit-button current-state) false)
+     :last-expanded-section (or (:last-expanded-section current-state) nil)}))
+
 (defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
 
   (init-state [_]
-    {:editing false
-     :new-sections-requested false
-     :show-topic-edit-button false
-     :last-expanded-section nil})
+    (let [save-ch (chan)
+          cancel-ch (chan)]
+      (utils/add-channel "save-bt-navbar" save-ch)
+      (utils/add-channel "cancel-bt-navbar" cancel-ch))
+    (get-state owner nil))
 
   (did-mount [_]
     (when-not (:read-only (:company-data data))
-      (get-new-sections-if-needed owner)))
+      (get-new-sections-if-needed owner))
+    ; save all the changes....
+    (let [save-ch (utils/get-channel "save-bt-navbar")]
+      (go (while true
+        (let [change (<! save-ch)]
+          (save-sections-cb owner options)))))
+    (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
+      (go (while true
+        (let [change (<! cancel-ch)]
+          ((:navbar-editing-cb options) false)
+          (om/set-state! owner :editing false))))))
 
-  (did-update [_ _ _]
+  (will-unmount [_]
+    (utils/remove-channel "save-bt-navbar")
+    (utils/remove-channel "cancel-bt-navbar"))
+
+  (did-update [_ prev-props _]
+    (when-not (= (:company-data prev-props) (:company-data data))
+      (om/set-state! owner (get-state data (om/get-state owner))))
     (when-not (:read-only (:company-data data))
       (get-new-sections-if-needed owner)))
 
-  (render-state [_ {:keys [show-topic-edit-button editing] :as state}]
+  (render-state [_ {:keys [show-topic-edit-button active-topics editing]}]
     (let [slug (keyword (:slug @router/path))]
       (if editing
-        (om/build topic-list-edit data {:opts {:new-sections (slug @caches/new-sections)
-                                               :active-category (:active-category data)
-                                               :save-sections-cb (partial save-sections-cb owner data options)
-                                               :cancel-editing-cb (fn []
-                                                                    (om/set-state! owner :editing false)
-                                                                    (navbar-editing-cb false))}})
+        (let [categories (map name (keys active-topics))]
+          (dom/div {:class "topic-list-edit-container"
+                    :key "topic-list-edit-container"}
+            (for [cat categories]
+              (om/build topic-list-edit
+                        (merge data {:active (= cat (:active-category data))
+                                     :category cat
+                                     :active-topics (get active-topics (keyword cat))})
+                        {:key cat
+                         :opts {:active-category (:active-category data)
+                                :new-sections (slug @caches/new-sections)
+                                :did-change-sort (partial update-active-topics owner options (keyword cat))}}))))
         (let [company-data (:company-data data)
               active-category (keyword (:active-category data))
-              active-sections (get-in company-data [:sections active-category])]
-          (dom/div {:class "topic-list fix-top-margin-scrolling"}
+              category-topics (get active-topics active-category)]
+          (dom/div {:class "topic-list fix-top-margin-scrolling"
+                    :key "topic-list"}
             (dom/div {:class "topic-list-internal"}
-              (for [section-name active-sections
+              (for [section-name category-topics
                     :let [sd (->> section-name keyword (get company-data))]]
                 (dom/div {:class "topic-row"
                           :key (str "topic-row-" (name section-name))}
                   (when-not (and (:read-only company-data) (:placeholder sd))
                     (om/build topic {:loading (:loading company-data)
-                                     :company-data company-data
+                                     :section section-name
+                                     :section-data (get company-data (keyword section-name))
+                                     :currency (:currency company-data)
                                      :active-category active-category}
                                      {:opts {:section-name section-name
                                              :navbar-editing-cb navbar-editing-cb
                                              :force-edit-cb (partial force-edit-button owner)
                                              :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)}})))))
-            (when (and (not (:read-only company-data)) (pos? (count active-sections)))
-              (om/build manage-topics {} {:opts {:manage-topics-cb #(manage-topics-cb owner options)}}))
+            (when (and (not (:read-only company-data)) (seq company-data))
+              (dom/div #js {:className "manage-topics-container"
+                            :style #js {:opacity (if (om/get-state owner :show-topic-edit-button) "0" "1")}}
+                (om/build manage-topics
+                          nil
+                          {:opts {:manage-topics-cb #(manage-topics-cb owner options)}})))
             (when-not (:read-only company-data)
               (dom/div #js {:className "topic-row floating-edit-topic-button"
                             :ref "edit-topic-button"

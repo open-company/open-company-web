@@ -19,24 +19,29 @@
   (utils/remove-channel "save-bt-navbar")
   (utils/remove-channel "cancel-bt-navbar"))
 
-(def tinymce-options #js {
-  :selector "div.body-editor"
-  :theme "advanced"
-  :toolbar1 "bold,italic,underline,separator,strikethrough,style-h1"
-  :toolbar2 "bullist,numlist,link,unlink,image"
-  :plugins "link,image,stylebuttons"
-  :resize false
-  :menubar false
-  :statusbar false
-  :theme_advanced_buttons1 ""
-  :theme_advanced_buttons2 ""
-  :theme_advanced_buttons3 ""})
+(defn tinymce-options [opts]
+  (clj->js {
+    :selector "div.body-editor"
+    :theme "advanced"
+    :toolbar "bold,italic,strikethrough,style-h1,bullist,link,unlink,image"
+    :plugins "link,image,stylebuttons"
+    :resize false
+    :menubar false
+    :statusbar false
+    :theme_advanced_buttons1 ""
+    :theme_advanced_buttons2 ""
+    :theme_advanced_buttons3 ""
+    :setup (fn [editor]
+             (.on editor "change" #((:save-bt-active-cb opts) true)))}))
 
-(defn setup-medium-editor [owner]
+(defn setup-editor [owner options]
   (when (and (om/get-state owner :did-mount)
              (om/get-state owner :did-load-resources))
-    (let [tinymce-editor (.init js/tinymce (clj->js tinymce-options))]
+    (let [tinymce-editor (.init js/tinymce (tinymce-options options))]
       (om/set-state! owner :tinymce-editor tinymce-editor))))
+
+(defn body-content []
+  (.getContent (.-activeEditor js/tinymce)))
 
 (defcomponent edit-topic [{:keys [section section-data] :as data} owner options]
 
@@ -44,10 +49,9 @@
     (cdr/add-script! "/lib/tinymce/tinymce.min.js"
                       (fn []
                         (om/set-state! owner :did-load-resources true)
-                        (setup-medium-editor owner)))
+                        (setup-editor owner options)))
     {:title (:title section-data)
      :headline (:headline section-data)
-     :body (:body section-data)
      :tinymce-editor nil
      :did-mount false
      :did-load-resources false})
@@ -61,13 +65,13 @@
 
   (did-mount [_]
     (om/set-state! owner :did-mount true)
-    (setup-medium-editor owner)
+    (setup-editor owner options)
     (let [save-ch (utils/get-channel "save-bt-navbar")]
       (go (loop []
         (let [change (<! save-ch)]
           (let [section-data {:title (om/get-state owner :title)
                               :headline (om/get-state owner :headline)
-                              :body (.-innerHTML (sel1 [:div.body-editor]))}]
+                              :body (body-content)}]
             (api/partial-update-section section section-data)
             ((:dismiss-topic-editing-cb options) true))))))
     (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
@@ -75,7 +79,7 @@
         (let [change (<! cancel-ch)]
           ((:dismiss-topic-editing-cb options) false))))))
 
-  (render-state [_ {:keys [title headline body]}]
+  (render-state [_ {:keys [title headline]}]
     (dom/div {:class "edit-topic"}
       (dom/div {:class "edit-topic-internal group"}
         (dom/div {:class "edit-topic-title"}
@@ -83,18 +87,20 @@
                           :className "edit-topic-title-input"
                           :maxLength 100
                           :value title
-                          :onChange #(om/set-state! owner :title (.. % -target -value))}))
+                          :onChange (fn [e]
+                                      (om/set-state! owner :title (.. e -target -value))
+                                      ((:save-bt-active-cb options) true))}))
         (dom/div {:class "edit-topic-headline"}
           (dom/input #js {:ref "topic-headline"
                           :className "edit-topic-headline-input"
                           :maxLength 100
                           :value headline
-                          :onChange #(om/set-state! owner :headline (.. % -target -value))}))
+                          :onChange (fn [e]
+                                      (om/set-state! owner :headline (.. e -target -value))
+                                      ((:save-bt-active-cb options) true))}))
         (dom/div {:class "edit-topic-body"}
           (dom/div #js {:ref "topic-body"
                         :className "body-editor"
-                        :dangerouslySetInnerHTML (clj->js {"__html" body})
-                        :onChange (fn [e]
-                                    (om/set-state! owner :body (.. e -target -value)))})
+                        :dangerouslySetInnerHTML (clj->js {"__html" (:body section-data)})})
           (dom/div #js {:className "toolbar-container"
                         :ref "toolbar-container"}))))))

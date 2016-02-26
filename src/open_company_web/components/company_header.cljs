@@ -54,7 +54,7 @@
             (gstyle/setStyle company-name-container #js {:webkitTransform "translate3d(0,0,0)"})
             (gstyle/setStyle company-description-container #js {:webkitTransform "translate3d(0,0,0)"})))))))
 
-(defcomponent company-header [data owner]
+(defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner]
 
   (did-mount [_]
     (.setTimeout js/window #(watch-scroll owner) 500))
@@ -77,15 +77,17 @@
             (dom/button {:class "oc-btn 3dots"}
               (dom/img {:src (str "/img/3dots.png?" ls/deploy-key)}))))
 
-        ;; Company name
-        (dom/div #js {:className "company-name-container oc-header"
-                      :ref "company-name-container"}
-          (dom/div {:class "company-name"} (:name company-data)))
+        (when-not navbar-editing
+          (dom/div {}
+            ;; Company name
+            (dom/div #js {:className "company-name-container oc-header"
+                          :ref "company-name-container"}
+              (dom/div {:class "company-name"} (:name company-data)))
 
-        ;; Company description
-        (dom/div #js {:className "container oc-header"
-                      :ref "company-description-container"}
-          (dom/div {:class "company-description"} (:description company-data)))
+            ;; Company description
+            (dom/div #js {:className "container oc-header"
+                          :ref "company-description-container"}
+              (dom/div {:class "company-description"} (:description company-data)))))
 
         ;; Category navigation
-        (om/build category-nav data)))))
+        (om/build category-nav (assoc data :navbar-editing navbar-editing))))))

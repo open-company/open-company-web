@@ -13,7 +13,8 @@
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as EventType]
-            [goog.events :as events]))
+            [goog.events :as events]
+            [goog.style :refer (setStyle)]))
 
 (defn- get-body [section-data section]
   (if (#{:finances :growth} section)
@@ -75,10 +76,10 @@
   (let [topic (om/get-ref owner "topic")
         topic-more (om/get-ref owner "topic-more")
         body-node (om/get-ref owner "topic-body")]
-    (set! (.-height (.-style body-node)) "auto")
+    (setStyle body-node #js {:height "auto"})
     (let [body-height (.-offsetHeight body-node)
           body-width (.-offsetWidth body-node)]
-      (set! (.-height (.-style body-node)) (if expanded "auto" "0"))
+      (setStyle body-node #js {:height (if expanded "auto" "0")})
 
       ;; animate finances headtitle
       (when-let [finances-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-finances")]
@@ -144,7 +145,7 @@
       (if-not expanded
         ;; show the edit button if the topic body is empty
         (let [section (keyword (:section-name options))
-              section-data (get (:company-data data) section)
+              section-data (:section-data data)
               body (get-body section-data section)]
           (when (clojure.string/blank? body)
             ((:force-edit-cb options) true)))
@@ -163,7 +164,7 @@
     :else
     topic-headline))
 
-(defcomponent topic [{:keys [company-data] :as data} owner {:keys [section-name navbar-editing-cb] :as options}]
+(defcomponent topic [{:keys [section-data section currency] :as data} owner {:keys [section-name navbar-editing-cb] :as options}]
 
   (init-state [_]
     {:expanded false})
@@ -175,10 +176,8 @@
     (utils/replace-svg))
 
   (render-state [_ {:keys [editing expanded show-edit-button] :as state}]
-    (let [section (keyword section-name)
-          section-data (get company-data section)
-          section-body (get-body section-data section)
-          currency (:currency company-data)
+    (let [section-kw (keyword section)
+          section-body (get-body section-data section-kw)
           headline-options {:opts {:currency currency}}
           headline-data (assoc section-data :expanded expanded)]
       (dom/div #js {:className "topic"
@@ -188,16 +187,18 @@
         ;; Topic title
         (dom/div {:class "topic-header group"}
           (dom/img {:class (str "topic-image svg")
+                    :width 30
+                    :height 30
                     :src (str (:image section-data) "?" ls/deploy-key)})
           (dom/div {:class "topic-title oc-header"} (:title section-data)))
 
         ;; Topic headline
         (dom/div {:class "topic-headline"}
           (cond
-            (= section :finances)
+            (= section-kw :finances)
             (om/build topic-headline-finances headline-data headline-options)
 
-            (= section :growth)
+            (= section-kw :growth)
             (om/build topic-headline-growth headline-data headline-options)
 
             :else
@@ -216,18 +217,18 @@
                                   (topic-body-click % owner options show-edit-button))
                       :style #js {"height" (if expanded "auto" "0")}}
           (cond
-            (= section :growth)
+            (= section-kw :growth)
             (om/build growth {:section-data section-data
-                              :section section
+                              :section section-kw
                               :currency currency
                               :actual-as-of (:updated-at section-data)
                               :read-only true}
                              {:opts {:show-title false
                                      :show-revisions-navigation false}})
 
-            (= section :finances)
+            (= section-kw :finances)
             (om/build finances {:section-data section-data
-                                :section section
+                                :section section-kw
                                 :currency currency
                                 :actual-as-of (:updated-at section-data)
                                 :read-only true}
