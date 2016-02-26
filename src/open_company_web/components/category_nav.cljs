@@ -62,7 +62,7 @@
           (let [category-name (name category)
                 category-class (utils/class-set {:category true
                                                  :active (= active-category category-name)})]
-            (dom/a {:class "oc-header"
+            (dom/a {:class ""
                     :href (str "/companies/" slug "/dashboard#" category-name)
                     :on-click (partial category-click data category-name)}
               (dom/div {:class category-class}
