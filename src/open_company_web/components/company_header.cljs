@@ -32,7 +32,9 @@
               (let [company-name-container-height (.-clientHeight company-name-container)
                     category-nav-height (.-clientHeight category-nav)
                     company-header-height (.-clientHeight company-header)
-                    category-nav-pivot (+ (- company-header-height category-nav-height company-name-container-height) 0)]
+                    category-nav-pivot (- company-header-height
+                                          category-nav-height
+                                          company-name-container-height)]
                 (reset! company-header-pt category-nav-pivot)))
             ; fix company name and move the company description relatively when
             ; the scroll hit the company name
@@ -52,12 +54,12 @@
                   (gstyle/setStyle category-nav #js {:position "fixed"
                                                      :top "50px"
                                                      :left "0"})
-                  (gstyle/setStyle topic-list #js {:marginTop "50px"}))
+                  (gstyle/setStyle topic-list #js {:marginTop "60px"}))
                 (do
                   (gstyle/setStyle category-nav #js {:position "relative"
                                                      :top "0"
                                                      :left "0"})
-                  (gstyle/setStyle topic-list #js {:marginTop "0px"}))))
+                  (gstyle/setStyle topic-list #js {:marginTop "10px"}))))
             (when category-nav
               (gstyle/setStyle category-nav #js {:webkitTransform "translate3d(0,0,0)"}))
             (when company-name-container
