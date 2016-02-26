@@ -3,7 +3,7 @@ div.company-dashboard {
   div.category-nav {
     border-top: 1px solid #DFDFDF; /* gray */
     border-bottom: 1px solid #DFDFDF; /* gray */
-    background-color: rgb(250, 250, 250);
+    background-color: white;
     width: 100%;
     z-index: 2;
     padding: 0px;
@@ -22,6 +22,8 @@ div.company-dashboard {
       vertical-align: middle;
       /* horizontally center the text */
       text-align: center;
+      color: #8b8a8a;
+      text-transform: uppercase;
 
       div.category-label {
         font-size: 16px;
@@ -33,7 +35,7 @@ div.company-dashboard {
       }
 
       &.active div.category-label {
-        color: black;
+        color: #2d2d2d;
         border-bottom: 3px solid black;
       }
     }
