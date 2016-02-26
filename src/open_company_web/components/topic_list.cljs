@@ -21,24 +21,25 @@
         (om/update-state! owner :new-sections-requested not)
         (api/get-new-sections)))))
 
-(defn save-sections-cb [owner data options new-sections]
-  (let [company-data (:company-data data)
-        categories (:categories company-data)
-        active-category (keyword (:active-category data))
-        old-active-sections (get-in company-data [:sections active-category])
-        remaining-categories (utils/vec-dissoc categories (name active-category))
-        remaining-sections (apply merge
-                                  (map #(hash-map (keyword %) ((keyword %) (:sections company-data)))
-                                       remaining-categories))
-        all-sections (assoc remaining-sections active-category new-sections)]
-    (api/patch-sections all-sections)
-    ((:navbar-editing-cb options) false)
-    (om/set-state! owner :editing false)))
+(defn save-sections-cb [owner options]
+  (api/patch-sections (om/get-state owner :active-topics))
+  ((:navbar-editing-cb options) false)
+  (om/set-state! owner :editing false))
 
 (defn manage-topic-cb [owner options]
   (om/set-state! owner :editing true)
   ((:navbar-editing-cb options) true)
   (utils/scroll-to-y 0))
+
+(defn get-active-topics [company-data category]
+  (get-in company-data [:sections (keyword category)]))
+
+(defn update-active-topics [owner options category new-active-topics]
+  (let [old-active-categories (om/get-state owner :active-topics)
+        new-active-categories (assoc old-active-categories category new-active-topics)]
+    (om/set-state! owner :active-topics new-active-categories)
+    ; enable/disable save button
+    ((:save-bt-active-cb options) (not= new-active-topics (om/get-state owner :initial-active-topics)))))
 
 (defcomponent topic-list [data owner options]
 
@@ -47,9 +48,14 @@
           cancel-ch (chan)]
       (utils/add-channel "save-bt-navbar" save-ch)
       (utils/add-channel "cancel-bt-navbar" cancel-ch))
-    {:editing false
-     :new-sections-requested false
-     :save-bt-active false})
+    (let [company-data (:company-data data)
+          categories (:categories company-data)
+          active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))]
+      {:editing false
+       :initial-active-topics active-topics
+       :active-topics active-topics
+       :new-sections-requested false
+       :save-bt-active false}))
 
   (did-mount [_]
     (when-not (:read-only (:company-data data))
@@ -58,43 +64,39 @@
     (let [save-ch (utils/get-channel "save-bt-navbar")]
       (go (loop []
         (let [change (<! save-ch)]
-          (let [active-topics (om/get-state owner :active-topics)]
-            ((:save-sections-cb options) active-topics))))))
+          (save-sections-cb owner options)))))
     (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
       (go (loop []
         (let [change (<! cancel-ch)]
-          ((:cancel-editing-cb options)))))))
+          ((:navbar-editing-cb options) false)
+          (om/set-state! owner :editing false))))))
 
   (did-update [_ _ _]
     (when-not (:read-only (:company-data data))
       (get-new-sections-if-needed owner)))
 
-  (render [_]
-    (let [slug (keyword (:slug @router/path))
-          editing (om/get-state owner :editing)]
+  (render-state [_ {:keys [active-topics editing]}]
+    (let [slug (keyword (:slug @router/path))]
       (if editing
-        (let [categories (vec (map :name (:categories (slug @caches/new-sections))))]
+        (let [categories (map name (keys active-topics))]
           (dom/div {:class "topic-list-edit-container"
                     :key "topic-list-edit-container"}
             (for [cat categories]
-              (om/build topic-list-edit (assoc data :active (= cat (:active-category data)))
+              (om/build topic-list-edit
+                        (merge data {:active (= cat (:active-category data))
+                                     :category cat
+                                     :active-topics (get active-topics (keyword cat))})
                         {:key cat
-                         :opts {:new-sections (slug @caches/new-sections)
-                                :active-category cat
-                                :save-sections-cb (partial save-sections-cb owner data options)
-                                :save-bt-active-cb (fn [active]
-                                                     (om/set-state! owner :save-bt-active (or (om/get-state owner :save-bt-active) active))
-                                                     ((:save-bt-active-cb options) (om/get-state owner :save-bt-active)))
-                                :cancel-editing-cb (fn []
-                                                     (om/set-state! owner :editing false)
-                                                     ((:navbar-editing-cb options) false))}}))))
+                         :opts {:active-category (:active-category data)
+                                :new-sections (slug @caches/new-sections)
+                                :did-change-sort (partial update-active-topics owner options (keyword cat))}}))))
         (let [company-data (:company-data data)
               active-category (keyword (:active-category data))
-              active-sections (get-in company-data [:sections active-category])]
+              category-topics (get active-topics active-category)]
           (dom/div {:class "topic-list fix-top-margin-scrolling"
                     :key "topic-list"}
             (dom/div {:class "topic-list-internal"}
-              (for [section-name active-sections
+              (for [section-name category-topics
                     :let [sd (->> section-name keyword (get company-data))]]
                 (dom/div {:class "topic-row"
                           :key (str "topic-row-" (name section-name))}
