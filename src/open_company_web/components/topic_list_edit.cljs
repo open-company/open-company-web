@@ -1,7 +1,5 @@
 (ns open-company-web.components.topic-list-edit
-  (:require-macros [cljs.core.async.macros :refer (go)])
-  (:require [cljs.core.async :refer (chan <!)]
-            [om.core :as om :include-macros true]
+  (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
@@ -59,7 +57,7 @@
 (defn resize-handles []
   (let [sortable (sel1 [:ul.topic-list-sortable])
         handles (sel sortable [:div.topic-edit-handle])
-        height (.-offsetHeight (sel1 [:div.topic-edit-internal]))]
+        height (.-clientHeight (sel1 [:div.topic-edit-internal]))]
     (doseq [el handles]
       (setStyle el #js {:height (str height "px")}))))
 
@@ -71,9 +69,9 @@
                                                          (let [li-elements (sel [:ul.topic-list-sortable :li])
                                                                items (vec (map #(.-itemname (.-dataset %)) li-elements))]
                                                            (om/set-state! owner :active-topics items)
-                                                           ((:save-bt-active-cb options) true)))})))))
+                                                           ((:did-change-sort options) items)))})))))
 
-(defn topic-on-click [item-name owner save-bt-active-cb]
+(defn topic-on-click [item-name owner did-change-sort]
   (let [active-topics (om/get-state owner :active-topics)
         unactive-topics (om/get-state owner :unactive-topics)
         is-active (utils/in? active-topics item-name)
@@ -85,7 +83,7 @@
                               (utils/vec-dissoc unactive-topics item-name))]
     (om/set-state! owner :active-topics (vec new-active-topics))
     (om/set-state! owner :unactive-topics (vec new-unactive-topics))
-    (save-bt-active-cb (not= new-active-topics (om/get-state owner :initial-active-topics)))))
+    (did-change-sort new-active-topics)))
 
 (defcomponent topic-list-edit [data owner options]
 
@@ -94,16 +92,12 @@
                      (fn []
                        (om/set-state! owner :sortable-loaded true)
                        (setup-sortable owner options)))
-    (let [save-ch (chan)
-          cancel-ch (chan)]
-      (utils/add-channel "save-bt-navbar" save-ch)
-      (utils/add-channel "cancel-bt-navbar" cancel-ch))
     (when (empty? @caches/new-sections)
       (api/get-new-sections))
-    (let [active-category (:active-category options)
-          active-topics (get-in (:company-data data) [:sections (keyword active-category)])
+    (let [active-topics (:active-topics data)
+          category (:category data)
           all-sections (:new-sections options)
-          category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
+          category-sections (:sections (first (filter #(= (:name %) category) (:categories all-sections))))
           sections-list (vec (map :section-name category-sections))
           unactive-topics (reduce utils/vec-dissoc sections-list active-topics)]
       {:initial-active-topics active-topics
@@ -124,16 +118,7 @@
 
   (did-mount [_]
     (om/set-state! owner :did-mount true)
-    (setup-sortable owner options)
-    (let [save-ch (utils/get-channel "save-bt-navbar")]
-      (go (loop []
-        (let [change (<! save-ch)]
-          (let [active-topics (om/get-state owner :active-topics)]
-            ((:save-sections-cb options) active-topics))))))
-    (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
-      (go (loop []
-        (let [change (<! cancel-ch)]
-          ((:cancel-editing-cb options)))))))
+    (setup-sortable owner options))
 
   (render-state [_ {:keys [unactive-topics active-topics]}]
     ; resize the handles after each render
@@ -144,7 +129,8 @@
             all-sections (:new-sections options)
             category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
             items (get-sections-data category-sections)]
-        (dom/div {:class "topic-list-edit group no-select"}
+        (dom/div {:class "topic-list-edit group no-select"
+                  :style #js {:display (if (:active data) "inline" "none")}}
           (dom/div {}
             (apply dom/ul
                    ; props
@@ -154,7 +140,7 @@
                    (map (fn [item-name]
                           (dom/li {:data-itemname item-name
                                    :key item-name
-                                   :on-click #(topic-on-click item-name owner (:save-bt-active-cb options))}
+                                   :on-click #(topic-on-click item-name owner (:did-change-sort options))}
                             (om/build item {:id item-name
                                             :item-data (get items (keyword item-name))
                                             :active-topics active-topics}))) active-topics)))
@@ -165,7 +151,7 @@
                    (map (fn [item-name]
                           (dom/li {:data-itemname item-name
                                    :key item-name
-                                   :on-click #(topic-on-click item-name owner (:save-bt-active-cb options))}
+                                   :on-click #(topic-on-click item-name owner (:did-change-sort options))}
                             (om/build item {:id item-name
                                             :item-data (get items (keyword item-name))
                                             :active-topics active-topics}))) unactive-topics))))))))
