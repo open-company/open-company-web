@@ -122,26 +122,22 @@
         (dom/div {:class "topic-list-edit group no-select"
                   :style #js {:display (if (:active data) "inline" "none")}}
           (dom/div {}
-            (apply dom/ul
-                   ; props
-                   {:class "topic-list-sortable"
-                    :key "topic-list-edit"}
-                   ; childrens
-                   (map (fn [item-name]
-                          (dom/li {:data-itemname item-name
-                                   :key item-name
-                                   :on-click #(topic-on-click item-name owner (:did-change-sort options))}
-                            (om/build item {:id item-name
-                                            :item-data (get items (keyword item-name))
-                                            :active-topics active-topics}))) active-topics)))
+            (dom/ul {:class "topic-list-sortable"
+                     :key "topic-list-edit"}
+              (for [item-name active-topics]
+                (dom/li {:data-itemname item-name
+                         :key item-name
+                         :on-click #(topic-on-click item-name owner (:did-change-sort options))}
+                  (om/build item {:id item-name
+                                  :item-data (get items (keyword item-name))
+                                  :active-topics active-topics})))))
           (dom/div {}
-            (apply dom/ul
-                   {:class "topic-list-unactive"
-                    :key "topic-list-unactive"}
-                   (map (fn [item-name]
-                          (dom/li {:data-itemname item-name
-                                   :key item-name
-                                   :on-click #(topic-on-click item-name owner (:did-change-sort options))}
-                            (om/build item {:id item-name
-                                            :item-data (get items (keyword item-name))
-                                            :active-topics active-topics}))) unactive-topics))))))))
+            (dom/ul {:class "topic-list-unactive"
+                     :key "topic-list-unactive"}
+              (for [item-name unactive-topics]
+                (dom/li {:data-itemname item-name
+                         :key item-name
+                         :on-click #(topic-on-click item-name owner (:did-change-sort options))}
+                  (om/build item {:id item-name
+                                  :item-data (get items (keyword item-name))
+                                  :active-topics active-topics}))))))))))
