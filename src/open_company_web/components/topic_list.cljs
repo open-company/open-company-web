@@ -69,6 +69,18 @@
     ; enable/disable save button
     ((:save-bt-active-cb options) (not= new-active-topics (om/get-state owner :initial-active-topics)))))
 
+(defn get-state [data current-state]
+  (let [company-data (:company-data data)
+        categories (:categories company-data)
+        active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))]
+    {:editing (or (:editing current-state) false)
+     :initial-active-topics active-topics
+     :active-topics active-topics
+     :new-sections-requested (or (:new-sections-requested current-state) false)
+     :save-bt-active (or (:save-bt-active current-state) false)
+     :show-topic-edit-button (or (:show-topic-edit-button current-state) false)
+     :last-expanded-section (or (:last-expanded-section current-state) nil)}))
+
 (defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
 
   (init-state [_]
@@ -76,16 +88,7 @@
           cancel-ch (chan)]
       (utils/add-channel "save-bt-navbar" save-ch)
       (utils/add-channel "cancel-bt-navbar" cancel-ch))
-    (let [company-data (:company-data data)
-          categories (:categories company-data)
-          active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))]
-      {:editing false
-       :initial-active-topics active-topics
-       :active-topics active-topics
-       :new-sections-requested false
-       :save-bt-active false
-       :show-topic-edit-button false
-       :last-expanded-section nil}))
+    (get-state owner nil))
 
   (did-mount [_]
     (when-not (:read-only (:company-data data))
@@ -101,7 +104,13 @@
           ((:navbar-editing-cb options) false)
           (om/set-state! owner :editing false))))))
 
-  (did-update [_ _ _]
+  (will-unmount [_]
+    (utils/remove-channel "save-bt-navbar")
+    (utils/remove-channel "cancel-bt-navbar"))
+
+  (did-update [_ prev-props _]
+    (when-not (= (:company-data prev-props) (:company-data data))
+      (om/set-state! owner (get-state data (om/get-state owner))))
     (when-not (:read-only (:company-data data))
       (get-new-sections-if-needed owner)))
 
