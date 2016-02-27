@@ -79,7 +79,8 @@
     (setStyle body-node #js {:height "auto"})
     (let [body-height (.-offsetHeight body-node)
           body-width (.-offsetWidth body-node)]
-      (setStyle body-node #js {:height (if expanded "auto" "0")})
+      (setStyle body-node #js {:height (if expanded "auto" "0")
+                               :overflow (if expanded "hidden" "visible")})
 
       ;; animate finances headtitle
       (when-let [finances-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-finances")]
@@ -213,7 +214,8 @@
           (dom/i {:class "fa fa-circle"}))
 
         ;; Topic body
-        (dom/div #js {:className "topic-body"
+        (dom/div #js {:className (utils/class-set {:topic-body true
+                                                   :expanded expanded})
                       :ref "topic-body"
                       :onClick #(when-not (:read-only section-data)
                                   (topic-body-click % owner options show-edit-button))
