@@ -23,7 +23,7 @@
 
 (defcomponent topic-headline [data owner]
   (render [_]
-    (dom/div {:class "topic-headline"} (:headline data))))
+    (dom/div {:class "topic-headline-inner"} (:headline data))))
 
 (defcomponent topic-headline-finances [data owner options]
   (render [_]
@@ -35,7 +35,7 @@
           cur-symbol (utils/get-symbol-for-currency-code currency)
           cash-val (str cur-symbol (utils/thousands-separator (:cash actual)))
           actual-label (str "as of " (finances-utils/get-as-of-string (:period actual)))]
-      (dom/div {:class (utils/class-set {:topic-headline true
+      (dom/div {:class (utils/class-set {:topic-headline-inner true
                                          :topic-headline-finances true
                                          :group true
                                          :collapse (:expanded data)})}
@@ -57,7 +57,7 @@
           unit (when (= metric-unit "%") "%")
           last-value (utils/thousands-separator (:value (first metric-data)))
           last-value-label (str fixed-cur-unit last-value unit)]
-      (dom/div {:class (utils/class-set {:topic-headline true
+      (dom/div {:class (utils/class-set {:topic-headline-inner true
                                          :topic-headline-growth true
                                          :group true
                                          :collapse (:expanded data)})}
@@ -208,7 +208,9 @@
                       :ref "topic-more"
                       :style #js {:opacity (if expanded 0 1)
                                   :height (if expanded "0px" "21px")}}
-          (dom/img {:src "/img/3dots-horizontal.png"}))
+          (dom/i {:class "fa fa-circle"})
+          (dom/i {:class "fa fa-circle"})
+          (dom/i {:class "fa fa-circle"}))
 
         ;; Topic body
         (dom/div #js {:className "topic-body"

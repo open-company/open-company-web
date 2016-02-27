@@ -34,7 +34,8 @@
                     company-header-height (.-clientHeight company-header)
                     category-nav-pivot (- company-header-height
                                           category-nav-height
-                                          company-name-container-height)]
+                                          company-name-container-height
+                                          -19)]
                 (reset! company-header-pt category-nav-pivot)))
             ; fix company name and move the company description relatively when
             ; the scroll hit the company name
@@ -42,7 +43,7 @@
               (if (> scroll-top company-name-offset-top)
                 (do
                   (gstyle/setStyle company-name-container #js {:position "fixed"})
-                  (gstyle/setStyle company-description-container #js {:marginTop "50px"}))
+                  (gstyle/setStyle company-description-container #js {:marginTop "46px"}))
                 (do
                   (gstyle/setStyle company-name-container #js {:position "relative"})
                   (gstyle/setStyle company-description-container #js {:marginTop "0px"}))))
@@ -52,14 +53,14 @@
               (if (> scroll-top @company-header-pt)
                 (do
                   (gstyle/setStyle category-nav #js {:position "fixed"
-                                                     :top "50px"
+                                                     :top "46px"
                                                      :left "0"})
-                  (gstyle/setStyle topic-list #js {:marginTop "60px"}))
+                  (gstyle/setStyle topic-list #js {:marginTop "71px"}))
                 (do
                   (gstyle/setStyle category-nav #js {:position "relative"
                                                      :top "0"
                                                      :left "0"})
-                  (gstyle/setStyle topic-list #js {:marginTop "10px"}))))
+                  (gstyle/setStyle topic-list #js {:marginTop "5px"}))))
             (when category-nav
               (gstyle/setStyle category-nav #js {:webkitTransform "translate3d(0,0,0)"}))
             (when company-name-container
