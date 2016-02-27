@@ -22,6 +22,7 @@ div.company-header{
   }
 
   div.company-header-top {
+    margin-top: 22px;
 
     div.company-logo-container{
       padding-left: 15px;
@@ -30,28 +31,30 @@ div.company-header{
 
       img.company-logo {
         width: auto;
-        height: 50px;
+        height: 70px;
       }
     }
 
     div.buttons-container {
       padding-right: 15px;
-      width: 150px;
+      width: 160px;
       float: right;
       text-align: right;
 
       button.oc-btn {
-        width: 40px;
-        height: 30px;
-        margin-top: 15px;
-        margin-right: 0px;
-        margin-left: 10px;
+        width: 25px;
+        height: 21px;
+        margin: 0px;
+        padding: 0px;
         border: 0px;
         outline: none;
 
+        &.bullhorn {
+          margin-right: 15px;
+        }
+
         & img {
-          width: 30px;
-          height: 30px;
+          height: 21px;
         }
 
         &:focus, &:active{
@@ -68,13 +71,14 @@ div.company-header{
     z-index: 2;
 
     div.company-name {
-      padding-top: 10px;
-      padding-bottom: 10px;
-      padding-left: 15px;
-      height: 50px;
+      padding-top: 20px;
+      padding-bottom: 9px;
+      padding-left: 20px;
+      height: 46px;
       text-align: left;
       font-weight: bold;
-      font-size: 21px;
+      font-size: 24px;
+      line-height: 0.9;
       background-color: white;
       color: #2d2d2d;
     }
@@ -85,10 +89,11 @@ div.company-header{
 
     div.company-description {
       text-align: left;
-      font-size: 18px;
-      margin-top: 10px;
-      margin-bottom: 10px;
-      margin-left: 15px;
+      font-size: 16px;
+      line-height: 1.2;
+      margin-top: 0px;
+      margin-bottom: 20px;
+      margin-left: 20px;
       color: #2d2d2d;
     }
   }

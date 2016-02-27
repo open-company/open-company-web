@@ -3,34 +3,39 @@ div.topic-list {
   div.topic {
     margin-left: 0px;
     margin-right: 0px;
-    margin-top: 10px;
-    padding: 15px;
+    margin-top: 5px;
+    padding: 22px 0 22px 0;
     min-height: 100px;
     border-bottom: 1px solid #DFDFDF; /* gray */
     background-color: white;
 
     div.topic-header {
+      margin-left: 22px;
 
       .topic-image {
-        width: 30px;
-        height: 30px;
+        width: 28px;
+        height: 28px;
         float: left;
       }
 
       div.topic-title {
         float: left;
-        margin-left: 5px;
-        font-size: 19px;
-        font-weight: bold;
+        margin-top: 5px;
+        margin-left: 12px;
+        font-size: 26px;
+        font-weight: 600;
+        line-height: 0.7;
         color: #2d2d2d;
       }
     }
 
     div.topic-headline {
-      font-size: 17px;
-      padding: 5px 0px;
+      margin-left: 22px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #444444;
       width: 100%;
-      color: #2d2d2d;
+      margin-top: 15px;
 
       &.collapse {
         height: 0px;
@@ -65,15 +70,25 @@ div.topic-list {
     }
 
     div.topic-more {
+      margin-top: 10px;
       text-align: center;
 
       img {
-        width: 20px;
-        height: 20px;
+        width: 30px;
+        height: 30px;
+      }
+
+      i {
+        font-size: 6px;
+        margin-left: 3px;
+        line-height: 1;
+        font-weight: 600;
+        color: #bababa;
       }
     }
 
     div.topic-date {
+      margin-left: 22px;
       font-size: 12px;
       font-style: italic;
       color: #A6A6A3; /* gray */
@@ -87,12 +102,15 @@ div.topic-list {
     div.topic-body {
       position: relative;
       overflow: hidden;
-
-
-      color: #191919;
       border: 1px solid transparent;
-      font-weight: normal;
-      font-size: 15px;
+
+      & p, & ul {
+        margin-left: 22px;
+        color: #444444;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 1.6;
+      }
 
       &:focus,
       &.editing {
@@ -102,24 +120,12 @@ div.topic-list {
         border: 1px solid black;
       }
 
-      img {
-        max-width: 98%;
+      img, ul img, ul ul img {
+        width: 100%;
+        margin-bottom: 10px;
       }
 
-      ul img {
-        max-width: 98%;
-      }
-
-      ul ul img {
-        max-width: 98%;
-      }
-
-      p {
-         font-weight: normal;
-         font-size: 15px;
-      }
-
-      h1, h3 {
+      h1, h2, h3, h4 {
         font-weight: 600;
         font-size: 17px; 
       }
