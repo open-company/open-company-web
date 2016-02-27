@@ -4,13 +4,12 @@ div.topic-list {
     margin-left: 0px;
     margin-right: 0px;
     margin-top: 5px;
-    padding: 22px 0 22px 0;
+    padding: 22px 0 22px 22px;
     min-height: 100px;
     border-bottom: 1px solid #DFDFDF; /* gray */
     background-color: white;
 
     div.topic-header {
-      margin-left: 22px;
 
       .topic-image {
         width: 28px;
@@ -30,7 +29,6 @@ div.topic-list {
     }
 
     div.topic-headline {
-      margin-left: 22px;
       font-size: 16px;
       line-height: 1.6;
       color: #444444;
@@ -88,7 +86,6 @@ div.topic-list {
     }
 
     div.topic-date {
-      margin-left: 22px;
       font-size: 12px;
       font-style: italic;
       color: #A6A6A3; /* gray */
@@ -104,8 +101,11 @@ div.topic-list {
       overflow: hidden;
       border: 1px solid transparent;
 
+      &.expanded {
+        overflow: visible;
+      }
+
       & p, & ul {
-        margin-left: 22px;
         color: #444444;
         font-weight: normal;
         font-size: 16px;
@@ -120,8 +120,9 @@ div.topic-list {
         border: 1px solid black;
       }
 
-      img, ul img, ul ul img {
-        width: 100%;
+      img {
+        width: calc(100% + 22px);
+        margin-left: -22px;
         margin-bottom: 10px;
       }
 
