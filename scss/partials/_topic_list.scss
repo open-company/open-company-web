@@ -16,7 +16,7 @@ div.topic-list{
       height: 200px;
 
       &:after {
-        content: "This category seams to be empty. Add a topic below to fill it out.";
+        content: "This category is empty. Add a topic below.";
       }
     }
   }
