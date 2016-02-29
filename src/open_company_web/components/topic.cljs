@@ -80,7 +80,7 @@
     (let [body-height (.-offsetHeight body-node)
           body-width (.-offsetWidth body-node)]
       (setStyle body-node #js {:height (if expanded "auto" "0")
-                               :overflow (if expanded "hidden" "visible")})
+                               :overflow "hidden"})
 
       ;; animate finances headtitle
       (when-let [finances-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-finances")]
@@ -133,10 +133,13 @@
                                   (new js/Array body-width (if expanded body-height 0))
                                   (new js/Array body-width (if expanded 0 body-height))
                                   utils/oc-animation-duration)]
-        (events/listen height-animation
-                       EventType/FINISH
-                       #(om/update-state! owner :expanded not))
-        (.play height-animation))
+        (doto height-animation
+          (events/listen
+           EventType/FINISH
+           (fn [e]
+            (om/update-state! owner :expanded not)
+            (setStyle body-node #js {:overflow (if expanded "hidden" "visible")})))
+          (.play)))
 
       (let [topic (om/get-ref owner "topic")
             body-scroll (.-scrollTop (.-body js/document))
