@@ -20,7 +20,7 @@ div.topic-list-edit{
   }
 
   div.topic-edit {
-    min-height: 50px;
+    min-height: 56px;
     padding-top: 10px;
 
     &.active{
@@ -32,7 +32,7 @@ div.topic-list-edit{
 
     div.topic-edit-internal{
       margin: 0px 10px 0px 10px;
-      min-height: 40px;
+      min-height: 56px;
       border: 1px solid rgba(0, 0, 0, 0.1);
       background-color: rgb(252, 252, 252);
       vertical-align: middle;
@@ -43,7 +43,7 @@ div.topic-list-edit{
 
       div.topic-edit-handle {
         float: left;
-        min-height: 50px;
+        min-height: 56px;
         height: 100%;
         width: 30px;
       }
