@@ -1,19 +1,19 @@
-div.topic-row.manage-topic{
+div.topic-row.edit-topic-button{
 
-  div.manage-topic-internal {
+  div.edit-topic-button-internal {
     margin: 10px;
-    border: 1px solid rgb(237, 237, 237);
+    border: 1px dotted black;
     background-color: white;
     height: 50px;
     vertical-align: middle;
     text-align: center;
+    cursor: pointer;
 
-    div.manage-topic-cta{
+    div.edit-topic-button-cta{
       padding: 0;
-      margin: 12px 0;
+      margin: 8px 0;
       font-size: 19px;
       font-weight: bold;
-      cursor: pointer;
     }
   }
 }

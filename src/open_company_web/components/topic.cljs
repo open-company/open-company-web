@@ -17,7 +17,7 @@
 
 (defn- get-body [section-data section]
   (if (#{:finances :growth} section)
-    (get-in section-data [:body :notes])
+    (get-in section-data [:notes :body])
     (:body section-data)))
 
 (defcomponent topic-headline [data owner]
@@ -66,9 +66,13 @@
               (dom/h3 {:class "actual blue"} (:name metric-info))
               (dom/h3 {:class "actual blue"} last-value-label))))))))
 
-(def animation-duration 500)
+(defn topic-body-click [e owner options show-edit-button]
+  (when e
+    (.stopPropagation e))
+  ((:toggle-edit-topic-cb options) (not show-edit-button) (:section-name options))
+  (om/update-state! owner :show-edit-button not))
 
-(defn topic-click [owner expanded]
+(defn topic-click [data owner options expanded]
   (let [topic (om/get-ref owner "topic")
         topic-date-author (om/get-ref owner "topic-date-author")
         body-node (om/get-ref owner "topic-body")]
@@ -83,12 +87,12 @@
                                    finances-children
                                    (new js/Array body-width (if expanded 0 100))
                                    (new js/Array body-width (if expanded 100 0))
-                                   500)
+                                   utils/oc-animation-duration)
               finances-fade (new Fade
                                  finances-children
                                  (if expanded 0 1)
                                  (if expanded 1 0)
-                                 500)]
+                                 utils/oc-animation-duration)]
           (.play finances-resize)
           (.play finances-fade)))
 
@@ -98,12 +102,12 @@
                                  growth-children
                                  (new js/Array body-width (if expanded 0 100))
                                  (new js/Array body-width (if expanded 100 0))
-                                 500)
+                                 utils/oc-animation-duration)
               growth-fade (new Fade
                                growth-children
                                (if expanded 0 1)
                                (if expanded 1 0)
-                               500)]
+                               utils/oc-animation-duration)]
             (.play growth-resize)
             (.play growth-fade)))
 
@@ -114,37 +118,64 @@
                topic-date-author
                (if expanded 1 0)
                (if expanded 0 1)
-               500)))
+               utils/oc-animation-duration)))
+
+      ; animate height
       (let [height-animation (new Resize
                                   body-node
                                   (new js/Array body-width (if expanded body-height 0))
                                   (new js/Array body-width (if expanded 0 body-height))
-                                  500)]
+                                  utils/oc-animation-duration)]
         (events/listen height-animation
                        EventType/FINISH
-                       #(om/update-state! owner :expanded not))
-        ; animate height
+                       (fn []
+                         (om/update-state! owner :expanded not)
+                         (when expanded
+                           (om/set-state! owner :show-edit-button false))))
         (.play height-animation))
 
       (let [topic (om/get-ref owner "topic")
             body-scroll (.-scrollTop (.-body js/document))
             topic-scroll-top (utils/offset-top topic)]
-        (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))))
+        (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90)))
 
-(defcomponent topic [data owner]
+      (if-not expanded
+        ;; show the edit button if the topic body is empty
+        (let [section (keyword (:section data))
+              section-data (:section-data data)
+              body (get-body section-data section)]
+          (when (clojure.string/blank? body)
+            (topic-body-click nil owner options false)))
+        ;; hide the edit button if necessary
+        (when (om/get-state owner :show-edit-button)
+          (topic-body-click nil owner options true))))))
+
+(defn headline-component [section]
+  (cond
+
+    (= section :finances)
+    topic-headline-finances
+
+    (= section :growth)
+    topic-headline-growth
+
+    :else
+    topic-headline))
+
+(defcomponent topic [{:keys [section-data section currency] :as data} owner {:keys [section-name navbar-editing-cb] :as options}]
 
   (init-state [_]
-    {:expanded false})
+    {:expanded false
+     :show-edit-button false})
 
-  (render [_]
-    (let [currency (:currency data)
-          section (:section-name data)
-          section-data (:section-data data)
-          expanded (om/get-state owner :expanded)
-          section-body (get-body section-data section)]
+  (render-state [_ {:keys [editing expanded show-edit-button] :as state}]
+    (let [section-kw (keyword section)
+          section-body (get-body section-data section-kw)
+          headline-options {:opts {:currency currency}}
+          headline-data (assoc section-data :expanded expanded)]
       (dom/div #js {:className "topic"
                     :ref "topic"
-                    :onClick #(topic-click owner expanded)}
+                    :onClick #(topic-click data owner options expanded)}
 
         ;; Topic title
         (dom/div {:class "topic-title oc-header"} (:title section-data))
@@ -152,11 +183,11 @@
         ;; Topic headline
         (dom/div {:class "topic-headline"}
           (cond
-            (= section :finances)
-            (om/build topic-headline-finances (assoc section-data :expanded expanded) {:opts {:currency currency}})
+            (= section-kw :finances)
+            (om/build topic-headline-finances headline-data headline-options)
 
-            (= section :growth)
-            (om/build topic-headline-growth (assoc section-data :expanded expanded) {:opts {:currency currency}})
+            (= section-kw :growth)
+            (om/build topic-headline-growth headline-data headline-options)
 
             :else
             (om/build topic-headline section-data)))
@@ -172,20 +203,22 @@
         ;; Topic body
         (dom/div #js {:className "topic-body"
                       :ref "topic-body"
+                      :onClick #(when-not (:read-only section-data)
+                                  (topic-body-click % owner options show-edit-button))
                       :style #js {"height" (if expanded "auto" "0")}}
           (cond
-            (= section :growth)
+            (= section-kw :growth)
             (om/build growth {:section-data section-data
-                              :section section
+                              :section section-kw
                               :currency currency
                               :actual-as-of (:updated-at section-data)
                               :read-only true}
                              {:opts {:show-title false
                                      :show-revisions-navigation false}})
 
-            (= section :finances)
+            (= section-kw :finances)
             (om/build finances {:section-data section-data
-                                :section section
+                                :section section-kw
                                 :currency currency
                                 :actual-as-of (:updated-at section-data)
                                 :read-only true}

@@ -9,7 +9,7 @@
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
-            [open-company-web.components.manage-topic :refer (manage-topic)]
+            [open-company-web.components.ui.manage-topics :refer (manage-topics)]
             [cljs-dynamic-resources.core :as cdr]
             [goog.style :refer (setStyle)]))
 

@@ -54,8 +54,14 @@ google.visualization.ColumnChart = {};
 google.visualization.ColumnChart.draw = function(){};
 // jwt
 var jwt_decode = function(){};
+// TimyMCE
+var tinymce = function(){};
+tinymce.init = function(){};
+tinymce.activeEditor = {};
+tinymce.activeEditor.getContent = function(){};
 // Sortable.js
 var Sortable = function(){};
 Sortable.create = function(){};
 Sortable.handle = {};
 Sortable.onSort = function(){};
+Sortable.on = function(){};

@@ -7,6 +7,7 @@
             [open-company-web.components.company-header :refer [company-header]]
             [open-company-web.components.topic-list :refer [topic-list]]
             [open-company-web.components.navbar :refer (navbar)]
+            [open-company-web.components.edit-topic :refer (edit-topic)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
 
@@ -15,13 +16,24 @@
 (defn set-save-bt-active [owner active]
   (om/set-state! owner :save-bt-active active))
 
-(defn set-navbar-editing [owner editing]
+(defn set-navbar-editing [owner editing & [title]]
   (when-not editing
     (set-save-bt-active owner false))
-  (om/set-state! owner :navbar-editing editing))
+  (let [fixed-title (or title "")]
+    (om/set-state! owner :navbar-editing editing)
+    (om/set-state! owner :navbar-title fixed-title)))
 
 (defn switch-tab-cb [owner new-tab]
   (om/set-state! owner :active-category new-tab))
+
+(defn topic-edit-cb [owner section]
+  (om/set-state! owner :editing-topic section)
+  (utils/scroll-to-y 0))
+
+(defn dismiss-topic-editing-cb [owner did-save]
+  (om/set-state! owner {:editing-topic nil
+                        :navbar-editing false
+                        :active-category (om/get-state owner :active-category)}))
 
 (defcomponent company-dashboard [data owner]
 
@@ -33,29 +45,40 @@
                        default-category)]
       {:active-category active-tab
        :navbar-editing false
+       :editing-topic false
        :save-bt-active false}))
 
-  (render-state [_ {:keys [navbar-editing] :as state}]
+  (render-state [_ {:keys [editing-topic navbar-editing] :as state}]
     (let [slug (:slug @router/path)
-          company-data ((keyword slug) data)]
+          company-data ((keyword slug) data)
+          navbar-editing-cb (partial set-navbar-editing owner)]
       (dom/div {:class "company-dashboard row-fluid"}
 
         ;; navbar
         (om/build navbar (merge data {:show-share true
-                                      :save-bt-active (om/get-state owner :save-bt-active)
-                                      :edit-mode (om/get-state owner :navbar-editing)}))
+                                      :edit-mode (:navbar-editing state)
+                                      :edit-title (:navbar-title state)
+                                      :save-bt-active (om/get-state owner :save-bt-active)}))
+        (if-not editing-topic
+          (dom/div {}
+            ;; company header
+            (om/build company-header {:loading (:loading company-data)
+                                      :company-data company-data
+                                      :navbar-editing navbar-editing
+                                      :switch-tab-cb (partial switch-tab-cb owner)
+                                      :active-category (:active-category state)})
 
-        ;; company header
-        (om/build company-header {:loading (:loading company-data)
-                                  :company-data company-data
-                                  :navbar-editing navbar-editing
-                                  :switch-tab-cb (partial switch-tab-cb owner)
-                                  :active-category (:active-category state)})
-
-        ;; topic list
-        (om/build topic-list
-                  {:loading (:loading company-data)
-                   :company-data company-data
-                   :active-category (:active-category state)}
-                  {:opts {:navbar-editing-cb (partial set-navbar-editing owner)
-                          :save-bt-active-cb (partial set-save-bt-active owner)}})))))
+            ;; topic list
+            (om/build topic-list
+                      {:loading (:loading company-data)
+                       :company-data company-data
+                       :active-category (:active-category state)}
+                      {:opts {:navbar-editing-cb navbar-editing-cb
+                              :topic-edit-cb #(topic-edit-cb owner %)
+                              :save-bt-active-cb (partial set-save-bt-active owner)}}))
+          ;; topic edit
+          (om/build edit-topic {:section editing-topic
+                                :section-data (get company-data (keyword editing-topic))}
+                    {:opts {:navbar-editing-cb navbar-editing-cb
+                            :save-bt-active-cb (partial set-save-bt-active owner)
+                            :dismiss-topic-editing-cb (partial dismiss-topic-editing-cb owner)}}))))))

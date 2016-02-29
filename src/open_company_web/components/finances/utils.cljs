@@ -38,16 +38,17 @@
    :new true})
 
 (defn chart-placeholder-data [initial-data]
-  (let [first-period (:period (last initial-data))
-        last-period (:period (first initial-data))
-        months-diff (utils/periods-diff first-period last-period)]
-    (vec
-      (for [idx (range 0 (inc months-diff))]
-        (let [prev-period (get-past-period last-period idx)
-              period-exists (utils/period-exists prev-period initial-data)]
-          (if period-exists
-            (some #(when (= (:period %) prev-period) %) initial-data)
-            (placeholder-data prev-period)))))))
+  (when (seq initial-data)
+    (let [first-period (:period (last initial-data))
+          last-period (:period (first initial-data))
+          months-diff (utils/periods-diff first-period last-period)]
+      (vec
+        (for [idx (range 0 (inc months-diff))]
+          (let [prev-period (get-past-period last-period idx)
+                period-exists (utils/period-exists prev-period initial-data)]
+            (if period-exists
+              (some #(when (= (:period %) prev-period) %) initial-data)
+              (placeholder-data prev-period))))))))
 
 (defn edit-placeholder-data [initial-data]
   (let [current-period (utils/current-period)
@@ -84,9 +85,10 @@
       :pattern (if pattern pattern "###,###.##")}))
 
 (defn get-as-of-string [period]
-  (let [period-date (utils/date-from-period period)
-        month-name (utils/month-string (t/month period-date))]
-    (str month-name ", " (t/year period-date))))
+  (when period
+    (let [period-date (utils/date-from-period period)
+          month-name (utils/month-string (t/month period-date))]
+      (str month-name ", " (t/year period-date)))))
 
 (defn map-placeholder-data [data]
   (let [fixed-data (edit-placeholder-data data)]
