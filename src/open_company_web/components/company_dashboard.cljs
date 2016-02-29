@@ -4,6 +4,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [cljs.core.async :refer (chan <!)]
+            [open-company-web.components.navbar :refer [navbar]]
             [open-company-web.components.company-header :refer [company-header]]
             [open-company-web.components.topic-list :refer [topic-list]]
             [open-company-web.components.navbar :refer (navbar)]
@@ -52,7 +53,12 @@
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)
           navbar-editing-cb (partial set-navbar-editing owner)]
-      (dom/div {:class "company-dashboard row-fluid"}
+      (dom/div {:class (utils/class-set {:company-dashboard true
+                                         :row-fluid true
+                                         :fix-navbar (not (utils/is-mobile))})}
+
+       (when-not (utils/is-mobile)
+          (om/build navbar data {}))
 
         (if-not editing-topic
           (dom/div {}
