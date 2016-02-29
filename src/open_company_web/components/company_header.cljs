@@ -81,6 +81,7 @@
         (dom/div {:class "navbar-editing"
                   :key "navbar-editing"}
           (dom/button {:class "save-bt oc-btn oc-link"
+                       :disabled (not (:save-bt-active data))
                        :on-click (fn [e]
                                   (when-let [ch (utils/get-channel "save-bt-navbar")]
                                    (put! ch {:click true :event e})))} "Save")
