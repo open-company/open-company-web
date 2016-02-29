@@ -8,6 +8,7 @@
             [goog.fx.dom :refer (Scroll)]
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
+            [open-company-web.lib.cookies :as cook]
             [open-company-web.lib.iso4217 :refer (iso4217)]
             [open-company-web.caches :refer (company-cache)]
             [open-company-web.local-settings :as ls]))
@@ -545,3 +546,23 @@
 (defn replace-svg []
   (when (.-svgcss js/window)
     (.setTimeout js/window #(.svgcss js/window) 1)))
+
+(def _mobile (atom -1))
+
+(def mobile-min-width 768)
+
+(defn set-browser-type! []
+  (let [force-mobile-cookie (cook/get-cookie :force-browser-type)
+        browser-type (<= (.-clientWidth (.-body js/document)) mobile-min-width)
+        fixed-browser-type (if (nil? force-mobile-cookie)
+                            browser-type
+                            (if (= force-mobile-cookie "mobile")
+                             true
+                             false))]
+  (reset! _mobile fixed-browser-type)))
+
+(defn is-mobile []
+ ; fake the browser type for the moment
+ (when (neg? @_mobile)
+  (set-browser-type!))
+ @_mobile)
