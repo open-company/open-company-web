@@ -32,6 +32,10 @@
 
 (defn check-get-params [query-params]
   (when (contains? query-params :browser-type)
+    ; if :browser-type is "mobile" the mobile site is forced
+    ; any other value will be set as big web
+    ; remove the cookie to let it calculate the type of site
+    ; Rules set via css won't be affected by this
     (cook/set-cookie! :force-browser-type (:browser-type query-params) (* 60 60 24 6))))
 
 (defn inject-loading []
