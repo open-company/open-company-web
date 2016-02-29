@@ -12,6 +12,14 @@
 
 (defonce default-category "progress")
 
+(defn set-save-bt-active [owner active]
+  (om/set-state! owner :save-bt-active active))
+
+(defn set-navbar-editing [owner editing]
+  (when-not editing
+    (set-save-bt-active owner false))
+  (om/set-state! owner :navbar-editing editing))
+
 (defn switch-tab-cb [owner new-tab]
   (om/set-state! owner :active-category new-tab))
 
@@ -23,23 +31,31 @@
           active-tab (if (pos? (count url-tab))
                        url-tab
                        default-category)]
-      {:active-category active-tab}))
+      {:active-category active-tab
+       :navbar-editing false
+       :save-bt-active false}))
 
-  (render-state [_ state]
+  (render-state [_ {:keys [navbar-editing] :as state}]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)]
       (dom/div {:class "company-dashboard row-fluid"}
 
         ;; navbar
-        (om/build navbar (assoc data :show-share true))
+        (om/build navbar (merge data {:show-share true
+                                      :save-bt-active (om/get-state owner :save-bt-active)
+                                      :edit-mode (om/get-state owner :navbar-editing)}))
 
         ;; company header
         (om/build company-header {:loading (:loading company-data)
                                   :company-data company-data
+                                  :navbar-editing navbar-editing
                                   :switch-tab-cb (partial switch-tab-cb owner)
                                   :active-category (:active-category state)})
 
         ;; topic list
-        (om/build topic-list {:loading (:loading company-data)
-                              :company-data company-data
-                              :active-category (:active-category state)})))))
+        (om/build topic-list
+                  {:loading (:loading company-data)
+                   :company-data company-data
+                   :active-category (:active-category state)}
+                  {:opts {:navbar-editing-cb (partial set-navbar-editing owner)
+                          :save-bt-active-cb (partial set-save-bt-active owner)}})))))

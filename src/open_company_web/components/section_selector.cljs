@@ -2,12 +2,17 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.components.finances.finances :refer (finances)]
             [open-company-web.components.growth.growth :refer (growth)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.simple-section :refer (simple-section)]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.lib.utils :as utils]
+            [goog.fx.dom :refer (Resize)]
+            [goog.fx.dom :refer (Fade)]
+            [goog.fx.Animation.EventType :as EventType]
+            [goog.events :as events]))
 
 (defn section-component [section-name]
   (cond
@@ -29,37 +34,55 @@
 (def anim-d 800)
 
 (defn box-height [box-id]
-  (let [new-box (.$ js/window box-id)
-        new-box-height (.height new-box)]
-    (.height new-box)))
+  (if-let [box (sel1 (str "#" box-id))]
+    (.-offsetHeight box)
+    0))
 
 (defn next-box-height [owner section-name]
   (let [first-box (om/get-state owner :first-box)
         box-label (if first-box "b" "a")
-        box-id (str "#sec-box-" box-label"-" section-name)]
+        box-id (str "sec-box-" box-label "-" section-name)]
     (box-height box-id)))
 
 (defn actual-box-height [owner section-name]
   (let [first-box (om/get-state owner :first-box)
         box-label (if first-box "a" "b")
-        box-id (str "#sec-box-" box-label "-" section-name)]
+        box-id (str "sec-box-" box-label "-" section-name)]
     (box-height box-id)))
 
 (defn animate-section-translation [owner section-name]
   (let [first-box (om/get-state owner :first-box)
-        a-box (.$ js/window (str "#sec-box-a-" section-name))
-        b-box (.$ js/window (str "#sec-box-b-" section-name))
+        a-box (sel1 (str "#sec-box-a-" section-name))
+        b-box (sel1 (str "#sec-box-b-" section-name))
         next-box-height (min 724 (next-box-height owner section-name))
-        box (.$ js/window (str "#sec-box-" section-name))]
-    (.animate box #js {"height" (str next-box-height "px")} anim-d)
-    (.fadeTo a-box anim-d (if first-box 0 1))
-    (.fadeTo b-box anim-d (if first-box 1 0) (fn []
-                                                (let [next-as-of (om/get-state owner :next-as-of)
-                                                      first-box (om/get-state owner :first-box)]
-                                                  (om/update-state! owner :as-of (fn [_]next-as-of))
-                                                  (om/update-state! owner :first-box (fn [_](not first-box)))
-                                                  (om/update-state! owner :animating (fn [_]false))
-                                                  (om/update-state! owner :next-as-of (fn [_]nil)))))
+        box (sel1 (str "#sec-box-" section-name))]
+    (.play
+      (new Resize
+           box
+           (new js/Array (.-offsetWidth box) (.-offsetHeight box))
+           (new js/Array (.-offsetWidth box) next-box-height)
+           anim-d))
+    (.play
+      (new Fade
+           a-box
+           (if first-box 1 0)
+           (if first-box 0 1)
+           anim-d))
+    (let [fade-b-box (new Fade
+                          b-box
+                          (if first-box 0 1)
+                          (if first-box 1 0)
+                          anim-d)]
+      (events/listen fade-b-box
+                     EventType/FINISH
+                     (fn []
+                       (let [next-as-of (om/get-state owner :next-as-of)
+                             first-box (om/get-state owner :first-box)]
+                         (om/update-state! owner :as-of (fn [_]next-as-of))
+                         (om/update-state! owner :first-box (fn [_](not first-box)))
+                         (om/update-state! owner :animating (fn [_]false))
+                         (om/update-state! owner :next-as-of (fn [_]nil)))))
+      (.play fade-b-box))
     (utils/scroll-to-id (str "sec-box-" section-name) anim-d)))
 
 (defn setup-box-height [section-name owner]
@@ -115,9 +138,10 @@
       (dom/div #js {:className "section-selector" :ref "section-selector"}
         (dom/div {:class "section-animator-box" :id (str "sec-box-" (name section))}
           (when a-section-data
-            (dom/div {:class "section-box"
-                      :id (str "sec-box-a-" (name section))
-                      :style {:opacity (if first-box 1 0)}}
+            (dom/div #js {:className "section-box"
+                          :id (str "sec-box-a-" (name section))
+                          :ref "sec-box-a"
+                          :style #js {:opacity (if first-box 1 0)}}
               (om/build (section-component section) {:section-data a-section-data
                                                      :section section
                                                      :currency (:currency data)
@@ -125,9 +149,10 @@
                                                      :revisions-navigation-cb #(revisions-navigation-cb owner section %)
                                                      :read-only a-read-only})))
           (when b-section-data
-            (dom/div {:class "section-box"
-                      :id (str "sec-box-b-" (name section))
-                      :style {:opacity (if first-box 0 1)}}
+            (dom/div #js {:className "section-box"
+                          :id (str "sec-box-b-" (name section))
+                          :ref "sec-box-b"
+                          :style #js {:opacity (if first-box 0 1)}}
               (om/build (section-component section) {:section-data b-section-data
                                                      :section section
                                                      :actual-as-of (:updated-at actual-data)

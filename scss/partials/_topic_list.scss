@@ -1,4 +1,29 @@
+div.topic-list-edit-container {
+  margin-top: 90px;
+  padding-bottom: 10px;
+}
+
 div.topic-list{
+  background-color: rgb(217, 217, 217);
+  content: "";
+
+  div.topic-list-internal {
+    margin-top: 10px;
+
+    &:empty {
+      text-align: center;
+      font-size: 18px;
+      padding-top: 100px;
+      color: rgba(0, 0, 0, 0.4);
+      font-family: $oc_main_font;
+      height: 200px;
+
+      &:after {
+        content: "This category seams to be empty. Add a topic below to fill it out.";
+      }
+    }
+  }
+
   div.topic-row{
     padding: 0px;
     margin: 0px;

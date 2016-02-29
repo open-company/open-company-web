@@ -1,0 +1,80 @@
+div.topic-list-edit{
+  background-color: rgb(217, 217, 217);
+
+  & * {
+    @include no-user-select();
+  }
+
+  ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+  }
+  ul li{
+    margin: 0px;
+    padding: 0px;
+  }
+
+  li.placeholder {
+    height: 68px;
+  }
+
+  div.topic-edit {
+    min-height: 50px;
+    padding-top: 10px;
+
+    &.active{
+      div.topic-edit-internal{
+        background-color: rgb(255, 255, 255);
+        border: 1px solid rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    div.topic-edit-internal{
+      margin: 0px 10px 0px 10px;
+      min-height: 40px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background-color: rgb(252, 252, 252);
+      vertical-align: middle;
+      background-image: url("/img/draggable_transparent.png?#{$deploy_key}");
+      background-size: 20px 20px;
+      background-position: center left;
+      background-repeat: no-repeat;
+
+      div.topic-edit-handle {
+        float: left;
+        min-height: 50px;
+        height: 100%;
+        width: 30px;
+      }
+
+      &:hover{
+        background-color: rgb(253, 253, 253);
+      }
+
+      div.topic-edit-labels{
+        float: center;
+        overflow: hidden;
+
+        h3.topic-title {
+          font-size: 15px;
+          font-weight: bold;
+          margin: 10px 0px 5px 0px;
+        }
+
+        label.topic-description {
+          font-weight: normal;
+          font-size: 14px;
+          font-family: $oc_main_font;
+        }
+      }
+
+      img.check {
+        float: right;
+        margin: 15px 10px 0 0;
+        width: 30px;
+        height: 30px;
+      }
+    }
+  }
+}

@@ -35,6 +35,7 @@ $.append = function(){};
 $.sortable = function(){};
 $.get = function(){};
 $.autogrow = function(){};
+$.addClass = function(){};
 // svgcss
 var svgcss = function(){};
 // Hallo
@@ -53,3 +54,8 @@ google.visualization.ColumnChart = {};
 google.visualization.ColumnChart.draw = function(){};
 // jwt
 var jwt_decode = function(){};
+// Sortable.js
+var Sortable = function(){};
+Sortable.create = function(){};
+Sortable.handle = {};
+Sortable.onSort = function(){};
