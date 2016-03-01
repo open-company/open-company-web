@@ -114,5 +114,6 @@
                         :ref "company-description-container"}
             (dom/div {:class "company-description"} (:description company-data)))))
 
-      ;; Category navigation
-      (om/build category-nav data))))
+      (when-not (:editing-topic data)
+        ;; Category navigation
+        (om/build category-nav data)))))
