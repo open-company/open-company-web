@@ -73,6 +73,7 @@
 (defn update-active-topics [owner options category new-active-topics]
   (let [old-active-categories (om/get-state owner :active-topics)
         new-active-categories (assoc old-active-categories category new-active-topics)]
+    (println "update active topics:" new-active-categories)
     (om/set-state! owner :active-topics new-active-categories)
     ; enable/disable save button
     ((:save-bt-active-cb options) (not= new-active-topics (om/get-state owner :initial-active-topics)))))
