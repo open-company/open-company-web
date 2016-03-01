@@ -11,7 +11,8 @@
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.ui.manage-topics :refer (manage-topics)]
             [cljs-dynamic-resources.core :as cdr]
-            [goog.style :refer (setStyle)]))
+            [goog.style :refer (setStyle)]
+            [shodan.console :as console]))
 
 (defcomponent item [data owner options]
   (render [_]
@@ -51,7 +52,9 @@
                                                            (let [li-elements (sel ul-node [:li])
                                                                  items (vec (map #(.-itemname (.-dataset %)) li-elements))]
                                                              (println "onSort" li-elements)
-                                                             (println "onSort" (map #(.-dataset %) li-elements))
+                                                             (doseq [li li-elements]
+                                                                (console/warn li)
+                                                                (println "   " (.-dataset li) (.-itemname (.-dataset li))))
                                                              (om/set-state! owner :active-topics items)
                                                              ((:did-change-sort options) items)))})))))
 
