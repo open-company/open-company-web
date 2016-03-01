@@ -110,7 +110,10 @@
       (go (while true
         (let [change (<! cancel-ch)]
           ((:navbar-editing-cb options) false)
-          (om/set-state! owner :editing false))))))
+          ; reset editing
+          (om/set-state! owner :editing false)
+          ; reset active topics changes
+          (om/set-state! owner :active-topics (om/get-state owner :initial-active-topics)))))))
 
   (will-unmount [_]
     (utils/remove-channel "save-bt-navbar")
