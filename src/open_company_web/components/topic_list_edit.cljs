@@ -128,7 +128,7 @@
           (dom/div {}
             (println "unactive topics: " unactive-topics)
             (dom/ul {:class "topic-list-unactive"
-                     :key "topic-list-unactive"}
+                     :key (apply str unactive-topics)}
               (for [item-name unactive-topics]
                 (dom/li {:data-itemname item-name
                          :key item-name
