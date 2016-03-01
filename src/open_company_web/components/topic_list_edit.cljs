@@ -105,14 +105,15 @@
     (.setTimeout js/window resize-handles 100)
     (if (empty? @caches/new-sections)
       (dom/h2 {} "Loading sections...")
-      (let [active-category (:active-category options)
+      (let [current-category (:category data)
             all-sections (:new-sections options)
-            category-sections (:sections (first (filter #(= (:name %) active-category) (:categories all-sections))))
+            category-sections (:sections (first (filter #(= (:name %) current-category) (:categories all-sections))))
             items (get-sections-data category-sections)]
         (dom/div {:class "topic-list-edit group no-select"
                   :style #js {:display (if (:active data) "inline" "none")}}
+          (println "topic-list-edit render" (:category data) " (active cat:" (:active-category options) ")")
           (dom/div {}
-            (println "active topics: " active-topics)
+            (println "   active topics: " active-topics)
             (dom/ul {:class "topic-list-sortable"
                      :ref "topic-list-sortable"
                      :key (apply str active-topics)}
@@ -120,20 +121,20 @@
                 (dom/li {:data-itemname item-name
                          :key item-name
                          :on-click #(topic-on-click item-name owner (:did-change-sort options))}
-                  (println "   active" item-name)
+                  (println "      " item-name)
                   (om/build item {:id item-name
                                   :item-data (get items (keyword item-name))
                                   :active-topics active-topics}
                                  {:key item-name})))))
           (dom/div {}
-            (println "unactive topics: " unactive-topics)
+            (println "   unactive topics: " unactive-topics)
             (dom/ul {:class "topic-list-unactive"
                      :key (apply str unactive-topics)}
               (for [item-name unactive-topics]
                 (dom/li {:data-itemname item-name
                          :key item-name
                          :on-click #(topic-on-click item-name owner (:did-change-sort options))}
-                  (println "   unactive" item-name)
+                  (println "      " item-name)
                   (om/build item {:id item-name
                                   :item-data (get items (keyword item-name))
                                   :active-topics active-topics}))))))))))
