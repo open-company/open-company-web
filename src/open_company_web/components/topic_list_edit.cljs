@@ -43,25 +43,16 @@
                   (hash-map (keyword section-name) section-data)))
               category-sections)))
 
-(defn resize-handles []
-  (let [sortable (sel1 [:ul.topic-list-sortable])
-        handles (sel sortable [:div.topic-edit-handle])
-        height (.-clientHeight (sel1 [:div.topic-edit-internal]))]
-    (doseq [el handles]
-      (setStyle el #js {:height (str height "px")}))))
-
 (defn setup-sortable [owner options]
   (when (and (om/get-state owner :did-mount) (om/get-state owner :sortable-loaded))
-    (let [ul-node (om/get-ref owner "topic-list-sortable")]
-      (.create js/Sortable ul-node (clj->js {:handle ".topic-edit-handle"
-                                             :onSort (fn [_]
-                                                         (let [ul-list (om/get-ref owner "topic-list-sortable")
-                                                               li-elements (sel ul-list [:li])
-                                                               items (vec (map #(.-itemname (.-dataset %)) li-elements))]
-                                                           (println "onSort list:" ul-list)
-                                                           (println "items:" items)
-                                                           (om/set-state! owner :active-topics items)
-                                                           ((:did-change-sort options) items)))})))))
+    (let [ul-node (om/get-ref owner "topic-list-sortable")
+          cat (:category (om/get-props owner))]
+      (.create js/Sortable ul-node (clj->js #js {:handle ".topic-edit-handle"
+                                                 :onSort (fn [_]
+                                                           (let [li-elements (sel ul-node [:li])
+                                                                 items (vec (map #(.-itemname (.-dataset %)) li-elements))]
+                                                             (om/set-state! owner :active-topics items)
+                                                             ((:did-change-sort options) items)))})))))
 
 (defn topic-on-click [item-name owner did-change-sort]
   (let [active-topics (om/get-state owner :active-topics)
@@ -103,8 +94,7 @@
     (setup-sortable owner options))
 
   (render-state [_ {:keys [unactive-topics active-topics]}]
-    ; resize the handles after each render
-    (.setTimeout js/window resize-handles 100)
+    (.setTimeout js/window #(setup-sortable owner options) 100)
     (if (empty? @caches/new-sections)
       (dom/h2 {} "Loading sections...")
       (let [current-category (:category data)
@@ -113,30 +103,24 @@
             items (get-sections-data category-sections)]
         (dom/div {:class "topic-list-edit group no-select"
                   :style #js {:display (if (:active data) "inline" "none")}}
-          (println "topic-list-edit render" (:category data) " (active cat:" (:active-category options) ")")
           (dom/div {}
-            (println "   active topics: " active-topics)
             (dom/ul #js {:className "topic-list-sortable"
                          :ref "topic-list-sortable"
                          :key (apply str active-topics)}
               (for [item-name active-topics]
                 (dom/li {:data-itemname item-name
-                         :key item-name
+                         :key (str "active-" item-name)
                          :on-click #(topic-on-click item-name owner (:did-change-sort options))}
-                  (println "      " item-name)
                   (om/build item {:id item-name
                                   :item-data (get items (keyword item-name))
-                                  :active-topics active-topics}
-                                 {:key item-name})))))
+                                  :active-topics active-topics})))))
           (dom/div {}
-            (println "   unactive topics: " unactive-topics)
             (dom/ul {:class "topic-list-unactive"
                      :key (apply str unactive-topics)}
               (for [item-name unactive-topics]
                 (dom/li {:data-itemname item-name
-                         :key item-name
+                         :key (str "unactive-" item-name)
                          :on-click #(topic-on-click item-name owner (:did-change-sort options))}
-                  (println "      " item-name)
                   (om/build item {:id item-name
                                   :item-data (get items (keyword item-name))
                                   :active-topics active-topics}))))))))))
