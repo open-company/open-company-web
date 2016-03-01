@@ -65,7 +65,7 @@
         (if-not editing-topic
           ;; topic list
           (om/build topic-list
-                    {:loading (:loading company-data)
+                    {:loading (or (:loading company-data) (:loading data))
                      :company-data company-data
                      :active-category (:active-category state)}
                     {:opts {:navbar-editing-cb navbar-editing-cb
