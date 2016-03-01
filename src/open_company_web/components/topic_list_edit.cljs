@@ -15,12 +15,11 @@
 
 (defcomponent item [data owner options]
   (render [_]
-    (println "item render" (:id data))
     (let [section (:id data)
           section-data (:item-data data)
           active-topics (:active-topics data)
           active (utils/in? active-topics section)
-          section-name (or (:name section-data) (utils/camel-case-str section))
+          section-name (:name section-data)
           section-title (or (:title section-data) section-name)
           section-description (or (:description section-data) "")
           check-img (str "/img/check_" (if active "checked" "empty") ".png?" ls/deploy-key)]
@@ -121,7 +120,7 @@
                 (dom/li {:data-itemname item-name
                          :key item-name
                          :on-click #(topic-on-click item-name owner (:did-change-sort options))}
-                  (println "active" item-name)
+                  (println "   active" item-name)
                   (om/build item {:id item-name
                                   :item-data (get items (keyword item-name))
                                   :active-topics active-topics}
@@ -134,7 +133,7 @@
                 (dom/li {:data-itemname item-name
                          :key item-name
                          :on-click #(topic-on-click item-name owner (:did-change-sort options))}
-                  (println "unactive" item-name)
+                  (println "   unactive" item-name)
                   (om/build item {:id item-name
                                   :item-data (get items (keyword item-name))
                                   :active-topics active-topics}))))))))))
