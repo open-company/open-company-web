@@ -19,7 +19,7 @@
           section-data (:item-data data)
           active-topics (:active-topics data)
           active (utils/in? active-topics section)
-          section-name (:name section-data)
+          section-name (or (:name section-data) (utils/camel-case-str section))
           section-title (or (:title section-data) section-name)
           section-description (or (:description section-data) "")
           check-img (str "/img/check_" (if active "checked" "empty") ".png?" ls/deploy-key)]
