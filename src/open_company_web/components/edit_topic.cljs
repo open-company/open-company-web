@@ -93,6 +93,7 @@
         (dom/div {:class "edit-topic-headline"}
           (dom/input #js {:ref "topic-headline"
                           :className "edit-topic-headline-input"
+                          :placeholder "Headline"
                           :maxLength 100
                           :value headline
                           :onChange (fn [e]

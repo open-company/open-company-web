@@ -22,7 +22,7 @@
                            :id (str "headline-" (name (:section data)))
                            :className (utils/class-set {:headline-textarea true
                                                         :edit (:editing data)})
-                           :placeholder (:placeholder data)
+                           :placeholder "Headline"
                            :maxLength 100
                            :disabled (:read-only data)
                            :value headline
