@@ -142,7 +142,8 @@
               category-topics (get active-topics active-category)]
           (dom/div {:class "topic-list fix-top-margin-scrolling"
                     :key "topic-list"}
-            (dom/div {:class "topic-list-internal"}
+            (dom/div {:class (utils/class-set {:topic-list-internal true
+                                               :content-loaded (not (:loading data))})}
               (for [section-name category-topics
                     :let [sd (->> section-name keyword (get company-data))]]
                 (dom/div {:class "topic-row"
