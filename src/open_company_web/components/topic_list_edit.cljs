@@ -15,6 +15,7 @@
 
 (defcomponent item [data owner options]
   (render [_]
+    (println "item render" (:id data))
     (let [section (:id data)
           section-data (:item-data data)
           active-topics (:active-topics data)
@@ -119,6 +120,7 @@
                 (dom/li {:data-itemname item-name
                          :key item-name
                          :on-click #(topic-on-click item-name owner (:did-change-sort options))}
+                  (println "active" item-name)
                   (om/build item {:id item-name
                                   :item-data (get items (keyword item-name))
                                   :active-topics active-topics}
@@ -130,6 +132,7 @@
                 (dom/li {:data-itemname item-name
                          :key item-name
                          :on-click #(topic-on-click item-name owner (:did-change-sort options))}
+                  (println "unactive" item-name)
                   (om/build item {:id item-name
                                   :item-data (get items (keyword item-name))
                                   :active-topics active-topics}))))))))))
