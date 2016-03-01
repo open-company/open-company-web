@@ -50,11 +50,11 @@
       (.create js/Sortable ul-node (clj->js #js {:handle ".topic-edit-handle"
                                                  :onSort (fn [_]
                                                            (let [li-elements (sel ul-node [:li])
-                                                                 items (vec (map #(.-itemname (.-dataset %)) li-elements))]
+                                                                 items (vec (map #(aget (.-dataset %) "itemname") li-elements))]
                                                              (println "onSort" li-elements)
                                                              (doseq [li li-elements]
                                                                 (console/warn li)
-                                                                (println "   " (.-dataset li) (.-itemname (.-dataset li))))
+                                                                (println "   " (aget (.-dataset li) "itemname")))
                                                              (om/set-state! owner :active-topics items)
                                                              ((:did-change-sort options) items)))})))))
 
