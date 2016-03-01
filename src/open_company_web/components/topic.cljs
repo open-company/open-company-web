@@ -70,7 +70,7 @@
 (defn topic-body-click [e owner options show-edit-button]
   (when e
     (.stopPropagation e))
-  ((:toggle-edit-topic-cb options) (not show-edit-button) (:section-name options)))
+  ((:toggle-edit-topic-cb options) (:section-name options)))
 
 (defn topic-click [data owner options expanded]
   (let [topic (om/get-ref owner "topic")
@@ -81,6 +81,8 @@
           body-width (.-offsetWidth body-node)]
       (setStyle body-node #js {:height (if expanded "auto" "0")
                                :overflow "hidden"})
+
+      (setStyle topic-more #js {:opacity "0"})
 
       ;; animate finances headtitle
       (when-let [finances-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-finances")]
@@ -111,21 +113,6 @@
                                utils/oc-animation-duration)]
             (.play growth-resize)
             (.play growth-fade)))
-
-      ;; Fade in/out 3 horizontal dots
-      (.play
-        (new Fade
-             topic-more
-             (if expanded 0 1)
-             (if expanded 1 0)
-             utils/oc-animation-duration))
-      ;; Collapse the more dots
-      (.play
-        (new Resize
-             topic-more
-             (new js/Array body-width (if expanded 0 21))
-             (new js/Array body-width (if expanded 21 0))
-             utils/oc-animation-duration))
 
       ;; animate height
       (let [height-animation (new Resize
@@ -210,8 +197,7 @@
 
         (dom/div #js {:className "topic-more"
                       :ref "topic-more"
-                      :style #js {:opacity (if expanded 0 1)
-                                  :height (if expanded "0px" "21px")}}
+                      :style #js {:opacity (if expanded 0 1)}}
           (dom/i {:class "fa fa-circle"})
           (dom/i {:class "fa fa-circle"})
           (dom/i {:class "fa fa-circle"}))

@@ -60,23 +60,24 @@
        (when-not (utils/is-mobile)
           (om/build navbar data {}))
 
-        (if-not editing-topic
-          (dom/div {}
-            ;; company header
-            (om/build company-header {:loading (:loading company-data)
-                                      :company-data company-data
-                                      :navbar-editing navbar-editing
-                                      :switch-tab-cb (partial switch-tab-cb owner)
-                                      :active-category (:active-category state)})
+        ;; company header
+        (om/build company-header {:loading (:loading company-data)
+                                  :company-data company-data
+                                  :navbar-editing navbar-editing
+                                  :editing-topic editing-topic
+                                  :switch-tab-cb (partial switch-tab-cb owner)
+                                  :active-category (:active-category state)
+                                  :save-bt-active (om/get-state owner :save-bt-active)})
 
-            ;; topic list
-            (om/build topic-list
-                      {:loading (:loading company-data)
-                       :company-data company-data
-                       :active-category (:active-category state)}
-                      {:opts {:navbar-editing-cb navbar-editing-cb
-                              :topic-edit-cb #(topic-edit-cb owner %)
-                              :save-bt-active-cb (partial set-save-bt-active owner)}}))
+        (if-not editing-topic
+          ;; topic list
+          (om/build topic-list
+                    {:loading (or (:loading company-data) (:loading data))
+                     :company-data company-data
+                     :active-category (:active-category state)}
+                    {:opts {:navbar-editing-cb navbar-editing-cb
+                            :topic-edit-cb #(topic-edit-cb owner %)
+                            :save-bt-active-cb (partial set-save-bt-active owner)}})
           ;; topic edit
           (om/build edit-topic {:section editing-topic
                                 :section-data (get company-data (keyword editing-topic))}

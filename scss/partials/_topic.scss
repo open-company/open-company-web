@@ -4,7 +4,7 @@ div.topic-list {
     margin-left: 0px;
     margin-right: 0px;
     margin-top: 5px;
-    padding: 22px 0 22px 22px;
+    padding: 22px 22px 14px 22px;
     min-height: 100px;
     border-bottom: 1px solid #DFDFDF; /* gray */
     background-color: white;
@@ -15,6 +15,10 @@ div.topic-list {
         width: 28px;
         height: 28px;
         float: left;
+      }
+
+      svg path, svg polygon {
+        fill: #8b8a8a;
       }
 
       div.topic-title {

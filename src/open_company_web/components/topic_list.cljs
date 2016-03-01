@@ -99,6 +99,9 @@
     (get-state data nil))
 
   (did-mount [_]
+    ; scroll to top when the component is initially mounted to
+    ; make sure the calculation for the fixed navbar are correct
+    (set! (.-scrollTop (.-body js/document)) 0)
     (when-not (:read-only (:company-data data))
       (get-new-sections-if-needed owner))
     ; save all the changes....
@@ -110,7 +113,10 @@
       (go (while true
         (let [change (<! cancel-ch)]
           ((:navbar-editing-cb options) false)
-          (om/set-state! owner :editing false))))))
+          ; reset editing
+          (om/set-state! owner :editing false)
+          ; reset active topics changes
+          (om/set-state! owner :active-topics (om/get-state owner :initial-active-topics)))))))
 
   (will-unmount [_]
     (utils/remove-channel "save-bt-navbar")
@@ -142,7 +148,8 @@
               category-topics (get active-topics active-category)]
           (dom/div {:class "topic-list fix-top-margin-scrolling"
                     :key "topic-list"}
-            (dom/div {:class "topic-list-internal"}
+            (dom/div {:class (utils/class-set {:topic-list-internal true
+                                               :content-loaded (not (:loading data))})}
               (for [section-name category-topics
                     :let [sd (->> section-name keyword (get company-data))]]
                 (dom/div {:class "topic-row"

@@ -5,22 +5,22 @@ div.manage-topics{
 
   div.manage-topics-internal {
     background-color: transparent;
-    color: #8c8c8c;
-    height: 30px;
+    color: #777;
+    height: 60px;
+    padding-top: 20px;
     vertical-align: middle;
-    text-align: left;
+    text-align: center;
+    text-decoration: underline;
 
     &:hover {
       background-color: rgb(207, 207, 207);
-      text-decoration: underline;
     }
 
     div.manage-topics-cta{
-      padding: 5px 0 0 0;
+      padding: 0;
       margin: 0;
       font-size: 14px;
       cursor: pointer;
-      margin-left: 10px;
     }
   }
 }

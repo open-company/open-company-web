@@ -9,4 +9,4 @@
               :key "topic-row-manage-topics"}
       (dom/div {:class "manage-topics-internal"
                 :on-click (:manage-topics-cb options)}
-        (dom/div {:class "manage-topics-cta oc-header"} "Manage topics...")))))
+        (dom/div {:class "manage-topics-cta oc-header"} "Manage topics")))))

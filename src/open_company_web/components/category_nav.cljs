@@ -10,7 +10,7 @@
             [goog.style :as gstyle])
   (:import [goog.events EventType]))
 
-(def max-scroll-top (atom -1))
+(def max-scroll-top 133)
 
 (defn category-click [data category-name e]
   ;; prevent the route reload
@@ -22,9 +22,8 @@
   ;; change the window.location.hash
   (set! (.-hash (.-location js/window)) category-name)
   ;; fix the scroll to the first section if necessary
-  (when (and (not= @max-scroll-top -1)
-             (>= (.-scrollTop (sel1 :body)) @max-scroll-top))
-    (set! (.-scrollTop (sel1 :body)) @max-scroll-top))
+  (when (>= (.-scrollTop (sel1 :body)) max-scroll-top)
+    (set! (.-scrollTop (sel1 :body)) max-scroll-top))
   ;; reactivate the url change handler
   (reset! open-company-web.core/prevent-route-dispatch false))
 
@@ -48,7 +47,7 @@
           navbar-style (if (or navbar-editing ; is editing style
                                ; or the scroll pivot has been initialized and
                                ; the scroll is higher than the header
-                               (and (pos? @max-scroll-top) (>= scroll-top @max-scroll-top)))
+                               (>= scroll-top max-scroll-top))
                          #js {:position "fixed"
                               :top "50px"}
                          #js {:position "relative"
@@ -56,8 +55,7 @@
       (setup-body-min-height)
       (dom/div #js {:className "row category-nav"
                     :ref "category-nav"
-                    ; :style navbar-style
-                  }
+                    :style navbar-style}
         (for [category categories]
           (let [category-name (name category)
                 category-class (utils/class-set {:category true
