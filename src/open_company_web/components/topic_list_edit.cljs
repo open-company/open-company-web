@@ -45,12 +45,13 @@
 
 (defn setup-sortable [owner options]
   (when (and (om/get-state owner :did-mount) (om/get-state owner :sortable-loaded))
-    (let [ul-node (om/get-ref owner "topic-list-sortable")
-          cat (:category (om/get-props owner))]
+    (let [ul-node (om/get-ref owner "topic-list-sortable")]
       (.create js/Sortable ul-node (clj->js #js {:handle ".topic-edit-handle"
                                                  :onSort (fn [_]
                                                            (let [li-elements (sel ul-node [:li])
                                                                  items (vec (map #(.-itemname (.-dataset %)) li-elements))]
+                                                             (println "onSort" li-elements)
+                                                             (println "onSort" items)
                                                              (om/set-state! owner :active-topics items)
                                                              ((:did-change-sort options) items)))})))))
 
