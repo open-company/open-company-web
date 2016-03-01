@@ -70,9 +70,6 @@
 
 (defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner]
 
-  ; (did-mount [_]
-  ;   (.setTimeout js/window #(watch-scroll owner) 500))
- 
   (render [_]
     (dom/div #js {:className "company-header"
                   :ref "company-header"}
