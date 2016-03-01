@@ -51,7 +51,7 @@
                                                            (let [li-elements (sel ul-node [:li])
                                                                  items (vec (map #(.-itemname (.-dataset %)) li-elements))]
                                                              (println "onSort" li-elements)
-                                                             (println "onSort" (map #(.-itemname (.-dataset %)) li-elements))
+                                                             (println "onSort" (map #(.-dataset %) li-elements))
                                                              (om/set-state! owner :active-topics items)
                                                              ((:did-change-sort options) items)))})))))
 
@@ -97,7 +97,8 @@
   (render-state [_ {:keys [unactive-topics active-topics]}]
     (.setTimeout js/window #(setup-sortable owner options) 100)
     (if (empty? @caches/new-sections)
-      (dom/h2 {} "Loading sections...")
+      (dom/h2 {:style #js {:display (if (:active data) "inline" "none")}}
+        "Loading sections...")
       (let [current-category (:category data)
             all-sections (:new-sections options)
             category-sections (:sections (first (filter #(= (:name %) current-category) (:categories all-sections))))
