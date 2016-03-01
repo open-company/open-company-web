@@ -17,6 +17,10 @@ div.topic-list {
         float: left;
       }
 
+      svg path, svg polygon {
+        fill: #8b8a8a;
+      }
+
       div.topic-title {
         float: left;
         margin-top: 5px;
