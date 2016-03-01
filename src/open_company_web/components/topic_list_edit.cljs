@@ -46,7 +46,7 @@
 
 (defn setup-sortable [owner options]
   (when (and (om/get-state owner :did-mount) (om/get-state owner :sortable-loaded))
-    (let [ul-node (om/get-ref owner "topic-list-sortable")]
+    (when-let [ul-node (om/get-ref owner "topic-list-sortable")]
       (.create js/Sortable ul-node (clj->js #js {:handle ".topic-edit-handle"
                                                  :onSort (fn [_]
                                                            (let [li-elements (sel ul-node [:li])
@@ -113,9 +113,9 @@
                          :ref "topic-list-sortable"
                          :key (apply str active-topics)}
               (for [item-name active-topics]
-                (dom/li {:data-itemname item-name
-                         :key (str "active-" item-name)
-                         :on-click #(topic-on-click item-name owner (:did-change-sort options))}
+                (dom/li #js {:data-itemname item-name
+                             :key (str "active-" item-name)
+                             :onClick #(topic-on-click item-name owner (:did-change-sort options))}
                   (om/build item {:id item-name
                                   :item-data (get items (keyword item-name))
                                   :active-topics active-topics})))))
@@ -123,9 +123,9 @@
             (dom/ul {:class "topic-list-unactive"
                      :key (apply str unactive-topics)}
               (for [item-name unactive-topics]
-                (dom/li {:data-itemname item-name
-                         :key (str "unactive-" item-name)
-                         :on-click #(topic-on-click item-name owner (:did-change-sort options))}
+                (dom/li #js {:data-itemname item-name
+                             :key (str "unactive-" item-name)
+                             :onClick #(topic-on-click item-name owner (:did-change-sort options))}
                   (om/build item {:id item-name
                                   :item-data (get items (keyword item-name))
                                   :active-topics active-topics}))))))))))
