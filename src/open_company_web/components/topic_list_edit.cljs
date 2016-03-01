@@ -43,17 +43,6 @@
                   (hash-map (keyword section-name) section-data)))
               category-sections)))
 
-(defn sorted-active-topics [sorted-sections active-topics]
-  (loop [ret []
-         sections sorted-sections]
-    (let [section (first sections)
-          next-ret (if (utils/in? active-topics section)
-                     (conj ret section)
-                     ret)]
-      (if (zero? (count sections))
-        next-ret
-        (recur next-ret (next sections))))))
-
 (defn resize-handles []
   (let [sortable (sel1 [:ul.topic-list-sortable])
         handles (sel sortable [:div.topic-edit-handle])
@@ -66,7 +55,8 @@
     (let [ul-node (om/get-ref owner "topic-list-sortable")]
       (.create js/Sortable ul-node (clj->js {:handle ".topic-edit-handle"
                                              :onSort (fn [_]
-                                                         (let [li-elements (sel [:ul.topic-list-sortable :li])
+                                                         (let [ul-list (om/get-ref owner "topic-list-sortable")
+                                                               li-elements (sel ul-list [:li])
                                                                items (vec (map #(.-itemname (.-dataset %)) li-elements))]
                                                            (om/set-state! owner :active-topics items)
                                                            ((:did-change-sort options) items)))})))))
@@ -124,14 +114,15 @@
           (dom/div {}
             (dom/ul {:class "topic-list-sortable"
                      :ref "topic-list-sortable"
-                     :key "topic-list-edit"}
+                     :key (apply str active-topics)}
               (for [item-name active-topics]
                 (dom/li {:data-itemname item-name
                          :key item-name
                          :on-click #(topic-on-click item-name owner (:did-change-sort options))}
                   (om/build item {:id item-name
                                   :item-data (get items (keyword item-name))
-                                  :active-topics active-topics})))))
+                                  :active-topics active-topics}
+                                 {:key item-name})))))
           (dom/div {}
             (dom/ul {:class "topic-list-unactive"
                      :key "topic-list-unactive"}
