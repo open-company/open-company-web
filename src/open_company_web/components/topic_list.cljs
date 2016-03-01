@@ -73,7 +73,6 @@
 (defn update-active-topics [owner options category new-active-topics]
   (let [old-active-categories (om/get-state owner :active-topics)
         new-active-categories (assoc old-active-categories category new-active-topics)]
-    (println "update active topics:" new-active-categories)
     (om/set-state! owner :active-topics new-active-categories)
     ; enable/disable save button
     ((:save-bt-active-cb options) (not= new-active-topics (om/get-state owner :initial-active-topics)))))
@@ -100,6 +99,9 @@
     (get-state data nil))
 
   (did-mount [_]
+    ; scroll to top when the component is initially mounted to
+    ; make sure the calculation for the fixed navbar are correct
+    (set! (.-scrollTop (.-body js/document)) 0)
     (when-not (:read-only (:company-data data))
       (get-new-sections-if-needed owner))
     ; save all the changes....
