@@ -70,7 +70,7 @@
 (defn topic-body-click [e owner options show-edit-button]
   (when e
     (.stopPropagation e))
-  ((:toggle-edit-topic-cb options) (not show-edit-button) (:section-name options)))
+  ((:toggle-edit-topic-cb options) (:section-name options)))
 
 (defn topic-click [data owner options expanded]
   (let [topic (om/get-ref owner "topic")
