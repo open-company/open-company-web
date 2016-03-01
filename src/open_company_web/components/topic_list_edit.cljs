@@ -113,6 +113,7 @@
         (dom/div {:class "topic-list-edit group no-select"
                   :style #js {:display (if (:active data) "inline" "none")}}
           (dom/div {}
+            (println "active topics: " active-topics)
             (dom/ul {:class "topic-list-sortable"
                      :ref "topic-list-sortable"
                      :key (apply str active-topics)}
@@ -126,6 +127,7 @@
                                   :active-topics active-topics}
                                  {:key item-name})))))
           (dom/div {}
+            (println "unactive topics: " unactive-topics)
             (dom/ul {:class "topic-list-unactive"
                      :key "topic-list-unactive"}
               (for [item-name unactive-topics]
