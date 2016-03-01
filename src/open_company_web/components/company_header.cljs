@@ -35,7 +35,7 @@
                     category-nav-pivot (- company-header-height
                                           category-nav-height
                                           company-name-container-height
-                                          -19)]
+                                          3)]
                 (reset! company-header-pt category-nav-pivot)))
             ; fix company name and move the company description relatively when
             ; the scroll hit the company name
@@ -50,12 +50,12 @@
             ; fix the category navigation bar and move the topic list relatively when
             ; the scroll hit the category navigation max top
             (when (and category-nav topic-list)
-              (if (> scroll-top @company-header-pt)
+              (if (or (> scroll-top @company-header-pt) (om/get-props owner :navbar-editing))
                 (do
                   (gstyle/setStyle category-nav #js {:position "fixed"
                                                      :top "46px"
                                                      :left "0"})
-                  (gstyle/setStyle topic-list #js {:marginTop "71px"}))
+                  (gstyle/setStyle topic-list #js {:marginTop "72px"}))
                 (do
                   (gstyle/setStyle category-nav #js {:position "relative"
                                                      :top "0"
@@ -70,8 +70,8 @@
 
 (defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner]
 
-  (did-mount [_]
-    (.setTimeout js/window #(watch-scroll owner) 500))
+  ; (did-mount [_]
+  ;   (.setTimeout js/window #(watch-scroll owner) 500))
  
   (render [_]
     (dom/div #js {:className "company-header"
@@ -96,6 +96,8 @@
             ;; Company logo
             (dom/div {:class "company-logo-container"}
               (dom/img {:src (:logo company-data)
+                        :on-load #(watch-scroll owner)
+                        :on-error #(watch-scroll owner)
                         :class "company-logo"
                         :title (:name company-data)}))
             ;; Buttons
@@ -116,4 +118,4 @@
             (dom/div {:class "company-description"} (:description company-data)))))
 
       ;; Category navigation
-      (om/build category-nav (assoc data :navbar-editing navbar-editing)))))
+      (om/build category-nav data))))
