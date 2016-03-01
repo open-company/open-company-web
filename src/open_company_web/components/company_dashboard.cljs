@@ -58,6 +58,7 @@
         (om/build company-header {:loading (:loading company-data)
                                   :company-data company-data
                                   :navbar-editing navbar-editing
+                                  :editing-topic editing-topic
                                   :switch-tab-cb (partial switch-tab-cb owner)
                                   :active-category (:active-category state)
                                   :save-bt-active (om/get-state owner :save-bt-active)})
