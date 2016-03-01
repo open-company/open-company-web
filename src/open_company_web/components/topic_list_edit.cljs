@@ -51,7 +51,7 @@
                                                            (let [li-elements (sel ul-node [:li])
                                                                  items (vec (map #(.-itemname (.-dataset %)) li-elements))]
                                                              (println "onSort" li-elements)
-                                                             (println "onSort" items)
+                                                             (println "onSort" (map #(.-itemname (.-dataset %)) li-elements))
                                                              (om/set-state! owner :active-topics items)
                                                              ((:did-change-sort options) items)))})))))
 
