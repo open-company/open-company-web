@@ -63,7 +63,7 @@
 
 (defn setup-sortable [owner options]
   (when (and (om/get-state owner :did-mount) (om/get-state owner :sortable-loaded))
-    (let [ul-node (sel1 :ul.topic-list-sortable)]
+    (let [ul-node (om/get-ref owner "topic-list-sortable")]
       (.create js/Sortable ul-node (clj->js {:handle ".topic-edit-handle"
                                              :onSort (fn [_]
                                                          (let [li-elements (sel [:ul.topic-list-sortable :li])
@@ -123,6 +123,7 @@
                   :style #js {:display (if (:active data) "inline" "none")}}
           (dom/div {}
             (dom/ul {:class "topic-list-sortable"
+                     :ref "topic-list-sortable"
                      :key "topic-list-edit"}
               (for [item-name active-topics]
                 (dom/li {:data-itemname item-name
