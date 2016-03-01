@@ -89,6 +89,11 @@
      :show-topic-edit-button (or (:show-topic-edit-button current-state) false)
      :last-expanded-section (or (:last-expanded-section current-state) nil)}))
 
+; (defn calc-ul-width []
+;   (let [win-width (.-clientWidth (.-body js/document))
+;         ul (sel1 [:ul.topic-list-internal])]
+;     (setStyle ul #js {:width (str (- win-width 40) "px")})))
+
 (defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
 
   (init-state [_]
@@ -129,6 +134,7 @@
       (get-new-sections-if-needed owner)))
 
   (render-state [_ {:keys [show-topic-edit-button active-topics editing]}]
+    ; (.setTimeout js/window calc-ul-width 100)
     (let [slug (keyword (:slug @router/path))]
       (if editing
         (let [categories (map name (keys active-topics))]
@@ -148,11 +154,12 @@
               category-topics (get active-topics active-category)]
           (dom/div {:class "topic-list fix-top-margin-scrolling"
                     :key "topic-list"}
-            (dom/div {:class (utils/class-set {:topic-list-internal true
-                                               :content-loaded (not (:loading data))})}
+            (dom/ul {:class (utils/class-set {:topic-list-internal true
+                                              :group true
+                                              :content-loaded (not (:loading data))})}
               (for [section-name category-topics
                     :let [sd (->> section-name keyword (get company-data))]]
-                (dom/div {:class "topic-row"
+                (dom/li {:class "topic-row"
                           :key (str "topic-row-" (name section-name))}
                   (when-not (and (:read-only company-data) (:placeholder sd))
                     (om/build topic {:loading (:loading company-data)
