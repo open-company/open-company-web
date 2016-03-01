@@ -58,6 +58,8 @@
                                                          (let [ul-list (om/get-ref owner "topic-list-sortable")
                                                                li-elements (sel ul-list [:li])
                                                                items (vec (map #(.-itemname (.-dataset %)) li-elements))]
+                                                           (println "onSort list:" ul-list)
+                                                           (println "items:" items)
                                                            (om/set-state! owner :active-topics items)
                                                            ((:did-change-sort options) items)))})))))
 
@@ -114,9 +116,9 @@
           (println "topic-list-edit render" (:category data) " (active cat:" (:active-category options) ")")
           (dom/div {}
             (println "   active topics: " active-topics)
-            (dom/ul {:class "topic-list-sortable"
-                     :ref "topic-list-sortable"
-                     :key (apply str active-topics)}
+            (dom/ul #js {:className "topic-list-sortable"
+                         :ref "topic-list-sortable"
+                         :key (apply str active-topics)}
               (for [item-name active-topics]
                 (dom/li {:data-itemname item-name
                          :key item-name
