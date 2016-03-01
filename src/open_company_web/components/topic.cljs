@@ -123,8 +123,8 @@
       (.play
         (new Resize
              topic-more
-             (new js/Array body-width (if expanded 0 21))
-             (new js/Array body-width (if expanded 21 0))
+             (new js/Array body-width (if expanded 0 14))
+             (new js/Array body-width (if expanded 14 0))
              utils/oc-animation-duration))
 
       ;; animate height
@@ -211,7 +211,7 @@
         (dom/div #js {:className "topic-more"
                       :ref "topic-more"
                       :style #js {:opacity (if expanded 0 1)
-                                  :height (if expanded "0px" "21px")}}
+                                  :height (if expanded "0px" "14px")}}
           (dom/i {:class "fa fa-circle"})
           (dom/i {:class "fa fa-circle"})
           (dom/i {:class "fa fa-circle"}))
