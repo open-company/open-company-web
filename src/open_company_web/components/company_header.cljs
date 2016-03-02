@@ -16,8 +16,15 @@
 
 (defonce company-header-pt (atom 0))
 
-(defn listener [e owner company-header company-name-offset-top category-nav topic-list]
-  (let [scroll-top (.-scrollTop (.-body js/document))
+(defonce company-name-offset-top (atom 0))
+
+(defonce scroll-listener-key (atom nil))
+
+(defn listener [e owner]
+  (let [company-header (om/get-ref owner "company-header")
+        category-nav (sel1 [:div.category-nav])
+        topic-list (sel1 [:div.topic-list])
+        scroll-top (.-scrollTop (.-body js/document))
         company-name-container (om/get-ref owner "company-name-container")
         company-description-container (om/get-ref owner "company-description-container")]
     (when (zero? @company-header-pt)
@@ -32,7 +39,7 @@
     ; fix company name and move the company description relatively when
     ; the scroll hit the company name
     (when (and company-name-container company-description-container)
-      (if (> scroll-top company-name-offset-top)
+      (if (> scroll-top @company-name-offset-top)
         (do
           (gstyle/setStyle company-name-container #js {:position "fixed"})
           (gstyle/setStyle company-description-container #js {:marginTop "46px"}))
@@ -61,20 +68,21 @@
       (gstyle/setStyle company-description-container #js {:webkitTransform "translate3d(0,0,0)"}))))
 
 (defn watch-scroll [owner]
-  (when (utils/is-mobile)
-    (when-let [company-header (om/get-ref owner "company-header")]
-      (let [company-name-offset-top (.-offsetTop (om/get-ref owner "company-name-container"))
-            category-nav (sel1 [:div.category-nav])
-            topic-list (sel1 [:div.topic-list])]
-        (events/listen
-          js/window
-          EventType/SCROLL
-          #(listener % owner company-header company-name-offset-top category-nav topic-list))))))
+  (if (utils/is-mobile)
+    (when (nil? @scroll-listener-key)
+      (when-let [company-header (om/get-ref owner "company-header")]
+        (let [name-offset-top (.-offsetTop (om/get-ref owner "company-name-container"))
+              category-nav (sel1 [:div.category-nav])
+              topic-list (sel1 [:div.topic-list])]
+          (when (zero? @company-name-offset-top)
+            (reset! company-name-offset-top name-offset-top))
+          (reset! scroll-listener-key (events/listen
+                                       js/window
+                                       EventType/SCROLL
+                                       #(listener % owner))))))
+    (events/unlistenByKey @scroll-listener-key)))
 
 (defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner]
-
-  (will-unmount [_]
-    (events/unlisten js/window EventType/SCROLL listener))
 
   (render [_]
     (dom/div #js {:className "company-header"
