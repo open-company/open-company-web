@@ -8,6 +8,7 @@ div.topic-list {
     min-height: 100px;
     border-bottom: 1px solid #DFDFDF; /* gray */
     background-color: white;
+    text-align: left;
 
     @media screen and (min-width: $max_mobile_width) {
       height: 200px;
