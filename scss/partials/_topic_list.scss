@@ -53,6 +53,19 @@ div.topic-list{
             height: auto;
             color: black;
 
+            &::before {
+              @include triangle(top, white, 0.6em);
+              position: relative;
+              top: -51px;
+              left: 50%;
+            }
+
+            @for $i from 0 through 20{
+              &.li-#{$i}::before {
+                left: #{(400 * $i) + 162}px;
+              }
+            }
+
             img {
               width: 100%;
             }
