@@ -87,12 +87,27 @@
      :new-sections-requested (or (:new-sections-requested current-state) false)
      :save-bt-active (or (:save-bt-active current-state) false)
      :show-topic-edit-button (or (:show-topic-edit-button current-state) false)
-     :last-expanded-section (or (:last-expanded-section current-state) nil)}))
+     :last-expanded-section (or (:last-expanded-section current-state) nil)
+     :bw-expanded-topic nil}))
 
-; (defn calc-ul-width []
-;   (let [win-width (.-clientWidth (.-body js/document))
-;         ul (sel1 [:ul.topic-list-internal])]
-;     (setStyle ul #js {:width (str (- win-width 40) "px")})))
+(defn calc-ul-width [owner]
+  (let [win-width (.-clientWidth (.-body js/document))
+        ul (om/get-ref owner "topic-list-ul")
+        li-in-row (int (/ win-width 400))]
+    (setStyle ul #js {:width (str (* 400 li-in-row) "px")})))
+
+(defn add-expanded-topic [category-topics owner]
+  (if (om/get-state owner :bw-expanded-topic)
+    (let [win-width (.-clientWidth (.-body js/document))
+          selected-topic (om/get-state owner :bw-expanded-topic)
+          fix-category-topics (to-array category-topics)
+          idx (.indexOf fix-category-topics selected-topic)
+          li-in-row (int (/ win-width 400))
+          cur-row (int (/ idx li-in-row))
+          insert-at (+ li-in-row (* cur-row li-in-row))
+          [before after] (split-at insert-at category-topics)]
+      (concat before ["li-expander"] after))
+  category-topics))
 
 (defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
 
@@ -134,7 +149,7 @@
       (get-new-sections-if-needed owner)))
 
   (render-state [_ {:keys [show-topic-edit-button active-topics editing]}]
-    ; (.setTimeout js/window calc-ul-width 100)
+    (.setTimeout js/window #(calc-ul-width owner) 100)
     (let [slug (keyword (:slug @router/path))]
       (if editing
         (let [categories (map name (keys active-topics))]
@@ -151,26 +166,35 @@
                                 :did-change-sort (partial update-active-topics owner options (keyword cat))}}))))
         (let [company-data (:company-data data)
               active-category (keyword (:active-category data))
-              category-topics (get active-topics active-category)]
+              category-topics (get active-topics active-category)
+              fixed-category-topics (add-expanded-topic category-topics owner)]
           (dom/div {:class "topic-list fix-top-margin-scrolling"
                     :key "topic-list"}
-            (dom/ul {:class (utils/class-set {:topic-list-internal true
-                                              :group true
-                                              :content-loaded (not (:loading data))})}
-              (for [section-name category-topics
+            (dom/ul #js {:className (utils/class-set {:topic-list-internal true
+                                                      :group true
+                                                      :content-loaded (not (:loading data))})
+                         :ref "topic-list-ul"}
+              (for [section-name fixed-category-topics
                     :let [sd (->> section-name keyword (get company-data))]]
-                (dom/li {:class "topic-row"
+                (dom/li {:class (utils/class-set {:topic-row true
+                                                  :full-width (= section-name "li-expander")})
                           :key (str "topic-row-" (name section-name))}
-                  (when-not (and (:read-only company-data) (:placeholder sd))
-                    (om/build topic {:loading (:loading company-data)
-                                     :section section-name
-                                     :section-data sd
-                                     :currency (:currency company-data)
-                                     :active-category active-category}
-                                     {:opts {:section-name section-name
-                                             :navbar-editing-cb navbar-editing-cb
-                                             :force-edit-cb (partial force-edit-button owner)
-                                             :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)}})))))
+                  (if (= section-name "li-expander")
+                    (let [sec-data (->> (om/get-state owner :bw-expanded-topic) keyword (get company-data))]
+                     (dom/div {:class "topic"}
+                      (dom/div {:class "topic-expanded-body"
+                                :dangerouslySetInnerHTML (clj->js {"__html" (:body sec-data)})})))
+                    (when-not (and (:read-only company-data) (:placeholder sd))
+                      (om/build topic {:loading (:loading company-data)
+                                       :section section-name
+                                       :section-data sd
+                                       :currency (:currency company-data)
+                                       :active-category active-category}
+                                       {:opts {:section-name section-name
+                                               :navbar-editing-cb navbar-editing-cb
+                                               :force-edit-cb (partial force-edit-button owner)
+                                               :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)
+                                               :bw-topic-click #(om/set-state! owner :bw-expanded-topic %)}}))))))
             (when (and (not (:read-only company-data)) (seq company-data))
               (dom/div #js {:className "manage-topics-container"
                             :style #js {:opacity (if (om/get-state owner :show-topic-edit-button) "0" "1")}}
