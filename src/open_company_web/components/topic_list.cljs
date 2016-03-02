@@ -14,6 +14,7 @@
             [open-company-web.components.ui.manage-topics :refer (manage-topics)]
             [open-company-web.components.ui.edit-topic-button :refer (edit-topic-button)]
             [goog.fx.dom :refer (Fade)]
+            [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as AnimationEventType]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -122,18 +123,29 @@
 
 (defn animate-expand [owner expand]
   (when-let [topic (om/get-ref owner "li-expander")]
-    (let [win-width (.-clientWidth (.-body js/document))
-          ul-width (* 400 (li-in-row))
-          resize-animation (new Fade
-                                topic
-                                (if expand 0 1)
-                                (if expand 1 0)
-                                utils/oc-animation-duration)]
-      (doto resize-animation
-        (events/listen
-          AnimationEventType/FINISH
-          #(om/set-state! owner :bw-expand-animated (om/get-state owner :bw-expanded-topic)))
-        (.play)))))
+    (let [current-topic-height (.-offsetHeight topic)
+          topic-width (.-offsetWidth topic)]
+      (setStyle topic #js {:height "auto"})
+      (let [win-width (.-clientWidth (.-body js/document))
+            ul-width (* 400 (li-in-row))
+            topic-height (.-offsetHeight topic)
+            resize-animation (new Fade
+                                  topic
+                                  (if expand 0 1)
+                                  (if expand 1 0)
+                                  utils/oc-animation-duration)]
+        (setStyle topic #js {:height (if expand "0" (str current-topic-height "px"))})
+        (.play
+          (new Resize
+                topic
+               (new js/Array topic-width (if expand current-topic-height topic-height))
+               (new js/Array topic-width (if expand topic-height 0))
+               utils/oc-animation-duration))
+        (doto resize-animation
+          (events/listen
+            AnimationEventType/FINISH
+            #(om/set-state! owner :bw-expand-animated (om/get-state owner :bw-expanded-topic)))
+          (.play))))))
 
 (defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
 
@@ -215,7 +227,11 @@
                              :style #js {:opacity (if (= section-name "li-expander")
                                                     (if bw-expand-animated
                                                         1 0)
-                                                    1)}
+                                                    1)
+                                         :height  (if (= section-name "li-expander")
+                                                    (if bw-expand-animated
+                                                      "auto" "0")
+                                                    "200px")}
                              :key (str "topic-row-" (name section-name))}
                   (if (= section-name "li-expander")
                     (let [sec-data (->> selected-topic keyword (get company-data))]
