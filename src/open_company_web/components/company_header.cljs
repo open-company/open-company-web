@@ -105,7 +105,7 @@
                   :key "company-header-internal"}
           (dom/div #js {:className "company-header-top group"}
             ;; add the scroll listener if the logo is not present
-            (when (clojure.string/empty? (:logo company-data))
+            (when (clojure.string/blank? (:logo company-data))
               (.setTimeout js/window #(watch-scroll owner) 500))
             ;; Company logo
             (dom/div {:class "company-logo-container"}
