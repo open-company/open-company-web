@@ -241,19 +241,24 @@
                                                       :content-loaded (not (:loading data))})
                          :ref "topic-list-ul"}
               (for [section-name fixed-category-topics
-                    :let [sd (->> section-name keyword (get company-data))]]
-                (dom/li #js {:className (utils/class-set {:topic-row true
+                    :let [sd (->> section-name keyword (get company-data))
+                          li-props (if-not (utils/is-mobile)
+                                      #js {:className (utils/class-set {:topic-row true
                                                           :full-width (= section-name "li-expander")})
-                             :ref section-name
-                             :style #js {:opacity (if (= section-name "li-expander")
-                                                    (if bw-expand-animated
-                                                        1 0)
-                                                    1)
-                                         :height  (if (= section-name "li-expander")
-                                                    (if bw-expand-animated
-                                                      "auto" "0")
-                                                    "200px")}
-                             :key (str "topic-row-" (name section-name))}
+                                           :ref section-name
+                                           :style #js {:opacity (if (= section-name "li-expander")
+                                                                  (if bw-expand-animated
+                                                                      1 0)
+                                                                  1)
+                                                       :height  (if (= section-name "li-expander")
+                                                                  (if bw-expand-animated
+                                                                    "auto" "0")
+                                                                  "200px")}
+                                           :key (str "topic-row-" (name section-name))}
+                                      #js {:className "topic-row"
+                                           :ref section-name
+                                           :key (str "topic-row-" (name section-name))})]]
+                (dom/li li-props
                   (if (= section-name "li-expander")
                     (let [sec-data (->> selected-topic keyword (get company-data))]
                       (dom/div #js {:className (str "topic li-" row-idx)}
