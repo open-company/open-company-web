@@ -154,7 +154,8 @@
       (get-new-sections-if-needed owner)))
 
   (render-state [_ {:keys [show-topic-edit-button active-topics editing]}]
-    (.setTimeout js/window #(calc-ul-width owner) 100)
+    (when-not (utils/is-mobile)
+      (.setTimeout js/window #(calc-ul-width owner) 100))
     (let [slug (keyword (:slug @router/path))]
       (if editing
         (let [categories (map name (keys active-topics))]
