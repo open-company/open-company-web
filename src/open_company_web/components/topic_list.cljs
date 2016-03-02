@@ -109,6 +109,11 @@
       (concat before ["li-expander"] after))
   category-topics))
 
+(defn topic-click [owner topic]
+  (if (= (om/get-state owner :bw-expanded-topic) topic)
+    (om/set-state! owner :bw-expanded-topic nil)
+    (om/set-state! owner :bw-expanded-topic topic)))
+
 (defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
 
   (init-state [_]
@@ -194,7 +199,7 @@
                                                :navbar-editing-cb navbar-editing-cb
                                                :force-edit-cb (partial force-edit-button owner)
                                                :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)
-                                               :bw-topic-click #(om/set-state! owner :bw-expanded-topic %)}}))))))
+                                               :bw-topic-click (partial topic-click owner)}}))))))
             (when (and (not (:read-only company-data)) (seq company-data))
               (dom/div #js {:className "manage-topics-container"
                             :style #js {:opacity (if (om/get-state owner :show-topic-edit-button) "0" "1")}}
