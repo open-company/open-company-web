@@ -72,7 +72,7 @@
     (.stopPropagation e))
   ((:toggle-edit-topic-cb options) (:section-name options)))
 
-(defn topic-click [data owner options expanded]
+(defn mobile-topic-animation [data owner options expanded]
   (let [topic (om/get-ref owner "topic")
         topic-more (om/get-ref owner "topic-more")
         body-node (om/get-ref owner "topic-body")]
@@ -142,6 +142,11 @@
             ((:force-edit-cb options) true)))
         ;; hide the edit button if necessary
         ((:force-edit-cb options) false)))))
+
+(defn topic-click [data owner options expanded]
+  (if (utils/is-mobile)
+    (mobile-topic-animation data owner options expanded)
+    ((:bw-topic-click options) (:section data))))
 
 (defn headline-component [section]
   (cond
