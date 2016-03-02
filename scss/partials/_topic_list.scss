@@ -8,10 +8,9 @@ div.topic-list{
   content: "";
 
   ul.topic-list-internal {
+    list-style: none;
     padding: 0;
-    list-style-type: none;
-    text-align: center;
-    margin: 5px 20px;
+    margin: 0 auto;
 
     &.content-loaded:empty {
 
@@ -42,6 +41,20 @@ div.topic-list{
         overflow: hidden;
         padding: 10px;
         float: left;
+
+        &.full-width {
+          width: 100%;
+          height: auto;
+
+          div.topic {
+            height: auto;
+            color: black;
+
+            img {
+              width: 100%;
+            }
+          }
+        }
       }
 
 
