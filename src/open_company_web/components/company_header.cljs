@@ -104,11 +104,14 @@
         (dom/div {:class "company-header-internal"
                   :key "company-header-internal"}
           (dom/div #js {:className "company-header-top group"}
+            ;; add the scroll listener if the logo is not present
+            (when (clojure.string/empty? (:logo company-data))
+              (.setTimeout js/window #(watch-scroll owner) 500))
             ;; Company logo
             (dom/div {:class "company-logo-container"}
               (dom/img {:src (:logo company-data)
-                        :on-load #(watch-scroll owner)
-                        :on-error #(watch-scroll owner)
+                        :on-load #(watch-scroll owner) ;; add scroll listener when the logo is loaded
+                        :on-error #(watch-scroll owner) ;; or it errors on loading
                         :class "company-logo"
                         :title (:name company-data)}))
             ;; Buttons
