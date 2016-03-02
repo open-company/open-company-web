@@ -88,23 +88,26 @@
      :save-bt-active (or (:save-bt-active current-state) false)
      :show-topic-edit-button (or (:show-topic-edit-button current-state) false)
      :last-expanded-section (or (:last-expanded-section current-state) nil)
-     :bw-expanded-topic nil}))
+     :bw-expanded-topic nil
+     :bw-expand-animated nil}))
+
+(defn li-in-row []
+  (let [win-width (.-clientWidth (.-body js/document))]
+    (int (/ win-width 400))))
 
 (defn calc-ul-width [owner]
-  (let [win-width (.-clientWidth (.-body js/document))
-        ul (om/get-ref owner "topic-list-ul")
-        li-in-row (int (/ win-width 400))]
-    (setStyle ul #js {:width (str (* 400 li-in-row) "px")})))
+  (let [ul (om/get-ref owner "topic-list-ul")]
+    (setStyle ul #js {:width (str (* 400 (li-in-row)) "px")})))
 
 (defn add-expanded-topic [category-topics owner]
-  (if (om/get-state owner :bw-expanded-topic)
-    (let [win-width (.-clientWidth (.-body js/document))
-          selected-topic (om/get-state owner :bw-expanded-topic)
-          fix-category-topics (to-array category-topics)
-          idx (.indexOf fix-category-topics selected-topic)
-          li-in-row (int (/ win-width 400))
-          cur-row (int (/ idx li-in-row))
-          insert-at (+ li-in-row (* cur-row li-in-row))
+  (if (or (om/get-state owner :bw-expanded-topic)
+          (om/get-state owner :bw-expand-animated))
+    (let [selected-topic (or (om/get-state owner :bw-expanded-topic)
+                             (om/get-state owner :bw-expand-animated))
+          idx (.indexOf (to-array category-topics) selected-topic)
+          li-num (li-in-row)
+          cur-row (int (/ idx li-num))
+          insert-at (+ li-num (* cur-row li-num))
           [before after] (split-at insert-at category-topics)]
       (concat before ["li-expander"] after))
   category-topics))
@@ -112,7 +115,25 @@
 (defn topic-click [owner topic]
   (if (= (om/get-state owner :bw-expanded-topic) topic)
     (om/set-state! owner :bw-expanded-topic nil)
-    (om/set-state! owner :bw-expanded-topic topic)))
+    (do
+      (om/set-state! owner :bw-expanded-topic topic)
+      (when-not (nil? (om/get-state owner :bw-expand-animated))
+        (om/set-state! owner :bw-expand-animated topic)))))
+
+(defn animate-expand [owner expand]
+  (when-let [topic (om/get-ref owner "li-expander")]
+    (let [win-width (.-clientWidth (.-body js/document))
+          ul-width (* 400 (li-in-row))
+          resize-animation (new Fade
+                                topic
+                                (if expand 0 1)
+                                (if expand 1 0)
+                                utils/oc-animation-duration)]
+      (doto resize-animation
+        (events/listen
+          AnimationEventType/FINISH
+          #(om/set-state! owner :bw-expand-animated (om/get-state owner :bw-expanded-topic)))
+        (.play)))))
 
 (defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
 
@@ -153,9 +174,12 @@
     (when-not (:read-only (:company-data data))
       (get-new-sections-if-needed owner)))
 
-  (render-state [_ {:keys [show-topic-edit-button active-topics editing]}]
+  (render-state [_ {:keys [show-topic-edit-button active-topics editing bw-expanded-topic bw-expand-animated]}]
     (when-not (utils/is-mobile)
       (.setTimeout js/window #(calc-ul-width owner) 100))
+    (when (or (and bw-expanded-topic (not bw-expand-animated))
+              (and (nil? bw-expanded-topic) bw-expand-animated))
+      (.setTimeout js/window #(animate-expand owner (not bw-expand-animated)) 0))
     (let [slug (keyword (:slug @router/path))]
       (if editing
         (let [categories (map name (keys active-topics))]
@@ -170,10 +194,13 @@
                          :opts {:active-category (:active-category data)
                                 :new-sections (slug @caches/new-sections)
                                 :did-change-sort (partial update-active-topics owner options (keyword cat))}}))))
-        (let [company-data (:company-data data)
+        (let [selected-topic (or bw-expanded-topic bw-expand-animated)
+              company-data (:company-data data)
               active-category (keyword (:active-category data))
               category-topics (get active-topics active-category)
-              fixed-category-topics (add-expanded-topic category-topics owner)]
+              fixed-category-topics (add-expanded-topic category-topics owner)
+              idx (.indexOf (to-array category-topics) selected-topic)
+              row-idx (mod idx (li-in-row))]
           (dom/div {:class "topic-list fix-top-margin-scrolling"
                     :key "topic-list"}
             (dom/ul #js {:className (utils/class-set {:topic-list-internal true
@@ -182,14 +209,19 @@
                          :ref "topic-list-ul"}
               (for [section-name fixed-category-topics
                     :let [sd (->> section-name keyword (get company-data))]]
-                (dom/li {:class (utils/class-set {:topic-row true
-                                                  :full-width (= section-name "li-expander")})
-                          :key (str "topic-row-" (name section-name))}
+                (dom/li #js {:className (utils/class-set {:topic-row true
+                                                          :full-width (= section-name "li-expander")})
+                             :ref section-name
+                             :style #js {:opacity (if (= section-name "li-expander")
+                                                    (if bw-expand-animated
+                                                        1 0)
+                                                    1)}
+                             :key (str "topic-row-" (name section-name))}
                   (if (= section-name "li-expander")
-                    (let [sec-data (->> (om/get-state owner :bw-expanded-topic) keyword (get company-data))]
-                     (dom/div {:class "topic"}
-                      (dom/div {:class "topic-expanded-body"
-                                :dangerouslySetInnerHTML (clj->js {"__html" (:body sec-data)})})))
+                    (let [sec-data (->> selected-topic keyword (get company-data))]
+                      (dom/div #js {:className (str "topic li-" row-idx)}
+                        (dom/div {:class "topic-expanded-body"
+                                  :dangerouslySetInnerHTML (clj->js {"__html" (:body sec-data)})})))
                     (when-not (and (:read-only company-data) (:placeholder sd))
                       (om/build topic {:loading (:loading company-data)
                                        :section section-name
