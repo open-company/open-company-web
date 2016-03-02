@@ -17,14 +17,14 @@ nav.navbar {
     padding: 0px;
   }
 
-  @media screen and (max-width: 960px) {
+  @include mobile(){
     div#navbar {
       width: auto;
       padding-right: 230px;
     }
   }
 
-  @media screen and (min-width: 960px) {
+  @include big_web(){
     & > div {
       width: auto;
       padding-left: 85px;
@@ -111,7 +111,7 @@ nav.navbar {
       }
     }
 
-    @media screen and (max-width: 960px){
+    @include mobile(){
       ul.navbar-right{
         margin: 0;
       }

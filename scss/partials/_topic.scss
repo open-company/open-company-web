@@ -10,7 +10,7 @@ div.topic-list {
     background-color: white;
     text-align: left;
 
-    @media screen and (min-width: $max_mobile_width) {
+    @include big_web(){
       height: 200px;
     }
 

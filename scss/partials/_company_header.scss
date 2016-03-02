@@ -26,7 +26,9 @@ div.company-header{
   }
 
   div.company-header-internal {
-    padding: 0 70px;
+    @include big_web(){
+      padding: 0 70px;
+    }
     
     div.company-header-top {
       padding-top: 22px;

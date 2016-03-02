@@ -1,3 +1,5 @@
+@import "../modules/_browser_type";
+
 @mixin blur ($radius) {
   -webkit-filter: blur($radius+px); /* Chrome, Safari */
   -ms-filter: blur($radius+px); /* IE12? */
@@ -37,5 +39,17 @@
     background-size: $width $height;
     width: $width;
     height: $height;
+  }
+}
+
+@mixin mobile(){
+  @media screen and (max-width: $max_mobile_width){
+    @content;
+  }
+}
+
+@mixin big_web(){
+  @media screen and (min-width: $max_mobile_width){
+    @content;
   }
 }

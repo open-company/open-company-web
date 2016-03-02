@@ -11,7 +11,7 @@ div.topic-list{
     list-style: none;
     padding: 0;
 
-    @media screen and (min-width: $max_mobile_width) {
+    @include big_web(){
       margin: 0 auto;
     }
 
@@ -32,13 +32,13 @@ div.topic-list{
 
     li.topic-row{
 
-      @media screen and (max-width: $max_mobile_width){
+      @include mobile(){
         padding: 0px;
         margin: 0px;
         width: 100%;
       }
 
-      @media screen and (min-width: $max_mobile_width) {
+      @include big_web(){
         width: 400px;
         height: 200px;
         overflow: hidden;

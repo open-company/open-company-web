@@ -53,7 +53,7 @@ a:hover, a:hover *{
  .main {
     padding: 0px !important;
 }
-@media screen and (min-width: 768px) {
+@include mobile(){
     .main {
         padding-right: 40px;
         padding-left: 40px;
