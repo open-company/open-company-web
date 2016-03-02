@@ -49,7 +49,7 @@
 }
 
 @mixin big_web(){
-  @media screen and (min-width: $max_mobile_width){
+  @media screen and (min-width: $min_big_web_width){
     @content;
   }
 }
