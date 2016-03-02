@@ -113,13 +113,34 @@
       (concat before ["li-expander"] after))
   category-topics))
 
+(defn same-line? [owner topic1 topic2]
+  (let [props (om/get-props owner)
+        active-category (keyword (:active-category props))
+        active-topics (om/get-state owner :active-topics)
+        category-topics (get active-topics active-category)
+        idx1 (.indexOf (to-array category-topics) topic1)
+        idx2 (.indexOf (to-array category-topics) topic2)]
+    (= (int (/ idx1 (li-in-row))) (int (/ idx2 (li-in-row))))))
+
 (defn topic-click [owner topic]
-  (if (= (om/get-state owner :bw-expanded-topic) topic)
-    (om/set-state! owner :bw-expanded-topic nil)
-    (do
-      (om/set-state! owner :bw-expanded-topic topic)
-      (when-not (nil? (om/get-state owner :bw-expand-animated))
-        (om/set-state! owner :bw-expand-animated topic)))))
+  (let [bw-expanded-topic (om/get-state owner :bw-expanded-topic)
+        bw-expand-animated (om/get-state owner :bw-expand-animated)]
+    (if (= bw-expanded-topic topic)
+      ; close currently expanded topic
+      (om/set-state! owner :bw-expanded-topic nil)
+      (if (and (not (nil? bw-expanded-topic))
+               (not (nil? bw-expand-animated))
+               (not= bw-expanded-topic topic)
+               (not (same-line? owner bw-expanded-topic topic)))
+        ; expand another topic while one is already focused
+        (do
+          (om/set-state! owner :bw-expanded-topic nil)
+          (.setTimeout js/window #(om/set-state! owner :bw-expanded-topic topic) (+ utils/oc-animation-duration 100)))
+        ; expand new topic
+        (do
+          (om/set-state! owner :bw-expanded-topic topic)
+          (when-not (nil? (om/get-state owner :bw-expand-animated))
+            (om/set-state! owner :bw-expand-animated topic)))))))
 
 (defn animate-expand [owner expand]
   (when-let [topic (om/get-ref owner "li-expander")]
