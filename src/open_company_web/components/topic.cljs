@@ -76,6 +76,8 @@
   ((:toggle-edit-topic-cb options) (:section-name options)))
 
 (defn topic-click [data owner options expanded]
+  (when expanded
+    (om/set-state! owner :as-of (om/get-state owner :actual-as-of)))
   (let [topic (om/get-ref owner "topic")
         topic-more (om/get-ref owner "topic-more")
         topic-date (om/get-ref owner "topic-date")
