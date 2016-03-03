@@ -53,6 +53,25 @@ div.company-header{
         border: 0px;
         outline: none;
 
+        &.vert-ellipse {
+          background-image: url("/img/3dots.png");
+          background-size: 25px 25px;
+          background-position: 0px 0px;
+          width: 25px;
+          height: 25px;
+
+          &:hover, &:active, &:focus {
+            background-color: white;
+            border: 0px solid black;
+            outline: none;
+            box-shadow: none;
+          }
+
+          & span.caret {
+            display: none;
+          }
+        }
+
         &.bullhorn {
           margin-right: 15px;
         }

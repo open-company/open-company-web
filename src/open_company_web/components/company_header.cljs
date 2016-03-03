@@ -7,11 +7,13 @@
             [open-company-web.components.ui.company-avatar :refer (company-avatar)]
             [open-company-web.components.category-nav :refer (category-nav)]
             [open-company-web.router :as router]
+            [open-company-web.lib.cookies :as cook]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
             [goog.events :as events]
             [goog.style :as gstyle]
-            [goog.events.EventType :as EventType])
+            [goog.events.EventType :as EventType]
+            [om-bootstrap.button :as b])
   (:import [goog.events EventType]))
 
 (defonce company-header-pt (atom 0))
@@ -68,6 +70,14 @@
             (when company-description-container
               (gstyle/setStyle company-description-container #js {:webkitTransform "translate3d(0,0,0)"}))))))))
 
+(defn menu-click [owner]
+  (if (cook/get-cookie :jwt)
+    (do ; Logout
+      (cook/remove-cookie! :jwt)
+      (utils/redirect! "/"))
+    (do ; Login
+      (utils/redirect! "/login"))))
+
 (defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner]
 
   (render [_]
@@ -99,8 +109,9 @@
                         :title (:name company-data)}))
             ;; Buttons
             (dom/div {:class "buttons-container"}
-              (dom/button {:class "oc-btn 3dots"}
-                (dom/img {:src (str "/img/3dots.png?" ls/deploy-key)}))))
+              (b/dropdown {:class "oc-btn vert-ellipse" :bs-size "30px" :title "" :pull-right? true}
+                (b/menu-item {:key 1
+                              :on-click #(menu-click owner)} (if (cook/get-cookie :jwt) "Logout" "Sign In/Sign Up")))))
 
           ;; Company name
           (dom/div #js {:className "company-name-container"
