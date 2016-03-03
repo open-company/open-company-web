@@ -72,7 +72,9 @@
       (toggle-edit-topic-button owner section-name))))
 
 (defn get-active-topics [company-data category]
-  (get-in company-data [:sections (keyword category)]))
+  (if (= category "all")
+    (apply concat (vals (:sections company-data)))
+    (get-in company-data [:sections (keyword category)])))
 
 (defn update-active-topics [owner options category new-active-topics]
   (let [old-active-categories (om/get-state owner :active-topics)
@@ -84,7 +86,7 @@
 (defn get-state [data current-state]
   (let [company-data (:company-data data)
         categories (:categories company-data)
-        active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))]
+        active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) (concat ["all"] categories)))]
     {:editing (or (:editing current-state) false)
      :initial-active-topics active-topics
      :active-topics active-topics
