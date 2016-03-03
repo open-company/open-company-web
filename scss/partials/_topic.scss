@@ -17,8 +17,8 @@ div.topic-list {
     div.topic-header {
 
       .topic-image {
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
         float: left;
       }
 
@@ -30,19 +30,35 @@ div.topic-list {
         float: left;
         margin-top: 5px;
         margin-left: 12px;
-        font-size: 26px;
         font-weight: 600;
-        line-height: 0.7;
         color: #2d2d2d;
+
+        @include mobile(){
+          font-size: 26px;
+          line-height: 1;
+        }
+
+        @include big_web(){
+          font-size: 18px;
+          line-height: 1;
+        }
       }
     }
 
     div.topic-headline {
-      font-size: 16px;
-      line-height: 1.6;
-      color: #444444;
       width: 100%;
       margin-top: 15px;
+      color: #444444;
+
+      @include mobile(){
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      @include big_web(){
+        font-size: 14px;
+        line-height: 1.4;
+      }
 
       &.collapse {
         height: 0px;
