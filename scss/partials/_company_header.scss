@@ -85,11 +85,18 @@ div.company-header{
         padding-left: 20px;
         height: 46px;
         text-align: left;
-        font-weight: bold;
-        font-size: 24px;
-        line-height: 0.9;
         background-color: white;
         color: #2d2d2d;
+        font-size: 24px;
+        line-height: 0.9;
+
+        @include mobile(){
+          font-weight: regular;
+        }
+
+        @include big_web(){
+          font-weight: 600;
+        }
       }
     }
 
@@ -98,12 +105,20 @@ div.company-header{
 
       div.company-description {
         text-align: left;
-        font-size: 16px;
-        line-height: 1.2;
         margin-top: 0px;
         margin-bottom: 20px;
         margin-left: 20px;
         color: #2d2d2d;
+
+        @include mobile(){
+          font-size: 16px;
+          line-height: 1.2;
+        }
+
+        @include big_web(){
+          font-size: 14px;
+          line-height: 1.3;
+        }
       }
     }
   }
