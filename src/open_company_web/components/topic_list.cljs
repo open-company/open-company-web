@@ -20,6 +20,9 @@
             [goog.events.EventType :as EventType]
             [goog.style :refer (getStyle setStyle)]))
 
+(def topic-box-width 290)
+(def topic-box-height 170)
+
 (defn get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
     (let [slug (keyword (:slug @router/path))
@@ -94,11 +97,11 @@
 
 (defn li-in-row []
   (let [win-width (.-clientWidth (.-body js/document))]
-    (int (/ win-width 400))))
+    (int (/ win-width topic-box-width))))
 
 (defn calc-ul-width [owner]
   (let [ul (om/get-ref owner "topic-list-ul")]
-    (setStyle ul #js {:width (str (* 400 (li-in-row)) "px")})))
+    (setStyle ul #js {:width (str (* topic-box-width (li-in-row)) "px")})))
 
 (defn add-expanded-topic [category-topics owner]
   (if (or (om/get-state owner :bw-expanded-topic)
@@ -148,7 +151,7 @@
           topic-width (.-offsetWidth topic)]
       (setStyle topic #js {:height "auto"})
       (let [win-width (.-clientWidth (.-body js/document))
-            ul-width (* 400 (li-in-row))
+            ul-width (* topic-box-width (li-in-row))
             topic-height (.-offsetHeight topic)
             resize-animation (new Fade
                                   topic
@@ -252,8 +255,8 @@
                                                                   1)
                                                        :height  (if (= section-name "li-expander")
                                                                   (if bw-expand-animated
-                                                                    "auto" "0")
-                                                                  "200px")}
+                                                                    "auto" "0px")
+                                                                  (str topic-box-height "px"))}
                                            :key (str "topic-row-" (name section-name))}
                                       #js {:className "topic-row"
                                            :ref section-name
