@@ -26,13 +26,21 @@ div.company-dashboard {
       text-transform: uppercase;
 
       div.category-label {
-        font-size: 16px;
-        line-height: 0;
+        height: 18px;
         padding-left: 5px;
         padding-right: 5px;
         display: inline-block;
         color: #8b8a8a;
-        height: 18px;
+        font-weight: 600;
+        line-height: 0;
+
+        @include mobile(){
+          font-size: 16px;
+        }
+
+        @include big_web(){
+          font-size: 14px;
+        }
       }
 
       &.active div.category-label {
