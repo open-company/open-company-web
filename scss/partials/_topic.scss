@@ -22,13 +22,20 @@ div.topic-list {
       }
 
       div.topic-title {
-        float: left;
-        margin-top: 5px;
-        margin-left: 12px;
+        padding-top: 6px;
+        margin-left: 38px;
         font-size: 26px;
         font-weight: 600;
         line-height: 0.7;
         color: #2d2d2d;
+      }
+
+      div.topic-date {
+        font-size: 13px;
+        line-height: 0.8;
+        color: #5b5b5b;
+        margin-left: 38px;
+        padding-top: 16px;
       }
     }
 
@@ -155,6 +162,26 @@ div.topic-list {
 
       &.expanded {
         height: auto;
+      }
+
+      div.topic-navigation{
+        width: 100%;
+        margin-bottom: 15px;
+
+        div a {
+          font-size: 14px;
+          line-height: 1;
+          color: #707070;
+          text-decoration: none;
+        }
+
+        div.previous {
+          float: left;
+        }
+
+        div.next {
+          float: right;
+        }
       }
     }
   }
