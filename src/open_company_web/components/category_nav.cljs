@@ -35,6 +35,11 @@
       (when (> app-height fix-cur-min-height)
         (gstyle/setStyle (sel1 :body) #js {:minHeight (str app-height "px")})))))
 
+(defn get-categories [categories]
+  (if (utils/is-mobile)
+    categories
+    (vec (concat ["all"] categories))))
+
 (defcomponent category-nav [data owner]
 
   (render [_]
@@ -42,8 +47,9 @@
           scroll-top (.-scrollTop (sel1 :body))
           slug (:slug @router/path)
           company-data (:company-data data)
-          categories (:categories company-data)
+          categories (get-categories (:categories company-data))
           active-category (:active-category data)
+          sections (keys (:sections company-data))
           navbar-style (if (and (utils/is-mobile)
                                 (or navbar-editing ; is editing style
                                 ; or the scroll pivot has been initialized and
@@ -58,13 +64,17 @@
       (dom/div #js {:className "row category-nav"
                     :ref "category-nav"
                     :style navbar-style}
-        (for [category categories]
-          (let [category-name (name category)
-                category-class (utils/class-set {:category true
-                                                 :active (= active-category category-name)})]
-            (dom/a {:class ""
-                    :href (str "/companies/" slug "/dashboard#" category-name)
-                    :on-click (partial category-click data category-name)}
-              (dom/div {:class category-class}
-                (dom/div {:class "category-label"}
-                  (utils/camel-case-str category-name))))))))))
+        (dom/div #js {:className "category-nav-internal"
+                      :style #js {:width (if (utils/is-mobile)
+                                           "100%"
+                                           (str (* (inc (count sections)) 150) "px"))}}
+          (for [category categories]
+            (let [category-name (name category)
+                  category-class (utils/class-set {:category true
+                                                   :active (= active-category category-name)})]
+              (dom/a {:class ""
+                      :href (str "/companies/" slug "/dashboard#" category-name)
+                      :on-click (partial category-click data category-name)}
+                (dom/div {:class category-class}
+                  (dom/div {:class "category-label"}
+                    (utils/camel-case-str category-name)))))))))))
