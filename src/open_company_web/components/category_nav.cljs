@@ -22,7 +22,7 @@
   ;; change the window.location.hash
   (set! (.-hash (.-location js/window)) category-name)
   ;; fix the scroll to the first section if necessary
-  (when (>= (.-scrollTop (sel1 :body)) max-scroll-top)
+  (when (and (utils/is-mobile) (>= (.-scrollTop (sel1 :body)) max-scroll-top))
     (set! (.-scrollTop (sel1 :body)) max-scroll-top))
   ;; reactivate the url change handler
   (reset! open-company-web.core/prevent-route-dispatch false))
@@ -44,15 +44,17 @@
           company-data (:company-data data)
           categories (:categories company-data)
           active-category (:active-category data)
-          navbar-style (if (or navbar-editing ; is editing style
-                               ; or the scroll pivot has been initialized and
-                               ; the scroll is higher than the header
-                               (>= scroll-top max-scroll-top))
+          navbar-style (if (and (utils/is-mobile)
+                                (or navbar-editing ; is editing style
+                                ; or the scroll pivot has been initialized and
+                                ; the scroll is higher than the header
+                                (>= scroll-top max-scroll-top)))
                          #js {:position "fixed"
                               :top "50px"}
                          #js {:position "relative"
                               :top "0px"})]
-      (setup-body-min-height)
+      (when (utils/is-mobile)
+        (setup-body-min-height))
       (dom/div #js {:className "row category-nav"
                     :ref "category-nav"
                     :style navbar-style}
