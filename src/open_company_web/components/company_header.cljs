@@ -99,8 +99,6 @@
                         :title (:name company-data)}))
             ;; Buttons
             (dom/div {:class "buttons-container"}
-              (dom/button {:class "oc-btn bullhorn"}
-                (dom/img {:src (str "/img/bullhorn.png?" ls/deploy-key)}))
               (dom/button {:class "oc-btn 3dots"}
                 (dom/img {:src (str "/img/3dots.png?" ls/deploy-key)}))))
 
