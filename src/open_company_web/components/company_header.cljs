@@ -75,8 +75,8 @@
     (do ; Logout
       (cook/remove-cookie! :jwt)
       (utils/redirect! "/"))
-    (do ; Login
-      (utils/redirect! "/login"))))
+    ; redirect to login
+    (utils/redirect! "/login")))
 
 (defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner]
 
