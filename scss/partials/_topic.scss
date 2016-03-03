@@ -27,21 +27,30 @@ div.topic-list {
       }
 
       div.topic-title {
-        float: left;
-        margin-top: 5px;
-        margin-left: 12px;
         font-weight: 600;
         color: #2d2d2d;
+        margin-top: 5px;
 
         @include mobile(){
           font-size: 26px;
           line-height: 1;
+          margin-left: 38px;
         }
 
         @include big_web(){
           font-size: 18px;
           line-height: 1;
+          float: left;
+          margin-left: 12px;
         }
+      }
+
+      div.topic-date {
+        font-size: 13px;
+        line-height: 0.8;
+        color: #5b5b5b;
+        margin-left: 38px;
+        padding-top: 16px;
       }
     }
 
@@ -176,6 +185,26 @@ div.topic-list {
 
       &.expanded {
         height: auto;
+      }
+
+      div.topic-navigation{
+        width: 100%;
+        margin-bottom: 15px;
+
+        div a {
+          font-size: 14px;
+          line-height: 1;
+          color: #707070;
+          text-decoration: none;
+        }
+
+        div.previous {
+          float: left;
+        }
+
+        div.next {
+          float: right;
+        }
       }
     }
   }

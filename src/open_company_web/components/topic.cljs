@@ -3,7 +3,10 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
+            [open-company-web.router :as router]
+            [open-company-web.caches :as cache]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.api :as api]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.components.ui.charts :refer (column-chart)]
@@ -73,8 +76,11 @@
   ((:toggle-edit-topic-cb options) (:section-name options)))
 
 (defn mobile-topic-animation [data owner options expanded]
+  (when expanded
+    (om/set-state! owner :as-of (om/get-state owner :actual-as-of)))
   (let [topic (om/get-ref owner "topic")
         topic-more (om/get-ref owner "topic-more")
+        topic-date (om/get-ref owner "topic-date")
         body-node (om/get-ref owner "topic-body")]
     (setStyle body-node #js {:height "auto"})
     (let [body-height (.-offsetHeight body-node)
@@ -113,6 +119,13 @@
                                utils/oc-animation-duration)]
             (.play growth-resize)
             (.play growth-fade)))
+
+      (.play
+        (new Fade
+             topic-date
+             (if expanded 1 0)
+             (if expanded 0 1)
+             utils/oc-animation-duration))
 
       ;; animate height
       (let [height-animation (new Resize
@@ -160,10 +173,34 @@
     :else
     topic-headline))
 
+(defn revision-next
+  "Return the first future revision"
+  [revisions as-of]
+  (when (pos? (count revisions))
+    (first (remove nil? (map
+                          (fn [r]
+                            (when (= (:updated-at r) as-of)
+                              (let [idx (.indexOf (to-array revisions) r)]
+                                (get revisions (inc idx)))))
+                          revisions)))))
+
+(defn revision-prev
+  "Return the first future revision"
+  [revisions as-of]
+  (when (pos? (count revisions))
+    (first (remove nil? (map
+                          (fn [r]
+                            (when (= (:updated-at r) as-of)
+                              (let [idx (.indexOf (to-array revisions) r)]
+                                (get revisions (dec idx)))))
+                          revisions)))))
+
 (defcomponent topic [{:keys [section-data section currency] :as data} owner {:keys [section-name navbar-editing-cb] :as options}]
 
   (init-state [_]
-    {:expanded false})
+    {:expanded false
+     :as-of (:updated-at section-data)
+     :actual-as-of (:updated-at section-data)})
 
   (did-mount [_]
     (utils/replace-svg))
@@ -171,11 +208,25 @@
   (did-update [_ _ _]
     (utils/replace-svg))
 
-  (render-state [_ {:keys [editing expanded show-edit-button] :as state}]
+  (render-state [_ {:keys [editing expanded show-edit-button as-of actual-as-of] :as state}]
     (let [section-kw (keyword section)
-          section-body (get-body section-data section-kw)
+          revisions (utils/sort-revisions (:revisions section-data))
           headline-options {:opts {:currency currency}}
-          headline-data (assoc section-data :expanded expanded)]
+          headline-data (assoc section-data :expanded expanded)
+          prev-rev (revision-prev revisions as-of)
+          next-rev (revision-next revisions as-of)
+          slug (keyword (:slug @router/path))
+          revisions-list (section-kw (slug @cache/revisions))
+          topic-data (utils/select-section-data section-data section-kw as-of)
+          section-body (get-body topic-data section-kw)]
+      ; preload previous revision
+      (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
+        (api/load-revision prev-rev slug section-kw))
+      ; preload next revision as it can be that it's missing (ie: user jumped to the first rev then went forward)
+      (when (and (not= (:updated-at next-rev) actual-as-of)
+                  next-rev
+                  (not (contains? revisions-list (:updated-at next-rev))))
+        (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className "topic"
                     :ref "topic"
                     :onClick #(topic-click data owner options expanded)}
@@ -185,8 +236,12 @@
           (dom/img {:class (str "topic-image svg")
                     :width 30
                     :height 30
-                    :src (str (:image section-data) "?" ls/deploy-key)})
-          (dom/div {:class "topic-title"} (:title section-data)))
+                    :src (str (:image topic-data) "?" ls/deploy-key)})
+          (dom/div {:class "topic-title"} (:title topic-data))
+          (dom/div #js {:className "topic-date"
+                        :ref "topic-date"
+                        :style #js {:opacity (if expanded 1 0)}}
+            (utils/date-string (utils/js-date (:updated-at topic-data)))))
 
         ;; Topic headline
         (dom/div {:class "topic-headline"}
@@ -198,7 +253,7 @@
             (om/build topic-headline-growth headline-data headline-options)
 
             :else
-            (om/build topic-headline section-data)))
+            (om/build topic-headline topic-data)))
 
         (when (utils/is-mobile)
           (dom/div #js {:className "topic-more"
@@ -212,28 +267,39 @@
         (dom/div #js {:className (utils/class-set {:topic-body true
                                                    :expanded expanded})
                       :ref "topic-body"
-                      :onClick #(when-not (:read-only section-data)
+                      :onClick #(when-not (:read-only topic-data)
                                   (topic-body-click % owner options show-edit-button))
                       :style #js {"height" (if expanded "auto" "0")}}
           (cond
             (= section-kw :growth)
-            (om/build growth {:section-data section-data
+            (om/build growth {:section-data topic-data
                               :section section-kw
                               :currency currency
-                              :actual-as-of (:updated-at section-data)
+                              :actual-as-of (:updated-at topic-data)
                               :read-only true}
                              {:opts {:show-title false
                                      :show-revisions-navigation false}})
 
             (= section-kw :finances)
-            (om/build finances {:section-data section-data
+            (om/build finances {:section-data topic-data
                                 :section section-kw
                                 :currency currency
-                                :actual-as-of (:updated-at section-data)
+                                :actual-as-of (:updated-at topic-data)
                                 :read-only true}
                                {:opts {:show-title false
                                        :show-revisions-navigation false}})
 
             :else
             (dom/div #js {:className "topic-body-inner"
-                          :dangerouslySetInnerHTML (clj->js {"__html" section-body})})))))))
+                          :dangerouslySetInnerHTML (clj->js {"__html" section-body})}))
+          (dom/div {:class "topic-navigation group"}
+            (when prev-rev
+              (dom/div {:class "previous"}
+                (dom/a {:on-click (fn [e]
+                                    (om/set-state! owner :as-of (:updated-at prev-rev))
+                                    (.stopPropagation e))} "< Previous")))
+            (when next-rev
+              (dom/div {:class "next"}
+                (dom/a {:on-click (fn [e]
+                                    (om/set-state! owner :as-of (:updated-at next-rev))
+                                    (.stopPropagation e))} "Next >")))))))))
