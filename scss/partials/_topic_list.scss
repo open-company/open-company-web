@@ -62,7 +62,7 @@ div.topic-list{
 
             @for $i from 0 through 20{
               &.li-#{$i}::before {
-                left: #{(290 * $i) + 162}px;
+                left: #{(290 * $i) + (((290 - 20) / 2) - (20 * 2))}px;
               }
             }
 
