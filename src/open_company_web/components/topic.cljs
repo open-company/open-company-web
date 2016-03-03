@@ -200,12 +200,13 @@
             :else
             (om/build topic-headline section-data)))
 
-        (dom/div #js {:className "topic-more"
-                      :ref "topic-more"
-                      :style #js {:opacity (if expanded 0 1)}}
-          (dom/i {:class "fa fa-circle"})
-          (dom/i {:class "fa fa-circle"})
-          (dom/i {:class "fa fa-circle"}))
+        (when (utils/is-mobile)
+          (dom/div #js {:className "topic-more"
+                        :ref "topic-more"
+                        :style #js {:opacity (if expanded 0 1)}}
+            (dom/i {:class "fa fa-circle"})
+            (dom/i {:class "fa fa-circle"})
+            (dom/i {:class "fa fa-circle"})))
 
         ;; Topic body
         (dom/div #js {:className (utils/class-set {:topic-body true
