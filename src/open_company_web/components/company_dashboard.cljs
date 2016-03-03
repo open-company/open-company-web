@@ -12,7 +12,7 @@
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
 
-(defonce default-category "progress")
+(defonce default-category (if (utils/is-mobile) "progress" "all"))
 
 (defn set-save-bt-active [owner active]
   (om/set-state! owner :save-bt-active active))
