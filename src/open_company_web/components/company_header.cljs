@@ -85,6 +85,9 @@
 (defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner]
 
   (render [_]
+    ;; add the scroll listener if the logo is not present
+    (when (clojure.string/blank? (:logo company-data))
+      (.setTimeout js/window #(watch-scroll owner) 500))
     (dom/div #js {:className "company-header"
                   :ref "company-header"}
       (if navbar-editing
@@ -104,9 +107,6 @@
         (dom/div {:class "company-header-internal"
                   :key "company-header-internal"}
           (dom/div #js {:className "company-header-top group"}
-            ;; add the scroll listener if the logo is not present
-            (when (clojure.string/blank? (:logo company-data))
-              (.setTimeout js/window #(watch-scroll owner) 500))
             ;; Company logo
             (dom/div {:class "company-logo-container"}
               (dom/img {:src (:logo company-data)
