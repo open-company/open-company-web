@@ -91,3 +91,25 @@
     border-top:    $perpendicular-borders;
   }
 }
+
+@mixin topic_navigation(){
+  div.topic-navigation{
+    width: 100%;
+    margin-bottom: 15px;
+
+    div a {
+      font-size: 14px;
+      line-height: 1;
+      color: #707070;
+      text-decoration: none;
+    }
+
+    div.previous {
+      float: left;
+    }
+
+    div.next {
+      float: right;
+    }
+  }
+}
