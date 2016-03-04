@@ -97,13 +97,7 @@
      :bw-expanded-topic nil
      :bw-expand-animated nil}))
 
-(defn li-in-row []
-  (let [win-width (.-clientWidth (.-body js/document))]
-    (int (/ win-width (:width topic-box-size)))))
-
-(defn calc-ul-width [owner]
-  (let [ul (om/get-ref owner "topic-list-ul")]
-    (setStyle ul #js {:width (str (* (:width topic-box-size) (li-in-row)) "px")})))
+(def li-in-row 3)
 
 (defn add-expanded-topic [category-topics owner]
   (if (or (om/get-state owner :bw-expanded-topic)
@@ -111,9 +105,8 @@
     (let [selected-topic (or (om/get-state owner :bw-expanded-topic)
                              (om/get-state owner :bw-expand-animated))
           idx (.indexOf (to-array category-topics) selected-topic)
-          li-num (li-in-row)
-          cur-row (int (/ idx li-num))
-          insert-at (+ li-num (* cur-row li-num))
+          cur-row (int (/ idx li-in-row))
+          insert-at (+ li-in-row (* cur-row li-in-row))
           [before after] (split-at insert-at category-topics)]
       (concat before ["li-expander"] after))
   category-topics))
@@ -125,7 +118,7 @@
         category-topics (get active-topics active-category)
         idx1 (.indexOf (to-array category-topics) topic1)
         idx2 (.indexOf (to-array category-topics) topic2)]
-    (= (int (/ idx1 (li-in-row))) (int (/ idx2 (li-in-row))))))
+    (= (int (/ idx1 li-in-row)) (int (/ idx2 li-in-row)))))
 
 (defn topic-click [owner topic]
   (let [bw-expanded-topic (om/get-state owner :bw-expanded-topic)
@@ -153,7 +146,6 @@
           topic-width (.-offsetWidth topic)]
       (setStyle topic #js {:height "auto"})
       (let [win-width (.-clientWidth (.-body js/document))
-            ul-width (* (:width topic-box-size) (li-in-row))
             topic-height (.-offsetHeight topic)
             resize-animation (new Fade
                                   topic
@@ -213,8 +205,6 @@
       (get-new-sections-if-needed owner)))
 
   (render-state [_ {:keys [show-topic-edit-button active-topics editing bw-expanded-topic bw-expand-animated]}]
-    (when-not (utils/is-mobile)
-      (.setTimeout js/window #(calc-ul-width owner) 100))
     (when (or (and bw-expanded-topic (not bw-expand-animated))
               (and (nil? bw-expanded-topic) bw-expand-animated))
       (.setTimeout js/window #(animate-expand owner (not bw-expand-animated)) 0))
@@ -238,7 +228,7 @@
               category-topics (get active-topics active-category)
               fixed-category-topics (add-expanded-topic category-topics owner)
               idx (.indexOf (to-array category-topics) selected-topic)
-              row-idx (mod idx (li-in-row))]
+              row-idx (mod idx li-in-row)]
           (dom/div {:class "topic-list fix-top-margin-scrolling"
                     :key "topic-list"}
             (dom/ul #js {:className (utils/class-set {:topic-list-internal true
@@ -267,7 +257,7 @@
                   (if (= section-name "li-expander")
                     (let [sec-data (->> selected-topic keyword (get company-data))]
                       (dom/div #js {:className (str "topic li-" row-idx)}
-                        (dom/div {:class "topic-expanded-body"
+                        (dom/div {:class "topic-expanded-body group"
                                   :dangerouslySetInnerHTML (clj->js {"__html" (:body sec-data)})})))
                     (when-not (and (:read-only company-data) (:placeholder sd))
                       (om/build topic {:loading (:loading company-data)
