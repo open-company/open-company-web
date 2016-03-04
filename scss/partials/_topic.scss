@@ -129,5 +129,7 @@ div.topic-list {
         font-weight: normal;
       }
     }
+
+    @include topic_navigation();
   }
 }
