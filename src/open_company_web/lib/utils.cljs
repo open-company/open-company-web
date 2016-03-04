@@ -575,7 +575,9 @@
 
 (defn set-browser-type! []
   (let [force-mobile-cookie (cook/get-cookie :force-browser-type)
-        is-big-web (>= (.-clientWidth (.-body js/document)) big-web-min-width)
+        is-big-web (if (.-body js/document)
+                      (>= (.-clientWidth (.-body js/document)) big-web-min-width)
+                      true) ; to not break tests
         fixed-browser-type (if (nil? force-mobile-cookie)
                             (not is-big-web)
                             (if (= force-mobile-cookie "mobile")
@@ -588,3 +590,8 @@
  (when (neg? @_mobile)
   (set-browser-type!))
  @_mobile)
+
+(defn get-topic-body [section-data section]
+  (if (#{:finances :growth} section)
+    (get-in section-data [:notes :body])
+    (:body section-data)))
