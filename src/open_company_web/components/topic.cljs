@@ -5,6 +5,7 @@
             [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
+            [open-company-web.api :as api]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.topic-body :refer (topic-body)]
@@ -62,12 +63,13 @@
               (dom/h3 {:class "actual blue"} last-value-label))))))))
 
 (defn mobile-topic-animation [data owner options expanded]
+  (println "mobile-topic-animation" (:section-name options))
   (when expanded
     (om/set-state! owner :as-of (om/get-state owner :actual-as-of)))
   (let [topic (om/get-ref owner "topic")
         topic-more (om/get-ref owner "topic-more")
         topic-date (om/get-ref owner "topic-date")
-        body-node (om/get-ref owner "topic-body")]
+        body-node (sel1 topic [:div.topic-body])]
     (setStyle body-node #js {:height "auto"})
     (let [body-height (.-offsetHeight body-node)
           body-width (.-offsetWidth body-node)]
@@ -175,7 +177,23 @@
   (render-state [_ {:keys [editing expanded as-of actual-as-of] :as state}]
     (let [section-kw (keyword section)
           headline-options {:opts {:currency currency}}
-          headline-data (assoc section-data :expanded expanded)]
+          revisions (utils/sort-revisions (:revisions section-data))
+          prev-rev (utils/revision-prev revisions as-of)
+          next-rev (utils/revision-next revisions as-of)
+          slug (keyword (:slug @router/path))
+          revisions-list (section-kw (slug @cache/revisions))
+          topic-data (utils/select-section-data section-data section-kw as-of)
+          headline-data (assoc topic-data :expanded expanded)]
+      ; preload previous revision
+      (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
+        (api/load-revision prev-rev slug section-kw))
+      ; preload next revision as it can be that it's missing (ie: user jumped to the first rev then went forward)
+      (when (and (not= (:updated-at next-rev) actual-as-of)
+                  next-rev
+                  (not (contains? revisions-list (:updated-at next-rev))))
+        (api/load-revision next-rev slug section-kw))
+      (when (= section "update")
+        (println "topic render" as-of "cur updated-at:" (:updated-at topic-data) "prev:" (:updated-at prev-rev)))
       (dom/div #js {:className "topic"
                     :ref "topic"
                     :onClick #(topic-click data owner options expanded)}
@@ -185,12 +203,12 @@
           (dom/img {:class (str "topic-image svg")
                     :width 30
                     :height 30
-                    :src (str (:image section-data) "?" ls/deploy-key)})
-          (dom/div {:class "topic-title"} (:title section-data))
+                    :src (str (:image topic-data) "?" ls/deploy-key)})
+          (dom/div {:class "topic-title"} (:title topic-data))
           (dom/div #js {:className "topic-date"
                         :ref "topic-date"
                         :style #js {:opacity (if expanded 1 0)}}
-            (utils/date-string (utils/js-date (:updated-at section-data)))))
+            (utils/date-string (utils/js-date (:updated-at topic-data)))))
 
         ;; Topic headline
         (dom/div {:class "topic-headline"}
@@ -202,7 +220,7 @@
             (om/build topic-headline-growth headline-data headline-options)
 
             :else
-            (om/build topic-headline section-data)))
+            (om/build topic-headline topic-data)))
 
         (when (utils/is-mobile)
           (dom/div #js {:className "topic-more"
@@ -213,4 +231,18 @@
             (dom/i {:class "fa fa-circle"})))
 
         ;; topic body
-        (om/build topic-body (assoc data :expanded expanded) {:opts options})))))
+        (when (utils/is-mobile)
+          (dom/div {}
+            (om/build topic-body {:section section :section-data topic-data :expanded expanded} {:opts options})
+            (when expanded
+              (dom/div {:class "topic-navigation group"}
+                (when prev-rev
+                  (dom/div {:class "previous"}
+                    (dom/a {:on-click (fn [e]
+                                        (om/set-state! owner :as-of (:updated-at prev-rev))
+                                        (.stopPropagation e))} "< Previous")))
+                (when next-rev
+                  (dom/div {:class "next"}
+                    (dom/a {:on-click (fn [e]
+                                        (om/set-state! owner :as-of (:updated-at next-rev))
+                                        (.stopPropagation e))} "Next >")))))))))))
