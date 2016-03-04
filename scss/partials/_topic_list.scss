@@ -16,6 +16,7 @@ div.topic-list{
     padding: 0;
 
     @include big_web(){
+      width: #{($topic_box_width * 3)}px;
       margin: 0 auto;
     }
 
@@ -64,14 +65,20 @@ div.topic-list{
               left: 50%;
             }
 
-            @for $i from 0 through 20{
+            @for $i from 0 through 2{
               &.li-#{$i}::before {
                 left: #{($topic_box_width * $i) + ((($topic_box_width - ($topic_box_padding * 2)) / 2) - (20 * 2))}px;
               }
             }
 
-            img {
-              width: 100%;
+            div.topic-expanded-body{
+              padding-top: 0px;
+              margin-top: 0px;
+              padding-bottom: 20px;
+
+              img {
+                width: 100%;
+              }
             }
           }
         }
