@@ -1,5 +1,11 @@
 div.company-header{
-  background-color: white;
+  @include mobile(){
+    background-color: white;
+  }
+
+  @include big_web(){
+    background-color: #fafafa;
+  }
 
   div.navbar-editing {
     width: 100%;
@@ -92,7 +98,7 @@ div.company-header{
         padding-left: 20px;
         height: 46px;
         text-align: left;
-        background-color: white;
+        background-color: inherit;
         color: #2d2d2d;
         font-size: 24px;
         line-height: 0.9;
