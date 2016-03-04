@@ -1,3 +1,7 @@
+$topic_box_width: 290;
+$topic_box_height: 170;
+$topic_box_padding: 10;
+
 div.topic-list-edit-container {
   padding-bottom: 10px;
   margin-top: 92px;
@@ -39,10 +43,10 @@ div.topic-list{
       }
 
       @include big_web(){
-        width: 290px;
-        height: 170px;
+        width: #{$topic_box_width}px;
+        height: #{$topic_box_height}px;
         overflow: hidden;
-        padding: 10px;
+        padding: #{$topic_box_padding}px;
         float: left;
 
         &.full-width {
@@ -62,7 +66,7 @@ div.topic-list{
 
             @for $i from 0 through 20{
               &.li-#{$i}::before {
-                left: #{(290 * $i) + (((290 - 20) / 2) - (20 * 2))}px;
+                left: #{($topic_box_width * $i) + ((($topic_box_width - ($topic_box_padding * 2)) / 2) - (20 * 2))}px;
               }
             }
 
