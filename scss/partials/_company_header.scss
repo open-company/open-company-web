@@ -98,13 +98,14 @@ div.company-header{
         padding-left: 20px;
         height: 46px;
         text-align: left;
-        background-color: inherit;
         color: #2d2d2d;
         font-size: 24px;
         line-height: 0.9;
+        background-color: inherit;
 
         @include mobile(){
           font-weight: regular;
+          background-color: white;
         }
 
         @include big_web(){
