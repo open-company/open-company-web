@@ -20,8 +20,8 @@
             [goog.events.EventType :as EventType]
             [goog.style :refer (getStyle setStyle)]))
 
-(def topic-box-width 290)
-(def topic-box-height 170)
+(def topic-box-size {:width 290
+                     :height 170})
 
 (defn get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
@@ -99,11 +99,11 @@
 
 (defn li-in-row []
   (let [win-width (.-clientWidth (.-body js/document))]
-    (int (/ win-width topic-box-width))))
+    (int (/ win-width (:width topic-box-size)))))
 
 (defn calc-ul-width [owner]
   (let [ul (om/get-ref owner "topic-list-ul")]
-    (setStyle ul #js {:width (str (* topic-box-width (li-in-row)) "px")})))
+    (setStyle ul #js {:width (str (* (:width topic-box-size) (li-in-row)) "px")})))
 
 (defn add-expanded-topic [category-topics owner]
   (if (or (om/get-state owner :bw-expanded-topic)
@@ -153,7 +153,7 @@
           topic-width (.-offsetWidth topic)]
       (setStyle topic #js {:height "auto"})
       (let [win-width (.-clientWidth (.-body js/document))
-            ul-width (* topic-box-width (li-in-row))
+            ul-width (* (:width topic-box-size) (li-in-row))
             topic-height (.-offsetHeight topic)
             resize-animation (new Fade
                                   topic
@@ -258,7 +258,7 @@
                                                        :height  (if (= section-name "li-expander")
                                                                   (if bw-expand-animated
                                                                     "auto" "0px")
-                                                                  (str topic-box-height "px"))}
+                                                                  (str (:height topic-box-size) "px"))}
                                            :key (str "topic-row-" (name section-name))}
                                       #js {:className "topic-row"
                                            :ref section-name
