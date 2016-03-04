@@ -173,28 +173,6 @@
     :else
     topic-headline))
 
-(defn revision-next
-  "Return the first future revision"
-  [revisions as-of]
-  (when (pos? (count revisions))
-    (first (remove nil? (map
-                          (fn [r]
-                            (when (= (:updated-at r) as-of)
-                              (let [idx (.indexOf (to-array revisions) r)]
-                                (get revisions (inc idx)))))
-                          revisions)))))
-
-(defn revision-prev
-  "Return the first future revision"
-  [revisions as-of]
-  (when (pos? (count revisions))
-    (first (remove nil? (map
-                          (fn [r]
-                            (when (= (:updated-at r) as-of)
-                              (let [idx (.indexOf (to-array revisions) r)]
-                                (get revisions (dec idx)))))
-                          revisions)))))
-
 (defcomponent topic [{:keys [section-data section currency] :as data} owner {:keys [section-name navbar-editing-cb] :as options}]
 
   (init-state [_]
@@ -213,8 +191,8 @@
           revisions (utils/sort-revisions (:revisions section-data))
           headline-options {:opts {:currency currency}}
           headline-data (assoc section-data :expanded expanded)
-          prev-rev (revision-prev revisions as-of)
-          next-rev (revision-next revisions as-of)
+          prev-rev (utils/revision-prev revisions as-of)
+          next-rev (utils/revision-next revisions as-of)
           slug (keyword (:slug @router/path))
           revisions-list (section-kw (slug @cache/revisions))
           topic-data (utils/select-section-data section-data section-kw as-of)
