@@ -1,0 +1,100 @@
+div.topic-body {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+
+  &.expanded {
+    overflow: visible;
+  }
+
+  * {
+    color: #444444;
+    font-weight: normal;
+
+    @include mobile() {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    @include big_web(){
+      font-size: 15px;
+      line-height: 1.7;
+    }
+  }
+
+  h1, h2, h3, h4 {
+    font-weight: 600;
+
+    @include mobile() {
+      font-size: 17px;
+    }
+
+    @include big_web(){
+      font-size: 16px;
+    }
+  }
+
+  &:focus,
+  &.editing {
+    outline: none;
+    overflow: hidden;
+    cursor: text;
+    border: 1px solid black;
+  }
+
+  img {
+
+    @include mobile() {
+      width: calc(100% + 22px);
+      margin-left: -22px;
+    }
+
+    @include big_web(){
+      width: 100%;
+    }
+
+    margin-bottom: 10px;
+  }
+
+  &.no-data {
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  *::selection {
+    background: #C1E7F4;
+  }
+
+  *::-moz-selection {
+    background: #C1E7F4;
+  }
+
+  a {
+    font-weight: bold;
+    text-decoration: underline;
+    color: black;
+  }
+
+  &.expanded {
+    height: auto;
+  }
+
+  div.topic-navigation{
+    width: 100%;
+    margin-bottom: 15px;
+
+    div a {
+      font-size: 14px;
+      line-height: 1;
+      color: #707070;
+      text-decoration: none;
+    }
+
+    div.previous {
+      float: left;
+    }
+
+    div.next {
+      float: right;
+    }
+  }
+}
