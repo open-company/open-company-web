@@ -10,7 +10,7 @@
             [open-company-web.api :as api]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
-            [open-company-web.components.topic-body :refer (topic-body)]
+            [open-company-web.components.expanded-topic :refer (expanded-topic)]
             [open-company-web.components.topic-list-edit :refer (topic-list-edit)]
             [open-company-web.components.ui.manage-topics :refer (manage-topics)]
             [open-company-web.components.ui.edit-topic-button :refer (edit-topic-button)]
@@ -257,16 +257,16 @@
                   (if (= section-name "li-expander")
                     (let [sec-data (->> selected-topic keyword (get company-data))]
                       (dom/div #js {:className (str "topic li-" row-idx)}
-                        (om/build topic-body {:section-data sec-data
-                                              :section selected-topic
-                                              :expanded true
-                                              :currency (:currency company-data)}
-                                             {:opts {
-                                               :section-name section-name
-                                               :navbar-editing-cb navbar-editing-cb
-                                               :force-edit-cb (partial force-edit-button owner)
-                                               :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)
-                                               :bw-topic-click (partial topic-click owner)}})))
+                        (om/build expanded-topic {:section-data sec-data
+                                                  :section selected-topic
+                                                  :expanded true
+                                                  :currency (:currency company-data)}
+                                                 {:opts {
+                                                   :section-name section-name
+                                                   :navbar-editing-cb navbar-editing-cb
+                                                   :force-edit-cb (partial force-edit-button owner)
+                                                   :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)
+                                                   :bw-topic-click (partial topic-click owner)}})))
                     (when-not (and (:read-only company-data) (:placeholder sd))
                       (om/build topic {:loading (:loading company-data)
                                        :section section-name
