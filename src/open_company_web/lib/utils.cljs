@@ -345,6 +345,28 @@
   (let [sort-pred (sort-by-key-pred :updated-at)]
     (vec (sort sort-pred revisions))))
 
+(defn revision-next
+  "Return the first future revision"
+  [revisions as-of]
+  (when (pos? (count revisions))
+    (first (remove nil? (map
+                          (fn [r]
+                            (when (= (:updated-at r) as-of)
+                              (let [idx (.indexOf (to-array revisions) r)]
+                                (get revisions (inc idx)))))
+                          revisions)))))
+
+(defn revision-prev
+  "Return the first future revision"
+  [revisions as-of]
+  (when (pos? (count revisions))
+    (first (remove nil? (map
+                          (fn [r]
+                            (when (= (:updated-at r) as-of)
+                              (let [idx (.indexOf (to-array revisions) r)]
+                                (get revisions (dec idx)))))
+                          revisions)))))
+
 (defn as-of-now []
   (let [date (js-date)]
     (.toISOString date)))
