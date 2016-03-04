@@ -571,13 +571,13 @@
 
 (def _mobile (atom -1))
 
-(def mobile-min-width 768)
+(def big-web-min-width 970)
 
 (defn set-browser-type! []
   (let [force-mobile-cookie (cook/get-cookie :force-browser-type)
-        browser-type (<= (.-clientWidth (.-body js/document)) mobile-min-width)
+        is-big-web (>= (.-clientWidth (.-body js/document)) big-web-min-width)
         fixed-browser-type (if (nil? force-mobile-cookie)
-                            browser-type
+                            (not is-big-web)
                             (if (= force-mobile-cookie "mobile")
                              true
                              false))]
