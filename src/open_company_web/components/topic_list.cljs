@@ -141,11 +141,18 @@
           (when-not (nil? (om/get-state owner :bw-expand-animated))
             (om/set-state! owner :bw-expand-animated topic)))))))
 
+(defn scroll-to-card [card]
+ (utils/scroll-to-y (- (.-offsetTop card) 40)))
+
 (defn animate-expand [owner expand]
   (when-let [topic (om/get-ref owner "li-expander")]
-    (let [current-topic-height (.-offsetHeight topic)
+    (let [bw-expanded-topic (om/get-state owner :bw-expanded-topic)
+          current-topic-height (.-offsetHeight topic)
           topic-width (.-offsetWidth topic)]
       (setStyle topic #js {:height "auto"})
+      (when (and expand bw-expanded-topic)
+        (when-let [topic-card (om/get-ref owner bw-expanded-topic)]
+          (scroll-to-card topic-card)))
       (let [topic-height (.-offsetHeight topic)
             resize-animation (new Fade
                                   topic
@@ -205,9 +212,11 @@
       (get-new-sections-if-needed owner)))
 
   (render-state [_ {:keys [show-topic-edit-button active-topics editing bw-expanded-topic bw-expand-animated]}]
-    (when (or (and bw-expanded-topic (not bw-expand-animated))
+    (if (or (and bw-expanded-topic (not bw-expand-animated))
               (and (nil? bw-expanded-topic) bw-expand-animated))
-      (.setTimeout js/window #(animate-expand owner (not bw-expand-animated)) 0))
+      (.setTimeout js/window #(animate-expand owner (not bw-expand-animated)) 0)
+      (when bw-expanded-topic
+        (.setTimeout js/window #(scroll-to-card (om/get-ref owner bw-expanded-topic)) 0)))
     (let [slug (keyword (:slug @router/path))]
       (if editing
         (let [categories (map name (keys active-topics))]
