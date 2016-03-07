@@ -130,6 +130,11 @@ div.topic-list {
       }
     }
 
-    @include topic_navigation();
+    div.topic-body-nav-container{
+      overflow: hidden;
+      height: 0px;
+
+      @include topic_navigation();
+    }
   }
 }
