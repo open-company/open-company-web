@@ -68,14 +68,13 @@
   (let [topic (om/get-ref owner "topic")
         topic-more (om/get-ref owner "topic-more")
         topic-date (om/get-ref owner "topic-date")
-        body-node (sel1 topic [:div.topic-body])]
-    (setStyle body-node #js {:height "auto"})
-    (let [body-height (.-offsetHeight body-node)
-          body-width (.-offsetWidth body-node)]
-      (setStyle body-node #js {:height (if expanded "auto" "0")
-                               :overflow "hidden"})
-
-      (setStyle topic-more #js {:opacity "0"})
+        body-node (sel1 topic [:div.topic-body])
+        body-nav-node (om/get-ref owner "body-navigation-container")]
+    (setStyle body-nav-node #js {:height "auto"})
+    (let [body-height (.-offsetHeight body-nav-node)
+          body-width (.-offsetWidth body-nav-node)]
+      (setStyle body-nav-node #js {:height (if expanded "auto" "0")
+                                   :overflow "hidden"})
 
       ;; animate finances headtitle
       (when-let [finances-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-finances")]
@@ -109,23 +108,36 @@
 
       (.play
         (new Fade
+             topic-more
+             (if expanded 0 1)
+             (if expanded 1 0)
+             utils/oc-animation-duration))
+
+      (.play
+        (new Resize
+             topic-more
+             (new js/Array body-width (if expanded 0 20))
+             (new js/Array body-width (if expanded 20 0))
+             utils/oc-animation-duration))
+
+      (.play
+        (new Fade
              topic-date
              (if expanded 1 0)
              (if expanded 0 1)
              utils/oc-animation-duration))
-
       ;; animate height
       (let [height-animation (new Resize
-                                  body-node
-                                  (new js/Array body-width (if expanded body-height 0))
-                                  (new js/Array body-width (if expanded 0 body-height))
+                                  body-nav-node
+                                  (new js/Array body-width (if expanded (+ body-height 20) 0))
+                                  (new js/Array body-width (if expanded 0 (+ body-height 20)))
                                   utils/oc-animation-duration)]
         (doto height-animation
           (events/listen
            EventType/FINISH
            (fn [e]
             (om/update-state! owner :expanded not)
-            (setStyle body-node #js {:overflow (if expanded "hidden" "visible")})))
+            (setStyle body-nav-node #js {:overflow (if expanded "hidden" "visible")})))
           (.play)))
 
       (let [topic (om/get-ref owner "topic")
@@ -229,17 +241,18 @@
 
         ;; topic body
         (when (utils/is-mobile)
-          (dom/div {}
+          (dom/div #js {:className "topic-body-nav-container group"
+                        :ref "body-navigation-container"}
             (om/build topic-body {:section section :section-data topic-data :expanded expanded} {:opts options})
             (when expanded
               (dom/div {:class "topic-navigation group"}
                 (when prev-rev
-                  (dom/div {:class "previous"}
+                  (dom/div {:class "previous group"}
                     (dom/a {:on-click (fn [e]
                                         (om/set-state! owner :as-of (:updated-at prev-rev))
                                         (.stopPropagation e))} "< Previous")))
                 (when next-rev
-                  (dom/div {:class "next"}
+                  (dom/div {:class "next group"}
                     (dom/a {:on-click (fn [e]
                                         (om/set-state! owner :as-of (:updated-at next-rev))
                                         (.stopPropagation e))} "Next >")))))))))))
