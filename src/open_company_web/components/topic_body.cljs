@@ -17,11 +17,9 @@
     (let [section-kw (keyword section)
           section-body (utils/get-topic-body section-data section-kw)]
       ;; Topic body
-      (dom/div #js {:className (utils/class-set {:topic-body true
-                                                 :expanded expanded})
+      (dom/div #js {:className "topic-body"
                     :onClick #(when-not (:read-only section-data)
-                                (topic-body-click % owner options))
-                    :style #js {"height" (if expanded "auto" "0")}}
+                                (topic-body-click % owner options))}
         (cond
           (= section-kw :growth)
           (om/build growth {:section-data section-data
@@ -42,5 +40,5 @@
                                      :show-revisions-navigation false}})
 
           :else
-          (dom/div #js {:className "topic-body-inner"
-                        :dangerouslySetInnerHTML (clj->js {"__html" section-body})}))))))
+          (dom/div #js {:className "topic-body-inner group"
+                        :dangerouslySetInnerHTML (clj->js {"__html" (str section-body "<p style='height:1px;margin-top:0px;padding-top:0px;'> </p>")})}))))))
