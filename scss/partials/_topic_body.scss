@@ -1,11 +1,8 @@
 div.topic-body {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  height: auto;
   border: 1px solid transparent;
-
-  &.expanded {
-    overflow: visible;
-  }
 
   * {
     color: #444444;
@@ -45,7 +42,7 @@ div.topic-body {
   img {
 
     @include mobile() {
-      width: calc(100% + 22px);
+      width: calc(100% + 44px);
       margin-left: -22px;
     }
 
