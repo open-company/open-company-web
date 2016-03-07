@@ -44,7 +44,7 @@
     :dev {
       :dependencies [
         [ring "1.4.0"] ; Web framework https://github.com/ring-clojure/ring
-        [compojure "1.4.0"] ; Web routing http://github.com/weavejester/compojure
+        [compojure "1.5.0"] ; Web routing http://github.com/weavejester/compojure
         [shodan "0.4.2"] ; A ClojureScript library providing wrappers for the JavaScript console API. https://github.com/noprompt/shodan
       ]
     }
