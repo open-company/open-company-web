@@ -27,8 +27,8 @@
         category-nav (sel1 [:div.category-nav])
         topic-list (sel1 [:div.topic-list])
         scroll-top (.-scrollTop (.-body js/document))
-        company-name-container (om/get-ref owner "company-name-container")
-        company-description-container (om/get-ref owner "company-description-container")]
+        company-name-container (sel1 [:div.company-name-container])
+        company-description-container (sel1 [:div.company-description-container])]
     (when (and (zero? @company-header-pt) company-name-container company-header category-nav)
       (let [company-name-container-height (.-clientHeight company-name-container)
             company-header-height (.-clientHeight company-header)
@@ -102,7 +102,7 @@
     (dom/div #js {:className "company-header"
                   :ref "company-header"}
       (if navbar-editing
-
+        ; topic editing
         (dom/div {:class "navbar-editing"
                   :key "navbar-editing"}
           (dom/button {:class "save-bt oc-btn oc-link"
@@ -114,7 +114,7 @@
                        :on-click (fn [e]
                                   (when-let [ch (utils/get-channel "cancel-bt-navbar")]
                                    (put! ch {:click true :event e})))} "Cancel"))
-
+        ; topic list
         (dom/div {:class "company-header-internal"
                   :key "company-header-internal"}
           (dom/div #js {:className "company-header-top group"}
