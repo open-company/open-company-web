@@ -172,6 +172,8 @@
             #(om/set-state! owner :bw-expand-animated (om/get-state owner :bw-expanded-topic)))
           (.play))))))
 
+(def scrolled-to-top (atom false))
+
 (defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
 
   (init-state [_]
@@ -184,7 +186,9 @@
   (did-mount [_]
     ; scroll to top when the component is initially mounted to
     ; make sure the calculation for the fixed navbar are correct
-    (set! (.-scrollTop (.-body js/document)) 0)
+    (when-not @scrolled-to-top
+      (set! (.-scrollTop (.-body js/document)) 0)
+      (reset! scrolled-to-top true))
     (when-not (:read-only (:company-data data))
       (get-new-sections-if-needed owner))
     ; save all the changes....
