@@ -63,7 +63,6 @@
               (dom/h3 {:class "actual blue"} last-value-label))))))))
 
 (defn mobile-topic-animation [data owner options expanded]
-  (println "mobile-topic-animation" (:section-name options))
   (when expanded
     (om/set-state! owner :as-of (om/get-state owner :actual-as-of)))
   (let [topic (om/get-ref owner "topic")
@@ -192,8 +191,6 @@
                   next-rev
                   (not (contains? revisions-list (:updated-at next-rev))))
         (api/load-revision next-rev slug section-kw))
-      (when (= section "update")
-        (println "topic render" as-of "cur updated-at:" (:updated-at topic-data) "prev:" (:updated-at prev-rev)))
       (dom/div #js {:className "topic"
                     :ref "topic"
                     :onClick #(topic-click data owner options expanded)}
