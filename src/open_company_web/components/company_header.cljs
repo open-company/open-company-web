@@ -16,11 +16,11 @@
             [om-bootstrap.button :as b])
   (:import [goog.events EventType]))
 
-(defonce company-header-pt (atom 0))
+(def company-header-pt (atom 0))
 
-(defonce company-name-offset-top (atom 0))
+(def company-name-offset-top (atom 0))
 
-(defonce scroll-listener-key (atom nil))
+(def scroll-listener-key (atom nil))
 
 (defn listener [e owner]
   (let [company-header (om/get-ref owner "company-header")
@@ -29,10 +29,10 @@
         scroll-top (.-scrollTop (.-body js/document))
         company-name-container (om/get-ref owner "company-name-container")
         company-description-container (om/get-ref owner "company-description-container")]
-    (when (zero? @company-header-pt)
+    (when (and (zero? @company-header-pt) company-name-container company-header category-nav)
       (let [company-name-container-height (.-clientHeight company-name-container)
-            category-nav-height (.-clientHeight category-nav)
             company-header-height (.-clientHeight company-header)
+            category-nav-height (.-clientHeight category-nav)
             category-nav-pivot (- company-header-height
                                   category-nav-height
                                   company-name-container-height
@@ -43,10 +43,10 @@
     (when (and company-name-container company-description-container)
       (if (> scroll-top @company-name-offset-top)
         (do
-          (gstyle/setStyle company-name-container #js {:position "fixed"})
+          (gstyle/setStyle company-name-container #js {:position "fixed" :top "0px"})
           (gstyle/setStyle company-description-container #js {:marginTop "46px"}))
         (do
-          (gstyle/setStyle company-name-container #js {:position "relative"})
+          (gstyle/setStyle company-name-container #js {:position "relative" :top (str company-name-offset-top "px")})
           (gstyle/setStyle company-description-container #js {:marginTop "0px"}))))
     ; fix the category navigation bar and move the topic list relatively when
     ; the scroll hit the category navigation max top
@@ -71,9 +71,10 @@
 
 (defn watch-scroll [owner]
   (if (utils/is-mobile)
-    (when (nil? @scroll-listener-key)
+    (when-not @scroll-listener-key
       (when-let [company-header (om/get-ref owner "company-header")]
-        (let [name-offset-top (.-offsetTop (om/get-ref owner "company-name-container"))
+        (let [company-name-container (om/get-ref owner "company-name-container")
+              name-offset-top (.-offsetTop company-name-container)
               category-nav (sel1 [:div.category-nav])
               topic-list (sel1 [:div.topic-list])]
           (when (zero? @company-name-offset-top)
@@ -92,11 +93,11 @@
     ; redirect to login
     (utils/redirect! "/login")))
 
-(defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner]
+(defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner options]
 
   (render [_]
     ;; add the scroll listener if the logo is not present
-    (when (clojure.string/blank? (:logo company-data))
+    (when (and company-data (clojure.string/blank? (:logo company-data)))
       (.setTimeout js/window #(watch-scroll owner) 500))
     (dom/div #js {:className "company-header"
                   :ref "company-header"}
