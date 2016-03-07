@@ -27,7 +27,6 @@
           topic-data (utils/select-section-data section-data section-kw as-of)
           section-body (utils/get-topic-body topic-data section-kw)
           topic-updated-at (f/unparse (f/formatter "MM/dd/YY") (t/date-time (utils/js-date (:updated-at topic-data))))]
-      (println "topic-updated-at" topic-updated-at)
       ; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
