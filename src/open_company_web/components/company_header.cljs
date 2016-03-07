@@ -22,7 +22,7 @@
 
 (def scroll-listener-key (atom nil))
 
-(defn listener [e owner]
+(defn scroll-listener [e owner]
   (let [company-header (om/get-ref owner "company-header")
         category-nav (sel1 [:div.category-nav])
         topic-list (sel1 [:div.topic-list])
@@ -43,10 +43,10 @@
     (when (and company-name-container company-description-container)
       (if (> scroll-top @company-name-offset-top)
         (do
-          (gstyle/setStyle company-name-container #js {:position "fixed" :top "0px"})
+          (gstyle/setStyle company-name-container #js {:position "fixed" :top "0px" :left "0px"})
           (gstyle/setStyle company-description-container #js {:marginTop "46px"}))
         (do
-          (gstyle/setStyle company-name-container #js {:position "relative" :top (str company-name-offset-top "px")})
+          (gstyle/setStyle company-name-container #js {:position "relative"})
           (gstyle/setStyle company-description-container #js {:marginTop "0px"}))))
     ; fix the category navigation bar and move the topic list relatively when
     ; the scroll hit the category navigation max top
@@ -82,7 +82,7 @@
           (reset! scroll-listener-key (events/listen
                                        js/window
                                        EventType/SCROLL
-                                       #(listener % owner))))))
+                                       #(scroll-listener % owner))))))
     (events/unlistenByKey @scroll-listener-key)))
 
 (defn menu-click [owner]
