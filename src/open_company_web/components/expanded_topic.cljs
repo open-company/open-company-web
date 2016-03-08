@@ -26,7 +26,8 @@
           revisions-list (section-kw (slug @cache/revisions))
           topic-data (utils/select-section-data section-data section-kw as-of)
           section-body (utils/get-topic-body topic-data section-kw)
-          topic-updated-at (f/unparse (f/formatter "MM/dd/YY") (t/date-time (utils/js-date (:updated-at topic-data))))]
+          js-date-upat (utils/js-date (:updated-at topic-data))
+          topic-updated-at (str (utils/month-string-int (inc (.getMonth js-date-upat))) " " (.getDate js-date-upat))]
       ; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -38,7 +39,7 @@
       (dom/div {:class "topic-expanded"}
         (dom/div {:class "topic-title"} (:title topic-data))
         (dom/div #js {:className "topic-last-updated"}
-          (str "Last updated by " (:name (:author topic-data)) " on " topic-updated-at))
+          (str (:name (:author topic-data)) " on " topic-updated-at))
         ;; topic body
         (om/build topic-body {:section section :section-data topic-data :expanded expanded} {:opts options})
         (dom/div {:class "topic-navigation group"}
