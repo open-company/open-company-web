@@ -49,8 +49,9 @@
           url-tab (subs url-hash 1 (count url-hash))
           active-tab (if (pos? (count url-tab))
                        url-tab
-                       default-category)]
-      {:active-category active-tab
+                       default-category)
+          fix-active-tab (if (and (utils/is-mobile) (= active-tab "all")) default-category active-tab)]
+      {:active-category fix-active-tab
        :navbar-editing false
        :editing-topic false
        :save-bt-active false}))
