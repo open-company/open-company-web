@@ -11,6 +11,10 @@ div.topic-list {
 
     @include big_web(){
       height: 154px;
+
+      &:hover {
+        background-color: #E5E4E4;
+      }
     }
 
     div.topic-header {
