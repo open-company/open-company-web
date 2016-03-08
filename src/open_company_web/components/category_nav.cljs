@@ -35,8 +35,8 @@
       (when (> app-height fix-cur-min-height)
         (gstyle/setStyle (sel1 :body) #js {:minHeight (str app-height "px")})))))
 
-(defn get-categories [categories]
-  (if (utils/is-mobile)
+(defn get-categories [categories is-editing]
+  (if (or (utils/is-mobile) is-editing)
     categories
     (vec (concat ["all"] categories))))
 
@@ -47,7 +47,7 @@
           scroll-top (.-scrollTop (sel1 :body))
           slug (:slug @router/path)
           company-data (:company-data data)
-          categories (get-categories (:categories company-data))
+          categories (if (:company-data data) (get-categories (:categories company-data) navbar-editing) [])
           active-category (:active-category data)
           sections (keys (:sections company-data))
           navbar-style (if (and (utils/is-mobile)
