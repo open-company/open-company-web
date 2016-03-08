@@ -34,10 +34,16 @@ div.company-header{
   div.company-header-internal {
     @include big_web(){
       padding: 0 70px;
+      height: 120px;
     }
     
     div.company-header-top {
       padding-top: 22px;
+
+      @include big_web(){
+        float: left;
+        width: 105px;
+      }
 
       div.company-logo-container{
         padding-left: 15px;
@@ -93,7 +99,6 @@ div.company-header{
       z-index: 2;
 
       div.company-name {
-        padding-top: 20px;
         padding-bottom: 9px;
         padding-left: 20px;
         height: 46px;
@@ -104,11 +109,13 @@ div.company-header{
         background-color: inherit;
 
         @include mobile(){
+          padding-top: 20px;
           font-weight: regular;
           background-color: white;
         }
 
         @include big_web(){
+          padding-top: 30px;
           font-weight: 600;
         }
       }
@@ -125,11 +132,13 @@ div.company-header{
         color: #2d2d2d;
 
         @include mobile(){
+          padding-top: 0px;
           font-size: 16px;
           line-height: 1.2;
         }
 
         @include big_web(){
+          padding-top: 10px;
           font-size: 14px;
           line-height: 1.3;
         }
