@@ -67,6 +67,11 @@ div.topic-list{
           div.topic {
             height: auto;
             color: black;
+            cursor: auto;
+
+            &:hover {
+              background-color: white;
+            }
 
             &::before {
               @include triangle(top, white, 0.6em);
