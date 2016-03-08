@@ -17,8 +17,14 @@
 (defn set-save-bt-active [owner active]
   (om/set-state! owner :save-bt-active active))
 
-(defn set-navbar-editing [owner editing & [title]]
-  (when-not editing
+(defn set-navbar-editing [owner data editing & [title]]
+  (if editing
+    ; if ALL is selected switch to the first available category
+    ; for editing purpose
+    (when (= (om/get-state owner :active-category) "all")
+      (let [slug (:slug @router/path)
+            company-data ((keyword slug) data)]
+        (om/set-state! owner :active-category (first (:categories company-data)))))
     (set-save-bt-active owner false))
   (let [fixed-title (or title "")]
     (om/set-state! owner :navbar-editing editing)
@@ -52,13 +58,13 @@
   (render-state [_ {:keys [editing-topic navbar-editing] :as state}]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)
-          navbar-editing-cb (partial set-navbar-editing owner)]
+          navbar-editing-cb (partial set-navbar-editing owner data)]
       (dom/div {:class (utils/class-set {:company-dashboard true
                                          :row-fluid true
                                          :fix-navbar (not (utils/is-mobile))})}
 
        (when-not (utils/is-mobile)
-          (om/build navbar data {}))
+          (om/build navbar (merge data {:edit-mode navbar-editing})))
 
         ;; company header
         (om/build company-header {:loading (:loading company-data)
