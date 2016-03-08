@@ -9,7 +9,9 @@
 (defn topic-body-click [e owner options]
   (when e
     (.stopPropagation e))
-  ((:toggle-edit-topic-cb options) (:section-name options)))
+  (if (utils/is-mobile)
+    ((:toggle-edit-topic-cb options) (:section-name options))
+    ((:bw-topic-click options) (:section (om/get-props owner)))))
 
 (defcomponent topic-body [{:keys [section section-data currency expanded] :as data} owner options]
 
