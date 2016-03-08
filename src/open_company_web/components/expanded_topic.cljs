@@ -72,6 +72,7 @@
                 (om/set-state! owner :as-of transit-as-of)
                 (om/set-state! owner :transit-as-of nil)
                 (.setTimeout js/window (fn []
+                                        (setStyle topic-expanded-container #js {:height "auto"})
                                         (setStyle actual-topic-expanded #js {:opacity 1 :position "relative"})) 1))))
           (.play))))))
 
