@@ -1,10 +1,13 @@
-$topic_box_width: 290;
+$topic_box_width: 310;
 $topic_box_height: 170;
 $topic_box_padding: 10;
 
 div.topic-list-edit-container {
   padding-bottom: 10px;
-  margin-top: 92px;
+
+  @include mobile(){
+    margin-top: 92px;
+  }
 }
 
 div.topic-list{
