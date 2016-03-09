@@ -145,7 +145,8 @@
             (om/set-state! owner :bw-expand-animated topic)))))))
 
 (defn scroll-to-card [card]
- (utils/scroll-to-y (- (.-offsetTop card) 40)))
+ (when card
+  (utils/scroll-to-y (- (.-offsetTop card) 40))))
 
 (defn animate-expand [owner expand]
   (when-let [topic (om/get-ref owner "li-expander")]
@@ -216,7 +217,10 @@
     (when-not (= (:company-data prev-props) (:company-data data))
       (om/set-state! owner (get-state data (om/get-state owner))))
     (when-not (:read-only (:company-data data))
-      (get-new-sections-if-needed owner)))
+      (get-new-sections-if-needed owner))
+    (when-not (= (:active-category prev-props) (:active-category data))
+      (om/set-state! owner :bw-expanded-topic nil)
+      (om/set-state! owner :bw-expand-animated nil)))
 
   (render-state [_ {:keys [show-topic-edit-button active-topics editing bw-expanded-topic bw-expand-animated last-expanded-section]}]
     (if (or (and bw-expanded-topic (not bw-expand-animated))

@@ -33,6 +33,8 @@
     (om/set-state! owner :navbar-title fixed-title)))
 
 (defn switch-tab-cb [owner new-tab]
+  ; reset the last edited topic when switching category
+  (om/set-state! owner :last-editing-topic nil)
   (om/set-state! owner :active-category new-tab))
 
 (defn topic-edit-cb [owner section]
