@@ -151,6 +151,7 @@
                   :value (om/get-state owner :description)
                   :id "description"
                   :class "form-control"
+                  :max-length 250
                   :on-change #(om/set-state! owner :description (.. % -target -value))
                   :on-blur (fn [e]
                              (utils/handle-change company-data (om/get-state owner :description) :description)
