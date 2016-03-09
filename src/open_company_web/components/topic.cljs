@@ -145,7 +145,7 @@
             (om/update-state! owner :expanded not)
             (.setTimeout js/window
               #(setStyle body-nav-node #js {:overflow (if expanded "hidden" "visible")
-                                            :height "auto"}) 1)))
+                                            :height (if expanded "0" "auto")}) 1)))
           (.play)))
 
       (scroll-to-topic-top owner)
@@ -222,7 +222,7 @@
           (dom/div #js {:className "topic-date"
                         :ref "topic-date"
                         :style #js {:opacity (if expanded 1 0)}}
-            (utils/date-string (utils/js-date (:updated-at topic-data)))))
+            (str (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data))))))
 
         ;; Topic headline
         (dom/div {:class "topic-headline"}
