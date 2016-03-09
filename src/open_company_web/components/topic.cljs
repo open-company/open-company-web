@@ -62,6 +62,12 @@
               (dom/h3 {:class "actual blue"} (:name metric-info))
               (dom/h3 {:class "actual blue"} last-value-label))))))))
 
+(defn scroll-to-topic-top [owner]
+  (let [topic (om/get-ref owner "topic")
+        body-scroll (.-scrollTop (.-body js/document))
+        topic-scroll-top (utils/offset-top topic)]
+    (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
+
 (defn mobile-topic-animation [data owner options expanded]
   (when expanded
     (om/set-state! owner :as-of (om/get-state owner :actual-as-of)))
@@ -140,10 +146,7 @@
             (setStyle body-nav-node #js {:overflow (if expanded "hidden" "visible")})))
           (.play)))
 
-      (let [topic (om/get-ref owner "topic")
-            body-scroll (.-scrollTop (.-body js/document))
-            topic-scroll-top (utils/offset-top topic)]
-        (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90)))
+      (scroll-to-topic-top owner)
 
       (if-not expanded
         ;; show the edit button if the topic body is empty
@@ -249,10 +252,12 @@
                 (when prev-rev
                   (dom/div {:class "previous group"}
                     (dom/a {:on-click (fn [e]
+                                        (scroll-to-topic-top owner)
                                         (om/set-state! owner :as-of (:updated-at prev-rev))
                                         (.stopPropagation e))} "< Previous")))
                 (when next-rev
                   (dom/div {:class "next group"}
                     (dom/a {:on-click (fn [e]
+                                        (scroll-to-topic-top owner)
                                         (om/set-state! owner :as-of (:updated-at next-rev))
                                         (.stopPropagation e))} "Next >")))))))))))
