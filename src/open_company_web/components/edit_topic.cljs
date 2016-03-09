@@ -94,7 +94,7 @@
           (dom/input #js {:ref "topic-headline"
                           :className "edit-topic-headline-input"
                           :placeholder "Headline"
-                          :maxLength 100
+                          :maxLength 120
                           :value headline
                           :onChange (fn [e]
                                       (om/set-state! owner :headline (.. e -target -value))
