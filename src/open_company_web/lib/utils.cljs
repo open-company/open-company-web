@@ -15,7 +15,7 @@
 
 (defn abs [n] (max n (- n)))
 
-(def oc-animation-duration 500)
+(def oc-animation-duration 250)
 
 (defn sort-by-key-pred [k & invert]
   (if-not (first invert)

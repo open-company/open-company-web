@@ -1,8 +1,8 @@
 div.company-dashboard {
 
   div.category-nav {
-    border-top: 1px solid #979797; /* gray */
-    border-bottom: 1px solid #979797; /* gray */
+    border-top: 1px solid #D8D8D8; /* gray */
+    border-bottom: 1px solid #D8D8D8; /* gray */
     background-color: white;
     width: 100%;
     z-index: 2;
@@ -45,8 +45,8 @@ div.company-dashboard {
 
         div.category-label {
           height: 18px;
-          padding-left: 5px;
-          padding-right: 5px;
+          padding-left: 10px;
+          padding-right: 10px;
           display: inline-block;
           color: #8b8a8a;
           font-weight: 600;
