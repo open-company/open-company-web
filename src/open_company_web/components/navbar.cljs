@@ -37,8 +37,8 @@
             (dom/div {:class "editing-title oc-title"} (:edit-title data))))
         (n/navbar {:inverse? true :fixed-top? true :fluid true :collapse? true}
           (dom/div {:class "navbar-header"}
-            (dom/img {:src (str "/img/open-company-logo.png?" ls/deploy-key)
-                      :class "open-company-logo"})
+            (dom/label {:class "opencompany-logo-open"} "open")
+            (dom/label {:class "opencompany-logo-company"} "company")
             (dom/ul {:class "nav navbar-nav navbar-right"}
               (dom/li {}
                 (if (:show-share data)

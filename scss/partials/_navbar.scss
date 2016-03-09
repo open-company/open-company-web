@@ -37,6 +37,21 @@ nav.navbar {
     margin: 0px;
     padding: 0px;
 
+    label {
+      color: rgb(65, 132, 217);
+      font-size: 24px;
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+
+    label.opencompany-logo-open{
+      font-weight: 900;
+    }
+
+    label.opencompany-logo-company{
+      font-weight: 100;
+    }
+
     img.open-company-logo{
       width: 150px;
       margin-top: 15px;
