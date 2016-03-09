@@ -9,7 +9,7 @@
 (defn topic-body-click [e owner options]
   (when e
     (.stopPropagation e))
-  ((:toggle-edit-topic-cb options) (:section-name options)))
+  ((:toggle-edit-topic-cb options) (om/get-props owner :section)))
 
 (defcomponent topic-body [{:keys [section section-data currency expanded] :as data} owner options]
 
@@ -18,7 +18,7 @@
           section-body (utils/get-topic-body section-data section-kw)]
       ;; Topic body
       (dom/div #js {:className "topic-body"
-                    :onClick #(when-not (:read-only section-data)
+                    :onClick #(when (and (not (:read-only section-data)) (utils/is-mobile))
                                 (topic-body-click % owner options))}
         (cond
           (= section-kw :growth)
