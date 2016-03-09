@@ -254,8 +254,13 @@
               (for [section-name fixed-category-topics
                     :let [sd (->> section-name keyword (get company-data))
                           li-props (if-not (utils/is-mobile)
-                                      #js {:className (utils/class-set {:topic-row true
-                                                          :full-width (= section-name "li-expander")})
+                                      #js {:className (utils/class-set {
+                                                          :topic-row true
+                                                          :full-width (= section-name "li-expander")
+                                                          :expanded (= selected-topic section-name)
+                                                          :unexpanded (and selected-topic
+                                                                           (not= selected-topic section-name)
+                                                                           (not= section-name "li-expander"))})
                                            :ref section-name
                                            :style #js {:opacity (if (= section-name "li-expander")
                                                                   (if (or bw-expand-animated (:expanded-topic data))
