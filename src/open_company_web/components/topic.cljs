@@ -143,7 +143,9 @@
            EventType/FINISH
            (fn [e]
             (om/update-state! owner :expanded not)
-            (setStyle body-nav-node #js {:overflow (if expanded "hidden" "visible")})))
+            (.setTimeout js/window
+              #(setStyle body-nav-node #js {:overflow (if expanded "hidden" "visible")
+                                            :height "auto"}) 1)))
           (.play)))
 
       (scroll-to-topic-top owner)
