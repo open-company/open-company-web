@@ -54,6 +54,7 @@
      :headline (:headline section-data)
      :tinymce-editor nil
      :did-mount false
+     :headline-countdown (- 120 (count (:headline section-data)))
      :did-load-resources false})
 
   (will-mount [_]
@@ -97,8 +98,12 @@
                           :maxLength 120
                           :value headline
                           :onChange (fn [e]
+                                      (om/set-state! owner :headline-countdown (- 120 (count (.. e -target -value))))
                                       (om/set-state! owner :headline (.. e -target -value))
-                                      ((:save-bt-active-cb options) true))}))
+                                      ((:save-bt-active-cb options) true))})
+          (dom/div {:class (utils/class-set {:edit-topic-headline-countdown true
+                                             :red (zero? (- 120 (count headline)))})}
+            (str (om/get-state owner :headline-countdown))))
         (dom/div {:class "edit-topic-body"}
           (dom/div #js {:ref "topic-body"
                         :className "body-editor"

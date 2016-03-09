@@ -1,7 +1,8 @@
 div.edit-topic {
+  max-width: 1108px;
+  margin: 52px auto;
   background-color: transparent;
   padding: 10px;
-  margin-top: 52px;
 
   div.edit-topic-internal{
     background-color: white;
@@ -39,6 +40,12 @@ div.edit-topic {
     }
 
     div.edit-topic-headline {
+      margin-bottom: 10px;
+
+      div.edit-topic-headline-countdown {
+        float: right;
+      }
+
       input {
         font-family: "#{$oc_headers_font}";
         border: 1px solid transparent;
