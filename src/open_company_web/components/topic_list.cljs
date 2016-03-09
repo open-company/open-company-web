@@ -103,9 +103,11 @@
 
 (defn add-expanded-topic [category-topics owner]
   (if (or (om/get-state owner :bw-expanded-topic)
-          (om/get-state owner :bw-expand-animated))
+          (om/get-state owner :bw-expand-animated)
+          (om/get-props owner :expanded-topic))
     (let [selected-topic (or (om/get-state owner :bw-expanded-topic)
-                             (om/get-state owner :bw-expand-animated))
+                             (om/get-state owner :bw-expand-animated)
+                             (om/get-props owner :expanded-topic))
           idx (.indexOf (to-array category-topics) selected-topic)
           cur-row (int (/ idx li-in-row))
           insert-at (+ li-in-row (* cur-row li-in-row))
@@ -216,9 +218,9 @@
     (when-not (:read-only (:company-data data))
       (get-new-sections-if-needed owner)))
 
-  (render-state [_ {:keys [show-topic-edit-button active-topics editing bw-expanded-topic bw-expand-animated]}]
+  (render-state [_ {:keys [show-topic-edit-button active-topics editing bw-expanded-topic bw-expand-animated last-expanded-section]}]
     (if (or (and bw-expanded-topic (not bw-expand-animated))
-              (and (nil? bw-expanded-topic) bw-expand-animated))
+            (and (not bw-expanded-topic) bw-expand-animated))
       (.setTimeout js/window #(animate-expand owner (not bw-expand-animated)) 0)
       (when bw-expanded-topic
         (.setTimeout js/window #(scroll-to-card (om/get-ref owner bw-expanded-topic)) 0)))
@@ -236,7 +238,7 @@
                          :opts {:active-category (:active-category data)
                                 :new-sections (slug @caches/new-sections)
                                 :did-change-sort (partial update-active-topics owner options (keyword cat))}}))))
-        (let [selected-topic (or bw-expanded-topic bw-expand-animated)
+        (let [selected-topic (or bw-expanded-topic bw-expand-animated (:expanded-topic data))
               company-data (:company-data data)
               active-category (keyword (:active-category data))
               category-topics (get active-topics active-category)
@@ -256,11 +258,11 @@
                                                           :full-width (= section-name "li-expander")})
                                            :ref section-name
                                            :style #js {:opacity (if (= section-name "li-expander")
-                                                                  (if bw-expand-animated
+                                                                  (if (or bw-expand-animated (:expanded-topic data))
                                                                       1 0)
                                                                   1)
                                                        :height  (if (= section-name "li-expander")
-                                                                  (if bw-expand-animated
+                                                                  (if (or bw-expand-animated (:expanded-topic data))
                                                                     "auto" "0px")
                                                                   (str (:height topic-box-size) "px"))}
                                            :key (str "topic-row-" (name section-name))}
@@ -277,10 +279,8 @@
                                                   :currency (:currency company-data)}
                                                  {:opts {
                                                    :section-name section-name
-                                                   :navbar-editing-cb navbar-editing-cb
-                                                   :force-edit-cb (partial force-edit-button owner)
                                                    :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)
-                                                   :bw-topic-click (partial topic-click owner)}})))
+                                                   :topic-edit-cb (:topic-edit-cb options)}})))
                     (when-not (and (:read-only company-data) (:placeholder sd))
                       (om/build topic {:loading (:loading company-data)
                                        :section section-name
@@ -306,4 +306,4 @@
                 (om/build edit-topic-button
                           nil
                           {:opts
-                           {:edit-topic-cb #((:topic-edit-cb options) (om/get-state owner :last-expanded-section))}})))))))))
+                           {:topic-edit-cb #((:topic-edit-cb options) last-expanded-section)}})))))))))
