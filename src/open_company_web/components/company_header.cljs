@@ -93,6 +93,16 @@
     ; redirect to login
     (utils/redirect! "/login")))
 
+(def logo-max-height 70)
+
+(defn logo-on-load [owner]
+  (when-not (utils/is-mobile)
+    (when-let [logo (om/get-ref owner "company-logo")]
+      (let [logo-height (.-height logo)]
+        (when (< logo-height logo-max-height)
+          (gstyle/setStyle logo #js {:marginTop (str (+ (/ logo-height 2) 10) "px")})))))
+  (watch-scroll owner))
+
 (defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner options]
 
   (render [_]
@@ -120,11 +130,12 @@
           (dom/div #js {:className "company-header-top group"}
             ;; Company logo
             (dom/div {:class "company-logo-container"}
-              (dom/img {:src (:logo company-data)
-                        :on-load #(watch-scroll owner) ;; add scroll listener when the logo is loaded
-                        :on-error #(watch-scroll owner) ;; or it errors on loading
-                        :class "company-logo"
-                        :title (:name company-data)}))
+              (dom/img #js {:src (:logo company-data)
+                            :onLoad #(logo-on-load owner) ;; add scroll listener when the logo is loaded
+                            :onError #(watch-scroll owner) ;; or it errors on loading
+                            :className "company-logo"
+                            :title (:name company-data)
+                            :ref "company-logo"}))
             ;; Buttons
             (dom/div {:class (utils/class-set {:buttons-container true
                                                :hidden (not (utils/is-mobile))})}
