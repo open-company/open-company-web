@@ -82,12 +82,13 @@
         new-active-categories (assoc old-active-categories category new-active-topics)]
     (om/set-state! owner :active-topics new-active-categories)
     ; enable/disable save button
-    ((:save-bt-active-cb options) (not= new-active-topics (om/get-state owner :initial-active-topics)))))
+    ((:save-bt-active-cb options) (not= new-active-categories (om/get-state owner :initial-active-topics)))))
 
 (defn get-state [data current-state]
   (let [company-data (:company-data data)
         categories (:categories company-data)
-        active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) (concat ["all"] categories)))]
+        all-categories (if (or (utils/is-mobile) (:editing current-state)) categories (concat ["all"] categories))
+        active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) all-categories))]
     {:editing (or (:editing current-state) false)
      :initial-active-topics active-topics
      :active-topics active-topics
