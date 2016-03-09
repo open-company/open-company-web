@@ -93,7 +93,6 @@
                     :style #js {:overflow "hidden"}}
         (when transit-as-of
           (dom/div #js {:className "transit-topic-expanded topic-expanded-internal"
-                        ; :key (:updated-at transit-topic-data)
                         :ref "transit-topic-expanded"
                         :style #js {:opacity 0}}
             (om/build expanded-internal {:section section
@@ -104,7 +103,7 @@
                                          :expanded expanded
                                          :transit true})))
         (dom/div #js {:className "actual-topic-expanded topic-expanded-internal"
-                      ; :key (:updated-at topic-data)
+                      :onClick #((:topic-edit-cb options) section)
                       :ref "actual-topic-expanded"
                       :style #js {:opacity 1 :position "relative"}}
           (om/build expanded-internal {:section section
