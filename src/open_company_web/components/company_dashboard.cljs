@@ -21,10 +21,12 @@
   (if editing
     ; if ALL is selected switch to the first available category
     ; for editing purpose
-    (when (= (om/get-state owner :active-category) "all")
-      (let [slug (:slug @router/path)
-            company-data ((keyword slug) data)]
-        (om/set-state! owner :active-category (first (:categories company-data)))))
+    (do
+      (om/set-state! owner :last-active-category (om/get-state owner :active-category))
+      (when (= (om/get-state owner :active-category) "all")
+        (let [slug (:slug @router/path)
+              company-data ((keyword slug) data)]
+          (om/set-state! owner :active-category (first (:categories company-data))))))
     (set-save-bt-active owner false))
   (let [fixed-title (or title "")]
     (om/set-state! owner :navbar-editing editing)
@@ -38,9 +40,12 @@
   (utils/scroll-to-y 0))
 
 (defn dismiss-topic-editing-cb [owner did-save]
-  (om/set-state! owner {:editing-topic nil
-                        :navbar-editing false
-                        :active-category (om/get-state owner :active-category)}))
+  (let [state (om/get-state owner)]
+    (om/set-state! owner :active-category (:last-active-category state))
+    (om/set-state! owner :last-editing-topic (:editing-topic state))
+    (om/set-state! owner :editing-topic nil)
+    (om/set-state! owner :navbar-editing false)
+    (om/set-state! owner :last-active-category nil)))
 
 (defcomponent company-dashboard [data owner]
 
@@ -81,9 +86,10 @@
           (om/build topic-list
                     {:loading (or (:loading company-data) (:loading data))
                      :company-data company-data
-                     :active-category (:active-category state)}
+                     :active-category (:active-category state)
+                     :expanded-topic (:last-editing-topic state)}
                     {:opts {:navbar-editing-cb navbar-editing-cb
-                            :topic-edit-cb #(topic-edit-cb owner %)
+                            :topic-edit-cb (partial topic-edit-cb owner)
                             :save-bt-active-cb (partial set-save-bt-active owner)}})
           ;; topic edit
           (om/build edit-topic {:section editing-topic
