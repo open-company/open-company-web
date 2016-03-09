@@ -56,7 +56,7 @@
        :editing-topic false
        :save-bt-active false}))
 
-  (render-state [_ {:keys [editing-topic navbar-editing] :as state}]
+  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active] :as state}]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)
           navbar-editing-cb (partial set-navbar-editing owner data)]
@@ -65,7 +65,7 @@
                                          :fix-navbar (not (utils/is-mobile))})}
 
        (when-not (utils/is-mobile)
-          (om/build navbar (merge data {:edit-mode navbar-editing})))
+          (om/build navbar (merge data {:edit-mode navbar-editing :save-bt-active save-bt-active})))
 
         ;; company header
         (om/build company-header {:loading (:loading company-data)
@@ -74,7 +74,7 @@
                                   :editing-topic editing-topic
                                   :switch-tab-cb (partial switch-tab-cb owner)
                                   :active-category (:active-category state)
-                                  :save-bt-active (om/get-state owner :save-bt-active)})
+                                  :save-bt-active save-bt-active})
 
         (if-not editing-topic
           ;; topic list
