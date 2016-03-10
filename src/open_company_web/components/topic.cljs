@@ -62,9 +62,8 @@
               (dom/h3 {:class "actual blue"} (:name metric-info))
               (dom/h3 {:class "actual blue"} last-value-label))))))))
 
-(defn scroll-to-topic-top [owner]
-  (let [topic (om/get-ref owner "topic")
-        body-scroll (.-scrollTop (.-body js/document))
+(defn scroll-to-topic-top [topic]
+  (let [body-scroll (.-scrollTop (.-body js/document))
         topic-scroll-top (utils/offset-top topic)]
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
@@ -72,10 +71,10 @@
   (when expanded
     (om/set-state! owner :as-of (om/get-state owner :actual-as-of)))
   (let [topic (om/get-ref owner "topic")
-        topic-more (om/get-ref owner "topic-more")
-        topic-date (om/get-ref owner "topic-date")
+        topic-more (sel1 topic [:div.topic-more])
+        topic-date (sel1 topic [:div.topic-date])
         body-node (sel1 topic [:div.topic-body])
-        body-nav-node (om/get-ref owner "body-navigation-container")]
+        body-nav-node (sel1 topic [:div.body-navigation-container])]
     (setStyle body-nav-node #js {:height "auto"})
     (let [body-height (.-offsetHeight body-nav-node)
           body-width (.-offsetWidth body-nav-node)]
@@ -148,7 +147,7 @@
                                             :height (if expanded "0" "auto")}) 1)))
           (.play)))
 
-      (scroll-to-topic-top owner)
+      (scroll-to-topic-top topic)
 
       (if-not expanded
         ;; show the edit button if the topic body is empty
@@ -177,41 +176,13 @@
     :else
     topic-headline))
 
-(defcomponent topic [{:keys [section-data section currency] :as data} owner {:keys [section-name navbar-editing-cb] :as options}]
-
-  (init-state [_]
-    {:expanded false
-     :as-of (:updated-at section-data)
-     :actual-as-of (:updated-at section-data)})
-
-  (did-mount [_]
-    (utils/replace-svg))
-
-  (did-update [_ _ _]
-    (utils/replace-svg))
-
-  (render-state [_ {:keys [editing expanded as-of actual-as-of] :as state}]
+(defcomponent topic-internal [{:keys [topic-data section currency expanded prev-rev next-rev] :as data} owner options]
+  (render [_]
     (let [section-kw (keyword section)
           headline-options {:opts {:currency currency}}
-          revisions (utils/sort-revisions (:revisions section-data))
-          prev-rev (utils/revision-prev revisions as-of)
-          next-rev (utils/revision-next revisions as-of)
-          slug (keyword (:slug @router/path))
-          revisions-list (section-kw (slug @cache/revisions))
-          topic-data (utils/select-section-data section-data section-kw as-of)
           headline-data (assoc topic-data :expanded expanded)]
-      ; preload previous revision
-      (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
-        (api/load-revision prev-rev slug section-kw))
-      ; preload next revision as it can be that it's missing (ie: user jumped to the first rev then went forward)
-      (when (and (not= (:updated-at next-rev) actual-as-of)
-                  next-rev
-                  (not (contains? revisions-list (:updated-at next-rev))))
-        (api/load-revision next-rev slug section-kw))
-      (dom/div #js {:className "topic"
-                    :ref "topic"
-                    :onClick #(topic-click data owner options expanded)}
-
+      (dom/div #js {:className "topic-internal"
+                    :ref "topic-internal"}
         ;; Topic title
         (dom/div {:class "topic-header group"}
           (dom/img {:class (str "topic-image svg")
@@ -246,20 +217,58 @@
 
         ;; topic body
         (when (utils/is-mobile)
-          (dom/div #js {:className "topic-body-nav-container group"
+          (dom/div #js {:className "body-navigation-container group"
                         :ref "body-navigation-container"}
             (om/build topic-body {:section section :section-data topic-data :expanded expanded} {:opts options})
             (when expanded
               (dom/div {:class "topic-navigation group"}
                 (when prev-rev
                   (dom/div {:class "previous group"}
-                    (dom/a {:on-click (fn [e]
-                                        (scroll-to-topic-top owner)
-                                        (om/set-state! owner :as-of (:updated-at prev-rev))
-                                        (.stopPropagation e))} "< Previous")))
+                    (dom/a {:on-click #((:rev-click options) % prev-rev)} "< Previous")))
                 (when next-rev
                   (dom/div {:class "next group"}
-                    (dom/a {:on-click (fn [e]
-                                        (scroll-to-topic-top owner)
-                                        (om/set-state! owner :as-of (:updated-at next-rev))
-                                        (.stopPropagation e))} "Next >")))))))))))
+                    (dom/a {:on-click #((:rev-click options) % next-rev)} "Next >")))))))))))
+
+(defcomponent topic [{:keys [section-data section currency] :as data} owner options]
+
+  (init-state [_]
+    {:expanded false
+     :as-of (:updated-at section-data)
+     :actual-as-of (:updated-at section-data)})
+
+  (did-mount [_]
+    (utils/replace-svg))
+
+  (did-update [_ _ _]
+    (utils/replace-svg))
+
+  (render-state [_ {:keys [editing expanded as-of actual-as-of] :as state}]
+    (let [section-kw (keyword section)
+          revisions (utils/sort-revisions (:revisions section-data))
+          prev-rev (utils/revision-prev revisions as-of)
+          next-rev (utils/revision-next revisions as-of)
+          slug (keyword (:slug @router/path))
+          revisions-list (section-kw (slug @cache/revisions))
+          topic-data (utils/select-section-data section-data section-kw as-of)]
+      ; preload previous revision
+      (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
+        (api/load-revision prev-rev slug section-kw))
+      ; preload next revision as it can be that it's missing (ie: user jumped to the first rev then went forward)
+      (when (and (not= (:updated-at next-rev) actual-as-of)
+                  next-rev
+                  (not (contains? revisions-list (:updated-at next-rev))))
+        (api/load-revision next-rev slug section-kw))
+      (dom/div #js {:className "topic"
+                    :ref "topic"
+                    :onClick #(topic-click data owner options expanded)}
+        (om/build topic-internal {:section section
+                                  :topic-data topic-data
+                                  :currency currency
+                                  :expanded expanded
+                                  :revisions revisions
+                                  :prev-rev prev-rev
+                                  :next-rev next-rev}
+                                 {:opts (merge options {:rev-click (fn [e rev]
+                                                                      (scroll-to-topic-top (om/get-ref owner "topic"))
+                                                                      (om/set-state! owner :as-of (:updated-at rev))
+                                                                      (.stopPropagation e))})})))))
