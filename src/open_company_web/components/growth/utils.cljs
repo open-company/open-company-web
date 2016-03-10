@@ -107,14 +107,14 @@
         values (if has-target
                  [period
                   target
-                  (occ/fill-color :gray)
+                  (occ/fill-color :oc-gray-2)
                   target-label
                   value
-                  (occ/fill-color :blue)
+                  (occ/fill-color :oc-blue-light)
                   label]
                  [period
                   value
-                  (occ/fill-color :blue)
+                  (occ/fill-color :oc-blue-light)
                   label])]
     values))
 
