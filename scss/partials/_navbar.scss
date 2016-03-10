@@ -9,7 +9,7 @@
 nav.navbar {
   width: auto;
   background-color: white;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid rgb(215, 215, 215);
   margin: 0px;
 
   &>div{
@@ -40,7 +40,7 @@ nav.navbar {
     label {
       font-size: 16px;
       line-height: 24px;
-      margin-top: 11px;
+      margin-top: 14px;
     }
 
     label.opencompany-logo-open{
