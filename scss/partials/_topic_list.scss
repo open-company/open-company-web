@@ -48,7 +48,7 @@ div.topic-list{
     li.topic-row{
 
       &.unexpanded {
-        opacity: 0.5 !important;
+        opacity: 0.3 !important;
       }
 
       @include mobile(){
