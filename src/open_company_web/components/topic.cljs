@@ -182,8 +182,12 @@
   (did-mount [_]
     (utils/replace-svg))
 
-  (did-update [_ _ _]
-    (utils/replace-svg))
+  (did-update [_ prev-props _]
+    (utils/replace-svg)
+    (when (and (not= (:updated-at (:section-data prev-props)) (:updated-at (:section-data data)))
+               (not (om/get-state owner :as-of)))
+      (om/set-state! owner :as-of (:updated-at (:section-data data)))
+      (om/set-state! owner :actual-as-of (:updated-at (:section-data data)))))
 
   (render-state [_ {:keys [editing expanded as-of actual-as-of] :as state}]
     (let [section-kw (keyword section)
