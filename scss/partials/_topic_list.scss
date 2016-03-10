@@ -18,7 +18,7 @@ div.topic-list{
   }
 
   @include big_web(){
-    background-color: #f1f1f1;
+    background-color: $oc_gray_1;
   }
 
   ul.topic-list-internal {
