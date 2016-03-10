@@ -82,6 +82,11 @@
    {:as-of (:updated-at section-data)
     :transit-as-of nil})
 
+  (did-update [_ prev-props _]
+    (when (and (not= (:updated-at (:section-data prev-props)) (:updated-at (:section-data data)))
+               (not (om/get-state owner :as-of)))
+      (om/set-state! owner :as-of (:updated-at (:section-data data)))))
+
   (render-state [_ {:keys [as-of transit-as-of]}]
     (let [section-kw (keyword section)
           topic-data (utils/select-section-data section-data section-kw as-of)
