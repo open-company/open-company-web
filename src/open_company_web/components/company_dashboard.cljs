@@ -17,14 +17,24 @@
 (defn set-save-bt-active [owner active]
   (om/set-state! owner :save-bt-active active))
 
-(defn set-navbar-editing [owner editing & [title]]
-  (when-not editing
+(defn set-navbar-editing [owner data editing & [title]]
+  (if editing
+    ; if ALL is selected switch to the first available category
+    ; for editing purpose
+    (do
+      (om/set-state! owner :last-active-category (om/get-state owner :active-category))
+      (when (= (om/get-state owner :active-category) "all")
+        (let [slug (:slug @router/path)
+              company-data ((keyword slug) data)]
+          (om/set-state! owner :active-category (first (:categories company-data))))))
     (set-save-bt-active owner false))
   (let [fixed-title (or title "")]
     (om/set-state! owner :navbar-editing editing)
     (om/set-state! owner :navbar-title fixed-title)))
 
 (defn switch-tab-cb [owner new-tab]
+  ; reset the last edited topic when switching category
+  (om/set-state! owner :last-editing-topic nil)
   (om/set-state! owner :active-category new-tab))
 
 (defn topic-edit-cb [owner section]
@@ -32,9 +42,12 @@
   (utils/scroll-to-y 0))
 
 (defn dismiss-topic-editing-cb [owner did-save]
-  (om/set-state! owner {:editing-topic nil
-                        :navbar-editing false
-                        :active-category (om/get-state owner :active-category)}))
+  (let [state (om/get-state owner)]
+    (om/set-state! owner :active-category (:last-active-category state))
+    (om/set-state! owner :last-editing-topic (:editing-topic state))
+    (om/set-state! owner :editing-topic nil)
+    (om/set-state! owner :navbar-editing false)
+    (om/set-state! owner :last-active-category nil)))
 
 (defcomponent company-dashboard [data owner]
 
@@ -43,8 +56,9 @@
           url-tab (subs url-hash 1 (count url-hash))
           active-tab (if (pos? (count url-tab))
                        url-tab
-                       default-category)]
-      {:active-category active-tab
+                       default-category)
+          fix-active-tab (if (and (utils/is-mobile) (= active-tab "all")) default-category active-tab)]
+      {:active-category fix-active-tab
        :navbar-editing false
        :editing-topic false
        :save-bt-active false}))
@@ -52,7 +66,7 @@
   (render-state [_ {:keys [editing-topic navbar-editing save-bt-active] :as state}]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)
-          navbar-editing-cb (partial set-navbar-editing owner)]
+          navbar-editing-cb (partial set-navbar-editing owner data)]
       (dom/div {:class (utils/class-set {:company-dashboard true
                                          :row-fluid true
                                          :fix-navbar (not (utils/is-mobile))})}
@@ -75,7 +89,8 @@
           (om/build topic-list
                     {:loading (or (:loading company-data) (:loading data))
                      :company-data company-data
-                     :active-category (:active-category state)}
+                     :active-category (:active-category state)
+                     :expanded-topic (:last-editing-topic state)}
                     {:opts {:navbar-editing-cb navbar-editing-cb
                             :topic-edit-cb (partial topic-edit-cb owner)
                             :save-bt-active-cb (partial set-save-bt-active owner)}})

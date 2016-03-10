@@ -1,10 +1,13 @@
-$topic_box_width: 290;
+$topic_box_width: 310;
 $topic_box_height: 170;
 $topic_box_padding: 10;
 
 div.topic-list-edit-container {
   padding-bottom: 10px;
-  margin-top: 92px;
+
+  @include mobile(){
+    margin-top: 92px;
+  }
 }
 
 div.topic-list{
@@ -49,6 +52,10 @@ div.topic-list{
 
     li.topic-row{
 
+      &.unexpanded {
+        opacity: 0.3 !important;
+      }
+
       @include mobile(){
         padding: 0px;
         margin: 0px;
@@ -69,6 +76,11 @@ div.topic-list{
           div.topic {
             height: auto;
             color: black;
+            cursor: auto;
+
+            &:hover {
+              background-color: white;
+            }
 
             &::before {
               @include triangle(top, white, 0.6em);

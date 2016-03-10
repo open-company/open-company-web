@@ -7,6 +7,7 @@
             [open-company-web.components.ui.login-button :refer (login-button)]
             [om-bootstrap.nav :as n]
             [open-company-web.router :as router]
+            [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.jwt :as jwt]
             [cljs.core.async :refer (put!)]))
@@ -36,9 +37,8 @@
             (dom/div {:class "editing-title oc-title"} (:edit-title data))))
         (n/navbar {:inverse? true :fixed-top? true :fluid true :collapse? true}
           (dom/div {:class "navbar-header"}
-            (when (contains? @router/path :slug)
-              (let [slug (keyword (:slug @router/path))]
-                (om/build company-avatar {:company-data (slug data) :navbar-brand true})))
+            (dom/label {:class "opencompany-logo-open"} "open")
+            (dom/label {:class "opencompany-logo-company"} "company")
             (dom/ul {:class "nav navbar-nav navbar-right"}
               (dom/li {}
                 (if (:show-share data)

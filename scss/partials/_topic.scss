@@ -5,13 +5,17 @@ div.topic-list {
     margin-right: 0px;
     margin-top: 5px;
     padding: 22px 22px 14px 22px;
-    min-height: 100px;
-    border-bottom: 1px solid #DFDFDF; /* gray */
     background-color: white;
     text-align: left;
+    box-shadow: 1px 1px 1px 0 #bababa;
 
     @include big_web(){
-      height: 200px;
+      height: 154px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #E5E4E4;
+      }
     }
 
     div.topic-header {

@@ -20,7 +20,7 @@
           section-body (utils/get-topic-body section-data section-kw)]
       ;; Topic body
       (dom/div #js {:className "topic-body"
-                    :onClick #(when-not (:read-only section-data)
+                    :onClick #(when (and (not (:read-only section-data)) (utils/is-mobile))
                                 (topic-body-click % owner options))}
         (cond
           (= section-kw :growth)

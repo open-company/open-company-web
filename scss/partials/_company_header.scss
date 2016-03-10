@@ -34,18 +34,25 @@ div.company-header{
   div.company-header-internal {
     @include big_web(){
       padding: 0 70px;
+      min-height: 120px;
     }
     
     div.company-header-top {
       padding-top: 22px;
 
+      @include big_web(){
+        float: left;
+        width: 105px;
+      }
+
       div.company-logo-container{
-        padding-left: 15px;
-        width: 150px;
+        margin-left: 15px;
+        width: 70px;
+        height: 70px;
         float: left;
 
         img.company-logo {
-          max-width: 140px;
+          max-width: 70px;
           max-height: 70px;
         }
       }
@@ -87,16 +94,19 @@ div.company-header{
     }
 
     div.company-name-container {
-      width: 100%;
-      top: 0px;
-      left: 0px;
-      z-index: 2;
+
+      @include mobile(){
+        width: 100%;
+        top: 0px;
+        left: 0px;
+        z-index: 2;
+      }
+
+      @include big_web(){
+        margin-left: 100px;
+      }
 
       div.company-name {
-        padding-top: 20px;
-        padding-bottom: 9px;
-        padding-left: 20px;
-        height: 46px;
         text-align: left;
         color: #2d2d2d;
         font-size: 24px;
@@ -104,32 +114,45 @@ div.company-header{
         background-color: inherit;
 
         @include mobile(){
+          padding-left: 20px;
+          padding-top: 20px;
+          padding-bottom: 9px;
+          height: 46px;
           font-weight: regular;
           background-color: white;
         }
 
         @include big_web(){
+          padding-top: 30px;
           font-weight: 600;
         }
       }
     }
 
     div.company-description-container {
-      width: 100%;
+
+      @include mobile(){
+        width: 100%;
+      }
 
       div.company-description {
         text-align: left;
-        margin-top: 0px;
-        margin-bottom: 20px;
-        margin-left: 20px;
         color: #2d2d2d;
 
         @include mobile(){
+          margin-top: 0px;
+          margin-bottom: 20px;
+          margin-left: 20px;
+          padding-top: 0px;
           font-size: 16px;
           line-height: 1.2;
         }
 
         @include big_web(){
+          width: 355px;
+          padding-top: 10px;
+          padding-left: 105px;
+          padding-bottom: 20px;
           font-size: 14px;
           line-height: 1.3;
         }
