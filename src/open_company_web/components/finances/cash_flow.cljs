@@ -15,7 +15,7 @@
         abs-cash-flow (utils/abs cash-flow)]
     [(utils/get-period-string (:period obj) "monthly" [:short])
      (:revenue obj)
-     (occ/fill-color :green)
+     (occ/fill-color :oc-green-light)
      (str (utils/get-period-string (:period obj))
           " Revenue: "
           prefix
@@ -27,7 +27,7 @@
           prefix
           (utils/thousands-separator (or (:costs obj) 0)))
      abs-cash-flow
-     (occ/fill-color (if cash-flow-pos? :green :red))
+     (occ/fill-color (if cash-flow-pos? :oc-green-light :red))
      (str (utils/get-period-string (:period obj))
           " Cash flow: "
           (when (neg? cash-flow) "-")

@@ -31,4 +31,4 @@
                                                               :cash
                                                               "Cash"
                                                               #js {"type" "string" "role" "style"}
-                                                              (occ/fill-color :green)))))))
+                                                              (occ/fill-color :oc-green-light)))))))
