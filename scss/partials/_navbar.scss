@@ -9,7 +9,7 @@
 nav.navbar {
   width: auto;
   background-color: white;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid rgb(215, 215, 215);
   margin: 0px;
 
   &>div{
@@ -17,14 +17,14 @@ nav.navbar {
     padding: 0px;
   }
 
-  @media screen and (max-width: 960px) {
+  @include mobile(){
     div#navbar {
       width: auto;
       padding-right: 230px;
     }
   }
 
-  @media screen and (min-width: 960px) {
+  @include big_web(){
     & > div {
       width: auto;
       padding-left: 85px;
@@ -36,6 +36,25 @@ nav.navbar {
     width: 100%;
     margin: 0px;
     padding: 0px;
+
+    label {
+      font-size: 16px;
+      line-height: 24px;
+      margin-top: 14px;
+    }
+
+    label.opencompany-logo-open{
+      font-weight: 900;
+    }
+
+    label.opencompany-logo-company{
+      font-weight: 100;
+    }
+
+    img.open-company-logo{
+      width: 150px;
+      margin-top: 15px;
+    }
 
     &.editing-mode {
 
@@ -56,7 +75,7 @@ nav.navbar {
         button.cancel-bt {
           font-size: 15px;
           margin: 15px 0px;
-          color: $oc_blue;
+          color: $oc_red;
 
           &:disabled {
             opacity: 0.4;
@@ -66,11 +85,11 @@ nav.navbar {
 
       div.right-button {
         float: right;
-        color: $oc_blue;
 
         button.save-bt {
           font-size: 15px;
           margin: 15px 0px;
+          color: $oc_green;
 
           &:disabled {
             opacity: 0.4;
@@ -111,7 +130,7 @@ nav.navbar {
       }
     }
 
-    @media screen and (max-width: 960px){
+    @include mobile(){
       ul.navbar-right{
         margin: 0;
       }

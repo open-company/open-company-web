@@ -8,13 +8,14 @@
             [goog.fx.dom :refer (Scroll)]
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
+            [open-company-web.lib.cookies :as cook]
             [open-company-web.lib.iso4217 :refer (iso4217)]
             [open-company-web.caches :refer (company-cache)]
             [open-company-web.local-settings :as ls]))
 
 (defn abs [n] (max n (- n)))
 
-(def oc-animation-duration 500)
+(def oc-animation-duration 300)
 
 (defn sort-by-key-pred [k & invert]
   (if-not (first invert)
@@ -344,6 +345,28 @@
   (let [sort-pred (sort-by-key-pred :updated-at)]
     (vec (sort sort-pred revisions))))
 
+(defn revision-next
+  "Return the first future revision"
+  [revisions as-of]
+  (when (pos? (count revisions))
+    (first (remove nil? (map
+                          (fn [r]
+                            (when (= (:updated-at r) as-of)
+                              (let [idx (.indexOf (to-array revisions) r)]
+                                (get revisions (inc idx)))))
+                          revisions)))))
+
+(defn revision-prev
+  "Return the first future revision"
+  [revisions as-of]
+  (when (pos? (count revisions))
+    (first (remove nil? (map
+                          (fn [r]
+                            (when (= (:updated-at r) as-of)
+                              (let [idx (.indexOf (to-array revisions) r)]
+                                (get revisions (dec idx)))))
+                          revisions)))))
+
 (defn as-of-now []
   (let [date (js-date)]
     (.toISOString date)))
@@ -545,3 +568,30 @@
 (defn replace-svg []
   (when (.-svgcss js/window)
     (.setTimeout js/window #(.svgcss js/window) 1)))
+
+(def _mobile (atom -1))
+
+(def big-web-min-width 970)
+
+(defn set-browser-type! []
+  (let [force-mobile-cookie (cook/get-cookie :force-browser-type)
+        is-big-web (if (.-body js/document)
+                      (>= (.-clientWidth (.-body js/document)) big-web-min-width)
+                      true) ; to not break tests
+        fixed-browser-type (if (nil? force-mobile-cookie)
+                            (not is-big-web)
+                            (if (= force-mobile-cookie "mobile")
+                             true
+                             false))]
+  (reset! _mobile fixed-browser-type)))
+
+(defn is-mobile []
+ ; fake the browser type for the moment
+ (when (neg? @_mobile)
+  (set-browser-type!))
+ @_mobile)
+
+(defn get-topic-body [section-data section]
+  (if (#{:finances :growth} section)
+    (get-in section-data [:notes :body])
+    (:body section-data)))

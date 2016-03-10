@@ -5,24 +5,16 @@
             [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
-            [open-company-web.lib.utils :as utils]
             [open-company-web.api :as api]
+            [open-company-web.lib.utils :as utils]
             [open-company-web.components.finances.utils :as finances-utils]
-            [open-company-web.components.growth.utils :as growth-utils]
-            [open-company-web.components.ui.charts :refer (column-chart)]
-            [open-company-web.components.finances.finances :refer (finances)]
-            [open-company-web.components.growth.growth :refer (growth)]
+            [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.local-settings :as ls]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as EventType]
             [goog.events :as events]
             [goog.style :refer (setStyle)]))
-
-(defn- get-body [section-data section]
-  (if (#{:finances :growth} section)
-    (get-in section-data [:notes :body])
-    (:body section-data)))
 
 (defcomponent topic-headline [data owner]
   (render [_]
@@ -70,25 +62,19 @@
               (dom/h3 {:class "actual blue"} (:name metric-info))
               (dom/h3 {:class "actual blue"} last-value-label))))))))
 
-(defn topic-body-click [e owner options show-edit-button]
-  (when e
-    (.stopPropagation e))
-  ((:toggle-edit-topic-cb options) (:section-name options)))
-
-(defn topic-click [data owner options expanded]
+(defn mobile-topic-animation [data owner options expanded]
   (when expanded
     (om/set-state! owner :as-of (om/get-state owner :actual-as-of)))
   (let [topic (om/get-ref owner "topic")
         topic-more (om/get-ref owner "topic-more")
         topic-date (om/get-ref owner "topic-date")
-        body-node (om/get-ref owner "topic-body")]
-    (setStyle body-node #js {:height "auto"})
-    (let [body-height (.-offsetHeight body-node)
-          body-width (.-offsetWidth body-node)]
-      (setStyle body-node #js {:height (if expanded "auto" "0")
-                               :overflow "hidden"})
-
-      (setStyle topic-more #js {:opacity "0"})
+        body-node (sel1 topic [:div.topic-body])
+        body-nav-node (om/get-ref owner "body-navigation-container")]
+    (setStyle body-nav-node #js {:height "auto"})
+    (let [body-height (.-offsetHeight body-nav-node)
+          body-width (.-offsetWidth body-nav-node)]
+      (setStyle body-nav-node #js {:height (if expanded "auto" "0")
+                                   :overflow "hidden"})
 
       ;; animate finances headtitle
       (when-let [finances-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-finances")]
@@ -122,23 +108,36 @@
 
       (.play
         (new Fade
+             topic-more
+             (if expanded 0 1)
+             (if expanded 1 0)
+             utils/oc-animation-duration))
+
+      (.play
+        (new Resize
+             topic-more
+             (new js/Array body-width (if expanded 0 20))
+             (new js/Array body-width (if expanded 20 0))
+             utils/oc-animation-duration))
+
+      (.play
+        (new Fade
              topic-date
              (if expanded 1 0)
              (if expanded 0 1)
              utils/oc-animation-duration))
-
       ;; animate height
       (let [height-animation (new Resize
-                                  body-node
-                                  (new js/Array body-width (if expanded body-height 0))
-                                  (new js/Array body-width (if expanded 0 body-height))
+                                  body-nav-node
+                                  (new js/Array body-width (if expanded (+ body-height 20) 0))
+                                  (new js/Array body-width (if expanded 0 (+ body-height 20)))
                                   utils/oc-animation-duration)]
         (doto height-animation
           (events/listen
            EventType/FINISH
            (fn [e]
             (om/update-state! owner :expanded not)
-            (setStyle body-node #js {:overflow (if expanded "hidden" "visible")})))
+            (setStyle body-nav-node #js {:overflow (if expanded "hidden" "visible")})))
           (.play)))
 
       (let [topic (om/get-ref owner "topic")
@@ -150,11 +149,16 @@
         ;; show the edit button if the topic body is empty
         (let [section (keyword (:section-name options))
               section-data (:section-data data)
-              body (get-body section-data section)]
+              body (utils/get-topic-body section-data section)]
           (when (clojure.string/blank? body)
             ((:force-edit-cb options) true)))
         ;; hide the edit button if necessary
         ((:force-edit-cb options) false)))))
+
+(defn topic-click [data owner options expanded]
+  (if (utils/is-mobile)
+    (mobile-topic-animation data owner options expanded)
+    ((:bw-topic-click options) (:section data))))
 
 (defn headline-component [section]
   (cond
@@ -167,28 +171,6 @@
 
     :else
     topic-headline))
-
-(defn revision-next
-  "Return the first future revision"
-  [revisions as-of]
-  (when (pos? (count revisions))
-    (first (remove nil? (map
-                          (fn [r]
-                            (when (= (:updated-at r) as-of)
-                              (let [idx (.indexOf (to-array revisions) r)]
-                                (get revisions (inc idx)))))
-                          revisions)))))
-
-(defn revision-prev
-  "Return the first future revision"
-  [revisions as-of]
-  (when (pos? (count revisions))
-    (first (remove nil? (map
-                          (fn [r]
-                            (when (= (:updated-at r) as-of)
-                              (let [idx (.indexOf (to-array revisions) r)]
-                                (get revisions (dec idx)))))
-                          revisions)))))
 
 (defcomponent topic [{:keys [section-data section currency] :as data} owner {:keys [section-name navbar-editing-cb] :as options}]
 
@@ -203,17 +185,16 @@
   (did-update [_ _ _]
     (utils/replace-svg))
 
-  (render-state [_ {:keys [editing expanded show-edit-button as-of actual-as-of] :as state}]
+  (render-state [_ {:keys [editing expanded as-of actual-as-of] :as state}]
     (let [section-kw (keyword section)
-          revisions (utils/sort-revisions (:revisions section-data))
           headline-options {:opts {:currency currency}}
-          headline-data (assoc section-data :expanded expanded)
-          prev-rev (revision-prev revisions as-of)
-          next-rev (revision-next revisions as-of)
+          revisions (utils/sort-revisions (:revisions section-data))
+          prev-rev (utils/revision-prev revisions as-of)
+          next-rev (utils/revision-next revisions as-of)
           slug (keyword (:slug @router/path))
           revisions-list (section-kw (slug @cache/revisions))
           topic-data (utils/select-section-data section-data section-kw as-of)
-          section-body (get-body topic-data section-kw)]
+          headline-data (assoc topic-data :expanded expanded)]
       ; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -250,50 +231,28 @@
             :else
             (om/build topic-headline topic-data)))
 
-        (dom/div #js {:className "topic-more"
-                      :ref "topic-more"
-                      :style #js {:opacity (if expanded 0 1)}}
-          (dom/i {:class "fa fa-circle"})
-          (dom/i {:class "fa fa-circle"})
-          (dom/i {:class "fa fa-circle"}))
+        (when (utils/is-mobile)
+          (dom/div #js {:className "topic-more"
+                        :ref "topic-more"
+                        :style #js {:opacity (if expanded 0 1)}}
+            (dom/i {:class "fa fa-circle"})
+            (dom/i {:class "fa fa-circle"})
+            (dom/i {:class "fa fa-circle"})))
 
-        ;; Topic body
-        (dom/div #js {:className (utils/class-set {:topic-body true
-                                                   :expanded expanded})
-                      :ref "topic-body"
-                      :onClick #(when-not (:read-only topic-data)
-                                  (topic-body-click % owner options show-edit-button))
-                      :style #js {"height" (if expanded "auto" "0")}}
-          (cond
-            (= section-kw :growth)
-            (om/build growth {:section-data topic-data
-                              :section section-kw
-                              :currency currency
-                              :actual-as-of (:updated-at topic-data)
-                              :read-only true}
-                             {:opts {:show-title false
-                                     :show-revisions-navigation false}})
-
-            (= section-kw :finances)
-            (om/build finances {:section-data topic-data
-                                :section section-kw
-                                :currency currency
-                                :actual-as-of (:updated-at topic-data)
-                                :read-only true}
-                               {:opts {:show-title false
-                                       :show-revisions-navigation false}})
-
-            :else
-            (dom/div #js {:className "topic-body-inner"
-                          :dangerouslySetInnerHTML (clj->js {"__html" section-body})}))
-          (dom/div {:class "topic-navigation group"}
-            (when prev-rev
-              (dom/div {:class "previous"}
-                (dom/a {:on-click (fn [e]
-                                    (om/set-state! owner :as-of (:updated-at prev-rev))
-                                    (.stopPropagation e))} "< Previous")))
-            (when next-rev
-              (dom/div {:class "next"}
-                (dom/a {:on-click (fn [e]
-                                    (om/set-state! owner :as-of (:updated-at next-rev))
-                                    (.stopPropagation e))} "Next >")))))))))
+        ;; topic body
+        (when (utils/is-mobile)
+          (dom/div #js {:className "topic-body-nav-container group"
+                        :ref "body-navigation-container"}
+            (om/build topic-body {:section section :section-data topic-data :expanded expanded} {:opts options})
+            (when expanded
+              (dom/div {:class "topic-navigation group"}
+                (when prev-rev
+                  (dom/div {:class "previous group"}
+                    (dom/a {:on-click (fn [e]
+                                        (om/set-state! owner :as-of (:updated-at prev-rev))
+                                        (.stopPropagation e))} "< Previous")))
+                (when next-rev
+                  (dom/div {:class "next group"}
+                    (dom/a {:on-click (fn [e]
+                                        (om/set-state! owner :as-of (:updated-at next-rev))
+                                        (.stopPropagation e))} "Next >")))))))))))

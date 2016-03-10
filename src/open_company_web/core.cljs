@@ -19,8 +19,9 @@
             [goog.events :as events]
             [open-company-web.lib.cookies :as cook]
             [open-company-web.local-settings :as ls]
-            [open-company-web.lib.jwt :as jwt])
-  (:import [goog.history EventType]))
+            [open-company-web.lib.jwt :as jwt]
+            [goog.history.EventType :as HistoryEventType]
+            [goog.events.EventType :as EventType]))
 
 (enable-console-print!)
 
@@ -29,13 +30,25 @@
 ;; setup Sentry error reporting
 (defonce raven (raven-setup))
 
+(defn check-get-params [query-params]
+  (when (contains? query-params :browser-type)
+    ; if :browser-type is "mobile" the mobile site is forced
+    ; any other value will be set as big web
+    ; remove the cookie to let it calculate the type of site
+    ; Rules set via css won't be affected by this
+    (cook/set-cookie! :force-browser-type (:browser-type query-params) (* 60 60 24 6))))
+
 (defn inject-loading []
   (let [target (sel1 [:div#oc-loading])]
     (om/root loading app-state {:target target})))
 
+(defn pre-routing [query-params]
+ (check-get-params query-params)
+ (inject-loading))
+
 ;; Company list
-(defn home-handler [target]
-  (inject-loading)
+(defn home-handler [target params]
+  (pre-routing (:query-params params))
   ;; clean the caches
   (utils/clean-company-caches)
   ;; save route
@@ -48,12 +61,12 @@
   (om/root list-companies app-state {:target target}))
 
 ;; Handle successful and unsuccessful logins
-(defn login-handler [target query-params]
-  (inject-loading)
+(defn login-handler [target params]
+  (pre-routing (:query-params params))
   (utils/clean-company-caches)
-  (if (contains? query-params :jwt)
+  (if (contains? (:query-params params) :jwt)
     (do ; contains :jwt so auth went well
-      (cook/set-cookie! :jwt (:jwt query-params) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
       ;; redirect to dashboard
       (if-let [login-redirect (cook/get-cookie :login-redirect)]
         (do
@@ -64,23 +77,23 @@
         ;; redirect to / if no cookie is set
         (utils/redirect! "/")))
     (do
-      (when (contains? query-params :login-redirect)
-        (cook/set-cookie! :login-redirect (:login-redirect query-params) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+      (when (contains? (:query-params params) :login-redirect)
+        (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
       ;; save route
       (router/set-route! ["login"] {})
       (swap! app-state assoc :loading true)
-      (when (contains? query-params :access)
+      (when (contains? (:query-params params) :access)
         ;login went bad, add the error message to the app-state
-        (swap! app-state assoc :access (:access query-params)))
+        (swap! app-state assoc :access (:access (:query-params params))))
       ;; render component
       (om/root login app-state {:target target}))))
 
 ;; Component specific to a company
 (defn company-handler [route target component params]
-  (inject-loading)
-  (utils/clean-company-caches)
   (let [slug (:slug (:params params))
         query-params (:query-params params)]
+    (pre-routing query-params)
+    (utils/clean-company-caches)
     ;; save the route
     (router/set-route! ["companies" slug route] {:slug slug :query-params query-params})
     ;; do we have the company data already?
@@ -96,20 +109,21 @@
 (if-let [target (sel1 :div#app)]
   (do
 
-    (defroute login-route "/login" {:keys [query-params]}
-      (login-handler target query-params))
+    (defroute login-route "/login" {:as params}
+      (login-handler target params))
 
-    (defroute home-page-route "/" []
-      (home-handler target))
+    (defroute home-page-route "/" {:as params}
+      (home-handler target params))
 
-    (defroute company-create-route "/create-company" []
+    (defroute company-create-route "/create-company" {:as params}
+      (pre-routing (:query-params params))
       (om/root company-editor app-state {:target target}))
 
-    (defroute list-page-route "/companies" []
-      (home-handler target))
+    (defroute list-page-route "/companies" {:as params}
+      (home-handler target params))
 
-    (defroute list-page-route-slash "/companies/" []
-      (home-handler target))
+    (defroute list-page-route-slash "/companies/" {:as params}
+      (home-handler target params))
 
     (defroute company-route "/companies/:slug" {:as params}
       (company-handler nil target company params))
@@ -122,6 +136,7 @@
 
     (defroute user-profile-route "/profile" {:as params}
       (utils/clean-company-caches)
+      (pre-routing (:query-params params))
       (om/root user-profile app-state {:target target}))
 
     (defroute not-found-route "*" []
@@ -163,10 +178,19 @@
 
 (defonce history
   (doto (router/make-history)
-    (events/listen EventType.NAVIGATE
+    (events/listen HistoryEventType/NAVIGATE
       ;; wrap in a fn to allow live reloading
       handle-url-change)
     (.setEnabled true)))
+
+(defonce resize-listener
+  ; define this inside a defonce to avoid multiple listener during development
+  (events/listen
+    js/window
+    EventType/RESIZE
+    (fn [e]
+      (utils/set-browser-type!)
+      (route-dispatch! (router/get-token)))))
 
 (defn on-js-reload []
   ;; optionally touch your app-state to force rerendering depending on

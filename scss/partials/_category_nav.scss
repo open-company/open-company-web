@@ -1,43 +1,70 @@
 div.company-dashboard {
 
   div.category-nav {
-    border-top: 1px solid #979797; /* gray */
-    border-bottom: 1px solid #979797; /* gray */
+    border-top: 1px solid #D8D8D8; /* gray */
+    border-bottom: 1px solid #D8D8D8; /* gray */
     background-color: white;
     width: 100%;
     z-index: 2;
-    padding: 2px 0px;
     margin: 0px;
+    padding: 2px 0px;
     width: 100%;
     height: 46px;
     -webkit-backface-visibility: hidden;
+    text-align: center;
 
-    div.category {
-      width: 33.33333%;
-      padding-left: 15px;
-      padding-right: 15px;
-      float: left;
-      /* vertically center the text */
-      padding-top: 15px;
-      vertical-align: middle;
-      /* horizontally center the text */
-      text-align: center;
-      color: #8b8a8a;
-      text-transform: uppercase;
 
-      div.category-label {
-        font-size: 16px;
-        line-height: 0;
-        padding-left: 5px;
-        padding-right: 5px;
-        display: inline-block;
-        color: #8b8a8a;
-        height: 18px;
+    div.category-nav-internal{
+      @include mobile() {
+        margin: 0px;
       }
 
-      &.active div.category-label {
-        color: #2d2d2d;
-        border-bottom: 3px solid black;
+      @include big_web() {
+        margin: 0 auto;
+      }
+
+
+      div.category {
+        @include mobile(){
+          width: 33.33333%;
+          float: left;
+        }
+        @include big_web(){
+          width: 150px;
+          float: left;
+        }
+        padding-left: 15px;
+        padding-right: 15px;
+        /* vertically center the text */
+        padding-top: 15px;
+        vertical-align: middle;
+        /* horizontally center the text */
+        text-align: center;
+        color: #8b8a8a;
+        text-transform: uppercase;
+
+        div.category-label {
+          height: 18px;
+          padding-left: 10px;
+          padding-right: 10px;
+          display: inline-block;
+          color: #8b8a8a;
+          font-weight: 600;
+          line-height: 0;
+
+          @include mobile(){
+            font-size: 16px;
+          }
+
+          @include big_web(){
+            font-size: 14px;
+          }
+        }
+
+        &.active div.category-label {
+          color: #2d2d2d;
+          border-bottom: 3px solid black;
+        }
       }
     }
   }

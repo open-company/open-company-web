@@ -1,5 +1,11 @@
 div.company-header{
-  background-color: white;
+  @include mobile(){
+    background-color: white;
+  }
+
+  @include big_web(){
+    background-color: #fafafa;
+  }
 
   div.navbar-editing {
     width: 100%;
@@ -25,99 +31,133 @@ div.company-header{
     }
   }
 
-  div.company-header-top {
-    padding-top: 22px;
-
-    div.company-logo-container{
-      padding-left: 15px;
-      width: 150px;
-      float: left;
-
-      img.company-logo {
-        max-width: 140px;
-        max-height: 70px;
-      }
+  div.company-header-internal {
+    @include big_web(){
+      padding: 0 70px;
+      min-height: 120px;
     }
+    
+    div.company-header-top {
+      padding-top: 22px;
 
-    div.buttons-container {
-      padding-right: 15px;
-      width: 160px;
-      float: right;
-      text-align: right;
+      @include big_web(){
+        float: left;
+        width: 105px;
+      }
 
-      button.oc-btn {
-        width: 25px;
-        height: 21px;
-        margin: 0px;
-        padding: 0px;
-        border: 0px;
-        outline: none;
+      div.company-logo-container{
+        margin-left: 15px;
+        width: 70px;
+        height: 70px;
+        float: left;
 
-        &.vert-ellipse {
-          background-image: url("/img/3dots.png");
-          background-size: 25px 25px;
-          background-position: 0px 0px;
+        img.company-logo {
+          max-width: 70px;
+          max-height: 70px;
+        }
+      }
+
+      div.buttons-container {
+        padding-right: 15px;
+        width: 160px;
+        float: right;
+        text-align: right;
+
+        button.oc-btn {
           width: 25px;
-          height: 25px;
-
-          &:hover, &:active, &:focus {
-            background-color: white;
-            border: 0px solid black;
-            outline: none;
-            box-shadow: none;
-          }
-
-          & span.caret {
-            display: none;
-          }
-        }
-
-        &.bullhorn {
-          margin-right: 15px;
-        }
-
-        & img {
           height: 21px;
-        }
-
-        &:focus, &:active{
+          margin: 0px;
+          padding: 0px;
+          border: 0px;
           outline: none;
+
+          &.vert-ellipse {
+            background-image: url("/img/3dots.png");
+            background-size: 25px 25px;
+            background-position: 0px 0px;
+            width: 25px;
+            height: 25px;
+
+            &:hover, &:active, &:focus {
+              background-color: white;
+              border: 0px solid black;
+              outline: none;
+              box-shadow: none;
+            }
+
+            & span.caret {
+              display: none;
+            }
+          }
         }
       }
     }
-  }
 
-  div.company-name-container {
-    width: 100%;
-    top: 0px;
-    left: 0px;
-    z-index: 2;
+    div.company-name-container {
 
-    div.company-name {
-      padding-top: 20px;
-      padding-bottom: 9px;
-      padding-left: 20px;
-      height: 46px;
-      text-align: left;
-      font-weight: bold;
-      font-size: 24px;
-      line-height: 0.9;
-      background-color: white;
-      color: #2d2d2d;
+      @include mobile(){
+        width: 100%;
+        top: 0px;
+        left: 0px;
+        z-index: 2;
+      }
+
+      @include big_web(){
+        margin-left: 100px;
+      }
+
+      div.company-name {
+        text-align: left;
+        color: #2d2d2d;
+        font-size: 24px;
+        line-height: 0.9;
+        background-color: inherit;
+
+        @include mobile(){
+          padding-left: 20px;
+          padding-top: 20px;
+          padding-bottom: 9px;
+          height: 46px;
+          font-weight: regular;
+          background-color: white;
+        }
+
+        @include big_web(){
+          padding-top: 30px;
+          font-weight: 600;
+        }
+      }
     }
-  }
 
-  div.company-description-container {
-    width: 100%;
+    div.company-description-container {
 
-    div.company-description {
-      text-align: left;
-      font-size: 16px;
-      line-height: 1.2;
-      margin-top: 0px;
-      margin-bottom: 20px;
-      margin-left: 20px;
-      color: #2d2d2d;
+      @include mobile(){
+        width: 100%;
+      }
+
+      div.company-description {
+        text-align: left;
+        color: #2d2d2d;
+
+        @include mobile(){
+          margin-top: 0px;
+          margin-bottom: 20px;
+          margin-left: 20px;
+          padding-top: 0px;
+          font-size: 16px;
+          line-height: 1.2;
+        }
+
+        @include big_web(){
+          width: 355px;
+          padding-top: 10px;
+          padding-left: 105px;
+          padding-bottom: 20px;
+          font-size: 14px;
+          line-height: 1.3;
+        }
+      }
     }
   }
 }
+

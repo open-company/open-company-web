@@ -10,7 +10,7 @@ div.table-of-contents {
   width: 241px;
 }
 
-@media screen and (max-width: 1024px) {
+@include mobile(){
   div.table-of-contents {
     display: none;
   }

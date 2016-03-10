@@ -16,59 +16,74 @@
             [om-bootstrap.button :as b])
   (:import [goog.events EventType]))
 
-(defonce company-header-pt (atom 0))
+(def company-header-pt (atom 0))
+
+(def company-name-offset-top (atom 0))
+
+(def scroll-listener-key (atom nil))
+
+(defn scroll-listener [e owner]
+  (let [company-header (om/get-ref owner "company-header")
+        category-nav (sel1 [:div.category-nav])
+        topic-list (sel1 [:div.topic-list])
+        scroll-top (.-scrollTop (.-body js/document))
+        company-name-container (sel1 [:div.company-name-container])
+        company-description-container (sel1 [:div.company-description-container])]
+    (when (and (zero? @company-header-pt) company-name-container company-header category-nav)
+      (let [company-name-container-height (.-clientHeight company-name-container)
+            company-header-height (.-clientHeight company-header)
+            category-nav-height (.-clientHeight category-nav)
+            category-nav-pivot (- company-header-height
+                                  category-nav-height
+                                  company-name-container-height
+                                  3)]
+        (reset! company-header-pt category-nav-pivot)))
+    ; fix company name and move the company description relatively when
+    ; the scroll hit the company name
+    (when (and company-name-container company-description-container)
+      (if (> scroll-top @company-name-offset-top)
+        (do
+          (gstyle/setStyle company-name-container #js {:position "fixed" :top "0px" :left "0px"})
+          (gstyle/setStyle company-description-container #js {:marginTop "46px"}))
+        (do
+          (gstyle/setStyle company-name-container #js {:position "relative"})
+          (gstyle/setStyle company-description-container #js {:marginTop "0px"}))))
+    ; fix the category navigation bar and move the topic list relatively when
+    ; the scroll hit the category navigation max top
+    (when (and category-nav topic-list)
+      (if (or (> scroll-top @company-header-pt) (om/get-props owner :navbar-editing))
+        (do
+          (gstyle/setStyle category-nav #js {:position "fixed"
+                                             :top "46px"
+                                             :left "0"})
+          (gstyle/setStyle topic-list #js {:marginTop "72px"}))
+        (do
+          (gstyle/setStyle category-nav #js {:position "relative"
+                                             :top "0"
+                                             :left "0"})
+          (gstyle/setStyle topic-list #js {:marginTop "5px"}))))
+    (when category-nav
+      (gstyle/setStyle category-nav #js {:webkitTransform "translate3d(0,0,0)"}))
+    (when company-name-container
+      (gstyle/setStyle company-name-container #js {:webkitTransform "translate3d(0,0,0)"}))
+    (when company-description-container
+      (gstyle/setStyle company-description-container #js {:webkitTransform "translate3d(0,0,0)"}))))
 
 (defn watch-scroll [owner]
-  (when-let [company-header (om/get-ref owner "company-header")]
-    (let [company-name-offset-top (.-offsetTop (om/get-ref owner "company-name-container"))
-          category-nav (sel1 [:div.category-nav])
-          topic-list (sel1 [:div.topic-list])]
-      (events/listen
-        js/window
-        EventType/SCROLL
-        (fn [e]
-          (let [scroll-top (.-scrollTop (.-body js/document))
-                company-name-container (om/get-ref owner "company-name-container")
-                company-description-container (om/get-ref owner "company-description-container")]
-            (when (zero? @company-header-pt)
-              (let [company-name-container-height (.-clientHeight company-name-container)
-                    category-nav-height (.-clientHeight category-nav)
-                    company-header-height (.-clientHeight company-header)
-                    category-nav-pivot (- company-header-height
-                                          category-nav-height
-                                          company-name-container-height
-                                          3)]
-                (reset! company-header-pt category-nav-pivot)))
-            ; fix company name and move the company description relatively when
-            ; the scroll hit the company name
-            (when (and company-name-container company-description-container)
-              (if (> scroll-top company-name-offset-top)
-                (do
-                  (gstyle/setStyle company-name-container #js {:position "fixed"})
-                  (gstyle/setStyle company-description-container #js {:marginTop "46px"}))
-                (do
-                  (gstyle/setStyle company-name-container #js {:position "relative"})
-                  (gstyle/setStyle company-description-container #js {:marginTop "0px"}))))
-            ; fix the category navigation bar and move the topic list relatively when
-            ; the scroll hit the category navigation max top
-            (when (and category-nav topic-list)
-              (if (or (> scroll-top @company-header-pt) (om/get-props owner :navbar-editing))
-                (do
-                  (gstyle/setStyle category-nav #js {:position "fixed"
-                                                     :top "46px"
-                                                     :left "0"})
-                  (gstyle/setStyle topic-list #js {:marginTop "72px"}))
-                (do
-                  (gstyle/setStyle category-nav #js {:position "relative"
-                                                     :top "0"
-                                                     :left "0"})
-                  (gstyle/setStyle topic-list #js {:marginTop "5px"}))))
-            (when category-nav
-              (gstyle/setStyle category-nav #js {:webkitTransform "translate3d(0,0,0)"}))
-            (when company-name-container
-              (gstyle/setStyle company-name-container #js {:webkitTransform "translate3d(0,0,0)"}))
-            (when company-description-container
-              (gstyle/setStyle company-description-container #js {:webkitTransform "translate3d(0,0,0)"}))))))))
+  (if (utils/is-mobile)
+    (when-not @scroll-listener-key
+      (when-let [company-header (om/get-ref owner "company-header")]
+        (let [company-name-container (om/get-ref owner "company-name-container")
+              name-offset-top (.-offsetTop company-name-container)
+              category-nav (sel1 [:div.category-nav])
+              topic-list (sel1 [:div.topic-list])]
+          (when (zero? @company-name-offset-top)
+            (reset! company-name-offset-top name-offset-top))
+          (reset! scroll-listener-key (events/listen
+                                       js/window
+                                       EventType/SCROLL
+                                       #(scroll-listener % owner))))))
+    (events/unlistenByKey @scroll-listener-key)))
 
 (defn menu-click [owner]
   (if (cook/get-cookie :jwt)
@@ -78,13 +93,26 @@
     ; redirect to login
     (utils/redirect! "/login")))
 
-(defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner]
+(def logo-max-height 70)
+
+(defn logo-on-load [owner]
+  (when-not (utils/is-mobile)
+    (when-let [logo (om/get-ref owner "company-logo")]
+      (let [logo-height (.-height logo)]
+        (when (< logo-height logo-max-height)
+          (gstyle/setStyle logo #js {:marginTop (str (+ (/ logo-height 2) 10) "px")})))))
+  (watch-scroll owner))
+
+(defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner options]
 
   (render [_]
+    ;; add the scroll listener if the logo is not present
+    (when (and company-data (clojure.string/blank? (:logo company-data)))
+      (.setTimeout js/window #(watch-scroll owner) 500))
     (dom/div #js {:className "company-header"
                   :ref "company-header"}
       (if navbar-editing
-
+        ; topic editing
         (dom/div {:class "navbar-editing"
                   :key "navbar-editing"}
           (dom/button {:class "save-bt oc-btn oc-link"
@@ -96,19 +124,21 @@
                        :on-click (fn [e]
                                   (when-let [ch (utils/get-channel "cancel-bt-navbar")]
                                    (put! ch {:click true :event e})))} "Cancel"))
-
+        ; topic list
         (dom/div {:class "company-header-internal"
                   :key "company-header-internal"}
           (dom/div #js {:className "company-header-top group"}
             ;; Company logo
             (dom/div {:class "company-logo-container"}
-              (dom/img {:src (:logo company-data)
-                        :on-load #(watch-scroll owner)
-                        :on-error #(watch-scroll owner)
-                        :class "company-logo"
-                        :title (:name company-data)}))
+              (dom/img #js {:src (:logo company-data)
+                            :onLoad #(logo-on-load owner) ;; add scroll listener when the logo is loaded
+                            :onError #(watch-scroll owner) ;; or it errors on loading
+                            :className "company-logo"
+                            :title (:name company-data)
+                            :ref "company-logo"}))
             ;; Buttons
-            (dom/div {:class "buttons-container"}
+            (dom/div {:class (utils/class-set {:buttons-container true
+                                               :hidden (not (utils/is-mobile))})}
               (b/dropdown {:class "oc-btn vert-ellipse" :bs-size "30px" :title "" :pull-right? true}
                 (b/menu-item {:key 1
                               :on-click #(menu-click owner)} (if (cook/get-cookie :jwt) "Logout" "Sign In/Sign Up")))))

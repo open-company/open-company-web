@@ -22,7 +22,7 @@
   ;; change the window.location.hash
   (set! (.-hash (.-location js/window)) category-name)
   ;; fix the scroll to the first section if necessary
-  (when (>= (.-scrollTop (sel1 :body)) max-scroll-top)
+  (when (and (utils/is-mobile) (>= (.-scrollTop (sel1 :body)) max-scroll-top))
     (set! (.-scrollTop (sel1 :body)) max-scroll-top))
   ;; reactivate the url change handler
   (reset! open-company-web.core/prevent-route-dispatch false))
@@ -35,6 +35,11 @@
       (when (> app-height fix-cur-min-height)
         (gstyle/setStyle (sel1 :body) #js {:minHeight (str app-height "px")})))))
 
+(defn get-categories [categories is-editing]
+  (if (or (utils/is-mobile) is-editing)
+    categories
+    (vec (concat ["all"] categories))))
+
 (defcomponent category-nav [data owner]
 
   (render [_]
@@ -42,27 +47,34 @@
           scroll-top (.-scrollTop (sel1 :body))
           slug (:slug @router/path)
           company-data (:company-data data)
-          categories (:categories company-data)
+          categories (if (:company-data data) (get-categories (:categories company-data) navbar-editing) [])
           active-category (:active-category data)
-          navbar-style (if (or navbar-editing ; is editing style
-                               ; or the scroll pivot has been initialized and
-                               ; the scroll is higher than the header
-                               (>= scroll-top max-scroll-top))
+          sections (keys (:sections company-data))
+          navbar-style (if (and (utils/is-mobile)
+                                (or navbar-editing ; is editing style
+                                ; or the scroll pivot has been initialized and
+                                ; the scroll is higher than the header
+                                (>= scroll-top max-scroll-top)))
                          #js {:position "fixed"
                               :top "50px"}
                          #js {:position "relative"
                               :top "0px"})]
-      (setup-body-min-height)
+      (when (utils/is-mobile)
+        (setup-body-min-height))
       (dom/div #js {:className "row category-nav"
                     :ref "category-nav"
                     :style navbar-style}
-        (for [category categories]
-          (let [category-name (name category)
-                category-class (utils/class-set {:category true
-                                                 :active (= active-category category-name)})]
-            (dom/a {:class ""
-                    :href (str "/companies/" slug "/dashboard#" category-name)
-                    :on-click (partial category-click data category-name)}
-              (dom/div {:class category-class}
-                (dom/div {:class "category-label"}
-                  (utils/camel-case-str category-name))))))))))
+        (dom/div #js {:className "category-nav-internal"
+                      :style #js {:width (if (utils/is-mobile)
+                                           "100%"
+                                           (str (* (inc (count sections)) 150) "px"))}}
+          (for [category categories]
+            (let [category-name (name category)
+                  category-class (utils/class-set {:category true
+                                                   :active (= active-category category-name)})]
+              (dom/a {:class ""
+                      :href (str "/companies/" slug "/dashboard#" category-name)
+                      :on-click (partial category-click data category-name)}
+                (dom/div {:class category-class}
+                  (dom/div {:class "category-label"}
+                    (utils/camel-case-str category-name)))))))))))

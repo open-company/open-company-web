@@ -13,7 +13,12 @@ div.manage-topics{
     text-decoration: underline;
 
     &:hover {
-      background-color: rgb(207, 207, 207);
+      @include mobile(){
+        background-color: #cfcfcf;
+      }
+      @include big_web(){
+        background-color: #ececec;
+      }
     }
 
     div.manage-topics-cta{
