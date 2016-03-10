@@ -72,7 +72,8 @@
                                          :fix-navbar (not (utils/is-mobile))})}
 
        (when-not (utils/is-mobile)
-          (om/build navbar (merge data {:edit-mode navbar-editing :save-bt-active save-bt-active})))
+          (om/build navbar (merge data {:edit-mode navbar-editing
+                                        :save-bt-active save-bt-active})))
 
         ;; company header
         (om/build company-header {:loading (:loading company-data)

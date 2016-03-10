@@ -34,7 +34,8 @@
                   next-rev
                   (not (contains? revisions-list (:updated-at next-rev))))
         (api/load-revision next-rev slug section-kw))
-      (dom/div {:class "topic-expanded"}
+      (dom/div {:class "topic-expanded"
+                :on-click #((:bw-topic-click options) section)}
         (dom/div {:class "topic-title"} (:title section-data))
         (dom/div #js {:className "topic-last-updated"}
           (str (:name (:author section-data)) " on " topic-updated-at))

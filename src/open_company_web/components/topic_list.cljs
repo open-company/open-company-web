@@ -250,6 +250,7 @@
           (dom/div {:class "topic-list fix-top-margin-scrolling"
                     :key "topic-list"}
             (dom/ul #js {:className (utils/class-set {:topic-list-internal true
+                                                      :read-only (or (utils/is-mobile) (:read-only company-data))
                                                       :group true
                                                       :content-loaded (not (:loading data))})
                          :ref "topic-list-ul"}
@@ -287,6 +288,7 @@
                                                  {:opts {
                                                    :section-name section-name
                                                    :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)
+                                                   :bw-topic-click (:topic-edit-cb options)
                                                    :topic-edit-cb (:topic-edit-cb options)}})))
                     (when-not (and (:read-only company-data) (:placeholder sd))
                       (om/build topic {:loading (:loading company-data)
@@ -299,7 +301,7 @@
                                                :force-edit-cb (partial force-edit-button owner)
                                                :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)
                                                :bw-topic-click (partial topic-click owner)}}))))))
-            (when (and (not (:read-only company-data)) (seq company-data))
+            (when (and (not (:read-only company-data)) (seq company-data) (not (utils/is-mobile)))
               (dom/div #js {:className "manage-topics-container"
                             :style #js {:opacity (if (om/get-state owner :show-topic-edit-button) "0" "1")}}
                 (om/build manage-topics
