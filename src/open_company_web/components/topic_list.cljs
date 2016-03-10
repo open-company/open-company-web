@@ -33,7 +33,7 @@
         (api/get-new-sections)))))
 
 (defn save-sections-cb [owner options]
-  (api/patch-sections (om/get-state owner :active-topics))
+  (api/patch-sections (dissoc (om/get-state owner :active-topics) :all))
   ((:navbar-editing-cb options) false)
   (om/set-state! owner :editing false))
 
