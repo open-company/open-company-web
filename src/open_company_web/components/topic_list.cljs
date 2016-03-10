@@ -96,18 +96,16 @@
      :save-bt-active (or (:save-bt-active current-state) false)
      :show-topic-edit-button (or (:show-topic-edit-button current-state) false)
      :last-expanded-section (or (:last-expanded-section current-state) nil)
-     :bw-expanded-topic nil
-     :bw-expand-animated nil}))
+     :bw-expanded-topic (:expanded-topic data)
+     :bw-expand-animated (:expanded-topic data)}))
 
 (def li-in-row 3)
 
 (defn add-expanded-topic [category-topics owner]
   (if (or (om/get-state owner :bw-expanded-topic)
-          (om/get-state owner :bw-expand-animated)
-          (om/get-props owner :expanded-topic))
+          (om/get-state owner :bw-expand-animated))
     (let [selected-topic (or (om/get-state owner :bw-expanded-topic)
-                             (om/get-state owner :bw-expand-animated)
-                             (om/get-props owner :expanded-topic))
+                             (om/get-state owner :bw-expand-animated))
           idx (.indexOf (to-array category-topics) selected-topic)
           cur-row (int (/ idx li-in-row))
           insert-at (+ li-in-row (* cur-row li-in-row))
@@ -242,7 +240,7 @@
                          :opts {:active-category (:active-category data)
                                 :new-sections (slug @caches/new-sections)
                                 :did-change-sort (partial update-active-topics owner options (keyword cat))}}))))
-        (let [selected-topic (or bw-expanded-topic bw-expand-animated (:expanded-topic data))
+        (let [selected-topic (or bw-expanded-topic bw-expand-animated)
               company-data (:company-data data)
               active-category (keyword (:active-category data))
               category-topics (get active-topics active-category)
@@ -267,11 +265,11 @@
                                                                            (not= section-name "li-expander"))})
                                            :ref section-name
                                            :style #js {:opacity (if (= section-name "li-expander")
-                                                                  (if (or bw-expand-animated (:expanded-topic data))
+                                                                  (if bw-expand-animated
                                                                       1 0)
                                                                   1)
                                                        :height  (if (= section-name "li-expander")
-                                                                  (if (or bw-expand-animated (:expanded-topic data))
+                                                                  (if bw-expand-animated
                                                                     "auto" "0px")
                                                                   (str (:height topic-box-size) "px"))}
                                            :key (str "topic-row-" (name section-name))}
