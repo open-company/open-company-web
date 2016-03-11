@@ -85,24 +85,6 @@ div.topic-list {
         }
       }
 
-      &.topic-headline-growth {
-
-        div.chart-header-container {
-          h3.actual {
-            margin: 0px;
-          }
-        }
-
-        div.charts {
-          height: 50px;
-          width: 400px;
-
-          div.chart-container.column-chart {
-            height: 50px;
-            width: 100%;
-          }
-        }
-      }
     }
 
     div.topic-more {
