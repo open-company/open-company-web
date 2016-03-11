@@ -11,7 +11,7 @@
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
 
-(defcomponent growth-metric [data owner]
+(defcomponent growth-metric [data owner options]
 
   (render [_]
     (let [slug (keyword (:slug @router/path))
@@ -29,7 +29,9 @@
           fixed-cur-unit (when (= metric-unit "currency")
                            (utils/get-symbol-for-currency-code (:currency company-data)))
           unit (when (= metric-unit "%") "%")
-          actual-with-label (str fixed-cur-unit actual unit)]
+          actual-with-label (str fixed-cur-unit actual unit)
+          chart-opts (when (contains? options :chart-size) {:opts {:chart-height (:height (:chart-size options))
+                                                                 :chart-width (:width (:chart-size options))}})]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})
@@ -48,4 +50,4 @@
                                                                 (:slug metric-info)
                                                                 (:name metric-info)
                                                                 unit
-                                                                interval))))))))
+                                                                interval) chart-opts)))))))
