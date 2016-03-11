@@ -20,10 +20,10 @@
         (dom/div {:class "topic-headline-labels"}
           (dom/div {:class "finances-metric cash"}
             (dom/div {:class "label"} "Cash")
-            (dom/div {:class "value"} (str (.toLocaleString (:cash actual)) currency)))
+            (dom/div {:class "value"} (str currency (utils/with-metric-prefix (:cash actual)))))
           (dom/div {:class "finances-metric burn-rate"}
             (dom/div {:class "label"} "Burn")
-            (dom/div {:class "value"} (str (.toLocaleString (:burn-rate actual)) currency)))
+            (dom/div {:class "value"} (str currency (utils/with-metric-prefix (utils/abs (:burn-rate actual))))))
           (dom/div {:class "finances-metric runway"}
             (dom/div {:class "label"} "Runway")
             (dom/div {:class "value"} (finances-utils/get-rounded-runway runway [:round :remove-trailing-zero]))))
