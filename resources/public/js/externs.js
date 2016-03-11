@@ -52,6 +52,8 @@ google.visualization.PieChart = {};
 google.visualization.PieChart.draw = function(){};
 google.visualization.ColumnChart = {};
 google.visualization.ColumnChart.draw = function(){};
+google.visualization.LineChart = {};
+google.visualization.LineChart.draw = function(){};
 // jwt
 var jwt_decode = function(){};
 // TimyMCE
