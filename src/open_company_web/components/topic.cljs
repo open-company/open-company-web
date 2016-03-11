@@ -27,11 +27,6 @@
         topic-scroll-top (utils/offset-top topic)]
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
-(defn scroll-to-topic-top [topic]
-  (let [body-scroll (.-scrollTop (.-body js/document))
-        topic-scroll-top (utils/offset-top topic)]
-    (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
-
 (defn mobile-topic-animation [data owner options expanded]
   (when expanded
     (om/set-state! owner :as-of (om/get-state owner :actual-as-of)))
