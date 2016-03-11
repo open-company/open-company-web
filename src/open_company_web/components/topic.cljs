@@ -9,6 +9,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.topic-body :refer (topic-body)]
+            [open-company-web.components.topic-growth-headline :refer (topic-growth-headline)]
             [open-company-web.local-settings :as ls]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
@@ -92,7 +93,7 @@
           (.play finances-fade)))
 
       ;; animate growth headtitle
-      (when-let [growth-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-growth")]
+      (when-let [growth-children (sel1 topic ":scope > div.topic-headline > div.topic-growth-headline")]
         (let [growth-resize (new Resize
                                  growth-children
                                  (new js/Array body-width (if expanded 0 100))
@@ -167,7 +168,7 @@
     topic-headline-finances
 
     (= section :growth)
-    topic-headline-growth
+    topic-growth-headline
 
     :else
     topic-headline))
@@ -220,7 +221,9 @@
           (dom/div {:class "topic-title"} (:title topic-data))
           (dom/div #js {:className "topic-date"
                         :ref "topic-date"
-                        :style #js {:opacity (if expanded 1 0)}}
+                        :style #js {:opacity (if expanded 1 0)
+                                    :height (str (if expanded 20 0) "px")
+                                    :padding-top (str (if expanded 16 0) "px")}}
             (utils/date-string (utils/js-date (:updated-at topic-data)))))
 
         ;; Topic headline
@@ -230,7 +233,7 @@
             (om/build topic-headline-finances headline-data headline-options)
 
             (= section-kw :growth)
-            (om/build topic-headline-growth headline-data headline-options)
+            (om/build topic-growth-headline headline-data headline-options)
 
             :else
             (om/build topic-headline topic-data)))
