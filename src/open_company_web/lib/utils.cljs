@@ -6,6 +6,7 @@
             [cljs-time.format :as cljs-time-format]
             [cljs-time.core :as cljs-time]
             [goog.fx.dom :refer (Scroll)]
+            [goog.string :as gstring]
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
             [open-company-web.lib.cookies :as cook]
@@ -595,3 +596,19 @@
   (if (#{:finances :growth} section)
     (get-in section-data [:notes :body])
     (:body section-data)))
+
+(defn round-2-dec [value]
+  ; cut to 2 dec maximum then parse to float to use toString to remove trailing zeros
+  (.toLocaleString (js/parseFloat (gstring/format "%.2f" value))))
+
+(defn with-metric-prefix [value]
+  (cond
+    ; M
+    (> value 1000000)
+    (str (round-2-dec (/ value 1000000)) "M")
+    ; K
+    (> value 1000)
+    (str (round-2-dec (/ value 1000)) "K")
+
+    :else
+    (str (round-2-dec value))))
