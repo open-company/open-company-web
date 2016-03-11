@@ -27,14 +27,19 @@
         topic-scroll-top (utils/offset-top topic)]
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
+(defn scroll-to-topic-top [topic]
+  (let [body-scroll (.-scrollTop (.-body js/document))
+        topic-scroll-top (utils/offset-top topic)]
+    (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
+
 (defn mobile-topic-animation [data owner options expanded]
   (when expanded
     (om/set-state! owner :as-of (om/get-state owner :actual-as-of)))
   (let [topic (om/get-ref owner "topic")
-        topic-more (om/get-ref owner "topic-more")
-        topic-date (om/get-ref owner "topic-date")
+        topic-more (sel1 topic [:div.topic-more])
+        topic-date (sel1 topic [:div.topic-date])
         body-node (sel1 topic [:div.topic-body])
-        body-nav-node (om/get-ref owner "body-navigation-container")]
+        body-nav-node (sel1 topic [:div.body-navigation-container])]
     (setStyle body-nav-node #js {:height "auto"})
     (let [body-height (.-offsetHeight body-nav-node)
           body-width (.-offsetWidth body-nav-node)]
@@ -102,13 +107,12 @@
            EventType/FINISH
            (fn [e]
             (om/update-state! owner :expanded not)
-            (setStyle body-nav-node #js {:overflow (if expanded "hidden" "visible")})))
+            (.setTimeout js/window
+              #(setStyle body-nav-node #js {:overflow (if expanded "hidden" "visible")
+                                            :height (if expanded "0" "auto")}) 1)))
           (.play)))
 
-      (let [topic (om/get-ref owner "topic")
-            body-scroll (.-scrollTop (.-body js/document))
-            topic-scroll-top (utils/offset-top topic)]
-        (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90)))
+      (scroll-to-topic-top topic)
 
       (if-not expanded
         ;; show the edit button if the topic body is empty
@@ -137,7 +141,54 @@
     :else
     topic-headline))
 
-(defcomponent topic [{:keys [section-data section currency] :as data} owner {:keys [section-name navbar-editing-cb] :as options}]
+(defcomponent topic-internal [{:keys [topic-data section currency expanded prev-rev next-rev] :as data} owner options]
+  (render [_]
+    (let [section-kw (keyword section)
+          headline-options {:opts {:currency currency}}
+          headline-data (assoc topic-data :expanded expanded)]
+      (dom/div #js {:className "topic-internal"
+                    :ref "topic-internal"}
+        ;; Topic title
+        (dom/div {:class "topic-header group"}
+          (dom/img {:class (str "topic-image svg")
+                    :width 30
+                    :height 30
+                    :src (str (:image topic-data) "?" ls/deploy-key)})
+          (dom/div {:class "topic-title"} (:title topic-data))
+          (dom/div #js {:className "topic-date"
+                        :ref "topic-date"
+                        :style #js {:opacity (if expanded 1 0)
+                                    :height (str (if expanded 20 0) "px")
+                                    :paddingTop (str (if expanded 16 0) "px")}}
+            (str (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data))))))
+
+        ;; Topic headline
+        (dom/div {:class "topic-headline"}
+          (om/build (headline-component section-kw) headline-data headline-options))
+
+        (when (utils/is-mobile)
+          (dom/div #js {:className "topic-more"
+                        :ref "topic-more"
+                        :style #js {:opacity (if expanded 0 1)}}
+            (dom/i {:class "fa fa-circle"})
+            (dom/i {:class "fa fa-circle"})
+            (dom/i {:class "fa fa-circle"})))
+
+        ;; topic body
+        (when (utils/is-mobile)
+          (dom/div #js {:className "body-navigation-container group"
+                        :ref "body-navigation-container"}
+            (om/build topic-body {:section section :section-data topic-data :expanded expanded} {:opts options})
+            (when expanded
+              (dom/div {:class "topic-navigation group"}
+                (when prev-rev
+                  (dom/div {:class "previous group"}
+                    (dom/a {:on-click #((:rev-click options) % prev-rev)} "< Previous")))
+                (when next-rev
+                  (dom/div {:class "next group"}
+                    (dom/a {:on-click #((:rev-click options) % next-rev)} "Next >")))))))))))
+
+(defcomponent topic [{:keys [section-data section currency] :as data} owner options]
 
   (init-state [_]
     {:expanded false
@@ -156,14 +207,12 @@
 
   (render-state [_ {:keys [editing expanded as-of actual-as-of] :as state}]
     (let [section-kw (keyword section)
-          headline-options {:opts {:currency currency}}
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
           next-rev (utils/revision-next revisions as-of)
           slug (keyword (:slug @router/path))
           revisions-list (section-kw (slug @cache/revisions))
-          topic-data (utils/select-section-data section-data section-kw as-of)
-          headline-data (assoc topic-data :expanded expanded)]
+          topic-data (utils/select-section-data section-data section-kw as-of)]
       ; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -175,47 +224,14 @@
       (dom/div #js {:className "topic"
                     :ref "topic"
                     :onClick #(topic-click data owner options expanded)}
-
-        ;; Topic title
-        (dom/div {:class "topic-header group"}
-          (dom/img {:class (str "topic-image svg")
-                    :width 30
-                    :height 30
-                    :src (str (:image topic-data) "?" ls/deploy-key)})
-          (dom/div {:class "topic-title"} (:title topic-data))
-          (dom/div #js {:className "topic-date"
-                        :ref "topic-date"
-                        :style #js {:opacity (if expanded 1 0)
-                                    :height (str (if expanded 20 0) "px")
-                                    :paddingTop (str (if expanded 16 0) "px")}}
-            (utils/date-string (utils/js-date (:updated-at topic-data)))))
-
-        ;; Topic headline
-        (dom/div {:class "topic-headline"}
-          (om/build (headline-component section-kw) headline-data headline-options))
-
-        (when (utils/is-mobile)
-          (dom/div #js {:className "topic-more"
-                        :ref "topic-more"
-                        :style #js {:opacity (if expanded 0 1)}}
-            (dom/i {:class "fa fa-circle"})
-            (dom/i {:class "fa fa-circle"})
-            (dom/i {:class "fa fa-circle"})))
-
-        ;; topic body
-        (when (utils/is-mobile)
-          (dom/div #js {:className "topic-body-nav-container group"
-                        :ref "body-navigation-container"}
-            (om/build topic-body {:section section :section-data topic-data :expanded expanded} {:opts options})
-            (when expanded
-              (dom/div {:class "topic-navigation group"}
-                (when prev-rev
-                  (dom/div {:class "previous group"}
-                    (dom/a {:on-click (fn [e]
-                                        (om/set-state! owner :as-of (:updated-at prev-rev))
-                                        (.stopPropagation e))} "< Previous")))
-                (when next-rev
-                  (dom/div {:class "next group"}
-                    (dom/a {:on-click (fn [e]
-                                        (om/set-state! owner :as-of (:updated-at next-rev))
-                                        (.stopPropagation e))} "Next >")))))))))))
+        (om/build topic-internal {:section section
+                                  :topic-data topic-data
+                                  :currency currency
+                                  :expanded expanded
+                                  :revisions revisions
+                                  :prev-rev prev-rev
+                                  :next-rev next-rev}
+                                 {:opts (merge options {:rev-click (fn [e rev]
+                                                                      (scroll-to-topic-top (om/get-ref owner "topic"))
+                                                                      (om/set-state! owner :as-of (:updated-at rev))
+                                                                      (.stopPropagation e))})})))))

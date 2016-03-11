@@ -40,7 +40,12 @@ div.topic-list{
       height: 200px;
 
       &:after {
+        width: 100%;
         content: "This category is empty. Add a topic below.";
+      }
+
+      &.read-only:after {
+        content: "This category is empty.";
       }
     }
   
