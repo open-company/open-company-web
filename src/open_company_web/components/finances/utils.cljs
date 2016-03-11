@@ -2,6 +2,7 @@
   (:require [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
+            [goog.string :as gstring]
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
 
@@ -93,3 +94,39 @@
 (defn map-placeholder-data [data]
   (let [fixed-data (edit-placeholder-data data)]
     (apply merge (map #(hash-map (:period %) %) fixed-data))))
+
+(defn fix-runway [runway]
+  (if (neg? runway)
+    (utils/abs runway)
+    0))
+
+(defn remove-trailing-zero [string]
+  "Remove the last zero(s) in a numeric string only after the dot.
+   Remote the dot too if it is the last char after removing the zeros"
+  (cond
+
+    (and (not= (.indexOf string ".") -1) (= (last string) "0"))
+    (remove-trailing-zero (subs string 0 (dec (count string))))
+
+    (= (last string) ".")
+    (subs string 0 (dec (count string)))
+
+    :else
+    string))
+
+(defn get-rounded-runway [runway-days & [flags]]
+  (cond
+    (< runway-days 90)
+    (str runway-days " days")
+    (< runway-days (* 30 24))
+    (if (utils/in? flags :round)
+      (if (utils/in? flags :remove-trailing-zero)
+        (str (remove-trailing-zero (gstring/format "%.2f" (/ runway-days 30))) " months")
+        (str (gstring/format "%.2f" (/ runway-days 30)) " months"))
+      (str (quot runway-days 30) " months"))
+    :else
+    (if (utils/in? flags :round)
+      (if (utils/in? flags :remove-trailing-zero)
+        (str (remove-trailing-zero (gstring/format "%.2f" (/ runway-days (* 30 12)))) " years")
+        (str (gstring/format "%.2f" (/ runway-days (* 30 12))) " years"))
+      (str (quot runway-days (* 30 12)) " years"))))
