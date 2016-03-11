@@ -74,4 +74,11 @@ div.topic-body {
   &.expanded {
     height: auto;
   }
+
+  div.charts {
+    @include mobile(){
+      width: 320px;
+      height: 90px;
+    }
+  }
 }
