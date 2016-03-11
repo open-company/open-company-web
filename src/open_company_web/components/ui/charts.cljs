@@ -44,6 +44,7 @@
   (clj->js {:title  ""
             :width (or chart-width (min 600 (max (* 50 (count data)) 125)))
             :height chart-height
+            :pointSize 10
             :animation #js {"startup" startup
                             "duration" 400
                             "easing" "out"}
@@ -63,7 +64,7 @@
     (let [data-table (add-columns-and-rows columns data currency-symbol pattern)
           options (chart-options owner data column-thickness (om/get-state owner :max-value) true chart-height chart-width)]
       (when dom-node
-        (let [column-chart (js/google.visualization.ColumnChart. dom-node)]
+        (let [column-chart (js/google.visualization.LineChart. dom-node)]
           (.draw column-chart data-table options)
           (om/set-state! owner :chart column-chart)
           (om/set-state! owner :chart-computed-data data-table))))))
