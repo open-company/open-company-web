@@ -10,6 +10,7 @@
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.topic-growth-headline :refer (topic-growth-headline)]
+            [open-company-web.components.topic-finances-headline :refer (topic-finances-headline)]
             [open-company-web.local-settings :as ls]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
@@ -21,47 +22,10 @@
   (render [_]
     (dom/div {:class "topic-headline-inner"} (:headline data))))
 
-(defcomponent topic-headline-finances [data owner options]
-  (render [_]
-    (let [data (:data data)
-          sorter (utils/sort-by-key-pred :period true)
-          sorted-data (sort sorter data)
-          actual (first sorted-data)
-          currency (:currency options)
-          cur-symbol (utils/get-symbol-for-currency-code currency)
-          cash-val (str cur-symbol (utils/thousands-separator (:cash actual)))
-          actual-label (str "as of " (finances-utils/get-as-of-string (:period actual)))]
-      (dom/div {:class (utils/class-set {:topic-headline-inner true
-                                         :topic-headline-finances true
-                                         :group true
-                                         :collapse (:expanded data)})}
-        (dom/div {:class "target-actual-container"}
-          (dom/div {:class "actual-container"}
-            (dom/h3 {:class "actual green"} cash-val)
-            (dom/h3 {:class "actual-label gray"} actual-label)))))))
-
-(defcomponent topic-headline-growth [data owner options]
-  (render [_]
-    (let [metric-info (first (:metrics data))
-          metric-data (filter #(= (:slug metric-info) (:slug %)) (:data data))
-          sort-pred (utils/sort-by-key-pred :period true)
-          sorted-metric (vec (sort sort-pred metric-data))
-          interval (:interval metric-info)
-          metric-unit (:unit metric-info)
-          fixed-cur-unit (when (= metric-unit "currency")
-                           (utils/get-symbol-for-currency-code (:currency options)))
-          unit (when (= metric-unit "%") "%")
-          last-value (utils/thousands-separator (:value (first metric-data)))
-          last-value-label (str fixed-cur-unit last-value unit)]
-      (dom/div {:class (utils/class-set {:topic-headline-inner true
-                                         :topic-headline-growth true
-                                         :group true
-                                         :collapse (:expanded data)})}
-        (dom/div {:class "chart-header-container"}
-          (dom/div {:class "target-actual-container"}
-            (dom/div {:class "actual-container"}
-              (dom/h3 {:class "actual blue"} (:name metric-info))
-              (dom/h3 {:class "actual blue"} last-value-label))))))))
+(defn scroll-to-topic-top [topic]
+  (let [body-scroll (.-scrollTop (.-body js/document))
+        topic-scroll-top (utils/offset-top topic)]
+    (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
 (defn mobile-topic-animation [data owner options expanded]
   (when expanded
@@ -165,7 +129,7 @@
   (cond
 
     (= section :finances)
-    topic-headline-finances
+    topic-finances-headline
 
     (= section :growth)
     topic-growth-headline
@@ -228,15 +192,7 @@
 
         ;; Topic headline
         (dom/div {:class "topic-headline"}
-          (cond
-            (= section-kw :finances)
-            (om/build topic-headline-finances headline-data headline-options)
-
-            (= section-kw :growth)
-            (om/build topic-growth-headline headline-data headline-options)
-
-            :else
-            (om/build topic-headline topic-data)))
+          (om/build (headline-component section-kw) headline-data headline-options))
 
         (when (utils/is-mobile)
           (dom/div #js {:className "topic-more"
