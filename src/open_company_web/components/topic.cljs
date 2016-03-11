@@ -223,7 +223,7 @@
                         :ref "topic-date"
                         :style #js {:opacity (if expanded 1 0)
                                     :height (str (if expanded 20 0) "px")
-                                    :padding-top (str (if expanded 16 0) "px")}}
+                                    :paddingTop (str (if expanded 16 0) "px")}}
             (utils/date-string (utils/js-date (:updated-at topic-data)))))
 
         ;; Topic headline
