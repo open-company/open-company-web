@@ -1,0 +1,42 @@
+div.topic-finances-headline {
+  @include big_web() {
+    height: 75px;
+    overflow: hidden;
+  }
+
+  div.topic-headline-labels{
+    width: 100%;
+
+    div.finances-metric {
+      width: 33%;
+      float: left;
+      text-align: left;
+      font-size: 15px;
+
+      &.cash {
+        width: 34%;
+      }
+
+      div.label {
+        color: $oc_gray_3;
+        font-weight: 100;
+        text-align: left;
+        padding: 0;
+        margin: 0;
+      }
+
+      div.value {
+        font-weight: 600;
+        color: $oc_gray_4;
+        text-align: left;
+        padding: 0;
+        margin: 0;
+
+      }
+    }
+  }
+
+  div.topic-headline-inner {
+    margin-top: 10px;
+  }
+}
