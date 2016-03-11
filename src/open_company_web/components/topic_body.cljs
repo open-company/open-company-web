@@ -30,7 +30,9 @@
                             :actual-as-of (:updated-at section-data)
                             :read-only true}
                            {:opts {:show-title false
-                                   :show-revisions-navigation false}})
+                                   :show-revisions-navigation false
+                                   :chart-size {:height (if (utils/is-mobile) 90 290)
+                                                :width (if (utils/is-mobile) 320 650)}}})
 
           (= section-kw :finances)
           (om/build finances {:section-data section-data
