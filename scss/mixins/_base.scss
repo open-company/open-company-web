@@ -113,3 +113,24 @@
     }
   }
 }
+
+@mixin pillbox(){
+  label.pillbox {
+    margin: 4px 3px;
+    padding: 4px 8px;
+    height: 30px;
+    border-radius: 20px;
+    background-color: #f8f8f8;
+    box-shadow: 0 1px 0 0 $oc_gray_2;
+    border: solid 0.3px #979797;
+    font-size: 14px;
+    color: #5b5b5b;
+    cursor: pointer;
+
+    &.active {
+      box-shadow: 0 1px 0 0 #d8d8d8;
+      border: solid 0.5px #979797;
+      background-color: #bababa;
+    }
+  }
+}
