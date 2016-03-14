@@ -48,8 +48,8 @@
           needs-cash-flow (has-revenues-or-costs finances-row-data)
           subsection-data {:section-data section-data
                            :read-only true
-                           :currency currency
-                           :start-editing-cb start-data-editing-fn}]
+                           :currency currency}
+          subsection-options {:opts options}]
       (dom/div {:class "section-container" :id "section-finances"}
         (dom/div {:class "composed-section finances"}
           (dom/div {:class (utils/class-set {:link-bar true})}
@@ -74,12 +74,12 @@
             (case focus
 
               "cash"
-              (om/build cash subsection-data)
+              (om/build cash subsection-data subsection-options)
 
               "cash-flow"
               (if (pos? sum-revenues)
-                (om/build cash-flow subsection-data)
-                (om/build costs subsection-data))
+                (om/build cash-flow subsection-data subsection-options)
+                (om/build costs subsection-data subsection-options))
 
               "runway"
-              (om/build runway subsection-data))))))))
+              (om/build runway subsection-data subsection-options))))))))
