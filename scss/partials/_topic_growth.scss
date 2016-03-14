@@ -1,0 +1,13 @@
+div.section-container{
+  div.pillbox-container{
+    background-color: $oc_gray_1;
+    padding: 15px;
+
+    @include mobile(){
+      margin-left: -20px;
+      width: calc(100% + 40px);
+    }
+
+    @include pillbox();
+  }
+}
