@@ -2,7 +2,8 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.oc-colors :as occ]))
 
 (defn- get-max [chart-data]
   (let [values (:values chart-data)
@@ -54,9 +55,12 @@
                         "gridlineColor" "transparent"
                         "baselineColor" "transparent"
                         "textPosition" "none"}
-            :hAxis #js {"textStyle" #js {"fontSize" 9}
+            :hAxis #js {"textStyle" #js {"fontSize" 9
+                                         "bold" true
+                                         "fontName" "proxima-nova"
+                                         "color" (occ/get-color-by-kw :oc-blue-regular)}
                         "viewWindow" (get-pagination owner data)}
-            :chartArea #js {"left" 0 "top" 30 "width" "100%" "height" "80%"}
+            :chartArea #js {"left" 0 "top" 0 "width" "100%" "height" "90%"}
             :bar #js { "groupWidth" column-thickness}}))
 
 (defn draw-chart [owner currency-symbol columns pattern data column-thickness dom-node chart-height chart-width]
@@ -153,20 +157,26 @@
                              (:chart-navigation options)
                              true)]
       (dom/div #js {:className "charts"
+                    :style #js {:height (str (:chart-height options) "px")
+                                :width (str (+ (:chart-width options) 15) "px")}
                     :ref "charts"}
         (when chart-navigation
           (dom/div {:class (utils/class-set {:prev-values true
                                              :values-navigator true
                                              :hidden (<= data-count (+ (* page max-show) max-show))})
+                    :style #js {:marginTop (str (- (:chart-height options) 30) "px")}
                     :on-click (fn [e]
                                 (previous-values owner chart-data (:chart-height options) (:chart-width options))
                                 (.stopPropagation e))}
             (dom/i {:class "fa fa-caret-left"})))
-        (dom/div #js {:className "chart-container column-chart" :ref "column-chart" })
+        (dom/div #js {:className "chart-container column-chart"
+                      :ref "column-chart"
+                      :style #js {:height (str (:chart-height options) "px")}})
         (when chart-navigation
           (dom/div {:class (utils/class-set {:next-values true
                                              :values-navigator true
                                              :hidden (zero? (om/get-state owner :page))})
+                    :style #js {:marginTop (str (- (:chart-height options) 30) "px")}
                     :on-click (fn [e]
                                 (next-values owner chart-data (:chart-height options) (:chart-width options))
                                 (.stopPropagation e))}
