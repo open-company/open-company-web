@@ -14,7 +14,7 @@
        " ≅ "
        (str (finances-utils/get-rounded-runway runway-days [:round :remove-trailing-zero]))))
 
-(defcomponent runway [data owner]
+(defcomponent runway [data owner options]
   
   (render [_]
     (let [finances-data (:data (:section-data data))
@@ -31,7 +31,10 @@
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))
           runway-string (if is-profitable
                           runway
-                          (finances-utils/get-rounded-runway runway-value))]
+                          (finances-utils/get-rounded-runway runway-value))
+          chart-opts (when (contains? options :chart-size)
+                        {:opts {:chart-height (:height (:chart-size options))
+                                :chart-width (:width (:chart-size options))}})]
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))
                 :on-click (:start-editing-cb data)}
         (dom/div {:class "chart-header-container"}
@@ -46,4 +49,5 @@
                                                               #js {"type" "string" "role" "style"}
                                                               (occ/fill-color :oc-green-light)
                                                               "###,### days"
-                                                              " days"))))))
+                                                              " days")
+                               chart-opts)))))

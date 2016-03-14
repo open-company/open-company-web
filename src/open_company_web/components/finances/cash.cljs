@@ -7,7 +7,7 @@
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.lib.oc-colors :as occ]))
 
-(defcomponent cash [data owner]
+(defcomponent cash [data owner options]
   
   (render [_]
     (let [finances-data (:data (:section-data data))
@@ -16,7 +16,10 @@
           value-set (first sorted-finances)
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
-          cash-val (str cur-symbol (utils/thousands-separator (:cash value-set)))]
+          cash-val (str cur-symbol (utils/thousands-separator (:cash value-set)))
+          chart-opts (when (contains? options :chart-size)
+                        {:opts {:chart-height (:height (:chart-size options))
+                                :chart-width (:width (:chart-size options))}})]
       (dom/div {:class (utils/class-set {:section true
                                          :cash true
                                          :read-only (:read-only data)})
@@ -31,4 +34,5 @@
                                                               :cash
                                                               "Cash"
                                                               #js {"type" "string" "role" "style"}
-                                                              (occ/fill-color :oc-green-light)))))))
+                                                              (occ/fill-color :oc-green-light))
+                               chart-opts)))))

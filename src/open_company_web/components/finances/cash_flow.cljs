@@ -55,7 +55,7 @@
       :max-show finances-utils/columns-num
       :column-thickness "42"}))
 
-(defcomponent cash-flow [data owner]
+(defcomponent cash-flow [data owner options]
   
   (render [_]
     (let [finances-data (:data (:section-data data))
@@ -69,7 +69,10 @@
           [year month] (clojure.string/split (:period value-set) "-")
           int-month (int month)
           month-3 (- int-month 2)
-          month-3-fixed (utils/add-zero (if (<= month-3 0) (- 12 month-3) month-3))]
+          month-3-fixed (utils/add-zero (if (<= month-3 0) (- 12 month-3) month-3))
+          chart-opts (when (contains? options :chart-size)
+                        {:opts {:chart-height (:height (:chart-size options))
+                                :chart-width (:width (:chart-size options))}})]
       (dom/div {:class (utils/class-set {:section true
                                          :cash-flow true
                                          :read-only (:read-only data)})
@@ -83,4 +86,4 @@
                                                (str cur-symbol (utils/thousands-separator (int cash-flow-val))))
               (dom/h3 {:class "actual-label gray"}
                       (str "3 months avg. " (utils/month-string month-3-fixed) " to " (utils/month-string month))))))
-        (om/build column-chart (get-chart-data sorted-finances cur-symbol))))))
+        (om/build column-chart (get-chart-data sorted-finances cur-symbol) chart-opts)))))
