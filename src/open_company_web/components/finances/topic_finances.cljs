@@ -13,7 +13,7 @@
 (defn get-state [owner data & [initial]]
   (let [section-data (:section-data data)]
     {:focus (if initial
-              "cash"
+              (or (:selected-metric data) "cash")
               (om/get-state owner :focus))
      :finances-data (finances-utils/map-placeholder-data (:data section-data))}))
 
@@ -34,7 +34,7 @@
   (will-receive-props [_ next-props]
     ; this means the section datas have changed from the API or at a upper lever of this component
     (when-not (= next-props (om/get-props owner))
-      (om/set-state! owner (get-state owner next-props))))
+      (om/set-state! owner (get-state owner next-props true))))
 
   (render-state [_ {:keys [focus] :as state}]
     (let [classes "composed-section-link oc-header"
