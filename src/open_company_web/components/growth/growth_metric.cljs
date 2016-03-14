@@ -39,12 +39,13 @@
                 :on-click (:start-editing-cb data)}
         (when (pos? (count metric-data))
           (dom/div {}
-            (dom/div {:class "chart-header-container"}
-              (dom/div {:class "target-actual-container"}
-                (dom/div {:class "actual-container"}
-                  (dom/h3 {:class "actual blue"} actual-with-label
-                    (om/build editable-pen {:click-callback (:start-data-editing-cb data)}))
-                  (dom/h3 {:class "actual-label gray"} (str "as of " period)))))
+            (when (:show-label options)
+              (dom/div {:class "chart-header-container"}
+                (dom/div {:class "target-actual-container"}
+                  (dom/div {:class "actual-container"}
+                    (dom/h3 {:class "actual blue"} actual-with-label
+                      (om/build editable-pen {:click-callback (:start-data-editing-cb data)}))
+                    (dom/h3 {:class "actual-label gray"} (str "as of " period))))))
             (om/build column-chart (growth-utils/get-chart-data sorted-metric
                                                                 fixed-cur-unit
                                                                 (:slug metric-info)
