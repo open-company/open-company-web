@@ -14,5 +14,5 @@
                                          :collapse (:expanded data)})}
         (for [metric metrics]
           (dom/label {:class "pillbox"
-                      :on-click #((:pillbox-click-cb options) (:slug metric))} (:name metric)))
+                      :on-click #((:pillbox-click-cb options) (:slug metric) %)} (:name metric)))
         (dom/div {:class "topic-headline-inner"} (:headline data))))))
