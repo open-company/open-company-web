@@ -77,13 +77,14 @@
                                          :cash-flow true
                                          :read-only (:read-only data)})
                 :on-click (:start-editing-cb data)}
-        (dom/div {:class "chart-header-container"}
-          (dom/div {:class "target-actual-container"}
-            (dom/div {:class "actual-container"}
-              (dom/h3 {:class (utils/class-set {:actual true
-                                                :green (pos? cash-flow-val)
-                                                :red (not (pos? cash-flow-val))})}
-                                               (str cur-symbol (utils/thousands-separator (int cash-flow-val))))
-              (dom/h3 {:class "actual-label gray"}
-                      (str "3 months avg. " (utils/month-string month-3-fixed) " to " (utils/month-string month))))))
+        (when (:show-label options)
+          (dom/div {:class "chart-header-container"}
+            (dom/div {:class "target-actual-container"}
+              (dom/div {:class "actual-container"}
+                (dom/h3 {:class (utils/class-set {:actual true
+                                                  :green (pos? cash-flow-val)
+                                                  :red (not (pos? cash-flow-val))})}
+                                                 (str cur-symbol (utils/thousands-separator (int cash-flow-val))))
+                (dom/h3 {:class "actual-label gray"}
+                        (str "3 months avg. " (utils/month-string month-3-fixed) " to " (utils/month-string month)))))))
         (om/build column-chart (get-chart-data sorted-finances cur-symbol) chart-opts)))))
