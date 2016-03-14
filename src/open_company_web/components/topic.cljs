@@ -136,10 +136,18 @@
     :else
     topic-headline))
 
+(defn pillbox-click-cb [owner metric-slug e]
+  (.stopPropagation e)
+  (.preventDefault e)
+  (om/set-state! owner :selected-metric metric-slug)
+  (let [topic-click (om/get-props owner :topic-click)]
+    (topic-click)))
+
 (defcomponent topic-internal [{:keys [topic-data section currency expanded prev-rev next-rev] :as data} owner options]
   (render [_]
     (let [section-kw (keyword section)
-          headline-options {:opts {:currency currency}}
+          headline-options {:opts {:currency currency
+                                   :pillbox-click-cb (partial pillbox-click-cb owner)}}
           headline-data (assoc topic-data :expanded expanded)]
       (dom/div #js {:className "topic-internal"
                     :ref "topic-internal"}
@@ -168,12 +176,15 @@
             (dom/i {:class "fa fa-circle"})
             (dom/i {:class "fa fa-circle"})
             (dom/i {:class "fa fa-circle"})))
-
         ;; topic body
         (when (utils/is-mobile)
           (dom/div #js {:className "body-navigation-container group"
                         :ref "body-navigation-container"}
-            (om/build topic-body {:section section :section-data topic-data :expanded expanded} {:opts options})
+            (om/build topic-body {:section section
+                                  :section-data topic-data
+                                  :expanded expanded
+                                  :selected-metric (om/get-state owner :selected-metric)}
+                                 {:opts options})
             (when expanded
               (dom/div {:class "topic-navigation group"}
                 (when prev-rev
@@ -224,6 +235,7 @@
                                   :currency currency
                                   :expanded expanded
                                   :revisions revisions
+                                  :topic-click #(topic-click data owner options expanded)
                                   :prev-rev prev-rev
                                   :next-rev next-rev}
                                  {:opts (merge options {:rev-click (fn [e rev]
