@@ -1,11 +1,13 @@
 div.section-container{
   div.pillbox-container{
     background-color: $oc_gray_1;
-    padding: 15px;
+    padding: 12px;
+    border: 1px solid $oc_gray_2;
+    margin: 10px 0;
 
     @include mobile(){
-      margin-left: -20px;
-      width: calc(100% + 40px);
+      margin-left: -23px;
+      width: calc(100% + 46px);
     }
 
     @include pillbox();
