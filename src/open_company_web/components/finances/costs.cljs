@@ -24,11 +24,12 @@
                                          :costs true
                                          :read-only (:read-only data)})
                 :on-click (:start-editing-cb data)}
-        (dom/div {:class "chart-header-container"}
-          (dom/div {:class "target-actual-container"}
-            (dom/div {:class "actual-container"}
-              (dom/h3 {:class "actual gray"} costs-val)
-              (dom/h3 {:class "actual-label gray"} (str "as of " (finances-utils/get-as-of-string (:period value-set)))))))
+        (when (:show-label options)
+          (dom/div {:class "chart-header-container"}
+            (dom/div {:class "target-actual-container"}
+              (dom/div {:class "actual-container"}
+                (dom/h3 {:class "actual gray"} costs-val)
+                (dom/h3 {:class "actual-label gray"} (str "as of " (finances-utils/get-as-of-string (:period value-set))))))))
         (om/build column-chart (finances-utils/get-chart-data sorted-finances
                                                               cur-symbol
                                                               :costs

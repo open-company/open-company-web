@@ -37,11 +37,12 @@
                                 :chart-width (:width (:chart-size options))}})]
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))
                 :on-click (:start-editing-cb data)}
-        (dom/div {:class "chart-header-container"}
-          (dom/div {:class "target-actual-container"}
-            (dom/div {:class "actual-container"}
-              (dom/h3 {:class "actual green"} runway-string)
-              (dom/h3 {:class "actual-label gray"} (get-runway-subtitle (:cash value-set) (:avg-burn-rate value-set) runway-value cur-symbol)))))
+        (when (:show-label options)
+          (dom/div {:class "chart-header-container"}
+            (dom/div {:class "target-actual-container"}
+              (dom/div {:class "actual-container"}
+                (dom/h3 {:class "actual green"} runway-string)
+                (dom/h3 {:class "actual-label gray"} (get-runway-subtitle (:cash value-set) (:avg-burn-rate value-set) runway-value cur-symbol))))))
         (om/build column-chart (finances-utils/get-chart-data fixed-runway-finances
                                                               ""
                                                               :runway
