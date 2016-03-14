@@ -70,23 +70,24 @@
                            :metric-info focus-metric-info
                            :read-only true
                            :total-metrics (count growth-metrics)}]
-      (dom/div {:class "section-container" :id "section-growth" :key (name section)}
+      (dom/div {:class "section-container"
+                :id "section-growth"
+                :key (name section)}
         (dom/div {:class "composed-section growth"}
-          (dom/div {:class "link-bar"}
-            (when focus
-              (for [metric-slug growth-metric-slugs]
-                (let [metric (get growth-metrics metric-slug)
-                      mname (:name metric)
-                      metric-classes (utils/class-set {:composed-section-link true
-                                                       metric-slug true
-                                                       :oc-header true
-                                                       :active (= focus metric-slug)})]
-                  (dom/a {:class metric-classes
-                          :title (:description metric)
-                          :data-tab metric-slug
-                          :on-click #(subsection-click % owner data)} mname)))))
           ; growth data chart
           (dom/div {:class (utils/class-set {:composed-section-body true})}
             ;; growth metric currently shown
             (when (and focus (seq (:metric-data subsection-data)))
-              (om/build growth-metric subsection-data {:opts options}))))))))
+              (om/build growth-metric subsection-data {:opts options})))
+          (dom/div {:class "pillbox-container"}
+            (when focus
+              (for [metric-slug growth-metric-slugs]
+                (let [metric (get growth-metrics metric-slug)
+                      mname (:name metric)
+                      metric-classes (utils/class-set {:pillbox true
+                                                       metric-slug true
+                                                       :active (= focus metric-slug)})]
+                  (dom/label {:class metric-classes
+                              :title (:description metric)
+                              :data-tab metric-slug
+                              :on-click #(subsection-click % owner data)} mname))))))))))
