@@ -6,7 +6,7 @@
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
 
-(def columns-num 12)
+(def columns-num 6)
 
 (defn chart-data-at-index [data keyw column-name prefix suffix idx]
   (let [data (to-array data)
