@@ -29,11 +29,9 @@
         metrics (metrics-map all-metrics)
         first-metric (:slug (first (:metrics section-data)))
         last-focus (utils/company-cache-key focus-cache-key)
-        focus (if (and initial (:oc-editing data))
-                growth-utils/new-metric-slug-placeholder
-                (if initial
-                  (or last-focus first-metric)
-                  (om/get-state owner :focus)))
+        focus (if initial
+                (or (:selected-metric data) last-focus first-metric)
+                (om/get-state owner :focus))
         growth-data (map-metric-data (:data section-data))
         metric-slugs (metrics-order all-metrics)]
     {:focus focus
@@ -60,7 +58,7 @@
   (will-receive-props [_ next-props]
     ; this means the section datas have changed from the API or at a upper lever of this component
     (when-not (= next-props (om/get-props owner))
-      (om/set-state! owner (get-state owner next-props))))
+      (om/set-state! owner (get-state owner next-props true))))
 
   (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs]}]
     (let [section-name (utils/camel-case-str (name section))
