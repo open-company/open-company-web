@@ -45,7 +45,8 @@
   (clj->js {:title  ""
             :width (or chart-width (min 600 (max (* 50 (count data)) 125)))
             :height chart-height
-            :pointSize 10
+            :pointSize 9
+            :colors (new js/Array (occ/get-color-by-kw :oc-blue-regular))
             :animation #js {"startup" startup
                             "duration" 400
                             "easing" "out"}
