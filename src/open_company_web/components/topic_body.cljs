@@ -3,8 +3,8 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.finances.finances :refer (finances)]
-            [open-company-web.components.growth.growth :refer (growth)]))
+            [open-company-web.components.finances.topic-finances :refer (topic-finances)]
+            [open-company-web.components.growth.topic-growth :refer (topic-growth)]))
 
 (defn topic-body-click [e owner options]
   (when e
@@ -24,24 +24,26 @@
                                 (topic-body-click % owner options))}
         (cond
           (= section-kw :growth)
-          (om/build growth {:section-data section-data
-                            :section section-kw
-                            :currency currency
-                            :actual-as-of (:updated-at section-data)
-                            :read-only true}
-                           {:opts {:show-title false
-                                   :show-revisions-navigation false
-                                   :chart-size {:height (if (utils/is-mobile) 90 290)
-                                                :width (if (utils/is-mobile) 320 650)}}})
+          (om/build topic-growth {:section-data section-data
+                                  :section section-kw
+                                  :currency currency
+                                  :actual-as-of (:updated-at section-data)
+                                  :read-only true}
+                                 {:opts {:show-title false
+                                         :show-revisions-navigation false
+                                         :chart-size {:height (if (utils/is-mobile) 90 290)
+                                                      :width (if (utils/is-mobile) 320 650)}}})
 
           (= section-kw :finances)
-          (om/build finances {:section-data section-data
-                              :section section-kw
-                              :currency currency
-                              :actual-as-of (:updated-at section-data)
-                              :read-only true}
-                             {:opts {:show-title false
-                                     :show-revisions-navigation false}})
+          (om/build topic-finances {:section-data section-data
+                                    :section section-kw
+                                    :currency currency
+                                    :actual-as-of (:updated-at section-data)
+                                    :read-only true}
+                                   {:opts {:show-title false
+                                           :show-revisions-navigation false
+                                           :chart-size {:height (if (utils/is-mobile) 90 290)
+                                                        :width (if (utils/is-mobile) 320 650)}}})
 
           :else
           (dom/div #js {:className "topic-body-inner group"
