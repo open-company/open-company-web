@@ -64,7 +64,6 @@ div.topic-list{
 
       @include big_web(){
         width: #{$topic_box_width}px;
-        height: #{$topic_box_height}px;
         overflow: hidden;
         padding: #{$topic_box_padding}px;
         float: left;
