@@ -7,6 +7,7 @@
             [open-company-web.components.ui.utility-components :refer (editable-pen)]
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.router :as router]
+            [open-company-web.lib.oc-colors :as occ]
             [open-company-web.dispatcher :as dispatcher]
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
@@ -31,7 +32,8 @@
           unit (when (= metric-unit "%") "%")
           actual-with-label (str fixed-cur-unit actual unit)
           chart-opts (when (contains? options :chart-size) {:opts {:chart-height (:height (:chart-size options))
-                                                                 :chart-width (:width (:chart-size options))}})]
+                                                                   :chart-width (:width (:chart-size options))
+                                                                   :chart-color (occ/get-color-by-kw :oc-blue-regular)}})]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})
