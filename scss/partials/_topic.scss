@@ -10,7 +10,7 @@ div.topic-list {
     box-shadow: 1px 1px 1px 0 #bababa;
 
     @include big_web(){
-      height: 154px;
+      height: 100%;
       cursor: pointer;
 
       &:hover {
