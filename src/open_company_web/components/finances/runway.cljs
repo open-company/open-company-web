@@ -34,7 +34,8 @@
                           (finances-utils/get-rounded-runway runway-value))
           chart-opts (when (contains? options :chart-size)
                         {:opts {:chart-height (:height (:chart-size options))
-                                :chart-width (:width (:chart-size options))}})]
+                                :chart-width (:width (:chart-size options))
+                                :chart-color (occ/get-color-by-kw :oc-green-regular)}})]
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))
                 :on-click (:start-editing-cb data)}
         (when (:show-label options)

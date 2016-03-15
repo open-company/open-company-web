@@ -72,7 +72,8 @@
           month-3-fixed (utils/add-zero (if (<= month-3 0) (- 12 month-3) month-3))
           chart-opts (when (contains? options :chart-size)
                         {:opts {:chart-height (:height (:chart-size options))
-                                :chart-width (:width (:chart-size options))}})]
+                                :chart-width (:width (:chart-size options))
+                                :chart-color (occ/get-color-by-kw :oc-green-regular)}})]
       (dom/div {:class (utils/class-set {:section true
                                          :cash-flow true
                                          :read-only (:read-only data)})

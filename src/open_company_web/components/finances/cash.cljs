@@ -19,7 +19,8 @@
           cash-val (str cur-symbol (utils/thousands-separator (:cash value-set)))
           chart-opts (when (contains? options :chart-size)
                         {:opts {:chart-height (:height (:chart-size options))
-                                :chart-width (:width (:chart-size options))}})]
+                                :chart-width (:width (:chart-size options))
+                                :chart-color (occ/get-color-by-kw :oc-green-regular)}})]
       (dom/div {:class (utils/class-set {:section true
                                          :cash true
                                          :read-only (:read-only data)})
