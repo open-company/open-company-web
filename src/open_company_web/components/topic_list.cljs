@@ -234,7 +234,8 @@
       (.setTimeout js/window #(animate-expand owner (not bw-expand-animated)) 0)
       (when bw-expanded-topic
         (.setTimeout js/window #(scroll-to-card (om/get-ref owner bw-expanded-topic)) 0)))
-    (.setTimeout js/window #(set-lis-height owner) 0)
+    (when-not (utils/is-mobile)
+      (.setTimeout js/window #(set-lis-height owner) 0))
     (let [slug (keyword (:slug @router/path))]
       (if editing
         (let [categories (map name (keys active-topics))]
