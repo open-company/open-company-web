@@ -4,6 +4,7 @@
             [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel sel1)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.caches :as caches]
@@ -176,6 +177,13 @@
 
 (def scrolled-to-top (atom false))
 
+(defn set-lis-height [owner]
+  (doall
+    (let [li-elems (sel (om/get-ref owner "topic-list-ul") [:li.card])
+          max-height (apply max (map #(.-clientHeight %) li-elems))]
+      (for [li li-elems]
+        (setStyle li #js {:height (str max-height "px")})))))
+
 (defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
 
   (init-state [_]
@@ -226,6 +234,7 @@
       (.setTimeout js/window #(animate-expand owner (not bw-expand-animated)) 0)
       (when bw-expanded-topic
         (.setTimeout js/window #(scroll-to-card (om/get-ref owner bw-expanded-topic)) 0)))
+    (.setTimeout js/window #(set-lis-height owner) 0)
     (let [slug (keyword (:slug @router/path))]
       (if editing
         (let [categories (map name (keys active-topics))]
@@ -259,6 +268,7 @@
                           li-props (if-not (utils/is-mobile)
                                       #js {:className (utils/class-set {
                                                           :topic-row true
+                                                          :card (not= section-name "li-expander")
                                                           :full-width (= section-name "li-expander")
                                                           :expanded (= selected-topic section-name)
                                                           :unexpanded (and selected-topic
@@ -272,7 +282,7 @@
                                                        :height  (if (= section-name "li-expander")
                                                                   (if bw-expand-animated
                                                                     "auto" "0px")
-                                                                  (str (:height topic-box-size) "px"))}
+                                                                  "auto")} ;(str (:height topic-box-size) "px")
                                            :key (str "topic-row-" (name section-name))}
                                       #js {:className "topic-row"
                                            :ref section-name
