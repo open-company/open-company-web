@@ -40,7 +40,10 @@
         (dom/div #js {:className "topic-last-updated"}
           (str (:name (:author section-data)) " on " topic-updated-at))
         ;; topic body
-        (om/build topic-body {:section section :section-data section-data :expanded expanded} {:opts options})
+        (om/build topic-body {:section section
+                              :section-data section-data
+                              :currency currency
+                              :expanded expanded} {:opts options})
         (dom/div {:class "topic-navigation group"}
           (when prev-rev
             (dom/div {:class "previous"}
