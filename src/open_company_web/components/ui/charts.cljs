@@ -41,12 +41,12 @@
           (.format formatter data-table idx))))
     data-table))
 
-(defn chart-options [owner data column-thickness max-value startup chart-height chart-width]
+(defn chart-options [owner data column-thickness max-value startup options]
   (clj->js {:title  ""
-            :width (or chart-width (min 600 (max (* 50 (count data)) 125)))
-            :height chart-height
+            :width (or (:chart-width options) (min 600 (max (* 50 (count data)) 125)))
+            :height (:chart-height options)
             :pointSize 9
-            :colors (new js/Array (occ/get-color-by-kw :oc-blue-regular))
+            :colors (new js/Array (or (:chart-color options) (occ/get-color-by-kw :oc-blue-regular)))
             :animation #js {"startup" startup
                             "duration" 400
                             "easing" "out"}
@@ -59,15 +59,15 @@
             :hAxis #js {"textStyle" #js {"fontSize" 9
                                          "bold" true
                                          "fontName" "proxima-nova"
-                                         "color" (occ/get-color-by-kw :oc-blue-regular)}
+                                         "color" (or (:chart-color options) (occ/get-color-by-kw :oc-blue-regular))}
                         "viewWindow" (get-pagination owner data)}
             :chartArea #js {"left" 0 "top" 0 "width" "100%" "height" "90%"}
             :bar #js { "groupWidth" column-thickness}}))
 
-(defn draw-chart [owner currency-symbol columns pattern data column-thickness dom-node chart-height chart-width]
+(defn draw-chart [owner currency-symbol columns pattern data column-thickness dom-node options]
   (when (.-google js/window)
     (let [data-table (add-columns-and-rows columns data currency-symbol pattern)
-          options (chart-options owner data column-thickness (om/get-state owner :max-value) true chart-height chart-width)]
+          options (chart-options owner data column-thickness (om/get-state owner :max-value) true options)]
       (when dom-node
         (let [column-chart (js/google.visualization.LineChart. dom-node)]
           (.draw column-chart data-table options)
@@ -79,7 +79,7 @@
     (:column-thickness chart-data)
     "14"))
 
-(defn check-scrolls-and-draw [owner chart-data initial-check chart-height chart-width]
+(defn check-scrolls-and-draw [owner chart-data initial-check options]
   (when-not (om/get-state owner :animated)
     (when-let [chart-node (om/get-ref owner "charts")]
       (let [$chart-node (.$ js/window chart-node)
@@ -89,7 +89,7 @@
             window-outer-height (.innerHeight $window)
             win-scroll  (+ window-scroll-top window-outer-height)]
         (when (and (> chart-offset-top window-scroll-top)
-                   (< (+ chart-offset-top chart-height) win-scroll))
+                   (< (+ chart-offset-top (:chart-height options)) win-scroll))
           (draw-chart owner
                       (:prefix chart-data)
                       (:columns chart-data)
@@ -97,35 +97,33 @@
                       (:values chart-data)
                       (get-column-thickness chart-data)
                       (om/get-ref owner "column-chart")
-                      chart-height
-                      chart-width)
+                      options)
           (om/set-state! owner :animated true))))))
 
-(defn draw-chart-when-visible [owner chart-data chart-height chart-width]
-  (check-scrolls-and-draw owner chart-data true chart-height chart-width)
+(defn draw-chart-when-visible [owner chart-data options]
+  (check-scrolls-and-draw owner chart-data true options)
   (when-not (om/get-state owner :animated)
     (.scroll (.$ js/window js/window)
                (fn [e]
-                 (check-scrolls-and-draw owner chart-data false chart-height chart-width)))))
+                 (check-scrolls-and-draw owner chart-data false options)))))
 
-(defn redraw-chart [owner chart-data chart-height chart-width]
+(defn redraw-chart [owner chart-data options]
   (let [data-table (om/get-state owner :chart-computed-data)
         chart-options (chart-options owner
                                      (:values chart-data)
                                      (get-column-thickness chart-data)
                                      (om/get-state owner :max-value)
                                      false
-                                     chart-height
-                                    chart-width)]
+                                     options)]
     (.draw (om/get-state owner :chart) data-table chart-options)))
 
-(defn previous-values [owner chart-data chart-height chart-width]
+(defn previous-values [owner chart-data options]
   (om/set-state! owner :page (inc (om/get-state owner :page)))
-  (redraw-chart owner chart-data chart-height chart-width))
+  (redraw-chart owner chart-data options))
 
-(defn next-values [owner chart-data chart-height chart-width]
+(defn next-values [owner chart-data options]
   (om/set-state! owner :page (dec (om/get-state owner :page)))
-  (redraw-chart owner chart-data chart-height chart-width))
+  (redraw-chart owner chart-data options))
 
 (defcomponent column-chart [chart-data owner options]
 
@@ -138,7 +136,7 @@
      :max-value (get-max chart-data)})
 
   (did-mount [_]
-    (.setTimeout js/window #(draw-chart-when-visible owner chart-data (:chart-height options) (:chart-width options)) 200))
+    (.setTimeout js/window #(draw-chart-when-visible owner chart-data options) 200))
 
   (will-receive-props [_ next-props]
     (om/set-state! owner :max-value (get-max next-props)))
@@ -148,7 +146,7 @@
     (when (not= (:values prev-props) (:values chart-data))
       ; we need to force the cahrt redraw
       (om/set-state! owner :animated false)
-      (draw-chart-when-visible owner chart-data (:chart-height options) (:chart-width options))))
+      (draw-chart-when-visible owner chart-data options)))
 
   (render [_]
     (let [data-count (count (:values chart-data))
@@ -167,7 +165,7 @@
                                              :hidden (<= data-count (+ (* page max-show) max-show))})
                     :style #js {:marginTop (str (- (:chart-height options) 30) "px")}
                     :on-click (fn [e]
-                                (previous-values owner chart-data (:chart-height options) (:chart-width options))
+                                (previous-values owner chart-data options)
                                 (.stopPropagation e))}
             (dom/i {:class "fa fa-caret-left"})))
         (dom/div #js {:className "chart-container column-chart"
@@ -179,6 +177,6 @@
                                              :hidden (zero? (om/get-state owner :page))})
                     :style #js {:marginTop (str (- (:chart-height options) 30) "px")}
                     :on-click (fn [e]
-                                (next-values owner chart-data (:chart-height options) (:chart-width options))
+                                (next-values owner chart-data options)
                                 (.stopPropagation e))}
             (dom/i {:class "fa fa-caret-right"})))))))
