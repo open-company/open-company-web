@@ -9,15 +9,15 @@
   "10.1"   10.101234
   "100"    100.00123
   "100.1"  100.10123
-  "1k"     1001.1234
-  "1.1k"   1101.1234
+  "1K"     1001.1234
+  "1.1K"   1101.1234
   "1M"     1001234
   "1.1M"   1101234
   "10M"    10001234
-  "10.1M"  10112345
+  "10.1M"  10101234
 })
 
 (deftest test-utils
   (testing "Metric prefix functions"
     (doseq [v (vals values)]
-      (is v (get values (utils/with-metric-prefix v))))))
+      (is (= v (get values (utils/with-metric-prefix v)))))))
