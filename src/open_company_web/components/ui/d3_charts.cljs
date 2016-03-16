@@ -14,7 +14,6 @@
 (defn fix-chart-label-position []
   (let [chart-label (.select js/d3 "#chart-label")
         label-width (.-width (.getBBox (get (get chart-label 0) 0)))]
-    (println "dx" (/ label-width 2))
     (.attr chart-label "dx" (str "-" (- (/ label-width 2) 10) "px"))))
 
 (defn get-formatted-data [chart-key value prefix]
@@ -128,5 +127,7 @@
       (d3-calc owner options)))
 
   (render [_]
-    (dom/div {:class "d3-column-container"}
+    (dom/div {:class "d3-column-container"
+              :style #js {:width (str (:chart-width options) "px")
+                          :height (str (:chart-height options) "px")}}
       (dom/svg #js {:className "d3-column-chart" :ref "d3-column"}))))
