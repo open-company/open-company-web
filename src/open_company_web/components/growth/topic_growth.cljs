@@ -77,7 +77,7 @@
             ;; growth metric currently shown
             (when (and focus (seq (:metric-data subsection-data)))
               (om/build growth-metric subsection-data {:opts options})))
-          (dom/div {:class "pillbox-container"}
+          (dom/div {:class "pillbox-container growth"}
             (when focus
               (for [metric-slug growth-metric-slugs]
                 (let [metric (get growth-metrics metric-slug)
