@@ -19,7 +19,11 @@
   :oc-gray-1 "#F1F1F1"
   :oc-gray-2 "#D8D8D8"
   :oc-gray-3 "#8B8A8A"
-  :oc-gray-4 "#5B5B5B"})
+  :oc-gray-4 "#5B5B5B"
+
+  :oc-red-dark "#9E001A"
+  :oc-red-regular "#D72A46"
+  :oc-red-light "#EC7A8D"})
 
 (defn get-color-by-kw [kw]
   (if (contains? oc-colors kw)
