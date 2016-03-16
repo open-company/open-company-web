@@ -229,11 +229,14 @@
       (om/set-state! owner :bw-expand-animated nil)))
 
   (render-state [_ {:keys [show-topic-edit-button active-topics editing bw-expanded-topic bw-expand-animated last-expanded-section]}]
+    ; run the expand/collapse animation
     (if (or (and bw-expanded-topic (not bw-expand-animated))
             (and (not bw-expanded-topic) bw-expand-animated))
       (.setTimeout js/window #(animate-expand owner (not bw-expand-animated)) 0)
+      ; scroll to the selected card if it's already expanded
       (when bw-expanded-topic
         (.setTimeout js/window #(scroll-to-card (om/get-ref owner bw-expanded-topic)) 0)))
+    ; set the cards height on big web
     (when-not (utils/is-mobile)
       (.setTimeout js/window #(set-lis-height owner) 0))
     (let [slug (keyword (:slug @router/path))]
