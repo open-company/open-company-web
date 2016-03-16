@@ -11,7 +11,7 @@ div.topic-finances-headline {
       width: 33%;
       float: left;
       text-align: left;
-      font-size: 14px;
+      font-size: 16px;
 
       &.cash {
         width: 34%;
@@ -19,19 +19,29 @@ div.topic-finances-headline {
 
       div.label {
         color: $oc_gray_3;
-        font-weight: 100;
         text-align: left;
         padding: 0;
         margin: 0;
       }
 
       div.value {
-        font-weight: 600;
-        color: $oc_gray_4;
+        font-size: 24px;
+        color: #444444;
         text-align: left;
         padding: 0;
         margin: 0;
 
+        &.cash {
+          color: $oc_green_regular;
+        }
+
+        &.costs, &.burn-rate {
+          color: $oc_red_regular;
+        }
+
+        &.cash-flow {
+          color: $oc_green_regular;
+        }
       }
     }
   }
