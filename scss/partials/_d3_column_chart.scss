@@ -1,0 +1,9 @@
+svg{
+  rect.chart-bar {
+    cursor: pointer;
+  }
+  text.chart-label{
+    font-family: $oc_main_font;
+    font-size: 24px;
+  }
+}
