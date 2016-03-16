@@ -19,6 +19,11 @@
                           "Cash Flow"
                           "Burn Rate")
                         "Costs")
+          burn-class  (if (pos? all-revenues)
+                        (if (pos? (:burn-rate actual))
+                          "cash-flow"
+                          "burn-rate")
+                        "costs")
           burn-value (utils/with-metric-prefix (if (pos? all-revenues)
                                                 (utils/abs (:burn-rate actual))
                                                 (:costs actual)))]
@@ -29,10 +34,10 @@
         (dom/div {:class "topic-headline-labels"}
           (dom/div {:class "finances-metric cash"}
             (dom/div {:class "label"} "Cash")
-            (dom/div {:class "value"} (str currency (utils/with-metric-prefix (:cash actual)))))
+            (dom/div {:class "value cash"} (str currency (utils/with-metric-prefix (:cash actual)))))
           (dom/div {:class "finances-metric burn-rate"}
             (dom/div {:class "label"} burn-label)
-            (dom/div {:class "value"} (str currency burn-value)))
+            (dom/div {:class (str "value " burn-class)} (str currency burn-value)))
           (when-not (zero? runway)
             (dom/div {:class "finances-metric runway"}
               (dom/div {:class "label"} "Runway")
