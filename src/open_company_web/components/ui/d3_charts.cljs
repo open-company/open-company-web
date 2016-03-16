@@ -3,7 +3,8 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.lib.oc-colors :as occ]))
+            [open-company-web.lib.oc-colors :as occ]
+            [cljsjs.d3]))
 
 (def bar-width 15)
 
@@ -15,8 +16,8 @@
 (defn scale [data options]
   (let [chart-key (first (:chart-keys options))
         values (map chart-key (:chart-data data))
-        data-max (.max (.-d3 js/window) (clj->js values))
-        linear-fn (.. (.-d3 js/window) -scale linear)
+        data-max (.max js/d3 (clj->js values))
+        linear-fn (.. js/d3 -scale linear)
         domain-fn (.domain linear-fn #js [0 data-max])
         range-fn (.range linear-fn #js [0 (- (:chart-height options) 100)])]
     range-fn))
@@ -26,16 +27,15 @@
     (- (* (inc i) bar-spacer) (/ bar-width 2))))
 
 (defn bar-click [owner options scale-fn value idx]
-  (.stopPropagation (.-event (.-d3 js/window)))
+  (.stopPropagation (.-event js/d3))
   (let [fill-color (:chart-color options)
         fill-selected-color (:chart-selected-color options)
-        d3 (.-d3 js/window)
         selected (om/get-state owner :selected)
-        cur-g (.select d3 (str "#chart-g-" selected))
-        next-g (.select d3 (str "#chart-g-" idx))
-        cur-x-label (.select d3 (str "#chart-x-label-" selected))
-        next-x-label (.select d3 (str "#chart-x-label-" idx))
-        chart-label (.select d3 (str "#chart-label"))]
+        cur-g (.select js/d3 (str "#chart-g-" selected))
+        next-g (.select js/d3 (str "#chart-g-" idx))
+        cur-x-label (.select js/d3 (str "#chart-x-label-" selected))
+        next-x-label (.select js/d3 (str "#chart-x-label-" idx))
+        chart-label (.select js/d3 (str "#chart-label"))]
     (.attr cur-g "fill" fill-color)
     (.attr next-g "fill" fill-selected-color)
     (.attr cur-x-label "fill" fill-color)
@@ -56,11 +56,11 @@
         scale-fn (scale data options)
         chart-key (first (:chart-keys options))
         data-vec (clj->js (map chart-key (:chart-data data)))
-        chart-node (-> (.-d3 js/window)
+        chart-node (-> js/d3
                        (.select (om/get-ref owner "d3-column"))
                        (.attr "width" (:chart-width options))
                        (.attr "height" (:chart-height options))
-                       (.on "click" #(.stopPropagation (.-event (.-d3 js/window)))))
+                       (.on "click" #(.stopPropagation (.-event js/d3))))
         bar (.selectAll chart-node "g")
         bar-enter (-> (.data bar data-vec)
                       (.enter)
