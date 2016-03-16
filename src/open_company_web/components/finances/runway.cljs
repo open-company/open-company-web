@@ -22,10 +22,10 @@
   
   (render [_]
     (let [finances-data (:data (:section-data data))
-          sort-pred (utils/sort-by-key-pred :period true)
+          sort-pred (utils/sort-by-key-pred :period)
           sorted-finances (sort sort-pred finances-data)
           fixed-runway-finances (map #(update-in % [:runway] finances-utils/fix-runway) sorted-finances)
-          value-set (first fixed-runway-finances)
+          value-set (last fixed-runway-finances)
           runway-value (:runway value-set)
           is-profitable (pos? (:runway (first sorted-finances)))
           runway (if is-profitable
