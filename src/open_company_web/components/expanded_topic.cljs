@@ -98,8 +98,7 @@
       (when transit-as-of
         (.setTimeout js/window #(perform-transition owner) 1))
       (dom/div #js {:className "topic-expanded-container"
-                    :ref "topic-expanded-container"
-                    :style #js {:overflow "hidden"}}
+                    :ref "topic-expanded-container"}
         (when transit-as-of
           (dom/div #js {:className "transit-topic-expanded topic-expanded-internal"
                         :ref "transit-topic-expanded"
