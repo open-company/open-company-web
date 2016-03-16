@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.oc-colors :as occ]
+            [open-company-web.components.finances.utils :as finances-utils]
             [cljsjs.d3]))
 
 (def bar-width 15)
@@ -16,8 +17,10 @@
     (println "dx" (/ label-width 2))
     (.attr chart-label "dx" (str "-" (- (/ label-width 2) 10) "px"))))
 
-(defn get-formatted-data [value prefix]
-  (str prefix (.toLocaleString (js/parseFloat (str value)))))
+(defn get-formatted-data [chart-key value prefix]
+  (if (= chart-key :runway)
+    (finances-utils/get-rounded-runway value [:round])
+    (str prefix (.toLocaleString (js/parseFloat (str value))))))
 
 (defn scale [owner options]
   (let [chart-key (first (:chart-keys options))
@@ -46,7 +49,7 @@
     (.attr cur-g "fill" fill-color)
     (.attr next-g "fill" fill-selected-color)
     (-> chart-label
-      (.text (get-formatted-data value (:prefix options)))
+      (.text (get-formatted-data (first (:chart-keys options)) value (:prefix options)))
       (.attr "x" label-x-position))
     (fix-chart-label-position)
     (om/set-state! owner :selected idx)))
@@ -95,7 +98,7 @@
           (.append "text")
           (.attr "class" "chart-x-label")
           (.attr "x" (- (bar-position chart-width idx (count chart-data)) 8))
-          (.attr "y" (- (:chart-height options) 8))
+          (.attr "y" (:chart-height options))
           (.attr "fill" fill-selected-color)
           (.text (utils/get-period-string (:period (get chart-data idx)) nil [:short])))))
 
@@ -106,7 +109,7 @@
         (.attr "x" (bar-position chart-width selected (count chart-data)))
         (.attr "y" 50)
         (.attr "fill" fill-selected-color)
-        (.text (get-formatted-data (get data-vec selected) (:prefix options))))
+        (.text (get-formatted-data (first (:chart-keys options)) (get data-vec selected) (:prefix options))))
     (fix-chart-label-position)))
 
 (defcomponent d3-column-chart [data owner options]
