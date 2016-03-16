@@ -2,24 +2,23 @@
   (:require [cljs.test :refer-macros [deftest async testing is]]
             [open-company-web.lib.utils :as utils]))
 
-(def values {
-  "1"      1.0012345
-  "1.1"    1.1012345
-  "10"     10.001234
-  "10.1"   10.101234
-  "100"    100.00123
-  "100.1"  100.10123
-  "1K"     1001.1234
-  "1.1K"   1101.1234
-  "1M"     1001234
-  "1.1M"   1101234
-  "10M"    10001234
-  "10.1M"  10101234
-  "100M"   100001234
-  "101M"   101001234
-})
-
 (deftest test-utils
   (testing "Metric prefix functions"
-    (doseq [v (vals values)]
-      (is (= v (get values (utils/with-metric-prefix v)))))))
+    (is (= "1"     (utils/with-metric-prefix 1.00123456)))
+    (is (= "1.2"   (utils/with-metric-prefix 1.20123456)))
+    (is (= "1.23"  (utils/with-metric-prefix 1.23456789)))
+    (is (= "10"    (utils/with-metric-prefix 10.0123456)))
+    (is (= "10.2"  (utils/with-metric-prefix 10.2345678)))
+    (is (= "100"   (utils/with-metric-prefix 100.000000)))
+    (is (= "100"   (utils/with-metric-prefix 100.123456)))
+    (is (= "1K"    (utils/with-metric-prefix 1000.12345)))
+    (is (= "1.2K"  (utils/with-metric-prefix 1200.12345)))
+    (is (= "1.23K" (utils/with-metric-prefix 1230.12345)))
+    (is (= "10K"   (utils/with-metric-prefix 10000.3456)))
+    (is (= "10.1K" (utils/with-metric-prefix 10120.3456)))
+    (is (= "1M"    (utils/with-metric-prefix 1000000.12)))
+    (is (= "1.2M"  (utils/with-metric-prefix 1200000.12)))
+    (is (= "1.23M" (utils/with-metric-prefix 1230000.12)))
+    (is (= "10M"   (utils/with-metric-prefix 10000000.1)))
+    (is (= "10.1M" (utils/with-metric-prefix 10123456.7)))
+    (is (= "100M"  (utils/with-metric-prefix 100123456)))))

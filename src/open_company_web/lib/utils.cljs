@@ -597,18 +597,36 @@
     (get-in section-data [:notes :body])
     (:body section-data)))
 
-(defn round-2-dec [value]
+(defn round-2-dec [value decimals]
   ; cut to 2 dec maximum then parse to float to use toString to remove trailing zeros
-  (.toLocaleString (js/parseFloat (gstring/format "%.2f" value))))
+  (.toLocaleString (js/parseFloat (gstring/format (str "%." decimals "f") value))))
 
 (defn with-metric-prefix [value]
   (cond
-    ; M
-    (> value 1000000)
-    (str (round-2-dec (/ value 1000000)) "M")
-    ; K
-    (> value 1000)
-    (str (round-2-dec (/ value 1000)) "K")
-
+    ; 100M
+    (>= value 100000000)
+    (str (round-2-dec (int (/ value 1000000)) 2) "M")
+    ; 10.0M
+    (>= value 10000000)
+    (str (round-2-dec (/ value 1000000) 1) "M")
+    ; 1.00M
+    (>= value 1000000)
+    (str (round-2-dec (/ value 1000000) 2) "M")
+    ; 100K
+    (>= value 100000)
+    (str (round-2-dec (int (/ value 1000)) 2) "K")
+    ; 10.0K
+    (>= value 10000)
+    (str (round-2-dec (/ value 1000) 1) "K")
+    ; 1.00K
+    (>= value 1000)
+    (str (round-2-dec (/ value 1000) 2) "K")
+    ; 100
+    (>= value 100)
+    (str (round-2-dec (int value) 2))
+    ; 10.0
+    (>= value 10)
+    (str (round-2-dec value 1))
+    ; 1.00
     :else
-    (str (round-2-dec value))))
+    (str (round-2-dec value 2))))
