@@ -37,7 +37,7 @@
       (om/set-state! owner (get-state owner next-props true))))
 
   (render-state [_ {:keys [focus] :as state}]
-    (let [classes "composed-section-link oc-header"
+    (let [classes "pillbox"
           cash-classes (str classes (when (= focus "cash") " active"))
           cash-flow-classes (str classes (when (= focus "cash-flow") " active"))
           runway-classes (str classes (when (= focus "runway") " active"))
@@ -52,24 +52,6 @@
           subsection-options {:opts options}]
       (dom/div {:class "section-container" :id "section-finances"}
         (dom/div {:class "composed-section finances"}
-          (dom/div {:class (utils/class-set {:link-bar true})}
-            (dom/a {:href "#"
-                    :class cash-classes
-                    :title "Cash"
-                    :data-tab "cash"
-                    :on-click #(subsection-click % owner)} "Cash")
-            (when needs-cash-flow
-              (dom/a {:href "#"
-                      :class cash-flow-classes
-                      :title first-title
-                      :data-tab "cash-flow"
-                      :on-click #(subsection-click % owner)} first-title))
-            (when needs-runway
-              (dom/a {:href "#"
-                      :class runway-classes
-                      :title "Runway"
-                      :data-tab "runway"
-                      :on-click #(subsection-click % owner)} "Runway")))
           (dom/div {:class (utils/class-set {:composed-section-body true})}
             (case focus
 
@@ -82,4 +64,19 @@
                 (om/build costs subsection-data subsection-options))
 
               "runway"
-              (om/build runway subsection-data subsection-options))))))))
+              (om/build runway subsection-data subsection-options)))
+          (dom/div {:class "pillbox-container finances"}
+            (dom/label {:class cash-classes
+                        :title "Cash"
+                        :data-tab "cash"
+                        :on-click #(subsection-click % owner)} "Cash")
+            (when needs-cash-flow
+              (dom/label {:class cash-flow-classes
+                          :title first-title
+                          :data-tab "cash-flow"
+                          :on-click #(subsection-click % owner)} first-title))
+            (when needs-runway
+              (dom/label {:class runway-classes
+                          :title "Runway"
+                          :data-tab "runway"
+                          :on-click #(subsection-click % owner)} "Runway"))))))))
