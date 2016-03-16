@@ -1,23 +1,27 @@
-svg{
+div.d3-column-container{
+  margin: 0 auto;
 
-  g.chart-g{
+  svg{
 
-    rect.chart-bar {
-      cursor: pointer;
+    g.chart-g{
+
+      rect.chart-bar {
+        cursor: pointer;
+      }
     }
-  }
 
-  text.chart-label{
-    font-family: $oc_main_font;
-    font-size: 24px;
-    font-weight: 500;
-    line-height: 1.5;
-  }
+    text.chart-label{
+      font-family: $oc_main_font;
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
 
-  text.chart-x-label {
-    font-family: $oc_main_font;
-    font-size: 14px;
-    line-height: 1.1;
-    font-weight: bold;
+    text.chart-x-label {
+      font-family: $oc_main_font;
+      font-size: 14px;
+      line-height: 1.1;
+      font-weight: bold;
+    }
   }
 }
