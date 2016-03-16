@@ -116,17 +116,19 @@
 
 (defn get-rounded-runway [runway-days & [flags]]
   (cond
-    (< runway-days 90)
-    (str runway-days " Days")
-    (< runway-days (* 30 24))
+    (< runway-days 7)
+    (str (int runway-days) " days")
+    (< runway-days (* 30 3))
+    (str (int runway-days) " wks")
+    (< runway-days (* 30 12))
     (if (utils/in? flags :round)
       (if (utils/in? flags :remove-trailing-zero)
-        (str (remove-trailing-zero (gstring/format "%.2f" (/ runway-days 30))) " Months")
-        (str (gstring/format "%.2f" (/ runway-days 30)) " Months"))
-      (str (quot runway-days 30) " Months"))
+        (str (remove-trailing-zero (str (int (/ runway-days 30)))) " mnths")
+        (str (int (/ runway-days 30)) " mnths"))
+      (str (quot runway-days 30) " mnths"))
     :else
     (if (utils/in? flags :round)
       (if (utils/in? flags :remove-trailing-zero)
-        (str (remove-trailing-zero (gstring/format "%.2f" (/ runway-days (* 30 12)))) " Years")
-        (str (gstring/format "%.2f" (/ runway-days (* 30 12))) " Years"))
-      (str (quot runway-days (* 30 12)) " Years"))))
+        (str (remove-trailing-zero (str (int (/ runway-days (* 30 12))))) " yrs")
+        (str (int (/ runway-days (* 30 12))) " yrs"))
+      (str (quot runway-days (* 30 12)) " yrs"))))
