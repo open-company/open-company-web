@@ -1,0 +1,13 @@
+div.section-container{
+  div.pillbox-container.finances{
+    background-color: $oc_gray_1;
+    padding: 12px;
+    border: 1px solid $oc_gray_2;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: -23px;
+    width: calc(100% + 46px);
+
+    @include pillbox($oc_green_regular);
+  }
+}
