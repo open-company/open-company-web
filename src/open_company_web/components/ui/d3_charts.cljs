@@ -10,12 +10,18 @@
 
 (def show-column 6)
 
+(defn fix-chart-label-position []
+  (let [chart-label (.select js/d3 "#chart-label")
+        label-width (.-width (.getBBox (get (get chart-label 0) 0)))]
+    (println "dx" (/ label-width 2))
+    (.attr chart-label "dx" (str "-" (- (/ label-width 2) 10) "px"))))
+
 (defn get-formatted-data [value prefix]
   (str prefix (.toLocaleString (js/parseFloat (str value)))))
 
-(defn scale [data options]
+(defn scale [owner options]
   (let [chart-key (first (:chart-keys options))
-        values (map chart-key (:chart-data data))
+        values (map chart-key (om/get-state owner :current-data))
         data-max (.max js/d3 (clj->js values))
         linear-fn (.. js/d3 -scale linear)
         domain-fn (.domain linear-fn #js [0 data-max])
@@ -33,29 +39,28 @@
         selected (om/get-state owner :selected)
         cur-g (.select js/d3 (str "#chart-g-" selected))
         next-g (.select js/d3 (str "#chart-g-" idx))
-        cur-x-label (.select js/d3 (str "#chart-x-label-" selected))
-        next-x-label (.select js/d3 (str "#chart-x-label-" idx))
-        chart-label (.select js/d3 (str "#chart-label"))]
+        chart-label (.select js/d3 (str "#chart-label"))
+        chart-width (:chart-width options)
+        data-count (count (om/get-state owner :current-data))
+        label-x-position (bar-position chart-width idx data-count)]
     (.attr cur-g "fill" fill-color)
     (.attr next-g "fill" fill-selected-color)
-    (.attr cur-x-label "fill" fill-color)
-    (.attr next-x-label "fill" fill-selected-color)
     (-> chart-label
       (.text (get-formatted-data value (:prefix options)))
-      (.attr "x" (bar-position (:chart-width options) idx (count (om/get-props owner :chart-data)))))
-
+      (.attr "x" label-x-position))
+    (fix-chart-label-position)
     (om/set-state! owner :selected idx)))
 
-(defn d3-calc [owner data options]
+(defn d3-calc [owner options]
   ; render the chart
   (let [selected (om/get-state owner :selected)
-        chart-data (:chart-data data)
+        chart-data (om/get-state owner :current-data)
         fill-color (:chart-color options)
         fill-selected-color (:chart-selected-color options)
         chart-width (:chart-width options)
-        scale-fn (scale data options)
+        scale-fn (scale owner options)
         chart-key (first (:chart-keys options))
-        data-vec (clj->js (map chart-key (:chart-data data)))
+        data-vec (clj->js (map chart-key chart-data))
         chart-node (-> js/d3
                        (.select (om/get-ref owner "d3-column"))
                        (.attr "width" (:chart-width options))
@@ -89,12 +94,9 @@
         (-> chart-node
           (.append "text")
           (.attr "class" "chart-x-label")
-          (.attr "id" (str "chart-x-label-" idx))
-          (.attr "x" (- (bar-position chart-width idx (count chart-data)) 10))
+          (.attr "x" (- (bar-position chart-width idx (count chart-data)) 8))
           (.attr "y" (- (:chart-height options) 8))
-          (.attr "fill" (if (= idx selected)
-                          fill-selected-color
-                          fill-color))
+          (.attr "fill" fill-selected-color)
           (.text (utils/get-period-string (:period (get chart-data idx)) nil [:short])))))
 
     (-> chart-node
@@ -102,22 +104,25 @@
         (.attr "class" "chart-label")
         (.attr "id" "chart-label")
         (.attr "x" (bar-position chart-width selected (count chart-data)))
-        (.attr "y" 40)
-        (.attr "dx" "-24px")
+        (.attr "y" 50)
         (.attr "fill" fill-selected-color)
-        (.text (get-formatted-data (get data-vec selected) (:prefix options))))))
+        (.text (get-formatted-data (get data-vec selected) (:prefix options))))
+    (fix-chart-label-position)))
 
 (defcomponent d3-column-chart [data owner options]
 
   (init-state [_]
-    {:selected (dec (count (:chart-data data)))})
+    (let [current-data (vec (take-last show-column (:chart-data data)))]
+      {:selected (dec (count current-data))
+       :current-data current-data}))
 
   (did-mount [_]
-    (d3-calc owner data options))
+    (d3-calc owner options))
 
   (did-update [_ old-props _]
     (when-not (= old-props data)
-      (d3-calc owner data options)))
+      (om/set-state! owner (take-last show-column (:chart-data data)))
+      (d3-calc owner options)))
 
   (render [_]
     (dom/div {:class "d3-column-container"}
