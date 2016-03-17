@@ -36,16 +36,16 @@
           runway-string (if is-profitable
                           runway
                           (finances-utils/get-rounded-runway runway-value))
-          chart-opts (when (contains? options :chart-size)
-                        {:opts {:chart-height (:height (:chart-size options))
-                                :chart-width (:width (:chart-size options))
-                                :chart-keys [:runway]
-                                :label-color (occ/get-color-by-kw :oc-green-regular)
-                                :label-key :runway
-                                :h-axis-color (occ/get-color-by-kw :oc-green-regular)
-                                :chart-colors {:runway (occ/get-color-by-kw :oc-green-light)}
-                                :chart-selected-colors {:runway (occ/get-color-by-kw :oc-green-regular)}
-                                :prefix (utils/get-symbol-for-currency-code currency)}})]
+          fixed-sorted-finances (vec (map #(merge % {:label (finances-utils/get-rounded-runway (:runway %) [:round])}) sorted-finances))
+          chart-opts {:opts {:chart-height (when (contains? options :chart-size) (:height (:chart-size options)))
+                             :chart-width (when (contains? options :chart-size)(:width (:chart-size options)))
+                             :chart-keys [:runway]
+                             :label-color (occ/get-color-by-kw :oc-green-regular)
+                             :label-key :label
+                             :h-axis-color (occ/get-color-by-kw :oc-green-regular)
+                             :chart-colors {:runway (occ/get-color-by-kw :oc-green-light)}
+                             :chart-selected-colors {:runway (occ/get-color-by-kw :oc-green-regular)}
+                             :prefix (utils/get-symbol-for-currency-code currency)}}]
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))
                 :on-click (:start-editing-cb data)}
         (when (:show-label options)
@@ -54,4 +54,4 @@
               (dom/div {:class "actual-container"}
                 (dom/h3 {:class "actual green"} runway-string)
                 (dom/h3 {:class "actual-label gray"} (get-runway-subtitle (:cash value-set) (:avg-burn-rate value-set) runway-value cur-symbol))))))
-        (om/build d3-column-chart (get-d3-chart-data sorted-finances) chart-opts)))))
+        (om/build d3-column-chart (get-d3-chart-data fixed-sorted-finances) chart-opts)))))
