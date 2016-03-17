@@ -57,23 +57,23 @@
         label-x-pos (bar-position chart-width idx data-count chart-keys-count)
         next-g-rects (.selectAll next-g "rect")
         cur-g-rects (.selectAll cur-g "rect")]
-    (.each next-g-rects
-           (fn [d i]
-              (this-as rect
-                (let [d3-rect (.select js/d3 rect)
-                      selected-color (.attr d3-rect "data-selectedFill")]
-                  (.attr d3-rect "fill" selected-color)))))
     (.each cur-g-rects
            (fn [d i]
               (this-as rect
                 (let [d3-rect (.select js/d3 rect)
                       color (.attr d3-rect "data-fill")]
                   (.attr d3-rect "fill" color)))))
+    (.each next-g-rects
+           (fn [d i]
+              (this-as rect
+                (let [d3-rect (.select js/d3 rect)
+                      selected-color (.attr d3-rect "data-selectedFill")]
+                  (.attr d3-rect "fill" selected-color)))))
     (-> chart-label
-      (.text (get-formatted-data (:label-key options) (label-key next-set) (:prefix options))))
+      (.text (label-key next-set)))
     (let [chart-label-width (width chart-label)
           new-x-pos (+ label-x-pos (/ (- (* bar-width chart-keys-count) chart-label-width) 2))]
-      (.attr chart-label "x" new-x-pos))
+      (.attr chart-label "x" (min (max 0 new-x-pos) (- (:chart-width options) chart-label-width))))
     (om/set-state! owner :selected idx)))
 
 (defn d3-calc [owner options]
@@ -125,7 +125,7 @@
                 (.attr "x" (* j bar-width))
                 (.attr "y" (- scaled-max-val scaled-val))
                 (.attr "width" bar-width)
-                (.attr "height" (scale-fn (chart-key (get chart-data i)))))))))
+                (.attr "height" (max 0 (scale-fn (chart-key (get chart-data i))))))))))
     ; add the month labels
     (doseq [v chart-data]
       (let [idx (.indexOf (to-array chart-data) v)
@@ -149,9 +149,14 @@
                           (.attr "x" x-pos)
                           (.attr "y" 50)
                           (.attr "fill" (:label-color options))
-                          (.text (get-formatted-data label-key (label-key (get chart-data selected)) (:prefix options))))
-          chart-label-width (width chart-label)]
-      (.attr chart-label "x" (+ x-pos (/ (- (* bar-width (count chart-keys)) chart-label-width) 2))))))
+                          (.text (label-key (get chart-data selected))))
+          chart-label-width (width chart-label)
+          chart-label-pos (+ x-pos (/ (- (* bar-width (count chart-keys)) chart-label-width) 2))]
+      (when (> chart-label-width 150)
+        (.attr chart-label "class" "chart-label small"))
+      (let [new-chart-label-width (width chart-label)
+            new-chart-label-pos (+ x-pos (/ (- (* bar-width (count chart-keys)) new-chart-label-width) 2))]
+        (.attr chart-label "x" (min (max 0 new-chart-label-pos) (- chart-width new-chart-label-width)))))))
 
 (defcomponent d3-column-chart [data owner options]
 
