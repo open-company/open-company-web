@@ -1,0 +1,31 @@
+div.d3-dot-container{
+  margin: 0 auto;
+
+  svg{
+
+    g.chart-g{
+
+      circle.chart-dot {
+        cursor: pointer;
+      }
+    }
+
+    text.chart-label{
+      font-family: $oc_main_font;
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.5;
+
+      &.small {
+        font-size: 18px;
+      }
+    }
+
+    text.chart-x-label {
+      font-family: $oc_main_font;
+      font-size: 14px;
+      line-height: 1.1;
+      font-weight: bold;
+    }
+  }
+}
