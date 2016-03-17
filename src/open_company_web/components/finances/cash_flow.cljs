@@ -3,7 +3,7 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.ui.d3-charts :refer (d3-column-chart)]
+            [open-company-web.components.ui.d3-column-chart :refer (d3-column-chart)]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.lib.oc-colors :as occ]))
 
