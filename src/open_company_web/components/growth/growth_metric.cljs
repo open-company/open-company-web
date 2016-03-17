@@ -3,7 +3,7 @@
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.ui.charts :refer (column-chart)]
+            [open-company-web.components.ui.d3-dot-chart :refer (d3-dot-chart)]
             [open-company-web.components.ui.utility-components :refer (editable-pen)]
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.router :as router]
@@ -31,9 +31,18 @@
                            (utils/get-symbol-for-currency-code (:currency company-data)))
           unit (when (= metric-unit "%") "%")
           actual-with-label (str fixed-cur-unit actual unit)
-          chart-opts (when (contains? options :chart-size) {:opts {:chart-height (:height (:chart-size options))
-                                                                   :chart-width (:width (:chart-size options))
-                                                                   :chart-color (occ/get-color-by-kw :oc-blue-regular)}})]
+          fixed-sorted-metric (vec (map #(merge % {:label actual-with-label}) sorted-metric))
+          chart-opts {:opts {:chart-height (when (contains? options :chart-size) (:height (:chart-size options)))
+                             :chart-width (when (contains? options :chart-size) (:width (:chart-size options)))
+                             :chart-keys [:value]
+                             :label-color (occ/get-color-by-kw :oc-blue-regular)
+                             :label-key :label
+                             :h-axis-color (occ/get-color-by-kw :oc-blue-regular)
+                             :chart-colors {:value (occ/get-color-by-kw :oc-blue-light)
+                                            :target (occ/get-color-by-kw :oc-blue-regular)}
+                             :chart-selected-colors {:value (occ/get-color-by-kw :oc-blue-dark)
+                                                     :target (occ/get-color-by-kw :oc-blue-dark)}
+                             :prefix fixed-cur-unit}}]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})
@@ -48,9 +57,4 @@
                     (dom/h3 {:class "actual blue"} actual-with-label
                       (om/build editable-pen {:click-callback (:start-data-editing-cb data)}))
                     (dom/h3 {:class "actual-label gray"} (str "as of " period))))))
-            (om/build column-chart (growth-utils/get-chart-data sorted-metric
-                                                                fixed-cur-unit
-                                                                (:slug metric-info)
-                                                                (:name metric-info)
-                                                                unit
-                                                                interval) chart-opts)))))))
+            (om/build d3-dot-chart {:chart-data fixed-sorted-metric} chart-opts)))))))
