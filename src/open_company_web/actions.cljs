@@ -1,5 +1,6 @@
 (ns open-company-web.actions
   (:require [medley.core :as med]
+            [clojure.string :as string]
             [open-company-web.dispatcher :refer [action dispatch!]]
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
@@ -23,10 +24,13 @@
   (assoc-in db path value))
 
 (defmethod action :entry [db [_ {:keys [links]}]]
-  (if-let [co (med/find-first #(= (:rel %) "company") links)]
-    (router/nav! (str (:href co) "/dashboard"))
-    (if (med/find-first #(= (:rel %) "company-create") links)
-      (router/nav! "/create-company")))
+  (let [create-link    (med/find-first #(= (:rel %) "company-create") links)
+        slug           (fn [co] (last (string/split (:href co) #"/")))
+        [first second] (filter #(= (:rel %) "company") links)]
+    (cond
+      (and first (not second)) (router/nav! (str "/" (slug first) "/dashboard"))
+      (and first second)       (router/nav! "/companies")
+      create-link              (router/nav! "/create-company")))
   db)
 
 (defmethod action :company-submit [db _]
