@@ -8,6 +8,10 @@ div.section-container{
     margin-left: -23px;
     width: calc(100% + 46px);
 
+    @include big_web() {
+      text-align: center;
+    }
+
     @include pillbox($oc_green_regular);
   }
 }
