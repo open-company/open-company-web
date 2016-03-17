@@ -3,7 +3,7 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.ui.charts :refer (column-chart)]
+            [open-company-web.components.ui.d3-charts :refer (d3-column-chart)]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.lib.oc-colors :as occ]))
 
@@ -59,9 +59,9 @@
   
   (render [_]
     (let [finances-data (:data (:section-data data))
-          sort-pred (utils/sort-by-key-pred :period true)
+          sort-pred (utils/sort-by-key-pred :period)
           sorted-finances (sort sort-pred finances-data)
-          value-set (first sorted-finances)
+          value-set (last sorted-finances)
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
           cash-val (str cur-symbol (utils/thousands-separator (:cash value-set)))
@@ -73,7 +73,13 @@
           chart-opts (when (contains? options :chart-size)
                         {:opts {:chart-height (:height (:chart-size options))
                                 :chart-width (:width (:chart-size options))
-                                :chart-color (occ/get-color-by-kw :oc-green-regular)}})]
+                                :chart-keys [:costs]
+                                :label-color (occ/get-color-by-kw :oc-red-regular)
+                                :label-key :costs
+                                :h-axis-color (occ/get-color-by-kw :oc-red-regular)
+                                :chart-colors {:costs (occ/get-color-by-kw :oc-red-light)}
+                                :chart-selected-colors {:costs (occ/get-color-by-kw :oc-red-regular)}
+                                :prefix (utils/get-symbol-for-currency-code currency)}})]
       (dom/div {:class (utils/class-set {:section true
                                          :cash-flow true
                                          :read-only (:read-only data)})
@@ -88,4 +94,4 @@
                                                  (str cur-symbol (utils/thousands-separator (int cash-flow-val))))
                 (dom/h3 {:class "actual-label gray"}
                         (str "3 months avg. " (utils/month-string month-3-fixed) " to " (utils/month-string month)))))))
-        (om/build column-chart (get-chart-data sorted-finances cur-symbol) chart-opts)))))
+        (om/build d3-column-chart {:chart-data sorted-finances} chart-opts)))))
