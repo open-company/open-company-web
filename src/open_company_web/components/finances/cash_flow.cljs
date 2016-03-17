@@ -51,9 +51,18 @@
                 #js {"type" "string" "role" "style"}
                 #js {"type" "string" "role" "tooltip"}]
       :values (vec (map chart-data placeholder-vect))
-      :pattern "###,###.##"
+      :pattern "######.##"
       :max-show finances-utils/columns-num
       :column-thickness "42"}))
+
+(defn chart-label [data-set prefix]
+  ;example Revenue $12.3K Costs $107K Cash flow -$94.7K
+  (let [revenue (str prefix (utils/with-metric-prefix (:revenue data-set)))
+        costs (str prefix (utils/with-metric-prefix (:costs data-set)))
+        cash-flow-val (- (:revenue data-set) (:costs data-set))
+        abs-cash-flow-val (utils/abs cash-flow-val)
+        cash-flow (str (when (neg? cash-flow-val) "-") prefix (utils/with-metric-prefix abs-cash-flow-val))]
+    (str "Revenue " revenue " Costs " costs " Cash flow " cash-flow)))
 
 (defcomponent cash-flow [data owner options]
   
@@ -61,6 +70,7 @@
     (let [finances-data (:data (:section-data data))
           sort-pred (utils/sort-by-key-pred :period)
           sorted-finances (sort sort-pred finances-data)
+          has-revenues (pos? (apply + (filter #(not (nil? %)) (map :revenue sorted-finances))))
           value-set (last sorted-finances)
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
@@ -70,16 +80,24 @@
           int-month (int month)
           month-3 (- int-month 2)
           month-3-fixed (utils/add-zero (if (<= month-3 0) (- 12 month-3) month-3))
-          chart-opts (when (contains? options :chart-size)
-                        {:opts {:chart-height (:height (:chart-size options))
-                                :chart-width (:width (:chart-size options))
-                                :chart-keys [:costs]
-                                :label-color (occ/get-color-by-kw :oc-red-regular)
-                                :label-key :costs
-                                :h-axis-color (occ/get-color-by-kw :oc-red-regular)
-                                :chart-colors {:costs (occ/get-color-by-kw :oc-red-light)}
-                                :chart-selected-colors {:costs (occ/get-color-by-kw :oc-red-regular)}
-                                :prefix (utils/get-symbol-for-currency-code currency)}})]
+          fixed-sorted-finances (into [] (map #(merge % {:label (chart-label % cur-symbol)}) sorted-finances))
+          chart-opts {:opts {:chart-height (when (contains? options :chart-size) (:height (:chart-size options)))
+                             :chart-width (when (contains? options :chart-size)(:width (:chart-size options)))
+                             :chart-keys (if has-revenues
+                                           [:revenue :costs]
+                                           [:costs])
+                             :label-color (occ/get-color-by-kw :oc-gray-3)
+                             :label-key :label
+                             :h-axis-color (occ/get-color-by-kw :oc-gray-3)
+                             :chart-colors (if has-revenues
+                                            {:revenue (occ/get-color-by-kw :oc-green-light)
+                                             :costs (occ/get-color-by-kw :oc-red-light)}
+                                            {:costs (occ/get-color-by-kw :oc-red-light)})
+                             :chart-selected-colors (if has-revenues
+                                                      {:revenue (occ/get-color-by-kw :oc-green-regular)
+                                                       :costs (occ/get-color-by-kw :oc-red-regular)}
+                                                      {:costs (occ/get-color-by-kw :oc-red-regular)})
+                             :prefix (utils/get-symbol-for-currency-code currency)}}]
       (dom/div {:class (utils/class-set {:section true
                                          :cash-flow true
                                          :read-only (:read-only data)})
@@ -94,4 +112,4 @@
                                                  (str cur-symbol (utils/thousands-separator (int cash-flow-val))))
                 (dom/h3 {:class "actual-label gray"}
                         (str "3 months avg. " (utils/month-string month-3-fixed) " to " (utils/month-string month)))))))
-        (om/build d3-column-chart {:chart-data sorted-finances} chart-opts)))))
+        (om/build d3-column-chart {:chart-data fixed-sorted-finances} chart-opts)))))
