@@ -1,4 +1,4 @@
-(ns open-company-web.components.ui.d3-charts
+(ns open-company-web.components.ui.d3-column-chart
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
@@ -9,7 +9,7 @@
 
 (def bar-width 15)
 
-(def show-column 6)
+(def show-columns 6)
 
 (defn width [el]
   (.-width (.getBBox (.node el))))
@@ -38,9 +38,9 @@
         range-fn (.range linear-fn #js [0 (- (:chart-height options) 100)])]
     range-fn))
 
-(defn bar-position [chart-width i data-count column-num]
-  (let [bar-spacer (/ chart-width (inc (min show-column data-count)))]
-    (- (* (inc i) bar-spacer) (/ (* bar-width column-num) 2))))
+(defn bar-position [chart-width i data-count columns-num]
+  (let [bar-spacer (/ chart-width (inc (min show-columns data-count)))]
+    (- (* (inc i) bar-spacer) (/ (* bar-width columns-num) 2))))
 
 (defn bar-click [owner options idx]
   (.stopPropagation (.-event js/d3))
@@ -161,7 +161,7 @@
 (defcomponent d3-column-chart [data owner options]
 
   (init-state [_]
-    (let [current-data (vec (take-last show-column (:chart-data data)))]
+    (let [current-data (vec (take-last show-columns (:chart-data data)))]
       {:selected (dec (count current-data))
        :current-data current-data}))
 
@@ -170,7 +170,7 @@
 
   (did-update [_ old-props _]
     (when-not (= old-props data)
-      (om/set-state! owner (take-last show-column (:chart-data data)))
+      (om/set-state! owner (take-last show-columns (:chart-data data)))
       (d3-calc owner options)))
 
   (render [_]
