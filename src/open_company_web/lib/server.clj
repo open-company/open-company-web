@@ -15,8 +15,7 @@
   (as-html (resource-response "/devcards.html" {:root "public"})))
 
 (defn not-found []
-  (-> (as-html (resource-response "/404.html" {:root "public"}))
-      (assoc :status 404)))
+  (assoc (as-html (resource-response "/404.html" {:root "public"})) :status 404))
 
 (defroutes resources
   ; serve the react app for all requests
