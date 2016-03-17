@@ -9,7 +9,7 @@
             [open-company-web.lib.oc-colors :as occ]))
 
 (defn- get-d3-chart-data [sorted-data]
-  {:chart-data (vec (filter #(pos? (:runway %)) (map #(hash-map :runway (:runway %) :period (:period %)) sorted-data)))})
+  {:chart-data (filter #(not (nil? (:runway %))) sorted-data)})
 
 (defn get-runway-subtitle [cash avg-burn-rate runway-days cur-symbol]
   (str cur-symbol (utils/thousands-separator (or cash 0))
@@ -40,8 +40,12 @@
                         {:opts {:chart-height (:height (:chart-size options))
                                 :chart-width (:width (:chart-size options))
                                 :chart-keys [:runway]
-                                :chart-color (occ/get-color-by-kw :oc-green-light)
-                                :chart-selected-color (occ/get-color-by-kw :oc-green-regular)}})]
+                                :label-color (occ/get-color-by-kw :oc-green-regular)
+                                :label-key :runway
+                                :h-axis-color (occ/get-color-by-kw :oc-green-regular)
+                                :chart-colors {:runway (occ/get-color-by-kw :oc-green-light)}
+                                :chart-selected-colors {:runway (occ/get-color-by-kw :oc-green-regular)}
+                                :prefix (utils/get-symbol-for-currency-code currency)}})]
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))
                 :on-click (:start-editing-cb data)}
         (when (:show-label options)
