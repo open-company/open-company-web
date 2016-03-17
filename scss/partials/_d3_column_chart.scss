@@ -15,6 +15,10 @@ div.d3-column-container{
       font-size: 24px;
       font-weight: 500;
       line-height: 1.5;
+
+      &.small {
+        font-size: 18px;
+      }
     }
 
     text.chart-x-label {
