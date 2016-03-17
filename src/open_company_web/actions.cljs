@@ -35,9 +35,8 @@
 
 (defmethod action :company-created [db [_ body]]
   (if (:links body)
-    (let [updated (utils/fix-sections body)
-          link (:href (med/find-first #(= "self" (:rel %)) (:links body)))]
-      (router/nav! (str link "/dashboard"))
+    (let [updated (utils/fix-sections body)]
+      (router/nav! (str "/" (:slug updated) "/dashboard"))
       (assoc db (keyword (:slug updated)) updated))
     db))
 

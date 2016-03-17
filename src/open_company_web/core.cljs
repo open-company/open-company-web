@@ -125,19 +125,20 @@
     (defroute list-page-route-slash "/companies/" {:as params}
       (home-handler target params))
 
-    (defroute company-route "/companies/:slug" {:as params}
-      (company-handler nil target company params))
-
-    (defroute company-profile-route "/companies/:slug/profile" {:as params}
-      (company-handler "profile" target company params))
-
-    (defroute company-dashboard-route "/companies/:slug/dashboard" {:as params}
-      (company-handler "dashboard" target company-dashboard params))
-
     (defroute user-profile-route "/profile" {:as params}
       (utils/clean-company-caches)
       (pre-routing (:query-params params))
       (om/root user-profile app-state {:target target}))
+
+    (defroute company-route "/:slug" {:as params}
+      (company-handler nil target company params))
+
+    (defroute company-profile-route "/:slug/profile" {:as params}
+      (company-handler "profile" target company params))
+
+    (defroute company-dashboard-route "/:slug/dashboard" {:as params}
+      (company-handler "dashboard" target company-dashboard params))
+
 
     (defroute not-found-route "*" []
       ;; render component
@@ -148,11 +149,11 @@
                                  home-page-route
                                  list-page-route-slash
                                  list-page-route
-                                 company-route
                                  company-create-route
+                                 user-profile-route
+                                 company-route
                                  company-profile-route
                                  company-dashboard-route
-                                 user-profile-route
                                  not-found-route]))
 
     (defn login-wall []

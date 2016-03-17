@@ -76,7 +76,7 @@
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)]
       (when (:read-only company-data)
-        (utils/redirect! (str "/companies/" (name slug))))
+        (utils/redirect! (str "/" (name slug))))
       (dom/div {:class "profile-container"}
         ;; Company
         (dom/div {:class "row"}
