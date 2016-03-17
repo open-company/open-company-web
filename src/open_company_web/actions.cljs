@@ -73,14 +73,18 @@
           (dissoc :loading)))
     db))
 
-(defmethod action :company [db [_ body]]
-  (if body
+(defmethod action :company [db [_ {:keys [success status body]}]]
+  (cond
+    success
     ;; add section name inside each section
     (let [updated-body (utils/fix-sections body)]
       (-> db
           (assoc (keyword (:slug updated-body)) updated-body)
           (dissoc :loading)))
-    db))
+    (= 404 status)
+    (do (.replace js/window.location "/404") db)
+    ;; probably some default failure handling should be added here
+    :else db))
 
 (defmethod action :companies [db [_ body]]
   (if body
