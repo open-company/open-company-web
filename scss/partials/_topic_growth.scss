@@ -12,6 +12,6 @@ div.section-container{
         text-align: center;
     }
 
-    @include pillbox();
+    @include pillbox($oc_blue_regular);
   }
 }
