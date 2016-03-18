@@ -7,10 +7,7 @@ div.section-container{
     margin-bottom: 10px;
     margin-left: -23px;
     width: calc(100% + 46px);
-
-    @include big_web() {
-        text-align: center;
-    }
+    text-align: center;
 
     @include pillbox($oc_blue_regular);
   }
