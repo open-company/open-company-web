@@ -42,7 +42,7 @@
   (let [bar-spacer (/ chart-width (inc (min show-columns data-count)))]
     (- (* (inc i) bar-spacer) (/ (* bar-width columns-num) 2))))
 
-(defn bar-click [owner options idx]
+(defn bar-click [owner options idx & [is-hover]]
   (.stopPropagation (.-event js/d3))
   (let [selected (om/get-state owner :selected)
         chart-label (.select js/d3 (str "#chart-label"))
@@ -56,8 +56,8 @@
         chart-keys-count (count (:chart-keys options))
         label-x-pos (bar-position chart-width idx data-count chart-keys-count)
         next-g-rects (.selectAll next-g "rect")
-        cur-g-rects (.selectAll cur-g "rect")]
-    (.each cur-g-rects
+        all-rects (.selectAll js/d3 "rect")]
+    (.each all-rects
            (fn [d i]
               (this-as rect
                 (let [d3-rect (.select js/d3 rect)
@@ -74,7 +74,8 @@
     (let [chart-label-width (width chart-label)
           new-x-pos (+ label-x-pos (/ (- (* bar-width chart-keys-count) chart-label-width) 2))]
       (.attr chart-label "x" (min (max 0 new-x-pos) (- (:chart-width options) chart-label-width))))
-    (om/set-state! owner :selected idx)))
+    (when-not is-hover
+      (om/set-state! owner :selected idx))))
 
 (defn d3-calc [owner options]
   ; render the chart
@@ -103,6 +104,8 @@
                           (.attr "class" "chart-g")
                           (.attr "id" (str "chart-g-" i))
                           (.on "click" #(bar-click owner options i))
+                          (.on "mouseover" #(bar-click owner options i true))
+                          (.on "mouseout" #(bar-click owner options (om/get-state owner :selected)))
                           (.attr "transform"
                                  (str "translate("
                                       (bar-position chart-width i (count chart-data) (count chart-keys))
@@ -136,6 +139,9 @@
                       (.attr "class" "chart-x-label")
                       (.attr "x" x-pos)
                       (.attr "y" (:chart-height options))
+                      (.on "click" #(bar-click owner options idx))
+                      (.on "mouseover" #(bar-click owner options idx true))
+                      (.on "mouseout" #(bar-click owner options (om/get-state owner :selected)))
                       (.attr "fill" (:h-axis-color options))
                       (.text text))
             label-width (width label)]
