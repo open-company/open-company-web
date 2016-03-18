@@ -25,8 +25,11 @@
     range-fn))
 
 (defn dot-position [chart-width i data-count dots-num]
-  (let [dot-spacer (/ chart-width (inc (min show-dots data-count)))]
-    (- (* (inc i) dot-spacer) (/ (* (* dot-radius 2) dots-num) 2))))
+  (let [dot-spacer (/ (- chart-width 50) (dec show-dots))
+        pos (- (* i dot-spacer)
+               (/ (* (* dot-radius 2) dots-num) 2)
+               -30)]
+    pos))
 
 (defn current-data [owner]
   (let [start (om/get-state owner :start)
@@ -57,8 +60,7 @@
       (-> next-circle
           (.attr "fill" selected-color)
           (.attr "r" (* dot-radius 1.5))))
-    (-> chart-label
-      (.text (label-key next-set)))
+    (.text chart-label (label-key next-set))
     (let [chart-label-width (width chart-label)
           new-x-pos (+ label-x-pos (/ (- (* (* dot-radius 2) chart-keys-count) chart-label-width) 2))]
       (.attr chart-label "x" (min (max 0 new-x-pos) (- (:chart-width options) chart-label-width))))
@@ -90,7 +92,21 @@
     (doseq [i (range (count chart-data))]
       (let [data-set (get chart-data i)
             max-val (apply max (vals (select-keys data-set chart-keys)))
-            scaled-max-val (scale-fn max-val)]
+            scaled-max-val (scale-fn max-val)
+            text (utils/get-period-string (:period data-set) nil [:short])
+            x-pos (dot-position chart-width i (count chart-data) (count chart-keys))
+            label (-> chart-node
+                      (.append "text")
+                      (.attr "class" "chart-x-label")
+                      (.attr "x" x-pos)
+                      (.attr "y" (:chart-height options))
+                      (.attr "fill" (:h-axis-color options))
+                      (.on "click" #(dot-click owner options i))
+                      (.on "mouseover" #(dot-click owner options i true))
+                      (.on "mouseout" #(dot-click owner options (om/get-state owner :selected)))
+                      (.text text))
+            label-width (width label)]
+        (.attr label "x" (+ x-pos (/ (- (* (* dot-radius 2) (count chart-keys)) label-width) 2)))
         ; for each key in the set
         (doseq [j (range (count chart-keys))]
           (let [chart-key (get chart-keys j)
@@ -128,23 +144,6 @@
                     (.attr "y1" cy)
                     (.attr "x2" next-cx)
                     (.attr "y2" next-cy))))))))
-    ; add the month labels
-    (doseq [v chart-data]
-      (let [idx (.indexOf (to-array chart-data) v)
-            text (utils/get-period-string (:period (get chart-data idx)) nil [:short])
-            x-pos (dot-position chart-width idx (count chart-data) (count chart-keys))
-            label (-> chart-node
-                      (.append "text")
-                      (.attr "class" "chart-x-label")
-                      (.attr "x" x-pos)
-                      (.attr "y" (:chart-height options))
-                      (.attr "fill" (:h-axis-color options))
-                      (.on "click" #(dot-click owner options idx))
-                      (.on "mouseover" #(dot-click owner options idx true))
-                      (.on "mouseout" #(dot-click owner options (om/get-state owner :selected)))
-                      (.text text))
-            label-width (width label)]
-        (.attr label "x" (+ x-pos (/ (- (* (* dot-radius 2) (count chart-keys)) label-width) 2)))))
     ; add the selected value label
     (let [x-pos (dot-position chart-width selected (count chart-data) (count chart-keys))
           chart-label (-> chart-node
@@ -198,13 +197,13 @@
               :style #js {:width (str (+ chart-width 20) "px")
                           :height (str chart-height "px")}}
       (dom/div {:class "chart-prev"
-                :style #js {:paddingTop (str (- chart-height 20) "px")
+                :style #js {:paddingTop (str (- chart-height 17) "px")
                             :opacity (if (> start 0) 1 0)}
                 :on-click #(prev-data owner %)}
         (dom/i {:class "fa fa-caret-left"}))
       (dom/svg #js {:className "d3-dot-chart" :ref "d3-dot"})
       (dom/div {:class "chart-next"
-                :style #js {:paddingTop (str (- chart-height 20) "px")
+                :style #js {:paddingTop (str (- chart-height 17) "px")
                             :opacity (if (< start (- (count chart-data) show-dots)) 1 0)}
                 :on-click #(next-data owner %)}
         (dom/i {:class "fa fa-caret-right"})))))

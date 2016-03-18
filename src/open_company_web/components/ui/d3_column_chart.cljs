@@ -32,8 +32,11 @@
     range-fn))
 
 (defn bar-position [chart-width i data-count columns-num]
-  (let [bar-spacer (/ chart-width (inc (min show-columns data-count)))]
-    (- (* (inc i) bar-spacer) (/ (* bar-width columns-num) 2))))
+  (let [bar-spacer (/ (- chart-width 50) (dec show-columns))
+        pos (- (* i bar-spacer)
+               (/ (* (* bar-width 2) columns-num) 2)
+               -30)]
+    pos))
 
 (defn build-selected-label [chart-label-g label-value label-color]
   (.each (.selectAll chart-label-g "text")
@@ -242,13 +245,13 @@
               :style #js {:width (str (+ chart-width 20) "px")
                           :height (str chart-height "px")}}
       (dom/div {:class "chart-prev"
-                :style #js {:paddingTop (str (- chart-height 20) "px")
+                :style #js {:paddingTop (str (- chart-height 17) "px")
                             :opacity (if (> start 0) 1 0)}
                 :on-click #(prev-data owner %)}
         (dom/i {:class "fa fa-caret-left"}))
       (dom/svg #js {:className "d3-column-chart" :ref "d3-column"})
       (dom/div {:class "chart-next"
-                :style #js {:paddingTop (str (- chart-height 20) "px")
+                :style #js {:paddingTop (str (- chart-height 17) "px")
                             :opacity (if (< start (- (count chart-data) show-columns)) 1 0)}
                 :on-click #(next-data owner %)}
         (dom/i {:class "fa fa-caret-right"})))))
