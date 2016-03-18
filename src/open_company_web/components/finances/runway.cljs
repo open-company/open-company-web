@@ -18,6 +18,16 @@
        " ≅ "
        (str (finances-utils/get-rounded-runway runway-days [:round :remove-trailing-zero]))))
 
+(defn runway-data-set [data-set]
+  (let [runway (:runway data-set)
+        fixed-runway (if (pos? runway) (utils/abs runway) 0)
+        label (if (pos? runway) (finances-utils/get-rounded-runway runway [:round]) "Pofitable")]
+    (merge data-set {:runway fixed-runway
+                     :label label})))
+
+(defn runway-data [sorted-data]
+  (vec (map #(runway-data-set %) sorted-data)))
+
 (defcomponent runway [data owner options]
   
   (render [_]
@@ -27,7 +37,7 @@
           fixed-runway-finances (map #(update-in % [:runway] finances-utils/fix-runway) sorted-finances)
           value-set (last fixed-runway-finances)
           runway-value (:runway value-set)
-          is-profitable (pos? (:runway (first sorted-finances)))
+          is-profitable (pos? (:runway (last sorted-finances)))
           runway (if is-profitable
                     "Profitable"
                     (str (utils/thousands-separator (utils/abs runway-value)) " days"))
@@ -36,7 +46,7 @@
           runway-string (if is-profitable
                           runway
                           (finances-utils/get-rounded-runway runway-value))
-          fixed-sorted-finances (vec (map #(merge % {:label (finances-utils/get-rounded-runway (utils/abs (:runway %)) [:round])}) sorted-finances))
+          fixed-sorted-finances (runway-data sorted-finances)
           chart-opts {:opts {:chart-height (when (contains? options :chart-size) (:height (:chart-size options)))
                              :chart-width (when (contains? options :chart-size)(:width (:chart-size options)))
                              :chart-keys [:runway]
