@@ -42,39 +42,37 @@
   (let [dot-spacer (/ chart-width (inc (min show-dots data-count)))]
     (- (* (inc i) dot-spacer) (/ (* (* dot-radius 2) dots-num) 2))))
 
-(defn dot-click [owner options idx]
+(defn dot-click [owner options idx & [is-hover]]
   (.stopPropagation (.-event js/d3))
   (let [selected (om/get-state owner :selected)
         chart-label (.select js/d3 (str "#chart-label"))
         chart-width (:chart-width options)
-        cur-g (.select js/d3 (str "#chart-g-" selected))
-        next-g (.select js/d3 (str "#chart-g-" idx))
         data (om/get-state owner :current-data)
         next-set (get data idx)
         label-key (:label-key options)
         data-count (count data)
         chart-keys-count (count (:chart-keys options))
         label-x-pos (dot-position chart-width idx data-count chart-keys-count)
-        next-g-rects (.selectAll next-g "rect")
-        cur-g-rects (.selectAll cur-g "rect")]
-    (.each cur-g-rects
-           (fn [d i]
-              (this-as rect
-                (let [d3-rect (.select js/d3 rect)
-                      color (.attr d3-rect "data-fill")]
-                  (.attr d3-rect "fill" color)))))
-    (.each next-g-rects
-           (fn [d i]
-              (this-as rect
-                (let [d3-rect (.select js/d3 rect)
-                      selected-color (.attr d3-rect "data-selectedFill")]
-                  (.attr d3-rect "fill" selected-color)))))
+        next-circle (.select js/d3 (str "circle#chart-dot-" idx))
+        all-circles (.selectAll js/d3 "circle")]
+    (.each all-circles (fn [d i]
+                        (this-as circle-node
+                          (let [circle (.select js/d3 circle-node)
+                                color (.attr circle "data-fill")]
+                            (-> circle
+                                (.attr "fill" color)
+                                (.attr "r" dot-radius))))))
+    (let [selected-color (.attr next-circle "data-selectedFill")]
+      (-> next-circle
+          (.attr "fill" selected-color)
+          (.attr "r" (* dot-radius 1.5))))
     (-> chart-label
       (.text (label-key next-set)))
     (let [chart-label-width (width chart-label)
           new-x-pos (+ label-x-pos (/ (- (* (* dot-radius 2) chart-keys-count) chart-label-width) 2))]
       (.attr chart-label "x" (min (max 0 new-x-pos) (- (:chart-width options) chart-label-width))))
-    (om/set-state! owner :selected idx)))
+    (when-not is-hover
+      (om/set-state! owner :selected idx))))
 
 (defn d3-calc [owner options]
   ; render the chart
@@ -96,36 +94,44 @@
     (doseq [i (range (count chart-data))]
       (let [data-set (get chart-data i)
             max-val (apply max (vals (select-keys data-set chart-keys)))
-            scaled-max-val (scale-fn max-val)
-            ; add a g element
-            dot-enter (-> chart-node
-                          (.append "g")
-                          (.attr "class" "chart-g")
-                          (.attr "fill" "green")
-                          (.attr "id" (str "chart-g-" i))
-                          (.on "click" #(dot-click owner options i))
-                          (.attr "transform"
-                                 (str "translate("
-                                      (dot-position chart-width i (count chart-data) (count chart-keys))
-                                      ","
-                                      (- (:chart-height options) scaled-max-val 20) ")")))]
+            scaled-max-val (scale-fn max-val)]
         ; for each key in the set
         (doseq [j (range (count chart-keys))]
           (let [chart-key (get chart-keys j)
-                scaled-val (scale-fn (chart-key data-set))]
+                cx (dot-position chart-width i (count chart-data) (count chart-keys))
+                cy (scale-fn (chart-key data-set))]
             ; add a rect to represent the data
-            (-> dot-enter
+            (-> chart-node
                 (.append "circle")
                 (.attr "class" "chart-dot")
-                (.attr "r" dot-radius)
+                (.attr "r" (if (= i selected)
+                              (* dot-radius 1.5)
+                              dot-radius))
                 (.attr "fill" (if (= i selected)
                                 (chart-key fill-selected-colors)
                                 (chart-key fill-colors)))
+                (.on "click" #(dot-click owner options i))
+                (.on "mouseover" #(dot-click owner options i true))
+                (.on "mouseout" #(dot-click owner options (om/get-state owner :selected)))
                 (.attr "data-fill" (chart-key fill-colors))
                 (.attr "data-selectedFill" (chart-key fill-selected-colors))
-                (.attr "id" (str "chart-dot-" (name chart-key) "-" i))
-                (.attr "cx" (* j (* dot-radius 2)))
-                (.attr "cy" (- scaled-max-val scaled-val)))))))
+                (.attr "id" (str "chart-dot-" i))
+                (.attr "cx" cx)
+                (.attr "cy" cy))
+            (when (< i (dec (count chart-data)))
+              (let [next-data-set (get chart-data (inc i))
+                    next-scaled-val (scale-fn (chart-key next-data-set))
+                    next-cx (dot-position chart-width (inc i) (count chart-data) (count chart-keys))
+                    next-cy (scale-fn (chart-key next-data-set))]
+                (-> chart-node
+                    (.append "line")
+                    (.attr "class" "chart-line")
+                    (.style "stroke" (chart-key fill-colors))
+                    (.style "stroke-width" 2)
+                    (.attr "x1" cx)
+                    (.attr "y1" cy)
+                    (.attr "x2" next-cx)
+                    (.attr "y2" next-cy))))))))
     ; add the month labels
     (doseq [v chart-data]
       (let [idx (.indexOf (to-array chart-data) v)
@@ -137,6 +143,9 @@
                       (.attr "x" x-pos)
                       (.attr "y" (:chart-height options))
                       (.attr "fill" (:h-axis-color options))
+                      (.on "click" #(dot-click owner options idx))
+                      (.on "mouseover" #(dot-click owner options idx true))
+                      (.on "mouseout" #(dot-click owner options (om/get-state owner :selected)))
                       (.text text))
             label-width (width label)]
         (.attr label "x" (+ x-pos (/ (- (* (* dot-radius 2) (count chart-keys)) label-width) 2)))))
