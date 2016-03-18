@@ -80,22 +80,31 @@
           int-month (int month)
           month-3 (- int-month 2)
           month-3-fixed (utils/add-zero (if (<= month-3 0) (- 12 month-3) month-3))
-          fixed-sorted-finances (into [] (map #(merge % {:label (chart-label % cur-symbol)}) sorted-finances))
+          with-income-burn (into [] (map #(merge % {:income-burn (- (:revenue %) (:costs %))}) sorted-finances))
+          fixed-sorted-finances (into [] (map #(merge % {:label (chart-label % cur-symbol)}) with-income-burn))
           chart-opts {:opts {:chart-height (when (contains? options :chart-size) (:height (:chart-size options)))
                              :chart-width (when (contains? options :chart-size)(:width (:chart-size options)))
                              :chart-keys (if has-revenues
-                                           [:revenue :costs]
+                                           [:revenue :costs :income-burn]
                                            [:costs])
+                             :chart-hover-keys [] ;(if has-revenue
+                                                  ;[:income-burn]
+                                                  ;[])
                              :label-color (occ/get-color-by-kw :oc-gray-3)
                              :label-key :label
                              :h-axis-color (occ/get-color-by-kw :oc-gray-3)
                              :chart-colors (if has-revenues
                                             {:revenue (occ/get-color-by-kw :oc-green-light)
-                                             :costs (occ/get-color-by-kw :oc-red-light)}
+                                             :costs (occ/get-color-by-kw :oc-red-light)
+                                             :income-burn "rgba(0,0,0,0)"}
                                             {:costs (occ/get-color-by-kw :oc-red-light)})
                              :chart-selected-colors (if has-revenues
                                                       {:revenue (occ/get-color-by-kw :oc-green-regular)
-                                                       :costs (occ/get-color-by-kw :oc-red-regular)}
+                                                       :costs (occ/get-color-by-kw :oc-red-regular)
+                                                       :income-burn (fn [value]
+                                                                     (if (pos? value)
+                                                                      (occ/get-color-by-kw :oc-green-regular)
+                                                                      (occ/get-color-by-kw :oc-red-regular)))}
                                                       {:costs (occ/get-color-by-kw :oc-red-regular)})
                              :prefix (utils/get-symbol-for-currency-code currency)}}]
       (dom/div {:class (utils/class-set {:section true
