@@ -36,7 +36,7 @@
           (dom/div {:class "finances-metric burn-rate"}
             (dom/div {:class "label"} burn-label)
             (dom/div {:class (str "value " burn-class)} (str currency burn-value)))
-          (when-not (zero? runway)
+          (when (neg? runway)
             (dom/div {:class "finances-metric runway"}
               (dom/div {:class "label"} "Runway")
               (dom/div {:class "value"} (finances-utils/get-rounded-runway runway [:round :remove-trailing-zero])))))
