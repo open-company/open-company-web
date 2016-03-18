@@ -36,7 +36,7 @@
           runway-string (if is-profitable
                           runway
                           (finances-utils/get-rounded-runway runway-value))
-          fixed-sorted-finances (vec (map #(merge % {:label (finances-utils/get-rounded-runway (:runway %) [:round])}) sorted-finances))
+          fixed-sorted-finances (vec (map #(merge % {:label (finances-utils/get-rounded-runway (utils/abs (:runway %)) [:round])}) sorted-finances))
           chart-opts {:opts {:chart-height (when (contains? options :chart-size) (:height (:chart-size options)))
                              :chart-width (when (contains? options :chart-size)(:width (:chart-size options)))
                              :chart-keys [:runway]
