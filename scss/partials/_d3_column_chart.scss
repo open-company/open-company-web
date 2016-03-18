@@ -3,11 +3,8 @@ div.d3-column-container{
 
   svg{
 
-    g.chart-g{
-
-      rect.chart-bar {
-        cursor: pointer;
-      }
+    rect.chart-bar {
+      cursor: pointer;
     }
 
     text.chart-label{
@@ -28,5 +25,15 @@ div.d3-column-container{
       font-weight: bold;
       cursor: pointer;
     }
+  }
+
+  div.chart-prev {
+    float: left;
+    cursor: pointer;
+  }
+
+  div.chart-next {
+    float: right;
+    cursor: pointer;
   }
 }
