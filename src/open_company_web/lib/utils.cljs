@@ -202,10 +202,11 @@
                       start (max 0 (- idx 3))
                       sub-data (subvec sorted-data start idx)
                       avg-burn-rate (calc-avg-burn-rate sub-data)
-                      runway (calc-runway (:cash data) avg-burn-rate)]
+                      burn-rate (calc-burn-rate (:revenue data) (:costs data))
+                      runway (calc-runway (:cash data) burn-rate)]
                   (merge data {:runway runway
                                :avg-burn-rate avg-burn-rate
-                               :burn-rate (calc-burn-rate (:revenue data) (:costs data))})))
+                               :burn-rate burn-rate})))
               sorted-data)))))
 
 (defn camel-case-str [value]
