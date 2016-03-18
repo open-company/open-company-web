@@ -32,10 +32,10 @@
     range-fn))
 
 (defn bar-position [chart-width i data-count columns-num]
-  (let [bar-spacer (/ (- chart-width 50) (dec show-columns))
+  (let [bar-spacer (/ (- chart-width 80) (dec show-columns))
         pos (- (* i bar-spacer)
                (/ (* (* bar-width 2) columns-num) 2)
-               -30)]
+               -60)]
     pos))
 
 (defn build-selected-label [chart-label-g label-value label-color]
