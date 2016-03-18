@@ -26,4 +26,14 @@ div.d3-dot-container{
       cursor: pointer;
     }
   }
+
+  div.chart-prev {
+    float: left;
+    cursor: pointer;
+  }
+
+  div.chart-next {
+    float: right;
+    cursor: pointer;
+  }
 }
