@@ -26,7 +26,7 @@
           company-data (slug @dispatcher/app-state)
           metric-info (:metric-info data)
           metric-data (:metric-data data)
-          sort-pred (utils/sort-by-key-pred :period true)
+          sort-pred (utils/sort-by-key-pred :period)
           sorted-metric (vec (sort sort-pred metric-data))
           actual-idx (growth-utils/get-actual sorted-metric)
           actual-set (sorted-metric actual-idx)
