@@ -15,9 +15,7 @@
           currency (utils/get-symbol-for-currency-code (:currency options))
           runway (finances-utils/fix-runway (:runway actual))
           burn-label (if (pos? all-revenues)
-                        (if (pos? (:burn-rate actual))
-                          "Cash Flow"
-                          "Burn Rate")
+                        "Cash Flow"
                         "Costs")
           burn-class  (if (pos? all-revenues)
                         (if (pos? (:burn-rate actual))
