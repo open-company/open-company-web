@@ -16,7 +16,7 @@
 
 (deftest test-company-editor-component
   (testing "Company editor component"
-    (router/set-route! ["create-company"])
+    (router/set-route! ["create-company"] {})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root company-editor app-state {:target c})
