@@ -26,7 +26,7 @@
                      :label label})))
 
 (defn runway-data [sorted-data]
-  (vec (map #(runway-data-set %) sorted-data)))
+  (vec (map runway-data-set sorted-data)))
 
 (defcomponent runway [data owner options]
   
