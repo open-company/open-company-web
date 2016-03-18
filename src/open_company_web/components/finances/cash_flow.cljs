@@ -64,6 +64,22 @@
         cash-flow (str (when (neg? cash-flow-val) "-") prefix (utils/with-metric-prefix abs-cash-flow-val))]
     (str "Revenue " revenue " Costs " costs " Cash flow " cash-flow)))
 
+(defn chart-label-fn [prefix data-set]
+  ;example Revenue $12.3K Costs $107K Cash flow -$94.7K
+  (let [revenue (str prefix (utils/with-metric-prefix (:revenue data-set)))
+        costs (str prefix (utils/with-metric-prefix (:costs data-set)))
+        cash-flow-val (- (:revenue data-set) (:costs data-set))
+        abs-cash-flow-val (utils/abs cash-flow-val)
+        cash-flow (str (when (neg? cash-flow-val) "-") prefix (utils/with-metric-prefix abs-cash-flow-val))]
+   [{:label (str "Revenue " revenue)
+     :color (occ/get-color-by-kw :oc-green-regular)}
+    {:label (str " Costs " costs)
+     :color (occ/get-color-by-kw :oc-red-regular)}
+    {:label (str " Cash flow " cash-flow)
+     :color (if (pos? cash-flow-val)
+              (occ/get-color-by-kw :oc-green-regular)
+              (occ/get-color-by-kw :oc-red-regular))}]))
+
 (defcomponent cash-flow [data owner options]
   
   (render [_]
@@ -81,15 +97,14 @@
           month-3 (- int-month 2)
           month-3-fixed (utils/add-zero (if (<= month-3 0) (- 12 month-3) month-3))
           with-income-burn (into [] (map #(merge % {:income-burn (- (:revenue %) (:costs %))}) sorted-finances))
-          fixed-sorted-finances (into [] (map #(merge % {:label (chart-label % cur-symbol)}) with-income-burn))
+          fixed-sorted-finances (into [] (map #(merge % {:label (chart-label-fn cur-symbol %)}) with-income-burn))
           chart-opts {:opts {:chart-height (when (contains? options :chart-size) (:height (:chart-size options)))
                              :chart-width (when (contains? options :chart-size)(:width (:chart-size options)))
                              :chart-keys (if has-revenues
                                            [:revenue :costs :income-burn]
                                            [:costs])
-                             :label-color (occ/get-color-by-kw :oc-gray-3)
                              :label-key :label
-                             :h-axis-color (occ/get-color-by-kw :oc-gray-3)
+                             :h-axis-color (occ/get-color-by-kw :oc-green-regular)
                              :chart-colors (if has-revenues
                                             {:revenue (occ/get-color-by-kw :oc-green-light)
                                              :costs (occ/get-color-by-kw :oc-red-light)
