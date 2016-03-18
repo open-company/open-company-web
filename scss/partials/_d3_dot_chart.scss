@@ -3,11 +3,8 @@ div.d3-dot-container{
 
   svg{
 
-    g.chart-g{
-
-      circle.chart-dot {
-        cursor: pointer;
-      }
+    circle.chart-dot {
+      cursor: pointer;
     }
 
     text.chart-label{
@@ -26,6 +23,7 @@ div.d3-dot-container{
       font-size: 14px;
       line-height: 1.1;
       font-weight: bold;
+      cursor: pointer;
     }
   }
 }
