@@ -87,9 +87,6 @@
                              :chart-keys (if has-revenues
                                            [:revenue :costs :income-burn]
                                            [:costs])
-                             :chart-hover-keys [] ;(if has-revenue
-                                                  ;[:income-burn]
-                                                  ;[])
                              :label-color (occ/get-color-by-kw :oc-gray-3)
                              :label-key :label
                              :h-axis-color (occ/get-color-by-kw :oc-gray-3)
