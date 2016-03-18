@@ -8,7 +8,7 @@
 
 (defcomponent topic-finances-headline [data owner options]
   (render [_]
-    (let [sort-pred (utils/sort-by-key-pred :period true)
+    (let [sort-pred (utils/sort-by-key-pred :period)
           finances-data (sort sort-pred (:data data))
           all-revenues (apply + (map :revenue finances-data))
           actual (last finances-data)
