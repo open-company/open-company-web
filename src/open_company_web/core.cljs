@@ -108,7 +108,6 @@
 ;; is undefined because it breaks tests
 (if-let [target (sel1 :div#app)]
   (do
-
     (defroute login-route "/login" {:as params}
       (login-handler target params))
 
@@ -131,14 +130,10 @@
       (om/root user-profile app-state {:target target}))
 
     (defroute company-route "/:slug" {:as params}
-      (company-handler nil target company params))
+      (company-handler "dashboard" target company-dashboard params))
 
     (defroute company-profile-route "/:slug/profile" {:as params}
       (company-handler "profile" target company params))
-
-    (defroute company-dashboard-route "/:slug/dashboard" {:as params}
-      (company-handler "dashboard" target company-dashboard params))
-
 
     (defroute not-found-route "*" []
       ;; render component
@@ -153,7 +148,6 @@
                                  user-profile-route
                                  company-route
                                  company-profile-route
-                                 company-dashboard-route
                                  not-found-route]))
 
     (defn login-wall []

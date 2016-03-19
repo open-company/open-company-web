@@ -28,7 +28,7 @@
         slug           (fn [co] (last (string/split (:href co) #"/")))
         [first second] (filter #(= (:rel %) "company") links)]
     (cond
-      (and first (not second)) (router/nav! (str "/" (slug first) "/dashboard"))
+      (and first (not second)) (router/nav! (str "/" (slug first)))
       (and first second)       (router/nav! "/companies")
       create-link              (router/nav! "/create-company")))
   db)
@@ -40,7 +40,7 @@
 (defmethod action :company-created [db [_ body]]
   (if (:links body)
     (let [updated (utils/fix-sections body)]
-      (router/nav! (str "/" (:slug updated) "/dashboard"))
+      (router/nav! (str "/" (:slug updated)))
       (assoc db (keyword (:slug updated)) updated))
     db))
 

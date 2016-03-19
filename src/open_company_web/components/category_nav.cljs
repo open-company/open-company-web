@@ -73,7 +73,7 @@
                   category-class (utils/class-set {:category true
                                                    :active (= active-category category-name)})]
               (dom/a {:class ""
-                      :href (str "/" slug "/dashboard#" category-name)
+                      :href (str "/" slug "#" category-name)
                       :on-click (partial category-click data category-name)}
                 (dom/div {:class category-class}
                   (dom/div {:class "category-label"}

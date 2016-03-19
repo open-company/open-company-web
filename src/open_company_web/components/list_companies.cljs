@@ -11,7 +11,7 @@
     (dom/li
       (om/build link {:href (str "/" (:slug data)) :name (:name data)})
       (dom/label {:style {:margin "0px 5px"}} " - ")
-      (om/build link {:href (str "/" (:slug data) "/dashboard") :name "Dashboard"}))))
+      (om/build link {:href (str "/" (:slug data)) :name "Dashboard"}))))
 
 (defcomponent list-companies [data owner]
   (render [_]
