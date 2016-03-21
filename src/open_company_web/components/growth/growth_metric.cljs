@@ -34,10 +34,10 @@
           metric-unit (:unit metric-info)
           period (utils/get-period-string (:period actual-set) interval)
           currency-symbol (utils/get-symbol-for-currency-code (:currency company-data))
-          actual-with-label (label-from-set actual-set interval metric-unit currency-symbol) ;(str fixed-cur-unit actual unit)
+          actual-with-label (label-from-set actual-set interval metric-unit currency-symbol)
           fixed-sorted-metric (vec (map #(merge % {:label (label-from-set % interval metric-unit currency-symbol)}) sorted-metric))
-          chart-opts {:opts {:chart-height (when (contains? options :chart-size) (:height (:chart-size options)))
-                             :chart-width (when (contains? options :chart-size) (:width (:chart-size options)))
+          chart-opts {:opts {:chart-height (:height (:chart-size options))
+                             :chart-width (:width (:chart-size options))
                              :chart-keys [:value]
                              :label-color (occ/get-color-by-kw :oc-blue-regular)
                              :label-key :label
