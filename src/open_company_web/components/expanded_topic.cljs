@@ -47,10 +47,14 @@
         (dom/div {:class "topic-navigation group"}
           (when prev-rev
             (dom/div {:class "previous"}
-              (dom/a {:on-click #((:prev-cb options) (:updated-at prev-rev))} "< Previous")))
+              (dom/a {:on-click (fn [e]
+                                  (.stopPropagation e)
+                                  ((:prev-cb options) (:updated-at prev-rev)))} "< Previous")))
           (when next-rev
             (dom/div {:class "next"}
-              (dom/a {:on-click #((:next-cb options) (:updated-at next-rev))} "Next >"))))))))
+              (dom/a {:on-click (fn [e]
+                                  (.stopPropagation e)
+                                  ((:next-cb options) (:updated-at next-rev)))} "Next >"))))))))
 
 (defn perform-transition [owner]
   (when-let [transit-topic-expanded (om/get-ref owner "transit-topic-expanded")]
