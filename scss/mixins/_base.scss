@@ -117,10 +117,10 @@
 @mixin pillbox($active_pillbox_bg: #bababa){
   label.pillbox {
     margin: 4px 3px;
-    padding: 3px 8px;
+    padding: 3px 12px;
     height: 30px;
     border-radius: 20px;
-    background-color: #f8f8f8;
+    background-color: #ffffff;
     box-shadow: 0 1px 0 0 $oc_gray_2;
     border: solid 0.3px #979797;
     font-size: 14px;
@@ -128,8 +128,7 @@
     cursor: pointer;
 
     &.active {
-      box-shadow: 0 1px 0 0 #d8d8d8;
-      border: solid 0.5px #979797;
+      border: solid 0.3px transparent;
       background-color: $active_pillbox_bg;
       color: white;
     }
