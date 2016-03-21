@@ -22,15 +22,14 @@
           cur-symbol (utils/get-symbol-for-currency-code currency)
           cash-val (str cur-symbol (utils/thousands-separator (:cash value-set)))
           fixed-sorted-finances (vec (map #(merge % {:label (str cur-symbol (.toLocaleString (js/parseFloat (str (:cash %)))))}) sorted-finances))
-          chart-opts {:opts {:chart-height (when (contains? options :chart-size) (:height (:chart-size options)))
-                             :chart-width (when (contains? options :chart-size)(:width (:chart-size options)))
+          chart-opts {:opts {:chart-height (:height (:chart-size options))
+                             :chart-width (:width (:chart-size options))
                              :chart-keys [:cash]
                              :label-color (occ/get-color-by-kw :oc-green-regular)
                              :label-key :label
                              :h-axis-color (occ/get-color-by-kw :oc-green-regular)
                              :chart-colors {:cash (occ/get-color-by-kw :oc-green-light)}
-                             :chart-selected-colors {:cash (occ/get-color-by-kw :oc-green-regular)}
-                             :prefix (utils/get-symbol-for-currency-code currency)}}]
+                             :chart-selected-colors {:cash (occ/get-color-by-kw :oc-green-regular)}}}]
       (dom/div {:class (utils/class-set {:section true
                                          :cash true
                                          :read-only (:read-only data)})
