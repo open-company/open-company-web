@@ -189,10 +189,14 @@
               (dom/div {:class "topic-navigation group"}
                 (when prev-rev
                   (dom/div {:class "previous group"}
-                    (dom/a {:on-click #((:rev-click options) % prev-rev)} "< Previous")))
+                    (dom/a {:on-click (fn [e]
+                                        (.stopPropagation e)
+                                        ((:rev-click options) e prev-rev))} "< Previous")))
                 (when next-rev
                   (dom/div {:class "next group"}
-                    (dom/a {:on-click #((:rev-click options) % next-rev)} "Next >")))))))))))
+                    (dom/a {:on-click (fn [e]
+                                        (.stopPropagation e)
+                                        ((:rev-click options) e next-rev))} "Next >")))))))))))
 
 (defcomponent topic [{:keys [section-data section currency] :as data} owner options]
 
