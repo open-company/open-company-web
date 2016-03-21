@@ -68,8 +68,7 @@
           company-data ((keyword slug) data)
           navbar-editing-cb (partial set-navbar-editing owner data)]
       (dom/div {:class (utils/class-set {:company-dashboard true
-                                         :row-fluid true
-                                         :fix-navbar (not (utils/is-mobile))})}
+                                         :navbar-offset (not (utils/is-mobile))})}
 
        (when-not (utils/is-mobile)
           (om/build navbar (merge data {:edit-mode navbar-editing

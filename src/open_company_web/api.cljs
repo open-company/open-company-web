@@ -58,7 +58,12 @@
 
 (defn get-company [slug]
   (when slug
-    (api-get (str "/companies/" slug) nil #(dispatch-body :company %))))
+    (api-get (str "/companies/" slug)
+             nil
+             (fn [{:keys [success body status]}]
+               (dispatcher/dispatch! [:company {:success success
+                                                :status status
+                                                :body (when success (json->cljs body))}])))))
 
 (defn post-company [data]
   (api-post "/companies" {:json-params data} #(dispatch-body :company-created %)))
