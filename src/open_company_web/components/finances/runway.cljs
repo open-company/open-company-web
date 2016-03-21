@@ -20,8 +20,8 @@
 
 (defn runway-data-set [data-set]
   (let [runway (:runway data-set)
-        fixed-runway (if (pos? runway) (utils/abs runway) 0)
-        label (if (pos? runway) (finances-utils/get-rounded-runway runway [:round]) "Pofitable")]
+        fixed-runway (if (neg? runway) (utils/abs runway) 0)
+        label (if (neg? runway) (finances-utils/get-rounded-runway runway [:round]) "Pofitable")]
     (merge data-set {:runway fixed-runway
                      :label label})))
 
