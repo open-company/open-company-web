@@ -18,8 +18,9 @@
 
 (defn current-data [owner]
   (let [start (om/get-state owner :start)
-        all-data (vec (om/get-props owner :chart-data))]
-    (subvec all-data start (+ start show-columns))))
+        all-data (vec (om/get-props owner :chart-data))
+        stop (min (count all-data) (+ start show-columns))]
+    (subvec all-data start stop)))
 
 (defn scale [owner options]
   (let [all-data (om/get-props owner :chart-data)
