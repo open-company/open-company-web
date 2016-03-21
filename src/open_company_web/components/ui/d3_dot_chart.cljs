@@ -14,11 +14,14 @@
 (defn width [el]
   (.-width (.getBBox (.node el))))
 
+(defn max-y [data chart-keys]
+  (let [filtered-data (map #(select-keys % chart-keys) data)]
+    (apply max (vec (flatten (map vals filtered-data))))))
+
 (defn scale [owner options]
   (let [all-data (om/get-props owner :chart-data)
         chart-keys (:chart-keys options)
-        filtered-data (map #(select-keys % chart-keys) all-data)
-        data-max (apply max (vec (flatten (map vals filtered-data))))
+        data-max (max-y all-data chart-keys)
         linear-fn (.. js/d3 -scale linear)
         domain-fn (.domain linear-fn #js [0 data-max])
         range-fn (.range linear-fn #js [0 (- (:chart-height options) 100)])]
@@ -63,10 +66,13 @@
           (.attr "r" (* dot-radius 1.5))))
     (.text chart-label (label-key next-set))
     (let [chart-label-width (width chart-label)
-          new-x-pos (+ label-x-pos (/ (- (* (* dot-radius 2) chart-keys-count) chart-label-width) 2))]
-      (.attr chart-label "x" (min (max 0 new-x-pos) (- (:chart-width options) chart-label-width))))
+          new-x-pos (- (/ chart-width 2) (/ chart-label-width 2))]
+      (.attr chart-label "x" (max 0 new-x-pos)))
     (when-not is-hover
       (om/set-state! owner :selected idx))))
+
+(defn get-y [y max-y]
+  (+ 70 (- max-y y)))
 
 (defn d3-calc [owner options]
   ; clean the chart area
@@ -88,6 +94,8 @@
                        (.attr "height" (:chart-height options))
                        (.on "click" #(.stopPropagation (.-event js/d3))))
         scale-fn (scale owner options)
+        data-max (max-y (om/get-props owner :chart-data) chart-keys)
+        max-y (scale-fn data-max)
         label-key (:label-key options)]
     ; for each set of data
     (doseq [i (range (count chart-data))]
@@ -113,6 +121,21 @@
           (let [chart-key (get chart-keys j)
                 cx (dot-position chart-width i (count chart-data) (count chart-keys))
                 cy (scale-fn (chart-key data-set))]
+            ; add the line to connect this to the next dot
+            (when (< i (dec (count chart-data)))
+              (let [next-data-set (get chart-data (inc i))
+                    next-scaled-val (scale-fn (chart-key next-data-set))
+                    next-cx (dot-position chart-width (inc i) (count chart-data) (count chart-keys))
+                    next-cy (scale-fn (chart-key next-data-set))]
+                (-> chart-node
+                    (.append "line")
+                    (.attr "class" "chart-line")
+                    (.style "stroke" (chart-key fill-colors))
+                    (.style "stroke-width" 2)
+                    (.attr "x1" cx)
+                    (.attr "y1" (get-y cy max-y))
+                    (.attr "x2" next-cx)
+                    (.attr "y2" (get-y next-cy max-y)))))
             ; add a rect to represent the data
             (-> chart-node
                 (.append "circle")
@@ -130,21 +153,7 @@
                 (.attr "data-selectedFill" (chart-key fill-selected-colors))
                 (.attr "id" (str "chart-dot-" i))
                 (.attr "cx" cx)
-                (.attr "cy" cy))
-            (when (< i (dec (count chart-data)))
-              (let [next-data-set (get chart-data (inc i))
-                    next-scaled-val (scale-fn (chart-key next-data-set))
-                    next-cx (dot-position chart-width (inc i) (count chart-data) (count chart-keys))
-                    next-cy (scale-fn (chart-key next-data-set))]
-                (-> chart-node
-                    (.append "line")
-                    (.attr "class" "chart-line")
-                    (.style "stroke" (chart-key fill-colors))
-                    (.style "stroke-width" 2)
-                    (.attr "x1" cx)
-                    (.attr "y1" cy)
-                    (.attr "x2" next-cx)
-                    (.attr "y2" next-cy))))))))
+                (.attr "cy" (get-y cy max-y)))))))
     ; add the selected value label
     (let [x-pos (dot-position chart-width selected (count chart-data) (count chart-keys))
           chart-label (-> chart-node
@@ -156,17 +165,19 @@
                           (.attr "fill" (:label-color options))
                           (.text (label-key (get chart-data selected))))
           chart-label-width (width chart-label)
-          chart-label-pos (+ x-pos (/ (- (* (* dot-radius 2) (count chart-keys)) chart-label-width) 2))]
+          chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
       (when (> chart-label-width 150)
         (.attr chart-label "class" "chart-label small"))
       (let [new-chart-label-width (width chart-label)
-            new-chart-label-pos (+ x-pos (/ (- (* (* dot-radius 2) (count chart-keys)) new-chart-label-width) 2))]
-        (.attr chart-label "x" (min (max 0 new-chart-label-pos) (- chart-width new-chart-label-width)))))))
+            new-chart-label-pos (- (/ chart-width 2) (/ new-chart-label-width 2))]
+        (.attr chart-label "x" (max 0 new-chart-label-pos))))))
+
+(def chart-step show-dots)
 
 (defn prev-data [owner e]
   (.stopPropagation e)
   (let [start (om/get-state owner :start)
-        next-start (- start show-dots)
+        next-start (- start chart-step)
         fixed-next-start (max 0 next-start)]
     (om/set-state! owner :start fixed-next-start)))
 
@@ -174,7 +185,7 @@
   (.stopPropagation e)
   (let [start (om/get-state owner :start)
         all-data (om/get-props owner :chart-data)
-        next-start (+ start show-dots)
+        next-start (+ start chart-step)
         fixed-next-start (min (- (count all-data) show-dots) next-start)]
     (om/set-state! owner :start fixed-next-start)))
 
