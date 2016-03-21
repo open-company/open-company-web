@@ -33,8 +33,9 @@
 
 (defn current-data [owner]
   (let [start (om/get-state owner :start)
-        all-data (om/get-props owner :chart-data)]
-    (subvec all-data start (+ start show-dots))))
+        all-data (om/get-props owner :chart-data)
+        stop (min (count all-data) (+ start show-dots))]
+    (subvec all-data start stop)))
 
 (defn dot-click [owner options idx & [is-hover]]
   (.stopPropagation (.-event js/d3))
