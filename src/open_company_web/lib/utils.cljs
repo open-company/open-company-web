@@ -633,4 +633,4 @@
     (str (round-2-dec value 2))))
 
 (defn is-test-env? []
-  (not (not js/_phantom)))
+  (not (not (.-_phantom js/window))))
