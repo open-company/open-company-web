@@ -98,8 +98,8 @@
           month-3-fixed (utils/add-zero (if (<= month-3 0) (- 12 month-3) month-3))
           with-income-burn (vec (map #(merge % {:income-burn (- (:revenue %) (:costs %))}) sorted-finances))
           fixed-sorted-finances (vec (map #(merge % {:label (chart-label-fn cur-symbol %)}) with-income-burn))
-          chart-opts {:opts {:chart-height (when (contains? options :chart-size) (:height (:chart-size options)))
-                             :chart-width (when (contains? options :chart-size)(:width (:chart-size options)))
+          chart-opts {:opts {:chart-height (:height (:chart-size options))
+                             :chart-width (:width (:chart-size options))
                              :chart-keys (if has-revenues
                                            [:revenue :costs :income-burn]
                                            [:costs])
