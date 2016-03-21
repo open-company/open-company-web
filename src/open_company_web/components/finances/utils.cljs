@@ -114,21 +114,57 @@
     :else
     string))
 
+(defn day-label [& [flags]]
+ "day")
+
+(defn week-label [flags]
+  (if (utils/in? flags :short)
+    "wk"
+    "week"))
+
+(defn month-label [flags]
+ (if (utils/in? flags :short)
+    "mnth"
+    "month"))
+
+(defn year-label [flags]
+ (if (utils/in? flags :short)
+    "yr"
+    "year"))
+
+(defn pluralize [n]
+  (if (> n 1)
+    "s"
+    ""))
+
 (defn get-rounded-runway [runway-days & [flags]]
-  (cond
-    (< runway-days 7)
-    (str (int runway-days) " days")
-    (< runway-days (* 30 3))
-    (str (int runway-days) " wks")
-    (< runway-days (* 30 12))
-    (if (utils/in? flags :round)
-      (if (utils/in? flags :remove-trailing-zero)
-        (str (remove-trailing-zero (str (int (/ runway-days 30)))) " mnths")
-        (str (int (/ runway-days 30)) " mnths"))
-      (str (quot runway-days 30) " mnths"))
-    :else
-    (if (utils/in? flags :round)
-      (if (utils/in? flags :remove-trailing-zero)
-        (str (remove-trailing-zero (str (int (/ runway-days (* 30 12))))) " yrs")
-        (str (int (/ runway-days (* 30 12))) " yrs"))
-      (str (quot runway-days (* 30 12)) " yrs"))))
+  (let [abs-runway-days (utils/abs runway-days)]
+    (cond
+      ; days
+      (< abs-runway-days 7)
+      (let [days (int abs-runway-days)]
+        (str days " " (day-label flags) (pluralize days)))
+      ; weeks
+      (< abs-runway-days (* 30 3))
+      (let [weeks (int (/ abs-runway-days 7))]
+        (str weeks " " (week-label flags) (pluralize weeks)))
+      ; months
+      (< abs-runway-days (* 30 12))
+      (if (utils/in? flags :round)
+        (let [months (int (/ abs-runway-days 30))
+              fixed-months (if (utils/in? flags :remove-trailing-zero)
+                             (remove-trailing-zero (str months))
+                             (str months))]
+          (str fixed-months " " (month-label flags) (pluralize months)))
+        (let [months (quot abs-runway-days 30)]
+          (str months " " (month-label flags) (pluralize months))))
+      ; years
+      :else
+      (if (utils/in? flags :round)
+        (let [years (int (/ abs-runway-days (* 30 12)))
+              fixed-years (if (utils/in? flags :remove-trailing-zero)
+                            (remove-trailing-zero (str years))
+                            (str years))]
+          (str fixed-years " " (year-label flags) (pluralize years)))
+        (let [years (quot abs-runway-days (* 30 12))]
+          (str years " " (year-label flags) (pluralize years)))))))
