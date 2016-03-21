@@ -66,7 +66,7 @@
         (.attr txt "dx" txt-left)
         (when (< idx (dec (count label-value)))
           (recur (inc idx)
-                 (+ txt-left txt-width 5)))))))
+                 (+ txt-left txt-width 10)))))))
 
 (defn bar-click [owner options idx & [is-hover]]
   (.stopPropagation (.-event js/d3))
@@ -80,7 +80,6 @@
         label-key (:label-key options)
         data-count (count data)
         chart-keys-count (count (:chart-keys options))
-        label-x-pos (bar-position chart-width idx data-count chart-keys-count)
         next-g-rects (.selectAll next-g "rect")
         all-rects (.selectAll js/d3 "rect")]
     (.each all-rects
@@ -97,9 +96,9 @@
                   (.attr d3-rect "fill" selected-color)))))
     (build-selected-label chart-label (label-key next-set) (:label-color options))
     (let [chart-label-width (width chart-label)
-          new-x-pos (+ label-x-pos (/ (- (* bar-width chart-keys-count) chart-label-width) 2))]
+          new-x-pos (- (/ chart-width 2) (/ chart-label-width 2))]
       (.attr chart-label "transform" (str "translate("
-                                          (min (max 0 new-x-pos) (- (:chart-width options) chart-label-width))
+                                          (max 0 new-x-pos)
                                           ","
                                           50")")))
     (when-not is-hover
@@ -189,7 +188,7 @@
                 (.attr "width" bar-width)
                 (.attr "height" (max 0 scaled-val)))))))
     ; add the selected value label
-    (let [x-pos (bar-position chart-width selected (count chart-data) (count chart-keys))
+    (let [x-pos (/ chart-width 2)
           label-value (label-key (get chart-data selected))
           label-color (:label-color options)
           chart-label-g (-> chart-node
@@ -199,21 +198,19 @@
                             (.attr "transform" (str "translate(" x-pos "," 50")")))]
       (build-selected-label chart-label-g label-value label-color)
       (let [chart-label-width (width chart-label-g)
-            chart-label-pos (+ x-pos (/ (- (* bar-width (count chart-keys)) chart-label-width) 2))]
-        (when (> chart-label-width 150)
-          (.attr chart-label-g "class" "chart-label-container"))
-        (let [new-chart-label-width (width chart-label-g)
-              new-chart-label-pos (+ x-pos (/ (- (* bar-width (count chart-keys)) new-chart-label-width) 2))]
-          (.attr chart-label-g "transform" (str "translate("
-                                                (min (max 0 new-chart-label-pos) (- chart-width new-chart-label-width))
-                                                ","
-                                                50
-                                                ")")))))))
+            chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
+        (.attr chart-label-g "transform" (str "translate("
+                                              (max 0 chart-label-pos)
+                                              ","
+                                              50
+                                              ")"))))))
+
+(def chart-step show-columns)
 
 (defn prev-data [owner e]
   (.stopPropagation e)
   (let [start (om/get-state owner :start)
-        next-start (- start show-columns)
+        next-start (- start chart-step)
         fixed-next-start (max 0 next-start)]
     (om/set-state! owner :start fixed-next-start)))
 
@@ -221,7 +218,7 @@
   (.stopPropagation e)
   (let [start (om/get-state owner :start)
         all-data (om/get-props owner :chart-data)
-        next-start (+ start show-columns)
+        next-start (+ start chart-step)
         fixed-next-start (min (- (count all-data) show-columns) next-start)]
     (om/set-state! owner :start fixed-next-start)))
 
