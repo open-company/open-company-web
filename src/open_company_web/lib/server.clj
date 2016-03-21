@@ -14,9 +14,13 @@
 (defn devcards []
   (as-html (resource-response "/devcards.html" {:root "public"})))
 
+(defn not-found []
+  (assoc (as-html (resource-response "/404.html" {:root "public"})) :status 404))
+
 (defroutes resources
   ; serve the react app for all requests
   (GET "/devcards" [] (devcards))
+  (GET "/404" [] (not-found))
   (GET "*" [] (index))
   ; remove the static paths
   (route/files "/css/*" {:root "resources/public"})

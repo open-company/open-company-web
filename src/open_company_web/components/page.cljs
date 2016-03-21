@@ -25,7 +25,7 @@
         ;; Company / user header
         (om/build navbar data)
 
-        (dom/div {:class "container-fluid"}
+        (dom/div {:class "navbar-offset container-fluid"}
 
           ;; ToC
           (when-not profile-page
