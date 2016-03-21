@@ -96,27 +96,21 @@
           int-month (int month)
           month-3 (- int-month 2)
           month-3-fixed (utils/add-zero (if (<= month-3 0) (- 12 month-3) month-3))
-          with-income-burn (vec (map #(merge % {:income-burn (- (:revenue %) (:costs %))}) sorted-finances))
-          fixed-sorted-finances (vec (map #(merge % {:label (chart-label-fn cur-symbol %)}) with-income-burn))
+          fixed-sorted-finances (vec (map #(merge % {:label (chart-label-fn cur-symbol %)}) sorted-finances))
           chart-opts {:opts {:chart-height (:height (:chart-size options))
                              :chart-width (:width (:chart-size options))
                              :chart-keys (if has-revenues
-                                           [:revenue :costs :income-burn]
+                                           [:revenue :costs]
                                            [:costs])
                              :label-key :label
                              :h-axis-color (occ/get-color-by-kw :oc-green-regular)
                              :chart-colors (if has-revenues
                                             {:revenue (occ/get-color-by-kw :oc-green-light)
-                                             :costs (occ/get-color-by-kw :oc-red-light)
-                                             :income-burn "rgba(0,0,0,0)"}
+                                             :costs (occ/get-color-by-kw :oc-red-light)}
                                             {:costs (occ/get-color-by-kw :oc-red-light)})
                              :chart-selected-colors (if has-revenues
                                                       {:revenue (occ/get-color-by-kw :oc-green-regular)
-                                                       :costs (occ/get-color-by-kw :oc-red-regular)
-                                                       :income-burn (fn [value]
-                                                                     (if (pos? value)
-                                                                      (occ/get-color-by-kw :oc-green-regular)
-                                                                      (occ/get-color-by-kw :oc-red-regular)))}
+                                                       :costs (occ/get-color-by-kw :oc-red-regular)}
                                                       {:costs (occ/get-color-by-kw :oc-red-regular)})
                              :prefix (utils/get-symbol-for-currency-code currency)}}]
       (dom/div {:class (utils/class-set {:section true
