@@ -234,12 +234,14 @@
        :selected (dec (count current-data))}))
 
   (did-mount [_]
-    (d3-calc owner options))
+    (when-not (utils/is-test-env?)
+      (d3-calc owner options)))
 
   (did-update [_ old-props old-state]
-    (when (or (not= old-props data)
-              (not= old-state (om/get-state owner)))
-      (d3-calc owner options)))
+    (when-not (utils/is-test-env?)
+      (when (or (not= old-props data)
+                (not= old-state (om/get-state owner)))
+        (d3-calc owner options))))
 
   (render-state [_ {:keys [start]}]
     (dom/div {:class "d3-column-container"
