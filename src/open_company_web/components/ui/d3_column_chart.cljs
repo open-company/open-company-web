@@ -33,7 +33,7 @@
     range-fn))
 
 (defn bar-position [chart-width i data-count columns-num]
-  (let [bar-spacer (/ (- chart-width 80) (dec show-columns))
+  (let [bar-spacer (/ (- chart-width 90) (dec show-columns))
         pos (- (* i bar-spacer)
                (/ (* (* bar-width 2) columns-num) 2)
                -60)]
@@ -68,7 +68,7 @@
           (recur (inc idx)
                  (+ txt-left txt-width 10)))))))
 
-(defn bar-click [owner options idx & [is-hover]]
+(defn bar-click [owner options idx is-hover action]
   (.stopPropagation (.-event js/d3))
   (let [selected (om/get-state owner :selected)
         chart-label (.select js/d3 (str "#chart-label"))
@@ -111,99 +111,101 @@
       color)))
 
 (defn d3-calc [owner options]
-  ; clean the chart area
-  (.each (.selectAll (.select js/d3 "svg") "*")
-         (fn [_ _]
-           (this-as el
-             (.remove (.select js/d3 el)))))
-  ; render the chart
-  (let [selected (om/get-state owner :selected)
-        chart-data (current-data owner)
-        fill-colors (:chart-colors options)
-        fill-selected-colors (:chart-selected-colors options)
-        chart-width (:chart-width options)
-        chart-keys (:chart-keys options)
-        keys-count (count chart-keys)
-        ; main chart node
-        chart-node (-> js/d3
-                       (.select (om/get-ref owner "d3-column"))
-                       (.attr "width" (:chart-width options))
-                       (.attr "height" (:chart-height options))
-                       (.on "click" #(.stopPropagation (.-event js/d3))))
-        scale-fn (scale owner options)
-        label-key (:label-key options)]
-    ; for each set of data
-    (doseq [i (range (count chart-data))]
-      (let [data-set (get chart-data i)
-            max-val (apply max (vals (select-keys data-set chart-keys)))
-            scaled-max-val (scale-fn max-val)
-            ; add a g element
-            bar-enter (-> chart-node
-                          (.append "g")
-                          (.attr "class" "chart-g")
-                          (.attr "id" (str "chart-g-" i))
-                          (.on "click" #(bar-click owner options i))
-                          (.on "mouseover" #(bar-click owner options i true))
-                          (.on "mouseout" #(bar-click owner options (om/get-state owner :selected)))
-                          (.attr "transform"
-                                 (str "translate("
-                                      (bar-position chart-width i (count chart-data) keys-count)
-                                      ","
-                                      (- (:chart-height options) scaled-max-val 20) ")")))
-            ; month label
-            text (utils/get-period-string (:period data-set) nil [:short])
-            x-pos (bar-position chart-width i (count chart-data) keys-count)
-            label (-> chart-node
-                      (.append "text")
-                      (.attr "class" "chart-x-label")
-                      (.attr "x" x-pos)
-                      (.attr "y" (:chart-height options))
-                      (.on "click" #(bar-click owner options i))
-                      (.on "mouseover" #(bar-click owner options i true))
-                      (.on "mouseout" #(bar-click owner options (om/get-state owner :selected)))
-                      (.attr "fill" (:h-axis-color options))
-                      (.text text))
-            label-width (width label)]
-        ; set month label x position depending on its width
-        (.attr label "x" (+ x-pos (/ (- (* bar-width keys-count) label-width) 2)))
-        ; for each key in the set
-        (doseq [j (range (count chart-keys))]
-          (let [chart-key (get chart-keys j)
-                value (chart-key data-set)
-                scaled-val (scale-fn (utils/abs value))
-                color (get-color :chart-colors options chart-key value)
-                selected-color (get-color :chart-selected-colors options chart-key value)]
-            ; add a rect to represent the data
-            (-> bar-enter
-                (.append "rect")
-                (.attr "class" "chart-bar")
-                (.attr "fill" (if (= i selected)
-                                selected-color
-                                color))
-                (.attr "data-fill" color)
-                (.attr "data-selectedFill" selected-color)
-                (.attr "id" (str "chart-bar-" (name chart-key) "-" i))
-                (.attr "x" (* j bar-width))
-                (.attr "y" (- scaled-max-val scaled-val))
-                (.attr "width" bar-width)
-                (.attr "height" (max 0 scaled-val)))))))
-    ; add the selected value label
-    (let [x-pos (/ chart-width 2)
-          label-value (label-key (get chart-data selected))
-          label-color (:label-color options)
-          chart-label-g (-> chart-node
+  (when-let [d3-column (om/get-ref owner "d3-column")]
+    ; clean the chart area
+    (.each (.selectAll (.select js/d3 d3-column) "*")
+           (fn [_ _]
+             (this-as el
+               (.remove (.select js/d3 el)))))
+    ; render the chart
+    (let [selected (om/get-state owner :selected)
+          chart-data (current-data owner)
+          fill-colors (:chart-colors options)
+          fill-selected-colors (:chart-selected-colors options)
+          chart-width (:chart-width options)
+          chart-keys (:chart-keys options)
+          keys-count (count chart-keys)
+          ; main chart node
+          chart-node (-> js/d3
+                         (.select d3-column)
+                         (.attr "width" (:chart-width options))
+                         (.attr "height" (:chart-height options))
+                         (.on "click" #(.stopPropagation (.-event js/d3))))
+          scale-fn (scale owner options)
+          label-key (:label-key options)]
+      ; for each set of data
+      (doseq [i (range (count chart-data))]
+        (let [data-set (get chart-data i)
+              max-val (apply max (vals (select-keys data-set chart-keys)))
+              scaled-max-val (scale-fn max-val)
+              ; add a g element
+              bar-enter (-> chart-node
                             (.append "g")
-                            (.attr "class" "chart-label-container")
-                            (.attr "id" "chart-label")
-                            (.attr "transform" (str "translate(" x-pos "," 50")")))]
-      (build-selected-label chart-label-g label-value label-color)
-      (let [chart-label-width (width chart-label-g)
-            chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
-        (.attr chart-label-g "transform" (str "translate("
-                                              (max 0 chart-label-pos)
-                                              ","
-                                              50
-                                              ")"))))))
+                            (.attr "class" "chart-g")
+                            (.attr "id" (str "chart-g-" i))
+                            (.on "click" #(bar-click owner options i false "click"))
+                            (.on "mouseover" #(bar-click owner options i true "mouseover"))
+                            (.on "mouseout" #(bar-click owner options (om/get-state owner :selected) true "mouseout"))
+                            (.attr "transform"
+                                   (str "translate("
+                                        (bar-position chart-width i (count chart-data) keys-count)
+                                        ","
+                                        (- (:chart-height options) scaled-max-val 20) ")")))
+              ; month label
+              force-year (or (zero? i) (= i (dec (count chart-data))))
+              text (utils/get-period-string (:period data-set) nil [:short (when force-year :force-year)])
+              x-pos (bar-position chart-width i (count chart-data) keys-count)
+              label (-> chart-node
+                        (.append "text")
+                        (.attr "class" "chart-x-label")
+                        (.attr "x" x-pos)
+                        (.attr "y" (:chart-height options))
+                        (.on "click" #(bar-click owner options i false "click"))
+                        (.on "mouseover" #(bar-click owner options i true "mouseover"))
+                        (.on "mouseout" #(bar-click owner options (om/get-state owner :selected) true "mouseout"))
+                        (.attr "fill" (:h-axis-color options))
+                        (.text text))
+              label-width (width label)]
+          ; set month label x position depending on its width
+          (.attr label "x" (+ x-pos (/ (- (* bar-width keys-count) label-width) 2)))
+          ; for each key in the set
+          (doseq [j (range (count chart-keys))]
+            (let [chart-key (get chart-keys j)
+                  value (chart-key data-set)
+                  scaled-val (scale-fn (utils/abs value))
+                  color (get-color :chart-colors options chart-key value)
+                  selected-color (get-color :chart-selected-colors options chart-key value)]
+              ; add a rect to represent the data
+              (-> bar-enter
+                  (.append "rect")
+                  (.attr "class" "chart-bar")
+                  (.attr "fill" (if (= i selected)
+                                  selected-color
+                                  color))
+                  (.attr "data-fill" color)
+                  (.attr "data-selectedFill" selected-color)
+                  (.attr "id" (str "chart-bar-" (name chart-key) "-" i))
+                  (.attr "x" (* j bar-width))
+                  (.attr "y" (- scaled-max-val scaled-val))
+                  (.attr "width" bar-width)
+                  (.attr "height" (max 0 scaled-val)))))))
+      ; add the selected value label
+      (let [x-pos (/ chart-width 2)
+            label-value (label-key (get chart-data selected))
+            label-color (:label-color options)
+            chart-label-g (-> chart-node
+                              (.append "g")
+                              (.attr "class" "chart-label-container")
+                              (.attr "id" "chart-label")
+                              (.attr "transform" (str "translate(" x-pos "," 50")")))]
+        (build-selected-label chart-label-g label-value label-color)
+        (let [chart-label-width (width chart-label-g)
+              chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
+          (.attr chart-label-g "transform" (str "translate("
+                                                (max 0 chart-label-pos)
+                                                ","
+                                                50
+                                                ")")))))))
 
 (def chart-step show-columns)
 
