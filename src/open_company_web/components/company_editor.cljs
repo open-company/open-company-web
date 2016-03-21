@@ -11,7 +11,7 @@
     (utils/update-page-title "OpenCompany - Setup Your Company")
     (dom/div {:class "company-editor container"}
       (om/build navbar data)
-      (dom/div {:class "container-fluid"}
+      (dom/div {:class "navbar-offset container-fluid"}
         (dom/div {:class "col-md-6 col-md-offset-3 main"}
           (dom/form {:style {:margin-top "3em"}}
             (dom/div {:class "form-group"}

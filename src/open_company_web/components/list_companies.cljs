@@ -9,20 +9,19 @@
 (defcomponent list-page-item [data owner]
   (render [_]
     (dom/li
-      (om/build link {:href (str "/companies/" (:slug data)) :name (:name data)})
-      (dom/label {:style {:margin "0px 5px"}} " - ")
-      (om/build link {:href (str "/companies/" (:slug data) "/dashboard") :name "Dashboard"}))))
+      (om/build link {:href (str "/" (:slug data)) :name (:name data)}))))
 
 (defcomponent list-companies [data owner]
   (render [_]
     (utils/update-page-title "OpenCompany - Startup Transparency Made Simple")
     (let [company-list (:companies data)]
-      (dom/div {:class "row-fluid"}
+      (dom/div {}
         (om/build navbar data)
-        (dom/h1 "Companies:")
-        (if (:loading data)
-          (dom/h4 "Loading companies...")
-          (if (pos? (count company-list))
-            (dom/ul
-              (om/build-all list-page-item company-list))
-            (dom/h2 "No companies found.")))))))
+        (dom/div {:class "navbar-offset"}
+                 (dom/h1 "Companies:")
+                 (if (:loading data)
+                   (dom/h4 "Loading companies...")
+                   (if (pos? (count company-list))
+                     (dom/ul
+                      (om/build-all list-page-item company-list))
+                     (dom/h2 "No companies found."))))))))

@@ -11,7 +11,7 @@
   (render [_]
     (dom/div {:class "user-profile row"}
       (om/build navbar {})
-      (dom/div {:class "container-fluid"}
+      (dom/div {:class "navbar-offset container-fluid"}
         (dom/div {:class "col-md-12 main"}
           (dom/div {:class "panel panel-default"}
             (dom/div {:class "panel-heading"} "User profile")

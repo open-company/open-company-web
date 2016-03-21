@@ -19,7 +19,7 @@
             first-letter (first (clojure.string/upper-case company-name))
             is-profile-page (utils/in? (:route @router/path) "profile")
             read-only-company (:read-only company-data)
-            company-home (str "/companies/" slug (when-not (or read-only-company is-profile-page) "/profile"))
+            company-home (str "/" slug (when-not (or read-only-company is-profile-page) "/profile"))
             av-size (or (:size data) df-company-avatar-size)
             px-size (utils/px av-size)
             bd-radius (utils/px (int (/ av-size 2)))

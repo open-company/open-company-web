@@ -12,7 +12,7 @@
           slug (:slug @router/path)
           selected-section (:section @router/path)]
       (dom/li {:class (if (= section selected-section) "active" "")}
-        (om/build link {:href (str "/companies/" slug "/" section) :name (utils/camel-case-str section)})))))
+        (om/build link {:href (str "/" slug "/" section) :name (utils/camel-case-str section)})))))
 
 (defcomponent sidebar [data owner]
   (render [_]
