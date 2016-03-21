@@ -24,7 +24,7 @@
   (testing "Costs component"
     (let [c (tu/new-container!)
           app-state (atom test-atom)
-          _ (om/root costs app-state {:target c} {:opts {:width 100 :height 100}})
+          _ (om/root costs app-state {:target c})
           chart-node (sel1 c [:div.section.costs])]
       (is (not (nil? chart-node)))
       (tu/unmount! c))))

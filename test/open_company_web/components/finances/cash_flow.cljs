@@ -24,7 +24,7 @@
   (testing "Cash flow component"
     (let [c (tu/new-container!)
           app-state (atom test-atom)
-          _ (om/root cash-flow app-state {:target c} {:opts {:width 100 :height 100}})
+          _ (om/root cash-flow app-state {:target c})
           cash-flow-node (sel1 c [:div.section.cash-flow])]
       (is (not (nil? cash-flow-node)))
       (tu/unmount! c))))
