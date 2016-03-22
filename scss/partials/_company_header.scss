@@ -47,8 +47,8 @@ div.company-header{
 
       div.company-logo-container{
         margin-left: 15px;
-        width: 70px;
-        height: 70px;
+        max-width: 70px;
+        max-height: 70px;
         float: left;
 
         img.company-logo {
