@@ -27,7 +27,8 @@
                              :chart-keys [:cash]
                              :label-color (occ/get-color-by-kw :oc-green-regular)
                              :label-key :label
-                             :h-axis-color (occ/get-color-by-kw :oc-green-regular)
+                             :h-axis-color (occ/get-color-by-kw :oc-green-light)
+                             :h-axis-selected-color (occ/get-color-by-kw :oc-green-regular)
                              :chart-colors {:cash (occ/get-color-by-kw :oc-green-light)}
                              :chart-selected-colors {:cash (occ/get-color-by-kw :oc-green-regular)}}}]
       (dom/div {:class (utils/class-set {:section true

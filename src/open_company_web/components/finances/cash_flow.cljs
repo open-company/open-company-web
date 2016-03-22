@@ -103,7 +103,8 @@
                                            [:revenue :costs]
                                            [:costs])
                              :label-key :label
-                             :h-axis-color (occ/get-color-by-kw :oc-green-regular)
+                             :h-axis-color (occ/get-color-by-kw :oc-green-light)
+                             :h-axis-selected-color (occ/get-color-by-kw :oc-green-regular)
                              :chart-colors (if has-revenues
                                             {:revenue (occ/get-color-by-kw :oc-green-light)
                                              :costs (occ/get-color-by-kw :oc-red-light)}
