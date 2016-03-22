@@ -72,8 +72,7 @@
               (this-as month-text
                 (let [d3-month-text (.select js/d3 month-text)]
                   (.attr d3-month-text "fill" (:h-axis-color options))))))
-    (-> next-month-text
-        (.attr "fill" (:h-axis-selected-color options)))
+    (.attr next-month-text "fill" (:h-axis-selected-color options))
     (let [chart-label-width (width chart-label)
           new-x-pos (- (/ chart-width 2) (/ chart-label-width 2))]
       (.attr chart-label "x" (max 0 new-x-pos)))
