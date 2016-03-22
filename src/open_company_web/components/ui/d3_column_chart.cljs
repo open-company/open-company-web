@@ -33,25 +33,27 @@
     range-fn))
 
 (defn bar-position [chart-width i data-count columns-num]
-  (let [bar-spacer (/ chart-width data-count)
+  (let [bar-spacer (/ (- chart-width 30) data-count)
         pos (- (* i bar-spacer)
                (/ (* (* bar-width 2) columns-num) 2)
                -60)]
     pos))
 
-(defn build-selected-label [chart-label-g label-value label-color]
+(defn build-selected-label [chart-label-g label-value label-color chart-width]
   (.each (.selectAll chart-label-g "text")
          (fn [_ _]
            (this-as el
              (.remove (.select js/d3 el)))))
   (if (string? label-value)
-    (-> chart-label-g
-        (.append "text")
-        (.attr "fill" label-color)
-        (.attr "class" "chart-label")
-        (.attr "dx" 0)
-        (.attr "dy" 0)
-        (.text label-value))
+    (let [chart-label (-> chart-label-g
+                          (.append "text")
+                          (.attr "fill" label-color)
+                          (.attr "class" "chart-label")
+                          (.attr "dx" 0)
+                          (.attr "dy" 0)
+                          (.text label-value))
+          txt-width (width chart-label)]
+        (.attr chart-label "dx" (- (/ chart-width 2) (/ txt-width 2))))
     (loop [idx 0
            txt-left 0]
       (let [{:keys [label color]} (get label-value idx)
@@ -64,8 +66,10 @@
                     (.text label))
             txt-width (width txt)
             txt-height (* idx 25)]
-        (if (utils/is-mobile)
+        (when (utils/is-mobile)
           (.attr txt "dy" txt-height)
+          (.attr txt "dx" (- (/ chart-width 2) (/ txt-width 2))))
+        (when-not (utils/is-mobile)
           (.attr txt "dx" txt-left))
         (when (< idx (dec (count label-value)))
           (recur (inc idx)
@@ -105,13 +109,14 @@
                 (let [d3-month-text (.select js/d3 month-text)]
                   (.attr d3-month-text "fill" (:h-axis-color options))))))
     (.attr next-month-text "fill" (:h-axis-selected-color options))
-    (build-selected-label chart-label (label-key next-set) (:label-color options))
+    (build-selected-label chart-label (label-key next-set) (:label-color options) (:chart-width options))
     (let [chart-label-width (width chart-label)
           new-x-pos (- (/ chart-width 2) (/ chart-label-width 2))]
       (.attr chart-label "transform" (str "translate("
                                           (max 0 new-x-pos)
                                           ","
-                                          50")")))
+                                          (if (> chart-keys-count 1) 20 50)
+                                          ")")))
     (when-not is-hover
       (om/set-state! owner :selected idx))))
 
@@ -164,7 +169,7 @@
                                         (- (:chart-height options) scaled-max-val 20) ")")))
               ; month label
               force-year (or (zero? i) (= i (dec (count chart-data))))
-              text (utils/get-period-string (:period data-set) nil [:short (when force-year :force-year)])
+              text (utils/get-period-string (:period data-set) nil [:short (when force-year :force-year) (when (utils/is-mobile) :short-year)])
               x-pos (bar-position chart-width i (count chart-data) keys-count)
               label (-> chart-node
                         (.append "text")
@@ -219,12 +224,12 @@
                               (.append "g")
                               (.attr "class" "chart-label-container")
                               (.attr "id" "chart-label")
-                              (.attr "transform" (str "translate(" x-pos "," (if (> (count chart-keys) 1) 20 50) ")")))]
-        (build-selected-label chart-label-g label-value label-color)
+                              (.attr "transform" (str "translate(" 0 "," (if (> (count chart-keys) 1) 20 50) ")")))] ;x-pos
+        (build-selected-label chart-label-g label-value label-color chart-width)
         (let [chart-label-width (width chart-label-g)
               chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
           (.attr chart-label-g "transform" (str "translate("
-                                                (max 0 chart-label-pos)
+                                                0 ;(max 0 chart-label-pos)
                                                 ","
                                                 (if (> (count chart-keys) 1) 20 50)
                                                 ")")))))))
