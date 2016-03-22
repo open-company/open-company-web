@@ -178,6 +178,7 @@
             (om/build topic-body {:section section
                                   :section-data topic-data
                                   :expanded expanded
+                                  :currency currency
                                   :selected-metric (om/get-state owner :selected-metric)}
                                  {:opts options})
             (when expanded
