@@ -115,7 +115,7 @@
               max-val (apply max (vals (select-keys data-set chart-keys)))
               scaled-max-val (scale-fn max-val)
               force-year (or (zero? i) (= i (dec (count chart-data))))
-              text (utils/get-period-string (:period data-set) nil [:short (when force-year :force-year)])
+              text (utils/get-period-string (:period data-set) nil [:short (when force-year :force-year) (when (utils/is-mobile) :short-year)])
               x-pos (dot-position chart-width i (count chart-data) (count chart-keys))
               label (-> chart-node
                         (.append "text")
