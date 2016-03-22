@@ -77,16 +77,12 @@
 
 (defn bar-click [owner options idx is-hover]
   (.stopPropagation (.-event js/d3))
-  (let [selected (om/get-state owner :selected)
-        chart-label (.select js/d3 (str "#chart-label"))
+  (let [chart-label (.select js/d3 (str "#chart-label"))
         chart-width (:chart-width options)
-        cur-g (.select js/d3 (str "#chart-g-" selected))
         next-g (.select js/d3 (str "#chart-g-" idx))
         data (current-data owner)
         next-set (get data idx)
         label-key (:label-key options)
-        data-count (count data)
-        chart-keys-count (count (:chart-keys options))
         next-g-rects (.selectAll next-g "rect")
         all-rects (.selectAll js/d3 "rect.chart-bar")
         next-month-text (.select js/d3 (str "text#chart-x-label-" idx))
@@ -109,14 +105,7 @@
                 (let [d3-month-text (.select js/d3 month-text)]
                   (.attr d3-month-text "fill" (:h-axis-color options))))))
     (.attr next-month-text "fill" (:h-axis-selected-color options))
-    (build-selected-label chart-label (label-key next-set) (:label-color options) (:chart-width options))
-    (let [chart-label-width (width chart-label)
-          new-x-pos (- (/ chart-width 2) (/ chart-label-width 2))]
-      (.attr chart-label "transform" (str "translate("
-                                          (max 0 new-x-pos)
-                                          ","
-                                          (if (> chart-keys-count 1) 20 50)
-                                          ")")))
+    (build-selected-label chart-label (label-key next-set) (:label-color options) chart-width)
     (when-not is-hover
       (om/set-state! owner :selected idx))))
 
@@ -169,7 +158,7 @@
                                         (- (:chart-height options) scaled-max-val 20) ")")))
               ; month label
               force-year (or (zero? i) (= i (dec (count chart-data))))
-              text (utils/get-period-string (:period data-set) nil [:short (when force-year :force-year) (when (utils/is-mobile) :short-year)])
+              text (utils/get-period-string (:period data-set) nil [:short (when force-year :force-year)])
               x-pos (bar-position chart-width i (count chart-data) keys-count)
               label (-> chart-node
                         (.append "text")
