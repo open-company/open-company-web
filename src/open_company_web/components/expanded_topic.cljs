@@ -15,7 +15,7 @@
             [goog.events :as events]
             [goog.fx.dom :refer (Fade Resize)]))
 
-(defcomponent expanded-internal [{:keys [as-of section section-data currency expanded actual-as-of] :as data} owner options]
+(defcomponent expanded-internal [{:keys [as-of section section-data currency expanded actual-as-of selected-metric] :as data} owner options]
   (render [_]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
@@ -42,6 +42,7 @@
         ;; topic body
         (om/build topic-body {:section section
                               :section-data section-data
+                              :selected-metric selected-metric
                               :currency currency
                               :expanded expanded} {:opts options})
         (dom/div {:class "topic-navigation group"}
@@ -84,7 +85,7 @@
                                         (setStyle actual-topic-expanded #js {:opacity 1 :position "relative"})) 1))))
           (.play))))))
 
-(defcomponent expanded-topic [{:keys [section section-data currency expanded] :as data} owner options]
+(defcomponent expanded-topic [{:keys [section section-data currency expanded selected-metric] :as data} owner options]
 
   (init-state [_]
    {:as-of (:updated-at section-data)
@@ -111,6 +112,7 @@
                                          :section-data transit-topic-data
                                          :as-of transit-as-of
                                          :actual-as-of (:updated-at section-data)
+                                         :selected-metric selected-metric
                                          :currency currency
                                          :expanded expanded
                                          :transit true})))
@@ -122,6 +124,7 @@
                                        :section-data topic-data
                                        :as-of as-of
                                        :actual-as-of (:updated-at section-data)
+                                       :selected-metric selected-metric
                                        :currency currency
                                        :expanded expanded}
                                       {:opts {:prev-cb #(om/set-state! owner :transit-as-of %)
