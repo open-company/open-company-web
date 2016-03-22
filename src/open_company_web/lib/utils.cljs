@@ -432,6 +432,7 @@
         parsed-date (date-from-period period fixed-interval)
         month (cljs-time/month parsed-date)
         year (cljs-time/year parsed-date)
+        short-year (str "'" (subs (str year) 2 4))
         plus-one-week-year (cljs-time/year (cljs-time/plus parsed-date (cljs-time/days 7)))
         minus-one-week-year (cljs-time/year (cljs-time/minus parsed-date (cljs-time/days 7)))
         needs-year (or (in? flags :force-year)
@@ -446,17 +447,17 @@
       "quarterly"
       (str (get-quarter-from-month (cljs-time/month parsed-date) flags)
            (when needs-year
-             (str " " (cljs-time/year parsed-date))))
+             (str " " (if (in? flags :short-year) short-year year))))
       "monthly"
       (str (month-string-int (cljs-time/month parsed-date) flags)
            (when needs-year
-             (str " " (cljs-time/year parsed-date))))
+             (str " " (if (in? flags :short-year) short-year year))))
       "weekly"
       (str (month-string-int (cljs-time/month parsed-date) flags)
            " "
            (cljs-time/day parsed-date)
            (when needs-year
-             (str ", " (cljs-time/year parsed-date)))))))
+             (str ", " (if (in? flags :short-year) short-year year)))))))
 
 (defn update-page-title [title]
   (set! (.-title js/document) title))
