@@ -123,7 +123,8 @@
         idx2 (.indexOf (to-array category-topics) topic2)]
     (= (int (/ idx1 li-in-row)) (int (/ idx2 li-in-row)))))
 
-(defn topic-click [owner topic]
+(defn topic-click [owner topic selected-metric]
+  (om/set-state! owner :selected-metric selected-metric)
   (let [bw-expanded-topic (om/get-state owner :bw-expanded-topic)
         bw-expand-animated (om/get-state owner :bw-expand-animated)]
     (if (= bw-expanded-topic topic)
@@ -228,7 +229,7 @@
       (om/set-state! owner :bw-expanded-topic nil)
       (om/set-state! owner :bw-expand-animated nil)))
 
-  (render-state [_ {:keys [show-topic-edit-button active-topics editing bw-expanded-topic bw-expand-animated last-expanded-section]}]
+  (render-state [_ {:keys [show-topic-edit-button active-topics editing bw-expanded-topic bw-expand-animated last-expanded-section selected-metric]}]
     ; run the expand/collapse animation
     (if (or (and bw-expanded-topic (not bw-expand-animated))
             (and (not bw-expanded-topic) bw-expand-animated))
@@ -298,6 +299,7 @@
                         (om/build expanded-topic {:section-data sec-data
                                                   :section selected-topic
                                                   :expanded true
+                                                  :selected-metric selected-metric
                                                   :currency (:currency company-data)}
                                                  {:opts {
                                                    :section-name section-name

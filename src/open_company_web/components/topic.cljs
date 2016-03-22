@@ -119,11 +119,6 @@
         ;; hide the edit button if necessary
         ((:force-edit-cb options) false)))))
 
-(defn topic-click [data owner options expanded]
-  (if (utils/is-mobile)
-    (mobile-topic-animation data owner options expanded)
-    ((:bw-topic-click options) (:section data))))
-
 (defn headline-component [section]
   (cond
 
@@ -140,8 +135,8 @@
   (.stopPropagation e)
   (.preventDefault e)
   (om/set-state! owner :selected-metric metric-slug)
-  (let [topic-click (om/get-props owner :topic-click)]
-    (topic-click)))
+  (let [topic-click-cb (om/get-props owner :topic-click)]
+    (topic-click-cb metric-slug)))
 
 (defcomponent topic-internal [{:keys [topic-data section currency expanded prev-rev next-rev] :as data} owner options]
   (render [_]
@@ -198,6 +193,11 @@
                                         (.stopPropagation e)
                                         ((:rev-click options) e next-rev))} "Next >")))))))))))
 
+(defn topic-click [data owner options expanded selected-metric]
+  (if (utils/is-mobile)
+    (mobile-topic-animation data owner options expanded)
+    ((:bw-topic-click options) (:section data) selected-metric)))
+
 (defcomponent topic [{:keys [section-data section currency] :as data} owner options]
 
   (init-state [_]
@@ -233,13 +233,13 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className "topic"
                     :ref "topic"
-                    :onClick #(topic-click data owner options expanded)}
+                    :onClick #(topic-click data owner options expanded nil)}
         (om/build topic-internal {:section section
                                   :topic-data topic-data
                                   :currency currency
                                   :expanded expanded
                                   :revisions revisions
-                                  :topic-click #(topic-click data owner options expanded)
+                                  :topic-click (partial topic-click data owner options expanded)
                                   :prev-rev prev-rev
                                   :next-rev next-rev}
                                  {:opts (merge options {:rev-click (fn [e rev]
