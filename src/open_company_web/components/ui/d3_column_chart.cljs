@@ -62,8 +62,11 @@
                     (.attr "dx" 0)
                     (.attr "dy" 0)
                     (.text label))
-            txt-width (width txt)]
-        (.attr txt "dx" txt-left)
+            txt-width (width txt)
+            txt-height (* idx 25)]
+        (if (utils/is-mobile)
+          (.attr txt "dy" txt-height)
+          (.attr txt "dx" txt-left))
         (when (< idx (dec (count label-value)))
           (recur (inc idx)
                  (+ txt-left txt-width 10)))))))
@@ -216,14 +219,14 @@
                               (.append "g")
                               (.attr "class" "chart-label-container")
                               (.attr "id" "chart-label")
-                              (.attr "transform" (str "translate(" x-pos "," 50")")))]
+                              (.attr "transform" (str "translate(" x-pos "," (if (> (count chart-keys) 1) 20 50) ")")))]
         (build-selected-label chart-label-g label-value label-color)
         (let [chart-label-width (width chart-label-g)
               chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
           (.attr chart-label-g "transform" (str "translate("
                                                 (max 0 chart-label-pos)
                                                 ","
-                                                50
+                                                (if (> (count chart-keys) 1) 20 50)
                                                 ")")))))))
 
 (def chart-step show-columns)
