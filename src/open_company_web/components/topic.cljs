@@ -184,15 +184,21 @@
             (when expanded
               (dom/div {:class "topic-navigation group"}
                 (when prev-rev
-                  (dom/div {:class "previous group"}
-                    (dom/a {:on-click (fn [e]
-                                        (.stopPropagation e)
-                                        ((:rev-click options) e prev-rev))} "< Previous")))
+                  (dom/div {:class "arrow previous group"}
+                    (dom/button {:on-click (fn [e]
+                                            (set! (.-disabled (.-target e)) "disabled")
+                                            (.stopPropagation e)
+                                            ((:rev-click options) e prev-rev)
+                                            (.setTimeout js/window
+                                              #(set! (.-disabled (.-target e)) false) 1000))} "< Previous")))
                 (when next-rev
-                  (dom/div {:class "next group"}
-                    (dom/a {:on-click (fn [e]
-                                        (.stopPropagation e)
-                                        ((:rev-click options) e next-rev))} "Next >")))))))))))
+                  (dom/div {:class "arrow next group"}
+                    (dom/button {:on-click (fn [e]
+                                            (set! (.-disabled (.-target e)) "disabled")
+                                            (.stopPropagation e)
+                                            ((:rev-click options) e next-rev)
+                                            (.setTimeout js/window
+                                              #(set! (.-disabled (.-target e)) false) 1000))} "Next >")))))))))))
 
 (defn topic-click [data owner options expanded selected-metric]
   (if (utils/is-mobile)
