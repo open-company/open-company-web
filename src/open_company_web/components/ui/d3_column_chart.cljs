@@ -68,7 +68,7 @@
           (recur (inc idx)
                  (+ txt-left txt-width 10)))))))
 
-(defn bar-click [owner options idx is-hover action]
+(defn bar-click [owner options idx is-hover]
   (.stopPropagation (.-event js/d3))
   (let [selected (om/get-state owner :selected)
         chart-label (.select js/d3 (str "#chart-label"))
@@ -81,7 +81,9 @@
         data-count (count data)
         chart-keys-count (count (:chart-keys options))
         next-g-rects (.selectAll next-g "rect")
-        all-rects (.selectAll js/d3 "rect")]
+        all-rects (.selectAll js/d3 "rect.chart-bar")
+        next-month-text (.select js/d3 (str "text#chart-x-label-" idx))
+        all-month-text (.selectAll js/d3 ".chart-x-label")]
     (.each all-rects
            (fn [d i]
               (this-as rect
@@ -94,6 +96,13 @@
                 (let [d3-rect (.select js/d3 rect)
                       selected-color (.attr d3-rect "data-selectedFill")]
                   (.attr d3-rect "fill" selected-color)))))
+    (.each all-month-text
+           (fn [d i]
+              (this-as month-text
+                (let [d3-month-text (.select js/d3 month-text)]
+                  (.attr d3-month-text "fill" (:h-axis-color options))))))
+    (-> next-month-text
+        (.attr "fill" (:h-axis-selected-color options)))
     (build-selected-label chart-label (label-key next-set) (:label-color options))
     (let [chart-label-width (width chart-label)
           new-x-pos (- (/ chart-width 2) (/ chart-label-width 2))]
@@ -123,6 +132,7 @@
           fill-colors (:chart-colors options)
           fill-selected-colors (:chart-selected-colors options)
           chart-width (:chart-width options)
+          chart-height (:chart-height options)
           chart-keys (:chart-keys options)
           keys-count (count chart-keys)
           ; main chart node
@@ -132,6 +142,8 @@
                          (.attr "height" (:chart-height options))
                          (.on "click" #(.stopPropagation (.-event js/d3))))
           scale-fn (scale owner options)
+          h-axis-color (:h-axis-color options)
+          h-axis-selected-color (:h-axis-selected-color options)
           label-key (:label-key options)]
       ; for each set of data
       (doseq [i (range (count chart-data))]
@@ -143,9 +155,6 @@
                             (.append "g")
                             (.attr "class" "chart-g")
                             (.attr "id" (str "chart-g-" i))
-                            (.on "click" #(bar-click owner options i false "click"))
-                            (.on "mouseover" #(bar-click owner options i true "mouseover"))
-                            (.on "mouseout" #(bar-click owner options (om/get-state owner :selected) true "mouseout"))
                             (.attr "transform"
                                    (str "translate("
                                         (bar-position chart-width i (count chart-data) keys-count)
@@ -158,12 +167,10 @@
               label (-> chart-node
                         (.append "text")
                         (.attr "class" "chart-x-label")
+                        (.attr "id" (str "chart-x-label-" i))
                         (.attr "x" x-pos)
                         (.attr "y" (:chart-height options))
-                        (.on "click" #(bar-click owner options i false "click"))
-                        (.on "mouseover" #(bar-click owner options i true "mouseover"))
-                        (.on "mouseout" #(bar-click owner options (om/get-state owner :selected) true "mouseout"))
-                        (.attr "fill" (:h-axis-color options))
+                        (.attr "fill" (if (= i selected) h-axis-selected-color h-axis-color))
                         (.text text))
               label-width (width label)]
           ; set month label x position depending on its width
@@ -189,6 +196,19 @@
                   (.attr "y" (- scaled-max-val scaled-val))
                   (.attr "width" bar-width)
                   (.attr "height" (max 0 scaled-val)))))))
+      ; add the hovering rects
+      (doseq [i (range (count chart-data))]
+        (-> chart-node
+            (.append "rect")
+            (.attr "class" "hover-rect")
+            (.attr "width" (/ chart-width (count chart-data)))
+            (.attr "height" (- chart-height 50))
+            (.attr "x" (* i (/ chart-width (count chart-data))))
+            (.attr "y" 50)
+            (.on "click" #(bar-click owner options i false))
+            (.on "mouseover" #(bar-click owner options i true))
+            (.on "mouseout" #(bar-click owner options (om/get-state owner :selected) true))
+            (.attr "fill" "transparent")))
       ; add the selected value label
       (let [x-pos (/ chart-width 2)
             label-value (label-key (get chart-data selected))

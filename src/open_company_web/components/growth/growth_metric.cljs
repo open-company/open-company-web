@@ -41,7 +41,8 @@
                              :chart-keys [:value]
                              :label-color (occ/get-color-by-kw :oc-blue-regular)
                              :label-key :label
-                             :h-axis-color (occ/get-color-by-kw :oc-blue-regular)
+                             :h-axis-color (occ/get-color-by-kw :oc-blue-light)
+                             :h-axis-selected-color (occ/get-color-by-kw :oc-blue-regular)
                              :chart-colors {:value (occ/get-color-by-kw :oc-blue-light)
                                             :target (occ/get-color-by-kw :oc-blue-regular)}
                              :chart-selected-colors {:value (occ/get-color-by-kw :oc-blue-dark)

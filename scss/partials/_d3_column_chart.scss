@@ -3,7 +3,7 @@ div.d3-column-container{
 
   svg{
 
-    rect.chart-bar {
+    rect.hover-rect {
       cursor: pointer;
     }
 
@@ -23,7 +23,6 @@ div.d3-column-container{
       font-size: 14px;
       line-height: 1.1;
       font-weight: bold;
-      cursor: pointer;
     }
   }
 
