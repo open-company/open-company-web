@@ -33,7 +33,7 @@
     range-fn))
 
 (defn bar-position [chart-width i data-count columns-num]
-  (let [bar-spacer (/ (- chart-width 90) (dec show-columns))
+  (let [bar-spacer (/ chart-width data-count)
         pos (- (* i bar-spacer)
                (/ (* (* bar-width 2) columns-num) 2)
                -60)]
@@ -261,7 +261,7 @@
   (did-update [_ old-props old-state]
     (when-not (utils/is-test-env?)
       (when (or (not= old-props data)
-                (not= old-state (om/get-state owner)))
+                (not= (:start old-state) (om/get-state owner :start)))
         (d3-calc owner options))))
 
   (render-state [_ {:keys [start]}]
