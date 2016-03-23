@@ -1,8 +1,8 @@
 div.company-dashboard {
 
   div.category-nav {
-    border-top: 1px solid #D8D8D8; /* gray */
-    border-bottom: 1px solid #D8D8D8; /* gray */
+    border-top: 1px solid $oc_gray_2; /* gray */
+    border-bottom: 1px solid $oc_gray_2; /* gray */
     background-color: white;
     width: 100%;
     z-index: 2;
@@ -40,7 +40,7 @@ div.company-dashboard {
         vertical-align: middle;
         /* horizontally center the text */
         text-align: center;
-        color: #8b8a8a;
+        color: $oc_gray_3;
         text-transform: uppercase;
 
         div.category-label {
@@ -48,7 +48,7 @@ div.company-dashboard {
           padding-left: 10px;
           padding-right: 10px;
           display: inline-block;
-          color: #8b8a8a;
+          color: $oc_gray_3;
           font-weight: 600;
           line-height: 0;
 

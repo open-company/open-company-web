@@ -4,6 +4,7 @@
             [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel sel1)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.caches :as caches]
@@ -122,7 +123,8 @@
         idx2 (.indexOf (to-array category-topics) topic2)]
     (= (int (/ idx1 li-in-row)) (int (/ idx2 li-in-row)))))
 
-(defn topic-click [owner topic]
+(defn topic-click [owner topic selected-metric]
+  (om/set-state! owner :selected-metric selected-metric)
   (let [bw-expanded-topic (om/get-state owner :bw-expanded-topic)
         bw-expand-animated (om/get-state owner :bw-expand-animated)]
     (if (= bw-expanded-topic topic)
@@ -176,6 +178,13 @@
 
 (def scrolled-to-top (atom false))
 
+(defn set-lis-height [owner]
+  (doall
+    (let [li-elems (sel (om/get-ref owner "topic-list-ul") [:li.card])
+          max-height (apply max (map #(.-clientHeight %) li-elems))]
+      (for [li li-elems]
+        (setStyle li #js {:height (str max-height "px")})))))
+
 (defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
 
   (init-state [_]
@@ -220,12 +229,17 @@
       (om/set-state! owner :bw-expanded-topic nil)
       (om/set-state! owner :bw-expand-animated nil)))
 
-  (render-state [_ {:keys [show-topic-edit-button active-topics editing bw-expanded-topic bw-expand-animated last-expanded-section]}]
+  (render-state [_ {:keys [show-topic-edit-button active-topics editing bw-expanded-topic bw-expand-animated last-expanded-section selected-metric]}]
+    ; run the expand/collapse animation
     (if (or (and bw-expanded-topic (not bw-expand-animated))
             (and (not bw-expanded-topic) bw-expand-animated))
       (.setTimeout js/window #(animate-expand owner (not bw-expand-animated)) 0)
+      ; scroll to the selected card if it's already expanded
       (when bw-expanded-topic
         (.setTimeout js/window #(scroll-to-card (om/get-ref owner bw-expanded-topic)) 0)))
+    ; set the cards height on big web
+    (when-not (utils/is-mobile)
+      (.setTimeout js/window #(set-lis-height owner) 0))
     (let [slug (keyword (:slug @router/path))]
       (if editing
         (let [categories (map name (keys active-topics))]
@@ -259,6 +273,7 @@
                           li-props (if-not (utils/is-mobile)
                                       #js {:className (utils/class-set {
                                                           :topic-row true
+                                                          :card (not= section-name "li-expander")
                                                           :full-width (= section-name "li-expander")
                                                           :expanded (= selected-topic section-name)
                                                           :unexpanded (and selected-topic
@@ -272,7 +287,7 @@
                                                        :height  (if (= section-name "li-expander")
                                                                   (if bw-expand-animated
                                                                     "auto" "0px")
-                                                                  (str (:height topic-box-size) "px"))}
+                                                                  "auto")} ;(str (:height topic-box-size) "px")
                                            :key (str "topic-row-" (name section-name))}
                                       #js {:className "topic-row"
                                            :ref section-name
@@ -284,6 +299,7 @@
                         (om/build expanded-topic {:section-data sec-data
                                                   :section selected-topic
                                                   :expanded true
+                                                  :selected-metric selected-metric
                                                   :currency (:currency company-data)}
                                                  {:opts {
                                                    :section-name section-name
@@ -306,13 +322,4 @@
                             :style #js {:opacity (if (om/get-state owner :show-topic-edit-button) "0" "1")}}
                 (om/build manage-topics
                           nil
-                          {:opts {:manage-topics-cb #(manage-topics-cb owner options)}})))
-            (when-not (:read-only company-data)
-              (dom/div #js {:className "topic-row floating-edit-topic-button"
-                            :ref "edit-topic-button"
-                            :style #js {:opacity (if show-topic-edit-button "1" "0")
-                                        :display (if show-topic-edit-button "inline" "none")}}
-                (om/build edit-topic-button
-                          nil
-                          {:opts
-                           {:topic-edit-cb #((:topic-edit-cb options) last-expanded-section)}})))))))))
+                          {:opts {:manage-topics-cb #(manage-topics-cb owner options)}})))))))))

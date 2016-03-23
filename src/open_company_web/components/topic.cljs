@@ -9,6 +9,8 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.topic-body :refer (topic-body)]
+            [open-company-web.components.topic-growth-headline :refer (topic-growth-headline)]
+            [open-company-web.components.topic-finances-headline :refer (topic-finances-headline)]
             [open-company-web.local-settings :as ls]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
@@ -19,48 +21,6 @@
 (defcomponent topic-headline [data owner]
   (render [_]
     (dom/div {:class "topic-headline-inner"} (:headline data))))
-
-(defcomponent topic-headline-finances [data owner options]
-  (render [_]
-    (let [data (:data data)
-          sorter (utils/sort-by-key-pred :period true)
-          sorted-data (sort sorter data)
-          actual (first sorted-data)
-          currency (:currency options)
-          cur-symbol (utils/get-symbol-for-currency-code currency)
-          cash-val (str cur-symbol (utils/thousands-separator (:cash actual)))
-          actual-label (str "as of " (finances-utils/get-as-of-string (:period actual)))]
-      (dom/div {:class (utils/class-set {:topic-headline-inner true
-                                         :topic-headline-finances true
-                                         :group true
-                                         :collapse (:expanded data)})}
-        (dom/div {:class "target-actual-container"}
-          (dom/div {:class "actual-container"}
-            (dom/h3 {:class "actual green"} cash-val)
-            (dom/h3 {:class "actual-label gray"} actual-label)))))))
-
-(defcomponent topic-headline-growth [data owner options]
-  (render [_]
-    (let [metric-info (first (:metrics data))
-          metric-data (filter #(= (:slug metric-info) (:slug %)) (:data data))
-          sort-pred (utils/sort-by-key-pred :period true)
-          sorted-metric (vec (sort sort-pred metric-data))
-          interval (:interval metric-info)
-          metric-unit (:unit metric-info)
-          fixed-cur-unit (when (= metric-unit "currency")
-                           (utils/get-symbol-for-currency-code (:currency options)))
-          unit (when (= metric-unit "%") "%")
-          last-value (utils/thousands-separator (:value (first metric-data)))
-          last-value-label (str fixed-cur-unit last-value unit)]
-      (dom/div {:class (utils/class-set {:topic-headline-inner true
-                                         :topic-headline-growth true
-                                         :group true
-                                         :collapse (:expanded data)})}
-        (dom/div {:class "chart-header-container"}
-          (dom/div {:class "target-actual-container"}
-            (dom/div {:class "actual-container"}
-              (dom/h3 {:class "actual blue"} (:name metric-info))
-              (dom/h3 {:class "actual blue"} last-value-label))))))))
 
 (defn scroll-to-topic-top [topic]
   (let [body-scroll (.-scrollTop (.-body js/document))
@@ -97,7 +57,7 @@
           (.play finances-fade)))
 
       ;; animate growth headtitle
-      (when-let [growth-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-growth")]
+      (when-let [growth-children (sel1 topic ":scope > div.topic-headline > div.topic-growth-headline")]
         (let [growth-resize (new Resize
                                  growth-children
                                  (new js/Array body-width (if expanded 0 100))
@@ -159,27 +119,30 @@
         ;; hide the edit button if necessary
         ((:force-edit-cb options) false)))))
 
-(defn topic-click [data owner options expanded]
-  (if (utils/is-mobile)
-    (mobile-topic-animation data owner options expanded)
-    ((:bw-topic-click options) (:section data))))
-
 (defn headline-component [section]
   (cond
 
     (= section :finances)
-    topic-headline-finances
+    topic-finances-headline
 
     (= section :growth)
-    topic-headline-growth
+    topic-growth-headline
 
     :else
     topic-headline))
 
+(defn pillbox-click-cb [owner metric-slug e]
+  (.stopPropagation e)
+  (.preventDefault e)
+  (om/set-state! owner :selected-metric metric-slug)
+  (let [topic-click-cb (om/get-props owner :topic-click)]
+    (topic-click-cb metric-slug)))
+
 (defcomponent topic-internal [{:keys [topic-data section currency expanded prev-rev next-rev] :as data} owner options]
   (render [_]
     (let [section-kw (keyword section)
-          headline-options {:opts {:currency currency}}
+          headline-options {:opts {:currency currency
+                                   :pillbox-click-cb (partial pillbox-click-cb owner)}}
           headline-data (assoc topic-data :expanded expanded)]
       (dom/div #js {:className "topic-internal"
                     :ref "topic-internal"}
@@ -192,20 +155,14 @@
           (dom/div {:class "topic-title"} (:title topic-data))
           (dom/div #js {:className "topic-date"
                         :ref "topic-date"
-                        :style #js {:opacity (if expanded 1 0)}}
+                        :style #js {:opacity (if expanded 1 0)
+                                    :height (str (if expanded 20 0) "px")
+                                    :paddingTop (str (if expanded 16 0) "px")}}
             (str (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data))))))
 
         ;; Topic headline
         (dom/div {:class "topic-headline"}
-          (cond
-            (= section-kw :finances)
-            (om/build topic-headline-finances headline-data headline-options)
-
-            (= section-kw :growth)
-            (om/build topic-headline-growth headline-data headline-options)
-
-            :else
-            (om/build topic-headline topic-data)))
+          (om/build (headline-component section-kw) headline-data headline-options))
 
         (when (utils/is-mobile)
           (dom/div #js {:className "topic-more"
@@ -214,20 +171,41 @@
             (dom/i {:class "fa fa-circle"})
             (dom/i {:class "fa fa-circle"})
             (dom/i {:class "fa fa-circle"})))
-
         ;; topic body
         (when (utils/is-mobile)
           (dom/div #js {:className "body-navigation-container group"
                         :ref "body-navigation-container"}
-            (om/build topic-body {:section section :section-data topic-data :expanded expanded} {:opts options})
+            (om/build topic-body {:section section
+                                  :section-data topic-data
+                                  :expanded expanded
+                                  :currency currency
+                                  :selected-metric (om/get-state owner :selected-metric)}
+                                 {:opts options})
             (when expanded
               (dom/div {:class "topic-navigation group"}
                 (when prev-rev
-                  (dom/div {:class "previous group"}
-                    (dom/a {:on-click #((:rev-click options) % prev-rev)} "< Previous")))
+                  (dom/div {:class "arrow previous group"}
+                    (dom/button {:on-click (fn [e]
+                                            (let [bt (.-target e)]
+                                              (set! (.-disabled bt) "disabled")
+                                              (.stopPropagation e)
+                                              ((:rev-click options) e prev-rev)
+                                              (.setTimeout js/window
+                                                #(set! (.-disabled bt) false) 1000)))} "< Previous")))
                 (when next-rev
-                  (dom/div {:class "next group"}
-                    (dom/a {:on-click #((:rev-click options) % next-rev)} "Next >")))))))))))
+                  (dom/div {:class "arrow next group"}
+                    (dom/button {:on-click (fn [e]
+                                            (let [bt (.-target e)]
+                                              (set! (.-disabled bt) "disabled")
+                                              (.stopPropagation e)
+                                              ((:rev-click options) e next-rev)
+                                              (.setTimeout js/window
+                                                #(set! (.-disabled bt) false) 1000)))} "Next >")))))))))))
+
+(defn topic-click [data owner options expanded selected-metric]
+  (if (utils/is-mobile)
+    (mobile-topic-animation data owner options expanded)
+    ((:bw-topic-click options) (:section data) selected-metric)))
 
 (defcomponent topic [{:keys [section-data section currency] :as data} owner options]
 
@@ -264,12 +242,13 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className "topic"
                     :ref "topic"
-                    :onClick #(topic-click data owner options expanded)}
+                    :onClick #(topic-click data owner options expanded nil)}
         (om/build topic-internal {:section section
                                   :topic-data topic-data
                                   :currency currency
                                   :expanded expanded
                                   :revisions revisions
+                                  :topic-click (partial topic-click data owner options expanded)
                                   :prev-rev prev-rev
                                   :next-rev next-rev}
                                  {:opts (merge options {:rev-click (fn [e rev]

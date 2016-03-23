@@ -98,9 +98,10 @@
 (defn logo-on-load [owner]
   (when-not (utils/is-mobile)
     (when-let [logo (om/get-ref owner "company-logo")]
-      (let [logo-height (.-height logo)]
-        (when (< logo-height logo-max-height)
-          (gstyle/setStyle logo #js {:marginTop (str (+ (/ logo-height 2) 10) "px")})))))
+      (let [logo-height (.-height logo)
+            height-diff (- logo-max-height logo-height)]
+        (when (pos? height-diff)
+          (gstyle/setStyle logo #js {:marginTop (str (quot height-diff 2) "px")})))))
   (watch-scroll owner))
 
 (defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner options]

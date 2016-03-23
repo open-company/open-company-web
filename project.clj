@@ -10,7 +10,7 @@
 
   :dependencies [
     [org.clojure/clojure "1.8.0"] ; Lisp on the JVM http://clojure.org/documentation
-    [org.clojure/clojurescript "1.7.228"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    [org.clojure/clojurescript "1.8.34"] ; ClojureScript compiler https://github.com/clojure/clojurescript
     ; --- DO NOT UPDATE OM, the 1.x.x code is Om Next and requires changes on our part https://github.com/omcljs/om/wiki/Quick-Start-(om.next)
     [org.omcljs/om "0.9.0" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
     [cljs-http "0.1.39"] ; HTTP for cljs https://github.com/r0man/cljs-http
@@ -22,16 +22,17 @@
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     [com.cognitect/transit-cljs "0.8.237"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
     [racehub/om-bootstrap "0.6.1"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
-    [noencore "0.2.0"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
+    [noencore "0.2.1"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
     [com.andrewmcveigh/cljs-time "0.4.0"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     [funcool/cuerdas "0.7.1"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
-    [cljsjs/react "0.14.3-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
+    [cljsjs/react "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [medley "0.7.3"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
+    [cljsjs/d3 "3.5.7-1"] ; d3 externs https://clojars.org/cljsjs/d3
   ]
 
   :plugins [
-    [lein-cljsbuild "1.1.2"] ; ClojureScript compiler https://github.com/emezeske/lein-cljsbuild
+    [lein-cljsbuild "1.1.3"] ; ClojureScript compiler https://github.com/emezeske/lein-cljsbuild
     [lein-figwheel "0.5.0-6"] ; Dynamic development environment https://github.com/bhauman/lein-figwheel
     [lein-ancient "0.6.8"] ; Check for outdated dependencies https://github.com/xsc/lein-ancient
     [lein-doo "0.1.6"] ; A plugin to run tests in many JS environments https://github.com/bensu/doo

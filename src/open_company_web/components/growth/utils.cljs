@@ -7,14 +7,7 @@
 
 (def new-metric-slug-placeholder "new-metric-slug-placeholder")
 
-(defn columns-num [interval]
-  (case interval
-    "quarterly"
-    8
-    "weekly"
-    8
-    ;else
-    12))
+(def columns-num 6)
 
 (defn get-noise []
   (int (* (rand 4) 1000)))
@@ -74,13 +67,12 @@
             (placeholder-data prev-period slug)))))))
 
 (defn edit-placeholder-data [initial-data slug interval]
-  (let [tot-num (columns-num interval)
-        current-period (utils/current-growth-period interval)
+  (let [current-period (utils/current-growth-period interval)
         first-period (if (first initial-data)
                       (:period (first initial-data))
                       (get-past-period current-period 12 interval))
         diff (utils/periods-diff first-period current-period interval)
-        data-count (max (dec tot-num) diff)]
+        data-count (max (dec columns-num) diff)]
     (let [fixed-data (for [idx (range 0 data-count)]
                        (let [prev-period (get-past-period current-period idx interval)
                              period-exists (utils/period-exists prev-period initial-data)]
@@ -107,14 +99,14 @@
         values (if has-target
                  [period
                   target
-                  (occ/fill-color :gray)
+                  (occ/fill-color :oc-gray-2)
                   target-label
                   value
-                  (occ/fill-color :blue)
+                  (occ/fill-color :oc-blue-light)
                   label]
                  [period
                   value
-                  (occ/fill-color :blue)
+                  (occ/fill-color :oc-blue-light)
                   label])]
     values))
 
@@ -140,7 +132,7 @@
         values (vec (map chart-data mapper))]
     { :prefix (if prefix prefix "")
       :columns columns
-      :max-show (columns-num interval)
+      :max-show columns-num
       :values values
       :pattern "###,###.##"
       :column-thickness (if has-target "28" "14")}))

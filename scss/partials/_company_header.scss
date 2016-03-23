@@ -41,8 +41,8 @@ div.company-header{
       padding-top: 22px;
 
       div.company-logo-container{
-        width: 200px;
-        height: 100px;
+        max-width: 200px;
+        max-height: 100px;
         float: left;
 
         @include mobile(){

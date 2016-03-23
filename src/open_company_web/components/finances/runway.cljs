@@ -4,63 +4,40 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.charts :refer (column-chart)]
+            [open-company-web.components.ui.d3-column-chart :refer (d3-column-chart)]
             [open-company-web.components.finances.utils :as finances-utils]
-            [goog.string :as gstring]
             [open-company-web.lib.oc-colors :as occ]))
 
-(defn remove-trailing-zero [string]
-  "Remove the last zero(s) in a numeric string only after the dot.
-   Remote the dot too if it is the last char after removing the zeros"
-  (cond
-
-    (and (not= (.indexOf string ".") -1) (= (last string) "0"))
-    (remove-trailing-zero (subs string 0 (dec (count string))))
-
-    (= (last string) ".")
-    (subs string 0 (dec (count string)))
-
-    :else
-    string))
-
-(defn get-rounded-runway [runway-days & [flags]]
-  (cond
-    (< runway-days 90)
-    (str runway-days " days")
-    (< runway-days (* 30 24))
-    (if (utils/in? flags :round)
-      (if (utils/in? flags :remove-trailing-zero)
-        (str (remove-trailing-zero (gstring/format "%.2f" (/ runway-days 30))) " months")
-        (str (gstring/format "%.2f" (/ runway-days 30)) " months"))
-      (str (quot runway-days 30) " months"))
-    :else
-    (if (utils/in? flags :round)
-      (if (utils/in? flags :remove-trailing-zero)
-        (str (remove-trailing-zero (gstring/format "%.2f" (/ runway-days (* 30 12)))) " years")
-        (str (gstring/format "%.2f" (/ runway-days (* 30 12))) " years"))
-      (str (quot runway-days (* 30 12)) " years"))))
+(defn- get-d3-chart-data [sorted-data]
+  {:chart-data (filter #(not (nil? (:runway %))) sorted-data)})
 
 (defn get-runway-subtitle [cash avg-burn-rate runway-days cur-symbol]
   (str cur-symbol (utils/thousands-separator (or cash 0))
        " ÷ a 3-month avg. burn of "
        cur-symbol (utils/thousands-separator (utils/abs (or (int avg-burn-rate) 0)))
        " ≅ "
-       (str (get-rounded-runway runway-days [:round :remove-trailing-zero]))))
+       (str (finances-utils/get-rounded-runway runway-days [:round :remove-trailing-zero]))))
 
-(defn fix-runway [runway]
-  (if (neg? runway)
-    (utils/abs runway)
-    0))
+(defn runway-data-set [data-set]
+  (let [runway (:runway data-set)
+        fixed-runway (if (neg? runway) (utils/abs runway) 0)
+        label (if (neg? runway) (finances-utils/get-rounded-runway runway [:round]) "Pofitable")]
+    (merge data-set {:runway fixed-runway
+                     :label label})))
 
-(defcomponent runway [data owner]
+(defn runway-data [sorted-data]
+  (vec (map runway-data-set sorted-data)))
+
+(defcomponent runway [data owner options]
   
   (render [_]
     (let [finances-data (:data (:section-data data))
-          sort-pred (utils/sort-by-key-pred :period true)
+          sort-pred (utils/sort-by-key-pred :period)
           sorted-finances (sort sort-pred finances-data)
-          fixed-runway-finances (map #(update-in % [:runway] fix-runway) sorted-finances)
-          value-set (first fixed-runway-finances)
+          fixed-runway-finances (map #(update-in % [:runway] finances-utils/fix-runway) sorted-finances)
+          value-set (last fixed-runway-finances)
           runway-value (:runway value-set)
-          is-profitable (pos? (:runway (first sorted-finances)))
+          is-profitable (pos? (:runway (last sorted-finances)))
           runway (if is-profitable
                     "Profitable"
                     (str (utils/thousands-separator (utils/abs runway-value)) " days"))
@@ -68,19 +45,24 @@
           cur-symbol (utils/get-symbol-for-currency-code (:currency data))
           runway-string (if is-profitable
                           runway
-                          (get-rounded-runway runway-value))]
+                          (finances-utils/get-rounded-runway runway-value))
+          fixed-sorted-finances (runway-data sorted-finances)
+          chart-opts {:opts {:chart-height (when (contains? options :chart-size) (:height (:chart-size options)))
+                             :chart-width (when (contains? options :chart-size)(:width (:chart-size options)))
+                             :chart-keys [:runway]
+                             :label-color (occ/get-color-by-kw :oc-green-regular)
+                             :label-key :label
+                             :h-axis-color (occ/get-color-by-kw :oc-green-light)
+                             :h-axis-selected-color (occ/get-color-by-kw :oc-green-regular)
+                             :chart-colors {:runway (occ/get-color-by-kw :oc-green-light)}
+                             :chart-selected-colors {:runway (occ/get-color-by-kw :oc-green-regular)}
+                             :prefix (utils/get-symbol-for-currency-code currency)}}]
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))
                 :on-click (:start-editing-cb data)}
-        (dom/div {:class "chart-header-container"}
-          (dom/div {:class "target-actual-container"}
-            (dom/div {:class "actual-container"}
-              (dom/h3 {:class "actual green"} runway-string)
-              (dom/h3 {:class "actual-label gray"} (get-runway-subtitle (:cash value-set) (:avg-burn-rate value-set) runway-value cur-symbol)))))
-        (om/build column-chart (finances-utils/get-chart-data fixed-runway-finances
-                                                              ""
-                                                              :runway
-                                                              "runway"
-                                                              #js {"type" "string" "role" "style"}
-                                                              (occ/fill-color :green)
-                                                              "###,### days"
-                                                              " days"))))))
+        (when (:show-label options)
+          (dom/div {:class "chart-header-container"}
+            (dom/div {:class "target-actual-container"}
+              (dom/div {:class "actual-container"}
+                (dom/h3 {:class "actual green"} runway-string)
+                (dom/h3 {:class "actual-label gray"} (get-runway-subtitle (:cash value-set) (:avg-burn-rate value-set) runway-value cur-symbol))))))
+        (om/build d3-column-chart (get-d3-chart-data fixed-sorted-finances) chart-opts)))))

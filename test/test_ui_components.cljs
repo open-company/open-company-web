@@ -16,7 +16,8 @@
             [test.open-company-web.components.popover]
             [test.open-company-web.components.ui.headline]
             [test.open-company-web.components.ui.manage-topics]
-            [test.open-company-web.components.ui.loading]))
+            [test.open-company-web.components.ui.loading]
+            [test.open-company-web.lib.utils]))
 
 (enable-console-print!)
 
@@ -40,4 +41,5 @@
   'test.open-company-web.components.popover
   'test.open-company-web.components.ui.headline
   'test.open-company-web.components.ui.manage-topics
-  'test.open-company-web.components.ui.loading)
+  'test.open-company-web.components.ui.loading
+  'test.open-company-web.lib.utils)

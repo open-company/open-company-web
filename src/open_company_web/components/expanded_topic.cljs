@@ -15,7 +15,7 @@
             [goog.events :as events]
             [goog.fx.dom :refer (Fade Resize)]))
 
-(defcomponent expanded-internal [{:keys [as-of section section-data currency expanded actual-as-of] :as data} owner options]
+(defcomponent expanded-internal [{:keys [as-of section section-data currency expanded actual-as-of selected-metric] :as data} owner options]
   (render [_]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
@@ -35,19 +35,36 @@
                   (not (contains? revisions-list (:updated-at next-rev))))
         (api/load-revision next-rev slug section-kw))
       (dom/div {:class "topic-expanded"
-                :on-click #((:bw-topic-click options) section)}
+                :on-click #(when (:bw-topic-click options)
+                             ((:bw-topic-click options) section))}
         (dom/div {:class "topic-title"} (:title section-data))
         (dom/div #js {:className "topic-last-updated"}
           (str (:name (:author section-data)) " on " topic-updated-at))
         ;; topic body
-        (om/build topic-body {:section section :section-data section-data :expanded expanded} {:opts options})
+        (om/build topic-body {:section section
+                              :section-data section-data
+                              :selected-metric selected-metric
+                              :currency currency
+                              :expanded expanded} {:opts options})
         (dom/div {:class "topic-navigation group"}
           (when prev-rev
-            (dom/div {:class "previous"}
-              (dom/a {:on-click #((:prev-cb options) (:updated-at prev-rev))} "< Previous")))
+            (dom/div {:class "arrow previous"}
+              (dom/button {:on-click (fn [e]
+                                  (let [bt (.-target e)]
+                                    (set! (.-disabled bt) "disabled")
+                                    (.stopPropagation e)
+                                    ((:prev-cb options) (:updated-at prev-rev))
+                                    (.setTimeout js/window
+                                      #(set! (.-disabled bt) false) 1000)))} "< Previous")))
           (when next-rev
-            (dom/div {:class "next"}
-              (dom/a {:on-click #((:next-cb options) (:updated-at next-rev))} "Next >"))))))))
+            (dom/div {:class "arrow next"}
+              (dom/button {:on-click (fn [e]
+                                      (let [bt (.-target e)]
+                                        (set! (.-disabled bt) "disabled")
+                                        (.stopPropagation e)
+                                        ((:next-cb options) (:updated-at next-rev))
+                                        (.setTimeout js/window
+                                          #(set! (.-disabled bt) false) 1000)))} "Next >"))))))))
 
 (defn perform-transition [owner]
   (when-let [transit-topic-expanded (om/get-ref owner "transit-topic-expanded")]
@@ -77,7 +94,7 @@
                                         (setStyle actual-topic-expanded #js {:opacity 1 :position "relative"})) 1))))
           (.play))))))
 
-(defcomponent expanded-topic [{:keys [section section-data currency expanded] :as data} owner options]
+(defcomponent expanded-topic [{:keys [section section-data currency expanded selected-metric] :as data} owner options]
 
   (init-state [_]
    {:as-of (:updated-at section-data)
@@ -95,8 +112,7 @@
       (when transit-as-of
         (.setTimeout js/window #(perform-transition owner) 1))
       (dom/div #js {:className "topic-expanded-container"
-                    :ref "topic-expanded-container"
-                    :style #js {:overflow "hidden"}}
+                    :ref "topic-expanded-container"}
         (when transit-as-of
           (dom/div #js {:className "transit-topic-expanded topic-expanded-internal"
                         :ref "transit-topic-expanded"
@@ -105,6 +121,7 @@
                                          :section-data transit-topic-data
                                          :as-of transit-as-of
                                          :actual-as-of (:updated-at section-data)
+                                         :selected-metric selected-metric
                                          :currency currency
                                          :expanded expanded
                                          :transit true})))
@@ -116,6 +133,7 @@
                                        :section-data topic-data
                                        :as-of as-of
                                        :actual-as-of (:updated-at section-data)
+                                       :selected-metric selected-metric
                                        :currency currency
                                        :expanded expanded}
                                       {:opts {:prev-cb #(om/set-state! owner :transit-as-of %)
