@@ -322,13 +322,4 @@
                             :style #js {:opacity (if (om/get-state owner :show-topic-edit-button) "0" "1")}}
                 (om/build manage-topics
                           nil
-                          {:opts {:manage-topics-cb #(manage-topics-cb owner options)}})))
-            (when-not (:read-only company-data)
-              (dom/div #js {:className "topic-row floating-edit-topic-button"
-                            :ref "edit-topic-button"
-                            :style #js {:opacity (if show-topic-edit-button "1" "0")
-                                        :display (if show-topic-edit-button "inline" "none")}}
-                (om/build edit-topic-button
-                          nil
-                          {:opts
-                           {:topic-edit-cb #((:topic-edit-cb options) last-expanded-section)}})))))))))
+                          {:opts {:manage-topics-cb #(manage-topics-cb owner options)}})))))))))
