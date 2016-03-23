@@ -21,6 +21,10 @@ html, body {
   background-color: $oc_gray_1;
 }
 
+.no-scroll {
+  overflow: hidden;
+}
+
 h1, h2, h3, h4, h5, h6, .oc-header {
   font-family: $oc_headers_font;
 }
