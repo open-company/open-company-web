@@ -186,19 +186,21 @@
                 (when prev-rev
                   (dom/div {:class "arrow previous group"}
                     (dom/button {:on-click (fn [e]
-                                            (set! (.-disabled (.-target e)) "disabled")
-                                            (.stopPropagation e)
-                                            ((:rev-click options) e prev-rev)
-                                            (.setTimeout js/window
-                                              #(set! (.-disabled (.-target e)) false) 1000))} "< Previous")))
+                                            (let [bt (.-target e)]
+                                              (set! (.-disabled bt) "disabled")
+                                              (.stopPropagation e)
+                                              ((:rev-click options) e prev-rev)
+                                              (.setTimeout js/window
+                                                #(set! (.-disabled bt) false) 1000)))} "< Previous")))
                 (when next-rev
                   (dom/div {:class "arrow next group"}
                     (dom/button {:on-click (fn [e]
-                                            (set! (.-disabled (.-target e)) "disabled")
-                                            (.stopPropagation e)
-                                            ((:rev-click options) e next-rev)
-                                            (.setTimeout js/window
-                                              #(set! (.-disabled (.-target e)) false) 1000))} "Next >")))))))))))
+                                            (let [bt (.-target e)]
+                                              (set! (.-disabled bt) "disabled")
+                                              (.stopPropagation e)
+                                              ((:rev-click options) e next-rev)
+                                              (.setTimeout js/window
+                                                #(set! (.-disabled bt) false) 1000)))} "Next >")))))))))))
 
 (defn topic-click [data owner options expanded selected-metric]
   (if (utils/is-mobile)
