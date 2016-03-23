@@ -50,19 +50,21 @@
           (when prev-rev
             (dom/div {:class "arrow previous"}
               (dom/button {:on-click (fn [e]
-                                  (set! (.-disabled (.-target e)) "disabled")
-                                  (.stopPropagation e)
-                                  ((:prev-cb options) (:updated-at prev-rev))
-                                  (.setTimeout js/window
-                                    #(set! (.-disabled (.-target e)) false) 1000))} "< Previous")))
+                                  (let [bt (.-target e)]
+                                    (set! (.-disabled bt) "disabled")
+                                    (.stopPropagation e)
+                                    ((:prev-cb options) (:updated-at prev-rev))
+                                    (.setTimeout js/window
+                                      #(set! (.-disabled bt) false) 1000)))} "< Previous")))
           (when next-rev
             (dom/div {:class "arrow next"}
               (dom/button {:on-click (fn [e]
-                                  (set! (.-disabled (.-target e)) "disabled")
-                                  (.stopPropagation e)
-                                  ((:next-cb options) (:updated-at next-rev))
-                                  (.setTimeout js/window
-                                    #(set! (.-disabled (.-target e)) false) 1000))} "Next >"))))))))
+                                      (let [bt (.-target e)]
+                                        (set! (.-disabled bt) "disabled")
+                                        (.stopPropagation e)
+                                        ((:next-cb options) (:updated-at next-rev))
+                                        (.setTimeout js/window
+                                          #(set! (.-disabled bt) false) 1000)))} "Next >"))))))))
 
 (defn perform-transition [owner]
   (when-let [transit-topic-expanded (om/get-ref owner "transit-topic-expanded")]
