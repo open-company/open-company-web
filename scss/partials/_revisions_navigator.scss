@@ -1,5 +1,4 @@
 @import "../modules/_fonts";
-$revisions_gray: #5B5B5B;
 
 div.revisions-navigator {
   width: 100%;
@@ -12,7 +11,7 @@ div.revisions-navigator {
 
     div.single-prev,
     div.double-prev {
-      color: $revisions_gray;
+      color: $oc_gray_4;
       float: left;
     }
 
@@ -43,7 +42,7 @@ div.revisions-navigator {
 
     div.single-next,
     div.double-next {
-      color: $revisions_gray;
+      color: $oc_gray_4;
       float: right;
     }
 
@@ -69,7 +68,7 @@ div.revisions-navigator {
   }
 
   p.rev-nav-label {
-    color: $revisions_gray;
+    color: $oc_gray_4;
     font-size: 16px;
     font-weight: normal;
   }

@@ -6,6 +6,7 @@
             [cljs-time.format :as cljs-time-format]
             [cljs-time.core :as cljs-time]
             [goog.fx.dom :refer (Scroll)]
+            [goog.string :as gstring]
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
             [open-company-web.lib.cookies :as cook]
@@ -201,10 +202,11 @@
                       start (max 0 (- idx 3))
                       sub-data (subvec sorted-data start idx)
                       avg-burn-rate (calc-avg-burn-rate sub-data)
-                      runway (calc-runway (:cash data) avg-burn-rate)]
+                      burn-rate (calc-burn-rate (:revenue data) (:costs data))
+                      runway (calc-runway (:cash data) burn-rate)]
                   (merge data {:runway runway
                                :avg-burn-rate avg-burn-rate
-                               :burn-rate (calc-burn-rate (:revenue data) (:costs data))})))
+                               :burn-rate burn-rate})))
               sorted-data)))))
 
 (defn camel-case-str [value]
@@ -430,6 +432,7 @@
         parsed-date (date-from-period period fixed-interval)
         month (cljs-time/month parsed-date)
         year (cljs-time/year parsed-date)
+        fixed-year (if (in? flags :short-year) (str "'" (subs (str year) 2 4)) (str year))
         plus-one-week-year (cljs-time/year (cljs-time/plus parsed-date (cljs-time/days 7)))
         minus-one-week-year (cljs-time/year (cljs-time/minus parsed-date (cljs-time/days 7)))
         needs-year (or (in? flags :force-year)
@@ -444,17 +447,17 @@
       "quarterly"
       (str (get-quarter-from-month (cljs-time/month parsed-date) flags)
            (when needs-year
-             (str " " (cljs-time/year parsed-date))))
+             (str " " fixed-year)))
       "monthly"
       (str (month-string-int (cljs-time/month parsed-date) flags)
            (when needs-year
-             (str " " (cljs-time/year parsed-date))))
+             (str " " fixed-year)))
       "weekly"
       (str (month-string-int (cljs-time/month parsed-date) flags)
            " "
            (cljs-time/day parsed-date)
            (when needs-year
-             (str ", " (cljs-time/year parsed-date)))))))
+             (str ", " fixed-year))))))
 
 (defn update-page-title [title]
   (set! (.-title js/document) title))
@@ -595,3 +598,40 @@
   (if (#{:finances :growth} section)
     (get-in section-data [:notes :body])
     (:body section-data)))
+
+(defn round-2-dec [value decimals]
+  ; cut to 2 dec maximum then parse to float to use toString to remove trailing zeros
+  (.toLocaleString (js/parseFloat (gstring/format (str "%." decimals "f") value))))
+
+(defn with-metric-prefix [value]
+  (cond
+    ; 100M
+    (>= value 100000000)
+    (str (round-2-dec (int (/ value 1000000)) 2) "M")
+    ; 10.0M
+    (>= value 10000000)
+    (str (round-2-dec (/ value 1000000) 1) "M")
+    ; 1.00M
+    (>= value 1000000)
+    (str (round-2-dec (/ value 1000000) 2) "M")
+    ; 100K
+    (>= value 100000)
+    (str (round-2-dec (int (/ value 1000)) 2) "K")
+    ; 10.0K
+    (>= value 10000)
+    (str (round-2-dec (/ value 1000) 1) "K")
+    ; 1.00K
+    (>= value 1000)
+    (str (round-2-dec (/ value 1000) 2) "K")
+    ; 100
+    (>= value 100)
+    (str (round-2-dec (int value) 2))
+    ; 10.0
+    (>= value 10)
+    (str (round-2-dec value 1))
+    ; 1.00
+    :else
+    (str (round-2-dec value 2))))
+
+(defn is-test-env? []
+  (not (not (.-_phantom js/window))))

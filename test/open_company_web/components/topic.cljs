@@ -16,9 +16,9 @@
 
 (def test-atom {
   :loading false
-  :section "update"
-  :section-data (:update company-data)
-  :active-category "progress"})
+  :section "values"
+  :section-data (:values company)
+  :active-category "company"})
 
 (deftest test-topic-component
   (testing "Topic component"

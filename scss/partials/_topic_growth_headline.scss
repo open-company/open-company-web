@@ -1,0 +1,16 @@
+div.topic-growth-headline {
+  @include big_web() {
+    overflow: hidden;
+  }
+
+  @include pillbox();
+
+  label.pillbox {
+    padding: 5px 12px;
+  }
+
+  div.topic-headline-inner {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+}

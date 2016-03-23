@@ -10,7 +10,7 @@ div.topic-list {
     box-shadow: 1px 1px 1px 0 #bababa;
 
     @include big_web(){
-      height: 154px;
+      height: 100%;
       cursor: pointer;
 
       &:hover {
@@ -52,7 +52,7 @@ div.topic-list {
       div.topic-date {
         font-size: 13px;
         line-height: 0.8;
-        color: #5b5b5b;
+        color: $oc_gray_4;
         margin-left: 38px;
         padding-top: 16px;
       }
@@ -85,24 +85,6 @@ div.topic-list {
         }
       }
 
-      &.topic-headline-growth {
-
-        div.chart-header-container {
-          h3.actual {
-            margin: 0px;
-          }
-        }
-
-        div.charts {
-          height: 50px;
-          width: 400px;
-
-          div.chart-container.column-chart {
-            height: 50px;
-            width: 100%;
-          }
-        }
-      }
     }
 
     div.topic-more {

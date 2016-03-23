@@ -1,0 +1,53 @@
+div.topic-finances-headline {
+  @include big_web() {
+    overflow: hidden;
+  }
+
+  div.topic-headline-labels{
+    width: 100%;
+    height: 52px;
+
+    div.finances-metric {
+      width: 33%;
+      float: left;
+      text-align: center;
+      font-size: 16px;
+
+      &.cash {
+        width: 34%;
+      }
+
+      div.label {
+        color: $oc_gray_3;
+        text-align: center;
+        padding: 0;
+        margin: 0;
+      }
+
+      div.value {
+        font-size: 22px;
+        color: #444444;
+        text-align: center;
+        padding: 0;
+        margin: 0;
+
+        &.cash {
+          color: $oc_green_regular;
+        }
+
+        &.costs, &.burn-rate {
+          color: $oc_red_regular;
+        }
+
+        &.cash-flow {
+          color: $oc_green_regular;
+        }
+      }
+    }
+  }
+
+  div.topic-headline-inner {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+}

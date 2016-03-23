@@ -355,7 +355,7 @@
                                                :editable (not read-only)})}
               ;; growth metric currently shown
               (when (and focus (seq (:metric-data subsection-data)))
-                (om/build growth-metric subsection-data))))
+                (om/build growth-metric subsection-data {:opts options}))))
           (when-not (:placeholder section-data)
             (om/build update-footer {:updated-at (:updated-at section-data)
                                      :author (:author section-data)

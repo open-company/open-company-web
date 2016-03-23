@@ -2,10 +2,11 @@
   (:require [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
+            [goog.string :as gstring]
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
 
-(def columns-num 12)
+(def columns-num 6)
 
 (defn chart-data-at-index [data keyw column-name prefix suffix idx]
   (let [data (to-array data)
@@ -93,3 +94,77 @@
 (defn map-placeholder-data [data]
   (let [fixed-data (edit-placeholder-data data)]
     (apply merge (map #(hash-map (:period %) %) fixed-data))))
+
+(defn fix-runway [runway]
+  (if (neg? runway)
+    (utils/abs runway)
+    0))
+
+(defn remove-trailing-zero [string]
+  "Remove the last zero(s) in a numeric string only after the dot.
+   Remote the dot too if it is the last char after removing the zeros"
+  (cond
+
+    (and (not= (.indexOf string ".") -1) (= (last string) "0"))
+    (remove-trailing-zero (subs string 0 (dec (count string))))
+
+    (= (last string) ".")
+    (subs string 0 (dec (count string)))
+
+    :else
+    string))
+
+(defn day-label [& [flags]]
+ "day")
+
+(defn week-label [flags]
+  (if (utils/in? flags :short)
+    "wk"
+    "week"))
+
+(defn month-label [flags]
+ (if (utils/in? flags :short)
+    "mnth"
+    "month"))
+
+(defn year-label [flags]
+ (if (utils/in? flags :short)
+    "yr"
+    "year"))
+
+(defn pluralize [n]
+  (if (> n 1)
+    "s"
+    ""))
+
+(defn get-rounded-runway [runway-days & [flags]]
+  (let [abs-runway-days (utils/abs runway-days)]
+    (cond
+      ; days
+      (< abs-runway-days 7)
+      (let [days (int abs-runway-days)]
+        (str days " " (day-label flags) (pluralize days)))
+      ; weeks
+      (< abs-runway-days (* 30 3))
+      (let [weeks (int (/ abs-runway-days 7))]
+        (str weeks " " (week-label flags) (pluralize weeks)))
+      ; months
+      (< abs-runway-days (* 30 12))
+      (if (utils/in? flags :round)
+        (let [months (int (/ abs-runway-days 30))
+              fixed-months (if (utils/in? flags :remove-trailing-zero)
+                             (remove-trailing-zero (str months))
+                             (str months))]
+          (str fixed-months " " (month-label flags) (pluralize months)))
+        (let [months (quot abs-runway-days 30)]
+          (str months " " (month-label flags) (pluralize months))))
+      ; years
+      :else
+      (if (utils/in? flags :round)
+        (let [years (int (/ abs-runway-days (* 30 12)))
+              fixed-years (if (utils/in? flags :remove-trailing-zero)
+                            (remove-trailing-zero (str years))
+                            (str years))]
+          (str fixed-years " " (year-label flags) (pluralize years)))
+        (let [years (quot abs-runway-days (* 30 12))]
+          (str years " " (year-label flags) (pluralize years)))))))
