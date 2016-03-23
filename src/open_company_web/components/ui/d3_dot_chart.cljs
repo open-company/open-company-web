@@ -28,9 +28,10 @@
     range-fn))
 
 (defn dot-position [chart-width i data-count dots-num]
-  (let [dot-spacer (/ chart-width data-count)]
+  (let [dot-spacer (/ (- chart-width 20) data-count)]
     (+ (/ dot-spacer 2)
-       (* i dot-spacer))))
+       (* i dot-spacer)
+       10)))
 
 (defn current-data [owner]
   (let [start (om/get-state owner :start)
@@ -113,7 +114,7 @@
               max-val (apply max (vals (select-keys data-set chart-keys)))
               scaled-max-val (scale-fn max-val)
               force-year (or (zero? i) (= i (dec (count chart-data))))
-              text (utils/get-period-string (:period data-set) nil [:short (when force-year :force-year)])
+              text (utils/get-period-string (:period data-set) nil [:short (when force-year :force-year) (when (utils/is-mobile) :short-year)])
               x-pos (dot-position chart-width i (count chart-data) (count chart-keys))
               label (-> chart-node
                         (.append "text")
