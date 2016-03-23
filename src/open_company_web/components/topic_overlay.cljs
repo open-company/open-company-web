@@ -81,7 +81,8 @@
                                           (.stopPropagation e)
                                           ((:next-cb options) (:updated-at next-rev))
                                           (.setTimeout js/window
-                                            #(set! (.-disabled bt) false) 1000)))} "Next >")))))))))
+                                            #(set! (.-disabled bt) false) 1000)))} "Next >")))))
+        (dom/div {:class "gradient"})))))
 
 (defn animate-topic-overlay [owner show]
   (when-let [topic-overlay (om/get-ref owner "topic-overlay")]

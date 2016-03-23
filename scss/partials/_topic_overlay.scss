@@ -83,12 +83,12 @@ $topic_overlay_text_color: #2d2d2d;
         }
 
         div.topic-overlay-content {
-          // padding: 0 50px;
           margin: 10px 0px 10px 0px;
           padding: 15px 50px 15px 50px;
           max-height: 515px;
           overflow: scroll;
           overflow-y: scroll;
+          position: relative;
 
           div.topic-overlay-headline {
             font-weight: 600;
@@ -113,6 +113,21 @@ $topic_overlay_text_color: #2d2d2d;
           }
 
           @include topic_navigation();
+        }
+
+        div.gradient {
+          position:absolute;
+          z-index:2;
+          right:0; bottom:0; left:15px;
+          width: 630px;
+          height: 70px; /* adjust it to your needs */
+          background: url(data:image/svg+xml;base64,alotofcodehere);
+          background: -moz-linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(255,255,255,1) 70%);
+          background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(70%,rgba(255,255,255,1)));
+          background: -webkit-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+          background: -o-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+          background: -ms-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+          background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
         }
       }
     }
