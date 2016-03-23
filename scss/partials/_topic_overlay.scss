@@ -1,0 +1,120 @@
+$topic_overlay_border_color: #bababa;
+$topic_overlay_text_color: #2d2d2d;
+
+@include big_web (){
+  div.topic-overlay{
+    position: fixed;
+    display: block;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(250, 250, 250, 0.7);
+    z-index: 10000;
+    opacity: 0;
+    text-align: center;
+    vertical-align: middle;
+
+    div.topic-overlay-box {
+      position: relative;
+      display: inline-block;
+      width: 660px;
+      min-height: 200px;
+      max-height: 650px;
+      margin: 170px -330px;
+      background-color: #fefefe;
+      box-shadow: 3px 3px 2px 0 $topic_overlay_border_color;
+      border: solid 1px $oc_gray_3;
+
+      div.topic-overlay-internal {
+        text-align: left;
+
+        button {
+          background-color: transparent;
+          border: 0px;
+          margin: 0;
+          padding: 0;
+          outline: none;
+        }
+
+        button.pencil {
+          width: 30px;
+          height: 30px;
+          background-image: url("/img/pencil.png");
+          background-position: 0px 0px;
+          background-size: 30px 30px;
+          background-repeat: no-repeat;
+          margin-top: 10px;
+          margin-right: 20px;
+          float: right;
+        }
+
+        button.circle-remove {
+          width: 30px;
+          height: 30px;
+          background-image: url("/img/circle-remove.png");
+          background-position: 0px 0px;
+          background-size: 30px 30px;
+          background-repeat: no-repeat;
+          margin-top: 10px;
+          margin-right: 10px;
+          float: right;
+        }
+
+        div.topic-overlay-header {
+          padding-top: 24px;
+          padding-left: 50px;
+          height: 85px;
+          border-bottom: 2px solid $topic_overlay_border_color;
+
+          div.topic-overlay-title {
+            font-size: 26px;
+            color: $topic_overlay_text_color;
+            line-height: 24px;
+            width: 500px;
+          }
+
+          div.topic-overlay-date {
+            font-size: 12px;
+            color: $topic_overlay_text_color;
+            width: 500px;
+          }
+
+        }
+
+        div.topic-overlay-content {
+          // padding: 0 50px;
+          margin: 10px 0px 10px 0px;
+          padding: 15px 50px 15px 50px;
+          max-height: 515px;
+          overflow: scroll;
+          overflow-y: scroll;
+
+          div.topic-overlay-headline {
+            font-weight: 600;
+            font-size: 20px;
+            color: $topic_overlay_text_color;
+          }
+
+          div.topic-overlay-body {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #141312;
+
+            * {
+              font-size: 15px;
+              line-height: 1.7;
+              color: #141312;
+            }
+
+            img {
+              width: 100%;
+            }
+          }
+
+          @include topic_navigation();
+        }
+      }
+    }
+  }
+}
