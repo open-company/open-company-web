@@ -28,11 +28,9 @@
     range-fn))
 
 (defn dot-position [chart-width i data-count dots-num]
-  (let [dot-spacer (/ (- chart-width 90) (dec show-dots))
-        pos (- (* i dot-spacer)
-               (/ (* (* dot-radius 2) dots-num) 2)
-               -40)]
-    pos))
+  (let [dot-spacer (/ chart-width data-count)]
+    (+ (/ dot-spacer 2)
+       (* i dot-spacer))))
 
 (defn current-data [owner]
   (let [start (om/get-state owner :start)
