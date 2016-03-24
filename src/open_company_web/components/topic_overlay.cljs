@@ -23,7 +23,7 @@
   (.stopPropagation e)
   ((:close-overlay-cb options)))
 
-(defcomponent topic-overlay-internal [{:keys [as-of topic topic-data prev-rev next-rev currency selected-metric] :as data} owner options]
+(defcomponent topic-overlay-internal [{:keys [read-only as-of topic topic-data prev-rev next-rev currency selected-metric] :as data} owner options]
   (render [_]
     (let [topic-kw (keyword topic)
           js-date-upat (utils/js-date (:updated-at topic-data))
@@ -34,8 +34,9 @@
       (dom/div {:class "topic-overlay-internal"}
         (dom/button {:class "circle-remove"
                      :on-click #(circle-remove-click options %)})
-        (dom/button {:class "pencil"
-                     :on-click #(pencil-click options topic %)})
+        (when-not read-only
+          (dom/button {:class "pencil"
+                       :on-click #(pencil-click options topic %)}))
         (dom/div {:class "topic-overlay-header"}
           (dom/div {:class "topic-overlay-title"} (:title topic-data))
           (dom/div {:class "topic-overlay-date"} subtitle-string))
@@ -146,6 +147,7 @@
                                             :topic section
                                             :currency currency
                                             :selected-metric selected-metric
+                                            :read-only (:read-only section-data)
                                             :prev-rev prev-rev
                                             :next-rev next-rev}
                                            {:opts {:close-overlay-cb #(close-overlay owner options)
