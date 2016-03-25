@@ -143,7 +143,6 @@
           max-height (if needs-fix?
                        (- win-height 20)
                        650)]
-      (println "topic-overlay: top-margin" top-margin "max-height" max-height)
       ; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
