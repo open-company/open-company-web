@@ -10,15 +10,15 @@
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [goog.style :refer (setStyle)]
-            [goog.fx.dom :refer (Fade)]))
+            [goog.fx.dom :refer (Fade)]
+            [cljs-dynamic-resources.core :as cdr]
+            [cljsjs.medium-editor]))
 
 (defonce max-win-height 670)
 (defonce overlay-top-margin 100)
 
 (defn pencil-click [options topic e]
   (.stopPropagation e)
-  ; start topic editing
-  ((:close-overlay-cb options))
   ; remove the overlay
   ((:edit-topic-cb options) topic))
 
@@ -38,7 +38,8 @@
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height max-win-height)
           max-height (- win-height 126)]
-      (dom/div {:class "topic-overlay-internal"}
+      (dom/div {:class "topic-overlay-internal"
+                :on-click #(.stopPropagation %)}
         (dom/button {:class "circle-remove"
                      :on-click #(circle-remove-click options %)})
         (when-not read-only
@@ -94,6 +95,77 @@
                                             #(set! (.-disabled bt) false) 1000)))} "Next >")))))
         (dom/div {:class "gradient"})))))
 
+(defn change-value [owner k e]
+  (let [target (.-target e)
+        value (.-value target)]
+    (om/set-state! owner :has-changes true)
+    (om/set-state! owner k value)))
+
+(def medium-editor-options {
+  :toolbar {
+    :buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "unordered-list" "ordered-list"]
+  }})
+
+(defcomponent topic-overlay-edit [{:keys [topic topic-data currency] :as data} owner options]
+
+  (init-state [_]
+    (cdr/add-style! "/css/medium-editor/medium-editor.css")
+    (cdr/add-style! "/css/medium-editor/beagle.css")
+    {:has-changes false
+     :title (:title topic-data)
+     :headline (:headline topic-data)
+     :body (utils/get-topic-body topic-data topic)
+     :medium-editor nil})
+
+  (did-mount [_]
+    ; save initial innerHTML and setup MediumEditor
+    (let [body-el (om/get-ref owner "topic-overlay-edit-body")
+          med-ed (new js/MediumEditor body-el (clj->js medium-editor-options))]
+      (om/set-state! owner :initial-body (.-innerHTML body-el))
+      (om/set-state! owner :medium-editor med-ed)))
+
+  (render-state [_ {:keys [has-changes title headline body]}]
+    (let [topic-kw (keyword topic)
+          js-date-upat (utils/js-date (:updated-at topic-data))
+          month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
+          topic-updated-at (str month-string " " (.getDate js-date-upat))
+          subtitle-string (str (:name (:author topic-data)) " on " topic-updated-at)
+          section-body (utils/get-topic-body topic-data topic-kw)
+          win-height (.-clientHeight (.-body js/document))
+          needs-fix? (< win-height max-win-height)
+          max-height (- win-height 126)]
+      (dom/div {:class "topic-overlay-edit"
+                :on-click #(.stopPropagation %)}
+        (when has-changes
+          (dom/button {:class "save-topic"
+                       :on-click #((:dismiss-editing-cb options))} "Save Topic"))
+        (dom/button {:class "cancel"
+                     :on-click #((:dismiss-editing-cb options))} "Cancel")
+        (dom/div {:class "topic-overlay-edit-header"}
+          (dom/input {:class "topic-overlay-edit-title"
+                      :type "text"
+                      :placeholder "Type your title here"
+                      :max-length 100
+                      :value title
+                      :on-change #(change-value owner :headline %)})
+          (dom/div {:class "topic-overlay-date"} subtitle-string))
+        (dom/div #js {:className "topic-overlay-edit-content"
+                      :ref "topic-overlay-edit-content"
+                      :style #js {:maxHeight (str max-height "px")}}
+          (dom/div {}
+            (dom/div {:class "topic-overlay-edit-headline-count"}
+              (dom/label {:class "bold"} (- 100 (count headline))) "/100"))
+          (dom/input {:class "topic-overlay-edit-headline"
+                      :type "text"
+                      :placeholder "Type your headline here"
+                      :max-length 100
+                      :value headline
+                      :on-change #(change-value owner :headline %)})
+          (dom/div #js {:className "topic-overlay-edit-body"
+                        :ref "topic-overlay-edit-body"
+                        :dangerouslySetInnerHTML (clj->js {"__html" section-body})}))
+        (dom/div {:class "gradient"})))))
+
 (defn animate-topic-overlay [owner show]
   (when-let [topic-overlay (om/get-ref owner "topic-overlay")]
     (.play
@@ -111,7 +183,8 @@
 (defcomponent topic-overlay [{:keys [section section-data currency selected-metric] :as data} owner options]
 
   (init-state [_]
-    {:as-of (:updated-at section-data)})
+    {:as-of (:updated-at section-data)
+     :editing false})
 
   (did-mount [_]
     (animate-topic-overlay owner true)
@@ -122,7 +195,7 @@
     ; let the window scroll
     (dommy/remove-class! (sel1 [:body]) "no-scroll"))
 
-  (render-state [_ {:keys [as-of]}]
+  (render-state [_ {:keys [as-of editing]}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           slug (keyword (:slug @router/path))
@@ -143,7 +216,6 @@
           max-height (if needs-fix?
                        (- win-height 20)
                        650)]
-      (println "topic-overlay: top-margin" top-margin "max-height" max-height)
       ; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -161,15 +233,20 @@
                       :style #js {:marginTop (str top-margin "px")
                                   :maxHeight (str max-height "px")}
                       :on-click #(.stopPropagation %)}
-          (om/build topic-overlay-internal {:topic-data topic-data
-                                            :as-of as-of
-                                            :topic section
-                                            :currency currency
-                                            :selected-metric selected-metric
-                                            :read-only (or (:read-only section-data) (not= as-of (:updated-at section-data)))
-                                            :prev-rev prev-rev
-                                            :next-rev next-rev}
-                                           {:opts {:close-overlay-cb #(close-overlay owner options)
-                                                   :edit-topic-cb (:topic-edit-cb options)
-                                                   :prev-cb #(om/set-state! owner :as-of %)
-                                                   :next-cb #(om/set-state! owner :as-of %)}}))))))
+          (if-not editing
+            (om/build topic-overlay-internal {:topic-data topic-data
+                                              :as-of as-of
+                                              :topic section
+                                              :currency currency
+                                              :selected-metric selected-metric
+                                              :read-only (or (:read-only section-data) (not= as-of (:updated-at section-data)))
+                                              :prev-rev prev-rev
+                                              :next-rev next-rev}
+                                             {:opts {:close-overlay-cb #(close-overlay owner options)
+                                                     :edit-topic-cb #(om/set-state! owner :editing true)
+                                                     :prev-cb #(om/set-state! owner :as-of %)
+                                                     :next-cb #(om/set-state! owner :as-of %)}})
+            (om/build topic-overlay-edit {:topic-data section-data
+                                          :topic section
+                                          :currency currency}
+                                         {:opts {:dismiss-editing-cb #(om/set-state! owner :editing false)}})))))))
