@@ -21,7 +21,7 @@ $topic_overlay_text_color: #2d2d2d;
       width: 660px;
       min-height: 200px;
       max-height: 650px;
-      margin: 170px -330px;
+      margin: 100px -330px;
       background-color: #fefefe;
       box-shadow: 3px 3px 2px 0 $topic_overlay_border_color;
       border: solid 1px $oc_gray_3;
@@ -86,11 +86,13 @@ $topic_overlay_text_color: #2d2d2d;
           margin: 10px 0px 10px 0px;
           padding: 15px 50px 15px 50px;
           max-height: 515px;
+          height: 100%;
           overflow: scroll;
           overflow-y: scroll;
           position: relative;
 
           div.topic-overlay-headline {
+            margin-bottom: 30px;
             font-weight: 600;
             font-size: 20px;
             color: $topic_overlay_text_color;
@@ -118,9 +120,9 @@ $topic_overlay_text_color: #2d2d2d;
         div.gradient {
           position:absolute;
           z-index:2;
-          right:0; bottom:0; left:15px;
-          width: 630px;
-          height: 70px; /* adjust it to your needs */
+          right:0; bottom:0; left:0px;
+          width: 660px;
+          height: 50px; /* adjust it to your needs */
           background: url(data:image/svg+xml;base64,alotofcodehere);
           background: -moz-linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(255,255,255,1) 70%);
           background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(70%,rgba(255,255,255,1)));

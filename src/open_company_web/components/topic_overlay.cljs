@@ -12,6 +12,9 @@
             [goog.style :refer (setStyle)]
             [goog.fx.dom :refer (Fade)]))
 
+(defonce max-win-height 670)
+(defonce overlay-top-margin 100)
+
 (defn pencil-click [options topic e]
   (.stopPropagation e)
   ; start topic editing
@@ -24,13 +27,17 @@
   ((:close-overlay-cb options)))
 
 (defcomponent topic-overlay-internal [{:keys [read-only as-of topic topic-data prev-rev next-rev currency selected-metric] :as data} owner options]
+
   (render [_]
     (let [topic-kw (keyword topic)
           js-date-upat (utils/js-date (:updated-at topic-data))
           month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
           topic-updated-at (str month-string " " (.getDate js-date-upat))
           subtitle-string (str (:name (:author topic-data)) " on " topic-updated-at)
-          section-body (utils/get-topic-body topic-data topic-kw)]
+          section-body (utils/get-topic-body topic-data topic-kw)
+          win-height (.-clientHeight (.-body js/document))
+          needs-fix? (< win-height max-win-height)
+          max-height (- win-height 126)]
       (dom/div {:class "topic-overlay-internal"}
         (dom/button {:class "circle-remove"
                      :on-click #(circle-remove-click options %)})
@@ -40,7 +47,9 @@
         (dom/div {:class "topic-overlay-header"}
           (dom/div {:class "topic-overlay-title"} (:title topic-data))
           (dom/div {:class "topic-overlay-date"} subtitle-string))
-        (dom/div {:class "topic-overlay-content"}
+        (dom/div #js {:className "topic-overlay-content"
+                      :ref "topic-overlay-content"
+                      :style #js {:maxHeight (str max-height "px")}}
           (dom/div {:class "topic-overlay-headline"} (:headline topic-data))
           (when (= topic "finances")
             (om/build topic-finances {:section-data topic-data
@@ -107,12 +116,7 @@
   (did-mount [_]
     (animate-topic-overlay owner true)
     ; prevent the window from scrolling
-    (dommy/add-class! (sel1 [:body]) "no-scroll")
-    ; setup the top margin if the window is small
-    (let [win-height (.-clientHeight (.-body js/document))]
-      (when (< win-height (+ 660 (* 170 2)))
-        (let [top-margin (+ (/ (- win-height 660) 2) 10)]
-          (setStyle (om/get-ref owner "topic-overlay-box") #js {:marginTop (str top-margin "px")})))))
+    (dommy/add-class! (sel1 [:body]) "no-scroll"))
 
   (will-unmount [_]
     ; let the window scroll
@@ -126,7 +130,20 @@
           topic-data (utils/select-section-data section-data section-kw as-of)
           prev-rev (utils/revision-prev revisions as-of)
           next-rev (utils/revision-next revisions as-of)
-          actual-as-of (:updated-at section-data)]
+          actual-as-of (:updated-at section-data)
+          win-height (.-clientHeight (.-body js/document))
+          content-max-height (if (< win-height max-win-height)
+                               (- win-height 20)
+                               (- max-win-height 20))
+          needs-fix? (< win-height (+ content-max-height (* overlay-top-margin 2)))
+          calc-top-margin (+ (/ (- content-max-height (min win-height max-win-height)) 2) 10)
+          top-margin (if needs-fix?
+                       (max 10 calc-top-margin)
+                       100)
+          max-height (if needs-fix?
+                       (- win-height 20)
+                       650)]
+      (println "topic-overlay: top-margin" top-margin "max-height" max-height)
       ; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -141,13 +158,15 @@
                     :key (name section)}
         (dom/div #js {:className "topic-overlay-box"
                       :ref "topic-overlay-box"
+                      :style #js {:marginTop (str top-margin "px")
+                                  :maxHeight (str max-height "px")}
                       :on-click #(.stopPropagation %)}
           (om/build topic-overlay-internal {:topic-data topic-data
                                             :as-of as-of
                                             :topic section
                                             :currency currency
                                             :selected-metric selected-metric
-                                            :read-only (:read-only section-data)
+                                            :read-only (or (:read-only section-data) (not= as-of (:updated-at section-data)))
                                             :prev-rev prev-rev
                                             :next-rev next-rev}
                                            {:opts {:close-overlay-cb #(close-overlay owner options)
