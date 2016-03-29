@@ -103,7 +103,7 @@
 
 (def medium-editor-options {
   :toolbar {
-    :buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "unordered-list" "ordered-list"]
+    :buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "orderedlist" "unorderedlist"]
   }})
 
 (defcomponent topic-overlay-edit [{:keys [topic topic-data currency] :as data} owner options]
@@ -121,6 +121,8 @@
     ; save initial innerHTML and setup MediumEditor
     (let [body-el (om/get-ref owner "topic-overlay-edit-body")
           med-ed (new js/MediumEditor body-el (clj->js medium-editor-options))]
+      (.subscribe med-ed "editableInput" (fn [event editable]
+                                           (om/set-state! owner :has-changes true)))
       (om/set-state! owner :initial-body (.-innerHTML body-el))
       (om/set-state! owner :medium-editor med-ed)))
 
@@ -138,7 +140,11 @@
                 :on-click #(.stopPropagation %)}
         (when has-changes
           (dom/button {:class "save-topic"
-                       :on-click #((:dismiss-editing-cb options))} "Save Topic"))
+                       :on-click #(let [section-data {:title (om/get-state owner :title)
+                                                      :headline (om/get-state owner :headline)
+                                                      :body (.-innerHTML (om/get-ref owner "topic-overlay-edit-body"))}]
+                                    (api/partial-update-section topic section-data)
+                                    (:dismiss-editing-cb options))} "Save Topic"))
         (dom/button {:class "cancel"
                      :on-click #((:dismiss-editing-cb options))} "Cancel")
         (dom/div {:class "topic-overlay-edit-header"}
@@ -191,6 +197,10 @@
     ; prevent the window from scrolling
     (dommy/add-class! (sel1 [:body]) "no-scroll"))
 
+  (did-update [_ old-props _]
+    (when-not (= old-props data)
+      (om/set-state! owner :as-of (:updated-at data))))
+
   (will-unmount [_]
     ; let the window scroll
     (dommy/remove-class! (sel1 [:body]) "no-scroll"))
@@ -226,7 +236,8 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className "topic-overlay"
                     :ref "topic-overlay"
-                    :onClick #(close-overlay owner options)
+                    :onClick #(when-not editing
+                                (close-overlay owner options))
                     :key (name section)}
         (dom/div #js {:className "topic-overlay-box"
                       :ref "topic-overlay-box"
