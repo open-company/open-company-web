@@ -10,7 +10,7 @@
 
   :dependencies [
     [org.clojure/clojure "1.8.0"] ; Lisp on the JVM http://clojure.org/documentation
-    [org.clojure/clojurescript "1.8.34"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    [org.clojure/clojurescript "1.8.40"] ; ClojureScript compiler https://github.com/clojure/clojurescript
     ; --- DO NOT UPDATE OM, the 1.x.x code is Om Next and requires changes on our part https://github.com/omcljs/om/wiki/Quick-Start-(om.next)
     [org.omcljs/om "0.9.0" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
     [cljs-http "0.1.39"] ; HTTP for cljs https://github.com/r0man/cljs-http
