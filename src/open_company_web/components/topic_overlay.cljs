@@ -141,7 +141,7 @@
       (om/set-state! owner :initial-body (.-innerHTML body-el))
       (om/set-state! owner :medium-editor med-ed))
     (when focus
-      (js/setTimeout #(focus-field topic focus) 1)))
+      (focus-field topic focus)))
 
   (render-state [_ {:keys [has-changes title headline body]}]
     (let [topic-kw (keyword topic)
