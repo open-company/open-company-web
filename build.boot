@@ -35,8 +35,7 @@
                       :page "app-shell.html")))
 
 (deftask dev []
-  (comp (serve ;:dir "target/public")
-         :handler 'oc.server/handler)
+  (comp (serve :handler 'oc.server/handler
+               :port 3559)
         (watch)
-        (build)
-        (target)))
+        (build)))

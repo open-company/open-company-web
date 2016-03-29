@@ -13,19 +13,32 @@
 (defn devcards []
   (res/resource-response "/devcards.html" {:root "public"}))
 
+(defn index []
+  (res/resource-response "/index.html" {:root "public"}))
+
 (defn not-found []
-  (assoc (res/resource-response "/404.html" {:root "public"})) :status 404)
+  (assoc (res/resource-response "/404.html" {:root "public"}) :status 404))
 
 (defroutes resources
   (GET "/devcards" [] (devcards))
   (GET "/404" [] (not-found))
-  (GET "*" [req] (app-shell)))
+  (GET "/" [] (index))
+  (GET "*" [] (app-shell)))
 
-(defn wrap-default-content-type [handler content-type]
+;; Some routes like /, /404 and similar can't have their content-type
+;; derived automatically, because of that we set it with the middleware below
+
+(defn html-uri?
+  "Return true if `uri` does not end in what looks like a file extension"
+  [uri]
+  (empty? (re-seq #"\.\w{2,4}$" uri)))
+
+(defn wrap-default-content-type [handler]
   (fn [request]
     (let [response (handler request)]
-      (if-not (res/get-header response "Content-Type")
-        (res/content-type response content-type)
+      (if (and (html-uri? (:uri request))
+               (not (res/get-header response "Content-Type")))
+        (res/content-type response "text/html;charset=UTF-0")
         response))))
 
 (def handler
@@ -33,4 +46,4 @@
       (wrap-file "target/public")
       (wrap-resource "public")
       (wrap-reload {:dirs "site"})
-      (wrap-default-content-type "text/html;charset=UTF-0")))
+      (wrap-default-content-type)))
