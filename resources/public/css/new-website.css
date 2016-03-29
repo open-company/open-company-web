@@ -132,7 +132,7 @@ div.early-access input {
   border-width: 0px;
 }
 
-div.early-access button, {
+div.early-access button {
   background-color: #4183D7;
   color: white;
   border-width: 0px;
@@ -434,32 +434,4 @@ div.container.outer.footer nav.navbar {
   background: transparent;
   border-color: transparent;
   border-width: 0px;
-}
-
-.not-found {
-  margin: 10rem auto;
-  text-align: center;
-}
-
-.not-found h1 {
-    font-family: "Lora", serif;
-    font-size: 6rem;
-    color: #4183D7;
-}
-
-.not-found h2 {
-    font-size: 2rem;
-}
-
-.not-found p {
-  font-family: 'Open Sans', sans-serif;
-}
-
-.not-found .btn {
-    margin-top: 2rem;
-    font-family: 'Open Sans', sans-serif;
-    background-color: #4183D7;
-    padding: .7rem 2rem;
-    color: white;
-    font-weight: 700
 }
