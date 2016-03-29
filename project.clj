@@ -63,7 +63,7 @@
 
   :source-paths ["src"]
 
-  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
+  :clean-targets ^{:protect false} ["target/public/js/compiled" "target"]
 
   :cljsbuild {
     :builds {
@@ -76,8 +76,8 @@
         :compiler {
           :main open-company-web.core
           :asset-path "/js/compiled/out"
-          :output-to "resources/public/js/compiled/open_company.js"
-          :output-dir "resources/public/js/compiled/out"
+          :output-to "target/public/js/compiled/open_company.js"
+          :output-dir "target/public/js/compiled/out"
           :optimizations :none
           :source-map-timestamp true
           :pretty-print true}}
@@ -89,8 +89,8 @@
         :compiler {
           :main "open-company-web.lib.devcards"
           :asset-path "/js/compiled/out_devcards"
-          :output-to "resources/public/js/compiled/devcards/oc_devcards.js"
-          :output-dir "resources/public/js/compiled/out_devcards"
+          :output-to "target/public/js/compiled/devcards/oc_devcards.js"
+          :output-dir "target/public/js/compiled/out_devcards"
           :optimizations :none
           :source-map-timestamp true
           :pretty-print true}}
@@ -99,9 +99,9 @@
         :id "min"
         :source-paths ["src"]
         :compiler {
-          :output-to "resources/public/js/compiled/open_company.js"
+          :output-to "target/public/js/compiled/open_company.js"
           :main open-company-web.core
-          :externs ["resources/public/js/externs.js"]
+          :externs ["target/public/js/externs.js"]
           :optimizations :advanced
           :pretty-print false}}
 
@@ -138,7 +138,7 @@
     ;; :server-port 3449 ;; default
     ;; :server-ip "127.0.0.1"
 
-    :css-dirs ["resources/public/css"] ;; watch and update CSS
+    :css-dirs ["target/public/css"] ;; watch and update CSS
 
     ;; Start an nREPL server into the running figwheel process
     ;; :nrepl-port 7888
@@ -147,7 +147,7 @@
     ;; if you want to embed a ring handler into the figwheel http-kit
     ;; server, this is for simple ring servers, if this
     ;; doesn't work for you just run your own server :)
-    :ring-handler open-company-web.lib.server/handler
+    ;; :ring-handler open-company-web.lib.server/handler
 
     ;; To be able to open files in your editor from the heads up display
     ;; you will need to put a script on your path.
@@ -167,7 +167,7 @@
 
   :sass {
     :src "scss"
-    :dst "resources/public/css"
+    :dst "target/public/css"
 
     ;; other options (provided are default values):
     ; :delete-output-dir false
