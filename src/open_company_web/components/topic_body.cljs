@@ -22,7 +22,6 @@
       (dom/div #js {:className "topic-body"
                     :onClick #(when (and (not (:read-only section-data)) (utils/is-mobile))
                                 (topic-body-click % owner options))}
-        (dom/div {:class "topic-headline"} (:headline section-data))
 
         (cond
           (= section-kw :growth)
