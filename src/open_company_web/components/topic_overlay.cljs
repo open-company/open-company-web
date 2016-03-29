@@ -17,10 +17,10 @@
 (defonce max-win-height 670)
 (defonce overlay-top-margin 100)
 
-(defn pencil-click [options topic e]
+(defn pencil-click [options topic e focus-field]
   (.stopPropagation e)
   ; remove the overlay
-  ((:edit-topic-cb options) topic))
+  ((:edit-topic-cb options) focus-field))
 
 (defn circle-remove-click [options e]
   (.stopPropagation e)
@@ -44,35 +44,43 @@
                      :on-click #(circle-remove-click options %)})
         (when-not read-only
           (dom/button {:class "pencil"
-                       :on-click #(pencil-click options topic %)}))
+                       :on-click #(pencil-click options topic % "title")}))
         (dom/div {:class "topic-overlay-header"}
-          (dom/div {:class "topic-overlay-title"} (:title topic-data))
+          (dom/div {:class "topic-overlay-title"
+                    :on-click #(when-not read-only
+                                (pencil-click options topic % "title"))} (:title topic-data))
           (dom/div {:class "topic-overlay-date"} subtitle-string))
         (dom/div #js {:className "topic-overlay-content"
                       :ref "topic-overlay-content"
                       :style #js {:maxHeight (str max-height "px")}}
-          (dom/div {:class "topic-overlay-headline"} (:headline topic-data))
-          (when (= topic "finances")
-            (om/build topic-finances {:section-data topic-data
-                                      :section topic-kw
-                                      :currency currency
-                                      :selected-metric selected-metric
-                                      :read-only true}
-                                     {:opts {:show-title false
-                                             :show-revisions-navigation false
-                                             :chart-size {:height (if (utils/is-mobile) 200 290)
-                                                          :width (if (utils/is-mobile) 320 480)}}}))
-          (when (= topic "growth")
-            (om/build topic-growth   {:section-data topic-data
-                                      :section topic-kw
-                                      :currency currency
-                                      :selected-metric selected-metric
-                                      :read-only true}
-                                     {:opts {:show-title false
-                                             :show-revisions-navigation false
-                                             :chart-size {:height (if (utils/is-mobile) 200 290)
-                                                          :width (if (utils/is-mobile) 320 480)}}}))
+          (dom/div {:class "topic-overlay-headline"
+                    :on-click #(when-not read-only
+                                (pencil-click options topic % "headline"))} (:headline topic-data))
+          (dom/div {:on-click #(when-not read-only
+                                 (pencil-click options topic % "body"))}
+            (when (= topic "finances")
+              (om/build topic-finances {:section-data topic-data
+                                        :section topic-kw
+                                        :currency currency
+                                        :selected-metric selected-metric
+                                        :read-only true}
+                                       {:opts {:show-title false
+                                               :show-revisions-navigation false
+                                               :chart-size {:height (if (utils/is-mobile) 200 290)
+                                                            :width (if (utils/is-mobile) 320 480)}}}))
+            (when (= topic "growth")
+              (om/build topic-growth   {:section-data topic-data
+                                        :section topic-kw
+                                        :currency currency
+                                        :selected-metric selected-metric
+                                        :read-only true}
+                                       {:opts {:show-title false
+                                               :show-revisions-navigation false
+                                               :chart-size {:height (if (utils/is-mobile) 200 290)
+                                                            :width (if (utils/is-mobile) 320 480)}}})))
           (dom/div {:class "topic-overlay-body"
+                    :on-click #(when-not read-only
+                                (pencil-click options topic % "body"))
                     :dangerouslySetInnerHTML (clj->js {"__html" section-body})})
           (dom/div {:class "topic-overlay-navigation topic-navigation group"}
             (when prev-rev
@@ -106,7 +114,14 @@
     :buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "orderedlist" "unorderedlist"]
   }})
 
-(defcomponent topic-overlay-edit [{:keys [topic topic-data currency] :as data} owner options]
+(defn focus-field [topic field]
+  (let [topic-field (.getElementById js/document (str "topic-edit-" field "-" (name topic)))
+        field-value (.-value topic-field)]
+    (.focus topic-field)
+    (when (or (= field "headline") (= field "title"))
+      (set! (.-value topic-field) field-value))))
+
+(defcomponent topic-overlay-edit [{:keys [topic topic-data currency focus] :as data} owner options]
 
   (init-state [_]
     (cdr/add-style! "/css/medium-editor/medium-editor.css")
@@ -124,7 +139,9 @@
       (.subscribe med-ed "editableInput" (fn [event editable]
                                            (om/set-state! owner :has-changes true)))
       (om/set-state! owner :initial-body (.-innerHTML body-el))
-      (om/set-state! owner :medium-editor med-ed)))
+      (om/set-state! owner :medium-editor med-ed))
+    (when focus
+      (js/setTimeout #(focus-field topic focus) 1)))
 
   (render-state [_ {:keys [has-changes title headline body]}]
     (let [topic-kw (keyword topic)
@@ -143,12 +160,14 @@
                        :on-click #(let [section-data {:title (om/get-state owner :title)
                                                       :headline (om/get-state owner :headline)
                                                       :body (.-innerHTML (om/get-ref owner "topic-overlay-edit-body"))}]
+                                    (.stopPropagation %)
                                     (api/partial-update-section topic section-data)
-                                    (:dismiss-editing-cb options))} "Save Topic"))
+                                    ((:dismiss-editing-cb options)))} "Save Topic"))
         (dom/button {:class "cancel"
                      :on-click #((:dismiss-editing-cb options))} "Cancel")
         (dom/div {:class "topic-overlay-edit-header"}
           (dom/input {:class "topic-overlay-edit-title"
+                      :id (str "topic-edit-title-" (name topic))
                       :type "text"
                       :placeholder "Type your title here"
                       :max-length 100
@@ -162,6 +181,7 @@
             (dom/div {:class "topic-overlay-edit-headline-count"}
               (dom/label {:class "bold"} (- 100 (count headline))) "/100"))
           (dom/input {:class "topic-overlay-edit-headline"
+                      :id (str "topic-edit-headline-" (name topic))
                       :type "text"
                       :placeholder "Type your headline here"
                       :max-length 100
@@ -169,6 +189,7 @@
                       :on-change #(change-value owner :headline %)})
           (dom/div #js {:className "topic-overlay-edit-body"
                         :ref "topic-overlay-edit-body"
+                        :id (str "topic-edit-body-" (name topic))
                         :dangerouslySetInnerHTML (clj->js {"__html" section-body})}))
         (dom/div {:class "gradient"})))))
 
@@ -186,10 +207,15 @@
   (.setTimeout js/window
     #((:close-overlay-cb options)) utils/oc-animation-duration))
 
+(defn start-editing [owner focus]
+  (om/set-state! owner :focus focus)
+  (om/set-state! owner :editing true))
+
 (defcomponent topic-overlay [{:keys [section section-data currency selected-metric] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
+     :focus nil
      :editing false})
 
   (did-mount [_]
@@ -199,13 +225,13 @@
 
   (did-update [_ old-props _]
     (when-not (= old-props data)
-      (om/set-state! owner :as-of (:updated-at data))))
+      (om/set-state! owner :as-of (:updated-at section-data))))
 
   (will-unmount [_]
     ; let the window scroll
     (dommy/remove-class! (sel1 [:body]) "no-scroll"))
 
-  (render-state [_ {:keys [as-of editing]}]
+  (render-state [_ {:keys [as-of editing focus]}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           slug (keyword (:slug @router/path))
@@ -254,10 +280,11 @@
                                               :prev-rev prev-rev
                                               :next-rev next-rev}
                                              {:opts {:close-overlay-cb #(close-overlay owner options)
-                                                     :edit-topic-cb #(om/set-state! owner :editing true)
+                                                     :edit-topic-cb #(start-editing owner %)
                                                      :prev-cb #(om/set-state! owner :as-of %)
                                                      :next-cb #(om/set-state! owner :as-of %)}})
             (om/build topic-overlay-edit {:topic-data section-data
                                           :topic section
+                                          :focus focus
                                           :currency currency}
                                          {:opts {:dismiss-editing-cb #(om/set-state! owner :editing false)}})))))))
