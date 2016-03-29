@@ -1,11 +1,5 @@
 div.company-header{
-  @include mobile(){
-    background-color: white;
-  }
-
-  @include big_web(){
-    background-color: #fafafa;
-  }
+  background-color: white;
 
   div.navbar-editing {
     width: 100%;
@@ -46,7 +40,7 @@ div.company-header{
         float: left;
 
         @include mobile(){
-          margin-left: 40px;
+          margin-left: 20px;
         }
 
         img.company-logo {
@@ -108,7 +102,7 @@ div.company-header{
         background-color: inherit;
 
         @include mobile(){
-          padding-left: 40px;
+          padding-left: 20px;
           padding-top: 20px;
           padding-bottom: 9px;
           height: 46px;

@@ -37,7 +37,7 @@
           section-body (utils/get-topic-body topic-data topic-kw)
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height max-win-height)
-          max-height (- win-height 126)]
+          max-height (min (- 650 126) (- win-height 126))]
       (dom/div {:class "topic-overlay-internal"
                 :on-click #(.stopPropagation %)}
         (dom/button {:class "circle-remove"
