@@ -1,11 +1,5 @@
 div.company-header{
-  @include mobile(){
-    background-color: white;
-  }
-
-  @include big_web(){
-    background-color: #fafafa;
-  }
+  background-color: white;
 
   div.navbar-editing {
     width: 100%;
