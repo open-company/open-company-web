@@ -44,10 +44,10 @@
       (if (> scroll-top @company-name-offset-top)
         (do
           (gstyle/setStyle company-name-container #js {:position "fixed" :top "0px" :left "0px"})
-          (gstyle/setStyle company-description-container #js {:marginTop "46px"}))
+          (gstyle/setStyle company-description-container #js {:marginTop "61px"}))
         (do
           (gstyle/setStyle company-name-container #js {:position "relative"})
-          (gstyle/setStyle company-description-container #js {:marginTop "0px"}))))
+          (gstyle/setStyle company-description-container #js {:marginTop "15px"}))))
     ; fix the category navigation bar and move the topic list relatively when
     ; the scroll hit the category navigation max top
     (when (and category-nav topic-list)
@@ -93,7 +93,7 @@
     ; redirect to login
     (utils/redirect! "/login")))
 
-(def logo-max-height 70)
+(def logo-max-height 100)
 
 (defn logo-on-load [owner]
   (when-not (utils/is-mobile)

@@ -1,11 +1,5 @@
 div.company-header{
-  @include mobile(){
-    background-color: white;
-  }
-
-  @include big_web(){
-    background-color: #fafafa;
-  }
+  background-color: white;
 
   div.navbar-editing {
     width: 100%;
@@ -33,27 +27,25 @@ div.company-header{
 
   div.company-header-internal {
     @include big_web(){
-      padding: 0 70px;
+      padding: 0 185px;
       min-height: 120px;
     }
     
     div.company-header-top {
       padding-top: 22px;
 
-      @include big_web(){
-        float: left;
-        width: 105px;
-      }
-
       div.company-logo-container{
-        margin-left: 15px;
-        max-width: 70px;
-        max-height: 70px;
+        max-width: 200px;
+        max-height: 100px;
         float: left;
+
+        @include mobile(){
+          margin-left: 20px;
+        }
 
         img.company-logo {
-          max-width: 70px;
-          max-height: 70px;
+          max-width: 200px;
+          max-height: 100px;
         }
       }
 
@@ -102,10 +94,6 @@ div.company-header{
         z-index: 2;
       }
 
-      @include big_web(){
-        margin-left: 100px;
-      }
-
       div.company-name {
         text-align: left;
         color: #2d2d2d;
@@ -123,7 +111,7 @@ div.company-header{
         }
 
         @include big_web(){
-          padding-top: 30px;
+          padding-top: 10px;
           font-weight: 600;
         }
       }
@@ -140,19 +128,18 @@ div.company-header{
         color: #2d2d2d;
 
         @include mobile(){
-          margin-top: 0px;
+          margin-top: 15px;
           margin-bottom: 20px;
           margin-left: 20px;
           padding-top: 0px;
           font-size: 16px;
-          line-height: 1.2;
+          line-height: 0.5;
         }
 
         @include big_web(){
           width: 355px;
-          padding-top: 10px;
-          padding-left: 105px;
-          padding-bottom: 20px;
+          padding-top: 5px;
+          padding-bottom: 34px;
           font-size: 14px;
           line-height: 1.3;
         }

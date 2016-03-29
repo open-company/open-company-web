@@ -27,8 +27,8 @@ nav.navbar {
   @include big_web(){
     & > div {
       width: auto;
-      padding-left: 85px;
-      padding-right: 85px;
+      padding-left: 40px;
+      padding-right: 40px;
     }
   }
 

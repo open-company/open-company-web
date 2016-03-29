@@ -12,15 +12,6 @@ div.manage-topics{
     text-align: center;
     text-decoration: underline;
 
-    &:hover {
-      @include mobile(){
-        background-color: #cfcfcf;
-      }
-      @include big_web(){
-        background-color: #ececec;
-      }
-    }
-
     div.manage-topics-cta{
       padding: 0;
       margin: 0;

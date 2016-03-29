@@ -18,7 +18,7 @@
   :oc-gray-0 "#FEFEFE"
   :oc-gray-1 "#F1F1F1"
   :oc-gray-2 "#D8D8D8"
-  :oc-gray-3 "#8B8A8A"
+  :oc-gray-3 "#8A8A8A"
   :oc-gray-4 "#5B5B5B"
 
   :oc-red-dark "#9E001A"

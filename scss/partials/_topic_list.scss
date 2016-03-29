@@ -51,10 +51,7 @@ div.topic-list{
   
 
     li.topic-row{
-
-      &.unexpanded {
-        opacity: 0.3 !important;
-      }
+      height: auto;
 
       @include mobile(){
         padding: 0px;
