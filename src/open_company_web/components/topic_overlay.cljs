@@ -9,6 +9,8 @@
             [open-company-web.api :as api]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
+            [goog.events :as events]
+            [goog.history.EventType :as EventType]
             [goog.style :refer (setStyle)]
             [goog.fx.dom :refer (Fade)]
             [cljs-dynamic-resources.core :as cdr]
@@ -121,6 +123,8 @@
     (when (or (= field "headline") (= field "title"))
       (set! (.-value topic-field) field-value))))
 
+(def before-unload-message "You have unsaved changes to the topic.")
+
 (defcomponent topic-overlay-edit [{:keys [topic topic-data currency focus] :as data} owner options]
 
   (init-state [_]
@@ -130,9 +134,19 @@
      :title (:title topic-data)
      :headline (:headline topic-data)
      :body (utils/get-topic-body topic-data topic)
-     :medium-editor nil})
+     :medium-editor nil
+     :history-listener-id nil})
+
+  (will-unmount [_]
+    ; re enable the route dispatcher
+    (reset! open-company-web.core/prevent-route-dispatch false)
+    ; remove the onbeforeunload handler
+    (set! (.-onbeforeunload js/window) nil)
+    ; remove history change listener
+    (events/unlistenByKey (om/get-state owner :history-listener-id)))
 
   (did-mount [_]
+    (reset! open-company-web.core/prevent-route-dispatch true)
     ; save initial innerHTML and setup MediumEditor
     (let [body-el (om/get-ref owner "topic-overlay-edit-body")
           med-ed (new js/MediumEditor body-el (clj->js medium-editor-options))]
@@ -141,7 +155,18 @@
       (om/set-state! owner :initial-body (.-innerHTML body-el))
       (om/set-state! owner :medium-editor med-ed))
     (when focus
-      (focus-field topic focus)))
+      (focus-field topic focus))
+    (let [win-location (.-location js/window)
+          current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
+          listener (events/listen open-company-web.core/history EventType/NAVIGATE
+                     #(when-not (= (.-token %) current-token)
+                        (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
+                          ; dispatch the current url
+                          (open-company-web.core/route-dispatch! (router/get-token))
+                          ; go back to the previous token
+                          (.setToken open-company-web.core/history current-token))
+                        (.log js/console %)))]
+      (om/set-state! owner :history-listener-id listener)))
 
   (render-state [_ {:keys [has-changes title headline body]}]
     (let [topic-kw (keyword topic)
@@ -153,6 +178,9 @@
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height max-win-height)
           max-height (- win-height 126)]
+      ; set the onbeforeunload handler only if there are changes
+      (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
+        (set! (.-onbeforeunload js/window) onbeforeunload-cb))
       (dom/div {:class "topic-overlay-edit"
                 :on-click #(.stopPropagation %)}
         (when has-changes
@@ -235,7 +263,7 @@
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           slug (keyword (:slug @router/path))
-          revisions-list (section-kw (slug @cache/revisions))
+          revisions-list (section-kw (@cache/revisions slug))
           topic-data (utils/select-section-data section-data section-kw as-of)
           prev-rev (utils/revision-prev revisions as-of)
           next-rev (utils/revision-next revisions as-of)
