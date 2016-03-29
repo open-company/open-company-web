@@ -1,12 +1,14 @@
 (set-env!
-  :source-paths   #{"site"}
+  :source-paths   #{"scss" "site"}
   :resource-paths #{"resources"}
   :dependencies '[[hiccup "1.0.5" :scope "test"]
                   [perun "0.3.0" :scope "test"]
+                  [compojure "1.5.0" :scope "test"]
                   [pandeiro/boot-http "0.7.3" :scope "test"]
-                  [compojure "1.5.0" :scope "test"]])
+                  [deraen/boot-sass "0.2.0" :scope "test"]])
 
 (require '[pandeiro.boot-http  :refer [serve]]
+         '[deraen.boot-sass :refer [sass]]
          '[io.perun :as p])
 
 ;; We use a bunch of edn files in `resources/pages` to declare a "page"
@@ -22,7 +24,8 @@
       :page name (str ".html")))
 
 (deftask build []
-  (comp (p/base)
+  (comp (sass)
+        (p/base)
         (p/permalink :permalink-fn page->permalink
                      :filterer page?)
         (p/render :renderer 'oc.core/static-page
