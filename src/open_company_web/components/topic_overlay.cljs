@@ -12,7 +12,6 @@
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [goog.fx.dom :refer (Fade)]))
 
-(defonce max-win-height 670)
 (defonce overlay-top-margin 100)
 
 (defn pencil-click [options topic e focus-field]
@@ -34,7 +33,7 @@
           subtitle-string (str (:name (:author topic-data)) " on " topic-updated-at)
           section-body (utils/get-topic-body topic-data topic-kw)
           win-height (.-clientHeight (.-body js/document))
-          needs-fix? (< win-height max-win-height)
+          needs-fix? (< win-height utils/overlay-max-win-height)
           max-height (min (- 650 126) (- win-height 126))]
       (dom/div {:class "topic-overlay-internal"
                 :on-click #(.stopPropagation %)}
@@ -150,11 +149,11 @@
           next-rev (utils/revision-next revisions as-of)
           actual-as-of (:updated-at section-data)
           win-height (.-clientHeight (.-body js/document))
-          content-max-height (if (< win-height max-win-height)
+          content-max-height (if (< win-height utils/overlay-max-win-height)
                                (- win-height 20)
-                               (- max-win-height 20))
+                               (- utils/overlay-max-win-height 20))
           needs-fix? (< win-height (+ content-max-height (* overlay-top-margin 2)))
-          calc-top-margin (+ (/ (- content-max-height (min win-height max-win-height)) 2) 10)
+          calc-top-margin (+ (/ (- content-max-height (min win-height utils/overlay-max-win-height)) 2) 10)
           top-margin (if needs-fix?
                        (max 10 calc-top-margin)
                        100)
