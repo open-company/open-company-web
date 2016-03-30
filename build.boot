@@ -1,6 +1,7 @@
 (def cljs-deps
   '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
     [adzerk/boot-reload "0.4.5" :scope "test"]
+    [devcards "0.2.1-6" :scope "test"]
     [org.clojure/clojurescript "1.8.40"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
     ;; --- DO NOT UPDATE OM, the 1.x.x code is Om Next and requires changes on our part https://github.com/omcljs/om/wiki/Quick-Start-(om.next)
     [org.omcljs/om "0.9.0" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om

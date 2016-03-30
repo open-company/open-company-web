@@ -185,7 +185,7 @@
           ;; SVG CSS lib
           [:script {:type "text/javascript", :src "/lib/svg-css/svg-css.js?oc_deploy_key"}]
           ;; ClojureScript generated JavaScript
-          [:script {:type "text/javascript", :src "/js/compiled/open_company.js?oc_deploy_key"}]
+          [:script {:type "text/javascript", :src "/js/oc.js?oc_deploy_key"}]
           ;; Adobe Typekit
           [:script {:src "//use.typekit.net/olr5ghy.js"}]
           [:script "try{Typekit.load({ async: true });}catch(e){}"]]})
