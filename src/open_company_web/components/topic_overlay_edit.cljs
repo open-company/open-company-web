@@ -177,7 +177,8 @@
       :body (utils/get-topic-body topic-data topic)
       :medium-editor nil
       :history-listener-id nil}
-     (finances-init-state topic (:data topic-data))))
+     (finances-init-state topic (:data topic-data))
+     (growth-init-state topic topic-data)))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
