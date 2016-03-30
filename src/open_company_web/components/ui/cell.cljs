@@ -21,7 +21,7 @@
   (when (= state :edit)
     (.setTimeout js/window #(let [input (om/get-ref owner "edit-field")]
                               (when input
-                                (.focus input))) 10)))
+                                (.focus (.getDOMNode input)))) 10)))
 
 (defn- initial-cell-state
   "Get the initial state for the cell.
