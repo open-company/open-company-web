@@ -165,6 +165,19 @@
         (om/set-state! owner :growth-metric-slugs add-slug)))
     (om/set-state! owner :growth-metrics new-metrics)))
 
+(defn growth-cancel-cb [owner data]
+  (let [state (growth-init-state owner data)]
+    ; reset the finances fields to the initial values
+    (om/set-state! owner :growth-data (:growth-data state))
+    (om/set-state! owner :growth-metrics (:growth-metrics state))
+    (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))
+    (when (om/get-state owner :growth-new-metric)
+      (let [section-data (:topic-data data)
+            first-metric (:slug (first (:metrics section-data)))]
+        (om/set-state! owner :growth-focus first-metric)))
+    ; and the editing state flags
+    (om/set-state! owner :growth-new-metric false)))
+
 (defcomponent topic-overlay-edit [{:keys [topic topic-data currency focus] :as data} owner options]
 
   (init-state [_]
@@ -225,7 +238,8 @@
           max-height (- win-height 126)
           ; growth
           focus-metric-data (filter-growth-data growth-focus growth-data)
-          growth-data (when (= topic "growth") (growth-map-metric-data (:data topic-data)))]
+          growth-data (when (= topic "growth") (growth-map-metric-data (:data topic-data)))
+          growth-cancel-fn #(growth-cancel-cb owner data)]
       ; set the onbeforeunload handler only if there are changes
       (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
@@ -278,6 +292,7 @@
                                      :change-growth-cb (partial growth-change-data-cb owner)
                                      :delete-metric-cb (partial growth-delete-metric-cb owner data)
                                      :reset-metrics-cb #(growth-reset-metrics-cb owner data)
+                                     :cancel-cb growth-cancel-fn
                                      :change-growth-metric-cb (partial growth-change-metric-cb owner data)
                                      :new-growth-section (om/get-state owner :oc-editing)})))
           (dom/div #js {:className "topic-overlay-edit-body"
