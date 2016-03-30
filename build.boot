@@ -48,13 +48,11 @@
 ;; these edn files can hold additional information about the page such
 ;; as it's permalink identifier (`:page` key) or the page's title etc.
 
-(deftask apptest []
+(deftask test! []
   (set-env! :source-paths #(conj % "test"))
-  (test-cljs :js-env :phantom
-             :namespaces #{'test.open-company-web.components.all-sections}
-             :update-fs? true
-             ;; :suite-ns 'test.test-company
-                   ))
+  (comp (test-cljs :js-env :phantom
+                   :exit? true
+                   :namespaces #{"test.open-company-web.*"})))
 
 (defn page? [f]
   (and (.startsWith (:path f) "pages/")
