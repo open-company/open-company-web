@@ -8,18 +8,20 @@ before_install:
   - tar -xjf phantomjs-2.0.0-ubuntu-12.04.tar.bz2    
   - sudo rm -rf /usr/local/phantomjs/bin/phantomjs   
   - sudo mv phantomjs /usr/local/phantomjs/bin/phantomjs
-  - gem install sass
+  - sudo bash -c "cd /usr/local/bin && curl -fsSLo boot https://github.com/boot-clj/boot-bin/releases/download/latest/boot.sh && chmod 755 boot"
+  # - gem install sass
 before_script:
-  - export JAVA_OPTS="-Xms256m -Xmx2048m"
-  - echo $JAVA_OPTS
-  - lein2 clean
-  - chmod +x script/sass-test.rb
+  - export BOOT_JVM_OPTIONS="-Xms256m -Xmx2048m"
+  - echo $BOOT_JVM_OPTIONS
+  # - lein2 clean
+  # - chmod +x script/sass-test.rb
 script:
-  - lein2 test-navigation!
-  - lein2 test-company!
-  - lein2 test-ui-components!
-  - lein2 kibit
-  - "script/sass-test.rb"
+  - boot test!
+  # - lein2 test-navigation!
+  # - lein2 test-company!
+  # - lein2 test-ui-components!
+  # - lein2 kibit
+  # - "script/sass-test.rb"
 cache:
   directories:
   - "$HOME/.m2"
