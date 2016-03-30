@@ -11,7 +11,6 @@
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [goog.events :as events]
             [goog.history.EventType :as EventType]
-            [goog.style :refer (setStyle)]
             [goog.fx.dom :refer (Fade)]
             [cljs-dynamic-resources.core :as cdr]
             [cljsjs.medium-editor]))
@@ -138,35 +137,37 @@
      :history-listener-id nil})
 
   (will-unmount [_]
-    ; re enable the route dispatcher
-    (reset! open-company-web.core/prevent-route-dispatch false)
-    ; remove the onbeforeunload handler
-    (set! (.-onbeforeunload js/window) nil)
-    ; remove history change listener
-    (events/unlistenByKey (om/get-state owner :history-listener-id)))
+    (when-not (utils/is-test-env?)
+      ; re enable the route dispatcher
+      (reset! open-company-web.core/prevent-route-dispatch false)
+      ; remove the onbeforeunload handler
+      (set! (.-onbeforeunload js/window) nil)
+      ; remove history change listener
+      (events/unlistenByKey (om/get-state owner :history-listener-id))))
 
   (did-mount [_]
-    (reset! open-company-web.core/prevent-route-dispatch true)
-    ; save initial innerHTML and setup MediumEditor
-    (let [body-el (om/get-ref owner "topic-overlay-edit-body")
-          med-ed (new js/MediumEditor body-el (clj->js medium-editor-options))]
-      (.subscribe med-ed "editableInput" (fn [event editable]
-                                           (om/set-state! owner :has-changes true)))
-      (om/set-state! owner :initial-body (.-innerHTML body-el))
-      (om/set-state! owner :medium-editor med-ed))
-    (when focus
-      (focus-field topic focus))
-    (let [win-location (.-location js/window)
-          current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
-          listener (events/listen open-company-web.core/history EventType/NAVIGATE
-                     #(when-not (= (.-token %) current-token)
-                        (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
-                          ; dispatch the current url
-                          (open-company-web.core/route-dispatch! (router/get-token))
-                          ; go back to the previous token
-                          (.setToken open-company-web.core/history current-token))
-                        (.log js/console %)))]
-      (om/set-state! owner :history-listener-id listener)))
+    (when-not (utils/is-test-env?)
+      (reset! open-company-web.core/prevent-route-dispatch true)
+      ; save initial innerHTML and setup MediumEditor
+      (let [body-el (om/get-ref owner "topic-overlay-edit-body")
+            med-ed (new js/MediumEditor body-el (clj->js medium-editor-options))]
+        (.subscribe med-ed "editableInput" (fn [event editable]
+                                             (om/set-state! owner :has-changes true)))
+        (om/set-state! owner :initial-body (.-innerHTML body-el))
+        (om/set-state! owner :medium-editor med-ed))
+      (when focus
+        (focus-field topic focus))
+      (let [win-location (.-location js/window)
+            current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
+            listener (events/listen open-company-web.core/history EventType/NAVIGATE
+                       #(when-not (= (.-token %) current-token)
+                          (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
+                            ; dispatch the current url
+                            (open-company-web.core/route-dispatch! (router/get-token))
+                            ; go back to the previous token
+                            (.setToken open-company-web.core/history current-token))
+                          (.log js/console %)))]
+        (om/set-state! owner :history-listener-id listener))))
 
   (render-state [_ {:keys [has-changes title headline body]}]
     (let [topic-kw (keyword topic)
@@ -222,13 +223,14 @@
         (dom/div {:class "gradient"})))))
 
 (defn animate-topic-overlay [owner show]
-  (when-let [topic-overlay (om/get-ref owner "topic-overlay")]
-    (.play
-      (new Fade
+  (when-not (utils/is-test-env?)
+    (when-let [topic-overlay (om/get-ref owner "topic-overlay")]
+      (.play
+        (new Fade
              topic-overlay
              (if show 0 1)
              (if show 1 0)
-             utils/oc-animation-duration))))
+             utils/oc-animation-duration)))))
 
 (defn close-overlay [owner options]
   (animate-topic-overlay owner false)
@@ -239,12 +241,12 @@
   (om/set-state! owner :focus focus)
   (om/set-state! owner :editing true))
 
-(defcomponent topic-overlay [{:keys [section section-data currency selected-metric] :as data} owner options]
+(defcomponent topic-overlay [{:keys [section section-data currency selected-metric force-editing] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
      :focus nil
-     :editing false})
+     :editing force-editing})
 
   (did-mount [_]
     (animate-topic-overlay owner true)
