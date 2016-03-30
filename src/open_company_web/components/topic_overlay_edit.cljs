@@ -63,7 +63,19 @@
         period (:period fixed-row)
         finances-data (om/get-state owner :finances-data)
         fixed-data (assoc finances-data period fixed-row)]
+    (om/set-state! owner :has-changes true)
     (om/set-state! owner :finances-data fixed-data)))
+
+(defn finances-clean-row [data]
+  ; a data entry is good if we have the period and one other value: cash, costs or revenue
+  (when (and (not (nil? (:period data)))
+             (or (not (nil? (:cash data)))
+                 (not (nil? (:costs data)))
+                 (not (nil? (:revenue data)))))
+    (dissoc data :burn-rate :runway :avg-burn-rate :new :value)))
+
+(defn finances-clean-data [finances-data]
+  (remove nil? (vec (map (fn [[_ v]] (finances-clean-row v)) finances-data))))
 
 ;; Growth helpers
 
@@ -178,6 +190,18 @@
     ; and the editing state flags
     (om/set-state! owner :growth-new-metric false)))
 
+(defn data-to-save [owner topic]
+ (let [topic-kw (keyword topic)
+       is-data-topic (#{:finances :growth} topic-kw)
+       with-title {:title (om/get-state owner :title)}
+       with-headline (merge with-title {:headline (om/get-state owner :headline)})
+       body (.-innerHTML (om/get-ref owner "topic-overlay-edit-body"))
+       with-body (merge with-headline (if is-data-topic {:notes {:body body}} {:body body}))
+       with-finances-data (if (= topic-kw :finances)
+                            (merge with-body {:data (finances-clean-data (om/get-state owner :finances-data))})
+                            with-body)]
+  with-finances-data))
+
 (defcomponent topic-overlay-edit [{:keys [topic topic-data currency focus] :as data} owner options]
 
   (init-state [_]
@@ -247,11 +271,9 @@
                 :on-click #(.stopPropagation %)}
         (when has-changes
           (dom/button {:class "save-topic"
-                       :on-click #(let [section-data {:title (om/get-state owner :title)
-                                                      :headline (om/get-state owner :headline)
-                                                      :body (.-innerHTML (om/get-ref owner "topic-overlay-edit-body"))}]
+                       :on-click #(let [section-data (data-to-save owner topic)]
                                     (.stopPropagation %)
-                                    (api/partial-update-section topic topic-data)
+                                    (api/partial-update-section topic section-data)
                                     ((:dismiss-editing-cb options)))} "Save Topic"))
         (dom/button {:class "cancel"
                      :on-click #((:dismiss-editing-cb options))} "Cancel")
