@@ -1,6 +1,6 @@
 (def cljs-deps
   '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
-    [adzerk/boot-reload "0.4.5" :scope "test"]
+    [adzerk/boot-reload "0.4.6" :scope "test"]
     [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
     [cljs-react-test "0.1.3-SNAPSHOT" :scope "test"]
     [devcards "0.2.1-6" :scope "test"]
