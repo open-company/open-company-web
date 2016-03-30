@@ -43,7 +43,6 @@
 
 (def handler
   (-> resources
-      (wrap-file "target/public")
       (wrap-resource "public")
       (wrap-reload {:dirs "site"})
       (wrap-default-content-type)))
