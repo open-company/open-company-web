@@ -5,6 +5,8 @@
     [cljs-react-test "0.1.3-SNAPSHOT" :scope "test"]
     [devcards "0.2.1-6" :scope "test"]
 
+    [tolitius/boot-check "0.1.1" :scope "test"]
+
     [org.clojure/clojurescript "1.8.40"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
     ;; --- DO NOT UPDATE OM, the 1.x.x code is Om Next and requires changes on our part https://github.com/omcljs/om/wiki/Quick-Start-(om.next)
     [org.omcljs/om "0.9.0" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
@@ -41,6 +43,7 @@
          '[adzerk.boot-cljs :refer [cljs]]
          '[crisptrutski.boot-cljs-test :refer [test-cljs]]
          '[adzerk.boot-reload :refer [reload]]
+         '[tolitius.boot-check :as check]
          '[deraen.boot-sass :refer [sass]]
          '[io.perun :as p])
 
