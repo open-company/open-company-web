@@ -154,6 +154,7 @@
           ;; Bootstrap CSS //getbootstrap.com/
           [:link {:rel "stylesheet", :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"}]
           ;; Normalize.css //necolas.github.io/normalize.css/
+          ;; TODO inline this into app.main.css
           [:link {:rel "stylesheet", :href "/css/normalize.css?oc_deploy_key"}]
           ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
           [:link {:rel "stylesheet", :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
