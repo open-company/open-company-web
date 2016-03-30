@@ -636,3 +636,5 @@
 
 (defn is-test-env? []
   (not (not (.-_phantom js/window))))
+
+(defonce overlay-max-win-height 670)
