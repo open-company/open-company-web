@@ -16,7 +16,7 @@
            :integrity "sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7",
            :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css",
            :rel "stylesheet"}]
-   [:link {:href "/css/new-website.css", :rel "stylesheet"}]
+   [:link {:href "/css/site.main.css", :rel "stylesheet"}]
    ;; HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries
    ;; WARNING: Respond.js doesn't work if you view the page via file://
    "<!--[if lt IE 9]>

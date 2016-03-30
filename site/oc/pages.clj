@@ -158,7 +158,7 @@
           ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
           [:link {:rel "stylesheet", :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
           ;; OpenCompany CSS
-          [:link {:type "text/css", :rel "stylesheet", :href "/css/oc.main.css?oc_deploy_key"}]
+          [:link {:type "text/css", :rel "stylesheet", :href "/css/app.main.css?oc_deploy_key"}]
           ;; jQuery UI CSS
           [:link {:rel "stylesheet", :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"}]
           ;; Google fonts Lora
