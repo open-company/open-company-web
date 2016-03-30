@@ -1,7 +1,10 @@
 (def cljs-deps
   '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
     [adzerk/boot-reload "0.4.5" :scope "test"]
+    [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
+    [cljs-react-test "0.1.3-SNAPSHOT" :scope "test"]
     [devcards "0.2.1-6" :scope "test"]
+
     [org.clojure/clojurescript "1.8.40"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
     ;; --- DO NOT UPDATE OM, the 1.x.x code is Om Next and requires changes on our part https://github.com/omcljs/om/wiki/Quick-Start-(om.next)
     [org.omcljs/om "0.9.0" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
@@ -36,6 +39,7 @@
 
 (require '[pandeiro.boot-http  :refer [serve]]
          '[adzerk.boot-cljs :refer [cljs]]
+         '[crisptrutski.boot-cljs-test :refer [test-cljs]]
          '[adzerk.boot-reload :refer [reload]]
          '[deraen.boot-sass :refer [sass]]
          '[io.perun :as p])
@@ -43,6 +47,14 @@
 ;; We use a bunch of edn files in `resources/pages` to declare a "page"
 ;; these edn files can hold additional information about the page such
 ;; as it's permalink identifier (`:page` key) or the page's title etc.
+
+(deftask apptest []
+  (set-env! :source-paths #(conj % "test"))
+  (test-cljs :js-env :phantom
+             :namespaces #{'test.open-company-web.components.all-sections}
+             :update-fs? true
+             ;; :suite-ns 'test.test-company
+                   ))
 
 (defn page? [f]
   (and (.startsWith (:path f) "pages/")
