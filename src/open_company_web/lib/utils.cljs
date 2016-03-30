@@ -558,16 +558,6 @@
 (defn scroll-to-section [section-name]
   (scroll-to-id (str "section-" (name section-name))))
 
-(defn scroll-toc-to-id [id]
-  (let [toc (.querySelector js/document "div.table-of-contents-inner")
-        top (scroll-top-with-id id)]
-    (.play
-      (new Scroll
-           toc
-           (new js/Array 0 (.-scrollTop toc))
-           (new js/Array 0 top)
-           oc-animation-duration))))
-
 (defn replace-svg []
   (when (.-svgcss js/window)
     (.setTimeout js/window #(.svgcss js/window) 1)))

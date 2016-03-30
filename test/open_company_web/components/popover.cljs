@@ -15,8 +15,8 @@
 
 (def test-atom {})
 
-(deftest test-all-sections-component
-  (testing "All sections component"
+(deftest test-popover-component
+  (testing "Popover component"
     (router/set-route! ["companies" :test]
                        {:slug :test})
     (let [c (tu/new-container!)

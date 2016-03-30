@@ -4,6 +4,7 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.ui.link :refer (link)]
+            [open-company-web.components.navbar :refer (navbar)]
             [om-bootstrap.nav :as n]
             [om-bootstrap.panel :as p]
             [open-company-web.router :as router]
@@ -41,22 +42,18 @@
       :disabled (and (contains? :value data) (= (count (:value data)) 0))}
       (:text data))))
 
-(defcomponent company-profile [data owner]
+(defcomponent company-profile-form [data owner]
 
   (init-state [_]
     (let [save-chan (chan)]
       (utils/add-channel "save-company" save-chan))
-    (let [slug (:slug @router/path)
-          company-data ((keyword slug) data)]
-      {:initial-logo (:logo company-data)
-       :logo (:logo company-data)
-       :name (:name company-data)
-       :description (:description company-data)}))
+      {:initial-logo (:logo data)
+       :logo (:logo data)
+       :name (:name data)
+       :description (:description data)})
 
   (will-receive-props [_ next-props]
-    (let [slug (:slug @router/path)
-          company-data ((keyword slug) next-props)]
-      (om/set-state! owner :initial-logo (:logo company-data))))
+    (om/set-state! owner :initial-logo (:logo data)))
 
   (will-mount [_]
     (let [save-change (utils/get-channel "save-company")]
@@ -73,10 +70,10 @@
             (recur)))))))
 
   (render [_]
-    (let [slug (:slug @router/path)
-          company-data ((keyword slug) data)]
-      (when (:read-only company-data)
-        (utils/redirect! (str "/" (name slug))))
+    (let [slug (keyword (:slug @router/path))]
+
+      (utils/update-page-title (str "OpenCompany - " (:name data)))
+
       (dom/div {:class "profile-container"}
         ;; Company
         (dom/div {:class "row"}
@@ -92,7 +89,7 @@
                   :value (om/get-state owner :name)
                   :on-change #(om/set-state! owner :name (.. % -target -value))
                   :on-blur (fn [e]
-                             (utils/handle-change company-data (om/get-state owner :name) :name)
+                             (utils/handle-change data (om/get-state owner :name) :name)
                              (utils/save-values "save-company"))
                   :class "form-control"}))
               (dom/p {:class "help-block"} "Casual company name (leave out Inc., LLC, etc.)"))
@@ -103,11 +100,11 @@
               (dom/div {:class "col-sm-3"}
                 (dom/input {
                   :type "text"
-                  :value (:slug company-data)
+                  :value (:slug data)
                   :id "slug"
                   :class "form-control"
                   :disabled true}))
-              (dom/p {:class "help-block"} ""))
+              (dom/p {:class "help-block"} "https://opencompany.com/bago"))
 
             ;; Currency
             (dom/div {:class "form-group"}
@@ -116,9 +113,9 @@
                 (dom/select {
                   :type "file"
                   :id "currency"
-                  :value (:currency company-data)
+                  :value (:currency data)
                   :on-change (fn [e]
-                               (utils/change-value company-data e :currency)
+                               (utils/change-value data e :currency)
                                (utils/save-values "save-company"))
                   :class "form-control"}
                     (for [currency (sorted-iso4217)]
@@ -154,6 +151,35 @@
                   :max-length 250
                   :on-change #(om/set-state! owner :description (.. % -target -value))
                   :on-blur (fn [e]
-                             (utils/handle-change company-data (om/get-state owner :description) :description)
+                             (utils/handle-change data (om/get-state owner :description) :description)
                              (utils/save-values "save-company"))}))
               (dom/p {:class "help-block"} "Description of the company"))))))))
+
+(defcomponent company-profile [data owner]
+
+  (render [_]
+    (let [slug (keyword (:slug @router/path))
+          company-data (get data slug)]
+
+      (when (:read-only company-data)
+        (utils/redirect! (str "/" (name slug))))
+
+      (dom/div {:class "company-container container"}
+
+        ;; Company / user header
+        (om/build navbar data)
+
+        (dom/div {:class "navbar-offset container-fluid"}
+
+          ;; White space
+          (dom/div {:class "col-md-1"})
+
+          (dom/div {:class "col-md-7 main"}
+
+            (if (:loading data)
+              
+              ;; The data is still loading
+              (dom/div (dom/h4 "Loading data..."))
+
+              ;; Company profile
+              (om/build company-profile-form company-data))))))))

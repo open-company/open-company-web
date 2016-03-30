@@ -13,10 +13,10 @@
     [org.clojure/clojurescript "1.8.40"] ; ClojureScript compiler https://github.com/clojure/clojurescript
     ; --- DO NOT UPDATE OM, the 1.x.x code is Om Next and requires changes on our part https://github.com/omcljs/om/wiki/Quick-Start-(om.next)
     [org.omcljs/om "0.9.0" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
-    [cljs-http "0.1.39"] ; HTTP for cljs https://github.com/r0man/cljs-http
-    [prismatic/schema "1.1.0"] ; Dependency of om-tools https://github.com/Prismatic/schema
-    [prismatic/plumbing "0.5.2"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
+    [cljs-http "0.1.40"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/om-tools "0.4.0"] ; Tools for Om https://github.com/Prismatic/om-tools
+    [prismatic/schema "1.1.0"] ; Dependency of om-tools https://github.com/Prismatic/schema
+    [prismatic/plumbing "0.5.3"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
