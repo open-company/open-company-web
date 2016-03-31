@@ -167,8 +167,6 @@
    :body [:body
           [:div#app [:div.oc-loading.active [:div.oc-loading-internal]]]
           [:div#oc-loading]
-          ;; Raven - Sentry error reporting
-          [:script {:src "//cdn.ravenjs.com/2.0.2/raven.min.js"}]
           ;; jQuery needed by Bootstrap JavaScript
           [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"}]
           ;; Bootstrap JavaScript //getbootstrap.com/

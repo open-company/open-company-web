@@ -23,6 +23,7 @@
     [com.andrewmcveigh/cljs-time "0.4.0"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     [funcool/cuerdas "0.7.1"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
     [cljsjs/react "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
+    [cljsjs/raven "2.1.0-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [medley "0.7.3"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [cljsjs/d3 "3.5.7-1"]]) ; d3 externs https://clojars.org/cljsjs/d3
 
