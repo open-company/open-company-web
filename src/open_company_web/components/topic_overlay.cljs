@@ -155,12 +155,14 @@
             current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
             listener (events/listen open-company-web.core/history EventType/NAVIGATE
                        #(when-not (= (.-token %) current-token)
-                          (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
+                          (if (om/get-state owner :has-changes)
+                            (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
+                              ; dispatch the current url
+                              (open-company-web.core/route-dispatch! (router/get-token))
+                              ; go back to the previous token
+                              (.setToken open-company-web.core/history current-token))
                             ; dispatch the current url
-                            (open-company-web.core/route-dispatch! (router/get-token))
-                            ; go back to the previous token
-                            (.setToken open-company-web.core/history current-token))
-                          (.log js/console %)))]
+                            (open-company-web.core/route-dispatch! (router/get-token)))))]
         (om/set-state! owner :history-listener-id listener))))
 
   (render-state [_ {:keys [has-changes title headline body show-headline-counter]}]
@@ -200,10 +202,6 @@
         (dom/div #js {:className "topic-overlay-edit-content"
                       :ref "topic-overlay-edit-content"
                       :style #js {:maxHeight (str max-height "px")}}
-          (dom/div {}
-            (dom/div {:class (utils/class-set {:topic-overlay-edit-headline-count true
-                                               :transparent (not show-headline-counter)})}
-              (dom/label {:class "bold"} (- 100 (count headline))) "/100"))
           (dom/input {:class "topic-overlay-edit-headline"
                       :id (str "topic-edit-headline-" (name topic))
                       :type "text"
@@ -213,6 +211,9 @@
                       :max-length 100
                       :value headline
                       :on-change #(change-value owner :headline %)})
+          (dom/div {:class (utils/class-set {:topic-overlay-edit-headline-count true
+                                             :transparent (not show-headline-counter)})}
+            (dom/label {:class "bold"} (- 100 (count headline))) "/100")
           (dom/div #js {:className "topic-overlay-edit-body"
                         :ref "topic-overlay-edit-body"
                         :id (str "topic-edit-body-" (name topic))
