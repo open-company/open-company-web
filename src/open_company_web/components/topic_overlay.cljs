@@ -201,7 +201,7 @@
                       :placeholder "Type your title here"
                       :max-length 100
                       :value title
-                      :on-change #(change-value owner :headline %)})
+                      :on-change #(change-value owner :title %)})
           (dom/div {:class "topic-overlay-date"} subtitle-string))
         (dom/div #js {:className "topic-overlay-edit-content"
                       :ref "topic-overlay-edit-content"
