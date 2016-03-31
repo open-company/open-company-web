@@ -104,6 +104,7 @@ $topic_overlay_text_color: #2d2d2d;
           }
 
           div.topic-overlay-body {
+            border: 1px solid transparent;
             font-size: 15px;
             line-height: 1.7;
             color: #141312;
@@ -165,7 +166,7 @@ $topic_overlay_text_color: #2d2d2d;
             line-height: 24px;
             height: 32px;
             width: 450px;
-            border: 1px solid transparent;
+            border: 1px solid $oc_gray_3;
 
             &:active, &:focus{
               border: 1px solid black;
@@ -209,7 +210,7 @@ $topic_overlay_text_color: #2d2d2d;
             font-weight: 600;
             font-size: 20px;
             color: $topic_overlay_text_color;
-            border: 1px solid transparent;
+            border: 1px solid $oc_gray_3;
 
             &:active, &:focus{
               border: 1px solid black;
@@ -218,10 +219,16 @@ $topic_overlay_text_color: #2d2d2d;
           }
 
           div.topic-overlay-edit-body {
+            border: 1px solid $oc_gray_3;
             margin-top: 1px;
             font-size: 15px;
             line-height: 1.7;
             color: #141312;
+            outline: none;
+
+            &:active, &:focus {
+              border: 1px solid $topic_overlay_border_color;
+            }
 
             * {
               font-size: 15px;
