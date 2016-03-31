@@ -178,7 +178,7 @@
           section-body (utils/get-topic-body topic-data topic-kw)
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height max-win-height)
-          max-height (- win-height 126)]
+          max-height (min (- 650 126) (- win-height 126))]
       ; set the onbeforeunload handler only if there are changes
       (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
