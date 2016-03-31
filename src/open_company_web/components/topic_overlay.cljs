@@ -127,6 +127,7 @@
      :headline (:headline topic-data)
      :body (utils/get-topic-body topic-data topic)
      :medium-editor nil
+     :show-headline-counter false
      :history-listener-id nil})
 
   (will-unmount [_]
@@ -162,7 +163,7 @@
                           (.log js/console %)))]
         (om/set-state! owner :history-listener-id listener))))
 
-  (render-state [_ {:keys [has-changes title headline body]}]
+  (render-state [_ {:keys [has-changes title headline body show-headline-counter]}]
     (let [topic-kw (keyword topic)
           js-date-upat (utils/js-date (:updated-at topic-data))
           month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
@@ -200,12 +201,15 @@
                       :ref "topic-overlay-edit-content"
                       :style #js {:maxHeight (str max-height "px")}}
           (dom/div {}
-            (dom/div {:class "topic-overlay-edit-headline-count"}
+            (dom/div {:class (utils/class-set {:topic-overlay-edit-headline-count true
+                                               :transparent (not show-headline-counter)})}
               (dom/label {:class "bold"} (- 100 (count headline))) "/100"))
           (dom/input {:class "topic-overlay-edit-headline"
                       :id (str "topic-edit-headline-" (name topic))
                       :type "text"
                       :placeholder "Type your headline here"
+                      :on-focus #(om/set-state! owner :show-headline-counter true)
+                      :on-blur #(om/set-state! owner :show-headline-counter false)
                       :max-length 100
                       :value headline
                       :on-change #(change-value owner :headline %)})
