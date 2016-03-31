@@ -73,6 +73,7 @@
                                         :read-only true}
                                        {:opts {:show-title false
                                                :show-revisions-navigation false
+                                               :switch-metric-cb (:switch-metric-cb options)
                                                :chart-size {:height (if (utils/is-mobile) 200 290)
                                                             :width (if (utils/is-mobile) 320 480)}}})))
           (dom/div {:class "topic-overlay-body"
@@ -116,14 +117,15 @@
     #((:close-overlay-cb options)) utils/oc-animation-duration))
 
 (defn start-editing [owner focus]
-  (om/set-state! owner :focus focus)
+  (om/set-state! owner :field-focus focus)
   (om/set-state! owner :editing true))
 
 (defcomponent topic-overlay [{:keys [section section-data currency selected-metric force-editing] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
-     :focus nil
+     :growth-metric-focus selected-metric
+     :field-focus nil
      :editing force-editing})
 
   (did-mount [_]
@@ -139,7 +141,7 @@
     ; let the window scroll
     (dommy/remove-class! (sel1 [:body]) "no-scroll"))
 
-  (render-state [_ {:keys [as-of editing focus]}]
+  (render-state [_ {:keys [as-of editing growth-metric-focus field-focus]}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           slug (keyword (:slug @router/path))
@@ -189,10 +191,12 @@
                                               :next-rev next-rev}
                                              {:opts {:close-overlay-cb #(close-overlay owner options)
                                                      :edit-topic-cb #(start-editing owner %)
+                                                     :switch-metric-cb #(om/set-state! owner :growth-metric-focus %)
                                                      :prev-cb #(om/set-state! owner :as-of %)
                                                      :next-cb #(om/set-state! owner :as-of %)}})
             (om/build topic-overlay-edit {:topic-data section-data
                                           :topic section
-                                          :focus focus
+                                          :focus field-focus
+                                          :growth-metric-focus growth-metric-focus
                                           :currency currency}
                                          {:opts {:dismiss-editing-cb #(om/set-state! owner :editing false)}})))))))
