@@ -105,7 +105,7 @@
 
 (def medium-editor-options {
   :toolbar {
-    :buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "orderedlist" "unorderedlist"]
+    :buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "orderedlist" "unorderedlist" "anchor" "image"]
   }})
 
 (defn focus-field [topic field]
