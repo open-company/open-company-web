@@ -120,8 +120,8 @@
 (defn filter-growth-data [focus growth-data]
   (vec (filter #(= (:slug %) focus) (vals growth-data))))
 
-(defn growth-reset-metrics-cb [owner data]
-  (let [state (growth-init-state owner data)]
+(defn growth-reset-metrics-cb [topic owner data]
+  (let [state (growth-init-state topic data)]
     (om/set-state! owner :growth-metrics (:growth-metrics state))
     (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))))
 
@@ -152,6 +152,7 @@
                             (not (:value fixed-row)))
                      (dissoc growth-data (str period slug))
                      (assoc growth-data (str period slug) fixed-row))]
+    (om/set-state! owner :has-changes true)
     (om/set-state! owner :growth-data fixed-data)))
 
 (defn growth-change-metric-cb [owner data slug properties-map]
@@ -166,15 +167,16 @@
                           (dissoc slug)
                           (assoc (:slug properties-map) new-metric))
                       (assoc metrics slug new-metric))
-        focus (om/get-state owner :focus)]
+        focus (om/get-state owner :growth-focus)]
     (when change-slug
       (let [slugs (om/get-state owner :growth-metric-slugs)
             remove-slug (vec (remove #(= % slug) slugs))
             add-slug (conj remove-slug (:slug properties-map))]
         ; switch the focus to the new metric-slug
-        (om/set-state! owner :focus (:slug properties-map))
+        (om/set-state! owner :growth-focus (:slug properties-map))
         ; save the new metrics list
         (om/set-state! owner :growth-metric-slugs add-slug)))
+    (om/set-state! owner :has-changes true)
     (om/set-state! owner :growth-metrics new-metrics)))
 
 (defn growth-cancel-cb [owner data]
@@ -190,6 +192,26 @@
     ; and the editing state flags
     (om/set-state! owner :growth-new-metric false)))
 
+(defn growth-clean-row [data]
+  ; a data entry is good if we have the period and one other value: cash, costs or revenue
+  (when (and (not (nil? (:period data)))
+             (not (nil? (:slug data)))
+             (or (not (nil? (:target data)))
+                 (not (nil? (:value data)))))
+    (dissoc data :new)))
+
+(defn growth-clean-data [growth-data]
+  (remove nil? (vec (map (fn [[_ v]] (growth-clean-row v)) growth-data))))
+
+(defn growth-save-map [owner]
+  (let [growth-data (om/get-state owner :growth-data)
+        fixed-growth-data (growth-clean-data growth-data)
+        growth-metrics (om/get-state owner :growth-metrics)
+        growth-metric-slugs (om/get-state owner :growth-metric-slugs)
+        metrics-vec (vec (map #(get growth-metrics %) growth-metric-slugs))]
+    {:data fixed-growth-data
+     :metrics metrics-vec}))
+
 (defn data-to-save [owner topic]
  (let [topic-kw (keyword topic)
        is-data-topic (#{:finances :growth} topic-kw)
@@ -199,8 +221,12 @@
        with-body (merge with-headline (if is-data-topic {:notes {:body body}} {:body body}))
        with-finances-data (if (= topic-kw :finances)
                             (merge with-body {:data (finances-clean-data (om/get-state owner :finances-data))})
-                            with-body)]
-  with-finances-data))
+                            with-body)
+       with-growth-data (if (= topic-kw :growth)
+                          (merge with-body (growth-save-map owner))
+                          with-body)]
+  (println "data-to-save" with-growth-data)
+  with-growth-data))
 
 (defcomponent topic-overlay-edit [{:keys [topic topic-data currency focus] :as data} owner options]
 
@@ -313,7 +339,7 @@
                                      :metric-count (count focus-metric-data)
                                      :change-growth-cb (partial growth-change-data-cb owner)
                                      :delete-metric-cb (partial growth-delete-metric-cb owner data)
-                                     :reset-metrics-cb #(growth-reset-metrics-cb owner data)
+                                     :reset-metrics-cb #(growth-reset-metrics-cb topic owner data)
                                      :cancel-cb growth-cancel-fn
                                      :change-growth-metric-cb (partial growth-change-metric-cb owner data)
                                      :new-growth-section (om/get-state owner :oc-editing)})))
