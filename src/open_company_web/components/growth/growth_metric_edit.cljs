@@ -131,7 +131,7 @@
         slug (keyword (:slug @router/path))
         sections-map (:categories (slug @new-sections))
         all-sections (mapcat :sections sections-map)
-        growth-defaults (first (filter #(= (:name %) "growth") all-sections))
+        growth-defaults (first (filter #(= (:section-name %) "growth") all-sections))
         all-metrics (:metrics growth-defaults)
         available-metrics (vec (filter #(not (utils/in? slugs (:slug %))) all-metrics))]
     {:intervals (:intervals growth-defaults)
@@ -209,7 +209,7 @@
           (dom/div {:class "metric-data-container right group"}
             (dom/label {:for "mtr-unit"} "Measured as")
             (dom/select {:class "metric-data metric-unit"
-                         :value (om/get-state owner :unit)
+                         :default-value (om/get-state owner :unit)
                          :id "mtr-unit"
                          :placeholder "Metric unit"
                          :style {"width" "150px"}}
@@ -235,7 +235,7 @@
           (dom/div {:class "metric-data-container group"}
             (dom/label {:for "mtr-goal"} "Goal:")
             (dom/select {:class "metric-data metric-goal"
-                         :value (om/get-state owner :target)
+                         :default-value (om/get-state owner :target)
                          :id "mtr-goal"
                          :placeholder "Metric goal"
                          :style {"width" "150px"}}
@@ -246,7 +246,7 @@
           (dom/div {:class "metric-data-container right group"}
             (dom/label {:for "mtr-goal"} "Interval:")
             (dom/select {:class "metric-data metric-interval"
-                         :value (om/get-state owner :interval)
+                         :default-value (om/get-state owner :interval)
                          :id "mtr-interval"
                          ; if there are data the interval can't be changed
                          :disabled (and (pos? (:metric-count data))
