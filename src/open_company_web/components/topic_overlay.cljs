@@ -128,6 +128,7 @@
      :body (utils/get-topic-body topic-data topic)
      :medium-editor nil
      :show-headline-counter false
+     :show-title-counter false
      :history-listener-id nil})
 
   (will-unmount [_]
@@ -165,7 +166,7 @@
                             (open-company-web.core/route-dispatch! (router/get-token)))))]
         (om/set-state! owner :history-listener-id listener))))
 
-  (render-state [_ {:keys [has-changes title headline body show-headline-counter]}]
+  (render-state [_ {:keys [has-changes title headline body show-headline-counter show-title-counter]}]
     (let [topic-kw (keyword topic)
           js-date-upat (utils/js-date (:updated-at topic-data))
           month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
@@ -195,9 +196,14 @@
                       :id (str "topic-edit-title-" (name topic))
                       :type "text"
                       :placeholder "Type your title here"
+                      :on-focus #(om/set-state! owner :show-title-counter true)
+                      :on-blur #(om/set-state! owner :show-title-counter false)
                       :max-length 100
                       :value title
                       :on-change #(change-value owner :title %)})
+          (dom/div {:class (utils/class-set {:topic-overlay-edit-title-count true
+                                             :transparent (not show-title-counter)})}
+            (dom/label {:class "bold"} (- 100 (count title))) "/100")
           (dom/div {:class "topic-overlay-date"} subtitle-string))
         (dom/div #js {:className "topic-overlay-edit-content"
                       :ref "topic-overlay-edit-content"

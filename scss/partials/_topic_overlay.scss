@@ -178,11 +178,24 @@ $topic_overlay_text_color: #2d2d2d;
             }
           }
 
+          div.topic-overlay-edit-title-count {
+            float: right;
+            text-align: right;
+            width: 57px;
+            height: 16px;
+            margin-top: 0px;
+            margin-right: 158px;
+
+            label.bold{
+              font-weight: bold;
+            } 
+          }
+
           div.topic-overlay-date {
             margin-left: 1px;
             font-size: 12px;
             color: $topic_overlay_text_color;
-            width: 500px;
+            width: 360px;
           }
 
         }
