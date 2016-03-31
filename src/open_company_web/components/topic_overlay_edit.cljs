@@ -108,12 +108,14 @@
 
 (defn growth-init-state [topic data]
   (when (= topic "growth")
-    (let [first-metric (:slug (first (:metrics data)))
-          all-metrics (:metrics data)]
-      {:growth-focus (or first-metric growth-utils/new-metric-slug-placeholder)
+    (let [topic-data (:topic-data data)
+          growth-metric-focus (:growth-metric-focus data)
+          all-metrics (:metrics topic-data)
+          focus-metric (or growth-metric-focus (:slug (first all-metrics)))]
+      {:growth-focus (or focus-metric growth-utils/new-metric-slug-placeholder)
        :growth-metadata-editing false
        :growth-new-metric false
-       :growth-data (growth-map-metric-data (:data data))
+       :growth-data (growth-map-metric-data (:data topic-data))
        :growth-metrics (growth-metrics-map all-metrics)
        :growth-metric-slugs (growth-metrics-order all-metrics)})))
 
@@ -225,7 +227,6 @@
        with-growth-data (if (= topic-kw :growth)
                           (merge with-body (growth-save-map owner))
                           with-body)]
-  (println "data-to-save" with-growth-data)
   with-growth-data))
 
 (defcomponent topic-overlay-edit [{:keys [topic topic-data currency focus] :as data} owner options]
@@ -241,7 +242,7 @@
       :medium-editor nil
       :history-listener-id nil}
      (finances-init-state topic (:data topic-data))
-     (growth-init-state topic topic-data)))
+     (growth-init-state topic data)))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
