@@ -2,12 +2,14 @@ language: clojure
 jdk:
   - oraclejdk8
 sudo: true
-before_install:    
-  - wget https://s3.amazonaws.com/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2    
-  - tar -xjf phantomjs-2.0.0-ubuntu-12.04.tar.bz2    
-  - sudo rm -rf /usr/local/phantomjs/bin/phantomjs   
+before_install:
+  - wget https://s3.amazonaws.com/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2
+  - tar -xjf phantomjs-2.0.0-ubuntu-12.04.tar.bz2
+  - sudo rm -rf /usr/local/phantomjs/bin/phantomjs
   - sudo mv phantomjs /usr/local/phantomjs/bin/phantomjs
   - sudo bash -c "cd /usr/local/bin && curl -fsSLo boot https://github.com/boot-clj/boot-bin/releases/download/latest/boot.sh && chmod 755 boot"
+install:
+  - boot repl -e '(System/exit 0)'
 before_script:
   - export BOOT_JVM_OPTIONS="-Xms256m -Xmx2048m"
   - echo $BOOT_JVM_OPTIONS
