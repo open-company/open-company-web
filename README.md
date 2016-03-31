@@ -31,11 +31,10 @@ To get started, head to: [OpenCompany](https://opencompany.io)
 
 Users of the [OpenCompany](https://opencompany.io) platform should get started by going to [OpenCompany](https://opencompany.io). The following local setup is for developers wanting to work on the platform's Web application software.
 
-Most of the dependencies are internal, meaning [Leiningen](https://github.com/technomancy/leiningen) will handle getting them for you. There are a few exceptions:
+Most of the dependencies are internal, meaning [Boot](https://github.com/boot-clj/boot) will handle getting them for you. There are a few exceptions:
 
 * [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) - a Java 8 JRE is needed to run Clojure
-* [Leiningen](https://github.com/technomancy/leiningen) - Clojure's build and dependency management tool
-* [Sass](http://sass-lang.com/install) - CSS with superpowers
+* [Boot](https://github.com/boot-clj/boot) - A Clojure build and dependency management tool
 
 Chances are your system already has Java 8 installed. You can verify this with:
 
@@ -45,29 +44,7 @@ java -version
 
 If you do not have Java 8 [download it](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and follow the installation instructions.
 
-Leiningen is easy to install:
-
-1. Download the latest [lein script from the stable branch](https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein).
-1. Place it somewhere that's on your $PATH (`env | grep PATH`). `/usr/local/bin` is a good choice if it is on your PATH.
-1. Set it to be executable. `chmod 755 /usr/local/bin/lein`
-1. Run it: `lein` This will finish the installation.
-
-Then let Leiningen install the rest of the dependencies:
-
-```console
-git clone https://github.com/open-company/open-company-web.git
-cd open-company-web
-lein deps
-```
-
-The other dependency is a [Sass](http://sass-lang.com/) compiler. You can follow the [installation steps](http://sass-lang.com/) if you don't already have Sass on your system.
-
-On a Mac, it's as easy as:
-
-```console
-gem install sass
-sass -v
-```
+Installing Boot is easy, for the most up to date instructions, check out the [Boot README](https://github.com/boot-clj/boot#install)
 
 ## Usage
 
@@ -79,55 +56,23 @@ Local usage requires you to run 2 services, the [API service](https://github.com
 lein start
 ```
 
-To get an interactive web development environment, start Figwheel in this repository:
+**Development**: To get an interactive web development environment, start the iterative compilation process in this repository:
 
 ```console
-lein figwheel!
+boot dev
 ```
 
-You'll also need to start the Sass watcher in this repository:
+If you've done it right, you'll have 3 terminal sessions running: API, Auth, Web.
+
+Open your browser to [http://localhost:3559/](http://localhost:3559/).
+
+**Production**: To create a production build run:
 
 ```console
-lein scss!
+boot prod-build
 ```
 
-If you've done it right, you'll have 4 terminal sessions running: API, Auth, Figwheel, and Sass.
-
-Open your browser to [http://localhost:3449/](http://localhost:3449/).
-
-This will auto compile and send all changes to the browser without the
-need to reload. After the compilation process is complete, you will
-get a Browser Connected REPL. An easy way to test it is:
-
-```clojure
-(js/alert "Am I connected?")
-```
-
-You should see an alert in the browser window.
-
-If you want to use the [devcards](https://github.com/bhauman/devcards) for development, run:
-
-```console
-lein devcards!
-```
-
-Then load [http://localhost:3449/devcards](http://localhost:3449/devcards) in your browser.
-
-
-To clean all compiled files:
-
-```console
-lein clean
-```
-
-To create a production build run:
-
-```console
-lein build!
-```
-
-Open your browser in `resources/public/index.html`. You will not
-get live reloading nor a REPL.
+Open `target/public/app-shell.html` in your browser. You will not get live reloading nor a REPL.
 
 
 ## Tests
@@ -143,13 +88,13 @@ phantomjs -v
 Then run:
 
 ```console
-lein test-all!
+boot test!
 ```
 
 For more info on testing:
 
 - Plugin: [bensu/doo](https://github.com/bensu/doo)
-- React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/doo)
+- React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/cljs-react-test)
 
 
 ## Participation

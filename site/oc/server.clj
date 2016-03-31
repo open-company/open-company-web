@@ -10,9 +10,6 @@
 (defn app-shell []
   (res/resource-response "/app-shell.html" {:root "public"}))
 
-(defn devcards []
-  (res/resource-response "/devcards.html" {:root "public"}))
-
 (defn index []
   (res/resource-response "/index.html" {:root "public"}))
 
@@ -20,7 +17,6 @@
   (assoc (res/resource-response "/404.html" {:root "public"}) :status 404))
 
 (defroutes resources
-  (GET "/devcards" [] (devcards))
   (GET "/404" [] (not-found))
   (GET "/" [] (index))
   (GET "*" [] (app-shell)))
