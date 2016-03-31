@@ -90,4 +90,5 @@
 (deftask prod-build []
   (comp (sass :output-style :compressed)
         (build-site)
-        (cljs :optimizations :advanced)))
+        (cljs :optimizations :advanced
+              :externs ["public/js/externs.js"])))
