@@ -2,7 +2,6 @@
   '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
     [adzerk/boot-reload "0.4.6" :scope "test"]
     [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
-    [cljs-react-test "0.1.3-SNAPSHOT" :scope "test"]
     [devcards "0.2.1-6" :scope "test"]
 
     [tolitius/boot-check "0.1.1" :scope "test"]
@@ -52,7 +51,8 @@
 ;; as it's permalink identifier (`:page` key) or the page's title etc.
 
 (deftask test! []
-  (set-env! :source-paths #(conj % "test"))
+  (set-env! :source-paths #(conj % "test")
+            :dependencies #(conj % '[cljs-react-test "0.1.3-SNAPSHOT" :scope "test"]))
   (comp (test-cljs :js-env :phantom
                    :exit? true
                    :namespaces #{"test.open-company-web.*"})))
