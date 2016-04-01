@@ -83,7 +83,7 @@
               new-rows (assoc array-data idx new-row)
               sort-pred (utils/sort-by-key-pred :period true)
               sorted-rows (sort sort-pred new-rows)]
-          (om/update-state! owner :sorted-data (fn [_] sorted-rows)))))))
+          (om/update-state! owner :metric-data (fn [_] sorted-rows)))))))
 
 (defn get-current-metric-info [data]
   (let [metric-slug (:metric-slug data)
@@ -92,13 +92,13 @@
 
 (defn sort-growth-data [data]
   (let [metric-data (:growth-data data)
-        metric-info (get-current-metric-info data)
+        sorter (utils/sort-by-key-pred :period true)
+        sorted-metric-data (sort sorter metric-data)
+        {:keys [interval] :as metric-info} (get-current-metric-info data)
         focus (:metric-slug data)]
     (if (or (= focus growth-utils/new-metric-slug-placeholder)
-             (not (:interval metric-info)))
-      (vec [])
-      (let [placeholder-data (growth-utils/edit-placeholder-data metric-data focus (:interval metric-info))
-            sorter (utils/sort-by-key-pred :period true)]
+            (not interval))
+      (let [placeholder-data (growth-utils/edit-placeholder-data sorted-metric-data focus interval)]
         (vec (sort sorter placeholder-data))))))
 
 (defn get-interval-batch-size [interval]
@@ -117,12 +117,12 @@
          :new true}))))
 
 (defn more-months [owner data]
-  (let [sorted-data (om/get-state owner :sorted-data)
-        last-data (last sorted-data)
+  (let [metric-data (om/get-state owner :metric-data)
+        last-data (last metric-data)
         last-period (:period last-data)
         interval (:interval (get-current-metric-info data))
         more (get-more last-period interval)]
-    (om/set-state! owner :sorted-data (concat sorted-data more))))
+    (om/set-state! owner :metric-data (concat metric-data more))))
 
 (defn set-metadata-edit [owner data editing]
   ((:metadata-edit-cb data) editing)
@@ -132,15 +132,15 @@
 
   (init-state [_]
     {:metadata-edit (:new-metric data)
-     :sorted-data (sort-growth-data data)})
+     :metric-data (sort-growth-data data)})
 
-  (will-receive-props [_ next-props]
-    (when (not= (:metrics data) (:metrcs next-props))
-      (om/set-state! owner :sorted-data (sort-growth-data next-props))))
+  (will-update [_ next-props _]
+    (when (not= data next-props)
+      (let [metric-data (sort-growth-data next-props)]
+        (om/set-state! owner :metric-data metric-data))))
 
-  (render [_]
+  (render-state [_ {:keys [metric-data metadata-edit]}]
     (let [metric-info (get-current-metric-info data)
-          metric-data (om/get-state owner :sorted-data)
           slug (keyword (:slug @router/path))
           company-data (slug @dispatcher/app-state)
           prefix (if (= (:unit metric-info) "currency")
@@ -203,7 +203,7 @@
                   (dom/th {} "Target")
                   (dom/th {} "Value")))
               (dom/tbody {}
-                (for [idx (range (dec (count rows-data)))]
+                (for [idx (range (count rows-data))]
                   (let [row-data (get rows-data idx)
                         next-period (next-period metric-data idx)
                         row (merge row-data {:next-period next-period
