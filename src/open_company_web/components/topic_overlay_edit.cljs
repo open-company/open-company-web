@@ -133,7 +133,7 @@
         new-metrics-map (growth-map-metric-data new-metrics)
         all-data (vals (om/get-state owner :growth-data))
         filtered-data (vec (filter #(not= (:slug %) metric-slug) all-data))
-        new-data (growth-metrics-map filtered-data)
+        new-data (growth-map-metric-data filtered-data)
         metrics-order (growth-metrics-order new-metrics)]
     (om/set-state! owner :growth-metrics new-metrics-map)
     (om/set-state! owner :growth-data new-data)
@@ -146,9 +146,7 @@
   (om/set-state! owner :growth-metadata-editing editing))
 
 (defn growth-change-data-cb [owner row]
-  (let [fixed-row (growth-fix-row row)
-        period (:period fixed-row)
-        slug (:slug fixed-row)
+  (let [{:keys [period slug] :as fixed-row} (growth-fix-row row)
         growth-data (om/get-state owner :growth-data)
         fixed-data (if (and (not (:target fixed-row))
                             (not (:value fixed-row)))
