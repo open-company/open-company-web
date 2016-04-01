@@ -40,7 +40,7 @@ div.topic-overlay-edit {
       line-height: 24px;
       height: 32px;
       width: 450px;
-      border: 1px solid transparent;
+      border: 1px solid $oc_gray_3;
 
       &:active, &:focus{
         border: 1px solid black;
@@ -48,18 +48,31 @@ div.topic-overlay-edit {
       }
     }
 
+    div.topic-overlay-edit-title-count {
+      float: right;
+      text-align: right;
+      width: 57px;
+      height: 16px;
+      margin-top: 0px;
+      margin-right: 158px;
+
+      label.bold{
+        font-weight: bold;
+      } 
+    }
+
     div.topic-overlay-date {
       margin-left: 1px;
       font-size: 12px;
       color: $topic_overlay_text_color;
-      width: 500px;
+      width: 360px;
     }
 
   }
 
   div.topic-overlay-edit-content {
     margin: 10px 0px 10px 0px;
-    padding: 0px 50px 15px 50px;
+    padding: 15px 50px 15px 50px;
     max-height: 515px;
     height: 100%;
     overflow: scroll;
@@ -76,9 +89,10 @@ div.topic-overlay-edit {
     div.topic-overlay-edit-headline-count{
       float: right;
       text-align: right;
-      width: 80px;
+      width: 57px;
       height: 16px;
       font-size: 14px;
+      margin-top: 13px;
 
       label.bold{
         font-weight: bold;
@@ -91,7 +105,7 @@ div.topic-overlay-edit {
       font-weight: 600;
       font-size: 20px;
       color: $topic_overlay_text_color;
-      border: 1px solid transparent;
+      border: 1px solid $oc_gray_3;
 
       &:active, &:focus{
         border: 1px solid black;
@@ -100,15 +114,25 @@ div.topic-overlay-edit {
     }
 
     div.topic-overlay-edit-body {
+      border: 1px solid $oc_gray_3;
       margin-top: 1px;
       font-size: 15px;
       line-height: 1.7;
       color: #141312;
+      outline: none;
+
+      &:active, &:focus {
+        border: 1px solid $topic_overlay_border_color;
+      }
 
       * {
         font-size: 15px;
         line-height: 1.7;
         color: #141312;
+      }
+
+      a {
+        text-decoration: underline;
       }
 
       img {

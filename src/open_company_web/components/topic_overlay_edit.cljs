@@ -23,7 +23,7 @@
 
 (def medium-editor-options {
   :toolbar {
-    :buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "orderedlist" "unorderedlist"]
+    :buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "orderedlist" "unorderedlist" "anchor" "image"]
   }
   :placeholder {
     :text "Add your notes here"
@@ -239,6 +239,8 @@
       :title (:title topic-data)
       :headline (:headline topic-data)
       :body (utils/get-topic-body topic-data topic)
+      :show-headline-counter false
+      :show-title-counter false
       :medium-editor nil
       :history-listener-id nil}
      (finances-init-state topic (:data topic-data))
@@ -269,15 +271,17 @@
             current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
             listener (events/listen open-company-web.core/history EventType/NAVIGATE
                        #(when-not (= (.-token %) current-token)
-                          (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
+                          (if (om/get-state owner :has-changes)
+                            (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
+                              ; dispatch the current url
+                              (open-company-web.core/route-dispatch! (router/get-token))
+                              ; go back to the previous token
+                              (.setToken open-company-web.core/history current-token))
                             ; dispatch the current url
-                            (open-company-web.core/route-dispatch! (router/get-token))
-                            ; go back to the previous token
-                            (.setToken open-company-web.core/history current-token))
-                          (.log js/console %)))]
+                            (open-company-web.core/route-dispatch! (router/get-token)))))]
         (om/set-state! owner :history-listener-id listener))))
 
-  (render-state [_ {:keys [has-changes title headline body finances-data growth-focus growth-new-metric growth-data growth-metrics]}]
+  (render-state [_ {:keys [has-changes title headline body finances-data growth-focus growth-new-metric growth-data growth-metrics show-headline-counter show-title-counter]}]
     (let [topic-kw (keyword topic)
           js-date-upat (utils/js-date (:updated-at topic-data))
           month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
@@ -286,7 +290,7 @@
           section-body (utils/get-topic-body topic-data topic-kw)
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height utils/overlay-max-win-height)
-          max-height (- win-height 126)
+          max-height (min (- 650 126) (- win-height 126))
           ; growth
           focus-metric-data (filter-growth-data growth-focus growth-data)
           growth-data (when (= topic "growth") (growth-map-metric-data (:data topic-data)))
@@ -309,23 +313,29 @@
                       :id (str "topic-edit-title-" (name topic))
                       :type "text"
                       :placeholder "Type your title here"
+                      :on-focus #(om/set-state! owner :show-title-counter true)
+                      :on-blur #(om/set-state! owner :show-title-counter false)
                       :max-length 100
                       :value title
-                      :on-change #(change-value owner :headline %)})
+                      :on-change #(change-value owner :title %)})
+          (dom/div {:class (utils/class-set {:topic-overlay-edit-title-count true
+                                             :transparent (not show-title-counter)})}
+            (dom/label {:class "bold"} (- 100 (count title))) "/100")
           (dom/div {:class "topic-overlay-date"} subtitle-string))
         (dom/div #js {:className "topic-overlay-edit-content"
                       :ref "topic-overlay-edit-content"
                       :style #js {:maxHeight (str max-height "px")}}
-          (dom/div {}
-            (dom/div {:class "topic-overlay-edit-headline-count"}
-              (dom/label {:class "bold"} (- 100 (count headline))) "/100"))
           (dom/input {:class "topic-overlay-edit-headline"
                       :id (str "topic-edit-headline-" (name topic))
                       :type "text"
                       :placeholder "Type your headline here"
+                      :on-focus #(om/set-state! owner :show-headline-counter true)
+                      :on-blur #(om/set-state! owner :show-headline-counter false)
                       :max-length 100
                       :value headline
                       :on-change #(change-value owner :headline %)})
+          (dom/div {:class "topic-overlay-edit-headline-count"}
+              (dom/label {:class "bold"} (- 100 (count headline))) "/100")
           (dom/div {:class "topic-overlay-edit-data"}
             (when (= topic "finances")
               (om/build finances-edit {:finances-data finances-data

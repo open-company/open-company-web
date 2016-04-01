@@ -104,6 +104,7 @@ $topic_overlay_text_color: #2d2d2d;
           }
 
           div.topic-overlay-body {
+            border: 1px solid transparent;
             font-size: 15px;
             line-height: 1.7;
             color: #141312;
@@ -112,6 +113,10 @@ $topic_overlay_text_color: #2d2d2d;
               font-size: 15px;
               line-height: 1.7;
               color: #141312;
+            }
+
+            a {
+              text-decoration: underline;
             }
 
             img {

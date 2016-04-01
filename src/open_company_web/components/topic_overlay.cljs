@@ -41,20 +41,15 @@
                      :on-click #(circle-remove-click options %)})
         (when-not read-only
           (dom/button {:class "pencil"
-                       :on-click #(pencil-click options topic % "title")}))
+                       :on-click #(pencil-click options topic % "body")}))
         (dom/div {:class "topic-overlay-header"}
-          (dom/div {:class "topic-overlay-title"
-                    :on-click #(when-not read-only
-                                (pencil-click options topic % "title"))} (:title topic-data))
+          (dom/div {:class "topic-overlay-title"} (:title topic-data))
           (dom/div {:class "topic-overlay-date"} subtitle-string))
         (dom/div #js {:className "topic-overlay-content"
                       :ref "topic-overlay-content"
                       :style #js {:maxHeight (str max-height "px")}}
-          (dom/div {:class "topic-overlay-headline"
-                    :on-click #(when-not read-only
-                                (pencil-click options topic % "headline"))} (:headline topic-data))
-          (dom/div {:on-click #(when-not read-only
-                                 (pencil-click options topic % "body"))}
+          (dom/div {:class "topic-overlay-headline"} (:headline topic-data))
+          (dom/div {}
             (when (= topic "finances")
               (om/build topic-finances {:section-data topic-data
                                         :section topic-kw
@@ -77,8 +72,6 @@
                                                :chart-size {:height (if (utils/is-mobile) 200 290)
                                                             :width (if (utils/is-mobile) 320 480)}}})))
           (dom/div {:class "topic-overlay-body"
-                    :on-click #(when-not read-only
-                                (pencil-click options topic % "body"))
                     :dangerouslySetInnerHTML (clj->js {"__html" section-body})})
           (dom/div {:class "topic-overlay-navigation topic-navigation group"}
             (when prev-rev

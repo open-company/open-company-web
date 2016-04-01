@@ -214,11 +214,7 @@
      :as-of (:updated-at section-data)
      :actual-as-of (:updated-at section-data)})
 
-  (did-mount [_]
-    (utils/replace-svg))
-
   (did-update [_ prev-props _]
-    (utils/replace-svg)
     (let [new-as-of (:updated-at section-data)
           current-as-of (om/get-state owner :as-of)
           old-as-of (:updated-at (:section-data prev-props))]
