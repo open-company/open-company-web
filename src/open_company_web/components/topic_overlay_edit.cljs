@@ -225,8 +225,8 @@
                             (merge with-body {:data (finances-clean-data (om/get-state owner :finances-data))})
                             with-body)
        with-growth-data (if (= topic-kw :growth)
-                          (merge with-body (growth-save-map owner))
-                          with-body)]
+                          (merge with-finances-data (growth-save-map owner))
+                          with-finances-data)]
   with-growth-data))
 
 (defcomponent topic-overlay-edit [{:keys [topic topic-data currency focus] :as data} owner options]
