@@ -240,22 +240,27 @@
         fixed-next-start (min (- (count all-data) show-columns) next-start)]
     (om/set-state! owner :start fixed-next-start)))
 
+(defn get-state [chart-data]
+  (let [start (max 0 (- (count chart-data) show-columns))
+        current-data (vec (take-last show-columns chart-data))]
+    {:start start
+     :selected (dec (count current-data))}))
+
 (defcomponent d3-column-chart [{:keys [chart-data] :as data} owner {:keys [chart-width chart-height] :as options}]
 
   (init-state [_]
-    (let [start (max 0 (- (count chart-data) show-columns))
-          current-data (vec (take-last show-columns chart-data))]
-      {:start start
-       :selected (dec (count current-data))}))
+    (get-state chart-data))
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (d3-calc owner options)))
 
-  (did-update [_ old-props old-state]
+  (did-update [_ old-props _]
     (when-not (utils/is-test-env?)
-      (when (or (not= old-props data)
-                (not= (:start old-state) (om/get-state owner :start)))
+      (when (not= old-props data)
+        (let [new-state (get-state chart-data)]
+          (om/set-state! owner :start (:start new-state))
+          (om/set-state! owner :selected (:selected new-state)))
         (d3-calc owner options))))
 
   (render-state [_ {:keys [start]}]
