@@ -57,9 +57,9 @@
   (init-state [_]
     (get-state owner data true))
 
-  (will-receive-props [_ next-props]
+  (will-update [_ next-props _]
     ; this means the section datas have changed from the API or at a upper lever of this component
-    (when-not (= next-props (om/get-props owner))
+    (when-not (= next-props data)
       (om/set-state! owner (get-state owner next-props true))))
 
   (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs]}]
