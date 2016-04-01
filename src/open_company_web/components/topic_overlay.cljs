@@ -178,7 +178,7 @@
                                               :as-of as-of
                                               :topic section
                                               :currency currency
-                                              :selected-metric selected-metric
+                                              :selected-metric growth-metric-focus
                                               :read-only (or (:read-only section-data) (not= as-of (:updated-at section-data)))
                                               :prev-rev prev-rev
                                               :next-rev next-rev}
