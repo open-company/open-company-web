@@ -98,6 +98,7 @@
         focus (:metric-slug data)]
     (if (or (= focus growth-utils/new-metric-slug-placeholder)
             (not interval))
+      (vec [])
       (let [placeholder-data (growth-utils/edit-placeholder-data sorted-metric-data focus interval)]
         (vec (sort sorter placeholder-data))))))
 
