@@ -279,7 +279,20 @@
                             (open-company-web.core/route-dispatch! (router/get-token)))))]
         (om/set-state! owner :history-listener-id listener))))
 
-  (render-state [_ {:keys [has-changes title headline body finances-data growth-focus growth-new-metric growth-data growth-metrics show-headline-counter show-title-counter]}]
+  (render-state [_ {:keys [has-changes
+                           title
+                           headline
+                           body
+                           ; finances states
+                           finances-data
+                           ; growth states
+                           growth-focus
+                           growth-new-metric
+                           growth-data
+                           growth-metrics
+                           show-headline-counter
+                           show-title-counter
+                           growth-metric-slugs]}]
     (let [topic-kw (keyword topic)
           js-date-upat (utils/js-date (:updated-at topic-data))
           month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
@@ -340,18 +353,31 @@
                                        :change-finances-cb (partial change-finances-data-cb owner)
                                        :currency currency}))
             (when (= topic "growth")
-              (om/build growth-edit {:growth-data focus-metric-data
-                                     :metric-slug growth-focus
-                                     :metadata-edit-cb (partial growth-metadata-edit-cb owner)
-                                     :new-metric growth-new-metric
-                                     :metrics growth-metrics
-                                     :metric-count (count focus-metric-data)
-                                     :change-growth-cb (partial growth-change-data-cb owner)
-                                     :delete-metric-cb (partial growth-delete-metric-cb owner data)
-                                     :reset-metrics-cb #(growth-reset-metrics-cb topic owner data)
-                                     :cancel-cb growth-cancel-fn
-                                     :change-growth-metric-cb (partial growth-change-metric-cb owner data)
-                                     :new-growth-section (om/get-state owner :oc-editing)})))
+              (dom/div {}
+                (om/build growth-edit {:growth-data focus-metric-data
+                                       :metric-slug growth-focus
+                                       :metadata-edit-cb (partial growth-metadata-edit-cb owner)
+                                       :new-metric growth-new-metric
+                                       :metrics growth-metrics
+                                       :metric-count (count focus-metric-data)
+                                       :change-growth-cb (partial growth-change-data-cb owner)
+                                       :delete-metric-cb (partial growth-delete-metric-cb owner data)
+                                       :reset-metrics-cb #(growth-reset-metrics-cb topic owner data)
+                                       :cancel-cb growth-cancel-fn
+                                       :change-growth-metric-cb (partial growth-change-metric-cb owner data)
+                                       :new-growth-section (om/get-state owner :oc-editing)}
+                                      {:key focus-metric-data})
+                (dom/div {:class "pillbox-container growth"}
+                  (for [metric-slug growth-metric-slugs]
+                    (let [metric (get growth-metrics metric-slug)
+                          mname (:name metric)
+                          metric-classes (utils/class-set {:pillbox true
+                                                           metric-slug true
+                                                           :active (= growth-focus metric-slug)})]
+                      (dom/label {:class metric-classes
+                                  :title (:description metric)
+                                  :data-tab metric-slug
+                                  :on-click #(om/set-state! owner :growth-focus metric-slug)} mname)))))))
           (dom/div #js {:className "topic-overlay-edit-body"
                         :ref "topic-overlay-edit-body"
                         :id (str "topic-edit-body-" (name topic))
