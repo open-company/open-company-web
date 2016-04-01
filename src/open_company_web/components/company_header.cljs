@@ -104,7 +104,7 @@
           (gstyle/setStyle logo #js {:marginTop (str (quot height-diff 2) "px")})))))
   (watch-scroll owner))
 
-(defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner options]
+(defcomponent company-header [{:keys [company-data navbar-editing stakeholder-update] :as data} owner options]
 
   (render [_]
     ;; add the scroll listener if the logo is not present
@@ -152,7 +152,10 @@
           ;; Company description
           (dom/div #js {:className "company-description-container"
                         :ref "company-description-container"}
-            (dom/div {:class "company-description"} (:description company-data)))))
+            (dom/div {:class "company-description"} (:description company-data))
+            (let [link-name (if stakeholder-update "Dashboard" "Stakeholder Updates")
+                  link-url (str "/" (:slug company-data) (when-not stakeholder-update "/updates"))]
+                (dom/a {:class "nav-link" :href link-url} link-name)))))
 
       (when-not (:editing-topic data)
         ;; Category navigation
