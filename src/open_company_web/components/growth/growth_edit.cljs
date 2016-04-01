@@ -19,7 +19,7 @@
 
   (render [_]
     (let [growth-data (:cursor data)
-          is-new (:new growth-data)
+          is-new (and (not (:value growth-data)) (not (:target growth-data)) (:new growth-data))
           value (:value growth-data)
           target (:target growth-data)
           interval (:interval data)
@@ -157,7 +157,8 @@
                                          :cursor row}]
                                   v))
                               metric-data))]
-      (dom/div {:class "composed-section-edit growth-body edit"}
+      (dom/div {:class "composed-section-edit growth-body edit"
+                :key (:slug metric-info)}
         (if (om/get-state owner :metadata-edit)
           (om/build growth-metric-edit {:metric-info metric-info
                                         :metric-count (:metric-count data)
