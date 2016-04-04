@@ -2,11 +2,12 @@
   (:require [open-company-web.local-settings :as ls]
             [cljsjs.raven]))
 
-(def whitelistUrls #js {:whitelistUrls ls/local-whitelist-array})
+(def ravenParameter #js {:whitelistUrls ls/local-whitelist-array
+                         :release ls/deploy-key})
 
 (defn raven-setup []
   (when (and (exists? js/Raven) ls/local-dsn)
-    (.. js/Raven (config ls/local-dsn whitelistUrls) install)))
+    (.. js/Raven (config ls/local-dsn ravenParameter) install)))
 
 (defn test-raven []
   (js/setTimeout #(.captureMessage js/Raven "Message from clojure" 1000))
