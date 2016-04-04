@@ -85,8 +85,8 @@
 
         ;; Stakeholder update
         (and (not (contains? data :loading)) (contains? data slug))
-        (dom/div {:class "stakeholder-update navbar-offset"}
-
+        (dom/div {:class (utils/class-set {:stakeholder-update true
+                                           :navbar-offset (not (utils/is-mobile))})}
           ;; Company / user header
           (when-not (utils/is-mobile)
             (om/build navbar data))

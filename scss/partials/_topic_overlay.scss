@@ -97,7 +97,7 @@ $topic_overlay_text_color: #2d2d2d;
             border: 1px solid transparent;
             height: 32px;
             margin-left: 1px;
-            margin-bottom: 28px;
+            margin-bottom: 18px;
             font-weight: 600;
             font-size: 20px;
             color: $topic_overlay_text_color;
@@ -105,13 +105,13 @@ $topic_overlay_text_color: #2d2d2d;
 
           div.topic-overlay-body {
             border: 1px solid transparent;
-            font-size: 15px;
-            line-height: 1.7;
+            font-size: 16px;
+            line-height: 1.6;
             color: #141312;
 
             * {
-              font-size: 15px;
-              line-height: 1.7;
+              font-size: 16px;
+              line-height: 1.6;
               color: #141312;
             }
 

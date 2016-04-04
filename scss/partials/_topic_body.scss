@@ -8,15 +8,8 @@ div.topic-body {
     color: #444444;
     font-weight: normal;
 
-    @include mobile() {
-      font-size: 16px;
-      line-height: 1.6;
-    }
-
-    @include big_web(){
-      font-size: 15px;
-      line-height: 1.7;
-    }
+    font-size: 16px;
+    line-height: 1.6;
   }
 
   h1, h2, h3, h4 {

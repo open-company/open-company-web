@@ -60,18 +60,10 @@ div.topic-list {
 
     div.topic-headline {
       width: 100%;
-      margin-top: 15px;
+      margin-top: 16px;
       color: #444444;
-
-      @include mobile(){
-        font-size: 16px;
-        line-height: 1.6;
-      }
-
-      @include big_web(){
-        font-size: 14px;
-        line-height: 1.4;
-      }
+      font-size: 16px;
+      line-height: 1.6;
 
       &.collapse {
         height: 0px;

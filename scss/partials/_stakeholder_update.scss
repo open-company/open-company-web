@@ -1,7 +1,50 @@
-@include big_web (){
+div.stakeholder-update {
+  background-color: white;
+
+  div.intro-title,
+  div.topic-title {
+    font-weight: 600;
+    font-size: 26px;
+    line-height: 1;
+    margin-bottom: 17px;
+    text-transform: uppercase;
+  }
+
+  div.topic-headline {
+    font-weight: 600;
+    margin-bottom: 7px;
+  }
+
+  div.topic-headline {
+    font-size: 16px;
+  }
+
+}
+
+@include mobile() {
 
   div.stakeholder-update {
-    background-color: white;
+
+    div.intro-title,
+    div.topic-title,
+    div.topic-headline,
+    div.topic-body {
+      padding-left: 22px;
+      padding-right: 22px;
+    }
+  }
+
+  div.update-topic {
+
+    div.topic-title {
+      margin-top: 14px;
+    }
+  }
+}
+
+@include big_web() {
+
+  div.stakeholder-update {
 
     div.company-header-internal {
       padding: 0 0;
@@ -17,13 +60,6 @@
         padding: 0 0;
       }
 
-      div.intro-title, div.topic-title {
-        font-weight: 600;
-        font-size: 26px;
-        margin-bottom: 17px;
-        text-transform: uppercase;
-      }
-
       div.intro-title,
       div.topic-title,
       div.topic-headline,
@@ -35,12 +71,6 @@
 
         div.topic-title {
           margin-top: 26px;
-        }
-
-        div.topic-headline {
-          margin-bottom: 7px;
-          font-weight: 600;
-          font-size: 15px;
         }
       }
     }
