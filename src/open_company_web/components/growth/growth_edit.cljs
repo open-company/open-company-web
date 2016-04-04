@@ -136,7 +136,7 @@
                               metric-data))]
       (dom/div {:class "composed-section-edit growth-body edit"
                 :key slug}
-        (if (om/get-state owner :metadata-edit)
+        (if metadata-edit
           (om/build growth-metric-edit {:metric-info metric-info
                                         :metric-count (:metric-count data)
                                         :metrics (:metrics data)
@@ -149,7 +149,9 @@
                                                      (.setTimeout js/window
                                                                   #(signal-tab (:period (:cursor (get rows-data 0))) :target)
                                                                   400)))
-                                        :delete-metric-cb (:delete-metric-cb data)
+                                        :delete-metric-cb (fn [metric-slug]
+                                                           (om/set-state! owner :metadata-edit false)
+                                                           ((:delete-metric-cb data) metric-slug))
                                         :cancel-cb (fn []
                                                      ; 3 cases
                                                      (if (or (:new-growth-section data) (:new-metric data))
