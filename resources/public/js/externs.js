@@ -69,14 +69,6 @@ Sortable.create.handle = function(){};
 Sortable.handle = {};
 Sortable.onSort = function(){};
 Sortable.on = function(){};
-// SVG
-var SVGTextElement = function(){};
-SVGTextElement.getBBox = function(){};
-SVGTextElement.getBBox.width = {};
-var SVGGElement = function(){};
-SVGGElement.getBBox = function(){};
-SVGGElement.getBBox.width = {};
-var el = {};
-el.node = function(){};
-el.node.getBBox = function(){};
-el.node.getBBox.width = {};
+// SVG getBBox
+d3.selection.prototype.node.prototype.getBBox = function(){};
+d3.selection.prototype.node.prototype.getBBox.width = {};
