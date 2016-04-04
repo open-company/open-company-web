@@ -19,7 +19,7 @@
 (defcomponent prior-updates [data owner]
   (render [_]
     (js/console.log (pr-str data))
-    (dom/div "Prior Updates")))
+    (dom/div "")))
 
 (defcomponent stakeholder-update-topic [data owner]
   (render [_]
@@ -99,13 +99,13 @@
           
           (dom/div {:class "update-internal row"}
           
-            (dom/div {:class "sections col-md-8 col-sm-12"}
+            (dom/div {:class "sections col-md-9 col-sm-12"}
               ;; Stakeholder update intro
               (om/build stakeholder-update-intro (:stakeholder-update company-data))
               ;; Stakeholder update topics
               (om/build selected-topics company-data))
 
-            (dom/div {:class "col-md-4 col-sm-0"} 
+            (dom/div {:class "col-md-3 col-sm-0"} 
               (om/build prior-updates company-data))))
 
 

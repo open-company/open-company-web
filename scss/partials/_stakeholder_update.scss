@@ -8,35 +8,57 @@
       width: 930px;
       margin: 0 auto;
     }
-  }
   
-  div.update-internal {
-    width: 930px;
-    margin: 0 auto;
+    div.update-internal {
+      width: 930px;
+      margin: 0 auto;
 
-    padding-right: 15px;
-
-    div.sections {
-      padding: 0 0;
-    }
-
-    div.intro-title, div.topic-title {
-      font-weight: 600;
-      font-size: 26px;
-      margin-bottom: 17px;
-      text-transform: uppercase;
-    }
-
-    div.update-topic {
-
-      div.topic-title {
-        margin-top: 26px;
+      div.sections {
+        padding: 0 0;
       }
 
-      div.topic-headline {
-        margin-bottom: 7px;
+      div.intro-title, div.topic-title {
         font-weight: 600;
-        font-size: 15px;
+        font-size: 26px;
+        margin-bottom: 17px;
+        text-transform: uppercase;
+      }
+
+      div.intro-title,
+      div.topic-title,
+      div.topic-headline,
+      div.topic-body {
+        padding-right: 45px;
+      }
+
+      div.update-topic {
+
+        div.topic-title {
+          margin-top: 26px;
+        }
+
+        div.topic-headline {
+          margin-bottom: 7px;
+          font-weight: 600;
+          font-size: 15px;
+        }
+      }
+    }
+
+    div.section-container {
+
+      div.pillbox-container.growth,
+      div.pillbox-container.finances {
+
+        @include big_web(){
+          margin-left: 0px;
+          width: 650px;
+        }
+
+        @include mobile(){
+          margin-left: -23px;
+          width: calc(100% + 46px);
+        }
       }
     }
   }
