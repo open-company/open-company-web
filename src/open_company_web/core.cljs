@@ -1,4 +1,4 @@
-(ns ^:figwheel-always open-company-web.core
+(ns open-company-web.core
   (:require [om.core :as om :include-macros true]
             [secretary.core :as secretary :refer-macros (defroute)]
             [dommy.core :refer-macros (sel1)]
@@ -188,8 +188,5 @@
       (route-dispatch! (router/get-token)))))
 
 (defn on-js-reload []
-  ;; optionally touch your app-state to force rerendering depending on
-  ;; your application
-  ;; (swap! app-state update-in [:__figwheel_counter] inc)
   (.clear js/console)
   (route-dispatch! (router/get-token)))
