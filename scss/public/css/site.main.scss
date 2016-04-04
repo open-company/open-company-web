@@ -1,0 +1,465 @@
+/*
+Colors:
+#4183D7 OC blue
+#65C6BB OC grean
+
+Sizes:
+<768 xs
+768-991 sm
+992-1199 md
+1200+ lg
+*/
+
+html, body {
+ font-family: "Lora", serif;
+ font-size: 14px;
+ height: 100%;
+ color: #777;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Open Sans', sans-serif;
+  color: #444;
+}
+
+h1 {
+  font-size: 34px;
+  font-weight: 300;
+}
+
+h2 {
+  font-size: 18px;
+}
+
+h3 {
+  font-size: 16px;
+}
+
+/* At lg size, there is an outer container, not full width */
+@media (min-width: 1200px) {
+  div.container.outer {
+      max-width: 1040px;
+  }
+}
+
+/* At md size, there is (also) an inner container, not full width */
+@media (min-width: 992px) {
+  div.container.inner {
+      max-width: 760px;
+  }
+}
+
+/*--- Nav / Header ---*/
+
+div.gradient {
+  background-image: linear-gradient(138deg, #4183D7 0%, #51A0CB 44%, #54A6C9 51%, #56ABC6 59%, #65C6BB 100%);
+  color: white;
+  width: 100%;
+}
+
+/* At sm size and up, the gradient takes up "hero" height of 500px. */
+@media (min-width: 768px) {
+  div.gradient.hero,
+  div.container.outer.header.hero {
+    height: 500px;
+  }
+  div.tagline {
+    height: 420px;
+  }
+}
+/*   At xs size, gradient takes up the full viewport size. */
+@media (max-width: 767px) {
+  div.gradient.hero,
+  div.container.outer.header.hero {
+    height: 100vh;
+  }
+}
+
+nav.navbar {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+}
+
+div.container.outer.header nav.navbar {
+  margin-top: 30px;
+  margin-bottom: 0px;
+  background-color: transparent;
+  background: transparent;
+  border-color: transparent;
+  border-width: 0px;
+}
+
+div.navbar-header > a.navbar-brand,
+div.navbar-header > a.navbar-brand:hover {
+  letter-spacing: -1px;
+  color: white;
+  font-size: 28px;
+}
+
+nav.navbar-default ul.navbar-nav > li > a,
+nav.navbar-default ul.navbar-nav > li > a:hover {
+    color:white;
+}
+
+div.tagline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column
+}
+
+div.tagline h1,
+div.tagline h2 {
+  color: white;
+  font-weight: 400;
+}
+
+/*--- Early Access Form ---*/
+
+div.tagline div.early-access {
+  margin-top: 30px;
+}
+
+div.early-access {
+  padding: 8px;
+  background: rgba(0,0,0,0.40);
+  border-radius: 6px;
+}
+
+div.early-access input {
+  border-radius: 3px;
+  padding: 7px;
+  border-width: 0px;
+}
+
+div.early-access button {
+  background-color: #4183D7;
+  color: white;
+  border-width: 0px;
+  border-radius: 3px;
+  height: 34px;
+  font-size: 12px;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-left: 5px;
+  transition: all 0.3s ease 0s;
+  font-family: 'Open Sans', sans-serif;
+}
+
+div.early-access button:hover {
+  background-color: #65C6BB;
+}
+
+/* Override Bootstrap's bottom margin on <= sm form group media size */
+div.early-access div.form-group {
+  margin-bottom: 0px;
+}
+
+/*--- Sections ---*/
+
+div.section-text {
+  width: 50%;
+  float: right;
+  /* vectically center the section text */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+div.update-image {
+  width: 50%;
+  float: left;
+  background: url('/img/update@2x.png') no-repeat center;
+  background-size: contain;
+  height: 303px;
+}
+
+div.team-image {
+  width: 50%;
+  float: left;
+  background: url('/img/team@2x.png') no-repeat center;
+  background-size: contain;
+  height: 216px;
+}
+
+div.public-image {
+  width: 50%;
+  float: left;
+  background: url('/img/public@4x.png') no-repeat center;
+  background-size: contain;
+  height: 309px;
+}
+
+/* md size and above, reverse the left/right order of the even numbered section text and section image */
+@media (min-width: 992px) {
+  div.section-box.even div.section-text {
+    float: left;
+  }
+  div.section-box.even div.section-image {
+    float: right;
+  }
+}
+
+/* sm size and below, make the text and section image vertically stacked */
+@media (max-width: 991px) {
+  div.section-text {
+    width: 100%;
+    float: left;
+    /* When section text and section image are vertically stacked, make the text centered */
+    text-align: center;
+  }
+  div.section-image {
+    width: 100%;
+    float: right;
+  }
+}
+
+/* 
+  md and above, when the section text and section image are side by side, add row top margin
+  and force the text to image height. 
+*/
+@media (min-width: 992px) {
+  div.section-box {
+    margin-top: 60px;
+  }
+  
+  div.team-text {
+    height: 216px;
+  }
+  div.update-text {
+    height: 303px;
+  }
+  div.public-text {
+    height: 309px;
+  }
+
+}
+
+hr {
+  color: #d8d8d8;
+}
+
+/*--- Features ---*/
+
+/* Don't show feature icons at xs size */
+@media (max-width: 767px) {
+  div.feature-icon {
+    display: none;
+  }
+}
+
+img.feature-icon {
+  width: 26px;
+}
+
+div.row.features {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+div.row.features h2 {
+  margin-top: 0px;
+}
+
+/*--- Pricing ---*/
+
+.pricing-header {
+  margin-top: 50px;
+}
+
+.pricing {
+  position: relative;
+  margin-top: 30px;
+  margin-bottom: 50px;
+}
+
+/* pricing header and price */
+
+.pricing-header, .pricing-name, .pricing-price {
+  text-align: center;
+}
+
+.pricing-name {
+  border: 3px solid #4183D7;
+}
+
+.pricing-name h3,
+.pricing-price h4 {
+  margin: 0;
+  line-height: normal;
+}
+
+.pricing-name h3 span,
+.pricing-price h4 span {
+  display: block;
+  margin-top: 5px;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.pricing-name h3 {
+  font-weight: 300;
+  color: #fafafa;
+  padding: 12px 0;
+  font-size: 27px;
+  background: #4183D7;
+}
+
+.pricing-price h4 {
+  color: #808080;
+  padding: 5px 0;
+  font-size: 54px;
+  font-weight: 300;
+  background: #eee;
+  border-bottom: solid 1px #f5f9e7;
+}
+
+.pricing-price h4 i {
+  top: -8px;
+  font-size: 28px;
+  font-style: normal;
+  position: relative;
+}
+
+.pricing-price h4 span {
+  top: -10px;
+  font-size: 14px;
+  font-style: normal;
+  position: relative;
+}
+
+.pricing-price {
+  border-left: 3px solid #eee;
+  border-right: 3px solid #eee;
+}
+
+
+/*Pricing Content*/
+
+.pricing-content {
+  border-left: 3px solid #eee;
+  border-right: 3px solid #eee;
+}
+
+ul.pricing-content {
+  margin-bottom: 0px;
+}
+
+.pricing-content li {
+  color: #888;
+  padding: 7px 15px;
+  border-bottom: solid 1px #f5f9e7;
+}
+
+/*Pricing Footer*/
+
+.pricing-footer {
+  color: #777;
+  line-height: 17px;
+  text-align: center;
+  padding: 30px 20px 19px;
+  border-left: 3px solid #eee;
+  border-right: 3px solid #eee;
+  border-bottom: 3px solid #eee;
+}
+
+/*--- About ---*/
+
+div.content h2 {
+  text-align: center;
+  margin-top: 50px;
+  margin-bottom: 20px;
+}
+
+/*--- Bottom Form ---*/
+
+div.solid {
+  height: 100px;
+  background-color: #65C6BB;
+}
+
+div.bottom-block h2 {
+  color: white;
+  float: left;
+  margin-right: 30px;
+  margin-top: 40px;
+}
+
+div.bottom-block div.early-access {
+  float: left;
+  margin-top: 22px;
+}
+
+/* Don't show the bottom form tagline at xs size */
+@media (max-width: 767px) {
+  div.bottom-block h2 {
+    display: none;
+  }
+}
+
+/*--- Footer ---*/
+
+/* Don't show the footer at xs size */
+@media (max-width: 767px) {
+  div.container.outer.footer {
+    display: none;
+  }
+}
+
+div.container.outer.footer .navbar-default .navbar-nav > li > a {
+  color: #777;
+}
+
+div.container.outer.footer .navbar-default .navbar-nav > li > a:hover {
+  color: #444;
+}
+
+div.container.outer.footer nav.navbar i.fa {
+  font-size: 18px;
+}
+
+div.container.outer.footer nav.navbar a > i.fa {
+  color: #4183D7;
+  transition: all 0.3s ease 0s;
+}
+
+div.container.outer.footer nav.navbar a:hover > i.fa {
+  color: #65C6BB;
+}
+
+div.container.outer.footer nav.navbar {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  background-color: transparent;
+  background: transparent;
+  border-color: transparent;
+  border-width: 0px;
+}
+
+.not-found {
+  margin: 10rem auto;
+  text-align: center;
+}
+
+.not-found h1 {
+    font-family: "Lora", serif;
+    font-size: 6rem;
+    color: #4183D7;
+}
+
+.not-found h2 {
+    font-size: 2rem;
+}
+
+.not-found p {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.not-found .btn {
+    margin-top: 2rem;
+    font-family: 'Open Sans', sans-serif;
+    background-color: #4183D7;
+    padding: .7rem 2rem;
+    color: white;
+    font-weight: 700
+}
