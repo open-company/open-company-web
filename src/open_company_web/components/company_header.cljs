@@ -153,7 +153,7 @@
           (dom/div #js {:className "company-description-container"
                         :ref "company-description-container"}
             (dom/div {:class "company-description"} (:description company-data))
-            (let [link-name (if stakeholder-update "Dashboard" "Stakeholder Updates")
+            (let [link-name (if stakeholder-update "Dashboard View" "Digest View")
                   link-url (str "/" (:slug company-data) (when-not stakeholder-update "/updates"))]
                 (dom/a {:class "nav-link" :href link-url} link-name)))))
 
