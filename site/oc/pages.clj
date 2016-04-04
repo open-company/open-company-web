@@ -181,8 +181,6 @@
           ;;  "google.load(\"visualization\", \"1\", {packages:[\"corechart\"]});"]
           ;; JWT Decode lib
           [:script {:type "text/javascript",:src "/lib/jwt-decode/jwt-decode.min.js?oc_deploy_key"}]
-          ;; SVG CSS lib
-          [:script {:type "text/javascript", :src "/lib/svg-css/svg-css.js?oc_deploy_key"}]
           ;; ClojureScript generated JavaScript
           [:script {:type "text/javascript", :src "/js/oc.js?oc_deploy_key"}]
           ;; Adobe Typekit
