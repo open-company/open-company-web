@@ -73,3 +73,6 @@ Sortable.on = function(){};
 var SVGTextElement = function(){};
 SVGTextElement.getBBox = function(){};
 SVGTextElement.getBBox.width = {};
+var SVGGElement = function(){};
+SVGGElement.getBBox = function(){};
+SVGGElement.getBBox.width = {};
