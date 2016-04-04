@@ -6,7 +6,7 @@
 
 (defn decode [encoded-jwt]
   (when (exists? js/jwt_decode)
-    (js/jwt_decode. encoded-jwt)))
+    (js/jwt_decode encoded-jwt)))
 
 (defn get-key [k]
   (when-let [decoded-jwt (js->clj (decode (jwt)))]
