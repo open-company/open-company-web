@@ -169,6 +169,7 @@
                         (.attr "fill" (if (= i selected) h-axis-selected-color h-axis-color))
                         (.text text))
               label-width (width label)]
+          (println "aa" label (.node label) (.getBBox (.node label)))
           ; set month label x position depending on its width
           (.attr label "x" (+ x-pos (/ (- (* bar-width keys-count) label-width) 2)))
           ; for each key in the set
