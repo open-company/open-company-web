@@ -76,3 +76,5 @@ SVGTextElement.getBBox.width = {};
 var SVGGElement = function(){};
 SVGGElement.getBBox = function(){};
 SVGGElement.getBBox.width = {};
+var getBBox = function(){};
+getBBox.width = {};
