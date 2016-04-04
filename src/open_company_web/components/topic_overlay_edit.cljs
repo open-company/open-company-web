@@ -134,13 +134,16 @@
         all-data (vals (om/get-state owner :growth-data))
         filtered-data (vec (filter #(not= (:slug %) metric-slug) all-data))
         new-data (growth-map-metric-data filtered-data)
-        metrics-order (growth-metrics-order new-metrics)]
+        metrics-order (growth-metrics-order new-metrics)
+        next-focus (if metrics-order
+                      (first metrics-order)
+                      growth-utils/new-metric-slug-placeholder)]
+    (om/set-state! owner :growth-focus next-focus)
     (om/set-state! owner :growth-metrics new-metrics-map)
     (om/set-state! owner :growth-data new-data)
     (om/set-state! owner :growth-metric-slugs metrics-order)
-    ; FIXME!!
-    ; (save-cb owner data)
-    ))
+    (om/set-state! owner :growth-metadata-editing false)
+    (om/set-state! owner :has-changes true)))
 
 (defn growth-metadata-edit-cb [owner editing]
   (om/set-state! owner :growth-metadata-editing editing))
