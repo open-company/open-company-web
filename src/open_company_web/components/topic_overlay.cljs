@@ -126,7 +126,7 @@
     ; prevent the window from scrolling
     (dommy/add-class! (sel1 [:body]) "no-scroll"))
 
-  (will-update [_ next-props _]
+  (will-receive-props [_ next-props]
     (when-not (= next-props data)
       (om/set-state! owner :as-of (:updated-at (:section-data next-props)))))
 
