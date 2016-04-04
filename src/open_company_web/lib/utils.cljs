@@ -558,10 +558,6 @@
 (defn scroll-to-section [section-name]
   (scroll-to-id (str "section-" (name section-name))))
 
-(defn replace-svg []
-  (when (.-svgcss js/window)
-    (.setTimeout js/window #(.svgcss js/window) 1)))
-
 (def _mobile (atom -1))
 
 (def big-web-min-width 970)
@@ -585,9 +581,10 @@
  @_mobile)
 
 (defn get-topic-body [section-data section]
-  (if (#{:finances :growth} section)
-    (get-in section-data [:notes :body])
-    (:body section-data)))
+  (let [section-kw (keyword section)]
+    (if (#{:finances :growth} section-kw)
+      (get-in section-data [:notes :body])
+      (:body section-data))))
 
 (defn round-2-dec [value decimals]
   ; cut to 2 dec maximum then parse to float to use toString to remove trailing zeros
