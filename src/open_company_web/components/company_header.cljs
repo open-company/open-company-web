@@ -110,9 +110,11 @@
     ;; add the scroll listener if the logo is not present and not stakeholder update
     (when (and (not stakeholder-update) company-data (clojure.string/blank? (:logo company-data)))
       (.setTimeout js/window #(watch-scroll owner) 500))
+
     (dom/div #js {:className "company-header"
                   :ref "company-header"}
-      (if navbar-editing
+      (let [link-url (str "/" (:slug company-data) (when-not stakeholder-update "/updates"))]
+        
         ; topic editing
         (dom/div {:class "navbar-editing"
                   :key "navbar-editing"}
@@ -142,6 +144,9 @@
             ;; Buttons
             (dom/div {:class (utils/class-set {:buttons-container true
                                                :hidden (not (utils/is-mobile))})}
+              (let [icon-url (if stakeholder-update "/img/dashboard.svg" "/img/digest.svg")]
+                (dom/button {:type "button" :class "btn btn-link digest-button"}
+                  (dom/img {:src icon-url})))
               (b/dropdown {:class "oc-btn vert-ellipse" :bs-size "30px" :title "" :pull-right? true}
                 (b/menu-item {:key 1
                               :on-click #(menu-click owner)} (if (cook/get-cookie :jwt) "Logout" "Sign In/Sign Up")))))
@@ -155,8 +160,8 @@
           (dom/div #js {:className "company-description-container"
                         :ref "company-description-container"}
             (dom/div {:class "company-description"} (:description company-data))
-            (let [link-name (if stakeholder-update "Dashboard View" "Digest View")
-                  link-url (str "/" (:slug company-data) (when-not stakeholder-update "/updates"))]
+            ;; View navigation
+            (let [link-name (if stakeholder-update "Dashboard View" "Digest View")]
                 (dom/a {:class "nav-link" :href link-url} link-name)))))
 
       (when-not (:editing-topic data)

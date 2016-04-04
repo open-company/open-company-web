@@ -103,8 +103,12 @@
               ;; Stakeholder update intro
               (om/build stakeholder-update-intro (:stakeholder-update company-data))
               ;; Stakeholder update topics
-              (om/build selected-topics company-data))
-
+              (om/build selected-topics company-data)
+              ;; Dashboard link
+              (when (utils/is-mobile)
+                (dom/div {:class "dashboard-link"}
+                  (dom/a {:href (str "/" (:slug company-data))} (str "View Dashboard")))))
+            
             (dom/div {:class "col-md-3 col-sm-0"} 
               (om/build prior-updates company-data))))
 

@@ -32,12 +32,17 @@ div.stakeholder-update {
       padding-left: 22px;
       padding-right: 22px;
     }
-  }
 
-  div.update-topic {
+    div.update-topic {
 
-    div.topic-title {
-      margin-top: 14px;
+      div.topic-title {
+        margin-top: 14px;
+      }
+    }
+
+    div.dashboard-link {
+      padding-bottom: 20px; 
+      text-align: center;
     }
   }
 }
