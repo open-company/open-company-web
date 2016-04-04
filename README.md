@@ -44,35 +44,40 @@ java -version
 
 If you do not have Java 8 [download it](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and follow the installation instructions.
 
-Installing Boot is easy, for the most up to date instructions, check out the [Boot README](https://github.com/boot-clj/boot#install)
+Installing Boot is easy, for the most up to date instructions, check out the [Boot README](https://github.com/boot-clj/boot#install).
+You can verify your install with:
+
+```console
+boot -V
+```
 
 ## Usage
 
 Users of the [OpenCompany](https://opencompany.io) platform should get started by going to [OpenCompany](https://opencompany.io). The following usage is for developers wanting to work on the platform's Web application software.
 
-Local usage requires you to run 2 services, the [API service](https://github.com/open-company/open-company-api) and the [Auth service](https://github.com/open-company/open-company-auth). Both can be started in their respective repositiories with:
+Local usage of the web application requires you to run 2 services, the [API service](https://github.com/open-company/open-company-api) and the [Auth service](https://github.com/open-company/open-company-auth). Both can be started in their respective repositiories with:
 
 ```console
 lein start
 ```
 
-**Development**: To get an interactive web development environment, start the iterative compilation process in this repository:
+To get an interactive web **development** environment, start the iterative compilation process in this repository:
 
 ```console
 boot dev
 ```
 
-If you've done it right, you'll have 3 terminal sessions running: API, Auth, Web.
+If you've done it right, you'll now have 3 terminal sessions running: API, Auth, Web.
 
 Open your browser to [http://localhost:3559/](http://localhost:3559/).
 
-**Production**: To create a production build run:
+To create a **production** build run:
 
 ```console
 boot prod-build
 ```
 
-Open `target/public/app-shell.html` in your browser. You will not get live reloading nor a REPL.
+Open `target/public/app-shell.html` in your browser. Using production rather than dev, you will not get the live reloading nor a REPL.
 
 
 ## Tests
