@@ -93,5 +93,5 @@
   (comp (sass :output-style :compressed)
         (build-site)
         (cljs :optimizations :advanced
-              :source-map "target/public/js/oc.js.map"
+              :source-map true
               :externs ["public/js/externs.js"])))
