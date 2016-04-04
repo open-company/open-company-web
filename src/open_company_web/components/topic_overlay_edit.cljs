@@ -120,7 +120,7 @@
        :growth-metric-slugs (growth-metrics-order all-metrics)})))
 
 (defn filter-growth-data [focus growth-data]
-  (vec (filter #(= (:slug %) focus) (vals growth-data))))
+  (into {} (filter (fn [[k v]] (= (:slug v) focus)) growth-data)))
 
 (defn growth-reset-metrics-cb [topic owner data]
   (let [state (growth-init-state topic data)]
