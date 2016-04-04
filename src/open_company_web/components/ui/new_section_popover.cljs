@@ -46,11 +46,9 @@
 (defcomponent new-section-popover [data owner]
 
   (did-mount [_]
-    (utils/replace-svg)
     (.setTimeout js/window #(scroll-to-category (:selected-category data)) 200))
 
   (did-update [_ _ _]
-    (utils/replace-svg)
     (.setTimeout js/window #(scroll-to-category (:selected-category data)) 200))
 
   (render [_]

@@ -214,15 +214,14 @@
      :as-of (:updated-at section-data)
      :actual-as-of (:updated-at section-data)})
 
-  (did-mount [_]
-    (utils/replace-svg))
-
   (did-update [_ prev-props _]
-    (utils/replace-svg)
-    (when (and (not= (:updated-at (:section-data prev-props)) (:updated-at (:section-data data)))
-               (not (om/get-state owner :as-of)))
-      (om/set-state! owner :as-of (:updated-at (:section-data data)))
-      (om/set-state! owner :actual-as-of (:updated-at (:section-data data)))))
+    (let [new-as-of (:updated-at section-data)
+          current-as-of (om/get-state owner :as-of)
+          old-as-of (:updated-at (:section-data prev-props))]
+      (when (and (not= old-as-of new-as-of)
+                 (not= current-as-of new-as-of))
+        (om/set-state! owner :as-of new-as-of)
+        (om/set-state! owner :actual-as-of new-as-of))))
 
   (render-state [_ {:keys [editing expanded as-of actual-as-of] :as state}]
     (let [section-kw (keyword section)

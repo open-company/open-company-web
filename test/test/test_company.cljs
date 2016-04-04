@@ -29,7 +29,8 @@
             [test.open-company-web.components.topic]
             [test.open-company-web.components.edit-topic]
             [test.open-company-web.components.topic-body]
-            [test.open-company-web.components.expanded-topic]))
+            [test.open-company-web.components.expanded-topic]
+            [test.open-company-web.components.topic-overlay]))
 
 (enable-console-print!)
 
@@ -66,4 +67,5 @@
   'test.open-company-web.components.topic
   'test.open-company-web.components.edit-topic
   'test.open-company-web.components.topic-body
-  'test.open-company-web.components.expanded-topic)
+  'test.open-company-web.components.expanded-topic
+  'test.open-company-web.components.topic-overlay)
