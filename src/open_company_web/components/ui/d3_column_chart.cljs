@@ -158,7 +158,7 @@
                                         (- (:chart-height options) scaled-max-val 20) ")")))
               ; month label
               force-year (or (zero? i) (= i (dec (count chart-data))))
-              text (utils/get-period-string (:period data-set) nil [:short (when force-year :force-year)])
+              text (utils/get-period-string (:period data-set) (:interval options) [:short (when force-year :force-year)])
               x-pos (bar-position chart-width i (count chart-data) keys-count)
               label (-> chart-node
                         (.append "text")
