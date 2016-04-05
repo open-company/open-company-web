@@ -35,7 +35,7 @@
     "monthly" (t/months diff)
     "weekly" (t/weeks diff)))
 
-(defn- get-past-period [period diff interval]
+(defn get-past-period [period diff interval]
   (let [period-date (utils/date-from-period period interval)
         past-date (t/minus period-date (get-minus diff interval))
         formatter (utils/get-formatter interval)]
