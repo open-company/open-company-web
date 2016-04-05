@@ -70,10 +70,9 @@ Sortable.handle = {};
 Sortable.onSort = function(){};
 Sortable.on = function(){};
 // SVG getBBox
-var d3 = {};
-d3.select = function(){};
-d3.select.node = function(){};
-d3.select.node.getBBox = function(){};
-d3.select.node.getBBox.width = {};
-d3.selection.prototype.node.prototype.getBBox = function(){};
-d3.selection.prototype.node.prototype.getBBox.width = {};
+var SVGTextElement = function(){};
+SVGTextElement.prototype.getBBox = function(){};
+SVGTextElement.prototype.getBBox.width = {};
+var SVGGElement = function(){};
+SVGGElement.prototype.getBBox = function(){};
+SVGGElement.prototype.getBBox.width = {};
