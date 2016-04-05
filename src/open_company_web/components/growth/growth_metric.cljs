@@ -39,6 +39,7 @@
           chart-opts {:opts {:chart-height (:height (:chart-size options))
                              :chart-width (:width (:chart-size options))
                              :chart-keys [:value]
+                             :interval interval
                              :label-color (occ/get-color-by-kw :oc-blue-regular)
                              :label-key :label
                              :h-axis-color (occ/get-color-by-kw :oc-blue-light)
