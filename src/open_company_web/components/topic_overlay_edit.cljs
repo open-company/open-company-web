@@ -380,7 +380,15 @@
                       (dom/label {:class metric-classes
                                   :title (:description metric)
                                   :data-tab metric-slug
-                                  :on-click #(om/set-state! owner :growth-focus metric-slug)} mname)))))))
+                                  :on-click #(om/set-state! owner :growth-focus metric-slug)} mname)))
+                  (dom/label {:class (utils/class-set {:pillbox true
+                                                       growth-utils/new-metric-slug-placeholder true
+                                                       :active (= growth-focus growth-utils/new-metric-slug-placeholder)})
+                              :title "New metric"
+                              :data-tab growth-utils/new-metric-slug-placeholder
+                              :on-click (fn []
+                                         (om/set-state! owner :growth-new-metric true)
+                                         (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "New metric")))))
           (dom/div #js {:className "topic-overlay-edit-body"
                         :ref "topic-overlay-edit-body"
                         :id (str "topic-edit-body-" (name topic))
