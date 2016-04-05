@@ -38,7 +38,7 @@
 
 (defn change-name [owner data]
   (let [change-cb (:change-growth-metric-cb data)
-        name-value (s/trim (.val (.$ js/window "input#mtr-name")))
+        name-value (.val (.$ js/window "input#mtr-name"))
         slug (om/get-state owner :metric-slug)]
     (om/set-state! owner :metric-name name-value)
     ; if it's a newly created metric
@@ -47,7 +47,7 @@
       (let [presets (om/get-state owner :presets)
             metrics (:metrics data)
             slugs (vec (map :slug (vals metrics)))
-            new-slug (growth-utils/get-slug slugs presets name-value)]
+            new-slug (growth-utils/get-slug slugs presets (s/trim name-value))]
         (om/set-state! owner :metric-slug new-slug)
         (change-cb slug {:slug new-slug
                          :description (om/get-state owner :description)
@@ -172,17 +172,17 @@
        :target (if new-metric (:target metric-defaults) (:target metric-info))
        :currency company-currency-code}))
 
+  (will-mount [_]
+    ; load needed resources
+    (cdr/add-style! "/lib/select2/css/select2.css")
+    (cdr/add-scripts! [{:src "/lib/select2/js/select2.js"}]
+                      (fn []
+                        (om/update-state! owner :req-libs-loaded (fn [] true))
+                        (init-select2 owner data))))
+
   (did-mount [_]
     (om/set-state! owner :did-mount true)
     (init-select2 owner data))
-
-  (will-mount [_]
-              ; load needed resources
-              (cdr/add-style! "/lib/select2/css/select2.css")
-              (cdr/add-scripts! [{:src "/lib/select2/js/select2.js"}]
-                                (fn []
-                                  (om/update-state! owner :req-libs-loaded (fn [] true))
-                                  (init-select2 owner data))))
 
   (render [_]
     (let [{:keys [new-growth-section metric-info]} data
