@@ -62,7 +62,6 @@
     (let [intro (:intro data)
           body (:body intro)
           title (:title intro)]
-      (js/console.log (pr-str intro))
       (when-not (str/blank? body)
         (dom/div {:class "update-intro"}
           (dom/div {:class "intro-title"} (if (str/blank? title) "Current Update" title))
@@ -107,7 +106,7 @@
               ;; Dashboard link
               (when (utils/is-mobile)
                 (dom/div {:class "dashboard-link"}
-                  (dom/a {:href (str "/" (:slug company-data))} (str "View Dashboard")))))
+                  (om/build link {:href (str "/" (:slug company-data)) :name "View Dashboard"}))))
             
             (dom/div {:class "col-md-3 col-sm-0"} 
               (om/build prior-updates company-data))))

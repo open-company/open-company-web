@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
             [cljs.core.async :refer (put!)]
+            [open-company-web.components.ui.link :refer (link)]
             [open-company-web.components.ui.company-avatar :refer (company-avatar)]
             [open-company-web.components.category-nav :refer (category-nav)]
             [open-company-web.router :as router]
@@ -145,7 +146,9 @@
             (dom/div {:class (utils/class-set {:buttons-container true
                                                :hidden (not (utils/is-mobile))})}
               (let [icon-url (if stakeholder-update "/img/dashboard.svg" "/img/digest.svg")]
-                (dom/button {:type "button" :class "btn btn-link digest-button"}
+                (dom/button {:type "button"
+                             :class "btn btn-link digest-button"
+                             :on-click (fn [e] (router/nav! link-url))}
                   (dom/img {:src icon-url})))
               (b/dropdown {:class "oc-btn vert-ellipse" :bs-size "30px" :title "" :pull-right? true}
                 (b/menu-item {:key 1
@@ -162,7 +165,7 @@
             (dom/div {:class "company-description"} (:description company-data))
             ;; View navigation
             (let [link-name (if stakeholder-update "Dashboard View" "Digest View")]
-                (dom/a {:class "nav-link" :href link-url} link-name)))))
+              (om/build link {:class "nav-link" :href link-url :name link-name})))))
 
       (when-not (:editing-topic data)
         ;; Category navigation
