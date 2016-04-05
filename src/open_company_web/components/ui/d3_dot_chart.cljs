@@ -114,14 +114,14 @@
               max-val (apply max (vals (select-keys data-set chart-keys)))
               scaled-max-val (scale-fn max-val)
               force-year (or (zero? i) (= i (dec (count chart-data))))
-              text (utils/get-period-string (:period data-set) nil [:short (when force-year :force-year) (when (utils/is-mobile) :short-year)])
+              text (utils/get-period-string (:period data-set) (:interval options) [:short (when force-year :force-year) (when (utils/is-mobile) :short-year)])
               x-pos (dot-position chart-width i (count chart-data) (count chart-keys))
               label (-> chart-node
                         (.append "text")
                         (.attr "class" "chart-x-label")
                         (.attr "id" (str "chart-x-label-" i))
                         (.attr "x" x-pos)
-                        (.attr "y" (:chart-height options))
+                        (.attr "y" (- (:chart-height options) 5))
                         (.attr "fill" (if (= i selected) h-axis-selected-color h-axis-color))
                         (.text text))
               label-width (width label)]
