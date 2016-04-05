@@ -510,7 +510,7 @@
       (let [day-of-week (cljs-time/day-of-week now)
             to-monday (dec day-of-week)
             monday-date (cljs-time/minus now (cljs-time/days to-monday))]
-        (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (cljs-time/day monday-date))))))
+        (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (add-zero (cljs-time/day monday-date)))))))
 
 (defn company-cache-key [k & [v]]
   (let [slug (keyword (:slug @router/path))
