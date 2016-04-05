@@ -12,7 +12,7 @@
             [cljs.core.async :refer (put!)]))
 
 (defn signal-tab [period k]
-  (let [ch (utils/get-channel (str period k))]
+  (when-let [ch (utils/get-channel (str period k))]
     (put! ch {:period period :key k})))
 
 (defcomponent growth-edit-row [data _]
@@ -115,6 +115,7 @@
 
   (will-receive-props [_ next-props]
     (when (not= (:growth-data data) (:growth-data next-props))
+      (om/set-state! owner :metadata-edit (:new-metric next-props))
       (om/set-state! owner :growth-data (:growth-data next-props))))
 
   (render-state [_ {:keys [growth-data metric-data metadata-edit stop]}]
@@ -134,8 +135,7 @@
                                          :cursor row}]
                                   v))
                               metric-data))]
-      (dom/div {:class "composed-section-edit growth-body edit"
-                :key slug}
+      (dom/div {:class "composed-section-edit growth-body edit"}
         (if metadata-edit
           (om/build growth-metric-edit {:metric-info metric-info
                                         :metric-count (:metric-count data)
