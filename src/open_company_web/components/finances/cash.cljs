@@ -27,6 +27,7 @@
                              :chart-keys [:cash]
                              :label-color (occ/get-color-by-kw :oc-green-regular)
                              :label-key :label
+                             :interval "monthly"
                              :h-axis-color (occ/get-color-by-kw :oc-green-light)
                              :h-axis-selected-color (occ/get-color-by-kw :oc-green-regular)
                              :chart-colors {:cash (occ/get-color-by-kw :oc-green-light)}

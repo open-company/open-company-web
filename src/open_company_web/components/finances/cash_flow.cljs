@@ -103,6 +103,7 @@
                                            [:revenue :costs]
                                            [:costs])
                              :label-key :label
+                             :interval "monthly"
                              :h-axis-color (occ/get-color-by-kw :oc-green-light)
                              :h-axis-selected-color (occ/get-color-by-kw :oc-green-regular)
                              :chart-colors (if has-revenues
