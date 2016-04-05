@@ -9,8 +9,7 @@
             [open-company-web.components.ui.utility-components :refer (editable-pen)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
-            [cljs.core.async :refer (put!)]
-            [cljs-time.core :as cljs-time]))
+            [cljs.core.async :refer (put!)]))
 
 (defn signal-tab [period k]
   (when-let [ch (utils/get-channel (str period k))]
