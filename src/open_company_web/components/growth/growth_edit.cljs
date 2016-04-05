@@ -9,7 +9,8 @@
             [open-company-web.components.ui.utility-components :refer (editable-pen)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
-            [cljs.core.async :refer (put!)]))
+            [cljs.core.async :refer (put!)]
+            [cljs-time.core :as cljs-time]))
 
 (defn signal-tab [period k]
   (when-let [ch (utils/get-channel (str period k))]
@@ -184,7 +185,7 @@
                   (dom/th {} "Target")
                   (dom/th {} "Value")))
               (dom/tbody {}
-                (let [current-period (utils/current-period)]
+                (let [current-period (utils/current-growth-period interval)]
                   (for [idx (range stop)]
                     (let [period (growth-utils/get-past-period current-period idx interval)
                           has-value (contains? growth-data (str period slug))
