@@ -86,10 +86,12 @@
         (build-site)
         (reload :asset-path "/public"
                 :on-jsload 'open-company-web.core/on-js-reload)
-        (cljs)))
+        (cljs :optimizations :none
+              :compiler-options {:source-map-timestamp true})))
 
 (deftask prod-build []
   (comp (sass :output-style :compressed)
         (build-site)
         (cljs :optimizations :advanced
+              :source-map true
               :externs ["public/js/externs.js"])))
