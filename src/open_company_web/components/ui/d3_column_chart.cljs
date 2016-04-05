@@ -167,11 +167,8 @@
                         (.attr "x" x-pos)
                         (.attr "y" (:chart-height options))
                         (.attr "fill" (if (= i selected) h-axis-selected-color h-axis-color))
-                        (.text text))]
-          (println "aa" label (type label))
-          (when (.-node label)
-            (println "bb" (.node label)))
-          (let [label-width (width label)]
+                        (.text text))
+              label-width (width label)]
           ; set month label x position depending on its width
           (.attr label "x" (+ x-pos (/ (- (* bar-width keys-count) label-width) 2)))
           ; for each key in the set
@@ -194,7 +191,7 @@
                   (.attr "x" (* j bar-width))
                   (.attr "y" (- scaled-max-val scaled-val))
                   (.attr "width" bar-width)
-                  (.attr "height" (max 0 scaled-val))))))))
+                  (.attr "height" (max 0 scaled-val)))))))
       ; add the hovering rects
       (doseq [i (range (count chart-data))]
         (-> chart-node
