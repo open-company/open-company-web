@@ -11,11 +11,6 @@
 
 (def show-columns 6)
 
-(defn width [el]
-  (if (and el (.node el))
-    (.-width (.getBBox (.node el)))
-    0))
-
 (defn current-data [owner]
   (let [start (om/get-state owner :start)
         all-data (vec (om/get-props owner :chart-data))
@@ -52,7 +47,7 @@
                           (.attr "dx" 0)
                           (.attr "dy" 0)
                           (.text label-value))
-          txt-width (width chart-label)]
+          txt-width (js/SVGgetWidth chart-label)]
         (.attr chart-label "dx" (- (/ chart-width 2) (/ txt-width 2))))
     (loop [idx 0
            txt-left 0]
@@ -64,7 +59,7 @@
                     (.attr "dx" 0)
                     (.attr "dy" 0)
                     (.text label))
-            txt-width (width txt)
+            txt-width (js/SVGgetWidth txt)
             txt-height (* idx 25)]
         (when (utils/is-mobile)
           (.attr txt "dy" txt-height)
@@ -168,7 +163,7 @@
                         (.attr "y" (:chart-height options))
                         (.attr "fill" (if (= i selected) h-axis-selected-color h-axis-color))
                         (.text text))
-              label-width (width label)]
+              label-width (js/SVGgetWidth label)]
           ; set month label x position depending on its width
           (.attr label "x" (+ x-pos (/ (- (* bar-width keys-count) label-width) 2)))
           ; for each key in the set
@@ -215,7 +210,7 @@
                               (.attr "id" "chart-label")
                               (.attr "transform" (str "translate(" 0 "," (if (> (count chart-keys) 1) 20 50) ")")))] ;x-pos
         (build-selected-label chart-label-g label-value label-color chart-width)
-        (let [chart-label-width (width chart-label-g)
+        (let [chart-label-width (js/SVGgetWidth chart-label-g)
               chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
           (.attr chart-label-g "transform" (str "translate("
                                                 0 ;(max 0 chart-label-pos)
