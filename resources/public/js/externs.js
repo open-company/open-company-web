@@ -70,9 +70,11 @@ Sortable.handle = {};
 Sortable.onSort = function(){};
 Sortable.on = function(){};
 // SVG getBBox
-var SVGTextElement = function(){};
 SVGTextElement.prototype.getBBox = function(){};
 SVGTextElement.prototype.getBBox.width = {};
-var SVGGElement = function(){};
 SVGGElement.prototype.getBBox = function(){};
 SVGGElement.prototype.getBBox.width = {};
+Element.prototype.getBBox = function(){};
+Element.prototype.getBBox.width = {};
+Object.prototype.getBBox = function(){};
+Object.prototype.getBBox.width = {};
