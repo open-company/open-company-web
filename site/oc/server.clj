@@ -14,7 +14,7 @@
   (res/resource-response "/index.html" {:root "public"}))
 
 (defn not-found []
-  (assoc (res/resource-response "/not-found.html" {:root "public"}) :status 404))
+  (assoc (res/resource-response "/404.html" {:root "public"}) :status 404))
 
 (defroutes resources
   (GET "/404" [] (not-found))

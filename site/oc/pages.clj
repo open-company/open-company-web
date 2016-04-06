@@ -135,10 +135,8 @@
        [:p
         "You seem to have come accross a page that does not yet exist."
         [:br]
-        "Please try again or contact support:"
-        [:a
-         {:href "mailto:support@opencompany.com"}
-         "support@opencompany.com"]]
+        "Please try again or contact support: "
+        [:a {:href "mailto:support@opencompany.com"} "support@opencompany.com"]]
        [:a.btn {:href "/"} "Return To Home"]
        [:script {:src "/js/set-path.js"}]]]]]])
 
