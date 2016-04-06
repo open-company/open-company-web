@@ -133,13 +133,14 @@
        [:h1 "404"]
        [:h2 "Hmm, this does not look right."]
        [:p
-        "\n                You seem to have come accross a page that does not yet exist."
+        "You seem to have come accross a page that does not yet exist."
         [:br]
-        "\n                Please try again or contact support: "
+        "Please try again or contact support:"
         [:a
          {:href "mailto:support@opencompany.com"}
          "support@opencompany.com"]]
-       [:a.btn {:href "/"} "Return To Home"]]]]]])
+       [:a.btn {:href "/"} "Return To Home"]
+       [:script {:src "/js/set-path.js"}]]]]]])
 
 (def app-shell
   {:head [:head
