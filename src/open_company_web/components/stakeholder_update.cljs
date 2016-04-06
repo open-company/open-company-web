@@ -18,7 +18,6 @@
 
 (defcomponent prior-updates [data owner]
   (render [_]
-    (js/console.log (pr-str data))
     (dom/div "")))
 
 (defcomponent stakeholder-update-topic [data owner]
