@@ -1,22 +1,24 @@
 $open_degrees: 225deg;
+$icon_size: 24px;
 
 div.drawer-toggler {
   position: absolute;
   top: 0px;
   left: 0px;
-  width: 48px;
-  height: 48px;
+  width: $icon_size;
+  height: $icon_size;
   z-index: 1035;
   padding: 0px;
   margin: 5px;
 
   button.drawer-toggler-bt {
     display: inline-block;
-    height: 48px;
-    width: 48px;
+    height: $icon_size;
+    width: $icon_size;
     border: none;
     outline: none;
     background-image: url("/img/x-drawer.svg");
+    background-size: $icon_size $icon_size;
     background-repeat: no-repeat;
     background-color: transparent;
     // start with the button rotated of 45 degrees
