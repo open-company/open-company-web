@@ -13,7 +13,6 @@
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.topic-overlay :refer (topic-overlay)]
             [open-company-web.components.topic-list-edit :refer (topic-list-edit)]
-            [open-company-web.components.ui.manage-topics :refer (manage-topics)]
             [open-company-web.components.ui.edit-topic-button :refer (edit-topic-button)]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
@@ -34,11 +33,6 @@
   (api/patch-sections (dissoc (om/get-state owner :active-topics) :all))
   ((:navbar-editing-cb options) false)
   (om/set-state! owner :editing false))
-
-(defn manage-topics-cb [owner options]
-  (om/set-state! owner :editing true)
-  ((:navbar-editing-cb options) true)
-  (utils/scroll-to-y 0))
 
 (defn toggle-edit-topic-button [owner & [section-name]]
   (om/set-state! owner :last-expanded-section section-name)
@@ -205,10 +199,4 @@
                                              :navbar-editing-cb navbar-editing-cb
                                              :force-edit-cb (partial force-edit-button owner)
                                              :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)
-                                             :bw-topic-click (partial topic-click owner)}})))))
-            (when (and (not (:read-only company-data)) (seq company-data) (not (utils/is-mobile)))
-              (dom/div #js {:className "manage-topics-container"
-                            :style #js {:opacity (if (om/get-state owner :show-topic-edit-button) "0" "1")}}
-                (om/build manage-topics
-                          nil
-                          {:opts {:manage-topics-cb #(manage-topics-cb owner options)}})))))))))
+                                             :bw-topic-click (partial topic-click owner)}})))))))))))
