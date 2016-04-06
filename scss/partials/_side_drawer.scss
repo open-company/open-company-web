@@ -1,4 +1,4 @@
-$drawer_width: 200px;
+$drawer_width: 400px;
 
 div.side-drawer {
   content: "";
@@ -49,5 +49,11 @@ div.side-drawer {
       -moz-transform: translate(- $drawer_width, 0);
       transform: translate(- $drawer_width, 0);
     }
+  }
+
+  div.side-drawer-internal {
+    margin-top: 35px;
+    height: calc(100% - 45px);
+    overflow-y: scroll;
   }
 }
