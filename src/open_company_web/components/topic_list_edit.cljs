@@ -77,7 +77,7 @@
       (api/get-new-sections))
     (let [active-topics (:active-topics data)
           category (:category data)
-          all-sections (:new-sections options)
+          all-sections (:new-sections data)
           category-sections (:sections (first (filter #(= (:name %) category) (:categories all-sections))))
           sections-list (vec (map :section-name category-sections))
           unactive-topics (reduce utils/vec-dissoc sections-list active-topics)]
@@ -91,13 +91,15 @@
     (om/set-state! owner :did-mount true)
     (setup-sortable owner options))
 
+  (did-update [_ _ _]
+    (setup-sortable owner options))
+
   (render-state [_ {:keys [unactive-topics active-topics]}]
-    (.setTimeout js/window #(setup-sortable owner options) 100)
     (if (empty? @caches/new-sections)
       (dom/h2 {:style #js {:display (if (:active data) "inline" "none")}}
         "Loading sections...")
       (let [current-category (:category data)
-            all-sections (:new-sections options)
+            all-sections (:new-sections data)
             category-sections (:sections (first (filter #(= (:name %) current-category) (:categories all-sections))))
             items (get-sections-data category-sections)]
         (dom/div {:class "topic-list-edit group no-select"
