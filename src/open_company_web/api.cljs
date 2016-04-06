@@ -61,7 +61,8 @@
     (api-get (str "/companies/" slug)
              nil
              (fn [{:keys [success body status]}]
-               (dispatcher/dispatch! [:company {:success success
+               (dispatcher/dispatch! [:company {:slug slug
+                                                :success success
                                                 :status status
                                                 :body (when success (json->cljs body))}])))))
 
