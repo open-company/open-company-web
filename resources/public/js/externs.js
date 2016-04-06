@@ -69,10 +69,5 @@ Sortable.create.handle = function(){};
 Sortable.handle = {};
 Sortable.onSort = function(){};
 Sortable.on = function(){};
-// SVG
-var SVGTextElement = function(){};
-SVGTextElement.getBBox = function(){};
-SVGTextElement.getBBox.width = {};
-var SVGGElement = function(){};
-SVGGElement.getBBox = function(){};
-SVGGElement.getBBox.width = {};
+// SVG getBBox
+var SVGgetWidth = function(){};
