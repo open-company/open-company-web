@@ -14,12 +14,12 @@
   (res/resource-response "/index.html" {:root "public"}))
 
 (defn not-found []
-  (assoc (res/resource-response "/404.html" {:root "public"}) :status 404))
+  (assoc (res/resource-response "/not-found.html" {:root "public"}) :status 404))
 
 (defroutes resources
   (GET "/404" [] (not-found))
   (GET "/" [] (index))
-  (GET "*" [] (app-shell)))
+  (GET ["/:path" :path #"[^\.]+"] [path] (app-shell)))
 
 ;; Some routes like /, /404 and similar can't have their content-type
 ;; derived automatically, because of that we set it with the middleware below
@@ -34,7 +34,7 @@
     (let [response (handler request)]
       (if (and (html-uri? (:uri request))
                (not (res/get-header response "Content-Type")))
-        (res/content-type response "text/html;charset=UTF-0")
+        (res/content-type response "text/html;charset=UTF-8")
         response))))
 
 (def handler
