@@ -102,10 +102,10 @@
 (def scrolled-to-top (atom false))
 
 (defn set-lis-height [owner]
-  (doall
-    (let [li-elems (sel (om/get-ref owner "topic-list-ul") [:li.topic-row])
+  (when-let [topic-list (om/get-ref owner "topic-list-ul")]
+    (let [li-elems (sel topic-list [:li.topic-row])
           max-height (apply max (map #(.-clientHeight %) li-elems))]
-      (for [li li-elems]
+      (doseq [li li-elems]
         (setStyle li #js {:height (str max-height "px")})))))
 
 (defn close-overlay-cb [owner]
@@ -147,16 +147,18 @@
     (utils/remove-channel "save-bt-navbar")
     (utils/remove-channel "cancel-bt-navbar"))
 
-  (did-update [_ prev-props _]
-    (when-not (= (:company-data prev-props) (:company-data data))
-      (om/set-state! owner (get-state data (om/get-state owner))))
-    (when-not (:read-only (:company-data data))
+  (will-receive-props [_ next-props]
+    (when-not (= (:company-data next-props) (:company-data data))
+      (om/set-state! owner (get-state next-props (om/get-state owner))))
+    (when-not (:read-only (:company-data next-props))
       (get-new-sections-if-needed owner)))
 
-  (render-state [_ {:keys [show-topic-edit-button active-topics editing selected-topic selected-metric]}]
+  (did-update [_ _ _]
     ; set the cards height on big web
     (when-not (utils/is-mobile)
-      (.setTimeout js/window #(set-lis-height owner) 0))
+      (set-lis-height owner)))
+
+  (render-state [_ {:keys [show-topic-edit-button active-topics editing selected-topic selected-metric]}]
     (let [slug (keyword (:slug @router/path))]
       (if editing
         (let [categories (map name (keys active-topics))]
