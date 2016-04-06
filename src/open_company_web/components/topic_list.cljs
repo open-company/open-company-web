@@ -14,6 +14,8 @@
             [open-company-web.components.topic-overlay :refer (topic-overlay)]
             [open-company-web.components.topic-list-edit :refer (topic-list-edit)]
             [open-company-web.components.ui.edit-topic-button :refer (edit-topic-button)]
+            [open-company-web.components.ui.drawer-toggler :refer [drawer-toggler]]
+            [open-company-web.components.ui.side-drawer :refer [side-drawer]]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -87,7 +89,8 @@
      :new-sections-requested (or (:new-sections-requested current-state) false)
      :save-bt-active (or (:save-bt-active current-state) false)
      :show-topic-edit-button (or (:show-topic-edit-button current-state) false)
-     :selected-topic (or (:selected-topic current-state) (:selected-topic data))}))
+     :selected-topic (or (:selected-topic current-state) (:selected-topic data))
+     :drawer-open (or (:drawer-open current-state) false)}))
 
 (defn topic-click [owner topic selected-metric]
   (om/set-state! owner :selected-topic topic)
@@ -96,11 +99,12 @@
 (def scrolled-to-top (atom false))
 
 (defn set-lis-height [owner]
-  (when-let [topic-list (om/get-ref owner "topic-list-ul")]
-    (let [li-elems (sel topic-list [:li.topic-row])
-          max-height (apply max (map #(.-clientHeight %) li-elems))]
-      (doseq [li li-elems]
-        (setStyle li #js {:height (str max-height "px")})))))
+  (when-not (utils/is-mobile)
+    (when-let [topic-list (om/get-ref owner "topic-list-ul")]
+      (let [li-elems (sel topic-list [:li.topic-row])
+            max-height (apply max (map #(.-clientHeight %) li-elems))]
+        (doseq [li li-elems]
+          (setStyle li #js {:height (str max-height "px")}))))))
 
 (defn close-overlay-cb [owner]
   (om/set-state! owner :selected-topic nil)
@@ -135,7 +139,9 @@
           ; reset editing
           (om/set-state! owner :editing false)
           ; reset active topics changes
-          (om/set-state! owner :active-topics (om/get-state owner :initial-active-topics)))))))
+          (om/set-state! owner :active-topics (om/get-state owner :initial-active-topics))))))
+    ; set the cards height on big web
+    (set-lis-height owner))
 
   (will-unmount [_]
     (utils/remove-channel "save-bt-navbar")
@@ -149,10 +155,9 @@
 
   (did-update [_ _ _]
     ; set the cards height on big web
-    (when-not (utils/is-mobile)
-      (set-lis-height owner)))
+    (set-lis-height owner))
 
-  (render-state [_ {:keys [show-topic-edit-button active-topics editing selected-topic selected-metric]}]
+  (render-state [_ {:keys [show-topic-edit-button active-topics editing selected-topic selected-metric drawer-open]}]
     (let [slug (keyword (:slug @router/path))]
       (if editing
         (let [categories (map name (keys active-topics))]
@@ -172,6 +177,12 @@
               category-topics (get active-topics active-category)]
           (dom/div {:class "topic-list fix-top-margin-scrolling"
                     :key "topic-list"}
+            (when (and (not (:read-only company-data)) (not (utils/is-mobile)))
+              ;; drawer toggler
+              (om/build drawer-toggler {} {:opts {:click-cb #(om/update-state! owner :drawer-open not)}}))
+            (when (and (not (:read-only company-data)) (not (utils/is-mobile)))
+              ;; side drawer
+              (om/build side-drawer {:open drawer-open}))
             (when selected-topic
               (om/build topic-overlay {:section selected-topic
                                        :section-data (->> selected-topic keyword (get company-data))
