@@ -32,7 +32,8 @@
     [perun "0.3.0" :scope "test"]
     [compojure "1.5.0" :scope "test"]
     [pandeiro/boot-http "0.7.3" :scope "test"]
-    [deraen/boot-sass "0.2.1" :scope "test"]])
+    [deraen/boot-sass "0.2.1" :scope "test"]
+    [org.slf4j/slf4j-nop "1.7.13" :scope "test"]])
 
 (set-env!
   :source-paths   #{"src" "scss" "site"}
