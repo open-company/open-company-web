@@ -44,11 +44,11 @@
                 :on-click #(.stopPropagation %)}
         (dom/button {:class "right mr2 mt2"
                      :on-click #(circle-remove-click options %)}
-                    (i/icon :nc-icon-circle-remove))
+                    (i/icon :circle-remove))
         (when-not read-only
           (dom/button {:class "right mr2 mt2"
                        :on-click #(pencil-click options topic % "body")}
-                      (i/icon :nc-icon-pencil)))
+                      (i/icon :pencil)))
         (dom/div {:class "topic-overlay-header"}
           (dom/div {:class "topic-overlay-title"} (:title topic-data))
           (dom/div {:class "topic-overlay-date"} subtitle-string))
