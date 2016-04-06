@@ -8,9 +8,9 @@
     [org.clojure/clojurescript "1.8.40"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
     ;; --- DO NOT UPDATE OM, the 1.x.x code is Om Next and requires changes on our part https://github.com/omcljs/om/wiki/Quick-Start-(om.next)
     [org.omcljs/om "0.9.0" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
-    [cljs-http "0.1.39"] ; HTTP for cljs https://github.com/r0man/cljs-http
+    [cljs-http "0.1.40"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/schema "1.1.0"] ; Dependency of om-tools https://github.com/Prismatic/schema
-    [prismatic/plumbing "0.5.2"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
+    [prismatic/plumbing "0.5.3"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [prismatic/om-tools "0.4.0"] ; Tools for Om https://github.com/Prismatic/om-tools
     [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
@@ -23,7 +23,7 @@
     [funcool/cuerdas "0.7.1"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
     [cljsjs/react "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/raven "2.1.0-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
-    [medley "0.7.3"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
+    [medley "0.7.4"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [cljsjs/d3 "3.5.7-1"] ; d3 externs https://clojars.org/cljsjs/d3
     [cljsjs/medium-editor "5.15.0-0"]]) ; Medium editor https://clojars.org/cljsjs/medium-editor
 
