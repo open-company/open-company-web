@@ -26,7 +26,7 @@
       (om/set-state! owner :open (open-value (:open next-props)))))
 
   (render-state [_ {:keys [open]}]
-    (let [cat "progress"
+    (let [cat "company"
           slug (keyword (:slug @router/path))
           company-data (:company-data data)
           categories (:categories company-data)
@@ -36,11 +36,12 @@
                                          :open-drawer (= open "open")
                                          :close-drawer (= open "close")})}
         (dom/div {:class "side-drawer-internal"}
-          (om/build topic-list-edit
-                    (merge data {:active true
-                                 :category cat
-                                 :active-topics (get (:active-topics data) (keyword cat))})
-                    {:key cat
-                     :opts {:active-category (:active-category data)
-                            :new-sections (slug @caches/new-sections)
-                            :did-change-sort #()}})))))) ; (partial update-active-topics owner options (keyword cat))
+          (when (and open (slug @caches/new-sections))
+            (om/build topic-list-edit
+                      (merge data {:active true
+                                   :category cat
+                                   :new-sections (slug @caches/new-sections)
+                                   :active-topics (get (:active-topics data) (keyword cat))})
+                      {:key cat
+                       :opts {:active-category (:active-category data)
+                              :did-change-sort #()}}))))))) ; (partial update-active-topics owner options (keyword cat))
