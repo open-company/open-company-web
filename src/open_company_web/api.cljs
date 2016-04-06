@@ -83,9 +83,9 @@
             "content-type" (:type company-link)
           }}
         (fn [{:keys [success body status]}]
-          (dispatcher/dispatch! :company {:success success
-                                          :status status
-                                          :body (when success (json->cljs body))}))))))
+          (dispatcher/dispatch! [:company {:success success
+                                           :status status
+                                           :body (when success (json->cljs body))}]))))))
 
 (defn get-auth-settings []
   (auth-get "/auth-settings"
@@ -224,9 +224,9 @@
             ; custom content type
             "content-type" (:type company-patch-link)}}
         (fn [{:keys [success body status]}]
-          (dispatcher/dispatch! :company {:success success
-                                          :status status
-                                          :body (when success (json->cljs body))}))))))
+          (dispatcher/dispatch! [:company {:success success
+                                           :status status
+                                           :body (when success (json->cljs body))}]))))))
 
 (defn remove-section [section-name]
   (when (and section-name)
