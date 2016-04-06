@@ -177,10 +177,10 @@
               category-topics (get active-topics active-category)]
           (dom/div {:class "topic-list fix-top-margin-scrolling"
                     :key "topic-list"}
-            (when (and (not (:read-only company-data)) (not (utils/is-mobile)))
+            (when (and (not (:read-only company-data)) (not (utils/is-mobile)) (not (:loading data)))
               ;; drawer toggler
               (om/build drawer-toggler {} {:opts {:click-cb #(om/update-state! owner :drawer-open not)}}))
-            (when (and (not (:read-only company-data)) (not (utils/is-mobile)))
+            (when (and (not (:read-only company-data)) (not (utils/is-mobile)) (not (:loading data)))
               ;; side drawer
               (om/build side-drawer {:open drawer-open}))
             (when selected-topic
