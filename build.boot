@@ -1,9 +1,11 @@
 (def cljs-deps
   '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
-    [adzerk/boot-reload "0.4.6" :scope "test"]
+    [adzerk/boot-reload "0.4.7" :scope "test"]
     [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
-
     [tolitius/boot-check "0.1.1" :scope "test"]
+
+    ;; boot -d boot-deps ancient
+    [boot-deps "0.1.6" :scope "test"] ; Dependency version checker https://github.com/martinklepsch/boot-deps
 
     [org.clojure/clojurescript "1.8.40"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
     ;; --- DO NOT UPDATE OM, the 1.x.x code is Om Next and requires changes on our part https://github.com/omcljs/om/wiki/Quick-Start-(om.next)
@@ -33,7 +35,7 @@
     [compojure "1.5.0" :scope "test"]
     [pandeiro/boot-http "0.7.3" :scope "test"]
     [deraen/boot-sass "0.2.1" :scope "test"]
-    [org.slf4j/slf4j-nop "1.7.13" :scope "test"]])
+    [org.slf4j/slf4j-nop "1.7.21" :scope "test"]])
 
 (set-env!
   :source-paths   #{"src" "scss" "site"}
