@@ -121,17 +121,19 @@
                            :key (apply str active-topics)}
                 (for [item-name active-topics]
                   (dom/li #js {:data-itemname item-name
+                               :className (utils/class-set {:topic-list-edit-li true
+                                                            :topic-active true
+                                                            :last-active-topic (= item-name (last active-topics))})
                                :key (str "active-" item-name)
                                :onClick #(topic-on-click item-name owner (:did-change-sort options))}
                     (om/build item {:id item-name
                                     :item-data (get items (keyword item-name))
-                                    :active-topics active-topics})))))
-            (dom/div {}
-              (dom/ul {:class "topic-list-unactive"
-                       :key (apply str unactive-topics)}
+                                    :active-topics active-topics})))
                 (for [item-name unactive-topics]
                   (dom/li #js {:data-itemname item-name
                                :key (str "unactive-" item-name)
+                               :className (utils/class-set {:topic-list-edit-li true
+                                                            :topic-unactive true})
                                :onClick #(topic-on-click item-name owner (:did-change-sort options))}
                     (om/build item {:id item-name
                                     :item-data (get items (keyword item-name))
