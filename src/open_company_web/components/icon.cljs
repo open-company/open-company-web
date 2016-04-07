@@ -1,5 +1,6 @@
 (ns open-company-web.components.icon
-    (:require [om-tools.dom :as dom]))
+  (:require [om-tools.dom :as dom]
+            [open-company-web.local-settings :as ls]))
 
 (defn icon
   ([id] (icon id {}))
@@ -12,4 +13,5 @@
                :style {:color accent-color :stroke outline-color :strokeWidth (str stroke "px")}
                ;; use tag isn't supported by react 0.14.7 and 0.14.8 isn't on cljsjs
                ;; Also their changelog doesn't mention it at all so I'm not sure if .8 would work
-               :dangerouslySetInnerHTML {:__html (str "<use xlink:href=/img/oc-icons.svg#nc-icon-" (name id) ">")}}))))
+               :dangerouslySetInnerHTML {:__html (str "<use xlink:href=/img/oc-icons.svg?" ls/deploy-key
+                                                      "#nc-icon-" (name id) ">")}}))))

@@ -6,7 +6,6 @@
             [open-company-web.api :as api]
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
-            [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.icon :as i]
             [open-company-web.components.topic :refer (topic)]
