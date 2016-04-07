@@ -164,7 +164,7 @@
                         :ref "company-description-container"}
             (dom/div {:class "company-description"} (:description company-data))
             ;; View navigation
-            (let [link-name (if stakeholder-update "Dashboard View" "Digest View")]
+            (let [link-name (if stakeholder-update "Dashboard" "Stakeholder Updates")]
               (om/build link {:class "nav-link" :href link-url :name link-name})))))
 
       (when-not (:editing-topic data)
