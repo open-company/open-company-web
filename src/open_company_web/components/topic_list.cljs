@@ -102,10 +102,12 @@
 (def scrolled-to-top (atom false))
 
 (defn set-lis-height [owner]
-  (doall
-    (let [li-elems (sel (om/get-ref owner "topic-list-ul") [:li.topic-row])
-          max-height (apply max (map #(.-clientHeight %) li-elems))]
-      (for [li li-elems]
+  (let [lis (sel (om/get-ref owner "topic-list-ul") [:li.topic-row])]
+    (doseq [li lis]
+      (.removeAttribute li "style"))
+    (let [max-height (apply max (map #(.-clientHeight %) lis))]
+      (doseq [li lis]
+          (js/console.log "set-lis-height" li)
         (setStyle li #js {:height (str max-height "px")})))))
 
 (defn close-overlay-cb [owner]
