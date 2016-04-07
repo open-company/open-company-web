@@ -5,7 +5,7 @@
   ([id] (icon id {}))
   ([id {:keys [accent-color size stroke] :as opts}]
    (let [outline-color "#0f0f0f"
-         accent-color  (or accent-color "red")
+         accent-color  (or accent-color "#007A9D") ; oc-blue from scss/modules/_colors.scss
          stroke        (or stroke 2)
          size          (or size 30)]
      (dom/svg {:viewBox "0 0 16 16" :width (str size "px") :height (str size "px")
