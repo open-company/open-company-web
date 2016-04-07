@@ -100,6 +100,9 @@ For more info on testing:
 - Plugin: [bensu/doo](https://github.com/bensu/doo)
 - React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/cljs-react-test)
 
+## Browser Support
+
+Chrome, Firefox, Safari and Edge.
 
 ## Participation
 
