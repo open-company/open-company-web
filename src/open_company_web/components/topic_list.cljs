@@ -183,7 +183,11 @@
             (when (and (not (:read-only company-data)) (not (utils/is-mobile)) (not (:loading data)))
               ;; side drawer
               (om/build side-drawer (merge data {:open drawer-open
-                                                 :active-topics category-topics})))
+                                                 :active true
+                                                 :new-sections (slug @caches/new-sections)
+                                                 :category active-category
+                                                 :active-topics category-topics}
+                                                {:opts {:did-change-sort #(println "did-change-sort")}})))
             (when selected-topic
               (om/build topic-overlay {:section selected-topic
                                        :section-data (->> selected-topic keyword (get company-data))
