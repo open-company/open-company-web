@@ -185,10 +185,6 @@ $topic_overlay_text_color: #2d2d2d;
             height: 16px;
             margin-top: 0px;
             margin-right: 158px;
-
-            label.bold{
-              font-weight: bold;
-            } 
           }
 
           div.topic-overlay-date {
@@ -211,15 +207,11 @@ $topic_overlay_text_color: #2d2d2d;
 
           div.topic-overlay-edit-headline-count{
             float: right;
-            text-align: right;
-            width: 57px;
+            text-align: left;
+            width: 46px;
             height: 16px;
             font-size: 14px;
             margin-top: 6px;
-
-            label.bold{
-              font-weight: bold;
-            }
           }
 
           textarea.topic-overlay-edit-headline {
