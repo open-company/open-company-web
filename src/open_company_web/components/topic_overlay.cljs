@@ -171,7 +171,6 @@
           js-date-upat (utils/js-date (:updated-at topic-data))
           month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
           topic-updated-at (str month-string " " (.getDate js-date-upat))
-          subtitle-string (str (:name (:author topic-data)) " on " topic-updated-at)
           section-body (utils/get-topic-body topic-data topic-kw)
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height max-win-height)
@@ -203,8 +202,7 @@
                       :on-change #(change-value owner :title %)})
           (dom/div {:class (utils/class-set {:topic-overlay-edit-title-count true
                                              :transparent (not show-title-counter)})}
-            (dom/label {:class "bold"} (- 100 (count title))) "/100")
-          (dom/div {:class "topic-overlay-date"} subtitle-string))
+            (dom/label {:class "bold"} (- 100 (count title))) "/100"))
         (dom/div #js {:className "topic-overlay-edit-content"
                       :ref "topic-overlay-edit-content"
                       :style #js {:maxHeight (str max-height "px")}}
