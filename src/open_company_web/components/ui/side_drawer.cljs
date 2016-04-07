@@ -23,5 +23,6 @@
                                        :open-drawer (= open "open")
                                        :close-drawer (= open "close")})}
       (dom/div {:class "side-drawer-internal"}
-        (om/build topic-list-edit (:list-data data) {:key (:list-key data)
-                                                     :opts (:list-opts options)})))))
+        (when open
+          (om/build topic-list-edit (:list-data data) {:key (:list-key data)
+                                                       :opts (:list-opts options)}))))))
