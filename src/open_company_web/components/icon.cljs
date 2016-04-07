@@ -3,6 +3,16 @@
             [open-company-web.local-settings :as ls]))
 
 (defn icon
+  "Render an icon from our Nucleo icon set.
+
+  The icon set should be saved at resources/public/img/oc-icons.svg.
+  When exporting the icons from Nucleo make sure to use 'Export as <symbol>'.
+  Screenshot of Download window: http://i.imgur.com/ltAj6X1.png
+
+  Optional second argument can be used to pass a map of options:
+  - :accent-color (oc-blue)
+  - :size (30px)
+  - :stroke (2px)"
   ([id] (icon id {}))
   ([id {:keys [accent-color size stroke] :as opts}]
    (let [outline-color "#0f0f0f"
