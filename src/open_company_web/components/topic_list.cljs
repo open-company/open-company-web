@@ -107,7 +107,6 @@
       (.removeAttribute li "style"))
     (let [max-height (apply max (map #(.-clientHeight %) lis))]
       (doseq [li lis]
-          (js/console.log "set-lis-height" li)
         (setStyle li #js {:height (str max-height "px")})))))
 
 (defn close-overlay-cb [owner]
