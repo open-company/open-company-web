@@ -7,6 +7,7 @@
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
             [open-company-web.api :as api]
+            [open-company-web.components.icon :as i]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [goog.events :as events]
@@ -41,11 +42,13 @@
           max-height (min (- 650 126) (- win-height 126))]
       (dom/div {:class "topic-overlay-internal"
                 :on-click #(.stopPropagation %)}
-        (dom/button {:class "circle-remove"
-                     :on-click #(circle-remove-click options %)})
+        (dom/button {:class "right mr2 mt2"
+                     :on-click #(circle-remove-click options %)}
+                    (i/icon :circle-remove))
         (when-not read-only
-          (dom/button {:class "pencil"
-                       :on-click #(pencil-click options topic % "body")}))
+          (dom/button {:class "right mr2 mt2"
+                       :on-click #(pencil-click options topic % "body")}
+                      (i/icon :pencil)))
         (dom/div {:class "topic-overlay-header"}
           (dom/div {:class "topic-overlay-title"} (:title topic-data))
           (dom/div {:class "topic-overlay-date"} subtitle-string))

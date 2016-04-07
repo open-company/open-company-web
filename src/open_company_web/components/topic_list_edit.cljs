@@ -6,8 +6,8 @@
             [open-company-web.api :as api]
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
-            [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.components.icon :as i]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.ui.manage-topics :refer (manage-topics)]
             [cljs-dynamic-resources.core :as cdr]
@@ -21,8 +21,7 @@
           active (utils/in? active-topics section)
           section-name (or (:name section-data) (utils/camel-case-str section))
           section-title (or (:title section-data) section-name)
-          section-description (or (:description section-data) "")
-          check-img (str "/img/check_" (if active "checked" "empty") ".png?" ls/deploy-key)]
+          section-description (or (:description section-data) "")]
       (dom/div {:class (utils/class-set {:topic-edit true
                                          :group true
                                          :topic-sortable true
@@ -30,7 +29,9 @@
                                          :active active})
                 :key (str "topic-edit-" section-name)}
         (dom/div {:class "topic-edit-internal group"}
-          (dom/img {:class "check" :src check-img})
+          (dom/div {:class "right"
+                    :style {:margin "13px 10px 0 0"}}
+             (i/icon :check-square-09 {:accent-color (when-not active "transparent")}))
           (dom/div {:class "topic-edit-handle group"})
           (dom/div {:class "topic-edit-labels"}
             (dom/h3 {:class "topic-title oc-header"} section-title)
