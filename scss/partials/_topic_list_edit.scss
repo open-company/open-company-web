@@ -15,13 +15,22 @@ div.topic-list-edit{
     padding: 0px;
   }
 
+  li.topic-list-edit-li {
+    border-bottom: 1px solid transparent;
+    padding-bottom: 4px;
+
+    &.last-active-topic {
+      border-bottom: 1px solid $oc_gray_3;
+    }
+  }
+
   li.placeholder {
     height: 68px;
   }
 
   div.topic-edit {
     min-height: 56px;
-    padding-top: 10px;
+    padding-top: 6px;
 
     &.active{
       div.topic-edit-internal{
