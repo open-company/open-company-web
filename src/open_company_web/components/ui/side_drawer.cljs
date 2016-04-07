@@ -15,7 +15,7 @@
 
   (will-receive-props [_ next-props]
     (when-not (= (:open next-props) (:open data))
-      (om/set-state! owner :open (if (:open next-props) "open" "close")))))
+      (om/set-state! owner :open (if (:open next-props) "open" "close"))))
 
   (render-state [_ {:keys [open]}]
     (dom/div {:class (utils/class-set {:side-drawer true
