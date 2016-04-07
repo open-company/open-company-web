@@ -66,6 +66,19 @@
     (om/set-state! owner :unactive-topics (vec new-unactive-topics))
     (did-change-sort new-active-topics)))
 
+(defn get-state [data]
+  (let [active-topics (:active-topics data)
+        category (name (:category data))
+        all-sections (:new-sections data)
+        category-sections (:sections (first (filter #(= (:name %) category) (:categories all-sections))))
+        sections-list (vec (map :section-name category-sections))
+        unactive-topics (reduce utils/vec-dissoc sections-list active-topics)]
+    {:initial-active-topics active-topics
+     :active-topics active-topics
+     :unactive-topics unactive-topics
+     :sortable-loaded false
+     :did-mount false}))
+
 (defcomponent topic-list-edit [data owner options]
 
   (init-state [_]
@@ -73,55 +86,53 @@
                      (fn []
                        (om/set-state! owner :sortable-loaded true)
                        (setup-sortable owner options)))
+    ; load the new sections if needed
     (when (empty? @caches/new-sections)
       (api/get-new-sections))
-    (let [active-topics (:active-topics data)
-          category (:category data)
-          all-sections (:new-sections data)
-          category-sections (:sections (first (filter #(= (:name %) category) (:categories all-sections))))
-          sections-list (vec (map :section-name category-sections))
-          unactive-topics (reduce utils/vec-dissoc sections-list active-topics)]
-      {:initial-active-topics active-topics
-       :active-topics active-topics
-       :unactive-topics unactive-topics
-       :sortable-loaded false
-       :did-mount false}))
+    (get-state data))
 
   (did-mount [_]
     (om/set-state! owner :did-mount true)
     (setup-sortable owner options))
 
   (did-update [_ _ _]
+    ; make sure the new-sections has been loaded and the data are available
+    (when (empty? @caches/new-sections)
+      (api/get-new-sections))
     (setup-sortable owner options))
 
+  (will-receive-props [_ next-props]
+    (when-not (= next-props data)
+      (om/set-state! owner (get-state next-props))))
+
   (render-state [_ {:keys [unactive-topics active-topics]}]
-    (if (empty? @caches/new-sections)
-      (dom/h2 {:style #js {:display (if (:active data) "inline" "none")}}
-        "Loading sections...")
-      (let [current-category (:category data)
-            all-sections (:new-sections data)
-            category-sections (:sections (first (filter #(= (:name %) current-category) (:categories all-sections))))
-            items (get-sections-data category-sections)]
-        (dom/div {:class "topic-list-edit group no-select"
-                  :style #js {:display (if (:active data) "inline" "none")}}
-          (dom/div {}
-            (dom/ul #js {:className "topic-list-sortable"
-                         :ref "topic-list-sortable"
-                         :key (apply str active-topics)}
-              (for [item-name active-topics]
-                (dom/li #js {:data-itemname item-name
-                             :key (str "active-" item-name)
-                             :onClick #(topic-on-click item-name owner (:did-change-sort options))}
-                  (om/build item {:id item-name
-                                  :item-data (get items (keyword item-name))
-                                  :active-topics active-topics})))))
-          (dom/div {}
-            (dom/ul {:class "topic-list-unactive"
-                     :key (apply str unactive-topics)}
-              (for [item-name unactive-topics]
-                (dom/li #js {:data-itemname item-name
-                             :key (str "unactive-" item-name)
-                             :onClick #(topic-on-click item-name owner (:did-change-sort options))}
-                  (om/build item {:id item-name
-                                  :item-data (get items (keyword item-name))
-                                  :active-topics active-topics}))))))))))
+    (let [slug (keyword (:slug @router/path))]
+      (if (empty? (slug @caches/new-sections))
+        (dom/h2 {:style #js {:display (if (:active data) "inline" "none")}} "Loading sections...")
+        (let [current-category (name (:category data))
+              all-sections (:new-sections data)
+              category-sections (:sections (first (filter #(= (:name %) current-category) (:categories all-sections))))
+              items (get-sections-data category-sections)]
+          (dom/div {:class "topic-list-edit group no-select"
+                    :style #js {:display (if (:active data) "inline" "none")}}
+            (dom/div {}
+              (dom/ul #js {:className "topic-list-sortable"
+                           :ref "topic-list-sortable"
+                           :key (apply str active-topics)}
+                (for [item-name active-topics]
+                  (dom/li #js {:data-itemname item-name
+                               :key (str "active-" item-name)
+                               :onClick #(topic-on-click item-name owner (:did-change-sort options))}
+                    (om/build item {:id item-name
+                                    :item-data (get items (keyword item-name))
+                                    :active-topics active-topics})))))
+            (dom/div {}
+              (dom/ul {:class "topic-list-unactive"
+                       :key (apply str unactive-topics)}
+                (for [item-name unactive-topics]
+                  (dom/li #js {:data-itemname item-name
+                               :key (str "unactive-" item-name)
+                               :onClick #(topic-on-click item-name owner (:did-change-sort options))}
+                    (om/build item {:id item-name
+                                    :item-data (get items (keyword item-name))
+                                    :active-topics active-topics})))))))))))
