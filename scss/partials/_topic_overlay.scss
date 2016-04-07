@@ -222,7 +222,8 @@ $topic_overlay_text_color: #2d2d2d;
             }
           }
 
-          input.topic-overlay-edit-headline {
+          textarea.topic-overlay-edit-headline {
+            resize: none;
             width: 500px;
             margin-bottom: 30px;
             font-weight: 600;

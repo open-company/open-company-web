@@ -207,15 +207,16 @@
         (dom/div #js {:className "topic-overlay-edit-content"
                       :ref "topic-overlay-edit-content"
                       :style #js {:maxHeight (str max-height "px")}}
-          (dom/input {:class "topic-overlay-edit-headline"
-                      :id (str "topic-edit-headline-" (name topic))
-                      :type "text"
-                      :placeholder "Type your headline here"
-                      :on-focus #(om/set-state! owner :show-headline-counter true)
-                      :on-blur #(om/set-state! owner :show-headline-counter false)
-                      :max-length 100
-                      :value headline
-                      :on-change #(change-value owner :headline %)})
+          (dom/textarea {:class "topic-overlay-edit-headline"
+                         :resize false
+                         :id (str "topic-edit-headline-" (name topic))
+                         :type "text"
+                         :placeholder "Type your headline here"
+                         :on-focus #(om/set-state! owner :show-headline-counter true)
+                         :on-blur #(om/set-state! owner :show-headline-counter false)
+                         :max-length 100
+                         :value headline
+                         :on-change #(change-value owner :headline %)})
           (dom/div {:class (utils/class-set {:topic-overlay-edit-headline-count true
                                              :transparent (not show-headline-counter)})}
             (dom/label {:class "bold"} (- 100 (count headline))) "/100")
