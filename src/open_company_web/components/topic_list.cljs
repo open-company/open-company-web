@@ -182,7 +182,8 @@
               (om/build drawer-toggler {} {:opts {:click-cb #(om/update-state! owner :drawer-open not)}}))
             (when (and (not (:read-only company-data)) (not (utils/is-mobile)) (not (:loading data)))
               ;; side drawer
-              (om/build side-drawer (merge data {:open drawer-open})))
+              (om/build side-drawer (merge data {:open drawer-open
+                                                 :active-topics category-topics})))
             (when selected-topic
               (om/build topic-overlay {:section selected-topic
                                        :section-data (->> selected-topic keyword (get company-data))
