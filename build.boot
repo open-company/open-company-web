@@ -1,14 +1,12 @@
+;; boot show --updates
 (def cljs-deps
   '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
     [adzerk/boot-reload "0.4.7" :scope "test"]
     [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
     [tolitius/boot-check "0.1.1" :scope "test"]
 
-    ;; boot -d boot-deps ancient
-    [boot-deps "0.1.6" :scope "test"] ; Dependency version checker https://github.com/martinklepsch/boot-deps
-
     [org.clojure/clojurescript "1.8.40"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
-    ;; --- DO NOT UPDATE OM, the 1.x.x code is Om Next and requires changes on our part https://github.com/omcljs/om/wiki/Quick-Start-(om.next)
+    ;; --- DO NOT UPDATE OM, the 1.x.x code requires changes on our part
     [org.omcljs/om "0.9.0" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
     [cljs-http "0.1.40"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/schema "1.1.0"] ; Dependency of om-tools https://github.com/Prismatic/schema
@@ -23,6 +21,7 @@
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
     [com.andrewmcveigh/cljs-time "0.4.0"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     [funcool/cuerdas "0.7.1"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
+    ;; --- DO NOT UPDATE REACT, the 15.x.x code requires changes on our part
     [cljsjs/react "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/raven "2.1.0-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [medley "0.7.4"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
