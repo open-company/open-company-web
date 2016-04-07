@@ -149,10 +149,7 @@
                     :ref "topic-internal"}
         ;; Topic title
         (dom/div {:class "topic-header group"}
-          (dom/img {:class (str "topic-image svg")
-                    :width 30
-                    :height 30
-                    :src (str (:image topic-data) "?" ls/deploy-key)})
+          (dom/div {:class "left"} (i/icon (:icon topic-data)))
           (dom/div {:class "topic-title"} (:title topic-data))
           (dom/div #js {:className "topic-date"
                         :ref "topic-date"
