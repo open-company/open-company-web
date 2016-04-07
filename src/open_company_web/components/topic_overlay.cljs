@@ -168,6 +168,7 @@
 
   (render-state [_ {:keys [has-changes title headline body show-headline-counter show-title-counter]}]
     (let [topic-kw (keyword topic)
+          title-length-limit 20
           js-date-upat (utils/js-date (:updated-at topic-data))
           month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
           topic-updated-at (str month-string " " (.getDate js-date-upat))
@@ -197,12 +198,12 @@
                       :placeholder "Type your title here"
                       :on-focus #(om/set-state! owner :show-title-counter true)
                       :on-blur #(om/set-state! owner :show-title-counter false)
-                      :max-length 100
+                      :max-length title-length-limit
                       :value title
                       :on-change #(change-value owner :title %)})
           (dom/div {:class (utils/class-set {:topic-overlay-edit-title-count true
                                              :transparent (not show-title-counter)})}
-            (dom/label {:class "bold"} (- 100 (count title))) "/100"))
+            (dom/label {:class "bold"} (- title-length-limit (count title))) "/" title-length-limit))
         (dom/div #js {:className "topic-overlay-edit-content"
                       :ref "topic-overlay-edit-content"
                       :style #js {:maxHeight (str max-height "px")}}
