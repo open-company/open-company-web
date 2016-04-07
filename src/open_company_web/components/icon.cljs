@@ -15,6 +15,7 @@
   - :stroke (2px)"
   ([id] (icon id {}))
   ([id {:keys [accent-color size stroke] :as opts}]
+   (assert id "Icon ID is required")
    (let [outline-color "#0f0f0f"
          accent-color  (or accent-color "#007A9D") ; oc-blue from scss/modules/_colors.scss
          stroke        (or stroke 2)
