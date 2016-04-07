@@ -5,23 +5,20 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel sel1)]
-            [open-company-web.router :as router]
-            [open-company-web.dispatcher :as dispatcher]
-            [open-company-web.caches :as caches]
-            [open-company-web.api :as api]
-            [open-company-web.lib.utils :as utils]
-            [open-company-web.components.topic :refer (topic)]
-            [open-company-web.components.topic-overlay :refer (topic-overlay)]
-            [open-company-web.components.topic-list-edit :refer (topic-list-edit)]
-            [open-company-web.components.ui.edit-topic-button :refer (edit-topic-button)]
-            [open-company-web.components.ui.drawer-toggler :refer [drawer-toggler]]
-            [open-company-web.components.ui.side-drawer :refer [side-drawer]]
             [goog.fx.dom :refer (Fade)]
-            [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as AnimationEventType]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
-            [goog.style :refer (getStyle setStyle)]))
+            [goog.style :refer (getStyle setStyle)]
+            [open-company-web.api :as api]
+            [open-company-web.caches :as caches]
+            [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dispatcher]
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.components.topic :refer (topic)]
+            [open-company-web.components.ui.side-drawer :refer [side-drawer]]
+            [open-company-web.components.topic-overlay :refer (topic-overlay)]
+            [open-company-web.components.ui.drawer-toggler :refer [drawer-toggler]]))
 
 (defn get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
@@ -32,9 +29,7 @@
         (api/get-new-sections)))))
 
 (defn save-sections-cb [owner options]
-  (api/patch-sections (dissoc (om/get-state owner :active-topics) :all))
-  ((:navbar-editing-cb options) false)
-  (om/set-state! owner :editing false))
+  (api/patch-sections (dissoc (om/get-state owner :active-topics) :all)))
 
 (defn toggle-edit-topic-button [owner & [section-name]]
   (om/set-state! owner :last-expanded-section section-name)
@@ -81,10 +76,9 @@
 (defn get-state [data current-state]
   (let [company-data (:company-data data)
         categories (:categories company-data)
-        all-categories (if (or (utils/is-mobile) (:editing current-state)) categories (concat ["all"] categories))
+        all-categories (if (utils/is-mobile) categories (concat ["all"] categories))
         active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) all-categories))]
-    {:editing (or (:editing current-state) false)
-     :initial-active-topics active-topics
+    {:initial-active-topics active-topics
      :active-topics active-topics
      :new-sections-requested (or (:new-sections-requested current-state) false)
      :save-bt-active (or (:save-bt-active current-state) false)
@@ -110,7 +104,7 @@
   (om/set-state! owner :selected-topic nil)
   (om/set-state! owner :selected-metric nil))
 
-(defcomponent topic-list [data owner {:keys [navbar-editing-cb] :as options}]
+(defcomponent topic-list [data owner options]
 
   (init-state [_]
     (let [save-ch (chan)
@@ -120,13 +114,13 @@
     (get-state data nil))
 
   (did-mount [_]
+    (when-not (:read-only (:company-data data))
+      (get-new-sections-if-needed owner))
     ; scroll to top when the component is initially mounted to
     ; make sure the calculation for the fixed navbar are correct
     (when-not @scrolled-to-top
       (set! (.-scrollTop (.-body js/document)) 0)
       (reset! scrolled-to-top true))
-    (when-not (:read-only (:company-data data))
-      (get-new-sections-if-needed owner))
     ; save all the changes....
     (let [save-ch (utils/get-channel "save-bt-navbar")]
       (go (while true
@@ -135,9 +129,6 @@
     (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
       (go (while true
         (let [change (<! cancel-ch)]
-          ((:navbar-editing-cb options) false)
-          ; reset editing
-          (om/set-state! owner :editing false)
           ; reset active topics changes
           (om/set-state! owner :active-topics (om/get-state owner :initial-active-topics))))))
     ; set the cards height on big web
@@ -157,62 +148,51 @@
     ; set the cards height on big web
     (set-lis-height owner))
 
-  (render-state [_ {:keys [show-topic-edit-button active-topics editing selected-topic selected-metric drawer-open]}]
+  (render-state [_ {:keys [show-topic-edit-button active-topics selected-topic selected-metric drawer-open]}]
     (let [slug (keyword (:slug @router/path))]
-      (if editing
-        (let [categories (map name (keys active-topics))]
-          (dom/div {:class "topic-list-edit-container"
-                    :key "topic-list-edit-container"}
-            (for [cat categories]
-              (om/build topic-list-edit
-                        (merge data {:active (= cat (:active-category data))
-                                     :category cat
-                                     :active-topics (get active-topics (keyword cat))})
-                        {:key cat
-                         :opts {:active-category (:active-category data)
-                                :new-sections (slug @caches/new-sections)
-                                :did-change-sort (partial update-active-topics owner options (keyword cat))}}))))
-        (let [company-data (:company-data data)
-              active-category (keyword (:active-category data))
-              category-topics (get active-topics active-category)]
-          (dom/div {:class "topic-list fix-top-margin-scrolling"
-                    :key "topic-list"}
-            (when (and (not (:read-only company-data)) (not (utils/is-mobile)) (not (:loading data)))
-              ;; drawer toggler
-              (om/build drawer-toggler {} {:opts {:click-cb #(om/update-state! owner :drawer-open not)}}))
-            (when (and (not (:read-only company-data)) (not (utils/is-mobile)) (not (:loading data)))
-              ;; side drawer
-              (om/build side-drawer (merge data {:open drawer-open
-                                                 :active true
-                                                 :new-sections (slug @caches/new-sections)
-                                                 :category active-category
-                                                 :active-topics category-topics}
-                                                {:opts {:did-change-sort #(println "did-change-sort")}})))
-            (when selected-topic
-              (om/build topic-overlay {:section selected-topic
-                                       :section-data (->> selected-topic keyword (get company-data))
-                                       :selected-metric selected-metric
-                                       :currency (:currency company-data)}
-                                      {:opts {:close-overlay-cb #(close-overlay-cb owner)
-                                              :topic-edit-cb (:topic-edit-cb options)}}))
-            (dom/ul #js {:className (utils/class-set {:topic-list-internal true
-                                                      :read-only (or (utils/is-mobile) (:read-only company-data))
-                                                      :group true
-                                                      :content-loaded (not (:loading data))})
-                         :ref "topic-list-ul"}
-              (for [section-name category-topics
-                    :let [sd (->> section-name keyword (get company-data))]]
-                (dom/li #js {:className "topic-row"
-                             :ref section-name
-                             :key (str "topic-row-" (name section-name))}
-                  (when-not (and (:read-only company-data) (:placeholder sd))
-                    (om/build topic {:loading (:loading company-data)
-                                     :section section-name
-                                     :section-data sd
-                                     :currency (:currency company-data)
-                                     :active-category active-category}
-                                     {:opts {:section-name section-name
-                                             :navbar-editing-cb navbar-editing-cb
-                                             :force-edit-cb (partial force-edit-button owner)
-                                             :toggle-edit-topic-cb (partial toggle-edit-topic-button owner)
-                                             :bw-topic-click (partial topic-click owner)}})))))))))))
+      (let [company-data (:company-data data)
+            active-category (keyword (:active-category data))
+            category-topics (get active-topics active-category)]
+        (dom/div {:class "topic-list fix-top-margin-scrolling"
+                  :key "topic-list"}
+          (when (and (not (:read-only company-data)) (not (utils/is-mobile)) (not (:loading data)))
+            ;; drawer toggler
+            (om/build drawer-toggler {} {:opts {:click-cb #(om/update-state! owner :drawer-open not)}}))
+          (when-not (or (:read-only company-data)
+                        (utils/is-mobile)
+                        (:loading data))
+            ;; side drawer
+            (let [list-data (merge data {:active true
+                                         :new-sections (slug @caches/new-sections)
+                                         :category active-category
+                                         :active-topics category-topics})
+                  list-opts {:did-change-sort #(println "did-change-sort")}]
+              (om/build side-drawer {:open drawer-open
+                                     :list-key active-category
+                                     :list-data list-data}
+                                    {:opts {:list-opts list-opts}})))
+          (when selected-topic
+            (om/build topic-overlay {:section selected-topic
+                                     :section-data (->> selected-topic keyword (get company-data))
+                                     :selected-metric selected-metric
+                                     :currency (:currency company-data)}
+                                    {:opts {:close-overlay-cb #(close-overlay-cb owner)
+                                            :topic-edit-cb (:topic-edit-cb options)}}))
+          (dom/ul #js {:className (utils/class-set {:topic-list-internal true
+                                                    :read-only (or (utils/is-mobile) (:read-only company-data))
+                                                    :group true
+                                                    :content-loaded (not (:loading data))})
+                       :ref "topic-list-ul"}
+            (for [section-name category-topics
+                  :let [sd (->> section-name keyword (get company-data))]]
+              (dom/li #js {:className "topic-row"
+                           :ref section-name
+                           :key (str "topic-row-" (name section-name))}
+                (when-not (and (:read-only company-data) (:placeholder sd))
+                  (om/build topic {:loading (:loading company-data)
+                                   :section section-name
+                                   :section-data sd
+                                   :currency (:currency company-data)
+                                   :active-category active-category}
+                                   {:opts {:section-name section-name
+                                           :bw-topic-click (partial topic-click owner)}}))))))))))
