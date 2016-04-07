@@ -238,18 +238,26 @@
                                          sections))]
       (patch-sections new-sections))))
 
-(defn get-new-sections []
-  (let [slug (keyword (:slug @router/path))
-        company-data (slug @dispatcher/app-state)
-        links (:links company-data)
-        add-section-link (utils/link-for links "section-list" "GET")]
-    (when add-section-link
-      (api-get (:href add-section-link)
-        { :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (:type add-section-link)}}
-        (fn [response]
-          (let [body (if (:success response) (json->cljs (:body response)) {})]
-            (dispatcher/dispatch! [:new-section {:response body :slug slug}])))))))
+(def new-sections-requested (atom false))
+
+(defn get-new-sections [& [force-load]]
+  "Load new sections, avoid to start multiple request or reload it if it's already loading or loaded.
+   It's possible to force the load passing an optional boolean parameter."
+  (when (or force-load (not @new-sections-requested))
+    (reset! new-sections-requested true)
+    (let [slug (keyword (:slug @router/path))
+          company-data (slug @dispatcher/app-state)
+          links (:links company-data)
+          add-section-link (utils/link-for links "section-list" "GET")]
+      (when add-section-link
+        (api-get (:href add-section-link)
+          { :headers {
+              ; required by Chrome
+              "Access-Control-Allow-Headers" "Content-Type"
+              ; custom content type
+              "content-type" (:type add-section-link)}}
+          (fn [{:keys [success body]}]
+            (when (not success)
+              (reset! new-sections-requested false))
+            (let [fixed-body (if success (json->cljs body) {})]
+              (dispatcher/dispatch! [:new-section {:response fixed-body :slug slug}]))))))))
