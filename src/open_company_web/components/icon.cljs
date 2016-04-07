@@ -1,5 +1,6 @@
 (ns open-company-web.components.icon
   (:require [om-tools.dom :as dom]
+            [open-company-web.lib.oc-colors :as occ]
             [open-company-web.local-settings :as ls]))
 
 (defn icon
@@ -16,8 +17,8 @@
   ([id] (icon id {}))
   ([id {:keys [accent-color size stroke] :as opts}]
    (assert id "Icon ID is required")
-   (let [outline-color "#0f0f0f"
-         accent-color  (or accent-color "#007A9D") ; oc-blue from scss/modules/_colors.scss
+   (let [outline-color (occ/get-color-by-kw :black)
+         accent-color  (or accent-color (occ/get-color-by-kw :blue))
          stroke        (or stroke 2)
          size          (or size 30)]
      (dom/svg {:viewBox "0 0 16 16" :width (str size "px") :height (str size "px")
