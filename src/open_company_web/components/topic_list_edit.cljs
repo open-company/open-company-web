@@ -1,6 +1,6 @@
 (ns open-company-web.components.topic-list-edit
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [open-company-web.api :as api]
@@ -73,8 +73,7 @@
     (did-change-active-topics new-active-topics)))
 
 (defn get-state [{:keys [active-topics all-topics]} old-state]
-  (let [all-topics-map (get-topics-data all-topics)
-        topics-list (map name (keys all-topics-map))
+  (let [topics-list (map name (keys all-topics))
         unactive-topics (reduce utils/vec-dissoc topics-list active-topics)]
     {:initial-active-topics active-topics
      :active-topics active-topics
@@ -113,30 +112,29 @@
     (let [slug (keyword (:slug @router/path))]
       (if (empty? (slug @caches/new-sections))
         (dom/h2 {} "Loading sections...")
-        (let [items (get-topics-data all-topics)]
-          (dom/div {:class "topic-list-edit group no-select"
-                    :style #js {:display (if (:active data) "inline" "none")}}
-            (dom/div {}
-              (dom/ul #js {:className "topic-list-sortable"
-                           :ref "topic-list-sortable"
-                           :key (apply str active-topics)}
-                (for [item-name active-topics]
-                  (dom/li #js {:data-itemname item-name
-                               :className "topic-list-edit-li topic-active"
-                               :key (str "active-" item-name)
-                               :onClick #(topic-on-click item-name owner (:did-change-active-topics options))}
-                    (om/build item {:id item-name
-                                    :item-data (get items (keyword item-name))
-                                    :active-topics active-topics})))))
-            (dom/div {:class "topic-list-separator"})
-            (dom/div {}
-              (dom/ul #js {:className "topic-list-unactive"
-                           :key (apply str active-topics)}
-                (for [item-name unactive-topics]
-                  (dom/li #js {:data-itemname item-name
-                               :key (str "unactive-" item-name)
-                               :className "topic-list-edit-li topic-unactive"
-                               :onClick #(topic-on-click item-name owner (:did-change-active-topics options))}
-                    (om/build item {:id item-name
-                                    :item-data (get items (keyword item-name))
-                                    :active-topics active-topics})))))))))))
+        (dom/div {:class "topic-list-edit group no-select"
+                  :style #js {:display (if (:active data) "inline" "none")}}
+          (dom/div {}
+            (dom/ul #js {:className "topic-list-sortable"
+                         :ref "topic-list-sortable"
+                         :key (apply str active-topics)}
+              (for [item-name active-topics]
+                (dom/li #js {:data-itemname item-name
+                             :className "topic-list-edit-li topic-active"
+                             :key (str "active-" item-name)
+                             :onClick #(topic-on-click item-name owner (:did-change-active-topics options))}
+                  (om/build item {:id item-name
+                                  :item-data (get all-topics (keyword item-name))
+                                  :active-topics active-topics})))))
+          (dom/div {:class "topic-list-separator"})
+          (dom/div {}
+            (dom/ul #js {:className "topic-list-unactive"
+                         :key (apply str active-topics)}
+              (for [item-name unactive-topics]
+                (dom/li #js {:data-itemname item-name
+                             :key (str "unactive-" item-name)
+                             :className "topic-list-edit-li topic-unactive"
+                             :onClick #(topic-on-click item-name owner (:did-change-active-topics options))}
+                  (om/build item {:id item-name
+                                  :item-data (get all-topics (keyword item-name))
+                                  :active-topics active-topics}))))))))))
