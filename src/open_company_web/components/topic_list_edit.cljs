@@ -14,19 +14,19 @@
 
 (defcomponent item [data owner options]
   (render [_]
-    (let [section (:id data)
-          section-data (:item-data data)
+    (let [topic (:id data)
+          topic-data (:item-data data)
           active-topics (:active-topics data)
-          active (utils/in? active-topics section)
-          section-name (or (:name section-data) (utils/camel-case-str section))
-          section-title (or (:title section-data) section-name)
-          section-description (or (:description section-data) "")]
+          active (utils/in? active-topics topic)
+          topic-name (or (:name topic-data) (utils/camel-case-str topic))
+          topic-title (or (:title topic-data) topic-name)
+          topic-description (or (:description topic-data) "")]
       (dom/div {:class (utils/class-set {:topic-edit true
                                          :group true
                                          :topic-sortable true
-                                         (str "topic-" section) true
+                                         (str "topic-" topic) true
                                          :active active})
-                :key (str "topic-edit-" section-name)}
+                :key (str "topic-edit-" topic-name)}
         (dom/div {:class "topic-edit-internal group"}
           (dom/div {:class "right"
                     :style {:margin "13px 10px 0 0"}}
@@ -35,15 +35,15 @@
                                              :topic-edit-handle active
                                              :group true})})
           (dom/div {:class "topic-edit-labels"}
-            (dom/h3 {:class "topic-title oc-header"} section-title)
-            (dom/label {:class "topic-description"} section-description)))))))
+            (dom/h3 {:class "topic-title oc-header"} topic-title)
+            (dom/label {:class "topic-description"} topic-description)))))))
 
-(defn get-sections-data [category-sections]
+(defn get-topics-data [category-topics]
   (apply merge
-         (map (fn [section-data]
-                (let [section-name (:section-name section-data)]
-                  (hash-map (keyword section-name) section-data)))
-              category-sections)))
+         (map (fn [topic-data]
+                (let [topic-name (:section-name topic-data)]
+                  (hash-map (keyword topic-name) topic-data)))
+              category-topics)))
 
 (defn setup-sortable [owner options]
   (when (and (om/get-state owner :did-mount)
@@ -72,20 +72,17 @@
     (om/set-state! owner :unactive-topics (vec new-unactive-topics))
     (did-change-active-topics new-active-topics)))
 
-(defn get-state [data old-state]
-  (let [active-topics (:active-topics data)
-        category (name (:category data))
-        all-sections (:new-sections data)
-        category-sections (:sections (first (filter #(= (:name %) category) (:categories all-sections))))
-        sections-list (vec (map :section-name category-sections))
-        unactive-topics (reduce utils/vec-dissoc sections-list active-topics)]
+(defn get-state [{:keys [active-topics all-topics]} old-state]
+  (let [all-topics-map (get-topics-data all-topics)
+        topics-list (map name (keys all-topics-map))
+        unactive-topics (reduce utils/vec-dissoc topics-list active-topics)]
     {:initial-active-topics active-topics
      :active-topics active-topics
-     :unactive-topics unactive-topics
+     :unactive-topics (map name unactive-topics)
      :sortable-loaded (or (:sortable-loaded old-state) false)
      :did-mount (or (:did-mount old-state) false)}))
 
-(defcomponent topic-list-edit [data owner options]
+(defcomponent topic-list-edit [{:keys [all-topics active-topics] :as data} owner options]
 
   (init-state [_]
     (cdr/add-script! "/lib/Sortable.js/Sortable.js"
@@ -115,11 +112,8 @@
   (render-state [_ {:keys [unactive-topics active-topics]}]
     (let [slug (keyword (:slug @router/path))]
       (if (empty? (slug @caches/new-sections))
-        (dom/h2 {:style #js {:display (if (:active data) "inline" "none")}} "Loading sections...")
-        (let [current-category (name (:category data))
-              all-sections (:new-sections data)
-              category-sections (:sections (first (filter #(= (:name %) current-category) (:categories all-sections))))
-              items (get-sections-data category-sections)]
+        (dom/h2 {} "Loading sections...")
+        (let [items (get-topics-data all-topics)]
           (dom/div {:class "topic-list-edit group no-select"
                     :style #js {:display (if (:active data) "inline" "none")}}
             (dom/div {}
