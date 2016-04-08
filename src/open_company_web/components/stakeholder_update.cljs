@@ -2,13 +2,17 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.local-settings :as ls]
-            [open-company-web.components.navbar :refer (navbar)]
-            [open-company-web.components.company-header :refer [company-header]]
-            [open-company-web.components.topic-body :refer (topic-body)]
-            [open-company-web.components.ui.link :refer (link)]
             [open-company-web.router :as router]
+            [open-company-web.local-settings :as ls]
+            [open-company-web.api :as api]
+            [open-company-web.caches :as caches]
+            [open-company-web.components.navbar :refer (navbar)]
+            [open-company-web.components.topic-body :refer (topic-body)]
+            [open-company-web.components.company-header :refer [company-header]]
             [open-company-web.components.section-selector :refer (section-selector)]
+            [open-company-web.components.ui.link :refer (link)]
+            [open-company-web.components.ui.side-drawer :refer (side-drawer)]
+            [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]
             [clojure.string :as str]
             [open-company-web.lib.utils :as utils]))
 
@@ -67,10 +71,19 @@
           (dom/div {:class "topic-body"}
             (dom/div {:class "topic-body-inner group"} body)))))))
 
+(defn save-stakeholder-update [old-stakeholder-update active-topics]
+  (let [new-stakeholder-update (assoc old-stakeholder-update :sections (vec active-topics))]
+    (api/patch-stakeholder-update new-stakeholder-update)))
+
 (defcomponent stakeholder-update [data owner]
-  (render [_]
+
+  (init-state [_]
+    {:drawer-open false})
+
+  (render-state [_ {:keys [drawer-open]}]
     (let [slug (keyword (:slug @router/path))
-          company-data (get data slug)]
+          company-data (get data slug)
+          stakeholder-update-data (:stakeholder-update company-data)]
 
       (utils/update-page-title (str "OpenCompany - " (:name company-data)))
 
@@ -88,6 +101,27 @@
           ;; Company / user header
           (when-not (utils/is-mobile)
             (om/build navbar data))
+
+          (dom/div {:class "stakeholder-update-drawer"}
+            (when (and (not (:read-only company-data))
+                       (not (utils/is-mobile))
+                       (not (:loading data)))
+              ;; drawer toggler
+              (om/build drawer-toggler {} {:opts {:click-cb #(om/update-state! owner :drawer-open not)}}))
+            (when-not (or (:read-only company-data)
+                          (utils/is-mobile)
+                          (:loading data)))
+            ;; side drawer
+            (let [all-sections (vec (flatten (vals (:sections company-data))))
+                  all-section-keys (map keyword all-sections)
+                  list-data (merge data {:active true
+                                         :all-topics (select-keys company-data all-section-keys)
+                                         :active-topics (:sections stakeholder-update-data)})
+                  list-opts {:did-change-active-topics (partial save-stakeholder-update stakeholder-update-data)}]
+              (om/build side-drawer {:open drawer-open
+                                     :list-key "su-update"
+                                     :list-data list-data}
+                                    {:opts {:list-opts list-opts}})))
             
           ;; Company header
           (om/build company-header {
@@ -99,7 +133,7 @@
           
             (dom/div {:class "sections col-md-9 col-sm-12"}
               ;; Stakeholder update intro
-              (om/build stakeholder-update-intro (:stakeholder-update company-data))
+              (om/build stakeholder-update-intro stakeholder-update-data)
               ;; Stakeholder update topics
               (om/build selected-topics company-data)
               ;; Dashboard link
