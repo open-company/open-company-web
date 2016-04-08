@@ -21,9 +21,10 @@
          accent-color  (or accent-color (occ/get-color-by-kw :blue))
          stroke        (or stroke 2)
          size          (or size 30)]
-     (dom/svg {:viewBox "0 0 16 16" :width (str size "px") :height (str size "px")
-               :style {:color accent-color :stroke outline-color :strokeWidth (str stroke "px")}
-               ;; use tag isn't supported by react 0.14.7 and 0.14.8 isn't on cljsjs
-               ;; Also their changelog doesn't mention it at all so I'm not sure if .8 would work
-               :dangerouslySetInnerHTML {:__html (str "<use xlink:href=/img/oc-icons.svg?" ls/deploy-key
-                                                      "#nc-icon-" (name id) ">")}}))))
+     (dom/div {:class "svg-icon"}
+       (dom/svg {:viewBox "0 0 16 16" :width (str size "px") :height (str size "px")
+                 :style {:color accent-color :stroke outline-color :strokeWidth (str stroke "px")}
+                 ;; use tag isn't supported by react 0.14.7 and 0.14.8 isn't on cljsjs
+                 ;; Also their changelog doesn't mention it at all so I'm not sure if .8 would work
+                 :dangerouslySetInnerHTML {:__html (str "<use xlink:href=/img/oc-icons.svg?" ls/deploy-key
+                                                        "#nc-icon-" (name id) ">")}})))))
