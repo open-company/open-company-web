@@ -97,7 +97,7 @@
                                   body-nav-node
                                   (new js/Array body-width (if expanded (+ body-height 20) 0))
                                   (new js/Array body-width (if expanded 0 (+ body-height 20)))
-                                  utils/oc-animation-duration)]
+                                  (* 0.8 utils/oc-animation-duration))]
         (doto height-animation
           (events/listen
            EventType/FINISH
