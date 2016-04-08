@@ -19,6 +19,7 @@
           active-topics (:active-topics data)
           active (utils/in? active-topics topic)
           topic-name (or (:name topic-data) (utils/camel-case-str topic))
+          topic-icon (:icon topic-data)
           topic-title (or (:title topic-data) topic-name)
           topic-description (or (:description topic-data) "")]
       (dom/div {:class (utils/class-set {:topic-edit true
@@ -34,16 +35,11 @@
           (dom/div {:class (utils/class-set {:topic-edit-handle-placeholder (not active)
                                              :topic-edit-handle active
                                              :group true})})
+          (when-not (clojure.string/blank? topic-icon)
+            (i/icon topic-icon))
           (dom/div {:class "topic-edit-labels"}
             (dom/h3 {:class "topic-title oc-header"} topic-title)
             (dom/label {:class "topic-description"} topic-description)))))))
-
-(defn get-topics-data [category-topics]
-  (apply merge
-         (map (fn [topic-data]
-                (let [topic-name (:section-name topic-data)]
-                  (hash-map (keyword topic-name) topic-data)))
-              category-topics)))
 
 (defn setup-sortable [owner options]
   (when (and (om/get-state owner :did-mount)
@@ -58,7 +54,8 @@
                                                    (om/set-state! owner :active-topics active-items)
                                                    ((:did-change-active-topics options) active-items)))}))))
 
-(defn topic-on-click [item-name owner did-change-active-topics]
+(defn topic-on-click [item-name owner did-change-active-topics e]
+  (.stopPropagation e)
   (let [active-topics (om/get-state owner :active-topics)
         unactive-topics (om/get-state owner :unactive-topics)
         is-active (utils/in? active-topics item-name)
@@ -72,16 +69,15 @@
     (om/set-state! owner :unactive-topics (vec new-unactive-topics))
     (did-change-active-topics new-active-topics)))
 
-(defn get-state [{:keys [active-topics all-topics]} old-state]
+(defn get-state [{:keys [active-topics-list all-topics]} old-state]
   (let [topics-list (map name (keys all-topics))
-        unactive-topics (reduce utils/vec-dissoc topics-list active-topics)]
-    {:initial-active-topics active-topics
-     :active-topics active-topics
+        unactive-topics (reduce utils/vec-dissoc topics-list active-topics-list)]
+    {:active-topics active-topics-list
      :unactive-topics (map name unactive-topics)
      :sortable-loaded (or (:sortable-loaded old-state) false)
      :did-mount (or (:did-mount old-state) false)}))
 
-(defcomponent topic-list-edit [{:keys [all-topics active-topics] :as data} owner options]
+(defcomponent topic-list-edit [{:keys [all-topics active-topics-list] :as data} owner options]
 
   (init-state [_]
     (cdr/add-script! "/lib/Sortable.js/Sortable.js"
@@ -122,7 +118,7 @@
                 (dom/li #js {:data-itemname item-name
                              :className "topic-list-edit-li topic-active"
                              :key (str "active-" item-name)
-                             :onClick #(topic-on-click item-name owner (:did-change-active-topics options))}
+                             :onClick #(topic-on-click item-name owner (:did-change-active-topics options) %)}
                   (om/build item {:id item-name
                                   :item-data (get all-topics (keyword item-name))
                                   :active-topics active-topics})))))
@@ -134,7 +130,7 @@
                 (dom/li #js {:data-itemname item-name
                              :key (str "unactive-" item-name)
                              :className "topic-list-edit-li topic-unactive"
-                             :onClick #(topic-on-click item-name owner (:did-change-active-topics options))}
+                             :onClick #(topic-on-click item-name owner (:did-change-active-topics options) %)}
                   (om/build item {:id item-name
                                   :item-data (get all-topics (keyword item-name))
                                   :active-topics active-topics}))))))))))
