@@ -3,7 +3,7 @@ $drawer_width: 400px;
 div.side-drawer {
   content: "";
   width: $drawer_width;
-  height: 100%;
+  min-height: 400px;
   position: absolute;
   z-index: 1033;
   background-color: white;
