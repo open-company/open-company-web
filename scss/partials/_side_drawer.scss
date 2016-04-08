@@ -1,17 +1,15 @@
 $drawer_width: 400px;
 
-div.side-drawer {
-  content: "";
-  width: $drawer_width;
-  min-height: 400px;
-  position: absolute;
-  z-index: 1033;
-  background-color: white;
-  border: 1px solid $oc_gray_2;
+div.side-drawer-container {
+  position: fixed;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
   opacity: 0;
   @include animation(0s, 0s, closeDrawer);
+  z-index: 1033;
 
   &.open-drawer {
     @include animation(0s, 1s, openDrawer);
@@ -24,9 +22,9 @@ div.side-drawer {
   @include keyframe(openDrawer){
     from {
       opacity: 0;
-      -webkit-transform: translate(- $drawer_width, 0);
-      -moz-transform: translate(- $drawer_width, 0);
-      transform: translate(- $drawer_width, 0);
+      -webkit-transform: translate(-100%, 0);
+      -moz-transform: translate(-100%, 0);
+      transform: translate(-100%, 0);
     }
     to { 
       opacity: 1;
@@ -45,15 +43,26 @@ div.side-drawer {
     }
     to {
       opacity: 0;
-      -webkit-transform: translate(- $drawer_width, 0);
-      -moz-transform: translate(- $drawer_width, 0);
-      transform: translate(- $drawer_width, 0);
+      -webkit-transform: translate(-100%, 0);
+      -moz-transform: translate(-100%, 0);
+      transform: translate(-100%, 0);
     }
   }
 
-  div.side-drawer-internal {
-    margin-top: 35px;
-    height: calc(100% - 45px);
-    overflow-y: scroll;
+  div.side-drawer {
+    content: "";
+    width: $drawer_width;
+    height: calc(100% - 50px);
+    position: absolute;
+    background-color: white;
+    border: 1px solid $oc_gray_2;
+    top: 50px;
+    left: 0;
+
+    div.side-drawer-internal {
+      margin-left: 35px;
+      height: calc(100% - 10px);
+      overflow-y: scroll;
+    }
   }
 }
