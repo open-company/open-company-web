@@ -5,10 +5,11 @@
             [dommy.core :as dommy]
             [open-company-web.components.icon :refer (icon)]))
 
-(defn rotate [owner options & [is-extern]]
-  (when (and (not is-extern)
-             (contains? options :click-cb))
-    ((:click-cb options)))
+(defn rotate [owner & [from-extern]]
+  (let [props (om/get-props owner)]
+    (when (and (not from-extern)
+               (contains? props :click-cb))
+      ((:click-cb props))))
   (when-let [drawer (om/get-ref owner "drawer-toggler")]
     (if (dommy/has-class? drawer :rotate45)
       (do
@@ -23,10 +24,10 @@
   (will-receive-props [_ next-props]
     (when (and (not= (:close data) (:close next-props))
                (:close next-props))
-      (rotate owner options true)))
+      (rotate owner true)))
 
   (render [_]
     (dom/div #js {:className "drawer-toggler"
                   :ref "drawer-toggler"}
       (dom/button #js {:className "drawer-toggler-bt"
-                       :onClick #(rotate owner options)} (icon :circle-remove {:size 24})))))
+                       :onClick #(rotate owner)} (icon :circle-remove {:size 24})))))
