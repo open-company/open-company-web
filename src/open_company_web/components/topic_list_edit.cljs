@@ -50,7 +50,9 @@
              (om/get-state owner :sortable-loaded))
     (when-let [ul-node (om/get-ref owner "topic-list-sortable")]
       (.create js/Sortable ul-node #js {:handle ".topic-edit-handle"
+                                        :onStart #(dommy/add-class! ul-node :dragging)
                                         :onEnd (fn [_]
+                                                 (dommy/remove-class! ul-node :dragging)
                                                  (let [li-active-elements (sel ul-node [:li.topic-active])
                                                        active-items (vec (map #(aget (.-dataset %) "itemname") li-active-elements))]
                                                    (om/set-state! owner :active-topics active-items)
