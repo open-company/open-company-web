@@ -4,12 +4,8 @@
             [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
-            [dommy.core :refer-macros (sel sel1)]
-            [goog.fx.dom :refer (Fade)]
-            [goog.fx.Animation.EventType :as AnimationEventType]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
-            [goog.style :refer (getStyle setStyle)]
+            [dommy.core :refer-macros (sel)]
+            [goog.style :refer (setStyle)]
             [open-company-web.api :as api]
             [open-company-web.caches :as caches]
             [open-company-web.router :as router]
@@ -28,39 +24,6 @@
         (om/update-state! owner :new-sections-requested not)
         (api/get-new-sections)))))
 
-(defn save-sections-cb [owner options]
-  (api/patch-sections (dissoc (om/get-state owner :active-topics) :all)))
-
-(defn toggle-edit-topic-button [owner & [section-name]]
-  (om/set-state! owner :last-expanded-section section-name)
-  ; avoid to do animate if it's not needed
-  (when-let [edit-topic-button (om/get-ref owner "edit-topic-button")]
-    (let [is-showing (om/get-state owner :show-topic-edit-button)
-          current-display (getStyle edit-topic-button "display")]
-      (when-not is-showing
-        ; reset display rule if going to show
-        (setStyle edit-topic-button "display" "inline"))
-      (let [start (if (= current-display "none") 0 1)
-            end   (if (= current-display "none") 1 0)
-            fade-anim (new Fade
-                          edit-topic-button
-                          start
-                          end
-                          utils/oc-animation-duration)]
-        (doto fade-anim
-          (events/listen
-            AnimationEventType/FINISH
-            (fn [_]
-              (om/update-state! owner :show-topic-edit-button not)))
-          (.play))))))
-
-(defn force-edit-button [owner show & [section-name]]
-  (let [showing (om/get-state owner :show-topic-edit-button)]
-    (if (= show showing)
-      (when section-name
-        (om/set-state! owner :last-expanded-section section-name))
-      (toggle-edit-topic-button owner section-name))))
-
 (defn get-active-topics [company-data category]
   (if (= category "all")
     (apply concat (vals (:sections company-data)))
@@ -69,9 +32,7 @@
 (defn update-active-topics [owner options category new-active-topics]
   (let [old-active-categories (om/get-state owner :active-topics)
         new-active-categories (assoc old-active-categories category new-active-topics)]
-    (om/set-state! owner :active-topics new-active-categories)
-    ; enable/disable save button
-    ((:save-bt-active-cb options) (not= new-active-categories (om/get-state owner :initial-active-topics)))))
+    (api/patch-sections (dissoc new-active-categories :all))))
 
 (defn get-state [data current-state]
   (let [company-data (:company-data data)
@@ -107,10 +68,6 @@
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
-    (let [save-ch (chan)
-          cancel-ch (chan)]
-      (utils/add-channel "save-bt-navbar" save-ch)
-      (utils/add-channel "cancel-bt-navbar" cancel-ch))
     (get-state data nil))
 
   (did-mount [_]
@@ -121,22 +78,8 @@
     (when-not @scrolled-to-top
       (set! (.-scrollTop (.-body js/document)) 0)
       (reset! scrolled-to-top true))
-    ; save all the changes....
-    (let [save-ch (utils/get-channel "save-bt-navbar")]
-      (go (while true
-        (let [change (<! save-ch)]
-          (save-sections-cb owner options)))))
-    (let [cancel-ch (utils/get-channel "cancel-bt-navbar")]
-      (go (while true
-        (let [change (<! cancel-ch)]
-          ; reset active topics changes
-          (om/set-state! owner :active-topics (om/get-state owner :initial-active-topics))))))
     ; set the cards height on big web
     (set-lis-height owner))
-
-  (will-unmount [_]
-    (utils/remove-channel "save-bt-navbar")
-    (utils/remove-channel "cancel-bt-navbar"))
 
   (will-receive-props [_ next-props]
     (when-not (= (:company-data next-props) (:company-data data))
@@ -166,7 +109,7 @@
                                          :new-sections (slug @caches/new-sections)
                                          :category active-category
                                          :active-topics category-topics})
-                  list-opts {:did-change-sort #(println "did-change-sort")}]
+                  list-opts {:did-change-active-topics #(update-active-topics owner options active-category %)}]
               (om/build side-drawer {:open drawer-open
                                      :list-key active-category
                                      :list-data list-data}
