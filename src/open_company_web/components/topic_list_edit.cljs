@@ -15,6 +15,7 @@
 (defcomponent item [data owner options]
   (render [_]
     (let [topic (:id data)
+          transition? (:transition data)
           topic-data (:item-data data)
           active-topics (:active-topics data)
           active (utils/in? active-topics topic)
@@ -56,24 +57,33 @@
 
 (defn topic-on-click [item-name owner did-change-active-topics e]
   (.stopPropagation e)
-  (let [active-topics (om/get-state owner :active-topics)
-        unactive-topics (om/get-state owner :unactive-topics)
-        is-active (utils/in? active-topics item-name)
-        new-active-topics (if is-active
-                            (utils/vec-dissoc active-topics item-name)
-                            (concat active-topics [item-name]))
-        new-unactive-topics (if is-active
-                              (concat unactive-topics [item-name])
-                              (utils/vec-dissoc unactive-topics item-name))]
-    (om/set-state! owner :active-topics (vec new-active-topics))
-    (om/set-state! owner :unactive-topics (vec new-unactive-topics))
-    (did-change-active-topics new-active-topics)))
+  (when-not (om/get-state owner :transition-topic)
+    (om/set-state! owner :transition-topic item-name)))
+
+(defn transition-topic-finish [owner did-change-active-topics]
+  (let [current-state (om/get-state owner)
+        item-name (:transition-topic current-state)]
+    (when item-name
+      (let [active-topics (om/get-state owner :active-topics)
+            unactive-topics (om/get-state owner :unactive-topics)
+            is-active (utils/in? active-topics item-name)
+            new-active-topics (if is-active
+                                (utils/vec-dissoc active-topics item-name)
+                                (conj active-topics item-name))
+            new-unactive-topics (if is-active
+                                  (concat [item-name] unactive-topics)
+                                  (utils/vec-dissoc unactive-topics item-name))]
+    (om/set-state! owner (merge current-state {:active-topics (vec new-active-topics)
+                                               :unactive-topics (vec new-unactive-topics)
+                                               :transition-topic nil}))
+    (did-change-active-topics new-active-topics)))))
 
 (defn get-state [{:keys [active-topics-list all-topics]} old-state]
   (let [topics-list (map name (keys all-topics))
-        unactive-topics (reduce utils/vec-dissoc topics-list active-topics-list)]
+        unactive-topics (map name (reduce utils/vec-dissoc topics-list active-topics-list))
+        unactive-equal? (= (set unactive-topics) (set (:unactive-topics old-state)))]
     {:active-topics active-topics-list
-     :unactive-topics (map name unactive-topics)
+     :unactive-topics (if unactive-equal? (:unactive-topics old-state) unactive-topics)
      :sortable-loaded (or (:sortable-loaded old-state) false)
      :did-mount (or (:did-mount old-state) false)}))
 
@@ -97,14 +107,16 @@
     ; make sure the new-sections has been loaded and the data are available
     (when (empty? @caches/new-sections)
       (api/get-new-sections))
-    (setup-sortable owner options))
+    (setup-sortable owner options)
+    (when (om/get-state owner :transition-topic)
+      (js/setTimeout #(transition-topic-finish owner (:did-change-active-topics options)) 250)))
 
   (will-receive-props [_ next-props]
     (when-not (= next-props data)
       (om/set-state! owner (get-state next-props (om/get-state owner))))
     (setup-sortable owner options))
 
-  (render-state [_ {:keys [unactive-topics active-topics]}]
+  (render-state [_ {:keys [unactive-topics active-topics transition-topic]}]
     (let [slug (keyword (:slug @router/path))]
       (if (empty? (slug @caches/new-sections))
         (dom/h2 {} "Loading sections...")
@@ -115,22 +127,47 @@
                          :ref "topic-list-sortable"
                          :key (apply str active-topics)}
               (for [item-name active-topics]
-                (dom/li #js {:data-itemname item-name
-                             :className "topic-list-edit-li topic-active"
-                             :key (str "active-" item-name)
-                             :onClick #(topic-on-click item-name owner (:did-change-active-topics options) %)}
-                  (om/build item {:id item-name
-                                  :item-data (get all-topics (keyword item-name))
-                                  :active-topics active-topics})))))
-          (dom/div {:class "topic-list-separator"})
+                (when (not= transition-topic item-name)
+                  (dom/li #js {:data-itemname item-name
+                               :className (utils/class-set {:topic-list-edit-li true
+                                                            :topic-active true
+                                                            :tt-collapse (= item-name transition-topic)})
+                               :key (str "active-" item-name)
+                               :onClick #(topic-on-click item-name owner (:did-change-active-topics options) %)}
+                    (om/build item {:id item-name
+                                    :item-data (get all-topics (keyword item-name))
+                                    :active-topics active-topics}))))
+              (when (and transition-topic
+                         (not (utils/in? active-topics transition-topic)))
+                (dom/li #js {:data-itemname transition-topic
+                             :key (str "active-" transition-topic)
+                             :className "topic-list-edit-li topic-active tt-expand"}
+                  (om/build item {:id transition-topic
+                                  :transition true
+                                  :item-data (get all-topics (keyword transition-topic))
+                                  :active-topics (conj active-topics transition-topic)}))))
+          (when (seq unactive-topics)
+            (dom/div {:class "topic-list-separator"}))
           (dom/div {}
             (dom/ul #js {:className "topic-list-unactive"
-                         :key (apply str active-topics)}
+                         :key (apply str unactive-topics)}
+              (when (and transition-topic
+                         (not (utils/in? unactive-topics transition-topic)))
+                (dom/li #js {:data-itemname transition-topic
+                             :key (str "unactive-" transition-topic)
+                             :className "topic-list-edit-li topic-unactive tt-expand"}
+                  (om/build item {:id transition-topic
+                                  :transition true
+                                  :item-data (get all-topics (keyword transition-topic))
+                                  :active-topics (utils/vec-dissoc active-topics transition-topic)})))
               (for [item-name unactive-topics]
-                (dom/li #js {:data-itemname item-name
-                             :key (str "unactive-" item-name)
-                             :className "topic-list-edit-li topic-unactive"
-                             :onClick #(topic-on-click item-name owner (:did-change-active-topics options) %)}
-                  (om/build item {:id item-name
-                                  :item-data (get all-topics (keyword item-name))
-                                  :active-topics active-topics}))))))))))
+                (when (not= transition-topic item-name)
+                  (dom/li #js {:data-itemname item-name
+                               :key (str "unactive-" item-name)
+                               :className (utils/class-set {:topic-list-edit-li true
+                                                            :topic-unactive true
+                                                            :tt-collapse (= item-name transition-topic)})
+                               :onClick #(topic-on-click item-name owner (:did-change-active-topics options) %)}
+                    (om/build item {:id item-name
+                                    :item-data (get all-topics (keyword item-name))
+                                    :active-topics active-topics}))))))))))))
