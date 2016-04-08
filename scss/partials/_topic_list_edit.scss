@@ -37,6 +37,15 @@ div.topic-list-edit{
   li.topic-list-edit-li {
     border-bottom: 1px solid transparent;
     padding-bottom: 4px;
+    height: auto;
+
+    &.tt-expand {
+      @include animation(0s, $oc_animation_duration, expand);
+    }
+
+    &.tt-collapse {
+      @include animation(0s, $oc_animation_duration, collapse);
+    }
 
     &.last-active-topic {
       border-bottom: 1px solid $oc_gray_3;
@@ -107,4 +116,38 @@ div.topic-list-edit{
       }
     }
   }
+
+  $expand_size: scale(1, 1);
+  $collapse_size: scale(0.5, 0.5);
+
+  @include keyframe(expand){
+    from {
+      opacity: 0;
+      -webkit-transform: $collapse_size;
+      -moz-transform: $collapse_size;
+      transform: $collapse_size;
+    }
+    to {
+      opacity: 1;
+      -webkit-transform: $expand_size;
+      -moz-transform: $expand_size;
+      transform: $expand_size;
+    }
+  }
+
+  @include keyframe(collapse){
+    from {
+      opacity: 1;
+      -webkit-transform: $expand_size;
+      -moz-transform: $expand_size;
+      transform: $expand_size;
+    }
+    to {
+      opacity: 0;
+      -webkit-transform: $collapse_size;
+      -moz-transform: $collapse_size;
+      transform: $collapse_size;
+    }
+  }
+
 }
