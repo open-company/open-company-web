@@ -12,11 +12,11 @@ div.side-drawer-container {
   z-index: 1033;
 
   &.open-drawer {
-    @include animation(0s, 1s, openDrawer);
+    @include animation(0s, $oc_animation_duration, openDrawer);
   }
 
   &.close-drawer {
-    @include animation(0s, 1s, closeDrawer);
+    @include animation(0s, $oc_animation_duration, closeDrawer);
   }
 
   @include keyframe(openDrawer){
