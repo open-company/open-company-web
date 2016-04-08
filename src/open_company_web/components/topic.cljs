@@ -163,7 +163,8 @@
             (str (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data))))))
 
         ;; Topic headline
-        (dom/div {:class "topic-headline"}
+        (dom/div {:class "topic-headline"
+                  :style {:font-weight (if expanded 600)}}
           (om/build (headline-component section-kw) headline-data headline-options))
 
         (when (utils/is-mobile)
