@@ -60,7 +60,7 @@
                             (utils/vec-dissoc active-topics item-name)
                             (concat active-topics [item-name]))
         new-unactive-topics (if is-active
-                              (concat [item-name] unactive-topics)
+                              (concat unactive-topics [item-name])
                               (utils/vec-dissoc unactive-topics item-name))]
     (om/set-state! owner :active-topics (vec new-active-topics))
     (om/set-state! owner :unactive-topics (vec new-unactive-topics))
