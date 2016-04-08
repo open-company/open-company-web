@@ -21,15 +21,15 @@ div.drawer-toggler {
     outline: none;
     background-color: transparent;
     // start with the button rotated of 45 degrees
-    @include animation(0s, 0s, rotate45);
+    @include animation(0s, $oc_animation_duration, rotate45);
   }
 
   &.rotate45{
-    @include animation(0s, 0.5s, rotate45);
+    @include animation(0s, $oc_animation_duration, rotate45);
   }
 
   &.rotate0{
-    @include animation(0s, 0.5s, rotate0);
+    @include animation(0s, $oc_animation_duration, rotate0);
   }
 
   @include keyframe(rotate45){
