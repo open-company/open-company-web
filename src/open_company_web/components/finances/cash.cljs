@@ -8,12 +8,8 @@
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.lib.oc-colors :as occ]))
 
-(defn- get-label [cur-symbol value]
-  (when value
-    (str cur-symbol (.toLocaleString (js/parseFloat (str value))))))
-
 (defcomponent cash [data owner options]
-  
+
   (render [_]
     (let [finances-data (:data (:section-data data))
           filled-finances-data (finances-utils/fill-gap-months finances-data)
@@ -23,7 +19,7 @@
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
           cash-val (str cur-symbol (utils/thousands-separator (:cash value-set)))
-          fixed-sorted-finances (vec (map #(merge % {:label (get-label cur-symbol (:cash %))}) sorted-finances))
+          fixed-sorted-finances (mapv #(merge % {:label (when-let [c (:cash %)] (utils/thousands-separator c))}) sorted-finances)
           chart-opts {:opts {:chart-height (:height (:chart-size options))
                              :chart-width (:width (:chart-size options))
                              :chart-keys [:cash]
