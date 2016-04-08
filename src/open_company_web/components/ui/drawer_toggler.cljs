@@ -2,7 +2,8 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
-            [dommy.core :as dommy]))
+            [dommy.core :as dommy]
+            [open-company-web.components.icon :refer (icon)]))
 
 (defn rotate [owner options]
   (when (contains? options :click-cb)
@@ -21,4 +22,4 @@
     (dom/div #js {:className "drawer-toggler"
                   :ref "drawer-toggler"}
       (dom/button #js {:className "drawer-toggler-bt"
-                       :onClick #(rotate owner options)}))))
+                       :onClick #(rotate owner options)} (icon "circle-remove" {:size 24})))))
