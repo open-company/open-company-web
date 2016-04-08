@@ -47,10 +47,13 @@
     (when-let [ul-node (om/get-ref owner "topic-list-sortable")]
       (.create js/Sortable ul-node (clj->js #js {:handle ".topic-edit-handle"
                                                  :onSort (fn [_]
-                                                           (let [li-elements (sel ul-node [:li])
-                                                                 items (vec (map #(aget (.-dataset %) "itemname") li-elements))]
-                                                             (om/set-state! owner :active-topics items)
-                                                             ((:did-change-sort options) items)))})))))
+                                                           (let [li-active-elements (sel ul-node [:li.topic-active])
+                                                                 active-items (vec (map #(aget (.-dataset %) "itemname") li-active-elements))
+                                                                 li-unactive-elements (sel ul-node [:li.topic-unactive])
+                                                                 unactive-items (vec (map #(aget (.-dataset %) "itemname") li-unactive-elements))]
+                                                             (om/set-state! owner :active-topics active-items)
+                                                             (om/set-state! owner :unactive-topics unactive-items)
+                                                             ((:did-change-sort options) active-items)))})))))
 
 (defn topic-on-click [item-name owner did-change-sort]
   (let [active-topics (om/get-state owner :active-topics)
