@@ -49,7 +49,8 @@
     (let [slug (:slug body)
           response (:response body)]
       (swap! cache/new-sections assoc-in [(keyword slug) :categories] (:categories response))
-      db)))
+      ;; signal to the app-state that the new-sections have been loaded
+      (assoc-in db [(keyword slug) :new-sections] (rand 4)))))
 
 (defmethod action :auth-settings [db [_ body]]
   (when body
