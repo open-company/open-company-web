@@ -32,10 +32,10 @@
     (om/set-state! owner :navbar-editing editing)
     (om/set-state! owner :navbar-title fixed-title)))
 
-(defn switch-tab-cb [owner new-tab]
+(defn switch-category-cb [owner new-category]
   ; reset the last edited topic when switching category
   (om/set-state! owner :last-editing-topic nil)
-  (om/set-state! owner :active-category new-tab))
+  (om/set-state! owner :active-category new-category))
 
 (defn topic-edit-cb [owner section]
   (om/set-state! owner :editing-topic section)
@@ -63,7 +63,7 @@
        :editing-topic false
        :save-bt-active false}))
 
-  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active] :as state}]
+  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active active-category] :as state}]
     (let [slug (:slug @router/path)
           company-data ((keyword slug) data)
           navbar-editing-cb (partial set-navbar-editing owner data)]
@@ -79,8 +79,8 @@
                                   :company-data company-data
                                   :navbar-editing navbar-editing
                                   :editing-topic editing-topic
-                                  :switch-tab-cb (partial switch-tab-cb owner)
-                                  :active-category (:active-category state)
+                                  :switch-category-cb (partial switch-category-cb owner)
+                                  :active-category active-category
                                   :save-bt-active save-bt-active})
 
         (if-not editing-topic
@@ -92,6 +92,7 @@
                      :expanded-topic (:last-editing-topic state)}
                     {:opts {:navbar-editing-cb navbar-editing-cb
                             :topic-edit-cb (partial topic-edit-cb owner)
+                            :switch-category-cb (partial switch-category-cb owner)
                             :save-bt-active-cb (partial set-save-bt-active owner)}})
           ;; topic edit
           (om/build edit-topic {:section editing-topic
