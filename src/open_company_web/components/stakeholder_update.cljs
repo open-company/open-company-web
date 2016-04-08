@@ -107,7 +107,7 @@
                        (not (utils/is-mobile))
                        (not (:loading data)))
               ;; drawer toggler
-              (om/build drawer-toggler {} {:opts {:click-cb #(om/update-state! owner :drawer-open not)}}))
+              (om/build drawer-toggler {:close (not drawer-open)} {:opts {:click-cb #(om/update-state! owner :drawer-open not)}}))
             (when-not (or (:read-only company-data)
                           (utils/is-mobile)
                           (:loading data)))
@@ -116,12 +116,13 @@
                   all-section-keys (map keyword all-sections)
                   list-data (merge data {:active true
                                          :all-topics (select-keys company-data all-section-keys)
-                                         :active-topics (:sections stakeholder-update-data)})
+                                         :active-topics-list (:sections stakeholder-update-data)})
                   list-opts {:did-change-active-topics (partial save-stakeholder-update stakeholder-update-data)}]
               (om/build side-drawer {:open drawer-open
                                      :list-key "su-update"
                                      :list-data list-data}
-                                    {:opts {:list-opts list-opts}})))
+                                    {:opts {:list-opts list-opts
+                                            :bg-click-cb #(om/set-state! owner :drawer-open false)}})))
             
           ;; Company header
           (om/build company-header {
