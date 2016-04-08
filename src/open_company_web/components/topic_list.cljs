@@ -2,7 +2,7 @@
   (:require-macros [cljs.core.async.macros :refer (go)])
   (:require [cljs.core.async :refer (chan <!)]
             [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel)]
             [goog.style :refer (setStyle)]
@@ -12,9 +12,9 @@
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
-            [open-company-web.components.ui.side-drawer :refer [side-drawer]]
+            [open-company-web.components.ui.side-drawer :refer (side-drawer)]
             [open-company-web.components.topic-overlay :refer (topic-overlay)]
-            [open-company-web.components.ui.drawer-toggler :refer [drawer-toggler]]))
+            [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]))
 
 (defn get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
@@ -42,8 +42,6 @@
     {:initial-active-topics active-topics
      :active-topics active-topics
      :new-sections-requested (or (:new-sections-requested current-state) false)
-     :save-bt-active (or (:save-bt-active current-state) false)
-     :show-topic-edit-button (or (:show-topic-edit-button current-state) false)
      :selected-topic (or (:selected-topic current-state) (:selected-topic data))
      :drawer-open (or (:drawer-open current-state) false)}))
 
@@ -66,8 +64,10 @@
   (om/set-state! owner :selected-metric nil))
 
 (defn sections-for-category [slug active-category]
-  (let [category-data (first (filter #(= (:name %) (name active-category)) (:categories (slug @caches/new-sections))))]
-    (:sections category-data)))
+  (let [category-data (first (filter #(= (:name %) (name active-category)) (:categories (slug @caches/new-sections))))
+        all-category-sections (:sections category-data)]
+    (apply merge
+           (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
 
 (defcomponent topic-list [data owner options]
 
@@ -95,7 +95,7 @@
     ; set the cards height on big web
     (set-lis-height owner))
 
-  (render-state [_ {:keys [show-topic-edit-button active-topics selected-topic selected-metric drawer-open]}]
+  (render-state [_ {:keys [active-topics selected-topic selected-metric drawer-open]}]
     (let [slug (keyword (:slug @router/path))
           company-data (:company-data data)
           active-category (keyword (:active-category data))
