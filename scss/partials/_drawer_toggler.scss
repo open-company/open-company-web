@@ -15,11 +15,10 @@ div.drawer-toggler {
     display: inline-block;
     height: $icon_size;
     width: $icon_size;
+    margin: 0;
+    padding: 0;
     border: none;
     outline: none;
-    background-image: url("/img/x-drawer.svg");
-    background-size: $icon_size $icon_size;
-    background-repeat: no-repeat;
     background-color: transparent;
     // start with the button rotated of 45 degrees
     @include animation(0s, 0s, rotate45);
