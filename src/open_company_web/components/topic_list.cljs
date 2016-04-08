@@ -106,7 +106,7 @@
                    (not (utils/is-mobile))
                    (not (:loading data)))
           ;; drawer toggler
-          (om/build drawer-toggler {} {:opts {:click-cb #(om/update-state! owner :drawer-open not)}}))
+          (om/build drawer-toggler {:close (not drawer-open)} {:opts {:click-cb #(om/update-state! owner :drawer-open not)}}))
         (when-not (or (:read-only company-data)
                       (utils/is-mobile)
                       (:loading data))
@@ -114,12 +114,13 @@
           (let [all-category-sections (sections-for-category slug active-category)
                 list-data (merge data {:active true
                                        :all-topics all-category-sections
-                                       :active-topics category-topics})
+                                       :active-topics-list category-topics})
                 list-opts {:did-change-active-topics #(update-active-topics owner options active-category %)}]
             (om/build side-drawer {:open drawer-open
                                    :list-key active-category
                                    :list-data list-data}
-                                  {:opts {:list-opts list-opts}})))
+                                  {:opts {:list-opts list-opts
+                                          :bg-click-cb #(om/set-state! owner :drawer-open false)}})))
         (when selected-topic
           (om/build topic-overlay {:section selected-topic
                                    :section-data (->> selected-topic keyword (get company-data))
