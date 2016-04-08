@@ -46,7 +46,8 @@
               category-sections)))
 
 (defn setup-sortable [owner options]
-  (when (and (om/get-state owner :did-mount) (om/get-state owner :sortable-loaded))
+  (when (and (om/get-state owner :did-mount)
+             (om/get-state owner :sortable-loaded))
     (when-let [ul-node (om/get-ref owner "topic-list-sortable")]
       (.create js/Sortable ul-node #js {:handle ".topic-edit-handle"
                                         :onEnd (fn [_]
@@ -69,7 +70,7 @@
     (om/set-state! owner :unactive-topics (vec new-unactive-topics))
     (did-change-active-topics new-active-topics)))
 
-(defn get-state [data]
+(defn get-state [data old-state]
   (let [active-topics (:active-topics data)
         category (name (:category data))
         all-sections (:new-sections data)
@@ -79,8 +80,8 @@
     {:initial-active-topics active-topics
      :active-topics active-topics
      :unactive-topics unactive-topics
-     :sortable-loaded false
-     :did-mount false}))
+     :sortable-loaded (or (:sortable-loaded old-state) false)
+     :did-mount (or (:did-mount old-state) false)}))
 
 (defcomponent topic-list-edit [data owner options]
 
@@ -92,7 +93,7 @@
     ; load the new sections if needed
     (when (empty? @caches/new-sections)
       (api/get-new-sections))
-    (get-state data))
+    (get-state data nil))
 
   (did-mount [_]
     (om/set-state! owner :did-mount true)
@@ -106,7 +107,8 @@
 
   (will-receive-props [_ next-props]
     (when-not (= next-props data)
-      (om/set-state! owner (get-state next-props))))
+      (om/set-state! owner (get-state next-props (om/get-state owner))))
+    (setup-sortable owner options))
 
   (render-state [_ {:keys [unactive-topics active-topics]}]
     (let [slug (keyword (:slug @router/path))]
