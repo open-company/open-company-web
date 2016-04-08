@@ -107,7 +107,8 @@
                        (not (utils/is-mobile))
                        (not (:loading data)))
               ;; drawer toggler
-              (om/build drawer-toggler {:close (not drawer-open)} {:opts {:click-cb #(om/update-state! owner :drawer-open not)}}))
+              (om/build drawer-toggler {:close (not drawer-open)
+                                        :click-cb #(om/update-state! owner :drawer-open not)}))
             (when-not (or (:read-only company-data)
                           (utils/is-mobile)
                           (:loading data)))
