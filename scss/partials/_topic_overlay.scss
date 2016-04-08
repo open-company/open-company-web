@@ -32,33 +32,8 @@ $topic_overlay_text_color: #2d2d2d;
         button {
           background-color: transparent;
           border: 0px;
-          margin: 0;
           padding: 0;
           outline: none;
-        }
-
-        button.pencil {
-          width: 30px;
-          height: 30px;
-          background-image: url("/img/pencil.png");
-          background-position: 0px 0px;
-          background-size: 30px 30px;
-          background-repeat: no-repeat;
-          margin-top: 10px;
-          margin-right: 20px;
-          float: right;
-        }
-
-        button.circle-remove {
-          width: 30px;
-          height: 30px;
-          background-image: url("/img/circle-remove.png");
-          background-position: 0px 0px;
-          background-size: 30px 30px;
-          background-repeat: no-repeat;
-          margin-top: 10px;
-          margin-right: 10px;
-          float: right;
         }
 
         div.topic-overlay-header {

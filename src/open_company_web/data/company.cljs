@@ -4,12 +4,13 @@
   :name "Buffer"
   :currency "USD"
   :slug "buffer"
-  
+
   :categories ["progress", "company"]
   :sections {:progress ["finances" "challenges" "growth"] :company ["values"]}
-  
+
   :challenges {
     :title "Key Challenges"
+    :icon "tactic"
     :body "<h3>Recruiting</h3><p>We're continuing our fast pace of growing the team, and we'd love your help to spread the word about all our <a>current open positions</a>, <a href=\"http://twitter.com\">Twitter</a> or <a href=\"http://buffer.com\">Buffer</a>.</p>
 <h3>Spead & Reliability</h3><p>We've made some key speed and reliability <a href=\"/improvements\">improvements</a> to <a href=\"http://buffer.com/b2b\">Buffer for business</a>, but there is still a ways to go. Everyone please drop everything and support the devops team in anyway you can when we have an outage situation.</p>
 <h3>Onbarding</h3><p>We're in the <a href=\"/early-stages\">early stages</a> of experimenting with a progress indicator in the onboarding improvement ideas to <a href=\"/gretchen\">Gretchen</a>."
@@ -24,6 +25,7 @@
   :values {
     :updated-at "2015-11-30T18:17:55.073Z"
     :title "Values"
+    :icon "scale"
     :author {
       :image "https://secure.gravatar.com/avatar/98b5456ea1c562024f41501ffd7bc3c6.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F7fa9%2Fimg%2Favatars%2Fava_0022-192.png"
       :name "Iacopo Carraro"
@@ -71,6 +73,7 @@
   :growth {
     :updated-at "2015-10-23T11:21:39.000Z"
     :title "Key metrics"
+    :icon "chart-growth"
     :author {
       :image "https://secure.gravatar.com/avatar/46c1c756f36549c2dea0253e1e025053?s=96&d=mm&r=g"
       :name "Joel Gascoigne"
@@ -255,6 +258,7 @@
   :finances {
     :updated-at "2015-10-23T11:21:40.000Z"
     :title "Finances"
+    :icon "money-bag"
     :author {
       :image "https://secure.gravatar.com/avatar/46c1c756f36549c2dea0253e1e025053?s=96&d=mm&r=g"
       :name "Joel Gascoigne"
