@@ -229,6 +229,24 @@
                                            :status status
                                            :body (when success (json->cljs body))}]))))))
 
+(defn patch-stakeholder-update [stakeholder-update]
+  (when stakeholder-update
+    (let [slug (keyword (:slug @router/path))
+          company-data (slug @dispatcher/app-state)
+          company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
+          json-data (cljs->json {:stakeholder-update stakeholder-update})]
+      (api-patch (:href company-patch-link)
+        { :json-params json-data
+          :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (:type company-patch-link)}}
+        (fn [{:keys [success body status]}]
+          (dispatcher/dispatch! [:company {:success success
+                                           :status status
+                                           :body (when success (json->cljs body))}]))))))
+
 (defn remove-section [section-name]
   (when (and section-name)
     (let [slug (keyword (:slug @router/path))
