@@ -45,6 +45,7 @@ $topic_overlay_text_color: #2d2d2d;
           div.topic-overlay-title {
             border: 1px solid transparent;
             font-size: 26px;
+            font-weight: 600;
             color: $topic_overlay_text_color;
             line-height: 24px;
             width: 500px;
@@ -160,10 +161,6 @@ $topic_overlay_text_color: #2d2d2d;
             height: 16px;
             margin-top: 0px;
             margin-right: 158px;
-
-            label.bold{
-              font-weight: bold;
-            } 
           }
 
           div.topic-overlay-date {
@@ -186,18 +183,15 @@ $topic_overlay_text_color: #2d2d2d;
 
           div.topic-overlay-edit-headline-count{
             float: right;
-            text-align: right;
-            width: 57px;
+            text-align: left;
+            width: 46px;
             height: 16px;
             font-size: 14px;
-            margin-top: 13px;
-
-            label.bold{
-              font-weight: bold;
-            }
+            margin-top: 6px;
           }
 
-          input.topic-overlay-edit-headline {
+          textarea.topic-overlay-edit-headline {
+            resize: none;
             width: 500px;
             margin-bottom: 30px;
             font-weight: 600;

@@ -70,7 +70,7 @@
           (recur (inc idx)
                  (+ txt-left txt-width 10)))))))
 
-(defn bar-click [owner options idx is-hover]
+(defn bar-click [owner options idx]
   (.stopPropagation (.-event js/d3))
   (let [chart-label (.select js/d3 (str "#chart-label"))
         chart-width (:chart-width options)
@@ -101,8 +101,7 @@
                   (.attr d3-month-text "fill" (:h-axis-color options))))))
     (.attr next-month-text "fill" (:h-axis-selected-color options))
     (build-selected-label chart-label (label-key next-set) (:label-color options) chart-width)
-    (when-not is-hover
-      (om/set-state! owner :selected idx))))
+    (om/set-state! owner :selected idx)))
 
 (defn get-color [color-key options chart-key value]
   (let [color (chart-key (color-key options))]
@@ -196,9 +195,9 @@
             (.attr "height" (- chart-height 50))
             (.attr "x" (* i (/ chart-width (count chart-data))))
             (.attr "y" 50)
-            (.on "click" #(bar-click owner options i false))
-            (.on "mouseover" #(bar-click owner options i true))
-            (.on "mouseout" #(bar-click owner options (om/get-state owner :selected) true))
+            (.on "click" #(bar-click owner options i))
+            (.on "mouseover" #(bar-click owner options i))
+            (.on "mouseout" #(bar-click owner options (om/get-state owner :selected)))
             (.attr "fill" "transparent")))
       ; add the selected value label
       (let [x-pos (/ chart-width 2)

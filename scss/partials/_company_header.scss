@@ -27,10 +27,11 @@ div.company-header{
 
   div.company-header-internal {
     @include big_web(){
-      padding: 0 185px;
+      max-width: 910px;
+      margin: 0 auto;
       min-height: 120px;
     }
-    
+
     div.company-header-top {
       padding-top: 22px;
 

@@ -100,7 +100,7 @@
           company-data (:company-data data)
           active-category (keyword (:active-category data))
           category-topics (get active-topics active-category)]
-      (dom/div {:class "topic-list fix-top-margin-scrolling"
+      (dom/div {:class "topic-list"
                 :key "topic-list"}
         (when (and (not (:read-only company-data))
                    (not (utils/is-mobile))
