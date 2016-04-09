@@ -37,8 +37,10 @@
             (dom/div {:class "editing-title oc-title"} (:edit-title data))))
         (n/navbar {:inverse? true :fixed-top? true :fluid true :collapse? true}
           (dom/div {:class "navbar-header"}
-            (dom/label {:class "opencompany-logo-open"} "open")
-            (dom/label {:class "opencompany-logo-company"} "company")
+            (dom/a {:href "/" :style {:color "inherit"
+                                      :line-height "50px"}}
+              (dom/span {:class "bold"} "open")
+              (dom/span {:style {:font-weight 100}} "company"))
             (dom/ul {:class "nav navbar-nav navbar-right"}
               (dom/li {}
                 (if (:show-share data)
