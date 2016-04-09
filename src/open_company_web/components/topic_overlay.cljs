@@ -168,10 +168,10 @@
 
   (render-state [_ {:keys [has-changes title headline body show-headline-counter show-title-counter]}]
     (let [topic-kw (keyword topic)
+          title-length-limit 20
           js-date-upat (utils/js-date (:updated-at topic-data))
           month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
           topic-updated-at (str month-string " " (.getDate js-date-upat))
-          subtitle-string (str (:name (:author topic-data)) " on " topic-updated-at)
           section-body (utils/get-topic-body topic-data topic-kw)
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height max-win-height)
@@ -198,28 +198,28 @@
                       :placeholder "Type your title here"
                       :on-focus #(om/set-state! owner :show-title-counter true)
                       :on-blur #(om/set-state! owner :show-title-counter false)
-                      :max-length 100
+                      :max-length title-length-limit
                       :value title
                       :on-change #(change-value owner :title %)})
           (dom/div {:class (utils/class-set {:topic-overlay-edit-title-count true
                                              :transparent (not show-title-counter)})}
-            (dom/label {:class "bold"} (- 100 (count title))) "/100")
-          (dom/div {:class "topic-overlay-date"} subtitle-string))
+            (dom/span (- title-length-limit (count title)))))
         (dom/div #js {:className "topic-overlay-edit-content"
                       :ref "topic-overlay-edit-content"
                       :style #js {:maxHeight (str max-height "px")}}
-          (dom/input {:class "topic-overlay-edit-headline"
-                      :id (str "topic-edit-headline-" (name topic))
-                      :type "text"
-                      :placeholder "Type your headline here"
-                      :on-focus #(om/set-state! owner :show-headline-counter true)
-                      :on-blur #(om/set-state! owner :show-headline-counter false)
-                      :max-length 100
-                      :value headline
-                      :on-change #(change-value owner :headline %)})
+          (dom/textarea {:class "topic-overlay-edit-headline"
+                         :resize false
+                         :id (str "topic-edit-headline-" (name topic))
+                         :type "text"
+                         :placeholder "Type your headline here"
+                         :on-focus #(om/set-state! owner :show-headline-counter true)
+                         :on-blur #(om/set-state! owner :show-headline-counter false)
+                         :max-length 100
+                         :value headline
+                         :on-change #(change-value owner :headline %)})
           (dom/div {:class (utils/class-set {:topic-overlay-edit-headline-count true
                                              :transparent (not show-headline-counter)})}
-            (dom/label {:class "bold"} (- 100 (count headline))) "/100")
+            (dom/span (- 100 (count headline))))
           (dom/div #js {:className "topic-overlay-edit-body"
                         :ref "topic-overlay-edit-body"
                         :id (str "topic-edit-body-" (name topic))
