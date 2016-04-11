@@ -4,10 +4,10 @@
 (defn jwt []
   (cook/get-cookie :jwt))
 
-(defn decode [jwt]
-  (when (.-jwt_decode js/window)
-    (.jwt_decode js/window jwt)))
+(defn decode [encoded-jwt]
+  (when (exists? js/jwt_decode)
+    (js/jwt_decode encoded-jwt)))
 
 (defn get-key [k]
-  (if-let [decoded-jwt (js->clj (decode (jwt)))]
+  (when-let [decoded-jwt (js->clj (decode (jwt)))]
     (decoded-jwt (name k))))

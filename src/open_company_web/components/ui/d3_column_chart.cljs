@@ -11,11 +11,6 @@
 
 (def show-columns 6)
 
-(defn width [el]
-  (if (and el (.node el))
-    (.-width (.getBBox (.node el)))
-    0))
-
 (defn current-data [owner]
   (let [start (om/get-state owner :start)
         all-data (vec (om/get-props owner :chart-data))
@@ -52,7 +47,7 @@
                           (.attr "dx" 0)
                           (.attr "dy" 0)
                           (.text label-value))
-          txt-width (width chart-label)]
+          txt-width (js/SVGgetWidth chart-label)]
         (.attr chart-label "dx" (- (/ chart-width 2) (/ txt-width 2))))
     (loop [idx 0
            txt-left 0]
@@ -64,7 +59,7 @@
                     (.attr "dx" 0)
                     (.attr "dy" 0)
                     (.text label))
-            txt-width (width txt)
+            txt-width (js/SVGgetWidth txt)
             txt-height (* idx 25)]
         (when (utils/is-mobile)
           (.attr txt "dy" txt-height)
@@ -75,7 +70,7 @@
           (recur (inc idx)
                  (+ txt-left txt-width 10)))))))
 
-(defn bar-click [owner options idx is-hover]
+(defn bar-click [owner options idx]
   (.stopPropagation (.-event js/d3))
   (let [chart-label (.select js/d3 (str "#chart-label"))
         chart-width (:chart-width options)
@@ -106,8 +101,7 @@
                   (.attr d3-month-text "fill" (:h-axis-color options))))))
     (.attr next-month-text "fill" (:h-axis-selected-color options))
     (build-selected-label chart-label (label-key next-set) (:label-color options) chart-width)
-    (when-not is-hover
-      (om/set-state! owner :selected idx))))
+    (om/set-state! owner :selected idx)))
 
 (defn get-color [color-key options chart-key value]
   (let [color (chart-key (color-key options))]
@@ -168,7 +162,7 @@
                         (.attr "y" (:chart-height options))
                         (.attr "fill" (if (= i selected) h-axis-selected-color h-axis-color))
                         (.text text))
-              label-width (width label)]
+              label-width (js/SVGgetWidth label)]
           ; set month label x position depending on its width
           (.attr label "x" (+ x-pos (/ (- (* bar-width keys-count) label-width) 2)))
           ; for each key in the set
@@ -201,9 +195,9 @@
             (.attr "height" (- chart-height 50))
             (.attr "x" (* i (/ chart-width (count chart-data))))
             (.attr "y" 50)
-            (.on "click" #(bar-click owner options i false))
-            (.on "mouseover" #(bar-click owner options i true))
-            (.on "mouseout" #(bar-click owner options (om/get-state owner :selected) true))
+            (.on "click" #(bar-click owner options i))
+            (.on "mouseover" #(bar-click owner options i))
+            (.on "mouseout" #(bar-click owner options (om/get-state owner :selected)))
             (.attr "fill" "transparent")))
       ; add the selected value label
       (let [x-pos (/ chart-width 2)
@@ -215,7 +209,7 @@
                               (.attr "id" "chart-label")
                               (.attr "transform" (str "translate(" 0 "," (if (> (count chart-keys) 1) 20 50) ")")))] ;x-pos
         (build-selected-label chart-label-g label-value label-color chart-width)
-        (let [chart-label-width (width chart-label-g)
+        (let [chart-label-width (js/SVGgetWidth chart-label-g)
               chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
           (.attr chart-label-g "transform" (str "translate("
                                                 0 ;(max 0 chart-label-pos)

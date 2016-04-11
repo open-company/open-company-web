@@ -73,7 +73,7 @@
           (dissoc :loading)))
     db))
 
-(defmethod action :company [db [_ {:keys [success status body]}]]
+(defmethod action :company [db [_ {:keys [slug success status body]}]]
   (cond
     success
     ;; add section name inside each section
@@ -82,7 +82,7 @@
           (assoc (keyword (:slug updated-body)) updated-body)
           (dissoc :loading)))
     (= 404 status)
-    (do (.replace js/window.location "/404") db)
+    (do (utils/redirect! (str "/404?path=/" slug)) db)
     ;; probably some default failure handling should be added here
     :else db))
 

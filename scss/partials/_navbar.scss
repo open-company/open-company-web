@@ -37,25 +37,6 @@ nav.navbar {
     margin: 0px;
     padding: 0px;
 
-    label {
-      font-size: 16px;
-      line-height: 24px;
-      margin-top: 14px;
-    }
-
-    label.opencompany-logo-open{
-      font-weight: 900;
-    }
-
-    label.opencompany-logo-company{
-      font-weight: 100;
-    }
-
-    img.open-company-logo{
-      width: 150px;
-      margin-top: 15px;
-    }
-
     &.editing-mode {
 
       div.editing-title {

@@ -102,10 +102,11 @@
 (def scrolled-to-top (atom false))
 
 (defn set-lis-height [owner]
-  (doall
-    (let [li-elems (sel (om/get-ref owner "topic-list-ul") [:li.topic-row])
-          max-height (apply max (map #(.-clientHeight %) li-elems))]
-      (for [li li-elems]
+  (let [lis (sel (om/get-ref owner "topic-list-ul") [:li.topic-row])]
+    (doseq [li lis]
+      (.removeAttribute li "style"))
+    (let [max-height (apply max (map #(.-clientHeight %) lis))]
+      (doseq [li lis]
         (setStyle li #js {:height (str max-height "px")})))))
 
 (defn close-overlay-cb [owner]
@@ -174,7 +175,7 @@
         (let [company-data (:company-data data)
               active-category (keyword (:active-category data))
               category-topics (get active-topics active-category)]
-          (dom/div {:class "topic-list fix-top-margin-scrolling"
+          (dom/div {:class "topic-list"
                     :key "topic-list"}
             (when selected-topic
               (om/build topic-overlay {:section selected-topic

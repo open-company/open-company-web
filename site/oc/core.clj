@@ -115,10 +115,10 @@
                   (nav)
                   (when (is? :index) (tagline))]]
                 (case page
-                  :index     (pages/index)
-                  :about     (pages/about)
-                  :pricing   (pages/pricing)
-                  :not-found (pages/not-found))
+                  :index   (pages/index)
+                  :about   (pages/about)
+                  :pricing (pages/pricing)
+                  :404     (pages/not-found))
                 (if (is? :index :about)
                   (email-capture))
                 (footer)]))))

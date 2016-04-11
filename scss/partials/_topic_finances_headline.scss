@@ -31,7 +31,7 @@ div.topic-finances-headline {
         padding: 0;
         margin: 0;
 
-        &.cash {
+        &.cash, &.revenue {
           color: $oc_green_regular;
         }
 

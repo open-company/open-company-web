@@ -11,9 +11,6 @@
 
 (def show-dots 6)
 
-(defn width [el]
-  (.-width (.getBBox (.node el))))
-
 (defn max-y [data chart-keys]
   (let [filtered-data (map #(select-keys % chart-keys) data)]
     (apply max (vec (flatten (map vals filtered-data))))))
@@ -72,7 +69,7 @@
                 (let [d3-month-text (.select js/d3 month-text)]
                   (.attr d3-month-text "fill" (:h-axis-color options))))))
     (.attr next-month-text "fill" (:h-axis-selected-color options))
-    (let [chart-label-width (width chart-label)
+    (let [chart-label-width (js/SVGgetWidth chart-label)
           new-x-pos (- (/ chart-width 2) (/ chart-label-width 2))]
       (.attr chart-label "x" (max 0 new-x-pos)))
     (when-not is-hover
@@ -124,7 +121,7 @@
                         (.attr "y" (- (:chart-height options) 5))
                         (.attr "fill" (if (= i selected) h-axis-selected-color h-axis-color))
                         (.text text))
-              label-width (width label)]
+              label-width (js/SVGgetWidth label)]
           (.attr label "x" (+ x-pos (/ (- (* (* dot-radius 2) (count chart-keys)) label-width) 2)))
           ; for each key in the set
           (doseq [j (range (count chart-keys))]
@@ -184,11 +181,11 @@
                             (.attr "y" 50)
                             (.attr "fill" (:label-color options))
                             (.text (label-key (get chart-data selected))))
-            chart-label-width (width chart-label)
+            chart-label-width (js/SVGgetWidth chart-label)
             chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
         (when (> chart-label-width 150)
           (.attr chart-label "class" "chart-label small"))
-        (let [new-chart-label-width (width chart-label)
+        (let [new-chart-label-width (js/SVGgetWidth chart-label)
               new-chart-label-pos (- (/ chart-width 2) (/ new-chart-label-width 2))]
           (.attr chart-label "x" (max 0 new-chart-label-pos)))))))
 
