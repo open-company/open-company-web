@@ -212,7 +212,7 @@
                          :default-value (om/get-state owner :unit)
                          :id "mtr-unit"
                          :placeholder "Metric unit"
-                         :style {"width" "150px"}}
+                         :style {"width" "145px"}}
               (for [unit units]
                 (let [currency (om/get-state owner :currency)
                       unit-value (:unit unit)
