@@ -41,7 +41,7 @@
                      :on-click #(circle-remove-click options %)})
         (when-not read-only
           (dom/button {:class "pencil"
-                       :on-click #(pencil-click options topic % "body")}))
+                       :on-click #(pencil-click options topic % "headline")}))
         (dom/div {:class "topic-overlay-header"}
           (dom/div {:class "topic-overlay-title"} (:title topic-data))
           (dom/div {:class "topic-overlay-date"} subtitle-string))
