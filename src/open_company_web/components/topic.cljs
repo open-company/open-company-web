@@ -107,12 +107,7 @@
            EventType/FINISH
            (fn [e]
              (when-not expanded?
-               (.setTimeout js/window #(scroll-to-topic-top topic) 100))
-             ;; #_(.setTimeout js/window
-             ;;              #(setStyle body-nav-node #js {:overflow (if expanded? "hidden" "visible")
-             ;;                                            :height (if expanded? "0" "auto")})
-             ;;              1)
-             ))
+               (.setTimeout js/window #(scroll-to-topic-top topic) 100))))
           (.play)))
 
 
@@ -212,10 +207,7 @@
                                               (.setTimeout js/window
                                                 #(set! (.-disabled bt) false) 1000)))} "Next >")))))))))))
 
-(enable-console-print!)
 (defn topic-click [data owner options expanded selected-metric]
-  ;; (prn :expanded expanded)
-  ;; (prn :section (keyword (:section-name options)))
   (if (utils/is-mobile)
     (do (dis/dispatch! [:topic/expand (if expanded nil (keyword (:section-name options)))])
         (mobile-topic-animation data owner options expanded)
@@ -270,10 +262,6 @@
   ;;     (mobile-topic-animation data owner options false)))
 
   (did-update [_ prev-props _]
-    #_(when (and (utils/is-mobile)
-               (= (keyword section) (:expanded-topic prev-props))
-               (not= expanded-topic (:expanded-topic prev-props)))
-      (mobile-topic-animation data owner options true))
     (when (om/get-state owner :transition-as-of)
       (animate-revision-navigation owner)))
 
