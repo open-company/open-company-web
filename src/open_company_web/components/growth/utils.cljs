@@ -51,7 +51,6 @@
   {:period period
    :slug slug
    :value nil
-   :target nil
    :new true})
 
 (defn chart-placeholder-data [initial-data slug interval]

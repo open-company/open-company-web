@@ -52,7 +52,6 @@
         (change-cb slug {:slug new-slug
                          :description (om/get-state owner :description)
                          :unit (om/get-state owner :unit)
-                         :target (om/get-state owner :target)
                          :interval (om/get-state owner :interval)
                          :name name-value}))
       ; change only the name
@@ -99,18 +98,6 @@
                           (om/set-state! owner :unit unit-value)
                           (when slug
                             (change-cb slug {:unit unit-value}))))))
-      ; init goal
-      (doto (.$ js/window "select.metric-data#mtr-goal")
-        (.select2 (clj->js {"placeholder" "Metric goal"
-                            "minimumResultsForSearch" -1
-                            "templateResult" option-template
-                            "templateSelection" option-template}))
-        (.on "change" (fn [e]
-                        (let [target-value (.. e -target -value)
-                              slug (om/get-state owner :metric-slug)]
-                          (om/set-state! owner :target target-value)
-                          (when slug
-                            (change-cb slug {:target target-value}))))))
       ; init interval
       (doto (.$ js/window "select.metric-data#mtr-interval")
         (.select2 (clj->js {"placeholder" "Metric interval"
@@ -136,14 +123,12 @@
         available-metrics (vec (filter #(not (utils/in? slugs (:slug %))) all-metrics))]
     {:intervals (:intervals growth-defaults)
      :units (:units growth-defaults)
-     :target (:goal growth-defaults)
      :prompt (:prompt growth-defaults)
      :metrics available-metrics}))
 
 (def metric-defaults {
   :unit "number"
-  :interval "monthly"
-  :target "increase"})
+  :interval "monthly"})
 
 (defcomponent growth-metric-edit [data owner]
 
@@ -169,7 +154,6 @@
        :unit (if new-metric (:unit metric-defaults) (:unit metric-info))
        :units fixed-units
        :interval (if new-metric (:interval metric-defaults) (:interval metric-info))
-       :target (if new-metric (:target metric-defaults) (:target metric-info))
        :currency company-currency-code}))
 
   (will-mount [_]
@@ -186,7 +170,7 @@
 
   (render [_]
     (let [{:keys [new-growth-section metric-info]} data
-          {:keys [metrics intervals target prompt] :as presets} (om/get-state owner :presets)
+          {:keys [metrics intervals prompt] :as presets} (om/get-state owner :presets)
           units (om/get-state owner :units)]
       (dom/div {:class "growth-metric-edit"}
         (when (:new-metric data)
@@ -205,6 +189,12 @@
                         :id "mtr-name"
                         :placeholder "Metric name"
                         :style {"width" "240px"}}))
+          ;; delete button
+          (when-not (:new-metric data)
+            (dom/button {:class "oc-btn oc-cancel black"
+                         :title "Delete this metric"
+                         :on-click #(show-delete-confirm-popover owner data)} "DELETE")))
+        (dom/div {:class "growth-metric-edit-row group"}
           ; unit
           (dom/div {:class "metric-data-container right group"}
             (dom/label {:for "mtr-unit"} "Measured as")
@@ -218,33 +208,10 @@
                       unit-value (:unit unit)
                       unit-name (:name unit)]
                   (dom/option {:key unit-value
-                               :value unit-value} unit-name))))))
-        ; textarea
-        (dom/div {:class "growth-metric-edit-row group"}
-          (dom/textarea {:class "metric-data metric-description"
-                         :on-change (fn [e]
-                                      (let [value (.. e -target -value)
-                                            slug (om/get-state owner :metric-slug)
-                                            change-cb (:change-growth-metric-cb data)]
-                                        (when slug
-                                          (change-cb slug {:description value}))))
-                         :placeholder "Metric description"} (om/get-state owner :description)))
-        ; goal and interval
-        (dom/div {:class "growth-metric-edit-row group"}
-          ; goal
-          (dom/div {:class "metric-data-container group"}
-            (dom/label {:for "mtr-goal"} "Goal:")
-            (dom/select {:class "metric-data metric-goal"
-                         :default-value (om/get-state owner :target)
-                         :id "mtr-goal"
-                         :placeholder "Metric goal"
-                         :style {"width" "150px"}}
-              (dom/option {:value ""} "Goal")
-              (for [g target]
-                (dom/option {:value g} (utils/camel-case-str g)))))
+                               :value unit-value} unit-name)))))
           ; interval
-          (dom/div {:class "metric-data-container right group"}
-            (dom/label {:for "mtr-goal"} "Interval:")
+          (dom/div {:class "metric-data-container group"}
+            (dom/label {:for "mtr-interval"} "Interval:")
             (dom/select {:class "metric-data metric-interval"
                          :default-value (om/get-state owner :interval)
                          :id "mtr-interval"
@@ -255,19 +222,26 @@
                          :style {"width" "150px"}}
               (for [interval intervals]
                 (dom/option {:value interval} (utils/camel-case-str interval))))))
+        ; textarea
+        (dom/div {:class "growth-metric-edit-row group"}
+          (dom/textarea {:class "metric-data metric-description"
+                         :on-change (fn [e]
+                                      (let [value (.. e -target -value)
+                                            slug (om/get-state owner :metric-slug)
+                                            change-cb (:change-growth-metric-cb data)]
+                                        (when slug
+                                          (change-cb slug {:description value}))))
+                         :placeholder "Metric description"} (om/get-state owner :description)))
         (dom/div {:class "growth-metric-edit-row group"}
           (dom/button {:class "oc-btn oc-success green"
                        :disabled (or (s/blank? (om/get-state owner :metric-slug))
                                      (s/blank? (om/get-state owner :metric-name))
                                      (s/blank? (om/get-state owner :unit))
                                      (s/blank? (om/get-state owner :interval)))
-                       :on-click #((:next-cb data))} "NEXT")
-          (when-not (:new-metric data)
-            (dom/button {:class "oc-btn oc-cancel black"
-                         :title "Delete this metric"
-                         :on-click #(show-delete-confirm-popover owner data)} "DELETE"))
+                       :on-click #((:next-cb data))} (if (:new-metric data) "NEXT" "SAVE"))
+          ; cancel button
           (dom/button {:class "oc-btn oc-link blue"
                        :on-click (:cancel-cb data)}
-                      (if new-growth-section
-                        "DELETE"
-                        "CANCEL")))))))
+            (if new-growth-section
+              "DELETE"
+              "CANCEL")))))))

@@ -19,9 +19,8 @@
 
   (render [_]
     (let [growth-data (:cursor data)
-          is-new (and (not (:value growth-data)) (not (:target growth-data)) (:new growth-data))
+          is-new (and (not (:value growth-data)) (:new growth-data))
           value (:value growth-data)
-          target (:target growth-data)
           interval (:interval data)
           period (:period growth-data)
           period-month (utils/get-month period interval)
@@ -33,26 +32,12 @@
           next-period (:next-period data)
           tab-cb (fn [_ k]
                    (cond
-                     (and (= k :target) (:is-last data))
-                     (signal-tab next-period :target)
-                     (= k :target)
-                     (signal-tab (:period growth-data) :value)
                      (= k :value)
                      (when next-period
-                       (signal-tab next-period :target))))]
+                       (signal-tab next-period :value))))]
       (dom/tr {:class "growth-edit-row"}
         (dom/td {:class "no-cell"}
           period-string)
-        (dom/td {}
-          (om/build cell {:value target
-                          :placeholder "Target (optional)"
-                          :cell-state cell-state
-                          :draft-cb #(change-cb :target %)
-                          :prefix (:prefix data)
-                          :suffix (:suffix data)
-                          :period period
-                          :key :target
-                          :tab-cb tab-cb}))
         (dom/td {}
           (when-not (:is-last data)
             (om/build
@@ -162,7 +147,6 @@
               (dom/thead {}
                 (dom/tr {}
                   (dom/th {} "")
-                  (dom/th {} "Target")
                   (dom/th {} "Value")))
               (dom/tbody {}
                 (let [current-period (utils/current-growth-period interval)]
@@ -174,7 +158,6 @@
                                       {:period period
                                        :slug slug
                                        :value nil
-                                       :target nil
                                        :new true})
                           next-period (growth-utils/get-past-period current-period (inc idx) interval)]
                       (om/build growth-edit-row {:cursor row-data
@@ -190,5 +173,4 @@
                   (dom/tr {}
                     (dom/td {}
                       (dom/a {:on-click #(more-months owner data)} "More..."))
-                    (dom/td {})
                     (dom/td {}))))))))))
