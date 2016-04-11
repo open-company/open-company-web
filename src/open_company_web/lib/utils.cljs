@@ -14,7 +14,7 @@
             [open-company-web.caches :refer (company-cache)]
             [open-company-web.local-settings :as ls]))
 
-(defn abs [n] (max n (- n)))
+(defn abs [n] (when n (max n (- n))))
 
 (def oc-animation-duration 300)
 
