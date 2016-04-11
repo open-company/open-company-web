@@ -3,7 +3,6 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.router :as router]
             [open-company-web.components.ui.cell :refer (cell)]
             [open-company-web.components.finances.utils :as finances-utils]
             [cljs.core.async :refer (put!)]))
