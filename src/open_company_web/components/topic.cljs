@@ -20,6 +20,9 @@
             [goog.events :as events]
             [goog.style :refer (setStyle)]))
 
+(defn after [ms fn]
+  (.setTimeout js/window fn ms))
+
 (defcomponent topic-headline [data owner]
   (render [_]
     (dom/div {:class "topic-headline-inner"} (:headline data))))
@@ -40,8 +43,8 @@
     (setStyle body-nav-node #js {:height "auto"})
     (let [body-height (.-offsetHeight body-nav-node)
           body-width (.-offsetWidth body-nav-node)]
-      (setStyle body-nav-node #js {:height (if expanded? "auto" "0")
-                                   :overflow "hidden"})
+      ;; (setStyle body-nav-node #js {:height (if expanded? "auto" "0")
+      ;;                              :overflow "hidden"})
 
       ;; animate finances headtitle
       (when-let [finances-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-finances")]
@@ -105,10 +108,11 @@
            (fn [e]
              (when-not expanded?
                (.setTimeout js/window #(scroll-to-topic-top topic) 100))
-             (.setTimeout js/window
-                          #(setStyle body-nav-node #js {:overflow (if expanded? "hidden" "visible")
-                                                        :height (if expanded? "0" "auto")})
-                          1)))
+             ;; #_(.setTimeout js/window
+             ;;              #(setStyle body-nav-node #js {:overflow (if expanded? "hidden" "visible")
+             ;;                                            :height (if expanded? "0" "auto")})
+             ;;              1)
+             ))
           (.play)))
 
 
@@ -179,7 +183,7 @@
             (dom/i {:class "fa fa-circle"})))
         ;; topic body
         (when (utils/is-mobile)
-          (dom/div #js {:className (str "body-navigation-container group " (when (not expanded) "close"))
+          (dom/div #js {:className (str "body-navigation-container group " (when (not expanded?) "close"))
                         :ref "body-navigation-container"}
             (om/build topic-body {:section section
                                   :section-data topic-data
@@ -208,11 +212,14 @@
                                               (.setTimeout js/window
                                                 #(set! (.-disabled bt) false) 1000)))} "Next >")))))))))))
 
+(enable-console-print!)
 (defn topic-click [data owner options expanded selected-metric]
+  ;; (prn :expanded expanded)
+  ;; (prn :section (keyword (:section-name options)))
   (if (utils/is-mobile)
-    (do (mobile-topic-animation data owner options expanded)
-        (scroll-to-topic-top (om/get-ref owner "topic"))
-        (dis/dispatch! [:topic/expand (keyword (:section-name options))]))
+    (do (dis/dispatch! [:topic/expand (if expanded nil (keyword (:section-name options)))])
+        ;; (mobile-topic-animation data owner options expanded)
+        (after 50 #(scroll-to-topic-top (om/get-ref owner "topic"))))
     ((:bw-topic-click options) (:section data) selected-metric)))
 
 (defn animate-revision-navigation [owner]
@@ -244,8 +251,7 @@
 (defcomponent topic [{:keys [section-data section currency expanded-topic] :as data} owner options]
 
   (init-state [_]
-    {:expanded false
-     :as-of (:updated-at section-data)
+    {:as-of (:updated-at section-data)
      :actual-as-of (:updated-at section-data)
      :transition-as-of nil})
 
@@ -258,13 +264,13 @@
         (om/set-state! owner :as-of new-as-of)
         (om/set-state! owner :actual-as-of new-as-of))))
 
-  (did-mount [_]
-    ;; manually re-open the topic if on mobile
-    (when (and (utils/is-mobile) (= (keyword section) expanded-topic))
-      (mobile-topic-animation data owner options false)))
+  ;; (did-mount [_]
+  ;;   ;; manually re-open the topic if on mobile
+  ;;   (when (and (utils/is-mobile) (= (keyword section) expanded-topic))
+  ;;     (mobile-topic-animation data owner options false)))
 
   (did-update [_ prev-props _]
-    (when (and (utils/is-mobile)
+    #_(when (and (utils/is-mobile)
                (= (keyword section) (:expanded-topic prev-props))
                (not= expanded-topic (:expanded-topic prev-props)))
       (mobile-topic-animation data owner options true))
