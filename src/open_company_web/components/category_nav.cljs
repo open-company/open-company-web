@@ -6,11 +6,25 @@
             [cljs.core.async :refer (put!)]
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
+            [goog.fx.Animation.EventType :as EventType]
             [goog.events :as events]
             [goog.style :as gstyle])
-  (:import [goog.events EventType]))
+  (:import [goog.fx.dom Scroll]))
 
 (def max-scroll-top 133)
+
+(defn scroll-to-top!
+  "Scroll to top of the page while ensuring body is not shrinking to avoid jump"
+  []
+  (gstyle/setStyle (sel1 :body) #js {:minHeight "9999px"})
+  (doto (Scroll. (.-body js/document)
+                 #js [0 (.-scrollTop (.-body js/document))]
+                 #js [0 0]
+                 utils/oc-animation-duration)
+    (events/listen
+     EventType/FINISH
+     #(gstyle/setStyle (sel1 :body) #js {:minHeight "auto"}))
+    (.play)))
 
 (defn category-click [data category-name e]
   ;; prevent the route reload
@@ -19,21 +33,10 @@
   ((:switch-category-cb data) category-name)
   ;; prevent the anchor element from reload the route
   (.preventDefault e)
-  ;; change the window.location.hash
-  (set! (.-hash (.-location js/window)) category-name)
-  ;; fix the scroll to the first section if necessary
-  (when (and (utils/is-mobile) (>= (.-scrollTop (sel1 :body)) max-scroll-top))
-    (set! (.-scrollTop (sel1 :body)) max-scroll-top))
+  (set! js/window.location.hash category-name)
+  (when (utils/is-mobile) (scroll-to-top!))
   ;; reactivate the url change handler
   (reset! open-company-web.core/prevent-route-dispatch false))
-
-(defn setup-body-min-height []
-  (when-let [app-div (sel1 :div#app)]
-    (let [app-height (if app-div (.-offsetHeight app-div) 0)
-          cur-min-height (.parseInt js/window (.-minHeight (.-style (sel1 :body))))
-          fix-cur-min-height (if (js/isNaN cur-min-height) 0 cur-min-height)]
-      (when (> app-height fix-cur-min-height)
-        (gstyle/setStyle (sel1 :body) #js {:minHeight (str app-height "px")})))))
 
 (defn get-categories [categories is-editing]
   (if (or (utils/is-mobile) is-editing)
@@ -59,8 +62,6 @@
                               :top "50px"}
                          #js {:position "relative"
                               :top "0px"})]
-      (when (utils/is-mobile)
-        (setup-body-min-height))
       (dom/div #js {:className "row category-nav"
                     :ref "category-nav"
                     :style navbar-style}
