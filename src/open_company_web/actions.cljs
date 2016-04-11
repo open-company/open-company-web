@@ -93,3 +93,6 @@
      (assoc :companies (:companies (:collection body)))
      (dissoc :loading))
     db))
+
+(defmethod action :topic/expand [db [_ topic-kw]]
+  (assoc db :expanded-topic topic-kw))
