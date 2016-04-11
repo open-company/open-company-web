@@ -73,6 +73,7 @@
 (defn vec-dissoc [coll elem]
   (vec (filter #(not= elem %) coll)))
 
+;; TODO use goog.i18n.DateTimeFormat here
 (defn month-string [month & [flags]]
   (let [short-month (in? flags :short)]
     (case (.parseInt js/window month 10)
@@ -113,6 +114,7 @@
              "DEC"
              "December"))))
 
+;; TODO use goog.i18n.DateTimeFormat here
 (defn month-string-int [month & [flags]]
   (let [short-month (in? flags :short)]
     (case month
@@ -154,6 +156,7 @@
           "December")
       "")))
 
+;; TODO use goog.i18n.DateTimeFormat here
 (defn month-short-string [month]
   (case month
     "01" "JAN"
@@ -230,6 +233,7 @@
         (< v 100) "0")
     v))
 
+;; TODO use goog.i18n.DateTimeFormat here
 (defn date-string [js-date & [year]]
   (let [month (month-string (add-zero (inc (.getMonth js-date))))
         day (add-zero (.getDate js-date))]
