@@ -35,7 +35,7 @@
     "monthly" (t/months diff)
     "weekly" (t/weeks diff)))
 
-(defn- get-past-period [period diff interval]
+(defn get-past-period [period diff interval]
   (let [period-date (utils/date-from-period period interval)
         past-date (t/minus period-date (get-minus diff interval))
         formatter (utils/get-formatter interval)]
@@ -51,7 +51,6 @@
   {:period period
    :slug slug
    :value nil
-   :target nil
    :new true})
 
 (defn chart-placeholder-data [initial-data slug interval]
@@ -68,12 +67,12 @@
 
 (defn edit-placeholder-data [initial-data slug interval]
   (let [current-period (utils/current-growth-period interval)
-        first-period (if (first initial-data)
-                      (:period (first initial-data))
+        first-period (if (last initial-data)
+                      (:period (last initial-data))
                       (get-past-period current-period 12 interval))
         diff (utils/periods-diff first-period current-period interval)
-        data-count (max (dec columns-num) diff)]
-    (let [fixed-data (for [idx (range 0 data-count)]
+        data-count (max columns-num (inc diff))]
+    (let [fixed-data (for [idx (range data-count)]
                        (let [prev-period (get-past-period current-period idx interval)
                              period-exists (utils/period-exists prev-period initial-data)]
                          (if period-exists

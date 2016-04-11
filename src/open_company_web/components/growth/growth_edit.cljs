@@ -12,16 +12,15 @@
             [cljs.core.async :refer (put!)]))
 
 (defn signal-tab [period k]
-  (let [ch (utils/get-channel (str period k))]
+  (when-let [ch (utils/get-channel (str period k))]
     (put! ch {:period period :key k})))
 
 (defcomponent growth-edit-row [data _]
 
   (render [_]
     (let [growth-data (:cursor data)
-          is-new (:new growth-data)
+          is-new (and (not (:value growth-data)) (:new growth-data))
           value (:value growth-data)
-          target (:target growth-data)
           interval (:interval data)
           period (:period growth-data)
           period-month (utils/get-month period interval)
@@ -33,26 +32,12 @@
           next-period (:next-period data)
           tab-cb (fn [_ k]
                    (cond
-                     (and (= k :target) (:is-last data))
-                     (signal-tab next-period :target)
-                     (= k :target)
-                     (signal-tab (:period growth-data) :value)
                      (= k :value)
                      (when next-period
-                       (signal-tab next-period :target))))]
+                       (signal-tab next-period :value))))]
       (dom/tr {:class "growth-edit-row"}
         (dom/td {:class "no-cell"}
           period-string)
-        (dom/td {}
-          (om/build cell {:value target
-                          :placeholder "Target (optional)"
-                          :cell-state cell-state
-                          :draft-cb #(change-cb :target %)
-                          :prefix (:prefix data)
-                          :suffix (:suffix data)
-                          :period period
-                          :key :target
-                          :tab-cb tab-cb}))
         (dom/td {}
           (when-not (:is-last data)
             (om/build
@@ -67,11 +52,6 @@
                :key :value
                :tab-cb tab-cb})))))))
 
-(defn next-period [data idx]
-  (let [data (to-array data)]
-    (when (< idx (dec (count data)))
-      (let [next-row (get data (inc idx))] (:period next-row)))))
-
 (defn replace-row-in-data [owner data metric-data row k v]
   "Find and replace the edited row"
   (let [array-data (vec (js->clj metric-data))
@@ -83,7 +63,7 @@
               new-rows (assoc array-data idx new-row)
               sort-pred (utils/sort-by-key-pred :period true)
               sorted-rows (sort sort-pred new-rows)]
-          (om/update-state! owner :sorted-data (fn [_] sorted-rows)))))))
+          (om/update-state! owner :metric-data (fn [_] sorted-rows)))))))
 
 (defn get-current-metric-info [data]
   (let [metric-slug (:metric-slug data)
@@ -92,37 +72,15 @@
 
 (defn sort-growth-data [data]
   (let [metric-data (:growth-data data)
-        metric-info (get-current-metric-info data)
-        focus (:metric-slug data)]
-    (if (or (= focus growth-utils/new-metric-slug-placeholder)
-             (not (:interval metric-info)))
-      (vec [])
-      (let [placeholder-data (growth-utils/edit-placeholder-data metric-data focus (:interval metric-info))
-            sorter (utils/sort-by-key-pred :period true)]
-        (vec (sort sorter placeholder-data))))))
+        sorter (utils/sort-by-key-pred :period true)
+        sorted-metric-data (sort sorter metric-data)]
+    sorted-metric-data))
 
-(defn get-interval-batch-size [interval]
-  (case interval
-    "quarterly" 8
-    "monthly" 8
-    "weekly" 12))
-
-(defn get-more [last-period interval]
-  (vec
-    (for [idx (range 1 (inc (get-interval-batch-size interval)))]
-      (let [prev-period (growth-utils/get-past-period last-period idx interval)]
-        {:period prev-period
-         :value nil
-         :target nil
-         :new true}))))
+(def batch-size 6)
 
 (defn more-months [owner data]
-  (let [sorted-data (om/get-state owner :sorted-data)
-        last-data (last sorted-data)
-        last-period (:period last-data)
-        interval (:interval (get-current-metric-info data))
-        more (get-more last-period interval)]
-    (om/set-state! owner :sorted-data (concat sorted-data more))))
+  (let [metric-info (get-current-metric-info data)]
+    (om/update-state! owner :stop #(+ % batch-size))))
 
 (defn set-metadata-edit [owner data editing]
   ((:metadata-edit-cb data) editing)
@@ -131,46 +89,35 @@
 (defcomponent growth-edit [data owner]
 
   (init-state [_]
-    {:metadata-edit (:new-metric data)
-     :sorted-data (sort-growth-data data)})
+    (let [metric-info (get-current-metric-info data)]
+      {:metadata-edit (:new-metric data)
+       :growth-data (:growth-data data)
+       :stop batch-size}))
 
   (will-receive-props [_ next-props]
-    (when (not= (:metrics data) (:metrcs next-props))
-      (om/set-state! owner :sorted-data (sort-growth-data next-props))))
+    (when (not= (:growth-data data) (:growth-data next-props))
+      (om/set-state! owner :metadata-edit (:new-metric next-props))
+      (om/set-state! owner :growth-data (:growth-data next-props))))
 
-  (render [_]
-    (let [metric-info (get-current-metric-info data)
-          metric-data (om/get-state owner :sorted-data)
-          slug (keyword (:slug @router/path))
-          company-data (slug @dispatcher/app-state)
+  (render-state [_ {:keys [growth-data metric-data metadata-edit stop]}]
+    (let [{:keys [interval slug] :as metric-info} (get-current-metric-info data)
+          company-slug (keyword (:slug @router/path))
+          company-data (company-slug @dispatcher/app-state)
           prefix (if (= (:unit metric-info) "currency")
                    (utils/get-symbol-for-currency-code (:currency company-data))
                    "")
-          suffix (when (= (:unit metric-info) "%") "%")
-          rows-data (vec (map (fn [row]
-                                (let [v {:prefix prefix
-                                         :suffix suffix
-                                         :interval (:interval metric-info)
-                                         :change-cb (fn [k v]
-                                                      (replace-row-in-data owner data metric-data row k v))
-                                         :cursor row}]
-                                  v))
-                              metric-data))]
+          suffix (when (= (:unit metric-info) "%") "%")]
       (dom/div {:class "composed-section-edit growth-body edit"}
-        (if (om/get-state owner :metadata-edit)
+        (if metadata-edit
           (om/build growth-metric-edit {:metric-info metric-info
                                         :metric-count (:metric-count data)
                                         :metrics (:metrics data)
                                         :new-metric (:new-metric data)
                                         :new-growth-section (:new-growth-section data)
-                                        :next-cb (fn []
-                                                   (set-metadata-edit owner data false)
-                                                   (when (:new-metric data)
-                                                     ; delay focus on the first target
-                                                     (.setTimeout js/window
-                                                                  #(signal-tab (:period (:cursor (get rows-data 0))) :target)
-                                                                  400)))
-                                        :delete-metric-cb (:delete-metric-cb data)
+                                        :next-cb #(set-metadata-edit owner data false)
+                                        :delete-metric-cb (fn [metric-slug]
+                                                           (om/set-state! owner :metadata-edit false)
+                                                           ((:delete-metric-cb data) metric-slug))
                                         :cancel-cb (fn []
                                                      ; 3 cases
                                                      (if (or (:new-growth-section data) (:new-metric data))
@@ -200,19 +147,30 @@
               (dom/thead {}
                 (dom/tr {}
                   (dom/th {} "")
-                  (dom/th {} "Target")
                   (dom/th {} "Value")))
               (dom/tbody {}
-                (for [idx (range (dec (count rows-data)))]
-                  (let [row-data (get rows-data idx)
-                        next-period (next-period metric-data idx)
-                        row (merge row-data {:next-period next-period
-                                             :is-last (= idx 0)
-                                             :needs-year (or (= idx 0)
-                                                             (= idx (- (count rows-data) 2)))})]
-                    (om/build growth-edit-row row)))
-                (dom/tr {}
-                  (dom/td {}
-                    (dom/a {:on-click #(more-months owner data)} "More..."))
-                  (dom/td {})
-                  (dom/td {}))))))))))
+                (let [current-period (utils/current-growth-period interval)]
+                  (for [idx (range stop)]
+                    (let [period (growth-utils/get-past-period current-period idx interval)
+                          has-value (contains? growth-data (str period slug))
+                          row-data (if has-value
+                                      (get growth-data (str period slug))
+                                      {:period period
+                                       :slug slug
+                                       :value nil
+                                       :new true})
+                          next-period (growth-utils/get-past-period current-period (inc idx) interval)]
+                      (om/build growth-edit-row {:cursor row-data
+                                                 :next-period next-period
+                                                 :is-last (= idx 0)
+                                                 :needs-year (or (= idx 0)
+                                                                 (= idx (dec stop)))
+                                                 :prefix prefix
+                                                 :suffix suffix
+                                                 :interval interval
+                                                 :change-cb (fn [k v]
+                                                      (replace-row-in-data owner data metric-data row-data k v))}))))
+                  (dom/tr {}
+                    (dom/td {}
+                      (dom/a {:on-click #(more-months owner data)} "More..."))
+                    (dom/td {}))))))))))

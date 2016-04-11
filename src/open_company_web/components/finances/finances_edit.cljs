@@ -38,9 +38,11 @@
           runway-days (:runway finances-data)
           runway (cond
                    (nil? runway-days) "calculated"
+                   (or (not (:cash finances-data))
+                       (not (:costs finances-data))) ""
                    (zero? runway-days) "break-even"
                    (pos? runway-days) "profitable"
-                   :else (str (utils/thousands-separator (utils/abs runway-days)) " days"))
+                   :else (finances-utils/get-rounded-runway runway-days)) 
           ref-prefix (str (:period finances-data) "-")
           period-month (utils/get-month period)
           needs-year (or (= period-month "JAN")
@@ -87,72 +89,30 @@
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
                 runway)))))
 
-(defn replace-row-in-data [owner data finances-data row k v]
+(defn replace-row-in-data [data row k v]
   "Find and replace the edited row"
-  (let [array-data (vec (js->clj finances-data))
-        new-row (update row k (fn[_]v))]
-    ((:change-finances-cb data) new-row)
-    (doseq [cur-row array-data]
-      (when (= (:period cur-row) (:period new-row))
-        (let [idx (.indexOf (to-array array-data) cur-row)
-              new-rows (assoc array-data idx new-row)
-              runway-rows (utils/calc-burnrate-runway new-rows)
-              sort-pred (utils/sort-by-key-pred :period true)
-              sorted-rows (sort sort-pred runway-rows)]
-          (om/update-state! owner :sorted-data (fn [_] sorted-rows)))))))
+  (let [new-row (update row k (fn[_]v))]
+    ((:change-finances-cb data) new-row)))
 
-(defn next-period [data idx]
-  (let [data (to-array data)]
-    (when (< idx (dec (count data)))
-      (let [next-row (get data (inc idx))]
-        (:period next-row)))))
+(def batch-size 6)
 
-(defn sort-finances-data [data]
-  (let [data-vec (vec (vals data))
-        runway-rows (utils/calc-burnrate-runway data-vec)
-        sorter (utils/sort-by-key-pred :period true)]
-    (vec (sort sorter runway-rows))))
-
-(defn get-12-months [last-period]
-  (vec
-    (for [idx (range 1 13)]
-      (let [prev-period (finances-utils/get-past-period last-period idx)]
-        {:period prev-period
-         :cash nil
-         :revenue nil
-         :costs nil
-         :burn-rate nil
-         :avg-burn-rate nil
-         :runway nil
-         :value nil
-         :new true}))))
-
-
-(defn more-12-month [owner]
-  (let [sorted-data (om/get-state owner :sorted-data)
-        last-data (last sorted-data)
-        last-period (:period last-data)
-        more-12 (get-12-months last-period)]
-    (om/set-state! owner :sorted-data (concat sorted-data more-12))))
+(defn more-months [owner]
+  (om/update-state! owner :stop #(+ % batch-size)))
 
 (defcomponent finances-edit [data owner]
 
   (init-state [_]
-    {:sorted-data (sort-finances-data (:finances-data data))})
+    {:finances-data (:finances-data data)
+     :stop batch-size})
 
-  (render [_]
-    (let [finances-data (om/get-state owner :sorted-data)
-          currency (:currency data)
+  (will-receive-props [_ next-props]
+    (when-not (= (:finances-data data) (:finances-data next-props))
+      (om/set-state! owner :finances-data (:finances-data next-props))))
+
+  (render-state [_ {:keys [finances-data stop]}]
+    (let [currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
-          show-burn (some #(pos? (:revenue %)) finances-data)
-          rows-data (vec (map (fn [row]
-                                (let [v {:prefix cur-symbol
-                                         :show-burn show-burn
-                                         :change-cb (fn [k v]
-                                                      (replace-row-in-data owner data finances-data row k v))
-                                         :cursor row}]
-                                  v))
-                              finances-data))]
+          show-burn (some #(pos? (:revenue %)) finances-data)]
       ; real component
       (dom/div {:class "finances"}
         (dom/div {:class "composed-section-edit finances-body edit"}
@@ -167,16 +127,25 @@
                   (dom/th {} "Burn"))
                 (dom/th {} "Runway")))
             (dom/tbody {}
-              (for [idx (range (count rows-data))]
-                (let [row-data (get rows-data idx)
-                      next-period (next-period finances-data idx)
-                      row (merge row-data {:next-period next-period
-                                           :needs-year (or (= idx 0)
-                                                            (= idx (dec (count rows-data))))})]
-                  (om/build finances-edit-row row)))
+              (let [current-period (utils/current-period)]
+                (for [idx (range stop)]
+                  (let [period (finances-utils/get-past-period current-period idx)
+                        has-value (contains? finances-data period)
+                        row-data (if has-value
+                                    (get finances-data period)
+                                    (finances-utils/placeholder-data period))
+                        next-period (finances-utils/get-past-period current-period (inc idx))]
+                    (om/build finances-edit-row {:cursor row-data
+                                                 :next-period next-period
+                                                 :is-last (= idx 0)
+                                                 :needs-year (or (= idx 0)
+                                                                 (= idx (dec stop)))
+                                                 :prefix cur-symbol
+                                                 :show-burn show-burn
+                                                 :change-cb #(replace-row-in-data data row-data %1 %2)}))))
               (dom/tr {}
                 (dom/td {}
-                  (dom/a {:on-click #(more-12-month owner)} "More..."))
+                  (dom/a {:on-click #(more-months owner)} "More..."))
                 (dom/td {})
                 (dom/td {})
                 (dom/td {})

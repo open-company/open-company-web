@@ -39,14 +39,13 @@
           chart-opts {:opts {:chart-height (:height (:chart-size options))
                              :chart-width (:width (:chart-size options))
                              :chart-keys [:value]
+                             :interval interval
                              :label-color (occ/get-color-by-kw :oc-blue-regular)
                              :label-key :label
                              :h-axis-color (occ/get-color-by-kw :oc-blue-light)
                              :h-axis-selected-color (occ/get-color-by-kw :oc-blue-regular)
-                             :chart-colors {:value (occ/get-color-by-kw :oc-blue-light)
-                                            :target (occ/get-color-by-kw :oc-blue-regular)}
-                             :chart-selected-colors {:value (occ/get-color-by-kw :oc-blue-dark)
-                                                     :target (occ/get-color-by-kw :oc-blue-dark)}}}]
+                             :chart-colors {:value (occ/get-color-by-kw :oc-blue-light)}
+                             :chart-selected-colors {:value (occ/get-color-by-kw :oc-blue-dark)}}}]
       (dom/div {:class (utils/class-set {:section true
                                          (:slug metric-info) true
                                          :read-only (:read-only data)})

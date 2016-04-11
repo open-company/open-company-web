@@ -10,19 +10,20 @@
   (render [_]
     (let [sort-pred (utils/sort-by-key-pred :period)
           finances-data (sort sort-pred (:data data))
-          all-revenues (apply + (map :revenue finances-data))
+          all-revenues (remove js/isNaN (remove nil? (map #(js/parseFloat (:revenue %)) (:data data))))
+          revenues-sum (apply + all-revenues)
           actual (last finances-data)
           currency (utils/get-symbol-for-currency-code (:currency options))
           runway (finances-utils/fix-runway (:runway actual))
-          burn-label (if (pos? all-revenues)
+          burn-label (if (pos? revenues-sum)
                         "Cash Flow"
                         "Costs")
-          burn-class  (if (pos? all-revenues)
+          burn-class  (if (pos? revenues-sum)
                         (if (pos? (:burn-rate actual))
                           "cash-flow"
                           "burn-rate")
                         "costs")
-          burn-value (utils/with-metric-prefix (if (pos? all-revenues)
+          burn-value (utils/with-metric-prefix (if (pos? revenues-sum)
                                                 (utils/abs (:burn-rate actual))
                                                 (:costs actual)))]
       (dom/div {:class (utils/class-set {:topic-headline-inner true

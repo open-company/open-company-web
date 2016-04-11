@@ -212,10 +212,10 @@
      :as-of (:updated-at section-data)
      :actual-as-of (:updated-at section-data)})
 
-  (did-update [_ prev-props _]
-    (let [new-as-of (:updated-at section-data)
+  (will-update [_ next-props _]
+    (let [new-as-of (:updated-at (:section-data next-props))
           current-as-of (om/get-state owner :as-of)
-          old-as-of (:updated-at (:section-data prev-props))]
+          old-as-of (:updated-at section-data)]
       (when (and (not= old-as-of new-as-of)
                  (not= current-as-of new-as-of))
         (om/set-state! owner :as-of new-as-of)
