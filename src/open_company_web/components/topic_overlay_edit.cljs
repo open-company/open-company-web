@@ -5,6 +5,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.api :as api]
+            [open-company-web.caches :as caches]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
@@ -21,12 +22,12 @@
     (om/set-state! owner :has-changes true)
     (om/set-state! owner k value)))
 
-(def medium-editor-options {
+(defn medium-editor-options [placeholder] {
   :toolbar {
     :buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "orderedlist" "unorderedlist" "anchor" "image"]
   }
   :placeholder {
-    :text "Add your notes here"
+    :text placeholder
     :hideOnClick true
   }})
 
@@ -54,9 +55,12 @@
         fixed-runway (assoc fixed-burnrate :runway (utils/calc-runway (:cash fixed-burnrate) (:burn-rate fixed-burnrate)))]
     fixed-runway))
 
+(defn finances-data-map [finances-data]
+  (apply merge (map #(hash-map (:period %) %) finances-data)))
+
 (defn finances-init-state [topic data]
   (when (= topic "finances")
-    {:finances-data (finances-utils/map-placeholder-data data)}))
+    {:finances-data (finances-data-map data)}))
 
 (defn change-finances-data-cb [owner row]
   (let [fixed-row (finances-fix-row row)
@@ -240,6 +244,7 @@
       :title (:title topic-data)
       :headline (:headline topic-data)
       :body (utils/get-topic-body topic-data topic)
+      :note (:note topic-data)
       :show-headline-counter false
       :show-title-counter false
       :medium-editor nil
@@ -261,7 +266,9 @@
       (reset! open-company-web.core/prevent-route-dispatch true)
       ; save initial innerHTML and setup MediumEditor
       (let [body-el (om/get-ref owner "topic-overlay-edit-body")
-            med-ed (new js/MediumEditor body-el (clj->js medium-editor-options))]
+            slug (keyword (:slug @router/path))
+            finances-placeholder-data (get (:sections (get (:categories (slug @caches/new-sections)) 2)) 0)
+            med-ed (new js/MediumEditor body-el (clj->js (medium-editor-options (:note finances-placeholder-data))))]
         (.subscribe med-ed "editableInput" (fn [event editable]
                                              (om/set-state! owner :has-changes true)))
         (om/set-state! owner :initial-body (.-innerHTML body-el))
@@ -297,10 +304,7 @@
                            show-title-counter
                            growth-metric-slugs]}]
     (let [topic-kw (keyword topic)
-          js-date-upat (utils/js-date (:updated-at topic-data))
-          month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
-          topic-updated-at (str month-string " " (.getDate js-date-upat))
-          subtitle-string (str (:name (:author topic-data)) " on " topic-updated-at)
+          title-length-limit 20
           section-body (utils/get-topic-body topic-data topic-kw)
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height utils/overlay-max-win-height)
@@ -308,7 +312,11 @@
           ; growth
           focus-metric-data (filter-growth-data growth-focus growth-data)
           growth-data (when (= topic "growth") (growth-map-metric-data (:data topic-data)))
-          growth-cancel-fn #(growth-cancel-cb owner data)]
+          growth-cancel-fn #(growth-cancel-cb owner data)
+          headline-length-limit (if (or (= topic-kw :finances)
+                                        (= topic-kw :growth))
+                                  80
+                                  100)]
       ; set the onbeforeunload handler only if there are changes
       (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
@@ -329,27 +337,32 @@
                       :placeholder "Type your title here"
                       :on-focus #(om/set-state! owner :show-title-counter true)
                       :on-blur #(om/set-state! owner :show-title-counter false)
-                      :max-length 100
+                      :max-length title-length-limit
                       :value title
                       :on-change #(change-value owner :title %)})
           (dom/div {:class (utils/class-set {:topic-overlay-edit-title-count true
                                              :transparent (not show-title-counter)})}
-            (dom/label {:class "bold"} (- 100 (count title))) "/100")
-          (dom/div {:class "topic-overlay-date"} subtitle-string))
+            (dom/label {:class "bold"} (- title-length-limit (count title))))
+          (dom/div {:class "topic-overlay-date"}))
         (dom/div #js {:className "topic-overlay-edit-content"
                       :ref "topic-overlay-edit-content"
                       :style #js {:maxHeight (str max-height "px")}}
-          (dom/input {:class "topic-overlay-edit-headline"
-                      :id (str "topic-edit-headline-" (name topic))
-                      :type "text"
-                      :placeholder "Type your headline here"
-                      :on-focus #(om/set-state! owner :show-headline-counter true)
-                      :on-blur #(om/set-state! owner :show-headline-counter false)
-                      :max-length 100
-                      :value headline
-                      :on-change #(change-value owner :headline %)})
-          (dom/div {:class "topic-overlay-edit-headline-count"}
-              (dom/label {:class "bold"} (- 100 (count headline))) "/100")
+          (dom/div {:class "flex"}
+            (dom/textarea {:class "flex-auto mb3 topic-overlay-edit-headline"
+                           :resize false
+                           :id (str "topic-edit-headline-" (name topic))
+                           :type "text"
+                           :placeholder "Type your headline here"
+                           :on-focus #(om/set-state! owner :show-headline-counter true)
+                           :on-blur #(om/set-state! owner :show-headline-counter false)
+                           :max-length headline-length-limit
+                           :value headline
+                           :on-change #(change-value owner :headline %)})
+            (dom/div {:class (utils/class-set {:ml2 true
+                                               :mt1 true
+                                               :pr3 true
+                                               :transparent (not show-headline-counter)})}
+              (dom/label {:class "bold"} (- headline-length-limit (count headline)))))
           (dom/div {:class "topic-overlay-edit-data"}
             (when (= topic "finances")
               (om/build finances-edit {:finances-data finances-data
