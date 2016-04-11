@@ -91,15 +91,11 @@
         sorted-metric-data (sort sorter metric-data)]
     sorted-metric-data))
 
-(defn get-interval-batch-size [interval]
-  (case interval
-    "quarterly" 8
-    "monthly" 8
-    "weekly" 12))
+(def batch-size 6)
 
 (defn more-months [owner data]
   (let [metric-info (get-current-metric-info data)]
-    (om/update-state! owner :stop #(+ % (get-interval-batch-size (:interval metric-info))))))
+    (om/update-state! owner :stop #(+ % batch-size))))
 
 (defn set-metadata-edit [owner data editing]
   ((:metadata-edit-cb data) editing)
@@ -111,7 +107,7 @@
     (let [metric-info (get-current-metric-info data)]
       {:metadata-edit (:new-metric data)
        :growth-data (:growth-data data)
-       :stop (get-interval-batch-size (:interval metric-info))}))
+       :stop batch-size}))
 
   (will-receive-props [_ next-props]
     (when (not= (:growth-data data) (:growth-data next-props))
@@ -125,16 +121,7 @@
           prefix (if (= (:unit metric-info) "currency")
                    (utils/get-symbol-for-currency-code (:currency company-data))
                    "")
-          suffix (when (= (:unit metric-info) "%") "%")
-          rows-data (vec (map (fn [row]
-                                (let [v {:prefix prefix
-                                         :suffix suffix
-                                         :interval (:interval metric-info)
-                                         :change-cb (fn [k v]
-                                                      (replace-row-in-data owner data metric-data row k v))
-                                         :cursor row}]
-                                  v))
-                              metric-data))]
+          suffix (when (= (:unit metric-info) "%") "%")]
       (dom/div {:class "composed-section-edit growth-body edit"}
         (if metadata-edit
           (om/build growth-metric-edit {:metric-info metric-info
@@ -142,13 +129,7 @@
                                         :metrics (:metrics data)
                                         :new-metric (:new-metric data)
                                         :new-growth-section (:new-growth-section data)
-                                        :next-cb (fn []
-                                                   (set-metadata-edit owner data false)
-                                                   (when (:new-metric data)
-                                                     ; delay focus on the first target
-                                                     (.setTimeout js/window
-                                                                  #(signal-tab (:period (:cursor (get rows-data 0))) :target)
-                                                                  400)))
+                                        :next-cb #(set-metadata-edit owner data false)
                                         :delete-metric-cb (fn [metric-slug]
                                                            (om/set-state! owner :metadata-edit false)
                                                            ((:delete-metric-cb data) metric-slug))
