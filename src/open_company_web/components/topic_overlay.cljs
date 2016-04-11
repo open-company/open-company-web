@@ -207,19 +207,21 @@
         (dom/div #js {:className "topic-overlay-edit-content"
                       :ref "topic-overlay-edit-content"
                       :style #js {:maxHeight (str max-height "px")}}
-          (dom/textarea {:class "topic-overlay-edit-headline"
-                         :resize false
-                         :id (str "topic-edit-headline-" (name topic))
-                         :type "text"
-                         :placeholder "Type your headline here"
-                         :on-focus #(om/set-state! owner :show-headline-counter true)
-                         :on-blur #(om/set-state! owner :show-headline-counter false)
-                         :max-length 100
-                         :value headline
-                         :on-change #(change-value owner :headline %)})
-          (dom/div {:class (utils/class-set {:topic-overlay-edit-headline-count true
-                                             :transparent (not show-headline-counter)})}
-            (dom/span (- 100 (count headline))))
+          (dom/div {:class "flex"}
+            (dom/textarea {:class "flex-auto mb3 topic-overlay-edit-headline"
+                           :resize false
+                           :id (str "topic-edit-headline-" (name topic))
+                           :type "text"
+                           :placeholder "Type your headline here"
+                           :on-focus #(om/set-state! owner :show-headline-counter true)
+                           :on-blur #(om/set-state! owner :show-headline-counter false)
+                           :max-length 100
+                           :value headline
+                           :on-change #(change-value owner :headline %)})
+            (dom/div {:class (utils/class-set {;:topic-overlay-edit-headline-count true
+                                        :ml2 true, :mt1 true, :pr3 true,
+                                        :transparent (not show-headline-counter)})}
+              (dom/span (- 100 (count headline)))))
           (dom/div #js {:className "topic-overlay-edit-body"
                         :ref "topic-overlay-edit-body"
                         :id (str "topic-edit-body-" (name topic))
