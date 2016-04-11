@@ -218,7 +218,7 @@
   ;; (prn :section (keyword (:section-name options)))
   (if (utils/is-mobile)
     (do (dis/dispatch! [:topic/expand (if expanded nil (keyword (:section-name options)))])
-        ;; (mobile-topic-animation data owner options expanded)
+        (mobile-topic-animation data owner options expanded)
         (after 50 #(scroll-to-topic-top (om/get-ref owner "topic"))))
     ((:bw-topic-click options) (:section data) selected-metric)))
 
