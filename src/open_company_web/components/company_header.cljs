@@ -57,7 +57,7 @@
           (gstyle/setStyle category-nav #js {:position "fixed"
                                              :top "46px"
                                              :left "0"})
-          (gstyle/setStyle topic-list #js {:marginTop "72px"}))
+          (gstyle/setStyle topic-list #js {:marginTop "24px"}))
         (do
           (gstyle/setStyle category-nav #js {:position "relative"
                                              :top "0"

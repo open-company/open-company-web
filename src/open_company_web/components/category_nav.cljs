@@ -16,14 +16,14 @@
 (defn scroll-to-top!
   "Scroll to top of the page while ensuring body is not shrinking to avoid jump"
   []
-  (gstyle/setStyle (sel1 :body) #js {:minHeight "9999px"})
+  (gstyle/setStyle (sel1 :body) "min-height" "9999px")
   (doto (Scroll. (.-body js/document)
                  #js [0 (.-scrollTop (.-body js/document))]
-                 #js [0 0]
+                 #js [0 max-scroll-top]
                  utils/oc-animation-duration)
     (events/listen
      EventType/FINISH
-     #(gstyle/setStyle (sel1 :body) #js {:minHeight "auto"}))
+     #(gstyle/setStyle (sel1 :body) "min-height" 0))
     (.play)))
 
 (defn category-click [data category-name e]
