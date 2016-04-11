@@ -55,10 +55,6 @@ div.topic-overlay-edit {
       height: 16px;
       margin-top: 0px;
       margin-right: 158px;
-
-      label.bold{
-        font-weight: bold;
-      } 
     }
 
     div.topic-overlay-date {
@@ -107,21 +103,15 @@ div.topic-overlay-edit {
     }
 
     div.topic-overlay-edit-headline-count{
-      float: right;
       text-align: right;
-      width: 57px;
       height: 16px;
       font-size: 14px;
-      margin-top: 13px;
-
-      label.bold{
-        font-weight: bold;
-      }
+      width: 500px;
+      margin-bottom: 24px;
     }
 
-    input.topic-overlay-edit-headline {
-      width: 500px;
-      margin-bottom: 30px;
+    textarea.topic-overlay-edit-headline {
+      resize: none;
       font-weight: 600;
       font-size: 20px;
       color: $topic_overlay_text_color;
