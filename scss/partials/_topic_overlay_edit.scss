@@ -76,10 +76,22 @@ div.topic-overlay-edit {
     position: relative;
 
     div.topic-overlay-edit-data {
+
       div.finances, div.growth {
         margin-left: -50px;
         width: calc(100% + 100px);
       }
+
+      div.growth-body {
+        table.table {
+          margin-left: 40px;
+          width: 400px;
+          td.no-cell:first-child, tr:first-child{
+            width: 150px;
+          }
+        }
+      }
+
       div.pillbox-container.growth{
         background-color: $oc_gray_1;
         padding: 12px;
@@ -99,6 +111,12 @@ div.topic-overlay-edit {
         }
 
         @include pillbox($oc_blue_regular);
+
+        label.pillbox.new-metric-slug-placeholder{
+          background-color: $oc_green_light;
+          color: white;
+          text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.6);
+        }
       }
     }
 

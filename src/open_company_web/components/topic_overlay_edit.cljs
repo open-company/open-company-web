@@ -146,6 +146,12 @@
     (om/set-state! owner :growth-metadata-editing false)
     (om/set-state! owner :has-changes true)))
 
+(defn growth-save-metrics-metadata-cb [owner data metric-slug]
+ (let [metrics (om/get-state owner :growth-metrics)
+       metrics-order (om/get-state owner :growth-metric-slugs)
+       new-metrics (vec (map #(metrics %) metrics-order))]
+    (api/partial-update-section "growth" {:metrics new-metrics})))
+
 (defn growth-metadata-edit-cb [owner editing]
   (om/set-state! owner :growth-metadata-editing editing))
 
@@ -180,11 +186,10 @@
         (om/set-state! owner :growth-focus (:slug properties-map))
         ; save the new metrics list
         (om/set-state! owner :growth-metric-slugs add-slug)))
-    (om/set-state! owner :has-changes true)
     (om/set-state! owner :growth-metrics new-metrics)))
 
 (defn growth-cancel-cb [owner data]
-  (let [state (growth-init-state owner data)]
+  (let [state (growth-init-state (:topic data) data)]
     ; reset the finances fields to the initial values
     (om/set-state! owner :growth-data (:growth-data state))
     (om/set-state! owner :growth-metrics (:growth-metrics state))
@@ -207,14 +212,10 @@
 (defn growth-clean-data [growth-data]
   (remove nil? (vec (map (fn [[_ v]] (growth-clean-row v)) growth-data))))
 
-(defn growth-save-map [owner]
+(defn growth-save-data [owner]
   (let [growth-data (om/get-state owner :growth-data)
-        fixed-growth-data (growth-clean-data growth-data)
-        growth-metrics (om/get-state owner :growth-metrics)
-        growth-metric-slugs (om/get-state owner :growth-metric-slugs)
-        metrics-vec (vec (map #(get growth-metrics %) growth-metric-slugs))]
-    {:data fixed-growth-data
-     :metrics metrics-vec}))
+        fixed-growth-data (growth-clean-data growth-data)]
+    {:data fixed-growth-data}))
 
 (defn data-to-save [owner topic]
  (let [topic-kw (keyword topic)
@@ -227,7 +228,7 @@
                             (merge with-body {:data (finances-clean-data (om/get-state owner :finances-data))})
                             with-body)
        with-growth-data (if (= topic-kw :growth)
-                          (merge with-finances-data (growth-save-map owner))
+                          (merge with-finances-data (growth-save-data owner))
                           with-finances-data)]
   with-growth-data))
 
@@ -309,7 +310,6 @@
           ; growth
           focus-metric-data (filter-growth-data growth-focus growth-data)
           growth-data (when (= topic "growth") (growth-utils/growth-data-map (:data topic-data)))
-          growth-cancel-fn #(growth-cancel-cb owner data)
           headline-length-limit (if (or (= topic-kw :finances)
                                         (= topic-kw :growth))
                                   80
@@ -375,8 +375,9 @@
                                        :metric-count (count focus-metric-data)
                                        :change-growth-cb (partial growth-change-data-cb owner)
                                        :delete-metric-cb (partial growth-delete-metric-cb owner data)
+                                       :save-metadata-cb (partial growth-save-metrics-metadata-cb owner data)
                                        :reset-metrics-cb #(growth-reset-metrics-cb topic owner data)
-                                       :cancel-cb growth-cancel-fn
+                                       :cancel-cb #(growth-cancel-cb owner data)
                                        :change-growth-metric-cb (partial growth-change-metric-cb owner data)
                                        :new-growth-section (om/get-state owner :oc-editing)}
                                       {:key focus-metric-data})
@@ -390,15 +391,19 @@
                       (dom/label {:class metric-classes
                                   :title (:description metric)
                                   :data-tab metric-slug
-                                  :on-click #(om/set-state! owner :growth-focus metric-slug)} mname)))
+                                  :on-click (fn [e]
+                                              (.stopPropagation e)
+                                              (om/set-state! owner :growth-new-metric false)
+                                              (om/set-state! owner :growth-focus metric-slug))} mname)))
                   (dom/label {:class (utils/class-set {:pillbox true
                                                        growth-utils/new-metric-slug-placeholder true
                                                        :active (= growth-focus growth-utils/new-metric-slug-placeholder)})
-                              :title "New metric"
+                              :title "Add a new metric"
                               :data-tab growth-utils/new-metric-slug-placeholder
-                              :on-click (fn []
-                                         (om/set-state! owner :growth-new-metric true)
-                                         (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "New metric")))))
+                              :on-click (fn [e]
+                                          (.stopPropagation e)
+                                          (om/set-state! owner :growth-new-metric true)
+                                          (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
           (dom/div #js {:className "topic-overlay-edit-body"
                         :ref "topic-overlay-edit-body"
                         :id (str "topic-edit-body-" (name topic))

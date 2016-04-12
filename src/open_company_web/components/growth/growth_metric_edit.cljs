@@ -195,6 +195,19 @@
                          :title "Delete this metric"
                          :on-click #(show-delete-confirm-popover owner data)} "DELETE")))
         (dom/div {:class "growth-metric-edit-row group"}
+          ; interval
+          (dom/div {:class "metric-data-container group"}
+            (dom/label {:for "mtr-interval"} "Interval:")
+            (dom/select {:class "metric-data metric-interval"
+                         :default-value (om/get-state owner :interval)
+                         :id "mtr-interval"
+                         ; if there are data the interval can't be changed
+                         :disabled (and (pos? (:metric-count data))
+                                        (not (:new-metric data)))
+                         :placeholder "Metric interval"
+                         :style {"width" "150px"}}
+              (for [interval intervals]
+                (dom/option {:value interval} (utils/camel-case-str interval)))))
           ; unit
           (dom/div {:class "metric-data-container right group"}
             (dom/label {:for "mtr-unit"} "Measured as")
@@ -208,20 +221,7 @@
                       unit-value (:unit unit)
                       unit-name (:name unit)]
                   (dom/option {:key unit-value
-                               :value unit-value} unit-name)))))
-          ; interval
-          (dom/div {:class "metric-data-container group"}
-            (dom/label {:for "mtr-interval"} "Interval:")
-            (dom/select {:class "metric-data metric-interval"
-                         :default-value (om/get-state owner :interval)
-                         :id "mtr-interval"
-                         ; if there are data the interval can't be changed
-                         :disabled (and (pos? (:metric-count data))
-                                        (not (:new-metric data)))
-                         :placeholder "Metric interval"
-                         :style {"width" "150px"}}
-              (for [interval intervals]
-                (dom/option {:value interval} (utils/camel-case-str interval))))))
+                               :value unit-value} unit-name))))))
         ; textarea
         (dom/div {:class "growth-metric-edit-row group"}
           (dom/textarea {:class "metric-data metric-description"
@@ -238,10 +238,7 @@
                                      (s/blank? (om/get-state owner :metric-name))
                                      (s/blank? (om/get-state owner :unit))
                                      (s/blank? (om/get-state owner :interval)))
-                       :on-click #((:next-cb data))} (if (:new-metric data) "NEXT" "SAVE"))
+                       :on-click #((:next-cb data))} "SAVE")
           ; cancel button
           (dom/button {:class "oc-btn oc-link blue"
-                       :on-click (:cancel-cb data)}
-            (if new-growth-section
-              "DELETE"
-              "CANCEL")))))))
+                       :on-click (:cancel-cb data)} "CANCEL"))))))
