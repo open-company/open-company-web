@@ -9,12 +9,12 @@
 
 (def bar-width 15)
 
-(def show-columns 6)
+(def chart-step 6)
 
 (defn current-data [owner]
   (let [start (om/get-state owner :start)
         all-data (vec (om/get-props owner :chart-data))
-        stop (min (count all-data) (+ start show-columns))]
+        stop (min (count all-data) (+ start chart-step))]
     (subvec all-data start stop)))
 
 (defn scale [owner options]
@@ -181,6 +181,7 @@
                                   color))
                   (.attr "data-fill" color)
                   (.attr "data-selectedFill" selected-color)
+                  (.attr "data-hasvalue" value)
                   (.attr "id" (str "chart-bar-" (name chart-key) "-" i))
                   (.attr "x" (* j bar-width))
                   (.attr "y" (- scaled-max-val scaled-val))
@@ -217,8 +218,6 @@
                                                 (if (> (count chart-keys) 1) 20 50)
                                                 ")")))))))
 
-(def chart-step show-columns)
-
 (defn prev-data [owner e]
   (.stopPropagation e)
   (let [start (om/get-state owner :start)
@@ -231,12 +230,12 @@
   (let [start (om/get-state owner :start)
         all-data (om/get-props owner :chart-data)
         next-start (+ start chart-step)
-        fixed-next-start (min (- (count all-data) show-columns) next-start)]
+        fixed-next-start (min (- (count all-data) chart-step) next-start)]
     (om/set-state! owner :start fixed-next-start)))
 
 (defn get-state [chart-data]
-  (let [start (max 0 (- (count chart-data) show-columns))
-        current-data (vec (take-last show-columns chart-data))]
+  (let [start (max 0 (- (count chart-data) chart-step))
+        current-data (vec (take-last chart-step chart-data))]
     {:start start
      :selected (dec (count current-data))}))
 
@@ -249,12 +248,14 @@
     (when-not (utils/is-test-env?)
       (d3-calc owner options)))
 
-  (did-update [_ old-props _]
+  (did-update [_ old-props old-state]
     (when-not (utils/is-test-env?)
-      (when (not= old-props data)
-        (let [new-state (get-state chart-data)]
-          (om/set-state! owner :start (:start new-state))
-          (om/set-state! owner :selected (:selected new-state)))
+      (when (or (not= old-props data)
+                 (not= old-state (om/get-state owner)))
+        (when-not (= old-props data)
+          (let [new-state (get-state chart-data)]
+            (om/set-state! owner :start (:start new-state))
+            (om/set-state! owner :selected (:selected new-state))))
         (d3-calc owner options))))
 
   (render-state [_ {:keys [start]}]
@@ -269,6 +270,6 @@
       (dom/svg #js {:className "d3-column-chart" :ref "d3-column"})
       (dom/div {:class "chart-next"
                 :style #js {:paddingTop (str (- chart-height 17) "px")
-                            :opacity (if (< start (- (count chart-data) show-columns)) 1 0)}
+                            :opacity (if (< start (- (count chart-data) chart-step)) 1 0)}
                 :on-click #(next-data owner %)}
         (dom/i {:class "fa fa-caret-right"})))))
