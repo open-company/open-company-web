@@ -18,7 +18,7 @@
   ([id {:keys [accent-color size stroke] :as opts}]
    (assert id "Icon ID is required")
    (let [outline-color (occ/get-color-by-kw :black)
-         accent-color  (or accent-color (occ/get-color-by-kw :blue))
+         accent-color  (or accent-color (occ/get-color-by-kw :black))
          stroke        (or stroke 2)
          size          (or size 30)]
      (dom/div {:class "svg-icon"}
