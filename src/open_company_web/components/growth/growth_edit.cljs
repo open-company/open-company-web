@@ -67,6 +67,10 @@
   ((:metadata-edit-cb data) editing)
   (om/set-state! owner :metadata-edit editing))
 
+(defn save-metadata-cb [owner data]
+  ((:save-metadata-cb data) (:metric-slug data))
+  (set-metadata-edit owner data false))
+
 (defcomponent growth-edit [data owner]
 
   (init-state [_]
@@ -75,7 +79,8 @@
      :stop batch-size})
 
   (will-receive-props [_ next-props]
-    (when (not= (:growth-data data) (:growth-data next-props))
+    (when (or (not= (:growth-data data) (:growth-data next-props))
+              (not= (:metric-slug data) (:metric-slug next-props)))
       (om/set-state! owner :metadata-edit (:new-metric next-props))
       (om/set-state! owner :growth-data (:growth-data next-props))))
 
@@ -94,7 +99,7 @@
                                         :metrics (:metrics data)
                                         :new-metric (:new-metric data)
                                         :new-growth-section (:new-growth-section data)
-                                        :next-cb #(set-metadata-edit owner data false)
+                                        :next-cb #(save-metadata-cb owner data)
                                         :delete-metric-cb (fn [metric-slug]
                                                            (om/set-state! owner :metadata-edit false)
                                                            ((:delete-metric-cb data) metric-slug))
@@ -143,7 +148,7 @@
                           next-period (growth-utils/get-past-period current-period (inc idx) interval)]
                       (om/build growth-edit-row {:cursor row-data
                                                  :next-period next-period
-                                                 :is-last (= idx 1)
+                                                 :is-last (= idx 0)
                                                  :needs-year (or (= idx 1)
                                                                  (= idx (dec stop)))
                                                  :prefix prefix
