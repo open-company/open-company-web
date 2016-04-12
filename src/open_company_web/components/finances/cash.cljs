@@ -8,20 +8,22 @@
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.lib.oc-colors :as occ]))
 
-(defn- get-d3-chart-data [sorted-data]
-  {:chart-data (filter #(not (nil? (:cash %))) sorted-data)})
+(defn- get-label [cur-symbol value]
+  (when value
+    (str cur-symbol (.toLocaleString (js/parseFloat (str value))))))
 
 (defcomponent cash [data owner options]
   
   (render [_]
     (let [finances-data (:data (:section-data data))
+          filled-finances-data (finances-utils/fill-gap-months finances-data)
           sort-pred (utils/sort-by-key-pred :period)
-          sorted-finances (sort sort-pred finances-data)
+          sorted-finances (sort sort-pred (vals filled-finances-data))
           value-set (last sorted-finances)
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
           cash-val (str cur-symbol (utils/thousands-separator (:cash value-set)))
-          fixed-sorted-finances (vec (map #(merge % {:label (str cur-symbol (.toLocaleString (js/parseFloat (str (:cash %)))))}) sorted-finances))
+          fixed-sorted-finances (vec (map #(merge % {:label (get-label cur-symbol (:cash %))}) sorted-finances))
           chart-opts {:opts {:chart-height (:height (:chart-size options))
                              :chart-width (:width (:chart-size options))
                              :chart-keys [:cash]
@@ -42,4 +44,4 @@
               (dom/div {:class "actual-container"}
                 (dom/h3 {:class "actual green"} cash-val)
                 (dom/h3 {:class "actual-label gray"} (str "as of " (finances-utils/get-as-of-string (:period value-set))))))))
-        (om/build d3-column-chart (get-d3-chart-data fixed-sorted-finances) chart-opts)))))
+        (om/build d3-column-chart {:chart-data fixed-sorted-finances} chart-opts)))))
