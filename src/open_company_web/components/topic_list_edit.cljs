@@ -32,6 +32,7 @@
                 :key (str "topic-edit-" topic-name)}
         (dom/div {:class "topic-edit-internal group"}
           (dom/div {:class "right"
+                    :on-click (:checkbox-click-cb data)
                     :style {:margin "13px 10px 0 0"}}
              (i/icon :check-square-09 {:accent-color (if active (occ/get-color-by-kw :blue) "transparent")}))
           (dom/div {:class (utils/class-set {:topic-edit-handle-placeholder (not active)
@@ -47,7 +48,7 @@
   (when (and (om/get-state owner :did-mount)
              (om/get-state owner :sortable-loaded))
     (when-let [ul-node (om/get-ref owner "topic-list-sortable")]
-      (.create js/Sortable ul-node #js {:handle ".topic-edit-handle"
+      (.create js/Sortable ul-node #js {:handle ".topic-edit.active"
                                         :onStart #(dommy/add-class! ul-node :dragging)
                                         :onEnd (fn [_]
                                                  (dommy/remove-class! ul-node :dragging)
@@ -133,10 +134,10 @@
                                :className (utils/class-set {:topic-list-edit-li true
                                                             :topic-active true
                                                             :tt-collapse (= item-name transition-topic)})
-                               :key (str "active-" item-name)
-                               :onClick #(topic-on-click item-name owner (:did-change-active-topics options) %)}
+                               :key (str "active-" item-name)}
                     (om/build item {:id item-name
                                     :item-data (get all-topics (keyword item-name))
+                                    :checkbox-click-cb #(topic-on-click item-name owner (:did-change-active-topics options) %)
                                     :active-topics active-topics}))))
               (when (and transition-topic
                          (not (utils/in? active-topics transition-topic)))
@@ -146,6 +147,7 @@
                   (om/build item {:id transition-topic
                                   :transition true
                                   :item-data (get all-topics (keyword transition-topic))
+                                  :checkbox-click-cb #(topic-on-click transition-topic owner (:did-change-active-topics options) %)
                                   :active-topics (conj active-topics transition-topic)}))))
           (when (seq unactive-topics)
             (dom/div {:class "topic-list-separator"}))
@@ -160,6 +162,7 @@
                   (om/build item {:id transition-topic
                                   :transition true
                                   :item-data (get all-topics (keyword transition-topic))
+                                  :checkbox-click-cb #(topic-on-click transition-topic owner (:did-change-active-topics options) %)
                                   :active-topics (utils/vec-dissoc active-topics transition-topic)})))
               (for [item-name unactive-topics]
                 (when (not= transition-topic item-name)
@@ -167,8 +170,8 @@
                                :key (str "unactive-" item-name)
                                :className (utils/class-set {:topic-list-edit-li true
                                                             :topic-unactive true
-                                                            :tt-collapse (= item-name transition-topic)})
-                               :onClick #(topic-on-click item-name owner (:did-change-active-topics options) %)}
+                                                            :tt-collapse (= item-name transition-topic)})}
                     (om/build item {:id item-name
                                     :item-data (get all-topics (keyword item-name))
+                                    :checkbox-click-cb #(topic-on-click item-name owner (:did-change-active-topics options) %)
                                     :active-topics active-topics}))))))))))))
