@@ -147,7 +147,8 @@
                                                      :currency (:currency data)
                                                      :actual-as-of (:updated-at actual-data)
                                                      :revisions-navigation-cb #(revisions-navigation-cb owner section %)
-                                                     :read-only a-read-only})))
+                                                     :read-only a-read-only}
+                                                    {:opts {:currency (:currency data)}})))
           (when b-section-data
             (dom/div #js {:className "section-box"
                           :id (str "sec-box-b-" (name section))
@@ -157,7 +158,8 @@
                                                      :section section
                                                      :actual-as-of (:updated-at actual-data)
                                                      :revisions-navigation-cb #(revisions-navigation-cb owner section %)
-                                                     :read-only b-read-only})))
+                                                     :read-only b-read-only}
+                                                    {:opts {:currency (:currency data)}})))
           (when animating
             (.setTimeout js/window #(animate-section-translation owner (name section)) 1)
             nil))))))

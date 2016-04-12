@@ -101,9 +101,6 @@
                            (assoc with-fixed-value :target fixed-target))]
     with-fixed-target))
 
-(defn growth-map-metric-data [metric-data]
-  (apply merge (map #(hash-map (str (:period %) (:slug %)) %) metric-data)))
-
 (defn growth-metrics-map [metrics-coll]
   (apply merge (map #(hash-map (:slug %) %) (reverse metrics-coll))))
 
@@ -119,7 +116,7 @@
       {:growth-focus (or focus-metric growth-utils/new-metric-slug-placeholder)
        :growth-metadata-editing false
        :growth-new-metric false
-       :growth-data (growth-map-metric-data (:data topic-data))
+       :growth-data (growth-utils/growth-data-map (:data topic-data))
        :growth-metrics (growth-metrics-map all-metrics)
        :growth-metric-slugs (growth-metrics-order all-metrics)})))
 
@@ -134,10 +131,10 @@
 (defn growth-delete-metric-cb [owner data metric-slug]
   (let [all-metrics (vals (om/get-state owner :growth-metrics))
         new-metrics (vec (filter #(not= (:slug %) metric-slug) all-metrics))
-        new-metrics-map (growth-map-metric-data new-metrics)
+        new-metrics-map (growth-utils/growth-data-map new-metrics)
         all-data (vals (om/get-state owner :growth-data))
         filtered-data (vec (filter #(not= (:slug %) metric-slug) all-data))
-        new-data (growth-map-metric-data filtered-data)
+        new-data (growth-utils/growth-data-map filtered-data)
         metrics-order (growth-metrics-order new-metrics)
         next-focus (if metrics-order
                       (first metrics-order)
@@ -311,7 +308,7 @@
           max-height (min (- 650 126) (- win-height 126))
           ; growth
           focus-metric-data (filter-growth-data growth-focus growth-data)
-          growth-data (when (= topic "growth") (growth-map-metric-data (:data topic-data)))
+          growth-data (when (= topic "growth") (growth-utils/growth-data-map (:data topic-data)))
           growth-cancel-fn #(growth-cancel-cb owner data)
           headline-length-limit (if (or (= topic-kw :finances)
                                         (= topic-kw :growth))

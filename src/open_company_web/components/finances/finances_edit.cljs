@@ -133,7 +133,7 @@
                         has-value (contains? finances-data period)
                         row-data (if has-value
                                     (get finances-data period)
-                                    (finances-utils/placeholder-data period))
+                                    (finances-utils/placeholder-data period {:new true}))
                         next-period (finances-utils/get-past-period current-period (inc idx))]
                     (om/build finances-edit-row {:cursor row-data
                                                  :next-period next-period
