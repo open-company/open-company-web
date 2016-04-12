@@ -7,6 +7,7 @@
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.oc-colors :as occ]
             [open-company-web.components.icon :as i]
             [open-company-web.components.topic :refer (topic)]
             [cljs-dynamic-resources.core :as cdr]
@@ -32,7 +33,7 @@
         (dom/div {:class "topic-edit-internal group"}
           (dom/div {:class "right"
                     :style {:margin "13px 10px 0 0"}}
-             (i/icon :check-square-09 {:accent-color (when-not active "transparent")}))
+             (i/icon :check-square-09 {:accent-color (if active (occ/get-color-by-kw :blue) "transparent")}))
           (dom/div {:class (utils/class-set {:topic-edit-handle-placeholder (not active)
                                              :topic-edit-handle active
                                              :group true})})
