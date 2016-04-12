@@ -54,14 +54,16 @@
     (.each all-circles (fn [d i]
                         (this-as circle-node
                           (let [circle (.select js/d3 circle-node)
-                                color (.attr circle "data-fill")]
+                                color (.attr circle "data-fill")
+                                hasvalue (.attr circle "data-hasvalue")]
                             (-> circle
                                 (.attr "fill" color)
-                                (.attr "r" dot-radius))))))
-    (let [selected-color (.attr next-circle "data-selectedFill")]
+                                (.attr "r" (if hasvalue dot-radius 0)))))))
+    (let [selected-color (.attr next-circle "data-selectedFill")
+          hasvalue (.attr next-circle "data-hasvalue")]
       (-> next-circle
           (.attr "fill" selected-color)
-          (.attr "r" (* dot-radius 1.5))))
+          (.attr "r" (if hasvalue (* dot-radius 1.5) 0))))
     (.text chart-label (label-key next-set))
     (.each all-month-text
            (fn [d i]
@@ -129,31 +131,35 @@
                   cx (dot-position chart-width i (count chart-data) (count chart-keys))
                   cy (scale-fn (chart-key data-set))]
               ; add the line to connect this to the next dot
-              (when (< i (dec (count chart-data)))
+              (when (and (chart-key data-set)
+                         (< i (dec (count chart-data))))
                 (let [next-data-set (get chart-data (inc i))
-                      next-scaled-val (scale-fn (chart-key next-data-set))
                       next-cx (dot-position chart-width (inc i) (count chart-data) (count chart-keys))
                       next-cy (scale-fn (chart-key next-data-set))]
-                  (-> chart-node
-                      (.append "line")
-                      (.attr "class" "chart-line")
-                      (.style "stroke" (chart-key fill-colors))
-                      (.style "stroke-width" 2)
-                      (.attr "x1" cx)
-                      (.attr "y1" (get-y cy max-y))
-                      (.attr "x2" next-cx)
-                      (.attr "y2" (get-y next-cy max-y)))))
+                  (when (chart-key next-data-set)
+                    (-> chart-node
+                        (.append "line")
+                        (.attr "class" "chart-line")
+                        (.style "stroke" (chart-key fill-colors))
+                        (.style "stroke-width" 2)
+                        (.attr "x1" cx)
+                        (.attr "y1" (get-y cy max-y))
+                        (.attr "x2" next-cx)
+                        (.attr "y2" (get-y next-cy max-y))))))
               ; add a rect to represent the data
               (-> chart-node
                   (.append "circle")
                   (.attr "class" "chart-dot")
-                  (.attr "r" (if (= i selected)
+                  (.attr "r" (if (not (chart-key data-set))
+                              0
+                              (if (= i selected)
                                 (* dot-radius 1.5)
-                                dot-radius))
+                                dot-radius)))
                   (.attr "fill" (if (= i selected)
                                   (chart-key fill-selected-colors)
                                   (chart-key fill-colors)))
                   (.attr "data-fill" (chart-key fill-colors))
+                  (.attr "data-hasvalue" (chart-key data-set))
                   (.attr "data-selectedFill" (chart-key fill-selected-colors))
                   (.attr "id" (str "chart-dot-" i))
                   (.attr "cx" cx)
