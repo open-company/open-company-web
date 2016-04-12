@@ -47,11 +47,11 @@
    :interval "monthly"
    :goal nil})
 
-(defn placeholder-data [period slug]
-  {:period period
-   :slug slug
-   :value nil
-   :new true})
+(defn placeholder-data [period slug custom-map]
+  (merge custom-map
+   {:period period
+     :slug slug
+     :value nil}))
 
 (defn chart-placeholder-data [initial-data slug interval]
   (let [first-period (:period (last initial-data))
@@ -63,7 +63,7 @@
               period-exists (utils/period-exists prev-period initial-data)]
           (if period-exists
             (some #(when (= (:period %) prev-period) %) initial-data)
-            (placeholder-data prev-period slug)))))))
+            (placeholder-data prev-period slug {:new true})))))))
 
 (defn edit-placeholder-data [initial-data slug interval]
   (let [current-period (utils/current-growth-period interval)
@@ -77,7 +77,7 @@
                              period-exists (utils/period-exists prev-period initial-data)]
                          (if period-exists
                            (some #(when (= (:period %) prev-period) %) initial-data)
-                           (placeholder-data prev-period slug))))]
+                           (placeholder-data prev-period slug {:new true}))))]
       (vec fixed-data))))
 
 (defn get-graph-tooltip [label prefix value suffix]
@@ -138,3 +138,27 @@
 
 (defn get-actual [metrics]
   (some #(when (:value (metrics %)) %) (vec (range (count metrics)))))
+
+(defn growth-data-map [growth-data-coll]
+  (apply merge (map #(hash-map (str (:period %) (:slug %)) %) growth-data-coll)))
+
+(defn fill-gap-months [growth-data slug interval]
+  (let [data-map (growth-data-map growth-data)
+        sort-pred (utils/sort-by-key-pred :period)
+        sorted-data (vec (sort sort-pred growth-data))
+        first-data (first sorted-data)
+        last-data (last sorted-data)
+        period (:period last-data)]
+    (loop [current-period (:period last-data)
+           filled-data data-map
+           idx 1]
+      (let [data (get data-map (str period slug))
+            k (str current-period slug)
+            next-data (if (contains? filled-data k)
+                        filled-data
+                        (assoc filled-data k (placeholder-data current-period slug {:placeholder-data true})))]
+        (if (not= current-period (:period first-data))
+          (recur (get-past-period period idx interval)
+                 next-data
+                 (inc idx))
+          next-data)))))
