@@ -33,7 +33,7 @@
           actual-set (sorted-metric actual-idx)
           metric-unit (:unit metric-info)
           period (utils/get-period-string (:period actual-set) interval)
-          currency-symbol (utils/get-symbol-for-currency-code (:currency options))
+          currency-symbol (utils/get-symbol-for-currency-code (:currency data))
           actual-with-label (label-from-set actual-set interval metric-unit currency-symbol)
           fixed-sorted-metric (vec (map #(merge % {:label (label-from-set % interval metric-unit currency-symbol)}) sorted-metric))
           chart-opts {:opts {:chart-height (:height (:chart-size options))
