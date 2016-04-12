@@ -77,11 +77,14 @@
   (let [new-stakeholder-update (assoc old-stakeholder-update :sections (vec active-topics))]
     (api/patch-stakeholder-update new-stakeholder-update)))
 
+(def drawer-toggler-max-margin-top 300)
+
 (defn fix-drawer-toggler-position [owner]
   (when-let [update-internal (om/get-ref owner "update-internal")]
-    (let [offset (utils/absolute-offset update-internal)]
-      (setStyle (sel1 [:div.drawer-toggler]) #js {:marginTop (str (:top offset) "px")})
-      (om/set-state! owner :toggler-top-margin (:top offset)))))
+    (let [offset (utils/absolute-offset update-internal)
+          offset-top (min drawer-toggler-max-margin-top (:top offset))]
+      (setStyle (sel1 [:div.drawer-toggler]) #js {:marginTop (str offset-top "px")})
+      (om/set-state! owner :toggler-top-margin offset-top))))
 
 (defcomponent stakeholder-update [data owner]
 
