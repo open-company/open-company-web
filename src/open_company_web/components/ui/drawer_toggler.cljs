@@ -6,6 +6,7 @@
             [open-company-web.components.icon :refer (icon)]))
 
 (defn rotate [owner & [from-extern]]
+  (om/update-state! owner :open not)
   (let [props (om/get-props owner)]
     (when (and (not from-extern)
                (contains? props :click-cb))
@@ -13,17 +14,21 @@
   (when-let [drawer (om/get-ref owner "drawer-toggler")]
     (if (dommy/has-class? drawer :rotate45)
       (do
-       (dommy/remove-class! drawer :rotate45)
-       (dommy/add-class! drawer :rotate0))
+        (dommy/remove-class! drawer :rotate45)
+        (dommy/add-class! drawer :rotate0))
       (do
-       (dommy/add-class! drawer :rotate45)
-       (dommy/remove-class! drawer :rotate0)))))
+        (dommy/remove-class! drawer :rotate0)
+        (dommy/add-class! drawer :rotate45)))))
 
 (defcomponent drawer-toggler [data owner options]
 
+  (init-state [_]
+    {:open false})
+
   (will-receive-props [_ next-props]
     (when (and (not= (:close data) (:close next-props))
-               (:close next-props))
+               (:close next-props)
+               (om/get-state owner :open))
       (rotate owner true)))
 
   (render [_]
