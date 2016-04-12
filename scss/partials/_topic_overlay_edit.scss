@@ -99,6 +99,10 @@ div.topic-overlay-edit {
         }
 
         @include pillbox($oc_blue_regular);
+
+        label.pillbox.new-metric-slug-placeholder{
+          background-color: $oc_green_light;
+        }
       }
     }
 

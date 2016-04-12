@@ -394,11 +394,11 @@
                   (dom/label {:class (utils/class-set {:pillbox true
                                                        growth-utils/new-metric-slug-placeholder true
                                                        :active (= growth-focus growth-utils/new-metric-slug-placeholder)})
-                              :title "New metric"
+                              :title "Add a new metric"
                               :data-tab growth-utils/new-metric-slug-placeholder
                               :on-click (fn []
                                          (om/set-state! owner :growth-new-metric true)
-                                         (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "New metric")))))
+                                         (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
           (dom/div #js {:className "topic-overlay-edit-body"
                         :ref "topic-overlay-edit-body"
                         :id (str "topic-edit-body-" (name topic))
