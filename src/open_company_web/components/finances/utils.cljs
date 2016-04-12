@@ -28,15 +28,15 @@
         past-date (t/minus period-date (t/months diff))]
     (utils/period-from-date past-date)))
 
-(defn placeholder-data [period]
-  {:period period
-   :cash nil
-   :costs nil
-   :revenue nil
-   :burn-rate nil
-   :runway nil
-   :avg-burn-rate nil
-   :new true})
+(defn placeholder-data [period custom-map]
+  (merge custom-map
+   {:period period
+    :cash nil
+    :costs nil
+    :revenue nil
+    :burn-rate nil
+    :runway nil
+    :avg-burn-rate nil}))
 
 (defn chart-placeholder-data [initial-data]
   (when (seq initial-data)
@@ -49,7 +49,7 @@
                 period-exists (utils/period-exists prev-period initial-data)]
             (if period-exists
               (some #(when (= (:period %) prev-period) %) initial-data)
-              (placeholder-data prev-period))))))))
+              (placeholder-data prev-period {:new true}))))))))
 
 (defn edit-placeholder-data [initial-data]
   (let [current-period (utils/current-period)
@@ -63,7 +63,7 @@
                              period-exists (utils/period-exists prev-period initial-data)]
                          (if period-exists
                            (some #(when (= (:period %) prev-period) %) initial-data)
-                           (placeholder-data prev-period))))]
+                           (placeholder-data prev-period {:new true}))))]
       (vec fixed-data))))
 
 (defn- get-chart-data [data prefix keyw column-name & [style fill-color pattern tooltip-suffix]]
@@ -168,3 +168,26 @@
           (str fixed-years " " (year-label flags) (pluralize years)))
         (let [years (quot abs-runway-days (* 30 12))]
           (str years " " (year-label flags) (pluralize years)))))))
+
+(defn finances-data-map [finances-data-coll]
+  (apply merge (map #(hash-map (:period %) %) finances-data-coll)))
+
+(defn fill-gap-months [finances-data]
+  (let [data-map (finances-data-map finances-data)
+        sort-pred (utils/sort-by-key-pred :period)
+        sorted-data (vec (sort sort-pred finances-data))
+        first-data (first sorted-data)
+        last-data (last sorted-data)
+        period (:period last-data)]
+    (loop [current-period (:period last-data)
+           filled-data data-map
+           idx 1]
+      (let [data (get data-map period)
+            next-data (if (contains? filled-data current-period)
+                        filled-data
+                        (assoc filled-data current-period (placeholder-data current-period {:placeholder-data true})))]
+        (if (not= current-period (:period first-data))
+          (recur (get-past-period period idx)
+                 next-data
+                 (inc idx))
+          (do (println "aa" next-data) next-data))))))
