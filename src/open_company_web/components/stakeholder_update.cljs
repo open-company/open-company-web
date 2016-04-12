@@ -2,10 +2,12 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.local-settings :as ls]
             [open-company-web.api :as api]
             [open-company-web.caches :as caches]
+            [open-company-web.lib.utils :as utils]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.company-header :refer [company-header]]
@@ -14,7 +16,7 @@
             [open-company-web.components.ui.side-drawer :refer (side-drawer)]
             [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]
             [clojure.string :as str]
-            [open-company-web.lib.utils :as utils]))
+            [goog.style :refer (setStyle)]))
 
 (defn get-key-from-sections [sections]
   (clojure.string/join
@@ -75,10 +77,21 @@
   (let [new-stakeholder-update (assoc old-stakeholder-update :sections (vec active-topics))]
     (api/patch-stakeholder-update new-stakeholder-update)))
 
+(defn fix-drawer-toggler-position [owner]
+  (when-let [update-internal (om/get-ref owner "update-internal")]
+    (let [offset (utils/absolute-offset update-internal)]
+      (setStyle (sel1 [:div.drawer-toggler]) #js {:marginTop (str (:top offset) "px")})
+      (om/set-state! owner :toggler-top-margin (:top offset)))))
+
 (defcomponent stakeholder-update [data owner]
 
   (init-state [_]
-    {:drawer-open false})
+    {:drawer-open false
+     :toggler-top-margin false})
+
+  (did-update [_ _ _]
+    (when-not (om/get-state owner :toggler-top-margin)
+      (fix-drawer-toggler-position owner)))
 
   (render-state [_ {:keys [drawer-open]}]
     (let [slug (keyword (:slug @router/path))
@@ -131,7 +144,8 @@
               :company-data company-data
               :stakeholder-update true})
           
-          (dom/div {:class "update-internal row"}
+          (dom/div #js {:className "update-internal row"
+                        :ref "update-internal"}
           
             (dom/div {:class "sections col-md-9 col-sm-12"}
               ;; Stakeholder update intro
