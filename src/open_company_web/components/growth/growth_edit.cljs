@@ -48,35 +48,20 @@
                :key :value
                :tab-cb tab-cb})))))))
 
-(defn replace-row-in-data [owner data metric-data row k v]
+(defn replace-row-in-data [row k v change-cb]
   "Find and replace the edited row"
-  (let [array-data (vec (js->clj metric-data))
-        new-row (update row k (fn[_]v))]
-    ((:change-growth-cb data) new-row)
-    (doseq [cur-row array-data]
-      (when (= (:period cur-row) (:period new-row))
-        (let [idx (.indexOf (to-array array-data) cur-row)
-              new-rows (assoc array-data idx new-row)
-              sort-pred (utils/sort-by-key-pred :period true)
-              sorted-rows (sort sort-pred new-rows)]
-          (om/update-state! owner :metric-data (fn [_] sorted-rows)))))))
+  (let [new-row (update row k (fn[_]v))]
+    (change-cb new-row)))
 
 (defn get-current-metric-info [data]
   (let [metric-slug (:metric-slug data)
         metrics (:metrics data)]
     (or (get metrics metric-slug) {})))
 
-(defn sort-growth-data [data]
-  (let [metric-data (:growth-data data)
-        sorter (utils/sort-by-key-pred :period true)
-        sorted-metric-data (sort sorter metric-data)]
-    sorted-metric-data))
-
 (def batch-size 6)
 
 (defn more-months [owner data]
-  (let [metric-info (get-current-metric-info data)]
-    (om/update-state! owner :stop #(+ % batch-size))))
+  (om/update-state! owner :stop #(+ % batch-size)))
 
 (defn set-metadata-edit [owner data editing]
   ((:metadata-edit-cb data) editing)
@@ -85,17 +70,16 @@
 (defcomponent growth-edit [data owner]
 
   (init-state [_]
-    (let [metric-info (get-current-metric-info data)]
-      {:metadata-edit (:new-metric data)
-       :growth-data (:growth-data data)
-       :stop batch-size}))
+    {:metadata-edit (:new-metric data)
+     :growth-data (:growth-data data)
+     :stop batch-size})
 
   (will-receive-props [_ next-props]
     (when (not= (:growth-data data) (:growth-data next-props))
       (om/set-state! owner :metadata-edit (:new-metric next-props))
       (om/set-state! owner :growth-data (:growth-data next-props))))
 
-  (render-state [_ {:keys [growth-data metric-data metadata-edit stop]}]
+  (render-state [_ {:keys [growth-data metadata-edit stop]}]
     (let [{:keys [interval slug] :as metric-info} (get-current-metric-info data)
           company-slug (keyword (:slug @router/path))
           company-data (company-slug @dispatcher/app-state)
@@ -166,7 +150,7 @@
                                                  :suffix suffix
                                                  :interval interval
                                                  :change-cb (fn [k v]
-                                                      (replace-row-in-data owner data metric-data row-data k v))}))))
+                                                      (replace-row-in-data row-data k v (:change-growth-cb data)))}))))
                   (dom/tr {}
                     (dom/td {}
                       (dom/a {:on-click #(more-months owner data)} "More..."))
