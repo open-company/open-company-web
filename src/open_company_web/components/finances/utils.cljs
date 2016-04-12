@@ -190,4 +190,4 @@
           (recur (get-past-period period idx)
                  next-data
                  (inc idx))
-          (do (println "aa" next-data) next-data))))))
+          next-data)))))
