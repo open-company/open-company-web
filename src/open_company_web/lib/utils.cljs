@@ -625,3 +625,14 @@
   (not (not (.-_phantom js/window))))
 
 (defonce overlay-max-win-height 670)
+
+(defn absolute-offset [element]
+  (loop [top 0
+         left 0
+         el element]
+    (if-not el
+      {:top top
+       :left left}
+      (recur (+ top (or (.-offsetTop el) 0))
+             (+ left (or (.-offsetLeft el) 0))
+             (.-offsetParent el)))))
