@@ -22,9 +22,6 @@
 (defn metrics-order [metrics-coll]
   (map :slug metrics-coll))
 
-(defn map-metric-data [metric-data]
-  (apply merge (map #(hash-map (str (:period %) (:slug %)) %) metric-data)))
-
 (defn get-state [owner data & [initial]]
   (let [section-data (:section-data data)
         all-metrics (:metrics section-data)
@@ -34,7 +31,7 @@
         focus (if initial
                 (or (:selected-metric data) last-focus first-metric)
                 (om/get-state owner :focus))
-        growth-data (map-metric-data (:data section-data))
+        growth-data (growth-utils/growth-data-map (:data section-data))
         metric-slugs (metrics-order all-metrics)]
     {:focus focus
      :growth-data growth-data
@@ -68,6 +65,7 @@
           focus-metric-info (get growth-metrics focus)
           subsection-data {:metric-data focus-metric-data
                            :metric-info focus-metric-info
+                           :currency currency
                            :read-only true
                            :total-metrics (count growth-metrics)}]
       (dom/div {:class "section-container"
