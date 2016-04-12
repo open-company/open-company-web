@@ -15,21 +15,17 @@
   (when-let [ch (utils/get-channel (str period k))]
     (put! ch {:period period :key k})))
 
-(defcomponent growth-edit-row [data _]
+(defcomponent growth-edit-row [{:keys [interval needs-year is-last change-cb next-period prefix suffix] :as data} owner]
 
   (render [_]
     (let [growth-data (:cursor data)
           is-new (and (not (:value growth-data)) (:new growth-data))
           value (:value growth-data)
-          interval (:interval data)
           period (:period growth-data)
           period-month (utils/get-month period interval)
-          needs-year (:needs-year data)
           flags [:short (when needs-year :force-year)]
           period-string (utils/get-period-string period interval flags)
           cell-state (if is-new :new :display)
-          change-cb (:change-cb data)
-          next-period (:next-period data)
           tab-cb (fn [_ k]
                    (cond
                      (= k :value)
@@ -39,15 +35,15 @@
         (dom/td {:class "no-cell"}
           period-string)
         (dom/td {}
-          (when-not (:is-last data)
+          (when-not is-last
             (om/build
               cell
               {:value value
                :placeholder "Value"
                :cell-state cell-state
                :draft-cb #(change-cb :value %)
-               :prefix (:prefix data)
-               :suffix (:suffix data)
+               :prefix prefix
+               :suffix suffix
                :period period
                :key :value
                :tab-cb tab-cb})))))))
@@ -143,14 +139,15 @@
                     (str (:name metric-info) " ")
                     (om/build editable-pen {:click-callback #(set-metadata-edit owner data true)}))
                   (dom/h3 {:class "actual-label gray"} (str (utils/camel-case-str (:interval metric-info)) " " (utils/camel-case-str (:unit metric-info)))))))
-            (dom/table {:class "table"}
+            (dom/table {:class "table"
+                        :key (str "growth-edit-" slug)}
               (dom/thead {}
                 (dom/tr {}
                   (dom/th {} "")
                   (dom/th {} "Value")))
               (dom/tbody {}
                 (let [current-period (utils/current-growth-period interval)]
-                  (for [idx (range stop)]
+                  (for [idx (range 1 stop)]
                     (let [period (growth-utils/get-past-period current-period idx interval)
                           has-value (contains? growth-data (str period slug))
                           row-data (if has-value
@@ -162,8 +159,8 @@
                           next-period (growth-utils/get-past-period current-period (inc idx) interval)]
                       (om/build growth-edit-row {:cursor row-data
                                                  :next-period next-period
-                                                 :is-last (= idx 0)
-                                                 :needs-year (or (= idx 0)
+                                                 :is-last (= idx 1)
+                                                 :needs-year (or (= idx 1)
                                                                  (= idx (dec stop)))
                                                  :prefix prefix
                                                  :suffix suffix
