@@ -109,7 +109,7 @@
 
   (render [_]
     ;; add the scroll listener if the logo is not present and not stakeholder update
-    (when (and (not stakeholder-update) company-data (clojure.string/blank? (:logo company-data)))
+    (when (and company-data (clojure.string/blank? (:logo company-data)))
       (.setTimeout js/window #(watch-scroll owner) 500))
 
     (dom/div #js {:className "company-header"
@@ -136,9 +136,9 @@
             (dom/div {:class "company-logo-container"}
               (dom/img #js {:src (:logo company-data)
                             ;; add scroll listener when the logo is loaded unless stakeholder update
-                            :onLoad (when-not stakeholder-update #(logo-on-load owner))
+                            :onLoad #(logo-on-load owner)
                             ;; or add listener if logo errors on loading unless stakeholder update
-                            :onError (when-not stakeholder-update #(watch-scroll owner))
+                            :onError #(watch-scroll owner)
                             :className "company-logo"
                             :title (:name company-data)
                             :ref "company-logo"}))
