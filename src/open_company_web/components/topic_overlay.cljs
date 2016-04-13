@@ -11,7 +11,10 @@
             [open-company-web.components.topic-overlay-edit :refer (topic-overlay-edit)]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
-            [goog.fx.dom :refer (Fade)]))
+            [goog.events :as events]
+            [goog.fx.dom :refer (Fade Resize)]
+            [goog.style :refer (setStyle)]
+            [goog.fx.Animation.EventType :as EventType]))
 
 (defonce overlay-top-margin 100)
 
@@ -116,12 +119,34 @@
   (om/set-state! owner :field-focus focus)
   (om/set-state! owner :editing true))
 
+(defn animate-transition [owner]
+  (let [cur-topic (om/get-ref owner "cur-topic")
+        tr-topic (om/get-ref owner "tr-topic")
+        current-state (om/get-state owner)
+        appear-animation (Fade. tr-topic 0 1 utils/oc-animation-duration)
+        cur-size (js/getComputedStyle cur-topic)
+        tr-size (js/getComputedStyle tr-topic)]
+    (.play (Resize. (sel1 [:div.topic-overlay-transition])
+                    #js [(js/parseInt (.-width cur-size)) (js/parseInt (.-height cur-size))]
+                    #js [(js/parseInt (.-width cur-size)) (js/parseInt (.-height tr-size))]
+                    utils/oc-animation-duration))
+    ; disappear current topic
+    (.play (Fade. cur-topic 1 0 utils/oc-animation-duration))
+    (doto appear-animation
+      (events/listen
+        EventType/FINISH
+        #(om/set-state! owner (merge current-state
+                                    {:as-of (:transition-as-of current-state)
+                                     :transition-as-of nil})))
+      (.play))))
+
 (defcomponent topic-overlay [{:keys [section section-data currency selected-metric force-editing] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
      :growth-metric-focus selected-metric
      :field-focus nil
+     :transition-as-of nil
      :editing force-editing})
 
   (did-mount [_]
@@ -137,7 +162,11 @@
     ; let the window scroll
     (dommy/remove-class! (sel1 [:body]) "no-scroll"))
 
-  (render-state [_ {:keys [as-of editing growth-metric-focus field-focus]}]
+  (did-update [_ _ _]
+    (when (om/get-state owner :transition-as-of)
+      (animate-transition owner)))
+
+  (render-state [_ {:keys [as-of editing growth-metric-focus field-focus transition-as-of]}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           slug (keyword (:slug @router/path))
@@ -177,19 +206,44 @@
                                   :maxHeight (str max-height "px")}
                       :on-click #(.stopPropagation %)}
           (if-not editing
-            (om/build topic-overlay-internal {:topic-data topic-data
-                                              :as-of as-of
-                                              :topic section
-                                              :currency currency
-                                              :selected-metric growth-metric-focus
-                                              :read-only (or (:read-only section-data) (not= as-of (:updated-at section-data)))
-                                              :prev-rev prev-rev
-                                              :next-rev next-rev}
-                                             {:opts {:close-overlay-cb #(close-overlay owner options)
-                                                     :edit-topic-cb #(start-editing owner %)
-                                                     :switch-metric-cb #(om/set-state! owner :growth-metric-focus %)
-                                                     :prev-cb #(om/set-state! owner :as-of %)
-                                                     :next-cb #(om/set-state! owner :as-of %)}})
+            (dom/div {:class "topic-overlay-transition group"}
+              (dom/div #js {:className "topic-overlay-as-of group"
+                            :ref "cur-topic"
+                            :key (str as-of "-cur-" transition-as-of)
+                            :style #js {:opacity 1}}
+                (om/build topic-overlay-internal {:topic-data topic-data
+                                                  :as-of as-of
+                                                  :topic section
+                                                  :currency currency
+                                                  :selected-metric growth-metric-focus
+                                                  :read-only (or (:read-only section-data) (not= as-of (:updated-at section-data)))
+                                                  :prev-rev prev-rev
+                                                  :next-rev next-rev}
+                                                 {:opts {:close-overlay-cb #(close-overlay owner options)
+                                                         :edit-topic-cb #(start-editing owner %)
+                                                         :switch-metric-cb #(om/set-state! owner :growth-metric-focus %)
+                                                         :prev-cb #(om/set-state! owner :transition-as-of %)
+                                                         :next-cb #(om/set-state! owner :transition-as-of %)}}))
+              (when transition-as-of
+                (dom/div #js {:className "topic-overlay-tr-as-of group"
+                              :ref "tr-topic"
+                              :key (str transition-as-of "-tr-" as-of)
+                              :style #js {:opacity 0}}
+                  (let [tr-topic-data (utils/select-section-data section-data section-kw transition-as-of)
+                        tr-prev-rev (utils/revision-prev revisions transition-as-of)
+                        tr-next-rev (utils/revision-next revisions transition-as-of)]
+                    (om/build topic-overlay-internal {:topic-data tr-topic-data
+                                                      :as-of transition-as-of
+                                                      :topic section
+                                                      :currency currency
+                                                      :selected-metric growth-metric-focus
+                                                      :read-only true
+                                                      :prev-rev tr-prev-rev
+                                                      :next-rev tr-next-rev}
+                                                     {:opts {:close-overlay-cb #()
+                                                             :switch-metric-cb #()
+                                                             :prev-cb #()
+                                                             :next-cb #()}})))))
             (om/build topic-overlay-edit {:topic-data section-data
                                           :topic section
                                           :focus field-focus
