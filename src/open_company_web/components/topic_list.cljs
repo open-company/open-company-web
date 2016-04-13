@@ -96,11 +96,11 @@
     (set-lis-height owner))
 
   (render-state [_ {:keys [active-topics selected-topic selected-metric drawer-open]}]
-    (let [slug (keyword (:slug @router/path))
-          company-data (:company-data data)
+    (let [slug            (keyword (:slug @router/path))
+          company-data    (:company-data data)
           active-category (keyword (:active-category data))
           category-topics (get active-topics active-category)]
-      (dom/div {:class "topic-list"
+      (dom/div {:class "topic-list pb4"
                 :style (when (utils/is-mobile) {:min-height "100vh"})
                 :key "topic-list"}
         (when (and (not (:read-only company-data))
