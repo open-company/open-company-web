@@ -209,7 +209,7 @@
 
 (defn topic-click [data owner options expanded selected-metric]
   (if (utils/is-mobile)
-    (do (dis/dispatch! [:topic/expand (if expanded nil (keyword (:section-name options)))])
+    (do (dis/dispatch! [:topic/toggle-expand (if expanded nil (keyword (:section-name options)))])
         (mobile-topic-animation data owner options expanded)
         (after 50 #(scroll-to-topic-top (om/get-ref owner "topic"))))
     ((:bw-topic-click options) (:section data) selected-metric)))
@@ -240,7 +240,7 @@
                                      :transition-as-of nil})))
       (.play))))
 
-(defcomponent topic [{:keys [section-data section currency expanded-topic] :as data} owner options]
+(defcomponent topic [{:keys [section-data section currency expanded-topics] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
@@ -258,7 +258,7 @@
 
   ;; (did-mount [_]
   ;;   ;; manually re-open the topic if on mobile
-  ;;   (when (and (utils/is-mobile) (= (keyword section) expanded-topic))
+  ;;   (when (and (utils/is-mobile) (= (keyword section) expanded-topics))
   ;;     (mobile-topic-animation data owner options false)))
 
   (did-update [_ prev-props _]
@@ -267,7 +267,7 @@
 
   (render-state [_ {:keys [editing as-of actual-as-of] :as state}]
     (let [section-kw (keyword section)
-          expanded? (= section-kw expanded-topic)
+          expanded? (contains? expanded-topics section-kw)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
           next-rev (utils/revision-next revisions as-of)

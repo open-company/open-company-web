@@ -149,7 +149,7 @@
                                  :section section-name
                                  :section-data sd
                                  :currency (:currency company-data)
-                                 :expanded-topic (:expanded-topic data)
+                                 :expanded-topics (:expanded-topics data)
                                  :active-category active-category}
                                  {:opts {:section-name section-name
                                          :bw-topic-click (partial topic-click owner)}})))))))))

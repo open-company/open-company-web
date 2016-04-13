@@ -89,7 +89,7 @@
                     {:loading (or (:loading company-data) (:loading data))
                      :company-data company-data
                      :active-category (:active-category state)
-                     :expanded-topic (:expanded-topic data)}
+                     :expanded-topics (:expanded-topics data)}
                     {:opts {:navbar-editing-cb navbar-editing-cb
                             :topic-edit-cb (partial topic-edit-cb owner)
                             :switch-category-cb (partial switch-category-cb owner)
