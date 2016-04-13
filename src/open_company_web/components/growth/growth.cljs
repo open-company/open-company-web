@@ -31,9 +31,6 @@
 (defn metrics-order [metrics-coll]
   (map :slug metrics-coll))
 
-(defn map-metric-data [metric-data]
-  (apply merge (map #(hash-map (str (:period %) (:slug %)) %) metric-data)))
-
 (defn get-state [owner data & [initial]]
   (let [section-data (:section-data data)
         notes-data (:notes section-data)
@@ -46,7 +43,7 @@
                 (if initial
                   (or last-focus first-metric)
                   (om/get-state owner :focus)))
-        growth-data (map-metric-data (:data section-data))
+        growth-data (growth-utils/growth-data-map (:data section-data))
         metric-slugs (metrics-order all-metrics)]
     {:focus focus
      :metadata-editing (if initial
@@ -245,7 +242,7 @@
 (defn delete-metric-cb [owner data metric-slug]
   (let [all-metrics (vals (om/get-state owner :growth-metrics))
         new-metrics (vec (filter #(not= (:slug %) metric-slug) all-metrics))
-        new-metrics-map (map-metric-data new-metrics)
+        new-metrics-map (growth-utils/growth-data-map new-metrics)
         all-data (vals (om/get-state owner :growth-data))
         filtered-data (vec (filter #(not= (:slug %) metric-slug) all-data))
         new-data (metrics-map filtered-data)

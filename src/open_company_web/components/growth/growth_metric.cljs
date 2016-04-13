@@ -13,44 +13,43 @@
             [cljs-time.format :as f]))
 
 (defn label-from-set [data-set interval metric-unit currency-symbol]
-  (let [actual (utils/thousands-separator (or (:value data-set) 0))
+  (let [actual-val (:value data-set)
+        actual (when actual-val (utils/thousands-separator actual-val))
         period (utils/get-period-string (:period data-set) interval)
         fixed-cur-unit (when (= metric-unit "currency") currency-symbol)
         unit (when (= metric-unit "%") "%")]
-    (str fixed-cur-unit actual unit)))
+    (when actual-val
+      (str fixed-cur-unit actual unit))))
 
 (defcomponent growth-metric [data owner options]
 
   (render [_]
-    (let [slug (keyword (:slug @router/path))
-          company-data (slug @dispatcher/app-state)
-          metric-info (:metric-info data)
+    (let [{:keys [slug interval] :as metric-info} (:metric-info data)
           metric-data (:metric-data data)
+          filled-metric-data (growth-utils/fill-gap-months metric-data slug interval)
           sort-pred (utils/sort-by-key-pred :period)
-          sorted-metric (vec (sort sort-pred metric-data))
+          sorted-metric (vec (sort sort-pred (vals filled-metric-data)))
           actual-idx (growth-utils/get-actual sorted-metric)
           actual-set (sorted-metric actual-idx)
-          interval (:interval metric-info)
           metric-unit (:unit metric-info)
           period (utils/get-period-string (:period actual-set) interval)
-          currency-symbol (utils/get-symbol-for-currency-code (:currency company-data))
+          currency-symbol (utils/get-symbol-for-currency-code (:currency data))
           actual-with-label (label-from-set actual-set interval metric-unit currency-symbol)
           fixed-sorted-metric (vec (map #(merge % {:label (label-from-set % interval metric-unit currency-symbol)}) sorted-metric))
           chart-opts {:opts {:chart-height (:height (:chart-size options))
                              :chart-width (:width (:chart-size options))
                              :chart-keys [:value]
+                             :interval interval
                              :label-color (occ/get-color-by-kw :oc-blue-regular)
                              :label-key :label
                              :h-axis-color (occ/get-color-by-kw :oc-blue-light)
                              :h-axis-selected-color (occ/get-color-by-kw :oc-blue-regular)
-                             :chart-colors {:value (occ/get-color-by-kw :oc-blue-light)
-                                            :target (occ/get-color-by-kw :oc-blue-regular)}
-                             :chart-selected-colors {:value (occ/get-color-by-kw :oc-blue-dark)
-                                                     :target (occ/get-color-by-kw :oc-blue-dark)}}}]
+                             :chart-colors {:value (occ/get-color-by-kw :oc-blue-light)}
+                             :chart-selected-colors {:value (occ/get-color-by-kw :oc-blue-dark)}}}]
       (dom/div {:class (utils/class-set {:section true
-                                         (:slug metric-info) true
+                                         slug true
                                          :read-only (:read-only data)})
-                :key (:slug metric-info)
+                :key slug
                 :on-click (:start-editing-cb data)}
         (when (pos? (count metric-data))
           (dom/div {}

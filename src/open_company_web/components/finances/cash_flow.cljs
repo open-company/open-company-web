@@ -65,17 +65,17 @@
     (str "Revenue " revenue " Costs " costs " Cash flow " cash-flow)))
 
 (defn chart-label-fn [prefix data-set]
-  ;example Revenue $12.3K Costs $107K Cash flow -$94.7K
-  (let [revenue (str prefix (utils/with-metric-prefix (:revenue data-set)))
-        costs (str prefix (utils/with-metric-prefix (:costs data-set)))
-        cash-flow-val (- (:revenue data-set) (:costs data-set))
+  ; example: Revenue $12.3K Costs $107K Cash flow -$94.7K
+  (let [revenue (when (:revenue data-set) (str prefix (utils/with-metric-prefix (:revenue data-set))))
+        costs (when (:costs data-set) (str prefix (utils/with-metric-prefix (:costs data-set))))
+        cash-flow-val (when (and revenue costs) (- (:revenue data-set) (:costs data-set)))
         abs-cash-flow-val (utils/abs cash-flow-val)
-        cash-flow (str (when (neg? cash-flow-val) "-") prefix (utils/with-metric-prefix abs-cash-flow-val))]
-   [{:label (str "Revenue " revenue)
+        cash-flow (when cash-flow-val (str (when (neg? cash-flow-val) "-") prefix (utils/with-metric-prefix abs-cash-flow-val)))]
+   [{:label (when revenue (str "Revenue " revenue))
      :color (occ/get-color-by-kw :oc-green-regular)}
-    {:label (str " Costs " costs)
+    {:label (when costs (str " Costs " costs))
      :color (occ/get-color-by-kw :oc-red-regular)}
-    {:label (str " Cash flow " cash-flow)
+    {:label (when cash-flow (str " Cash flow " cash-flow))
      :color (if (pos? cash-flow-val)
               (occ/get-color-by-kw :oc-green-regular)
               (occ/get-color-by-kw :oc-red-regular))}]))
@@ -84,9 +84,11 @@
   
   (render [_]
     (let [finances-data (:data (:section-data data))
+          fixed-finances-data (finances-utils/fill-gap-months finances-data)
           sort-pred (utils/sort-by-key-pred :period)
-          sorted-finances (sort sort-pred finances-data)
-          has-revenues (pos? (apply + (remove nil? (map :revenue sorted-finances))))
+          sorted-finances (sort sort-pred (vals fixed-finances-data))
+          all-revenues (remove js/isNaN (remove nil? (map #(js/parseFloat (:revenue %)) (:data data))))
+          has-revenues (pos? (apply + all-revenues))
           value-set (last sorted-finances)
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
@@ -103,6 +105,7 @@
                                            [:revenue :costs]
                                            [:costs])
                              :label-key :label
+                             :interval "monthly"
                              :h-axis-color (occ/get-color-by-kw :oc-green-light)
                              :h-axis-selected-color (occ/get-color-by-kw :oc-green-regular)
                              :chart-colors (if has-revenues

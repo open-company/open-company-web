@@ -5,6 +5,7 @@ pom.xml
 /classes/
 /out/
 /target/
+resources/public/js/compiled/
 .lein-*
 .repl
 .nrepl-port

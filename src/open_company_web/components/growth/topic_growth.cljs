@@ -10,18 +10,17 @@
 
 (def focus-cache-key :last-selected-metric)
 
-(defn switch-focus [owner focus]
+(defn switch-focus [owner focus options]
   (utils/company-cache-key focus-cache-key focus)
-  (om/set-state! owner :focus focus))
+  (om/set-state! owner :focus focus)
+  (when (fn? (:switch-metric-cb options))
+    ((:switch-metric-cb options) focus)))
 
 (defn metrics-map [metrics-coll]
   (apply merge (map #(hash-map (:slug %) %) (reverse metrics-coll))))
 
 (defn metrics-order [metrics-coll]
   (map :slug metrics-coll))
-
-(defn map-metric-data [metric-data]
-  (apply merge (map #(hash-map (str (:period %) (:slug %)) %) metric-data)))
 
 (defn get-state [owner data & [initial]]
   (let [section-data (:section-data data)
@@ -32,19 +31,19 @@
         focus (if initial
                 (or (:selected-metric data) last-focus first-metric)
                 (om/get-state owner :focus))
-        growth-data (map-metric-data (:data section-data))
+        growth-data (growth-utils/growth-data-map (:data section-data))
         metric-slugs (metrics-order all-metrics)]
     {:focus focus
      :growth-data growth-data
      :growth-metrics metrics
      :growth-metric-slugs metric-slugs}))
 
-(defn subsection-click [e owner data]
+(defn subsection-click [e owner data options]
   (.preventDefault e)
   (let [focus  (.. e -target -dataset -tab)
         section-data (:section-data data)
         metrics (metrics-map (:metrics section-data))]
-    (switch-focus owner focus))
+    (switch-focus owner focus options))
   (.stopPropagation e))
 
 (defn filter-growth-data [focus growth-data]
@@ -55,9 +54,9 @@
   (init-state [_]
     (get-state owner data true))
 
-  (will-receive-props [_ next-props]
+  (will-update [_ next-props _]
     ; this means the section datas have changed from the API or at a upper lever of this component
-    (when-not (= next-props (om/get-props owner))
+    (when-not (= next-props data)
       (om/set-state! owner (get-state owner next-props true))))
 
   (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs]}]
@@ -66,6 +65,7 @@
           focus-metric-info (get growth-metrics focus)
           subsection-data {:metric-data focus-metric-data
                            :metric-info focus-metric-info
+                           :currency currency
                            :read-only true
                            :total-metrics (count growth-metrics)}]
       (dom/div {:class "section-container"
@@ -88,4 +88,4 @@
                   (dom/label {:class metric-classes
                               :title (:description metric)
                               :data-tab metric-slug
-                              :on-click #(subsection-click % owner data)} mname))))))))))
+                              :on-click #(subsection-click % owner data options)} mname))))))))))

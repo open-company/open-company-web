@@ -14,7 +14,8 @@
   }
 
   .state-new {
-    border: 2px solid black;
+    border: 2px solid transparent;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.4);
 
     span.placeholder {
       color: rgba(0, 0, 0, 0.4);
@@ -32,7 +33,7 @@
 
   .state-draft {
     border: 2px solid transparent;
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.8);
 
     span {
       color: black;

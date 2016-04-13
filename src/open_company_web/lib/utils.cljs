@@ -14,7 +14,7 @@
             [open-company-web.caches :refer (company-cache)]
             [open-company-web.local-settings :as ls]))
 
-(defn abs [n] (max n (- n)))
+(defn abs [n] (when n (max n (- n))))
 
 (def oc-animation-duration 300)
 
@@ -510,7 +510,7 @@
       (let [day-of-week (cljs-time/day-of-week now)
             to-monday (dec day-of-week)
             monday-date (cljs-time/minus now (cljs-time/days to-monday))]
-        (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (cljs-time/day monday-date))))))
+        (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (add-zero (cljs-time/day monday-date)))))))
 
 (defn company-cache-key [k & [v]]
   (let [slug (keyword (:slug @router/path))
@@ -601,34 +601,37 @@
   (.toLocaleString (js/parseFloat (gstring/format (str "%." decimals "f") value))))
 
 (defn with-metric-prefix [value]
-  (cond
-    ; 100M
-    (>= value 100000000)
-    (str (round-2-dec (int (/ value 1000000)) 2) "M")
-    ; 10.0M
-    (>= value 10000000)
-    (str (round-2-dec (/ value 1000000) 1) "M")
-    ; 1.00M
-    (>= value 1000000)
-    (str (round-2-dec (/ value 1000000) 2) "M")
-    ; 100K
-    (>= value 100000)
-    (str (round-2-dec (int (/ value 1000)) 2) "K")
-    ; 10.0K
-    (>= value 10000)
-    (str (round-2-dec (/ value 1000) 1) "K")
-    ; 1.00K
-    (>= value 1000)
-    (str (round-2-dec (/ value 1000) 2) "K")
-    ; 100
-    (>= value 100)
-    (str (round-2-dec (int value) 2))
-    ; 10.0
-    (>= value 10)
-    (str (round-2-dec value 1))
-    ; 1.00
-    :else
-    (str (round-2-dec value 2))))
+  (when value
+    (cond
+      ; 100M
+      (>= value 100000000)
+      (str (round-2-dec (int (/ value 1000000)) 2) "M")
+      ; 10.0M
+      (>= value 10000000)
+      (str (round-2-dec (/ value 1000000) 1) "M")
+      ; 1.00M
+      (>= value 1000000)
+      (str (round-2-dec (/ value 1000000) 2) "M")
+      ; 100K
+      (>= value 100000)
+      (str (round-2-dec (int (/ value 1000)) 2) "K")
+      ; 10.0K
+      (>= value 10000)
+      (str (round-2-dec (/ value 1000) 1) "K")
+      ; 1.00K
+      (>= value 1000)
+      (str (round-2-dec (/ value 1000) 2) "K")
+      ; 100
+      (>= value 100)
+      (str (round-2-dec (int value) 2))
+      ; 10.0
+      (>= value 10)
+      (str (round-2-dec value 1))
+      ; 1.00
+      :else
+      (str (round-2-dec value 2)))))
 
 (defn is-test-env? []
   (not (not (.-_phantom js/window))))
+
+(defonce overlay-max-win-height 670)
