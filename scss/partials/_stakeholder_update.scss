@@ -51,23 +51,46 @@ div.stakeholder-update {
 
   div.stakeholder-update {
 
-    div.stakeholder-update-drawer {
-      padding-top: 60px;
-      position: relative;
+    div.company-header {
+      border-bottom: 1px solid $oc_gray_2;
+      padding-bottom: 46px;
     }
 
-    div.company-header-internal {
-      padding: 0 0;
-      width: 930px;
-      margin: 0 auto;
+    div.stakeholder-update-drawer {
+      position: relative;
+
+      div.drawer-toggler {
+        margin-top: -5px;
+      }
     }
   
     div.update-internal {
-      width: 930px;
-      margin: 0 auto;
 
       div.sections {
-        padding: 0 0;
+        @include mobile(){
+          background-color: #d9d9d9;
+        }
+
+        @include big_web(){
+          background-color: $oc_gray_1;
+        }
+
+        div.update-intro {
+          width: 930px;
+          margin: 0 auto;
+        }
+
+        div.update-sections {
+          padding: 10px 0px;
+
+          div.update-sections-internal{
+            box-shadow: 1px 1px 1px 0 #bababa;
+            background-color: white;
+            padding: 10px;
+            width: 930px;
+            margin: 8px auto;
+          }
+        }
       }
 
       div.intro-title,
