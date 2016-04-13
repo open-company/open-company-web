@@ -1,0 +1,105 @@
+div.stakeholder-update {
+  background-color: white;
+
+  div.intro-title,
+  div.topic-title {
+    font-weight: 600;
+    font-size: 26px;
+    line-height: 1;
+    margin-bottom: 17px;
+    text-transform: uppercase;
+  }
+
+  div.topic-headline {
+    font-weight: 600;
+    margin-bottom: 7px;
+  }
+
+  div.topic-headline {
+    font-size: 16px;
+  }
+
+}
+
+@include mobile() {
+
+  div.stakeholder-update {
+
+    div.intro-title,
+    div.topic-title,
+    div.topic-headline,
+    div.topic-body {
+      padding-left: 22px;
+      padding-right: 22px;
+    }
+
+    div.update-topic {
+
+      div.topic-title {
+        margin-top: 14px;
+      }
+    }
+
+    div.dashboard-link {
+      padding-bottom: 20px; 
+      text-align: center;
+    }
+  }
+}
+
+@include big_web() {
+
+  div.stakeholder-update {
+
+    div.stakeholder-update-drawer {
+      padding-top: 60px;
+      position: relative;
+    }
+
+    div.company-header-internal {
+      padding: 0 0;
+      width: 930px;
+      margin: 0 auto;
+    }
+  
+    div.update-internal {
+      width: 930px;
+      margin: 0 auto;
+
+      div.sections {
+        padding: 0 0;
+      }
+
+      div.intro-title,
+      div.topic-title,
+      div.topic-headline,
+      div.topic-body {
+        padding-right: 45px;
+      }
+
+      div.update-topic {
+
+        div.topic-title {
+          margin-top: 26px;
+        }
+      }
+    }
+
+    div.section-container {
+
+      div.pillbox-container.growth,
+      div.pillbox-container.finances {
+
+        @include big_web(){
+          margin-left: 0px;
+          width: 650px;
+        }
+
+        @include mobile(){
+          margin-left: -23px;
+          width: calc(100% + 46px);
+        }
+      }
+    }
+  }
+}

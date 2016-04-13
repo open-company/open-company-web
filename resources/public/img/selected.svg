@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 3.6.1 (26313) - http://www.bohemiancoding.com/sketch -->
+    <title>Selection</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Checked-Copy-3" transform="translate(1.000000, 1.000000)">
+            <ellipse id="Oval-7" stroke="#979797" fill="#FFFFFF" cx="15" cy="15" rx="15" ry="15"></ellipse>
+            <ellipse id="Oval-7-Copy-3" fill="#029DB7" cx="15" cy="15" rx="13" ry="13"></ellipse>
+            <path d="M12.99521,22.841 L6,16.8468038 L7.79247641,15.0533136 L12.9080194,19.1698704 L22.1522501,9 L24.0278618,10.7052858 L12.99521,22.841 Z" id="Shape" fill="#FFFFFF"></path>
+        </g>
+    </g>
+</svg>

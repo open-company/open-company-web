@@ -2,7 +2,6 @@
   (:require [doo.runner :refer-macros [doo-tests]]
             [test.open-company-web.components.company-profile]
             [test.open-company-web.components.company-editor]
-            [test.open-company-web.components.all-sections]
             [test.open-company-web.components.revisions-navigator]
             [test.open-company-web.components.ui.company-avatar]
             [test.open-company-web.components.ui.user-avatar]
@@ -19,8 +18,6 @@
             [test.open-company-web.components.growth.growth-metric]
             [test.open-company-web.components.growth.growth-edit]
             [test.open-company-web.components.growth.growth-metric-edit]
-            [test.open-company-web.components.table-of-contents]
-            [test.open-company-web.components.table-of-contents-item]
             [test.open-company-web.components.simple-section]
             [test.open-company-web.components.company-dashboard]
             [test.open-company-web.components.company-header]
@@ -41,7 +38,6 @@
 (doo-tests
   'test.open-company-web.components.company-profile
   'test.open-company-web.components.company-editor
-  'test.open-company-web.components.all-sections
   'test.open-company-web.components.revisions-navigator
   'test.open-company-web.components.ui.company-avatar
   'test.open-company-web.components.ui.user-avatar
@@ -58,8 +54,6 @@
   'test.open-company-web.components.growth.growth-metric
   'test.open-company-web.components.growth.growth-edit
   'test.open-company-web.components.growth.growth-metric-edit
-  'test.open-company-web.components.table-of-contents
-  'test.open-company-web.components.table-of-contents-item
   'test.open-company-web.components.simple-section
   'test.open-company-web.components.company-dashboard
   'test.open-company-web.components.company-header

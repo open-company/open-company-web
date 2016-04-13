@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
             [cljs.core.async :refer (put!)]
+            [open-company-web.components.ui.link :refer (link)]
             [open-company-web.components.ui.company-avatar :refer (company-avatar)]
             [open-company-web.components.category-nav :refer (category-nav)]
             [open-company-web.router :as router]
@@ -104,15 +105,17 @@
           (gstyle/setStyle logo #js {:marginTop (str (quot height-diff 2) "px")})))))
   (watch-scroll owner))
 
-(defcomponent company-header [{:keys [company-data navbar-editing] :as data} owner options]
+(defcomponent company-header [{:keys [company-data navbar-editing stakeholder-update] :as data} owner options]
 
   (render [_]
-    ;; add the scroll listener if the logo is not present
-    (when (and company-data (clojure.string/blank? (:logo company-data)))
+    ;; add the scroll listener if the logo is not present and not stakeholder update
+    (when (and (not stakeholder-update) company-data (clojure.string/blank? (:logo company-data)))
       (.setTimeout js/window #(watch-scroll owner) 500))
+
     (dom/div #js {:className "company-header"
                   :ref "company-header"}
-      (if navbar-editing
+      (let [link-url (str "/" (:slug company-data) (when-not stakeholder-update "/updates"))]
+        
         ; topic editing
         (dom/div {:class "navbar-editing"
                   :key "navbar-editing"}
@@ -132,14 +135,21 @@
             ;; Company logo
             (dom/div {:class "company-logo-container"}
               (dom/img #js {:src (:logo company-data)
-                            :onLoad #(logo-on-load owner) ;; add scroll listener when the logo is loaded
-                            :onError #(watch-scroll owner) ;; or it errors on loading
+                            ;; add scroll listener when the logo is loaded unless stakeholder update
+                            :onLoad (when-not stakeholder-update #(logo-on-load owner))
+                            ;; or add listener if logo errors on loading unless stakeholder update
+                            :onError (when-not stakeholder-update #(watch-scroll owner))
                             :className "company-logo"
                             :title (:name company-data)
                             :ref "company-logo"}))
             ;; Buttons
             (dom/div {:class (utils/class-set {:buttons-container true
                                                :hidden (not (utils/is-mobile))})}
+              (let [icon-url (if stakeholder-update "/img/dashboard.svg" "/img/digest.svg")]
+                (dom/button {:type "button"
+                             :class "btn btn-link digest-button"
+                             :on-click (fn [e] (router/nav! link-url))}
+                  (dom/img {:src icon-url})))
               (b/dropdown {:class "oc-btn vert-ellipse" :bs-size "30px" :title "" :pull-right? true}
                 (b/menu-item {:key 1
                               :on-click #(menu-click owner)} (if (cook/get-cookie :jwt) "Logout" "Sign In/Sign Up")))))
@@ -152,7 +162,10 @@
           ;; Company description
           (dom/div #js {:className "company-description-container"
                         :ref "company-description-container"}
-            (dom/div {:class "company-description"} (:description company-data)))))
+            (dom/div {:class "company-description"} (:description company-data))
+            ;; View navigation
+            (let [link-name (if stakeholder-update "Dashboard" "Stakeholder Updates")]
+              (om/build link {:class "nav-link" :href link-url :name link-name})))))
 
       (when-not (:editing-topic data)
         ;; Category navigation

@@ -7,6 +7,7 @@
             [open-company-web.caches :as cache]
             [open-company-web.api :as api]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.components.icon :as i]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.topic-growth-headline :refer (topic-growth-headline)]
@@ -148,10 +149,7 @@
                     :ref "topic-internal"}
         ;; Topic title
         (dom/div {:class "topic-header group"}
-          (dom/img {:class (str "topic-image svg")
-                    :width 30
-                    :height 30
-                    :src (str (:image topic-data) "?" ls/deploy-key)})
+          (dom/div {:class "left"} (i/icon (:icon topic-data)))
           (dom/div {:class "topic-title"} (:title topic-data))
           (dom/div #js {:className "topic-date"
                         :ref "topic-date"

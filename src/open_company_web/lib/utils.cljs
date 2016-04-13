@@ -558,16 +558,6 @@
 (defn scroll-to-section [section-name]
   (scroll-to-id (str "section-" (name section-name))))
 
-(defn scroll-toc-to-id [id]
-  (let [toc (.querySelector js/document "div.table-of-contents-inner")
-        top (scroll-top-with-id id)]
-    (.play
-      (new Scroll
-           toc
-           (new js/Array 0 (.-scrollTop toc))
-           (new js/Array 0 top)
-           oc-animation-duration))))
-
 (def _mobile (atom -1))
 
 (def big-web-min-width 970)
@@ -635,3 +625,14 @@
   (not (not (.-_phantom js/window))))
 
 (defonce overlay-max-win-height 670)
+
+(defn absolute-offset [element]
+  (loop [top 0
+         left 0
+         el element]
+    (if-not el
+      {:top top
+       :left left}
+      (recur (+ top (or (.-offsetTop el) 0))
+             (+ left (or (.-offsetLeft el) 0))
+             (.-offsetParent el)))))

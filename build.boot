@@ -21,10 +21,11 @@
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
     [com.andrewmcveigh/cljs-time "0.4.0"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     [funcool/cuerdas "0.7.1"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
+    [medley "0.7.4"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
+
     ;; --- DO NOT UPDATE REACT, the 15.x.x code requires changes on our part
     [cljsjs/react "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/raven "2.1.0-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
-    [medley "0.7.4"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [cljsjs/d3 "3.5.7-1"] ; d3 externs https://clojars.org/cljsjs/d3
     [cljsjs/medium-editor "5.15.0-0"]]) ; Medium editor https://clojars.org/cljsjs/medium-editor
 
@@ -57,7 +58,7 @@
   (set-env! :source-paths #(conj % "test")
             :dependencies #(conj % '[cljs-react-test "0.1.3-SNAPSHOT" :scope "test"]))
   (comp (test-cljs :js-env :phantom
-                   :exit? true
+                   :update-fs? true
                    :namespaces #{"test.open-company-web.*"})))
 
 (defn page? [f]

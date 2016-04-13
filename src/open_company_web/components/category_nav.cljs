@@ -16,7 +16,7 @@
   ;; prevent the route reload
   (reset! open-company-web.core/prevent-route-dispatch true)
   ;; call the switch tab callback
-  ((:switch-tab-cb data) category-name)
+  ((:switch-category-cb data) category-name)
   ;; prevent the anchor element from reload the route
   (.preventDefault e)
   ;; change the window.location.hash

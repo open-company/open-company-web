@@ -1,0 +1,60 @@
+$open_degrees: 225deg;
+$icon_size: 24px;
+
+div.drawer-toggler {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: $icon_size;
+  height: $icon_size;
+  z-index: 1035;
+  padding: 0px;
+  margin: 5px;
+
+  button.drawer-toggler-bt {
+    display: inline-block;
+    height: $icon_size;
+    width: $icon_size;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    // start with the button rotated of 45 degrees
+    @include animation(0s, $oc_animation_duration, rotate45);
+  }
+
+  &.rotate45{
+    @include animation(0s, $oc_animation_duration, rotate45);
+  }
+
+  &.rotate0{
+    @include animation(0s, $oc_animation_duration, rotate0);
+  }
+
+  @include keyframe(rotate45){
+    from { 
+      -webkit-transform: rotate(0deg);
+      -moz-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    to { 
+      -webkit-transform: rotate($open_degrees);
+      -moz-transform: rotate($open_degrees);
+      transform: rotate($open_degrees);
+    }
+  }
+
+  @include keyframe(rotate0){
+    from { 
+      -webkit-transform: rotate($open_degrees);
+      -moz-transform: rotate($open_degrees);
+      transform: rotate($open_degrees);
+    }
+    to { 
+      -webkit-transform: rotate(0deg);
+      -moz-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+  }
+}

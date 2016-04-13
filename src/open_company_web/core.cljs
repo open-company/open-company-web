@@ -3,9 +3,10 @@
             [secretary.core :as secretary :refer-macros (defroute)]
             [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
-            [open-company-web.components.page :refer (company)]
             [open-company-web.components.company-editor :refer (company-editor)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
+            [open-company-web.components.company-profile :refer (company-profile)]
+            [open-company-web.components.stakeholder-update :refer (stakeholder-update)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
@@ -132,8 +133,14 @@
     (defroute company-route "/:slug" {:as params}
       (company-handler "dashboard" target company-dashboard params))
 
+    (defroute company-route-slash "/:slug/" {:as params}
+      (company-handler "dashboard" target company-dashboard params))
+
     (defroute company-profile-route "/:slug/profile" {:as params}
-      (company-handler "profile" target company params))
+      (company-handler "profile" target company-profile params))
+
+    (defroute stakeholder-updates-route "/:slug/updates" {:as params}
+      (company-handler "stakeholder-update" target stakeholder-update params))
 
     (defroute not-found-route "*" []
       ;; render component
@@ -147,7 +154,9 @@
                                  company-create-route
                                  user-profile-route
                                  company-route
+                                 company-route-slash
                                  company-profile-route
+                                 stakeholder-updates-route
                                  not-found-route]))
 
     (defn login-wall []

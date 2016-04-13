@@ -11,6 +11,7 @@ div.topic-list-edit-container {
 }
 
 div.topic-list{
+  position: relative;
   content: "";
 
   @include mobile(){

@@ -1,0 +1,68 @@
+$drawer_width: 400px;
+
+div.side-drawer-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  opacity: 0;
+  @include animation(0s, 0s, closeDrawer);
+  z-index: 1033;
+
+  &.open-drawer {
+    @include animation(0s, $oc_animation_duration, openDrawer);
+  }
+
+  &.close-drawer {
+    @include animation(0s, $oc_animation_duration, closeDrawer);
+  }
+
+  @include keyframe(openDrawer){
+    from {
+      opacity: 0;
+      -webkit-transform: translate(-100%, 0);
+      -moz-transform: translate(-100%, 0);
+      transform: translate(-100%, 0);
+    }
+    to { 
+      opacity: 1;
+      -webkit-transform: translate(0, 0);
+      -moz-transform: translate(0, 0);
+      transform: translate(0, 0);
+    }
+  }
+
+  @include keyframe(closeDrawer){
+    from {
+      opacity: 1;
+      -webkit-transform: translate(0, 0);
+      -moz-transform: translate(0, 0);
+      transform: translate(0, 0);
+    }
+    to {
+      opacity: 0;
+      -webkit-transform: translate(-100%, 0);
+      -moz-transform: translate(-100%, 0);
+      transform: translate(-100%, 0);
+    }
+  }
+
+  div.side-drawer {
+    content: "";
+    width: $drawer_width;
+    height: calc(100% - 50px);
+    position: absolute;
+    background-color: white;
+    border: 1px solid $oc_gray_2;
+    top: 50px;
+    left: 0;
+
+    div.side-drawer-internal {
+      margin-left: 35px;
+      height: calc(100% - 10px);
+      overflow-y: scroll;
+    }
+  }
+}

@@ -36,8 +36,6 @@ div.company-header{
       padding-top: 22px;
 
       div.company-logo-container{
-        max-width: 200px;
-        max-height: 100px;
         float: left;
 
         @include mobile(){
@@ -46,7 +44,7 @@ div.company-header{
 
         img.company-logo {
           max-width: 200px;
-          max-height: 100px;
+          max-height: 50px;
         }
       }
 
@@ -122,6 +120,14 @@ div.company-header{
 
       @include mobile(){
         width: 100%;
+
+        a.nav-link {
+          display: none;
+        }
+      }
+
+      @include big_web() {
+        padding-bottom: 34px;
       }
 
       div.company-description {
@@ -140,7 +146,6 @@ div.company-header{
         @include big_web(){
           width: 355px;
           padding-top: 5px;
-          padding-bottom: 34px;
           font-size: 14px;
           line-height: 1.3;
         }
