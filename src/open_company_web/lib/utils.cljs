@@ -528,7 +528,7 @@
   (-> (NumberFormat. nf/Format.CURRENCY "USD" nf/CurrencyStyle.LOCAL)
       (.setMinimumFractionDigits 0)))
 
-(defn ^:export thousands-separator [number]
+(defn thousands-separator [number]
   (.format +usd-fmt+ number))
 
 (defn offset-top [elem]
