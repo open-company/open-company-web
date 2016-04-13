@@ -18,7 +18,7 @@
             [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as EventType]
             [goog.events :as events]
-            [goog.style :refer (setStyle)]))
+            [goog.style :as gstyle]))
 
 (defn after [ms fn]
   (.setTimeout js/window fn ms))
@@ -40,11 +40,10 @@
         topic-date (sel1 topic [:div.topic-date])
         body-node (sel1 topic [:div.topic-body])
         body-nav-node (sel1 topic [:div.body-navigation-container])]
-    (setStyle body-nav-node #js {:height "auto"})
+    (gstyle/setStyle body-nav-node #js {:height "auto"})
     (let [body-height (.-offsetHeight body-nav-node)
           body-width (.-offsetWidth body-nav-node)]
-      ;; (setStyle body-nav-node #js {:height (if expanded? "auto" "0")
-      ;;                              :overflow "hidden"})
+      (gstyle/setStyle body-nav-node #js {:height (if expanded? "auto" "0")})
 
       ;; animate finances headtitle
       (when-let [finances-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-finances")]
@@ -106,8 +105,7 @@
           (events/listen
            EventType/FINISH
            (fn [e]
-             (when-not expanded?
-               (.setTimeout js/window #(scroll-to-topic-top topic) 100))))
+             (when-not expanded? (.setTimeout js/window #(scroll-to-topic-top topic) 100))))
           (.play)))
 
 
