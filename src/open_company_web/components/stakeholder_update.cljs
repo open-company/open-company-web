@@ -46,21 +46,66 @@
                               :currency (:currency data)
                               :expanded true})))))
 
+(defn save-stakeholder-update [old-stakeholder-update active-topics]
+  (let [new-stakeholder-update (assoc old-stakeholder-update :sections (vec active-topics))]
+    (api/patch-stakeholder-update new-stakeholder-update)))
+
+(def drawer-toggler-max-margin-top 300)
+
+(defn fix-drawer-toggler-position [owner]
+  (when-not (om/get-state owner :toggler-top-margin)
+    (when-let [update-internal (om/get-ref owner "update-internal")]
+      (let [offset (utils/absolute-offset update-internal)
+            offset-top (min drawer-toggler-max-margin-top (:top offset))]
+        (setStyle (sel1 [:div.drawer-toggler]) #js {:marginTop (str offset-top "px")})
+        (om/set-state! owner :toggler-top-margin offset-top)))))
+
 (defcomponent selected-topics [data owner]
-  (render [_]
-    (let [stakeholder-update (:stakeholder-update data)
+
+  (init-state [_] {
+    :drawer-open false})
+
+  (render-state [_ {:keys [drawer-open]}]
+    (let [slug (keyword (:slug @router/path))
+          company-data (get data slug)
+          stakeholder-update (:stakeholder-update company-data)
           section-keys (map keyword (:sections stakeholder-update))
-          all-sections-key (get-key-from-sections (:sections data))]
+          all-sections-key (get-key-from-sections (:sections company-data))]
       (dom/div {:class "update-sections"
                 :key all-sections-key}
-        (for [section section-keys]
-          (let [section-data (section data)]
-            (when-not (and (:read-only section-data) (:placeholder section-data))
-              (om/build stakeholder-update-topic {
-                                      :section-data section-data
-                                      :section section
-                                      :currency (:currency data)
-                                      :loading (:loading data)}))))))))
+
+        (dom/div {:class "stakeholder-update-drawer"}
+          (when (and (not (:read-only company-data))
+                     (not (utils/is-mobile))
+                     (not (:loading data)))
+            ;; drawer toggler
+            (om/build drawer-toggler {:close (not drawer-open)
+                                      :click-cb #(om/update-state! owner :drawer-open not)}))
+          (when-not (or (:read-only company-data)
+                        (utils/is-mobile)
+                        (:loading data)))
+          ;; side drawer
+          (let [all-sections (vec (flatten (vals (:sections company-data))))
+                all-section-keys (map keyword all-sections)
+                list-data (merge data {:active true
+                                       :all-topics (select-keys company-data all-section-keys)
+                                       :active-topics-list (:sections stakeholder-update)})
+                list-opts {:did-change-active-topics (partial save-stakeholder-update stakeholder-update)}]
+            (om/build side-drawer {:open drawer-open
+                                   :list-key "su-update"
+                                   :list-data list-data}
+                                  {:opts {:list-opts list-opts
+                                          :bg-click-cb #(om/set-state! owner :drawer-open false)}})))
+
+        (dom/div {:class "update-sections-internal"}
+          (for [section section-keys]
+            (let [section-data (section company-data)]
+              (when-not (and (:read-only section-data) (:placeholder section-data))
+                (om/build stakeholder-update-topic {
+                                        :section-data section-data
+                                        :section section
+                                        :currency (:currency company-data)
+                                        :loading (:loading data)})))))))))
 
 (defcomponent stakeholder-update-intro [data owner]
   (render [_]
@@ -73,28 +118,17 @@
           (dom/div {:class "topic-body"}
             (dom/div {:class "topic-body-inner group"} body)))))))
 
-(defn save-stakeholder-update [old-stakeholder-update active-topics]
-  (let [new-stakeholder-update (assoc old-stakeholder-update :sections (vec active-topics))]
-    (api/patch-stakeholder-update new-stakeholder-update)))
-
-(def drawer-toggler-max-margin-top 300)
-
-(defn fix-drawer-toggler-position [owner]
-  (when-let [update-internal (om/get-ref owner "update-internal")]
-    (let [offset (utils/absolute-offset update-internal)
-          offset-top (min drawer-toggler-max-margin-top (:top offset))]
-      (setStyle (sel1 [:div.drawer-toggler]) #js {:marginTop (str offset-top "px")})
-      (om/set-state! owner :toggler-top-margin offset-top))))
-
 (defcomponent stakeholder-update [data owner]
 
   (init-state [_]
     {:drawer-open false
      :toggler-top-margin false})
 
-  (did-update [_ _ _]
-    (when-not (om/get-state owner :toggler-top-margin)
-      (fix-drawer-toggler-position owner)))
+  ; (did-mount [_]
+  ;   (fix-drawer-toggler-position owner))
+
+  ; (did-update [_ _ _]
+  ;   (fix-drawer-toggler-position owner))
 
   (render-state [_ {:keys [drawer-open]}]
     (let [slug (keyword (:slug @router/path))
@@ -117,29 +151,6 @@
           ;; Company / user header
           (when-not (utils/is-mobile)
             (om/build navbar data))
-
-          (dom/div {:class "stakeholder-update-drawer"}
-            (when (and (not (:read-only company-data))
-                       (not (utils/is-mobile))
-                       (not (:loading data)))
-              ;; drawer toggler
-              (om/build drawer-toggler {:close (not drawer-open)
-                                        :click-cb #(om/update-state! owner :drawer-open not)}))
-            (when-not (or (:read-only company-data)
-                          (utils/is-mobile)
-                          (:loading data)))
-            ;; side drawer
-            (let [all-sections (vec (flatten (vals (:sections company-data))))
-                  all-section-keys (map keyword all-sections)
-                  list-data (merge data {:active true
-                                         :all-topics (select-keys company-data all-section-keys)
-                                         :active-topics-list (:sections stakeholder-update-data)})
-                  list-opts {:did-change-active-topics (partial save-stakeholder-update stakeholder-update-data)}]
-              (om/build side-drawer {:open drawer-open
-                                     :list-key "su-update"
-                                     :list-data list-data}
-                                    {:opts {:list-opts list-opts
-                                            :bg-click-cb #(om/set-state! owner :drawer-open false)}})))
             
           ;; Company header
           (om/build company-header {
@@ -147,14 +158,14 @@
               :company-data company-data
               :stakeholder-update true})
           
-          (dom/div #js {:className "update-internal row"
+          (dom/div #js {:className "update-internal"
                         :ref "update-internal"}
           
-            (dom/div {:class "sections col-md-9 col-sm-12"}
+            (dom/div {:class "sections"}; col-md-9 col-sm-12"}
               ;; Stakeholder update intro
               (om/build stakeholder-update-intro stakeholder-update-data)
               ;; Stakeholder update topics
-              (om/build selected-topics company-data)
+              (om/build selected-topics data)
               ;; Dashboard link
               (when (utils/is-mobile)
                 (dom/div {:class "dashboard-link"}
