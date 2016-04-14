@@ -9,6 +9,22 @@ div.topic-list {
     text-align: left;
     box-shadow: 1px 1px 1px 0 #bababa;
 
+    div.topic-anim{
+      position: relative;
+      height: auto;
+
+      div.topic-as-of {
+        height: auto;
+      }
+
+      div.topic-tr-as-of {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: auto;
+      }
+    }
+
     @include big_web(){
       height: 100%;
       cursor: pointer;
@@ -109,8 +125,10 @@ div.topic-list {
     }
 
     div.body-navigation-container{
-      overflow: hidden;
-      height: 0px;
+      &.close{
+        overflow: hidden;
+        height: 0px;
+      }
 
       @include topic_navigation();
     }
