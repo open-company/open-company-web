@@ -7,11 +7,6 @@ div.section-container{
     margin-bottom: 10px;
     text-align: center;
 
-    @include big_web(){
-      margin-left: -50px;
-      width: calc(100% + 100px);
-    }
-
     @include mobile(){
       margin-left: -23px;
       width: calc(100% + 46px);
