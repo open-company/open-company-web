@@ -8,7 +8,7 @@ div.side-drawer-container {
   height: 100%;
   background-color: rgba(255, 255, 255, 0.7);
   opacity: 0;
-  @include animation(0s, 0s, closeDrawer);
+  @include animation(0s, 0.01s, closeDrawer);
   z-index: 1033;
 
   &.open-drawer {
