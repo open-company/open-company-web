@@ -136,7 +136,7 @@
                       #js [0 0]
                       utils/oc-animation-duration)))
     ; resize the light box
-    (.play (Resize. (sel1 [:div.topic-overlay-transition])
+    (.play (Resize. topic-overlay-content
                     #js [(js/parseFloat (.-width cur-size)) (js/parseFloat (.-height cur-size))]
                     #js [(js/parseFloat (.-width cur-size)) (js/parseFloat (.-height tr-size))]
                     utils/oc-animation-duration))
