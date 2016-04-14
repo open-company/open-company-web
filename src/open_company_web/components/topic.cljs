@@ -71,28 +71,28 @@
                             utils/oc-animation-duration)]
             (.play growth-resize)
             (.play growth-fade)))
-
+      ;; show/hide topic more ellipses
       (.play
         (Fade.
           topic-more
           (if expanded 0 1)
           (if expanded 1 0)
           utils/oc-animation-duration))
-
+      ;; expand/collapse the ellipses div
       (.play
         (Resize.
           topic-more
           #js [body-width (if expanded 0 20)]
           #js [body-width (if expanded 20 0)]
           utils/oc-animation-duration))
-
+      ;; show/hide data and author div
       (.play
         (Fade.
           topic-date
           (if expanded 1 0)
           (if expanded 0 1)
           utils/oc-animation-duration))
-      ;; animate height
+      ;; animate body and navigation div height
       (let [height-animation (Resize.
                                body-nav-node
                                #js [body-width (if expanded (+ body-height 20) 0)]
@@ -170,7 +170,8 @@
         (when (utils/is-mobile)
           (dom/div #js {:className "topic-more"
                         :ref "topic-more"
-                        :style #js {:opacity (if expanded 0 1)}}
+                        :style #js {:opacity (if expanded 0 1)
+                                    :height (if expanded "0px" "20px")}}
             (dom/i {:class "fa fa-circle"})
             (dom/i {:class "fa fa-circle"})
             (dom/i {:class "fa fa-circle"})))

@@ -13,124 +13,126 @@ div.topic-list {
       position: relative;
       height: auto;
 
-      div.topic-as-of {
-        height: auto;
-      }
-
-      div.topic-tr-as-of {
+      & > div.topic-tr-as-of {
         position: absolute;
         top: 0;
         left: 0;
+      }
+
+      & > div {
         height: auto;
-      }
-    }
-
-    @include big_web(){
-      height: 100%;
-      cursor: pointer;
-
-      &:hover {
-        background-color: #E5E4E4;
-      }
-    }
-
-    div.topic-header {
-
-      .topic-image {
-        width: 30px;
-        height: 30px;
-        float: left;
-      }
-
-      svg path, svg polygon {
-        fill: #8b8a8a;
-      }
-
-      div.topic-title {
-        font-weight: 600;
-        color: #2d2d2d;
-        margin-top: 5px;
-
-        @include mobile(){
-          font-size: 26px;
-          line-height: 1;
-          margin-left: 38px;
-        }
 
         @include big_web(){
-          font-size: 18px;
-          line-height: 1;
-          float: left;
-          margin-left: 12px;
+          height: 100%;
+          cursor: pointer;
+
+          &:hover {
+            background-color: #E5E4E4;
+          }
         }
-      }
 
-      div.topic-date {
-        font-size: 13px;
-        line-height: 0.8;
-        color: $oc_gray_4;
-        margin-left: 38px;
-        padding-top: 16px;
-      }
-    }
+        div.topic-internal{
 
-    div.topic-headline {
-      width: 100%;
-      margin-top: 16px;
-      color: #444444;
-      font-size: 16px;
-      line-height: 1.6;
+          div.topic-header {
 
-      &.collapse {
-        height: 0px;
-      }
+            .topic-image {
+              width: 30px;
+              height: 30px;
+              float: left;
+            }
 
-      &.chart-header-container {
-        div.actual-container {
-          h3 {
-            margin: 5px 0;
+            svg path, svg polygon {
+              fill: #8b8a8a;
+            }
+
+            div.topic-title {
+              font-weight: 600;
+              color: #2d2d2d;
+              margin-top: 5px;
+
+              @include mobile(){
+                font-size: 22px;
+                line-height: 1;
+                margin-left: 38px;
+              }
+
+              @include big_web(){
+                font-size: 18px;
+                line-height: 1;
+                float: left;
+                margin-left: 12px;
+              }
+            }
+
+            div.topic-date {
+              font-size: 13px;
+              line-height: 0.8;
+              color: $oc_gray_4;
+              margin-left: 38px;
+              padding-top: 16px;
+            }
+          }
+
+          div.topic-headline {
+            width: 100%;
+            margin-top: 25px;
+            color: #444444;
+            font-size: 16px;
+            line-height: 1.6;
+
+            &.collapse {
+              height: 0px;
+            }
+
+            &.chart-header-container {
+              div.actual-container {
+                h3 {
+                  margin: 5px 0;
+                }
+              }
+            }
+
+          }
+
+          div.topic-more {
+            margin-top: 10px;
+            text-align: center;
+
+            img {
+              width: 30px;
+              height: 30px;
+            }
+
+            i {
+              font-size: 6px;
+              margin-left: 3px;
+              line-height: 1;
+              font-weight: 600;
+              color: #bababa;
+            }
+          }
+
+          div.topic-date {
+            font-size: 12px;
+            font-style: italic;
+            color: #A6A6A3; /* gray */
+
+            label {
+              margin: 0px;
+              font-weight: normal;
+            }
+          }
+
+          div.body-navigation-container{
+            &.close{
+              overflow: hidden;
+              height: 0px;
+            }
+
+            @include topic_navigation();
           }
         }
       }
-
-    }
-
-    div.topic-more {
-      margin-top: 10px;
-      text-align: center;
-
-      img {
-        width: 30px;
-        height: 30px;
-      }
-
-      i {
-        font-size: 6px;
-        margin-left: 3px;
-        line-height: 1;
-        font-weight: 600;
-        color: #bababa;
-      }
-    }
-
-    div.topic-date {
-      font-size: 12px;
-      font-style: italic;
-      color: #A6A6A3; /* gray */
-
-      label {
-        margin: 0px;
-        font-weight: normal;
-      }
-    }
-
-    div.body-navigation-container{
-      &.close{
-        overflow: hidden;
-        height: 0px;
-      }
-
-      @include topic_navigation();
     }
   }
 }
