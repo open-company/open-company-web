@@ -539,8 +539,8 @@
   (.play
     (new Scroll
          (.-body js/document)
-         (new js/Array 0 (.-scrollTop (.-body js/document)))
-         (new js/Array 0 scroll-y)
+         #js [0 (.-scrollTop (.-body js/document))]
+         #js [0 scroll-y]
          (or duration oc-animation-duration))))
 
 (defn scroll-to-element [elem]
