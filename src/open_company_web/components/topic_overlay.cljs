@@ -12,7 +12,7 @@
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [goog.events :as events]
-            [goog.fx.dom :refer (Fade Resize)]
+            [goog.fx.dom :refer (Fade Resize Scroll)]
             [goog.style :refer (setStyle)]
             [goog.fx.Animation.EventType :as EventType]))
 
@@ -125,13 +125,24 @@
         current-state (om/get-state owner)
         appear-animation (Fade. tr-topic 0 1 utils/oc-animation-duration)
         cur-size (js/getComputedStyle cur-topic)
-        tr-size (js/getComputedStyle tr-topic)]
+        tr-size (js/getComputedStyle tr-topic)
+        topic-overlay-content (sel1 [:div.topic-overlay-content])
+        scroll-top (.-scrollTop topic-overlay-content)]
+    ; scroll to top
+    (when (and topic-overlay-content
+               (pos? scroll-top))
+      (.play (Scroll. topic-overlay-content
+                      #js [0 scroll-top]
+                      #js [0 0]
+                      utils/oc-animation-duration)))
+    ; resize the light box
     (.play (Resize. (sel1 [:div.topic-overlay-transition])
-                    #js [(js/parseInt (.-width cur-size)) (js/parseInt (.-height cur-size))]
-                    #js [(js/parseInt (.-width cur-size)) (js/parseInt (.-height tr-size))]
+                    #js [(js/parseFloat (.-width cur-size)) (js/parseFloat (.-height cur-size))]
+                    #js [(js/parseFloat (.-width cur-size)) (js/parseFloat (.-height tr-size))]
                     utils/oc-animation-duration))
     ; disappear current topic
     (.play (Fade. cur-topic 1 0 utils/oc-animation-duration))
+    ; appear the new topic
     (doto appear-animation
       (events/listen
         EventType/FINISH
@@ -209,7 +220,7 @@
             (dom/div {:class "topic-overlay-transition group"}
               (dom/div #js {:className "topic-overlay-as-of group"
                             :ref "cur-topic"
-                            :key (str as-of "-cur-" transition-as-of)
+                            :key (str "cur-" as-of)
                             :style #js {:opacity 1}}
                 (om/build topic-overlay-internal {:topic-data topic-data
                                                   :as-of as-of
@@ -227,7 +238,7 @@
               (when transition-as-of
                 (dom/div #js {:className "topic-overlay-tr-as-of group"
                               :ref "tr-topic"
-                              :key (str transition-as-of "-tr-" as-of)
+                              :key (str "tr-" transition-as-of)
                               :style #js {:opacity 0}}
                   (let [tr-topic-data (utils/select-section-data section-data section-kw transition-as-of)
                         tr-prev-rev (utils/revision-prev revisions transition-as-of)
