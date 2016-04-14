@@ -44,60 +44,60 @@
 
       ;; animate finances headtitle
       (when-let [finances-children (sel1 topic ":scope > div.topic-headline > div.topic-headline-finances")]
-        (let [finances-resize (new Resize
-                                   finances-children
-                                   (new js/Array body-width (if expanded 0 100))
-                                   (new js/Array body-width (if expanded 100 0))
-                                   utils/oc-animation-duration)
-              finances-fade (new Fade
-                                 finances-children
-                                 (if expanded 0 1)
-                                 (if expanded 1 0)
-                                 utils/oc-animation-duration)]
+        (let [finances-resize (Resize.
+                                finances-children
+                                #js [body-width (if expanded 0 100)]
+                                #js [body-width (if expanded 100 0)]
+                                utils/oc-animation-duration)
+              finances-fade (Fade.
+                              finances-children
+                              (if expanded 0 1)
+                              (if expanded 1 0)
+                              utils/oc-animation-duration)]
           (.play finances-resize)
           (.play finances-fade)))
 
       ;; animate growth headtitle
       (when-let [growth-children (sel1 topic ":scope > div.topic-headline > div.topic-growth-headline")]
-        (let [growth-resize (new Resize
-                                 growth-children
-                                 (new js/Array body-width (if expanded 0 100))
-                                 (new js/Array body-width (if expanded 100 0))
-                                 utils/oc-animation-duration)
-              growth-fade (new Fade
-                               growth-children
-                               (if expanded 0 1)
-                               (if expanded 1 0)
-                               utils/oc-animation-duration)]
+        (let [growth-resize (Resize.
+                              growth-children
+                              #js [body-width (if expanded 0 100)]
+                              #js [body-width (if expanded 100 0)]
+                              utils/oc-animation-duration)
+              growth-fade (Fade.
+                            growth-children
+                            (if expanded 0 1)
+                            (if expanded 1 0)
+                            utils/oc-animation-duration)]
             (.play growth-resize)
             (.play growth-fade)))
 
       (.play
-        (new Fade
-             topic-more
-             (if expanded 0 1)
-             (if expanded 1 0)
-             utils/oc-animation-duration))
+        (Fade.
+          topic-more
+          (if expanded 0 1)
+          (if expanded 1 0)
+          utils/oc-animation-duration))
 
       (.play
-        (new Resize
-             topic-more
-             (new js/Array body-width (if expanded 0 20))
-             (new js/Array body-width (if expanded 20 0))
-             utils/oc-animation-duration))
+        (Resize.
+          topic-more
+          #js [body-width (if expanded 0 20)]
+          #js [body-width (if expanded 20 0)]
+          utils/oc-animation-duration))
 
       (.play
-        (new Fade
-             topic-date
-             (if expanded 1 0)
-             (if expanded 0 1)
-             utils/oc-animation-duration))
+        (Fade.
+          topic-date
+          (if expanded 1 0)
+          (if expanded 0 1)
+          utils/oc-animation-duration))
       ;; animate height
-      (let [height-animation (new Resize
-                                  body-nav-node
-                                  (new js/Array body-width (if expanded (+ body-height 20) 0))
-                                  (new js/Array body-width (if expanded 0 (+ body-height 20)))
-                                  (* 0.8 utils/oc-animation-duration))]
+      (let [height-animation (Resize.
+                               body-nav-node
+                               #js [body-width (if expanded (+ body-height 20) 0)]
+                               #js [body-width (if expanded 0 (+ body-height 20))]
+                               (* 0.8 utils/oc-animation-duration))]
         (doto height-animation
           (events/listen
            EventType/FINISH
@@ -145,7 +145,7 @@
           headline-options {:opts {:currency currency
                                    :pillbox-click-cb (partial pillbox-click-cb owner)}}
           headline-data (assoc topic-data :expanded expanded)]
-      (dom/div #js {:className "topic-internal"
+      (dom/div #js {:className "topic-internal group"
                     :ref "topic-internal"}
         ;; Topic title
         (dom/div {:class "topic-header group"}
@@ -176,7 +176,7 @@
             (dom/i {:class "fa fa-circle"})))
         ;; topic body
         (when (utils/is-mobile)
-          (dom/div #js {:className "body-navigation-container group"
+          (dom/div #js {:className (str "body-navigation-container group " (when (not expanded) "close"))
                         :ref "body-navigation-container"}
             (om/build topic-body {:section section
                                   :section-data topic-data
@@ -210,12 +210,39 @@
     (mobile-topic-animation data owner options expanded)
     ((:bw-topic-click options) (:section data) selected-metric)))
 
+(defn animate-transition [owner]
+  (let [cur-topic (om/get-ref owner "cur-topic")
+        tr-topic (om/get-ref owner "tr-topic")
+        current-state (om/get-state owner)
+        appear-animation (Fade. tr-topic 0 1 utils/oc-animation-duration)
+        cur-size (js/getComputedStyle cur-topic)
+        tr-size (js/getComputedStyle tr-topic)
+        topic (om/get-ref owner "topic-anim")
+        topic-size (js/getComputedStyle topic)
+        scroll-top (.-scrollTop topic)]
+    ; resize the light box
+    (.play (Resize. topic
+                    #js [(js/parseFloat (.-width topic-size)) (js/parseFloat (.-height cur-size))]
+                    #js [(js/parseFloat (.-width topic-size)) (js/parseFloat (.-height tr-size))]
+                    utils/oc-animation-duration))
+    ; disappear current topic
+    (.play (Fade. cur-topic 1 0 utils/oc-animation-duration))
+    ; appear the new topic
+    (doto appear-animation
+      (events/listen
+        EventType/FINISH
+        #(om/set-state! owner (merge current-state
+                                    {:as-of (:transition-as-of current-state)
+                                     :transition-as-of nil})))
+      (.play))))
+
 (defcomponent topic [{:keys [section-data section currency] :as data} owner options]
 
   (init-state [_]
     {:expanded false
      :as-of (:updated-at section-data)
-     :actual-as-of (:updated-at section-data)})
+     :actual-as-of (:updated-at section-data)
+     :transition-as-of nil})
 
   (will-update [_ next-props _]
     (let [new-as-of (:updated-at (:section-data next-props))
@@ -226,7 +253,11 @@
         (om/set-state! owner :as-of new-as-of)
         (om/set-state! owner :actual-as-of new-as-of))))
 
-  (render-state [_ {:keys [editing expanded as-of actual-as-of] :as state}]
+  (did-update [_ _ _]
+    (when (om/get-state owner :transition-as-of)
+      (animate-transition owner)))
+
+  (render-state [_ {:keys [expanded as-of actual-as-of transition-as-of] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -242,18 +273,39 @@
                   next-rev
                   (not (contains? revisions-list (:updated-at next-rev))))
         (api/load-revision next-rev slug section-kw))
-      (dom/div #js {:className "topic"
+      (dom/div #js {:className "topic group"
                     :ref "topic"
                     :onClick #(topic-click data owner options expanded nil)}
-        (om/build topic-internal {:section section
-                                  :topic-data topic-data
-                                  :currency currency
-                                  :expanded expanded
-                                  :revisions revisions
-                                  :topic-click (partial topic-click data owner options expanded)
-                                  :prev-rev prev-rev
-                                  :next-rev next-rev}
-                                 {:opts (merge options {:rev-click (fn [e rev]
-                                                                      (scroll-to-topic-top (om/get-ref owner "topic"))
-                                                                      (om/set-state! owner :as-of (:updated-at rev))
-                                                                      (.stopPropagation e))})})))))
+        (dom/div #js {:className "topic-anim group"
+                      :ref "topic-anim"}
+          (dom/div #js {:className "topic-as-of group"
+                        :ref "cur-topic"
+                        :key (str "cur-" as-of (when expanded "-expanded"))
+                        :style #js {:opacity 1 :width "100%" :height "auto"}}
+            (om/build topic-internal {:section section
+                                      :topic-data topic-data
+                                      :currency currency
+                                      :expanded expanded
+                                      :topic-click (partial topic-click data owner options expanded)
+                                      :prev-rev prev-rev
+                                      :next-rev next-rev}
+                                     {:opts (merge options {:rev-click (fn [e rev]
+                                                                          (scroll-to-topic-top (om/get-ref owner "topic"))
+                                                                          (om/set-state! owner :transition-as-of (:updated-at rev))
+                                                                          (.stopPropagation e))})}))
+            (when transition-as-of
+              (dom/div #js {:className "topic-tr-as-of group"
+                            :ref "tr-topic"
+                            :key (str "tr-" transition-as-of "-expanded")
+                            :style #js {:opacity 1}}
+                (let [tr-topic-data (utils/select-section-data section-data section-kw transition-as-of)
+                      tr-prev-rev (utils/revision-prev revisions transition-as-of)
+                      tr-next-rev (utils/revision-next revisions transition-as-of)]
+                  (om/build topic-internal {:section section
+                                            :topic-data tr-topic-data
+                                            :currency currency
+                                            :expanded expanded
+                                            :topic-click #()
+                                            :prev-rev tr-prev-rev
+                                            :next-rev tr-next-rev}
+                                           {:opts (merge options {:rev-click #()})})))))))))
