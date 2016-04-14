@@ -210,7 +210,7 @@
     (mobile-topic-animation data owner options expanded)
     ((:bw-topic-click options) (:section data) selected-metric)))
 
-(defn animate-transition [owner]
+(defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
         tr-topic (om/get-ref owner "tr-topic")
         current-state (om/get-state owner)
@@ -255,7 +255,7 @@
 
   (did-update [_ _ _]
     (when (om/get-state owner :transition-as-of)
-      (animate-transition owner)))
+      (animate-revision-navigation owner)))
 
   (render-state [_ {:keys [expanded as-of actual-as-of transition-as-of] :as state}]
     (let [section-kw (keyword section)
@@ -277,6 +277,7 @@
                     :ref "topic"
                     :onClick #(topic-click data owner options expanded nil)}
         (dom/div #js {:className "topic-anim group"
+                      :key (str "topic-anim-" as-of "-" transition-as-of (when expanded "-expanded"))
                       :ref "topic-anim"}
           (dom/div #js {:className "topic-as-of group"
                         :ref "cur-topic"
