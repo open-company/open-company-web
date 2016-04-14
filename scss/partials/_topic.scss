@@ -10,6 +10,14 @@ div.topic-list {
     text-align: left;
     box-shadow: 1px 1px 1px 0 #bababa;
 
+    @include big_web(){
+      cursor: pointer;
+
+      &:hover {
+        background-color: #E5E4E4;
+      }
+    }
+
     div.topic-anim{
       position: relative;
       height: auto;
@@ -22,15 +30,6 @@ div.topic-list {
 
       & > div {
         height: auto;
-
-        @include big_web(){
-          height: 100%;
-          cursor: pointer;
-
-          &:hover {
-            background-color: #E5E4E4;
-          }
-        }
 
         div.topic-internal{
 
