@@ -32,6 +32,15 @@ div.topic-body {
     border: 1px solid black;
   }
 
+  ul, ol {
+    padding-left: 30px;
+
+    li {
+      margin: 0;
+      padding: 0;
+    }
+  }
+
   img {
 
     @include mobile() {
