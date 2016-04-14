@@ -4,7 +4,8 @@ div.topic-list {
     margin-left: 0px;
     margin-right: 0px;
     margin-top: 5px;
-    padding: 22px 22px 14px 22px;
+    padding: 22px 0px 14px 0px;
+    height: 100%;
     background-color: white;
     text-align: left;
     box-shadow: 1px 1px 1px 0 #bababa;
@@ -32,6 +33,10 @@ div.topic-list {
         }
 
         div.topic-internal{
+
+          & > div{
+            padding: 0px 22px;
+          }
 
           div.topic-header {
 
@@ -124,12 +129,24 @@ div.topic-list {
           }
 
           div.body-navigation-container{
+            @include mobile(){
+              padding: 0px;
+            }
+
+            @include big_web(){
+              padding: 0px 22px;
+            }
+
             &.close{
               overflow: hidden;
               height: 0px;
             }
 
-            @include topic_navigation();
+            div.topic-body-inner {
+              padding: 0px 22px;
+            }
+
+            @include topic_navigation($x_padding: 22px);
           }
         }
       }
