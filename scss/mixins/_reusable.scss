@@ -1,0 +1,94 @@
+/// Triangle helper mixin
+/// @param {Direction} $direction - Triangle direction, either `top`, `right`, `bottom` or `left`
+/// @param {Color} $color [currentcolor] - Triangle color
+/// @param {Length} $size [1em] - Triangle size
+@mixin triangle($direction, $color: currentcolor, $size: 1em) {
+  @if not index(top right bottom left, $direction) {
+    @error "Direction must be either `top`, `right`, `bottom` or `left`.";
+  }
+
+  width: 0;
+  height: 0;
+  content: '';
+  z-index: 2;
+
+  $opposite-direction: top;
+  @if $direction == top {
+    $opposite-direction: bottom;
+  } @else if $direction == bottom {
+    $opposite-direction: top;
+  } @else if $direction == left {
+    $opposite-direction: right;
+  } @else if $direction == right {
+    $opposite-direction: left;
+  }
+
+  border-#{$opposite-direction}: ($size * 1.5) solid $color;
+
+  $perpendicular-borders: $size solid transparent;
+
+  @if $direction == top or $direction == bottom {
+    border-left:   $perpendicular-borders;
+    border-right:  $perpendicular-borders;
+  } @else if $direction == right or $direction == left {
+    border-bottom: $perpendicular-borders;
+    border-top:    $perpendicular-borders;
+  }
+}
+
+@mixin topic_navigation($x_padding: 0px){
+  div.topic-navigation{
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 0px $x_padding;
+
+    div a {
+      font-size: 14px;
+      line-height: 1;
+      color: #707070;
+      text-decoration: none;
+    }
+
+    div.arrow{
+      button {
+        font-size: 14px;
+        line-height: 1;
+        color: #5b5b5b;
+        margin: 0;
+        padding: 0;
+        width: auto;
+        border: 0px solid transparent;
+        background-color: transparent;
+      }
+    }
+
+    div.previous {
+      float: left;
+    }
+
+    div.next {
+      float: right;
+    }
+  }
+}
+
+@mixin pillbox($active_pillbox_bg: #bababa){
+  label.pillbox {
+    margin: 4px 3px;
+    padding: 3px 12px;
+    height: 30px;
+    border-radius: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 1px 0 0 $oc_gray_2;
+    border: solid 0.3px #979797;
+    font-size: 14px;
+    color: #5b5b5b;
+    cursor: pointer;
+
+    &.active {
+      border: solid 0.3px transparent;
+      background-color: $active_pillbox_bg;
+      color: white;
+    }
+  }
+}

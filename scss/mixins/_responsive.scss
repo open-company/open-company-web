@@ -1,0 +1,11 @@
+@mixin mobile(){
+  @media screen and (max-width: #{($min_big_web_width - 1)}px){
+    @content;
+  }
+}
+
+@mixin big_web(){
+  @media screen and (min-width: #{$min_big_web_width}px){
+    @content;
+  }
+}
