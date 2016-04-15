@@ -51,23 +51,38 @@ div.stakeholder-update {
 
   div.stakeholder-update {
 
-    div.stakeholder-update-drawer {
-      padding-top: 60px;
-      position: relative;
+    div.company-header {
+      padding-bottom: 46px;
     }
 
-    div.company-header-internal {
-      padding: 0 0;
-      width: 930px;
-      margin: 0 auto;
+    div.stakeholder-update-drawer {
+      position: relative;
+
+      div.drawer-toggler {
+        margin-top: -5px;
+      }
     }
   
     div.update-internal {
-      width: 930px;
-      margin: 0 auto;
 
       div.sections {
-        padding: 0 0;
+        background-color: white;
+
+        div.update-intro {
+          max-width: 650px;
+          margin: 0 auto;
+        }
+
+        div.update-sections {
+          padding: 10px 0px;
+
+          div.update-sections-internal{
+            background-color: white;
+            padding: 10px;
+            max-width: 930px;
+            margin: 8px auto;
+          }
+        }
       }
 
       div.intro-title,
@@ -78,6 +93,8 @@ div.stakeholder-update {
       }
 
       div.update-topic {
+
+        max-width: 650px;
 
         div.topic-title {
           margin-top: 26px;
@@ -92,7 +109,7 @@ div.stakeholder-update {
 
         @include big_web(){
           margin-left: 0px;
-          width: 650px;
+          width: 100%;
         }
 
         @include mobile(){
