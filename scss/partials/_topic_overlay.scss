@@ -29,6 +29,7 @@ $topic_overlay_text_color: #2d2d2d;
       div.topic-overlay-transition{
         position: relative;
         height: auto;
+        overflow: hidden;
 
         div.topic-overlay-as-of {
           height: auto;
@@ -39,6 +40,7 @@ $topic_overlay_text_color: #2d2d2d;
           top: 0;
           left: 0;
           height: auto;
+          width: 658px;
         }
 
         div.topic-overlay-internal {

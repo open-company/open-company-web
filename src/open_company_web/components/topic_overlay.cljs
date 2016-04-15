@@ -126,6 +126,8 @@
         appear-animation (Fade. tr-topic 0 1 utils/oc-animation-duration)
         cur-size (js/getComputedStyle cur-topic)
         tr-size (js/getComputedStyle tr-topic)
+        topic-overlay (om/get-ref owner "topic-overlay-transition")
+        topic-overlay-size (js/getComputedStyle topic-overlay)
         topic-overlay-content (sel1 [:div.topic-overlay-content])
         scroll-top (.-scrollTop topic-overlay-content)]
     ; scroll to top
@@ -136,13 +138,13 @@
                       #js [0 0]
                       utils/oc-animation-duration)))
     ; resize the light box
-    (.play (Resize. topic-overlay-content
-                    #js [(js/parseFloat (.-width cur-size)) (js/parseFloat (.-height cur-size))]
+    (.play (Resize. topic-overlay
+                    #js [(js/parseFloat (.-width cur-size)) (js/parseFloat (.-height topic-overlay-size))]
                     #js [(js/parseFloat (.-width cur-size)) (js/parseFloat (.-height tr-size))]
                     utils/oc-animation-duration))
-    ; disappear current topic
+    ; fade out current topic
     (.play (Fade. cur-topic 1 0 utils/oc-animation-duration))
-    ; appear the new topic
+    ; fade in the new topic
     (doto appear-animation
       (events/listen
         EventType/FINISH
@@ -217,7 +219,8 @@
                                   :maxHeight (str max-height "px")}
                       :on-click #(.stopPropagation %)}
           (if-not editing
-            (dom/div {:class "topic-overlay-transition group"}
+            (dom/div #js {:className "topic-overlay-transition group"
+                          :ref "topic-overlay-transition"}
               (dom/div #js {:className "topic-overlay-as-of group"
                             :ref "cur-topic"
                             :key (str "cur-" as-of)
