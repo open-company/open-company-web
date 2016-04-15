@@ -25,17 +25,15 @@ div.company-dashboard {
 
       div.category {
         @include mobile(){
-          width: 33.33333%;
+          width: 33.3%;
           float: left;
+          padding: 15px 0px 0px 0px;
         }
         @include big_web(){
           width: 150px;
           float: left;
+          padding: 15px 15px 0px 15px;
         }
-        padding-left: 15px;
-        padding-right: 15px;
-        /* vertically center the text */
-        padding-top: 15px;
         vertical-align: middle;
         /* horizontally center the text */
         text-align: center;

@@ -7,12 +7,14 @@
             [cljs-time.core :as cljs-time]
             [goog.fx.dom :refer (Scroll)]
             [goog.string :as gstring]
+            [goog.i18n.NumberFormat :as nf]
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
             [open-company-web.lib.cookies :as cook]
             [open-company-web.lib.iso4217 :refer (iso4217)]
             [open-company-web.caches :refer (company-cache)]
-            [open-company-web.local-settings :as ls]))
+            [open-company-web.local-settings :as ls])
+  (:import  [goog.i18n NumberFormat]))
 
 (defn abs [n] (when n (max n (- n))))
 
@@ -522,14 +524,12 @@
 (defn clean-company-caches []
   (reset! company-cache {}))
 
+(def +usd-fmt+
+  (-> (NumberFormat. nf/Format.CURRENCY "USD" nf/CurrencyStyle.LOCAL)
+      (.setMinimumFractionDigits 0)))
+
 (defn thousands-separator [number]
-  (let [parts (clojure.string/split (str number) "." 1)
-        int-part (first parts)
-        dec-part (get parts 1)
-        integer-string (clojure.string/replace int-part #"\B(?=(\d{3})+(?!\d))" ",")]
-    (if-not (nil? dec-part)
-      (str integer-string "." dec-part)
-      integer-string)))
+  (.format +usd-fmt+ number))
 
 (defn offset-top [elem]
   (let [bound-rect (.getBoundingClientRect elem)]
@@ -539,8 +539,8 @@
   (.play
     (new Scroll
          (.-body js/document)
-         (new js/Array 0 (.-scrollTop (.-body js/document)))
-         (new js/Array 0 scroll-y)
+         #js [0 (.-scrollTop (.-body js/document))]
+         #js [0 scroll-y]
          (or duration oc-animation-duration))))
 
 (defn scroll-to-element [elem]

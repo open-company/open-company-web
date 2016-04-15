@@ -4,13 +4,13 @@ div.topic-list {
     margin-left: 0px;
     margin-right: 0px;
     margin-top: 5px;
-    padding: 22px 22px 14px 22px;
+    padding: 22px 0px 14px 0px;
+    height: 100%;
     background-color: white;
     text-align: left;
     box-shadow: 1px 1px 1px 0 #bababa;
 
     @include big_web(){
-      height: 100%;
       cursor: pointer;
 
       &:hover {
@@ -18,101 +18,137 @@ div.topic-list {
       }
     }
 
-    div.topic-header {
+    div.topic-anim{
+      position: relative;
+      height: auto;
 
-      .topic-image {
-        width: 30px;
-        height: 30px;
-        float: left;
+      & > div.topic-tr-as-of {
+        position: absolute;
+        top: 0;
+        left: 0;
       }
 
-      svg path, svg polygon {
-        fill: #8b8a8a;
-      }
+      & > div {
+        height: auto;
 
-      div.topic-title {
-        font-weight: 600;
-        color: #2d2d2d;
-        margin-top: 5px;
+        div.topic-internal{
 
-        @include mobile(){
-          font-size: 26px;
-          line-height: 1;
-          margin-left: 38px;
-        }
+          & > div{
+            padding: 0px 22px;
+          }
 
-        @include big_web(){
-          font-size: 18px;
-          line-height: 1;
-          float: left;
-          margin-left: 12px;
-        }
-      }
+          div.topic-header {
 
-      div.topic-date {
-        font-size: 13px;
-        line-height: 0.8;
-        color: $oc_gray_4;
-        margin-left: 38px;
-        padding-top: 16px;
-      }
-    }
+            .topic-image {
+              width: 30px;
+              height: 30px;
+              float: left;
+            }
 
-    div.topic-headline {
-      width: 100%;
-      margin-top: 16px;
-      color: #444444;
-      font-size: 16px;
-      line-height: 1.6;
+            svg path, svg polygon {
+              fill: #8b8a8a;
+            }
 
-      &.collapse {
-        height: 0px;
-      }
+            div.topic-title {
+              font-weight: 600;
+              color: #2d2d2d;
+              margin-top: 5px;
 
-      &.chart-header-container {
-        div.actual-container {
-          h3 {
-            margin: 5px 0;
+              @include mobile(){
+                font-size: 22px;
+                line-height: 1;
+                margin-left: 38px;
+              }
+
+              @include big_web(){
+                font-size: 18px;
+                line-height: 1;
+                float: left;
+                margin-left: 12px;
+              }
+            }
+
+            div.topic-date {
+              font-size: 13px;
+              line-height: 0.8;
+              color: $oc_gray_4;
+              margin-left: 38px;
+              padding-top: 16px;
+            }
+          }
+
+          div.topic-headline {
+            width: 100%;
+            margin-top: 25px;
+            color: #444444;
+            font-size: 16px;
+            line-height: 1.6;
+
+            &.collapse {
+              height: 0px;
+            }
+
+            &.chart-header-container {
+              div.actual-container {
+                h3 {
+                  margin: 5px 0;
+                }
+              }
+            }
+
+          }
+
+          div.topic-more {
+            margin-top: 10px;
+            text-align: center;
+
+            img {
+              width: 30px;
+              height: 30px;
+            }
+
+            i {
+              font-size: 6px;
+              margin-left: 3px;
+              line-height: 1;
+              font-weight: 600;
+              color: #bababa;
+            }
+          }
+
+          div.topic-date {
+            font-size: 12px;
+            font-style: italic;
+            color: #A6A6A3; /* gray */
+
+            label {
+              margin: 0px;
+              font-weight: normal;
+            }
+          }
+
+          div.body-navigation-container{
+            @include mobile(){
+              padding: 0px;
+            }
+
+            @include big_web(){
+              padding: 0px 22px;
+            }
+
+            &.close{
+              overflow: hidden;
+              height: 0px;
+            }
+
+            div.topic-body-inner {
+              padding: 0px 22px;
+            }
+
+            @include topic_navigation($x_padding: 22px);
           }
         }
       }
-
-    }
-
-    div.topic-more {
-      margin-top: 10px;
-      text-align: center;
-
-      img {
-        width: 30px;
-        height: 30px;
-      }
-
-      i {
-        font-size: 6px;
-        margin-left: 3px;
-        line-height: 1;
-        font-weight: 600;
-        color: #bababa;
-      }
-    }
-
-    div.topic-date {
-      font-size: 12px;
-      font-style: italic;
-      color: #A6A6A3; /* gray */
-
-      label {
-        margin: 0px;
-        font-weight: normal;
-      }
-    }
-
-    div.body-navigation-container{
-      overflow: hidden;
-      height: 0px;
-
-      @include topic_navigation();
     }
   }
 }

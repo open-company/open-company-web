@@ -187,15 +187,6 @@
       handle-url-change)
     (.setEnabled true)))
 
-(defonce resize-listener
-  ; define this inside a defonce to avoid multiple listener during development
-  (events/listen
-    js/window
-    EventType/RESIZE
-    (fn [e]
-      (utils/set-browser-type!)
-      (route-dispatch! (router/get-token)))))
-
 (defn on-js-reload []
   (.clear js/console)
   (route-dispatch! (router/get-token)))
