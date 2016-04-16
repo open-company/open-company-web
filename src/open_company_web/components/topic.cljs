@@ -20,9 +20,6 @@
             [goog.events :as events]
             [goog.style :as gstyle]))
 
-(defn after [ms fn]
-  (.setTimeout js/window fn ms))
-
 (defcomponent topic-headline [data owner]
   (render [_]
     (dom/div {:class "topic-headline-inner"} (:headline data))))
@@ -198,7 +195,7 @@
   (if (utils/is-mobile)
     (do (dis/dispatch! [:topic/toggle-expand (keyword (:section-name options))])
         (mobile-topic-animation data owner options expanded)
-        (after 50 #(scroll-to-topic-top (om/get-ref owner "topic"))))
+        (js/setTimeout #(scroll-to-topic-top (om/get-ref owner "topic")) 50))
     ((:bw-topic-click options) (:section data) selected-metric)))
 
 (defn animate-revision-navigation [owner]
