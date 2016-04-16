@@ -208,7 +208,7 @@
 
 (defn topic-click [data owner options expanded selected-metric]
   (if (utils/is-mobile)
-    (do (dis/dispatch! [:topic/toggle-expand (if expanded nil (keyword (:section-name options)))])
+    (do (dis/dispatch! [:topic/toggle-expand (keyword (:section-name options))])
         (mobile-topic-animation data owner options expanded)
         (after 50 #(scroll-to-topic-top (om/get-ref owner "topic"))))
     ((:bw-topic-click options) (:section data) selected-metric)))
@@ -255,12 +255,11 @@
         (om/set-state! owner :as-of new-as-of)
         (om/set-state! owner :actual-as-of new-as-of))))
 
-  ;; (did-mount [_]
-  ;;   ;; manually re-open the topic if on mobile
-  ;;   (when (and (utils/is-mobile) (= (keyword section) expanded-topics))
-  ;;     (mobile-topic-animation data owner options false)))
-
   (did-update [_ prev-props _]
+    (let [prev-expanded? (contains? (:expanded-topics prev-props) (keyword section))
+          expanded? (contains? expanded-topics (keyword section))]
+      (when (and (utils/is-mobile) (not= prev-expanded? expanded?))
+        (mobile-topic-animation data owner options (not expanded?))))
     (when (om/get-state owner :transition-as-of)
       (animate-revision-navigation owner)))
 
