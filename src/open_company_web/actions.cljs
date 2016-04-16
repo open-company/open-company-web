@@ -95,6 +95,11 @@
     db))
 
 (defmethod action :topic/toggle-expand [db [_ topic-kw]]
-  ;; If we wanted to have multiple topics expandable at once we can just use this line:
-  ;; (update db :expanded-topics (fnil conj #{}) topic-kw)
-  (update db :expanded-topics #(if (= % new) nil new)) #{topic-kw})
+  (let [update-fn (fn [expanded? to-toggle]
+                    (if (expanded? to-toggle)
+                      (disj expanded? to-toggle)
+                      (conj expanded? to-toggle)))]
+    (update db :expanded-topics (fnil update-fn #{}) topic-kw)))
+
+(defmethod action :topic/reset-expanded [db _]
+  (assoc db :expanded-topics #{}))
