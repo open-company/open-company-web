@@ -263,7 +263,7 @@
     (when (om/get-state owner :transition-as-of)
       (animate-revision-navigation owner)))
 
-  (render-state [_ {:keys [editing as-of actual-as-of] :as state}]
+  (render-state [_ {:keys [editing as-of actual-as-of transition-as-of] :as state}]
     (let [section-kw (keyword section)
           expanded? (contains? expanded-topics section-kw)
           revisions (utils/sort-revisions (:revisions section-data))
@@ -293,7 +293,7 @@
             (om/build topic-internal {:section section
                                       :topic-data topic-data
                                       :currency currency
-                                      :expanded expanded?
+                                      :expanded? expanded?
                                       :topic-click (partial topic-click data owner options expanded?)
                                       :prev-rev prev-rev
                                       :next-rev next-rev}
