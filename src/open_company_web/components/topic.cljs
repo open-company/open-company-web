@@ -106,19 +106,7 @@
            EventType/FINISH
            (fn [e]
              (when-not expanded? (.setTimeout js/window #(scroll-to-topic-top topic) 100))))
-          (.play)))
-
-
-      (if-not expanded?
-        ;; show the edit button if the topic body is empty
-        (let [section (keyword (:section-name options))
-              section-data (:section-data data)
-              body (utils/get-topic-body section-data section)]
-          (when (and (clojure.string/blank? body) (:force-edit-cb options))
-            ((:force-edit-cb options) true)))
-        ;; hide the edit button if necessary
-        (when-let [f (:force-edit-cb options)]
-          (f false))))))
+          (.play))))))
 
 (defn headline-component [section]
   (cond
