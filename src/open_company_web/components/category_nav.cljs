@@ -19,7 +19,7 @@
   (gstyle/setStyle (sel1 :body) "min-height" "9999px")
   (doto (Scroll. (.-body js/document)
                  #js [0 (.-scrollTop (.-body js/document))]
-                 #js [0 max-scroll-top]
+                 #js [0 0]
                  utils/oc-animation-duration)
     (events/listen
      EventType/FINISH
