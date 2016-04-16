@@ -15,7 +15,7 @@
             [open-company-web.lib.raven :refer (raven-setup)]
             [open-company-web.lib.utils :as utils]
             [open-company-web.actions]
-            [open-company-web.dispatcher :refer (app-state)]
+            [open-company-web.dispatcher :as dis :refer (app-state)]
             [open-company-web.api :as api]
             [goog.events :as events]
             [open-company-web.lib.cookies :as cook]
@@ -95,6 +95,7 @@
         query-params (:query-params params)]
     (pre-routing query-params)
     (utils/clean-company-caches)
+    (dis/dispatch! [:topic/reset-expanded])
     ;; save the route
     (router/set-route! ["companies" slug route] {:slug slug :query-params query-params})
     ;; do we have the company data already?
