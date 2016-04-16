@@ -96,11 +96,12 @@
     (set-lis-height owner))
 
   (render-state [_ {:keys [active-topics selected-topic selected-metric drawer-open]}]
-    (let [slug (keyword (:slug @router/path))
-          company-data (:company-data data)
+    (let [slug            (keyword (:slug @router/path))
+          company-data    (:company-data data)
           active-category (keyword (:active-category data))
           category-topics (get active-topics active-category)]
-      (dom/div {:class "topic-list"
+      (dom/div {:class "topic-list pb4"
+                :style (when (utils/is-mobile) {:min-height "100vh"})
                 :key "topic-list"}
         (when (and (not (:read-only company-data))
                    (not (utils/is-mobile))
@@ -148,6 +149,7 @@
                                  :section section-name
                                  :section-data sd
                                  :currency (:currency company-data)
+                                 :expanded-topics (:expanded-topics data)
                                  :active-category active-category}
                                  {:opts {:section-name section-name
                                          :bw-topic-click (partial topic-click owner)}})))))))))

@@ -93,3 +93,13 @@
      (assoc :companies (:companies (:collection body)))
      (dissoc :loading))
     db))
+
+(defmethod action :topic/toggle-expand [db [_ topic-kw]]
+  (let [update-fn (fn [expanded? to-toggle]
+                    (if (expanded? to-toggle)
+                      (disj expanded? to-toggle)
+                      (conj expanded? to-toggle)))]
+    (update db :expanded-topics (fnil update-fn #{}) topic-kw)))
+
+(defmethod action :topic/reset-expanded [db _]
+  (assoc db :expanded-topics #{}))
