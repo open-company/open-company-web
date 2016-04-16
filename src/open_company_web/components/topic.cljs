@@ -114,10 +114,11 @@
         (let [section (keyword (:section-name options))
               section-data (:section-data data)
               body (utils/get-topic-body section-data section)]
-          (when (clojure.string/blank? body)
+          (when (and (clojure.string/blank? body) (:force-edit-cb options))
             ((:force-edit-cb options) true)))
         ;; hide the edit button if necessary
-        ((:force-edit-cb options) false)))))
+        (when-let [f (:force-edit-cb options)]
+          (f false))))))
 
 (defn headline-component [section]
   (cond
