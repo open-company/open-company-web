@@ -34,7 +34,7 @@
                                  {:opts {:show-title false
                                          :show-revisions-navigation false
                                          :chart-size {:height (if (utils/is-mobile) 200 295)
-                                                      :width (if (utils/is-mobile) 280 650)}}})
+                                                      :width (if (utils/is-mobile) 280 480)}}})
 
           (= section-kw :finances)
           (om/build topic-finances {:section-data section-data
