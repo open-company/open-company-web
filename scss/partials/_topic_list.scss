@@ -13,6 +13,7 @@ div.topic-list-edit-container {
 div.topic-list{
   position: relative;
   content: "";
+  padding-bottom: 20px;
 
   @include mobile(){
     background-color: #d9d9d9;

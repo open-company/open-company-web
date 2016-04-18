@@ -100,7 +100,7 @@
           company-data    (:company-data data)
           active-category (keyword (:active-category data))
           category-topics (get active-topics active-category)]
-      (dom/div {:class "topic-list pb4"
+      (dom/div {:class "topic-list"
                 :style (when (utils/is-mobile) {:min-height "100vh"})
                 :key "topic-list"}
         (when (and (not (:read-only company-data))
