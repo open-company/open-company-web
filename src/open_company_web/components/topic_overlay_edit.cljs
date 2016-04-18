@@ -324,19 +324,21 @@
                        :on-click #(let [section-data (data-to-save owner topic)]
                                     (.stopPropagation %)
                                     (api/partial-update-section topic section-data)
-                                    ((:dismiss-editing-cb options)))} "Save Topic"))
+                                    ((:dismiss-editing-cb options)))} "Save"))
         (dom/button {:class "cancel"
                      :on-click #((:dismiss-editing-cb options))} "Cancel")
         (dom/div {:class "topic-overlay-edit-header"}
           (dom/input {:class "topic-overlay-edit-title"
                       :id (str "topic-edit-title-" (name topic))
                       :type "text"
-                      :placeholder "Type your title here"
-                      :on-focus #(om/set-state! owner :show-title-counter true)
+                      :placeholder "Title"
                       :on-blur #(om/set-state! owner :show-title-counter false)
                       :max-length title-length-limit
                       :value title
-                      :on-change #(change-value owner :title %)})
+                      :on-change (fn [e]
+                                    (when (not show-title-counter)
+                                      (om/set-state! owner :show-title-counter true))
+                                    (change-value owner :title e))})
           (dom/div {:class (utils/class-set {:topic-overlay-edit-title-count true
                                              :transparent (not show-title-counter)})}
             (dom/label {:class "bold"} (- title-length-limit (count title))))
@@ -349,12 +351,14 @@
                            :resize false
                            :id (str "topic-edit-headline-" (name topic))
                            :type "text"
-                           :placeholder "Type your headline here"
-                           :on-focus #(om/set-state! owner :show-headline-counter true)
+                           :placeholder "Headline"
                            :on-blur #(om/set-state! owner :show-headline-counter false)
                            :max-length headline-length-limit
                            :value headline
-                           :on-change #(change-value owner :headline %)})
+                           :on-change (fn [e]
+                                        (when (not show-headline-counter)
+                                          (om/set-state! owner :show-headline-counter true))
+                                        (change-value owner :headline e))})
             (dom/div {:class (utils/class-set {:ml2 true
                                                :mt1 true
                                                :pr3 true
