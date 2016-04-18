@@ -25,6 +25,8 @@ div.topic-overlay-edit {
     box-shadow: 1px 1px 1px 0 $topic_overlay_border_color;
     margin-top: 20px;
     margin-right: 15px;
+    background-color: $oc_green;
+    color: white;
     float: right;
   }
 
@@ -43,7 +45,7 @@ div.topic-overlay-edit {
       border: 1px solid $oc_gray_3;
 
       &:active, &:focus{
-        border: 1px solid black;
+        border: 1px solid $oc_gray_3;
         outline: none;
       }
     }
@@ -133,16 +135,16 @@ div.topic-overlay-edit {
       font-weight: 600;
       font-size: 20px;
       color: $topic_overlay_text_color;
-      border: 1px solid $oc_gray_3;
+      border: 1px solid transparent;
 
       &:active, &:focus{
-        border: 1px solid black;
+        border: 1px solid transparent;
         outline: none;
       }
     }
 
     div.topic-overlay-edit-body {
-      border: 1px solid $oc_gray_3;
+      border: 1px solid transparent;
       margin-top: 1px;
       font-size: 15px;
       line-height: 1.7;
@@ -150,7 +152,7 @@ div.topic-overlay-edit {
       outline: none;
 
       &:active, &:focus {
-        border: 1px solid $topic_overlay_border_color;
+        border: 1px solid transparent;
       }
 
       * {
