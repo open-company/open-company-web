@@ -38,8 +38,10 @@
 
 (defn dot-click [owner options idx & [is-hover]]
   (.stopPropagation (.-event js/d3))
-  (let [selected (om/get-state owner :selected)
-        chart-label (.select js/d3 (str "#chart-label"))
+  (let [svg-el (om/get-ref owner "d3-dots")
+        d3-svg-el (.select js/d3 svg-el)
+        selected (om/get-state owner :selected)
+        chart-label (.select d3-svg-el (str "#dot-chart-label"))
         chart-width (:chart-width options)
         data (current-data owner)
         next-set (get data idx)
@@ -47,10 +49,10 @@
         data-count (count data)
         chart-keys-count (count (:chart-keys options))
         label-x-pos (dot-position chart-width idx data-count chart-keys-count)
-        next-circle (.select js/d3 (str "circle#chart-dot-" idx))
-        all-circles (.selectAll js/d3 "circle")
-        next-month-text (.select js/d3 (str "text#chart-x-label-" idx))
-        all-month-text (.selectAll js/d3 ".chart-x-label")]
+        next-circle (.select d3-svg-el (str "circle#chart-dot-" idx))
+        all-circles (.selectAll d3-svg-el "circle")
+        next-month-text (.select d3-svg-el (str "text#chart-x-label-" idx))
+        all-month-text (.selectAll d3-svg-el ".chart-x-label")]
     (.each all-circles (fn [d i]
                         (this-as circle-node
                           (let [circle (.select js/d3 circle-node)
@@ -181,8 +183,8 @@
       (let [x-pos (dot-position chart-width selected (count chart-data) (count chart-keys))
             chart-label (-> chart-node
                             (.append "text")
-                            (.attr "class" "chart-label")
-                            (.attr "id" "chart-label")
+                            (.attr "class" "dot-chart-label")
+                            (.attr "id" "dot-chart-label")
                             (.attr "x" x-pos)
                             (.attr "y" 50)
                             (.attr "fill" (:label-color options))
@@ -190,7 +192,7 @@
             chart-label-width (js/SVGgetWidth chart-label)
             chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
         (when (> chart-label-width 150)
-          (.attr chart-label "class" "chart-label small"))
+          (.attr chart-label "class" "dot-chart-label small"))
         (let [new-chart-label-width (js/SVGgetWidth chart-label)
               new-chart-label-pos (- (/ chart-width 2) (/ new-chart-label-width 2))]
           (.attr chart-label "x" (max 0 new-chart-label-pos)))))))
