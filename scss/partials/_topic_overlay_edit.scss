@@ -73,7 +73,7 @@ div.topic-overlay-edit {
     padding: 15px 50px 15px 50px;
     max-height: 515px;
     height: 100%;
-    overflow: scroll;
+    overflow-x: hidden;
     overflow-y: scroll;
     position: relative;
 
