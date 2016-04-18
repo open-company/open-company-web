@@ -88,7 +88,7 @@ $topic_overlay_text_color: #2d2d2d;
 
             div.topic-overlay-headline {
               border: 1px solid transparent;
-              height: 32px;
+              min-height: 32px;
               margin: 0px 50px 18px 51px;
               font-weight: 600;
               font-size: 20px;
