@@ -9,7 +9,7 @@ div.side-drawer-container {
   background-color: rgba(255, 255, 255, 0.7);
   opacity: 0;
   @include animation(0s, 0.01s, closeDrawer);
-  z-index: 1033;
+  z-index: 1030;
 
   &.open-drawer {
     @include animation(0s, $oc_animation_duration, openDrawer);

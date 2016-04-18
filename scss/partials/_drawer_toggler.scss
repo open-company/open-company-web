@@ -7,9 +7,13 @@ div.drawer-toggler {
   left: 0px;
   width: $icon_size;
   height: $icon_size;
-  z-index: 1035;
+  z-index: 1029;
   padding: 0px;
   margin: 5px;
+
+  &.above-navbar {
+    z-index: 1031;
+  }
 
   button.drawer-toggler-bt {
     display: inline-block;
