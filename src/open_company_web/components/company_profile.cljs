@@ -14,26 +14,30 @@
             [open-company-web.dispatcher :refer (app-state)]
             [open-company-web.lib.iso4217 :refer (iso4217 sorted-iso4217)]))
 
-(defn- save-company-data [company-data logo]
+(defn- save-company-data [company-data logo logo-width logo-height]
   (let [slug (:slug @router/path)]
     (api/patch-company slug {:name (:name company-data)
                              :slug slug
                              :currency (:currency company-data)
                              :description (:description company-data)
+                             :logo-width (js/parseInt logo-height)
+                             :logo-height (js/parseInt logo-height)
                              :logo logo})))
 
 (defn- check-image [url owner cb]
   (let [img (new js/Image)]
-    (set! (.-onload img) (fn [e] (cb owner true)))
-    (set! (.-onerror img) (fn [e] (cb owner false)))
+    (set! (.-onload img) (fn [e] (cb owner img true)))
+    (set! (.-onerror img) (fn [e] (cb owner img false)))
     (set! (.-src img) url)))
 
-(defn- check-img-cb [owner result]
-  (let [slug (:slug @router/path)
-        company-data ((keyword slug) @app-state)]
-    (if result
-      (save-company-data company-data (om/get-state owner :logo))
-      (js/alert "Invalid image url"))))
+(defn- check-img-cb [owner img result]
+ (if-not result
+    ; there was an error loading the logo, could be an invalid URL
+    ; or the link doesn't contain an image
+    (js/alert "Invalid image url")
+    (let [slug (:slug @router/path)
+          company-data ((keyword slug) @app-state)]
+      (save-company-data company-data (om/get-state owner :logo) (.-width img) (.-height img)))))
 
 (defcomponent currency-option [data owner]
   (render [_]
@@ -64,9 +68,9 @@
                 logo (om/get-state owner :logo)]
             (if (not= logo (om/get-state owner :initial-logo))
               (if (clojure.string/blank? logo)
-                (save-company-data company-data "")
+                (save-company-data company-data "" 0 0)
                 (check-image logo owner check-img-cb))
-              (save-company-data company-data (:logo company-data)))
+              (save-company-data company-data (:logo company-data) (:logo-width company-data) (:logo-height company-data)))
             (recur)))))))
 
   (render [_]
