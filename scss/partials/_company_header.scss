@@ -50,9 +50,16 @@ div.company-header{
 
       div.buttons-container {
         padding-right: 15px;
-        width: 160px;
         float: right;
         text-align: right;
+
+        @include mobile(){
+          width: 90px;
+        }
+
+        @include big_web(){
+          width: 160px;
+        }
 
         button.oc-btn {
           width: 25px;
