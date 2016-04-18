@@ -1,11 +1,13 @@
 (ns open-company-web.lib.raven
   (:require [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.jwt :as jwt]
             [cljsjs.raven]))
 
 (defn ravenParameters []
   #js {:whitelistUrls ls/local-whitelist-array
-       :tags #js {:isMobile (utils/is-mobile)}
+       :tags #js {:isMobile (utils/is-mobile)
+                  :hasJWT (not (not (jwt/jwt)))}
        :release ls/deploy-key})
 
 (defn raven-setup []
