@@ -16,8 +16,10 @@
     (if (dommy/has-class? drawer :rotate45)
       (do
         (dommy/remove-class! drawer :rotate45)
-        (dommy/add-class! drawer :rotate0))
+        (dommy/add-class! drawer :rotate0)
+        (dommy/remove-class! drawer :above-navbar))
       (do
+        (dommy/add-class! drawer :above-navbar)
         (dommy/remove-class! drawer :rotate0)
         (dommy/add-class! drawer :rotate45)))))
 
@@ -33,8 +35,7 @@
       (rotate owner true)))
 
   (render-state [_ {:keys [open]}]
-    (dom/div #js {:className (utils/class-set {:drawer-toggler true
-                                               :above-navbar open})
+    (dom/div #js {:className "drawer-toggler"
                   :ref "drawer-toggler"}
       (dom/button #js {:className "drawer-toggler-bt"
                        :onClick #(rotate owner)} (icon :circle-remove {:size 24})))))
