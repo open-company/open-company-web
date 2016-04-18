@@ -159,12 +159,13 @@
             (dom/div {:class "company-name"} (:name company-data)))
 
           ;; Company description
-          (dom/div #js {:className "company-description-container"
-                        :ref "company-description-container"}
-            (dom/div {:class "company-description"} (:description company-data))
-            ;; View navigation
-            (let [link-name (if stakeholder-update "Dashboard" "Stakeholder Updates")]
-              (om/build link {:class "nav-link" :href link-url :name link-name})))))
+          (when-not (or (:loading data) (empty? company-data))
+            (dom/div #js {:className "company-description-container"
+                          :ref "company-description-container"}
+              (dom/div {:class "company-description"} (:description company-data))
+              ;; View navigation
+              (let [link-name (if stakeholder-update "Dashboard" "Stakeholder Updates")]
+                (om/build link {:class "nav-link" :href link-url :name link-name}))))))
 
       (when-not (:editing-topic data)
         ;; Category navigation
