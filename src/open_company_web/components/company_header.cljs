@@ -96,14 +96,11 @@
 
 (def logo-max-height 100)
 
-(defn logo-on-load [owner]
-  (when-not (utils/is-mobile)
-    (when-let [logo (om/get-ref owner "company-logo")]
-      (let [logo-height (.-height logo)
-            height-diff (- logo-max-height logo-height)]
-        (when (pos? height-diff)
-          (gstyle/setStyle logo #js {:marginTop (str (quot height-diff 2) "px")})))))
-  (watch-scroll owner))
+(defn logo-top-margin [logo-height]
+  (let [height-diff (- logo-max-height logo-height)]
+    (if (and (not (utils/is-mobile)) (pos? height-diff))
+      (str (quot height-diff 2) "px")
+      "0px")))
 
 (defcomponent company-header [{:keys [company-data navbar-editing stakeholder-update] :as data} owner options]
 
@@ -134,14 +131,16 @@
           (dom/div #js {:className "company-header-top group"}
             ;; Company logo
             (dom/div {:class "company-logo-container"}
-              (dom/img #js {:src (:logo company-data)
-                            ;; add scroll listener when the logo is loaded unless stakeholder update
-                            :onLoad #(logo-on-load owner)
-                            ;; or add listener if logo errors on loading unless stakeholder update
-                            :onError #(watch-scroll owner)
-                            :className "company-logo"
-                            :title (:name company-data)
-                            :ref "company-logo"}))
+              (when (not (clojure.string/blank? (:logo company-data)))
+                (dom/img #js {:src (:logo company-data)
+                              ;; add scroll listener when the logo is loaded unless stakeholder update
+                              :onLoad #(watch-scroll owner)
+                              ;; or add listener if logo errors on loading unless stakeholder update
+                              :onError #(watch-scroll owner)
+                              :style #js {:marginTop (logo-top-margin (:logo-height company-data))}
+                              :className "company-logo"
+                              :title (:name company-data)
+                              :ref "company-logo"})))
             ;; Buttons
             (dom/div {:class (utils/class-set {:buttons-container true
                                                :hidden (not (utils/is-mobile))})}
