@@ -6,22 +6,13 @@
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]))
 
-(defn topic-body-click [e owner options]
-  (when e
-    (.stopPropagation e))
-  (if (utils/is-mobile)
-    ((:toggle-edit-topic-cb options) (:section-name options))
-    ((:bw-topic-click options) (:section (om/get-props owner)))))
-
 (defcomponent topic-body [{:keys [section section-data currency expanded selected-metric] :as data} owner options]
 
   (render [_]
     (let [section-kw (keyword section)
           section-body (utils/get-topic-body section-data section-kw)]
       ;; Topic body
-      (dom/div #js {:className "topic-body"
-                    :onClick #(when (and (not (:read-only section-data)) (utils/is-mobile))
-                                (topic-body-click % owner options))}
+      (dom/div {:class "topic-body"}
 
         (cond
           (= section-kw :growth)
