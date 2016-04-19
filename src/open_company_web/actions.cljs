@@ -103,3 +103,8 @@
 
 (defmethod action :topic/reset-expanded [db _]
   (assoc db :expanded-topics #{}))
+
+(defmethod action :stakeholder-update [db [_ {:keys [slug response]}]]
+  (-> db
+    (assoc-in [(keyword slug) :su-list] response)
+    (dissoc :loading)))
