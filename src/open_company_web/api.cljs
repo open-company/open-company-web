@@ -280,3 +280,21 @@
               (reset! new-sections-requested false))
             (let [fixed-body (if success (json->cljs body) {})]
               (dispatcher/dispatch! [:new-section {:response fixed-body :slug slug}]))))))))
+
+(defn get-stakeholder-update []
+  (let [slug (keyword (:slug @router/path))
+        company-data (slug @dispatcher/app-state)
+        links (:links company-data)
+        su-link (utils/link-for links "stakeholder-updates" "GET")]
+    (when su-link
+      (api-get (:href su-link)
+        { :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (:type su-link)}}
+        (fn [{:keys [success body]}]
+          (when (not success)
+            (reset! new-sections-requested false))
+          (let [fixed-body (if success (json->cljs {}) {})]
+            (dispatcher/dispatch! [:stakeholder-update {:response fixed-body :slug slug}])))))))
