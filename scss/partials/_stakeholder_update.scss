@@ -68,8 +68,12 @@ div.stakeholder-update {
         background-color: white;
 
         div.update-intro {
-          max-width: 650px;
+          max-width: 910px;
           margin: 0 auto;
+
+          div.update-intro-internal {
+            max-width: 570px;
+          }
         }
 
         div.update-sections {
@@ -78,8 +82,12 @@ div.stakeholder-update {
           div.update-sections-internal{
             background-color: white;
             padding: 10px;
-            max-width: 570px;
+            max-width: 930px;
             margin: 8px auto;
+
+            div.update-sections-internal-width {
+              max-width: 570px;
+            }
           }
         }
       }
