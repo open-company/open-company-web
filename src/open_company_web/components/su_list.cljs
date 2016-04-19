@@ -22,7 +22,7 @@
 (defcomponent su-update [data owner]
   (render [_]
     (let [update (:update data)
-          js-date-upat (utils/js-date (:updated-at update))
+          js-date-upat (utils/js-date (:created-at update))
           month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
           topic-updated-at (str month-string " " (.getDate js-date-upat) ", " (.getFullYear js-date-upat))
           intro (:intro update)]
