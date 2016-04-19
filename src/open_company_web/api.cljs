@@ -71,7 +71,7 @@
 
 (defn patch-company [slug data]
   (when data
-    (let [company-data (dissoc data :links :read-only :revisions)
+    (let [company-data (dissoc data :links :read-only :revisions :su-list :su-list-loaded)
           json-data (cljs->json company-data)
           links (:links ((keyword slug) @dispatcher/app-state))
           company-link (utils/link-for links "partial-update" "PATCH")]
@@ -296,5 +296,5 @@
         (fn [{:keys [success body]}]
           (when (not success)
             (reset! new-sections-requested false))
-          (let [fixed-body (if success (json->cljs {}) {})]
+          (let [fixed-body (if success (json->cljs body) {})]
             (dispatcher/dispatch! [:stakeholder-update {:response fixed-body :slug slug}])))))))
