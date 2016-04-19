@@ -1,0 +1,32 @@
+div.updates {
+  position: relative;
+  width: 100%;
+  background-color: white;
+  // padding: 20px 0;
+
+  div.updates-internal {
+    width: 930px;
+    margin: 10px auto;
+    padding: 10px;
+    background-color: white;
+    
+    div.su-update {
+      div.su-title {
+        font-size: 22px;
+        font-weight: 600;
+        line-height: 28px;
+      }
+
+      div.su-date {
+        font-size: 12px;
+        font-weight: 200;
+        margin: 0px 0px 5px 0px;
+      }
+
+      div.su-body {
+        font-size: 16px;
+        margin-bottom: 30px;
+      }
+    }
+  }
+}
