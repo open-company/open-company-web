@@ -7,6 +7,7 @@
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.company-profile :refer (company-profile)]
             [open-company-web.components.stakeholder-update :refer (stakeholder-update)]
+            [open-company-web.components.su-list :refer (su-list)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
@@ -143,6 +144,9 @@
     (defroute stakeholder-updates-route "/:slug/updates" {:as params}
       (company-handler "stakeholder-update" target stakeholder-update params))
 
+    (defroute su-list-route "/:slug/updates/list" {:as params}
+      (company-handler "su-list" target su-list params))
+
     (defroute not-found-route "*" []
       ;; render component
       (om/root page-not-found app-state {:target target}))
@@ -158,6 +162,7 @@
                                  company-route-slash
                                  company-profile-route
                                  stakeholder-updates-route
+                                 su-list-route
                                  not-found-route]))
 
     (defn login-wall []
