@@ -16,3 +16,6 @@
 
 (defn dispatch! [payload]
   (flux/dispatch actions payload))
+
+(defn su-list-key [slug]
+  (keyword (str (name slug) "-su-list")))
