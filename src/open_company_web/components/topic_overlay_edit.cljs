@@ -23,10 +23,24 @@
     (om/set-state! owner k value)))
 
 (defn medium-editor-options [placeholder] {
-  :toolbar {
+  :toolbar #js {
     :buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "orderedlist" "unorderedlist" "anchor" "image"]
   }
-  :placeholder {
+  :anchorPreview #js {
+    :hideDelay 500
+    :previewValueSelector "a"
+  }
+  :anchor #js {
+    ;; These are the default options for anchor form,
+    ;; if nothing is passed this is what it used
+    :customClassOption nil
+    :customClassOptionText "Button"
+    :linkValidation false
+    :placeholderText "Paste or type a link"
+    :targetCheckbox false
+    :targetCheckboxText "Open in new window"
+  }
+  :placeholder #js {
     :text placeholder
     :hideOnClick true
   }})
@@ -236,7 +250,7 @@
 
   (init-state [_]
     (cdr/add-style! "/css/medium-editor/medium-editor.css")
-    (cdr/add-style! "/css/medium-editor/beagle.css")
+    (cdr/add-style! "/css/medium-editor/default.css")
     (merge 
      {:has-changes false
       :title (:title topic-data)
