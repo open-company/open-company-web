@@ -7,6 +7,7 @@
             [open-company-web.local-settings :as ls]
             [open-company-web.api :as api]
             [open-company-web.caches :as caches]
+            [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-body :refer (topic-body)]
@@ -28,7 +29,8 @@
       (dom/div {:class "su-update"}
         (dom/div {:class "su-title"} (:title update))
         (dom/div {:class "su-date"} topic-updated-at)
-        (dom/div {:class "su-body"} (:body intro))))))
+        (dom/div {:class "su-body"
+                  :dangerouslySetInnerHTML (clj->js {"__html" (:body intro)})})))))
 
 (defcomponent stakeholder-updates [data owner]
 
@@ -36,7 +38,7 @@
     :drawer-open false})
 
   (render-state [_ {:keys [drawer-open]}]
-    (let [su-updates (:stakeholder-updates (:collection (:su-list (:company-data data))))]
+    (let [su-updates (:stakeholder-updates (:collection (:su-list data)))]
       (dom/div {:class "updates"}
 
         (dom/div {:class "updates-internal"}
@@ -60,7 +62,9 @@
 
   (render-state [_ {:keys [drawer-open]}]
     (let [slug (keyword (:slug @router/path))
+          su-list-key (dispatcher/su-list-key slug)
           company-data (get data slug)
+          su-list (get data su-list-key)
           stakeholder-update-data (:stakeholder-update company-data)]
 
       (utils/update-page-title (str "OpenCompany - " (:name company-data)))
@@ -90,7 +94,8 @@
           
             (dom/div {:class "sections"}; col-md-9 col-sm-12"}
               ;; Stakeholder update topics
-              (om/build stakeholder-updates {:company-data company-data})
+              (om/build stakeholder-updates {:company-data company-data
+                                             :su-list su-list})
               ;; Dashboard link
               (when (utils/is-mobile)
                 (dom/div {:class "dashboard-link"}
