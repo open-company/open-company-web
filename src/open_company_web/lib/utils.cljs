@@ -664,3 +664,6 @@
     :text placeholder
     :hideOnClick true
   }})
+
+(defn after [ms fn]
+  (js/setTimeout fn ms))
