@@ -2,21 +2,16 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
-            [open-company-web.local-settings :as ls]
             [open-company-web.api :as api]
-            [open-company-web.caches :as caches]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.company-header :refer [company-header]]
-            [open-company-web.components.section-selector :refer (section-selector)]
+            [open-company-web.components.stakeholder-update-header :refer (stakeholder-update-header)]
             [open-company-web.components.ui.link :refer (link)]
             [open-company-web.components.ui.side-drawer :refer (side-drawer)]
-            [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]
-            [clojure.string :as clj-string]
-            [goog.style :refer (setStyle)]))
+            [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]))
 
 (defn get-key-from-sections [sections]
   (clojure.string/join
@@ -49,16 +44,6 @@
 (defn save-stakeholder-update [old-stakeholder-update active-topics]
   (let [new-stakeholder-update (assoc old-stakeholder-update :sections (vec active-topics))]
     (api/patch-stakeholder-update new-stakeholder-update)))
-
-(def drawer-toggler-max-margin-top 300)
-
-(defn fix-drawer-toggler-position [owner]
-  (when-not (om/get-state owner :toggler-top-margin)
-    (when-let [update-internal (om/get-ref owner "update-internal")]
-      (let [offset (utils/absolute-offset update-internal)
-            offset-top (min drawer-toggler-max-margin-top (:top offset))]
-        (setStyle (sel1 [:div.drawer-toggler]) #js {:marginTop (str offset-top "px")})
-        (om/set-state! owner :toggler-top-margin offset-top)))))
 
 (defcomponent selected-topics [data owner]
 
@@ -108,36 +93,18 @@
                                           :currency (:currency company-data)
                                           :loading (:loading data)}))))))))))
 
-(defcomponent stakeholder-update-intro [data owner]
-  (render [_]
-    (let [intro (:intro data)
-          body (:body intro)
-          title (:title intro)]
-      (when-not (clj-string/blank? body)
-        (dom/div {:class "update-intro"}
-          (dom/div {:class "update-intro-internal"}
-            (dom/div {:class "intro-title"} (if (clj-string/blank? title) "Current Update" title))
-            (dom/div {:class "topic-body"}
-              (dom/div {:class "topic-body-inner group"} body))))))))
-
 (defcomponent stakeholder-update [data owner]
 
   (init-state [_]
     {:drawer-open false
      :toggler-top-margin false})
 
-  ; (did-mount [_]
-  ;   (fix-drawer-toggler-position owner))
-
-  ; (did-update [_ _ _]
-  ;   (fix-drawer-toggler-position owner))
-
   (render-state [_ {:keys [drawer-open]}]
     (let [slug (keyword (:slug @router/path))
           company-data (get data slug)
           stakeholder-update-data (:stakeholder-update company-data)]
 
-      (utils/update-page-title (str "OpenCompany - " (:name company-data)))
+      (utils/update-page-title (str "OpenCompany - Stakeholder Update Edit - " (:name company-data)))
 
       (cond
 
@@ -165,7 +132,7 @@
           
             (dom/div {:class "sections"}; col-md-9 col-sm-12"}
               ;; Stakeholder update intro
-              (om/build stakeholder-update-intro stakeholder-update-data)
+              (om/build stakeholder-update-header stakeholder-update-data)
               ;; Stakeholder update topics
               (om/build selected-topics data)
               ;; Dashboard link
