@@ -9,9 +9,15 @@
             [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.company-header :refer [company-header]]
             [open-company-web.components.stakeholder-update-header :refer (stakeholder-update-header)]
+            [open-company-web.components.stakeholder-update-footer :refer (stakeholder-update-footer)]
             [open-company-web.components.ui.link :refer (link)]
             [open-company-web.components.ui.side-drawer :refer (side-drawer)]
-            [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]))
+            [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]
+            [cljs-dynamic-resources.core :as cdr]
+            [goog.style :refer (setStyle)]
+            [goog.events :as events]
+            [goog.history.EventType :as EventType]
+            [clojure.string :as clj-string]))
 
 (defn get-key-from-sections [sections]
   (clojure.string/join
@@ -84,6 +90,7 @@
 
         (dom/div {:class "update-sections-internal"}
           (dom/div {:class "update-sections-internal-width"}
+            (dom/div {:class "overlay"})
             (for [section section-keys]
               (let [section-data (section company-data)]
                 (when-not (and (:read-only section-data) (:placeholder section-data))
@@ -93,13 +100,113 @@
                                           :currency (:currency company-data)
                                           :loading (:loading data)}))))))))))
 
+(defn fix-buttons-position [owner]
+  (when-not (om/get-state owner :fixed-buttons-position)
+    (when-let [su-header (om/get-ref owner "stakeholder-update-header")]
+      (when-let [buttons (om/get-ref owner "floating-buttons")]
+        (let [offset-top (utils/offset-top su-header)]
+          (om/set-state! owner :fixed-buttons-position offset-top)
+          (setStyle buttons #js {:top (str offset-top "px")}))))))
+
+(defn- get-title [data]
+  (let [title (:title data)]
+    (if (clj-string/blank? title)
+      (let [js-date (utils/js-date)
+            month (utils/month-string (utils/add-zero (.getMonth js-date)))
+            year (.getFullYear js-date)]
+        (str month " " year " Update"))
+      title)))
+
+(def before-unload-message "You have unsaved changes.")
+
+(defn save-click [owner]
+  (let [title (om/get-state owner :title)
+        intro-body (or (om/get-state owner :out-intro) (om/get-state owner :intro))
+        outro-body (or (om/get-state owner :out-outro) (om/get-state owner :outro))]
+    (api/patch-stakeholder-update {:title title
+                                   :intro {:body intro-body}
+                                   :sections (:sections (om/get-props owner))
+                                   :outro {:body outro-body}})))
+
+(defn cancel-click [owner]
+  (om/set-state! owner :has-changes false)
+  (let [current-state (om/get-state owner)]
+    (om/set-state! owner :title (:initial-title current-state))
+    (om/set-state! owner :intro (:initial-intro current-state))
+    (om/set-state! owner :outro (:initial-outro current-state))))
+
+(defn get-state [data current-state]
+  (let [slug (keyword (:slug @router/path))
+        company-data (get data slug)
+        su-data (:stakeholder-update company-data)
+        title (get-title su-data)
+        intro (:body (:intro su-data))
+        outro (:body (:outro su-data))]
+    {:title title
+     :initial-title title
+     :history-listener-id (or (:history-listener-id current-state) nil)
+     :has-changes false
+     :initial-intro intro
+     :intro intro
+     :initial-outro outro
+     :outro outro
+     :fixed-buttons-position (or (:fixed-buttons-position current-state) false)
+     :drawer-open (or (:drawer-open current-state) false)}))
+
+(defn change-cb [owner k v]
+  (om/set-state! owner :has-changes true)
+  (cond
+    (= k :outro)
+    (om/set-state! owner :out-outro v)
+
+    (= k :intro)
+    (om/set-state! owner :out-intro v)
+
+    :else
+    (om/set-state! owner k v)))
+
 (defcomponent stakeholder-update [data owner]
 
   (init-state [_]
-    {:drawer-open false
-     :toggler-top-margin false})
+    (cdr/add-style! "/css/medium-editor/medium-editor.css")
+    (cdr/add-style! "/css/medium-editor/default.css")
+    (get-state data nil))
 
-  (render-state [_ {:keys [drawer-open]}]
+  (will-unmount [_]
+    (when-not (utils/is-test-env?)
+      ; re enable the route dispatcher
+      (reset! open-company-web.core/prevent-route-dispatch false)
+      ; remove the onbeforeunload handler
+      (set! (.-onbeforeunload js/window) nil)
+      ; remove history change listener
+      (events/unlistenByKey (om/get-state owner :history-listener-id))))
+
+  (did-mount [_]
+    (fix-buttons-position owner)
+    (when-not (utils/is-test-env?)
+      (utils/after 100 (fn []
+        (reset! open-company-web.core/prevent-route-dispatch true)
+        (let [win-location (.-location js/window)
+              current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
+              listener (events/listen open-company-web.core/history EventType/NAVIGATE
+                         #(when-not (= (.-token %) current-token)
+                            (if (om/get-state owner :has-changes)
+                              (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
+                                ; dispatch the current url
+                                (open-company-web.core/route-dispatch! (router/get-token))
+                                ; go back to the previous token
+                                (.setToken open-company-web.core/history current-token))
+                              ; dispatch the current url
+                              (open-company-web.core/route-dispatch! (router/get-token)))))]
+          (om/set-state! owner :history-listener-id listener))))))
+
+  (did-update [_ _ _]
+    (fix-buttons-position owner))
+
+  (will-receive-props [_ next-props]
+    (get-state next-props (om/get-state owner)))
+
+  (render-state [_ {:keys [drawer-open has-changes title intro outro]}]
     (let [slug (keyword (:slug @router/path))
           company-data (get data slug)
           stakeholder-update-data (:stakeholder-update company-data)]
@@ -130,11 +237,26 @@
           (dom/div #js {:className "update-internal"
                         :ref "update-internal"}
           
-            (dom/div {:class "sections"}; col-md-9 col-sm-12"}
-              ;; Stakeholder update intro
-              (om/build stakeholder-update-header stakeholder-update-data)
+            (dom/div {:class "sections group"}; col-md-9 col-sm-12"}
+              (dom/div #js {:className "floating-buttons group"
+                            :ref "floating-buttons"}
+                (when has-changes
+                  (dom/button {:class "cancel"
+                               :on-click #(cancel-click owner)} "cancel"))
+                (when has-changes
+                  (dom/button {:class "save"
+                               :on-click #(save-click owner)} "Save")))
+              ;; Stakeholder update header
+              (dom/div #js {:className "stakeholder-update-header"
+                            :ref "stakeholder-update-header"}
+                (om/build stakeholder-update-header {:title title
+                                                     :intro intro}
+                                                    {:opts {:change-cb (partial change-cb owner)}}))
               ;; Stakeholder update topics
               (om/build selected-topics data)
+              ;; Stakeholder update footer
+              (om/build stakeholder-update-footer {:outro outro}
+                                                  {:opts {:change-cb (partial change-cb owner)}})
               ;; Dashboard link
               (when (utils/is-mobile)
                 (dom/div {:class "dashboard-link"}
