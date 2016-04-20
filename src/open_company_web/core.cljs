@@ -141,10 +141,10 @@
     (defroute company-profile-route "/:slug/profile" {:as params}
       (company-handler "profile" target company-profile params))
 
-    (defroute stakeholder-updates-route "/:slug/updates" {:as params}
+    (defroute stakeholder-updates-route "/:slug/updates/edit" {:as params}
       (company-handler "stakeholder-update" target stakeholder-update params))
 
-    (defroute su-list-route "/:slug/updates/list" {:as params}
+    (defroute su-list-route "/:slug/updates" {:as params}
       (company-handler "su-list" target su-list params))
 
     (defroute not-found-route "*" []
