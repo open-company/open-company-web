@@ -641,3 +641,26 @@
       (recur (+ top (or (.-offsetTop el) 0))
              (+ left (or (.-offsetLeft el) 0))
              (.-offsetParent el)))))
+
+(defn medium-editor-options [placeholder] {
+  :toolbar #js {
+    :buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "orderedlist" "unorderedlist" "anchor" "image"]
+  }
+  :anchorPreview #js {
+    :hideDelay 500
+    :previewValueSelector "a"
+  }
+  :anchor #js {
+    ;; These are the default options for anchor form,
+    ;; if nothing is passed this is what it used
+    :customClassOption nil
+    :customClassOptionText "Button"
+    :linkValidation false
+    :placeholderText "Paste or type a link"
+    :targetCheckbox false
+    :targetCheckboxText "Open in new window"
+  }
+  :placeholder #js {
+    :text placeholder
+    :hideOnClick true
+  }})
