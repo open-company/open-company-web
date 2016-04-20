@@ -1,0 +1,61 @@
+div.update-header {
+  max-width: 910px;
+  margin: 0 auto;
+
+  button {
+    background-color: transparent;
+    border: 0px;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    font-size: 12px;
+  }
+
+  button.cancel {
+    width: 30px;
+    height: 25px;
+    margin-top: 20px;
+    margin-right: 20px;
+    float: right;
+  }
+
+  button.save {
+    width: 90px;
+    height: 25px;
+    border: 1px solid $oc_gray_3;
+    box-shadow: 1px 1px 1px 0 $topic_overlay_border_color;
+    margin-top: 20px;
+    margin-right: 15px;
+    background-color: $oc_green;
+    color: white;
+    float: right;
+  }
+
+  div.update-header-internal {
+    max-width: 570px;
+
+    div.update-title {
+      margin-bottom: 15px;
+
+      input.update-title-input {
+        width: 100%;
+        border: 1px solid transparent;
+        font-size: 22px;
+        font-weight: 600;
+      }
+    }
+
+    div.intro-body {
+      font-size: 14px;
+      min-height: 130px;
+      cursor: text;
+    }
+
+    hr.divider {
+      height: 1px;
+      background-color: $oc_gray_3;
+      width: 25%;
+      margin: 20px 0;
+    }
+  }
+}
