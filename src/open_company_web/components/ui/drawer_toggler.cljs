@@ -19,6 +19,7 @@
         (dommy/add-class! drawer :rotate0)
         (dommy/remove-class! drawer :above-navbar))
       (do
+        (utils/scroll-to-y 0)
         (dommy/add-class! drawer :above-navbar)
         (dommy/remove-class! drawer :rotate0)
         (dommy/add-class! drawer :rotate45)))))
