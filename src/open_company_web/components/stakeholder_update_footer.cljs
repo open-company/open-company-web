@@ -10,6 +10,9 @@
 
 (defcomponent stakeholder-update-footer [data owner options]
 
+  (init-state [_]
+    {:outro (:outro data)})
+
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (reset! open-company-web.core/prevent-route-dispatch true)
@@ -19,10 +22,20 @@
         (.subscribe med-ed "editableInput" #((:change-cb options) :outro (.-innerHTML body-el)))
         (om/set-state! owner :medium-editor med-ed))))
 
-  (render [_]
+  (will-receive-props [_ next-props]
+    ; update outro when the content changes from the parent component
+    ; or when it force the conetnt refresh
+    (let [next-outro (:outro next-props)]
+      (when (or (:update-content next-props)
+                (not= next-outro (:outro data)))
+        (let [outro-body (om/get-ref owner "outro-body")]
+          (set! (.-innerHTML outro-body) next-outro))
+        (om/set-state! owner :outro next-outro))))
+
+  (render-state [_ {:keys [outro]}]
     (dom/div {:class "update-footer group"}
-      (dom/div {:class "update-footer-internal"}
-        (dom/div #js {:className "outro-body"
+      (dom/div {:class "update-footer-internal group"}
+        (dom/div #js {:className "outro-body group"
                       :ref "outro-body"
-                      :dangerouslySetInnerHTML (clj->js {"__html" (:outro data)})})
-        (dom/div {:class "update-footer-close"})))))
+                      :dangerouslySetInnerHTML (clj->js {"__html" outro})})
+        (dom/div {:class "update-footer-close group"})))))
