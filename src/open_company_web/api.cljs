@@ -281,6 +281,21 @@
             (let [fixed-body (if success (json->cljs body) {})]
               (dispatcher/dispatch! [:new-section {:response fixed-body :slug slug}]))))))))
 
+(defn share-stakeholder-update []
+  (let [slug (keyword (:slug @router/path))
+        company-data (slug @dispatcher/app-state)
+        links (:links company-data)
+        share-link (utils/link-for links "share" "POST")]
+    (api-post (:href share-link)
+      { :headers  {
+          ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type"
+          ; custom content type
+          "content-type" (:type share-link)}}
+      (fn [{:keys [success body]}]
+        ;; FIXME:
+        (.log js/console body)))))
+
 (defn get-stakeholder-update []
   (let [slug (keyword (:slug @router/path))
         company-data (slug @dispatcher/app-state)
