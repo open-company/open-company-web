@@ -21,12 +21,17 @@
 
 (defcomponent su-update [data owner]
   (render [_]
-    (let [update (:update data)
+    (let [slug (name (:slug @router/path))
+          update (:update data)
           js-date-upat (utils/js-date (:created-at update))
           month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
           topic-updated-at (str month-string " " (.getDate js-date-upat) ", " (.getFullYear js-date-upat))
-          intro (:intro update)]
-      (dom/div {:class "su-update"}
+          intro (:intro update)
+          update-slug (:slug update)
+          links (:links update)
+          update-get-link (utils/link-for links "self" "GET")]
+      (dom/div {:class "su-update"
+                :on-click #(router/nav! (str "/" slug "/updates/" update-slug))}
         (dom/div {:class "su-title"} (:title update))
         (dom/div {:class "su-date"} topic-updated-at)
         (dom/div {:class "su-body"
@@ -57,7 +62,7 @@
     (let [slug (keyword (:slug @router/path))
           company-data (get data slug)]
       (when (and (not (om/get-state owner :su-requested)) (contains? company-data :links))
-        (api/get-stakeholder-update)
+        (api/get-su-list)
         (om/set-state! owner :su-requested true))))
 
   (render-state [_ {:keys [drawer-open]}]
