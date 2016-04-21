@@ -19,3 +19,6 @@
 
 (defn su-list-key [slug]
   (keyword (str (name slug) "-su-list")))
+
+(defn stakeholder-update-key [slug]
+  (keyword (str (name slug) "-stakeholder-update")))
