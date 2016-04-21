@@ -17,9 +17,8 @@ div.update-header {
     }
 
     div.intro-body {
-      font-size: 14px;
       min-height: 130px;
-      cursor: text;
+      @include rich-editor-body($text_color: black);
     }
   }
 }
