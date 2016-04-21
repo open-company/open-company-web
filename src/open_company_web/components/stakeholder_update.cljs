@@ -135,7 +135,9 @@
     (om/set-state! owner :intro (:initial-intro current-state))
     (om/set-state! owner :outro (:initial-outro current-state))
     (om/set-state! owner :force-content-update true)
-    (utils/after 100 #(om/set-state! owner :force-content-update false))))
+    (utils/after 100 #(om/set-state! owner :force-content-update false)))
+  (let [slug (name (:slug @router/path))]
+    (router/nav! (str "/" slug "/updates"))))
 
 (defn get-state [data current-state]
   (let [slug (keyword (:slug @router/path))
