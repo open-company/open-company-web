@@ -5,6 +5,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [cuerdas.core :as s]
+            [cljsjs.react.dom]
             [cljs.core.async :refer (chan <!)]))
 
 ;; Cell component
@@ -21,7 +22,7 @@
   (when (= state :edit)
     (.setTimeout js/window #(let [input (om/get-ref owner "edit-field")]
                               (when input
-                                (.focus (.getDOMNode input)))) 10)))
+                                (.focus (.findDOMNode js/ReactDOM input)))) 10)))
 
 (defn- initial-cell-state
   "Get the initial state for the cell.
