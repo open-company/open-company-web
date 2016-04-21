@@ -121,11 +121,11 @@
 
 (defn save-click [owner]
   (let [title (om/get-state owner :title)
-        intro-body (or (om/get-state owner :out-intro) (om/get-state owner :intro))
-        outro-body (or (om/get-state owner :out-outro) (om/get-state owner :outro))]
+        intro-body (or (om/get-state owner :out-intro) (om/get-state owner :intro) "")
+        outro-body (or (om/get-state owner :out-outro) (om/get-state owner :outro) "")]
     (api/patch-stakeholder-update {:title title
                                    :intro {:body intro-body}
-                                   :sections (:sections (om/get-props owner))
+                                   :sections (om/get-state owner :sections)
                                    :outro {:body outro-body}})))
 
 (defn cancel-click [owner]
@@ -133,23 +133,29 @@
   (let [current-state (om/get-state owner)]
     (om/set-state! owner :title (:initial-title current-state))
     (om/set-state! owner :intro (:initial-intro current-state))
-    (om/set-state! owner :outro (:initial-outro current-state))))
+    (om/set-state! owner :outro (:initial-outro current-state))
+    (om/set-state! owner :force-content-update true)
+    (utils/after 100 #(om/set-state! owner :force-content-update false))))
 
 (defn get-state [data current-state]
   (let [slug (keyword (:slug @router/path))
         company-data (get data slug)
         su-data (:stakeholder-update company-data)
-        title (get-title su-data)
+        title (:title su-data)
+        sections (:sections su-data)
         intro (:body (:intro su-data))
-        outro (:body (:outro su-data))]
-    {:title title
+        outro (:body (:outro su-data))
+        fixed-title (get-title su-data)]
+    {:title (get-title su-data)
      :initial-title title
      :history-listener-id (or (:history-listener-id current-state) nil)
-     :has-changes false
+     :has-changes (not= fixed-title title)
+     :sections sections
      :initial-intro intro
      :intro intro
      :initial-outro outro
      :outro outro
+     :force-content-update false
      :fixed-buttons-position (or (:fixed-buttons-position current-state) false)
      :drawer-open (or (:drawer-open current-state) false)}))
 
@@ -164,6 +170,9 @@
 
     :else
     (om/set-state! owner k v)))
+
+(defn share-click [owner]
+  (api/share-stakeholder-update))
 
 (defcomponent stakeholder-update [data owner]
 
@@ -204,12 +213,12 @@
     (fix-buttons-position owner))
 
   (will-receive-props [_ next-props]
-    (get-state next-props (om/get-state owner)))
+    (om/set-state! owner (get-state next-props (om/get-state owner))))
 
-  (render-state [_ {:keys [drawer-open has-changes title intro outro]}]
+  (render-state [_ {:keys [drawer-open has-changes title intro sections outro force-content-update]}]
     (let [slug (keyword (:slug @router/path))
           company-data (get data slug)
-          stakeholder-update-data (:stakeholder-update company-data)]
+          su-data (:stakeholder-update company-data)]
 
       (utils/update-page-title (str "OpenCompany - Stakeholder Update Edit - " (:name company-data)))
 
@@ -242,20 +251,28 @@
                             :ref "floating-buttons"}
                 (when has-changes
                   (dom/button {:class "cancel"
-                               :on-click #(cancel-click owner)} "cancel"))
+                               :on-click #(cancel-click owner)} "Cancel"))
                 (when has-changes
                   (dom/button {:class "save"
                                :on-click #(save-click owner)} "Save")))
+              ;; share button
+              (dom/div {:class "share-su"}
+                (dom/button {:class "share"
+                             :disabled (or (clj-string/blank? (:title su-data))
+                                           (empty? sections))
+                             :on-click #(share-click owner)} "Share"))
               ;; Stakeholder update header
               (dom/div #js {:className "stakeholder-update-header"
                             :ref "stakeholder-update-header"}
                 (om/build stakeholder-update-header {:title title
-                                                     :intro intro}
+                                                     :intro intro
+                                                     :update-content force-content-update}
                                                     {:opts {:change-cb (partial change-cb owner)}}))
               ;; Stakeholder update topics
               (om/build selected-topics data)
               ;; Stakeholder update footer
-              (om/build stakeholder-update-footer {:outro outro}
+              (om/build stakeholder-update-footer {:outro outro
+                                                   :update-content force-content-update}
                                                   {:opts {:change-cb (partial change-cb owner)}})
               ;; Dashboard link
               (when (utils/is-mobile)
