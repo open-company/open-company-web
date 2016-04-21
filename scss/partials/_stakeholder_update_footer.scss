@@ -7,15 +7,15 @@ div.update-footer {
     max-width: 570px;
 
     div.outro-body {
-      font-size: 14px;
       min-height: 130px;
-      cursor: text;
+      @include rich-editor-body($text_color: black);
     }
 
     div.update-footer-close{
       position: relative;
       height: 10px;
       width: 100%;
+      color: black;
     }
   }
 }
