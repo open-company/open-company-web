@@ -15,7 +15,7 @@
             [open-company-web.components.ui.link :refer (link)]
             [open-company-web.components.ui.side-drawer :refer (side-drawer)]
             [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]
-            [clojure.string :as str]
+            [clojure.string :as clj-string]
             [goog.style :refer (setStyle)]))
 
 (defn get-key-from-sections [sections]
@@ -98,25 +98,27 @@
                                           :bg-click-cb #(om/set-state! owner :drawer-open false)}})))
 
         (dom/div {:class "update-sections-internal"}
-          (for [section section-keys]
-            (let [section-data (section company-data)]
-              (when-not (and (:read-only section-data) (:placeholder section-data))
-                (om/build stakeholder-update-topic {
-                                        :section-data section-data
-                                        :section section
-                                        :currency (:currency company-data)
-                                        :loading (:loading data)})))))))))
+          (dom/div {:class "update-sections-internal-width"}
+            (for [section section-keys]
+              (let [section-data (section company-data)]
+                (when-not (and (:read-only section-data) (:placeholder section-data))
+                  (om/build stakeholder-update-topic {
+                                          :section-data section-data
+                                          :section section
+                                          :currency (:currency company-data)
+                                          :loading (:loading data)}))))))))))
 
 (defcomponent stakeholder-update-intro [data owner]
   (render [_]
     (let [intro (:intro data)
           body (:body intro)
           title (:title intro)]
-      (when-not (str/blank? body)
+      (when-not (clj-string/blank? body)
         (dom/div {:class "update-intro"}
-          (dom/div {:class "intro-title"} (if (str/blank? title) "Current Update" title))
-          (dom/div {:class "topic-body"}
-            (dom/div {:class "topic-body-inner group"} body)))))))
+          (dom/div {:class "update-intro-internal"}
+            (dom/div {:class "intro-title"} (if (clj-string/blank? title) "Current Update" title))
+            (dom/div {:class "topic-body"}
+              (dom/div {:class "topic-body-inner group"} body))))))))
 
 (defcomponent stakeholder-update [data owner]
 

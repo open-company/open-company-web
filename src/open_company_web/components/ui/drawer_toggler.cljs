@@ -3,6 +3,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy]
+            [open-company-web.lib.utils :as utils]
             [open-company-web.components.icon :refer (icon)]))
 
 (defn rotate [owner & [from-extern]]
@@ -15,8 +16,11 @@
     (if (dommy/has-class? drawer :rotate45)
       (do
         (dommy/remove-class! drawer :rotate45)
-        (dommy/add-class! drawer :rotate0))
+        (dommy/add-class! drawer :rotate0)
+        (dommy/remove-class! drawer :above-navbar))
       (do
+        (utils/scroll-to-y 0)
+        (dommy/add-class! drawer :above-navbar)
         (dommy/remove-class! drawer :rotate0)
         (dommy/add-class! drawer :rotate45)))))
 
@@ -31,7 +35,7 @@
                (om/get-state owner :open))
       (rotate owner true)))
 
-  (render [_]
+  (render-state [_ {:keys [open]}]
     (dom/div #js {:className "drawer-toggler"
                   :ref "drawer-toggler"}
       (dom/button #js {:className "drawer-toggler-bt"

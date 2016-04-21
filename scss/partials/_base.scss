@@ -22,10 +22,8 @@ html, body {
   background-color: $oc_gray_1;
 }
 
-body.no-scroll {
-  overflow-y: scroll;
-  position: fixed;
-  width: 100%;
+.no-scroll {
+  overflow: hidden;
 }
 
 h1, h2, h3, h4, h5, h6, .oc-header {

@@ -9,7 +9,7 @@ div.side-drawer-container {
   background-color: rgba(255, 255, 255, 0.7);
   opacity: 0;
   @include animation(0s, 0.01s, closeDrawer);
-  z-index: 1033;
+  z-index: 1030;
 
   &.open-drawer {
     @include animation(0s, $oc_animation_duration, openDrawer);
@@ -19,33 +19,36 @@ div.side-drawer-container {
     @include animation(0s, $oc_animation_duration, closeDrawer);
   }
 
+  $dclose: 100%;
+  $dopen:  0;
+
   @include keyframe(openDrawer){
     from {
       opacity: 0;
-      -webkit-transform: translate(-100%, 0);
-      -moz-transform: translate(-100%, 0);
-      transform: translate(-100%, 0);
+      -webkit-transform: translate($dclose, 0);
+      -moz-transform: translate($dclose, 0);
+      transform: translate($dclose, 0);
     }
     to { 
       opacity: 1;
-      -webkit-transform: translate(0, 0);
-      -moz-transform: translate(0, 0);
-      transform: translate(0, 0);
+      -webkit-transform: translate($dopen, 0);
+      -moz-transform: translate($dopen, 0);
+      transform: translate($dopen, 0);
     }
   }
 
   @include keyframe(closeDrawer){
     from {
       opacity: 1;
-      -webkit-transform: translate(0, 0);
-      -moz-transform: translate(0, 0);
-      transform: translate(0, 0);
+      -webkit-transform: translate($dopen, 0);
+      -moz-transform: translate($dopen, 0);
+      transform: translate($dopen, 0);
     }
     to {
       opacity: 0;
-      -webkit-transform: translate(-100%, 0);
-      -moz-transform: translate(-100%, 0);
-      transform: translate(-100%, 0);
+      -webkit-transform: translate($dclose, 0);
+      -moz-transform: translate($dclose, 0);
+      transform: translate($dclose, 0);
     }
   }
 
@@ -57,10 +60,10 @@ div.side-drawer-container {
     background-color: white;
     border: 1px solid $oc_gray_2;
     top: 50px;
-    left: 0;
+    right: 0;
 
     div.side-drawer-internal {
-      margin-left: 35px;
+      padding-right: 35px;
       height: calc(100% - 10px);
       overflow-y: scroll;
     }

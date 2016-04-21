@@ -23,10 +23,24 @@
     (om/set-state! owner k value)))
 
 (defn medium-editor-options [placeholder] {
-  :toolbar {
+  :toolbar #js {
     :buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "orderedlist" "unorderedlist" "anchor" "image"]
   }
-  :placeholder {
+  :anchorPreview #js {
+    :hideDelay 500
+    :previewValueSelector "a"
+  }
+  :anchor #js {
+    ;; These are the default options for anchor form,
+    ;; if nothing is passed this is what it used
+    :customClassOption nil
+    :customClassOptionText "Button"
+    :linkValidation false
+    :placeholderText "Paste or type a link"
+    :targetCheckbox false
+    :targetCheckboxText "Open in new window"
+  }
+  :placeholder #js {
     :text placeholder
     :hideOnClick true
   }})
@@ -236,7 +250,7 @@
 
   (init-state [_]
     (cdr/add-style! "/css/medium-editor/medium-editor.css")
-    (cdr/add-style! "/css/medium-editor/beagle.css")
+    (cdr/add-style! "/css/medium-editor/default.css")
     (merge 
      {:has-changes false
       :title (:title topic-data)
@@ -324,19 +338,21 @@
                        :on-click #(let [section-data (data-to-save owner topic)]
                                     (.stopPropagation %)
                                     (api/partial-update-section topic section-data)
-                                    ((:dismiss-editing-cb options)))} "Save Topic"))
+                                    ((:dismiss-editing-cb options)))} "Save"))
         (dom/button {:class "cancel"
                      :on-click #((:dismiss-editing-cb options))} "Cancel")
         (dom/div {:class "topic-overlay-edit-header"}
           (dom/input {:class "topic-overlay-edit-title"
                       :id (str "topic-edit-title-" (name topic))
                       :type "text"
-                      :placeholder "Type your title here"
-                      :on-focus #(om/set-state! owner :show-title-counter true)
+                      :placeholder "Title"
                       :on-blur #(om/set-state! owner :show-title-counter false)
                       :max-length title-length-limit
                       :value title
-                      :on-change #(change-value owner :title %)})
+                      :on-change (fn [e]
+                                    (when (not show-title-counter)
+                                      (om/set-state! owner :show-title-counter true))
+                                    (change-value owner :title e))})
           (dom/div {:class (utils/class-set {:topic-overlay-edit-title-count true
                                              :transparent (not show-title-counter)})}
             (dom/label {:class "bold"} (- title-length-limit (count title))))
@@ -349,12 +365,14 @@
                            :resize false
                            :id (str "topic-edit-headline-" (name topic))
                            :type "text"
-                           :placeholder "Type your headline here"
-                           :on-focus #(om/set-state! owner :show-headline-counter true)
+                           :placeholder "Headline"
                            :on-blur #(om/set-state! owner :show-headline-counter false)
                            :max-length headline-length-limit
                            :value headline
-                           :on-change #(change-value owner :headline %)})
+                           :on-change (fn [e]
+                                        (when (not show-headline-counter)
+                                          (om/set-state! owner :show-headline-counter true))
+                                        (change-value owner :headline e))})
             (dom/div {:class (utils/class-set {:ml2 true
                                                :mt1 true
                                                :pr3 true

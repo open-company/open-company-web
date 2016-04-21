@@ -7,7 +7,6 @@ div.stakeholder-update {
     font-size: 26px;
     line-height: 1;
     margin-bottom: 17px;
-    text-transform: uppercase;
   }
 
   div.topic-headline {
@@ -69,8 +68,12 @@ div.stakeholder-update {
         background-color: white;
 
         div.update-intro {
-          max-width: 650px;
+          max-width: 910px;
           margin: 0 auto;
+
+          div.update-intro-internal {
+            max-width: 570px;
+          }
         }
 
         div.update-sections {
@@ -81,6 +84,10 @@ div.stakeholder-update {
             padding: 10px;
             max-width: 930px;
             margin: 8px auto;
+
+            div.update-sections-internal-width {
+              max-width: 570px;
+            }
           }
         }
       }

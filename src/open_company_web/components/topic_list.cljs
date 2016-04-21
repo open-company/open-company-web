@@ -100,7 +100,7 @@
           company-data    (:company-data data)
           active-category (keyword (:active-category data))
           category-topics (get active-topics active-category)]
-      (dom/div {:class "topic-list pb4"
+      (dom/div {:class "topic-list"
                 :style (when (utils/is-mobile) {:min-height "100vh"})
                 :key "topic-list"}
         (when (and (not (:read-only company-data))
@@ -141,10 +141,10 @@
                      :ref "topic-list-ul"}
           (for [section-name category-topics
                 :let [sd (->> section-name keyword (get company-data))]]
-            (dom/li #js {:className "topic-row"
-                         :ref section-name
-                         :key (str "topic-row-" (name section-name))}
-              (when-not (and (:read-only company-data) (:placeholder sd))
+            (when-not (and (:read-only company-data) (:placeholder sd))
+              (dom/li #js {:className "topic-row"
+                           :ref section-name
+                           :key (str "topic-row-" (name section-name))}
                 (om/build topic {:loading (:loading company-data)
                                  :section section-name
                                  :section-data sd

@@ -72,16 +72,18 @@
 
 (defn bar-click [owner options idx]
   (.stopPropagation (.-event js/d3))
-  (let [chart-label (.select js/d3 (str "#chart-label"))
+  (let [svg-el (om/get-ref owner "d3-column")
+        d3-svg-el (.select js/d3 svg-el)
+        chart-label (.select d3-svg-el (str "#column-chart-label"))
         chart-width (:chart-width options)
-        next-g (.select js/d3 (str "#chart-g-" idx))
+        next-g (.select d3-svg-el (str "#chart-g-" idx))
         data (current-data owner)
         next-set (get data idx)
         label-key (:label-key options)
         next-g-rects (.selectAll next-g "rect")
-        all-rects (.selectAll js/d3 "rect.chart-bar")
-        next-month-text (.select js/d3 (str "text#chart-x-label-" idx))
-        all-month-text (.selectAll js/d3 ".chart-x-label")]
+        all-rects (.selectAll d3-svg-el "rect.chart-bar")
+        next-month-text (.select d3-svg-el (str "text#chart-x-label-" idx))
+        all-month-text (.selectAll d3-svg-el ".chart-x-label")]
     (.each all-rects
            (fn [d i]
               (this-as rect
@@ -207,7 +209,7 @@
             chart-label-g (-> chart-node
                               (.append "g")
                               (.attr "class" "chart-label-container")
-                              (.attr "id" "chart-label")
+                              (.attr "id" "column-chart-label")
                               (.attr "transform" (str "translate(" 0 "," (if (> (count chart-keys) 1) 20 50) ")")))] ;x-pos
         (build-selected-label chart-label-g label-value label-color chart-width)
         (let [chart-label-width (js/SVGgetWidth chart-label-g)
