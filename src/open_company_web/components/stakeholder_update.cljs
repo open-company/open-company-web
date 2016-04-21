@@ -216,6 +216,9 @@
     (om/set-state! owner (get-state next-props (om/get-state owner))))
 
   (render-state [_ {:keys [drawer-open has-changes title intro sections outro force-content-update]}]
+    ; set the onbeforeunload handler only if there are changes
+    (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
+      (set! (.-onbeforeunload js/window) onbeforeunload-cb))
     (let [slug (keyword (:slug @router/path))
           company-data (get data slug)
           su-data (:stakeholder-update company-data)]
