@@ -6,7 +6,9 @@
             [open-company-web.local-settings :as ls]
             [open-company-web.api :as api]
             [open-company-web.lib.utils :as utils]
-            [cljsjs.medium-editor]))
+            [cljsjs.medium-editor]
+            [cljsjs.react.dom]
+            [shodan.console :as console :include-macros true]))
 
 (defcomponent stakeholder-update-header [data owner options]
 
@@ -15,6 +17,9 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
+      (when-let [input (.findDOMNode js/ReactDOM (om/get-ref owner "update-title-input"))]
+        (set! (.-value input) (.-value input))
+        (.focus input))
       (reset! open-company-web.core/prevent-route-dispatch true)
       ; save initial innerHTML and setup MediumEditor
       (let [body-el (om/get-ref owner "intro-body")
@@ -36,10 +41,11 @@
     (dom/div {:class "update-header"}
       (dom/div {:class "update-header-internal"}
         (dom/div {:class "update-title"}
-          (dom/input {:class "update-title-input"
-                      :value (:title data)
-                      :max-length 100
-                      :on-change #((:change-cb options) :title (.. % -target -value))}))
+          (dom/input #js {:className "update-title-input"
+                          :value (:title data)
+                          :maxLength 100
+                          :ref "update-title-input"
+                          :onChange #((:change-cb options) :title (.. % -target -value))}))
         (dom/div #js {:className "intro-body"
                       :ref "intro-body"
                       :dangerouslySetInnerHTML (clj->js {"__html" (:intro data)})})))))
