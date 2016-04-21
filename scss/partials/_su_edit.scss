@@ -1,4 +1,4 @@
-div.stakeholder-update {
+div.su-edit {
   background-color: white;
 
   div.intro-title,
@@ -22,7 +22,7 @@ div.stakeholder-update {
 
 @include mobile() {
 
-  div.stakeholder-update {
+  div.su-edit {
 
     div.intro-title,
     div.topic-title,
@@ -48,7 +48,7 @@ div.stakeholder-update {
 
 @include big_web() {
 
-  div.stakeholder-update {
+  div.su-edit {
 
     div.company-header {
       padding-bottom: 46px;

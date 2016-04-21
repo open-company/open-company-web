@@ -1,4 +1,4 @@
-(ns open-company-web.components.stakeholder-update-header
+(ns open-company-web.components.su-edit-header
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -7,10 +7,9 @@
             [open-company-web.api :as api]
             [open-company-web.lib.utils :as utils]
             [cljsjs.medium-editor]
-            [cljsjs.react.dom]
-            [shodan.console :as console :include-macros true]))
+            [cljsjs.react.dom]))
 
-(defcomponent stakeholder-update-header [data owner options]
+(defcomponent su-edit-header [data owner options]
 
   (init-state [_]
     {:intro (:intro data)})

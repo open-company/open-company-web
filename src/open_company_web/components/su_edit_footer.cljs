@@ -1,4 +1,4 @@
-(ns open-company-web.components.stakeholder-update-footer
+(ns open-company-web.components.su-edit-footer
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -8,7 +8,7 @@
             [open-company-web.lib.utils :as utils]
             [cljsjs.medium-editor]))
 
-(defcomponent stakeholder-update-footer [data owner options]
+(defcomponent su-edit-footer [data owner options]
 
   (init-state [_]
     {:outro (:outro data)})
