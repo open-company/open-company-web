@@ -5,6 +5,7 @@
             [dommy.core :refer-macros (sel1)]
             [cljs.core.async :refer (put!)]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [goog.fx.Animation.EventType :as EventType]
             [goog.events :as events]
@@ -48,7 +49,6 @@
   (render [_]
     (let [navbar-editing (:navbar-editing data)
           scroll-top (.-scrollTop (sel1 :body))
-          slug (:slug @router/path)
           company-data (:company-data data)
           categories (if (:company-data data) (get-categories (:categories company-data) navbar-editing) [])
           active-category (:active-category data)
@@ -74,7 +74,7 @@
                   category-class (utils/class-set {:category true
                                                    :active (= active-category category-name)})]
               (dom/a {:class ""
-                      :href (str "/" slug "#" category-name)
+                      :href (oc-urls/company-category category-name)
                       :on-click (partial category-click data category-name)}
                 (dom/div {:class category-class}
                   (dom/div {:class "category-label"}
