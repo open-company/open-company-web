@@ -112,14 +112,16 @@
 (defn update-handler [target component params]
   (let [slug (:slug (:params params))
         update-slug (:update-slug (:params params))
-        query-params (:query-params params)]
+        query-params (:query-params params)
+        su-key (dis/stakeholder-update-key slug)]
     (pre-routing query-params)
     (utils/clean-company-caches)
     (dis/dispatch! [:topic/reset-expanded])
     ;; save the route
     (router/set-route! ["companies" slug "updates" update-slug] {:slug slug :update-slug update-slug :query-params query-params})
     ;; do we have the company data already?
-    (when-not (contains? @app-state (keyword slug))
+    (when (or (not (contains? @app-state su-key))
+              (not (contains? (@app-state su-key) (keyword update-slug))))
       ;; load the company data from the API
       (api/get-stakeholder-update slug update-slug)
       (swap! app-state assoc-in [(dis/stakeholder-update-key slug) (keyword update-slug) :loading] true))
