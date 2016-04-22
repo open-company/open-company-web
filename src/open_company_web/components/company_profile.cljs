@@ -9,13 +9,14 @@
             [om-bootstrap.panel :as p]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.api :as api]
             [cljs.core.async :refer (put! chan <!)]
-            [open-company-web.dispatcher :refer (app-state)]
+            [open-company-web.dispatcher :as dis :refer (app-state)]
             [open-company-web.lib.iso4217 :refer (iso4217 sorted-iso4217)]))
 
 (defn- save-company-data [company-data logo logo-width logo-height]
-  (let [slug (:slug @router/path)]
+  (let [slug (router/current-company-slug)]
     (api/patch-company slug {:name (:name company-data)
                              :slug slug
                              :currency (:currency company-data)
@@ -24,20 +25,18 @@
                              :logo-height (js/parseInt logo-height)
                              :logo logo})))
 
-(defn- check-image [url owner cb]
+(defn- check-image [url owner data cb]
   (let [img (new js/Image)]
-    (set! (.-onload img) (fn [e] (cb owner img true)))
-    (set! (.-onerror img) (fn [e] (cb owner img false)))
+    (set! (.-onload img) (fn [e] (cb owner data img true)))
+    (set! (.-onerror img) (fn [e] (cb owner data img false)))
     (set! (.-src img) url)))
 
-(defn- check-img-cb [owner img result]
+(defn- check-img-cb [owner data img result]
  (if-not result
     ; there was an error loading the logo, could be an invalid URL
     ; or the link doesn't contain an image
     (js/alert "Invalid image url")
-    (let [slug (:slug @router/path)
-          company-data ((keyword slug) @app-state)]
-      (save-company-data company-data (om/get-state owner :logo) (.-width img) (.-height img)))))
+    (save-company-data data (om/get-state owner :logo) (.-width img) (.-height img))))
 
 (defcomponent currency-option [data owner]
   (render [_]
@@ -63,18 +62,22 @@
     (let [save-change (utils/get-channel "save-company")]
       (go (loop []
         (let [change (<! save-change)]
-          (let [slug (:slug @router/path)
-                company-data ((keyword slug) @app-state)
-                logo (om/get-state owner :logo)]
+          (let [logo (om/get-state owner :logo)
+                company-data (om/get-props owner)]
+            ; if the log has changed
             (if (not= logo (om/get-state owner :initial-logo))
+              ; and it's empty
               (if (clojure.string/blank? logo)
+                ; save the data w/o a logo
                 (save-company-data company-data "" 0 0)
-                (check-image logo owner check-img-cb))
+                ; else check the logo
+                (check-image logo owner company-data check-img-cb))
+              ; else save the company datas
               (save-company-data company-data (:logo company-data) (:logo-width company-data) (:logo-height company-data)))
             (recur)))))))
 
   (render [_]
-    (let [slug (keyword (:slug @router/path))]
+    (do
 
       (utils/update-page-title (str "OpenCompany - " (:name data)))
 
@@ -162,11 +165,10 @@
 (defcomponent company-profile [data owner]
 
   (render [_]
-    (let [slug (keyword (:slug @router/path))
-          company-data (get data slug)]
+    (let [company-data (dis/current-company-data data)]
 
       (when (:read-only company-data)
-        (utils/redirect! (str "/" (name slug))))
+        (utils/redirect! (oc-urls/company)))
 
       (dom/div {:class "company-container container"}
 
