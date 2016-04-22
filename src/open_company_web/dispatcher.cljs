@@ -1,5 +1,6 @@
 (ns open-company-web.dispatcher
-  (:require [cljs-flux.dispatcher :as flux]))
+  (:require [cljs-flux.dispatcher :as flux]
+            [open-company-web.router :as router]))
 
 (defonce app-state (atom {:loading false}))
 
@@ -22,3 +23,9 @@
 
 (defn stakeholder-update-key [slug]
   (keyword (str (name slug) "-stakeholder-update")))
+
+(defn get-slug []
+  (keyword (router/current-company-slug)))
+
+(defn current-company-data [data]
+  (get data (get-slug)))
