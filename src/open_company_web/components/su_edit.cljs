@@ -211,7 +211,9 @@
     (fix-buttons-position owner))
 
   (will-receive-props [_ next-props]
-    (om/set-state! owner (get-state next-props (om/get-state owner))))
+    (om/set-state! owner (get-state next-props (om/get-state owner)))
+    (when (:su-edit next-props)
+      (router/nav! (str "/" (:slug @router/path) "/updates"))))
 
   (render-state [_ {:keys [drawer-open has-changes title intro sections outro force-content-update]}]
     ; set the onbeforeunload handler only if there are changes
