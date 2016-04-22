@@ -24,8 +24,5 @@
 (defn stakeholder-update-key [slug]
   (keyword (str (name slug) "-stakeholder-update")))
 
-(defn get-slug []
-  (keyword (router/current-company-slug)))
-
 (defn current-company-data [data]
-  (get data (get-slug)))
+  (get data (keyword (router/current-company-slug))))
