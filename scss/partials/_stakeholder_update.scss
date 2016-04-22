@@ -1,0 +1,160 @@
+div.stakeholder-update {
+  div.intro-title,
+  div.topic-title {
+    font-weight: 600;
+    font-size: 26px;
+    line-height: 1;
+    margin-bottom: 17px;
+  }
+
+  div.topic-headline {
+    font-weight: 600;
+    margin-bottom: 7px;
+  }
+
+  div.topic-headline {
+    font-size: 16px;
+  }
+}
+
+@include big_web(){
+
+  div.stakeholder-update {
+
+    div.intro-title,
+    div.topic-title,
+    div.topic-headline,
+    div.topic-body {
+      padding-right: 45px;
+    }
+
+    div.update-topic {
+      max-width: 650px;
+
+      div.topic-title {
+        margin-top: 26px;
+      }
+    }
+
+    div.company-header {
+      padding-bottom: 46px;
+    }
+
+    div.stakeholder-update-internal {
+
+      div.stakeholder-update-header{
+        max-width: 910px;
+        margin: 0 auto;
+
+        div.title {
+          font-size: 22px;
+          font-weight: 600;
+          margin-bottom: 30px;
+        }
+
+        div.intro {
+          @include rich-editor-body();
+        }
+      }
+
+      div.sections {
+        background-color: white;
+        position: relative;
+
+        div.update-sections {
+          padding: 10px 0px;
+
+          div.update-sections-internal{
+            background-color: white;
+            padding: 10px;
+            max-width: 930px;
+            margin: 8px auto;
+
+            div.update-sections-internal-width {
+              max-width: 570px;
+              position: relative;
+            }
+          }
+        }
+      }
+
+      div.stakeholder-update-footer{
+        max-width: 910px;
+        margin: 0 auto;
+
+        div.outro {
+          @include rich-editor-body();
+        }
+      }
+    }
+  }
+}
+
+@include mobile(){
+
+  div.stakeholder-update {
+
+    div.intro-title,
+    div.topic-title,
+    div.topic-headline,
+    div.topic-body {
+      padding-left: 22px;
+      padding-right: 22px;
+    }
+
+    div.update-topic {
+      div.topic-title {
+        margin-top: 14px;
+      }
+    }
+
+    div.dashboard-link {
+      padding-bottom: 20px; 
+      text-align: center;
+    }
+
+    div.company-header {
+      padding-bottom: 46px;
+    }
+
+    div.stakeholder-update-internal {
+
+      div.stakeholder-update-header{
+        margin: 0 20px;
+
+        div.title {
+          font-size: 22px;
+          margin-bottom: 30px;
+        }
+
+        div.intro {
+          @include rich-editor-body();
+        }
+      }
+
+      div.sections {
+        background-color: white;
+        position: relative;
+
+        div.update-sections {
+
+          div.update-sections-internal{
+            background-color: white;
+
+            div.update-sections-internal-width {
+              position: relative;
+            }
+          }
+        }
+      }
+
+      div.stakeholder-update-footer{
+        margin: 0 20px;
+
+        div.outro {
+          @include rich-editor-body();
+        }
+      }
+    }
+  }
+}
