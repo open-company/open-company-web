@@ -23,10 +23,6 @@
   (clojure.string/join
     (map #(str (name (get % 0)) (clojure.string/join (get % 1))) sections)))
 
-(defcomponent prior-updates [data owner]
-  (render [_]
-    (dom/div "")))
-
 (defcomponent stakeholder-update-topic [data owner]
   (render [_]
     (let [section (:section data)
@@ -282,10 +278,7 @@
               ;; Dashboard link
               (when (utils/is-mobile)
                 (dom/div {:class "dashboard-link"}
-                  (om/build link {:href (str "/" (:slug company-data)) :name "View Dashboard"}))))
-            
-            (dom/div {:class "col-md-3 col-sm-0"} 
-              (om/build prior-updates company-data))))
+                  (om/build link {:href (str "/" (:slug company-data)) :name "View Dashboard"}))))))
 
 
         ;; Error fallback
