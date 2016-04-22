@@ -162,11 +162,11 @@
     (defroute company-profile-route "/:slug/profile" {:as params}
       (company-handler "profile" target company-profile params))
 
-    (defroute su-edit-route "/:slug/updates/edit" {:as params}
-      (company-handler "su-edit" target su-edit params))
-
     (defroute su-list-route "/:slug/updates" {:as params}
       (company-handler "su-list" target su-list params))
+
+    (defroute su-edit-route "/:slug/updates/edit" {:as params}
+      (company-handler "su-edit" target su-edit params))
 
     (defroute stakeholder-update-route "/:slug/updates/:update-slug" {:as params}
       (update-handler target stakeholder-update params))
