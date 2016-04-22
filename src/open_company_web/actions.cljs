@@ -110,6 +110,11 @@
     (assoc-in [(keyword slug) :su-list-loaded] true)
     (dissoc :loading)))
 
+(defmethod dispatcher/action :su-edit [db [_ {:keys [slug]}]]
+  (-> db
+    (assoc :su-edit true)
+    (dissoc :loading)))
+
 (defmethod dispatcher/action :stakeholder-update [db [_ {:keys [slug update-slug response]}]]
   (-> db
     (assoc-in [(dispatcher/stakeholder-update-key slug) (keyword update-slug)] response)

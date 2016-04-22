@@ -293,8 +293,8 @@
           ; custom content type
           "content-type" (:type share-link)}}
       (fn [{:keys [success body]}]
-        ;; FIXME:
-        (.log js/console body)))))
+        (when success
+          (dispatcher/dispatch! [:su-edit {:slug slug}]))))))
 
 (defn get-su-list []
   (let [slug (keyword (:slug @router/path))
