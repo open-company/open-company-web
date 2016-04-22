@@ -2,6 +2,14 @@
   (:require [open-company-web.router :as router]
             [clojure.string :as clj-str]))
 
+;; Main
+
+(def home "/")
+
+(def login "/login")
+
+(def not-found "/404")
+
 ;; User
 
 (def user-profile "/profile")
@@ -11,6 +19,8 @@
 (def companies "/companies")
 
 ;; Company
+
+(def create-company "/create-company")
 
 (defn company
   "Company url"
