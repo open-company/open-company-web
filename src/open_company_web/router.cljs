@@ -43,3 +43,11 @@
 (defn nav! [token]
   (swap! path {})
   (.setToken open-company-web.core/history token))
+
+;; Path components retrieve
+
+(defn current-company-slug []
+  (:slug @path))
+
+(defn current-stakeholder-update-slug []
+  (:update-slug @path))
