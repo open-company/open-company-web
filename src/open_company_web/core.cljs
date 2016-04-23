@@ -110,7 +110,7 @@
     (om/root component dis/app-state {:target target})))
 
 ;; Component specific to a stakeholder update
-(defn update-handler [target component params]
+(defn stakeholder-update-handler [target component params]
   (let [slug (:slug (:params params))
         update-slug (:update-slug (:params params))
         query-params (:query-params params)
@@ -170,7 +170,7 @@
       (company-handler "su-edit" target su-edit params))
 
     (defroute stakeholder-update-route (urls/stakeholder-update ":slug" ":update-slug") {:as params}
-      (update-handler target stakeholder-update params))
+      (stakeholder-update-handler target stakeholder-update params))
 
     (defroute not-found-route "*" []
       ;; render component
