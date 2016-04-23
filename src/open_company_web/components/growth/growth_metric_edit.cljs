@@ -115,7 +115,7 @@
 
 (defn get-presets [data]
   (let [slugs (:slugs data)
-        slug (keyword (:slug @router/path))
+        slug (keyword (router/current-company-slug))
         sections-map (:categories (slug @new-sections))
         all-sections (mapcat :sections sections-map)
         growth-defaults (first (filter #(= (:section-name %) "growth") all-sections))
@@ -130,13 +130,11 @@
   :unit "number"
   :interval "monthly"})
 
-(defcomponent growth-metric-edit [data owner]
+(defcomponent growth-metric-edit [data owner options]
 
   (init-state [_]
     (let [metric-info (:metric-info data)
-          company-slug (keyword (:slug @router/path))
-          company-data (company-slug @dispatcher/app-state)
-          company-currency-code (:currency company-data)
+          company-currency-code (:currency options)
           presets (get-presets data)
           units (:units presets)
           fixed-units (vec (map #(if (= (:unit %) "currency")
