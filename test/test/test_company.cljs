@@ -18,7 +18,6 @@
             [test.open-company-web.components.growth.growth-metric]
             [test.open-company-web.components.growth.growth-edit]
             [test.open-company-web.components.growth.growth-metric-edit]
-            [test.open-company-web.components.simple-section]
             [test.open-company-web.components.company-dashboard]
             [test.open-company-web.components.company-header]
             [test.open-company-web.components.category-nav]
@@ -54,7 +53,6 @@
   'test.open-company-web.components.growth.growth-metric
   'test.open-company-web.components.growth.growth-edit
   'test.open-company-web.components.growth.growth-metric-edit
-  'test.open-company-web.components.simple-section
   'test.open-company-web.components.company-dashboard
   'test.open-company-web.components.company-header
   'test.open-company-web.components.category-nav
