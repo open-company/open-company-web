@@ -10,7 +10,7 @@
             [open-company-web.lib.iso4217 :refer (sorted-iso4217)]
             [open-company-web.components.growth.utils :as growth-utils]
             [cuerdas.core :as s]
-            [open-company-web.components.popover :refer (add-popover hide-popover)]))
+            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
 
 (defn show-delete-confirm-popover [owner data]
   (add-popover {:container-id "delete-metric-confirm"
