@@ -31,11 +31,11 @@ div.topic-finances-headline {
         padding: 0;
         margin: 0;
 
-        &.cash, &.revenue {
+        &.cash {
           color: $oc_green_regular;
         }
 
-        &.costs, &.burn-rate {
+        &.costs {
           color: $oc_red_regular;
         }
 
