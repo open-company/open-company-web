@@ -255,7 +255,7 @@
       (reset! open-company-web.core/prevent-route-dispatch true)
       ; save initial innerHTML and setup MediumEditor
       (let [body-el (om/get-ref owner "topic-overlay-edit-body")
-            slug (keyword (:slug @router/path))
+            slug (keyword (router/current-company-slug))
             finances-placeholder-data (get (:sections (get (:categories (slug @caches/new-sections)) 2)) 0)
             med-ed (new js/MediumEditor body-el (clj->js (utils/medium-editor-options (:note finances-placeholder-data))))]
         (.subscribe med-ed "editableInput" (fn [event editable]

@@ -73,7 +73,7 @@
           prev-date  (utils/date-string (utils/js-date (:updated-at rev-prev)))
           next-date  (utils/date-string (utils/js-date (:updated-at rev-next)))
           last-date  (utils/date-string (utils/js-date (:updated-at rev-last)))
-          slug (keyword (:slug @router/path))
+          slug (keyword (router/current-company-slug))
           section (:section data)
           revisions-list (section (slug @cache/revisions))]
       ; preload previous revision

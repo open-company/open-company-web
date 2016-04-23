@@ -254,7 +254,7 @@
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
           next-rev (utils/revision-next revisions as-of)
-          slug (keyword (:slug @router/path))
+          slug (keyword (router/current-company-slug))
           revisions-list (section-kw (slug @cache/revisions))
           topic-data (utils/select-section-data section-data section-kw as-of)]
       ;; preload previous revision

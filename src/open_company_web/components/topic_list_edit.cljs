@@ -119,7 +119,7 @@
     (setup-sortable owner options))
 
   (render-state [_ {:keys [unactive-topics active-topics transition-topic]}]
-    (let [slug (keyword (:slug @router/path))]
+    (let [slug (keyword (router/current-company-slug))]
       (if (empty? (slug @caches/new-sections))
         (dom/h2 {} "Loading sections...")
         (dom/div {:class "topic-list-edit group no-select"

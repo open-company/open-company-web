@@ -182,7 +182,7 @@
   (render-state [_ {:keys [as-of editing growth-metric-focus field-focus transition-as-of]}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
-          slug (keyword (:slug @router/path))
+          slug (keyword (router/current-company-slug))
           revisions-list (section-kw (@cache/revisions slug))
           topic-data (utils/select-section-data section-data section-kw as-of)
           prev-rev (utils/revision-prev revisions as-of)
