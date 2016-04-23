@@ -3,6 +3,7 @@
             [clojure.string :as string]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
             [open-company-web.api :as api]))
@@ -28,9 +29,9 @@
         slug           (fn [co] (last (string/split (:href co) #"/")))
         [first second] (filter #(= (:rel %) "company") links)]
     (cond
-      (and first (not second)) (router/nav! (str "/" (slug first)))
-      (and first second)       (router/nav! "/companies")
-      create-link              (router/nav! "/create-company")))
+      (and first (not second)) (router/nav! (oc-urls/company (slug first)))
+      (and first second)       (router/nav! oc-urls/companies)
+      create-link              (router/nav! oc-urls/create-company)))
   db)
 
 (defmethod dispatcher/action :company-submit [db _]
