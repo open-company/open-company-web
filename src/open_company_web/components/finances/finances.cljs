@@ -2,7 +2,6 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.finances.cash :refer (cash)]
@@ -13,7 +12,6 @@
             [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.components.ui.rich-editor :refer (rich-editor)]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.lib.section-utils :as section-utils]
             [open-company-web.components.revisions-navigator :refer (revisions-navigator)]
             [open-company-web.api :as api]
             [open-company-web.components.ui.editable-title :refer (editable-title)]
@@ -56,19 +54,16 @@
   (om/set-state! owner :data-editing true))
 
 (defn cancel-cb [owner data]
-  (if (om/get-state owner :oc-editing)
-    ; remove an unsaved section
-    (section-utils/remove-section (name (:section data)))
-    ; revert the edited data to the initial values
-    (let [state (get-state owner data)]
-      ; reset the growth fields to the initial values
-      (om/set-state! owner :title (:title state))
-      (om/set-state! owner :notes-body (:notes-body state))
-      (om/set-state! owner :finances-data (:finances-data state))
-      ; and the editing state flags
-      (om/set-state! owner :title-editing false)
-      (om/set-state! owner :notes-editing false)
-      (om/set-state! owner :data-editing false))))
+  ; revert the edited data to the initial values
+  (let [state (get-state owner data)]
+    ; reset the growth fields to the initial values
+    (om/set-state! owner :title (:title state))
+    (om/set-state! owner :notes-body (:notes-body state))
+    (om/set-state! owner :finances-data (:finances-data state))
+    ; and the editing state flags
+    (om/set-state! owner :title-editing false)
+    (om/set-state! owner :notes-editing false)
+    (om/set-state! owner :data-editing false)))
 
 (defn has-data-changes [owner data]
   (let [section-data (:section-data data)]
@@ -211,8 +206,7 @@
                         :notes {:body notes-body}}]
       (if (om/get-state owner :oc-editing)
         ; save a new section
-        (let [slug (keyword (:slug @router/path))
-              company-data (slug @dispatcher/app-state)]
+        (let [company-data (dispatcher/current-company-data)]
           (api/patch-sections (:sections company-data) section-data (:section data)))
         ; save an existing section
         (api/save-or-create-section (merge section-data {:links (:links (:section-data data))
