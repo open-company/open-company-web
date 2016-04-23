@@ -2,7 +2,6 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.components.update-footer :refer (update-footer)]
             [open-company-web.components.ui.rich-editor :refer (rich-editor)]
@@ -13,7 +12,6 @@
             [open-company-web.components.growth.growth-metric :refer (growth-metric)]
             [open-company-web.components.ui.utility-components :refer (add-metric)]
             [open-company-web.components.section-footer :refer (section-footer)]
-            [open-company-web.lib.section-utils :as section-utils]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.caches :refer (company-cache)]
@@ -87,27 +85,24 @@
   (om/set-state! owner :data-editing true))
 
 (defn cancel-cb [owner data]
-  (if (om/get-state owner :oc-editing)
-    ; remove an unsaved section
-    (section-utils/remove-section (:section data))
-    ; revert the edited data to the initial values
-    (let [state (get-state owner data)]
-      ; reset the finances fields to the initial values
-      (om/set-state! owner :title (:title state))
-      (om/set-state! owner :growth-data (:growth-data state))
-      (om/set-state! owner :growth-metrics (:growth-metrics state))
-      (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))
-      (om/set-state! owner :notes-body (:notes-body state))
-      (when (om/get-state owner :new-metric)
-        (let [section-data (:section-data data)
-              first-metric (:slug (first (:metrics section-data)))
-              focus (or (utils/company-cache-key focus-cache-key) first-metric)]
-          (switch-focus owner focus)))
-      ; and the editing state flags
-      (om/set-state! owner :new-metric false)
-      (om/set-state! owner :title-editing false)
-      (om/set-state! owner :notes-editing false)
-      (om/set-state! owner :data-editing false))))
+  ; revert the edited data to the initial values
+  (let [state (get-state owner data)]
+    ; reset the finances fields to the initial values
+    (om/set-state! owner :title (:title state))
+    (om/set-state! owner :growth-data (:growth-data state))
+    (om/set-state! owner :growth-metrics (:growth-metrics state))
+    (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))
+    (om/set-state! owner :notes-body (:notes-body state))
+    (when (om/get-state owner :new-metric)
+      (let [section-data (:section-data data)
+            first-metric (:slug (first (:metrics section-data)))
+            focus (or (utils/company-cache-key focus-cache-key) first-metric)]
+        (switch-focus owner focus)))
+    ; and the editing state flags
+    (om/set-state! owner :new-metric false)
+    (om/set-state! owner :title-editing false)
+    (om/set-state! owner :notes-editing false)
+    (om/set-state! owner :data-editing false)))
 
 (defn has-data-changes [owner data]
   (let [section-data (:section-data data)]
@@ -215,8 +210,7 @@
                         :notes {:body notes-body}}]
       (if (om/get-state owner :oc-editing)
         ; save a new section
-        (let [slug (keyword (:slug @router/path))
-              company-data (slug @dispatcher/app-state)]
+        (let [company-data (dispatcher/current-company-data)]
           (api/patch-sections (:sections company-data) section-data (:section data)))
         ; save an existing section
         (api/save-or-create-section (merge section-data {:links (:links (:section-data data))
@@ -346,7 +340,8 @@
                                    :delete-metric-cb (partial delete-metric-cb owner data)
                                    :reset-metrics-cb #(reset-metrics-cb owner data)
                                    :change-growth-metric-cb (partial change-growth-metric-cb owner data)
-                                   :new-growth-section (om/get-state owner :oc-editing)})
+                                   :new-growth-section (om/get-state owner :oc-editing)}
+                                  {:opts {:currency (:currency data)}})
             ; growth data chart
             (dom/div {:class (utils/class-set {:composed-section-body true
                                                :editable (not read-only)})}
