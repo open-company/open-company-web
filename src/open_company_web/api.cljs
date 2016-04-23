@@ -95,10 +95,10 @@
               (let [body (if (:success response) (:body response) {})]
                 (dispatcher/dispatch! [:auth-settings body])))))
 
-(defn save-or-create-section[section-data]
+(defn save-or-create-section [section-data]
   (when section-data
     (let [links (:links section-data)
-          slug (:slug @router/path)
+          slug (router/current-company-slug)
           section (keyword (:section section-data))
           section-data (dissoc section-data :section
                                             :revisions
@@ -128,7 +128,7 @@
 
 (defn partial-update-section [section partial-section-data]
   (when (and section partial-section-data)
-    (let [slug (keyword (:slug @router/path))
+    (let [slug (keyword (router/current-company-slug))
           section-kw (keyword section)
           company-data (get @dispatcher/app-state slug)
           section-data (get company-data section-kw)
@@ -169,7 +169,7 @@
 (defn update-finances-data[finances-data]
   (when finances-data
     (let [links (:links finances-data)
-          slug (:slug @router/path)
+          slug (router/current-company-slug)
           data {:data (map #(dissoc % :burn-rate :runway :avg-burn-rate :value :new :read-only) (:data finances-data))}
           json-data (cljs->json data)
           finances-link (utils/link-for links "partial-update" "PATCH")]
@@ -189,7 +189,7 @@
 
 (defn patch-section-notes [notes-data links section]
   (when notes-data
-    (let [slug (:slug @router/path)
+    (let [slug (router/current-company-slug)
           clean-notes-data (dissoc notes-data :author :updated-at)
           json-data (cljs->json {:notes notes-data})
           section-link (utils/link-for links "partial-update" "PATCH")]
@@ -209,7 +209,7 @@
 
 (defn patch-sections [sections & [new-section section-name]]
   (when sections
-    (let [slug (keyword (:slug @router/path))
+    (let [slug (keyword (router/current-company-slug))
           company-data (slug @dispatcher/app-state)
           company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
           payload (if (and new-section section-name)
@@ -231,7 +231,7 @@
 
 (defn patch-stakeholder-update [stakeholder-update]
   (when stakeholder-update
-    (let [slug (keyword (:slug @router/path))
+    (let [slug (keyword (router/current-company-slug))
           company-data (slug @dispatcher/app-state)
           company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
           json-data (cljs->json {:stakeholder-update stakeholder-update})]
@@ -249,7 +249,7 @@
 
 (defn remove-section [section-name]
   (when (and section-name)
-    (let [slug (keyword (:slug @router/path))
+    (let [slug (keyword (router/current-company-slug))
           company-data (slug @dispatcher/app-state)
           sections (:sections company-data)
           new-sections (apply merge (map (fn [[k v]]
@@ -264,7 +264,7 @@
    It's possible to force the load passing an optional boolean parameter."
   (when (or force-load (not @new-sections-requested))
     (reset! new-sections-requested true)
-    (let [slug (keyword (:slug @router/path))
+    (let [slug (keyword (router/current-company-slug))
           company-data (slug @dispatcher/app-state)
           links (:links company-data)
           add-section-link (utils/link-for links "section-list" "GET")]
@@ -282,7 +282,7 @@
               (dispatcher/dispatch! [:new-section {:response fixed-body :slug slug}]))))))))
 
 (defn share-stakeholder-update []
-  (let [slug (keyword (:slug @router/path))
+  (let [slug (keyword (router/current-company-slug))
         company-data (slug @dispatcher/app-state)
         links (:links company-data)
         share-link (utils/link-for links "share" "POST")]
@@ -297,7 +297,7 @@
           (dispatcher/dispatch! [:su-edit {:slug slug}]))))))
 
 (defn get-su-list []
-  (let [slug (keyword (:slug @router/path))
+  (let [slug (keyword (router/current-company-slug))
         company-data (slug @dispatcher/app-state)
         links (:links company-data)
         su-link (utils/link-for links "stakeholder-updates" "GET")]
