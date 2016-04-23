@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
             [cljs.core.async :refer (put!)]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.components.ui.link :refer (link)]
             [open-company-web.components.ui.company-avatar :refer (company-avatar)]
             [open-company-web.components.category-nav :refer (category-nav)]
@@ -90,9 +91,9 @@
   (if (cook/get-cookie :jwt)
     (do ; Logout
       (cook/remove-cookie! :jwt)
-      (utils/redirect! "/"))
+      (utils/redirect! oc-urls/home))
     ; redirect to login
-    (utils/redirect! "/login")))
+    (utils/redirect! oc-urls/login)))
 
 (def logo-max-height 100)
 
