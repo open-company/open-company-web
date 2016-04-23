@@ -57,17 +57,14 @@
 
 (defcomponent stakeholder-update [data owner]
   (render [_]
-    (let [slug (keyword (:slug @router/path))
-          su-slug (keyword (:update-slug @router/path))
-          su-key (dispatcher/stakeholder-update-key slug)
-          su-data (get-in data [su-key su-slug])]
+    (let [su-data (dispatcher/current-stakeholder-update-data data)]
       (if (:loading su-data)
         (dom/h2 {} "Loading...")
         (dom/div {:class (utils/class-set {:stakeholder-update true
                                            :navbar-offset (not (utils/is-mobile))})}
           ;; Company / user header
           (when-not (utils/is-mobile)
-            (om/build navbar data))
+            (om/build navbar {:auth-settings (:auth-settings data)}))
 
           ;; Company header
           (om/build company-header {
