@@ -7,7 +7,7 @@
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
             [open-company-web.api :as api]
-            [open-company-web.components.icon :as i]
+            [open-company-web.components.ui.icon :as i]
             [open-company-web.components.topic-overlay-edit :refer (topic-overlay-edit)]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]

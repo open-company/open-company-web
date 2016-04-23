@@ -8,7 +8,7 @@
             [open-company-web.caches :as caches]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.oc-colors :as occ]
-            [open-company-web.components.icon :as i]
+            [open-company-web.components.ui.icon :as i]
             [open-company-web.components.topic :refer (topic)]
             [cljs-dynamic-resources.core :as cdr]
             [goog.style :refer (setStyle)]))

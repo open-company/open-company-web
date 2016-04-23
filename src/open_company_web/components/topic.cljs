@@ -8,7 +8,7 @@
             [open-company-web.api :as api]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.icon :as i]
+            [open-company-web.components.ui.icon :as i]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.topic-growth-headline :refer (topic-growth-headline)]
