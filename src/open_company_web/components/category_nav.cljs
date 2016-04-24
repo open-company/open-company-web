@@ -5,6 +5,7 @@
             [dommy.core :refer-macros (sel1)]
             [cljs.core.async :refer (put!)]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [goog.fx.Animation.EventType :as EventType]
@@ -29,7 +30,7 @@
 
 (defn category-click [data category-name e]
   ;; prevent the route reload
-  (reset! open-company-web.core/prevent-route-dispatch true)
+  (reset! prevent-route-dispatch true)
   ;; call the switch tab callback
   ((:switch-category-cb data) category-name)
   ;; prevent the anchor element from reload the route
@@ -37,7 +38,7 @@
   (set! js/window.location.hash category-name)
   (when (utils/is-mobile) (scroll-to-top!))
   ;; reactivate the url change handler
-  (reset! open-company-web.core/prevent-route-dispatch false))
+  (reset! prevent-route-dispatch false))
 
 (defn get-categories [categories is-editing]
   (if (or (utils/is-mobile) is-editing)

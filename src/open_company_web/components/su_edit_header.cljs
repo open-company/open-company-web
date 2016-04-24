@@ -6,6 +6,7 @@
             [open-company-web.local-settings :as ls]
             [open-company-web.api :as api]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [cljsjs.medium-editor]
             [cljsjs.react.dom]))
 
@@ -19,7 +20,7 @@
       (when-let [input (.findDOMNode js/ReactDOM (om/get-ref owner "update-title-input"))]
         (set! (.-value input) (.-value input))
         (.focus input))
-      (reset! open-company-web.core/prevent-route-dispatch true)
+      (reset! prevent-route-dispatch true)
       ; save initial innerHTML and setup MediumEditor
       (let [body-el (om/get-ref owner "intro-body")
             med-ed (new js/MediumEditor body-el (clj->js (utils/medium-editor-options "Add an introduction (optional).")))]

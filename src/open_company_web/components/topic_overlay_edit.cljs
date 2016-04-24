@@ -6,6 +6,7 @@
             [open-company-web.router :as router]
             [open-company-web.api :as api]
             [open-company-web.caches :as caches]
+            [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
@@ -244,7 +245,7 @@
   (will-unmount [_]
     (when-not (utils/is-test-env?)
       ; re enable the route dispatcher
-      (reset! open-company-web.core/prevent-route-dispatch false)
+      (reset! prevent-route-dispatch false)
       ; remove the onbeforeunload handler
       (set! (.-onbeforeunload js/window) nil)
       ; remove history change listener
@@ -252,7 +253,7 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (reset! open-company-web.core/prevent-route-dispatch true)
+      (reset! prevent-route-dispatch true)
       ; save initial innerHTML and setup MediumEditor
       (let [body-el (om/get-ref owner "topic-overlay-edit-body")
             slug (keyword (router/current-company-slug))

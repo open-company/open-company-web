@@ -6,6 +6,7 @@
             [open-company-web.local-settings :as ls]
             [open-company-web.api :as api]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [cljsjs.medium-editor]))
 
 (defcomponent su-edit-footer [data owner options]
@@ -15,7 +16,7 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (reset! open-company-web.core/prevent-route-dispatch true)
+      (reset! prevent-route-dispatch true)
       ; save initial innerHTML and setup MediumEditor
       (let [body-el (om/get-ref owner "outro-body")
             med-ed (new js/MediumEditor body-el (clj->js (utils/medium-editor-options "Add a conclusion or wrap-up (optional).")))]

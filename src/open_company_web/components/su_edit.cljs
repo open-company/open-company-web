@@ -7,6 +7,7 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.company-header :refer [company-header]]
@@ -181,7 +182,7 @@
   (will-unmount [_]
     (when-not (utils/is-test-env?)
       ; re enable the route dispatcher
-      (reset! open-company-web.core/prevent-route-dispatch false)
+      (reset! prevent-route-dispatch false)
       ; remove the onbeforeunload handler
       (set! (.-onbeforeunload js/window) nil)
       ; remove history change listener
@@ -191,7 +192,7 @@
     (fix-buttons-position owner)
     (when-not (utils/is-test-env?)
       (utils/after 100 (fn []
-        (reset! open-company-web.core/prevent-route-dispatch true)
+        (reset! prevent-route-dispatch true)
         (let [win-location (.-location js/window)
               current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
               listener (events/listen open-company-web.core/history EventType/NAVIGATE

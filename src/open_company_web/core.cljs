@@ -12,6 +12,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]
             [open-company-web.lib.raven :refer (raven-setup)]
+            [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.company-editor :refer (company-editor)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.company-profile :refer (company-profile)]
@@ -28,8 +29,6 @@
             [goog.history.EventType :as HistoryEventType]))
 
 (enable-console-print!)
-
-(defonce prevent-route-dispatch (atom false))
 
 ;; setup Sentry error reporting
 (defonce raven (raven-setup))

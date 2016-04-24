@@ -1,5 +1,6 @@
 (ns open-company-web.router
   (:require [secretary.core :as secretary]
+            [open-company-web.lib.prevent-route-dispatch :as prd]
             [goog.history.Html5History :as history5]))
 
 (enable-console-print!)
