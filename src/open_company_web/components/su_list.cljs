@@ -51,7 +51,7 @@
 
 (defn load-su-list-if-needed [owner]
   ;; request the live SU if necessary
-  (let [company-data (dispatcher/current-company-data (om/get-props owner))]
+  (let [company-data (dispatcher/company-data (om/get-props owner))]
     (when (and (not (om/get-state owner :su-requested))
                (contains? company-data :links))
       (api/get-su-list)
@@ -71,8 +71,8 @@
     (load-su-list-if-needed owner))
 
   (render-state [_ {:keys [drawer-open]}]
-    (let [company-data (dispatcher/current-company-data data)
-          su-list (dispatcher/current-stakeholder-update-list-data data)
+    (let [company-data (dispatcher/company-data data)
+          su-list (dispatcher/stakeholder-update-list-data data)
           stakeholder-update-data (:stakeholder-update company-data)]
 
       (utils/update-page-title (str "OpenCompany - " (:name company-data)))
