@@ -98,7 +98,7 @@
     ;; save the route
     (router/set-route! [slug route] {:slug slug :query-params query-params})
     ;; do we have the company data already?
-    (when-not (contains? @dis/app-state (keyword slug))
+    (when-not (dis/company-data)
       ;; load the company data from the API
       (api/get-company slug)
       (swap! dis/app-state assoc :loading true))
