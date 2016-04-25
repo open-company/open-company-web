@@ -112,7 +112,9 @@
 
     (dom/div #js {:className "company-header"
                   :ref "company-header"}
-      (let [link-url (str "/" (:slug company-data) (when-not stakeholder-update "/updates"))]
+      (let [link-url (if stakeholder-update
+                      (oc-urls/company)
+                      (oc-urls/stakeholder-update-list))]
         
         ; topic editing
         (dom/div {:class "navbar-editing"
