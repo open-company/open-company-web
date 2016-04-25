@@ -53,7 +53,8 @@
 (def scrolled-to-top (atom false))
 
 (defn set-lis-height [owner]
-  (when-not (utils/is-mobile)
+  (when (and (not (utils/is-mobile))
+             (not (utils/is-test-env?)))
     (when-let [topic-list (om/get-ref owner "topic-list-ul")]
       (let [li-elems (sel topic-list [:li.topic-row])
             max-height (apply max (map #(.-clientHeight %) li-elems))]
