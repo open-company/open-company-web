@@ -41,8 +41,8 @@
 (defmethod dispatcher/action :company-created [db [_ body]]
   (if (:links body)
     (let [updated (utils/fix-sections body)]
-      (router/nav! (str "/" (:slug updated)))
-      (assoc db (keyword (:slug updated)) updated))
+      (router/nav! (oc-urls/company (:slug updated)))
+      (assoc-in db (dispatcher/company-data-key (:slug updated)) updated))
     db))
 
 (defmethod dispatcher/action :new-section [db [_ body]]
@@ -71,7 +71,7 @@
   (if body
     (let [fixed-section (utils/fix-section (:body body) (:section body))]
       (-> db
-          (assoc-in [(:slug body) (:section body)] fixed-section)
+          (assoc-in (dispatcher/company-section-key (:slug body) (:section body)) fixed-section)
           (dissoc :loading)))
     db))
 
@@ -81,17 +81,19 @@
     ;; add section name inside each section
     (let [updated-body (utils/fix-sections body)]
       (-> db
-          (assoc (keyword (:slug updated-body)) updated-body)
+          (assoc-in (dispatcher/company-data-key (:slug updated-body)) updated-body)
           (dissoc :loading)))
     (= 404 status)
-    (do (utils/redirect! (str "/404?path=/" slug)) db)
+    (do
+      (utils/redirect! (oc-urls/not-found {:path (oc-urls/company slug)}))
+      db)
     ;; probably some default failure handling should be added here
     :else db))
 
 (defmethod dispatcher/action :companies [db [_ body]]
   (if body
     (-> db
-     (assoc :companies (:companies (:collection body)))
+     (assoc-in dispatcher/companies-key (:companies (:collection body)))
      (dissoc :loading))
     db))
 
@@ -107,8 +109,7 @@
 
 (defmethod dispatcher/action :su-list [db [_ {:keys [slug response]}]]
   (-> db
-    (assoc (dispatcher/su-list-key slug) response)
-    (assoc-in [(keyword slug) :su-list-loaded] true)
+    (assoc-in (dispatcher/su-list-key slug) response)
     (dissoc :loading)))
 
 (defmethod dispatcher/action :su-edit [db [_ {:keys [slug]}]]
@@ -118,5 +119,5 @@
 
 (defmethod dispatcher/action :stakeholder-update [db [_ {:keys [slug update-slug response]}]]
   (-> db
-    (assoc-in [(dispatcher/stakeholder-update-key slug) (keyword update-slug)] response)
+    (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
     (dissoc :loading)))
