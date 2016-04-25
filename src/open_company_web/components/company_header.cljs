@@ -159,7 +159,7 @@
             (dom/div {:class "company-name"} (:name company-data)))
 
           ;; Company description
-          (when-not (or (:loading data) (empty? company-data))
+          (when (and (not (:loading data)) (seq company-data))
             (dom/div #js {:className "company-description-container"
                           :ref "company-description-container"}
               (dom/div {:class "company-description"} (:description company-data))
