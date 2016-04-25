@@ -533,12 +533,8 @@
 (defn clean-company-caches []
   (reset! company-cache {}))
 
-(def +usd-fmt+
-  (-> (NumberFormat. nf/Format.CURRENCY "USD" nf/CurrencyStyle.LOCAL)
-      (.setMinimumFractionDigits 0)))
-
 (defn thousands-separator [number]
-  (.format +usd-fmt+ number))
+  (.format (NumberFormat. nf/Format.DECIMAL) number))
 
 (defn offset-top [elem]
   (let [bound-rect (.getBoundingClientRect elem)]
