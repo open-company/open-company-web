@@ -73,7 +73,7 @@
   (when data
     (let [company-data (dissoc data :links :read-only :revisions :su-list :su-list-loaded)
           json-data (cljs->json company-data)
-          links (:links ((keyword slug) @dispatcher/app-state))
+          links (:links (dispatcher/company-data))
           company-link (utils/link-for links "partial-update" "PATCH")]
       (api-patch (:href company-link)
         { :json-params json-data
@@ -130,7 +130,7 @@
   (when (and section partial-section-data)
     (let [slug (keyword (router/current-company-slug))
           section-kw (keyword section)
-          company-data (get @dispatcher/app-state slug)
+          company-data (dispatcher/company-data)
           section-data (get company-data section-kw)
           json-data (cljs->json partial-section-data)
           partial-update-link (utils/link-for (:links section-data) "partial-update" "PATCH")]
@@ -210,7 +210,7 @@
 (defn patch-sections [sections & [new-section section-name]]
   (when sections
     (let [slug (keyword (router/current-company-slug))
-          company-data (slug @dispatcher/app-state)
+          company-data (dispatcher/company-data)
           company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
           payload (if (and new-section section-name)
                     {:sections sections
@@ -232,7 +232,7 @@
 (defn patch-stakeholder-update [stakeholder-update]
   (when stakeholder-update
     (let [slug (keyword (router/current-company-slug))
-          company-data (slug @dispatcher/app-state)
+          company-data (dispatcher/company-data)
           company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
           json-data (cljs->json {:stakeholder-update stakeholder-update})]
       (api-patch (:href company-patch-link)
@@ -250,7 +250,7 @@
 (defn remove-section [section-name]
   (when (and section-name)
     (let [slug (keyword (router/current-company-slug))
-          company-data (slug @dispatcher/app-state)
+          company-data (dispatcher/company-data)
           sections (:sections company-data)
           new-sections (apply merge (map (fn [[k v]]
                                            {k (utils/vec-dissoc v section-name)})
@@ -265,7 +265,7 @@
   (when (or force-load (not @new-sections-requested))
     (reset! new-sections-requested true)
     (let [slug (keyword (router/current-company-slug))
-          company-data (slug @dispatcher/app-state)
+          company-data (dispatcher/company-data)
           links (:links company-data)
           add-section-link (utils/link-for links "section-list" "GET")]
       (when add-section-link
@@ -283,7 +283,7 @@
 
 (defn share-stakeholder-update []
   (let [slug (keyword (router/current-company-slug))
-        company-data (slug @dispatcher/app-state)
+        company-data (dispatcher/company-data)
         links (:links company-data)
         share-link (utils/link-for links "share" "POST")]
     (api-post (:href share-link)
@@ -298,7 +298,7 @@
 
 (defn get-su-list []
   (let [slug (keyword (router/current-company-slug))
-        company-data (slug @dispatcher/app-state)
+        company-data (dispatcher/company-data)
         links (:links company-data)
         su-link (utils/link-for links "stakeholder-updates" "GET")]
     (when su-link
