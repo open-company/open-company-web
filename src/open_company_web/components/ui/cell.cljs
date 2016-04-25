@@ -85,7 +85,11 @@
   (render [_]
     (let [value (om/get-state owner :value)
           flv (safe-parse-float value)
-          formatted-value (utils/thousands-separator flv)
+          prefix (:prefix data)
+          currency (:currency data)
+          formatted-value (if currency
+                            (utils/thousands-separator flv currency)
+                            (utils/thousands-separator flv))
           prefix-value (if (and (not (s/blank? formatted-value)) (:prefix data))
                          (str (:prefix data) formatted-value)
                          formatted-value)
