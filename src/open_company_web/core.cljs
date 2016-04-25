@@ -96,7 +96,7 @@
     (utils/clean-company-caches)
     (dis/dispatch! [:topic/reset-expanded])
     ;; save the route
-    (router/set-route! ["companies" slug route] {:slug slug :query-params query-params})
+    (router/set-route! [slug route] {:slug slug :query-params query-params})
     ;; do we have the company data already?
     (when-not (contains? @dis/app-state (keyword slug))
       ;; load the company data from the API
@@ -110,18 +110,18 @@
   (let [slug (:slug (:params params))
         update-slug (:update-slug (:params params))
         query-params (:query-params params)
-        su-key (dis/stakeholder-update-key slug)]
+        su-key (dis/stakeholder-update-key slug update-slug)]
     (pre-routing query-params)
     (utils/clean-company-caches)
     (dis/dispatch! [:topic/reset-expanded])
     ;; save the route
-    (router/set-route! ["companies" slug "updates" update-slug] {:slug slug :update-slug update-slug :query-params query-params})
+    (router/set-route! [slug "updates" update-slug] {:slug slug :update-slug update-slug :query-params query-params})
     ;; do we have the company data already?
-    (when (or (not (contains? @dis/app-state su-key))
-              (not (contains? (@dis/app-state su-key) (keyword update-slug))))
+    (when (not (get-in @dis/app-state su-key))
       ;; load the company data from the API
       (api/get-stakeholder-update slug update-slug)
-      (swap! dis/app-state assoc-in [(dis/stakeholder-update-key slug) (keyword update-slug) :loading] true))
+      (let [su-loading-key (conj su-key :loading)]
+        (swap! dis/app-state assoc-in su-loading-key true)))
     ;; render component
     (om/root component dis/app-state {:target target})))
 
