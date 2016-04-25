@@ -137,7 +137,7 @@
   (router/nav! (oc-urls/stakeholder-update-list)))
 
 (defn get-state [data current-state]
-  (let [company-data (dispatcher/current-company-data data)
+  (let [company-data (dispatcher/company-data data)
         su-data (:stakeholder-update company-data)
         title (:title su-data)
         sections (:sections su-data)
@@ -219,7 +219,7 @@
     ; set the onbeforeunload handler only if there are changes
     (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
       (set! (.-onbeforeunload js/window) onbeforeunload-cb))
-    (let [company-data (dispatcher/current-company-data data)
+    (let [company-data (dispatcher/company-data data)
           su-data (:stakeholder-update company-data)]
 
       (utils/update-page-title (str "OpenCompany - Stakeholder Update Edit - " (:name company-data)))
