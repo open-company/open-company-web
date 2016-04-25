@@ -165,7 +165,7 @@
 (defcomponent company-profile [data owner]
 
   (render [_]
-    (let [company-data (dis/current-company-data data)]
+    (let [company-data (dis/company-data data)]
 
       (when (:read-only company-data)
         (utils/redirect! (oc-urls/company)))
