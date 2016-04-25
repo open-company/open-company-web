@@ -533,8 +533,11 @@
 (defn clean-company-caches []
   (reset! company-cache {}))
 
-(defn thousands-separator [number]
-  (.format (NumberFormat. nf/Format.DECIMAL) number))
+(defn thousands-separator
+  ([number]
+    (.format (NumberFormat. nf/Format.DECIMAL) number))
+  ([number currency-code]
+    (.format (NumberFormat. nf/Format.CURRENCY currency-code nf/CurrencyStyle.LOCAL) number)))
 
 (defn offset-top [elem]
   (let [bound-rect (.getBoundingClientRect elem)]
