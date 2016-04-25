@@ -267,16 +267,16 @@
         (focus-field topic focus))
       (let [win-location (.-location js/window)
             current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
-            listener (events/listen open-company-web.core/history EventType/NAVIGATE
+            listener (events/listen @router/history EventType/NAVIGATE
                        #(when-not (= (.-token %) current-token)
                           (if (om/get-state owner :has-changes)
                             (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
                               ; dispatch the current url
-                              (open-company-web.core/route-dispatch! (router/get-token))
+                              (@router/route-dispatcher (router/get-token))
                               ; go back to the previous token
-                              (.setToken open-company-web.core/history current-token))
+                              (.setToken @router/history current-token))
                             ; dispatch the current url
-                            (open-company-web.core/route-dispatch! (router/get-token)))))]
+                            (@router/route-dispatcher (router/get-token)))))]
         (om/set-state! owner :history-listener-id listener))))
 
   (render-state [_ {:keys [has-changes

@@ -1,7 +1,10 @@
 (ns open-company-web.router
   (:require [secretary.core :as secretary]
             [open-company-web.lib.prevent-route-dispatch :as prd]
-            [goog.history.Html5History :as history5]))
+            [goog.history.Html5History :as history5]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
+            [goog.history.EventType :as HistoryEventType]))
 
 (enable-console-print!)
 
@@ -40,10 +43,22 @@
                          js/window.location.host))
     (.setUseFragment false)))
 
+(def history (atom nil))
+(def route-dispatcher (atom nil))
+
 ; FIXME: remove the warning of history not found
 (defn nav! [token]
   (swap! path {})
-  (.setToken open-company-web.core/history token))
+  (.setToken @history token))
+
+(defn setup-navigation! [cb-fn sec-route-dispatcher]
+  (reset! route-dispatcher sec-route-dispatcher)
+  (let [h (doto (make-history)
+            (events/listen HistoryEventType/NAVIGATE
+              ;; wrap in a fn to allow live reloading
+              cb-fn)
+            (.setEnabled true))]
+    (reset! history h)))
 
 ;; Path components retrieve
 

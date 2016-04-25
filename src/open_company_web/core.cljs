@@ -23,10 +23,7 @@
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
             [open-company-web.components.login :refer (login)]
-            [open-company-web.components.ui.loading :refer (loading)]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
-            [goog.history.EventType :as HistoryEventType]))
+            [open-company-web.components.ui.loading :refer (loading)]))
 
 (enable-console-print!)
 
@@ -211,12 +208,10 @@
         ;; dispatch on the token
         (route-dispatch! (router/get-token))))))
 
-(defonce history
-  (doto (router/make-history)
-    (events/listen HistoryEventType/NAVIGATE
-      ;; wrap in a fn to allow live reloading
-      handle-url-change)
-    (.setEnabled true)))
+;; setup the router navigation only when handle-url-change and route-disaptch!
+;; are defined, this is used to avoid crash on tests
+(when (and handle-url-change route-dispatch!)
+  (router/setup-navigation! handle-url-change route-dispatch!))
 
 (defn on-js-reload []
   (.clear js/console)
