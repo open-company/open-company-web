@@ -12,7 +12,7 @@
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
 
-(defonce default-category (if (utils/is-mobile) "progress" "all"))
+(defonce default-category "progress")
 
 (defn set-save-bt-active [owner active]
   (om/set-state! owner :save-bt-active active))
@@ -21,12 +21,7 @@
   (if editing
     ; if ALL is selected switch to the first available category
     ; for editing purpose
-    (do
-      (om/set-state! owner :last-active-category (om/get-state owner :active-category))
-      (when (= (om/get-state owner :active-category) "all")
-        (let [slug (:slug @router/path)
-              company-data ((keyword slug) data)]
-          (om/set-state! owner :active-category (first (:categories company-data))))))
+    (om/set-state! owner :last-active-category (om/get-state owner :active-category))
     (set-save-bt-active owner false))
   (let [fixed-title (or title "")]
     (om/set-state! owner :navbar-editing editing)
@@ -56,9 +51,8 @@
           url-tab (subs url-hash 1 (count url-hash))
           active-tab (if (pos? (count url-tab))
                        url-tab
-                       default-category)
-          fix-active-tab (if (and (utils/is-mobile) (= active-tab "all")) default-category active-tab)]
-      {:active-category fix-active-tab
+                       default-category)]
+      {:active-category active-tab
        :navbar-editing false
        :editing-topic false
        :save-bt-active false}))
