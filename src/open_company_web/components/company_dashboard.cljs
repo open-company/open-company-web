@@ -25,7 +25,7 @@
     (do
       (om/set-state! owner :last-active-category (om/get-state owner :active-category))
       (when (= (om/get-state owner :active-category) "all")
-        (let [company-data (dis/current-company-data data)]
+        (let [company-data (dis/company-data data)]
           (om/set-state! owner :active-category (first (:categories company-data))))))
     (set-save-bt-active owner false))
   (let [fixed-title (or title "")]
@@ -64,7 +64,7 @@
        :save-bt-active false}))
 
   (render-state [_ {:keys [editing-topic navbar-editing save-bt-active active-category] :as state}]
-    (let [company-data (dis/current-company-data data)
+    (let [company-data (dis/company-data data)
           navbar-editing-cb (partial set-navbar-editing owner data)]
       (dom/div {:class (utils/class-set {:company-dashboard true
                                          :navbar-offset (not (utils/is-mobile))})}
