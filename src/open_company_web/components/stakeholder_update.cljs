@@ -57,7 +57,7 @@
 
 (defcomponent stakeholder-update [data owner]
   (render [_]
-    (let [su-data (dispatcher/current-stakeholder-update-data data)]
+    (let [su-data (dispatcher/stakeholder-update-data data)]
       (if (:loading su-data)
         (dom/h2 {} "Loading...")
         (dom/div {:class (utils/class-set {:stakeholder-update true
