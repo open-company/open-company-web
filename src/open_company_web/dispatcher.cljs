@@ -18,30 +18,40 @@
 (defn dispatch! [payload]
   (flux/dispatch actions payload))
 
+(def companies-key [:companies])
+
+(defn company-data-key [company-slug]
+  [(keyword company-slug) :company-data])
+
+(defn company-section-key [company-slug section]
+  [(keyword company-slug) :company-data (keyword section)])
+
 (defn su-list-key [company-slug]
-  (keyword (str (name company-slug) "-su-list")))
+  [(keyword company-slug) :su-list])
 
-(defn stakeholder-update-key [company-slug]
-  (keyword (str (name company-slug) "-stakeholder-update")))
+(defn stakeholder-update-key [company-slug update-slug]
+  [(keyword company-slug) (keyword update-slug)])
 
-(defn current-company-data
+(defn company-data
   ([]
-    (current-company-data @app-state))
+    (company-data @app-state))
   ([data]
-    (get data (keyword (router/current-company-slug)))))
+    (company-data data (router/current-company-slug)))
+  ([data company-slug]
+    (get-in data (company-data-key company-slug))))
 
-(defn current-stakeholder-update-list-data
+(defn stakeholder-update-list-data
   ([]
-    (current-stakeholder-update-list-data @app-state))
+    (stakeholder-update-list-data @app-state))
   ([data]
-    (let [su-list-k (su-list-key (router/current-company-slug))]
-      (get data su-list-k))))
+    (stakeholder-update-list-data data (router/current-company-slug)))
+  ([data company-slug]
+    (get-in data (su-list-key company-slug))))
 
-(defn current-stakeholder-update-data
+(defn stakeholder-update-data
   ([]
-    (current-stakeholder-update-data @app-state))
+    (stakeholder-update-data @app-state))
   ([data]
-    (let [slug (router/current-company-slug)
-          update-slug (keyword (router/current-stakeholder-update-slug))
-          su-key (stakeholder-update-key slug)]
-      (get-in data [su-key update-slug]))))
+    (stakeholder-update-data data (router/current-company-slug) (router/current-stakeholder-update-slug)))
+  ([data company-slug update-slug]
+    (get-in data (stakeholder-update-key company-slug update-slug))))
