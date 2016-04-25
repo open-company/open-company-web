@@ -2,13 +2,17 @@
   (:require [open-company-web.router :as router]
             [clojure.string :as clj-str]))
 
+(defn params->query-string [m]
+     (clojure.string/join "&" (for [[k v] m] (str (name k) "=" v))))
+
 ;; Main
 
 (def home "/")
 
 (def login "/login")
 
-(def not-found "/404")
+(defn not-found [& [params]]
+  (str "/404" (when params (str "?" (params->query-string params)))))
 
 ;; User
 
