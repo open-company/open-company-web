@@ -19,7 +19,7 @@
 (defn get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
     (let [slug (keyword (router/current-company-slug))
-          company-data (dispatcher/current-company-data)]
+          company-data (dispatcher/company-data)]
       (when (and (empty? (slug @caches/new-sections))
                  (seq company-data))
         (om/update-state! owner :new-sections-requested not)
