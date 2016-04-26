@@ -2,4 +2,10 @@
 
 div.profile-container {
   padding-top: 65px;
+
+  button.btn.btn-save {
+    margin-left: 192px;
+    background-color: $oc_green;
+    color: white;
+  }
 }

@@ -157,7 +157,10 @@
                   :on-blur (fn [e]
                              (utils/handle-change data (om/get-state owner :description) :description)
                              (utils/save-values "save-company"))}))
-              (dom/p {:class "help-block"} "Description of the company"))))))))
+              (dom/p {:class "help-block"} "Description of the company"))
+            (dom/div {:class "form-group"}
+              (dom/button {:class "btn btn-save"
+                           :on-click #(router/nav! (str "/" (name slug) ""))} "Done"))))))))
 
 (defcomponent company-profile [data owner]
 
