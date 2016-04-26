@@ -510,11 +510,16 @@
   (not (or (not (number? number)) (zero? number))))
 
 (defn no-finances-data?
-  "Return `false` if the passed finances data has any non-zero data, otherwise return `true`."
+  "Return `true` if the passed finances data has no data, otherwise return `false`."
   [data]
   (not (some #(or (non-zero-number? (:cash %))
                   (non-zero-number? (:revenue %))
                   (non-zero-number? (:costs %))) data)))
+
+(defn no-growth-data?
+  "Return `true` if the passed finances data has no data, otherwise return `false`."
+  [data]
+  (not (some #(non-zero-number? (:value %)) (vals data))))
 
 (defn current-growth-period [interval]
   (let [now (cljs-time/now)
