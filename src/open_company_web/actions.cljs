@@ -40,7 +40,7 @@
 (defmethod dispatcher/action :company-created [db [_ body]]
   (if (:links body)
     (let [updated (utils/fix-sections body)]
-      (router/nav! (str "/" (:slug updated)))
+      (router/redirect! (str "/" (:slug updated)))
       (assoc db (keyword (:slug updated)) updated))
     db))
 
