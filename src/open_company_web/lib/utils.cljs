@@ -537,7 +537,11 @@
   ([number]
     (.format (NumberFormat. nf/Format.DECIMAL) number))
   ([number currency-code]
-    (.format (NumberFormat. nf/Format.CURRENCY currency-code nf/CurrencyStyle.LOCAL) number)))
+    (.format (NumberFormat. nf/Format.CURRENCY currency-code nf/CurrencyStyle.LOCAL) number))
+  ([number currency-code decimals]
+    (-> (NumberFormat. nf/Format.CURRENCY currency-code nf/CurrencyStyle.LOCAL)
+        (.setMinimumFractionDigits 0)
+        (.format number))))
 
 (defn offset-top [elem]
   (let [bound-rect (.getBoundingClientRect elem)]
