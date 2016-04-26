@@ -1,11 +1,22 @@
 div.user-avatar {
-  img.user-avatar-img {
-    margin: 10px;
-  }
+  button.dropdown-toggle{
+    border: 0px solid transparent;
+    background-color: transparent;
 
-  span.user-avatar-name {
-    margin-right: 10px;
-    color: #2D2D2D;
-    font-size: 12pt;
+    &:active, &:focus {
+      outline: none;
+      border: 0px solid tranparent;
+    }
+
+    span.user-avatar-name {
+      background-color: transparent;
+      margin-right: 10px;
+      color: #2D2D2D;
+      font-size: 12pt;
+    }
+
+    img.user-avatar-img {
+      margin: 10px;
+    }
   }
 }
