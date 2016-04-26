@@ -504,6 +504,21 @@
     (> current-month 9)
     10))
 
+(defn non-zero-number?
+  [number]
+  ; Seems a little convoluted, but need it to short circuit if it's not a number
+  (not (or (not (number? number)) (zero? number))))
+
+(defn no-finances-data?
+  "Return `false` if the passed finances data has any non-zero data, otherwise return `true`."
+  [data]
+  (if (some #(or (non-zero-number? (:cash %))
+                 (non-zero-number? (:revenue %))
+                 (non-zero-number? (:costs %)))
+        data)
+    false
+    true))
+
 (defn current-growth-period [interval]
   (let [now (cljs-time/now)
         year (cljs-time/year now)
