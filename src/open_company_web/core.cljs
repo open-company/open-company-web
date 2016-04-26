@@ -75,9 +75,9 @@
           ;; remove the login redirect cookie
           (cook/remove-cookie! :login-redirect)
           ;; redirect to the initial path
-          (utils/redirect! login-redirect))
+          (router/redirect! login-redirect))
         ;; redirect to / if no cookie is set
-        (utils/redirect! "/")))
+        (router/redirect! "/")))
     (do
       (when (contains? (:query-params params) :login-redirect)
         (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))

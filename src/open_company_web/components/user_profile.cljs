@@ -3,6 +3,7 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.navbar :refer (navbar)]
+            [open-company-web.router :as router]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]))
@@ -28,5 +29,5 @@
               (dom/button {:class "btn btn-danger"
                            :on-click (fn [e]
                                        (cook/remove-cookie! :jwt)
-                                       (utils/redirect! "/"))}
+                                       (router/redirect! "/"))}
                           "Log Out"))))))))

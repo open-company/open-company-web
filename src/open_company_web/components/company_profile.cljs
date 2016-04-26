@@ -166,7 +166,7 @@
           company-data (get data slug)]
 
       (when (:read-only company-data)
-        (utils/redirect! (str "/" (name slug))))
+        (router/redirect! (str "/" (name slug))))
 
       (dom/div {:class "company-container container"}
 

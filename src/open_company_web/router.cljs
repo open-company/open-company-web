@@ -43,3 +43,6 @@
 (defn nav! [token]
   (swap! path {})
   (.setToken open-company-web.core/history token))
+
+(defn redirect! [loc]
+  (set! (.-location js/window) loc))

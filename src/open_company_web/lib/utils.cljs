@@ -173,9 +173,6 @@
     "12" "DEC"
     ""))
 
-(defn redirect! [loc]
-  (set! (.-location js/window) loc))
-
 (defn format-value [value]
   (if (nil? value)
     0

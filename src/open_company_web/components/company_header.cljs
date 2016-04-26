@@ -90,9 +90,9 @@
   (if (cook/get-cookie :jwt)
     (do ; Logout
       (cook/remove-cookie! :jwt)
-      (utils/redirect! "/"))
+      (router/redirect! "/"))
     ; redirect to login
-    (utils/redirect! "/login")))
+    (router/redirect! "/login")))
 
 (def logo-max-height 100)
 

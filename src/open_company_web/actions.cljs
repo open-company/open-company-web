@@ -83,7 +83,7 @@
           (assoc (keyword (:slug updated-body)) updated-body)
           (dissoc :loading)))
     (= 404 status)
-    (do (utils/redirect! (str "/404?path=/" slug)) db)
+    (do (router/redirect! (str "/404?path=/" slug)) db)
     ;; probably some default failure handling should be added here
     :else db))
 
