@@ -46,3 +46,11 @@
 
 (defn redirect! [loc]
   (set! (.-location js/window) loc))
+
+(defn redirect-404! []
+  (let [win-location (.-location js/window)
+        pathname (.-pathname win-location)
+        search (.-search win-location)
+        hash-string (.-hash win-location)
+        encoded-url (js/encodeURIComponent (str pathname search hash-string))]
+    (redirect! (str "/404?path=" encoded-url))))
