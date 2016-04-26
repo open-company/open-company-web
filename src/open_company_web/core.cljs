@@ -149,7 +149,7 @@
 
     (defroute not-found-route "*" []
       ;; render component
-      (om/root page-not-found app-state {:target target}))
+      (router/redirect-404!))
 
     (def route-dispatch!
       (secretary/uri-dispatcher [login-route
