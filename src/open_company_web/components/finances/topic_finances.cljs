@@ -42,6 +42,7 @@
           cash-flow-classes (str classes (when (= focus "cash-flow") " active"))
           runway-classes (str classes (when (= focus "runway") " active"))
           finances-row-data (:data section-data)
+          no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))
           sum-revenues (apply + (map :revenue finances-row-data))
           first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
           needs-runway (some #(neg? (:runway %)) finances-row-data)
@@ -50,33 +51,39 @@
                            :read-only true
                            :currency currency}
           subsection-options {:opts options}]
-      (dom/div {:class "section-container" :id "section-finances"}
-        (dom/div {:class "composed-section finances"}
-          (dom/div {:class (utils/class-set {:composed-section-body true})}
-            (case focus
+  
+      (if no-data
+  
+        (dom/div {:class "topic-overlay-body"}
+          (dom/p "Information on finances is not yet available."))
+  
+        (dom/div {:class "section-container" :id "section-finances"}
+          (dom/div {:class "composed-section finances"}
+            (dom/div {:class (utils/class-set {:composed-section-body true})}
+              (case focus
 
-              "cash"
-              (om/build cash subsection-data subsection-options)
+                "cash"
+                (om/build cash subsection-data subsection-options)
 
-              "cash-flow"
-              (if (pos? sum-revenues)
-                (om/build cash-flow subsection-data subsection-options)
-                (om/build costs subsection-data subsection-options))
+                "cash-flow"
+                (if (pos? sum-revenues)
+                  (om/build cash-flow subsection-data subsection-options)
+                  (om/build costs subsection-data subsection-options))
 
-              "runway"
-              (om/build runway subsection-data subsection-options)))
-          (dom/div {:class "pillbox-container finances"}
-            (dom/label {:class cash-classes
-                        :title "Cash"
-                        :data-tab "cash"
-                        :on-click #(subsection-click % owner)} "Cash")
-            (when needs-cash-flow
-              (dom/label {:class cash-flow-classes
-                          :title first-title
-                          :data-tab "cash-flow"
-                          :on-click #(subsection-click % owner)} first-title))
-            (when needs-runway
-              (dom/label {:class runway-classes
-                          :title "Runway"
-                          :data-tab "runway"
-                          :on-click #(subsection-click % owner)} "Runway"))))))))
+                "runway"
+                (om/build runway subsection-data subsection-options)))
+            (dom/div {:class "pillbox-container finances"}
+              (dom/label {:class cash-classes
+                          :title "Cash"
+                          :data-tab "cash"
+                          :on-click #(subsection-click % owner)} "Cash")
+              (when needs-cash-flow
+                (dom/label {:class cash-flow-classes
+                            :title first-title
+                            :data-tab "cash-flow"
+                            :on-click #(subsection-click % owner)} first-title))
+              (when needs-runway
+                (dom/label {:class runway-classes
+                            :title "Runway"
+                            :data-tab "runway"
+                            :on-click #(subsection-click % owner)} "Runway")))))))))
