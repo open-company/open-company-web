@@ -55,7 +55,8 @@
       (if no-data
   
         (dom/div {:class "topic-overlay-body"}
-          (dom/p "Information on finances is not yet available."))
+          (dom/div {:class "topic-body-inner group"}
+            (dom/p "Information on finances is not yet available.")))
   
         (dom/div {:class "section-container" :id "section-finances"}
           (dom/div {:class "composed-section finances"}
