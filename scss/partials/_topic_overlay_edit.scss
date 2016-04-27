@@ -42,7 +42,8 @@ div.topic-overlay-edit {
       line-height: 24px;
       height: 32px;
       width: 450px;
-      border: 1px solid $oc_gray_3;
+      border: 1px solid $oc_gray_2;
+      border-radius: 3px;
 
       &:active, &:focus{
         border: 1px solid $oc_gray_3;
