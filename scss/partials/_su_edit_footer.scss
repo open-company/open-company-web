@@ -1,0 +1,21 @@
+div.update-footer {
+  max-width: 910px;
+  margin: 0 auto;
+  min-height: 150px;
+
+  div.update-footer-internal {
+    max-width: 570px;
+
+    div.outro-body {
+      min-height: 130px;
+      @include rich-editor-body($text_color: black);
+    }
+
+    div.update-footer-close{
+      position: relative;
+      height: 10px;
+      width: 100%;
+      color: black;
+    }
+  }
+}
