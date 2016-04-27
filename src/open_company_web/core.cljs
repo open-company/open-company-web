@@ -6,6 +6,7 @@
             [open-company-web.components.company-editor :refer (company-editor)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.company-profile :refer (company-profile)]
+            [open-company-web.components.su-edit :refer (su-edit)]
             [open-company-web.components.stakeholder-update :refer (stakeholder-update)]
             [open-company-web.components.su-list :refer (su-list)]
             [open-company-web.components.list-companies :refer (list-companies)]
@@ -107,6 +108,26 @@
     ;; render component
     (om/root component app-state {:target target})))
 
+;; Component specific to a stakeholder update
+(defn update-handler [target component params]
+  (let [slug (:slug (:params params))
+        update-slug (:update-slug (:params params))
+        query-params (:query-params params)
+        su-key (dis/stakeholder-update-key slug)]
+    (pre-routing query-params)
+    (utils/clean-company-caches)
+    (dis/dispatch! [:topic/reset-expanded])
+    ;; save the route
+    (router/set-route! ["companies" slug "updates" update-slug] {:slug slug :update-slug update-slug :query-params query-params})
+    ;; do we have the company data already?
+    (when (or (not (contains? @app-state su-key))
+              (not (contains? (@app-state su-key) (keyword update-slug))))
+      ;; load the company data from the API
+      (api/get-stakeholder-update slug update-slug)
+      (swap! app-state assoc-in [(dis/stakeholder-update-key slug) (keyword update-slug) :loading] true))
+    ;; render component
+    (om/root component app-state {:target target})))
+
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
 (if-let [target (sel1 :div#app)]
@@ -141,11 +162,14 @@
     (defroute company-profile-route "/:slug/profile" {:as params}
       (company-handler "profile" target company-profile params))
 
-    (defroute stakeholder-updates-route "/:slug/updates" {:as params}
-      (company-handler "stakeholder-update" target stakeholder-update params))
+    (defroute su-edit-route "/:slug/updates/edit" {:as params}
+      (company-handler "su-edit" target su-edit params))
 
-    (defroute su-list-route "/:slug/updates/list" {:as params}
+    (defroute su-list-route "/:slug/updates" {:as params}
       (company-handler "su-list" target su-list params))
+
+    (defroute stakeholder-update-route "/:slug/updates/:update-slug" {:as params}
+      (update-handler target stakeholder-update params))
 
     (defroute not-found-route "*" []
       ;; render component
@@ -161,8 +185,9 @@
                                  company-route
                                  company-route-slash
                                  company-profile-route
-                                 stakeholder-updates-route
+                                 su-edit-route
                                  su-list-route
+                                 stakeholder-update-route
                                  not-found-route]))
 
     (defn login-wall []

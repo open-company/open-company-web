@@ -22,29 +22,6 @@
     (om/set-state! owner :has-changes true)
     (om/set-state! owner k value)))
 
-(defn medium-editor-options [placeholder] {
-  :toolbar #js {
-    :buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "orderedlist" "unorderedlist" "anchor" "image"]
-  }
-  :anchorPreview #js {
-    :hideDelay 500
-    :previewValueSelector "a"
-  }
-  :anchor #js {
-    ;; These are the default options for anchor form,
-    ;; if nothing is passed this is what it used
-    :customClassOption nil
-    :customClassOptionText "Button"
-    :linkValidation false
-    :placeholderText "Paste or type a link"
-    :targetCheckbox false
-    :targetCheckboxText "Open in new window"
-  }
-  :placeholder #js {
-    :text placeholder
-    :hideOnClick true
-  }})
-
 (defn focus-field [topic field]
   (let [topic-field (.getElementById js/document (str "topic-edit-" field "-" (name topic)))
         field-value (.-value topic-field)]
@@ -280,7 +257,7 @@
       (let [body-el (om/get-ref owner "topic-overlay-edit-body")
             slug (keyword (:slug @router/path))
             finances-placeholder-data (get (:sections (get (:categories (slug @caches/new-sections)) 2)) 0)
-            med-ed (new js/MediumEditor body-el (clj->js (medium-editor-options (:note finances-placeholder-data))))]
+            med-ed (new js/MediumEditor body-el (clj->js (utils/medium-editor-options (:note finances-placeholder-data))))]
         (.subscribe med-ed "editableInput" (fn [event editable]
                                              (om/set-state! owner :has-changes true)))
         (om/set-state! owner :initial-body (.-innerHTML body-el))

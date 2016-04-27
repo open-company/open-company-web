@@ -21,12 +21,17 @@
 
 (defcomponent su-update [data owner]
   (render [_]
-    (let [update (:update data)
+    (let [slug (name (:slug @router/path))
+          update (:update data)
           js-date-upat (utils/js-date (:created-at update))
           month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
           topic-updated-at (str month-string " " (.getDate js-date-upat) ", " (.getFullYear js-date-upat))
-          intro (:intro update)]
-      (dom/div {:class "su-update"}
+          intro (:intro update)
+          update-slug (:slug update)
+          links (:links update)
+          update-get-link (utils/link-for links "self" "GET")]
+      (dom/div {:class "su-update"
+                :on-click #(router/nav! (str "/" slug "/updates/" update-slug))}
         (dom/div {:class "su-title"} (:title update))
         (dom/div {:class "su-date"} topic-updated-at)
         (dom/div {:class "su-body"
@@ -45,6 +50,16 @@
           (for [update su-updates]
             (om/build su-update {:update update})))))))
 
+(defn load-su-list-if-needed [owner]
+  ;; request the live SU if necessary
+  (let [slug (keyword (:slug @router/path))
+        data (om/get-props owner)
+        company-data (get data slug)]
+    (when (and (not (om/get-state owner :su-requested)) (contains? company-data :links))
+      (println "get-su-list")
+      (api/get-su-list)
+      (om/set-state! owner :su-requested true))))
+
 (defcomponent su-list [data owner]
 
   (init-state [_]
@@ -52,13 +67,11 @@
      :toggler-top-margin false
      :su-requested false})
 
+  (did-mount [_]
+    (load-su-list-if-needed owner))
+
   (did-update [_ _ _]
-    ;; request the live SU if necessary
-    (let [slug (keyword (:slug @router/path))
-          company-data (get data slug)]
-      (when (and (not (om/get-state owner :su-requested)) (contains? company-data :links))
-        (api/get-stakeholder-update)
-        (om/set-state! owner :su-requested true))))
+    (load-su-list-if-needed owner))
 
   (render-state [_ {:keys [drawer-open]}]
     (let [slug (keyword (:slug @router/path))

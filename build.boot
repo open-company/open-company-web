@@ -27,7 +27,7 @@
 
     ;; --- DO NOT UPDATE REACT, the 15.x.x code requires changes on our part
     [cljsjs/react "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
-
+    [cljsjs/react-dom "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/raven "2.1.0-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "3.5.16-0"] ; d3 externs https://clojars.org/cljsjs/d3
     [cljsjs/medium-editor "5.15.0-0"]]) ; Medium editor https://clojars.org/cljsjs/medium-editor

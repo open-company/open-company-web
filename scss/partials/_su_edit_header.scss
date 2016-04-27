@@ -1,0 +1,24 @@
+div.update-header {
+  max-width: 910px;
+  margin: 0 auto;
+
+  div.update-header-internal {
+    max-width: 570px;
+
+    div.update-title {
+      margin-bottom: 15px;
+
+      input.update-title-input {
+        width: 100%;
+        border: 1px solid transparent;
+        font-size: 22px;
+        font-weight: 600;
+      }
+    }
+
+    div.intro-body {
+      min-height: 130px;
+      @include rich-editor-body($text_color: black);
+    }
+  }
+}

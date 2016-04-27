@@ -2,76 +2,8 @@ div.topic-body {
   position: relative;
   overflow: visible;
   height: auto;
-  border: 1px solid transparent;
-
-  * {
-    color: #444444;
-    font-weight: normal;
-
-    font-size: 16px;
-    line-height: 1.6;
-  }
-
-  h1, h2, h3, h4 {
-    font-weight: 600;
-
-    @include mobile() {
-      font-size: 17px;
-    }
-
-    @include big_web(){
-      font-size: 16px;
-    }
-  }
-
-  &:focus,
-  &.editing {
-    outline: none;
-    overflow: hidden;
-    cursor: text;
-    border: 1px solid black;
-  }
-
-  ul, ol {
-    padding-left: 30px;
-
-    li {
-      margin: 0;
-      padding: 0;
-    }
-  }
-
-  img {
-
-    @include mobile() {
-      width: calc(100% + 44px);
-      margin-left: -22px;
-    }
-
-    @include big_web(){
-      width: 100%;
-    }
-
-    margin-bottom: 10px;
-  }
-
-  &.no-data {
-    color: rgba(0, 0, 0, 0.4);
-  }
-
-  *::selection {
-    background: #C1E7F4;
-  }
-
-  *::-moz-selection {
-    background: #C1E7F4;
-  }
-
-  a {
-    font-weight: bold;
-    text-decoration: underline;
-    color: black;
-  }
+  
+  @include rich-editor-body();
 
   &.expanded {
     height: auto;
