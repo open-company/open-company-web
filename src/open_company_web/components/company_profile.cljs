@@ -53,10 +53,12 @@
       (utils/add-channel "save-company" save-chan))
       {:initial-logo (:logo data)
        :logo (:logo data)
-       :name (:name data)
+       :company-name (:name data)
+       :loading false
        :description (:description data)})
 
   (will-receive-props [_ next-props]
+    (om/set-state! owner :loading false)
     (om/set-state! owner :initial-logo (:logo data)))
 
   (will-mount [_]
@@ -66,6 +68,7 @@
           (let [slug (:slug @router/path)
                 company-data ((keyword slug) @app-state)
                 logo (om/get-state owner :logo)]
+            (om/set-state! owner :loading true)
             (if (not= logo (om/get-state owner :initial-logo))
               (if (clojure.string/blank? logo)
                 (save-company-data company-data "" 0 0)
@@ -73,15 +76,18 @@
               (save-company-data company-data (:logo company-data) (:logo-width company-data) (:logo-height company-data)))
             (recur)))))))
 
-  (render [_]
+  (render-state [_ {:keys [company-name logo description loading]}]
     (let [slug (keyword (:slug @router/path))]
 
-      (utils/update-page-title (str "OpenCompany - " (:name data)))
+      (utils/update-page-title (str "OpenCompany - " company-name))
 
       (dom/div {:class "profile-container"}
         ;; Company
         (dom/div {:class "row"}
           (dom/form {:class "form-horizontal"}
+            (dom/img {:class (utils/class-set {:loading-spinner true
+                                               :loading loading})
+                      :src "/img/loading.gif"})
 
             ;; Company name
             (dom/div {:class "form-group"}
@@ -90,10 +96,10 @@
                 (dom/input {
                   :type "text"
                   :id "name"
-                  :value (om/get-state owner :name)
-                  :on-change #(om/set-state! owner :name (.. % -target -value))
+                  :value company-name
+                  :on-change #(om/set-state! owner :company-name (.. % -target -value))
                   :on-blur (fn [e]
-                             (utils/handle-change data (om/get-state owner :name) :name)
+                             (utils/handle-change data company-name :company-name)
                              (utils/save-values "save-company"))
                   :class "form-control"}))
               (dom/p {:class "help-block"} "Casual company name (leave out Inc., LLC, etc.)"))
@@ -135,27 +141,29 @@
               (dom/div {:class "col-sm-6"}
                 (dom/input {
                   :type "text"
-                  :value (om/get-state owner :logo)
+                  :value logo
                   :id "logo"
                   :class "form-control"
                   :maxLength 255
                   :on-change #(om/set-state! owner :logo (.. % -target -value))
                   :on-blur #(utils/save-values "save-company")
                   :placeholder "http://example.com/logo.png"}))
-              (dom/p {:class "help-block"} "URL to company logo"))
+              (dom/p {:class "help-block"} "180 pixels wide by 180 pixels high, or logo will be scaled")
+              (dom/img {:class "logo-preview"
+                        :src (:logo data)}))
 
             ;; Company description
             (dom/div {:class "form-group"}
               (dom/label {:for "logo" :class "col-sm-3 control-label oc-header"} "Description")
               (dom/div {:class "col-sm-6"}
                 (dom/textarea {
-                  :value (om/get-state owner :description)
+                  :value description
                   :id "description"
                   :class "form-control"
                   :max-length 250
                   :on-change #(om/set-state! owner :description (.. % -target -value))
                   :on-blur (fn [e]
-                             (utils/handle-change data (om/get-state owner :description) :description)
+                             (utils/handle-change data description :description)
                              (utils/save-values "save-company"))}))
               (dom/p {:class "help-block"} "Description of the company"))
             (dom/div {:class "form-group"}
