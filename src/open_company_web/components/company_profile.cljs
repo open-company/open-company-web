@@ -108,7 +108,7 @@
                   :id "slug"
                   :class "form-control"
                   :disabled true}))
-              (dom/p {:class "help-block"} "https://opencompany.com/bago"))
+              (dom/p {:class "help-block"} (str "https://opencompany.com/" (:slug data))))
 
             ;; Currency
             (dom/div {:class "form-group"}
@@ -132,7 +132,7 @@
             ;; Company logo
             (dom/div {:class "form-group"}
               (dom/label {:for "logo" :class "col-sm-3 control-label oc-header"} "Logo")
-              (dom/div {:class "col-sm-5"}
+              (dom/div {:class "col-sm-6"}
                 (dom/input {
                   :type "text"
                   :value (om/get-state owner :logo)
@@ -147,7 +147,7 @@
             ;; Company description
             (dom/div {:class "form-group"}
               (dom/label {:for "logo" :class "col-sm-3 control-label oc-header"} "Description")
-              (dom/div {:class "col-sm-5"}
+              (dom/div {:class "col-sm-6"}
                 (dom/textarea {
                   :value (om/get-state owner :description)
                   :id "description"
@@ -181,7 +181,7 @@
           ;; White space
           (dom/div {:class "col-md-1"})
 
-          (dom/div {:class "col-md-7 main"}
+          (dom/div {:class "col-md-9 main"}
 
             (if (:loading data)
               
