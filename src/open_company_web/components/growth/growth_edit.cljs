@@ -119,7 +119,9 @@
                                                          ; - exit the metadata edit state
                                                          (set-metadata-edit owner data false))))
                                         :change-growth-metric-cb (:change-growth-metric-cb data)})
-          (dom/div {}
+          
+          (if-not (empty? growth-data)
+            (dom/div {}
             (dom/div {:class "chart-header-container"}
               (dom/div {:class "target-actual-container"}
                 (dom/div {:class "actual-container"}
@@ -159,4 +161,4 @@
                   (dom/tr {}
                     (dom/td {}
                       (dom/a {:on-click #(more-months owner data)} "More..."))
-                    (dom/td {}))))))))))
+                    (dom/td {})))))))))))
