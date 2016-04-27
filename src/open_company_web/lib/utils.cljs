@@ -528,13 +528,13 @@
     (case interval
       "quarterly"
       (str year "-" (add-zero (get-month-quarter month)))
-      "monthly"
-      (str year "-" (add-zero month))
       "weekly"
       (let [day-of-week (cljs-time/day-of-week now)
             to-monday (dec day-of-week)
             monday-date (cljs-time/minus now (cljs-time/days to-monday))]
-        (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (add-zero (cljs-time/day monday-date)))))))
+        (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (add-zero (cljs-time/day monday-date))))
+      ;; Default tp monthly
+      (str year "-" (add-zero month)))))
 
 (defn company-cache-key [k & [v]]
   (let [slug (keyword (:slug @router/path))

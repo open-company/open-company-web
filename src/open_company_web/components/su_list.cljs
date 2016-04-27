@@ -56,7 +56,6 @@
         data (om/get-props owner)
         company-data (get data slug)]
     (when (and (not (om/get-state owner :su-requested)) (contains? company-data :links))
-      (println "get-su-list")
       (api/get-su-list)
       (om/set-state! owner :su-requested true))))
 
