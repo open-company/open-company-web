@@ -54,3 +54,6 @@
         hash-string (.-hash win-location)
         encoded-url (js/encodeURIComponent (str pathname search hash-string))]
     (redirect! (str "/404?path=" encoded-url))))
+
+(defn history-back! []
+  (.back (.-history js/window)))

@@ -136,7 +136,7 @@
               (dom/p {:class "help-block"} "Currency for company finances"))
 
             ;; Company logo
-            (dom/div {:class "form-group"}
+            (dom/div {:class "form-group logo-container"}
               (dom/label {:for "logo" :class "col-sm-3 control-label oc-header"} "Logo")
               (dom/div {:class "col-sm-6"}
                 (dom/input {
@@ -148,13 +148,15 @@
                   :on-change #(om/set-state! owner :logo (.. % -target -value))
                   :on-blur #(utils/save-values "save-company")
                   :placeholder "http://example.com/logo.png"}))
-              (dom/p {:class "help-block"} "180 pixels wide by 180 pixels high, or logo will be scaled")
-              (dom/img {:class "logo-preview"
-                        :src (:logo data)}))
+              (dom/p {:class "help-block"}
+                (when (:logo data)
+                  (dom/img {:class "logo-preview"
+                           :src (:logo data)}))
+                "180 pixels wide by 180 pixels high, or logo will be scaled"))
 
             ;; Company description
             (dom/div {:class "form-group"}
-              (dom/label {:for "logo" :class "col-sm-3 control-label oc-header"} "Description")
+              (dom/label {:for "description" :class "col-sm-3 control-label oc-header"} "Description")
               (dom/div {:class "col-sm-6"}
                 (dom/textarea {
                   :value description
@@ -168,7 +170,7 @@
               (dom/p {:class "help-block"} "Description of the company"))
             (dom/div {:class "form-group"}
               (dom/button {:class "btn btn-save"
-                           :on-click #(router/nav! (str "/" (name slug) ""))} "Done"))))))))
+                           :on-click #(router/history-back!)} "Done"))))))))
 
 (defcomponent company-profile [data owner]
 

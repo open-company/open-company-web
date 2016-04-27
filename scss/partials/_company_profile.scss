@@ -14,6 +14,17 @@ div.profile-container {
     }
   }
 
+  p.help-block {
+    font-size: 12px;
+    width: auto;
+  }
+
+  div.logo-container {
+    p.help-block span{
+      width: 100px;
+    }
+  }
+
   button.btn.btn-save {
     margin-left: 242px;
     background-color: $oc_green;
@@ -21,8 +32,8 @@ div.profile-container {
   }
 
   img.logo-preview {
-    margin-left: 242px;
-    max-width: 50px;
-    max-height: 50px;
+    margin-right: 10px;
+    max-width: 40px;
+    max-height: 40px;
   }
 }
