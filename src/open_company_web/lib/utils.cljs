@@ -478,6 +478,11 @@
       "monthly" (cljs-time/in-months (cljs-time/interval first-date last-date))
       "weekly" (cljs-time/in-weeks (cljs-time/interval first-date last-date)))))
 
+(defn get-year [period & [interval]]
+  (let [fixed-interval (or interval "monthly")
+        date (date-from-period period fixed-interval)]
+    (cljs-time/year date)))
+
 (defn get-month [period & [interval]]
   (let [fixed-interval (or interval "monthly")
         date (date-from-period period fixed-interval)
