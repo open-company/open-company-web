@@ -4,6 +4,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [cljs.core.async :refer (chan <!)]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.components.navbar :refer [navbar]]
             [open-company-web.components.company-header :refer [company-header]]
             [open-company-web.components.topic-list :refer [topic-list]]
@@ -58,15 +59,15 @@
        :save-bt-active false}))
 
   (render-state [_ {:keys [editing-topic navbar-editing save-bt-active active-category] :as state}]
-    (let [slug (:slug @router/path)
-          company-data ((keyword slug) data)
+    (let [company-data (dis/company-data data)
           navbar-editing-cb (partial set-navbar-editing owner data)]
       (dom/div {:class (utils/class-set {:company-dashboard true
                                          :navbar-offset (not (utils/is-mobile))})}
 
        (when-not (utils/is-mobile)
-          (om/build navbar (merge data {:edit-mode navbar-editing
-                                        :save-bt-active save-bt-active})))
+          (om/build navbar {:edit-mode navbar-editing
+                            :save-bt-active save-bt-active
+                            :auth-settings (:auth-settings data)}))
 
         ;; company header
         (om/build company-header {:loading (:loading company-data)

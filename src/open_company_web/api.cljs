@@ -73,7 +73,7 @@
   (when data
     (let [company-data (dissoc data :links :read-only :revisions :su-list :su-list-loaded)
           json-data (cljs->json company-data)
-          links (:links ((keyword slug) @dispatcher/app-state))
+          links (:links (dispatcher/company-data))
           company-link (utils/link-for links "partial-update" "PATCH")]
       (api-patch (:href company-link)
         { :json-params json-data
@@ -95,10 +95,10 @@
               (let [body (if (:success response) (:body response) {})]
                 (dispatcher/dispatch! [:auth-settings body])))))
 
-(defn save-or-create-section[section-data]
+(defn save-or-create-section [section-data]
   (when section-data
     (let [links (:links section-data)
-          slug (:slug @router/path)
+          slug (router/current-company-slug)
           section (keyword (:section section-data))
           section-data (dissoc section-data :section
                                             :revisions
@@ -128,9 +128,9 @@
 
 (defn partial-update-section [section partial-section-data]
   (when (and section partial-section-data)
-    (let [slug (keyword (:slug @router/path))
+    (let [slug (keyword (router/current-company-slug))
           section-kw (keyword section)
-          company-data (get @dispatcher/app-state slug)
+          company-data (dispatcher/company-data)
           section-data (get company-data section-kw)
           json-data (cljs->json partial-section-data)
           partial-update-link (utils/link-for (:links section-data) "partial-update" "PATCH")]
@@ -169,7 +169,7 @@
 (defn update-finances-data[finances-data]
   (when finances-data
     (let [links (:links finances-data)
-          slug (:slug @router/path)
+          slug (router/current-company-slug)
           data {:data (map #(dissoc % :burn-rate :runway :avg-burn-rate :value :new :read-only) (:data finances-data))}
           json-data (cljs->json data)
           finances-link (utils/link-for links "partial-update" "PATCH")]
@@ -189,7 +189,7 @@
 
 (defn patch-section-notes [notes-data links section]
   (when notes-data
-    (let [slug (:slug @router/path)
+    (let [slug (router/current-company-slug)
           clean-notes-data (dissoc notes-data :author :updated-at)
           json-data (cljs->json {:notes notes-data})
           section-link (utils/link-for links "partial-update" "PATCH")]
@@ -209,8 +209,8 @@
 
 (defn patch-sections [sections & [new-section section-name]]
   (when sections
-    (let [slug (keyword (:slug @router/path))
-          company-data (slug @dispatcher/app-state)
+    (let [slug (keyword (router/current-company-slug))
+          company-data (dispatcher/company-data)
           company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
           payload (if (and new-section section-name)
                     {:sections sections
@@ -231,8 +231,8 @@
 
 (defn patch-stakeholder-update [stakeholder-update]
   (when stakeholder-update
-    (let [slug (keyword (:slug @router/path))
-          company-data (slug @dispatcher/app-state)
+    (let [slug (keyword (router/current-company-slug))
+          company-data (dispatcher/company-data)
           company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
           json-data (cljs->json {:stakeholder-update stakeholder-update})]
       (api-patch (:href company-patch-link)
@@ -249,8 +249,8 @@
 
 (defn remove-section [section-name]
   (when (and section-name)
-    (let [slug (keyword (:slug @router/path))
-          company-data (slug @dispatcher/app-state)
+    (let [slug (keyword (router/current-company-slug))
+          company-data (dispatcher/company-data)
           sections (:sections company-data)
           new-sections (apply merge (map (fn [[k v]]
                                            {k (utils/vec-dissoc v section-name)})
@@ -264,8 +264,8 @@
    It's possible to force the load passing an optional boolean parameter."
   (when (or force-load (not @new-sections-requested))
     (reset! new-sections-requested true)
-    (let [slug (keyword (:slug @router/path))
-          company-data (slug @dispatcher/app-state)
+    (let [slug (keyword (router/current-company-slug))
+          company-data (dispatcher/company-data)
           links (:links company-data)
           add-section-link (utils/link-for links "section-list" "GET")]
       (when add-section-link
@@ -281,9 +281,24 @@
             (let [fixed-body (if success (json->cljs body) {})]
               (dispatcher/dispatch! [:new-section {:response fixed-body :slug slug}]))))))))
 
-(defn get-stakeholder-update []
-  (let [slug (keyword (:slug @router/path))
-        company-data (slug @dispatcher/app-state)
+(defn share-stakeholder-update []
+  (let [slug (keyword (router/current-company-slug))
+        company-data (dispatcher/company-data)
+        links (:links company-data)
+        share-link (utils/link-for links "share" "POST")]
+    (api-post (:href share-link)
+      { :headers  {
+          ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type"
+          ; custom content type
+          "content-type" (:type share-link)}}
+      (fn [{:keys [success body]}]
+        (when success
+          (dispatcher/dispatch! [:su-edit {:slug slug}]))))))
+
+(defn get-su-list []
+  (let [slug (keyword (router/current-company-slug))
+        company-data (dispatcher/company-data)
         links (:links company-data)
         su-link (utils/link-for links "stakeholder-updates" "GET")]
     (when su-link
@@ -297,4 +312,21 @@
           (when (not success)
             (reset! new-sections-requested false))
           (let [fixed-body (if success (json->cljs body) {})]
-            (dispatcher/dispatch! [:stakeholder-update {:response fixed-body :slug slug}])))))))
+            (dispatcher/dispatch! [:su-list {:response fixed-body :slug slug}])))))))
+
+(defn get-stakeholder-update
+  ([slug update-slug]
+    (when (and slug update-slug)
+      (let [update-link (str "/companies/" slug "/updates/" update-slug)]
+        (api-get update-link
+          { :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (content-type "stakeholder-update")}}
+          (fn [{:keys [success body]}]
+            (let [fixed-body (if success (json->cljs body) {})
+                  response {:slug (keyword slug)
+                            :update-slug (keyword update-slug)
+                            :response fixed-body}]
+              (dispatcher/dispatch! [:stakeholder-update response]))))))))

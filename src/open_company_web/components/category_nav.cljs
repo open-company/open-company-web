@@ -5,6 +5,8 @@
             [dommy.core :refer-macros (sel1)]
             [cljs.core.async :refer (put!)]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [goog.fx.Animation.EventType :as EventType]
             [goog.events :as events]
@@ -28,7 +30,7 @@
 
 (defn category-click [data category-name e]
   ;; prevent the route reload
-  (reset! open-company-web.core/prevent-route-dispatch true)
+  (reset! prevent-route-dispatch true)
   ;; call the switch tab callback
   ((:switch-category-cb data) category-name)
   ;; prevent the anchor element from reload the route
@@ -36,14 +38,13 @@
   (set! js/window.location.hash category-name)
   (when (utils/is-mobile) (scroll-to-top!))
   ;; reactivate the url change handler
-  (reset! open-company-web.core/prevent-route-dispatch false))
+  (reset! prevent-route-dispatch false))
 
 (defcomponent category-nav [data owner]
 
   (render [_]
     (let [navbar-editing (:navbar-editing data)
           scroll-top (.-scrollTop (sel1 :body))
-          slug (:slug @router/path)
           company-data (:company-data data)
           categories (or (:categories company-data) [])
           active-category (:active-category data)
@@ -69,7 +70,7 @@
                   category-class (utils/class-set {:category true
                                                    :active (= active-category category-name)})]
               (dom/a {:class ""
-                      :href (str "/" slug "#" category-name)
+                      :href (oc-urls/company-category category-name)
                       :on-click (partial category-click data category-name)}
                 (dom/div {:class category-class}
                   (dom/div {:class "category-label"}

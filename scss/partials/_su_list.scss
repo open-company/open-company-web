@@ -1,17 +1,24 @@
 div.updates {
   position: relative;
   width: 100%;
-  background-color: white;
-  // padding: 20px 0;
+  background-color: $oc_gray_1;
 
   div.updates-internal {
     width: 930px;
     margin: 10px auto;
     padding: 10px;
-    background-color: white;
     
     div.su-update {
       width: 550px;
+      margin: 10px;
+      padding: 10px;
+      box-shadow: 1px 1px 1px $oc_gray_3;
+      background-color: white;
+      cursor: pointer;
+
+      &:hover {
+        background-color: $oc_gray_2;
+      }
 
       div.su-title {
         font-size: 22px;

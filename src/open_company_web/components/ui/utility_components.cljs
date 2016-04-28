@@ -7,15 +7,13 @@
 
 (defcomponent editable-pen [data owner]
   (render [_]
-    (let [slug (:slug @router/path)]
-      (dom/i {:class "fa fa-pencil editable-pen"
-              :on-click (:click-callback data)}))))
+    (dom/i {:class "fa fa-pencil editable-pen"
+            :on-click (:click-callback data)})))
 
 (defcomponent add-metric [data owner]
   (render [_]
-    (let [slug (:slug @router/path)]
-      (dom/i {:class (utils/class-set {:fa true
-                                       :fa-plus-circle true
-                                       :add-metric true
-                                       :no-links (< (:count-metrics data) 2)})
-              :on-click (:click-callback data)}))))
+    (dom/i {:class (utils/class-set {:fa true
+                                     :fa-plus-circle true
+                                     :add-metric true
+                                     :no-links (< (:count-metrics data) 2)})
+            :on-click (:click-callback data)})))

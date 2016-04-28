@@ -2,32 +2,30 @@
   (:require [om.core :as om :include-macros true]
             [secretary.core :as secretary :refer-macros (defroute)]
             [dommy.core :refer-macros (sel1)]
+            [open-company-web.actions]
+            [open-company-web.api :as api]
+            [open-company-web.urls :as urls]
             [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dis]
+            [open-company-web.local-settings :as ls]
+            [open-company-web.lib.jwt :as jwt]
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.cookies :as cook]
+            [open-company-web.lib.raven :refer (raven-setup)]
+            [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.company-editor :refer (company-editor)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.company-profile :refer (company-profile)]
+            [open-company-web.components.su-edit :refer (su-edit)]
             [open-company-web.components.stakeholder-update :refer (stakeholder-update)]
             [open-company-web.components.su-list :refer (su-list)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
             [open-company-web.components.login :refer (login)]
-            [open-company-web.components.ui.loading :refer (loading)]
-            [open-company-web.lib.raven :refer (raven-setup)]
-            [open-company-web.lib.utils :as utils]
-            [open-company-web.actions]
-            [open-company-web.dispatcher :as dis :refer (app-state)]
-            [open-company-web.api :as api]
-            [goog.events :as events]
-            [open-company-web.lib.cookies :as cook]
-            [open-company-web.local-settings :as ls]
-            [open-company-web.lib.jwt :as jwt]
-            [goog.history.EventType :as HistoryEventType]
-            [goog.events.EventType :as EventType]))
+            [open-company-web.components.ui.loading :refer (loading)]))
 
 (enable-console-print!)
-
-(defonce prevent-route-dispatch (atom false))
 
 ;; setup Sentry error reporting
 (defonce raven (raven-setup))
@@ -42,7 +40,7 @@
 
 (defn inject-loading []
   (let [target (sel1 [:div#oc-loading])]
-    (om/root loading app-state {:target target})))
+    (om/root loading dis/app-state {:target target})))
 
 (defn pre-routing [query-params]
  (check-get-params query-params)
@@ -56,11 +54,11 @@
   ;; save route
   (router/set-route! ["companies"] {})
   ;; load data from api
-  (swap! app-state assoc :loading true)
+  (swap! dis/app-state assoc :loading true)
   (api/get-entry-point)
   (api/get-companies)
   ;; render component
-  (om/root list-companies app-state {:target target}))
+  (om/root list-companies dis/app-state {:target target}))
 
 ;; Handle successful and unsuccessful logins
 (defn login-handler [target params]
@@ -83,12 +81,12 @@
         (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
       ;; save route
       (router/set-route! ["login"] {})
-      (swap! app-state assoc :loading true)
+      (swap! dis/app-state assoc :loading true)
       (when (contains? (:query-params params) :access)
         ;login went bad, add the error message to the app-state
-        (swap! app-state assoc :access (:access (:query-params params))))
+        (swap! dis/app-state assoc :access (:access (:query-params params))))
       ;; render component
-      (om/root login app-state {:target target}))))
+      (om/root login dis/app-state {:target target}))))
 
 ;; Component specific to a company
 (defn company-handler [route target component params]
@@ -98,54 +96,77 @@
     (utils/clean-company-caches)
     (dis/dispatch! [:topic/reset-expanded])
     ;; save the route
-    (router/set-route! ["companies" slug route] {:slug slug :query-params query-params})
+    (router/set-route! [slug route] {:slug slug :query-params query-params})
     ;; do we have the company data already?
-    (when-not (contains? @app-state (keyword slug))
+    (when-not (dis/company-data)
       ;; load the company data from the API
       (api/get-company slug)
-      (swap! app-state assoc :loading true))
+      (swap! dis/app-state assoc :loading true))
     ;; render component
-    (om/root component app-state {:target target})))
+    (om/root component dis/app-state {:target target})))
+
+;; Component specific to a stakeholder update
+(defn stakeholder-update-handler [target component params]
+  (let [slug (:slug (:params params))
+        update-slug (:update-slug (:params params))
+        query-params (:query-params params)
+        su-key (dis/stakeholder-update-key slug update-slug)]
+    (pre-routing query-params)
+    (utils/clean-company-caches)
+    (dis/dispatch! [:topic/reset-expanded])
+    ;; save the route
+    (router/set-route! [slug "updates" update-slug] {:slug slug :update-slug update-slug :query-params query-params})
+    ;; do we have the company data already?
+    (when (not (get-in @dis/app-state su-key))
+      ;; load the company data from the API
+      (api/get-stakeholder-update slug update-slug)
+      (let [su-loading-key (conj su-key :loading)]
+        (swap! dis/app-state assoc-in su-loading-key true)))
+    ;; render component
+    (om/root component dis/app-state {:target target})))
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
 (if-let [target (sel1 :div#app)]
   (do
-    (defroute login-route "/login" {:as params}
+    (defroute login-route urls/login {:as params}
       (login-handler target params))
 
-    (defroute home-page-route "/" {:as params}
+    (defroute home-page-route urls/home {:as params}
       (home-handler target params))
 
-    (defroute company-create-route "/create-company" {:as params}
+    (defroute company-create-route urls/create-company {:as params}
       (pre-routing (:query-params params))
-      (om/root company-editor app-state {:target target}))
+      (om/root company-editor dis/app-state {:target target}))
 
-    (defroute list-page-route "/companies" {:as params}
+    (defroute list-page-route urls/companies {:as params}
       (home-handler target params))
 
-    (defroute list-page-route-slash "/companies/" {:as params}
+    (defroute list-page-route-slash (str urls/companies "/") {:as params}
       (home-handler target params))
 
-    (defroute user-profile-route "/profile" {:as params}
+    (defroute user-profile-route urls/user-profile {:as params}
       (utils/clean-company-caches)
       (pre-routing (:query-params params))
-      (om/root user-profile app-state {:target target}))
+      (om/root user-profile dis/app-state {:target target}))
 
-    (defroute company-route "/:slug" {:as params}
+    (defroute company-route (urls/company ":slug") {:as params}
       (company-handler "dashboard" target company-dashboard params))
 
-    (defroute company-route-slash "/:slug/" {:as params}
+    (defroute company-route-slash (str (urls/company ":slug") "/") {:as params}
       (company-handler "dashboard" target company-dashboard params))
 
-    (defroute company-profile-route "/:slug/profile" {:as params}
+    (defroute company-profile-route (urls/company-profile ":slug") {:as params}
       (company-handler "profile" target company-profile params))
 
-    (defroute stakeholder-updates-route "/:slug/updates" {:as params}
-      (company-handler "stakeholder-update" target stakeholder-update params))
-
-    (defroute su-list-route "/:slug/updates/list" {:as params}
+    (defroute su-list-route (urls/stakeholder-update-list ":slug") {:as params}
       (company-handler "su-list" target su-list params))
+
+    (defroute su-edit-route (urls/stakeholder-update-edit ":slug") {:as params}
+      (company-handler "su-edit" target su-edit params))
+
+    (defroute stakeholder-update-route (urls/stakeholder-update ":slug" ":update-slug") {:as params}
+      (stakeholder-update-handler target stakeholder-update params))
 
     (defroute not-found-route "*" []
       ;; render component
@@ -161,15 +182,16 @@
                                  company-route
                                  company-route-slash
                                  company-profile-route
-                                 stakeholder-updates-route
+                                 su-edit-route
                                  su-list-route
+                                 stakeholder-update-route
                                  not-found-route]))
 
     (defn login-wall []
       ;; load the login settings from auth server
       ;; if the user is not logged in yet
       (when-not (or (jwt/jwt)
-                    (contains? @app-state :auth-settings))
+                    (contains? @dis/app-state :auth-settings))
         (api/get-auth-settings)))
 
     (defn handle-url-change [e]
@@ -186,12 +208,10 @@
         ;; dispatch on the token
         (route-dispatch! (router/get-token))))))
 
-(defonce history
-  (doto (router/make-history)
-    (events/listen HistoryEventType/NAVIGATE
-      ;; wrap in a fn to allow live reloading
-      handle-url-change)
-    (.setEnabled true)))
+;; setup the router navigation only when handle-url-change and route-disaptch!
+;; are defined, this is used to avoid crash on tests
+(when (and handle-url-change route-dispatch!)
+  (router/setup-navigation! handle-url-change route-dispatch!))
 
 (defn on-js-reload []
   (.clear js/console)

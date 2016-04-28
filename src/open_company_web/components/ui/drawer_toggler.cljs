@@ -4,7 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.icon :refer (icon)]))
+            [open-company-web.components.ui.icon :refer (icon)]))
 
 (defn rotate [owner & [from-extern]]
   (om/update-state! owner :open not)

@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
             [cljs.core.async :refer (put!)]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.components.ui.link :refer (link)]
             [open-company-web.components.ui.company-avatar :refer (company-avatar)]
             [open-company-web.components.category-nav :refer (category-nav)]
@@ -90,9 +91,9 @@
   (if (cook/get-cookie :jwt)
     (do ; Logout
       (cook/remove-cookie! :jwt)
-      (router/redirect! "/"))
+      (router/redirect! oc-urls/home))
     ; redirect to login
-    (router/redirect! "/login")))
+    (router/redirect! oc-urls/login)))
 
 (def logo-max-height 100)
 
@@ -111,7 +112,9 @@
 
     (dom/div #js {:className "company-header"
                   :ref "company-header"}
-      (let [link-url (str "/" (:slug company-data) (when-not stakeholder-update "/updates"))]
+      (let [link-url (if stakeholder-update
+                      (oc-urls/company)
+                      (oc-urls/stakeholder-update-list))]
         
         ; topic editing
         (dom/div {:class "navbar-editing"

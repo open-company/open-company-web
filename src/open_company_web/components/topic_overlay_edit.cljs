@@ -6,6 +6,7 @@
             [open-company-web.router :as router]
             [open-company-web.api :as api]
             [open-company-web.caches :as caches]
+            [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
@@ -21,29 +22,6 @@
         value (.-value target)]
     (om/set-state! owner :has-changes true)
     (om/set-state! owner k value)))
-
-(defn medium-editor-options [placeholder] {
-  :toolbar #js {
-    :buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "orderedlist" "unorderedlist" "anchor" "image"]
-  }
-  :anchorPreview #js {
-    :hideDelay 500
-    :previewValueSelector "a"
-  }
-  :anchor #js {
-    ;; These are the default options for anchor form,
-    ;; if nothing is passed this is what it used
-    :customClassOption nil
-    :customClassOptionText "Button"
-    :linkValidation false
-    :placeholderText "Paste or type a link"
-    :targetCheckbox false
-    :targetCheckboxText "Open in new window"
-  }
-  :placeholder #js {
-    :text placeholder
-    :hideOnClick true
-  }})
 
 (defn focus-field [topic field]
   (let [topic-field (.getElementById js/document (str "topic-edit-" field "-" (name topic)))
@@ -267,7 +245,7 @@
   (will-unmount [_]
     (when-not (utils/is-test-env?)
       ; re enable the route dispatcher
-      (reset! open-company-web.core/prevent-route-dispatch false)
+      (reset! prevent-route-dispatch false)
       ; remove the onbeforeunload handler
       (set! (.-onbeforeunload js/window) nil)
       ; remove history change listener
@@ -275,12 +253,12 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (reset! open-company-web.core/prevent-route-dispatch true)
+      (reset! prevent-route-dispatch true)
       ; save initial innerHTML and setup MediumEditor
       (let [body-el (om/get-ref owner "topic-overlay-edit-body")
-            slug (keyword (:slug @router/path))
+            slug (keyword (router/current-company-slug))
             finances-placeholder-data (get (:sections (get (:categories (slug @caches/new-sections)) 2)) 0)
-            med-ed (new js/MediumEditor body-el (clj->js (medium-editor-options (:note finances-placeholder-data))))]
+            med-ed (new js/MediumEditor body-el (clj->js (utils/medium-editor-options (:note finances-placeholder-data))))]
         (.subscribe med-ed "editableInput" (fn [event editable]
                                              (om/set-state! owner :has-changes true)))
         (om/set-state! owner :initial-body (.-innerHTML body-el))
@@ -289,16 +267,16 @@
         (focus-field topic focus))
       (let [win-location (.-location js/window)
             current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
-            listener (events/listen open-company-web.core/history EventType/NAVIGATE
+            listener (events/listen @router/history EventType/NAVIGATE
                        #(when-not (= (.-token %) current-token)
                           (if (om/get-state owner :has-changes)
                             (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
                               ; dispatch the current url
-                              (open-company-web.core/route-dispatch! (router/get-token))
+                              (@router/route-dispatcher (router/get-token))
                               ; go back to the previous token
-                              (.setToken open-company-web.core/history current-token))
+                              (.setToken @router/history current-token))
                             ; dispatch the current url
-                            (open-company-web.core/route-dispatch! (router/get-token)))))]
+                            (@router/route-dispatcher (router/get-token)))))]
         (om/set-state! owner :history-listener-id listener))))
 
   (render-state [_ {:keys [has-changes

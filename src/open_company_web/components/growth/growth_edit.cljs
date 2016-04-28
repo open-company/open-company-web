@@ -71,7 +71,7 @@
   ((:save-metadata-cb data) (:metric-slug data))
   (set-metadata-edit owner data false))
 
-(defcomponent growth-edit [data owner]
+(defcomponent growth-edit [data owner options]
 
   (init-state [_]
     {:metadata-edit (:new-metric data)
@@ -86,10 +86,8 @@
 
   (render-state [_ {:keys [growth-data metadata-edit stop]}]
     (let [{:keys [interval slug] :as metric-info} (get-current-metric-info data)
-          company-slug (keyword (:slug @router/path))
-          company-data (company-slug @dispatcher/app-state)
           prefix (if (= (:unit metric-info) "currency")
-                   (utils/get-symbol-for-currency-code (:currency company-data))
+                   (utils/get-symbol-for-currency-code (:currency options))
                    "")
           suffix (when (= (:unit metric-info) "%") "%")]
       (dom/div {:class "composed-section-edit growth-body edit"}
@@ -118,7 +116,8 @@
                                                          ((:reset-metrics-cb data))
                                                          ; - exit the metadata edit state
                                                          (set-metadata-edit owner data false))))
-                                        :change-growth-metric-cb (:change-growth-metric-cb data)})
+                                        :change-growth-metric-cb (:change-growth-metric-cb data)}
+                                       {:opts {:currency (:currency options)}})
           (dom/div {}
             (dom/div {:class "chart-header-container"}
               (dom/div {:class "target-actual-container"}
