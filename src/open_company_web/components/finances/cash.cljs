@@ -19,12 +19,15 @@
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
           cash-val (str cur-symbol (utils/thousands-separator (:cash value-set)))
-          fixed-sorted-finances (mapv #(merge % {:label (when-let [c (:cash %)] (utils/thousands-separator c))}) sorted-finances)
-          chart-opts {:opts {:chart-height (:height (:chart-size options))
-                             :chart-width (:width (:chart-size options))
+          fixed-sorted-finances (mapv #(merge % {:label (when-let [c (:cash %)]
+                                                          (utils/thousands-separator c))
+                                                 :sub-label (str "CASH - " (utils/get-month (:period %)) " " (utils/get-year (:period %)))}) sorted-finances)
+          chart-opts {:opts {:chart-width (:width (:chart-size options))
+                             :chart-height (:height (:chart-size options))
                              :chart-keys [:cash]
-                             :label-color (occ/get-color-by-kw :oc-green-regular)
+                             :label-color (occ/get-color-by-kw :oc-gray-5)
                              :label-key :label
+                             :sub-label-key :sub-label
                              :interval "monthly"
                              :h-axis-color (occ/get-color-by-kw :oc-green-light)
                              :h-axis-selected-color (occ/get-color-by-kw :oc-green-regular)
