@@ -15,11 +15,11 @@
 (def test-atom {
   :companies [
     {
-      :symbol "OPEN"
+      :slug "OPEN"
       :name "OpenCompany"
     }
     {
-      :symbol "BUFF"
+      :slug "BUFF"
       :name "Buffer Inc."
     }
   ]

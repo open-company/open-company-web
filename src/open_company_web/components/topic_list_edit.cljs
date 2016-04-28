@@ -8,7 +8,7 @@
             [open-company-web.caches :as caches]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.oc-colors :as occ]
-            [open-company-web.components.icon :as i]
+            [open-company-web.components.ui.icon :as i]
             [open-company-web.components.topic :refer (topic)]
             [cljs-dynamic-resources.core :as cdr]
             [goog.style :refer (setStyle)]))
@@ -119,7 +119,7 @@
     (setup-sortable owner options))
 
   (render-state [_ {:keys [unactive-topics active-topics transition-topic]}]
-    (let [slug (keyword (:slug @router/path))]
+    (let [slug (keyword (router/current-company-slug))]
       (if (empty? (slug @caches/new-sections))
         (dom/h2 {} "Loading sections...")
         (dom/div {:class "topic-list-edit group no-select"

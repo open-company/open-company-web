@@ -8,7 +8,7 @@
             [open-company-web.api :as api]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.icon :as i]
+            [open-company-web.components.ui.icon :as i]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.topic-growth-headline :refer (topic-growth-headline)]
@@ -254,7 +254,7 @@
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
           next-rev (utils/revision-next revisions as-of)
-          slug (keyword (:slug @router/path))
+          slug (keyword (router/current-company-slug))
           revisions-list (section-kw (slug @cache/revisions))
           topic-data (utils/select-section-data section-data section-kw as-of)]
       ;; preload previous revision

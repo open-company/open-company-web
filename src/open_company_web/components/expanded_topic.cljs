@@ -19,7 +19,7 @@
   (render [_]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
-          slug (keyword (:slug @router/path))
+          slug (keyword (router/current-company-slug))
           revisions-list (section-kw (slug @cache/revisions))
           prev-rev (utils/revision-prev revisions as-of)
           next-rev (utils/revision-next revisions as-of)

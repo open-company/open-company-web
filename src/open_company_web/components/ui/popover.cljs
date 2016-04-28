@@ -1,4 +1,4 @@
-(ns open-company-web.components.popover
+(ns open-company-web.components.ui.popover
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -39,8 +39,7 @@
   (let [container-id (:container-id data)]
     (when (.-$ js/window) ; avoid tests crash
       (let [popover-ct (.$ js/window (str "<div class='oc-popover-container' id='" container-id "'></div>"))
-            body (.$ js/window (.-body js/document))
-            slug (keyword (:slug @router/path))]
+            body (.$ js/window (.-body js/document))]
         ; add the div to the body
         (.append body popover-ct)
         ; if the component has not been mount, render it

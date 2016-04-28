@@ -10,7 +10,7 @@
             [open-company-web.lib.iso4217 :refer (sorted-iso4217)]
             [open-company-web.components.growth.utils :as growth-utils]
             [cuerdas.core :as s]
-            [open-company-web.components.popover :refer (add-popover hide-popover)]))
+            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
 
 (defn show-delete-confirm-popover [owner data]
   (add-popover {:container-id "delete-metric-confirm"
@@ -115,7 +115,7 @@
 
 (defn get-presets [data]
   (let [slugs (:slugs data)
-        slug (keyword (:slug @router/path))
+        slug (keyword (router/current-company-slug))
         sections-map (:categories (slug @new-sections))
         all-sections (mapcat :sections sections-map)
         growth-defaults (first (filter #(= (:section-name %) "growth") all-sections))
@@ -130,13 +130,11 @@
   :unit "number"
   :interval "monthly"})
 
-(defcomponent growth-metric-edit [data owner]
+(defcomponent growth-metric-edit [data owner options]
 
   (init-state [_]
     (let [metric-info (:metric-info data)
-          company-slug (keyword (:slug @router/path))
-          company-data (company-slug @dispatcher/app-state)
-          company-currency-code (:currency company-data)
+          company-currency-code (:currency options)
           presets (get-presets data)
           units (:units presets)
           fixed-units (vec (map #(if (= (:unit %) "currency")
