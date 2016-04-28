@@ -79,6 +79,34 @@ boot prod-build
 Open `target/public/app-shell.html` in your browser. Using production rather than dev, you will not get the live reloading nor a REPL.
 
 
+## Design
+
+The app-state has the following structure:
+
+```clojure
+{
+  :buffer {
+     :company-data {
+       :name "Buffer"
+       :slug "buffer"
+       ;; ... other data form /companies/buffer ....
+     }
+     :su-list {
+        :collection {
+          ;; .. data from /companies/buffer/updates...
+        }
+     }
+     :buffer-update-march-2016 {
+       ;; ... data from /companies/buffer/buffer-update-march-2016 ...
+     }
+}
+```
+
+Never access the app-state directly but we should always use the proper functions in the `dispatcher`.
+This way it will be very simple to change the structure of the app-state in the future since we just need
+to change it in one place.
+
+
 ## Tests
 
 Install [PhantomJS](https://http://phantomjs.org/) downloading the latest binary [here](https://github.com/eugene1g/phantomjs/releases), the one from their site is currently broken.
@@ -100,9 +128,11 @@ For more info on testing:
 - Plugin: [bensu/doo](https://github.com/bensu/doo)
 - React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/cljs-react-test)
 
+
 ## Browser Support
 
-Chrome, Firefox, Safari and Edge.
+Latest Chrome, Firefox, Safari and Edge.
+
 
 ## Participation
 
