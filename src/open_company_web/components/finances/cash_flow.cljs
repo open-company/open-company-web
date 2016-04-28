@@ -72,6 +72,7 @@
         abs-cash-flow-val (utils/abs cash-flow-val)
         cash-flow (when cash-flow-val (str (when (neg? cash-flow-val) "-") prefix (utils/with-metric-prefix abs-cash-flow-val)))]
    [{:label (when revenue (str "Revenue " revenue))
+     :sub-label (str "CASH FLOW - " (utils/get-month (:period data-set)) " " (utils/get-year (:period data-set)))
      :color (occ/get-color-by-kw :oc-green-regular)}
     {:label (when costs (str " Costs " costs))
      :color (occ/get-color-by-kw :oc-red-regular)}
@@ -105,6 +106,7 @@
                                            [:revenue :costs]
                                            [:costs])
                              :label-key :label
+                             :sub-label-key :sub-label
                              :interval "monthly"
                              :h-axis-color (occ/get-color-by-kw :oc-green-light)
                              :h-axis-selected-color (occ/get-color-by-kw :oc-green-regular)
