@@ -34,6 +34,8 @@
                -60)]
     pos))
 
+(def chart-label-height 20)
+
 (defn build-selected-label [chart-label-g label-value sub-label-value label-color chart-width]
   (.each (.selectAll chart-label-g "text")
          (fn [_ _]
@@ -54,7 +56,7 @@
           (.attr "fill" label-color)
           (.attr "class" "sub-chart-label")
           (.attr "dx" 0)
-          (.attr "dy" 18)
+          (.attr "dy" chart-label-height)
           (.text sub-label-value)))
     ;; Show multiple values
     (loop [idx 0
@@ -69,16 +71,16 @@
                     (.attr "dy" txt-top)
                     (.text label))
             txt-width (js/SVGgetWidth txt)
-            txt-height (* idx 25)]
+            txt-height (* idx chart-label-height)]
         (when-not (utils/is-mobile)
           (.attr txt "dx" txt-left))
         (when (= idx (dec (count label-value)))
           (-> chart-label-g
             (.append "text")
-            (.attr "fill" label-color)
+            (.attr "fill" color)
             (.attr "class" "sub-chart-label")
             (.attr "dx" 0)
-            (.attr "dy" (+ txt-top 25))
+            (.attr "dy" (+ txt-top chart-label-height))
             (.text (:sub-label (get label-value 0)))))
         (when (< idx (dec (count label-value)))
           (recur (inc idx)
@@ -86,7 +88,7 @@
                     txt-left
                     (+ txt-left txt-width 10))
                  (if (utils/is-mobile)
-                    (+ txt-top 25)
+                    (+ txt-top chart-label-height)
                     txt-top)))))))
 
 (defn bar-click [owner options idx]
@@ -102,7 +104,6 @@
         sub-label-key (:sub-label-key options)
         next-g-rects (.selectAll next-g "rect")
         all-rects (.selectAll d3-svg-el "rect.chart-bar")
-        next-month-text (.select d3-svg-el (str "text#chart-x-label-" idx))
         all-month-text (.selectAll d3-svg-el ".chart-x-label")]
     (.each all-rects
            (fn [d i]
@@ -121,7 +122,6 @@
               (this-as month-text
                 (let [d3-month-text (.select js/d3 month-text)]
                   (.attr d3-month-text "fill" (:h-axis-color options))))))
-    (.attr next-month-text "fill" (:h-axis-selected-color options))
     (build-selected-label chart-label (label-key next-set) (sub-label-key next-set) (:label-color options) chart-width)
     (om/set-state! owner :selected idx)))
 
@@ -172,22 +172,7 @@
                                    (str "translate("
                                         (bar-position chart-width i (count chart-data) keys-count)
                                         ","
-                                        (- (:chart-height options) scaled-max-val 20) ")")))
-              ; month label
-              force-year (or (zero? i) (= i (dec (count chart-data))))
-              text (utils/get-period-string (:period data-set) (:interval options) [:short (when force-year :force-year)])
-              x-pos (bar-position chart-width i (count chart-data) keys-count)
-              label (-> chart-node
-                        (.append "text")
-                        (.attr "class" "chart-x-label")
-                        (.attr "id" (str "chart-x-label-" i))
-                        (.attr "x" x-pos)
-                        (.attr "y" (:chart-height options))
-                        (.attr "fill" (if (= i selected) h-axis-selected-color h-axis-color))
-                        (.text text))
-              label-width (js/SVGgetWidth label)]
-          ; set month label x position depending on its width
-          (.attr label "x" (+ x-pos (/ (- (* bar-width keys-count) label-width) 2)))
+                                        (- (:chart-height options) scaled-max-val) ")")))]
           ; for each key in the set
           (doseq [j (range (count chart-keys))]
             (let [chart-key (get chart-keys j)
