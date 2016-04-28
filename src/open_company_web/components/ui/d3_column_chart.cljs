@@ -34,21 +34,29 @@
                -60)]
     pos))
 
-(defn build-selected-label [chart-label-g label-value label-color chart-width]
+(defn build-selected-label [chart-label-g label-value sub-label-value label-color chart-width]
   (.each (.selectAll chart-label-g "text")
          (fn [_ _]
            (this-as el
              (.remove (.select js/d3 el)))))
   (if (string? label-value)
-    (let [chart-label (-> chart-label-g
-                          (.append "text")
-                          (.attr "fill" label-color)
-                          (.attr "class" "chart-label")
-                          (.attr "dx" 0)
-                          (.attr "dy" 0)
-                          (.text label-value))
-          txt-width (js/SVGgetWidth chart-label)]
-        (.attr chart-label "dx" (- (/ chart-width 2) (/ txt-width 2))))
+    ;; Show only one value
+    (do
+      (-> chart-label-g
+          (.append "text")
+          (.attr "fill" label-color)
+          (.attr "class" "chart-label")
+          (.attr "dx" 0)
+          (.attr "dy" 0)
+          (.text label-value))
+      (-> chart-label-g
+          (.append "text")
+          (.attr "fill" label-color)
+          (.attr "class" "sub-chart-label")
+          (.attr "dx" 0)
+          (.attr "dy" 18)
+          (.text sub-label-value)))
+    ;; Show multiple values
     (loop [idx 0
            txt-left 0]
       (let [{:keys [label color]} (get label-value idx)
@@ -61,11 +69,7 @@
                     (.text label))
             txt-width (js/SVGgetWidth txt)
             txt-height (* idx 25)]
-        (when (utils/is-mobile)
-          (.attr txt "dy" txt-height)
-          (.attr txt "dx" (- (/ chart-width 2) (/ txt-width 2))))
-        (when-not (utils/is-mobile)
-          (.attr txt "dx" txt-left))
+        (.attr txt "dx" txt-left)
         (when (< idx (dec (count label-value)))
           (recur (inc idx)
                  (+ txt-left txt-width 10)))))))
@@ -80,6 +84,7 @@
         data (current-data owner)
         next-set (get data idx)
         label-key (:label-key options)
+        sub-label-key (:sub-label-key options)
         next-g-rects (.selectAll next-g "rect")
         all-rects (.selectAll d3-svg-el "rect.chart-bar")
         next-month-text (.select d3-svg-el (str "text#chart-x-label-" idx))
@@ -102,7 +107,7 @@
                 (let [d3-month-text (.select js/d3 month-text)]
                   (.attr d3-month-text "fill" (:h-axis-color options))))))
     (.attr next-month-text "fill" (:h-axis-selected-color options))
-    (build-selected-label chart-label (label-key next-set) (:label-color options) chart-width)
+    (build-selected-label chart-label (label-key next-set) (sub-label-key next-set) (:label-color options) chart-width)
     (om/set-state! owner :selected idx)))
 
 (defn get-color [color-key options chart-key value]
@@ -136,7 +141,8 @@
           scale-fn (scale owner options)
           h-axis-color (:h-axis-color options)
           h-axis-selected-color (:h-axis-selected-color options)
-          label-key (:label-key options)]
+          label-key (:label-key options)
+          sub-label-key (:sub-label-key options)]
       ; for each set of data
       (doseq [i (range (count chart-data))]
         (let [data-set (get chart-data i)
@@ -206,16 +212,17 @@
       (let [x-pos (/ chart-width 2)
             label-value (label-key (get chart-data selected))
             label-color (:label-color options)
+            sub-label-value (sub-label-key (get chart-data selected))
             chart-label-g (-> chart-node
                               (.append "g")
                               (.attr "class" "chart-label-container")
                               (.attr "id" "column-chart-label")
                               (.attr "transform" (str "translate(" 0 "," (if (> (count chart-keys) 1) 20 50) ")")))] ;x-pos
-        (build-selected-label chart-label-g label-value label-color chart-width)
+        (build-selected-label chart-label-g label-value sub-label-value label-color chart-width)
         (let [chart-label-width (js/SVGgetWidth chart-label-g)
               chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
           (.attr chart-label-g "transform" (str "translate("
-                                                0 ;(max 0 chart-label-pos)
+                                                0
                                                 ","
                                                 (if (> (count chart-keys) 1) 20 50)
                                                 ")")))))))
