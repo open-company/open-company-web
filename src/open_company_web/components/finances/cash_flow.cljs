@@ -73,13 +73,11 @@
         cash-flow (when cash-flow-val (str (when (neg? cash-flow-val) "-") prefix (utils/with-metric-prefix abs-cash-flow-val)))]
    [{:label (when revenue (str "Revenue " revenue))
      :sub-label (str "CASH FLOW - " (utils/get-month (:period data-set)) " " (utils/get-year (:period data-set)))
-     :color (occ/get-color-by-kw :oc-green-regular)}
+     :color (occ/get-color-by-kw :oc-gray-5)}
     {:label (when costs (str " Costs " costs))
-     :color (occ/get-color-by-kw :oc-red-regular)}
+     :color (occ/get-color-by-kw :oc-gray-5)}
     {:label (when cash-flow (str " Cash flow " cash-flow))
-     :color (if (pos? cash-flow-val)
-              (occ/get-color-by-kw :oc-green-regular)
-              (occ/get-color-by-kw :oc-red-regular))}]))
+     :color (occ/get-color-by-kw :oc-gray-5)}]))
 
 (defcomponent cash-flow [data owner options]
   

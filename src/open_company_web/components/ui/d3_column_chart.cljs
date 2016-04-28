@@ -58,21 +58,36 @@
           (.text sub-label-value)))
     ;; Show multiple values
     (loop [idx 0
-           txt-left 0]
+           txt-left 0
+           txt-top 0]
       (let [{:keys [label color]} (get label-value idx)
             txt (-> chart-label-g
                     (.append "text")
                     (.attr "fill" color)
                     (.attr "class" "chart-label small")
-                    (.attr "dx" 0)
-                    (.attr "dy" 0)
+                    (.attr "dx" txt-left)
+                    (.attr "dy" txt-top)
                     (.text label))
             txt-width (js/SVGgetWidth txt)
             txt-height (* idx 25)]
-        (.attr txt "dx" txt-left)
+        (when-not (utils/is-mobile)
+          (.attr txt "dx" txt-left))
+        (when (= idx (dec (count label-value)))
+          (-> chart-label-g
+            (.append "text")
+            (.attr "fill" label-color)
+            (.attr "class" "sub-chart-label")
+            (.attr "dx" 0)
+            (.attr "dy" (+ txt-top 25))
+            (.text (:sub-label (get label-value 0)))))
         (when (< idx (dec (count label-value)))
           (recur (inc idx)
-                 (+ txt-left txt-width 10)))))))
+                 (if (utils/is-mobile)
+                    txt-left
+                    (+ txt-left txt-width 10))
+                 (if (utils/is-mobile)
+                    (+ txt-top 25)
+                    txt-top)))))))
 
 (defn bar-click [owner options idx]
   (.stopPropagation (.-event js/d3))
