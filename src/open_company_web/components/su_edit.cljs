@@ -4,7 +4,10 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
             [open-company-web.api :as api]
+            [open-company-web.urls :as oc-urls]
+            [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.company-header :refer [company-header]]
@@ -53,8 +56,7 @@
     :drawer-open false})
 
   (render-state [_ {:keys [drawer-open]}]
-    (let [slug (keyword (:slug @router/path))
-          company-data (get data slug)
+    (let [company-data (:company-data data)
           stakeholder-update (:stakeholder-update company-data)
           section-keys (map keyword (:sections stakeholder-update))
           all-sections-key (get-key-from-sections (:sections company-data))]
@@ -74,9 +76,9 @@
           ;; side drawer
           (let [all-sections (vec (flatten (vals (:sections company-data))))
                 all-section-keys (map keyword all-sections)
-                list-data (merge data {:active true
-                                       :all-topics (select-keys company-data all-section-keys)
-                                       :active-topics-list (:sections stakeholder-update)})
+                list-data {:active true
+                           :all-topics (select-keys company-data all-section-keys)
+                           :active-topics-list (:sections stakeholder-update)}
                 list-opts {:did-change-active-topics (partial save-stakeholder-update stakeholder-update)}]
             (om/build side-drawer {:open drawer-open
                                    :list-key "su-update"
@@ -132,12 +134,10 @@
     (om/set-state! owner :outro (:initial-outro current-state))
     (om/set-state! owner :force-content-update true)
     (utils/after 100 #(om/set-state! owner :force-content-update false)))
-  (let [slug (name (:slug @router/path))]
-    (router/nav! (str "/" slug "/updates"))))
+  (router/nav! (oc-urls/stakeholder-update-list)))
 
 (defn get-state [data current-state]
-  (let [slug (keyword (:slug @router/path))
-        company-data (get data slug)
+  (let [company-data (dispatcher/company-data data)
         su-data (:stakeholder-update company-data)
         title (:title su-data)
         sections (:sections su-data)
@@ -182,7 +182,7 @@
   (will-unmount [_]
     (when-not (utils/is-test-env?)
       ; re enable the route dispatcher
-      (reset! open-company-web.core/prevent-route-dispatch false)
+      (reset! prevent-route-dispatch false)
       ; remove the onbeforeunload handler
       (set! (.-onbeforeunload js/window) nil)
       ; remove history change listener
@@ -192,19 +192,19 @@
     (fix-buttons-position owner)
     (when-not (utils/is-test-env?)
       (utils/after 100 (fn []
-        (reset! open-company-web.core/prevent-route-dispatch true)
+        (reset! prevent-route-dispatch true)
         (let [win-location (.-location js/window)
               current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
-              listener (events/listen open-company-web.core/history EventType/NAVIGATE
+              listener (events/listen @router/history EventType/NAVIGATE
                          #(when-not (= (.-token %) current-token)
                             (if (om/get-state owner :has-changes)
                               (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
                                 ; dispatch the current url
-                                (open-company-web.core/route-dispatch! (router/get-token))
+                                (@router/route-dispatcher (router/get-token))
                                 ; go back to the previous token
-                                (.setToken open-company-web.core/history current-token))
+                                (.setToken @router/history current-token))
                               ; dispatch the current url
-                              (open-company-web.core/route-dispatch! (router/get-token)))))]
+                              (@router/route-dispatcher (router/get-token)))))]
           (om/set-state! owner :history-listener-id listener))))))
 
   (did-update [_ _ _]
@@ -213,14 +213,13 @@
   (will-receive-props [_ next-props]
     (om/set-state! owner (get-state next-props (om/get-state owner)))
     (when (:su-edit next-props)
-      (router/nav! (str "/" (:slug @router/path) "/updates"))))
+      (router/nav! (oc-urls/stakeholder-update-list))))
 
   (render-state [_ {:keys [drawer-open has-changes title intro sections outro force-content-update]}]
     ; set the onbeforeunload handler only if there are changes
     (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
       (set! (.-onbeforeunload js/window) onbeforeunload-cb))
-    (let [slug (keyword (:slug @router/path))
-          company-data (get data slug)
+    (let [company-data (dispatcher/company-data data)
           su-data (:stakeholder-update company-data)]
 
       (utils/update-page-title (str "OpenCompany - Stakeholder Update Edit - " (:name company-data)))
@@ -233,7 +232,7 @@
           (dom/h4 "Loading data..."))
 
         ;; Stakeholder update
-        (and (not (contains? data :loading)) (contains? data slug))
+        (and (not (contains? data :loading)) company-data)
         (dom/div {:class (utils/class-set {:su-edit true
                                            :navbar-offset (not (utils/is-mobile))})}
           ;; Company / user header
@@ -272,7 +271,8 @@
                                                      :update-content force-content-update}
                                                     {:opts {:change-cb (partial change-cb owner)}}))
               ;; Stakeholder update topics
-              (om/build selected-topics data)
+              (om/build selected-topics {:company-data company-data
+                                         :loading (:loading data)})
               ;; Stakeholder update footer
               (om/build su-edit-footer {:outro outro
                                                    :update-content force-content-update}
@@ -280,11 +280,11 @@
               ;; Dashboard link
               (when (utils/is-mobile)
                 (dom/div {:class "dashboard-link"}
-                  (om/build link {:href (str "/" (:slug company-data)) :name "View Dashboard"}))))))
+                  (om/build link {:href (oc-urls/company) :name "View Dashboard"}))))))
 
 
         ;; Error fallback
         :else
         (dom/div
-          (dom/h2 (str (name slug) " not found"))
-          (om/build link {:href "/" :name "Back home"}))))))
+          (dom/h2 "Company not found")
+          (om/build link {:href oc-urls/companies :name "Back home"}))))))

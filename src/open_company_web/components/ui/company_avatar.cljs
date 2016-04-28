@@ -4,7 +4,8 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.router :as router]))
+            [open-company-web.router :as router]
+            [open-company-web.urls :as oc-urls]))
 
 (def df-company-avatar-size 40)
 
@@ -12,14 +13,16 @@
   (render [_]
     (when (:company-data data)
       (let [company-data (:company-data data)
-            slug (:slug @router/path)
+            slug (router/current-company-slug)
             company-name (if (contains? company-data :name)
                            (:name company-data)
                            (utils/camel-case-str slug))
             first-letter (first (clojure.string/upper-case company-name))
             is-profile-page (utils/in? (:route @router/path) "profile")
             read-only-company (:read-only company-data)
-            company-home (str "/" slug (when-not (or read-only-company is-profile-page) "/profile"))
+            company-home (if (or read-only-company is-profile-page)
+                            (oc-urls/company-profile)
+                            (oc-urls/company))
             av-size (or (:size data) df-company-avatar-size)
             px-size (utils/px av-size)
             bd-radius (utils/px (int (/ av-size 2)))

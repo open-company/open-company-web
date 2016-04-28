@@ -12,9 +12,6 @@
             [open-company-web.lib.jwt :as jwt]
             [cljs.core.async :refer (put!)]))
 
-(defn company-title [data]
-  (str (:name data)))
-
 (defcomponent navbar [data owner]
 
   (render [_]

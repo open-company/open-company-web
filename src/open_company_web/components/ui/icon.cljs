@@ -1,4 +1,4 @@
-(ns open-company-web.components.icon
+(ns open-company-web.components.ui.icon
   (:require [om-tools.dom :as dom]
             [open-company-web.lib.oc-colors :as occ]
             [open-company-web.local-settings :as ls]))

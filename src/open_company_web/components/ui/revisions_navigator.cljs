@@ -1,4 +1,4 @@
-(ns open-company-web.components.revisions-navigator
+(ns open-company-web.components.ui.revisions-navigator
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -73,7 +73,7 @@
           prev-date  (utils/date-string (utils/js-date (:updated-at rev-prev)))
           next-date  (utils/date-string (utils/js-date (:updated-at rev-next)))
           last-date  (utils/date-string (utils/js-date (:updated-at rev-last)))
-          slug (keyword (:slug @router/path))
+          slug (keyword (router/current-company-slug))
           section (:section data)
           revisions-list (section (slug @cache/revisions))]
       ; preload previous revision

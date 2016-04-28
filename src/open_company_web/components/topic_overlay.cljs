@@ -7,7 +7,7 @@
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
             [open-company-web.api :as api]
-            [open-company-web.components.icon :as i]
+            [open-company-web.components.ui.icon :as i]
             [open-company-web.components.topic-overlay-edit :refer (topic-overlay-edit)]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
@@ -182,7 +182,7 @@
   (render-state [_ {:keys [as-of editing growth-metric-focus field-focus transition-as-of]}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
-          slug (keyword (:slug @router/path))
+          slug (keyword (router/current-company-slug))
           revisions-list (section-kw (@cache/revisions slug))
           topic-data (utils/select-section-data section-data section-kw as-of)
           prev-rev (utils/revision-prev revisions as-of)

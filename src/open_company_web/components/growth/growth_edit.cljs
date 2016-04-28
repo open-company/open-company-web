@@ -71,7 +71,7 @@
   ((:save-metadata-cb data) (:metric-slug data))
   (set-metadata-edit owner data false))
 
-(defcomponent growth-edit [data owner]
+(defcomponent growth-edit [data owner options]
 
   (init-state [_]
     {:metadata-edit (:new-metric data)
@@ -87,10 +87,8 @@
 
   (render-state [_ {:keys [growth-data metadata-edit stop]}]
     (let [{:keys [interval slug] :as metric-info} (get-current-metric-info data)
-          company-slug (keyword (:slug @router/path))
-          company-data (company-slug @dispatcher/app-state)
           prefix (if (= (:unit metric-info) "currency")
-                   (utils/get-symbol-for-currency-code (:currency company-data))
+                   (utils/get-symbol-for-currency-code (:currency options))
                    "")
           suffix (when (= (:unit metric-info) "%") "%")]
       (dom/div {:class "composed-section-edit growth-body edit"}
@@ -119,7 +117,8 @@
                                                          ((:reset-metrics-cb data))
                                                          ; - exit the metadata edit state
                                                          (set-metadata-edit owner data false))))
-                                        :change-growth-metric-cb (:change-growth-metric-cb data)})
+                                        :change-growth-metric-cb (:change-growth-metric-cb data)}
+                                        {:opts {:currency (:currency options)}})
           (dom/div{}
             (when interval
               (dom/div {:class "chart-header-container"}
@@ -130,6 +129,7 @@
                       (str (:name metric-info) " ")
                       (om/build editable-pen {:click-callback #(set-metadata-edit owner data true)}))
                     (dom/h3 {:class "actual-label gray"} (str (utils/camel-case-str (:interval metric-info)) " " (utils/camel-case-str (:unit metric-info))))))))
+
             (dom/table {:class "table"
                         :key (str "growth-edit-" slug)}
               (dom/thead {}

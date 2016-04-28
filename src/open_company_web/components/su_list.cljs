@@ -7,12 +7,12 @@
             [open-company-web.local-settings :as ls]
             [open-company-web.api :as api]
             [open-company-web.caches :as caches]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.company-header :refer [company-header]]
-            [open-company-web.components.section-selector :refer (section-selector)]
             [open-company-web.components.ui.link :refer (link)]
             [open-company-web.components.ui.side-drawer :refer (side-drawer)]
             [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]
@@ -21,8 +21,7 @@
 
 (defcomponent su-update [data owner]
   (render [_]
-    (let [slug (name (:slug @router/path))
-          update (:update data)
+    (let [update (:update data)
           js-date-upat (utils/js-date (:created-at update))
           month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
           topic-updated-at (str month-string " " (.getDate js-date-upat) ", " (.getFullYear js-date-upat))
@@ -31,7 +30,7 @@
           links (:links update)
           update-get-link (utils/link-for links "self" "GET")]
       (dom/div {:class "su-update"
-                :on-click #(router/nav! (str "/" slug "/updates/" update-slug))}
+                :on-click #(router/nav! (oc-urls/stakeholder-update update-slug))}
         (dom/div {:class "su-title"} (:title update))
         (dom/div {:class "su-date"} topic-updated-at)
         (dom/div {:class "su-body"
@@ -52,10 +51,9 @@
 
 (defn load-su-list-if-needed [owner]
   ;; request the live SU if necessary
-  (let [slug (keyword (:slug @router/path))
-        data (om/get-props owner)
-        company-data (get data slug)]
-    (when (and (not (om/get-state owner :su-requested)) (contains? company-data :links))
+  (let [company-data (dispatcher/company-data (om/get-props owner))]
+    (when (and (not (om/get-state owner :su-requested))
+               (contains? company-data :links))
       (api/get-su-list)
       (om/set-state! owner :su-requested true))))
 
@@ -73,10 +71,8 @@
     (load-su-list-if-needed owner))
 
   (render-state [_ {:keys [drawer-open]}]
-    (let [slug (keyword (:slug @router/path))
-          su-list-key (dispatcher/su-list-key slug)
-          company-data (get data slug)
-          su-list (get data su-list-key)
+    (let [company-data (dispatcher/company-data data)
+          su-list (dispatcher/stakeholder-update-list-data data)
           stakeholder-update-data (:stakeholder-update company-data)]
 
       (utils/update-page-title (str "OpenCompany - " (:name company-data)))
@@ -89,7 +85,7 @@
           (dom/h4 "Loading data..."))
 
         ;; Stakeholder update
-        (and (not (contains? data :loading)) (contains? data slug))
+        (and (not (contains? data :loading)) company-data)
         (dom/div {:class (utils/class-set {:stakeholder-update true
                                            :navbar-offset (not (utils/is-mobile))})}
           ;; Company / user header
@@ -104,18 +100,18 @@
           
           (dom/div {:class "update-internal"}
           
-            (dom/div {:class "sections"}; col-md-9 col-sm-12"}
+            (dom/div {:class "sections"}
               ;; Stakeholder update topics
               (om/build stakeholder-updates {:company-data company-data
                                              :su-list su-list})
               ;; Dashboard link
               (when (utils/is-mobile)
                 (dom/div {:class "dashboard-link"}
-                  (om/build link {:href (str "/" (:slug company-data)) :name "View Dashboard"}))))))
+                  (om/build link {:href (oc-urls/company) :name "View Dashboard"}))))))
 
 
         ;; Error fallback
         :else
         (dom/div
-          (dom/h2 (str (name slug) " not found"))
-          (om/build link {:href "/" :name "Back home"}))))))
+          (dom/h2 "Company not found")
+          (om/build link {:href oc-urls/companies :name "Back home"}))))))

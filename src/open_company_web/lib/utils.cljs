@@ -384,7 +384,7 @@
 
 (defn select-section-data [section-data section as-of]
   (when (or as-of (:placeholder section-data))
-    (let [slug (keyword (:slug @router/path))]
+    (let [slug (keyword (router/current-company-slug))]
       (if (or (not (contains? (slug @caches/revisions) section))
               (= as-of (:updated-at section-data)))
         section-data
@@ -537,7 +537,7 @@
       (str year "-" (add-zero month)))))
 
 (defn company-cache-key [k & [v]]
-  (let [slug (keyword (:slug @router/path))
+  (let [slug (keyword (router/current-company-slug))
         cc (slug @company-cache)]
     (when v
       (swap! company-cache assoc-in [slug k] v))

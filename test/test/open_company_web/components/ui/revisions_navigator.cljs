@@ -1,10 +1,10 @@
-(ns test.open-company-web.components.revisions-navigator
+(ns test.open-company-web.components.ui.revisions-navigator
     (:require [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
               [cljs-react-test.simulate :as sim]
               [cljs-react-test.utils :as tu]
               [om.core :as om :include-macros true]
               [dommy.core :as dommy :refer-macros [sel1 sel]]
-              [open-company-web.components.revisions-navigator :refer [revisions-navigator]]
+              [open-company-web.components.ui.revisions-navigator :refer [revisions-navigator]]
               [om.dom :as dom :include-macros true]
               [open-company-web.lib.utils :as utils]
               [open-company-web.router :as router]))
