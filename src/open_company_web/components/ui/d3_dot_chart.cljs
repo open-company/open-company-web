@@ -8,8 +8,10 @@
             [cljsjs.d3]))
 
 (def dot-radius 5)
+(def dot-stroke 3)
+(def dot-selected-stroke 6)
 
-(def show-dots 6)
+(def show-dots 5)
 
 (defn max-y [data chart-keys]
   (let [filtered-data (map #(select-keys % chart-keys) data)]
@@ -24,11 +26,9 @@
         range-fn (.range linear-fn #js [0 (- (:chart-height options) 100)])]
     range-fn))
 
-(defn dot-position [chart-width i data-count dots-num]
-  (let [dot-spacer (/ (- chart-width 20) data-count)]
-    (+ (/ dot-spacer 2)
-       (* i dot-spacer)
-       10)))
+(defn dot-position [chart-width i]
+  (let [dot-spacer (/ (- chart-width 20) (dec show-dots))]
+    (+ (* i dot-spacer) 10)))
 
 (defn current-data [owner]
   (let [start (om/get-state owner :start)
@@ -36,46 +36,66 @@
         stop (min (count all-data) (+ start show-dots))]
     (subvec all-data start stop)))
 
+(defn render-chart-label [owner options selected chart-data]
+  (when-let [d3-dots (.select js/d3 (om/get-ref owner "d3-dots"))]
+    (.remove (.select d3-dots "#dot-chart-label"))
+    (.remove (.select d3-dots "#dot-chart-label-sub"))
+    (let [chart-width (:chart-width options)
+          label-key (:label-key options)
+          sub-label-key (:sub-label-key options)
+          x-pos (dot-position chart-width selected)
+          selected-data-set (get chart-data selected)
+          label-text (get selected-data-set label-key)
+          sub-label-text (get selected-data-set sub-label-key)
+          chart-label (-> d3-dots
+                          (.append "text")
+                          (.attr "class" "dot-chart-label")
+                          (.attr "id" "dot-chart-label")
+                          (.attr "x" 0)
+                          (.attr "y" 20)
+                          (.attr "fill" (:label-color options))
+                          (.text label-text))
+          chart-label-width (js/SVGgetWidth chart-label)
+          small? (> chart-label-width 150)]
+      (when small?
+        (.attr chart-label "class" "dot-chart-label small"))
+      (when (and sub-label-key sub-label-text)
+        (-> d3-dots
+            (.append "text")
+            (.attr "class" (str "dot-chart-label-sub" (when small? " small")))
+            (.attr "id" "dot-chart-label-sub")
+            (.attr "x" 0)
+            (.attr "y" 40)
+            (.attr "fill" (:label-color options))
+            (.text sub-label-text))))))
+
 (defn dot-click [owner options idx & [is-hover]]
   (.stopPropagation (.-event js/d3))
   (let [svg-el (om/get-ref owner "d3-dots")
         d3-svg-el (.select js/d3 svg-el)
-        selected (om/get-state owner :selected)
-        chart-label (.select d3-svg-el (str "#dot-chart-label"))
         chart-width (:chart-width options)
         data (current-data owner)
         next-set (get data idx)
-        label-key (:label-key options)
-        data-count (count data)
-        chart-keys-count (count (:chart-keys options))
-        label-x-pos (dot-position chart-width idx data-count chart-keys-count)
         next-circle (.select d3-svg-el (str "circle#chart-dot-" idx))
-        all-circles (.selectAll d3-svg-el "circle")
-        next-month-text (.select d3-svg-el (str "text#chart-x-label-" idx))
-        all-month-text (.selectAll d3-svg-el ".chart-x-label")]
+        all-circles (.selectAll d3-svg-el "circle")]
     (.each all-circles (fn [d i]
                         (this-as circle-node
                           (let [circle (.select js/d3 circle-node)
                                 color (.attr circle "data-fill")
                                 hasvalue (.attr circle "data-hasvalue")]
                             (-> circle
-                                (.attr "fill" color)
+                                (.attr "stroke" color)
+                                (.attr "stroke-width" dot-stroke)
+                                (.attr "fill" "transparent")
                                 (.attr "r" (if hasvalue dot-radius 0)))))))
-    (let [selected-color (.attr next-circle "data-selectedFill")
+    (let [color (.attr next-circle "data-fill")
           hasvalue (.attr next-circle "data-hasvalue")]
       (-> next-circle
-          (.attr "fill" selected-color)
-          (.attr "r" (if hasvalue (* dot-radius 1.5) 0))))
-    (.text chart-label (label-key next-set))
-    (.each all-month-text
-           (fn [d i]
-              (this-as month-text
-                (let [d3-month-text (.select js/d3 month-text)]
-                  (.attr d3-month-text "fill" (:h-axis-color options))))))
-    (.attr next-month-text "fill" (:h-axis-selected-color options))
-    (let [chart-label-width (js/SVGgetWidth chart-label)
-          new-x-pos (- (/ chart-width 2) (/ chart-label-width 2))]
-      (.attr chart-label "x" (max 0 new-x-pos)))
+          (.attr "stroke" color)
+          (.attr "stroke-width" dot-selected-stroke)
+          (.attr "fill" "transparent")
+          (.attr "r" (if hasvalue dot-radius 0))))
+    (render-chart-label owner options idx data)
     (when-not is-hover
       (om/set-state! owner :selected idx))))
 
@@ -100,102 +120,79 @@
           ; main chart node
           chart-node (-> js/d3
                          (.select d3-dots)
-                         (.attr "width" (:chart-width options))
-                         (.attr "height" (:chart-height options))
+                         (.attr "width" chart-width)
+                         (.attr "height" chart-height)
                          (.on "click" #(.stopPropagation (.-event js/d3))))
           scale-fn (scale owner options)
           data-max (max-y (om/get-props owner :chart-data) chart-keys)
-          max-y (scale-fn data-max)
-          h-axis-color (:h-axis-color options)
-          h-axis-selected-color (:h-axis-selected-color options)
-          label-key (:label-key options)]
+          max-y (scale-fn data-max)]
       ; for each set of data
-      (doseq [i (range (count chart-data))]
-        (let [data-set (get chart-data i)
-              max-val (apply max (vals (select-keys data-set chart-keys)))
-              scaled-max-val (scale-fn max-val)
-              force-year (or (zero? i) (= i (dec (count chart-data))))
-              text (utils/get-period-string (:period data-set) (:interval options) [:short (when force-year :force-year) (when (utils/is-mobile) :short-year)])
-              x-pos (dot-position chart-width i (count chart-data) (count chart-keys))
-              label (-> chart-node
-                        (.append "text")
-                        (.attr "class" "chart-x-label")
-                        (.attr "id" (str "chart-x-label-" i))
-                        (.attr "x" x-pos)
-                        (.attr "y" (- (:chart-height options) 5))
-                        (.attr "fill" (if (= i selected) h-axis-selected-color h-axis-color))
-                        (.text text))
-              label-width (js/SVGgetWidth label)]
-          (.attr label "x" (+ x-pos (/ (- (* (* dot-radius 2) (count chart-keys)) label-width) 2)))
-          ; for each key in the set
-          (doseq [j (range (count chart-keys))]
-            (let [chart-key (get chart-keys j)
-                  cx (dot-position chart-width i (count chart-data) (count chart-keys))
-                  cy (scale-fn (chart-key data-set))]
-              ; add the line to connect this to the next dot
-              (when (and (chart-key data-set)
-                         (< i (dec (count chart-data))))
-                (let [next-data-set (get chart-data (inc i))
-                      next-cx (dot-position chart-width (inc i) (count chart-data) (count chart-keys))
-                      next-cy (scale-fn (chart-key next-data-set))]
-                  (when (chart-key next-data-set)
-                    (-> chart-node
-                        (.append "line")
-                        (.attr "class" "chart-line")
-                        (.style "stroke" (chart-key fill-colors))
-                        (.style "stroke-width" 2)
-                        (.attr "x1" cx)
-                        (.attr "y1" (get-y cy max-y))
-                        (.attr "x2" next-cx)
-                        (.attr "y2" (get-y next-cy max-y))))))
-              ; add a rect to represent the data
-              (-> chart-node
-                  (.append "circle")
-                  (.attr "class" "chart-dot")
-                  (.attr "r" (if (not (chart-key data-set))
-                              0
-                              (if (= i selected)
-                                (* dot-radius 1.5)
-                                dot-radius)))
-                  (.attr "fill" (if (= i selected)
-                                  (chart-key fill-selected-colors)
-                                  (chart-key fill-colors)))
-                  (.attr "data-fill" (chart-key fill-colors))
-                  (.attr "data-hasvalue" (chart-key data-set))
-                  (.attr "data-selectedFill" (chart-key fill-selected-colors))
-                  (.attr "id" (str "chart-dot-" i))
-                  (.attr "cx" cx)
-                  (.attr "cy" (get-y cy max-y)))))))
+      (when (> (count chart-data) 1)
+        (doseq [i (range (count chart-data))]
+          (let [data-set (get chart-data i)]
+            ; for each key in the set
+            (doseq [j (range (count chart-keys))]
+              (let [chart-key (get chart-keys j)
+                    cx (dot-position chart-width i)
+                    cy (scale-fn (chart-key data-set))]
+                ; add the line to connect this to the next dot and a polygon below the lines
+                (when (and (chart-key data-set)
+                           (< i (dec (count chart-data))))
+                  (let [next-data-set (get chart-data (inc i))
+                        next-cx (dot-position chart-width (inc i))
+                        next-cy (scale-fn (chart-key next-data-set))]
+                    (when (chart-key next-data-set)
+                      (-> chart-node
+                          (.append "polygon")
+                          (.attr "class" "chart-polygon")
+                          (.style "fill" (chart-key fill-colors))
+                          (.style "opacity" "0.35")
+                          (.attr "points"
+                            (str (inc cx) "," (get-y cy max-y) " "
+                                 (dec next-cx) "," (get-y next-cy max-y) " "
+                                 (dec next-cx) "," chart-height " "
+                                 (inc cx) "," chart-height " ")))
+                      (-> chart-node
+                          (.append "line")
+                          (.attr "class" "chart-line")
+                          (.style "stroke" (chart-key fill-colors))
+                          (.style "stroke-width" dot-stroke)
+                          (.attr "x1" (+ cx 2))
+                          (.attr "y1" (get-y cy max-y))
+                          (.attr "x2" (- next-cx 2))
+                          (.attr "y2" (get-y next-cy max-y))))))
+                ; add a rect to represent the data
+                (-> chart-node
+                    (.append "circle")
+                    (.attr "class" "chart-dot")
+                    (.attr "r" (if (not (chart-key data-set))
+                                0
+                                dot-radius))
+                    (.attr "stroke" (chart-key fill-colors))
+                    (.attr "stroke-width" (if (= i selected) dot-selected-stroke dot-stroke))
+                    (.attr "fill" "transparent")
+                    (.attr "data-fill" (chart-key fill-colors))
+                    (.attr "data-hasvalue" (chart-key data-set))
+                    (.attr "data-selectedFill" (chart-key fill-selected-colors))
+                    (.attr "id" (str "chart-dot-" i))
+                    (.attr "cx" cx)
+                    (.attr "cy" (get-y cy max-y))))))))
       ; add the hovering rects
-      (doseq [i (range (count chart-data))]
-        (-> chart-node
-            (.append "rect")
-            (.attr "class" "hover-rect")
-            (.attr "width" (/ chart-width (count chart-data)))
-            (.attr "height" (- chart-height 50))
-            (.attr "x" (* i (/ chart-width (count chart-data))))
-            (.attr "y" 50)
-            (.on "click" #(dot-click owner options i false))
-            (.on "mouseover" #(dot-click owner options i true))
-            (.on "mouseout" #(dot-click owner options (om/get-state owner :selected) true))
-            (.attr "fill" "transparent")))
+      (when (> (count chart-data) 1)
+        (doseq [i (range (count chart-data))]
+          (-> chart-node
+              (.append "rect")
+              (.attr "class" "hover-rect")
+              (.attr "width" (/ chart-width show-dots))
+              (.attr "height" (- chart-height 50))
+              (.attr "x" (* i (/ chart-width show-dots)))
+              (.attr "y" 50)
+              (.on "click" #(dot-click owner options i false))
+              (.on "mouseover" #(dot-click owner options i true))
+              (.on "mouseout" #(dot-click owner options (om/get-state owner :selected) true))
+              (.attr "fill" "transparent"))))
       ; add the selected value label
-      (let [x-pos (dot-position chart-width selected (count chart-data) (count chart-keys))
-            chart-label (-> chart-node
-                            (.append "text")
-                            (.attr "class" "dot-chart-label")
-                            (.attr "id" "dot-chart-label")
-                            (.attr "x" x-pos)
-                            (.attr "y" 50)
-                            (.attr "fill" (:label-color options))
-                            (.text (label-key (get chart-data selected))))
-            chart-label-width (js/SVGgetWidth chart-label)
-            chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
-        (when (> chart-label-width 150)
-          (.attr chart-label "class" "dot-chart-label small"))
-        (let [new-chart-label-width (js/SVGgetWidth chart-label)
-              new-chart-label-pos (- (/ chart-width 2) (/ new-chart-label-width 2))]
-          (.attr chart-label "x" (max 0 new-chart-label-pos)))))))
+      (render-chart-label owner options selected chart-data))))
 
 (def chart-step show-dots)
 
@@ -232,17 +229,20 @@
         (d3-calc owner options))))
 
   (render-state [_ {:keys [start]}]
-    (dom/div {:class "d3-dot-container"
-              :style #js {:width (str (+ chart-width 20) "px")
-                          :height (str chart-height "px")}}
-      (dom/div {:class "chart-prev"
-                :style #js {:paddingTop (str (- chart-height 17) "px")
-                            :opacity (if (> start 0) 1 0)}
-                :on-click #(prev-data owner %)}
-        (dom/i {:class "fa fa-caret-left"}))
-      (dom/svg #js {:className "d3-dot-chart" :ref "d3-dots"})
-      (dom/div {:class "chart-next"
-                :style #js {:paddingTop (str (- chart-height 17) "px")
-                            :opacity (if (< start (- (count chart-data) show-dots)) 1 0)}
-                :on-click #(next-data owner %)}
-        (dom/i {:class "fa fa-caret-right"})))))
+    (let [fixed-chart-height (if (> (count chart-data) 1)
+                              chart-height
+                              90)]
+      (dom/div {:class "d3-dot-container"
+                :style #js {:width (str (+ chart-width 20) "px")
+                            :height (str fixed-chart-height "px")}}
+        (dom/div {:class "chart-prev"
+                  :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
+                              :opacity (if (> start 0) 1 0)}
+                  :on-click #(prev-data owner %)}
+          (dom/i {:class "fa fa-caret-left"}))
+        (dom/svg #js {:className "d3-dot-chart" :ref "d3-dots"})
+        (dom/div {:class "chart-next"
+                  :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
+                              :opacity (if (< start (- (count chart-data) show-dots)) 1 0)}
+                  :on-click #(next-data owner %)}
+          (dom/i {:class "fa fa-caret-right"}))))))
