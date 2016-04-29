@@ -11,6 +11,9 @@
 
 (def chart-step 5)
 
+(def unselected-opacity "0.25")
+(def selected-opacity "0.7")
+
 (defn current-data [owner]
   (let [start (om/get-state owner :start)
         all-data (vec (om/get-props owner :chart-data))
@@ -107,26 +110,22 @@
         label-key (:label-key options)
         sub-label-key (:sub-label-key options)
         next-g-rects (.selectAll next-g "rect")
-        all-rects (.selectAll d3-svg-el "rect.chart-bar")
-        all-month-text (.selectAll d3-svg-el ".chart-x-label")]
+        all-rects (.selectAll d3-svg-el "rect.chart-bar")]
     (.each all-rects
            (fn [d i]
               (this-as rect
                 (let [d3-rect (.select js/d3 rect)
                       color (.attr d3-rect "data-fill")]
-                  (.attr d3-rect "fill" color)))))
+                  (.attr d3-rect "fill" color)
+                  (.style d3-rect "opacity" unselected-opacity)))))
     (.each next-g-rects
            (fn [d i]
               (this-as rect
                 (let [d3-rect (.select js/d3 rect)
                       selected-color (.attr d3-rect "data-selectedFill")]
-                  (.attr d3-rect "fill" selected-color)))))
-    (.each all-month-text
-           (fn [d i]
-              (this-as month-text
-                (let [d3-month-text (.select js/d3 month-text)]
-                  (.attr d3-month-text "fill" (:h-axis-color options))))))
-    (build-selected-label chart-label (label-key next-set) (sub-label-key next-set) (:label-color options) chart-width)
+                  (.attr d3-rect "fill" selected-color)
+                  (.style d3-rect "opacity" selected-opacity)))))
+    (build-selected-label chart-label (get next-set label-key) (get next-set sub-label-key) (:label-color options) chart-width)
     (om/set-state! owner :selected idx)))
 
 (defn get-color [color-key options chart-key value]
@@ -158,8 +157,6 @@
                          (.attr "height" (:chart-height options))
                          (.on "click" #(.stopPropagation (.-event js/d3))))
           scale-fn (scale owner options)
-          h-axis-color (:h-axis-color options)
-          h-axis-selected-color (:h-axis-selected-color options)
           label-key (:label-key options)
           sub-label-key (:sub-label-key options)]
       ; for each set of data
@@ -192,6 +189,9 @@
                     (.attr "fill" (if (= i selected)
                                     selected-color
                                     color))
+                    (.style "opacity" (if (= i selected)
+                                        selected-opacity
+                                        unselected-opacity))
                     (.attr "data-fill" color)
                     (.attr "data-selectedFill" selected-color)
                     (.attr "data-hasvalue" value)
@@ -216,9 +216,10 @@
               (.attr "fill" "transparent"))))
       ; add the selected value label
       (let [x-pos (/ chart-width 2)
-            label-value (label-key (get chart-data selected))
+            selected-data-set (get chart-data selected)
+            label-value (get selected-data-set label-key)
+            sub-label-value (get selected-data-set sub-label-key)
             label-color (:label-color options)
-            sub-label-value (sub-label-key (get chart-data selected))
             chart-label-g (-> chart-node
                               (.append "g")
                               (.attr "class" "chart-label-container")

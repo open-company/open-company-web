@@ -52,10 +52,8 @@
                              :label-key :label
                              :sub-label-key :sub-label
                              :interval "monthly"
-                             :h-axis-color (occ/get-color-by-kw :oc-green-light)
-                             :h-axis-selected-color (occ/get-color-by-kw :oc-green-regular)
-                             :chart-colors {:runway (occ/get-color-by-kw :oc-green-light)}
-                             :chart-selected-colors {:runway (occ/get-color-by-kw :oc-green-regular)}
+                             :chart-colors {:runway (occ/get-color-by-kw :oc-new-chart-green)}
+                             :chart-selected-colors {:runway (occ/get-color-by-kw :oc-new-chart-green)}
                              :prefix (utils/get-symbol-for-currency-code currency)}}]
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))
                 :on-click (:start-editing-cb data)}

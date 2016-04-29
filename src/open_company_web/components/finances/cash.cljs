@@ -28,10 +28,8 @@
                              :label-key :label
                              :sub-label-key :sub-label
                              :interval "monthly"
-                             :h-axis-color (occ/get-color-by-kw :oc-green-light)
-                             :h-axis-selected-color (occ/get-color-by-kw :oc-green-regular)
-                             :chart-colors {:cash (occ/get-color-by-kw :oc-green-light)}
-                             :chart-selected-colors {:cash (occ/get-color-by-kw :oc-green-regular)}}}]
+                             :chart-colors {:cash (occ/get-color-by-kw :oc-new-chart-green)}
+                             :chart-selected-colors {:cash (occ/get-color-by-kw :oc-new-chart-green)}}}]
       (dom/div {:class (utils/class-set {:section true
                                          :cash true
                                          :read-only (:read-only data)})

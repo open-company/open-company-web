@@ -31,8 +31,6 @@
                              :label-key :label
                              :sub-label-key :sub-label
                              :interval "monthly"
-                             :h-axis-color (occ/get-color-by-kw :oc-red-light)
-                             :h-axis-selected-color (occ/get-color-by-kw :oc-red-regular)
                              :chart-colors {:costs (occ/get-color-by-kw :oc-red-light)}
                              :chart-selected-colors {:costs (occ/get-color-by-kw :oc-red-regular)}}}]
       (dom/div {:class (utils/class-set {:section true
