@@ -16,14 +16,17 @@
             [open-company-web.lib.iso4217 :refer (iso4217 sorted-iso4217)]))
 
 (defn- save-company-data [company-data logo logo-width logo-height]
-  (let [slug (router/current-company-slug)]
+  (let [slug (router/current-company-slug)
+        fixed-logo (or logo "")
+        fixed-logo-width (or logo-width 0)
+        fixed-logo-height (or logo-height 0)]
     (api/patch-company slug {:name (:name company-data)
                              :slug slug
                              :currency (:currency company-data)
                              :description (:description company-data)
-                             :logo-width (js/parseInt logo-height)
-                             :logo-height (js/parseInt logo-height)
-                             :logo logo})))
+                             :logo-width (js/parseInt fixed-logo-width)
+                             :logo-height (js/parseInt fixed-logo-height)
+                             :logo fixed-logo})))
 
 (defn- check-image [url owner data cb]
   (let [img (new js/Image)]
