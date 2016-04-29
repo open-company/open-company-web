@@ -65,7 +65,7 @@
                                        {:opts {:show-title false
                                                :show-revisions-navigation false
                                                :chart-size {:width (if (utils/is-mobile) 300 480)
-                                                            :height (if (utils/is-mobile) 274 290)}}}))
+                                                            :height (if (utils/is-mobile) 274 190)}}}))
             (when (= topic "growth")
               (om/build topic-growth   {:section-data topic-data
                                         :section topic-kw
@@ -76,7 +76,7 @@
                                                :show-revisions-navigation false
                                                :switch-metric-cb (:switch-metric-cb options)
                                                :chart-size {:width (if (utils/is-mobile) 300 480)
-                                                            :height (if (utils/is-mobile) 274 290)}}})))
+                                                            :height (if (utils/is-mobile) 274 190)}}})))
           (dom/div {:class "topic-overlay-body"
                     :dangerouslySetInnerHTML (clj->js {"__html" section-body})})
           (dom/div {:class "topic-overlay-navigation topic-navigation group"}
