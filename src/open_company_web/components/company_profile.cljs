@@ -72,7 +72,7 @@
               ; and it's empty
               (if (clojure.string/blank? logo)
                 ; save the data w/o a logo
-                (save-company-data company-data "" 0 0))
+                (save-company-data company-data "" 0 0)
                 ; else check the logo
                 (check-image logo owner company-data check-img-cb))
               ; else save the company datas
