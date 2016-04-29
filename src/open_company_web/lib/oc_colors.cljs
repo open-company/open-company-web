@@ -7,6 +7,7 @@
   :gray "#D8D8D8" ;"#ADADAD"
   :black "#000000"
   :oc-new-chart-blue "#4EE4D6"
+  :oc-new-chart-green "#4de148"
   ;; greens
   :oc-green-dark "#008C54"
   :oc-green-regular "#26C485"
