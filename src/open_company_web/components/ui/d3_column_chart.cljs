@@ -7,9 +7,9 @@
             [open-company-web.components.finances.utils :as finances-utils]
             [cljsjs.d3]))
 
-(def bar-width 15)
+; (def bar-width 15)
 
-(def chart-step 6)
+(def chart-step 5)
 
 (defn current-data [owner]
   (let [start (om/get-state owner :start)
@@ -27,11 +27,15 @@
         range-fn (.range linear-fn #js [0 (- (:chart-height options) 100)])]
     range-fn))
 
+(def bar-spacer 2)
+
+(defn bar-width [chart-width columns-num]
+  (/ (- chart-width (* bar-spacer chart-step))
+       chart-step))
+
 (defn bar-position [chart-width i data-count columns-num]
-  (let [bar-spacer (/ (- chart-width 30) data-count)
-        pos (- (* i bar-spacer)
-               (/ (* (* bar-width 2) columns-num) 2)
-               -60)]
+  (let [bar-wdt (bar-width chart-width columns-num)
+        pos (+ (* bar-wdt i) (* bar-spacer i))]
     pos))
 
 (def chart-label-height 20)
@@ -159,55 +163,57 @@
           label-key (:label-key options)
           sub-label-key (:sub-label-key options)]
       ; for each set of data
-      (doseq [i (range (count chart-data))]
-        (let [data-set (get chart-data i)
-              max-val (apply max (vals (select-keys data-set chart-keys)))
-              scaled-max-val (scale-fn max-val)
-              ; add a g element
-              bar-enter (-> chart-node
-                            (.append "g")
-                            (.attr "class" "chart-g")
-                            (.attr "id" (str "chart-g-" i))
-                            (.attr "transform"
-                                   (str "translate("
-                                        (bar-position chart-width i (count chart-data) keys-count)
-                                        ","
-                                        (- (:chart-height options) scaled-max-val) ")")))]
-          ; for each key in the set
-          (doseq [j (range (count chart-keys))]
-            (let [chart-key (get chart-keys j)
-                  value (chart-key data-set)
-                  scaled-val (scale-fn (utils/abs value))
-                  color (get-color :chart-colors options chart-key value)
-                  selected-color (get-color :chart-selected-colors options chart-key value)]
-              ; add a rect to represent the data
-              (-> bar-enter
-                  (.append "rect")
-                  (.attr "class" "chart-bar")
-                  (.attr "fill" (if (= i selected)
-                                  selected-color
-                                  color))
-                  (.attr "data-fill" color)
-                  (.attr "data-selectedFill" selected-color)
-                  (.attr "data-hasvalue" value)
-                  (.attr "id" (str "chart-bar-" (name chart-key) "-" i))
-                  (.attr "x" (* j bar-width))
-                  (.attr "y" (- scaled-max-val scaled-val))
-                  (.attr "width" bar-width)
-                  (.attr "height" (max 0 scaled-val)))))))
+      (when (> (count chart-data) 1)
+        (doseq [i (range (count chart-data))]
+          (let [data-set (get chart-data i)
+                max-val (apply max (vals (select-keys data-set chart-keys)))
+                scaled-max-val (scale-fn max-val)
+                ; add a g element
+                bar-enter (-> chart-node
+                              (.append "g")
+                              (.attr "class" "chart-g")
+                              (.attr "id" (str "chart-g-" i))
+                              (.attr "transform"
+                                     (str "translate("
+                                          (bar-position chart-width i (count chart-data) keys-count)
+                                          ","
+                                          (- (:chart-height options) scaled-max-val) ")")))]
+            ; for each key in the set
+            (doseq [j (range (count chart-keys))]
+              (let [chart-key (get chart-keys j)
+                    value (chart-key data-set)
+                    scaled-val (scale-fn (utils/abs value))
+                    color (get-color :chart-colors options chart-key value)
+                    selected-color (get-color :chart-selected-colors options chart-key value)]
+                ; add a rect to represent the data
+                (-> bar-enter
+                    (.append "rect")
+                    (.attr "class" "chart-bar")
+                    (.attr "fill" (if (= i selected)
+                                    selected-color
+                                    color))
+                    (.attr "data-fill" color)
+                    (.attr "data-selectedFill" selected-color)
+                    (.attr "data-hasvalue" value)
+                    (.attr "id" (str "chart-bar-" (name chart-key) "-" i))
+                    (.attr "x" (* j (/ (bar-width chart-width keys-count) keys-count)))
+                    (.attr "y" (- scaled-max-val scaled-val))
+                    (.attr "width" (/ (bar-width chart-width keys-count) keys-count))
+                    (.attr "height" (max 0 scaled-val))))))))
       ; add the hovering rects
-      (doseq [i (range (count chart-data))]
-        (-> chart-node
-            (.append "rect")
-            (.attr "class" "hover-rect")
-            (.attr "width" (/ chart-width (count chart-data)))
-            (.attr "height" (- chart-height 50))
-            (.attr "x" (* i (/ chart-width (count chart-data))))
-            (.attr "y" 50)
-            (.on "click" #(bar-click owner options i))
-            (.on "mouseover" #(bar-click owner options i))
-            (.on "mouseout" #(bar-click owner options (om/get-state owner :selected)))
-            (.attr "fill" "transparent")))
+      (when (> (count chart-data) 1)
+        (doseq [i (range (count chart-data))]
+          (-> chart-node
+              (.append "rect")
+              (.attr "class" "hover-rect")
+              (.attr "width" (/ chart-width (count chart-data)))
+              (.attr "height" (- chart-height 50))
+              (.attr "x" (* i (/ chart-width (count chart-data))))
+              (.attr "y" 50)
+              (.on "click" #(bar-click owner options i))
+              (.on "mouseover" #(bar-click owner options i))
+              (.on "mouseout" #(bar-click owner options (om/get-state owner :selected)))
+              (.attr "fill" "transparent"))))
       ; add the selected value label
       (let [x-pos (/ chart-width 2)
             label-value (label-key (get chart-data selected))
@@ -268,17 +274,20 @@
         (d3-calc owner options))))
 
   (render-state [_ {:keys [start]}]
-    (dom/div {:class "d3-column-container"
-              :style #js {:width (str (+ chart-width 20) "px")
-                          :height (str chart-height "px")}}
-      (dom/div {:class "chart-prev"
-                :style #js {:paddingTop (str (- chart-height 17) "px")
-                            :opacity (if (> start 0) 1 0)}
-                :on-click #(prev-data owner %)}
-        (dom/i {:class "fa fa-caret-left"}))
-      (dom/svg #js {:className "d3-column-chart" :ref "d3-column"})
-      (dom/div {:class "chart-next"
-                :style #js {:paddingTop (str (- chart-height 17) "px")
-                            :opacity (if (< start (- (count chart-data) chart-step)) 1 0)}
-                :on-click #(next-data owner %)}
-        (dom/i {:class "fa fa-caret-right"})))))
+    (let [fixed-chart-height (if (> (count chart-data) 1)
+                              chart-height
+                              90)]
+      (dom/div {:class "d3-column-container"
+                :style #js {:width (str (+ chart-width 20) "px")
+                            :height (str fixed-chart-height "px")}}
+        (dom/div {:class "chart-prev"
+                  :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
+                              :opacity (if (> start 0) 1 0)}
+                  :on-click #(prev-data owner %)}
+          (dom/i {:class "fa fa-caret-left"}))
+        (dom/svg #js {:className "d3-column-chart" :ref "d3-column"})
+        (dom/div {:class "chart-next"
+                  :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
+                              :opacity (if (< start (- (count chart-data) chart-step)) 1 0)}
+                  :on-click #(next-data owner %)}
+          (dom/i {:class "fa fa-caret-right"}))))))
