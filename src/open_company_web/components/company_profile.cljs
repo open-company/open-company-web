@@ -38,7 +38,10 @@
  (if-not result
     ; there was an error loading the logo, could be an invalid URL
     ; or the link doesn't contain an image
-    (js/alert "Invalid image url")
+    (do
+      (js/alert "Invalid image url")
+      (om/set-state! owner :logo (om/get-state owner :initial-logo))
+      (om/set-state! owner :loading false))
     (save-company-data data (om/get-state owner :logo) (.-width img) (.-height img))))
 
 (defcomponent currency-option [data owner]
