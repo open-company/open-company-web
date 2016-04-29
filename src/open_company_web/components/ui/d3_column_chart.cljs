@@ -206,9 +206,9 @@
           (-> chart-node
               (.append "rect")
               (.attr "class" "hover-rect")
-              (.attr "width" (/ chart-width (count chart-data)))
+              (.attr "width" (/ chart-width chart-step))
               (.attr "height" (- chart-height 50))
-              (.attr "x" (* i (/ chart-width (count chart-data))))
+              (.attr "x" (* i (/ chart-width chart-step)))
               (.attr "y" 50)
               (.on "click" #(bar-click owner options i))
               (.on "mouseover" #(bar-click owner options i))
@@ -223,7 +223,7 @@
                               (.append "g")
                               (.attr "class" "chart-label-container")
                               (.attr "id" "column-chart-label")
-                              (.attr "transform" (str "translate(" 0 "," (if (> (count chart-keys) 1) 20 50) ")")))] ;x-pos
+                              (.attr "transform" (str "translate(" 0 "," (if (> (count chart-keys) 1) 20 50) ")")))]
         (build-selected-label chart-label-g label-value sub-label-value label-color chart-width)
         (let [chart-label-width (js/SVGgetWidth chart-label-g)
               chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
