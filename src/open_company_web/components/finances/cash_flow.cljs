@@ -55,22 +55,13 @@
       :max-show finances-utils/columns-num
       :column-thickness "42"}))
 
-(defn chart-label [data-set prefix]
-  ;example Revenue $12.3K Costs $107K Cash flow -$94.7K
-  (let [revenue (str prefix (utils/with-metric-prefix (:revenue data-set)))
-        costs (str prefix (utils/with-metric-prefix (:costs data-set)))
-        cash-flow-val (- (:revenue data-set) (:costs data-set))
-        abs-cash-flow-val (utils/abs cash-flow-val)
-        cash-flow (str (when (neg? cash-flow-val) "-") prefix (utils/with-metric-prefix abs-cash-flow-val))]
-    (str "Revenue " revenue " Costs " costs " Cash flow " cash-flow)))
 
 (defn chart-label-fn [prefix data-set]
   ; example: Revenue $12.3K Costs $107K Cash flow -$94.7K
   (let [revenue (when (:revenue data-set) (str prefix (utils/with-metric-prefix (:revenue data-set))))
         costs (when (:costs data-set) (str prefix (utils/with-metric-prefix (:costs data-set))))
         cash-flow-val (when (and revenue costs) (- (:revenue data-set) (:costs data-set)))
-        abs-cash-flow-val (utils/abs cash-flow-val)
-        cash-flow (when cash-flow-val (str (when (neg? cash-flow-val) "-") prefix (utils/with-metric-prefix abs-cash-flow-val)))]
+        cash-flow (when cash-flow-val (str (when (neg? cash-flow-val) "-") prefix (utils/with-metric-prefix cash-flow-val)))]
    [{:label (when revenue (str "Revenue " revenue))
      :sub-label (str "CASH FLOW - " (utils/get-month (:period data-set)) " " (utils/get-year (:period data-set)))
      :color (occ/get-color-by-kw :oc-gray-5)}
