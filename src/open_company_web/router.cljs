@@ -64,7 +64,7 @@
     (redirect! (str "/404?path=" encoded-url))))
 
 (defn history-back! []
-  (.back (.-history js/window)))
+  (.go (.-history js/window) -1))
 
 (defn setup-navigation! [cb-fn sec-route-dispatcher]
   (reset! route-dispatcher sec-route-dispatcher)

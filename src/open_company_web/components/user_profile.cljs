@@ -31,7 +31,6 @@
               (dom/span {:class "user-profile-label"} "Avatar:")
               (when (jwt/get-key :avatar)
                 (dom/img {:class "user-avatar" :src (jwt/get-key :avatar)}))
-              (dom/span {:class "user-profile-value"} (jwt/get-key :avatar))
               (dom/br)(dom/br)
               (dom/button {:class "btn btn-danger"
                            :on-click (fn [e]

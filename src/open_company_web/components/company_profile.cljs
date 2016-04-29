@@ -72,7 +72,7 @@
               ; and it's empty
               (if (clojure.string/blank? logo)
                 ; save the data w/o a logo
-                (save-company-data company-data "" 0 0)
+                (save-company-data company-data "" 0 0))
                 ; else check the logo
                 (check-image logo owner company-data check-img-cb))
               ; else save the company datas
@@ -80,7 +80,7 @@
             (recur)))))))
 
   (render-state [_ {:keys [company-name logo description loading]}]
-    (let [slug (keyword (:slug @router/path))]
+    (let [slug (keyword (router/current-company-slug))]
 
       (utils/update-page-title (str "OpenCompany - " company-name))
 
@@ -88,9 +88,6 @@
         ;; Company
         (dom/div {:class "row"}
           (dom/form {:class "form-horizontal"}
-            (dom/img {:class (utils/class-set {:loading-spinner true
-                                               :loading loading})
-                      :src "/img/loading.gif"})
 
             ;; Company name
             (dom/div {:class "form-group"}
@@ -151,7 +148,7 @@
                   :on-change #(om/set-state! owner :logo (.. % -target -value))
                   :on-blur #(utils/save-values "save-company")
                   :placeholder "http://example.com/logo.png"}))
-              (dom/p {:class "help-block"}
+              (dom/div {:class "help-block logo-help-block"}
                 (when (:logo data)
                   (dom/img {:class "logo-preview"
                            :src (:logo data)}))
@@ -173,7 +170,12 @@
               (dom/p {:class "help-block"} "Description of the company"))
             (dom/div {:class "form-group"}
               (dom/button {:class "btn btn-save"
-                           :on-click #(router/history-back!)} "Done"))))))))
+                           :on-click (fn [e]
+                                      (.preventDefault e)
+                                      (router/history-back!))} "Done")
+              (dom/img {:class (utils/class-set {:loading-spinner true
+                                                 :loading loading})
+                      :src "/img/loading.gif"}))))))))
 
 (defcomponent company-profile [data owner]
 
