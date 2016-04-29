@@ -61,7 +61,9 @@
   (let [revenue (when (:revenue data-set) (str prefix (utils/with-metric-prefix (:revenue data-set))))
         costs (when (:costs data-set) (str prefix (utils/with-metric-prefix (:costs data-set))))
         cash-flow-val (when (and revenue costs) (- (:revenue data-set) (:costs data-set)))
-        cash-flow (when cash-flow-val (str prefix (utils/with-metric-prefix cash-flow-val)))]
+        negative-cash-flow (neg? cash-flow-val)
+        abs-cash-flow (utils/abs cash-flow-val)
+        cash-flow (when abs-cash-flow (str (when negative-cash-flow "-") prefix (utils/with-metric-prefix abs-cash-flow)))]
    [{:label (when revenue (str "Revenue " revenue))
      :sub-label (str "CASH FLOW - " (utils/get-month (:period data-set)) " " (utils/get-year (:period data-set)))
      :color (occ/get-color-by-kw :oc-gray-5)}
