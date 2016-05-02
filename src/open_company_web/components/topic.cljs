@@ -52,27 +52,31 @@
 
   (render-state [_ {:keys [image-header]}]
     (let [section-kw (keyword section)
+          topic-body (utils/get-topic-body topic-data section-kw)
           chart-opts {:chart-size {:width  260
                                    :height 196}}]
       (dom/div #js {:className "topic-internal group"
                     :ref "topic-internal"}
 
-        (dom/div {:class "card-header"}
-          (cond
-            (= section "finances")
-            (om/build topic-finances {:section-data topic-data :section section} {:opts chart-opts})
-            (= section "growth")
-            (om/build topic-growth {:section-data topic-data :section section} {:opts chart-opts})
-            :else
-            (dom/img {:src image-header})))
+        (when (or (#{:growth :finances} section-kw)
+                  image-header)
+          (dom/div {:class "card-header"}
+            (cond
+              (= section "finances")
+              (om/build topic-finances {:section-data topic-data :section section} {:opts chart-opts})
+              (= section "growth")
+              (om/build topic-growth {:section-data topic-data :section section} {:opts chart-opts})
+              :else
+              (dom/img {:src image-header}))))
         ;; Topic title
         (dom/div {:class "topic-title"} (:title topic-data))
         ;; Topic headline
         (dom/div {:class "topic-headline"} (:headline topic-data))
         ;; Topic body: first 2 lines
-        (dom/div #js {:className "topic-body"
-                      :ref "topic-body"
-                      :dangerouslySetInnerHTML (clj->js {"__html" (utils/get-topic-body topic-data section-kw)})})
+        (when topic-body
+          (dom/div #js {:className "topic-body"
+                        :ref "topic-body"
+                        :dangerouslySetInnerHTML (clj->js {"__html" topic-body})}))
         ;; topic body
         (when (utils/is-mobile)
           (dom/div #js {:className (str "body-navigation-container group " (when (not expanded?) "close"))
