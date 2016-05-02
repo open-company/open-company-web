@@ -19,6 +19,7 @@
   ;; Grays
   :oc-gray-0 "#FEFEFE"
   :oc-gray-1 "#F1F1F1"
+  :oc-gray-6 "#E0E0E0"
   :oc-gray-2 "#D8D8D8"
   :oc-gray-3 "#8A8A8A"
   :oc-gray-4 "#5B5B5B"
