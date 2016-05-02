@@ -23,96 +23,44 @@ div.topic-list{
     background-color: $oc_gray_6;
   }
 
-  ul.topic-list-internal {
+  div.topic-list-internal {
     list-style: none;
     padding: 0;
+    width: 100%;
 
-    @include big_web(){
-      width: #{($topic_box_width * 3)}px;
+    div.topics-column-container {
+      padding: 20px 10px 20px 30px;
       margin: 0 auto;
+
+      &.columns-1{
+        width: 384px;
+      }
+      &.columns-2{
+        width: 728px;
+      }
+      &.columns-3{
+        width: 1132px;
+      }
+
+      div.topics-column {
+        width: 344px;
+        padding-right: 20px;
+        float: left;
+
+        div.topic-row{
+          height: auto;
+          padding-bottom: 22px;
+        }
+      }
     }
 
     &.content-loaded:empty {
-
       text-align: center;
       font-size: 18px;
       padding-top: 100px;
       color: rgba(0, 0, 0, 0.4);
       font-family: $oc_main_font;
       height: 200px;
-
-      &:after {
-        width: 100%;
-        content: "This category is empty. Add a topic below.";
-      }
-
-      &.read-only:after {
-        content: "This category is empty.";
-      }
-    }
-  
-
-    li.topic-row{
-      height: auto;
-
-      @include mobile(){
-        padding: 0px;
-        margin: 0px;
-        width: 100%;
-      }
-
-      @include big_web(){
-        width: #{$topic_box_width}px;
-        overflow: hidden;
-        padding: #{$topic_box_padding}px;
-        float: left;
-
-        &.full-width {
-          width: 100%;
-          height: auto;
-
-          div.topic {
-            height: auto;
-            color: black;
-            cursor: auto;
-
-            &:hover {
-              background-color: white;
-            }
-
-            &::before {
-              @include triangle(top, white, 0.6em);
-              position: relative;
-              top: -51px;
-              left: 50%;
-            }
-
-            @for $i from 0 through 2{
-              &.li-#{$i}::before {
-                left: #{($topic_box_width * $i) + ((($topic_box_width - ($topic_box_padding * 2)) / 2) - (20 * 2))}px;
-              }
-            }
-
-            div.topic-expanded-body{
-              padding-top: 0px;
-              margin-top: 0px;
-              padding-bottom: 20px;
-
-              img {
-                width: 100%;
-              }
-            }
-          }
-        }
-      }
-
-
-
-      &.floating-edit-topic-button {
-        position: fixed;
-        bottom: 0px;
-        background-color: rgba(255, 255, 255, 0.4);
-      }
     }
   }
 }
