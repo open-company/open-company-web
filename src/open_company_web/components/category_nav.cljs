@@ -69,7 +69,7 @@
         (dom/div #js {:className "category-nav-internal"
                       :style #js {:width (if (utils/is-mobile)
                                            "100%"
-                                           (str (* (inc (count sections)) 150) "px"))}}
+                                           (str (* (inc (count sections)) 200) "px"))}}
           (for [category categories]
             (let [category-name (name category)
                   category-class (utils/class-set {:category true
