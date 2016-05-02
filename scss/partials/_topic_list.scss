@@ -1,4 +1,4 @@
-$topic_box_width: 310;
+$topic_box_width: 344;
 $topic_box_height: 170;
 $topic_box_padding: 10;
 
@@ -20,7 +20,7 @@ div.topic-list{
   }
 
   @include big_web(){
-    background-color: $oc_gray_1;
+    background-color: $oc_gray_6;
   }
 
   ul.topic-list-internal {

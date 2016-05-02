@@ -52,15 +52,6 @@
 
 (def scrolled-to-top (atom false))
 
-(defn set-lis-height [owner]
-  (when (and (not (utils/is-mobile))
-             (not (utils/is-test-env?)))
-    (when-let [topic-list (om/get-ref owner "topic-list-ul")]
-      (let [li-elems (sel topic-list [:li.topic-row])
-            max-height (apply max (map #(.-clientHeight %) li-elems))]
-        (doseq [li li-elems]
-          (setStyle li #js {:height (str max-height "px")}))))))
-
 (defn close-overlay-cb [owner]
   (om/set-state! owner :selected-topic nil)
   (om/set-state! owner :selected-metric nil))
@@ -83,19 +74,13 @@
     ; make sure the calculation for the fixed navbar are correct
     (when-not @scrolled-to-top
       (set! (.-scrollTop (.-body js/document)) 0)
-      (reset! scrolled-to-top true))
-    ; set the cards height on big web
-    (set-lis-height owner))
+      (reset! scrolled-to-top true)))
 
   (will-receive-props [_ next-props]
     (when-not (= (:company-data next-props) (:company-data data))
       (om/set-state! owner (get-state next-props (om/get-state owner))))
     (when-not (:read-only (:company-data next-props))
       (get-new-sections-if-needed owner)))
-
-  (did-update [_ _ _]
-    ; set the cards height on big web
-    (set-lis-height owner))
 
   (render-state [_ {:keys [active-topics selected-topic selected-metric drawer-open]}]
     (let [slug            (keyword (router/current-company-slug))
