@@ -11,7 +11,10 @@
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.components.ui.icon :as i]
             [goog.events :as events]
+            [goog.style :as gstyle]
+            [goog.dom.classlist :as cl]
             [goog.history.EventType :as EventType]
             [cljs-dynamic-resources.core :as cdr]
             [cljsjs.medium-editor]
@@ -225,12 +228,90 @@
                           with-finances-data)]
     with-growth-data))
 
+(def file-upload
+  (let [class "file-upload-btn"
+        handle (fn [e]
+                 (js/console.log e)
+                 (.preventDefault e))
+        hide-btn (fn [] (gstyle/setStyle (js/document.getElementById "file-upload-ui") #js {:opacity 0}))
+        pos-btn (fn [top-v]
+                  (let [el (js/document.getElementById "file-upload-ui")]
+                    (js/console.log "setting styles" el)
+                    (gstyle/setStyle el #js {:position "absolute"
+                                             :opacity 1
+                                             :top (str top-v "px")
+                                             :left "15px"})))
+        show-btn (fn [e]
+                   (.setTimeout js/window
+                                #(when-let [el (.-commonAncestorContainer (.getRangeAt (js/window.getSelection) 0))]
+                                  (js/console.log "length" (.-length el))
+                                  (js/console.log "el" el)
+                                  (if (undefined? (.-length el))
+                                    (pos-btn (.-top (.position (js/$ el))))
+                                    (hide-btn)))
+                                400)
+                   true)]
+    {:name "disable-context-menu"
+     :init (fn []
+             (this-as this
+               (js/console.log this)
+               (hide-btn)
+               (doseq [el (.getEditorElements this)]
+                 (.on (.-base this) el "click" (.bind show-btn this))
+                 (.on (.-base this) el "keyup" (.bind show-btn this)))))}))
+
+(defn inject-extension [config-map ext-map]
+  (let [n   (:name ext-map)
+        ctr (js/MediumEditor.Extension.extend (clj->js ext-map))]
+    (assoc-in config-map [:extensions n] (new ctr))))
+
+(defcomponent uploader [data owner]
+  (did-mount [_]
+    (js/filepicker.setKey "Aoay0qXUSOyVIcDvls4Egz"))
+
+  (render-state [this _]
+    (dom/div {:id "file-upload-ui" :class "flex"
+              :style (merge {:transition ".2s"} (if (:state (om/get-state owner)) {:background "white" :right 0}))}
+        (dom/input {:id "file-upload-ui--select-trigger" :style {:display "none"} :type "file"
+                    :on-change (fn [e] (js/filepicker.store (-> e .-target .-files (aget 0))
+                                                            (fn [success]
+                                                              (js/MediumEditor.util.insertHTMLCommand js/document (str "<img src=\"" (.-url success) "\">"))
+                                                              (js/console.log (om/get-node owner))
+                                                              ;; (gstyle/setElementShown (om/get-node owner) false)
+                                                              (om/set-state! owner {}))
+                                                            (fn [error] (js/console.log "error" error))
+                                                            #(om/set-state! owner {:state :show-progress
+                                                                                   :progress %})))})
+        (dom/button {:style {:margin-right "13px"}
+                     :on-click (fn [_] (om/set-state! owner :state :show-options))}
+                    (i/icon :circle-add {:size 24}))
+        (case (:state (om/get-state owner))
+          :show-options
+          (dom/div (dom/button {:style {:font-size "14px"} :class "underline"
+                                :on-click #(.click (js/document.getElementById "file-upload-ui--select-trigger"))}
+                               "Select file ")
+                   #_(dom/span {:style {:font-size "14px"}} " or ")
+                   #_(dom/button {:style {:font-size "14px"} :class "underline"
+                                :on-click #(om/set-state! owner :state :show-url-field)}
+                               "provide URL"))
+          :show-progress
+          (dom/span (str "Uploading... " (om/get-state owner :progress) "%"))
+          :show-url-field
+          (dom/div (dom/input {:type "text" :auto-focus true :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
+                               :value (om/get-state owner :url)})
+                   (dom/button {:style {:font-size "14px" :margin-left "1rem"} :class "underline"
+                                :on-click #(do (js/MediumEditor.util.insertHTMLCommand js/document (str "<img src=\"" (om/get-state owner :url) "\">"))
+                                               (om/set-state! owner {}))}
+                               "add")
+                   )
+          (dom/div "")))))
+
 (defcomponent topic-overlay-edit [{:keys [topic topic-data currency focus] :as data} owner options]
 
   (init-state [_]
     (cdr/add-style! "/css/medium-editor/medium-editor.css")
     (cdr/add-style! "/css/medium-editor/default.css")
-    (merge 
+    (merge
      {:has-changes false
       :title (:title topic-data)
       :headline (:headline topic-data)
@@ -259,7 +340,9 @@
       (let [body-el (om/get-ref owner "topic-overlay-edit-body")
             slug (keyword (router/current-company-slug))
             finances-placeholder-data (get (:sections (get (:categories (slug @caches/new-sections)) 2)) 0)
-            med-ed (new js/MediumEditor body-el (clj->js (utils/medium-editor-options (:note finances-placeholder-data))))]
+            med-ed (new js/MediumEditor body-el (clj->js
+                                                 (->  (utils/medium-editor-options (:note finances-placeholder-data))
+                                                      (inject-extension file-upload))))]
         (.subscribe med-ed "editableInput" (fn [event editable]
                                              (om/set-state! owner :has-changes true)))
         (om/set-state! owner :initial-body (.-innerHTML body-el))
@@ -405,5 +488,6 @@
           (dom/div #js {:className "topic-overlay-edit-body"
                         :ref "topic-overlay-edit-body"
                         :id (str "topic-edit-body-" (name topic))
-                        :dangerouslySetInnerHTML (clj->js {"__html" section-body})}))
+                        :dangerouslySetInnerHTML (clj->js {"__html" section-body})})
+          (om/build uploader {}))
         (dom/div {:class "gradient"})))))
