@@ -35,6 +35,16 @@
         new-active-categories (assoc old-active-categories category new-active-topics)]
     (api/patch-sections (dissoc new-active-categories :all))))
 
+(defn columns-num []
+  (let [win-width (.-clientWidth (.-body js/document))]
+    (cond
+      (>= win-width 1132)
+      3
+      (>= win-width 780)
+      2
+      :else
+      1)))
+
 (defn get-state [data current-state]
   (let [company-data (:company-data data)
         categories (:categories company-data)
@@ -44,7 +54,8 @@
      :active-topics active-topics
      :new-sections-requested (or (:new-sections-requested current-state) false)
      :selected-topic (or (:selected-topic current-state) (:selected-topic data))
-     :drawer-open (or (:drawer-open current-state) false)}))
+     :drawer-open (or (:drawer-open current-state) false)
+     :columns (columns-num)}))
 
 (defn topic-click [owner topic selected-metric]
   (om/set-state! owner :selected-topic topic)
@@ -61,6 +72,21 @@
         all-category-sections (:sections category-data)]
     (apply merge
            (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
+
+(defn render-topic [owner section-name company-data expanded-topics active-category]
+  (let [sd (->> section-name keyword (get company-data))]
+    (when-not (and (:read-only company-data) (:placeholder sd))
+      (dom/div #js {:className "topic-row"
+                   :ref section-name
+                   :key (str "topic-row-" (name section-name))}
+        (om/build topic {:loading (:loading company-data)
+                         :section section-name
+                         :section-data sd
+                         :currency (:currency company-data)
+                         :expanded-topics expanded-topics
+                         :active-category active-category}
+                         {:opts {:section-name section-name
+                                 :bw-topic-click (partial topic-click owner)}})))))
 
 (defcomponent topic-list [data owner options]
 
@@ -82,7 +108,7 @@
     (when-not (:read-only (:company-data next-props))
       (get-new-sections-if-needed owner)))
 
-  (render-state [_ {:keys [active-topics selected-topic selected-metric drawer-open]}]
+  (render-state [_ {:keys [active-topics selected-topic selected-metric drawer-open columns]}]
     (let [slug            (keyword (router/current-company-slug))
           company-data    (:company-data data)
           active-category (keyword (:active-category data))
@@ -121,22 +147,47 @@
                                    :currency (:currency company-data)}
                                   {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                           :topic-edit-cb (:topic-edit-cb options)}}))
-        (dom/ul #js {:className (utils/class-set {:topic-list-internal true
-                                                  :read-only (or (utils/is-mobile) (:read-only company-data))
-                                                  :group true
-                                                  :content-loaded (not (:loading data))})
-                     :ref "topic-list-ul"}
-          (for [section-name category-topics
-                :let [sd (->> section-name keyword (get company-data))]]
-            (when-not (and (:read-only company-data) (:placeholder sd))
-              (dom/li #js {:className "topic-row"
-                           :ref section-name
-                           :key (str "topic-row-" (name section-name))}
-                (om/build topic {:loading (:loading company-data)
-                                 :section section-name
-                                 :section-data sd
-                                 :currency (:currency company-data)
-                                 :expanded-topics (:expanded-topics data)
-                                 :active-category active-category}
-                                 {:opts {:section-name section-name
-                                         :bw-topic-click (partial topic-click owner)}})))))))))
+        ;; Topic list
+        (dom/div {:class (utils/class-set {:topic-list-internal true
+                                           :group true
+                                           :content-loaded (not (:loading data))})}
+          (case columns
+            1
+            (dom/div {:class "topics-column-container columns-1 group"}
+              (dom/div {:class "topics-column"}
+                (for [section-name category-topics]
+                  (render-topic owner section-name company-data (:expanded-topics data) active-category))))
+            2
+            (dom/div {:class "topics-column-container columns-2 group"}
+              (dom/div {:class "topics-column"}
+                (for [idx (range (quot (count category-topics) 2))
+                  :while (< idx (quot (count category-topics) 2))
+                  :let [real-idx (* idx 2)
+                        section-name (get (vec category-topics) real-idx)]]
+                  (render-topic owner section-name company-data (:expanded-topics data) active-category)))
+              (dom/div {:class "topics-column"}
+                (for [idx (range (quot (count category-topics) 2))
+                  :while (< idx (quot (count category-topics) 2))
+                  :let [real-idx (inc (* idx 2))
+                        section-name (get (vec category-topics) real-idx)]]
+                  (render-topic owner section-name company-data (:expanded-topics data) active-category))))
+            3
+            (dom/div {:class "topics-column-container columns-3 group"}
+              (dom/div {:class "topics-column"}
+                (for [idx (range (quot (count category-topics) 3))
+                  :while (< idx (quot (count category-topics) 2))
+                  :let [real-idx (* idx 3)
+                        section-name (get (vec category-topics) real-idx)]]
+                  (render-topic owner section-name company-data (:expanded-topics data) active-category)))
+              (dom/div {:class "topics-column"}
+                (for [idx (range (quot (count category-topics) 3))
+                  :while (< idx (quot (count category-topics) 2))
+                  :let [real-idx (inc (* idx 3))
+                        section-name (get (vec category-topics) real-idx)]]
+                  (render-topic owner section-name company-data (:expanded-topics data) active-category)))
+              (dom/div {:class "topics-column"}
+                (for [idx (range (quot (count category-topics) 3))
+                  :while (< idx (quot (count category-topics) 2))
+                  :let [real-idx (+ (* idx 3) 2)
+                        section-name (get (vec category-topics) real-idx)]]
+                  (render-topic owner section-name company-data (:expanded-topics data) active-category))))))))))
