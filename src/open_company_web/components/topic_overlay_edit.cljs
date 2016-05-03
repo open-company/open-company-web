@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
+            [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.api :as api]
@@ -266,7 +267,7 @@
 
 (defcomponent uploader [data owner]
   (did-mount [_]
-    (js/filepicker.setKey "Aoay0qXUSOyVIcDvls4Egz"))
+    (js/filepicker.setKey ls/filepicker-key))
 
   (render-state [this _]
     (dom/div {:id "file-upload-ui" :class "flex"
