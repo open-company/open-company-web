@@ -55,7 +55,7 @@
                       :ref "topic-overlay-content"
                       :style #js {:maxHeight (str max-height "px")}}
           (dom/div {:class "topic-overlay-headline"
-                    :dangerouslySetInnerHTML (utils/emojify nil)})
+                    :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
           (dom/div {}
             (when (= topic "finances")
               (om/build topic-finances {:section-data topic-data
