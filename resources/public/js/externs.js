@@ -72,6 +72,7 @@ Sortable.on = function(){};
 // SVG getBBox
 var SVGgetWidth = function(){};
 // Emoji One
-var emojione = {};
-emojione.ascii = {};
-emojione.prototype.toImage = function(){};
+var emojione = {
+  "ascii": {},
+  "toImage": function(){}
+};
