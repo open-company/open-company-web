@@ -513,6 +513,24 @@
     (> current-month 9)
     10))
 
+(defn non-zero-number?
+  "Return `true` if the arg is both a number and is not zero, otherwise return `false`."
+  [number]
+  (and (number? number)
+       (not (zero? number))))
+
+(defn no-finances-data?
+  "Return `true` if the passed finances data has no substantive data, otherwise return `false`."
+  [data]
+  (not-any? #(or (non-zero-number? (:cash %))
+                 (non-zero-number? (:revenue %))
+                 (non-zero-number? (:costs %))) data))
+
+(defn no-growth-data?
+  "Return `true` if the passed finances data has no substantive data, otherwise return `false`."
+  [data]
+  (not-any? #(non-zero-number? (:value %)) (vals data)))
+
 (defn current-growth-period [interval]
   (let [fixed-interval (or interval default-growth-interval)
         now (cljs-time/now)
@@ -521,13 +539,13 @@
     (case interval
       "quarterly"
       (str year "-" (add-zero (get-month-quarter month)))
-      "monthly"
-      (str year "-" (add-zero month))
       "weekly"
       (let [day-of-week (cljs-time/day-of-week now)
             to-monday (dec day-of-week)
             monday-date (cljs-time/minus now (cljs-time/days to-monday))]
-        (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (add-zero (cljs-time/day monday-date)))))))
+        (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (add-zero (cljs-time/day monday-date))))
+      ;; Default tp monthly
+      (str year "-" (add-zero month)))))
 
 (defn company-cache-key [k & [v]]
   (let [slug (keyword (router/current-company-slug))
