@@ -74,4 +74,4 @@ var SVGgetWidth = function(){};
 // Emoji One
 var emojione = {};
 emojione.ascii = {};
-emojione.toImage = function(){};
+emojione.prototype.toImage = function(){};
