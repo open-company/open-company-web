@@ -156,8 +156,9 @@
   }
 
   a {
-    text-decoration: underline;
+    text-decoration: none;
     color: black;
     pointer-events: none;
+    border-bottom: 6px solid $oc_yellow;
   }
 }
