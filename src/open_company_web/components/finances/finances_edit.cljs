@@ -14,7 +14,8 @@
 (defcomponent finances-edit-row [data owner]
   
   (render [_]
-    (let [prefix (:prefix data)
+    (let [currency (:currency data)
+          prefix (:prefix data)
           finances-data (:cursor data)
           period (:period finances-data)
           is-new (:new finances-data)
@@ -55,7 +56,7 @@
         (dom/td {}
           (om/build cell {:value (:cash finances-data)
                           :placeholder (if is-new "at month end" "")
-                          :prefix prefix
+                          :currency currency
                           :cell-state cell-state
                           :draft-cb #(change-cb :cash %)
                           :period period
@@ -65,7 +66,7 @@
         (dom/td {}
           (om/build cell {:value (:revenue finances-data)
                           :placeholder (if is-new "entire month" "")
-                          :prefix prefix
+                          :currency currency
                           :cell-state cell-state
                           :draft-cb #(change-cb :revenue %)
                           :period period
@@ -75,7 +76,7 @@
         (dom/td {}
           (om/build cell {:value (:costs finances-data)
                           :placeholder (if is-new "entire month" "")
-                          :prefix prefix
+                          :currency currency
                           :cell-state cell-state
                           :draft-cb #(change-cb :costs %)
                           :period period
@@ -111,7 +112,6 @@
 
   (render-state [_ {:keys [finances-data stop]}]
     (let [currency (:currency data)
-          cur-symbol (utils/get-symbol-for-currency-code currency)
           show-burn (some #(pos? (:revenue %)) finances-data)]
       ; real component
       (dom/div {:class "finances"}
@@ -140,7 +140,7 @@
                                                  :is-last (= idx 0)
                                                  :needs-year (or (= idx 0)
                                                                  (= idx (dec stop)))
-                                                 :prefix cur-symbol
+                                                 :currency currency
                                                  :show-burn show-burn
                                                  :change-cb #(replace-row-in-data data row-data %1 %2)}))))
               (dom/tr {}

@@ -37,7 +37,6 @@
       (dom/div {:class (utils/class-set {:update-footer-hover true
                                          :show (om/get-state owner :hover)})
                 :id (str (get-footer-id data) "-hover")}
-        (dom/a {:href (str "/user/" (:user-id (:author data)))
-                :on-click #(.preventDefault %)}
+        (dom/a {:on-click #(.preventDefault %)}
           (dom/img {:src (:image (:author data)) :title (:name (:author data)) :class "author-image"})
           (dom/div {:class "author"} (:name (:author data))))))))

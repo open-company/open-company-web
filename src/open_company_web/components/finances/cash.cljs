@@ -16,9 +16,8 @@
           sorted-finances (sort sort-pred (vals filled-finances-data))
           value-set (last sorted-finances)
           currency (:currency data)
-          cur-symbol (utils/get-symbol-for-currency-code currency)
-          cash-val (str cur-symbol (utils/thousands-separator (:cash value-set)))
-          fixed-sorted-finances (mapv #(merge % {:label (when-let [c (:cash %)] (utils/thousands-separator c))}) sorted-finances)
+          cash-val (utils/thousands-separator (:cash value-set) currency 0)
+          fixed-sorted-finances (mapv #(merge % {:label (when-let [c (:cash %)] (utils/thousands-separator c currency 0))}) sorted-finances)
           chart-opts {:opts {:chart-height (:height (:chart-size options))
                              :chart-width (:width (:chart-size options))
                              :chart-keys [:cash]
