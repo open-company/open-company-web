@@ -69,7 +69,7 @@
             (.attr "fill" (:label-color options))
             (.text sub-label-text))))))
 
-(defn dot-click [owner options idx & [is-hover]]
+(defn dot-click [owner options idx]
   (.stopPropagation (.-event js/d3))
   (let [svg-el (om/get-ref owner "d3-dots")
         d3-svg-el (.select js/d3 svg-el)
@@ -86,7 +86,7 @@
                             (-> circle
                                 (.attr "stroke" color)
                                 (.attr "stroke-width" dot-stroke)
-                                (.attr "fill" "transparent")
+                                (.attr "fill" "white")
                                 (.attr "r" (if hasvalue dot-radius 0)))))))
     (let [color (.attr next-circle "data-fill")
           hasvalue (.attr next-circle "data-hasvalue")]
@@ -96,8 +96,7 @@
           (.attr "fill" "transparent")
           (.attr "r" (if hasvalue dot-radius 0))))
     (render-chart-label owner options idx data)
-    (when-not is-hover
-      (om/set-state! owner :selected idx))))
+    (om/set-state! owner :selected idx)))
 
 (defn get-y [y max-y]
   (+ 70 (- max-y y)))
@@ -187,9 +186,9 @@
               (.attr "height" (- chart-height 50))
               (.attr "x" (* i (/ chart-width show-dots)))
               (.attr "y" 50)
-              (.on "click" #(dot-click owner options i false))
-              (.on "mouseover" #(dot-click owner options i true))
-              (.on "mouseout" #(dot-click owner options (om/get-state owner :selected) true))
+              (.on "click" #(dot-click owner options i))
+              (.on "mouseover" #(dot-click owner options i))
+              (.on "mouseout" #(dot-click owner options (om/get-state owner :selected)))
               (.attr "fill" "transparent"))))
       ; add the selected value label
       (render-chart-label owner options selected chart-data))))
