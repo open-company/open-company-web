@@ -19,4 +19,4 @@
 ;; Deploy key
 (def deploy-key "asd")
 
-(def filepicker-key "Aoay0qXUSOyVIcDvls4Egz")
+(def filestack-key "Aoay0qXUSOyVIcDvls4Egz")

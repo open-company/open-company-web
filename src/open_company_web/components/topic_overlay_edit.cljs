@@ -267,7 +267,8 @@
 
 (defcomponent uploader [data owner]
   (did-mount [_]
-    (js/filepicker.setKey ls/filepicker-key))
+    (assert ls/filestack-key "FileStack API Key required")
+    (js/filepicker.setKey ls/filestack-key))
 
   (render-state [this _]
     (dom/div {:id "file-upload-ui" :class "flex"
