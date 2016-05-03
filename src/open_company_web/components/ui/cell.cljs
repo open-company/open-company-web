@@ -60,6 +60,12 @@
       ((:draft-cb data) parsed-value))
     (to-state owner data state)))
 
+(defn safe-parse-float [value]
+  (let [flv (js/parseFloat value)]
+    (if (js/isNaN flv)
+      0
+      flv)))
+
 (defcomponent cell [data owner]
 
   (init-state [_]
@@ -79,11 +85,12 @@
 
   (render [_]
     (let [value (om/get-state owner :value)
-          float-value (if (s/blank? value)
-                        value
-                        (.parseFloat js/window value))
-          float-value (if (js/isNaN float-value) 0 float-value)
-          formatted-value (utils/thousands-separator float-value)
+          flv (safe-parse-float value)
+          prefix (:prefix data)
+          currency (:currency data)
+          formatted-value (if currency
+                            (utils/thousands-separator flv currency)
+                            (utils/thousands-separator flv))
           prefix-value (if (and (not (s/blank? formatted-value)) (:prefix data))
                          (str (:prefix data) formatted-value)
                          formatted-value)

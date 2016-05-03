@@ -173,9 +173,6 @@
     "12" "DEC"
     ""))
 
-(defn redirect! [loc]
-  (set! (.-location js/window) loc))
-
 (defn format-value [value]
   (if (nil? value)
     0
@@ -215,9 +212,10 @@
               sorted-data)))))
 
 (defn camel-case-str [value]
-  (let [upper-value (clojure.string/replace value #"^(\w)" #(clojure.string/upper-case (first %1)))]
-    (clojure.string/replace upper-value #"-(\w)"
-                            #(str " " (clojure.string/upper-case (second %1))))))
+  (when value
+    (let [upper-value (clojure.string/replace value #"^(\w)" #(clojure.string/upper-case (first %1)))]
+      (clojure.string/replace upper-value #"-(\w)"
+                              #(str " " (clojure.string/upper-case (second %1)))))))
 
 (defn js-date [ & [date-str]]
   (if date-str
@@ -431,11 +429,13 @@
 (defn period-from-date [date & [interval]]
   (cljs-time-format/unparse (get-formatter interval) date))
 
+(def default-growth-interval "monthly")
+
 (defn get-period-string [period & [interval flags]]
   "Get descriptive string for the period by interval. Use :short as a flag to get
   the short formatted string."
   (when period
-    (let [fixed-interval (or interval "monthly")
+    (let [fixed-interval (or interval default-growth-interval)
           parsed-date (date-from-period period fixed-interval)
           month (cljs-time/month parsed-date)
           year (cljs-time/year parsed-date)
@@ -470,7 +470,7 @@
   (set! (.-title js/document) title))
 
 (defn periods-diff [first-period last-period & [interval]]
-  (let [fixed-interval (or interval "monthly")
+  (let [fixed-interval (or interval default-growth-interval)
         first-date (date-from-period first-period fixed-interval)
         last-date (date-from-period last-period fixed-interval)]
     (case fixed-interval
@@ -479,7 +479,7 @@
       "weekly" (cljs-time/in-weeks (cljs-time/interval first-date last-date)))))
 
 (defn get-month [period & [interval]]
-  (let [fixed-interval (or interval "monthly")
+  (let [fixed-interval (or interval default-growth-interval)
         date (date-from-period period fixed-interval)
         month (add-zero (cljs-time/month date))]
     (case interval
@@ -522,7 +522,8 @@
   (not (some #(non-zero-number? (:value %)) (vals data))))
 
 (defn current-growth-period [interval]
-  (let [now (cljs-time/now)
+  (let [fixed-interval (or interval default-growth-interval)
+        now (cljs-time/now)
         year (cljs-time/year now)
         month (cljs-time/month now)]
     (case interval
@@ -546,12 +547,15 @@
 (defn clean-company-caches []
   (reset! company-cache {}))
 
-(def +usd-fmt+
-  (-> (NumberFormat. nf/Format.CURRENCY "USD" nf/CurrencyStyle.LOCAL)
-      (.setMinimumFractionDigits 0)))
-
-(defn thousands-separator [number]
-  (.format +usd-fmt+ number))
+(defn thousands-separator
+  ([number]
+    (.format (NumberFormat. nf/Format.DECIMAL) number))
+  ([number currency-code]
+    (.format (NumberFormat. nf/Format.CURRENCY currency-code nf/CurrencyStyle.LOCAL) number))
+  ([number currency-code decimals]
+    (-> (NumberFormat. nf/Format.CURRENCY currency-code nf/CurrencyStyle.LOCAL)
+        (.setMinimumFractionDigits 0)
+        (.format number))))
 
 (defn offset-top [elem]
   (let [bound-rect (.getBoundingClientRect elem)]

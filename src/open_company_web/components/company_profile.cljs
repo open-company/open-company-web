@@ -16,14 +16,17 @@
             [open-company-web.lib.iso4217 :refer (iso4217 sorted-iso4217)]))
 
 (defn- save-company-data [company-data logo logo-width logo-height]
-  (let [slug (router/current-company-slug)]
+  (let [slug (router/current-company-slug)
+        fixed-logo (or logo "")
+        fixed-logo-width (or logo-width 0)
+        fixed-logo-height (or logo-height 0)]
     (api/patch-company slug {:name (:name company-data)
                              :slug slug
                              :currency (:currency company-data)
                              :description (:description company-data)
-                             :logo-width (js/parseInt logo-height)
-                             :logo-height (js/parseInt logo-height)
-                             :logo logo})))
+                             :logo-width (js/parseInt fixed-logo-width)
+                             :logo-height (js/parseInt fixed-logo-height)
+                             :logo fixed-logo})))
 
 (defn- check-image [url owner data cb]
   (let [img (new js/Image)]
@@ -35,7 +38,10 @@
  (if-not result
     ; there was an error loading the logo, could be an invalid URL
     ; or the link doesn't contain an image
-    (js/alert "Invalid image url")
+    (do
+      (js/alert "Invalid image url")
+      (om/set-state! owner :logo (om/get-state owner :initial-logo))
+      (om/set-state! owner :loading false))
     (save-company-data data (om/get-state owner :logo) (.-width img) (.-height img))))
 
 (defcomponent currency-option [data owner]
@@ -52,10 +58,12 @@
       (utils/add-channel "save-company" save-chan))
       {:initial-logo (:logo data)
        :logo (:logo data)
-       :name (:name data)
+       :company-name (:name data)
+       :loading false
        :description (:description data)})
 
   (will-receive-props [_ next-props]
+    (om/set-state! owner :loading false)
     (om/set-state! owner :initial-logo (:logo data)))
 
   (will-mount [_]
@@ -64,6 +72,7 @@
         (let [change (<! save-change)]
           (let [logo (om/get-state owner :logo)
                 company-data (om/get-props owner)]
+            (om/set-state! owner :loading true)
             ; if the log has changed
             (if (not= logo (om/get-state owner :initial-logo))
               ; and it's empty
@@ -76,10 +85,10 @@
               (save-company-data company-data (:logo company-data) (:logo-width company-data) (:logo-height company-data)))
             (recur)))))))
 
-  (render [_]
-    (do
+  (render-state [_ {:keys [company-name logo description loading]}]
+    (let [slug (keyword (router/current-company-slug))]
 
-      (utils/update-page-title (str "OpenCompany - " (:name data)))
+      (utils/update-page-title (str "OpenCompany - " company-name))
 
       (dom/div {:class "profile-container"}
         ;; Company
@@ -93,10 +102,10 @@
                 (dom/input {
                   :type "text"
                   :id "name"
-                  :value (om/get-state owner :name)
-                  :on-change #(om/set-state! owner :name (.. % -target -value))
+                  :value company-name
+                  :on-change #(om/set-state! owner :company-name (.. % -target -value))
                   :on-blur (fn [e]
-                             (utils/handle-change data (om/get-state owner :name) :name)
+                             (utils/handle-change data company-name :company-name)
                              (utils/save-values "save-company"))
                   :class "form-control"}))
               (dom/p {:class "help-block"} "Casual company name (leave out Inc., LLC, etc.)"))
@@ -111,7 +120,7 @@
                   :id "slug"
                   :class "form-control"
                   :disabled true}))
-              (dom/p {:class "help-block"} "https://opencompany.com/bago"))
+              (dom/p {:class "help-block"} (str "https://opencompany.com/" (:slug data))))
 
             ;; Currency
             (dom/div {:class "form-group"}
@@ -133,34 +142,46 @@
               (dom/p {:class "help-block"} "Currency for company finances"))
 
             ;; Company logo
-            (dom/div {:class "form-group"}
+            (dom/div {:class "form-group logo-container"}
               (dom/label {:for "logo" :class "col-sm-3 control-label oc-header"} "Logo")
-              (dom/div {:class "col-sm-5"}
+              (dom/div {:class "col-sm-6"}
                 (dom/input {
                   :type "text"
-                  :value (om/get-state owner :logo)
+                  :value logo
                   :id "logo"
                   :class "form-control"
                   :maxLength 255
                   :on-change #(om/set-state! owner :logo (.. % -target -value))
                   :on-blur #(utils/save-values "save-company")
                   :placeholder "http://example.com/logo.png"}))
-              (dom/p {:class "help-block"} "URL to company logo"))
+              (dom/div {:class "help-block logo-help-block"}
+                (when (:logo data)
+                  (dom/img {:class "logo-preview"
+                           :src (:logo data)}))
+                "180 pixels wide by 180 pixels high, or logo will be scaled"))
 
             ;; Company description
             (dom/div {:class "form-group"}
-              (dom/label {:for "logo" :class "col-sm-3 control-label oc-header"} "Description")
-              (dom/div {:class "col-sm-5"}
+              (dom/label {:for "description" :class "col-sm-3 control-label oc-header"} "Description")
+              (dom/div {:class "col-sm-6"}
                 (dom/textarea {
-                  :value (om/get-state owner :description)
+                  :value description
                   :id "description"
                   :class "form-control"
                   :max-length 250
                   :on-change #(om/set-state! owner :description (.. % -target -value))
                   :on-blur (fn [e]
-                             (utils/handle-change data (om/get-state owner :description) :description)
+                             (utils/handle-change data description :description)
                              (utils/save-values "save-company"))}))
-              (dom/p {:class "help-block"} "Description of the company"))))))))
+              (dom/p {:class "help-block"} "Description of the company"))
+            (dom/div {:class "form-group"}
+              (dom/button {:class "btn btn-save"
+                           :on-click (fn [e]
+                                      (.preventDefault e)
+                                      (router/history-back!))} "Done")
+              (dom/img {:class (utils/class-set {:loading-spinner true
+                                                 :loading loading})
+                      :src "/img/loading.gif"}))))))))
 
 (defcomponent company-profile [data owner]
 
@@ -168,7 +189,7 @@
     (let [company-data (dis/company-data data)]
 
       (when (:read-only company-data)
-        (utils/redirect! (oc-urls/company)))
+       (router/redirect! (oc-urls/company)))
 
       (dom/div {:class "company-container container"}
 
@@ -180,7 +201,7 @@
           ;; White space
           (dom/div {:class "col-md-1"})
 
-          (dom/div {:class "col-md-7 main"}
+          (dom/div {:class "col-md-9 main"}
 
             (if (:loading data)
               

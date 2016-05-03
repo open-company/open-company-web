@@ -1,8 +1,14 @@
 div.user-profile {
   margin-top: 10px;
+  width: 500px;
+  margin: 20px auto;
   div.panel-heading {
-    font-weight: bold;
-    font-size: 16px;
+    font-size: 12px;
+    h4 {
+      margin: 2px 0;
+      font-weight: bold;
+      font-size: 16px;
+    }
   }
 
   div.panel-body span.user-profile-label {
@@ -10,5 +16,11 @@ div.user-profile {
     float: left;
     font-size: 14px;
     font-weight: bold;
+  }
+
+  img.user-avatar {
+    max-width: 30px;
+    max-height: 30px;
+    margin-right: 10px;
   }
 }

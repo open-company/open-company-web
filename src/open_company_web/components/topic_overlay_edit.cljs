@@ -318,7 +318,8 @@
                                     (.stopPropagation %)
                                     (api/partial-update-section topic section-data)
                                     ((:dismiss-editing-cb options)))} "Save"))
-        (dom/button {:class "cancel"
+        (dom/button {:class (utils/class-set {:cancel true
+                                              :save-visible has-changes})
                      :on-click #((:dismiss-editing-cb options))} "Cancel")
         (dom/div {:class "topic-overlay-edit-header"}
           (dom/input {:class "topic-overlay-edit-title"

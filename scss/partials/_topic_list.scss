@@ -23,8 +23,7 @@ div.topic-list{
     background-color: $oc_gray_1;
   }
 
-  ul.topic-list-internal {
-    list-style: none;
+  div.topic-list-content {
     padding: 0;
 
     @include big_web(){
@@ -32,86 +31,89 @@ div.topic-list{
       margin: 0 auto;
     }
 
-    &.content-loaded:empty {
+    ul.topic-list-internal {
+      float: left;
+      list-style: none;
+      padding: 0;
+      width: 100%;
 
-      text-align: center;
-      font-size: 18px;
-      padding-top: 100px;
-      color: rgba(0, 0, 0, 0.4);
-      font-family: $oc_main_font;
-      height: 200px;
+      &.content-loaded:empty {
+        text-align: center;
+        font-size: 18px;
+        padding-top: 100px;
+        color: rgba(0, 0, 0, 0.4);
+        font-family: $oc_main_font;
+        height: 200px;
 
-      &:after {
-        width: 100%;
-        content: "This category is empty. Add a topic below.";
-      }
-
-      &.read-only:after {
-        content: "This category is empty.";
-      }
-    }
-  
-
-    li.topic-row{
-      height: auto;
-
-      @include mobile(){
-        padding: 0px;
-        margin: 0px;
-        width: 100%;
-      }
-
-      @include big_web(){
-        width: #{$topic_box_width}px;
-        overflow: hidden;
-        padding: #{$topic_box_padding}px;
-        float: left;
-
-        &.full-width {
+        &:after {
           width: 100%;
-          height: auto;
+          content: "This category is empty. Add a topic below.";
+        }
 
-          div.topic {
+        &.read-only:after {
+          content: "This category is empty.";
+        }
+      }
+
+      li.topic-row{
+        height: auto;
+
+        @include mobile(){
+          padding: 0px;
+          margin: 0px;
+          width: 100%;
+        }
+
+        @include big_web(){
+          width: #{$topic_box_width}px;
+          overflow: hidden;
+          padding: #{$topic_box_padding}px;
+          float: left;
+
+          &.full-width {
+            width: 100%;
             height: auto;
-            color: black;
-            cursor: auto;
 
-            &:hover {
-              background-color: white;
-            }
+            div.topic {
+              height: auto;
+              color: black;
+              cursor: auto;
 
-            &::before {
-              @include triangle(top, white, 0.6em);
-              position: relative;
-              top: -51px;
-              left: 50%;
-            }
-
-            @for $i from 0 through 2{
-              &.li-#{$i}::before {
-                left: #{($topic_box_width * $i) + ((($topic_box_width - ($topic_box_padding * 2)) / 2) - (20 * 2))}px;
+              &:hover {
+                background-color: white;
               }
-            }
 
-            div.topic-expanded-body{
-              padding-top: 0px;
-              margin-top: 0px;
-              padding-bottom: 20px;
+              &::before {
+                @include triangle(top, white, 0.6em);
+                position: relative;
+                top: -51px;
+                left: 50%;
+              }
 
-              img {
-                width: 100%;
+              @for $i from 0 through 2{
+                &.li-#{$i}::before {
+                  left: #{($topic_box_width * $i) + ((($topic_box_width - ($topic_box_padding * 2)) / 2) - (20 * 2))}px;
+                }
+              }
+
+              div.topic-expanded-body{
+                padding-top: 0px;
+                margin-top: 0px;
+                padding-bottom: 20px;
+
+                img {
+                  width: 100%;
+                }
               }
             }
           }
         }
-      }
 
-
-
-      &.floating-edit-topic-button {
-        position: fixed;
-        bottom: 0px;
-        background-color: rgba(255, 255, 255, 0.4);
+        &.floating-edit-topic-button {
+          position: fixed;
+          bottom: 0px;
+          background-color: rgba(255, 255, 255, 0.4);
+        }
       }
     }
   }

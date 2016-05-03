@@ -51,6 +51,21 @@
   (swap! path {})
   (.setToken @history token))
 
+(defn redirect! [loc]
+  (set! (.-location js/window) loc))
+
+(defn redirect-404! []
+  (let [win-location (.-location js/window)
+        pathname (.-pathname win-location)
+        search (.-search win-location)
+        hash-string (.-hash win-location)
+        encoded-url (js/encodeURIComponent (str pathname search hash-string))]
+    ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
+    (redirect! (str "/404?path=" encoded-url))))
+
+(defn history-back! []
+  (.go (.-history js/window) -1))
+
 (defn setup-navigation! [cb-fn sec-route-dispatcher]
   (reset! route-dispatcher sec-route-dispatcher)
   (let [h (doto (make-history)
@@ -61,7 +76,6 @@
     (reset! history h)))
 
 ;; Path components retrieve
-
 (defn current-company-slug []
   (:slug @path))
 
