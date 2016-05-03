@@ -9,8 +9,9 @@
 nav.navbar {
   width: auto;
   background-color: white;
-  border-bottom: 1px solid rgb(215, 215, 215);
+  border-top: 4px solid $oc_yellow;
   margin: 0px;
+  height: #{$navbar_height}px;
 
   &>div{
     margin: 0px;
@@ -36,6 +37,7 @@ nav.navbar {
     width: 100%;
     margin: 0px;
     padding: 0px;
+    margin-top: 30px;
 
     &.editing-mode {
 
@@ -105,16 +107,7 @@ nav.navbar {
 
     ul.navbar-right {
       float: right;
-      margin-right: 50px;
-      &>li>a{
-        padding: 5px;
-      }
-    }
-
-    @include mobile(){
-      ul.navbar-right{
-        margin: 0;
-      }
+      margin: 0px;
     }
   }
 }
