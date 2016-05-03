@@ -68,21 +68,12 @@
           navbar-editing-cb (partial set-navbar-editing owner data)]
       (dom/div {:class (utils/class-set {:company-dashboard true
                                          :navbar-offset (not (utils/is-mobile))})}
-
-       (when-not (utils/is-mobile)
-          (om/build navbar {:edit-mode navbar-editing
-                            :save-bt-active save-bt-active
-                            :auth-settings (:auth-settings data)}))
-
-        ;; company header
-        (om/build company-header {:loading (:loading company-data)
-                                  :company-data company-data
-                                  :navbar-editing navbar-editing
-                                  :editing-topic editing-topic
-                                  :switch-category-cb (partial switch-category-cb owner)
-                                  :active-category active-category
-                                  :save-bt-active save-bt-active})
-
+        ;; Navbar
+        (om/build navbar {:edit-mode navbar-editing
+                          :save-bt-active save-bt-active
+                          :company-data company-data
+                          :auth-settings (:auth-settings data)})
+        ;; Topic list or topic editing (old editing stuff)
         (if-not editing-topic
           ;; topic list
           (om/build topic-list
