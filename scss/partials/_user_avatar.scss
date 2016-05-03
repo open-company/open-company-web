@@ -1,11 +1,8 @@
 div.user-avatar {
-  img.user-avatar-img {
-    margin: 10px;
-  }
+  padding: 5px;
 
-  span.user-avatar-name {
-    margin-right: 10px;
-    color: #2D2D2D;
-    font-size: 12pt;
+  img.user-avatar-img {
+    max-width: 40px;
+    max-height: 40px;
   }
 }
