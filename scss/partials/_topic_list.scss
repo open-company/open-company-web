@@ -14,6 +14,7 @@ div.topic-list{
   position: relative;
   content: "";
   padding-bottom: 20px;
+  margin-top: #{$navbar_height}px;
 
   @include mobile(){
     background-color: #d9d9d9;
