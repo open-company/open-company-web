@@ -54,7 +54,8 @@
         (dom/div #js {:className "topic-overlay-content"
                       :ref "topic-overlay-content"
                       :style #js {:maxHeight (str max-height "px")}}
-          (dom/div {:class "topic-overlay-headline"} (:headline topic-data))
+          (dom/div {:class "topic-overlay-headline"
+                    :dangerouslySetInnerHTML (utils/emojify nil)})
           (dom/div {}
             (when (= topic "finances")
               (om/build topic-finances {:section-data topic-data
@@ -78,7 +79,7 @@
                                                :chart-size {:height (if (utils/is-mobile) 200 290)
                                                             :width (if (utils/is-mobile) 320 480)}}})))
           (dom/div {:class "topic-overlay-body"
-                    :dangerouslySetInnerHTML (clj->js {"__html" section-body})})
+                    :dangerouslySetInnerHTML (utils/emojify section-body)})
           (dom/div {:class "topic-overlay-navigation topic-navigation group"}
             (when prev-rev
               (dom/div {:class "arrow previous"}

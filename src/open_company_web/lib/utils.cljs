@@ -689,3 +689,12 @@
 
 (defn after [ms fn]
   (js/setTimeout fn ms))
+
+(defn emojify
+  "Take a string containing either Unicode emoji (mobile device keyboard), short code emoji (web app),
+  or ASCII emoji (old skool) and convert it to HTML string ready to be added to the DOM (dangerously)
+  with emoji image tags via the Emoji One lib and resources."
+  [text]
+  (set! (.-ascii js/emojione) true)
+  (let [text-string (or text "")] ; handle nil
+    (clj->js {"__html" (.toImage js/emojione text-string)})))

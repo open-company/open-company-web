@@ -22,7 +22,8 @@
 
 (defcomponent topic-headline [data owner]
   (render [_]
-    (dom/div {:class "topic-headline-inner"} (:headline data))))
+    (dom/div {:class "topic-headline-inner"
+              :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
 
 (defn scroll-to-topic-top [topic]
   (let [body-scroll (.-scrollTop (.-body js/document))

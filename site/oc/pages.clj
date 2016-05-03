@@ -178,6 +178,8 @@
           ;; [:script {:src "//www.google.com/jsapi", :type "text/javascript"}]
           ;; [:script {:type "text/javascript"}
           ;;  "google.load(\"visualization\", \"1\", {packages:[\"corechart\"]});"]
+          ;; Emoji One
+          [:script {:src "/lib/emojione/emojione.min.js?oc_deploy_key", :type "text/javascript"}]          
           ;; JWT Decode lib
           [:script {:type "text/javascript",:src "/lib/jwt-decode/jwt-decode.min.js?oc_deploy_key"}]
           ;; ClojureScript generated JavaScript
