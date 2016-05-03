@@ -15,39 +15,12 @@
 (defcomponent navbar [data owner]
 
   (render [_]
-    (let [edit-mode (:edit-mode data)
-          save-bt-active (:save-bt-active data)]
-      (if edit-mode
-        (n/navbar {:inverse? true :fixed-top? true :fluid true :collapse? true}
-          (dom/div {:class "navbar-header editing-mode"}
-            (dom/div {:class "left-button"}
-              (dom/button {:class "cancel-bt oc-btn oc-link"
-                           :on-click (fn [e]
-                                       (when-let [ch (utils/get-channel "cancel-bt-navbar")]
-                                         (put! ch {:click true :event e})))} "Cancel"))
-            (dom/div {:class "right-button"}
-              (dom/button {:class "save-bt oc-btn oc-link"
-                           :disabled (not save-bt-active)
-                           :on-click (fn [e]
-                                       (when-let [ch (utils/get-channel "save-bt-navbar")]
-                                         (put! ch {:click true :event e})))} "Save"))
-            (dom/div {:class "editing-title oc-title"} (:edit-title data))))
-        (n/navbar {:inverse? true :fixed-top? true :fluid true :collapse? true}
-          (dom/div {:class "navbar-header"}
-            (dom/a {:href "/" :style {:color "inherit"
-                                      :line-height "50px"}}
-              (dom/span {:class "bold"} "open")
-              (dom/span {:style {:font-weight 100}} "company"))
-            (dom/ul {:class "nav navbar-nav navbar-right"}
-              (dom/li {}
-                (if (:show-share data)
-                  (dom/div {}
-                    (dom/button {:type "button" :class "btn btn-link digest-button"}
-                                (dom/img {:src "/img/digest.svg"}))
-                    (dom/button {:type "button" :class "btn btn-link share-button"}
-                                (dom/img {:src "/img/share.svg"})))
-                  (if (jwt/jwt)
-                    (om/build user-avatar {})
-                    (om/build login-button data))))))
-          (dom/div {:id "navbar" :class "navbar-collapse collapse container-fluid"}))
-        ))))
+    (n/navbar {:inverse? true :fixed-top? true :fluid true :collapse? true}
+      (dom/div {:class "navbar-header"}
+        (om/build company-avatar data)
+        (dom/ul {:class "nav navbar-nav navbar-right"}
+          (dom/li {}
+            (if (jwt/jwt)
+              (om/build user-avatar {})
+              (om/build login-button data)))))
+      (dom/div {:id "navbar" :class "navbar-collapse collapse container-fluid"}))))
