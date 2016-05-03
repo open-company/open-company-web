@@ -2,4 +2,54 @@
 
 div.profile-container {
   padding-top: 65px;
+
+  img.loading-spinner {
+    margin-left: 25px;
+    margin-bottom: 10px;
+    width: 50px;
+    opacity: 0;
+
+    &.loading {
+      opacity: 1;
+    }
+  }
+
+  p.help-block {
+    font-size: 12px;
+    width: auto;
+  }
+
+  div.logo-container {
+    div.help-block{
+      &.logo-help-block {
+        margin-top: 40px;
+        margin-left: 240px;
+        @media screen and (max-width: 1200px){
+          margin-left: 200px;
+        }
+      }
+      span{
+        width: 100px;
+      }
+    }
+  }
+
+  button.btn.btn-save {
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    font-size: 10px;
+    margin-right: 20px;
+    height: 34px;
+    width: 59px;
+    border-radius: 4px;
+    margin-left: 242px;
+    background-color: $oc_green;
+    color: white;
+    padding-top: 10px;
+  }
+
+  img.logo-preview {
+    margin-right: 10px;
+    max-width: 40px;
+    max-height: 40px;
+  }
 }

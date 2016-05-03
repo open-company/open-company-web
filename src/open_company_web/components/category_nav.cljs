@@ -40,18 +40,13 @@
   ;; reactivate the url change handler
   (reset! prevent-route-dispatch false))
 
-(defn get-categories [categories is-editing]
-  (if (or (utils/is-mobile) is-editing)
-    categories
-    (vec (concat ["all"] categories))))
-
 (defcomponent category-nav [data owner]
 
   (render [_]
     (let [navbar-editing (:navbar-editing data)
           scroll-top (.-scrollTop (sel1 :body))
           company-data (:company-data data)
-          categories (if (:company-data data) (get-categories (:categories company-data) navbar-editing) [])
+          categories (or (:categories company-data) [])
           active-category (:active-category data)
           sections (keys (:sections company-data))
           navbar-style (if (and (utils/is-mobile)
