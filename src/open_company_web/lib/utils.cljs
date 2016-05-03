@@ -505,21 +505,22 @@
     10))
 
 (defn non-zero-number?
+  "Return `true` if the arg is both a number and is not zero, otherwise return `false`."
   [number]
-  ; Seems a little convoluted, but need it to short circuit if it's not a number
-  (not (or (not (number? number)) (zero? number))))
+  (and (number? number)
+       (not (zero? number))))
 
 (defn no-finances-data?
-  "Return `true` if the passed finances data has no data, otherwise return `false`."
+  "Return `true` if the passed finances data has no substantive data, otherwise return `false`."
   [data]
-  (not (some #(or (non-zero-number? (:cash %))
-                  (non-zero-number? (:revenue %))
-                  (non-zero-number? (:costs %))) data)))
+  (not-any? #(or (non-zero-number? (:cash %))
+                 (non-zero-number? (:revenue %))
+                 (non-zero-number? (:costs %))) data))
 
 (defn no-growth-data?
-  "Return `true` if the passed finances data has no data, otherwise return `false`."
+  "Return `true` if the passed finances data has no substantive data, otherwise return `false`."
   [data]
-  (not (some #(non-zero-number? (:value %)) (vals data))))
+  (not-any? #(non-zero-number? (:value %)) (vals data)))
 
 (defn current-growth-period [interval]
   (let [fixed-interval (or interval default-growth-interval)

@@ -107,7 +107,7 @@
           focus-metric (or growth-metric-focus (:slug (first all-metrics)))]
       {:growth-focus (or focus-metric growth-utils/new-metric-slug-placeholder)
        :growth-metadata-editing false
-       :growth-new-metric (zero? (count all-metrics))
+       :growth-new-metric (empty? all-metrics)
        :growth-data (growth-utils/growth-data-map (:data topic-data))
        :growth-metrics (growth-metrics-map all-metrics)
        :growth-metric-slugs (growth-metrics-order all-metrics)})))
@@ -223,7 +223,7 @@
        with-growth-data (if (= topic-kw :growth)
                           (merge with-finances-data (growth-save-data owner))
                           with-finances-data)]
-  with-growth-data))
+    with-growth-data))
 
 (defcomponent topic-overlay-edit [{:keys [topic topic-data currency focus] :as data} owner options]
 
