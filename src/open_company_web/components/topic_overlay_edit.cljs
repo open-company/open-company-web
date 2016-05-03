@@ -242,14 +242,13 @@
                                              :top (str top-v "px")
                                              :left "-35px"})))
         show-btn (fn [e]
-                   (.setTimeout js/window
-                                #(when-let [el (.-commonAncestorContainer (.getRangeAt (js/window.getSelection) 0))]
-                                  (js/console.log "length" (.-length el))
-                                  (js/console.log "el" el)
-                                  (if (undefined? (.-length el))
-                                    (pos-btn (.-top (.position (js/$ el))))
-                                    (hide-btn)))
-                                400)
+                   (utils/after 100
+                     #(when-let [el (.-commonAncestorContainer (.getRangeAt (js/window.getSelection) 0))]
+                        (js/console.log "length" (.-length el))
+                        (js/console.log "el" el)
+                        (if (undefined? (.-length el))
+                          (pos-btn (.-top (.position (js/$ el))))
+                          (hide-btn))))
                    true)]
     {:name "disable-context-menu"
      :init (fn []
@@ -291,7 +290,7 @@
           :show-options
           (dom/div (dom/button {:style {:font-size "14px"} :class "underline"
                                 :on-click #(.click (js/document.getElementById "file-upload-ui--select-trigger"))}
-                               "Select file ")
+                               "Select an image")
                    #_(dom/span {:style {:font-size "14px"}} " or ")
                    #_(dom/button {:style {:font-size "14px"} :class "underline"
                                 :on-click #(om/set-state! owner :state :show-url-field)}
