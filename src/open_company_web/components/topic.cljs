@@ -76,37 +76,7 @@
         (when topic-body
           (dom/div #js {:className "topic-body"
                         :ref "topic-body"
-                        :dangerouslySetInnerHTML (clj->js {"__html" topic-body})}))
-        ;; topic body
-        (when (utils/is-mobile)
-          (dom/div #js {:className (str "body-navigation-container group " (when (not expanded?) "close"))
-                        :ref "body-navigation-container"}
-            (om/build topic-body {:section section
-                                  :section-data topic-data
-                                  :expanded expanded?
-                                  :currency currency
-                                  :selected-metric (om/get-state owner :selected-metric)}
-                                 {:opts options})
-            (when expanded?
-              (dom/div {:class "topic-navigation group"}
-                (when prev-rev
-                  (dom/div {:class "arrow previous group"}
-                    (dom/button {:on-click (fn [e]
-                                            (let [bt (.-target e)]
-                                              (set! (.-disabled bt) "disabled")
-                                              (.stopPropagation e)
-                                              ((:rev-click options) e prev-rev)
-                                              (.setTimeout js/window
-                                                #(set! (.-disabled bt) false) 1000)))} "< Previous")))
-                (when next-rev
-                  (dom/div {:class "arrow next group"}
-                    (dom/button {:on-click (fn [e]
-                                            (let [bt (.-target e)]
-                                              (set! (.-disabled bt) "disabled")
-                                              (.stopPropagation e)
-                                              ((:rev-click options) e next-rev)
-                                              (.setTimeout js/window
-                                                #(set! (.-disabled bt) false) 1000)))} "Next >")))))))))))
+                        :dangerouslySetInnerHTML (clj->js {"__html" topic-body})}))))))
 
 (defn topic-click [data owner options expanded selected-metric]
   (println "FIXME: topic expand/collapse")
