@@ -73,5 +73,5 @@ Sortable.on = function(){};
 var SVGgetWidth = function(){};
 // Emoji One
 var emojione = {};
-var emojione.ascii = {};
-var emojione.toImage = function(){};
+emojione.ascii = {};
+emojione.toImage = function(){};
