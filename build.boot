@@ -19,7 +19,6 @@
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     [com.cognitect/transit-cljs "0.8.237"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
     [racehub/om-bootstrap "0.6.1"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
-    [noencore "0.2.1"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
     [com.andrewmcveigh/cljs-time "0.4.0"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     [funcool/cuerdas "0.7.2"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
