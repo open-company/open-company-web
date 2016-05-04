@@ -21,9 +21,6 @@
             company-home (if (or read-only-company is-profile-page)
                             (oc-urls/company-profile)
                             (oc-urls/company))
-            av-size (or (:size data) df-company-avatar-size)
-            px-size (utils/px av-size)
-            bd-radius (utils/px (int (/ av-size 2)))
             company-logo (:logo company-data)]
         (dom/div {:class (utils/class-set {:company-avatar true
                                            :navbar-brand (:navbar-brand data)})}
