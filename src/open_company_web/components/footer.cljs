@@ -13,9 +13,9 @@
       (dom/div {:class "footer-bottom"}
         (dom/a {:class "oc-logo" :href oc-urls/home} (dom/img {:src "/img/oc-logo-grey.svg"}))
         (dom/a {:class "footer-link" :href oc-urls/about} "ABOUT US")
-        (dom/a {:class "footer-link" :href "mailto:oc@opencompany.com"} "CONTACT US")
+        (dom/a {:class "footer-link" :target "_blank" :href "mailto:oc@opencompany.com"} "CONTACT US")
         (dom/div {:class "footer-bottom-right"}
-          (dom/a {:class "twitter" :href oc-urls/oc-twitter :alt "twitter"}
+          (dom/a {:class "twitter" :target "_blank" :href oc-urls/oc-twitter :alt "twitter"}
             (dom/img {:src "/img/twitter.svg"}))
-          (dom/a {:class "github" :href oc-urls/oc-github :alt "github"}
+          (dom/a {:class "github" :target "_blank" :href oc-urls/oc-github :alt "github"}
             (dom/img {:src "/img/github.svg"})))))))
