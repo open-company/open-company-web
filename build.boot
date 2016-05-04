@@ -95,9 +95,21 @@
         (cljs :optimizations :none
               :compiler-options {:source-map-timestamp true})))
 
+(deftask dev-advanced []
+  (comp (serve :handler 'oc.server/handler
+               :port 3559)
+        (watch)
+        (sass)
+        (build-site)
+        (reload :asset-path "/public"
+                :on-jsload 'open-company-web.core/on-js-reload)
+        (cljs :optimizations :advanced
+              :source-map true
+              :compiler-options {:externs ["public/js/externs.js"]})))
+
 (deftask prod-build []
   (comp (sass :output-style :compressed)
         (build-site)
         (cljs :optimizations :advanced
               :source-map true
-              :externs ["public/js/externs.js"])))
+              :compiler-options {:externs ["public/js/externs.js"]})))
