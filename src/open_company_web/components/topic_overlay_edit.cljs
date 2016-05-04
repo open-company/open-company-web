@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.medium-editor-exts :as editor]
             [open-company-web.router :as router]
             [open-company-web.api :as api]
             [open-company-web.caches :as caches]
@@ -229,42 +230,6 @@
                           with-finances-data)]
     with-growth-data))
 
-(def file-upload
-  (let [class "file-upload-btn"
-        handle (fn [e]
-                 (js/console.log e)
-                 (.preventDefault e))
-        hide-btn (fn [] (gstyle/setStyle (js/document.getElementById "file-upload-ui") #js {:opacity 0}))
-        pos-btn (fn [top-v]
-                  (let [el (js/document.getElementById "file-upload-ui")]
-                    (js/console.log "setting styles" el)
-                    (gstyle/setStyle el #js {:position "absolute"
-                                             :opacity 1
-                                             :top (str top-v "px")
-                                             :left "-35px"})))
-        show-btn (fn [e]
-                   (utils/after 100
-                     #(when-let [el (.-commonAncestorContainer (.getRangeAt (js/window.getSelection) 0))]
-                        (js/console.log "length" (.-length el))
-                        (js/console.log "el" el)
-                        (if (undefined? (.-length el))
-                          (pos-btn (.-top (.position (js/$ el))))
-                          (hide-btn))))
-                   true)]
-    {:name "disable-context-menu"
-     :init (fn []
-             (this-as this
-               (js/console.log this)
-               (hide-btn)
-               (doseq [el (.getEditorElements this)]
-                 (.on (.-base this) el "click" (.bind show-btn this))
-                 (.on (.-base this) el "keyup" (.bind show-btn this)))))}))
-
-(defn inject-extension [config-map ext-map]
-  (let [n   (:name ext-map)
-        ctr (js/MediumEditor.Extension.extend (clj->js ext-map))]
-    (assoc-in config-map [:extensions n] (new ctr))))
-
 (defcomponent uploader [data owner]
   (did-mount [_]
     (assert ls/filestack-key "FileStack API Key required")
@@ -345,7 +310,8 @@
             finances-placeholder-data (get (:sections (get (:categories (slug @caches/new-sections)) 2)) 0)
             med-ed (new js/MediumEditor body-el (clj->js
                                                  (->  (utils/medium-editor-options (:note finances-placeholder-data))
-                                                      (inject-extension file-upload))))]
+                                                      (editor/inject-extension editor/file-upload)
+                                                      (editor/inject-button "highlight" editor/hl-btn))))]
         (.subscribe med-ed "editableInput" (fn [event editable]
                                              (om/set-state! owner :has-changes true)))
         (om/set-state! owner :initial-body (.-innerHTML body-el))
