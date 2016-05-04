@@ -11,9 +11,9 @@
       (dom/div {:class "footer-cta"}
         "Powered by OpenCompany, a simple way to lead in the open.")
       (dom/div {:class "footer-bottom"}
-        (dom/a {:href oc-urls/home} "OC")
-        (dom/a {:href oc-urls/about} "ABOUT US")
-        (dom/a {:href "mailto:oc@opencompany.com"} "CONTACT US")
+        (dom/a {:class "oc-logo" :href oc-urls/home} (dom/img {:src "/img/oc-logo-grey.svg"}))
+        (dom/a {:class "footer-link" :href oc-urls/about} "ABOUT US")
+        (dom/a {:class "footer-link" :href "mailto:oc@opencompany.com"} "CONTACT US")
         (dom/div {:class "footer-bottom-right"}
           (dom/a {:class "twitter" :href oc-urls/oc-twitter :alt "twitter"}
             (dom/img {:src "/img/twitter.svg"}))
