@@ -33,6 +33,6 @@
                 (if-not (clojure.string/blank? company-logo)
                   (dom/img {:src company-logo
                             :class "company-avatar-img"
-                            :title company-name}))
-                  (dom/span {:class "company-avatar-initial"} first-letter))
+                            :title company-name})
+                  (dom/span {:class "company-avatar-initial"} first-letter)))
               (dom/span {:class "company-name"} company-name))))))))
