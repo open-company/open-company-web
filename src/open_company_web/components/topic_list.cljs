@@ -26,20 +26,17 @@
         (api/get-new-sections)))))
 
 (defn get-active-topics [company-data category]
-  (if (= category "all")
-    (apply concat (vals (:sections company-data)))
-    (get-in company-data [:sections (keyword category)])))
+  (get-in company-data [:sections (keyword category)]))
 
 (defn update-active-topics [owner options category new-active-topics]
   (let [old-active-categories (om/get-state owner :active-topics)
         new-active-categories (assoc old-active-categories category new-active-topics)]
-    (api/patch-sections (dissoc new-active-categories :all))))
+    (api/patch-sections new-active-categories)))
 
 (defn get-state [data current-state]
   (let [company-data (:company-data data)
         categories (:categories company-data)
-        all-categories (if (utils/is-mobile) categories (concat ["all"] categories))
-        active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) all-categories))]
+        active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))]
     {:initial-active-topics active-topics
      :active-topics active-topics
      :new-sections-requested (or (:new-sections-requested current-state) false)
@@ -102,7 +99,7 @@
           company-data    (:company-data data)
           active-category (keyword (:active-category data))
           category-topics (get active-topics active-category)]
-      (dom/div {:class "topic-list"
+      (dom/div {:class "topic-list group"
                 :style (when (utils/is-mobile) {:min-height "100vh"})
                 :key "topic-list"}
         (when (and (not (:read-only company-data))
@@ -110,11 +107,7 @@
                    (not (:loading data)))
           ;; drawer toggler
           (om/build drawer-toggler {:close (not drawer-open)
-                                    :click-cb
-                                      (fn [_]
-                                        (when (= active-category :all)
-                                          ((:switch-category-cb options) "progress"))
-                                        (om/update-state! owner :drawer-open not))}))
+                                    :click-cb #(om/update-state! owner :drawer-open not)}))
         (when-not (or (:read-only company-data)
                       (utils/is-mobile)
                       (:loading data))
@@ -136,22 +129,23 @@
                                    :currency (:currency company-data)}
                                   {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                           :topic-edit-cb (:topic-edit-cb options)}}))
-        (dom/ul #js {:className (utils/class-set {:topic-list-internal true
-                                                  :read-only (or (utils/is-mobile) (:read-only company-data))
-                                                  :group true
-                                                  :content-loaded (not (:loading data))})
-                     :ref "topic-list-ul"}
-          (for [section-name category-topics
-                :let [sd (->> section-name keyword (get company-data))]]
-            (when-not (and (:read-only company-data) (:placeholder sd))
-              (dom/li #js {:className "topic-row"
-                           :ref section-name
-                           :key (str "topic-row-" (name section-name))}
-                (om/build topic {:loading (:loading company-data)
-                                 :section section-name
-                                 :section-data sd
-                                 :currency (:currency company-data)
-                                 :expanded-topics (:expanded-topics data)
-                                 :active-category active-category}
-                                 {:opts {:section-name section-name
-                                         :bw-topic-click (partial topic-click owner)}})))))))))
+        (dom/div {:class "topic-list-content"}
+          (dom/ul #js {:className (utils/class-set {:topic-list-internal true
+                                                    :read-only (or (utils/is-mobile) (:read-only company-data))
+                                                    :group true
+                                                    :content-loaded (not (:loading data))})
+                       :ref "topic-list-ul"}
+            (for [section-name category-topics
+                  :let [sd (->> section-name keyword (get company-data))]]
+              (when-not (and (:read-only company-data) (:placeholder sd))
+                (dom/li #js {:className "topic-row"
+                             :ref section-name
+                             :key (str "topic-row-" (name section-name))}
+                  (om/build topic {:loading (:loading company-data)
+                                   :section section-name
+                                   :section-data sd
+                                   :currency (:currency company-data)
+                                   :expanded-topics (:expanded-topics data)
+                                   :active-category active-category}
+                                   {:opts {:section-name section-name
+                                           :bw-topic-click (partial topic-click owner)}}))))))))))

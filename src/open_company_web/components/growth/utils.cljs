@@ -32,8 +32,9 @@
 (defn get-minus [diff interval]
   (case interval
     "quarterly" (t/months (* diff 3))
-    "monthly" (t/months diff)
-    "weekly" (t/weeks diff)))
+    "weekly" (t/weeks diff)
+    ;; default to monthly
+    (t/months diff)))
 
 (defn get-past-period [period diff interval]
   (let [period-date (utils/date-from-period period interval)

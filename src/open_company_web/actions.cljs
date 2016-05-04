@@ -41,7 +41,7 @@
 (defmethod dispatcher/action :company-created [db [_ body]]
   (if (:links body)
     (let [updated (utils/fix-sections body)]
-      (router/nav! (oc-urls/company (:slug updated)))
+      (router/redirect! (oc-urls/company (:slug updated)))
       (assoc-in db (dispatcher/company-data-key (:slug updated)) updated))
     db))
 
@@ -85,7 +85,7 @@
           (dissoc :loading)))
     (= 404 status)
     (do
-      (utils/redirect! (oc-urls/not-found {:path (oc-urls/company slug)}))
+      (router/redirect-404!)
       db)
     ;; probably some default failure handling should be added here
     :else db))

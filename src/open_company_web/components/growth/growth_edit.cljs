@@ -80,7 +80,8 @@
 
   (will-receive-props [_ next-props]
     (when (or (not= (:growth-data data) (:growth-data next-props))
-              (not= (:metric-slug data) (:metric-slug next-props)))
+              (not= (:metric-slug data) (:metric-slug next-props))
+              (not= (:new-metric data) (:new-metric next-props)))
       (om/set-state! owner :metadata-edit (:new-metric next-props))
       (om/set-state! owner :growth-data (:growth-data next-props))))
 
@@ -117,16 +118,18 @@
                                                          ; - exit the metadata edit state
                                                          (set-metadata-edit owner data false))))
                                         :change-growth-metric-cb (:change-growth-metric-cb data)}
-                                       {:opts {:currency (:currency options)}})
-          (dom/div {}
-            (dom/div {:class "chart-header-container"}
-              (dom/div {:class "target-actual-container"}
-                (dom/div {:class "actual-container"}
-                  (dom/h3 {:class "actual blue"
-                           :on-click #(set-metadata-edit owner data true)}
-                    (str (:name metric-info) " ")
-                    (om/build editable-pen {:click-callback #(set-metadata-edit owner data true)}))
-                  (dom/h3 {:class "actual-label gray"} (str (utils/camel-case-str (:interval metric-info)) " " (utils/camel-case-str (:unit metric-info)))))))
+                                        {:opts {:currency (:currency options)}})
+          (dom/div{}
+            (when interval
+              (dom/div {:class "chart-header-container"}
+                (dom/div {:class "target-actual-container"}
+                  (dom/div {:class "actual-container"}
+                    (dom/h3 {:class "actual blue"
+                             :on-click #(set-metadata-edit owner data true)}
+                      (str (:name metric-info) " ")
+                      (om/build editable-pen {:click-callback #(set-metadata-edit owner data true)}))
+                    (dom/h3 {:class "actual-label gray"} (str (utils/camel-case-str (:interval metric-info)) " " (utils/camel-case-str (:unit metric-info))))))))
+
             (dom/table {:class "table"
                         :key (str "growth-edit-" slug)}
               (dom/thead {}

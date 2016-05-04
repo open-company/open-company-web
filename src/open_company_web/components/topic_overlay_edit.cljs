@@ -107,7 +107,7 @@
           focus-metric (or growth-metric-focus (:slug (first all-metrics)))]
       {:growth-focus (or focus-metric growth-utils/new-metric-slug-placeholder)
        :growth-metadata-editing false
-       :growth-new-metric false
+       :growth-new-metric (empty? all-metrics)
        :growth-data (growth-utils/growth-data-map (:data topic-data))
        :growth-metrics (growth-metrics-map all-metrics)
        :growth-metric-slugs (growth-metrics-order all-metrics)})))
@@ -139,10 +139,11 @@
     (om/set-state! owner :has-changes true)))
 
 (defn growth-save-metrics-metadata-cb [owner data metric-slug]
- (let [metrics (om/get-state owner :growth-metrics)
+  (let [metrics (om/get-state owner :growth-metrics)
        metrics-order (om/get-state owner :growth-metric-slugs)
        new-metrics (vec (map #(metrics %) metrics-order))]
-    (api/partial-update-section "growth" {:metrics new-metrics})))
+    (api/partial-update-section "growth" {:metrics new-metrics})
+    (om/set-state! owner :growth-new-metric false)))
 
 (defn growth-metadata-edit-cb [owner editing]
   (om/set-state! owner :growth-metadata-editing editing))
@@ -210,7 +211,7 @@
     {:data fixed-growth-data}))
 
 (defn data-to-save [owner topic]
- (let [topic-kw (keyword topic)
+  (let [topic-kw (keyword topic)
        is-data-topic (#{:finances :growth} topic-kw)
        with-title {:title (om/get-state owner :title)}
        with-headline (merge with-title {:headline (om/get-state owner :headline)})
@@ -222,7 +223,7 @@
        with-growth-data (if (= topic-kw :growth)
                           (merge with-finances-data (growth-save-data owner))
                           with-finances-data)]
-  with-growth-data))
+    with-growth-data))
 
 (defcomponent topic-overlay-edit [{:keys [topic topic-data currency focus] :as data} owner options]
 
@@ -317,7 +318,8 @@
                                     (.stopPropagation %)
                                     (api/partial-update-section topic section-data)
                                     ((:dismiss-editing-cb options)))} "Save"))
-        (dom/button {:class "cancel"
+        (dom/button {:class (utils/class-set {:cancel true
+                                              :save-visible has-changes})
                      :on-click #((:dismiss-editing-cb options))} "Cancel")
         (dom/div {:class "topic-overlay-edit-header"}
           (dom/input {:class "topic-overlay-edit-title"
@@ -363,6 +365,7 @@
                                        :currency currency}))
             (when (= topic "growth")
               (dom/div {}
+
                 (om/build growth-edit {:growth-data focus-metric-data
                                        :metric-slug growth-focus
                                        :metadata-edit-cb (partial growth-metadata-edit-cb owner)
@@ -396,8 +399,7 @@
                                                        :active (= growth-focus growth-utils/new-metric-slug-placeholder)})
                               :title "Add a new metric"
                               :data-tab growth-utils/new-metric-slug-placeholder
-                              :on-click (fn [e]
-                                          (.stopPropagation e)
+                              :on-click (fn [_]
                                           (om/set-state! owner :growth-new-metric true)
                                           (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
           (dom/div #js {:className "topic-overlay-edit-body"
