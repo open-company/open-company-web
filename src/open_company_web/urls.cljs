@@ -9,10 +9,16 @@
 
 (def home "/")
 
+(def about "/about")
+
 (def login "/login")
 
 (defn not-found [& [params]]
   (str "/404" (when params (str "?" (params->query-string params)))))
+
+(def oc-twitter "https://twitter.com/opencompanyhq")
+
+(def oc-github "https://github.com/open-company")
 
 ;; User
 
