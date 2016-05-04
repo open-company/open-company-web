@@ -18,7 +18,6 @@ div.footer {
     height: 90px;
 
     & > a {
-      // opacity: 0.2;
       border: solid 1px rgba(78, 90, 107, 0.5);
       opacity: 0.5;
       font-weight: 700;
@@ -35,12 +34,12 @@ div.footer {
       width: 100px;
       height: 30px;
 
-      a.twitter {
-
-      }
-
-      a.github {
-
+      a {
+        margin-right: 20px;
+        img {
+          width: 30px;
+          height: 30px;
+        }
       }
     }
   }
