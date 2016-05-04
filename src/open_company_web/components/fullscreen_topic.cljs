@@ -15,7 +15,7 @@
 (defcomponent fullscreen-topic-internal [{:keys [topic topic-data] :as data} owner options]
   (render [_]
     (let []
-      (dom/div {:class "fullscreen-topic-internal"}
+      (dom/div {:class "fullscreen-topic-internal group"}
         (dom/div {:class "topic-title"} (:title topic-data))
         (dom/div {:class "topic-headline"} (:headline topic-data))
         (dom/div {:class "separator"})

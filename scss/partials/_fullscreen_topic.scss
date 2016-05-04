@@ -21,8 +21,7 @@ div.fullscreen-topic {
 
   div.fullscreen-topic-internal {
     width: 575px;
-    margin: 0 auto;
-    margin-top: #{$navbar_height}px;
+    margin: #{$navbar_height}px auto 30px;
 
     div.topic-title {
       opacity: 0.5;
