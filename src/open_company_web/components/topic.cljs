@@ -40,7 +40,7 @@
         (when-let [first-image (sel1 body :img)]
           (om/set-state! owner :image-header (.-src first-image)))))))
 
-(defcomponent topic-internal [{:keys [topic-data section currency expanded? prev-rev next-rev] :as data} owner options]
+(defcomponent topic-internal [{:keys [topic-data section currency prev-rev next-rev] :as data} owner options]
   (init-state [_]
     {:image-header nil})
 
@@ -78,14 +78,11 @@
                         :ref "topic-body"
                         :dangerouslySetInnerHTML (clj->js {"__html" topic-body})}))))))
 
-(defn topic-click [data owner options expanded selected-metric]
-  (println "FIXME: topic expand/collapse")
-  ; (if (utils/is-mobile)
-  ;   (do (dis/dispatch! [:topic/toggle-expand (keyword (:section-name options))])
-  ;       (mobile-topic-animation data owner options expanded)
-  ;       (js/setTimeout #(scroll-to-topic-top (om/get-ref owner "topic")) 50))
-  ;   ((:bw-topic-click options) (:section data) selected-metric))
-  )
+(defn topic-click [data owner options selected-metric]
+  (let [props (om/get-props owner)]
+    ((:topic-click options)
+      (:section props)
+      (:selected-metric props))))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
@@ -113,7 +110,7 @@
                                      :transition-as-of nil})))
       (.play))))
 
-(defcomponent topic [{:keys [section-data section currency expanded-topics] :as data} owner options]
+(defcomponent topic [{:keys [section-data section currency] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
@@ -131,16 +128,11 @@
 
   (did-update [_ prev-props _]
     (println "FIXME: re-expand previously expanded topic")
-    ; (let [prev-expanded? (contains? (:expanded-topics prev-props) (keyword section))
-    ;       expanded? (contains? expanded-topics (keyword section))]
-    ;   (when (and (utils/is-mobile) (not= prev-expanded? expanded?))
-    ;     (mobile-topic-animation data owner options (not expanded?))))
     (when (om/get-state owner :transition-as-of)
       (animate-revision-navigation owner)))
 
   (render-state [_ {:keys [editing as-of actual-as-of transition-as-of] :as state}]
     (let [section-kw (keyword section)
-          expanded? (contains? expanded-topics section-kw)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
           next-rev (utils/revision-next revisions as-of)
@@ -157,19 +149,18 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className "topic group"
                     :ref "topic"
-                    :onClick #(topic-click data owner options expanded? nil)}
+                    :onClick #(topic-click data owner options nil)}
         (dom/div #js {:className "topic-anim group"
-                      :key (str "topic-anim-" as-of "-" transition-as-of (when expanded? "-expanded"))
+                      :key (str "topic-anim-" as-of "-" transition-as-of)
                       :ref "topic-anim"}
           (dom/div #js {:className "topic-as-of group"
                         :ref "cur-topic"
-                        :key (str "cur-" as-of (when expanded? "-expanded"))
+                        :key (str "cur-" as-of)
                         :style #js {:opacity 1 :width "100%" :height "auto"}}
             (om/build topic-internal {:section section
                                       :topic-data topic-data
                                       :currency currency
-                                      :expanded? expanded?
-                                      :topic-click (partial topic-click data owner options expanded?)
+                                      :topic-click (partial topic-click data owner options)
                                       :prev-rev prev-rev
                                       :next-rev next-rev}
                                      {:opts (merge options {:rev-click (fn [e rev]
@@ -187,7 +178,6 @@
                   (om/build topic-internal {:section section
                                             :topic-data tr-topic-data
                                             :currency currency
-                                            :expanded? expanded?
                                             :topic-click #()
                                             :prev-rev tr-prev-rev
                                             :next-rev tr-next-rev}
