@@ -174,10 +174,6 @@
           [:script {:src "/lib/scrollTo/scrollTo.min.js?oc_deploy_key", :type "text/javascript"}]
           ;; jQuery UI
           [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"}]
-          ;; Google Charts //developers.google.com/chart/
-          ;; [:script {:src "//www.google.com/jsapi", :type "text/javascript"}]
-          ;; [:script {:type "text/javascript"}
-          ;;  "google.load(\"visualization\", \"1\", {packages:[\"corechart\"]});"]
           ;; Emoji One
           [:script {:src "/lib/emojione/emojione.min.js?oc_deploy_key", :type "text/javascript"}]          
           ;; JWT Decode lib
