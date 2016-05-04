@@ -20,3 +20,12 @@
     (throw (js/errorThrowingCode.))
     (catch :default e
       (.captureException js/Raven e))))
+
+(defn capture-error [e]
+  (.captureException js/Raven e))
+
+(defn capture-message [msg]
+  (.captureMessage js/Raven msg))
+
+(defn capture-error-with-message [msg]
+  (capture-error (js/Error. msg)))

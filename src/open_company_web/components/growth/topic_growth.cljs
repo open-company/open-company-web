@@ -61,6 +61,7 @@
 
   (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs]}]
     (let [section-name (utils/camel-case-str (name section))
+          no-data (utils/no-growth-data? growth-data)
           focus-metric-data (filter-growth-data focus growth-data)
           focus-metric-info (get growth-metrics focus)
           subsection-data {:metric-data focus-metric-data
@@ -68,24 +69,30 @@
                            :currency currency
                            :read-only true
                            :total-metrics (count growth-metrics)}]
-      (dom/div {:class "section-container"
-                :id "section-growth"
-                :key (name section)}
-        (dom/div {:class "composed-section growth"}
-          ; growth data chart
-          (dom/div {:class (utils/class-set {:composed-section-body true})}
-            ;; growth metric currently shown
-            (when (and focus (seq (:metric-data subsection-data)))
-              (om/build growth-metric subsection-data {:opts options})))
-          (dom/div {:class "pillbox-container growth"}
-            (when focus
-              (for [metric-slug growth-metric-slugs]
-                (let [metric (get growth-metrics metric-slug)
-                      mname (:name metric)
-                      metric-classes (utils/class-set {:pillbox true
-                                                       metric-slug true
-                                                       :active (= focus metric-slug)})]
-                  (dom/label {:class metric-classes
-                              :title (:description metric)
-                              :data-tab metric-slug
-                              :on-click #(subsection-click % owner data options)} mname))))))))))
+      (if no-data
+  
+        (dom/div {:class "topic-overlay-body"}
+          (dom/div {:class "topic-body-inner group"}
+            (dom/p "Information on growth is not yet available.")))
+
+        (dom/div {:class "section-container"
+                  :id "section-growth"
+                  :key (name section)}
+          (dom/div {:class "composed-section growth"}
+            ; growth data chart
+            (dom/div {:class (utils/class-set {:composed-section-body true})}
+              ;; growth metric currently shown
+              (when (and focus (seq (:metric-data subsection-data)))
+                (om/build growth-metric subsection-data {:opts options})))
+            (dom/div {:class "pillbox-container growth"}
+              (when focus
+                (for [metric-slug growth-metric-slugs]
+                  (let [metric (get growth-metrics metric-slug)
+                        mname (:name metric)
+                        metric-classes (utils/class-set {:pillbox true
+                                                         metric-slug true
+                                                         :active (= focus metric-slug)})]
+                    (dom/label {:class metric-classes
+                                :title (:description metric)
+                                :data-tab metric-slug
+                                :on-click #(subsection-click % owner data options)} mname)))))))))))

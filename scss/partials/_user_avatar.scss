@@ -1,8 +1,20 @@
 div.user-avatar {
   padding: 5px;
 
-  img.user-avatar-img {
-    max-width: 40px;
-    max-height: 40px;
+  button.dropdown-toggle{
+    border: 0px solid transparent;
+    background-color: transparent;
+    width: 40px;
+    height: 40px;
+
+    &:active, &:focus {
+      outline: none;
+      border: 0px solid tranparent;
+    }
+
+    img.user-avatar-img {
+      max-width: 40px;
+      max-height: 40px;
+    }
   }
 }

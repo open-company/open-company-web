@@ -10,6 +10,7 @@
   (render [_]
     (let [sort-pred (utils/sort-by-key-pred :period)
           finances-data (sort sort-pred (:data data))
+          no-data (or (:placeholder data) (empty? finances-data) (utils/no-finances-data? finances-data))
           all-revenues (remove js/isNaN (remove nil? (map #(js/parseFloat (:revenue %)) (:data data))))
           revenues-sum (apply + all-revenues)
           actual (last finances-data)
@@ -30,19 +31,19 @@
                                          :topic-finances-headline true
                                          :group true
                                          :collapse (:expanded data)})}
-        (dom/div {:class "topic-headline-labels"}
-          (dom/div {:class "finances-metric cash"}
-            (dom/div {:class "label"} "Cash")
-            (dom/div {:class "value cash"} (str currency (utils/with-metric-prefix (:cash actual)))))
-          (dom/div {:class "finances-metric burn-rate"}
-            (dom/div {:class "label"} burn-label)
-            (dom/div {:class (str "value " burn-class)} (str currency burn-value)))
-          (if (neg? (:runway actual))
-            (dom/div {:class "finances-metric runway"}
-              (dom/div {:class "label"} "Runway")
-              (dom/div {:class "value"} (finances-utils/get-rounded-runway runway [:round :remove-trailing-zero :short])))
-            (dom/div {:class "finances-metric revenue"}
-              (dom/div {:class "label"} "Revenue")
-              (dom/div {:class "value revenue"} (str currency (utils/with-metric-prefix (:revenue actual)))))
-            ))
-        (dom/div {:class "topic-headline-inner"} (:headline data))))))
+        (if-not no-data
+          (dom/div {:class "topic-headline-labels"}
+            (dom/div {:class "finances-metric cash"}
+              (dom/div {:class "label"} "Cash")
+              (dom/div {:class "value cash"} (str currency (utils/with-metric-prefix (:cash actual)))))
+            (dom/div {:class "finances-metric burn-rate"}
+              (dom/div {:class "label"} burn-label)
+              (dom/div {:class (str "value " burn-class)} (str currency burn-value)))
+            (if (neg? (:runway actual))
+              (dom/div {:class "finances-metric runway"}
+                (dom/div {:class "label"} "Runway")
+                (dom/div {:class "value"} (finances-utils/get-rounded-runway runway [:round :remove-trailing-zero :short])))
+              (dom/div {:class "finances-metric revenue"}
+                (dom/div {:class "label"} "Revenue")
+                (dom/div {:class "value revenue"} (str currency (utils/with-metric-prefix (:revenue actual)))))))
+          (dom/div {:class "topic-headline-inner"} (:headline data)))))))
