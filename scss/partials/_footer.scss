@@ -1,0 +1,47 @@
+div.footer {
+  border-bottom: 4px solid $oc_yellow;
+  background-color: white;
+  padding-top: 90px;
+
+  div.footer-cta {
+    font-family: $oc_headers_font;
+    font-size: 18px;
+    line-height: 1.3;
+    color: $oc_gray_5;
+    text-align: center;
+  }
+
+  div.footer-bottom {
+    background-color: rgba(78, 90, 107, 0.05);
+    margin-top: 90px;
+    padding: 30px;
+    height: 90px;
+
+    & > a {
+      // opacity: 0.2;
+      border: solid 1px rgba(78, 90, 107, 0.5);
+      opacity: 0.5;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      color: #4e5a6b;
+      margin-left: 20px;
+      padding: 5.5px;
+    }
+
+    div.footer-bottom-right {
+      float: right;
+      width: 100px;
+      height: 30px;
+
+      a.twitter {
+
+      }
+
+      a.github {
+
+      }
+    }
+  }
+}
