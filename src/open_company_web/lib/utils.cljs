@@ -564,7 +564,7 @@
     (.format (NumberFormat. nf/Format.CURRENCY currency-code nf/CurrencyStyle.LOCAL) number))
   ([number currency-code decimals]
     (-> (NumberFormat. nf/Format.CURRENCY currency-code nf/CurrencyStyle.LOCAL)
-        (.setMinimumFractionDigits 0)
+        (.setMinimumFractionDigits (min 2 decimals))
         (.format number))))
 
 (defn offset-top [elem]
