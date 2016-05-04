@@ -7,15 +7,54 @@ div.fullscreen-topic {
   left: 0;
   border-top: 4px solid $oc_yellow;
   border-bottom: 4px solid $oc_yellow;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.9);
   z-index: 1036;
+  overflow: auto;
 
   div.close {
-    
+    float: right;
+    position: fixed;
+    top: 43px;
+    right: 24px;
+    cursor: pointer;
   }
 
-  div.fullscreen-topic-content {
+  div.fullscreen-topic-internal {
+    width: 575px;
+    margin: 0 auto;
     margin-top: #{$navbar_height}px;
-    width: 
+
+    div.topic-title {
+      opacity: 0.5;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      color: $oc_gray_5;
+      text-transform: uppercase;
+    }
+
+    div.topic-headline {
+      margin-top: 18px;
+      font-family: $oc_headers_font;
+      font-size: 26px;
+      line-height: 1.4;
+      color: $oc_gray_5;
+    }
+
+    div.separator {
+      margin-top: 20px;
+      width: 30px;
+      height: 2px;
+      background-color: rgba(77, 89, 106, 0.2);
+    }
+
+    div.topic-body {
+      margin-top: 21px;
+      font-family: $oc_headers_font;
+      font-size: 18px;
+      line-height: 1.8;
+      color: $oc_gray_5;
+    }
   }
 }
