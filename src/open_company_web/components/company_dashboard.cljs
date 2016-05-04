@@ -9,6 +9,7 @@
             [open-company-web.components.company-header :refer [company-header]]
             [open-company-web.components.topic-list :refer [topic-list]]
             [open-company-web.components.navbar :refer (navbar)]
+            [open-company-web.components.footer :refer (footer)]
             [open-company-web.components.edit-topic :refer (edit-topic)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
@@ -69,8 +70,7 @@
       (dom/div {:class (utils/class-set {:company-dashboard true
                                          :navbar-offset (not (utils/is-mobile))})}
         ;; Navbar
-        (om/build navbar {:edit-mode navbar-editing
-                          :save-bt-active save-bt-active
+        (om/build navbar {:save-bt-active save-bt-active
                           :company-data company-data
                           :auth-settings (:auth-settings data)})
         ;; Topic list or topic editing (old editing stuff)
@@ -90,4 +90,6 @@
                                 :section-data (get company-data (keyword editing-topic))}
                     {:opts {:navbar-editing-cb navbar-editing-cb
                             :save-bt-active-cb (partial set-save-bt-active owner)
-                            :dismiss-topic-editing-cb (partial dismiss-topic-editing-cb owner)}}))))))
+                            :dismiss-topic-editing-cb (partial dismiss-topic-editing-cb owner)}}))
+        ;;Footer
+        (om/build footer {})))))
