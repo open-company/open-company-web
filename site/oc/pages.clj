@@ -186,6 +186,8 @@
           [:script {:type "text/javascript", :src "/js/oc.js?oc_deploy_key"}]
           ;; ClojureScript generated JavaScript
           [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js?oc_deploy_key"}]
+          ;; Clamp JS
+          [:script {:type "text/javascript", :src "/lib/clamp/clamp.js?oc_deploy_key"}]
           ;; Adobe Typekit
           [:script {:src "//use.typekit.net/olr5ghy.js"}]
           [:script "try{Typekit.load({ async: true });}catch(e){}"]]})
