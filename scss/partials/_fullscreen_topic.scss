@@ -54,6 +54,11 @@ div.fullscreen-topic {
       font-size: 18px;
       line-height: 1.8;
       color: $oc_gray_5;
+
+      a {
+        cursor: pointer;
+        pointer-events: auto;
+      }
     }
 
     div.topic-attribution {
