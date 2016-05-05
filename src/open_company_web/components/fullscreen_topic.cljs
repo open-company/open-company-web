@@ -8,7 +8,9 @@
             [open-company-web.components.ui.icon :refer (icon)]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [goog.style :refer (setStyle)]
-            [goog.fx.Animation.EventType :as EventType]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
+            [goog.fx.Animation.EventType :as AnimationEventType]
             [goog.fx.dom :refer (Fade)]))
 
 
@@ -33,7 +35,7 @@
   (dommy/remove-class! (sel1 [:body]) :no-scroll)
   (let [fade-out (new Fade (om/get-ref owner "fullscreen-topic") 1 0 utils/oc-animation-duration)]
     (doto fade-out
-      (.listen EventType/FINISH
+      (.listen AnimationEventType/FINISH
         #((:close-overlay-cb options)))
       (.play))))
 
@@ -44,6 +46,9 @@
      :actual-as-of (:updated-at section-data)})
 
   (did-mount [_]
+    (let [ft (om/get-ref owner "fullscreen-topic")]
+      (dommy/listen! js/window :keypress (fn [e]
+                                    (println "dommy keyup" (.-key e)))))
     (show-fullscreen-topic owner))
 
   (render-state [_ {:keys [as-of actual-as-of] :as state}]
