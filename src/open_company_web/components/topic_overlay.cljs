@@ -65,8 +65,8 @@
                                         :read-only true}
                                        {:opts {:show-title false
                                                :show-revisions-navigation false
-                                               :chart-size {:height (if (utils/is-mobile) 200 290)
-                                                            :width (if (utils/is-mobile) 320 480)}}}))
+                                               :chart-size {:width (if (utils/is-mobile) 300 480)
+                                                            :height (if (utils/is-mobile) 274 190)}}}))
             (when (= topic "growth")
               (om/build topic-growth   {:section-data topic-data
                                         :section topic-kw
@@ -76,8 +76,8 @@
                                        {:opts {:show-title false
                                                :show-revisions-navigation false
                                                :switch-metric-cb (:switch-metric-cb options)
-                                               :chart-size {:height (if (utils/is-mobile) 200 290)
-                                                            :width (if (utils/is-mobile) 320 480)}}})))
+                                               :chart-size {:width (if (utils/is-mobile) 300 480)
+                                                            :height (if (utils/is-mobile) 274 190)}}})))
           (dom/div {:class "topic-overlay-body"
                     :dangerouslySetInnerHTML (utils/emojify section-body)})
           (dom/div {:class "topic-overlay-navigation topic-navigation group"}

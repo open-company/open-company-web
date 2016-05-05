@@ -478,6 +478,15 @@
       "monthly" (cljs-time/in-months (cljs-time/interval first-date last-date))
       "weekly" (cljs-time/in-weeks (cljs-time/interval first-date last-date)))))
 
+(defn get-year [period & [interval]]
+  (let [fixed-interval (or interval "monthly")
+        date (date-from-period period fixed-interval)]
+    (cljs-time/year date)))
+
+(defn get-weekly-period-day [period]
+  (let [date (date-from-period period "weekly")]
+    (cljs-time/day date)))
+
 (defn get-month [period & [interval]]
   (let [fixed-interval (or interval default-growth-interval)
         date (date-from-period period fixed-interval)
@@ -555,7 +564,7 @@
     (.format (NumberFormat. nf/Format.CURRENCY currency-code nf/CurrencyStyle.LOCAL) number))
   ([number currency-code decimals]
     (-> (NumberFormat. nf/Format.CURRENCY currency-code nf/CurrencyStyle.LOCAL)
-        (.setMinimumFractionDigits 0)
+        (.setMinimumFractionDigits (min 2 decimals))
         (.format number))))
 
 (defn offset-top [elem]

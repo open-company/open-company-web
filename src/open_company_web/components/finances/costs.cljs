@@ -22,15 +22,15 @@
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
           costs-val (str cur-symbol (utils/thousands-separator (:costs value-set)))
-          fixed-sorted-finances (vec (map #(merge % {:label (get-label cur-symbol (:costs %))}) sorted-finances))
+          fixed-sorted-finances (vec (map #(merge % {:label (get-label cur-symbol (:costs %))
+                                                     :sub-label (str "COSTS - " (utils/get-month (:period %)) " " (utils/get-year (:period %)))}) sorted-finances))
           chart-opts {:opts {:chart-height (:height (:chart-size options))
                              :chart-width (:width (:chart-size options))
                              :chart-keys [:costs]
-                             :label-color (occ/get-color-by-kw :oc-red-regular)
+                             :label-color (occ/get-color-by-kw :oc-gray-5)
                              :label-key :label
+                             :sub-label-key :sub-label
                              :interval "monthly"
-                             :h-axis-color (occ/get-color-by-kw :oc-red-light)
-                             :h-axis-selected-color (occ/get-color-by-kw :oc-red-regular)
                              :chart-colors {:costs (occ/get-color-by-kw :oc-red-light)}
                              :chart-selected-colors {:costs (occ/get-color-by-kw :oc-red-regular)}}}]
       (dom/div {:class (utils/class-set {:section true

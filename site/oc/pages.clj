@@ -162,7 +162,9 @@
           ;; jQuery UI CSS
           [:link {:rel "stylesheet", :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"}]
           ;; Google fonts Lora
-          [:link {:type "text/css", :rel "stylesheet", :href "//fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic"}]]
+          [:link {:type "text/css", :rel "stylesheet", :href "//fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic"}]
+          ;; Google fonts OpenSans
+          [:link {:type "text/css", :rel "stylesheet", :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]]
    :body [:body
           [:div#app [:div.oc-loading.active [:div.oc-loading-internal]]]
           [:div#oc-loading]

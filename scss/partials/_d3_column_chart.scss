@@ -10,8 +10,17 @@ div.d3-column-container{
     text.chart-label{
       font-family: $oc_main_font;
       font-size: 24px;
-      font-weight: 500;
-      line-height: 1.5;
+      font-weight: 700;
+      color: $oc_gray_5;
+      opacity: 0.75;
+    }
+
+    text.sub-chart-label {
+      opacity: 0.75;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: $oc_gray_5;
     }
 
     text.chart-label.small {
@@ -29,10 +38,12 @@ div.d3-column-container{
   div.chart-prev {
     float: left;
     cursor: pointer;
+    width: 10px;
   }
 
   div.chart-next {
     float: right;
     cursor: pointer;
+    width: 10px;
   }
 }
