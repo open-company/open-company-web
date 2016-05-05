@@ -100,12 +100,16 @@ div.topic-list {
           }
 
           div.topic-body {
-            color: #4e5a6b;
             margin-top: 10px;
             margin-bottom: 20px;
+            color: $oc_gray_5;
             max-height: 31px;
             overflow: hidden;
             cursor: pointer;
+            font-family: $oc_headers_font;
+            font-size: 12px;
+            line-height: 1.3;
+            with: 282px;
 
             *{
               with: 282px;
