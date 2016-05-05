@@ -72,23 +72,21 @@
   }
 }
 
-@mixin pillbox($active_pillbox_bg: #bababa){
+@mixin pillbox(){
   label.pillbox {
     margin: 4px 3px;
     padding: 3px 12px;
     height: 30px;
-    border-radius: 20px;
     background-color: #ffffff;
-    box-shadow: 0 1px 0 0 $oc_gray_2;
-    border: solid 0.3px #979797;
-    font-size: 14px;
-    color: #5b5b5b;
+    border: 1px solid rgba(78, 90, 107, 0.5);
+    font-size: 12px;
+    color: $oc_gray_5;
     cursor: pointer;
+    opacity: 0.5;
 
     &.active {
-      border: solid 0.3px transparent;
-      background-color: $active_pillbox_bg;
-      color: white;
+      background-color: #ffffff;
+      opacity: 1;
     }
   }
 }

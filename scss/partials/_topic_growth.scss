@@ -1,8 +1,7 @@
 div.section-container{
   div.pillbox-container.growth{
-    background-color: $oc_gray_1;
+    background-color: transparent;
     padding: 12px;
-    border: 1px solid $oc_gray_2;
     margin-top: 10px;
     margin-bottom: 10px;
     text-align: center;
@@ -12,6 +11,6 @@ div.section-container{
       width: calc(100% + 46px);
     }
 
-    @include pillbox($oc_blue_regular);
+    @include pillbox();
   }
 }

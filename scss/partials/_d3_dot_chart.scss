@@ -8,31 +8,36 @@ div.d3-dot-container{
     }
 
     text.dot-chart-label{
-      font-family: $oc_main_font;
       font-size: 24px;
-      font-weight: 500;
-      line-height: 1.5;
+      font-weight: 700;
+      opacity: 0.75;
 
       &.small {
         font-size: 18px;
       }
     }
 
-    text.chart-x-label {
-      font-family: $oc_main_font;
-      font-size: 14px;
-      line-height: 1.1;
-      font-weight: bold;
+    text.dot-chart-label-sub {
+      font-size: 12px;
+      opacity: 0.75;
+      font-weight: 700;
+      letter-spacing: 1px;
+      line-height: 1.5;
+
+      &.small {
+        font-size: 10px;
+      }
     }
   }
 
   div.chart-prev {
     float: left;
     cursor: pointer;
+    width: 10px;
   }
-
   div.chart-next {
     float: right;
     cursor: pointer;
+    width: 10px;
   }
 }
