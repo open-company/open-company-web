@@ -39,6 +39,10 @@
         #((:close-overlay-cb options)))
       (.play))))
 
+(defn esc-listener [owner options e]
+  (when (= (.-keyCode e) 27)
+    (hide-fullscreen-topic owner options)))
+
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency] :as data} owner options]
 
   (init-state [_]
@@ -46,10 +50,12 @@
      :actual-as-of (:updated-at section-data)})
 
   (did-mount [_]
-    (let [ft (om/get-ref owner "fullscreen-topic")]
-      (dommy/listen! js/window :keypress (fn [e]
-                                    (println "dommy keyup" (.-key e)))))
+    (om/set-state! owner :esc-listener-key
+      (events/listen js/document EventType/KEYUP (partial esc-listener owner options)))
     (show-fullscreen-topic owner))
+
+  (will-unmount [_]
+    (events/unlistenByKey (om/get-state owner :esc-listener-key)))
 
   (render-state [_ {:keys [as-of actual-as-of] :as state}]
     (let [section-kw (keyword section)
