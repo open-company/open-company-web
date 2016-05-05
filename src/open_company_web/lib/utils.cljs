@@ -234,7 +234,7 @@
 ;; TODO use goog.i18n.DateTimeFormat here
 (defn date-string [js-date & [year]]
   (let [month (month-string (add-zero (inc (.getMonth js-date))))
-        day (add-zero (.getDate js-date))]
+        day (.getDate js-date)]
     (str month " " day (when year (str ", " (.getFullYear js-date))))))
 
 (defn pluralize [string n]
