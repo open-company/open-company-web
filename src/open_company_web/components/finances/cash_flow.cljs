@@ -15,7 +15,7 @@
         abs-cash-flow (utils/abs cash-flow)]
     [(utils/get-period-string (:period obj) "monthly" [:short])
      (:revenue obj)
-     (occ/fill-color :oc-green-light)
+     (occ/fill-color :oc-new-chart-green)
      (str (utils/get-period-string (:period obj))
           " Revenue: "
           prefix
@@ -27,7 +27,7 @@
           prefix
           (utils/thousands-separator (or (:costs obj) 0)))
      abs-cash-flow
-     (occ/fill-color (if cash-flow-pos? :oc-green-light :red))
+     (occ/fill-color (if cash-flow-pos? :oc-new-chart-green :red))
      (str (utils/get-period-string (:period obj))
           " Cash flow: "
           (when (neg? cash-flow) "-")
@@ -55,30 +55,22 @@
       :max-show finances-utils/columns-num
       :column-thickness "42"}))
 
-(defn chart-label [data-set prefix]
-  ;example Revenue $12.3K Costs $107K Cash flow -$94.7K
-  (let [revenue (str prefix (utils/with-metric-prefix (:revenue data-set)))
-        costs (str prefix (utils/with-metric-prefix (:costs data-set)))
-        cash-flow-val (- (:revenue data-set) (:costs data-set))
-        abs-cash-flow-val (utils/abs cash-flow-val)
-        cash-flow (str (when (neg? cash-flow-val) "-") prefix (utils/with-metric-prefix abs-cash-flow-val))]
-    (str "Revenue " revenue " Costs " costs " Cash flow " cash-flow)))
 
 (defn chart-label-fn [prefix data-set]
   ; example: Revenue $12.3K Costs $107K Cash flow -$94.7K
   (let [revenue (when (:revenue data-set) (str prefix (utils/with-metric-prefix (:revenue data-set))))
         costs (when (:costs data-set) (str prefix (utils/with-metric-prefix (:costs data-set))))
         cash-flow-val (when (and revenue costs) (- (:revenue data-set) (:costs data-set)))
-        abs-cash-flow-val (utils/abs cash-flow-val)
-        cash-flow (when cash-flow-val (str (when (neg? cash-flow-val) "-") prefix (utils/with-metric-prefix abs-cash-flow-val)))]
+        negative-cash-flow (neg? cash-flow-val)
+        abs-cash-flow (utils/abs cash-flow-val)
+        cash-flow (when abs-cash-flow (str (when negative-cash-flow "-") prefix (utils/with-metric-prefix abs-cash-flow)))]
    [{:label (when revenue (str "Revenue " revenue))
-     :color (occ/get-color-by-kw :oc-green-regular)}
+     :sub-label (str "CASH FLOW - " (utils/get-month (:period data-set)) " " (utils/get-year (:period data-set)))
+     :color (occ/get-color-by-kw :oc-gray-5)}
     {:label (when costs (str " Costs " costs))
-     :color (occ/get-color-by-kw :oc-red-regular)}
+     :color (occ/get-color-by-kw :oc-gray-5)}
     {:label (when cash-flow (str " Cash flow " cash-flow))
-     :color (if (pos? cash-flow-val)
-              (occ/get-color-by-kw :oc-green-regular)
-              (occ/get-color-by-kw :oc-red-regular))}]))
+     :color (occ/get-color-by-kw :oc-gray-5)}]))
 
 (defcomponent cash-flow [data owner options]
   
@@ -87,7 +79,7 @@
           fixed-finances-data (finances-utils/fill-gap-months finances-data)
           sort-pred (utils/sort-by-key-pred :period)
           sorted-finances (sort sort-pred (vals fixed-finances-data))
-          all-revenues (remove js/isNaN (remove nil? (map #(js/parseFloat (:revenue %)) (:data data))))
+          all-revenues (remove js/isNaN (remove nil? (map #(js/parseFloat (:revenue %)) finances-data)))
           has-revenues (pos? (apply + all-revenues))
           value-set (last sorted-finances)
           currency (:currency data)
@@ -98,23 +90,29 @@
           int-month (int month)
           month-3 (- int-month 2)
           month-3-fixed (utils/add-zero (if (<= month-3 0) (- 12 month-3) month-3))
-          fixed-sorted-finances (vec (map #(merge % {:label (chart-label-fn cur-symbol %)}) sorted-finances))
+          fixed-sorted-finances (vec (map #(merge % {:label (chart-label-fn cur-symbol %)
+                                                     :cash-flow (- (:revenue %) (:costs %))}) sorted-finances))
           chart-opts {:opts {:chart-height (:height (:chart-size options))
                              :chart-width (:width (:chart-size options))
                              :chart-keys (if has-revenues
-                                           [:revenue :costs]
+                                           [:revenue :costs :cash-flow]
                                            [:costs])
                              :label-key :label
+                             :sub-label-key :sub-label
                              :interval "monthly"
-                             :h-axis-color (occ/get-color-by-kw :oc-green-light)
-                             :h-axis-selected-color (occ/get-color-by-kw :oc-green-regular)
                              :chart-colors (if has-revenues
-                                            {:revenue (occ/get-color-by-kw :oc-green-light)
-                                             :costs (occ/get-color-by-kw :oc-red-light)}
+                                            {:revenue (occ/get-color-by-kw :oc-new-chart-green)
+                                             :costs (occ/get-color-by-kw :oc-red-light)
+                                             :cash-flow #(if (pos? %)
+                                                            (occ/get-color-by-kw :oc-new-chart-green)
+                                                            (occ/get-color-by-kw :oc-red-light))}
                                             {:costs (occ/get-color-by-kw :oc-red-light)})
                              :chart-selected-colors (if has-revenues
-                                                      {:revenue (occ/get-color-by-kw :oc-green-regular)
-                                                       :costs (occ/get-color-by-kw :oc-red-regular)}
+                                                      {:revenue (occ/get-color-by-kw :oc-new-chart-green)
+                                                       :costs (occ/get-color-by-kw :oc-red-regular)
+                                                       :cash-flow #(if (pos? %)
+                                                                    (occ/get-color-by-kw :oc-new-chart-green)
+                                                                    (occ/get-color-by-kw :oc-red-regular))}
                                                       {:costs (occ/get-color-by-kw :oc-red-regular)})
                              :prefix (utils/get-symbol-for-currency-code currency)}}]
       (dom/div {:class (utils/class-set {:section true

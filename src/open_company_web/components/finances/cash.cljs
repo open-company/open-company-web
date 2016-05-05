@@ -17,17 +17,18 @@
           value-set (last sorted-finances)
           currency (:currency data)
           cash-val (utils/thousands-separator (:cash value-set) currency 0)
-          fixed-sorted-finances (mapv #(merge % {:label (when-let [c (:cash %)] (utils/thousands-separator c currency 0))}) sorted-finances)
-          chart-opts {:opts {:chart-height (:height (:chart-size options))
-                             :chart-width (:width (:chart-size options))
+          fixed-sorted-finances (mapv #(merge % {:label (when-let [c (:cash %)]
+                                                          (utils/thousands-separator c currency 0))
+                                                 :sub-label (str "CASH - " (utils/get-month (:period %)) " " (utils/get-year (:period %)))}) sorted-finances)
+          chart-opts {:opts {:chart-width (:width (:chart-size options))
+                             :chart-height (:height (:chart-size options))
                              :chart-keys [:cash]
-                             :label-color (occ/get-color-by-kw :oc-green-regular)
+                             :label-color (occ/get-color-by-kw :oc-gray-5)
                              :label-key :label
+                             :sub-label-key :sub-label
                              :interval "monthly"
-                             :h-axis-color (occ/get-color-by-kw :oc-green-light)
-                             :h-axis-selected-color (occ/get-color-by-kw :oc-green-regular)
-                             :chart-colors {:cash (occ/get-color-by-kw :oc-green-light)}
-                             :chart-selected-colors {:cash (occ/get-color-by-kw :oc-green-regular)}}}]
+                             :chart-colors {:cash (occ/get-color-by-kw :oc-new-chart-green)}
+                             :chart-selected-colors {:cash (occ/get-color-by-kw :oc-new-chart-green)}}}]
       (dom/div {:class (utils/class-set {:section true
                                          :cash true
                                          :read-only (:read-only data)})

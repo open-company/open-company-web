@@ -19,7 +19,8 @@
         fixed-runway (if (neg? runway) (utils/abs runway) 0)
         label (when runway (if (neg? runway) (finances-utils/get-rounded-runway runway [:round]) "Pofitable"))]
     (merge data-set {:runway fixed-runway
-                     :label label})))
+                     :label label
+                     :sub-label (str "RUNWAY - " (utils/get-month (:period data-set)) " " (utils/get-year (:period data-set)))})))
 
 (defn runway-data [sorted-data]
   (vec (map runway-data-set sorted-data)))
@@ -47,13 +48,12 @@
           chart-opts {:opts {:chart-height (when (contains? options :chart-size) (:height (:chart-size options)))
                              :chart-width (when (contains? options :chart-size)(:width (:chart-size options)))
                              :chart-keys [:runway]
-                             :label-color (occ/get-color-by-kw :oc-green-regular)
+                             :label-color (occ/get-color-by-kw :oc-gray-5)
                              :label-key :label
+                             :sub-label-key :sub-label
                              :interval "monthly"
-                             :h-axis-color (occ/get-color-by-kw :oc-green-light)
-                             :h-axis-selected-color (occ/get-color-by-kw :oc-green-regular)
-                             :chart-colors {:runway (occ/get-color-by-kw :oc-green-light)}
-                             :chart-selected-colors {:runway (occ/get-color-by-kw :oc-green-regular)}
+                             :chart-colors {:runway (occ/get-color-by-kw :oc-new-chart-green)}
+                             :chart-selected-colors {:runway (occ/get-color-by-kw :oc-new-chart-green)}
                              :prefix (utils/get-symbol-for-currency-code currency)}}]
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))
                 :on-click (:start-editing-cb data)}

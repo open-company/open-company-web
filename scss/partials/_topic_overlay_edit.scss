@@ -118,7 +118,7 @@ div.topic-overlay-edit {
           width: calc(100% + 46px);
         }
 
-        @include pillbox($oc_blue_regular);
+        @include pillbox();
 
         label.pillbox.new-metric-slug-placeholder{
           background-color: $oc_green_light;

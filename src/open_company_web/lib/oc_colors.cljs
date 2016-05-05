@@ -6,6 +6,8 @@
   :blue "#007A9D" ;"#004E64" ;"#109DB7"
   :gray "#D8D8D8" ;"#ADADAD"
   :black "#000000"
+  :oc-new-chart-blue "#4EE4D6"
+  :oc-new-chart-green "#4de148"
   ;; greens
   :oc-green-dark "#008C54"
   :oc-green-regular "#26C485"
@@ -20,6 +22,7 @@
   :oc-gray-2 "#D8D8D8"
   :oc-gray-3 "#8A8A8A"
   :oc-gray-4 "#5B5B5B"
+  :oc-gray-5 "#4E5A6B"
 
   :oc-red-dark "#9E001A"
   :oc-red-regular "#D72A46"
