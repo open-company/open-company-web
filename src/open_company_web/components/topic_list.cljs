@@ -33,16 +33,6 @@
         new-active-categories (assoc old-active-categories category new-active-topics)]
     (api/patch-sections new-active-categories)))
 
-(defn columns-num []
-  (let [win-width (.-clientWidth (.-body js/document))]
-    (cond
-      (>= win-width 1132)
-      3
-      (>= win-width 780)
-      2
-      :else
-      1)))
-
 (defn get-state [data current-state]
   (let [company-data (:company-data data)
         categories (:categories company-data)
@@ -52,7 +42,7 @@
      :new-sections-requested (or (:new-sections-requested current-state) false)
      :selected-topic (or (:selected-topic current-state) (:selected-topic data))
      :drawer-open (or (:drawer-open current-state) false)
-     :columns (columns-num)}))
+     :columns (utils/columns-num)}))
 
 (defn topic-click [owner topic selected-metric]
   (om/set-state! owner :selected-topic topic)
