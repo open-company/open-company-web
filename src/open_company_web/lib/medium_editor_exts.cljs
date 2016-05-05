@@ -37,10 +37,13 @@
   (let [class "file-upload-btn"
         handle (fn [e]
                  (.preventDefault e))
-        hide-btn (fn [] (gstyle/setStyle (js/document.getElementById "file-upload-ui") #js {:opacity 0}))
+        hide-btn (fn [] (let [el (js/document.getElementById "file-upload-ui")]
+                          (gstyle/setStyle el #js {:opacity 0})
+                          (utils/after 250 #(gstyle/setStyle el #js {:display "none"}))))
         pos-btn (fn [top-v]
                   (let [el (js/document.getElementById "file-upload-ui")]
                     (gstyle/setStyle el #js {:position "absolute"
+                                             :display "block"
                                              :opacity 1
                                              :top (str top-v "px")
                                              :left "-35px"})))
