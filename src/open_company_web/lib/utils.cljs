@@ -698,3 +698,13 @@
 
 (defn after [ms fn]
   (js/setTimeout fn ms))
+
+(defn columns-num []
+  (let [win-width (.-clientWidth (.-body js/document))]
+    (cond
+      (>= win-width 1132)
+      3
+      (>= win-width 780)
+      2
+      :else
+      1)))
