@@ -10,7 +10,6 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.finances.utils :as finances-utils]
-            [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.local-settings :as ls]
@@ -32,12 +31,13 @@
   (let [topic-click-cb (om/get-props owner :topic-click)]
     (topic-click-cb metric-slug)))
 
-(defn setup-card-header! [owner section]
+(defn setup-card! [owner section]
   (when-not (utils/is-test-env?)
     (let [section-kw (keyword section)]
       (when (and (not (om/get-state owner :image-header))
                  (not (#{:finances :growth} section-kw)))
         (when-let [body (om/get-ref owner "topic-body")]
+          (js/$clamp body #js {"clamp" 2 "animate" true})
           (when-let [first-image (sel1 body [:img])]
             (om/set-state! owner :image-header (.-src first-image))))))))
 
@@ -46,10 +46,10 @@
     {:image-header nil})
 
   (did-mount [_]
-    (setup-card-header! owner section))
+    (setup-card! owner section))
 
   (did-update [_ _ _]
-    (setup-card-header! owner section))
+    (setup-card! owner section))
 
   (render-state [_ {:keys [image-header]}]
     (let [section-kw (keyword section)
