@@ -82,7 +82,7 @@
                          :currency (:currency company-data)
                          :active-category active-category}
                          {:opts {:section-name section-name
-                                 :topic-click (partial topic-click owner)}})))))
+                                 :topic-click (partial topic-click owner section-name)}})))))
 
 (defcomponent topic-list [data owner options]
 

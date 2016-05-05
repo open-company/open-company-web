@@ -155,7 +155,9 @@
                          (.select d3-column)
                          (.attr "width" (:chart-width options))
                          (.attr "height" (:chart-height options))
-                         (.on "click" #(.stopPropagation (.-event js/d3))))
+                         (.on "click" (fn []
+                                        ((:svg-click options) nil)
+                                        (.stopPropagation (.-event js/d3)))))
           scale-fn (scale owner options)
           label-key (:label-key options)
           sub-label-key (:sub-label-key options)]
@@ -210,7 +212,6 @@
               (.attr "height" (- chart-height 50))
               (.attr "x" (* i (/ chart-width chart-step)))
               (.attr "y" 50)
-              (.on "click" #(bar-click owner options i))
               (.on "mouseover" #(bar-click owner options i))
               (.on "mouseout" #(bar-click owner options (om/get-state owner :selected)))
               (.attr "fill" "transparent"))))
@@ -255,7 +256,7 @@
     {:start start
      :selected (dec (count current-data))}))
 
-(defcomponent d3-column-chart [{:keys [chart-data] :as data} owner {:keys [chart-width chart-height] :as options}]
+(defcomponent d3-column-chart [{:keys [chart-data] :as data} owner {:keys [chart-width chart-height svg-click] :as options}]
 
   (init-state [_]
     (get-state chart-data))

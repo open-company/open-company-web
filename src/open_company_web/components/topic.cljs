@@ -28,7 +28,8 @@
   (.stopPropagation e)
   (.preventDefault e)
   (om/set-state! owner :selected-metric metric-slug)
-  (let [topic-click-cb (om/get-props owner :topic-click)]
+  (let [section (om/get-props owner :section)
+        topic-click-cb (om/get-props owner :topic-click)]
     (topic-click-cb metric-slug)))
 
 (defn setup-card! [owner section]
@@ -55,7 +56,8 @@
     (let [section-kw (keyword section)
           topic-body (utils/get-topic-body topic-data section-kw)
           chart-opts {:chart-size {:width  260
-                                   :height 196}}]
+                                   :height 196}
+                      :topic-click (:topic-click options)}]
       (dom/div #js {:className "topic-internal group"
                     :ref "topic-internal"}
 
@@ -79,11 +81,8 @@
                         :ref "topic-body"
                         :dangerouslySetInnerHTML (clj->js {"__html" topic-body})}))))))
 
-(defn topic-click [data owner options selected-metric]
-  (let [props (om/get-props owner)]
-    ((:topic-click options)
-      (:section props)
-      (:selected-metric props))))
+(defn topic-click [options selected-metric]
+  ((:topic-click options) selected-metric))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
@@ -150,7 +149,7 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className "topic group"
                     :ref "topic"
-                    :onClick #(topic-click data owner options nil)}
+                    :onClick #(topic-click options nil)}
         (dom/div #js {:className "topic-anim group"
                       :key (str "topic-anim-" as-of "-" transition-as-of)
                       :ref "topic-anim"}
@@ -161,7 +160,7 @@
             (om/build topic-internal {:section section
                                       :topic-data topic-data
                                       :currency currency
-                                      :topic-click (partial topic-click data owner options)
+                                      :topic-click (partial topic-click options)
                                       :prev-rev prev-rev
                                       :next-rev next-rev}
                                      {:opts (merge options {:rev-click (fn [e rev]

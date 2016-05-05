@@ -122,7 +122,9 @@
                          (.select d3-dots)
                          (.attr "width" chart-width)
                          (.attr "height" chart-height)
-                         (.on "click" #(.stopPropagation (.-event js/d3))))
+                         (.on "click" (fn []
+                                        ((:svg-click options) nil)
+                                        (.stopPropagation (.-event js/d3)))))
           scale-fn (scale owner options)
           data-max (max-y (om/get-props owner :chart-data) chart-keys)
           max-y (scale-fn data-max)]
@@ -187,7 +189,6 @@
               (.attr "height" (- chart-height 50))
               (.attr "x" (* i (/ chart-width show-dots)))
               (.attr "y" 50)
-              (.on "click" #(dot-click owner options i false))
               (.on "mouseover" #(dot-click owner options i true))
               (.on "mouseout" #(dot-click owner options (om/get-state owner :selected) true))
               (.attr "fill" "transparent"))))
