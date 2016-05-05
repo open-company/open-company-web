@@ -105,14 +105,15 @@ div.topic-list {
             margin-bottom: 20px;
             max-height: 31px;
             overflow: hidden;
+            cursor: pointer;
 
             *{
+              with: 282px;
               font-family: $oc_headers_font;
               font-size: 12px;
               line-height: 1.3;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
+              max-height: 31px;
+              cursor: pointer;
             }
 
             img{
