@@ -33,12 +33,13 @@
     (topic-click-cb metric-slug)))
 
 (defn setup-card-header! [owner section]
-  (let [section-kw (keyword section)]
-    (when (and (not (om/get-state owner :image-header))
-               (not (#{:finances :growth} section-kw)))
-      (when-let [body (om/get-ref owner "topic-body")]
-        (when-let [first-image (sel1 body :img)]
-          (om/set-state! owner :image-header (.-src first-image)))))))
+  (when-not (utils/is-test-env?)
+    (let [section-kw (keyword section)]
+      (when (and (not (om/get-state owner :image-header))
+                 (not (#{:finances :growth} section-kw)))
+        (when-let [body (om/get-ref owner "topic-body")]
+          (when-let [first-image (sel1 body [:img])]
+            (om/set-state! owner :image-header (.-src first-image))))))))
 
 (defcomponent topic-internal [{:keys [topic-data section currency prev-rev next-rev] :as data} owner options]
   (init-state [_]
