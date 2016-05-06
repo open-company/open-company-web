@@ -57,13 +57,16 @@
           topic-body (utils/get-topic-body topic-data section-kw)
           chart-opts {:chart-size {:width  260
                                    :height 196}
-                      :topic-click (:topic-click options)}]
+                      :pillboxes-first false
+                      :topic-click (:topic-click options)}
+          is-growth-finances? (#{:growth :finances} section-kw)]
       (dom/div #js {:className "topic-internal group"
                     :ref "topic-internal"}
 
-        (when (or (#{:growth :finances} section-kw)
+        (when (or is-growth-finances?
                   image-header)
-          (dom/div {:class "card-header"}
+          (dom/div {:class (utils/class-set {:card-header true
+                                             :card-image (not is-growth-finances?)})}
             (cond
               (= section "finances")
               (om/build topic-finances {:section-data topic-data :section section} {:opts chart-opts})
