@@ -156,7 +156,8 @@
                          (.attr "width" (:chart-width options))
                          (.attr "height" (:chart-height options))
                          (.on "click" (fn []
-                                        ((:svg-click options) nil)
+                                        (when (:svg-click options)
+                                          ((:svg-click options) nil))
                                         (.stopPropagation (.-event js/d3)))))
           scale-fn (scale owner options)
           label-key (:label-key options)

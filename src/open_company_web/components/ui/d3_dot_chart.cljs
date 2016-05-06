@@ -123,7 +123,8 @@
                          (.attr "width" chart-width)
                          (.attr "height" chart-height)
                          (.on "click" (fn []
-                                        ((:svg-click options) nil)
+                                        (when (:svg-click options)
+                                          ((:svg-click options) nil))
                                         (.stopPropagation (.-event js/d3)))))
           scale-fn (scale owner options)
           data-max (max-y (om/get-props owner :chart-data) chart-keys)
