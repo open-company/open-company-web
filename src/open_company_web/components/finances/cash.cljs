@@ -20,8 +20,8 @@
           fixed-sorted-finances (mapv #(merge % {:label (when-let [c (:cash %)]
                                                           (utils/thousands-separator c currency 0))
                                                  :sub-label (str "CASH - " (utils/get-month (:period %)) " " (utils/get-year (:period %)))}) sorted-finances)
-          chart-opts {:opts {:chart-height (:height (:chart-size options))
-                             :chart-width (:width (:chart-size options))
+          chart-opts {:opts {:chart-width (:width (:chart-size options))
+                             :chart-height (:height (:chart-size options))
                              :chart-keys [:cash]
                              :label-color (occ/get-color-by-kw :oc-gray-5)
                              :label-key :label
