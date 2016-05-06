@@ -130,7 +130,6 @@
         (om/set-state! owner :actual-as-of new-as-of))))
 
   (did-update [_ prev-props _]
-    (println "FIXME: re-expand previously expanded topic")
     (when (om/get-state owner :transition-as-of)
       (animate-revision-navigation owner)))
 
