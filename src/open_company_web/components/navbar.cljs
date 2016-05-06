@@ -15,12 +15,11 @@
 (defcomponent navbar [data owner]
 
   (render [_]
-    (n/navbar {:inverse? true :fixed-top? true :fluid true :collapse? true}
-      (dom/div {:class "navbar-header"}
+    (dom/nav {:class "mynavbar group"}
+      (dom/div {:class (str "mynavbar-header columns-" (utils/columns-num))}
         (om/build company-avatar data)
         (dom/ul {:class "nav navbar-nav navbar-right"}
           (dom/li {}
             (if (jwt/jwt)
               (om/build user-avatar {})
-              (om/build login-button data)))))
-      (dom/div {:id "navbar" :class "navbar-collapse collapse container-fluid"}))))
+              (om/build login-button data))))))))
