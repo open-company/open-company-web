@@ -2,6 +2,7 @@ div.footer {
   border-bottom: 4px solid $oc_yellow;
   background-color: white;
   padding-top: 90px;
+  height: #{$footer_height}px;
 
   div.footer-cta {
     font-family: $oc_headers_font;
