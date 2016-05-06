@@ -5,6 +5,8 @@
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.components.growth.topic-growth :refer (topic-growth)]
+            [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.ui.icon :refer (icon)]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [goog.style :refer (setStyle)]
@@ -26,7 +28,7 @@
         #((:close-overlay-cb options)))
       (.play))))
 
-(defcomponent fullscreen-topic-internal [{:keys [topic topic-data] :as data} owner options]
+(defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric] :as data} owner options]
   (render [_]
     (let []
       (dom/div {:class "fullscreen-topic-internal group"}
@@ -36,6 +38,34 @@
         (dom/div {:class "topic-title"} (:title topic-data))
         (dom/div {:class "topic-headline"} (:headline topic-data))
         (dom/div {:class "separator"})
+        (when (or (= topic "growth") (= topic "finances"))
+          (dom/div {}
+            (cond
+              (= topic "growth")
+              (om/build topic-growth {:section-data topic-data
+                                      :section (keyword topic)
+                                      :currency currency
+                                      :actual-as-of (:updated-at topic-data)
+                                      :selected-metric selected-metric
+                                      :read-only true}
+                                     {:opts {:show-title false
+                                             :show-revisions-navigation false
+                                             :pillboxes-first true
+                                             :chart-size {:width  (if (utils/is-mobile) 300 480)
+                                                          :height (if (utils/is-mobile) 174 295)}}})
+              (= topic "finances")
+              (om/build topic-finances {:section-data topic-data
+                                        :section (keyword topic)
+                                        :currency currency
+                                        :actual-as-of (:updated-at topic-data)
+                                        :selected-metric selected-metric
+                                        :read-only true}
+                                       {:opts {:show-title false
+                                               :show-revisions-navigation false
+                                               :pillboxes-first true
+                                               :chart-size {:width  (if (utils/is-mobile) 300 480)
+                                                            :height (if (utils/is-mobile) 174 295)}}}))
+            (dom/div {:class "separator"})))
         (dom/div {:class "topic-body"
                   :dangerouslySetInnerHTML (clj->js {"__html" (utils/get-topic-body topic-data topic)})})
         (dom/div {:class "topic-attribution"}
@@ -71,6 +101,7 @@
                     :ref "fullscreen-topic"}
         (om/build fullscreen-topic-internal {:topic section
                                              :topic-data topic-data
+                                             :selected-metric selected-metric
                                              :currency currency
                                              :prev-rev prev-rev
                                              :next-rev next-rev}
