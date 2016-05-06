@@ -114,7 +114,7 @@
           (let [all-category-sections (sections-for-category slug active-category)
                 list-data (merge data {:active true
                                        :all-topics all-category-sections
-                                       :active-topics-list category-topics})
+                                       :active-topics-list (get active-topics active-category)})
                 list-opts {:did-change-active-topics #(update-active-topics owner options active-category %)}]
             (om/build side-drawer {:open drawer-open
                                    :list-key active-category
