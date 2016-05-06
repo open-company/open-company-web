@@ -702,9 +702,9 @@
 (defn columns-num []
   (let [win-width (.-clientWidth (.-body js/document))]
     (cond
-      (>= win-width 1132)
+      (>= win-width 1006)
       3
-      (>= win-width 780)
+      (>= win-width 684)
       2
       :else
       1)))
