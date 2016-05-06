@@ -11,17 +11,15 @@ div.fullscreen-topic {
   z-index: 1036;
   overflow: auto;
 
-  div.close {
-    float: right;
-    position: fixed;
-    top: 43px;
-    right: 24px;
-    cursor: pointer;
-  }
-
   div.fullscreen-topic-internal {
     width: 575px;
     margin: #{$navbar_height}px auto 30px;
+
+    div.close {
+      float: right;
+      position: relative;
+      cursor: pointer;
+    }
 
     div.topic-title {
       opacity: 0.5;
@@ -31,6 +29,7 @@ div.fullscreen-topic {
       letter-spacing: 1px;
       color: $oc_gray_5;
       text-transform: uppercase;
+      width: 545px; // leave some space for the closing X button
     }
 
     div.topic-headline {
