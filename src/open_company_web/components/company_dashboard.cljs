@@ -65,25 +65,28 @@
       (dom/div {:class (utils/class-set {:company-dashboard true
                                          :navbar-offset (not (utils/is-mobile))})}
         ;; Navbar
-        (om/build navbar {:save-bt-active save-bt-active
-                          :company-data company-data
-                          :auth-settings (:auth-settings data)})
-        ;; Topic list or topic editing (old editing stuff)
-        (if-not editing-topic
-          ;; topic list
-          (om/build topic-list
-                    {:loading (or (:loading company-data) (:loading data))
-                     :company-data company-data
-                     :active-category (:active-category state)}
-                    {:opts {:navbar-editing-cb navbar-editing-cb
-                            :topic-edit-cb (partial topic-edit-cb owner)
-                            :switch-category-cb (partial switch-category-cb owner)
-                            :save-bt-active-cb (partial set-save-bt-active owner)}})
-          ;; topic edit
-          (om/build edit-topic {:section editing-topic
-                                :section-data (get company-data (keyword editing-topic))}
-                    {:opts {:navbar-editing-cb navbar-editing-cb
-                            :save-bt-active-cb (partial set-save-bt-active owner)
-                            :dismiss-topic-editing-cb (partial dismiss-topic-editing-cb owner)}}))
+        (when company-data
+          (om/build navbar {:save-bt-active save-bt-active
+                            :company-data company-data
+                            :auth-settings (:auth-settings data)}))
+        (when company-data
+          ;; Topic list or topic editing (old editing stuff)
+          (if-not editing-topic
+            ;; topic list
+            (om/build topic-list
+                      {:loading (or (:loading company-data) (:loading data))
+                       :company-data company-data
+                       :active-category (:active-category state)}
+                      {:opts {:navbar-editing-cb navbar-editing-cb
+                              :topic-edit-cb (partial topic-edit-cb owner)
+                              :switch-category-cb (partial switch-category-cb owner)
+                              :save-bt-active-cb (partial set-save-bt-active owner)}})
+            ;; topic edit
+            (om/build edit-topic {:section editing-topic
+                                  :section-data (get company-data (keyword editing-topic))}
+                      {:opts {:navbar-editing-cb navbar-editing-cb
+                              :save-bt-active-cb (partial set-save-bt-active owner)
+                              :dismiss-topic-editing-cb (partial dismiss-topic-editing-cb owner)}})))
         ;;Footer
-        (om/build footer {})))))
+        (when company-data
+          (om/build footer {}))))))
