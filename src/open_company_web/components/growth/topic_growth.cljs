@@ -49,6 +49,20 @@
 (defn filter-growth-data [focus growth-data]
   (vec (filter #(= (:slug %) focus) (vals growth-data))))
 
+(defn render-pillboxes [owner data options focus growth-metric-slugs growth-metrics]
+  (dom/div {:class "pillbox-container growth"}
+    (when focus
+      (for [metric-slug growth-metric-slugs]
+        (let [metric (get growth-metrics metric-slug)
+              mname (:name metric)
+              metric-classes (utils/class-set {:pillbox true
+                                               metric-slug true
+                                               :active (= focus metric-slug)})]
+          (dom/label {:class metric-classes
+                      :title (:description metric)
+                      :data-tab metric-slug
+                      :on-click #(subsection-click % owner data options)} mname))))))
+
 (defcomponent topic-growth [{:keys [section section-data currency] :as data} owner options]
 
   (init-state [_]
@@ -78,21 +92,14 @@
         (dom/div {:class "section-container"
                   :id "section-growth"
                   :key (name section)}
-          (dom/div {:class "composed-section growth"}
+          (dom/div {:class "composed-section growth group"}
+            ; growth pillboxes
+            (when (:pillboxes-first options)
+              (render-pillboxes owner data options focus growth-metric-slugs growth-metrics))
             ; growth data chart
             (dom/div {:class (utils/class-set {:composed-section-body true})}
               ;; growth metric currently shown
               (when (and focus (seq (:metric-data subsection-data)))
-                (om/build growth-metric subsection-data {:opts options})))
-            (dom/div {:class "pillbox-container growth"}
-              (when focus
-                (for [metric-slug growth-metric-slugs]
-                  (let [metric (get growth-metrics metric-slug)
-                        mname (:name metric)
-                        metric-classes (utils/class-set {:pillbox true
-                                                         metric-slug true
-                                                         :active (= focus metric-slug)})]
-                    (dom/label {:class metric-classes
-                                :title (:description metric)
-                                :data-tab metric-slug
-                                :on-click #(subsection-click % owner data options)} mname)))))))))))
+                (om/build growth-metric subsection-data {:opts options}))
+            (when-not (:pillboxes-first options)
+              (render-pillboxes owner data options focus growth-metric-slugs growth-metrics)))))))))

@@ -26,6 +26,23 @@
 (defn has-revenues-or-costs [finances-data]
   (some #(or (not (zero? (:revenue %))) (not (zero? (:costs %)))) finances-data))
 
+(defn render-pillboxes [owner cash-classes needs-cash-flow cash-flow-classes needs-runway runway-classes first-title]
+  (dom/div {:class "pillbox-container finances"}
+    (dom/label {:class cash-classes
+                :title "Cash"
+                :data-tab "cash"
+                :on-click #(subsection-click % owner)} "Cash")
+    (when needs-cash-flow
+      (dom/label {:class cash-flow-classes
+                  :title first-title
+                  :data-tab "cash-flow"
+                  :on-click #(subsection-click % owner)} first-title))
+    (when needs-runway
+      (dom/label {:class runway-classes
+                  :title "Runway"
+                  :data-tab "runway"
+                  :on-click #(subsection-click % owner)} "Runway"))))
+
 (defcomponent topic-finances [{:keys [section section-data currency] :as data} owner options]
 
   (init-state [_]
@@ -59,7 +76,9 @@
             (dom/p "Information on finances is not yet available.")))
   
         (dom/div {:class "section-container" :id "section-finances"}
-          (dom/div {:class "composed-section finances"}
+          (dom/div {:class "composed-section finances group"}
+            (when (:pillboxes-first options)
+              (render-pillboxes owner cash-classes needs-cash-flow cash-flow-classes needs-runway runway-classes first-title))
             (dom/div {:class (utils/class-set {:composed-section-body true})}
               (case focus
 
@@ -73,18 +92,5 @@
 
                 "runway"
                 (om/build runway subsection-data subsection-options)))
-            (dom/div {:class "pillbox-container finances"}
-              (dom/label {:class cash-classes
-                          :title "Cash"
-                          :data-tab "cash"
-                          :on-click #(subsection-click % owner)} "Cash")
-              (when needs-cash-flow
-                (dom/label {:class cash-flow-classes
-                            :title first-title
-                            :data-tab "cash-flow"
-                            :on-click #(subsection-click % owner)} first-title))
-              (when needs-runway
-                (dom/label {:class runway-classes
-                            :title "Runway"
-                            :data-tab "runway"
-                            :on-click #(subsection-click % owner)} "Runway")))))))))
+            (when-not (:pillboxes-first options)
+              (render-pillboxes owner cash-classes needs-cash-flow cash-flow-classes needs-runway runway-classes first-title))))))))
