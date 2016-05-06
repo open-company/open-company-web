@@ -50,9 +50,12 @@ div.topic-list {
             margin: 0px;
             padding: 0px;
             width: 100%;
-            max-height: 196px;
-            overflow: hidden;
             position: relative;
+
+            &.card-image {
+              max-height: 196px;
+              overflow: hidden;
+            }
 
             img {
               width:100%;
