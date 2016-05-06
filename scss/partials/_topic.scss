@@ -51,10 +51,12 @@ div.topic-list {
             padding: 0px;
             width: 100%;
             position: relative;
+            padding-top: 10px;
 
             &.card-image {
               max-height: 196px;
               overflow: hidden;
+              padding-top: 0px;
             }
 
             img {

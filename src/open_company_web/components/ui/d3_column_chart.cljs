@@ -226,14 +226,14 @@
                               (.append "g")
                               (.attr "class" "chart-label-container")
                               (.attr "id" "column-chart-label")
-                              (.attr "transform" (str "translate(" 0 "," (if (> (count chart-keys) 1) 20 50) ")")))]
+                              (.attr "transform" (str "translate(" 0 "," 0 ")")))]
         (build-selected-label chart-label-g label-value sub-label-value label-color chart-width)
         (let [chart-label-width (js/SVGgetWidth chart-label-g)
               chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
           (.attr chart-label-g "transform" (str "translate("
                                                 0
                                                 ","
-                                                (if (> (count chart-keys) 1) 20 50)
+                                                20
                                                 ")")))))))
 
 (defn prev-data [owner e]
