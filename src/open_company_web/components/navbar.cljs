@@ -15,8 +15,8 @@
 (defcomponent navbar [data owner]
 
   (render [_]
-    (dom/nav {:class "mynavbar group"}
-      (dom/div {:class (str "mynavbar-header columns-" (utils/columns-num))}
+    (dom/nav {:class "oc-navbar group"}
+      (dom/div {:class (str "oc-navbar-header columns-" (utils/columns-num))}
         (om/build company-avatar data)
         (dom/ul {:class "nav navbar-nav navbar-right"}
           (dom/li {}

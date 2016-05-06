@@ -1,12 +1,4 @@
-/*
- * Top navigation
- * Hide default border to remove 1px line.
- */
- .navbar-fixed-top {
-    border: 0;
-}
-
-nav.mynavbar {
+nav.oc-navbar {
   position: fixed;
   z-index: 1034;
   top: 0;
@@ -19,10 +11,11 @@ nav.mynavbar {
   border-bottom: 1px solid $oc_gray_6;
 
   @include big_web(){
-    div.mynavbar-header {
+    div.oc-navbar-header {
       position: relative;
       margin: 0 auto;
       padding: 0 30px;
+      margin-top: 30px;
       &.columns-1{
         width: 384px;
       }
@@ -32,15 +25,11 @@ nav.mynavbar {
       &.columns-3{
         width: 1072px;
       }
-    }
-  }
 
-  div.mynavbar-header {
-    margin-top: 30px;
-
-    ul.navbar-right {
-      float: right;
-      margin-right: 0px;
+      ul.navbar-right {
+        float: right;
+        margin-right: 0px;
+      }
     }
   }
 }
