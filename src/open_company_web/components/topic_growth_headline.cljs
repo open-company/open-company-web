@@ -15,4 +15,5 @@
         (for [metric metrics]
           (dom/label {:class "pillbox"
                       :on-click #((:pillbox-click-cb options) (:slug metric) %)} (:name metric)))
-        (dom/div {:class "topic-headline-inner"} (:headline data))))))
+        (dom/div {:class "topic-headline-inner"
+                  :dangerouslySetInnerHTML (utils/emojify (:headline data))})))))

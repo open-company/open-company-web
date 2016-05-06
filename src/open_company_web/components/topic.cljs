@@ -19,6 +19,11 @@
             [goog.events :as events]
             [goog.style :as gstyle]))
 
+(defcomponent topic-headline [data owner]
+  (render [_]
+    (dom/div {:class "topic-headline-inner"
+              :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
+
 (defn scroll-to-topic-top [topic]
   (let [body-scroll (.-scrollTop (.-body js/document))
         topic-scroll-top (utils/offset-top topic)]
@@ -77,7 +82,7 @@
         ;; Topic title
         (dom/div {:class "topic-title"} (:title topic-data))
         ;; Topic headline
-        (dom/div {:class "topic-headline"} (:headline topic-data))
+        (om/build topic-headline data)
         ;; Topic body: first 2 lines
         (when topic-body
           (dom/div #js {:className "topic-body"
