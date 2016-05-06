@@ -15,6 +15,7 @@ div.topic-list{
   content: "";
   padding-bottom: 20px;
   margin-top: #{$navbar_height}px;
+  min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
 
   @include mobile(){
     background-color: #d9d9d9;
