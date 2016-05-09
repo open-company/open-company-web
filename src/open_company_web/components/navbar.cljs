@@ -15,11 +15,17 @@
 (defcomponent navbar [data owner]
 
   (render [_]
-    (dom/nav {:class "oc-navbar group"}
-      (dom/div {:class (str "oc-navbar-header columns-" (utils/columns-num))}
-        (om/build company-avatar data)
-        (dom/ul {:class "nav navbar-nav navbar-right"}
-          (dom/li {}
-            (if (jwt/jwt)
-              (om/build user-avatar {})
-              (om/build login-button data))))))))
+    (let [columns-num (:columns-num data)
+          card-width (:card-width data)
+          header-width (+ (* card-width columns-num)    ; cards width
+                          (* 20 (dec columns-num))      ; cards right margin
+                          (when (> columns-num 1) 60))] ; x margins if needed
+      (dom/nav {:class "oc-navbar group"}
+        (dom/div {:class "oc-navbar-header"
+                  :style #js {:width (str header-width "px")}}
+          (om/build company-avatar data)
+          (dom/ul {:class "nav navbar-nav navbar-right"}
+            (dom/li {}
+              (if (jwt/jwt)
+                (om/build user-avatar {})
+                (om/build login-button data)))))))))
