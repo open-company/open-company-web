@@ -255,13 +255,14 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (reset! prevent-route-dispatch true)
-      ; save initial innerHTML and setup MediumEditor
+      ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
       (let [body-el (om/get-ref owner "topic-overlay-edit-body")
             slug (keyword (router/current-company-slug))
             finances-placeholder-data (get (:sections (get (:categories (slug @caches/new-sections)) 2)) 0)
             med-ed (new js/MediumEditor body-el (clj->js (utils/medium-editor-options (:note finances-placeholder-data))))]
         (.subscribe med-ed "editableInput" (fn [event editable]
                                              (om/set-state! owner :has-changes true)))
+        (js/emojioneAutocomplete)
         (om/set-state! owner :initial-body (.-innerHTML body-el))
         (om/set-state! owner :medium-editor med-ed))
       (when focus
@@ -341,7 +342,7 @@
                       :ref "topic-overlay-edit-content"
                       :style #js {:maxHeight (str max-height "px")}}
           (dom/div {:class "flex"}
-            (dom/textarea {:class "flex-auto mb3 topic-overlay-edit-headline"
+            (dom/textarea {:class "flex-auto mb3 topic-overlay-edit-headline emojione-autocomplete"
                            :resize false
                            :id (str "topic-edit-headline-" (name topic))
                            :type "text"
