@@ -10,10 +10,6 @@ nav.oc-navbar {
   height: #{$navbar_height}px;
   box-shadow: 1px 4px 4px 0 rgba(0, 0, 0, 0.2);
 
-  @media screen and (max-width: 683px){
-    position: absolute;
-  }
-
   div.oc-navbar-header {
     position: relative;
     margin: 0 auto;
