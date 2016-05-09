@@ -113,5 +113,6 @@
         (build-site)
         (cljs :optimizations :advanced
               :source-map true
-              :compiler-options {:externs ["public/js/externs.js"]
-                                 :source-map true})))
+              ; :compiler-options {:externs ["public/js/externs.js"]
+              ;                    :source-map true}
+                                 )))
