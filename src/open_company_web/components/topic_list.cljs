@@ -177,6 +177,7 @@
           company-data    (:company-data data)
           active-category (keyword (:active-category data))
           category-topics (flatten (vals active-topics))
+          win-width       (.-clientWidth (sel1 js/document :body))
           card-width      (calc-card-width columns)]
       (dom/div {:class "topic-list group"
                 :key "topic-list"}
@@ -204,6 +205,7 @@
           (om/build fullscreen-topic {:section selected-topic
                                       :section-data (->> selected-topic keyword (get company-data))
                                       :selected-metric selected-metric
+                                      :card-width card-width
                                       :currency (:currency company-data)}
                                      {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                              :topic-edit-cb (:topic-edit-cb options)}}))
@@ -214,7 +216,7 @@
           (case columns
             1
             (dom/div {:class "topics-column-container columns-1 group"
-                      :style #js {:width (str (+ card-width 60) "px")}}
+                      :style #js {:margin-left (str (/ (- win-width card-width) 2) "px")}}
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
                 (for [section-name category-topics]
