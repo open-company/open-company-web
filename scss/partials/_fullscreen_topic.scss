@@ -15,11 +15,15 @@ div.fullscreen-topic {
     max-width: 575px;
     min-width: 302px;
     margin: #{$navbar_height}px auto 30px;
+    position: relative;
 
     div.close {
       float: right;
       position: relative;
       cursor: pointer;
+      position: absolute;
+      right: 0;
+      top: 0;
     }
 
     div.topic-title {
