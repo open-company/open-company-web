@@ -30,42 +30,36 @@
 
 (defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric card-width] :as data} owner options]
   (render [_]
-    (let []
+    (let [ww (.-clientWidth (sel1 js/document :body))
+          fullscreen-width (if (> ww 575)
+                              575
+                              card-width)
+          chart-opts {:show-title false
+                      :show-revisions-navigation false
+                      :pillboxes-first true
+                      :chart-size {:width  (- fullscreen-width 20)
+                                   :height (if (utils/is-mobile) 174 295)}}
+          chart-data {:section-data topic-data
+                      :section (keyword topic)
+                      :currency currency
+                      :actual-as-of (:updated-at topic-data)
+                      :selected-metric selected-metric
+                      :read-only true}]
       (dom/div {:class "fullscreen-topic-internal group"
-                :style #js {:width (str card-width "px")}}
+                :style #js {:width (str fullscreen-width "px")}}
+        (dom/div {:class "topic-title"} (:title topic-data))
         (dom/div {:class "close"
                   :on-click #(hide-fullscreen-topic owner options)}
           (icon :circle-remove))
-        (dom/div {:class "topic-title"} (:title topic-data))
         (dom/div {:class "topic-headline"} (:headline topic-data))
         (dom/div {:class "separator"})
         (when (or (= topic "growth") (= topic "finances"))
           (dom/div {}
             (cond
               (= topic "growth")
-              (om/build topic-growth {:section-data topic-data
-                                      :section (keyword topic)
-                                      :currency currency
-                                      :actual-as-of (:updated-at topic-data)
-                                      :selected-metric selected-metric
-                                      :read-only true}
-                                     {:opts {:show-title false
-                                             :show-revisions-navigation false
-                                             :pillboxes-first true
-                                             :chart-size {:width  (- card-width 20)
-                                                          :height (if (utils/is-mobile) 174 295)}}})
+              (om/build topic-growth chart-data {:opts chart-opts})
               (= topic "finances")
-              (om/build topic-finances {:section-data topic-data
-                                        :section (keyword topic)
-                                        :currency currency
-                                        :actual-as-of (:updated-at topic-data)
-                                        :selected-metric selected-metric
-                                        :read-only true}
-                                       {:opts {:show-title false
-                                               :show-revisions-navigation false
-                                               :pillboxes-first true
-                                               :chart-size {:width  (- card-width 20)
-                                                            :height (if (utils/is-mobile) 174 295)}}}))
+              (om/build topic-finances chart-data {:opts chart-opts}))
             (dom/div {:class "separator"})))
         (dom/div {:class "topic-body"
                   :dangerouslySetInnerHTML (clj->js {"__html" (utils/get-topic-body topic-data topic)})})
