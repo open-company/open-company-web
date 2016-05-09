@@ -19,7 +19,6 @@
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     [com.cognitect/transit-cljs "0.8.237"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
     [racehub/om-bootstrap "0.6.1"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
-    [noencore "0.2.1"] ; Clojure & ClojureScript functions not in core https://github.com/r0man/noencore
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
     [com.andrewmcveigh/cljs-time "0.4.0"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     [funcool/cuerdas "0.7.2"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
@@ -30,7 +29,8 @@
     [cljsjs/react-dom "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/raven "2.1.0-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "3.5.16-0"] ; d3 externs https://clojars.org/cljsjs/d3
-    [cljsjs/medium-editor "5.15.0-0"]]) ; Medium editor https://clojars.org/cljsjs/medium-editor
+    [cljsjs/medium-editor "5.15.0-0"] ; Medium editor https://clojars.org/cljsjs/medium-editor
+    [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-1"]])
 
 (def static-site-deps
   '[[hiccup "1.0.5" :scope "test"]
@@ -60,9 +60,10 @@
 (deftask test! []
   (set-env! :source-paths #(conj % "test")
             :dependencies #(conj % '[cljs-react-test "0.1.3-SNAPSHOT" :scope "test"]))
-  (comp (test-cljs :js-env :phantom
-                   :update-fs? true
-                   :namespaces #{"test.open-company-web.*"})))
+  (test-cljs :js-env :phantom
+             :exit? true
+             :update-fs? true
+             :namespaces #{"test.open-company-web.*"}))
 
 (defn page? [f]
   (and (.startsWith (:path f) "pages/")
