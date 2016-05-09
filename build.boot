@@ -60,9 +60,10 @@
 (deftask test! []
   (set-env! :source-paths #(conj % "test")
             :dependencies #(conj % '[cljs-react-test "0.1.3-SNAPSHOT" :scope "test"]))
-  (comp (test-cljs :js-env :phantom
-                   :update-fs? true
-                   :namespaces #{"test.open-company-web.*"})))
+  (test-cljs :js-env :phantom
+             :exit? true
+             :update-fs? true
+             :namespaces #{"test.open-company-web.*"}))
 
 (defn page? [f]
   (and (.startsWith (:path f) "pages/")
