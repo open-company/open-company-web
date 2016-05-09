@@ -232,8 +232,9 @@
 
 (defcomponent uploader [data owner]
   (did-mount [_]
-    (assert ls/filestack-key "FileStack API Key required")
-    (js/filepicker.setKey ls/filestack-key))
+    (when-not (utils/is-test-env?)
+      (assert ls/filestack-key "FileStack API Key required")
+      (js/filepicker.setKey ls/filestack-key)))
 
   (render-state [this _]
     (dom/div {:id "file-upload-ui" :class "flex"
@@ -241,15 +242,16 @@
                             (when (:state (om/get-state owner))
                               {:background "white" :right 0}))}
         (dom/input {:id "file-upload-ui--select-trigger" :style {:display "none"} :type "file"
-                    :on-change (fn [e] (js/filepicker.store (-> e .-target .-files (aget 0))
-                                                            (fn [success]
-                                                              (js/MediumEditor.util.insertHTMLCommand js/document (str "<img src=\"" (.-url success) "\">"))
-                                                              (js/console.log (om/get-node owner))
-                                                              ;; (gstyle/setElementShown (om/get-node owner) false)
-                                                              (om/set-state! owner {}))
-                                                            (fn [error] (js/console.log "error" error))
-                                                            #(om/set-state! owner {:state :show-progress
-                                                                                   :progress %})))})
+                    :on-change (fn [e] (when-not (utils/is-test-env?)
+                                        (js/filepicker.store (-> e .-target .-files (aget 0))
+                                                              (fn [success]
+                                                                (js/MediumEditor.util.insertHTMLCommand js/document (str "<img src=\"" (.-url success) "\">"))
+                                                                (js/console.log (om/get-node owner))
+                                                                ;; (gstyle/setElementShown (om/get-node owner) false)
+                                                                (om/set-state! owner {}))
+                                                              (fn [error] (js/console.log "error" error))
+                                                              #(om/set-state! owner {:state :show-progress
+                                                                                     :progress %}))))})
         (dom/button {:style {:margin-right "13px"}
                      :on-click (fn [_] (om/set-state! owner :state :show-options))}
                     (i/icon :circle-add {:size 24}))
