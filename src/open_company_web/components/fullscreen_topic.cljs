@@ -17,11 +17,13 @@
 
 (defn show-fullscreen-topic [owner]
   (dommy/add-class! (sel1 [:body]) :no-scroll)
+  (setStyle (sel1 [:div.company-dashboard]) #js {:height "90vh" :overflow "hidden"})
   (.play
     (new Fade (om/get-ref owner "fullscreen-topic") 0 1 utils/oc-animation-duration)))
 
 (defn hide-fullscreen-topic [owner options]
   (dommy/remove-class! (sel1 [:body]) :no-scroll)
+  (setStyle (sel1 [:div.company-dashboard]) #js {:height "auto" :overflow "auto"})
   (let [fade-out (new Fade (sel1 :div.fullscreen-topic) 1 0 utils/oc-animation-duration)]
     (doto fade-out
       (.listen AnimationEventType/FINISH
