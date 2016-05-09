@@ -5,9 +5,6 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
-            [goog.style :refer (setStyle)]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
             [open-company-web.api :as api]
             [open-company-web.caches :as caches]
             [open-company-web.router :as router]
@@ -17,81 +14,6 @@
             [open-company-web.components.ui.side-drawer :refer (side-drawer)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
             [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]))
-
-;; 3 Columns
-(def c3-min-win-width 1006)
-(def c3-max-win-width 1800)
-(def c3-min-card-width 302)
-(def c3-max-card-width 500)
-(def c3-win-card-diff (- (/ c3-max-win-width c3-max-card-width) (/ c3-min-win-width c3-min-card-width)))
-(def c3-win-diff (- c3-max-win-width c3-min-win-width))
-(def c3-min-card-delta (/ c3-min-win-width c3-min-card-width))
-
-;; 2 Columns
-(def c2-min-win-width 684)
-(def c2-max-win-width 1005)
-(def c2-min-card-width 302)
-(def c2-max-card-width 462)
-(def c2-win-card-diff (- (/ c2-max-win-width c2-max-card-width) (/ c2-min-win-width c2-min-card-width)))
-(def c2-win-diff (- c2-max-win-width c2-min-win-width))
-(def c2-min-card-delta (/ c2-min-win-width c2-min-card-width))
-
-;; 1 Columns
-(def c1-min-win-width 320)
-(def c1-max-win-width 683)
-(def c1-min-card-width 302)
-(def c1-max-card-width 500)
-(def c1-win-card-diff (- (/ c1-max-win-width c1-max-card-width) (/ c1-min-win-width c1-min-card-width)))
-(def c1-win-diff (- c1-max-win-width c1-min-win-width))
-(def c1-min-card-delta (/ c1-min-win-width c1-min-card-width))
-
-(defn win-width [columns]
-  (let [ww (.-clientWidth (sel1 js/document :body))]
-    (case columns
-      3
-      (max (min ww c3-max-win-width) c3-min-win-width)
-      2
-      (max (min ww c2-max-win-width) c2-min-win-width)
-      1
-      (max (min ww c1-max-win-width) c1-min-win-width))))
-
-(defn get-min-win-width [columns]
-  (case columns
-    3 c3-min-win-width
-    2 c2-min-win-width
-    1 c1-min-win-width))
-
-(defn get-win-diff [columns]
-  (case columns
-    3 c3-win-diff
-    2 c2-win-diff
-    1 c1-win-diff))
-
-(defn get-win-card-diff [columns]
-  (case columns
-    3 c3-win-card-diff
-    2 c2-win-card-diff
-    1 c1-win-card-diff))
-
-(defn get-min-card-delta [columns]
-  (case columns
-    3 c3-min-card-delta
-    2 c2-min-card-delta
-    1 c1-min-card-delta))
-
-(defn calc-card-width [columns]
-  (let [ww (win-width columns)
-        ;; get params based on columns number
-        min-win-width (get-min-win-width columns)
-        win-diff (get-win-diff columns)
-        win-card-diff (get-win-card-diff columns)
-        min-card-delta (get-min-card-delta columns)
-        ;; calculations
-        win-delta-width (- ww min-win-width)
-        perc-win-delta  (/ (* win-delta-width 100) win-diff)
-        diff-delta      (* (/ win-card-diff 100) perc-win-delta)
-        delta           (+ min-card-delta diff-delta)]
-      (/ ww delta)))
 
 (defn get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
@@ -118,8 +40,7 @@
      :active-topics active-topics
      :new-sections-requested (or (:new-sections-requested current-state) false)
      :selected-topic (or (:selected-topic current-state) (:selected-topic data))
-     :drawer-open (or (:drawer-open current-state) false)
-     :columns (utils/columns-num)}))
+     :drawer-open (or (:drawer-open current-state) false)}))
 
 (defn topic-click [owner topic selected-metric]
   (om/set-state! owner :selected-topic topic)
@@ -163,8 +84,7 @@
     ; make sure the calculation for the fixed navbar are correct
     (when-not @scrolled-to-top
       (set! (.-scrollTop (.-body js/document)) 0)
-      (reset! scrolled-to-top true))
-    (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns (utils/columns-num))))
+      (reset! scrolled-to-top true)))
 
   (will-receive-props [_ next-props]
     (when-not (= (:company-data next-props) (:company-data data))
@@ -172,13 +92,14 @@
     (when-not (:read-only (:company-data next-props))
       (get-new-sections-if-needed owner)))
 
-  (render-state [_ {:keys [active-topics selected-topic selected-metric drawer-open columns]}]
+  (render-state [_ {:keys [active-topics selected-topic selected-metric drawer-open]}]
     (let [slug            (keyword (router/current-company-slug))
           company-data    (:company-data data)
           active-category (keyword (:active-category data))
           category-topics (flatten (vals active-topics))
           win-width       (.-clientWidth (sel1 js/document :body))
-          card-width      (calc-card-width columns)]
+          card-width      (:card-width data)
+          columns-num     (:columns-num data)]
       (dom/div {:class "topic-list group"
                 :key "topic-list"}
         (when (and (not (:read-only company-data))
@@ -213,7 +134,7 @@
         (dom/div {:class (utils/class-set {:topic-list-internal true
                                            :group true
                                            :content-loaded (not (:loading data))})}
-          (case columns
+          (case columns-num
             1
             (dom/div {:class "topics-column-container columns-1 group"
                       :style #js {:margin-left (str (/ (- win-width card-width) 2) "px")}}
