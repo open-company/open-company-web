@@ -37,5 +37,7 @@ function emojioneAutocomplete() {
             index: 1,
             maxCount: 10
         }
-        ],{});
+        ],{
+            zIndex: 1100
+        });
 };

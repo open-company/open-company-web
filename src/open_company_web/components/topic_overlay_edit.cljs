@@ -17,6 +17,9 @@
             [cljsjs.medium-editor]
             [cuerdas.core :as s]))
 
+(def before-unload-message "You have unsaved changes to the topic.")
+
+
 (defn change-value [owner k e]
   (let [target (.-target e)
         value (.-value target)]
@@ -29,8 +32,6 @@
     (.focus topic-field)
     (when (or (= field "headline") (= field "title"))
       (set! (.-value topic-field) field-value))))
-
-(def before-unload-message "You have unsaved changes to the topic.")
 
 ;; Finances helpers
 
@@ -323,7 +324,7 @@
                                               :save-visible has-changes})
                      :on-click #((:dismiss-editing-cb options))} "Cancel")
         (dom/div {:class "topic-overlay-edit-header"}
-          (dom/input {:class "topic-overlay-edit-title"
+          (dom/input {:class "topic-overlay-edit-title emojione-autocomplete"
                       :id (str "topic-edit-title-" (name topic))
                       :type "text"
                       :placeholder "Title"
@@ -403,7 +404,7 @@
                               :on-click (fn [_]
                                           (om/set-state! owner :growth-new-metric true)
                                           (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
-          (dom/div #js {:className "topic-overlay-edit-body"
+          (dom/div #js {:className "topic-overlay-edit-body emojione-autocomplete"
                         :ref "topic-overlay-edit-body"
                         :id (str "topic-edit-body-" (name topic))
                         :dangerouslySetInnerHTML (clj->js {"__html" section-body})}))

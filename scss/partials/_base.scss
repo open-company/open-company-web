@@ -97,9 +97,6 @@ svg.emojione {
   display: inline-block;
   vertical-align: text-top;
 }
-ul.dropdown-menu {
-  z-index: 1100 !important; /* above our topic overlays */
-}
 
 /* Reset bootstrap 3.3.5 help block overflow */
 .input-group[class*=col-] {
