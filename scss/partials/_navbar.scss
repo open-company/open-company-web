@@ -8,13 +8,21 @@ nav.oc-navbar {
   border-top: 4px solid $oc_yellow;
   margin: 0px;
   height: #{$navbar_height}px;
-  border-bottom: 1px solid $oc_gray_6;
+  box-shadow: 1px 4px 4px 0 rgba(0, 0, 0, 0.2);
+
+  @media screen and (max-width: 683px){
+    position: absolute;
+  }
 
   div.oc-navbar-header {
     position: relative;
     margin: 0 auto;
     padding: 0 30px;
     margin-top: 30px;
+
+    @media screen and (max-width: 683px){
+      padding: 0px;
+    }
 
     ul.navbar-right {
       float: right;
