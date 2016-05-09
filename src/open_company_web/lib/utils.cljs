@@ -699,16 +699,6 @@
 (defn after [ms fn]
   (js/setTimeout fn ms))
 
-(defn columns-num []
-  (let [win-width (.-clientWidth (.-body js/document))]
-    (cond
-      (>= win-width 1006)
-      3
-      (>= win-width 684)
-      2
-      :else
-      1)))
-
 (defn emojify
   "Take a string containing either Unicode emoji (mobile device keyboard), short code emoji (web app),
   or ASCII emoji (old skool) and convert it to HTML string ready to be added to the DOM (dangerously)
