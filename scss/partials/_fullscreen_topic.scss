@@ -12,7 +12,8 @@ div.fullscreen-topic {
   overflow: auto;
 
   div.fullscreen-topic-internal {
-    width: 575px;
+    max-width: 575px;
+    min-width: 302px;
     margin: #{$navbar_height}px auto 30px;
 
     div.close {
@@ -29,7 +30,6 @@ div.fullscreen-topic {
       letter-spacing: 1px;
       color: $oc_gray_5;
       text-transform: uppercase;
-      width: 545px; // leave some space for the closing X button
     }
 
     div.topic-headline {
