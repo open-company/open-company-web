@@ -135,30 +135,6 @@
                                            :group true
                                            :content-loaded (not (:loading data))})}
           (case columns-num
-            1
-            (dom/div {:class "topics-column-container columns-1 group"
-                      :style #js {:margin-left (str (/ (- win-width card-width) 2) "px")}}
-              (dom/div {:class "topics-column"
-                        :style #js {:width (str card-width "px")}}
-                (for [section-name category-topics]
-                  (render-topic owner section-name company-data active-category))))
-            2
-            (dom/div {:class "topics-column-container columns-2 group"
-                      :style #js {:width (str (+ (* card-width 2) 20 60) "px")}}
-              (dom/div {:class "topics-column"
-                        :style #js {:width (str card-width "px")}}
-                (for [idx (range (quot (count category-topics) 2))
-                  :while (< idx (quot (count category-topics) 2))
-                  :let [real-idx (* idx 2)
-                        section-name (get (vec category-topics) real-idx)]]
-                  (render-topic owner section-name company-data active-category)))
-              (dom/div {:class "topics-column"
-                        :style #js {:width (str card-width "px")}}
-                (for [idx (range (quot (count category-topics) 2))
-                  :while (< idx (quot (count category-topics) 2))
-                  :let [real-idx (inc (* idx 2))
-                        section-name (get (vec category-topics) real-idx)]]
-                  (render-topic owner section-name company-data active-category))))
             3
             (dom/div {:class "topics-column-container group"
                       :style #js {:width (str (+ (* card-width 3) 40 60) "px")}}
@@ -182,4 +158,28 @@
                   :while (< idx (quot (count category-topics) 2))
                   :let [real-idx (+ (* idx 3) 2)
                         section-name (get (vec category-topics) real-idx)]]
+                  (render-topic owner section-name company-data active-category))))
+            2
+            (dom/div {:class "topics-column-container columns-2 group"
+                      :style #js {:width (str (+ (* card-width 2) 20 60) "px")}}
+              (dom/div {:class "topics-column"
+                        :style #js {:width (str card-width "px")}}
+                (for [idx (range (quot (count category-topics) 2))
+                  :while (< idx (quot (count category-topics) 2))
+                  :let [real-idx (* idx 2)
+                        section-name (get (vec category-topics) real-idx)]]
+                  (render-topic owner section-name company-data active-category)))
+              (dom/div {:class "topics-column"
+                        :style #js {:width (str card-width "px")}}
+                (for [idx (range (quot (count category-topics) 2))
+                  :while (< idx (quot (count category-topics) 2))
+                  :let [real-idx (inc (* idx 2))
+                        section-name (get (vec category-topics) real-idx)]]
+                  (render-topic owner section-name company-data active-category))))
+            ; 1 column or default
+            (dom/div {:class "topics-column-container columns-1 group"
+                      :style #js {:margin-left (str (/ (- win-width card-width) 2) "px")}}
+              (dom/div {:class "topics-column"
+                        :style #js {:width (str card-width "px")}}
+                (for [section-name category-topics]
                   (render-topic owner section-name company-data active-category))))))))))
