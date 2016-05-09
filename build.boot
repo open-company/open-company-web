@@ -112,7 +112,6 @@
   (comp (sass :output-style :compressed)
         (build-site)
         (cljs :optimizations :advanced
-              :source-map true
-              ; :compiler-options {:externs ["public/js/externs.js"]
-              ;                    :source-map true}
-                                 )))
+              :source-map "public/js/oc.js.map"
+              :compiler-options {:externs ["public/js/externs.js"]
+                                 :source-map "public/js/oc.js.map"})))
