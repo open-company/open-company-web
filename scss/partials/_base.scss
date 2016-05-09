@@ -81,12 +81,6 @@ span img.user-icon {
   margin-right: 5px;
 }
 
-svg.emojione {
-  height: 18px;
-  width: 18px;
-  display: inline-block;
-  vertical-align: text-top;
-}
 
 span.num.red {
   color: red;
@@ -94,6 +88,17 @@ span.num.red {
 
 .form-group {
   margin-bottom: 25px;
+}
+
+/* Emoji One */
+svg.emojione {
+  height: 18px;
+  width: 18px;
+  display: inline-block;
+  vertical-align: text-top;
+}
+ul.dropdown-menu {
+  z-index: 1100 !important; /* above our topic overlays */
 }
 
 /* Reset bootstrap 3.3.5 help block overflow */
