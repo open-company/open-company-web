@@ -49,6 +49,13 @@ div.topic-list{
           padding-bottom: 22px;
         }
       }
+
+      &.columns-1 {
+        padding: 20px 0px 20px 0px;
+        div.topics-column{
+          margin: 0 auto;
+        }
+      }
     }
 
     &.content-loaded:empty {
