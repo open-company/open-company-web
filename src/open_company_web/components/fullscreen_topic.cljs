@@ -28,10 +28,11 @@
         #((:close-overlay-cb options)))
       (.play))))
 
-(defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric] :as data} owner options]
+(defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric card-width] :as data} owner options]
   (render [_]
     (let []
-      (dom/div {:class "fullscreen-topic-internal group"}
+      (dom/div {:class "fullscreen-topic-internal group"
+                :style #js {:width (str card-width "px")}}
         (dom/div {:class "close"
                   :on-click #(hide-fullscreen-topic owner options)}
           (icon :circle-remove))
@@ -51,7 +52,7 @@
                                      {:opts {:show-title false
                                              :show-revisions-navigation false
                                              :pillboxes-first true
-                                             :chart-size {:width  (if (utils/is-mobile) 300 480)
+                                             :chart-size {:width  (- card-width 20)
                                                           :height (if (utils/is-mobile) 174 295)}}})
               (= topic "finances")
               (om/build topic-finances {:section-data topic-data
@@ -63,7 +64,7 @@
                                        {:opts {:show-title false
                                                :show-revisions-navigation false
                                                :pillboxes-first true
-                                               :chart-size {:width  (if (utils/is-mobile) 300 480)
+                                               :chart-size {:width  (- card-width 20)
                                                             :height (if (utils/is-mobile) 174 295)}}}))
             (dom/div {:class "separator"})))
         (dom/div {:class "topic-body"
@@ -75,7 +76,7 @@
   (when (= (.-keyCode e) 27)
     (hide-fullscreen-topic owner options)))
 
-(defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency] :as data} owner options]
+(defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
@@ -103,6 +104,7 @@
                                              :topic-data topic-data
                                              :selected-metric selected-metric
                                              :currency currency
+                                             :card-width card-width
                                              :prev-rev prev-rev
                                              :next-rev next-rev}
                                             {:opts options})))))
