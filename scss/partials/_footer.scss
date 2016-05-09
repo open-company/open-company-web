@@ -23,7 +23,7 @@ div.footer {
       margin: 0 auto;
       padding: 30px;
       @media screen and (max-width: 683px){
-        text-align: center;
+        text-align: left;
       }
 
       a.oc-logo img {
@@ -43,6 +43,12 @@ div.footer {
         padding: 5.5px;
       }
 
+      @media screen and (max-width: 683px){
+        a:first-child{
+          margin-left: 0px;
+        }
+      }
+
       div.footer-bottom-right {
         float: right;
         width: 100px;
@@ -57,9 +63,13 @@ div.footer {
         }
         @media screen and (max-width: 683px){
           float: none;
-          text-align: center;
+          text-align: left;
           width: 100%;
           margin-top: 10px;
+
+          a:first-child{
+            margin-left: 0px;
+          }
         }
       }
     }
