@@ -315,7 +315,7 @@
                                                       (editor/inject-button "highlight" editor/hl-btn))))]
         (.subscribe med-ed "editableInput" (fn [event editable]
                                              (om/set-state! owner :has-changes true)))
-        (js/emojioneAutocomplete)
+        (js/emojiAutocomplete)
         (om/set-state! owner :initial-body (.-innerHTML body-el))
         (om/set-state! owner :medium-editor med-ed))
       (when focus
@@ -376,7 +376,7 @@
                                               :save-visible has-changes})
                      :on-click #((:dismiss-editing-cb options))} "Cancel")
         (dom/div {:class "topic-overlay-edit-header"}
-          (dom/input {:class "topic-overlay-edit-title emojione-autocomplete"
+          (dom/input {:class "topic-overlay-edit-title emoji-autocomplete"
                       :id (str "topic-edit-title-" (name topic))
                       :type "text"
                       :placeholder "Title"
