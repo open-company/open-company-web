@@ -93,7 +93,7 @@
       (-> next-circle
           (.attr "stroke" color)
           (.attr "stroke-width" dot-selected-stroke)
-          (.attr "fill" "transparent")
+          (.attr "fill" "white")
           (.attr "r" (if hasvalue dot-radius 0))))
     (render-chart-label owner options idx data)
     (om/set-state! owner :selected idx)))
@@ -172,7 +172,7 @@
                                 dot-radius))
                     (.attr "stroke" (chart-key fill-colors))
                     (.attr "stroke-width" (if (= i selected) dot-selected-stroke dot-stroke))
-                    (.attr "fill" "transparent")
+                    (.attr "fill" "white")
                     (.attr "data-fill" (chart-key fill-colors))
                     (.attr "data-hasvalue" (chart-key data-set))
                     (.attr "data-selectedFill" (chart-key fill-selected-colors))
