@@ -178,7 +178,7 @@
                   (render-topic owner section-name company-data active-category))))
             ; 1 column or default
             (dom/div {:class "topics-column-container columns-1 group"
-                      :style #js {:margin-left (str (/ (- win-width card-width) 2) "px")}}
+                      :style #js {:marginLeft (str (/ (- win-width card-width) 2) "px")}}
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
                 (for [section-name category-topics]
