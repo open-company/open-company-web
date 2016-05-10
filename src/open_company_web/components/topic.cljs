@@ -82,7 +82,7 @@
         ;; Topic title
         (dom/div {:class "topic-title"} (:title topic-data))
         ;; Topic headline
-        (om/build topic-headline data)
+        (om/build topic-headline topic-data)
         ;; Topic body: first 2 lines
         (when topic-body
           (dom/div #js {:className "topic-body"

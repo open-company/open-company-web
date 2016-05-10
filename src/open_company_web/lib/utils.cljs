@@ -677,12 +677,11 @@
     ;; do not use emojy in tests
     (clj->js {"__html" text})
     ;; use an SVG sprite map
-    (do
-      (set! (.-imageType js/emojione) "svg")
-      (set! (.-sprites js/emojione) true)
-      (set! (.-imagePathSVGSprites js/emojione) "/img/emojione.sprites.svg")
-      ;; convert textual emoji's into SVG elements
-      (set! (.-ascii js/emojione) true)
-      (let [text-string (or text "") ; handle nil
-            unicode-string (.toImage js/emojione text-string)]
-        (clj->js {"__html" unicode-string})))))
+    (let [text-string (or text "") ; handle nil
+          unicode-string (.toImage js/emojione text-string)]
+        (set! (.-imageType js/emojione) "svg")
+        (set! (.-sprites js/emojione) true)
+        (set! (.-imagePathSVGSprites js/emojione) "/img/emojione.sprites.svg")
+        ;; convert textual emoji's into SVG elements
+        (set! (.-ascii js/emojione) true)
+        (clj->js {"__html" unicode-string}))))
