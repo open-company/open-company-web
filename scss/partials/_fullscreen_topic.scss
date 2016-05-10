@@ -30,6 +30,7 @@ div.fullscreen-topic {
       position: fixed;
       cursor: pointer;
       top: #{$navbar_height}px;
+      z-index: 1040;
       @include mobile(){
         top: 10px;
         left: -20px;
