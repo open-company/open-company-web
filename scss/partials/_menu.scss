@@ -1,0 +1,27 @@
+ul#menu {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+ 
+  width: 190px;
+  min-height: 100vh;
+  border-top: 4px solid $oc_yellow;
+  padding: 15px 25px;
+  margin: 0;
+ 
+  list-style: none;
+  background: #333;
+  z-index: 10; /* Make sure the z-index is lower than the #page */
+
+  a {
+    display: block;
+    color: #fff;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba( 255, 255, 255, 0.05 );
+  }
+}
+
+.animating #menu, .menu-visible #menu {
+  display: block;
+}
