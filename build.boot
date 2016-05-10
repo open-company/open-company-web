@@ -30,7 +30,7 @@
     [cljsjs/raven "2.1.0-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "3.5.16-0"] ; d3 externs https://clojars.org/cljsjs/d3
     [cljsjs/medium-editor "5.15.0-0"] ; Medium editor https://clojars.org/cljsjs/medium-editor
-    [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-1"]])
+    [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"]])
 
 (def static-site-deps
   '[[hiccup "1.0.5" :scope "test"]
