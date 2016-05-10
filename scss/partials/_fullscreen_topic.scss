@@ -7,9 +7,13 @@ div.fullscreen-topic {
   left: 0;
   border-top: 4px solid $oc_yellow;
   border-bottom: 4px solid $oc_yellow;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.96);
   z-index: 1036;
   overflow: auto;
+
+  @include mobile(){
+    background-color: rgba(255, 255, 255, 1);
+  }
 
   div.fullscreen-topic-internal {
     max-width: 575px;
@@ -18,12 +22,9 @@ div.fullscreen-topic {
     position: relative;
 
     div.close {
-      float: right;
-      position: relative;
+      position: fixed;
       cursor: pointer;
-      position: absolute;
-      right: 0;
-      top: 0;
+      top: #{$navbar_height}px;
     }
 
     div.topic-title {
@@ -42,6 +43,10 @@ div.fullscreen-topic {
       font-size: 26px;
       line-height: 1.4;
       color: $oc_gray_5;
+    }
+
+    div.topic-growth-finances{
+      margin-top: 10px;
     }
 
     div.separator {
