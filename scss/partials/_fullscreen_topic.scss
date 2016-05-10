@@ -20,11 +20,20 @@ div.fullscreen-topic {
     min-width: 302px;
     margin: #{$navbar_height}px auto 30px;
     position: relative;
+    overflow: hidden;
+
+    @include mobile(){
+      margin-top: 40px;
+    }
 
     div.close {
       position: fixed;
       cursor: pointer;
       top: #{$navbar_height}px;
+      @include mobile(){
+        top: 10px;
+        left: -20px;
+      }
     }
 
     div.topic-title {
