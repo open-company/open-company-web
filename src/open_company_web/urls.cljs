@@ -11,7 +11,11 @@
 
 (def about "/about")
 
+(def contact "/contact")
+
 (def login "/login")
+
+(def logout "/logout")
 
 (defn not-found [& [params]]
   (str "/404" (when params (str "?" (params->query-string params)))))
