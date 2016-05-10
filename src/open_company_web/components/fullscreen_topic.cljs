@@ -35,7 +35,7 @@
     (let [ww (.-clientWidth (sel1 js/document :body))
           fullscreen-width (if (> ww 575)
                               575
-                              card-width)
+                              (min card-width ww))
           chart-opts {:show-title false
                       :show-revisions-navigation false
                       :chart-size {:width  (- fullscreen-width 20)
@@ -47,7 +47,7 @@
                       :selected-metric selected-metric
                       :read-only true}]
       (dom/div {:class "fullscreen-topic-internal group"
-                :style #js {:width (str fullscreen-width "px")}}
+                :style #js {:width (str (- fullscreen-width 20) "px")}}
         (dom/div {:class "topic-title"} (:title topic-data))
         (dom/div {:class "close"
                   :style #js {:paddingLeft (str fullscreen-width "px")}
