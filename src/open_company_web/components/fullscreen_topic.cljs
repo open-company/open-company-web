@@ -38,7 +38,6 @@
                               card-width)
           chart-opts {:show-title false
                       :show-revisions-navigation false
-                      :pillboxes-first true
                       :chart-size {:width  (- fullscreen-width 20)
                                    :height (if (utils/is-mobile) 174 295)}}
           chart-data {:section-data topic-data
@@ -51,12 +50,13 @@
                 :style #js {:width (str fullscreen-width "px")}}
         (dom/div {:class "topic-title"} (:title topic-data))
         (dom/div {:class "close"
+                  :style #js {:paddingLeft (str fullscreen-width "px")}
                   :on-click #(hide-fullscreen-topic owner options)}
           (icon :circle-remove))
         (dom/div {:class "topic-headline"} (:headline topic-data))
         (dom/div {:class "separator"})
         (when (or (= topic "growth") (= topic "finances"))
-          (dom/div {}
+          (dom/div {:class "topic-growth-finances"}
             (cond
               (= topic "growth")
               (om/build topic-growth chart-data {:opts chart-opts})
