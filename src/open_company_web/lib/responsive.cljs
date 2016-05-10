@@ -1,5 +1,6 @@
 (ns open-company-web.lib.responsive
-  (:require [dommy.core :refer-macros (sel1)]))
+  (:require [dommy.core :refer-macros (sel1)]
+            [open-company-web.lib.cookies :as cook]))
 
 (defn columns-num []
   (let [win-width (.-clientWidth (.-body js/document))]
@@ -86,3 +87,25 @@
         diff-delta      (* (/ win-card-diff 100) perc-win-delta)
         delta           (+ min-card-delta diff-delta)]
       (/ ww delta)))
+
+(def _mobile (atom -1))
+
+(def big-web-min-width 684)
+
+(defn set-browser-type! []
+  (let [force-mobile-cookie (cook/get-cookie :force-browser-type)
+        is-big-web (if (.-body js/document)
+                      (>= (.-clientWidth (.-body js/document)) big-web-min-width)
+                      true) ; to not break tests
+        fixed-browser-type (if (nil? force-mobile-cookie)
+                            (not is-big-web)
+                            (if (= force-mobile-cookie "mobile")
+                             true
+                             false))]
+  (reset! _mobile fixed-browser-type)))
+
+(defn is-mobile []
+ ; fake the browser type for the moment
+ (when (neg? @_mobile)
+  (set-browser-type!))
+ @_mobile)

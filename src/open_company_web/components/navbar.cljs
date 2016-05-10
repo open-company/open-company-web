@@ -9,7 +9,6 @@
             [om-bootstrap.nav :as n]
             [open-company-web.router :as router]
             [open-company-web.local-settings :as ls]
-            [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.components.ui.icon :refer (icon)]
@@ -51,7 +50,7 @@
           (om/build company-avatar data)
           (dom/ul {:class "nav navbar-nav navbar-right"}
             (dom/li {}
-              (if (utils/is-mobile)
+              (if (responsive/is-mobile)
                 (dom/div {:on-click (partial menu-click owner)}
                   (icon "menu-34"))
                 (if (jwt/jwt)

@@ -5,6 +5,7 @@
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.ui.icon :refer (icon)]
@@ -39,7 +40,7 @@
           chart-opts {:show-title false
                       :show-revisions-navigation false
                       :chart-size {:width  (- fullscreen-width 20)
-                                   :height (if (utils/is-mobile) 174 295)}}
+                                   :height (if (responsive/is-mobile) 174 295)}}
           chart-data {:section-data topic-data
                       :section (keyword topic)
                       :currency currency

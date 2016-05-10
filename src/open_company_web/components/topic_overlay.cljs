@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy :refer-macros (sel sel1)]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
             [open-company-web.api :as api]
@@ -65,8 +66,8 @@
                                         :read-only true}
                                        {:opts {:show-title false
                                                :show-revisions-navigation false
-                                               :chart-size {:width (if (utils/is-mobile) 300 480)
-                                                            :height (if (utils/is-mobile) 274 190)}}}))
+                                               :chart-size {:width (if (responsive/is-mobile) 300 480)
+                                                            :height (if (responsive/is-mobile) 274 190)}}}))
             (when (= topic "growth")
               (om/build topic-growth   {:section-data topic-data
                                         :section topic-kw
@@ -76,8 +77,8 @@
                                        {:opts {:show-title false
                                                :show-revisions-navigation false
                                                :switch-metric-cb (:switch-metric-cb options)
-                                               :chart-size {:width (if (utils/is-mobile) 300 480)
-                                                            :height (if (utils/is-mobile) 274 190)}}})))
+                                               :chart-size {:width (if (responsive/is-mobile) 300 480)
+                                                            :height (if (responsive/is-mobile) 274 190)}}})))
           (dom/div {:class "topic-overlay-body"
                     :dangerouslySetInnerHTML (utils/emojify section-body)})
           (dom/div {:class "topic-overlay-navigation topic-navigation group"}

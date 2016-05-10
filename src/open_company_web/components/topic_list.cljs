@@ -10,6 +10,7 @@
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.ui.side-drawer :refer (side-drawer)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
@@ -103,13 +104,13 @@
       (dom/div {:class "topic-list group"
                 :key "topic-list"}
         (when (and (not (:read-only company-data))
-                   (not (utils/is-mobile))
+                   (not (responsive/is-mobile))
                    (not (:loading data)))
           ;; drawer toggler
           (om/build drawer-toggler {:close (not drawer-open)
                                     :click-cb #(om/update-state! owner :drawer-open not)}))
         (when-not (or (:read-only company-data)
-                      (utils/is-mobile)
+                      (responsive/is-mobile)
                       (:loading data))
           ;; side drawer
           (let [all-category-sections (sections-for-category slug active-category)

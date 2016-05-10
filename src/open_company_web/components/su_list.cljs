@@ -10,6 +10,7 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.company-header :refer [company-header]]
@@ -87,9 +88,9 @@
         ;; Stakeholder update
         (and (not (contains? data :loading)) company-data)
         (dom/div {:class (utils/class-set {:stakeholder-update true
-                                           :navbar-offset (not (utils/is-mobile))})}
+                                           :navbar-offset (not (responsive/is-mobile))})}
           ;; Company / user header
-          (when-not (utils/is-mobile)
+          (when-not (responsive/is-mobile)
             (om/build navbar data))
             
           ;; Company header
@@ -105,7 +106,7 @@
               (om/build stakeholder-updates {:company-data company-data
                                              :su-list su-list})
               ;; Dashboard link
-              (when (utils/is-mobile)
+              (when (responsive/is-mobile)
                 (dom/div {:class "dashboard-link"}
                   (om/build link {:href (oc-urls/company) :name "View Dashboard"}))))))
 

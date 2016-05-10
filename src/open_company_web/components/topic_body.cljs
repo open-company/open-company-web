@@ -3,6 +3,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]))
 
@@ -24,8 +25,8 @@
                                   :read-only true}
                                  {:opts {:show-title false
                                          :show-revisions-navigation false
-                                         :chart-size {:width  (if (utils/is-mobile) 300 480)
-                                                      :height (if (utils/is-mobile) 174 295)}}})
+                                         :chart-size {:width  (if (responsive/is-mobile) 300 480)
+                                                      :height (if (responsive/is-mobile) 174 295)}}})
 
           (= section-kw :finances)
           (om/build topic-finances {:section-data section-data
@@ -36,7 +37,7 @@
                                     :read-only true}
                                    {:opts {:show-title false
                                            :show-revisions-navigation false
-                                           :chart-size {:width  (if (utils/is-mobile) 300 480)
-                                                        :height (if (utils/is-mobile) 174 295)}}}))
+                                           :chart-size {:width  (if (responsive/is-mobile) 300 480)
+                                                        :height (if (responsive/is-mobile) 174 295)}}}))
         (dom/div #js {:className "topic-body-inner group"
                       :dangerouslySetInnerHTML (clj->js {"__html" (str section-body "<p style='height:1px;margin-top:0px;padding-top:0px;'> </p>")})})))))

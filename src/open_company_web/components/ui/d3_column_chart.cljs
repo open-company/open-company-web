@@ -3,6 +3,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.oc-colors :as occ]
             [open-company-web.components.finances.utils :as finances-utils]
             [cljsjs.d3]))
@@ -79,7 +80,7 @@
                     (.text label))
             txt-width (js/SVGgetWidth txt)
             txt-height (* idx chart-label-height)]
-        (when-not (utils/is-mobile)
+        (when-not (responsive/is-mobile)
           (.attr txt "dx" txt-left))
         (when (= idx (dec (count label-value)))
           (-> chart-label-g
@@ -91,10 +92,10 @@
             (.text (:sub-label (get label-value 0)))))
         (when (< idx (dec (count label-value)))
           (recur (inc idx)
-                 (if (utils/is-mobile)
+                 (if (responsive/is-mobile)
                     txt-left
                     (+ txt-left txt-width 10))
-                 (if (utils/is-mobile)
+                 (if (responsive/is-mobile)
                     (+ txt-top chart-label-height)
                     txt-top)))))))
 
