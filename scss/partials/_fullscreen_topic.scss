@@ -66,17 +66,20 @@ div.fullscreen-topic {
       background-color: rgba(77, 89, 106, 0.2);
     }
 
-    div.topic-body, div.topic-body *{
+    div.topic-body{
       margin-top: 21px;
-      font-family: $oc_headers_font;
-      font-size: 18px;
-      line-height: 1.8;
-      color: $oc_gray_5;
 
-      a {
-        cursor: pointer;
-        pointer-events: auto;
-        height: 1.4em;
+      &, div.topic-body *{
+        font-family: $oc_headers_font;
+        font-size: 18px;
+        line-height: 1.8;
+        color: $oc_gray_5;
+
+        a {
+          cursor: pointer;
+          pointer-events: auto;
+          height: 1.4em;
+        }
       }
     }
 
