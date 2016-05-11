@@ -104,4 +104,6 @@
                                              :card-width card-width
                                              :prev-rev prev-rev
                                              :next-rev next-rev}
-                                            {:opts options})))))
+                                            {:opts options})
+        (when-not (responsive/is-mobile)
+          (dom/div {:class "bottom-border"}))))))

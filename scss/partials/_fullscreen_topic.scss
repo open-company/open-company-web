@@ -6,13 +6,19 @@ div.fullscreen-topic {
   top: 0;
   left: 0;
   border-top: 4px solid $oc_yellow;
-  border-bottom: 4px solid $oc_yellow;
   background-color: rgba(255, 255, 255, 0.96);
   z-index: 1036;
   overflow: auto;
 
   @include mobile(){
     background-color: rgba(255, 255, 255, 1);
+  }
+
+  div.bottom-border {
+    height: 4px;
+    background-color: $oc_yellow;
+    position: relative;
+    width: 100vw;
   }
 
   div.fullscreen-topic-internal {
