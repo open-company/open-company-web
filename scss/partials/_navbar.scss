@@ -16,6 +16,12 @@ nav.oc-navbar {
     padding: 0 30px;
     margin-top: 30px;
 
+    @media screen and (max-width: 413px){
+      margin-left: 9px;
+      margin-right: 9px;
+      width: auto !important;
+    }
+
     @media screen and (max-width: 683px){
       padding: 0px;
     }
