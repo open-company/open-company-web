@@ -43,7 +43,7 @@
       (when (and (not (om/get-state owner :image-header))
                  (not (#{:finances :growth} section-kw)))
         (when-let [body (om/get-ref owner "topic-body")]
-          (js/$clamp body #js {"clamp" 2 "animate" true})
+          (js/$clamp body #js {"clamp" 2})
           (when-let [first-image (sel1 body [:img])]
             (om/set-state! owner :image-header (.-src first-image))))))))
 
