@@ -65,7 +65,7 @@
               (om/build topic-finances chart-data {:opts chart-opts}))
             (dom/div {:class "separator"})))
         (dom/div {:class "topic-body"
-                  :dangerouslySetInnerHTML (clj->js {"__html" (utils/get-topic-body topic-data topic)})})
+                  :dangerouslySetInnerHTML (utils/emojify (utils/get-topic-body topic-data topic))})
         (dom/div {:class "topic-attribution"}
           (str "- " (:name (:author topic-data)) " / " (utils/date-string (js/Date. (:updated-at topic-data)) true)))))))
 
