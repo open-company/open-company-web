@@ -100,7 +100,8 @@
           category-topics (flatten (vals active-topics))
           win-width       (.-clientWidth (sel1 js/document :body))
           card-width      (:card-width data)
-          columns-num     (:columns-num data)]
+          columns-num     (:columns-num data)
+          ww              (.-clientWidth (sel1 js/document :body))]
       (dom/div {:class "topic-list group"
                 :key "topic-list"}
         (when (and (not (:read-only company-data))
@@ -178,8 +179,8 @@
                         section-name (get (vec category-topics) real-idx)]]
                   (render-topic owner section-name company-data active-category))))
             ; 1 column or default
-            (dom/div {:class "topics-column-container columns-1 group"}
-              (dom/div {:class "topics-column"
-                        :style #js {:width (str card-width "px")}}
+            (dom/div {:class "topics-column-container columns-1 group"
+                      :style #js {:width (if (> ww 413) (str card-width "px") "auto")}}
+              (dom/div {:class "topics-column"}
                 (for [section-name category-topics]
                   (render-topic owner section-name company-data active-category))))))))))
