@@ -92,12 +92,8 @@
             (.text (:sub-label (get label-value 0)))))
         (when (< idx (dec (count label-value)))
           (recur (inc idx)
-                 (if (responsive/is-mobile)
-                    txt-left
-                    (+ txt-left txt-width 10))
-                 (if (responsive/is-mobile)
-                    (+ txt-top chart-label-height)
-                    txt-top)))))))
+                 0
+                 (+ txt-top chart-label-height)))))))
 
 (defn bar-click [owner options idx]
   (.stopPropagation (.-event js/d3))
