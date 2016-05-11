@@ -39,7 +39,7 @@
                               (min card-width ww))
           chart-opts {:show-title false
                       :show-revisions-navigation false
-                      :chart-size {:width  (- fullscreen-width 20)
+                      :chart-size {:width  (- fullscreen-width 40)
                                    :height (if (responsive/is-mobile) 174 295)}}
           chart-data {:section-data topic-data
                       :section (keyword topic)
