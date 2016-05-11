@@ -19,8 +19,8 @@
             [goog.dom.classlist :as cl]
             [goog.history.EventType :as EventType]
             [cljs-dynamic-resources.core :as cdr]
-            [cljsjs.medium-editor]
-            [cljsjs.filestack]
+            [cljsjs.medium-editor] ; pulled in for cljsjs externs
+            [cljsjs.filestack] ; pulled in for cljsjs externs
             [cuerdas.core :as s]))
 
 (defn change-value [owner k e]
