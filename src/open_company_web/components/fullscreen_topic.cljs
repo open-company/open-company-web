@@ -54,7 +54,8 @@
                   :style #js {:paddingLeft (str fullscreen-width "px")}
                   :on-click #(hide-fullscreen-topic owner options)}
           (icon :circle-remove))
-        (dom/div {:class "topic-headline"} (:headline topic-data))
+        (dom/div {:class "topic-headline"
+                  :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
         (dom/div {:class "separator"})
         (when (or (= topic "growth") (= topic "finances"))
           (dom/div {:class "topic-growth-finances"}
