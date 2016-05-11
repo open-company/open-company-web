@@ -87,7 +87,7 @@
         (when topic-body
           (dom/div #js {:className "topic-body"
                         :ref "topic-body"
-                        :dangerouslySetInnerHTML (clj->js {"__html" topic-body})}))))))
+                        :dangerouslySetInnerHTML (utils/emojify topic-body)}))))))
 
 (defn topic-click [options selected-metric]
   ((:topic-click options) selected-metric))
