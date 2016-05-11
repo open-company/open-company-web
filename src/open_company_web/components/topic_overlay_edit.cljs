@@ -20,6 +20,7 @@
             [goog.history.EventType :as EventType]
             [cljs-dynamic-resources.core :as cdr]
             [cljsjs.medium-editor]
+            [cljsjs.filestack]
             [cuerdas.core :as s]))
 
 (defn change-value [owner k e]
