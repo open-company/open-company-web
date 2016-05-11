@@ -7,7 +7,7 @@ div.company-dashboard {
     top: 0px !important;
    
     background: #fff;
-    min-height: 100vh;
+    min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
   }
 }
 
