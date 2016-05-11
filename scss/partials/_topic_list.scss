@@ -10,6 +10,11 @@ div.topic-list-edit-container {
   }
 }
 
+.animating div.topic-list{
+  margin-top: 0px;
+  padding-top: #{$navbar_height}px;
+}
+
 div.topic-list{
   position: relative;
   content: "";
@@ -55,6 +60,11 @@ div.topic-list{
         padding: 20px 0px 20px 0px;
         div.topics-column{
           margin: 0 auto;
+          float: none;
+
+          div.topic-row{
+            padding-bottom: 12px;
+          }
         }
       }
     }
