@@ -20,9 +20,7 @@
 (defn pillbox-click [owner options e]
   (.preventDefault e)
   (let [tab  (.. e -target -dataset -tab)]
-    (om/update-state! owner :focus (fn [] tab))
-    (when (contains? options :topic-click)
-      ((:topic-click options) tab)))
+    (om/update-state! owner :focus (fn [] tab)))
   (.stopPropagation e))
 
 (defn has-revenues-or-costs [finances-data]

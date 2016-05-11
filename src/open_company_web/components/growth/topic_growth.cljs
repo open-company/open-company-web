@@ -44,9 +44,7 @@
         focus  (.. e -target -dataset -tab)
         section-data (:section-data data)
         metrics (metrics-map (:metrics section-data))]
-    (switch-focus owner focus options)
-    (when (contains? options :topic-click)
-      ((:topic-click options) focus)))
+    (switch-focus owner focus options))
   (.stopPropagation e))
 
 (defn filter-growth-data [focus growth-data]
