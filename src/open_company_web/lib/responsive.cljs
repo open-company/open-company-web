@@ -31,9 +31,9 @@
 (def c2-min-card-delta (/ c2-min-win-width c2-min-card-width))
 
 ;; 1 Columns
-(def c1-min-win-width 320)
+(def c1-min-win-width 414)
 (def c1-max-win-width 683)
-(def c1-min-card-width 302)
+(def c1-min-card-width 396)
 (def c1-max-card-width 500)
 (def c1-win-card-diff (- (/ c1-max-win-width c1-max-card-width) (/ c1-min-win-width c1-min-card-width)))
 (def c1-win-diff (- c1-max-win-width c1-min-win-width))
