@@ -26,6 +26,14 @@ div.footer {
         text-align: left;
       }
 
+      @media screen and (max-width: 413px){
+        margin-left: 9px;
+        margin-right: 9px;
+        width: auto !important;
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+
       a.oc-logo img {
         width: 30px;
         height: 30px;
