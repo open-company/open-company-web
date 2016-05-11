@@ -19,7 +19,8 @@
             [goog.dom.classlist :as cl]
             [goog.history.EventType :as EventType]
             [cljs-dynamic-resources.core :as cdr]
-            [cljsjs.medium-editor]
+            [cljsjs.medium-editor] ; pulled in for cljsjs externs
+            [cljsjs.filestack] ; pulled in for cljsjs externs
             [cuerdas.core :as s]))
 
 (def before-unload-message "You have unsaved changes to the topic.")
