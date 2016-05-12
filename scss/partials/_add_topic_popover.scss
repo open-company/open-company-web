@@ -1,0 +1,55 @@
+div.add-topic-popover {
+  width: 200px;
+  height: 312px;
+  background-color: #ffffff;
+  position: absolute;
+  left: 249px;
+  top: 29px;
+  z-index: 1000;
+  border-top: solid 2px $oc_yellow;
+  box-shadow: 1px 1px 1px black;
+
+  div.triangle {
+    @include triangle(left, $oc_gray_5);
+    position: absolute;
+    top: 0px;
+    left: -10px;
+  }
+
+  div.add-topic-popover-header {
+    height: 40px;
+    background-color: $oc_gray_5;
+    text-transform: uppercase;
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 1px;
+    color: #ffffff;
+    padding-top: 12px;
+  }
+
+  div.add-topic-popover-subheader {
+    opacity: 0.2;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 1px;
+    color: $oc_gray_5;
+    padding: 15px 0 0 19px;
+    text-align: left;
+  }
+
+  div.topics-to-add{
+    text-align: left;
+    margin-left: 19px;
+    height: 237px;
+    overflow: scroll;
+
+    div.potential-topic {
+      font-family: $oc_headers_font;
+      font-size: 14px;
+      line-height: 1.7;
+      color: $oc_gray_5;
+      padding-top: 6px;
+    }
+  }
+}
