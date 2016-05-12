@@ -3,17 +3,32 @@ div.add-topic-popover {
   max-height: 312px;
   background-color: #ffffff;
   position: absolute;
-  left: 249px;
   top: 29px;
   z-index: 1000;
   border-top: solid 2px $oc_yellow;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
 
+  &.column-1 {
+    left: 249px;
+
+    div.triangle {
+      @include triangle(left, $oc_gray_5);
+      left: -10px;
+    }
+  }
+
+  &.column-2, &.column-3 {
+    left: -80px;
+
+    div.triangle {
+      @include triangle(right, $oc_gray_5);
+      right: -10px;
+    }
+  }
+
   div.triangle {
-    @include triangle(left, $oc_gray_5);
     position: absolute;
     top: 0px;
-    left: -10px;
   }
 
   div.add-topic-popover-header {
