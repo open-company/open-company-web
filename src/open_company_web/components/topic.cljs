@@ -9,6 +9,7 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.icon :as i]
+            [open-company-web.components.ui.add-topic-popover :refer (add-topic-popover)]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
@@ -119,14 +120,15 @@
       (.play))))
 
 (defn add-topic [owner]
-  (println "add-topic clicked!"))
+  (om/set-state! owner :show-add-topic-popover true))
 
 (defcomponent topic [{:keys [section-data section currency] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
      :actual-as-of (:updated-at section-data)
-     :transition-as-of nil})
+     :transition-as-of nil
+     :show-add-topic-popover false})
 
   (will-update [_ next-props _]
     (let [new-as-of (:updated-at (:section-data next-props))
@@ -141,7 +143,7 @@
     (when (om/get-state owner :transition-as-of)
       (animate-revision-navigation owner)))
 
-  (render-state [_ {:keys [editing as-of actual-as-of transition-as-of] :as state}]
+  (render-state [_ {:keys [editing as-of actual-as-of transition-as-of show-add-topic-popover] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -158,11 +160,13 @@
                   next-rev
                   (not (contains? revisions-list (:updated-at next-rev))))
         (api/load-revision next-rev slug section-kw))
-      (dom/div #js {:className (str "topic group" (when add-topic? " add-topic"))
+      (dom/div #js {:className (str "topic group" (when add-topic? (str " add-topic" (when show-add-topic-popover " active"))))
                     :ref "topic"
                     :onClick #(if add-topic?
                                 (add-topic owner)
                                 (topic-click options nil))}
+        (when show-add-topic-popover
+          (om/build add-topic-popover {} {:opts {:dismiss-popover #(om/set-state! owner :show-add-topic-popover false)}}))
         (dom/div #js {:className "topic-anim group"
                       :key (str "topic-anim-" as-of "-" transition-as-of)
                       :ref "topic-anim"}
