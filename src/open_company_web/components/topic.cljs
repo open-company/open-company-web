@@ -118,6 +118,9 @@
                                      :transition-as-of nil})))
       (.play))))
 
+(defn add-topic [owner]
+  (println "add-topic clicked!"))
+
 (defcomponent topic [{:keys [section-data section currency] :as data} owner options]
 
   (init-state [_]
@@ -145,7 +148,8 @@
           next-rev (utils/revision-next revisions as-of)
           slug (keyword (router/current-company-slug))
           revisions-list (section-kw (slug @cache/revisions))
-          topic-data (utils/select-section-data section-data section-kw as-of)]
+          topic-data (utils/select-section-data section-data section-kw as-of)
+          add-topic? (:add-topic data)]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -154,9 +158,11 @@
                   next-rev
                   (not (contains? revisions-list (:updated-at next-rev))))
         (api/load-revision next-rev slug section-kw))
-      (dom/div #js {:className "topic group"
+      (dom/div #js {:className (str "topic group" (when add-topic? " add-topic"))
                     :ref "topic"
-                    :onClick #(topic-click options nil)}
+                    :onClick #(if add-topic?
+                                (add-topic owner)
+                                (topic-click options nil))}
         (dom/div #js {:className "topic-anim group"
                       :key (str "topic-anim-" as-of "-" transition-as-of)
                       :ref "topic-anim"}
