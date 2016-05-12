@@ -6,9 +6,17 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
+(defn is-child-of-popover [el]
+  (loop [cur-el el]
+    (if (= (.-id cur-el) "add-topic-popover")
+      true
+      (if (.-parentNode cur-el)
+        (recur (.-parentNode cur-el))
+        false))))
+
 (defn on-click-out [owner options e]
-  (.stopPropagation e)
-  ((:dismiss-popover options) nil))
+  (when (not (is-child-of-popover (.-target e)))
+    ((:dismiss-popover options) nil)))
 
 (defn on-click-in [owner options e]
   (.stopPropagation e))
@@ -24,6 +32,7 @@
 
   (render [_]
     (dom/div {:class "add-topic-popover"
+              :id "add-topic-popover"
               :on-click (partial on-click-in owner options)}
       (dom/div {:class "triangle"})
       (dom/div {:class "add-topic-popover-header"} "CHOOSE A TOPIC")
