@@ -15,8 +15,6 @@
             [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.company-header :refer [company-header]]
             [open-company-web.components.ui.link :refer (link)]
-            [open-company-web.components.ui.side-drawer :refer (side-drawer)]
-            [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]
             [clojure.string :as str]
             [goog.style :refer (setStyle)]))
 
@@ -39,10 +37,7 @@
 
 (defcomponent stakeholder-updates [data owner]
 
-  (init-state [_] {
-    :drawer-open false})
-
-  (render-state [_ {:keys [drawer-open]}]
+  (render [_]
     (let [su-updates (:stakeholder-updates (:collection (:su-list data)))]
       (dom/div {:class "updates"}
 
@@ -61,8 +56,7 @@
 (defcomponent su-list [data owner]
 
   (init-state [_]
-    {:drawer-open false
-     :toggler-top-margin false
+    {:toggler-top-margin false
      :su-requested false})
 
   (did-mount [_]
@@ -71,7 +65,7 @@
   (did-update [_ _ _]
     (load-su-list-if-needed owner))
 
-  (render-state [_ {:keys [drawer-open]}]
+  (render [_]
     (let [company-data (dispatcher/company-data data)
           su-list (dispatcher/stakeholder-update-list-data data)
           stakeholder-update-data (:stakeholder-update company-data)]

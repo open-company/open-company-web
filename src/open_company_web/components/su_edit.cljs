@@ -15,8 +15,6 @@
             [open-company-web.components.su-edit-header :refer (su-edit-header)]
             [open-company-web.components.su-edit-footer :refer (su-edit-footer)]
             [open-company-web.components.ui.link :refer (link)]
-            [open-company-web.components.ui.side-drawer :refer (side-drawer)]
-            [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]
             [cljs-dynamic-resources.core :as cdr]
             [goog.style :refer (setStyle)]
             [goog.events :as events]
@@ -53,39 +51,13 @@
 
 (defcomponent selected-topics [data owner]
 
-  (init-state [_] {
-    :drawer-open false})
-
-  (render-state [_ {:keys [drawer-open]}]
+  (render [_]
     (let [company-data (:company-data data)
           stakeholder-update (:stakeholder-update company-data)
           section-keys (map keyword (:sections stakeholder-update))
           all-sections-key (get-key-from-sections (:sections company-data))]
       (dom/div {:class "update-sections"
                 :key all-sections-key}
-
-        (dom/div {:class "stakeholder-update-drawer"}
-          (when (and (not (:read-only company-data))
-                     (not (responsive/is-mobile))
-                     (not (:loading data)))
-            ;; drawer toggler
-            (om/build drawer-toggler {:close (not drawer-open)
-                                      :click-cb #(om/update-state! owner :drawer-open not)}))
-          (when-not (or (:read-only company-data)
-                        (responsive/is-mobile)
-                        (:loading data)))
-          ;; side drawer
-          (let [all-sections (vec (flatten (vals (:sections company-data))))
-                all-section-keys (map keyword all-sections)
-                list-data {:active true
-                           :all-topics (select-keys company-data all-section-keys)
-                           :active-topics-list (:sections stakeholder-update)}
-                list-opts {:did-change-active-topics (partial save-stakeholder-update stakeholder-update)}]
-            (om/build side-drawer {:open drawer-open
-                                   :list-key "su-update"
-                                   :list-data list-data}
-                                  {:opts {:list-opts list-opts
-                                          :bg-click-cb #(om/set-state! owner :drawer-open false)}})))
 
         (dom/div {:class "update-sections-internal"}
           (dom/div {:class "update-sections-internal-width"}
@@ -155,8 +127,7 @@
      :initial-outro outro
      :outro outro
      :force-content-update false
-     :fixed-buttons-position (or (:fixed-buttons-position current-state) false)
-     :drawer-open (or (:drawer-open current-state) false)}))
+     :fixed-buttons-position (or (:fixed-buttons-position current-state) false)}))
 
 (defn change-cb [owner k v]
   (om/set-state! owner :has-changes true)
@@ -216,7 +187,7 @@
     (when (:su-edit next-props)
       (router/nav! (oc-urls/stakeholder-update-list))))
 
-  (render-state [_ {:keys [drawer-open has-changes title intro sections outro force-content-update]}]
+  (render-state [_ {:keys [has-changes title intro sections outro force-content-update]}]
     ; set the onbeforeunload handler only if there are changes
     (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
       (set! (.-onbeforeunload js/window) onbeforeunload-cb))
