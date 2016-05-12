@@ -12,9 +12,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.topic :refer (topic)]
-            [open-company-web.components.ui.side-drawer :refer (side-drawer)]
-            [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
-            [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]))
+            [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]))
 
 (defn get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
@@ -40,8 +38,7 @@
     {:initial-active-topics active-topics
      :active-topics active-topics
      :new-sections-requested (or (:new-sections-requested current-state) false)
-     :selected-topic (or (:selected-topic current-state) (:selected-topic data))
-     :drawer-open (or (:drawer-open current-state) false)}))
+     :selected-topic (or (:selected-topic current-state) (:selected-topic data))}))
 
 (defn topic-click [owner topic selected-metric]
   (om/set-state! owner :selected-topic topic)
@@ -88,7 +85,7 @@
 
 (defn get-topics [topics company-data]
   (if (and (not (:read-only company-data))
-             (not (responsive/is-mobile)))
+           (not (responsive/is-mobile)))
     (concat topics ["add-topic"])
     topics))
 
@@ -112,7 +109,7 @@
     (when-not (:read-only (:company-data next-props))
       (get-new-sections-if-needed owner)))
 
-  (render-state [_ {:keys [active-topics selected-topic selected-metric drawer-open]}]
+  (render-state [_ {:keys [active-topics selected-topic selected-metric]}]
     (let [slug            (keyword (router/current-company-slug))
           company-data    (:company-data data)
           active-category (keyword (:active-category data))
@@ -123,26 +120,6 @@
           ww              (.-clientWidth (sel1 js/document :body))]
       (dom/div {:class "topic-list group"
                 :key "topic-list"}
-        (when (and (not (:read-only company-data))
-                   (not (responsive/is-mobile))
-                   (not (:loading data)))
-          ;; drawer toggler
-          (om/build drawer-toggler {:close (not drawer-open)
-                                    :click-cb #(om/update-state! owner :drawer-open not)}))
-        (when-not (or (:read-only company-data)
-                      (responsive/is-mobile)
-                      (:loading data))
-          ;; side drawer
-          (let [all-category-sections (sections-for-category slug active-category)
-                list-data (merge data {:active true
-                                       :all-topics all-category-sections
-                                       :active-topics-list (get active-topics active-category)})
-                list-opts {:did-change-active-topics #(update-active-topics owner options active-category %)}]
-            (om/build side-drawer {:open drawer-open
-                                   :list-key active-category
-                                   :list-data list-data}
-                                  {:opts {:list-opts list-opts
-                                          :bg-click-cb #(om/set-state! owner :drawer-open false)}})))
         (when selected-topic
           (om/build fullscreen-topic {:section selected-topic
                                       :section-data (->> selected-topic keyword (get company-data))
