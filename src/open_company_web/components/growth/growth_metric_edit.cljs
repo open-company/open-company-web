@@ -38,7 +38,7 @@
 
 (defn change-name [owner data]
   (let [change-cb (:change-growth-metric-cb data)
-        name-value (.val (.$ js/window "input#mtr-name"))
+        name-value (.val (js/$ "input#mtr-name"))
         slug (om/get-state owner :metric-slug)]
     (om/set-state! owner :metric-name name-value)
     ; if it's a newly created metric
