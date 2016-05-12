@@ -26,7 +26,7 @@
 (defn get-active-topics [company-data category]
   (get-in company-data [:sections (keyword category)]))
 
-(defn update-active-topics [owner options category new-active-topics]
+(defn update-active-topics [owner category new-active-topics]
   (let [old-active-categories (om/get-state owner :active-topics)
         new-active-categories (assoc old-active-categories category new-active-topics)]
     (api/patch-sections new-active-categories)))
@@ -67,9 +67,11 @@
                                       :updated-at 0
                                       :headline ""}
                         :currency (:currency company-data)
+                        :active-topics (om/get-state owner :active-topics)
                         :active-category active-category}
                        {:opts {:section-name section-name
-                               :topic-click (partial topic-click owner section-name)}})
+                               :topic-click (partial topic-click owner section-name)
+                               :update-active-topics (partial update-active-topics owner active-category)}})
       (let [sd (->> section-name keyword (get company-data))]
         (when-not (and (:read-only company-data) (:placeholder sd))
           (dom/div #js {:className "topic-row"
@@ -139,21 +141,21 @@
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
                 (for [idx (range (inc (quot (count category-topics) 3)))
-                  :while (< idx (quot (count category-topics) 2))
+                  :while (< idx (inc (quot (count category-topics) 2)))
                   :let [real-idx (* idx 3)
                         section-name (get (vec category-topics) real-idx)]]
                   (render-topic owner section-name company-data active-category)))
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
                 (for [idx (range (inc (quot (count category-topics) 3)))
-                  :while (< idx (quot (count category-topics) 2))
+                  :while (< idx (inc (quot (count category-topics) 2)))
                   :let [real-idx (inc (* idx 3))
                         section-name (get (vec category-topics) real-idx)]]
                   (render-topic owner section-name company-data active-category)))
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
                 (for [idx (range (inc (quot (count category-topics) 3)))
-                  :while (< idx (quot (count category-topics) 2))
+                  :while (< idx (inc (quot (count category-topics) 2)))
                   :let [real-idx (+ (* idx 3) 2)
                         section-name (get (vec category-topics) real-idx)]]
                   (render-topic owner section-name company-data active-category))))
@@ -163,14 +165,14 @@
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
                 (for [idx (range (inc (quot (count category-topics) 2)))
-                  :while (< idx (quot (count category-topics) 2))
+                  :while (< idx (inc (quot (count category-topics) 2)))
                   :let [real-idx (* idx 2)
                         section-name (get (vec category-topics) real-idx)]]
                   (render-topic owner section-name company-data active-category)))
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
                 (for [idx (range (inc (quot (count category-topics) 2)))
-                  :while (< idx (quot (count category-topics) 2))
+                  :while (< idx (inc (quot (count category-topics) 2)))
                   :let [real-idx (inc (* idx 2))
                         section-name (get (vec category-topics) real-idx)]]
                   (render-topic owner section-name company-data active-category))))
