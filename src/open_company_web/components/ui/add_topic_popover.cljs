@@ -29,13 +29,34 @@
         unactive-topics (map name (reduce utils/vec-dissoc topics-list active-topics-list))
         unactive-equal? (= (set unactive-topics) (set (:unactive-topics old-state)))]
     {:active-topics active-topics-list
-     :unactive-topics (if unactive-equal? (:unactive-topics old-state) unactive-topics)}))
+     :unactive-topics (if unactive-equal? (:unactive-topics old-state) unactive-topics)
+     :highlighted-topic 0}))
 
 (defn add-topic-click [owner options topic]
   (let [active-topics (om/get-state owner :active-topics)
         new-active-topics (concat active-topics [topic])]
     ((:did-change-active-topics options) new-active-topics)
     ((:dismiss-popover options))))
+
+(defn kb-key-up [owner options e]
+  (let [unactive-topics (om/get-state owner :unactive-topics)
+        key-code (.-keyCode e)]
+    (when (= key-code 40)
+      ; down
+      (.stopPropagation e)
+      (.preventDefault e)
+      (om/update-state! owner :highlighted-topic #(mod (inc %) (count unactive-topics))))
+    (when (= key-code 38)
+      ; up
+      (.stopPropagation e)
+      (.preventDefault e)
+      (om/update-state! owner :highlighted-topic #(mod (dec %) (count unactive-topics))))
+    (when (= key-code 13)
+      ; enter
+      (.stopPropagation e)
+      (.preventDefault e)
+      (let [topic (get (vec unactive-topics) (om/get-state owner :highlighted-topic))]
+        (add-topic-click owner options topic)))))
 
 (defcomponent add-topic-popover [{:keys [all-topics active-topics-list] :as data} owner options]
 
@@ -45,17 +66,20 @@
     (get-state data nil))
 
   (did-mount [_]
-    (let [listener (events/listen (sel1 [:body]) EventType/CLICK (partial on-click-out owner options))]
-      (om/set-state! owner :click-out-listener listener)))
+    (let [click-listener (events/listen (sel1 [:body]) EventType/CLICK (partial on-click-out owner options))
+          kb-listner (events/listen (sel1 [:body]) EventType/KEYDOWN (partial kb-key-up owner options))]
+      (om/set-state! owner :click-out-listener click-listener)
+      (om/set-state! owner :kb-listener click-listener)))
 
   (will-receive-props [_ next-props]
     (when-not (= next-props data)
       (om/set-state! owner (get-state next-props (om/get-state owner)))))
 
   (will-unmount [_]
-    (events/unlistenByKey (om/get-state owner :click-out-listener)))
+    (events/unlistenByKey (om/get-state owner :click-out-listener))
+    (events/unlistenByKey (om/get-state owner :kb-listener)))
 
-  (render-state [_ {:keys [active-topics unactive-topics]}]
+  (render-state [_ {:keys [active-topics unactive-topics highlighted-topic]}]
     (dom/div {:class "add-topic-popover"
               :id "add-topic-popover"
               :on-click (partial on-click-in owner options)}
@@ -63,8 +87,9 @@
       (dom/div {:class "add-topic-popover-header"} "CHOOSE A TOPIC")
       (dom/div {:class "add-topic-popover-subheader"} "SUGGESTED TOPICS")
       (dom/div {:class "topics-to-add"}
-        (for [topic unactive-topics
-              :let [topic-data (->> topic keyword (get all-topics))]]
-          (dom/div {:class "potential-topic"
+        (for [idx (range (count unactive-topics))
+              :let [topic (get (vec unactive-topics) idx)
+                    topic-data (->> topic keyword (get all-topics))]]
+          (dom/div {:class (str "potential-topic" (when (= highlighted-topic idx) " highlighted"))
                     :on-click #(add-topic-click owner options topic)}
             (:title topic-data)))))))
