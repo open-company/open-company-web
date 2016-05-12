@@ -43,7 +43,7 @@
 (def up-arrow-key-code 38)
 (def enter-key-code 13)
 
-(defn kb-key-up [owner options e]
+(defn kb-key-down [owner options e]
   (let [key-code        (.-keyCode e)
         unactive-topics (om/get-state owner :unactive-topics)]
     (when (or (= key-code down-arrow-key-code)
@@ -79,9 +79,9 @@
 
   (did-mount [_]
     (let [click-listener (events/listen (sel1 [:body]) EventType/CLICK (partial on-click-out owner options))
-          kb-listner (events/listen (sel1 [:body]) EventType/KEYDOWN (partial kb-key-up owner options))]
+          kb-listener (events/listen (sel1 [:body]) EventType/KEYDOWN (partial kb-key-down owner options))]
       (om/set-state! owner :click-out-listener click-listener)
-      (om/set-state! owner :kb-listener click-listener)))
+      (om/set-state! owner :kb-listener kb-listener)))
 
   (will-receive-props [_ next-props]
     (when-not (= next-props data)
