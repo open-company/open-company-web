@@ -123,9 +123,13 @@
 (defn add-topic [owner]
   (om/set-state! owner :show-add-topic-popover true))
 
-(defn sections-for-category [slug active-category]
-  (let [category-data (first (filter #(= (:name %) (name active-category)) (:categories (slug @caches/new-sections))))
-        all-category-sections (:sections category-data)]
+(defn get-all-sections [slug]
+  (let [categories-data (:categories (slug @caches/new-sections))
+        all-category-sections (apply concat
+                                     (for [category categories-data]
+                                       (let [cat-name (:name category)
+                                             sections (:sections category)]
+                                         (map #(assoc % :category cat-name) sections))))]
     (apply merge
            (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
 
@@ -173,10 +177,10 @@
                                 (add-topic owner)
                                 (topic-click options nil))}
         (when show-add-topic-popover
-          (let [all-category-sections (sections-for-category slug active-category)
-                category-topics (get active-topics active-category)
+          (let [all-sections (get-all-sections slug)
+                category-topics (flatten (vals active-topics))
                 update-active-topics (:update-active-topics options)
-                list-data {:all-topics all-category-sections
+                list-data {:all-topics all-sections
                            :active-topics-list category-topics}
                 list-opts {:did-change-active-topics update-active-topics
                            :dismiss-popover #(om/set-state! owner :show-add-topic-popover false)}]
