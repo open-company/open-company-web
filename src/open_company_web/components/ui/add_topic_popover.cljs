@@ -33,9 +33,10 @@
      :highlighted-topic 0}))
 
 (defn add-topic-click [owner options topic]
-  (let [active-topics (om/get-state owner :active-topics)
-        new-active-topics (concat active-topics [topic])]
-    ((:did-change-active-topics options) new-active-topics)
+  (let [all-topics (om/get-props owner :all-topics)
+        topic-data (->> topic keyword (get all-topics))
+        category-name (:category topic-data)]
+    ((:did-change-active-topics options) category-name topic)
     ((:dismiss-popover options))))
 
 (defn kb-key-up [owner options e]
