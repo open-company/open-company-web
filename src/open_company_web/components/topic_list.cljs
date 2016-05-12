@@ -59,12 +59,13 @@
     (apply merge
            (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
 
-(defn render-topic [owner section-name company-data active-category]
+(defn render-topic [owner section-name company-data active-category & [column]]
   (when section-name
     (if (= section-name "add-topic")
       (om/build topic {:loading false
                        :section "add-topic"
                        :add-topic true
+                       :column column
                        :section-data {:title "+ ADD A TOPIC"
                                       :body ""
                                       :updated-at 0
@@ -148,7 +149,7 @@
                         section-name (get (vec category-topics) real-idx)]]
                   (render-topic owner section-name company-data active-category))
                 (when (and add-first-column? add-topic?)
-                  (render-topic owner "add-topic" company-data active-category)))
+                  (render-topic owner "add-topic" company-data active-category 1)))
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
                 (for [idx (range (inc (quot (count category-topics) 3)))
@@ -157,7 +158,7 @@
                         section-name (get (vec category-topics) real-idx)]]
                   (render-topic owner section-name company-data active-category))
                 (when (and add-second-column? add-topic?)
-                  (render-topic owner "add-topic" company-data active-category)))
+                  (render-topic owner "add-topic" company-data active-category 2)))
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
                 (for [idx (range (inc (quot (count category-topics) 3)))
@@ -166,7 +167,7 @@
                         section-name (get (vec category-topics) real-idx)]]
                   (render-topic owner section-name company-data active-category))
                 (when (and add-third-column? add-topic?)
-                  (render-topic owner "add-topic" company-data active-category))))
+                  (render-topic owner "add-topic" company-data active-category 3))))
             2
             (dom/div {:class "topics-column-container columns-2 group"
                       :style #js {:width (str (+ (* card-width 2) 20 60) "px")}}
@@ -178,7 +179,7 @@
                         section-name (get (vec category-topics) real-idx)]]
                   (render-topic owner section-name company-data active-category))
                 (when (and add-first-column? add-topic?)
-                  (render-topic owner "add-topic" company-data active-category)))
+                  (render-topic owner "add-topic" company-data active-category 1)))
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
                 (for [idx (range (inc (quot (count category-topics) 2)))
@@ -188,7 +189,7 @@
                   (render-topic owner section-name company-data active-category))
                 (when (and (not add-first-column?)
                            add-topic?)
-                  (render-topic owner "add-topic" company-data active-category))))
+                  (render-topic owner "add-topic" company-data active-category 2))))
             ; 1 column or default
             (dom/div {:class "topics-column-container columns-1 group"
                       :style #js {:width (if (> ww 413) (str card-width "px") "auto")}}
@@ -196,4 +197,4 @@
                 (for [section-name category-topics]
                   (render-topic owner section-name company-data active-category))
                 (when add-topic?
-                  (render-topic owner "add-topic" company-data active-category))))))))))
+                  (render-topic owner "add-topic" company-data active-category 1))))))))))
