@@ -42,19 +42,25 @@
 (def down-arrow-key-code 40)
 (def up-arrow-key-code 38)
 (def enter-key-code 13)
+(def esc-key-code 27)
 
 (defn kb-key-down [owner options e]
   (let [key-code        (.-keyCode e)
         unactive-topics (om/get-state owner :unactive-topics)]
     (when (or (= key-code down-arrow-key-code)
               (= key-code up-arrow-key-code)
-              (= key-code enter-key-code))
+              (= key-code enter-key-code)
+              (= key-code esc-key-code))
       (.stopPropagation e)
       (.preventDefault e)
-      (if (= key-code enter-key-code)
+      (cond
+        (= key-code enter-key-code)
         ; enter key: select topic
         (let [topic (get (vec unactive-topics) (om/get-state owner :highlighted-topic))]
           (add-topic-click owner options topic))
+        (= key-code esc-key-code)
+        ((:dismiss-popover options))
+        :else
         ; arrow key: change focus and scroll the parent div
         (let [cur-highlighted  (om/get-state owner :highlighted-topic)
               idx-fn           (cond
