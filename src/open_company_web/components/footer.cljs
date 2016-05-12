@@ -10,7 +10,7 @@
   (render [_]
     (dom/div {:class "footer"}
       (dom/div {:class "footer-cta"}
-        "Powered by OpenCompany. See the big picture.")
+        "Powered by OpenCompany")
       (dom/div {:class "footer-internal"}
         (dom/div {:class (str "footer-bottom columns-" (:columns-num data))}
           (when-not (responsive/is-mobile)
