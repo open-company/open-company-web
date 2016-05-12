@@ -26,10 +26,13 @@
 (defn get-active-topics [company-data category]
   (get-in company-data [:sections (keyword category)]))
 
-(defn update-active-topics [owner category new-active-topics]
-  (let [old-active-categories (om/get-state owner :active-topics)
-        new-active-categories (assoc old-active-categories category new-active-topics)]
-    (api/patch-sections new-active-categories)))
+(defn update-active-topics [owner category-name new-topic]
+  (let [company-data (om/get-props owner :company-data)
+        old-categories (:sections company-data)
+        old-topics (get-active-topics company-data category-name)
+        new-topics (concat old-topics [new-topic])
+        new-categories (assoc old-categories (keyword category-name) new-topics)]
+    (api/patch-sections new-categories)))
 
 (defn get-state [data current-state]
   (let [company-data (:company-data data)
@@ -71,7 +74,7 @@
                         :active-category active-category}
                        {:opts {:section-name section-name
                                :topic-click (partial topic-click owner section-name)
-                               :update-active-topics (partial update-active-topics owner active-category)}})
+                               :update-active-topics (partial update-active-topics owner)}})
       (let [sd (->> section-name keyword (get company-data))]
         (when-not (and (:read-only company-data) (:placeholder sd))
           (dom/div #js {:className "topic-row"
