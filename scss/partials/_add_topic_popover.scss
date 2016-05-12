@@ -40,7 +40,6 @@ div.add-topic-popover {
 
   div.topics-to-add{
     text-align: left;
-    margin-left: 19px;
     max-height: 237px;
     overflow: scroll;
     padding-bottom: 6px;
@@ -51,6 +50,12 @@ div.add-topic-popover {
       line-height: 1.7;
       color: $oc_gray_5;
       padding-top: 6px;
+      padding-left: 19px;
+      background-color: #ffffff;
+
+      &.highlighted {
+        background-color: rgba(78, 90, 107, 0.2);
+      }
     }
   }
 }
