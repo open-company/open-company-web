@@ -16,6 +16,7 @@ div.topic-list {
       border: solid 1px rgba(78, 90, 107, 0.2);
       text-align: center;
       position: relative;
+      box-shadow: none;
 
       &.active {
         background-color: #ffffff;

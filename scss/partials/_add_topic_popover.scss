@@ -7,7 +7,7 @@ div.add-topic-popover {
   top: 29px;
   z-index: 1000;
   border-top: solid 2px $oc_yellow;
-  box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
 
   div.triangle {
     @include triangle(left, $oc_gray_5);
