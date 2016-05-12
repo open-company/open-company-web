@@ -39,27 +39,38 @@
     ((:did-change-active-topics options) category-name topic)
     ((:dismiss-popover options))))
 
-(defn kb-key-up [owner options e]
-  (let [unactive-topics (om/get-state owner :unactive-topics)
-        key-code (.-keyCode e)]
-    (when (= key-code 40)
-      ; down
-      (.stopPropagation e)
-      (.preventDefault e)
-      (om/update-state! owner :highlighted-topic #(mod (inc %) (count unactive-topics))))
-    (when (= key-code 38)
-      ; up
-      (.stopPropagation e)
-      (.preventDefault e)
-      (om/update-state! owner :highlighted-topic #(mod (dec %) (count unactive-topics))))
-    (when (= key-code 13)
-      ; enter
-      (.stopPropagation e)
-      (.preventDefault e)
-      (let [topic (get (vec unactive-topics) (om/get-state owner :highlighted-topic))]
-        (add-topic-click owner options topic)))))
+(def down-arrow-key-code 40)
+(def up-arrow-key-code 38)
+(def enter-key-code 13)
 
-(defcomponent add-topic-popover [{:keys [all-topics active-topics-list] :as data} owner options]
+(defn kb-key-up [owner options e]
+  (let [key-code        (.-keyCode e)
+        unactive-topics (om/get-state owner :unactive-topics)]
+    (when (or (= key-code down-arrow-key-code)
+              (= key-code up-arrow-key-code)
+              (= key-code enter-key-code))
+      (.stopPropagation e)
+      (.preventDefault e)
+      (if (= key-code enter-key-code)
+        ; enter key: select topic
+        (let [topic (get (vec unactive-topics) (om/get-state owner :highlighted-topic))]
+          (add-topic-click owner options topic))
+        ; arrow key: change focus and scroll the parent div
+        (let [cur-highlighted  (om/get-state owner :highlighted-topic)
+              idx-fn           (cond
+                                 (= key-code down-arrow-key-code) inc
+                                 (= key-code up-arrow-key-code) dec)
+              next-highlighted (mod (idx-fn cur-highlighted) (count unactive-topics))
+              topics-to-add    (om/get-ref owner "topics-to-add")
+              new-topic-div    (om/get-ref owner (str "potential-topic-" next-highlighted))]
+          (set! (.-scrollTop topics-to-add) (- (.-offsetTop new-topic-div) (.-offsetTop topics-to-add)))
+          (cond
+            (= key-code down-arrow-key-code)
+            (om/set-state! owner :highlighted-topic next-highlighted)
+            (= key-code up-arrow-key-code)
+            (om/set-state! owner :highlighted-topic next-highlighted)))))))
+
+(defcomponent add-topic-popover [{:keys [all-topics active-topics-list column] :as data} owner options]
 
   (init-state [_]
     (when (empty? @caches/new-sections)
@@ -81,16 +92,18 @@
     (events/unlistenByKey (om/get-state owner :kb-listener)))
 
   (render-state [_ {:keys [active-topics unactive-topics highlighted-topic]}]
-    (dom/div {:class "add-topic-popover"
+    (dom/div {:class (str "add-topic-popover column-" column)
               :id "add-topic-popover"
               :on-click (partial on-click-in owner options)}
       (dom/div {:class "triangle"})
       (dom/div {:class "add-topic-popover-header"} "CHOOSE A TOPIC")
       (dom/div {:class "add-topic-popover-subheader"} "SUGGESTED TOPICS")
-      (dom/div {:class "topics-to-add"}
+      (dom/div #js {:className "topics-to-add"
+                    :ref "topics-to-add"}
         (for [idx (range (count unactive-topics))
               :let [topic (get (vec unactive-topics) idx)
                     topic-data (->> topic keyword (get all-topics))]]
-          (dom/div {:class (str "potential-topic" (when (= highlighted-topic idx) " highlighted"))
-                    :on-click #(add-topic-click owner options topic)}
+          (dom/div #js {:className (str "potential-topic" (when (= highlighted-topic idx) " highlighted"))
+                        :ref (str "potential-topic-" idx)
+                        :onClick #(add-topic-click owner options topic)}
             (:title topic-data)))))))
