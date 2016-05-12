@@ -86,6 +86,12 @@
                              {:opts {:section-name section-name
                                      :topic-click (partial topic-click owner section-name)}})))))))
 
+(defn get-topics [topics company-data]
+  (if (and (not (:read-only company-data))
+             (not (responsive/is-mobile)))
+    (concat topics ["add-topic"])
+    topics))
+
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
@@ -110,12 +116,11 @@
     (let [slug            (keyword (router/current-company-slug))
           company-data    (:company-data data)
           active-category (keyword (:active-category data))
-          category-topics (concat (flatten (vals active-topics)) ["add-topic"])
+          category-topics (get-topics (flatten (vals active-topics)) company-data)
           win-width       (.-clientWidth (sel1 js/document :body))
           card-width      (:card-width data)
           columns-num     (:columns-num data)
           ww              (.-clientWidth (sel1 js/document :body))]
-      (println "aa" category-topics)
       (dom/div {:class "topic-list group"
                 :key "topic-list"}
         (when (and (not (:read-only company-data))
