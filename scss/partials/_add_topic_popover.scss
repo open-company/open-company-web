@@ -1,6 +1,6 @@
 div.add-topic-popover {
   width: 200px;
-  height: 312px;
+  max-height: 312px;
   background-color: #ffffff;
   position: absolute;
   left: 249px;
@@ -41,8 +41,9 @@ div.add-topic-popover {
   div.topics-to-add{
     text-align: left;
     margin-left: 19px;
-    height: 237px;
+    max-height: 237px;
     overflow: scroll;
+    padding-bottom: 6px;
 
     div.potential-topic {
       font-family: $oc_headers_font;
