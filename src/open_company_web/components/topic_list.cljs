@@ -60,18 +60,31 @@
            (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
 
 (defn render-topic [owner section-name company-data active-category]
-  (let [sd (->> section-name keyword (get company-data))]
-    (when-not (and (:read-only company-data) (:placeholder sd))
-      (dom/div #js {:className "topic-row"
-                   :ref section-name
-                   :key (str "topic-row-" (name section-name))}
-        (om/build topic {:loading (:loading company-data)
-                         :section section-name
-                         :section-data sd
-                         :currency (:currency company-data)
-                         :active-category active-category}
-                         {:opts {:section-name section-name
-                                 :topic-click (partial topic-click owner section-name)}})))))
+  (when section-name
+    (if (= section-name "add-topic")
+      (om/build topic {:loading false
+                       :section "add-topic"
+                       :add-topic true
+                       :section-data {:title "+ ADD A TOPIC"
+                                      :body ""
+                                      :updated-at 0
+                                      :headline ""}
+                        :currency (:currency company-data)
+                        :active-category active-category}
+                       {:opts {:section-name section-name
+                               :topic-click (partial topic-click owner section-name)}})
+      (let [sd (->> section-name keyword (get company-data))]
+        (when-not (and (:read-only company-data) (:placeholder sd))
+          (dom/div #js {:className "topic-row"
+                       :ref section-name
+                       :key (str "topic-row-" (name section-name))}
+            (om/build topic {:loading (:loading company-data)
+                             :section section-name
+                             :section-data sd
+                             :currency (:currency company-data)
+                             :active-category active-category}
+                             {:opts {:section-name section-name
+                                     :topic-click (partial topic-click owner section-name)}})))))))
 
 (defcomponent topic-list [data owner options]
 
@@ -97,11 +110,12 @@
     (let [slug            (keyword (router/current-company-slug))
           company-data    (:company-data data)
           active-category (keyword (:active-category data))
-          category-topics (flatten (vals active-topics))
+          category-topics (concat (flatten (vals active-topics)) ["add-topic"])
           win-width       (.-clientWidth (sel1 js/document :body))
           card-width      (:card-width data)
           columns-num     (:columns-num data)
           ww              (.-clientWidth (sel1 js/document :body))]
+      (println "aa" category-topics)
       (dom/div {:class "topic-list group"
                 :key "topic-list"}
         (when (and (not (:read-only company-data))
@@ -142,21 +156,21 @@
                       :style #js {:width (str (+ (* card-width 3) 40 60) "px")}}
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
-                (for [idx (range (quot (count category-topics) 3))
+                (for [idx (range (inc (quot (count category-topics) 3)))
                   :while (< idx (quot (count category-topics) 2))
                   :let [real-idx (* idx 3)
                         section-name (get (vec category-topics) real-idx)]]
                   (render-topic owner section-name company-data active-category)))
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
-                (for [idx (range (quot (count category-topics) 3))
+                (for [idx (range (inc (quot (count category-topics) 3)))
                   :while (< idx (quot (count category-topics) 2))
                   :let [real-idx (inc (* idx 3))
                         section-name (get (vec category-topics) real-idx)]]
                   (render-topic owner section-name company-data active-category)))
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
-                (for [idx (range (quot (count category-topics) 3))
+                (for [idx (range (inc (quot (count category-topics) 3)))
                   :while (< idx (quot (count category-topics) 2))
                   :let [real-idx (+ (* idx 3) 2)
                         section-name (get (vec category-topics) real-idx)]]
@@ -166,14 +180,14 @@
                       :style #js {:width (str (+ (* card-width 2) 20 60) "px")}}
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
-                (for [idx (range (quot (count category-topics) 2))
+                (for [idx (range (inc (quot (count category-topics) 2)))
                   :while (< idx (quot (count category-topics) 2))
                   :let [real-idx (* idx 2)
                         section-name (get (vec category-topics) real-idx)]]
                   (render-topic owner section-name company-data active-category)))
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
-                (for [idx (range (quot (count category-topics) 2))
+                (for [idx (range (inc (quot (count category-topics) 2)))
                   :while (< idx (quot (count category-topics) 2))
                   :let [real-idx (inc (* idx 2))
                         section-name (get (vec category-topics) real-idx)]]
