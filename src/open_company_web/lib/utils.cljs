@@ -673,6 +673,7 @@
   or ASCII emoji (old skool) and convert it to HTML string ready to be added to the DOM (dangerously)
   with emoji image tags via the Emoji One lib and resources."
   [text]
+  ;; temporary until emojione is in cljsjs
   (if (is-test-env?)
     ;; do not use emojy in tests
     (clj->js {"__html" text})
