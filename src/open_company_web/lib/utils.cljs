@@ -695,12 +695,16 @@
   or ASCII emoji (old skool) and convert it to HTML string ready to be added to the DOM (dangerously)
   with emoji image tags via the Emoji One lib and resources."
   [text]
-  ;; use an SVG sprite map
-  (set! (.-imageType js/emojione) "svg")
-  (set! (.-sprites js/emojione) true)
-  (set! (.-imagePathSVGSprites js/emojione) "/img/emojione.sprites.svg")
-  ;; convert textual emoji's into SVG elements
-  (set! (.-ascii js/emojione) true)
-  (let [text-string (or text "") ; handle nil
-        unicode-string (.toImage js/emojione text-string)]
-    (clj->js {"__html" unicode-string})))
+  ;; temporary until emojione is in cljsjs
+  (if (is-test-env?)
+    (clj->js {"__html" unicode-string})
+    (do
+      ;; use an SVG sprite map
+      (set! (.-imageType js/emojione) "svg")
+      (set! (.-sprites js/emojione) true)
+      (set! (.-imagePathSVGSprites js/emojione) "/img/emojione.sprites.svg")
+      ;; convert textual emoji's into SVG elements
+      (set! (.-ascii js/emojione) true)
+      (let [text-string (or text "") ; handle nil
+            unicode-string (.toImage js/emojione text-string)]
+        (clj->js {"__html" unicode-string})))))
