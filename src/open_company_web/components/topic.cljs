@@ -8,6 +8,7 @@
             [open-company-web.api :as api]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.caches :as caches]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.add-topic-popover :refer (add-topic-popover)]
             [open-company-web.components.finances.utils :as finances-utils]
@@ -122,7 +123,13 @@
 (defn add-topic [owner]
   (om/set-state! owner :show-add-topic-popover true))
 
-(defcomponent topic [{:keys [section-data section currency] :as data} owner options]
+(defn sections-for-category [slug active-category]
+  (let [category-data (first (filter #(= (:name %) (name active-category)) (:categories (slug @caches/new-sections))))
+        all-category-sections (:sections category-data)]
+    (apply merge
+           (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
+
+(defcomponent topic [{:keys [active-category active-topics section-data section currency] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
@@ -166,7 +173,14 @@
                                 (add-topic owner)
                                 (topic-click options nil))}
         (when show-add-topic-popover
-          (om/build add-topic-popover {} {:opts {:dismiss-popover #(om/set-state! owner :show-add-topic-popover false)}}))
+          (let [all-category-sections (sections-for-category slug active-category)
+                category-topics (get active-topics active-category)
+                update-active-topics (:update-active-topics options)
+                list-data {:all-topics all-category-sections
+                           :active-topics-list category-topics}
+                list-opts {:did-change-active-topics update-active-topics
+                           :dismiss-popover #(om/set-state! owner :show-add-topic-popover false)}]
+            (om/build add-topic-popover list-data {:opts list-opts})))
         (dom/div #js {:className "topic-anim group"
                       :key (str "topic-anim-" as-of "-" transition-as-of)
                       :ref "topic-anim"}
