@@ -133,7 +133,7 @@
     (apply merge
            (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
 
-(defcomponent topic [{:keys [active-category active-topics section-data section currency] :as data} owner options]
+(defcomponent topic [{:keys [active-category active-topics section-data section currency column] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
@@ -181,7 +181,8 @@
                 category-topics (flatten (vals active-topics))
                 update-active-topics (:update-active-topics options)
                 list-data {:all-topics all-sections
-                           :active-topics-list category-topics}
+                           :active-topics-list category-topics
+                           :column column}
                 list-opts {:did-change-active-topics update-active-topics
                            :dismiss-popover #(om/set-state! owner :show-add-topic-popover false)}]
             (om/build add-topic-popover list-data {:opts list-opts})))
