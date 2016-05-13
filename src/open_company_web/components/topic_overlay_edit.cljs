@@ -19,7 +19,8 @@
             [goog.dom.classlist :as cl]
             [goog.history.EventType :as EventType]
             [cljs-dynamic-resources.core :as cdr]
-            [cljsjs.medium-editor]
+            [cljsjs.medium-editor] ; pulled in for cljsjs externs
+            [cljsjs.filestack] ; pulled in for cljsjs externs
             [cuerdas.core :as s]))
 
 (defn change-value [owner k e]
@@ -312,8 +313,7 @@
             finances-placeholder-data (get (:sections (get (:categories (slug @caches/new-sections)) 2)) 0)
             med-ed (new js/MediumEditor body-el (clj->js
                                                  (->  (utils/medium-editor-options (:note finances-placeholder-data))
-                                                      (editor/inject-extension editor/file-upload)
-                                                      (editor/inject-button "highlight" editor/hl-btn))))]
+                                                      (editor/inject-extension editor/file-upload))))]
         (.subscribe med-ed "editableInput" (fn [event editable]
                                              (om/set-state! owner :has-changes true)))
         (om/set-state! owner :initial-body (.-innerHTML body-el))
