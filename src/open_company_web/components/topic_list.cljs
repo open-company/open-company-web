@@ -129,6 +129,7 @@
           (om/build fullscreen-topic {:section selected-topic
                                       :section-data (->> selected-topic keyword (get company-data))
                                       :selected-metric selected-metric
+                                      :read-only (:read-only company-data)
                                       :card-width card-width
                                       :currency (:currency company-data)}
                                      {:opts {:close-overlay-cb #(close-overlay-cb owner)
