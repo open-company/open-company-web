@@ -2,8 +2,9 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.router :as router]
+            [open-company-web.api :as api]
             [open-company-web.caches :as cache]
+            [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
@@ -22,7 +23,7 @@
   (.play
     (new Fade (om/get-ref owner "fullscreen-topic") 0 1 utils/oc-animation-duration)))
 
-(defn hide-fullscreen-topic [owner options]
+(defn hide-fullscreen-topic [options]
   (dommy/remove-class! (sel1 [:body]) :no-scroll)
   (setStyle (sel1 [:div.company-dashboard]) #js {:height "auto" :overflow "auto"})
   (let [fade-out (new Fade (sel1 :div.fullscreen-topic) 1 0 utils/oc-animation-duration)]
@@ -50,10 +51,6 @@
       (dom/div {:class "fullscreen-topic-internal group"
                 :style #js {:width (str (- fullscreen-width 20) "px")}}
         (dom/div {:class "topic-title"} (:title topic-data))
-        (dom/div {:class "close"
-                  :style #js {:paddingLeft (str fullscreen-width "px")}
-                  :on-click #(hide-fullscreen-topic owner options)}
-          (icon :circle-remove))
         (dom/div {:class "topic-headline"
                   :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
         (dom/div {:class "separator"})
@@ -68,16 +65,26 @@
         (dom/div {:class "topic-body"
                   :dangerouslySetInnerHTML (utils/emojify (utils/get-topic-body topic-data topic))})
         (dom/div {:class "topic-attribution"}
-          (str "- " (:name (:author topic-data)) " / " (utils/date-string (js/Date. (:updated-at topic-data)) true)))))))
+          (str "- " (:name (:author topic-data)) " / " (utils/date-string (js/Date. (:updated-at topic-data)) true)))
+        (dom/div {:class "topic-revisions"}
+          (when (:prev-rev data)
+            (dom/button {:class "prev"
+                         :on-click #((:rev-nav options) (:updated-at (:prev-rev data)))}
+              (if (:is-actual data) "VIEW EARLIER UPDATE" "EARLIER")))
+          (when (:next-rev data)
+            (dom/button {:class "next"
+                         :on-click #((:rev-nav options) (:updated-at (:next-rev data)))}
+              "LATER")))))))
 
 (defn esc-listener [owner options e]
   (when (= (.-keyCode e) 27)
-    (hide-fullscreen-topic owner options)))
+    (hide-fullscreen-topic options)))
 
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
+     :editing false
      :actual-as-of (:updated-at section-data)})
 
   (did-mount [_]
@@ -95,14 +102,32 @@
           next-rev (utils/revision-next revisions as-of)
           slug (keyword (router/current-company-slug))
           revisions-list (section-kw (slug @cache/revisions))
-          topic-data (utils/select-section-data section-data section-kw as-of)]
+          topic-data (utils/select-section-data section-data section-kw as-of)
+          is-actual? (= as-of actual-as-of)
+          opts (merge options {:rev-nav #(om/set-state! owner :as-of %)})]
+      ; preload previous revision
+      (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
+        (api/load-revision prev-rev slug section-kw))
+      ; preload next revision
+      (when (and (not= (:updated-at next-rev) actual-as-of)
+                  next-rev
+                  (not (contains? revisions-list (:updated-at next-rev))))
+        (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className "fullscreen-topic"
                     :ref "fullscreen-topic"}
+        (when is-actual?
+          (dom/div {:class "edit"
+                    :on-click #(om/set-state! owner :editing true)}
+            (icon :pencil)))
+        (dom/div {:class "close"
+                  :on-click #(hide-fullscreen-topic options)}
+          (icon :simple-remove))
         (om/build fullscreen-topic-internal {:topic section
                                              :topic-data topic-data
                                              :selected-metric selected-metric
                                              :currency currency
                                              :card-width card-width
+                                             :is-actual is-actual?
                                              :prev-rev prev-rev
                                              :next-rev next-rev}
-                                            {:opts options})))))
+                                            {:opts opts})))))
