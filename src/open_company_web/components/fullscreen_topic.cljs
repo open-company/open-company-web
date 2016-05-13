@@ -1,5 +1,6 @@
 (ns open-company-web.components.fullscreen-topic
-  (:require [om.core :as om :include-macros true]
+  (:require [cljs.core.async :refer (chan put!)]
+            [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.api :as api]
@@ -9,6 +10,7 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
+            [open-company-web.components.topic-overlay-edit :refer (topic-overlay-edit)]
             [open-company-web.components.ui.icon :refer (icon)]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [goog.style :refer (setStyle)]
@@ -23,14 +25,20 @@
   (.play
     (new Fade (om/get-ref owner "fullscreen-topic") 0 1 utils/oc-animation-duration)))
 
-(defn hide-fullscreen-topic [options]
-  (dommy/remove-class! (sel1 [:body]) :no-scroll)
-  (setStyle (sel1 [:div.company-dashboard]) #js {:height "auto" :overflow "auto"})
-  (let [fade-out (new Fade (sel1 :div.fullscreen-topic) 1 0 utils/oc-animation-duration)]
-    (doto fade-out
-      (.listen AnimationEventType/FINISH
-        #((:close-overlay-cb options)))
-      (.play))))
+(defn hide-fullscreen-topic [owner options]
+  ; if it's in editing mode
+  (if (om/get-state owner :editing)
+    ; dismiss the editing
+    (om/set-state! owner :editing false)
+    ; else dismiss the fullscreen topic
+    (do
+      (dommy/remove-class! (sel1 [:body]) :no-scroll)
+      (setStyle (sel1 [:div.company-dashboard]) #js {:height "auto" :overflow "auto"})
+      (let [fade-out (new Fade (sel1 :div.fullscreen-topic) 1 0 utils/oc-animation-duration)]
+        (doto fade-out
+          (.listen AnimationEventType/FINISH
+            #((:close-overlay-cb options)))
+          (.play))))))
 
 (defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric card-width] :as data} owner options]
   (render [_]
@@ -78,13 +86,16 @@
 
 (defn esc-listener [owner options e]
   (when (= (.-keyCode e) 27)
-    (hide-fullscreen-topic options)))
+    (hide-fullscreen-topic owner options)))
 
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width] :as data} owner options]
 
   (init-state [_]
+    (utils/add-channel "fullscreen-topic-save" (chan))
+    (utils/add-channel "fullscreen-topic-cancel" (chan))
     {:as-of (:updated-at section-data)
      :editing false
+     :show-save-button false
      :actual-as-of (:updated-at section-data)})
 
   (did-mount [_]
@@ -92,19 +103,27 @@
       (events/listen js/document EventType/KEYUP (partial esc-listener owner options)))
     (show-fullscreen-topic owner))
 
+  (will-receive-props [_ next-props]
+    (when-not (= next-props data)
+      (om/set-state! owner :as-of (:updated-at (:section-data next-props)))))
+
   (will-unmount [_]
     (events/unlistenByKey (om/get-state owner :esc-listener-key)))
 
-  (render-state [_ {:keys [as-of actual-as-of] :as state}]
+  (render-state [_ {:keys [as-of actual-as-of editing show-save-button] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
           next-rev (utils/revision-next revisions as-of)
           slug (keyword (router/current-company-slug))
-          revisions-list (section-kw (slug @cache/revisions))
+          revisions-list (get (slug @cache/revisions) section-kw)
           topic-data (utils/select-section-data section-data section-kw as-of)
           is-actual? (= as-of actual-as-of)
-          opts (merge options {:rev-nav #(om/set-state! owner :as-of %)})]
+          fullscreen-topic-opts (merge options {:rev-nav #(om/set-state! owner :as-of %)})
+          edit-topic-opts (merge options {:show-save-button #(om/set-state! owner :show-save-button %)
+                                          :dismiss-editing #(om/set-state! owner :editing false)})
+          can-edit? (and (not (:read-only data))
+                         (not (responsive/is-mobile)))]
       ; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -115,19 +134,41 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className "fullscreen-topic"
                     :ref "fullscreen-topic"}
-        (when is-actual?
-          (dom/div {:class "edit"
-                    :on-click #(om/set-state! owner :editing true)}
+        (when (and can-edit?
+                   is-actual?
+                   (not editing))
+          (dom/div {:class "edit-button"
+                    :on-click #(om/update-state! owner :editing not)}
             (icon :pencil)))
+        (when (and can-edit?
+                   editing
+                   show-save-button)
+          (dom/div {:class "save-button"
+                    :on-click #(when-let [ch (utils/get-channel "fullscreen-topic-save")]
+                                 (put! ch {:click true :event %}))}
+            "POST"))
         (dom/div {:class "close"
-                  :on-click #(hide-fullscreen-topic options)}
+                  :on-click #(if editing
+                              (when-let [ch (utils/get-channel "fullscreen-topic-cancel")]
+                                 (put! ch {:click true :event %}))
+                              (hide-fullscreen-topic owner options))}
           (icon :simple-remove))
-        (om/build fullscreen-topic-internal {:topic section
-                                             :topic-data topic-data
-                                             :selected-metric selected-metric
-                                             :currency currency
-                                             :card-width card-width
-                                             :is-actual is-actual?
-                                             :prev-rev prev-rev
-                                             :next-rev next-rev}
-                                            {:opts opts})))))
+        (if editing
+          (om/build topic-overlay-edit {:topic section
+                                        :topic-data topic-data
+                                        :selected-metric selected-metric
+                                        :currency currency
+                                        :card-width card-width
+                                        :is-actual is-actual?
+                                        :prev-rev prev-rev
+                                        :next-rev next-rev}
+                                       {:opts edit-topic-opts})
+          (om/build fullscreen-topic-internal {:topic section
+                                               :topic-data topic-data
+                                               :selected-metric selected-metric
+                                               :currency currency
+                                               :card-width card-width
+                                               :is-actual is-actual?
+                                               :prev-rev prev-rev
+                                               :next-rev next-rev}
+                                              {:opts fullscreen-topic-opts}))))))
