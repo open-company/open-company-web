@@ -105,7 +105,8 @@
 
   (will-receive-props [_ next-props]
     (when-not (= next-props data)
-      (om/set-state! owner :as-of (:updated-at (:section-data next-props)))))
+      (om/set-state! owner :as-of (:updated-at (:section-data next-props)))
+      (om/set-state! owner :actual-as-of (:updated-at (:section-data next-props)))))
 
   (will-unmount [_]
     (utils/remove-channel "fullscreen-topic-save")
