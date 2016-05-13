@@ -14,7 +14,7 @@ div.fullscreen-topic {
     background-color: rgba(255, 255, 255, 1);
   }
 
-  div.edit {
+  div.edit-button {
     position: fixed;
     cursor: pointer;
     z-index: 1040;
@@ -25,6 +25,23 @@ div.fullscreen-topic {
     &:hover {
       opacity: 0.5;
     }
+  }
+
+  div.save-button {
+    position: fixed;
+    cursor: pointer;
+    z-index: 1040;
+    top: 20px;
+    right: 70px;
+    width: 95px;
+    height: 30px;
+    background-color: #f9d748;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 1px;
+    color: $oc_gray_5;
+    padding: 6px 0 0 32px;
   }
 
   div.close {
@@ -42,6 +59,7 @@ div.fullscreen-topic {
     position: relative;
     overflow: hidden;
     min-height: calc(100vh - #{$navbar_height}px - 30px - 8px);
+    padding-top: 2px;
 
     @include mobile(){
       margin-top: 40px;
@@ -55,6 +73,8 @@ div.fullscreen-topic {
       letter-spacing: 1px;
       color: $oc_gray_5;
       text-transform: uppercase;
+      margin: 0px;
+      padding-top: 2px;
     }
 
     div.topic-headline {
