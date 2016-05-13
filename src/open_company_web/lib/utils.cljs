@@ -697,7 +697,7 @@
   [text]
   ;; temporary until emojione is in cljsjs
   (if (is-test-env?)
-    (clj->js {"__html" unicode-string})
+    #js {"__html" text}
     (do
       ;; use an SVG sprite map
       (set! (.-imageType js/emojione) "svg")
@@ -707,4 +707,4 @@
       (set! (.-ascii js/emojione) true)
       (let [text-string (or text "") ; handle nil
             unicode-string (.toImage js/emojione text-string)]
-        (clj->js {"__html" unicode-string})))))
+        #js {"__html" unicode-string}))))
