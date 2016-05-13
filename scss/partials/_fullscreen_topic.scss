@@ -44,6 +44,30 @@ div.fullscreen-topic {
     padding: 6px 0 0 32px;
   }
 
+  div.remove-button {
+    position: relative;
+    cursor: pointer;
+    z-index: 1040;
+    bottom: 10px;
+    left: 50px;
+    width: 188px;
+    height: 30px;
+    opacity: 0.2;
+    border: solid 1px rgba(78, 90, 107, 0.5);
+    opacity: 0.5;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 1px;
+    color: $oc_gray_5;
+    padding: 5px 0 0 12px;
+
+    div.svg-icon {
+      float: left;
+      margin-right: 8px;
+    }
+  }
+
   div.close {
     position: fixed;
     cursor: pointer;
