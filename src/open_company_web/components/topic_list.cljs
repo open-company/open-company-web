@@ -26,6 +26,12 @@
 (defn get-active-topics [company-data category]
   (get-in company-data [:sections (keyword category)]))
 
+(defn remove-topic [owner topic]
+  (let [company-data (om/get-props owner :company-data)
+        old-categories (:sections company-data)
+        new-categories (apply merge (map #(hash-map (first %) (utils/vec-dissoc (second %) topic)) old-categories))]
+    (api/patch-sections new-categories)))
+
 (defn update-active-topics [owner category-name new-topic]
   (let [company-data (om/get-props owner :company-data)
         old-categories (:sections company-data)
@@ -133,7 +139,8 @@
                                       :card-width card-width
                                       :currency (:currency company-data)}
                                      {:opts {:close-overlay-cb #(close-overlay-cb owner)
-                                             :topic-edit-cb (:topic-edit-cb options)}}))
+                                             :topic-edit-cb (:topic-edit-cb options)
+                                             :remove-topic (partial remove-topic owner)}}))
         ;; Topic list
         (dom/div {:class (utils/class-set {:topic-list-internal true
                                            :group true
