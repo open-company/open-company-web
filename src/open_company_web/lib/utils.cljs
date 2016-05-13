@@ -674,7 +674,7 @@
              (.-offsetParent el)))))
 
 (defn medium-editor-options [placeholder]
-  {:toolbar #js {:buttons #js ["bold" "italic" "underline" "strikethrough" "h2" "orderedlist" "unorderedlist" "highlight"]}
+  {:toolbar #js {:buttons #js ["bold" "italic" "strikethrough" "h2" "orderedlist" "unorderedlist"]}
    :buttonLabels "fontawesome"
    :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
    :anchor #js {;; These are the default options for anchor form,
