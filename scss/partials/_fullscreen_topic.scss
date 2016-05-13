@@ -14,6 +14,27 @@ div.fullscreen-topic {
     background-color: rgba(255, 255, 255, 1);
   }
 
+  div.edit {
+    position: fixed;
+    cursor: pointer;
+    z-index: 1040;
+    top: 20px;
+    right: 70px;
+    opacity: 0.2;
+
+    &:hover {
+      opacity: 0.5;
+    }
+  }
+
+  div.close {
+    position: fixed;
+    cursor: pointer;
+    z-index: 1040;
+    top: 20px;
+    right: 20px;
+  }
+
   div.fullscreen-topic-internal {
     max-width: 575px;
     min-width: 302px;
@@ -24,17 +45,6 @@ div.fullscreen-topic {
 
     @include mobile(){
       margin-top: 40px;
-    }
-
-    div.close {
-      position: fixed;
-      cursor: pointer;
-      top: #{$navbar_height}px;
-      z-index: 1040;
-      @include mobile(){
-        top: 10px;
-        left: -20px;
-      }
     }
 
     div.topic-title {
@@ -89,6 +99,30 @@ div.fullscreen-topic {
       font-size: 18px;
       line-height: 1.8;
       color: $oc_gray_5;
+    }
+
+    div.topic-revisions {
+      margin-top: 65px;
+
+      button {
+        border: 0px;
+        outline: none;
+        background-color: transparent;
+        opacity: 0.5;
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: $oc_gray_5;
+      }
+
+      button.prev {
+        float: left;
+      }
+
+      button.next {
+        float: right;
+      }
     }
   }
 }
