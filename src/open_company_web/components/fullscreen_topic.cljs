@@ -108,6 +108,8 @@
       (om/set-state! owner :as-of (:updated-at (:section-data next-props)))))
 
   (will-unmount [_]
+    (utils/remove-channel "fullscreen-topic-save")
+    (utils/remove-channel "fullscreen-topic-cancel")
     (events/unlistenByKey (om/get-state owner :esc-listener-key)))
 
   (render-state [_ {:keys [as-of actual-as-of editing show-save-button] :as state}]
