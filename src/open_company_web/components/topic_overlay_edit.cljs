@@ -271,8 +271,8 @@
           (dom/div (dom/button {:style {:font-size "14px"} :class "underline btn-reset p0"
                                 :on-click #(.click (js/document.getElementById "file-upload-ui--select-trigger"))}
                      "Select an image")
-            #_(dom/span {:style {:font-size "14px"}} " or ")
-            #_(dom/button {:style {:font-size "14px"} :class "underline"
+            (dom/span {:style {:font-size "14px"}} " or ")
+            (dom/button {:style {:font-size "14px"} :class "underline"
                            :on-click #(om/set-state! owner :state :show-url-field)}
                 "provide URL"))
           :show-progress
