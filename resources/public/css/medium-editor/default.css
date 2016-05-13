@@ -1,5 +1,5 @@
 .medium-toolbar-arrow-under:after {
-  border-color: #242424 transparent transparent transparent;
+  border-color: #4E5A6B transparent transparent transparent;
   top: 50px; }
 
 .medium-toolbar-arrow-over:before {
@@ -7,16 +7,16 @@
   top: -8px; }
 
 .medium-editor-toolbar {
-  background-color: #242424;
-  background: -webkit-linear-gradient(top, #242424, rgba(36, 36, 36, 0.75));
-  background: linear-gradient(to bottom, #242424, rgba(36, 36, 36, 0.75));
-  border: 1px solid #000;
+  background-color: #4E5A6B;
+  background: -webkit-linear-gradient(top, #4E5A6B, rgba(78, 90, 107, 0.75));
+  background: linear-gradient(to bottom, #4E5A6B, rgba(78, 90, 107, 0.75));
+  border: 1px solid #4E5A6B;
   border-radius: 5px;
-  box-shadow: 0 0 3px #000; }
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.5); }
   .medium-editor-toolbar li button {
-    background-color: #242424;
-    background: -webkit-linear-gradient(top, #242424, rgba(36, 36, 36, 0.89));
-    background: linear-gradient(to bottom, #242424, rgba(36, 36, 36, 0.89));
+    background-color: #4E5A6B;
+    background: -webkit-linear-gradient(top, #4E5A6B, rgba(78, 90, 107, 0.89));
+    background: linear-gradient(to bottom, #4E5A6B, rgba(78, 90, 107, 0.89));
     border: 0;
     border-right: 1px solid #000;
     border-left: 1px solid #333;
