@@ -114,6 +114,7 @@
                                                                     (occ/get-color-by-kw :oc-new-chart-green)
                                                                     (occ/get-color-by-kw :oc-red-regular))}
                                                       {:costs (occ/get-color-by-kw :oc-red-regular)})
+                             :svg-click (:topic-click options)
                              :prefix (utils/get-symbol-for-currency-code currency)}}]
       (dom/div {:class (utils/class-set {:section true
                                          :cash-flow true

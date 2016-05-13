@@ -12,7 +12,7 @@
   (render [_]
     (let [full-url (:full-url (:auth-settings data))
           current-token (router/get-token)]
-      (dom/button {:class "btn btn-default login-button"
+      (dom/button {:class "login-button"
                    :on-click (fn [e]
                     (.preventDefault e)
                     (when-not (.startsWith current-token oc-urls/login)

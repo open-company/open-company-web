@@ -9,9 +9,14 @@
             [open-company-web.components.company-header :refer [company-header]]
             [open-company-web.components.topic-list :refer [topic-list]]
             [open-company-web.components.navbar :refer (navbar)]
+            [open-company-web.components.footer :refer (footer)]
+            [open-company-web.components.menu :refer (menu)]
             [open-company-web.components.edit-topic :refer (edit-topic)]
             [open-company-web.router :as router]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]))
 
 (defonce default-category "progress")
 
@@ -56,42 +61,48 @@
       {:active-category active-tab
        :navbar-editing false
        :editing-topic false
-       :save-bt-active false}))
+       :save-bt-active false
+       :columns-num (responsive/columns-num)}))
 
-  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active active-category] :as state}]
+  (did-mount [_]
+    (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
+
+  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active active-category columns-num] :as state}]
     (let [company-data (dis/company-data data)
-          navbar-editing-cb (partial set-navbar-editing owner data)]
+          navbar-editing-cb (partial set-navbar-editing owner data)
+          card-width (responsive/calc-card-width)]
       (dom/div {:class (utils/class-set {:company-dashboard true
-                                         :navbar-offset (not (utils/is-mobile))})}
-
-       (when-not (utils/is-mobile)
-          (om/build navbar {:edit-mode navbar-editing
-                            :save-bt-active save-bt-active
-                            :auth-settings (:auth-settings data)}))
-
-        ;; company header
-        (om/build company-header {:loading (:loading company-data)
-                                  :company-data company-data
-                                  :navbar-editing navbar-editing
-                                  :editing-topic editing-topic
-                                  :switch-category-cb (partial switch-category-cb owner)
-                                  :active-category active-category
-                                  :save-bt-active save-bt-active})
-
-        (if-not editing-topic
-          ;; topic list
-          (om/build topic-list
-                    {:loading (or (:loading company-data) (:loading data))
-                     :company-data company-data
-                     :active-category (:active-category state)
-                     :expanded-topics (:expanded-topics data)}
-                    {:opts {:navbar-editing-cb navbar-editing-cb
-                            :topic-edit-cb (partial topic-edit-cb owner)
-                            :switch-category-cb (partial switch-category-cb owner)
-                            :save-bt-active-cb (partial set-save-bt-active owner)}})
-          ;; topic edit
-          (om/build edit-topic {:section editing-topic
-                                :section-data (get company-data (keyword editing-topic))}
-                    {:opts {:navbar-editing-cb navbar-editing-cb
-                            :save-bt-active-cb (partial set-save-bt-active owner)
-                            :dismiss-topic-editing-cb (partial dismiss-topic-editing-cb owner)}}))))))
+                                         :navbar-offset (not (responsive/is-mobile))})}
+        (om/build menu data)
+        (dom/div {:class "page"}
+          ;; Navbar
+          (when company-data
+            (om/build navbar {:save-bt-active save-bt-active
+                              :company-data company-data
+                              :card-width card-width
+                              :columns-num columns-num
+                              :auth-settings (:auth-settings data)}))
+          (when company-data
+            ;; Topic list or topic editing (old editing stuff)
+            (if-not editing-topic
+              ;; topic list
+              (om/build topic-list
+                        {:loading (or (:loading company-data) (:loading data))
+                         :company-data company-data
+                         :card-width card-width
+                         :columns-num columns-num
+                         :active-category (:active-category state)}
+                        {:opts {:navbar-editing-cb navbar-editing-cb
+                                :topic-edit-cb (partial topic-edit-cb owner)
+                                :switch-category-cb (partial switch-category-cb owner)
+                                :save-bt-active-cb (partial set-save-bt-active owner)}})
+              ;; topic edit
+              (om/build edit-topic {:section editing-topic
+                                    :section-data (get company-data (keyword editing-topic))}
+                        {:opts {:navbar-editing-cb navbar-editing-cb
+                                :save-bt-active-cb (partial set-save-bt-active owner)
+                                :dismiss-topic-editing-cb (partial dismiss-topic-editing-cb owner)}})))
+          ;;Footer
+          (when company-data
+            (om/build footer {:columns-num columns-num
+                              :card-width card-width})))))))

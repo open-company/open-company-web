@@ -1,128 +1,34 @@
-/*
- * Top navigation
- * Hide default border to remove 1px line.
- */
- .navbar-fixed-top {
-    border: 0;
-}
-
-nav.navbar {
-  width: auto;
+nav.oc-navbar {
+  position: fixed;
+  z-index: 1030;
+  top: 0;
+  left: 0;
+  width: 100vw;
   background-color: white;
-  border-bottom: 1px solid rgb(215, 215, 215);
+  border-top: 4px solid $oc_yellow;
   margin: 0px;
+  height: #{$navbar_height}px;
+  box-shadow: 1px 4px 4px 0 rgba(0, 0, 0, 0.2);
 
-  &>div{
-    margin: 0px;
-    padding: 0px;
-  }
+  div.oc-navbar-header {
+    position: relative;
+    margin: 0 auto;
+    padding: 0 30px;
+    margin-top: 30px;
 
-  @include mobile(){
-    div#navbar {
-      width: auto;
-      padding-right: 230px;
-    }
-  }
-
-  @include big_web(){
-    & > div {
-      width: auto;
-      padding-left: 40px;
-      padding-right: 40px;
-    }
-  }
-
-  div.navbar-header {
-    width: 100%;
-    margin: 0px;
-    padding: 0px;
-
-    &.editing-mode {
-
-      div.editing-title {
-        position: relative;
-        width: 250px;
-        height: 50px;
-        padding-top: 8px;
-        margin: 0 auto;
-        text-align: center;
-        font-size: 22px;
-        text-transform: capitalize;
-      }
-
-      div.left-button {
-        float: left;
-
-        button.cancel-bt {
-          font-size: 15px;
-          margin: 15px 0px;
-          color: $oc_red;
-
-          &:disabled {
-            opacity: 0.4;
-          }
-        }
-      }
-
-      div.right-button {
-        float: right;
-
-        button.save-bt {
-          font-size: 15px;
-          margin: 15px 0px;
-          color: $oc_green;
-
-          &:disabled {
-            opacity: 0.4;
-          }
-        }
-      }
+    @media screen and (max-width: 413px){
+      margin-left: 9px;
+      margin-right: 9px;
+      width: auto !important;
     }
 
-    button.share-button{
-      margin-top: 4px;
-      img {
-        // width: 20px;
-        height: 30px;
-      }
-
-      &:hover, &:active, &:focus {
-        outline: none;
-      }
-    }
-
-    button.digest-button{
-      margin-top: 4px;
-      img {
-        // width: 20px;
-        height: 20px;
-      }
-
-      &:hover, &:active, &:focus {
-        outline: none;
-      }
+    @media screen and (max-width: 683px){
+      padding: 0px;
     }
 
     ul.navbar-right {
       float: right;
-      margin-right: 50px;
-      &>li>a{
-        padding: 5px;
-      }
-    }
-
-    @include mobile(){
-      ul.navbar-right{
-        margin: 0;
-      }
+      margin-right: 0px;
     }
   }
-}
-
-nav.tab-navigation {
-  margin-top: 10px;
-}
-
-.navbar-offset {
-  margin-top: 45px;
 }

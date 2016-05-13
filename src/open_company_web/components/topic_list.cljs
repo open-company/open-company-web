@@ -4,16 +4,16 @@
             [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [dommy.core :refer-macros (sel)]
-            [goog.style :refer (setStyle)]
+            [dommy.core :refer-macros (sel1)]
             [open-company-web.api :as api]
             [open-company-web.caches :as caches]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.ui.side-drawer :refer (side-drawer)]
-            [open-company-web.components.topic-overlay :refer (topic-overlay)]
+            [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
             [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]))
 
 (defn get-new-sections-if-needed [owner]
@@ -49,15 +49,6 @@
 
 (def scrolled-to-top (atom false))
 
-(defn set-lis-height [owner]
-  (when (and (not (utils/is-mobile))
-             (not (utils/is-test-env?)))
-    (when-let [topic-list (om/get-ref owner "topic-list-ul")]
-      (let [li-elems (sel topic-list [:li.topic-row])
-            max-height (apply max (map #(.-clientHeight %) li-elems))]
-        (doseq [li li-elems]
-          (setStyle li #js {:height (str max-height "px")}))))))
-
 (defn close-overlay-cb [owner]
   (om/set-state! owner :selected-topic nil)
   (om/set-state! owner :selected-metric nil))
@@ -67,6 +58,20 @@
         all-category-sections (:sections category-data)]
     (apply merge
            (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
+
+(defn render-topic [owner section-name company-data active-category]
+  (let [sd (->> section-name keyword (get company-data))]
+    (when-not (and (:read-only company-data) (:placeholder sd))
+      (dom/div #js {:className "topic-row"
+                   :ref section-name
+                   :key (str "topic-row-" (name section-name))}
+        (om/build topic {:loading (:loading company-data)
+                         :section section-name
+                         :section-data sd
+                         :currency (:currency company-data)
+                         :active-category active-category}
+                         {:opts {:section-name section-name
+                                 :topic-click (partial topic-click owner section-name)}})))))
 
 (defcomponent topic-list [data owner options]
 
@@ -80,9 +85,7 @@
     ; make sure the calculation for the fixed navbar are correct
     (when-not @scrolled-to-top
       (set! (.-scrollTop (.-body js/document)) 0)
-      (reset! scrolled-to-top true))
-    ; set the cards height on big web
-    (set-lis-height owner))
+      (reset! scrolled-to-top true)))
 
   (will-receive-props [_ next-props]
     (when-not (= (:company-data next-props) (:company-data data))
@@ -90,32 +93,31 @@
     (when-not (:read-only (:company-data next-props))
       (get-new-sections-if-needed owner)))
 
-  (did-update [_ _ _]
-    ; set the cards height on big web
-    (set-lis-height owner))
-
   (render-state [_ {:keys [active-topics selected-topic selected-metric drawer-open]}]
     (let [slug            (keyword (router/current-company-slug))
           company-data    (:company-data data)
           active-category (keyword (:active-category data))
-          category-topics (get active-topics active-category)]
+          category-topics (flatten (vals active-topics))
+          win-width       (.-clientWidth (sel1 js/document :body))
+          card-width      (:card-width data)
+          columns-num     (:columns-num data)
+          ww              (.-clientWidth (sel1 js/document :body))]
       (dom/div {:class "topic-list group"
-                :style (when (utils/is-mobile) {:min-height "100vh"})
                 :key "topic-list"}
         (when (and (not (:read-only company-data))
-                   (not (utils/is-mobile))
+                   (not (responsive/is-mobile))
                    (not (:loading data)))
           ;; drawer toggler
           (om/build drawer-toggler {:close (not drawer-open)
                                     :click-cb #(om/update-state! owner :drawer-open not)}))
         (when-not (or (:read-only company-data)
-                      (utils/is-mobile)
+                      (responsive/is-mobile)
                       (:loading data))
           ;; side drawer
           (let [all-category-sections (sections-for-category slug active-category)
                 list-data (merge data {:active true
                                        :all-topics all-category-sections
-                                       :active-topics-list category-topics})
+                                       :active-topics-list (get active-topics active-category)})
                 list-opts {:did-change-active-topics #(update-active-topics owner options active-category %)}]
             (om/build side-drawer {:open drawer-open
                                    :list-key active-category
@@ -123,29 +125,62 @@
                                   {:opts {:list-opts list-opts
                                           :bg-click-cb #(om/set-state! owner :drawer-open false)}})))
         (when selected-topic
-          (om/build topic-overlay {:section selected-topic
-                                   :section-data (->> selected-topic keyword (get company-data))
-                                   :selected-metric selected-metric
-                                   :currency (:currency company-data)}
-                                  {:opts {:close-overlay-cb #(close-overlay-cb owner)
-                                          :topic-edit-cb (:topic-edit-cb options)}}))
-        (dom/div {:class "topic-list-content"}
-          (dom/ul #js {:className (utils/class-set {:topic-list-internal true
-                                                    :read-only (or (utils/is-mobile) (:read-only company-data))
-                                                    :group true
-                                                    :content-loaded (not (:loading data))})
-                       :ref "topic-list-ul"}
-            (for [section-name category-topics
-                  :let [sd (->> section-name keyword (get company-data))]]
-              (when-not (and (:read-only company-data) (:placeholder sd))
-                (dom/li #js {:className "topic-row"
-                             :ref section-name
-                             :key (str "topic-row-" (name section-name))}
-                  (om/build topic {:loading (:loading company-data)
-                                   :section section-name
-                                   :section-data sd
-                                   :currency (:currency company-data)
-                                   :expanded-topics (:expanded-topics data)
-                                   :active-category active-category}
-                                   {:opts {:section-name section-name
-                                           :bw-topic-click (partial topic-click owner)}}))))))))))
+          (om/build fullscreen-topic {:section selected-topic
+                                      :section-data (->> selected-topic keyword (get company-data))
+                                      :selected-metric selected-metric
+                                      :card-width card-width
+                                      :currency (:currency company-data)}
+                                     {:opts {:close-overlay-cb #(close-overlay-cb owner)
+                                             :topic-edit-cb (:topic-edit-cb options)}}))
+        ;; Topic list
+        (dom/div {:class (utils/class-set {:topic-list-internal true
+                                           :group true
+                                           :content-loaded (not (:loading data))})}
+          (case columns-num
+            3
+            (dom/div {:class "topics-column-container group"
+                      :style #js {:width (str (+ (* card-width 3) 40 60) "px")}}
+              (dom/div {:class "topics-column"
+                        :style #js {:width (str card-width "px")}}
+                (for [idx (range (quot (count category-topics) 3))
+                  :while (< idx (quot (count category-topics) 2))
+                  :let [real-idx (* idx 3)
+                        section-name (get (vec category-topics) real-idx)]]
+                  (render-topic owner section-name company-data active-category)))
+              (dom/div {:class "topics-column"
+                        :style #js {:width (str card-width "px")}}
+                (for [idx (range (quot (count category-topics) 3))
+                  :while (< idx (quot (count category-topics) 2))
+                  :let [real-idx (inc (* idx 3))
+                        section-name (get (vec category-topics) real-idx)]]
+                  (render-topic owner section-name company-data active-category)))
+              (dom/div {:class "topics-column"
+                        :style #js {:width (str card-width "px")}}
+                (for [idx (range (quot (count category-topics) 3))
+                  :while (< idx (quot (count category-topics) 2))
+                  :let [real-idx (+ (* idx 3) 2)
+                        section-name (get (vec category-topics) real-idx)]]
+                  (render-topic owner section-name company-data active-category))))
+            2
+            (dom/div {:class "topics-column-container columns-2 group"
+                      :style #js {:width (str (+ (* card-width 2) 20 60) "px")}}
+              (dom/div {:class "topics-column"
+                        :style #js {:width (str card-width "px")}}
+                (for [idx (range (quot (count category-topics) 2))
+                  :while (< idx (quot (count category-topics) 2))
+                  :let [real-idx (* idx 2)
+                        section-name (get (vec category-topics) real-idx)]]
+                  (render-topic owner section-name company-data active-category)))
+              (dom/div {:class "topics-column"
+                        :style #js {:width (str card-width "px")}}
+                (for [idx (range (quot (count category-topics) 2))
+                  :while (< idx (quot (count category-topics) 2))
+                  :let [real-idx (inc (* idx 2))
+                        section-name (get (vec category-topics) real-idx)]]
+                  (render-topic owner section-name company-data active-category))))
+            ; 1 column or default
+            (dom/div {:class "topics-column-container columns-1 group"
+                      :style #js {:width (if (> ww 413) (str card-width "px") "auto")}}
+              (dom/div {:class "topics-column"}
+                (for [section-name category-topics]
+                  (render-topic owner section-name company-data active-category))))))))))

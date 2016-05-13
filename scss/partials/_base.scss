@@ -18,8 +18,10 @@ Comment font-weight to font name mapping: https://developer.mozilla.org/en-US/do
 html, body {
   font-family: $oc_main_font;
   font-size: 16px;
-  height: 100%;
   background-color: white;
+  overflow-x: hidden;
+  height: 100vh;
+  background-color: #d9d9d9;
 }
 
 .no-scroll {

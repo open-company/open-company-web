@@ -27,6 +27,7 @@
                              :label-key :label
                              :sub-label-key :sub-label
                              :interval "monthly"
+                             :svg-click (:topic-click options)
                              :chart-colors {:cash (occ/get-color-by-kw :oc-new-chart-green)}
                              :chart-selected-colors {:cash (occ/get-color-by-kw :oc-new-chart-green)}}}]
       (dom/div {:class (utils/class-set {:section true

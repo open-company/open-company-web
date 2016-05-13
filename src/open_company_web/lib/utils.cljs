@@ -234,7 +234,7 @@
 ;; TODO use goog.i18n.DateTimeFormat here
 (defn date-string [js-date & [year]]
   (let [month (month-string (add-zero (inc (.getMonth js-date))))
-        day (add-zero (.getDate js-date))]
+        day (.getDate js-date)]
     (str month " " day (when year (str ", " (.getFullYear js-date))))))
 
 (defn pluralize [string n]
@@ -594,28 +594,6 @@
 (defn scroll-to-section [section-name]
   (scroll-to-id (str "section-" (name section-name))))
 
-(def _mobile (atom -1))
-
-(def big-web-min-width 970)
-
-(defn set-browser-type! []
-  (let [force-mobile-cookie (cook/get-cookie :force-browser-type)
-        is-big-web (if (.-body js/document)
-                      (>= (.-clientWidth (.-body js/document)) big-web-min-width)
-                      true) ; to not break tests
-        fixed-browser-type (if (nil? force-mobile-cookie)
-                            (not is-big-web)
-                            (if (= force-mobile-cookie "mobile")
-                             true
-                             false))]
-  (reset! _mobile fixed-browser-type)))
-
-(defn is-mobile []
- ; fake the browser type for the moment
- (when (neg? @_mobile)
-  (set-browser-type!))
- @_mobile)
-
 (defn get-topic-body [section-data section]
   (let [section-kw (keyword section)]
     (if (#{:finances :growth} section-kw)
@@ -697,14 +675,14 @@
   [text]
   ;; temporary until emojione is in cljsjs
   (if (is-test-env?)
-    (clj->js {"__html" unicode-string})
-    (do
-      ;; use an SVG sprite map
-      (set! (.-imageType js/emojione) "svg")
-      (set! (.-sprites js/emojione) true)
-      (set! (.-imagePathSVGSprites js/emojione) "/img/emojione.sprites.svg")
-      ;; convert textual emoji's into SVG elements
-      (set! (.-ascii js/emojione) true)
-      (let [text-string (or text "") ; handle nil
-            unicode-string (.toImage js/emojione text-string)]
-        (clj->js {"__html" unicode-string})))))
+    ;; do not use emojy in tests
+    (clj->js {"__html" text})
+    ;; use an SVG sprite map
+    (let [text-string (or text "") ; handle nil
+          unicode-string (.toImage js/emojione text-string)]
+        (set! (.-imageType js/emojione) "svg")
+        (set! (.-sprites js/emojione) true)
+        (set! (.-imagePathSVGSprites js/emojione) "/img/emojione.sprites.svg")
+        ;; convert textual emoji's into SVG elements
+        (set! (.-ascii js/emojione) true)
+        (clj->js {"__html" unicode-string}))))

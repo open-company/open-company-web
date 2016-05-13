@@ -93,7 +93,7 @@
       (-> next-circle
           (.attr "stroke" color)
           (.attr "stroke-width" dot-selected-stroke)
-          (.attr "fill" "transparent")
+          (.attr "fill" "white")
           (.attr "r" (if hasvalue dot-radius 0))))
     (render-chart-label owner options idx data)
     (om/set-state! owner :selected idx)))
@@ -121,7 +121,10 @@
                          (.select d3-dots)
                          (.attr "width" chart-width)
                          (.attr "height" chart-height)
-                         (.on "click" #(.stopPropagation (.-event js/d3))))
+                         (.on "click" (fn []
+                                        (when (:svg-click options)
+                                          ((:svg-click options) nil))
+                                        (.stopPropagation (.-event js/d3)))))
           scale-fn (scale owner options)
           data-max (max-y (om/get-props owner :chart-data) chart-keys)
           max-y (scale-fn data-max)]
@@ -169,7 +172,7 @@
                                 dot-radius))
                     (.attr "stroke" (chart-key fill-colors))
                     (.attr "stroke-width" (if (= i selected) dot-selected-stroke dot-stroke))
-                    (.attr "fill" "transparent")
+                    (.attr "fill" "white")
                     (.attr "data-fill" (chart-key fill-colors))
                     (.attr "data-hasvalue" (chart-key data-set))
                     (.attr "data-selectedFill" (chart-key fill-selected-colors))
@@ -186,7 +189,6 @@
               (.attr "height" (- chart-height 50))
               (.attr "x" (* i (/ chart-width show-dots)))
               (.attr "y" 50)
-              (.on "click" #(dot-click owner options i))
               (.on "mouseover" #(dot-click owner options i))
               (.on "mouseout" #(dot-click owner options (om/get-state owner :selected)))
               (.attr "fill" "transparent"))))

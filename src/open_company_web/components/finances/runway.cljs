@@ -52,6 +52,7 @@
                              :label-key :label
                              :sub-label-key :sub-label
                              :interval "monthly"
+                             :svg-click (:topic-click options)
                              :chart-colors {:runway (occ/get-color-by-kw :oc-new-chart-green)}
                              :chart-selected-colors {:runway (occ/get-color-by-kw :oc-new-chart-green)}
                              :prefix (utils/get-symbol-for-currency-code currency)}}]

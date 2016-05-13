@@ -12,6 +12,7 @@
             [open-company-web.lib.cookies :as cook]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [goog.events :as events]
             [goog.style :as gstyle]
             [goog.events.EventType :as EventType]
@@ -72,7 +73,7 @@
       (gstyle/setStyle company-description-container #js {:webkitTransform "translate3d(0,0,0)"}))))
 
 (defn watch-scroll [owner]
-  (if (utils/is-mobile)
+  (if (responsive/is-mobile)
     (when-not @scroll-listener-key
       (when-let [company-header (om/get-ref owner "company-header")]
         (let [company-name-container (om/get-ref owner "company-name-container")
@@ -99,7 +100,7 @@
 
 (defn logo-top-margin [logo-height]
   (let [height-diff (- logo-max-height logo-height)]
-    (if (and (not (utils/is-mobile)) (pos? height-diff))
+    (if (and (not (responsive/is-mobile)) (pos? height-diff))
       (str (quot height-diff 2) "px")
       "0px")))
 
@@ -146,7 +147,7 @@
                               :ref "company-logo"})))
             ;; Buttons
             (dom/div {:class (utils/class-set {:buttons-container true
-                                               :hidden (not (utils/is-mobile))})}
+                                               :hidden (not (responsive/is-mobile))})}
               (let [icon-url (if stakeholder-update "/img/dashboard.svg" "/img/digest.svg")]
                 (dom/button {:type "button"
                              :class "btn btn-link digest-button"

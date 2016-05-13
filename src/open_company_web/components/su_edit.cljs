@@ -7,6 +7,7 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-body :refer (topic-body)]
@@ -65,13 +66,13 @@
 
         (dom/div {:class "stakeholder-update-drawer"}
           (when (and (not (:read-only company-data))
-                     (not (utils/is-mobile))
+                     (not (responsive/is-mobile))
                      (not (:loading data)))
             ;; drawer toggler
             (om/build drawer-toggler {:close (not drawer-open)
                                       :click-cb #(om/update-state! owner :drawer-open not)}))
           (when-not (or (:read-only company-data)
-                        (utils/is-mobile)
+                        (responsive/is-mobile)
                         (:loading data)))
           ;; side drawer
           (let [all-sections (vec (flatten (vals (:sections company-data))))
@@ -234,9 +235,9 @@
         ;; Stakeholder update
         (and (not (contains? data :loading)) company-data)
         (dom/div {:class (utils/class-set {:su-edit true
-                                           :navbar-offset (not (utils/is-mobile))})}
+                                           :navbar-offset (not (responsive/is-mobile))})}
           ;; Company / user header
-          (when-not (utils/is-mobile)
+          (when-not (responsive/is-mobile)
             (om/build navbar data))
             
           ;; Company header
@@ -278,7 +279,7 @@
                                                    :update-content force-content-update}
                                                   {:opts {:change-cb (partial change-cb owner)}})
               ;; Dashboard link
-              (when (utils/is-mobile)
+              (when (responsive/is-mobile)
                 (dom/div {:class "dashboard-link"}
                   (om/build link {:href (oc-urls/company) :name "View Dashboard"}))))))
 

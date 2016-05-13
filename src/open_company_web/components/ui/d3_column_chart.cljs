@@ -3,6 +3,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.oc-colors :as occ]
             [open-company-web.components.finances.utils :as finances-utils]
             [cljsjs.d3]))
@@ -79,7 +80,7 @@
                     (.text label))
             txt-width (js/SVGgetWidth txt)
             txt-height (* idx chart-label-height)]
-        (when-not (utils/is-mobile)
+        (when-not (responsive/is-mobile)
           (.attr txt "dx" txt-left))
         (when (= idx (dec (count label-value)))
           (-> chart-label-g
@@ -91,12 +92,8 @@
             (.text (:sub-label (get label-value 0)))))
         (when (< idx (dec (count label-value)))
           (recur (inc idx)
-                 (if (utils/is-mobile)
-                    txt-left
-                    (+ txt-left txt-width 10))
-                 (if (utils/is-mobile)
-                    (+ txt-top chart-label-height)
-                    txt-top)))))))
+                 0
+                 (+ txt-top chart-label-height)))))))
 
 (defn bar-click [owner options idx]
   (.stopPropagation (.-event js/d3))
@@ -155,7 +152,10 @@
                          (.select d3-column)
                          (.attr "width" (:chart-width options))
                          (.attr "height" (:chart-height options))
-                         (.on "click" #(.stopPropagation (.-event js/d3))))
+                         (.on "click" (fn []
+                                        (when (:svg-click options)
+                                          ((:svg-click options) nil))
+                                        (.stopPropagation (.-event js/d3)))))
           scale-fn (scale owner options)
           label-key (:label-key options)
           sub-label-key (:sub-label-key options)]
@@ -210,7 +210,6 @@
               (.attr "height" (- chart-height 50))
               (.attr "x" (* i (/ chart-width chart-step)))
               (.attr "y" 50)
-              (.on "click" #(bar-click owner options i))
               (.on "mouseover" #(bar-click owner options i))
               (.on "mouseout" #(bar-click owner options (om/get-state owner :selected)))
               (.attr "fill" "transparent"))))
@@ -224,14 +223,14 @@
                               (.append "g")
                               (.attr "class" "chart-label-container")
                               (.attr "id" "column-chart-label")
-                              (.attr "transform" (str "translate(" 0 "," (if (> (count chart-keys) 1) 20 50) ")")))]
+                              (.attr "transform" (str "translate(" 0 "," 0 ")")))]
         (build-selected-label chart-label-g label-value sub-label-value label-color chart-width)
         (let [chart-label-width (js/SVGgetWidth chart-label-g)
               chart-label-pos (- (/ chart-width 2) (/ chart-label-width 2))]
           (.attr chart-label-g "transform" (str "translate("
                                                 0
                                                 ","
-                                                (if (> (count chart-keys) 1) 20 50)
+                                                20
                                                 ")")))))))
 
 (defn prev-data [owner e]
@@ -255,7 +254,7 @@
     {:start start
      :selected (dec (count current-data))}))
 
-(defcomponent d3-column-chart [{:keys [chart-data] :as data} owner {:keys [chart-width chart-height] :as options}]
+(defcomponent d3-column-chart [{:keys [chart-data] :as data} owner {:keys [chart-width chart-height svg-click] :as options}]
 
   (init-state [_]
     (get-state chart-data))

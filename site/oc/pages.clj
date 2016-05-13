@@ -144,7 +144,7 @@
   {:head [:head
           [:meta {:charset "utf-8"}]
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
-          [:meta {:content "width=device-width, initial-scale=1, maximum-scale=1", :name "viewport"}]
+          [:meta {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no", :name "viewport"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
           [:title "OpenCompany - Startup Transparency Made Simple"]
@@ -184,6 +184,10 @@
           [:script {:type "text/javascript", :src "/js/oc.js?oc_deploy_key"}]
           ;; ClojureScript generated JavaScript
           [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js?oc_deploy_key"}]
+          ;; Clamp JS
+          [:script {:type "text/javascript", :src "/lib/clamp/clamp.js?oc_deploy_key"}]
+          ;; Filestack
+          [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]
           ;; Adobe Typekit
           [:script {:src "//use.typekit.net/olr5ghy.js"}]
           [:script "try{Typekit.load({ async: true });}catch(e){}"]]})

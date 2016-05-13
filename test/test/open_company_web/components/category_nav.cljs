@@ -7,7 +7,7 @@
             [open-company-web.components.category-nav :refer (category-nav)]
             [om.dom :as dom :include-macros true]
             [open-company-web.data.company :refer (company)]
-            [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.router :as router]))
 
 (enable-console-print!)
@@ -29,7 +29,7 @@
           category-nav-node (sel1 c [:div.category-nav])
           categories-elems (count (sel c [:div.category]))
           rendered-categories (count (:categories (:company-data test-atom)))
-          fixed-rendered-categories (if (utils/is-mobile) rendered-categories (inc rendered-categories))]
+          fixed-rendered-categories (if (responsive/is-mobile) rendered-categories (inc rendered-categories))]
       (is (not (nil? category-nav-node)))
       (is (= categories-elems fixed-rendered-categories))
       (tu/unmount! c))))
