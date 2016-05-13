@@ -17,7 +17,8 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
-            [goog.fx.dom :refer (Fade)]))
+            [goog.fx.dom :refer (Fade)]
+            [open-company-web.lib.oc-colors :as oc-colors]))
 
 (defn show-fullscreen-topic [owner]
   (dommy/add-class! (sel1 [:body]) :no-scroll)
@@ -86,6 +87,13 @@
 
 (defn esc-listener [owner options e]
   (when (= (.-keyCode e) 27)
+    (hide-fullscreen-topic owner options)))
+
+(defn remove-topic-click [owner options e]
+  (.stopPropagation e)
+  (when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
+    (let [section (om/get-props owner :section)]
+      ((:remove-topic options) section))
     (hide-fullscreen-topic owner options)))
 
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width] :as data} owner options]
@@ -174,4 +182,13 @@
                                                :is-actual is-actual?
                                                :prev-rev prev-rev
                                                :next-rev next-rev}
-                                              {:opts fullscreen-topic-opts}))))))
+                                              {:opts fullscreen-topic-opts}))
+        (when (and can-edit?
+                   is-actual?
+                   (not editing))
+          (dom/div {:class "remove-button"
+                    :on-click (partial remove-topic-click owner options)}
+            (icon :alert {:size 15
+                          :accent-color (oc-colors/get-color-by-kw :oc-gray-5)
+                          :stroke (oc-colors/get-color-by-kw :oc-gray-5)})
+            "ARCHIVE THIS TOPIC"))))))
