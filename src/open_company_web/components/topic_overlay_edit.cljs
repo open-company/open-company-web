@@ -23,6 +23,9 @@
             [cljsjs.filestack] ; pulled in for cljsjs externs
             [cuerdas.core :as s]))
 
+(def before-unload-message "You have unsaved changes to the topic.")
+
+
 (defn change-value [owner k e]
   (let [target (.-target e)
         value (.-value target)]
@@ -35,8 +38,6 @@
     (.focus topic-field)
     (when (or (= field "headline") (= field "title"))
       (set! (.-value topic-field) field-value))))
-
-(def before-unload-message "You have unsaved changes to the topic.")
 
 ;; Finances helpers
 
@@ -310,7 +311,7 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (reset! prevent-route-dispatch true)
-      ; save initial innerHTML and setup MediumEditor
+      ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
       (let [body-el (om/get-ref owner "topic-overlay-edit-body")
             slug (keyword (router/current-company-slug))
             finances-placeholder-data (get (:sections (get (:categories (slug @caches/new-sections)) 2)) 0)
@@ -319,6 +320,7 @@
                                                       (editor/inject-extension editor/file-upload))))]
         (.subscribe med-ed "editableInput" (fn [event editable]
                                              (om/set-state! owner :has-changes true)))
+        (js/emojiAutocomplete)
         (om/set-state! owner :initial-body (.-innerHTML body-el))
         (om/set-state! owner :medium-editor med-ed))
       (when focus
@@ -379,7 +381,7 @@
                                               :save-visible has-changes})
                      :on-click #((:dismiss-editing-cb options))} "Cancel")
         (dom/div {:class "topic-overlay-edit-header"}
-          (dom/input {:class "topic-overlay-edit-title"
+          (dom/input {:class "topic-overlay-edit-title emoji-autocomplete"
                       :id (str "topic-edit-title-" (name topic))
                       :type "text"
                       :placeholder "Title"
@@ -394,12 +396,12 @@
                                              :transparent (not show-title-counter)})}
             (dom/label {:class "bold"} (- title-length-limit (count title))))
           (dom/div {:class "topic-overlay-date"}))
-        (dom/div {:class "topic-overlay-edit-content"
+       (dom/div {:class "topic-overlay-edit-content"
                   :ref "topic-overlay-edit-content"
                   :style #js {:maxHeight (str max-height "px")}}
           (dom/div {:class "relative"}
             (dom/div {:class "flex"}
-              (dom/textarea {:class "flex-auto mb3 topic-overlay-edit-headline"
+              (dom/textarea {:class "flex-auto mb3 topic-overlay-edit-headline emoji-autocomplete"
                              :resize false
                              :id (str "topic-edit-headline-" (name topic))
                              :type "text"
@@ -460,7 +462,7 @@
                                             (.stopPropagation e)
                                             (om/set-state! owner :growth-new-metric true)
                                             (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
-            (dom/div #js {:className "topic-overlay-edit-body"
+            (dom/div #js {:className "topic-overlay-edit-body emoji-autocomplete"
                           :ref "topic-overlay-edit-body"
                           :id (str "topic-edit-body-" (name topic))
                           :dangerouslySetInnerHTML (clj->js {"__html" section-body})})
