@@ -236,9 +236,7 @@
 
 (defn upload-file! [editor owner file]
   (let [success-cb  (fn [success]
-                      ;; (.pasteHTML editor (str "<strong> URL " (.-url success) "</strong>"))
                       (.pasteHTML editor (str "<img src=\"" (.-url success) "\">"))
-                      ;; (gstyle/setElementShown (om/get-node owner) false)
                       (om/set-state! owner {}))
         error-cb    (fn [error] (js/console.log "error" error))
         progress-cb (fn [progress]
@@ -258,18 +256,19 @@
     (dom/div {:id "file-upload-ui"
               :style (merge {:transition ".2s"}
                             (when (:state (om/get-state owner))
-                              {:background "white" :right 0}))}
+                              {:right 0}))}
       (dom/div {:class "flex"}
         (dom/input {:id "file-upload-ui--select-trigger" :style {:display "none"} :type "file"
                     :on-change #(upload-file! editor owner (-> % .-target .-files (aget 0)))})
-        (dom/button {:style {:margin-right "13px"
+        (dom/button {:class "btn-reset p0"
+                     :style {:margin-right "13px"
                              :transition ".2s"
                              :transform (if (om/get-state owner :state) "rotate(135deg)")}
                      :on-click (fn [_] (om/update-state! owner :state #(if % nil :show-options)))}
           (i/icon :circle-add {:size 24}))
         (case (:state (om/get-state owner))
           :show-options
-          (dom/div (dom/button {:style {:font-size "14px"} :class "underline"
+          (dom/div (dom/button {:style {:font-size "14px"} :class "underline btn-reset p0"
                                 :on-click #(.click (js/document.getElementById "file-upload-ui--select-trigger"))}
                      "Select an image")
             #_(dom/span {:style {:font-size "14px"}} " or ")
@@ -281,7 +280,7 @@
           :show-url-field
           (dom/div (dom/input {:type "text" :auto-focus true :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
                                :value (om/get-state owner :url)})
-            (dom/button {:style {:font-size "14px" :margin-left "1rem"} :class "underline"
+            (dom/button {:style {:font-size "14px" :margin-left "1rem"} :class "underline btn-reset p0"
                          :on-click #(upload-file! editor owner (om/get-state owner :url))}
               "add"))
           (dom/span))))))
