@@ -24,7 +24,7 @@
           accent-color  (or accent-color (occ/get-color-by-kw :black))
           stroke        (or stroke 2)
           size          (or size 30)]
-      (dom/div {:class "svg-icon"}
+      (dom/div {:class "svg-icon" :style {:width (str size "px") :height (str size "px")}}
         (dom/svg {:viewBox "0 0 16 16" :width (str size "px") :height (str size "px")
                   :style {:color accent-color :stroke outline-color :strokeWidth (str stroke "px")}
                   ;; use tag isn't supported by react 0.14.7 and 0.14.8 isn't on cljsjs

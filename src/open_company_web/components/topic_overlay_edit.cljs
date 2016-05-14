@@ -231,49 +231,56 @@
                           with-finances-data)]
     with-growth-data))
 
-(defcomponent uploader [data owner]
+(defn upload-file! [editor owner file]
+  (let [success-cb  (fn [success]
+                      ;; (.pasteHTML editor (str "<strong> URL " (.-url success) "</strong>"))
+                      (.pasteHTML editor (str "<img src=\"" (.-url success) "\">"))
+                      ;; (gstyle/setElementShown (om/get-node owner) false)
+                      (om/set-state! owner {}))
+        error-cb    (fn [error] (js/console.log "error" error))
+        progress-cb (fn [progress]
+                      (om/set-state! owner {:state :show-progress
+                                            :progress progress}))]
+    (if (string? file)
+      (js/filepicker.storeUrl file success-cb error-cb progress-cb)
+      (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
+
+(defcomponent uploader [editor owner]
   (did-mount [_]
     (assert ls/filestack-key "FileStack API Key required")
     (js/filepicker.setKey ls/filestack-key))
 
   (render-state [this _]
-    (dom/div {:id "file-upload-ui" :class "flex"
+    (dom/div {:id "file-upload-ui"
               :style (merge {:transition ".2s"}
                             (when (:state (om/get-state owner))
                               {:background "white" :right 0}))}
+      (dom/div {:class "flex"}
         (dom/input {:id "file-upload-ui--select-trigger" :style {:display "none"} :type "file"
-                    :on-change (fn [e] (js/filepicker.store (-> e .-target .-files (aget 0))
-                                                            (fn [success]
-                                                              (js/MediumEditor.util.insertHTMLCommand js/document (str "<img src=\"" (.-url success) "\">"))
-                                                              (js/console.log (om/get-node owner))
-                                                              ;; (gstyle/setElementShown (om/get-node owner) false)
-                                                              (om/set-state! owner {}))
-                                                            (fn [error] (js/console.log "error" error))
-                                                            #(om/set-state! owner {:state :show-progress
-                                                                                   :progress %})))})
-        (dom/button {:style {:margin-right "13px"}
-                     :on-click (fn [_] (om/set-state! owner :state :show-options))}
-                    (i/icon :circle-add {:size 24}))
+                    :on-change #(upload-file! editor owner (-> % .-target .-files (aget 0)))})
+        (dom/button {:style {:margin-right "13px"
+                             :transition ".2s"
+                             :transform (if (om/get-state owner :state) "rotate(135deg)")}
+                     :on-click (fn [_] (om/update-state! owner :state #(if % nil :show-options)))}
+          (i/icon :circle-add {:size 24}))
         (case (:state (om/get-state owner))
           :show-options
           (dom/div (dom/button {:style {:font-size "14px"} :class "underline"
                                 :on-click #(.click (js/document.getElementById "file-upload-ui--select-trigger"))}
-                               "Select an image")
-                   #_(dom/span {:style {:font-size "14px"}} " or ")
-                   #_(dom/button {:style {:font-size "14px"} :class "underline"
-                                :on-click #(om/set-state! owner :state :show-url-field)}
-                               "provide URL"))
+                     "Select an image")
+            #_(dom/span {:style {:font-size "14px"}} " or ")
+            #_(dom/button {:style {:font-size "14px"} :class "underline"
+                           :on-click #(om/set-state! owner :state :show-url-field)}
+                "provide URL"))
           :show-progress
           (dom/span (str "Uploading... " (om/get-state owner :progress) "%"))
           :show-url-field
           (dom/div (dom/input {:type "text" :auto-focus true :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
                                :value (om/get-state owner :url)})
-                   (dom/button {:style {:font-size "14px" :margin-left "1rem"} :class "underline"
-                                :on-click #(do (js/MediumEditor.util.insertHTMLCommand js/document (str "<img src=\"" (om/get-state owner :url) "\">"))
-                                               (om/set-state! owner {}))}
-                               "add")
-                   )
-          (dom/div "")))))
+            (dom/button {:style {:font-size "14px" :margin-left "1rem"} :class "underline"
+                         :on-click #(upload-file! editor owner (om/get-state owner :url))}
+              "add"))
+          (dom/span))))))
 
 (defcomponent topic-overlay-edit [{:keys [topic topic-data currency focus] :as data} owner options]
 
@@ -459,5 +466,5 @@
                           :ref "topic-overlay-edit-body"
                           :id (str "topic-edit-body-" (name topic))
                           :dangerouslySetInnerHTML (clj->js {"__html" section-body})})
-            (om/build uploader {})))
+            (om/build uploader (om/get-state owner :medium-editor))))
         (dom/div {:class "gradient"})))))
