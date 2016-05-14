@@ -233,8 +233,6 @@
 
 (defn upload-file! [editor owner file]
   (let [success-cb  (fn [success]
-                      (js/console.log success)
-                      (js/console.log editor)
                       ;; (.pasteHTML editor (str "<strong> URL " (.-url success) "</strong>"))
                       (.pasteHTML editor (str "<img src=\"" (.-url success) "\">"))
                       ;; (gstyle/setElementShown (om/get-node owner) false)
