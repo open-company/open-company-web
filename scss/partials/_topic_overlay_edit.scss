@@ -3,7 +3,6 @@ div.fullscreen-topic-edit {
   min-width: 302px;
   margin: #{$navbar_height}px auto 30px;
   position: relative;
-  overflow: hidden;
   min-height: calc(100vh - #{$navbar_height}px - 30px - 8px);
 
   @include mobile(){
