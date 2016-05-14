@@ -475,8 +475,9 @@
                                         (.stopPropagation e)
                                         (om/set-state! owner :growth-new-metric true)
                                         (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
-        (dom/div #js {:className "topic-body emoji-autocomplete"
-                      :ref "topic-overlay-edit-body"
-                      :id (str "topic-edit-body-" (name topic))
-                      :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
-        (om/build uploader (om/get-state owner :medium-editor))))))
+        (dom/div {:class "relative"}
+          (dom/div {:className "topic-body emoji-autocomplete"
+                    :ref "topic-overlay-edit-body"
+                    :id (str "topic-edit-body-" (name topic))
+                    :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
+          (om/build uploader (om/get-state owner :medium-editor)))))))
