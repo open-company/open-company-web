@@ -1,6 +1,7 @@
 (ns open-company-web.lib.responsive
   (:require [dommy.core :refer-macros (sel1)]
-            [open-company-web.lib.cookies :as cook]))
+            [open-company-web.lib.cookies :as cook]
+            [goog.userAgent :as userAgent]))
 
 (defn columns-num []
   (let [win-width (.-clientWidth (.-body js/document))]
@@ -95,8 +96,8 @@
 (defn set-browser-type! []
   (let [force-mobile-cookie (cook/get-cookie :force-browser-type)
         is-big-web (if (.-body js/document)
-                      (>= (.-clientWidth (.-body js/document)) big-web-min-width)
-                      true) ; to not break tests
+                     (>= (.-clientWidth (.-body js/document)) big-web-min-width)
+                     true) ; to not break tests
         fixed-browser-type (if (nil? force-mobile-cookie)
                             (not is-big-web)
                             (if (= force-mobile-cookie "mobile")
@@ -109,3 +110,6 @@
  (when (neg? @_mobile)
   (set-browser-type!))
  @_mobile)
+
+(defn can-edit? []
+  (not userAgent/MOBILE))
