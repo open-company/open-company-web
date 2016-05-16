@@ -26,6 +26,9 @@
             [cljsjs.filestack] ; pulled in for cljsjs externs
             [cuerdas.core :as s]))
 
+(def before-unload-message "You have unsaved changes to the topic.")
+
+
 (defn change-value [owner k e]
   (let [target (.-target e)
         value (.-value target)]
@@ -37,8 +40,6 @@
         field-value (.-innerHTML topic-field)]
     (.focus topic-field)
     (set! (.-innerHTML topic-field) field-value)))
-
-(def before-unload-message "You have unsaved changes to the topic.")
 
 ;; Finances helpers
 
@@ -235,11 +236,7 @@
 
 (defn upload-file! [editor owner file]
   (let [success-cb  (fn [success]
-                      (js/console.log success)
-                      (js/console.log editor)
-                      ;; (.pasteHTML editor (str "<strong> URL " (.-url success) "</strong>"))
                       (.pasteHTML editor (str "<img src=\"" (.-url success) "\">"))
-                      ;; (gstyle/setElementShown (om/get-node owner) false)
                       (om/set-state! owner {}))
         error-cb    (fn [error] (js/console.log "error" error))
         progress-cb (fn [progress]
@@ -259,16 +256,19 @@
     (dom/div {:id "file-upload-ui"
               :style (merge {:transition ".2s"}
                             (when (:state (om/get-state owner))
-                              {:background "white" :right 0}))}
+                              {:right 0}))}
       (dom/div {:class "flex"}
         (dom/input {:id "file-upload-ui--select-trigger" :style {:display "none"} :type "file"
                     :on-change #(upload-file! editor owner (-> % .-target .-files (aget 0)))})
-        (dom/button {:style {:margin-right "13px"}
-                     :on-click (fn [_] (om/set-state! owner :state :show-options))}
+        (dom/button {:class "btn-reset p0"
+                     :style {:margin-right "13px"
+                             :transition ".2s"
+                             :transform (if (om/get-state owner :state) "rotate(135deg)")}
+                     :on-click (fn [_] (om/update-state! owner :state #(if % nil :show-options)))}
           (i/icon :circle-add {:size 24}))
         (case (:state (om/get-state owner))
           :show-options
-          (dom/div (dom/button {:style {:font-size "14px"} :class "underline"
+          (dom/div (dom/button {:style {:font-size "14px"} :class "underline btn-reset p0"
                                 :on-click #(.click (js/document.getElementById "file-upload-ui--select-trigger"))}
                      "Select an image")
             #_(dom/span {:style {:font-size "14px"}} " or ")
@@ -280,7 +280,7 @@
           :show-url-field
           (dom/div (dom/input {:type "text" :auto-focus true :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
                                :value (om/get-state owner :url)})
-            (dom/button {:style {:font-size "14px" :margin-left "1rem"} :class "underline"
+            (dom/button {:style {:font-size "14px" :margin-left "1rem"} :class "underline btn-reset p0"
                          :on-click #(upload-file! editor owner (om/get-state owner :url))}
               "add"))
           (dom/span))))))
@@ -332,7 +332,7 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (reset! prevent-route-dispatch true)
-      ; save initial innerHTML and setup MediumEditor
+      ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
       (let [body-el (om/get-ref owner "topic-overlay-edit-body")
             slug (keyword (router/current-company-slug))
             placeholder-data (when (:placeholder topic-data) (utils/get-topic-body topic-data topic))
@@ -341,6 +341,7 @@
                                                       (editor/inject-extension editor/file-upload))))]
         (.subscribe med-ed "editableInput" (fn [event editable]
                                              (om/set-state! owner :has-changes true)))
+        (js/emojiAutocomplete)
         (om/set-state! owner :initial-body (.-innerHTML body-el))
         (om/set-state! owner :medium-editor med-ed))
       (focus-headline topic)
@@ -401,20 +402,20 @@
                 :style #js {:width (str (- fullscreen-width 20) "px")}
                 :on-click #(.stopPropagation %)}
         (dom/input {:class "topic-edit-title"
-                      :id (str "topic-edit-title-" (name topic))
-                      :type "text"
-                      :placeholder "Title"
-                      :on-blur #(om/set-state! owner :show-title-counter false)
-                      :max-length title-length-limit
-                      :value title
-                      :on-change (fn [e]
-                                    (when (not show-title-counter)
-                                      (om/set-state! owner :show-title-counter true))
-                                    (change-value owner :title e))})
+                    :id (str "topic-edit-title-" (name topic))
+                    :type "text"
+                    :placeholder "Title"
+                    :on-blur #(om/set-state! owner :show-title-counter false)
+                    :max-length title-length-limit
+                    :value title
+                    :on-change (fn [e]
+                                  (when (not show-title-counter)
+                                    (om/set-state! owner :show-title-counter true))
+                                  (change-value owner :title e))})
           (dom/div {:class (utils/class-set {:topic-edit-title-count true
                                              :transparent (not show-title-counter)})}
             (dom/label {:class "bold"} (- title-length-limit (count title))))
-        (dom/textarea {:class "flex-auto mb3 topic-edit-headline"
+        (dom/textarea {:class "flex-auto mb3 topic-edit-headline emoji-autocomplete"
                        :resize false
                        :id (str "topic-edit-headline-" (name topic))
                        :type "text"
@@ -474,8 +475,9 @@
                                         (.stopPropagation e)
                                         (om/set-state! owner :growth-new-metric true)
                                         (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
-        (dom/div #js {:className "topic-body"
-                      :ref "topic-overlay-edit-body"
-                      :id (str "topic-edit-body-" (name topic))
-                      :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
-        (om/build uploader (om/get-state owner :medium-editor))))))
+        (dom/div {:class "relative"}
+          (dom/div {:className "topic-body emoji-autocomplete"
+                    :ref "topic-overlay-edit-body"
+                    :id (str "topic-edit-body-" (name topic))
+                    :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
+          (om/build uploader (om/get-state owner :medium-editor)))))))
