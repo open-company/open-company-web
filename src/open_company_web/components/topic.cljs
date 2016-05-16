@@ -43,7 +43,7 @@
     (let [section-kw (keyword section)]
       (when-not (om/get-state owner :image-header)
         (when-let [body (om/get-ref owner "topic-body")]
-          (js/$clamp body #js {"clamp" 2})
+          (js/$clamp body #js {"clamp" 2 "splitOnChars" #js ["." "," " "]})
           (when-not (not (#{:finances :growth} section-kw))
             (when-let [first-image (sel1 body [:img])]
               (om/set-state! owner :image-header (.-src first-image)))))))))
@@ -61,7 +61,7 @@
 
   (render-state [_ {:keys [image-header]}]
     (let [section-kw (keyword section)
-          topic-body (utils/get-topic-body topic-data section-kw)
+          topic-body (utils/strip-HTML-tags (utils/get-topic-body topic-data section-kw))
           chart-opts {:chart-size {:width  260
                                    :height 196}
                       :pillboxes-first false
