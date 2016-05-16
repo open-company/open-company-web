@@ -123,6 +123,11 @@ div.fullscreen-topic {
     div.topic-body{
       margin-top: 21px;
 
+      svg.emojione {
+        width: 18px;
+        height: 18px;
+      }
+
       &, div.topic-body *{
         font-family: $oc_headers_font;
         font-size: 18px;
