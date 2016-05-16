@@ -127,8 +127,8 @@
           add-first-column? (= (count category-topics) 0)
           add-second-column? (= (count category-topics) 1)
           add-third-column? (>= (count category-topics) 2)
-          add-topic?      (and (not (:read-only company-data))
-                               (not (responsive/is-mobile)))]
+          add-topic?      (and (responsive/can-edit?)
+                               (not (:read-only company-data)))]
       (dom/div {:class "topic-list group"
                 :key "topic-list"}
         (when selected-topic

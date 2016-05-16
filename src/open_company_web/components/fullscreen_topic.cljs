@@ -134,8 +134,8 @@
           fullscreen-topic-opts (merge options {:rev-nav #(om/set-state! owner :as-of %)})
           edit-topic-opts (merge options {:show-save-button #(om/set-state! owner :show-save-button %)
                                           :dismiss-editing #(om/set-state! owner :editing false)})
-          can-edit? (and (not (:read-only data))
-                         (not (responsive/is-mobile)))]
+          can-edit? (and (responsive/can-edit?)
+                         (not (:read-only data)))]
       ; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
