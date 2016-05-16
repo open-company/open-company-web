@@ -133,6 +133,15 @@
     (apply merge
            (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
 
+(def popover-max-height 312)
+
+(defn show-popover-above? [owner]
+  (let [topic-list (sel1 [:div.topic-list])
+        topic-list-height (.-clientHeight topic-list)
+        popover-offsettop (.-offsetTop (om/get-ref owner "topic"))]
+    (and (> topic-list-height popover-max-height)
+         (neg? (- topic-list-height popover-offsettop popover-max-height)))))
+
 (defcomponent topic [{:keys [active-category active-topics section-data section currency column] :as data} owner options]
 
   (init-state [_]
@@ -182,6 +191,7 @@
                 update-active-topics (:update-active-topics options)
                 list-data {:all-topics all-sections
                            :active-topics-list category-topics
+                           :show-above (show-popover-above? owner)
                            :column column}
                 list-opts {:did-change-active-topics update-active-topics
                            :dismiss-popover #(om/set-state! owner :show-add-topic-popover false)}]

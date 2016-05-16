@@ -88,7 +88,7 @@
 (defn history-nav [options]
   ((:dismiss-popover options)))
 
-(defcomponent add-topic-popover [{:keys [all-topics active-topics-list column] :as data} owner options]
+(defcomponent add-topic-popover [{:keys [all-topics active-topics-list column show-above] :as data} owner options]
 
   (init-state [_]
     (when (empty? @caches/new-sections)
@@ -116,7 +116,9 @@
     (events/unlistenByKey (om/get-state owner :nav-listener)))
 
   (render-state [_ {:keys [active-topics unactive-topics highlighted-topic]}]
-    (dom/div {:class (str "add-topic-popover column-" column)
+    (dom/div {:class (utils/class-set {:add-topic-popover true
+                                       (str "column-" column) true
+                                       :show-above show-above})
               :id "add-topic-popover"
               :on-click (partial on-click-in owner options)}
       (dom/div {:class "triangle"})
