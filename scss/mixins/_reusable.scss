@@ -153,13 +153,4 @@
   *::-moz-selection {
     background: #C1E7F4;
   }
-
-  a {
-    display: inline-block;
-    height: 1.25em;
-    text-decoration: none;
-    color: black;
-    pointer-events: none;
-    border-bottom: 6px solid $oc_yellow;
-  }
 }

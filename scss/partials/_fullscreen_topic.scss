@@ -133,6 +133,12 @@ div.fullscreen-topic {
           cursor: pointer;
           pointer-events: auto;
           height: 1.4em;
+          display: inline-block;
+          height: 1.25em;
+          text-decoration: none;
+          color: black;
+          pointer-events: none;
+          border-bottom: 6px solid $oc_yellow;
         }
       }
     }
