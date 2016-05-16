@@ -41,12 +41,12 @@
 (defn setup-card! [owner section]
   (when-not (utils/is-test-env?)
     (let [section-kw (keyword section)]
-      (when (and (not (om/get-state owner :image-header))
-                 (not (#{:finances :growth} section-kw)))
+      (when-not (om/get-state owner :image-header)
         (when-let [body (om/get-ref owner "topic-body")]
           (js/$clamp body #js {"clamp" 2})
-          (when-let [first-image (sel1 body [:img])]
-            (om/set-state! owner :image-header (.-src first-image))))))))
+          (when-not (not (#{:finances :growth} section-kw))
+            (when-let [first-image (sel1 body [:img])]
+              (om/set-state! owner :image-header (.-src first-image)))))))))
 
 (defcomponent topic-internal [{:keys [topic-data section currency prev-rev next-rev] :as data} owner options]
 
@@ -84,12 +84,12 @@
         ;; Topic title
         (dom/div {:class "topic-title"} (:title topic-data))
         ;; Topic headline
-        (om/build topic-headline topic-data)
+        (when-not (clojure.string/blank? (:headline topic-data))
+          (om/build topic-headline topic-data))
         ;; Topic body: first 2 lines
-        (when topic-body
-          (dom/div #js {:className "topic-body"
-                        :ref "topic-body"
-                        :dangerouslySetInnerHTML (utils/emojify topic-body)}))))))
+        (dom/div #js {:className "topic-body"
+                      :ref "topic-body"
+                      :dangerouslySetInnerHTML (utils/emojify topic-body)})))))
 
 (defn topic-click [options selected-metric]
   ((:topic-click options) selected-metric))
