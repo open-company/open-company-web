@@ -73,8 +73,9 @@
             (dom/div {:class "separator"})))
         (dom/div {:class "topic-body"
                   :dangerouslySetInnerHTML (utils/emojify (utils/get-topic-body topic-data topic))})
-        (dom/div {:class "topic-attribution"}
-          (str "- " (:name (:author topic-data)) " / " (utils/date-string (js/Date. (:updated-at topic-data)) true)))
+        (when (:author topic-data)
+          (dom/div {:class "topic-attribution"}
+            (str "- " (:name (:author topic-data)) " / " (utils/date-string (js/Date. (:updated-at topic-data)) true))))
         (dom/div {:class "topic-revisions"}
           (when (:prev-rev data)
             (dom/button {:class "prev"
