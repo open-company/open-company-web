@@ -687,3 +687,7 @@
       (let [text-string (or text "") ; handle nil
             unicode-string (.toImage js/emojione text-string)]
         #js {"__html" unicode-string}))))
+
+(defn strip-HTML-tags [text]
+  (let [reg (js/RegExp. "</?[^>]+(>|$)" "g")]
+    (.replace text reg "")))
