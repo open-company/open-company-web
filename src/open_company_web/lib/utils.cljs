@@ -689,5 +689,6 @@
         #js {"__html" unicode-string}))))
 
 (defn strip-HTML-tags [text]
-  (let [reg (js/RegExp. "</?[^>]+(>|$)" "g")]
-    (.replace text reg "")))
+  (when text
+    (let [reg (js/RegExp. "</?[^>]+(>|$)" "g")]
+      (.replace text reg ""))))
