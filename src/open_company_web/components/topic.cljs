@@ -3,18 +3,17 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
-            [open-company-web.router :as router]
-            [open-company-web.caches :as cache]
             [open-company-web.api :as api]
+            [open-company-web.caches :as caches]
+            [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.caches :as caches]
+            [open-company-web.local-settings :as ls]
             [open-company-web.components.ui.icon :as i]
-            [open-company-web.components.ui.add-topic-popover :refer (add-topic-popover)]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
+            [open-company-web.components.ui.add-topic-popover :refer (add-topic-popover)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
-            [open-company-web.local-settings :as ls]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as EventType]
@@ -50,6 +49,7 @@
             (om/set-state! owner :image-header (.-src first-image))))))))
 
 (defcomponent topic-internal [{:keys [topic-data section currency prev-rev next-rev] :as data} owner options]
+
   (init-state [_]
     {:image-header nil})
 
@@ -160,7 +160,7 @@
           prev-rev (utils/revision-prev revisions as-of)
           next-rev (utils/revision-next revisions as-of)
           slug (keyword (router/current-company-slug))
-          revisions-list (section-kw (slug @cache/revisions))
+          revisions-list (section-kw (slug @caches/revisions))
           topic-data (utils/select-section-data section-data section-kw as-of)
           add-topic? (:add-topic data)]
       ;; preload previous revision
