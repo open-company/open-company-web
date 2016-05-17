@@ -24,12 +24,12 @@
 (defn hide-popover [e container-id]
   (when (.-$ js/window)
     (try
-      (.css (.$ js/window "body") #js {"overflow" ""})
-      (let [popover-ct (.$ js/window (str "#" container-id))]
+      (.css (js/$ "body") #js {"overflow" ""})
+      (let [popover-ct (js/$ (str "#" container-id))]
         (.fadeOut popover-ct 400 #(.css popover-ct #js {"display" "none"})))
       (.setTimeout js/window #(try
                                 (let [container (sel1 (str "#" container-id))
-                                      $container (.$ js/window container)] 
+                                      $container (js/$ container)] 
                                   (om/detach-root container)
                                   (.remove $container))
                                 (catch :default e)) 1500)
@@ -38,8 +38,8 @@
 (defn add-popover [data]
   (let [container-id (:container-id data)]
     (when (.-$ js/window) ; avoid tests crash
-      (let [popover-ct (.$ js/window (str "<div class='oc-popover-container' id='" container-id "'></div>"))
-            body (.$ js/window (.-body js/document))]
+      (let [popover-ct (js/$ (str "<div class='oc-popover-container' id='" container-id "'></div>"))
+            body (js/$ (.-body js/document))]
         ; add the div to the body
         (.append body popover-ct)
         ; if the component has not been mount, render it
