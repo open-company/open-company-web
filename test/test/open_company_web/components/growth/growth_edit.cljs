@@ -38,6 +38,6 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root growth-edit app-state {:target c})
-          growth-edit-node (sel1 c [:div.composed-section-edit.growth-body.edit])]
+          growth-edit-node (sel1 c [:div.composed-section-edit.growth.edit])]
       (is (not (nil? growth-edit-node)))
       (tu/unmount! c))))
