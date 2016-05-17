@@ -17,6 +17,7 @@
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.components.ui.icon :as i]
+            [goog.dom :as gdom]
             [goog.events :as events]
             [goog.style :as gstyle]
             [goog.dom.classlist :as cl]
@@ -24,7 +25,7 @@
             [cljs-dynamic-resources.core :as cdr]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [cljsjs.filestack] ; pulled in for cljsjs externs
-            [cuerdas.core :as s]))
+            [clojure.string :as string]))
 
 (def before-unload-message "You have unsaved changes to the topic.")
 
@@ -85,7 +86,7 @@
 ;; Growth helpers
 
 (defn growth-get-value [v]
-  (if (s/blank? v)
+  (if (string/blank? v)
     ""
     (if (js/isNaN v)
       0
@@ -93,11 +94,11 @@
 
 (defn growth-fix-row [row]
   (let [fixed-value (growth-get-value (:value row))
-        with-fixed-value (if (s/blank? fixed-value)
+        with-fixed-value (if (string/blank? fixed-value)
                            (dissoc row :value)
                            (assoc row :value fixed-value))
         fixed-target (growth-get-value (:target with-fixed-value))
-        with-fixed-target (if (s/blank? fixed-target)
+        with-fixed-target (if (string/blank? fixed-target)
                            (dissoc with-fixed-value :target)
                            (assoc with-fixed-value :target fixed-target))]
     with-fixed-target))
@@ -236,7 +237,12 @@
 
 (defn upload-file! [editor owner file]
   (let [success-cb  (fn [success]
-                      (.pasteHTML editor (str "<img src=\"" (.-url success) "\">"))
+                      (let [img (str "<img src=\"" (.-url success) "\">")]
+                        (if-let [marker (gdom/getElement "abcd")]
+                          (gdom/replaceNode marker img)
+                          (.setContent editor img 50))) ;; 50????
+                      ;; (.pasteHTML editor (str "<strong> URL " (.-url success) "</strong>"))
+                      ;; (gstyle/setElementShown (om/get-node owner) false)
                       (om/set-state! owner {}))
         error-cb    (fn [error] (js/console.log "error" error))
         progress-cb (fn [progress]
@@ -273,7 +279,9 @@
                      "Select an image")
             (dom/span {:style {:font-size "14px"}} " or ")
             (dom/button {:style {:font-size "14px"} :class "underline"
-                           :on-click #(om/set-state! owner :state :show-url-field)}
+                         :on-click (fn [_]
+                                     (.pasteHTML editor (str "<span id=abcd></span>"))
+                                     (om/set-state! owner :state :show-url-field))}
                 "provide URL"))
           :show-progress
           (dom/span (str "Uploading... " (om/get-state owner :progress) "%"))
