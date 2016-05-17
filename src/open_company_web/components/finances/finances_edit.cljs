@@ -51,7 +51,7 @@
                          (:needs-year data))]
       (dom/tr {}
         (dom/td {:class "no-cell"}
-          (utils/get-period-string (:period finances-data) "monthly" (when needs-year [:force-year])))
+          (utils/get-period-string (:period finances-data) "monthly" [:short (when needs-year :force-year)]))
         ;; cash
         (dom/td {}
           (om/build cell {:value (:cash finances-data)
@@ -145,8 +145,7 @@
                                                  :change-cb #(replace-row-in-data data row-data %1 %2)}))))
               (dom/tr {}
                 (dom/td {}
-                  (dom/a {:on-click #(more-months owner)} "More..."))
-                (dom/td {})
+                  (dom/a {:class "more" :on-click #(more-months owner)} "More..."))
                 (dom/td {})
                 (dom/td {})
                 (dom/td {})
