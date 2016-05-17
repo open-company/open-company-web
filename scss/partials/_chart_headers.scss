@@ -30,11 +30,14 @@ div.chart-header-container {
 div.actual-container{
   h3.actual {
     margin-bottom: 5px;
+
+    span {
+      margin-right: 5px;
+    }
   }
 
   h3.actual.gray {
     color: $oc_gray_5;
-    opacity: 0.3;
   }
 
   h3.actual.green {
@@ -47,7 +50,6 @@ div.actual-container{
 
   h3.actual.blue {
     color: $oc_gray_5;
-    opacity: 0.5;
   }
 
   h3.actual-label {
@@ -56,7 +58,8 @@ div.actual-container{
     margin-top: 0px;
 
     &.gray {
-      color: $oc_gray;
+      color: $oc_gray_5;
+      opacity: 0.5;
     }
   }
 }
