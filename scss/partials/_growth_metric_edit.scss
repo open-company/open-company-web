@@ -1,0 +1,55 @@
+div.growth-metric-edit{
+  div.growth-metric-edit-row{
+    width: 100%;
+
+    div.metric-data-container{
+      width: 32%;
+      float: left;
+      margin-left: 5px;
+    }
+    label.metric-label{
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      color: $oc_gray_5;
+    }
+
+    .metric-data{
+      width: 100%;
+      float: left;
+    }
+
+    input.metric-name {
+      opacity: 0.5;
+      background-color: #ffffff;
+      border: 0px solid transparent;
+      outline: none;
+      &:active, &:focus {
+        border: 0px solid transparent;
+        outline: none;
+      }
+    }
+
+    span.select2 {
+      opacity: 0.5;
+      span{
+        background-color: #ffffff;
+        font-size: 12px;
+        letter-spacing: 1px;
+        color: $oc_gray_5;
+        border: 0px solid transparent;
+        border-radius: 0px;
+      }
+    }
+    textarea.metric-data{
+      opacity: 0.5;
+      background-color: #ffffff;
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: $oc_gray_5;
+      border: 0px solid transparent;
+      border-radius: 0px;
+    }
+  }
+}
