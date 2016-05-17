@@ -235,21 +235,25 @@
                           with-finances-data)]
     with-growth-data))
 
+(def placeholder-id (str (random-uuid)))
+
 (defn upload-file! [editor owner file]
   (let [success-cb  (fn [success]
-                      (let [img (str "<img src=\"" (.-url success) "\">")]
-                        (if-let [marker (gdom/getElement "abcd")]
-                          (gdom/replaceNode marker img)
-                          (.setContent editor img 50))) ;; 50????
-                      ;; (.pasteHTML editor (str "<strong> URL " (.-url success) "</strong>"))
-                      ;; (gstyle/setElementShown (om/get-node owner) false)
+                      (let [url      (.-url success)
+                            node     (gdom/createDom "img" #js {:src url})
+                            str-node (str "<img src=\"" url "\">")]
+                        (if-let [marker (gdom/getElement placeholder-id)]
+                          (gdom/replaceNode node marker)
+                          (js/MediumEditor.util.insertHTMLCommand js/document str-node)))
                       (om/set-state! owner {}))
         error-cb    (fn [error] (js/console.log "error" error))
         progress-cb (fn [progress]
                       (om/set-state! owner {:state :show-progress
                                             :progress progress}))]
-    (if (string? file)
+    (cond
+      (and (string? file) (not (string/blank? file)))
       (js/filepicker.storeUrl file success-cb error-cb progress-cb)
+      file
       (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
 
 (defcomponent uploader [editor owner]
@@ -278,9 +282,11 @@
                                 :on-click #(.click (js/document.getElementById "file-upload-ui--select-trigger"))}
                      "Select an image")
             (dom/span {:style {:font-size "14px"}} " or ")
-            (dom/button {:style {:font-size "14px"} :class "underline"
+            (dom/button {:style {:font-size "14px"} :class "underline btn-reset p0"
                          :on-click (fn [_]
-                                     (.pasteHTML editor (str "<span id=abcd></span>"))
+                                     (js/MediumEditor.util.insertHTMLCommand
+                                      js/document
+                                      (str "<span id=" placeholder-id "></span>"))
                                      (om/set-state! owner :state :show-url-field))}
                 "provide URL"))
           :show-progress
@@ -290,7 +296,13 @@
                                :value (om/get-state owner :url)})
             (dom/button {:style {:font-size "14px" :margin-left "1rem"} :class "underline btn-reset p0"
                          :on-click #(upload-file! editor owner (om/get-state owner :url))}
-              "add"))
+              "add")
+            (dom/button {:style {:font-size "14px" :margin-left "1rem" :opacity "0.5"}
+                         :class "underline btn-reset p0"
+                         :on-click (fn [_]
+                                     (gdom/removeNode (gdom/getElement placeholder-id))
+                                     (om/set-state! owner {}))}
+              "cancel"))
           (dom/span))))))
 
 (defcomponent topic-overlay-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
