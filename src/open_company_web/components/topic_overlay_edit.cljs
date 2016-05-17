@@ -288,11 +288,12 @@
                                       js/document
                                       (str "<span id=" placeholder-id "></span>"))
                                      (om/set-state! owner :state :show-url-field))}
-                "provide URL"))
+                "provide an image URL"))
           :show-progress
           (dom/span (str "Uploading... " (om/get-state owner :progress) "%"))
           :show-url-field
-          (dom/div (dom/input {:type "text" :auto-focus true :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
+          (dom/div (dom/input {:type "text" :style {:width 300} :auto-focus true
+                               :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
                                :value (om/get-state owner :url)})
             (dom/button {:style {:font-size "14px" :margin-left "1rem"} :class "underline btn-reset p0"
                          :on-click #(upload-file! editor owner (om/get-state owner :url))}
