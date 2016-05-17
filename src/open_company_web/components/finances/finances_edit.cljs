@@ -116,39 +116,40 @@
       ; real component
       (dom/div {:class "finances"}
         (dom/div {:class "composed-section-edit finances-body edit"}
-          (dom/table {:class "table"}
-            (dom/thead {}
-              (dom/tr {}
-                (dom/th {} "")
-                (dom/th {} "Cash")
-                (dom/th {} "Revenue")
-                (dom/th {} "Costs")
-                (when show-burn
-                  (dom/th {} "Burn"))
-                (dom/th {} "Runway")))
-            (dom/tbody {}
-              (let [current-period (utils/current-period)]
-                (for [idx (range stop)]
-                  (let [period (finances-utils/get-past-period current-period idx)
-                        has-value (contains? finances-data period)
-                        row-data (if has-value
-                                    (get finances-data period)
-                                    (finances-utils/placeholder-data period {:new true}))
-                        next-period (finances-utils/get-past-period current-period (inc idx))]
-                    (om/build finances-edit-row {:cursor row-data
-                                                 :next-period next-period
-                                                 :is-last (= idx 0)
-                                                 :needs-year (or (= idx 0)
-                                                                 (= idx (dec stop)))
-                                                 :currency currency
-                                                 :show-burn show-burn
-                                                 :change-cb #(replace-row-in-data data row-data %1 %2)}))))
-              (dom/tr {}
-                (dom/td {}
-                  (dom/a {:class "more" :on-click #(more-months owner)} "More..."))
-                (dom/td {})
-                (dom/td {})
-                (dom/td {})
-                (when show-burn
-                  (dom/th {} ""))
-                (dom/td {})))))))))
+          (dom/div {:class "table-container group"}
+            (dom/table {:class "table"}
+              (dom/thead {}
+                (dom/tr {}
+                  (dom/th {} "")
+                  (dom/th {} "Cash")
+                  (dom/th {} "Revenue")
+                  (dom/th {} "Costs")
+                  (when show-burn
+                    (dom/th {} "Burn"))
+                  (dom/th {} "Runway")))
+              (dom/tbody {}
+                (let [current-period (utils/current-period)]
+                  (for [idx (range stop)]
+                    (let [period (finances-utils/get-past-period current-period idx)
+                          has-value (contains? finances-data period)
+                          row-data (if has-value
+                                      (get finances-data period)
+                                      (finances-utils/placeholder-data period {:new true}))
+                          next-period (finances-utils/get-past-period current-period (inc idx))]
+                      (om/build finances-edit-row {:cursor row-data
+                                                   :next-period next-period
+                                                   :is-last (= idx 0)
+                                                   :needs-year (or (= idx 0)
+                                                                   (= idx (dec stop)))
+                                                   :currency currency
+                                                   :show-burn show-burn
+                                                   :change-cb #(replace-row-in-data data row-data %1 %2)}))))
+                (dom/tr {}
+                  (dom/td {}
+                    (dom/a {:class "more" :on-click #(more-months owner)} "More..."))
+                  (dom/td {})
+                  (dom/td {})
+                  (dom/td {})
+                  (when show-burn
+                    (dom/th {} ""))
+                  (dom/td {}))))))))))
