@@ -2,7 +2,6 @@
   (:require [doo.runner :refer-macros [doo-tests]]
             [test.open-company-web.components.ui.currency-picker]
             [test.open-company-web.components.ui.link]
-            [test.open-company-web.components.ui.user-selector]
             [test.open-company-web.components.login]
             [test.open-company-web.components.ui.login-button]
             [test.open-company-web.components.ui.cell]
@@ -22,7 +21,6 @@
 (doo-tests
   'test.open-company-web.components.ui.currency-picker
   'test.open-company-web.components.ui.link
-  'test.open-company-web.components.ui.user-selector
   'test.open-company-web.components.login
   'test.open-company-web.components.ui.login-button
   'test.open-company-web.components.ui.cell
