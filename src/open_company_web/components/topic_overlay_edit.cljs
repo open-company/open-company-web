@@ -26,7 +26,7 @@
             [cljsjs.filestack] ; pulled in for cljsjs externs
             [cuerdas.core :as s]))
 
-(def before-unload-message "You have unsaved changes to the topic.")
+(def before-unload-message "You have unsaved edits.")
 
 
 (defn change-value [owner k e]

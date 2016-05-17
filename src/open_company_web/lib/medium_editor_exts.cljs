@@ -61,4 +61,3 @@
                (doseq [el (.getEditorElements this)]
                  (.on (.-base this) el "click" (.bind show-btn this))
                  (.on (.-base this) el "keyup" (.bind show-btn this)))))}))
-
