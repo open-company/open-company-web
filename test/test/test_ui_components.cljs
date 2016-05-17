@@ -5,7 +5,6 @@
             [test.open-company-web.components.login]
             [test.open-company-web.components.ui.login-button]
             [test.open-company-web.components.ui.cell]
-            [test.open-company-web.components.update-footer]
             [test.open-company-web.components.ui.utility-components]
             [test.open-company-web.components.section-footer]
             [test.open-company-web.components.ui.popover]
@@ -24,7 +23,6 @@
   'test.open-company-web.components.login
   'test.open-company-web.components.ui.login-button
   'test.open-company-web.components.ui.cell
-  'test.open-company-web.components.update-footer
   'test.open-company-web.components.ui.utility-components
   'test.open-company-web.components.section-footer
   'test.open-company-web.components.ui.popover
