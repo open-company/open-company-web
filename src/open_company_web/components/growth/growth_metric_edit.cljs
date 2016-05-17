@@ -225,17 +225,17 @@
                                           (change-cb slug {:description value}))))
                          :placeholder "Metric description"} (om/get-state owner :description)))
         (dom/div {:class "growth-metric-edit-row group"}
-          (dom/button {:class "oc-btn oc-success green"
+          (dom/button {:class "save"
                        :disabled (or (s/blank? (om/get-state owner :metric-slug))
                                      (s/blank? (om/get-state owner :metric-name))
                                      (s/blank? (om/get-state owner :unit))
                                      (s/blank? (om/get-state owner :interval)))
-                       :on-click #((:next-cb data))} "SAVE")
+                       :on-click #((:next-cb data))} (if (:new-metric data) "ADD METRIC" "SAVE"))
           ;; delete button
           (when-not (:new-metric data)
-            (dom/button {:class "oc-btn oc-cancel black"
+            (dom/button {:class "delete"
                          :title "Delete this metric"
                          :on-click #(show-delete-confirm-popover owner data)} "DELETE"))
           ; cancel button
-          (dom/button {:class "oc-btn oc-link blue"
+          (dom/button {:class "cancel"
                        :on-click (:cancel-cb data)} "CANCEL"))))))
