@@ -83,6 +83,78 @@ div.fullscreen-topic-edit {
 
     div.finances, div.growth {
       width: 100%;
+      background-color: rgba(78, 90, 107, 0.05);
+      padding: 21px 10px 0px 10px;
+      margin-top: 10px;
+
+      table {
+        border-spacing: 10px;
+
+        * {
+          border: 0px solid transparent;
+        }
+      }
+    }
+
+    div.finances {
+      table.table{
+        thead th {
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+          text-transform: uppercase;
+        }
+
+        tr:last-child td:last-child {
+          opacity: 0;
+        }
+
+        tr td.no-cell:first-child {
+          padding-top: 12px;
+          font-weight: 700;
+          font-size: 12px;
+          letter-spacing: 1px;
+          color: rgba(78, 90, 107, 0.5);
+        }
+
+        td.no-cell {
+          font-weight: 700;
+          font-size: 12px;
+          letter-spacing: 1px;
+          color: rgba(78,90,107, 0.5);
+          text-transform: uppercase;
+        }
+
+        td div.comp-cell {
+          opacity: 0.5;
+          background-color: #ffffff;
+          padding-top: 4px;
+        }
+
+        td.no-cell, td div.comp-cell div.comp-cell-int {
+          font-weight: normal;
+          font-size: 12px;
+          letter-spacing: 1px;
+          color: #4e5a6b;
+        }
+
+        td.no-cell:last-child {
+          padding-top: 13px;
+        }
+
+        tr th:last-child, tr td:last-child {
+          background-color: rgba(78, 90, 107, 0.1);
+        }
+
+        a.more {
+          font-weight: 700;
+          font-size: 12px;
+          letter-spacing: 1px;
+          color: rgba(78, 90, 107, 0.5);
+        }
+      }
     }
 
     div.growth-body {
