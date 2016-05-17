@@ -91,7 +91,7 @@
                    (utils/get-symbol-for-currency-code (:currency options))
                    "")
           suffix (when (= (:unit metric-info) "%") "%")]
-      (dom/div {:class "composed-section-edit growth-body edit"}
+      (dom/div {:class "composed-section-edit growth edit"}
         (if metadata-edit
           (om/build growth-metric-edit {:metric-info metric-info
                                         :metric-count (:metric-count data)
@@ -160,5 +160,5 @@
                                                       (replace-row-in-data row-data k v (:change-growth-cb data)))}))))
                   (dom/tr {}
                     (dom/td {}
-                      (dom/a {:on-click #(more-months owner data)} "More..."))
+                      (dom/a {:class "more" :on-click #(more-months owner data)} "More..."))
                     (dom/td {}))))))))))
