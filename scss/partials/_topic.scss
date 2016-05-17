@@ -131,6 +131,13 @@ div.topic-list {
             }
           }
 
+          div.hidden-topic-body {
+            display: none;
+            padding: 0px;
+            margin: 0px;
+            opacity: 0;
+          }
+
           div.topic-body {
             margin-top: 10px;
             margin-bottom: 20px;

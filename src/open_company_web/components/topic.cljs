@@ -40,12 +40,13 @@
 
 (defn setup-card! [owner section]
   (when-not (utils/is-test-env?)
-    (let [section-kw (keyword section)]
-      (when-not (om/get-state owner :image-header)
-        (when-let [body (om/get-ref owner "topic-body")]
-          (js/$clamp body #js {"clamp" 2 "splitOnChars" #js ["." "," " "]})
-          (when-not (not (#{:finances :growth} section-kw))
-            (when-let [first-image (sel1 body [:img])]
+    (when-not (om/get-state owner :image-header)
+      (when-let [body (om/get-ref owner "topic-body")]
+        (js/$clamp body #js {"clamp" 2 "splitOnChars" #js ["." "," " "]}))
+      (let [section-kw (keyword section)]
+        (when-not (#{:finances :growth} section-kw)
+          (when-let [hidden-body (om/get-ref owner "hidden-topic-body")]
+            (when-let [first-image (sel1 hidden-body [:img])]
               (om/set-state! owner :image-header (.-src first-image)))))))))
 
 (defcomponent topic-internal [{:keys [topic-data section currency prev-rev next-rev] :as data} owner options]
@@ -60,16 +61,16 @@
     (setup-card! owner section))
 
   (render-state [_ {:keys [image-header]}]
-    (let [section-kw (keyword section)
-          topic-body (utils/strip-HTML-tags (utils/get-topic-body topic-data section-kw))
-          chart-opts {:chart-size {:width  260
-                                   :height 196}
-                      :pillboxes-first false
-                      :topic-click (:topic-click options)}
+    (let [section-kw          (keyword section)
+          topic-body          (utils/get-topic-body topic-data section-kw)
+          stripped-topic-body (utils/strip-HTML-tags topic-body)
+          chart-opts          {:chart-size {:width  260
+                                            :height 196}
+                               :pillboxes-first false
+                               :topic-click (:topic-click options)}
           is-growth-finances? (#{:growth :finances} section-kw)]
       (dom/div #js {:className "topic-internal group"
                     :ref "topic-internal"}
-
         (when (or is-growth-finances?
                   image-header)
           (dom/div {:class (utils/class-set {:card-header true
@@ -87,9 +88,12 @@
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
         ;; Topic body: first 2 lines
+        (dom/div #js {:className "hidden-topic-body"
+                      :ref "hidden-topic-body"
+                      :dangerouslySetInnerHTML #js {"__html" topic-body}})
         (dom/div #js {:className "topic-body"
                       :ref "topic-body"
-                      :dangerouslySetInnerHTML (utils/emojify topic-body)})))))
+                      :dangerouslySetInnerHTML (utils/emojify stripped-topic-body)})))))
 
 (defn topic-click [options selected-metric]
   ((:topic-click options) selected-metric))
