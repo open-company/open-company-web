@@ -72,7 +72,7 @@
     ; check if we are ready to initialize the widget and if we haven't aready done that
     (when (and req-libs-loaded did-mount (not select2-initialized))
       ; init name
-      (let [name-input (.$ js/window "input#mtr-name")
+      (let [name-input (js/$ "input#mtr-name")
             present-metrics (:metrics data)
             preset-metrics (:metrics (om/get-state owner :presets))
             usable-metrics (filter-metrics preset-metrics present-metrics)
@@ -87,7 +87,7 @@
         (.focus name-input)
         (.val name-input (.val name-input)))
       ; init unit
-      (doto (.$ js/window "select#mtr-unit")
+      (doto (js/$ "select#mtr-unit")
         (.select2 (clj->js {"placeholder" "Metric unit"
                             "minimumResultsForSearch" -1
                             "templateResult" unit-option-template
@@ -99,7 +99,7 @@
                           (when slug
                             (change-cb slug {:unit unit-value}))))))
       ; init interval
-      (doto (.$ js/window "select.metric-data#mtr-interval")
+      (doto (js/$ "select.metric-data#mtr-interval")
         (.select2 (clj->js {"placeholder" "Metric interval"
                             "minimumResultsForSearch" -1
                             "templateResult" option-template
@@ -178,6 +178,7 @@
         (dom/div {:class "growth-metric-edit-row group"}
           ; name
           (dom/div {:class "metric-data-container group"}
+            (dom/label {:class "metric-label"} "METRIC NAME")
             (dom/input {:class "metric-data metric-name"
                         :type "text"
                         :value (om/get-state owner :metric-name)
@@ -185,43 +186,36 @@
                                      (om/set-state! owner :metric-name (.. e -target -value))
                                      (change-name owner data))
                         :id "mtr-name"
-                        :placeholder "Metric name"
-                        :style {"width" "240px"}}))
-          ;; delete button
-          (when-not (:new-metric data)
-            (dom/button {:class "oc-btn oc-cancel black"
-                         :title "Delete this metric"
-                         :on-click #(show-delete-confirm-popover owner data)} "DELETE")))
-        (dom/div {:class "growth-metric-edit-row group"}
+                        :placeholder "Metric name"}))
           ; interval
           (dom/div {:class "metric-data-container group"}
-            (dom/label {:for "mtr-interval"} "Interval:")
+            (dom/label {:class "metric-label" :for "mtr-interval"} "INTERVAL")
             (dom/select {:class "metric-data metric-interval"
                          :default-value (om/get-state owner :interval)
                          :id "mtr-interval"
                          ; if there are data the interval can't be changed
                          :disabled (and (pos? (:metric-count data))
                                         (not (:new-metric data)))
-                         :placeholder "Metric interval"
-                         :style {"width" "150px"}}
+                         :placeholder "Metric interval"}
               (for [interval intervals]
                 (dom/option {:value interval} (utils/camel-case-str interval)))))
           ; unit
-          (dom/div {:class "metric-data-container right group"}
-            (dom/label {:for "mtr-unit"} "Measured as")
+          (dom/div {:class "metric-data-container group"}
+            (dom/label {:class "metric-label" :for "mtr-unit"} "MEASURED AS")
             (dom/select {:class "metric-data metric-unit"
                          :default-value (om/get-state owner :unit)
                          :id "mtr-unit"
-                         :placeholder "Metric unit"
-                         :style {"width" "145px"}}
+                         :placeholder "Metric unit"}
               (for [unit units]
                 (let [currency (om/get-state owner :currency)
                       unit-value (:unit unit)
                       unit-name (:name unit)]
                   (dom/option {:key unit-value
                                :value unit-value} unit-name))))))
-        ; textarea
+        ;; second row
         (dom/div {:class "growth-metric-edit-row group"}
+          ;; descriptions
+          (dom/label {:class "metric-label"} "DESCRIPTION")
           (dom/textarea {:class "metric-data metric-description"
                          :on-change (fn [e]
                                       (let [value (.. e -target -value)
@@ -237,6 +231,11 @@
                                      (s/blank? (om/get-state owner :unit))
                                      (s/blank? (om/get-state owner :interval)))
                        :on-click #((:next-cb data))} "SAVE")
+          ;; delete button
+          (when-not (:new-metric data)
+            (dom/button {:class "oc-btn oc-cancel black"
+                         :title "Delete this metric"
+                         :on-click #(show-delete-confirm-popover owner data)} "DELETE"))
           ; cancel button
           (dom/button {:class "oc-btn oc-link blue"
                        :on-click (:cancel-cb data)} "CANCEL"))))))
