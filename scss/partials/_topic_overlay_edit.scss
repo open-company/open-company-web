@@ -94,9 +94,7 @@ div.fullscreen-topic-edit {
           border: 0px solid transparent;
         }
       }
-    }
 
-    div.finances {
       table.table{
         thead th {
           font-weight: 700;
@@ -174,16 +172,7 @@ div.fullscreen-topic-edit {
       margin-top: 10px;
       margin-bottom: 10px;
       text-align: center;
-
-      @include big_web(){
-        margin-left: -50px;
-        width: calc(100% + 100px);
-      }
-
-      @include mobile(){
-        margin-left: -23px;
-        width: calc(100% + 46px);
-      }
+      width: 100%;
 
       @include pillbox();
 
