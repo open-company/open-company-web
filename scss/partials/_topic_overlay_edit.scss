@@ -82,20 +82,24 @@ div.fullscreen-topic-edit {
   div.topic-overlay-edit-data {
 
     div.finances, div.growth {
-      width: 100%;
-      background-color: rgba(78, 90, 107, 0.05);
-      padding: 21px 10px 0px 10px;
       margin-top: 10px;
 
-      table {
+      div.table-container{
+        width: 100%;
+        background-color: rgba(78, 90, 107, 0.05);
+        padding: 21px 10px 0px 10px;
+      }
+
+      table.table{
         border-spacing: 10px;
+        max-width: 100%;
+        width: auto;
+        float: left;
 
         * {
           border: 0px solid transparent;
         }
-      }
 
-      table.table{
         thead th {
           font-weight: 700;
           font-size: 12px;
@@ -103,6 +107,7 @@ div.fullscreen-topic-edit {
           letter-spacing: 1px;
           color: $oc_gray_5;
           text-transform: uppercase;
+          min-width: 100px;
         }
 
         tr:last-child td:last-child {
