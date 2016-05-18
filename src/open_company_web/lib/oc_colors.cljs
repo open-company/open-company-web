@@ -1,7 +1,7 @@
 (ns open-company-web.lib.oc-colors)
 
 (def oc-colors {
-  :yellow "#f9d748"
+  :yellow "#f9d748" ; rgb(249,215,72)
   :green "#74E0B4" ;"#26C485"
   :red "#d72a46"
   :blue "#007A9D" ;"#004E64" ;"#109DB7"
