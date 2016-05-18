@@ -82,7 +82,7 @@ div.fullscreen-topic {
     margin: #{$navbar_height}px auto 30px;
     position: relative;
     overflow: hidden;
-    min-height: calc(100vh - #{$navbar_height}px - 30px - 8px);
+    min-height: calc(100vh - #{$navbar_height}px - 60px - 4px);
     padding-top: 2px;
 
     @include mobile(){
@@ -123,29 +123,7 @@ div.fullscreen-topic {
     div.topic-body{
       margin-top: 21px;
 
-      svg.emojione {
-        width: 18px;
-        height: 18px;
-      }
-
-      &, div.topic-body *{
-        font-family: $oc_headers_font;
-        font-size: 18px;
-        line-height: 1.8;
-        color: $oc_gray_5;
-
-        a {
-          cursor: pointer;
-          pointer-events: auto;
-          height: 1.4em;
-          display: inline-block;
-          height: 1.25em;
-          text-decoration: none;
-          color: black;
-          pointer-events: none;
-          border-bottom: 6px solid $oc_yellow;
-        }
-      }
+      @include rich-editor-body($oc_gray_5);
     }
 
     div.topic-attribution {
