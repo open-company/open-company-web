@@ -234,7 +234,6 @@
                               chart-height
                               90)
           hide-chart-nav (:hide-nav options)]
-      (println "d3-dot-chart hide-chart-nav?" hide-chart-nav (keys options))
       (dom/div {:class "d3-dot-container"
                 :style #js {:width (str (+ chart-width 20) "px")
                             :height (str fixed-chart-height "px")}}
