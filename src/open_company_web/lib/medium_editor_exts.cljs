@@ -49,10 +49,14 @@
                                              :left "-35px"})))
         show-btn (fn [e]
                    (utils/after 100
-                     #(when-let [el (.-commonAncestorContainer (.getRangeAt (js/window.getSelection) 0))]
-                        (if (undefined? (.-length el))
-                          (pos-btn (.-top (.position (js/$ el))))
-                          (hide-btn))))
+                    (fn []
+                      (let [sel (js/window.getSelection)
+                            el  (when (= "Range" (.-type sel))
+                                  (.-commonAncestorContainer (.getRangeAt sel 0)))]
+                        (when (and sel el)
+                          (if (undefined? (.-length el))
+                            (pos-btn (.-top (.position (js/$ el))))
+                            (hide-btn))))))
                    true)]
     {:name "file-upload"
      :init (fn []
