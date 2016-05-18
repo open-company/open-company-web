@@ -14,5 +14,5 @@
         (dom/li {} (dom/a {:title "SIGN OUT" :href oc-urls/logout} "SIGN OUT")))
       (when-not (jwt/jwt)
         (dom/li {} (dom/a {:title "SIGN IN / SIGN UP" :href oc-urls/login} "SIGN IN / SIGN UP")))
-      (dom/li {} (dom/a {:title "ABOUT US" :href oc-urls/about} "ABOUT US"))
-      (dom/li {} (dom/a {:title "CONTACT" :href oc-urls/contact} "CONTACT")))))
+      ; (dom/li {} (dom/a {:title "ABOUT US" :href oc-urls/about} "ABOUT US"))
+      (dom/li {} (dom/a {:title "CONTACT" :href oc-urls/contact-mail-to} "CONTACT")))))

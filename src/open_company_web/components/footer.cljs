@@ -21,8 +21,8 @@
                     :style #js {:width (str footer-width "px")}}
             (when-not (responsive/is-mobile)
               (dom/a {:class "oc-logo" :href oc-urls/home} (dom/img {:src "/img/oc-logo-grey.svg"})))
-            (dom/a {:class "footer-link" :href oc-urls/about} (str "ABOUT"  (when-not (responsive/is-mobile) " US")))
-            (dom/a {:class "footer-link" :target "_blank" :href "mailto:oc@opencompany.com"} (str "CONTACT" (when-not (responsive/is-mobile) " US")))
+            ; (dom/a {:class "footer-link" :href oc-urls/about} (str "ABOUT"  (when-not (responsive/is-mobile) " US")))
+            (dom/a {:class "footer-link" :href oc-urls/contact-mail-to} (str "CONTACT" (when-not (responsive/is-mobile) " US")))
             (when (responsive/is-mobile)
               (dom/a {:class "twitter" :target "_blank" :href oc-urls/oc-twitter :alt "twitter"}
                 (dom/img {:src "/img/twitter.svg"})))

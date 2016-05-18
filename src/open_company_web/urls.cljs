@@ -13,6 +13,8 @@
 
 (def contact "/contact")
 
+(def contact-mail-to "mailto:oc@opencompany.com")
+
 (def login "/login")
 
 (def logout "/logout")
