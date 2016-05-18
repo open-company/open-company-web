@@ -55,7 +55,8 @@
                              :svg-click (:topic-click options)
                              :chart-colors {:runway (occ/get-color-by-kw :oc-new-chart-green)}
                              :chart-selected-colors {:runway (occ/get-color-by-kw :oc-new-chart-green)}
-                             :prefix (utils/get-symbol-for-currency-code currency)}}]
+                             :prefix (utils/get-symbol-for-currency-code currency)
+                             :hide-nav (:hide-nav options)}}]
       (dom/div {:class (str "section runway" (when (:read-only data) " read-only"))
                 :on-click (:start-editing-cb data)}
         (when (:show-label options)

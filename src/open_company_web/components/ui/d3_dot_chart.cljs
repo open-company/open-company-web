@@ -232,17 +232,21 @@
   (render-state [_ {:keys [start]}]
     (let [fixed-chart-height (if (> (count chart-data) 1)
                               chart-height
-                              90)]
+                              90)
+          hide-chart-nav (:hide-nav options)]
+      (println "d3-dot-chart hide-chart-nav?" hide-chart-nav (keys options))
       (dom/div {:class "d3-dot-container"
                 :style #js {:width (str (+ chart-width 20) "px")
                             :height (str fixed-chart-height "px")}}
-        (dom/div {:class "chart-prev"
+        (dom/div {:class (str "chart-prev" (when hide-chart-nav " hidden"))
                   :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
                               :opacity (if (> start 0) 1 0)}
                   :on-click #(prev-data owner %)}
           (dom/i {:class "fa fa-caret-left"}))
-        (dom/svg #js {:className "d3-dot-chart" :ref "d3-dots"})
-        (dom/div {:class "chart-next"
+        (dom/svg #js {:className "d3-dot-chart"
+                      :ref "d3-dots"
+                      :style #js {:marginLeft (str (if hide-chart-nav 10 0) "px")}})
+        (dom/div {:class (str "chart-next" (when hide-chart-nav " hidden"))
                   :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
                               :opacity (if (< start (- (count chart-data) show-dots)) 1 0)}
                   :on-click #(next-data owner %)}

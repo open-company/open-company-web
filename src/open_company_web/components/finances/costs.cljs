@@ -33,7 +33,8 @@
                              :interval "monthly"
                              :svg-click (:topic-click options)
                              :chart-colors {:costs (occ/get-color-by-kw :oc-red-light)}
-                             :chart-selected-colors {:costs (occ/get-color-by-kw :oc-red-regular)}}}]
+                             :chart-selected-colors {:costs (occ/get-color-by-kw :oc-red-regular)}
+                             :hide-nav (:hide-nav options)}}]
       (dom/div {:class (utils/class-set {:section true
                                          :costs true
                                          :read-only (:read-only data)})
