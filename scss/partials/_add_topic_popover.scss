@@ -88,6 +88,7 @@ div.add-topic-popover {
     max-height: 237px;
     overflow: scroll;
     padding-bottom: 6px;
+    overflow-x: hidden;
 
     div.potential-topic {
       font-family: $oc_headers_font;
