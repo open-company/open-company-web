@@ -16,3 +16,6 @@ $.append = function(){};
 $.position = function(){};
 $.position.top = {};
 $.position.left = {};
+// Location
+var location = {};
+location.reload = function(){};
