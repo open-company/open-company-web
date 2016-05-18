@@ -239,12 +239,11 @@
 
 (defn upload-file! [editor owner file]
   (let [success-cb  (fn [success]
-                      (let [url      (.-url success)
-                            node     (gdom/createDom "img" #js {:src url})
-                            str-node (str "<img src=\"" url "\">")]
-                        (if-let [marker (gdom/getElement placeholder-id)]
-                          (gdom/replaceNode node marker)
-                          (js/MediumEditor.util.insertHTMLCommand js/document str-node)))
+                      (let [url    (.-url success)
+                            node   (gdom/createDom "img" #js {:src url})
+                            marker (gdom/getElement placeholder-id)]
+                        (gdom/replaceNode node marker))
+                      (gstyle/setStyle (gdom/getElement "file-upload-ui") #js {:display "none"})
                       (om/set-state! owner {}))
         error-cb    (fn [error] (js/console.log "error" error))
         progress-cb (fn [progress]
@@ -255,6 +254,12 @@
       (js/filepicker.storeUrl file success-cb error-cb progress-cb)
       file
       (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
+
+(defn insert-marker! []
+  (when-not (gdom/getElement placeholder-id)
+    (js/MediumEditor.util.insertHTMLCommand
+     js/document
+     (str "<span id=" placeholder-id "></span>"))))
 
 (defcomponent uploader [editor owner]
   (did-mount [_]
@@ -279,14 +284,14 @@
         (case (:state (om/get-state owner))
           :show-options
           (dom/div (dom/button {:style {:font-size "14px"} :class "underline btn-reset p0"
-                                :on-click #(.click (js/document.getElementById "file-upload-ui--select-trigger"))}
+                                :on-click (fn [_]
+                                            (insert-marker!)
+                                            (.click (gdom/getElement "file-upload-ui--select-trigger")))}
                      "Select an image")
             (dom/span {:style {:font-size "14px"}} " or ")
             (dom/button {:style {:font-size "14px"} :class "underline btn-reset p0"
                          :on-click (fn [_]
-                                     (js/MediumEditor.util.insertHTMLCommand
-                                      js/document
-                                      (str "<span id=" placeholder-id "></span>"))
+                                     (insert-marker!)
                                      (om/set-state! owner :state :show-url-field))}
                 "provide an image URL"))
           :show-progress
