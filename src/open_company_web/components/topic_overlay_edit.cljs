@@ -26,6 +26,19 @@
             [cljsjs.filestack] ; pulled in for cljsjs externs
             [cuerdas.core :as s]))
 
+(defn set-end-of-content-editable [content-editable-element]
+  (if (.-createRange js/document)
+    (let [rg (.createRange js/document)]
+      (.selectNodeContents rg content-editable-element)
+      (.collapse rg false)
+      (let [selection (.getSelection js/window)]
+        (.removeAllRanges selection)
+        (.addRange selection rg)))
+    (let [rg (.createTextRange (.-body js/document))]
+      (.moveToElementText rg content-editable-element)
+      (.collapse rg false)
+      (.select rg))))
+
 (def before-unload-message "You have unsaved edits.")
 
 
@@ -35,11 +48,10 @@
     (om/set-state! owner :has-changes true)
     (om/set-state! owner k value)))
 
-(defn focus-headline [topic]
-  (let [topic-field (sel1 [(keyword (str "textarea#topic-edit-headline-" (name topic)))])
-        field-value (.-innerHTML topic-field)]
-    (.focus topic-field)
-    (set! (.-innerHTML topic-field) field-value)))
+(defn focus-headline [owner]
+  (when-let [headline (om/get-ref owner "topic-edit-headline")]
+    (.focus headline)
+    (set-end-of-content-editable headline)))
 
 ;; Finances helpers
 
@@ -220,19 +232,20 @@
     {:data fixed-growth-data}))
 
 (defn data-to-save [owner topic]
-  (let [topic-kw (keyword topic)
-       is-data-topic (#{:finances :growth} topic-kw)
-       with-title {:title (om/get-state owner :title)}
-       with-headline (merge with-title {:headline (om/get-state owner :headline)})
-       body (.-innerHTML (om/get-ref owner "topic-overlay-edit-body"))
-       with-body (merge with-headline (if is-data-topic {:notes {:body body}} {:body body}))
-       with-finances-data (if (= topic-kw :finances)
-                            (merge with-body {:data (finances-clean-data (om/get-state owner :finances-data))})
-                            with-body)
-       with-growth-data (if (= topic-kw :growth)
-                          (merge with-finances-data (growth-save-data owner))
-                          with-finances-data)]
-    with-growth-data))
+  (when-let [body-node (om/get-ref owner "topic-overlay-edit-body")]
+    (let [topic-kw (keyword topic)
+         is-data-topic (#{:finances :growth} topic-kw)
+         with-title {:title (om/get-state owner :title)}
+         with-headline (merge with-title {:headline (om/get-state owner :headline)})
+         body (.-innerHTML body-node)
+         with-body (merge with-headline (if is-data-topic {:notes {:body body}} {:body body}))
+         with-finances-data (if (= topic-kw :finances)
+                              (merge with-body {:data (finances-clean-data (om/get-state owner :finances-data))})
+                              with-body)
+         with-growth-data (if (= topic-kw :growth)
+                            (merge with-finances-data (growth-save-data owner))
+                            with-finances-data)]
+      with-growth-data)))
 
 (defn upload-file! [editor owner file]
   (let [success-cb  (fn [success]
@@ -285,6 +298,28 @@
               "add"))
           (dom/span))))))
 
+(defn headline-on-change [owner]
+  (when-not (om/get-state owner :show-headline-counter)
+    (om/set-state! owner :show-headline-counter true))
+  (om/set-state! owner :has-changes true)
+  (om/set-state! owner :headline (.-innerHTML (om/get-ref owner "topic-edit-headline"))))
+
+(defn check-headline-count [owner headline-mex-length e]
+  (when-let [headline (om/get-ref owner "topic-edit-headline")]
+    (let [headline-value (.-innerText headline)]
+      (when (and (not= (.-keyCode e) 8)
+                 (not= (.-keyCode e) 16)
+                 (not= (.-keyCode e) 17)
+                 (not= (.-keyCode e) 40)
+                 (not= (.-keyCode e) 38)
+                 (not= (.-keyCode e) 13)
+                 (not= (.-keyCode e) 27)
+                 (not= (.-keyCode e) 37)
+                 (not= (.-keyCode e) 39)
+                 (>= (count headline-value) headline-mex-length))
+        (.preventDefault e))
+      (headline-on-change owner))))
+
 (defcomponent topic-overlay-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
 
   (init-state [_]
@@ -307,9 +342,11 @@
     (let [save-ch (utils/get-channel "fullscreen-topic-save")]
       (go (loop []
         (let [change (<! save-ch)]
-          (let [section-data (data-to-save owner topic)]
-            (api/partial-update-section topic section-data)
-            ((:dismiss-editing options)))))))
+          (if-let [section-data (data-to-save owner topic)]
+            (do
+              (api/partial-update-section topic section-data)
+              ((:dismiss-editing options)))
+            (recur))))))
     (let [cancel-ch (utils/get-channel "fullscreen-topic-cancel")]
       (go (loop []
         (let [change (<! cancel-ch)]
@@ -335,7 +372,7 @@
       ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
       (let [body-el (om/get-ref owner "topic-overlay-edit-body")
             slug (keyword (router/current-company-slug))
-            placeholder-data (when (:placeholder topic-data) (utils/get-topic-body topic-data topic))
+            placeholder-data (if (:placeholder topic-data) (utils/get-topic-body topic-data topic) "")
             med-ed (new js/MediumEditor body-el (clj->js
                                                  (->  (utils/medium-editor-options placeholder-data)
                                                       (editor/inject-extension editor/file-upload))))]
@@ -344,7 +381,7 @@
         (js/emojiAutocomplete)
         (om/set-state! owner :initial-body (.-innerHTML body-el))
         (om/set-state! owner :medium-editor med-ed))
-      (focus-headline topic)
+      (focus-headline owner)
       (let [win-location (.-location js/window)
             current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
             listener (events/listen @router/history EventType/NAVIGATE
@@ -415,22 +452,19 @@
           (dom/div {:class (utils/class-set {:topic-edit-title-count true
                                              :transparent (not show-title-counter)})}
             (dom/label {:class "bold"} (- title-length-limit (count title))))
-        (dom/textarea {:class "flex-auto mb3 topic-edit-headline emoji-autocomplete"
-                       :resize false
-                       :id (str "topic-edit-headline-" (name topic))
-                       :type "text"
-                       :placeholder "Headline"
-                       :on-blur #(om/set-state! owner :show-headline-counter false)
-                       :max-length headline-length-limit
-                       :value headline
-                       :on-change (fn [e]
-                                    (when (not show-headline-counter)
-                                      (om/set-state! owner :show-headline-counter true))
-                                    (change-value owner :headline e))})
+        (dom/div #js {:className "topic-edit-headline emoji-autocomplete"
+                      :ref "topic-edit-headline"
+                      :contentEditable true
+                      :id (str "topic-edit-headline-" (name topic))
+                      :placeholder "Headline"
+                      :onBlur #(om/set-state! owner :show-headline-counter false)
+                      :onKeyUp (partial check-headline-count owner headline-length-limit)
+                      :onKeyDown (partial check-headline-count owner headline-length-limit)
+                      :dangerouslySetInnerHTML (clj->js {"__html" (:headline topic-data)})})
         (dom/div {:class (utils/class-set {:topic-edit-headline-count true
                                            :transparent (not show-headline-counter)})}
           (dom/label {:class "bold"} (- headline-length-limit (count headline))))
-        (dom/div {:class "separator headline-separator"})
+        (dom/div {:class "separator"})
         (dom/div {:class "topic-overlay-edit-data"} ;
           (when (= topic "finances")
             (om/build finances-edit {:finances-data finances-data
