@@ -184,9 +184,7 @@
                                                :prev-rev prev-rev
                                                :next-rev next-rev}
                                               {:opts fullscreen-topic-opts}))
-        (when (and can-edit?
-                   is-actual?
-                   (not editing))
+        (when editing
           (dom/div {:class "remove-button"
                     :on-click (partial remove-topic-click owner options)}
             (icon :alert {:size 15
