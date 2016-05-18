@@ -37,6 +37,31 @@ div.fullscreen-topic-edit {
     margin-right: 54px;
   }
 
+  div.topic-edit-headline{
+    font-family: $oc_headers_font;
+    font-size: 26px;
+    line-height: 1.4;
+    color: $oc_gray_5;
+    border: 0px;
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+    margin-top: 18px;
+    height: auto;
+
+    &:empty:before{
+      content: attr(placeholder);
+      display: block; /* For Firefox */
+      opacity: 0.5;
+    }
+
+    &:active, &:focus{
+      border: 0px;
+      outline: none;
+      box-shadow: none;
+    }
+  }
+
   textarea.topic-edit-headline {
     font-family: $oc_headers_font;
     font-size: 26px;
@@ -47,6 +72,7 @@ div.fullscreen-topic-edit {
     padding: 0px;
     margin: 0px;
     margin-top: 2px;
+    height: auto;
 
     &:active, &:focus{
       border: 0px;
@@ -69,10 +95,6 @@ div.fullscreen-topic-edit {
     width: 30px;
     height: 2px;
     background-color: rgba(77, 89, 106, 0.2);
-  }
-
-  div.headline-separator {
-    margin-top: 14px;
   }
 
   div.topic-growth-finances{
@@ -188,23 +210,6 @@ div.fullscreen-topic-edit {
   div.topic-body{
     margin-top: 22px;
 
-    &:active, &:focus {
-      border: 0px;
-      outline: none;
-      box-shadow: none;
-    }
-
-    &, div.topic-body *{
-      font-family: $oc_headers_font;
-      font-size: 18px;
-      line-height: 1.8;
-      color: $oc_gray_5;
-
-      a {
-        cursor: pointer;
-        pointer-events: auto;
-        height: 1.4em;
-      }
-    }
+    @include rich-editor-body($oc_gray_5);
   }
 }
