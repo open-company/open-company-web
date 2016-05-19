@@ -1,5 +1,6 @@
 (ns open-company-web.lib.medium-editor-exts
   (:require [open-company-web.lib.utils :as utils]
+            [goog.dom :as gdom]
             [goog.style :as gstyle]
             [cljsjs.medium-editor]
             [org.martinklepsch.cljsjs-medium-button]))
@@ -33,6 +34,10 @@
    :handleClick (fn [e] (this-as this (.. this -classApplier toggleSelection)))
 })
 
+(defn empty-paragraph? [el]
+  (and (= 1 (-> el .-childNodes .-length))
+       (= "BR" (some-> el .-childNodes (aget 0) .-tagName))))
+
 (def file-upload
   (let [class "file-upload-btn"
         handle (fn [e]
@@ -49,10 +54,14 @@
                                              :left "-35px"})))
         show-btn (fn [e]
                    (utils/after 100
-                     #(when-let [el (.-commonAncestorContainer (.getRangeAt (js/window.getSelection) 0))]
-                        (if (undefined? (.-length el))
-                          (pos-btn (.-top (.position (js/$ el))))
-                          (hide-btn))))
+                    (fn []
+                      (let [sel (js/window.getSelection)
+                            el  (when (pos? (.-rangeCount sel))
+                                  (.-commonAncestorContainer (.getRangeAt sel 0)))]
+                        (when (and sel el)
+                          (if (empty-paragraph? el)
+                            (pos-btn (.-top (.position (js/$ el))))
+                            (hide-btn))))))
                    true)]
     {:name "file-upload"
      :init (fn []
