@@ -12,7 +12,11 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.topic :refer (topic)]
-            [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]))
+            [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
+            [goog.fx.Animation.EventType :as AnimationEventType]
+            [goog.fx.dom :refer (Fade)]))
 
 (defn get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
@@ -47,7 +51,9 @@
     {:initial-active-topics active-topics
      :active-topics active-topics
      :new-sections-requested (or (:new-sections-requested current-state) false)
-     :selected-topic (or (:selected-topic current-state) (:selected-topic data))}))
+     :selected-topic (or (:selected-topic current-state) (:selected-topic data))
+     :tr-selected-topic nil
+     :transitioning false}))
 
 (defn topic-click [owner topic selected-metric]
   (om/set-state! owner :selected-topic topic)
@@ -56,6 +62,7 @@
 (def scrolled-to-top (atom false))
 
 (defn close-overlay-cb [owner]
+  (om/set-state! owner :transitioning false)
   (om/set-state! owner :selected-topic nil)
   (om/set-state! owner :selected-metric nil))
 
@@ -95,6 +102,41 @@
                              {:opts {:section-name section-name
                                      :topic-click (partial topic-click owner section-name)}})))))))
 
+(defn kb-listener [owner e]
+  (when (and (om/get-state owner :selected-topic)
+             (nil? (om/get-state owner :tr-selected-topic)))
+    (let [key-code (.-keyCode e)
+          selected-topic (om/get-state owner :selected-topic)
+          active-topics (om/get-state owner :active-topics)
+          topics-list (flatten (vals active-topics))
+          current-idx (.indexOf (vec topics-list) selected-topic)]
+      (when (= key-code 39)
+        ;next
+        (let [next-idx (mod (inc current-idx) (count topics-list))
+              next-topic (get (vec topics-list) next-idx)]
+          (om/set-state! owner :tr-selected-topic next-topic)))
+      (when (= key-code 37)
+        ;prev
+        (let [prev-idx (mod (dec current-idx) (count topics-list))
+              prev-topic (get (vec topics-list) prev-idx)]
+          (om/set-state! owner :tr-selected-topic prev-topic))))))
+
+(defn animation-finished [owner]
+  (let [cur-state (om/get-state owner)]
+    (om/set-state! owner (merge cur-state {:selected-topic (:tr-selected-topic cur-state)
+                                           :transitioning true
+                                           :tr-selected-topic nil}))))
+
+(defn animate-selected-topic-transition [owner]
+  (let [selected-topic (om/get-ref owner "selected-topic")
+        tr-selected-topic (om/get-ref owner "tr-selected-topic")
+        fade-anim (new Fade selected-topic 1 0 utils/oc-animation-duration)
+        cur-state (om/get-state owner)]
+    (.play (new Fade tr-selected-topic 0 1 utils/oc-animation-duration))
+    (doto fade-anim
+      (.listen AnimationEventType/FINISH #(animation-finished owner))
+      (.play))))
+
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
@@ -107,7 +149,12 @@
     ; make sure the calculation for the fixed navbar are correct
     (when-not @scrolled-to-top
       (set! (.-scrollTop (.-body js/document)) 0)
-      (reset! scrolled-to-top true)))
+      (reset! scrolled-to-top true))
+    (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))]
+      (om/set-state! owner :kb-listener kb-listener)))
+
+  (will-unmount [_]
+    (events/unlistenByKey (om/get-state owner :kb-listener)))
 
   (will-receive-props [_ next-props]
     (when-not (= (:company-data next-props) (:company-data data))
@@ -115,7 +162,11 @@
     (when-not (:read-only (:company-data next-props))
       (get-new-sections-if-needed owner)))
 
-  (render-state [_ {:keys [active-topics selected-topic selected-metric]}]
+  (did-update [_ _ _]
+    (when (om/get-state owner :tr-selected-topic)
+      (animate-selected-topic-transition owner)))
+
+  (render-state [_ {:keys [active-topics selected-topic selected-metric tr-selected-topic transitioning]}]
     (let [slug            (keyword (router/current-company-slug))
           company-data    (:company-data data)
           active-category (keyword (:active-category data))
@@ -132,15 +183,38 @@
       (dom/div {:class "topic-list group"
                 :key "topic-list"}
         (when selected-topic
-          (om/build fullscreen-topic {:section selected-topic
-                                      :section-data (->> selected-topic keyword (get company-data))
-                                      :selected-metric selected-metric
-                                      :read-only (:read-only company-data)
-                                      :card-width card-width
-                                      :currency (:currency company-data)}
-                                     {:opts {:close-overlay-cb #(close-overlay-cb owner)
-                                             :topic-edit-cb (:topic-edit-cb options)
-                                             :remove-topic (partial remove-topic owner)}}))
+          (dom/div {:class "selected-topic-container"
+                    :style #js {:opacity (if selected-topic 1 0)}}
+            (when selected-topic
+              (dom/div #js {:className "selected-topic"
+                            :key (str "transition-" selected-topic)
+                            :ref "selected-topic"
+                            :style #js {:opacity 1 :backgroundColor "rgba(255, 255, 255, 0.98)"}}
+                (om/build fullscreen-topic {:section selected-topic
+                                            :section-data (->> selected-topic keyword (get company-data))
+                                            :selected-metric selected-metric
+                                            :read-only (:read-only company-data)
+                                            :card-width card-width
+                                            :currency (:currency company-data)
+                                            :animate (not transitioning)}
+                                           {:opts {:close-overlay-cb #(close-overlay-cb owner)
+                                                   :topic-edit-cb (:topic-edit-cb options)
+                                                   :remove-topic (partial remove-topic owner)}})))
+            (when tr-selected-topic
+              (dom/div #js {:className "tr-selected-topic"
+                            :key (str "transition-" tr-selected-topic)
+                            :ref "tr-selected-topic"
+                            :style #js {:opacity (if tr-selected-topic 0 1)}}
+              (om/build fullscreen-topic {:section tr-selected-topic
+                                          :section-data (->> tr-selected-topic keyword (get company-data))
+                                          :selected-metric selected-metric
+                                          :read-only (:read-only company-data)
+                                          :card-width card-width
+                                          :currency (:currency company-data)
+                                          :animate false}
+                                         {:opts {:close-overlay-cb #(close-overlay-cb owner)
+                                                 :topic-edit-cb (:topic-edit-cb options)
+                                                 :remove-topic (partial remove-topic owner)}})))))
         ;; Topic list
         (dom/div {:class (utils/class-set {:topic-list-internal true
                                            :group true
