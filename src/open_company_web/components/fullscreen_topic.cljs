@@ -17,7 +17,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
-            [goog.fx.dom :refer (Fade)]
+            [goog.fx.dom :refer (Fade Resize Scroll)]
             [open-company-web.lib.oc-colors :as oc-colors]))
 
 (defn show-fullscreen-topic [owner]
@@ -97,12 +97,47 @@
       ((:remove-topic options) section))
     (hide-fullscreen-topic owner options)))
 
+(defn animate-transition [owner]
+  (let [cur-topic (om/get-ref owner "cur-topic")
+        tr-topic (om/get-ref owner "tr-topic")
+        current-state (om/get-state owner)
+        appear-animation (Fade. tr-topic 0 1 utils/oc-animation-duration)
+        cur-size (js/getComputedStyle cur-topic)
+        tr-size (js/getComputedStyle tr-topic)
+        fullscreen-topic-tran (om/get-ref owner "fullscreen-topic-transition")
+        fullscreen-topic-size (js/getComputedStyle fullscreen-topic-tran)
+        fullscreen-topic (om/get-ref owner "fullscreen-topic")
+        scroll-top (.-scrollTop fullscreen-topic)]
+    ; scroll to top
+    (when (and fullscreen-topic-internal
+               (pos? scroll-top))
+      (.play (Scroll. fullscreen-topic
+                      #js [0 scroll-top]
+                      #js [0 0]
+                      utils/oc-animation-duration)))
+    ; resize the light box
+    (.play (Resize. fullscreen-topic-tran
+                    #js [(js/parseFloat (.-width cur-size)) (js/parseFloat (.-height fullscreen-topic-size))]
+                    #js [(js/parseFloat (.-width cur-size)) (js/parseFloat (.-height tr-size))]
+                    utils/oc-animation-duration))
+    ; fade out current topic
+    (.play (Fade. cur-topic 1 0 utils/oc-animation-duration))
+    ; fade in the new topic
+    (doto appear-animation
+      (events/listen
+        AnimationEventType/FINISH
+        #(om/set-state! owner (merge current-state
+                                    {:as-of (:transition-as-of current-state)
+                                     :transition-as-of nil})))
+      (.play))))
+
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width] :as data} owner options]
 
   (init-state [_]
     (utils/add-channel "fullscreen-topic-save" (chan))
     (utils/add-channel "fullscreen-topic-cancel" (chan))
     {:as-of (:updated-at section-data)
+     :transition-as-of nil
      :editing false
      :show-save-button false
      :actual-as-of (:updated-at section-data)})
@@ -122,7 +157,11 @@
     (utils/remove-channel "fullscreen-topic-cancel")
     (events/unlistenByKey (om/get-state owner :esc-listener-key)))
 
-  (render-state [_ {:keys [as-of actual-as-of editing show-save-button] :as state}]
+  (did-update [_ _ _]
+    (when (om/get-state owner :transition-as-of)
+      (animate-transition owner)))
+
+  (render-state [_ {:keys [as-of transition-as-of actual-as-of editing show-save-button] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -131,13 +170,14 @@
           revisions-list (get (slug @cache/revisions) section-kw)
           topic-data (utils/select-section-data section-data section-kw as-of)
           is-actual? (= as-of actual-as-of)
-          fullscreen-topic-opts (merge options {:rev-nav #(om/set-state! owner :as-of %)})
+          fullscreen-topic-opts (merge options {:rev-nav #(om/set-state! owner :transition-as-of %)})
           edit-topic-opts (merge options {:show-save-button #(om/set-state! owner :show-save-button %)
                                           :dismiss-editing #(om/set-state! owner :editing false)})
           can-edit? (and (responsive/can-edit?)
                          (not (:read-only data)))]
       ; preload previous revision
-      (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
+      (when (and prev-rev
+                 (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
       ; preload next revision
       (when (and (not= (:updated-at next-rev) actual-as-of)
@@ -175,15 +215,38 @@
                                         :prev-rev prev-rev
                                         :next-rev next-rev}
                                        {:opts edit-topic-opts})
-          (om/build fullscreen-topic-internal {:topic section
-                                               :topic-data topic-data
-                                               :selected-metric selected-metric
-                                               :currency currency
-                                               :card-width card-width
-                                               :is-actual is-actual?
-                                               :prev-rev prev-rev
-                                               :next-rev next-rev}
-                                              {:opts fullscreen-topic-opts}))
+          (dom/div #js {:className "fullscreen-topic-transition group"
+                        :ref "fullscreen-topic-transition"
+                        :style (when-not transition-as-of #js {:height "auto"})}
+            (dom/div #js {:className "fullscreen-topic-as-of group"
+                          :ref "cur-topic"
+                          :key (str "cur-" as-of)
+                          :style #js {:opacity 1}}
+              (om/build fullscreen-topic-internal {:topic section
+                                                   :topic-data topic-data
+                                                   :selected-metric selected-metric
+                                                   :currency currency
+                                                   :card-width card-width
+                                                   :is-actual is-actual?
+                                                   :prev-rev prev-rev
+                                                   :next-rev next-rev}
+                                                  {:opts fullscreen-topic-opts}))
+            (when transition-as-of
+              (dom/div #js {:className "fullscreen-topic-tr-as-of group"
+                            :ref "tr-topic"
+                            :key (str "tr-" transition-as-of)
+                            :style #js {:opacity 0}}
+                (let [tr-topic-data (utils/select-section-data section-data section-kw transition-as-of)
+                      tr-prev-rev (utils/revision-prev revisions transition-as-of)
+                      tr-next-rev (utils/revision-next revisions transition-as-of)]
+                  (om/build fullscreen-topic-internal {:topic-data tr-topic-data
+                                                       :topic section
+                                                       :selected-metric selected-metric
+                                                       :currency currency
+                                                       :card-width card-width
+                                                       :prev-rev tr-prev-rev
+                                                       :next-rev tr-next-rev}
+                                                      {:opts fullscreen-topic-opts}))))))
         (when editing
           (dom/div {:class "remove-button"
                     :on-click (partial remove-topic-click owner options)}
