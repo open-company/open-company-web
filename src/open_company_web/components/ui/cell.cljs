@@ -103,8 +103,7 @@
 
           :new
           (dom/div {:class "comp-cell-int state-new"
-                    :on-click #(to-state owner data :edit)}
-            (dom/span {:class "placeholder"} (:placeholder data)))
+                    :on-click #(to-state owner data :edit)})
 
           :display
           (dom/div {:class "comp-cell-int state-display"
@@ -120,6 +119,7 @@
           (dom/div {:class "comp-cell-int state-edit"}
             (dom/input #js {
                        :ref "edit-field"
+                       :placeholder (:placeholder data)
                        :value value
                        :onFocus #(let [input (om/get-ref owner "edit-field")]
                                    (set! (.-value input) (.-value input)))
