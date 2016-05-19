@@ -16,7 +16,8 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
-            [goog.fx.dom :refer (Fade)]))
+            [goog.fx.dom :refer (Fade)]
+            [cljsjs.hammer]))
 
 (defn get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
@@ -102,24 +103,30 @@
                              {:opts {:section-name section-name
                                      :topic-click (partial topic-click owner section-name)}})))))))
 
-(defn kb-listener [owner e]
+(defn switch-topic [owner is-left?]
   (when (and (om/get-state owner :selected-topic)
              (nil? (om/get-state owner :tr-selected-topic)))
-    (let [key-code (.-keyCode e)
-          selected-topic (om/get-state owner :selected-topic)
+    (let [selected-topic (om/get-state owner :selected-topic)
           active-topics (om/get-state owner :active-topics)
           topics-list (flatten (vals active-topics))
           current-idx (.indexOf (vec topics-list) selected-topic)]
-      (when (= key-code 39)
-        ;next
-        (let [next-idx (mod (inc current-idx) (count topics-list))
-              next-topic (get (vec topics-list) next-idx)]
-          (om/set-state! owner :tr-selected-topic next-topic)))
-      (when (= key-code 37)
+      (if is-left?
         ;prev
         (let [prev-idx (mod (dec current-idx) (count topics-list))
               prev-topic (get (vec topics-list) prev-idx)]
-          (om/set-state! owner :tr-selected-topic prev-topic))))))
+          (om/set-state! owner :tr-selected-topic prev-topic))
+        ;next
+        (let [next-idx (mod (inc current-idx) (count topics-list))
+              next-topic (get (vec topics-list) next-idx)]
+          (om/set-state! owner :tr-selected-topic next-topic))))))
+
+(defn kb-listener [owner e]
+  (let [key-code (.-keyCode e)]
+    (when (= key-code 39)
+      ;next
+      (switch-topic owner false))
+    (when (= key-code 37)
+      (switch-topic owner true))))
 
 (defn animation-finished [owner]
   (let [cur-state (om/get-state owner)]
@@ -150,11 +157,18 @@
     (when-not @scrolled-to-top
       (set! (.-scrollTop (.-body js/document)) 0)
       (reset! scrolled-to-top true))
-    (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))]
-      (om/set-state! owner :kb-listener kb-listener)))
+    (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))
+          swipe-listener (js/Hammer (sel1 [:div#app]))];(.-body js/document))]
+      (om/set-state! owner :kb-listener kb-listener)
+      (om/set-state! owner :swipe-listener swipe-listener)
+      (.on swipe-listener "swipeleft" (fn [e] (switch-topic owner true)))
+      (.on swipe-listener "swiperight" (fn [e] (switch-topic owner false)))))
 
   (will-unmount [_]
-    (events/unlistenByKey (om/get-state owner :kb-listener)))
+    (events/unlistenByKey (om/get-state owner :kb-listener))
+    (let [swipe-listener (om/get-state owner :swipe-listener)]
+      (.off swipe-listener "swipeleft")
+      (.off swipe-listener "swiperight")))
 
   (will-receive-props [_ next-props]
     (when-not (= (:company-data next-props) (:company-data data))
