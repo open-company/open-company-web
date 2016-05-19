@@ -38,6 +38,7 @@ div.topic-list{
     left: 0px;
     position: fixed;
     z-index: 1036;
+    border-top: 4px solid $oc_yellow;
 
     div.selected-topic, div.tr-selected-topic {
       height: 100vh;
