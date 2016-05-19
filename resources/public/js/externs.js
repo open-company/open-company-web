@@ -12,3 +12,5 @@ $.position.left = {};
 // Location
 var location = {};
 location.reload = function(){};
+// EmojiAutocomplete
+var emojiAutocomplete = function(){};
