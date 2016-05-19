@@ -162,7 +162,7 @@
           ;; jQuery UI CSS
           [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"}]
           ;; Emoji One Autocomplete CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css?oc_deploy_key"}]          
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css?oc_deploy_key"}]
           ;; Google fonts OpenSans
           [:link {:type "text/css", :rel "stylesheet", :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]]
    :body [:body
@@ -178,10 +178,8 @@
           [:script {:src "/lib/scrollTo/scrollTo.min.js?oc_deploy_key" :type "text/javascript"}]
           ;; jQuery UI
           [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js" :type "text/javascript"}]
-          ;; Emoji One
-          [:script {:src "/lib/emojione/emojione.min.js?oc_deploy_key" :type "text/javascript"}]          
           ;; Emoji One Autocomplete
-          [:script {:src "/js/emojione/autocomplete.js?oc_deploy_key" :type "text/javascript"}]          
+          [:script {:src "/js/emojione/autocomplete.js?oc_deploy_key" :type "text/javascript"}]
           ;; JWT Decode lib
           [:script {:src "/lib/jwt-decode/jwt-decode.min.js?oc_deploy_key" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
