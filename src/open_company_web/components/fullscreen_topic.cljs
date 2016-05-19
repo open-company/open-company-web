@@ -145,7 +145,8 @@
   (did-mount [_]
     (om/set-state! owner :esc-listener-key
       (events/listen js/document EventType/KEYUP (partial esc-listener owner options)))
-    (show-fullscreen-topic owner))
+    (when (:animate data)
+      (show-fullscreen-topic owner)))
 
   (will-receive-props [_ next-props]
     (when-not (= next-props data)
@@ -184,7 +185,7 @@
                   next-rev
                   (not (contains? revisions-list (:updated-at next-rev))))
         (api/load-revision next-rev slug section-kw))
-      (dom/div #js {:className "fullscreen-topic"
+      (dom/div #js {:className (str "fullscreen-topic" (when (:animate data) " initial"))
                     :ref "fullscreen-topic"}
         (when (and can-edit?
                    is-actual?
