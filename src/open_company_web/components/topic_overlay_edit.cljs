@@ -346,6 +346,12 @@
         (.preventDefault e))
       (headline-on-change owner))))
 
+(defn count-chars
+  "A special variant of `count` that will count emoji strings (:smile:)
+   and html spaces (&nbsp;) as single characters."
+  [s]
+  (count (string/replace s #"(:\w+:|&nbsp;)" " ")))
+
 (defcomponent topic-overlay-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
 
   (init-state [_]
@@ -489,7 +495,7 @@
                       :dangerouslySetInnerHTML (clj->js {"__html" (:headline topic-data)})})
         (dom/div {:class (utils/class-set {:topic-edit-headline-count true
                                            :transparent (not show-headline-counter)})}
-          (dom/label {:class "bold"} (- headline-length-limit (count headline))))
+          (dom/label {:class "bold"} (- headline-length-limit (count-chars headline))))
         (dom/div {:class "separator"})
         (dom/div {:class "topic-overlay-edit-data"} ;
           (when (= topic "finances")
