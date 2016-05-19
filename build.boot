@@ -32,6 +32,7 @@
     [cljsjs/medium-editor "5.15.0-1"] ; Medium editor https://clojars.org/cljsjs/medium-editor
     [cljsjs/filestack "2.4.10-0"] ; Filestack https://clojars.org/cljsjs/filestack
     [cljsjs/hammer "2.0.4-5"] ; Touch handler http://hammerjs.github.io/
+    [cljsjs/emojione "2.1.4-0"] ; Emojione http://emojione.com
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"]])
 
 (def static-site-deps
