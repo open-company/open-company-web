@@ -58,18 +58,15 @@
          '[boot.util :as util])
 
 (deftask from-jars
+  "Import files from jars (e.g. CLJSJS) and move them to the desired location in the fileset."
   [i imports IMPORT #{[sym str str]} "Tuples describing imports: [jar-symbol path-in-jar target-path]"]
-  (let [add-jar-args (into {} (for [[j p]  imports] [j (re-pattern (str "^" p "$"))]))
-        move-args (into {} (for [[_ p t]  imports] [(re-pattern (str "^" p "$")) t]))]
-    (util/dbug "Importing from jars: %s\n" (pr-str add-jar-args))
-    (util/dbug "Moving into locations: %s\n" (pr-str move-args))
-    (util/info "Importing %s files from jars...\n" (count imports))
-    (sift :add-jar add-jar-args
-          :move move-args)))
+  (let [add-jar-args (into {} (for [[j p]   imports] [j (re-pattern (str "^" p "$"))]))
+        move-args    (into {} (for [[_ p t] imports] [(re-pattern (str "^" p "$")) t]))]
+    (sift :add-jar add-jar-args :move move-args)))
 
 (task-options!
  from-jars {:imports #{['cljsjs/emojione
-                        "cljsjs/emojione/cmon/sprites/emojione.sprites.svg"
+                        "cljsjs/emojione/common/sprites/emojione.sprites.svg"
                         "public/img/emojione.sprites.svg"]}})
 
 ;; We use a bunch of edn files in `resources/pages` to declare a "page"
