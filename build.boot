@@ -54,7 +54,23 @@
          '[adzerk.boot-reload :refer [reload]]
          '[tolitius.boot-check :as check]
          '[deraen.boot-sass :refer [sass]]
-         '[io.perun :as p])
+         '[io.perun :as p]
+         '[boot.util :as util])
+
+(deftask from-jars
+  [i imports IMPORT #{[sym str str]} "Tuples describing imports: [jar-symbol path-in-jar target-path]"]
+  (let [add-jar-args (into {} (for [[j p]  imports] [j (re-pattern (str "^" p "$"))]))
+        move-args (into {} (for [[_ p t]  imports] [(re-pattern (str "^" p "$")) t]))]
+    (util/dbug "Importing from jars: %s\n" (pr-str add-jar-args))
+    (util/dbug "Moving into locations: %s\n" (pr-str move-args))
+    (util/info "Importing %s files from jars...\n" (count imports))
+    (sift :add-jar add-jar-args
+          :move move-args)))
+
+(task-options!
+ from-jars {:imports #{['cljsjs/emojione
+                        "cljsjs/emojione/cmon/sprites/emojione.sprites.svg"
+                        "public/img/emojione.sprites.svg"]}})
 
 ;; We use a bunch of edn files in `resources/pages` to declare a "page"
 ;; these edn files can hold additional information about the page such
@@ -91,6 +107,7 @@
 (deftask dev []
   (comp (serve :handler 'oc.server/handler
                :port 3559)
+        (from-jars)
         (watch)
         (sass)
         (build-site)
@@ -102,6 +119,7 @@
 (deftask dev-advanced []
   (comp (serve :handler 'oc.server/handler
                :port 3559)
+        (from-jars)
         (watch)
         (sass)
         (build-site)
@@ -112,7 +130,8 @@
               :compiler-options {:externs ["public/js/externs.js"]})))
 
 (deftask prod-build []
-  (comp (sass :output-style :compressed)
+  (comp (from-jars)
+        (sass :output-style :compressed)
         (build-site)
         (cljs :optimizations :advanced
               :source-map true
