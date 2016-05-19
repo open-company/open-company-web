@@ -54,8 +54,10 @@
                              :label-color (occ/get-color-by-kw :oc-gray-5)
                              :label-key :label
                              :sub-label-key :sub-label
+                             :svg-click #(when (:topic-click options) ((:topic-click options) nil))
                              :chart-colors {:value (occ/get-color-by-kw :oc-new-chart-blue)}
-                             :chart-selected-colors {:value (occ/get-color-by-kw :oc-new-chart-blue)}}}]
+                             :chart-selected-colors {:value (occ/get-color-by-kw :oc-new-chart-blue)}
+                             :hide-nav (:hide-nav options)}}]
       (dom/div {:class (utils/class-set {:section true
                                          slug true
                                          :read-only (:read-only data)})

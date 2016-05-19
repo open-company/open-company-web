@@ -1,179 +1,215 @@
-div.topic-overlay-edit {
-  text-align: left;
+div.fullscreen-topic-edit {
+  max-width: 575px;
+  min-width: 302px;
+  margin: #{$navbar_height}px auto 30px;
+  position: relative;
+  min-height: calc(100vh - #{$navbar_height}px - 60px - 4px);
 
-  button {
-    background-color: transparent;
-    border: 0px;
-    margin: 0;
-    padding: 0;
-    outline: none;
+  @include mobile(){
+    margin-top: 40px;
+  }
+
+  input.topic-edit-title {
+    opacity: 0.5;
+    font-weight: 700;
     font-size: 12px;
-  }
+    line-height: 1.5;
+    letter-spacing: 1px;
+    color: $oc_gray_5;
+    text-transform: uppercase;
+    border: 0px;
+    width: 100%;
+    padding: 0px;
 
-  button.cancel {
-    width: 90px;
-    height: 25px;
-    margin-top: 23px;
-    margin-right: 15px;
-    float: right;
-
-    &.save-visible {
-      margin-top: 50px;
-      margin-right: -90px;
+    &:active, &:focus{
+      border: 0px;
+      outline: none;
+      box-shadow: none;
     }
   }
 
-  button.save-topic {
-    width: 90px;
-    height: 25px;
-    border: 1px solid $oc_gray_3;
-    box-shadow: 1px 1px 1px 0 $topic_overlay_border_color;
+  div.topic-edit-title-count {
+    float: right;
+    text-align: right;
+    width: 57px;
+    height: 16px;
+    margin-top: 0px;
+    margin-right: 54px;
+  }
+
+  div.topic-edit-headline{
+    font-family: $oc_headers_font;
+    font-size: 26px;
+    line-height: 1.4;
+    color: $oc_gray_5;
+    border: 0px;
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+    margin-top: 18px;
+    height: auto;
+
+    &:empty:before{
+      content: attr(placeholder);
+      display: block; /* For Firefox */
+      opacity: 0.5;
+    }
+
+    &:active, &:focus{
+      border: 0px;
+      outline: none;
+      box-shadow: none;
+    }
+  }
+
+  textarea.topic-edit-headline {
+    font-family: $oc_headers_font;
+    font-size: 26px;
+    line-height: 1.4;
+    color: $oc_gray_5;
+    border: 0px;
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+    margin-top: 2px;
+    height: auto;
+
+    &:active, &:focus{
+      border: 0px;
+      outline: none;
+      box-shadow: none;
+    }
+  }
+
+  div.topic-edit-headline-count{
+    float: right;
+    text-align: right;
+    width: 57px;
+    height: 16px;
+    margin-top: 0px;
+    margin-right: 54px;
+  }
+
+  div.separator {
     margin-top: 20px;
-    margin-right: 15px;
-    background-color: $oc_green;
-    color: white;
-    float: right;
+    width: 30px;
+    height: 2px;
+    background-color: rgba(77, 89, 106, 0.2);
   }
 
-  div.topic-overlay-edit-header {
-    padding-top: 20px;
-    padding-left: 49px;
-    height: 85px;
-    border-bottom: 2px solid $topic_overlay_border_color;
-
-    input.topic-overlay-edit-title {
-      font-size: 26px;
-      color: $topic_overlay_text_color;
-      line-height: 24px;
-      height: 32px;
-      width: 450px;
-      border: 1px solid $oc_gray_2;
-      border-radius: 3px;
-
-      &:active, &:focus{
-        border: 1px solid $oc_gray_3;
-        outline: none;
-      }
-    }
-
-    div.topic-overlay-edit-title-count {
-      float: right;
-      text-align: right;
-      width: 57px;
-      height: 16px;
-      margin-top: 0px;
-      margin-right: 54px;
-    }
-
-    div.topic-overlay-date {
-      margin-left: 1px;
-      font-size: 12px;
-      color: $topic_overlay_text_color;
-      width: 360px;
-    }
-
+  div.topic-growth-finances{
+    margin-top: 10px;
   }
 
-  div.topic-overlay-edit-content {
-    margin: 10px 0px 10px 0px;
-    padding: 15px 50px 15px 50px;
-    max-height: 515px;
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    position: relative;
+  div.topic-overlay-edit-data {
 
-    div.topic-overlay-edit-data {
+    div.finances, div.growth {
+      margin-top: 10px;
 
-      div.finances, div.growth {
-        margin-left: -50px;
-        width: calc(100% + 100px);
+      div.table-container{
+        width: 100%;
+        background-color: rgba(78, 90, 107, 0.05);
+        padding: 21px 10px 0px 10px;
       }
 
-      div.growth-body {
-        table.table {
-          margin-left: 40px;
-          width: 400px;
-          td.no-cell:first-child, tr:first-child{
-            width: 150px;
+      table.table{
+        border-spacing: 10px;
+        max-width: 100%;
+        width: auto;
+        float: left;
+
+        * {
+          border: 0px solid transparent;
+        }
+
+        thead tr th {
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+          text-transform: uppercase;
+
+          &:first-child {
+            min-width: 100px;
           }
         }
-      }
 
-      div.pillbox-container.growth{
-        background-color: $oc_gray_1;
-        padding: 12px;
-        border: 1px solid $oc_gray_2;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        text-align: center;
-
-        @include big_web(){
-          margin-left: -50px;
-          width: calc(100% + 100px);
+        tr:last-child td:last-child {
+          opacity: 0;
         }
 
-        @include mobile(){
-          margin-left: -23px;
-          width: calc(100% + 46px);
+        tr td.no-cell:first-child {
+          padding-top: 12px;
+          font-weight: 700;
+          font-size: 12px;
+          letter-spacing: 1px;
+          color: rgba(78, 90, 107, 0.5);
         }
 
-        @include pillbox();
+        td.no-cell {
+          font-weight: 700;
+          font-size: 12px;
+          letter-spacing: 1px;
+          color: rgba(78,90,107, 0.5);
+          text-transform: uppercase;
+        }
 
-        label.pillbox.new-metric-slug-placeholder{
-          background-color: $oc_green_light;
-          color: white;
-          text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.6);
+        td div.comp-cell {
+          opacity: 0.5;
+          background-color: #ffffff;
+          padding-top: 4px;
+        }
+
+        td.no-cell, td div.comp-cell div.comp-cell-int {
+          font-weight: normal;
+          font-size: 12px;
+          letter-spacing: 1px;
+          color: #4e5a6b;
+        }
+
+        td.no-cell:last-child {
+          padding-top: 13px;
+        }
+
+        tr th:last-child, tr td:last-child {
+          background-color: rgba(78, 90, 107, 0.1);
+        }
+
+        a.more {
+          font-weight: 700;
+          font-size: 12px;
+          letter-spacing: 1px;
+          color: rgba(78, 90, 107, 0.5);
         }
       }
     }
 
-    div.topic-overlay-edit-headline-count{
-      text-align: right;
-      height: 16px;
-      font-size: 14px;
-      width: 500px;
-      margin-bottom: 24px;
-    }
-
-    textarea.topic-overlay-edit-headline {
-      resize: none;
-      font-weight: 600;
-      font-size: 20px;
-      color: $topic_overlay_text_color;
-      border: 1px solid transparent;
-
-      &:active, &:focus{
-        border: 1px solid transparent;
-        outline: none;
+    div.growth-body {
+      table.table {
+        margin-left: 40px;
+        width: 400px;
+        td.no-cell:first-child, tr:first-child{
+          width: 150px;
+        }
       }
     }
 
-    div.topic-overlay-edit-body {
-      border: 1px solid transparent;
-      margin-top: 1px;
-      font-size: 15px;
-      line-height: 1.7;
-      color: #141312;
-      outline: none;
+    div.pillbox-container.growth{
+      background-color: transparent;
+      padding: 12px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      text-align: center;
+      width: 100%;
 
-      &:active, &:focus {
-        border: 1px solid transparent;
-      }
-
-      * {
-        font-size: 15px;
-        line-height: 1.7;
-        color: #141312;
-      }
-
-      a {
-        text-decoration: underline;
-      }
-
-      img {
-        width: 100%;
-      }
+      @include pillbox();
     }
+  }
+
+  div.topic-body{
+    margin-top: 22px;
+
+    @include rich-editor-body($oc_gray_5);
   }
 }

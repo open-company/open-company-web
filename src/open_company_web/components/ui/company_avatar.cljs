@@ -7,8 +7,6 @@
             [open-company-web.router :as router]
             [open-company-web.urls :as oc-urls]))
 
-(def df-company-avatar-size 40)
-
 (defcomponent company-avatar [data owner]
   (render [_]
     (when (:company-data data)
@@ -23,9 +21,6 @@
             company-home (if (or read-only-company is-profile-page)
                             (oc-urls/company-profile)
                             (oc-urls/company))
-            av-size (or (:size data) df-company-avatar-size)
-            px-size (utils/px av-size)
-            bd-radius (utils/px (int (/ av-size 2)))
             company-logo (:logo company-data)]
         (dom/div {:class (utils/class-set {:company-avatar true
                                            :navbar-brand (:navbar-brand data)})}
@@ -33,15 +28,11 @@
                   :on-click (fn [e]
                               (.preventDefault e)
                               (router/nav! company-home))}
-            (if-not (clojure.string/blank? company-logo)
-              (dom/img {:src company-logo
-                        :class "company-avatar-img"
-                        :title company-name})
-              (dom/div {}
-                (dom/div {:class (utils/class-set {:company-avatar-img true
-                                                   :no-image (clojure.string/blank? company-logo)})
-                          :style {:width px-size
-                                  :height px-size
-                                  :border-radius bd-radius}}
-                  (dom/span {:class "company-avatar-initial"} (clojure.string/upper-case first-letter)))
-                (dom/div {:class "company-avatar-name oc-header"} company-name)))))))))
+            (dom/div {:class "company-avatar-container"}
+              (dom/div {:class "company-avatar-border"}
+                (if-not (clojure.string/blank? company-logo)
+                  (dom/img {:src company-logo
+                            :class "company-avatar-img"
+                            :title company-name})
+                  (dom/span {:class "company-avatar-initial"} first-letter)))
+              (dom/span {:class "company-name"} company-name))))))))

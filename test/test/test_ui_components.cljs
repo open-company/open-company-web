@@ -2,11 +2,9 @@
   (:require [doo.runner :refer-macros [doo-tests]]
             [test.open-company-web.components.ui.currency-picker]
             [test.open-company-web.components.ui.link]
-            [test.open-company-web.components.ui.user-selector]
             [test.open-company-web.components.login]
             [test.open-company-web.components.ui.login-button]
             [test.open-company-web.components.ui.cell]
-            [test.open-company-web.components.update-footer]
             [test.open-company-web.components.ui.utility-components]
             [test.open-company-web.components.section-footer]
             [test.open-company-web.components.ui.popover]
@@ -22,11 +20,9 @@
 (doo-tests
   'test.open-company-web.components.ui.currency-picker
   'test.open-company-web.components.ui.link
-  'test.open-company-web.components.ui.user-selector
   'test.open-company-web.components.login
   'test.open-company-web.components.ui.login-button
   'test.open-company-web.components.ui.cell
-  'test.open-company-web.components.update-footer
   'test.open-company-web.components.ui.utility-components
   'test.open-company-web.components.section-footer
   'test.open-company-web.components.ui.popover

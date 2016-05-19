@@ -144,46 +144,56 @@
   {:head [:head
           [:meta {:charset "utf-8"}]
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
-          [:meta {:content "width=device-width, initial-scale=1, maximum-scale=1", :name "viewport"}]
+          [:meta {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no", :name "viewport"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
           [:title "OpenCompany - Startup Transparency Made Simple"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
-          [:link {:rel "stylesheet", :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"}]
+          [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"}]
           ;; Normalize.css //necolas.github.io/normalize.css/
           ;; TODO inline this into app.main.css
-          [:link {:rel "stylesheet", :href "/css/normalize.css?oc_deploy_key"}]
+          [:link {:rel "stylesheet" :href "/css/normalize.css?oc_deploy_key"}]
           ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
-          [:link {:rel "stylesheet", :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
+          [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
           ;; OpenCompany CSS
-          [:link {:type "text/css", :rel "stylesheet", :href "/css/app.main.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css?oc_deploy_key"}]
           ;; jQuery UI CSS
-          [:link {:rel "stylesheet", :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"}]
-          ;; Google fonts Lora
-          [:link {:type "text/css", :rel "stylesheet", :href "//fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic"}]
+          [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"}]
+          ;; Emoji One Autocomplete CSS
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css?oc_deploy_key"}]          
           ;; Google fonts OpenSans
           [:link {:type "text/css", :rel "stylesheet", :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]]
    :body [:body
           [:div#app [:div.oc-loading.active [:div.oc-loading-internal]]]
           [:div#oc-loading]
           ;; jQuery needed by Bootstrap JavaScript
-          [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"}]
+          [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
+          ;; jQuery needed by Emoji One autocomplete
+          [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.3.4/jquery.textcomplete.min.js" :type "text/javascript"}]
           ;; Bootstrap JavaScript //getbootstrap.com/
-          [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"}]
+          [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"  :type "text/javascript"}]
           ;; jQuery scrollTo plugin
-          [:script {:src "/lib/scrollTo/scrollTo.min.js?oc_deploy_key", :type "text/javascript"}]
+          [:script {:src "/lib/scrollTo/scrollTo.min.js?oc_deploy_key" :type "text/javascript"}]
           ;; jQuery UI
-          [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"}]
+          [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js" :type "text/javascript"}]
           ;; Emoji One
-          [:script {:src "/lib/emojione/emojione.min.js?oc_deploy_key", :type "text/javascript"}]          
+          [:script {:src "/lib/emojione/emojione.min.js?oc_deploy_key" :type "text/javascript"}]          
+          ;; Emoji One Autocomplete
+          [:script {:src "/js/emojione/autocomplete.js?oc_deploy_key" :type "text/javascript"}]          
           ;; JWT Decode lib
-          [:script {:type "text/javascript",:src "/lib/jwt-decode/jwt-decode.min.js?oc_deploy_key"}]
+          [:script {:src "/lib/jwt-decode/jwt-decode.min.js?oc_deploy_key" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
-          [:script {:type "text/javascript", :src "/js/oc.js?oc_deploy_key"}]
+          [:script {:src "/js/oc.js?oc_deploy_key" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
+          [:script {:src "/lib/js-utils/svg-utils.js?oc_deploy_key" :type "text/javascript"}]
+          ;; TODO Remove w/ externs
           [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js?oc_deploy_key"}]
+          ;; Clamp JS
+          [:script {:type "text/javascript", :src "/lib/clamp/clamp.js?oc_deploy_key"}]
+          ;; Filestack
+          [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]
           ;; Adobe Typekit
-          [:script {:src "//use.typekit.net/olr5ghy.js"}]
+          [:script {:src "//use.typekit.net/olr5ghy.js" :type "text/javascript"}]
           [:script "try{Typekit.load({ async: true });}catch(e){}"]]})

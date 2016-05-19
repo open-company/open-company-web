@@ -5,6 +5,7 @@
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.company-header :refer [company-header]]))
@@ -61,9 +62,9 @@
       (if (:loading su-data)
         (dom/h2 {} "Loading...")
         (dom/div {:class (utils/class-set {:stakeholder-update true
-                                           :navbar-offset (not (utils/is-mobile))})}
+                                           :navbar-offset (not (responsive/is-mobile))})}
           ;; Company / user header
-          (when-not (utils/is-mobile)
+          (when-not (responsive/is-mobile)
             (om/build navbar {:auth-settings (:auth-settings data)}))
 
           ;; Company header

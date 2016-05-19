@@ -29,8 +29,9 @@
     [cljsjs/react-dom "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/raven "2.1.0-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "3.5.16-0"] ; d3 externs https://clojars.org/cljsjs/d3
-    [cljsjs/medium-editor "5.15.0-0"] ; Medium editor https://clojars.org/cljsjs/medium-editor
+    [cljsjs/medium-editor "5.15.0-1"] ; Medium editor https://clojars.org/cljsjs/medium-editor
     [cljsjs/filestack "2.4.10-0"] ; Filestack https://clojars.org/cljsjs/filestack
+    [cljsjs/emojione "2.1.4-0"] ; Emojione
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"]])
 
 (def static-site-deps
@@ -52,19 +53,26 @@
          '[adzerk.boot-reload :refer [reload]]
          '[tolitius.boot-check :as check]
          '[deraen.boot-sass :refer [sass]]
-         '[io.perun :as p])
+         '[io.perun :as p]
+         '[boot.util :as util])
+
+(deftask from-jars
+  "Import files from jars (e.g. CLJSJS) and move them to the desired location in the fileset."
+  [i imports IMPORT #{[sym str str]} "Tuples describing imports: [jar-symbol path-in-jar target-path]"]
+  (let [add-jar-args (into {} (for [[j p]   imports] [j (re-pattern (str "^" p "$"))]))
+        move-args    (into {} (for [[_ p t] imports] [(re-pattern (str "^" p "$")) t]))]
+    (sift :add-jar add-jar-args :move move-args)))
+
+(task-options!
+ serve {:handler 'oc.server/handler
+        :port 3559}
+ from-jars {:imports #{['cljsjs/emojione
+                        "cljsjs/emojione/common/sprites/emojione.sprites.svg"
+                        "public/img/emojione.sprites.svg"]}})
 
 ;; We use a bunch of edn files in `resources/pages` to declare a "page"
 ;; these edn files can hold additional information about the page such
 ;; as it's permalink identifier (`:page` key) or the page's title etc.
-
-(deftask test! []
-  (set-env! :source-paths #(conj % "test")
-            :dependencies #(conj % '[cljs-react-test "0.1.3-SNAPSHOT" :scope "test"]))
-  (test-cljs :js-env :phantom
-             :exit? true
-             :update-fs? true
-             :namespaces #{"test.open-company-web.*"}))
 
 (defn page? [f]
   (and (.startsWith (:path f) "pages/")
@@ -86,32 +94,47 @@
                       :page "app-shell.html"
                       :filterer identity)))
 
-(deftask dev []
-  (comp (serve :handler 'oc.server/handler
-               :port 3559)
-        (watch)
+(deftask test! []
+  (set-env! :source-paths #(conj % "test")
+            :dependencies #(conj % '[cljs-react-test "0.1.3-SNAPSHOT" :scope "test"]))
+  (test-cljs :js-env :phantom
+             :exit? true
+             :update-fs? true
+             :namespaces #{"test.open-company-web.*"}))
+
+(deftask development []
+  (task-options!
+   reload {:asset-path "/public"
+           :on-jsload 'open-company-web.core/on-js-reload}
+   cljs {:optimizations :none
+         :compiler-options {:source-map-timestamp true}})
+  identity)
+
+(deftask production []
+  (task-options!
+   sass {:output-style :compressed}
+   cljs {:optimizations :advanced
+         :source-map true
+         :compiler-options {:externs ["public/js/externs.js"]}})
+  identity)
+
+(deftask build []
+  (comp (from-jars)
         (sass)
         (build-site)
-        (reload :asset-path "/public"
-                :on-jsload 'open-company-web.core/on-js-reload)
-        (cljs :optimizations :none
-              :compiler-options {:source-map-timestamp true})))
+        (cljs)))
+
+(deftask run []
+  (comp (serve)
+        (watch)
+        (reload)
+        (build)))
+
+(deftask dev []
+  (comp (development) (run)))
 
 (deftask dev-advanced []
-  (comp (serve :handler 'oc.server/handler
-               :port 3559)
-        (watch)
-        (sass)
-        (build-site)
-        (reload :asset-path "/public"
-                :on-jsload 'open-company-web.core/on-js-reload)
-        (cljs :optimizations :advanced
-              :source-map true
-              :compiler-options {:externs ["public/js/externs.js"]})))
+  (comp (production) (run)))
 
 (deftask prod-build []
-  (comp (sass :output-style :compressed)
-        (build-site)
-        (cljs :optimizations :advanced
-              :source-map true
-              :compiler-options {:externs ["public/js/externs.js"]})))
+  (comp (production) (build)))

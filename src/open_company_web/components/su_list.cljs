@@ -10,12 +10,11 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-body :refer (topic-body)]
             [open-company-web.components.company-header :refer [company-header]]
             [open-company-web.components.ui.link :refer (link)]
-            [open-company-web.components.ui.side-drawer :refer (side-drawer)]
-            [open-company-web.components.ui.drawer-toggler :refer (drawer-toggler)]
             [clojure.string :as str]
             [goog.style :refer (setStyle)]))
 
@@ -38,10 +37,7 @@
 
 (defcomponent stakeholder-updates [data owner]
 
-  (init-state [_] {
-    :drawer-open false})
-
-  (render-state [_ {:keys [drawer-open]}]
+  (render [_]
     (let [su-updates (:stakeholder-updates (:collection (:su-list data)))]
       (dom/div {:class "updates"}
 
@@ -60,8 +56,7 @@
 (defcomponent su-list [data owner]
 
   (init-state [_]
-    {:drawer-open false
-     :toggler-top-margin false
+    {:toggler-top-margin false
      :su-requested false})
 
   (did-mount [_]
@@ -70,7 +65,7 @@
   (did-update [_ _ _]
     (load-su-list-if-needed owner))
 
-  (render-state [_ {:keys [drawer-open]}]
+  (render [_]
     (let [company-data (dispatcher/company-data data)
           su-list (dispatcher/stakeholder-update-list-data data)
           stakeholder-update-data (:stakeholder-update company-data)]
@@ -87,9 +82,9 @@
         ;; Stakeholder update
         (and (not (contains? data :loading)) company-data)
         (dom/div {:class (utils/class-set {:stakeholder-update true
-                                           :navbar-offset (not (utils/is-mobile))})}
+                                           :navbar-offset (not (responsive/is-mobile))})}
           ;; Company / user header
-          (when-not (utils/is-mobile)
+          (when-not (responsive/is-mobile)
             (om/build navbar data))
             
           ;; Company header
@@ -105,7 +100,7 @@
               (om/build stakeholder-updates {:company-data company-data
                                              :su-list su-list})
               ;; Dashboard link
-              (when (utils/is-mobile)
+              (when (responsive/is-mobile)
                 (dom/div {:class "dashboard-link"}
                   (om/build link {:href (oc-urls/company) :name "View Dashboard"}))))))
 

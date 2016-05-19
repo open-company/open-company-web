@@ -1,4 +1,4 @@
-$topic_box_width: 310;
+$topic_box_width: 344;
 $topic_box_height: 170;
 $topic_box_padding: 10;
 
@@ -10,111 +10,77 @@ div.topic-list-edit-container {
   }
 }
 
+.animating div.topic-list{
+  margin-top: 0px;
+  padding-top: #{$navbar_height}px;
+}
+
 div.topic-list{
   position: relative;
   content: "";
   padding-bottom: 20px;
+  margin-top: #{$navbar_height}px;
+  min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
 
   @include mobile(){
     background-color: #d9d9d9;
   }
 
   @include big_web(){
-    background-color: $oc_gray_1;
+    background-color: $oc_gray_6;
   }
 
-  div.topic-list-content {
+  div.topic-list-internal {
+    list-style: none;
     padding: 0;
+    width: 100%;
 
-    @include big_web(){
-      width: #{($topic_box_width * 3)}px;
+    div.topics-column-container {
+      padding: 20px 30px 20px 30px;
       margin: 0 auto;
-    }
 
-    ul.topic-list-internal {
-      float: left;
-      list-style: none;
-      padding: 0;
-      width: 100%;
+      @media screen and (max-width: 413px){
+        margin-left: 9px;
+        margin-right: 9px;
+        width: auto;
+      }
 
-      &.content-loaded:empty {
-        text-align: center;
-        font-size: 18px;
-        padding-top: 100px;
-        color: rgba(0, 0, 0, 0.4);
-        font-family: $oc_main_font;
-        height: 200px;
+      div.topics-column {
+        min-width: 302px;
+        max-width: 500px;
+        margin-right: 20px;
+        float: left;
 
-        &:after {
-          width: 100%;
-          content: "This category is empty. Add a topic below.";
+        &:last-child {
+          margin-right: 0px;
         }
 
-        &.read-only:after {
-          content: "This category is empty.";
+        div.topic-row{
+          height: auto;
+          padding-bottom: 22px;
         }
       }
 
-      li.topic-row{
-        height: auto;
+      &.columns-1 {
+        padding: 20px 0px 20px 0px;
+        div.topics-column{
+          margin: 0 auto;
+          float: none;
 
-        @include mobile(){
-          padding: 0px;
-          margin: 0px;
-          width: 100%;
-        }
-
-        @include big_web(){
-          width: #{$topic_box_width}px;
-          overflow: hidden;
-          padding: #{$topic_box_padding}px;
-          float: left;
-
-          &.full-width {
-            width: 100%;
-            height: auto;
-
-            div.topic {
-              height: auto;
-              color: black;
-              cursor: auto;
-
-              &:hover {
-                background-color: white;
-              }
-
-              &::before {
-                @include triangle(top, white, 0.6em);
-                position: relative;
-                top: -51px;
-                left: 50%;
-              }
-
-              @for $i from 0 through 2{
-                &.li-#{$i}::before {
-                  left: #{($topic_box_width * $i) + ((($topic_box_width - ($topic_box_padding * 2)) / 2) - (20 * 2))}px;
-                }
-              }
-
-              div.topic-expanded-body{
-                padding-top: 0px;
-                margin-top: 0px;
-                padding-bottom: 20px;
-
-                img {
-                  width: 100%;
-                }
-              }
-            }
+          div.topic-row{
+            padding-bottom: 12px;
           }
         }
-
-        &.floating-edit-topic-button {
-          position: fixed;
-          bottom: 0px;
-          background-color: rgba(255, 255, 255, 0.4);
-        }
       }
+    }
+
+    &.content-loaded:empty {
+      text-align: center;
+      font-size: 18px;
+      padding-top: 100px;
+      color: rgba(0, 0, 0, 0.4);
+      font-family: $oc_main_font;
+      height: 200px;
     }
   }
 }

@@ -23,4 +23,13 @@ div.user-profile {
     max-height: 30px;
     margin-right: 10px;
   }
+
+  div.page{
+    position: relative; /* Set the position property so z-index will apply */
+    z-index: 20; /* Make sure this is higher than #menu */
+    top: 0px !important;
+   
+    background: #fff;
+    min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
+  }
 }

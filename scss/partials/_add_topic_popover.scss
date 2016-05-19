@@ -1,0 +1,107 @@
+div.add-topic-popover {
+  width: 200px;
+  max-height: 312px;
+  background-color: #ffffff;
+  position: absolute;
+  top: 29px;
+  z-index: 1000;
+  border-top: solid 2px $oc_yellow;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+
+  div.triangle {
+    position: absolute;
+    top: 0px;
+  }
+
+  &.column-1{
+    left: 249px;
+  }
+
+  &.column-2, &.column-3 {
+    left: -80px;
+  }
+
+  &.column-1:not(.show-above){
+    div.triangle{
+      top: 9px;
+      @include triangle(left, $oc_gray_5, 8px);
+      left: -12px;
+    }
+  }
+
+  &.column-2:not(.show-above), &.column-3:not(.show-above) {
+
+    div.triangle {
+      top: 8px;
+      @include triangle(right, $oc_gray_5, 8px);
+      right: -12px;
+    }
+  }
+
+  // show the popover above the add topic card
+  &.show-above {
+    top: -247px;
+
+    div.triangle {
+      top: 285px;
+    }
+
+    &.column-1 {
+      div.triangle {
+        @include triangle(left, $oc_gray_5, 8px);
+        left: -12px;
+      }
+    }
+
+    &.column-2, &.column-3 {
+      div.triangle {
+        @include triangle(right, $oc_gray_5, 8px);
+        right: -12px;
+      }
+    }
+  }
+
+  div.add-topic-popover-header {
+    height: 40px;
+    background-color: $oc_gray_5;
+    text-transform: uppercase;
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 1px;
+    color: #ffffff;
+    padding-top: 12px;
+  }
+
+  div.add-topic-popover-subheader {
+    opacity: 0.2;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 1px;
+    color: $oc_gray_5;
+    padding: 15px 0 0 19px;
+    text-align: left;
+  }
+
+  div.topics-to-add{
+    text-align: left;
+    max-height: 237px;
+    overflow: scroll;
+    padding-bottom: 6px;
+    overflow-x: hidden;
+
+    div.potential-topic {
+      font-family: $oc_headers_font;
+      font-size: 14px;
+      line-height: 1.7;
+      color: $oc_gray_5;
+      padding-top: 6px;
+      padding-left: 19px;
+      background-color: #ffffff;
+
+      &.highlighted {
+        background-color: rgba(78, 90, 107, 0.2);
+      }
+    }
+  }
+}

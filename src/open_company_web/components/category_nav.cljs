@@ -5,6 +5,7 @@
             [dommy.core :refer-macros (sel1)]
             [cljs.core.async :refer (put!)]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
@@ -36,7 +37,7 @@
   ;; prevent the anchor element from reload the route
   (.preventDefault e)
   (set! js/window.location.hash category-name)
-  (when (utils/is-mobile) (scroll-to-top!))
+  (when (responsive/is-mobile) (scroll-to-top!))
   ;; reactivate the url change handler
   (reset! prevent-route-dispatch false))
 
@@ -49,7 +50,7 @@
           categories (or (:categories company-data) [])
           active-category (:active-category data)
           sections (keys (:sections company-data))
-          navbar-style (if (and (utils/is-mobile)
+          navbar-style (if (and (responsive/is-mobile)
                                 (or navbar-editing ; is editing style
                                 ; or the scroll pivot has been initialized and
                                 ; the scroll is higher than the header
@@ -62,9 +63,9 @@
                     :ref "category-nav"
                     :style navbar-style}
         (dom/div #js {:className "category-nav-internal"
-                      :style #js {:width (if (utils/is-mobile)
+                      :style #js {:width (if (responsive/is-mobile)
                                            "100%"
-                                           (str (* (inc (count sections)) 150) "px"))}}
+                                           (str (* (inc (count sections)) 200) "px"))}}
           (for [category categories]
             (let [category-name (name category)
                   category-class (utils/class-set {:category true

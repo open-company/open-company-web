@@ -93,7 +93,7 @@
       (-> next-circle
           (.attr "stroke" color)
           (.attr "stroke-width" dot-selected-stroke)
-          (.attr "fill" "transparent")
+          (.attr "fill" "white")
           (.attr "r" (if hasvalue dot-radius 0))))
     (render-chart-label owner options idx data)
     (om/set-state! owner :selected idx)))
@@ -121,7 +121,10 @@
                          (.select d3-dots)
                          (.attr "width" chart-width)
                          (.attr "height" chart-height)
-                         (.on "click" #(.stopPropagation (.-event js/d3))))
+                         (.on "click" (fn []
+                                        (when (:svg-click options)
+                                          ((:svg-click options) nil))
+                                        (.stopPropagation (.-event js/d3)))))
           scale-fn (scale owner options)
           data-max (max-y (om/get-props owner :chart-data) chart-keys)
           max-y (scale-fn data-max)]
@@ -169,7 +172,7 @@
                                 dot-radius))
                     (.attr "stroke" (chart-key fill-colors))
                     (.attr "stroke-width" (if (= i selected) dot-selected-stroke dot-stroke))
-                    (.attr "fill" "transparent")
+                    (.attr "fill" "white")
                     (.attr "data-fill" (chart-key fill-colors))
                     (.attr "data-hasvalue" (chart-key data-set))
                     (.attr "data-selectedFill" (chart-key fill-selected-colors))
@@ -186,7 +189,6 @@
               (.attr "height" (- chart-height 50))
               (.attr "x" (* i (/ chart-width show-dots)))
               (.attr "y" 50)
-              (.on "click" #(dot-click owner options i))
               (.on "mouseover" #(dot-click owner options i))
               (.on "mouseout" #(dot-click owner options (om/get-state owner :selected)))
               (.attr "fill" "transparent"))))
@@ -230,17 +232,20 @@
   (render-state [_ {:keys [start]}]
     (let [fixed-chart-height (if (> (count chart-data) 1)
                               chart-height
-                              90)]
+                              90)
+          hide-chart-nav (:hide-nav options)]
       (dom/div {:class "d3-dot-container"
                 :style #js {:width (str (+ chart-width 20) "px")
                             :height (str fixed-chart-height "px")}}
-        (dom/div {:class "chart-prev"
+        (dom/div {:class (str "chart-prev" (when hide-chart-nav " hidden"))
                   :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
                               :opacity (if (> start 0) 1 0)}
                   :on-click #(prev-data owner %)}
           (dom/i {:class "fa fa-caret-left"}))
-        (dom/svg #js {:className "d3-dot-chart" :ref "d3-dots"})
-        (dom/div {:class "chart-next"
+        (dom/svg #js {:className "d3-dot-chart"
+                      :ref "d3-dots"
+                      :style #js {:marginLeft (str (if hide-chart-nav 10 0) "px")}})
+        (dom/div {:class (str "chart-next" (when hide-chart-nav " hidden"))
                   :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
                               :opacity (if (< start (- (count chart-data) show-dots)) 1 0)}
                   :on-click #(next-data owner %)}

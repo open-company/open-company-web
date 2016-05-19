@@ -94,7 +94,6 @@
         query-params (:query-params params)]
     (pre-routing query-params)
     (utils/clean-company-caches)
-    (dis/dispatch! [:topic/reset-expanded])
     ;; save the route
     (router/set-route! [slug route] {:slug slug :query-params query-params})
     ;; do we have the company data already?
@@ -113,7 +112,6 @@
         su-key (dis/stakeholder-update-key slug update-slug)]
     (pre-routing query-params)
     (utils/clean-company-caches)
-    (dis/dispatch! [:topic/reset-expanded])
     ;; save the route
     (router/set-route! [slug "updates" update-slug] {:slug slug :update-slug update-slug :query-params query-params})
     ;; do we have the company data already?

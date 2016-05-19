@@ -29,11 +29,15 @@ div.chart-header-container {
 
 div.actual-container{
   h3.actual {
-    color: $oc_blue;
+    margin-bottom: 5px;
+
+    span {
+      margin-right: 5px;
+    }
   }
 
   h3.actual.gray {
-    color: $oc_gray;
+    color: $oc_gray_5;
   }
 
   h3.actual.green {
@@ -45,15 +49,17 @@ div.actual-container{
   }
 
   h3.actual.blue {
-    color: $oc_blue;
+    color: $oc_gray_5;
   }
 
   h3.actual-label {
     font-size: 12px;
     font-weight: 700;
+    margin-top: 0px;
 
     &.gray {
-      color: $oc_gray;
+      color: $oc_gray_5;
+      opacity: 0.5;
     }
   }
 }

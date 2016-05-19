@@ -27,6 +27,6 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root topic-overlay-edit app-state {:target c})
-          topic-overlay-edit-node (sel1 c [:div.topic-overlay-edit])]
+          topic-overlay-edit-node (sel1 c [:div.fullscreen-topic-edit])]
       (is (not (nil? topic-overlay-edit-node)))
       (tu/unmount! c))))

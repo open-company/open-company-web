@@ -18,8 +18,10 @@ Comment font-weight to font name mapping: https://developer.mozilla.org/en-US/do
 html, body {
   font-family: $oc_main_font;
   font-size: 16px;
-  height: 100%;
   background-color: white;
+  overflow-x: hidden;
+  background-color: #d9d9d9;
+  width: 100vw;
 }
 
 .no-scroll {
@@ -81,12 +83,6 @@ span img.user-icon {
   margin-right: 5px;
 }
 
-svg.emojione {
-  height: 18px;
-  width: 18px;
-  display: inline-block;
-  vertical-align: text-top;
-}
 
 span.num.red {
   color: red;
@@ -96,9 +92,25 @@ span.num.red {
   margin-bottom: 25px;
 }
 
+/* Emoji One */
+svg.emojione {
+  height: 18px;
+  width: 18px;
+  display: inline-block;
+  vertical-align: text-top;
+}
+
 /* Reset bootstrap 3.3.5 help block overflow */
 .input-group[class*=col-] {
   float: left;
   padding-left: 15px;
   padding-right: 15px;
+}
+
+*::selection {
+  background: rgba(249,215,72, 0.5);
+}
+
+*::-moz-selection {
+  background: rgba(249,215,72, 0.5);
 }

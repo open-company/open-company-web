@@ -1,7 +1,10 @@
 (ns open-company-web.components.topic-overlay-edit
-  (:require [om.core :as om :include-macros true]
+  (:require-macros [cljs.core.async.macros :refer (go)])
+  (:require [cljs.core.async :refer (chan <!)]
+            [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel1)]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.medium-editor-exts :as editor]
@@ -16,12 +19,29 @@
             [open-company-web.components.ui.icon :as i]
             [goog.events :as events]
             [goog.style :as gstyle]
+            [goog.dom :as gdom]
             [goog.dom.classlist :as cl]
             [goog.history.EventType :as EventType]
             [cljs-dynamic-resources.core :as cdr]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [cljsjs.filestack] ; pulled in for cljsjs externs
-            [cuerdas.core :as s]))
+            [clojure.string :as string]))
+
+(defn set-end-of-content-editable [content-editable-element]
+  (if (.-createRange js/document)
+    (let [rg (.createRange js/document)]
+      (.selectNodeContents rg content-editable-element)
+      (.collapse rg false)
+      (let [selection (.getSelection js/window)]
+        (.removeAllRanges selection)
+        (.addRange selection rg)))
+    (let [rg (.createTextRange (.-body js/document))]
+      (.moveToElementText rg content-editable-element)
+      (.collapse rg false)
+      (.select rg))))
+
+(def before-unload-message "You have unsaved edits.")
+
 
 (defn change-value [owner k e]
   (let [target (.-target e)
@@ -29,14 +49,10 @@
     (om/set-state! owner :has-changes true)
     (om/set-state! owner k value)))
 
-(defn focus-field [topic field]
-  (let [topic-field (.getElementById js/document (str "topic-edit-" field "-" (name topic)))
-        field-value (.-value topic-field)]
-    (.focus topic-field)
-    (when (or (= field "headline") (= field "title"))
-      (set! (.-value topic-field) field-value))))
-
-(def before-unload-message "You have unsaved changes to the topic.")
+(defn focus-headline [owner]
+  (when-let [headline (om/get-ref owner "topic-edit-headline")]
+    (.focus headline)
+    (set-end-of-content-editable headline)))
 
 ;; Finances helpers
 
@@ -82,7 +98,7 @@
 ;; Growth helpers
 
 (defn growth-get-value [v]
-  (if (s/blank? v)
+  (if (string/blank? v)
     ""
     (if (js/isNaN v)
       0
@@ -90,11 +106,11 @@
 
 (defn growth-fix-row [row]
   (let [fixed-value (growth-get-value (:value row))
-        with-fixed-value (if (s/blank? fixed-value)
+        with-fixed-value (if (string/blank? fixed-value)
                            (dissoc row :value)
                            (assoc row :value fixed-value))
         fixed-target (growth-get-value (:target with-fixed-value))
-        with-fixed-target (if (s/blank? fixed-target)
+        with-fixed-target (if (string/blank? fixed-target)
                            (dissoc with-fixed-value :target)
                            (assoc with-fixed-value :target fixed-target))]
     with-fixed-target))
@@ -194,8 +210,8 @@
     (om/set-state! owner :growth-metrics (:growth-metrics state))
     (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))
     (when (om/get-state owner :growth-new-metric)
-      (let [section-data (:topic-data data)
-            first-metric (:slug (first (:metrics section-data)))]
+      (let [topic-data (:topic-data data)
+            first-metric (:slug (first (:metrics topic-data)))]
         (om/set-state! owner :growth-focus first-metric)))
     ; and the editing state flags
     (om/set-state! owner :growth-new-metric false)))
@@ -217,65 +233,120 @@
     {:data fixed-growth-data}))
 
 (defn data-to-save [owner topic]
-  (let [topic-kw (keyword topic)
-       is-data-topic (#{:finances :growth} topic-kw)
-       with-title {:title (om/get-state owner :title)}
-       with-headline (merge with-title {:headline (om/get-state owner :headline)})
-       body (.-innerHTML (om/get-ref owner "topic-overlay-edit-body"))
-       with-body (merge with-headline (if is-data-topic {:notes {:body body}} {:body body}))
-       with-finances-data (if (= topic-kw :finances)
-                            (merge with-body {:data (finances-clean-data (om/get-state owner :finances-data))})
-                            with-body)
-       with-growth-data (if (= topic-kw :growth)
-                          (merge with-finances-data (growth-save-data owner))
-                          with-finances-data)]
-    with-growth-data))
+  (when-let [body-node (om/get-ref owner "topic-overlay-edit-body")]
+    (let [topic-kw (keyword topic)
+         is-data-topic (#{:finances :growth} topic-kw)
+         with-title {:title (om/get-state owner :title)}
+         with-headline (merge with-title {:headline (om/get-state owner :headline)})
+         body (.-innerHTML body-node)
+         with-body (merge with-headline (if is-data-topic {:notes {:body body}} {:body body}))
+         with-finances-data (if (= topic-kw :finances)
+                              (merge with-body {:data (finances-clean-data (om/get-state owner :finances-data))})
+                              with-body)
+         with-growth-data (if (= topic-kw :growth)
+                            (merge with-finances-data (growth-save-data owner))
+                            with-finances-data)]
+      with-growth-data)))
 
-(defcomponent uploader [data owner]
+(def placeholder-id (str (random-uuid)))
+
+(defn upload-file! [editor owner file]
+  (let [success-cb  (fn [success]
+                      (let [url    (.-url success)
+                            node   (gdom/createDom "img" #js {:src url})
+                            marker (gdom/getElement placeholder-id)]
+                        (gdom/replaceNode node marker))
+                      (gstyle/setStyle (gdom/getElement "file-upload-ui") #js {:display "none"})
+                      (om/set-state! owner {}))
+        error-cb    (fn [error] (js/console.log "error" error))
+        progress-cb (fn [progress]
+                      (om/set-state! owner {:state :show-progress
+                                            :progress progress}))]
+    (cond
+      (and (string? file) (not (string/blank? file)))
+      (js/filepicker.storeUrl file success-cb error-cb progress-cb)
+      file
+      (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
+
+(defn insert-marker! []
+  (when-not (gdom/getElement placeholder-id)
+    (js/MediumEditor.util.insertHTMLCommand
+     js/document
+     (str "<span id=" placeholder-id "></span>"))))
+
+(defcomponent uploader [editor owner]
   (did-mount [_]
-    (assert ls/filestack-key "FileStack API Key required")
-    (js/filepicker.setKey ls/filestack-key))
+    (when-not (utils/is-test-env?)
+      (assert ls/filestack-key "FileStack API Key required")
+      (js/filepicker.setKey ls/filestack-key)))
 
   (render-state [this _]
-    (dom/div {:id "file-upload-ui" :class "flex"
+    (dom/div {:id "file-upload-ui"
               :style (merge {:transition ".2s"}
                             (when (:state (om/get-state owner))
-                              {:background "white" :right 0}))}
+                              {:right 0}))}
+      (dom/div {:class "flex"}
         (dom/input {:id "file-upload-ui--select-trigger" :style {:display "none"} :type "file"
-                    :on-change (fn [e] (js/filepicker.store (-> e .-target .-files (aget 0))
-                                                            (fn [success]
-                                                              (js/MediumEditor.util.insertHTMLCommand js/document (str "<img src=\"" (.-url success) "\">"))
-                                                              (js/console.log (om/get-node owner))
-                                                              ;; (gstyle/setElementShown (om/get-node owner) false)
-                                                              (om/set-state! owner {}))
-                                                            (fn [error] (js/console.log "error" error))
-                                                            #(om/set-state! owner {:state :show-progress
-                                                                                   :progress %})))})
-        (dom/button {:style {:margin-right "13px"}
-                     :on-click (fn [_] (om/set-state! owner :state :show-options))}
-                    (i/icon :circle-add {:size 24}))
+                    :on-change #(upload-file! editor owner (-> % .-target .-files (aget 0)))})
+        (dom/button {:class "btn-reset p0"
+                     :style {:margin-right "13px"
+                             :transition ".2s"
+                             :transform (if (om/get-state owner :state) "rotate(135deg)")}
+                     :on-click (fn [_] (om/update-state! owner :state #(if % nil :show-options)))}
+          (i/icon :circle-add {:size 24}))
         (case (:state (om/get-state owner))
           :show-options
-          (dom/div (dom/button {:style {:font-size "14px"} :class "underline"
-                                :on-click #(.click (js/document.getElementById "file-upload-ui--select-trigger"))}
-                               "Select an image")
-                   #_(dom/span {:style {:font-size "14px"}} " or ")
-                   #_(dom/button {:style {:font-size "14px"} :class "underline"
-                                :on-click #(om/set-state! owner :state :show-url-field)}
-                               "provide URL"))
+          (dom/div (dom/button {:style {:font-size "14px"} :class "underline btn-reset p0"
+                                :on-click (fn [_]
+                                            (insert-marker!)
+                                            (.click (gdom/getElement "file-upload-ui--select-trigger")))}
+                     "Select an image")
+            (dom/span {:style {:font-size "14px"}} " or ")
+            (dom/button {:style {:font-size "14px"} :class "underline btn-reset p0"
+                         :on-click (fn [_]
+                                     (insert-marker!)
+                                     (om/set-state! owner :state :show-url-field))}
+                "provide an image URL"))
           :show-progress
           (dom/span (str "Uploading... " (om/get-state owner :progress) "%"))
           :show-url-field
-          (dom/div (dom/input {:type "text" :auto-focus true :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
+          (dom/div (dom/input {:type "text" :style {:width 300} :auto-focus true
+                               :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
                                :value (om/get-state owner :url)})
-                   (dom/button {:style {:font-size "14px" :margin-left "1rem"} :class "underline"
-                                :on-click #(do (js/MediumEditor.util.insertHTMLCommand js/document (str "<img src=\"" (om/get-state owner :url) "\">"))
-                                               (om/set-state! owner {}))}
-                               "add")
-                   )
-          (dom/div "")))))
+            (dom/button {:style {:font-size "14px" :margin-left "1rem"} :class "underline btn-reset p0"
+                         :on-click #(upload-file! editor owner (om/get-state owner :url))}
+              "add")
+            (dom/button {:style {:font-size "14px" :margin-left "1rem" :opacity "0.5"}
+                         :class "underline btn-reset p0"
+                         :on-click (fn [_]
+                                     (gdom/removeNode (gdom/getElement placeholder-id))
+                                     (om/set-state! owner {}))}
+              "cancel"))
+          (dom/span))))))
 
-(defcomponent topic-overlay-edit [{:keys [topic topic-data currency focus] :as data} owner options]
+(defn headline-on-change [owner]
+  (when-not (om/get-state owner :show-headline-counter)
+    (om/set-state! owner :show-headline-counter true))
+  (om/set-state! owner :has-changes true)
+  (om/set-state! owner :headline (.-innerHTML (om/get-ref owner "topic-edit-headline"))))
+
+(defn check-headline-count [owner headline-mex-length e]
+  (when-let [headline (om/get-ref owner "topic-edit-headline")]
+    (let [headline-value (.-innerText headline)]
+      (when (and (not= (.-keyCode e) 8)
+                 (not= (.-keyCode e) 16)
+                 (not= (.-keyCode e) 17)
+                 (not= (.-keyCode e) 40)
+                 (not= (.-keyCode e) 38)
+                 (not= (.-keyCode e) 13)
+                 (not= (.-keyCode e) 27)
+                 (not= (.-keyCode e) 37)
+                 (not= (.-keyCode e) 39)
+                 (>= (count headline-value) headline-mex-length))
+        (.preventDefault e))
+      (headline-on-change owner))))
+
+(defcomponent topic-overlay-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
 
   (init-state [_]
     (cdr/add-style! "/css/medium-editor/medium-editor.css")
@@ -293,6 +364,25 @@
      (finances-init-state topic (:data topic-data))
      (growth-init-state topic data)))
 
+  (will-mount [_]
+    (let [save-ch (utils/get-channel "fullscreen-topic-save")]
+      (go (loop []
+        (let [change (<! save-ch)]
+          (if-let [section-data (data-to-save owner topic)]
+            (do
+              (api/partial-update-section topic section-data)
+              ((:dismiss-editing options)))
+            (recur))))))
+    (let [cancel-ch (utils/get-channel "fullscreen-topic-cancel")]
+      (go (loop []
+        (let [change (<! cancel-ch)]
+          (if-not (om/get-state owner :has-changes)
+            ((:dismiss-editing options))
+            (if (js/confirm (str before-unload-message " Are you sure you want to proceed?"))
+              ; discard changes
+              ((:dismiss-editing options))
+              (recur))))))))
+
   (will-unmount [_]
     (when-not (utils/is-test-env?)
       ; re enable the route dispatcher
@@ -305,19 +395,19 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (reset! prevent-route-dispatch true)
-      ; save initial innerHTML and setup MediumEditor
+      ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
       (let [body-el (om/get-ref owner "topic-overlay-edit-body")
             slug (keyword (router/current-company-slug))
-            finances-placeholder-data (get (:sections (get (:categories (slug @caches/new-sections)) 2)) 0)
+            placeholder-data (if (:placeholder topic-data) (utils/get-topic-body topic-data topic) "")
             med-ed (new js/MediumEditor body-el (clj->js
-                                                 (->  (utils/medium-editor-options (:note finances-placeholder-data))
+                                                 (->  (utils/medium-editor-options placeholder-data)
                                                       (editor/inject-extension editor/file-upload))))]
         (.subscribe med-ed "editableInput" (fn [event editable]
                                              (om/set-state! owner :has-changes true)))
+        (js/emojiAutocomplete)
         (om/set-state! owner :initial-body (.-innerHTML body-el))
         (om/set-state! owner :medium-editor med-ed))
-      (when focus
-        (focus-field topic focus))
+      (focus-headline owner)
       (let [win-location (.-location js/window)
             current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
             listener (events/listen @router/history EventType/NAVIGATE
@@ -331,6 +421,11 @@
                             ; dispatch the current url
                             (@router/route-dispatcher (router/get-token)))))]
         (om/set-state! owner :history-listener-id listener))))
+
+  (did-update [_ _ prev-state]
+    (let [has-changes (om/get-state owner :has-changes)]
+      (when-not (= (:has-changes prev-state) has-changes)
+        ((:show-save-button options) has-changes))))
 
   (render-state [_ {:keys [has-changes
                            title
@@ -348,7 +443,7 @@
                            growth-metric-slugs]}]
     (let [topic-kw (keyword topic)
           title-length-limit 20
-          section-body (utils/get-topic-body topic-data topic-kw)
+          topic-body (utils/get-topic-body topic-data topic-kw)
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height utils/overlay-max-win-height)
           max-height (min (- 650 126) (- win-height 126))
@@ -358,106 +453,91 @@
           headline-length-limit (if (or (= topic-kw :finances)
                                         (= topic-kw :growth))
                                   80
-                                  100)]
+                                  100)
+          ww (.-clientWidth (sel1 js/document :body))
+          fullscreen-width (if (> ww 575)
+                              575
+                              (min card-width ww))]
       ; set the onbeforeunload handler only if there are changes
       (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
-      (dom/div {:class "topic-overlay-edit"
+      (dom/div {:class "fullscreen-topic-edit group"
+                :style #js {:width (str (- fullscreen-width 20) "px")}
                 :on-click #(.stopPropagation %)}
-        (when has-changes
-          (dom/button {:class "save-topic"
-                       :on-click #(let [section-data (data-to-save owner topic)]
-                                    (.stopPropagation %)
-                                    (api/partial-update-section topic section-data)
-                                    ((:dismiss-editing-cb options)))} "Save"))
-        (dom/button {:class (utils/class-set {:cancel true
-                                              :save-visible has-changes})
-                     :on-click #((:dismiss-editing-cb options))} "Cancel")
-        (dom/div {:class "topic-overlay-edit-header"}
-          (dom/input {:class "topic-overlay-edit-title"
-                      :id (str "topic-edit-title-" (name topic))
-                      :type "text"
-                      :placeholder "Title"
-                      :on-blur #(om/set-state! owner :show-title-counter false)
-                      :max-length title-length-limit
-                      :value title
-                      :on-change (fn [e]
-                                    (when (not show-title-counter)
-                                      (om/set-state! owner :show-title-counter true))
-                                    (change-value owner :title e))})
-          (dom/div {:class (utils/class-set {:topic-overlay-edit-title-count true
+        (dom/input {:class "topic-edit-title"
+                    :id (str "topic-edit-title-" (name topic))
+                    :type "text"
+                    :placeholder "Title"
+                    :on-blur #(om/set-state! owner :show-title-counter false)
+                    :max-length title-length-limit
+                    :value title
+                    :on-change (fn [e]
+                                  (when (not show-title-counter)
+                                    (om/set-state! owner :show-title-counter true))
+                                  (change-value owner :title e))})
+          (dom/div {:class (utils/class-set {:topic-edit-title-count true
                                              :transparent (not show-title-counter)})}
             (dom/label {:class "bold"} (- title-length-limit (count title))))
-          (dom/div {:class "topic-overlay-date"}))
-        (dom/div {:class "topic-overlay-edit-content"
-                  :ref "topic-overlay-edit-content"
-                  :style #js {:maxHeight (str max-height "px")}}
-          (dom/div {:class "relative"}
-            (dom/div {:class "flex"}
-              (dom/textarea {:class "flex-auto mb3 topic-overlay-edit-headline"
-                             :resize false
-                             :id (str "topic-edit-headline-" (name topic))
-                             :type "text"
-                             :placeholder "Headline"
-                             :on-blur #(om/set-state! owner :show-headline-counter false)
-                             :max-length headline-length-limit
-                             :value headline
-                             :on-change (fn [e]
-                                          (when (not show-headline-counter)
-                                            (om/set-state! owner :show-headline-counter true))
-                                          (change-value owner :headline e))})
-              (dom/div {:class (utils/class-set {:ml2 true
-                                                 :mt1 true
-                                                 :pr3 true
-                                                 :transparent (not show-headline-counter)})}
-                (dom/label {:class "bold"} (- headline-length-limit (count headline)))))
-            (dom/div {:class "topic-overlay-edit-data"} ;
-              (when (= topic "finances")
-                (om/build finances-edit {:finances-data finances-data
-                                         :change-finances-cb (partial change-finances-data-cb owner)
-                                         :currency currency}))
-              (when (= topic "growth")
-                (dom/div {}
-                  (om/build growth-edit {:growth-data focus-metric-data
-                                         :metric-slug growth-focus
-                                         :metadata-edit-cb (partial growth-metadata-edit-cb owner)
-                                         :new-metric growth-new-metric
-                                         :metrics growth-metrics
-                                         :metric-count (count focus-metric-data)
-                                         :change-growth-cb (partial growth-change-data-cb owner)
-                                         :delete-metric-cb (partial growth-delete-metric-cb owner data)
-                                         :save-metadata-cb (partial growth-save-metrics-metadata-cb owner data)
-                                         :reset-metrics-cb #(growth-reset-metrics-cb topic owner data)
-                                         :cancel-cb #(growth-cancel-cb owner data)
-                                         :change-growth-metric-cb (partial growth-change-metric-cb owner data)
-                                         :new-growth-section (om/get-state owner :oc-editing)}
-                    {:key focus-metric-data})
-                  (dom/div {:class "pillbox-container growth"}
-                    (for [metric-slug growth-metric-slugs]
-                      (let [metric (get growth-metrics metric-slug)
-                            mname (:name metric)
-                            metric-classes (utils/class-set {:pillbox true
-                                                             metric-slug true
-                                                             :active (= growth-focus metric-slug)})]
-                        (dom/label {:class metric-classes
-                                    :title (:description metric)
-                                    :data-tab metric-slug
-                                    :on-click (fn [e]
-                                                (.stopPropagation e)
-                                                (om/set-state! owner :growth-new-metric false)
-                                                (om/set-state! owner :growth-focus metric-slug))} mname)))
-                    (dom/label {:class (utils/class-set {:pillbox true
-                                                         growth-utils/new-metric-slug-placeholder true
-                                                         :active (= growth-focus growth-utils/new-metric-slug-placeholder)})
-                                :title "Add a new metric"
-                                :data-tab growth-utils/new-metric-slug-placeholder
+        (dom/div #js {:className "topic-edit-headline emoji-autocomplete"
+                      :ref "topic-edit-headline"
+                      :contentEditable true
+                      :id (str "topic-edit-headline-" (name topic))
+                      :placeholder "Headline"
+                      :onBlur #(om/set-state! owner :show-headline-counter false)
+                      :onKeyUp (partial check-headline-count owner headline-length-limit)
+                      :onKeyDown (partial check-headline-count owner headline-length-limit)
+                      :dangerouslySetInnerHTML (clj->js {"__html" (:headline topic-data)})})
+        (dom/div {:class (utils/class-set {:topic-edit-headline-count true
+                                           :transparent (not show-headline-counter)})}
+          (dom/label {:class "bold"} (- headline-length-limit (count headline))))
+        (dom/div {:class "separator"})
+        (dom/div {:class "topic-overlay-edit-data"} ;
+          (when (= topic "finances")
+            (om/build finances-edit {:finances-data finances-data
+                                     :change-finances-cb (partial change-finances-data-cb owner)
+                                     :currency currency}))
+          (when (= topic "growth")
+            (dom/div {}
+              (om/build growth-edit {:growth-data focus-metric-data
+                                     :metric-slug growth-focus
+                                     :metadata-edit-cb (partial growth-metadata-edit-cb owner)
+                                     :new-metric growth-new-metric
+                                     :metrics growth-metrics
+                                     :metric-count (count focus-metric-data)
+                                     :change-growth-cb (partial growth-change-data-cb owner)
+                                     :delete-metric-cb (partial growth-delete-metric-cb owner data)
+                                     :save-metadata-cb (partial growth-save-metrics-metadata-cb owner data)
+                                     :reset-metrics-cb #(growth-reset-metrics-cb topic owner data)
+                                     :cancel-cb #(growth-cancel-cb owner data)
+                                     :change-growth-metric-cb (partial growth-change-metric-cb owner data)
+                                     :new-growth-section (om/get-state owner :oc-editing)}
+                {:key focus-metric-data})
+              (dom/div {:class "pillbox-container growth"}
+                (for [metric-slug growth-metric-slugs]
+                  (let [metric (get growth-metrics metric-slug)
+                        mname (:name metric)
+                        metric-classes (utils/class-set {:pillbox true
+                                                         metric-slug true
+                                                         :active (= growth-focus metric-slug)})]
+                    (dom/label {:class metric-classes
+                                :title (:description metric)
+                                :data-tab metric-slug
                                 :on-click (fn [e]
                                             (.stopPropagation e)
-                                            (om/set-state! owner :growth-new-metric true)
-                                            (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
-            (dom/div #js {:className "topic-overlay-edit-body"
-                          :ref "topic-overlay-edit-body"
-                          :id (str "topic-edit-body-" (name topic))
-                          :dangerouslySetInnerHTML (clj->js {"__html" section-body})})
-            (om/build uploader {})))
-        (dom/div {:class "gradient"})))))
+                                            (om/set-state! owner :growth-new-metric false)
+                                            (om/set-state! owner :growth-focus metric-slug))} mname)))
+                (dom/label {:class (utils/class-set {:pillbox true
+                                                     growth-utils/new-metric-slug-placeholder true
+                                                     :active (= growth-focus growth-utils/new-metric-slug-placeholder)})
+                            :title "Add a new metric"
+                            :data-tab growth-utils/new-metric-slug-placeholder
+                            :on-click (fn [e]
+                                        (.stopPropagation e)
+                                        (om/set-state! owner :growth-new-metric true)
+                                        (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
+        (dom/div {:class "relative"}
+          (dom/div {:className "topic-body emoji-autocomplete"
+                    :ref "topic-overlay-edit-body"
+                    :id (str "topic-edit-body-" (name topic))
+                    :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
+          (om/build uploader (om/get-state owner :medium-editor)))))))

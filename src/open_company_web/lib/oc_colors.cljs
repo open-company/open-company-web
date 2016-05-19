@@ -1,6 +1,7 @@
 (ns open-company-web.lib.oc-colors)
 
 (def oc-colors {
+  :yellow "#f9d748" ; rgb(249,215,72)
   :green "#74E0B4" ;"#26C485"
   :red "#d72a46"
   :blue "#007A9D" ;"#004E64" ;"#109DB7"
@@ -19,10 +20,11 @@
   ;; Grays
   :oc-gray-0 "#FEFEFE"
   :oc-gray-1 "#F1F1F1"
+  :oc-gray-6 "#E0E0E0"
   :oc-gray-2 "#D8D8D8"
   :oc-gray-3 "#8A8A8A"
   :oc-gray-4 "#5B5B5B"
-  :oc-gray-5 "#4E5A6B"
+  :oc-gray-5 "#4E5A6B" ;rgb(78,90,107)
 
   :oc-red-dark "#9E001A"
   :oc-red-regular "#D72A46"
