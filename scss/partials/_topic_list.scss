@@ -30,6 +30,30 @@ div.topic-list{
     background-color: $oc_gray_6;
   }
 
+  div.sharing-button-container {
+    height: 30px;
+    margin: 0 auto;
+    padding: 29px;
+    button.sharing-button {
+      float: right;
+      height: 30px;
+      padding: 5px 20px;
+      background-color: $oc_yellow;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      color: $oc_gray_5;
+      outline: none;
+      border: 0px solid transparent;
+
+      &:active, &:focus{
+        outline: none;
+        border: 0px solid transparent;
+      }
+    }
+  }
+
   div.selected-topic-container{
     background-color: rgba(255, 255, 255, 0.98);
     width: 100vw;
