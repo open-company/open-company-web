@@ -350,7 +350,9 @@
   "A special variant of `count` that will count emoji strings (:smile:)
    and html spaces (&nbsp;) as single characters."
   [s]
-  (count (string/replace s #"(:\w+:|&nbsp;)" " ")))
+  (-> (js/emojione.shortnameToUnicode s)
+      (string/replace #"&nbsp;" " ")
+      count))
 
 (defcomponent topic-overlay-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
 
