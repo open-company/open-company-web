@@ -54,6 +54,7 @@
      :new-sections-requested (or (:new-sections-requested current-state) false)
      :selected-topic (or (:selected-topic current-state) (:selected-topic data))
      :tr-selected-topic nil
+     :topic-navigation true
      :transitioning false}))
 
 (defn topic-click [owner topic selected-metric]
@@ -104,7 +105,8 @@
                                      :topic-click (partial topic-click owner section-name)}})))))))
 
 (defn switch-topic [owner is-left?]
-  (when (and (om/get-state owner :selected-topic)
+  (when (and (om/get-state owner :topic-navigation)
+             (om/get-state owner :selected-topic)
              (nil? (om/get-state owner :tr-selected-topic)))
     (let [selected-topic (om/get-state owner :selected-topic)
           active-topics (om/get-state owner :active-topics)
@@ -147,6 +149,8 @@
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
+    (utils/add-channel "fullscreen-topic-save" (chan))
+    (utils/add-channel "fullscreen-topic-cancel" (chan))
     (get-state data nil))
 
   (did-mount [_]
@@ -166,6 +170,8 @@
         (.on swipe-listener "swiperight" (fn [e] (switch-topic owner false))))))
 
   (will-unmount [_]
+    (utils/remove-channel "fullscreen-topic-save")
+    (utils/remove-channel "fullscreen-topic-cancel")
     (when-not (utils/is-test-env?)
       (events/unlistenByKey (om/get-state owner :kb-listener))
       (let [swipe-listener (om/get-state owner :swipe-listener)]
@@ -215,7 +221,8 @@
                                             :animate (not transitioning)}
                                            {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                    :topic-edit-cb (:topic-edit-cb options)
-                                                   :remove-topic (partial remove-topic owner)}})))
+                                                   :remove-topic (partial remove-topic owner)
+                                                   :toggle-topic-navigation #(om/set-state! owner :topic-navigation %)}})))
             (when tr-selected-topic
               (dom/div #js {:className "tr-selected-topic"
                             :key (str "transition-" tr-selected-topic)
@@ -230,7 +237,8 @@
                                           :animate false}
                                          {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                  :topic-edit-cb (:topic-edit-cb options)
-                                                 :remove-topic (partial remove-topic owner)}})))))
+                                                 :remove-topic (partial remove-topic owner)
+                                                 :toggle-topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
         ;; Topic list
         (dom/div {:class (utils/class-set {:topic-list-internal true
                                            :group true
