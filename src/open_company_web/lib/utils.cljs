@@ -14,7 +14,7 @@
             [open-company-web.lib.iso4217 :refer (iso4217)]
             [open-company-web.caches :refer (company-cache)]
             [open-company-web.local-settings :as ls]
-            [cljsjs.emojione])
+            [cljsjs.emojione]) ; pulled in for cljsjs externs
   (:import  [goog.i18n NumberFormat]))
 
 (defn abs [n] (when n (max n (- n))))
