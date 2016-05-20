@@ -25,11 +25,8 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root cell app-state {:target c})
-          new-node (sel1 c [:div.state-new])
-          new-span (sel1 c [:span])]
+          new-node (sel1 c [:div.state-new])]
       (is (not (nil? new-node)))
-      (is (not (nil? new-span)))
-      (is (= (.-innerHTML new-span) "placeholder"))
       (sim/click new-node nil)
       (om.core/render-all)
       (let [editing-node (sel1 c [:input])]
