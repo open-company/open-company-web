@@ -168,6 +168,7 @@
 
   (render [_]
     (let [{:keys [new-growth-section metric-info]} data
+          all-metrics (:metrics data)
           {:keys [metrics intervals prompt] :as presets} (om/get-state owner :presets)
           units (om/get-state owner :units)]
       (dom/div {:class "growth-metric-edit"}
@@ -237,5 +238,7 @@
                          :title "Delete this metric"
                          :on-click #(show-delete-confirm-popover owner data)} "DELETE"))
           ; cancel button
-          (dom/button {:class "cancel"
-                       :on-click (:cancel-cb data)} "CANCEL"))))))
+          (when-not (and (:new-metric data)
+                         (zero? (count all-metrics)))
+            (dom/button {:class "cancel"
+                         :on-click (:cancel-cb data)} "CANCEL")))))))
