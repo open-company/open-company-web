@@ -361,6 +361,14 @@
         (.preventDefault e))
       (headline-on-change owner))))
 
+(defn count-chars
+  "A special variant of `count` that will count emoji strings (:smile:)
+   and html spaces (&nbsp;) as single characters."
+  [s]
+  (-> (js/emojione.shortnameToUnicode s)
+      (string/replace #"&nbsp;" " ")
+      count))
+
 (defcomponent topic-overlay-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
 
   (init-state [_]
@@ -493,18 +501,20 @@
           (dom/div {:class (utils/class-set {:topic-edit-title-count true
                                              :transparent (not show-title-counter)})}
             (dom/label {:class "bold"} (- title-length-limit (count title))))
-        (dom/div #js {:className "topic-edit-headline emoji-autocomplete"
-                      :ref "topic-edit-headline"
-                      :contentEditable true
-                      :id (str "topic-edit-headline-" (name topic))
-                      :placeholder "Headline"
-                      :onBlur #(om/set-state! owner :show-headline-counter false)
-                      :onKeyUp (partial check-headline-count owner headline-length-limit)
-                      :onKeyDown (partial check-headline-count owner headline-length-limit)
-                      :dangerouslySetInnerHTML (clj->js {"__html" (:headline topic-data)})})
+        (dom/div {:className "topic-edit-headline emoji-autocomplete"
+                  :ref "topic-edit-headline"
+                  :contentEditable true
+                  :id (str "topic-edit-headline-" (name topic))
+                  :placeholder "Headline"
+                  :on-blur #(do (check-headline-count owner headline-length-limit %)
+                                (om/set-state! owner :show-headline-counter false))
+                  :on-key-up   #(check-headline-count owner headline-length-limit %)
+                  :on-key-down #(check-headline-count owner headline-length-limit %)
+                  :on-focus    #(check-headline-count owner headline-length-limit %)
+                  :dangerouslySetInnerHTML (clj->js {"__html" (:headline topic-data)})})
         (dom/div {:class (utils/class-set {:topic-edit-headline-count true
                                            :transparent (not show-headline-counter)})}
-          (dom/label {:class "bold"} (- headline-length-limit (count headline))))
+          (dom/label {:class "bold"} (- headline-length-limit (count-chars headline))))
         (dom/div {:class "separator"})
         (dom/div {:class "topic-overlay-edit-data"} ;
           (when (= topic "finances")

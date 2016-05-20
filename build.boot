@@ -32,6 +32,7 @@
     [cljsjs/medium-editor "5.15.0-1"] ; Medium editor https://clojars.org/cljsjs/medium-editor
     [cljsjs/filestack "2.4.10-0"] ; Filestack https://clojars.org/cljsjs/filestack
     [cljsjs/hammer "2.0.4-5"] ; Touch handler http://hammerjs.github.io/
+    [cljsjs/emojione "2.1.4-1"] ; Emojione http://emojione.com
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"]])
 
 (def static-site-deps
@@ -53,7 +54,20 @@
          '[adzerk.boot-reload :refer [reload]]
          '[tolitius.boot-check :as check]
          '[deraen.boot-sass :refer [sass]]
-         '[io.perun :as p])
+         '[io.perun :as p]
+         '[boot.util :as util])
+
+(deftask from-jars
+  "Import files from jars (e.g. CLJSJS) and move them to the desired location in the fileset."
+  [i imports IMPORT #{[sym str str]} "Tuples describing imports: [jar-symbol path-in-jar target-path]"]
+  (let [add-jar-args (into {} (for [[j p]   imports] [j (re-pattern (str "^" p "$"))]))
+        move-args    (into {} (for [[_ p t] imports] [(re-pattern (str "^" p "$")) t]))]
+    (sift :add-jar add-jar-args :move move-args)))
+
+(task-options!
+ from-jars {:imports #{['cljsjs/emojione
+                        "cljsjs/emojione/common/sprites/emojione.sprites.svg"
+                        "public/img/emojione.sprites.svg"]}})
 
 ;; We use a bunch of edn files in `resources/pages` to declare a "page"
 ;; these edn files can hold additional information about the page such
@@ -90,6 +104,7 @@
 (deftask dev []
   (comp (serve :handler 'oc.server/handler
                :port 3559)
+        (from-jars)
         (watch)
         (sass)
         (build-site)
@@ -101,6 +116,7 @@
 (deftask dev-advanced []
   (comp (serve :handler 'oc.server/handler
                :port 3559)
+        (from-jars)
         (watch)
         (sass)
         (build-site)
@@ -111,7 +127,8 @@
               :compiler-options {:externs ["public/js/externs.js"]})))
 
 (deftask prod-build []
-  (comp (sass :output-style :compressed)
+  (comp (from-jars)
+        (sass :output-style :compressed)
         (build-site)
         (cljs :optimizations :advanced
               :source-map true

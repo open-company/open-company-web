@@ -1,10 +1,3 @@
-// Emoji One
-var emojione = {};
-emojione.ascii = {};
-emojione.imageType = {};
-emojione.sprites = {};
-emojione.imagePathSVGSprites = {};
-emojione.toImage = function(){};
 // jQuery
 var $ = function(){};
 $.val = function(){};
@@ -19,3 +12,5 @@ $.position.left = {};
 // Location
 var location = {};
 location.reload = function(){};
+// EmojiAutocomplete
+var emojiAutocomplete = function(){};

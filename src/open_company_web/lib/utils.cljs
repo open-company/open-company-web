@@ -13,7 +13,8 @@
             [open-company-web.lib.cookies :as cook]
             [open-company-web.lib.iso4217 :refer (iso4217)]
             [open-company-web.caches :refer (company-cache)]
-            [open-company-web.local-settings :as ls])
+            [open-company-web.local-settings :as ls]
+            [cljsjs.emojione]) ; pulled in for cljsjs externs
   (:import  [goog.i18n NumberFormat]))
 
 (defn abs [n] (when n (max n (- n))))
@@ -673,20 +674,15 @@
   or ASCII emoji (old skool) and convert it to HTML string ready to be added to the DOM (dangerously)
   with emoji image tags via the Emoji One lib and resources."
   [text]
-  ;; temporary until emojione is in cljsjs
-  (if (is-test-env?)
-    ;; do not use emojy in tests
-    #js {"__html" text}
-    (do
-      ;; use an SVG sprite map
-      (set! (.-imageType js/emojione) "svg")
-      (set! (.-sprites js/emojione) true)
-      (set! (.-imagePathSVGSprites js/emojione) "/img/emojione.sprites.svg")
-      ;; convert textual emoji's into SVG elements
-      (set! (.-ascii js/emojione) true)
-      (let [text-string (or text "") ; handle nil
-            unicode-string (.toImage js/emojione text-string)]
-        #js {"__html" unicode-string}))))
+  ;; use an SVG sprite map
+  (set! (.-imageType js/emojione) "svg")
+  (set! (.-sprites js/emojione) true)
+  (set! (.-imagePathSVGSprites js/emojione) "/img/emojione.sprites.svg")
+  ;; convert textual emoji's into SVG elements
+  (set! (.-ascii js/emojione) true)
+  (let [text-string (or text "") ; handle nil
+        unicode-string (.toImage js/emojione text-string)]
+    #js {"__html" unicode-string}))
 
 (defn strip-HTML-tags [text]
   (when text
