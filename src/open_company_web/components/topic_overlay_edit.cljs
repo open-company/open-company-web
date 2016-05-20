@@ -342,8 +342,10 @@
 (defn headline-on-change [owner]
   (when-not (om/get-state owner :show-headline-counter)
     (om/set-state! owner :show-headline-counter true))
-  (om/set-state! owner :has-changes true)
-  (om/set-state! owner :headline (.-innerHTML (om/get-ref owner "topic-edit-headline"))))
+  (let [headline-innerHTML (.-innerHTML (om/get-ref owner "topic-edit-headline"))]
+    (when (not= (om/get-state owner :headline) headline-innerHTML)
+      (om/set-state! owner :has-changes true)
+      (om/set-state! owner :headline headline-innerHTML))))
 
 (defn check-headline-count [owner headline-mex-length e]
   (when-let [headline (om/get-ref owner "topic-edit-headline")]
