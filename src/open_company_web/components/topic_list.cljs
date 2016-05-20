@@ -9,10 +9,12 @@
             [open-company-web.caches :as caches]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
+            [open-company-web.lib.oc-colors :as oc-colors]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
+            [open-company-web.components.su-preview :refer (su-preview)]
             [open-company-web.components.ui.icon :refer (icon)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -57,6 +59,7 @@
      :tr-selected-topic nil
      :sharing-mode false
      :topic-navigation true
+     :show-su-preview false
      :share-selected-topics (:sections (:stakeholder-update company-data))
      :transitioning false}))
 
@@ -161,7 +164,7 @@
       (.play))))
 
 (defn toggle-sharing-mode [owner options]
-  (om/set-state! owner :sharing-mode true)
+  (om/update-state! owner :sharing-mode not)
   ((:toggle-sharing-mode options)))
 
 (defcomponent topic-list [data owner options]
@@ -206,7 +209,7 @@
     (when (om/get-state owner :tr-selected-topic)
       (animate-selected-topic-transition owner)))
 
-  (render-state [_ {:keys [active-topics selected-topic selected-metric tr-selected-topic transitioning sharing-mode]}]
+  (render-state [_ {:keys [active-topics selected-topic selected-metric tr-selected-topic transitioning sharing-mode share-selected-topics show-su-preview]}]
     (let [slug            (keyword (router/current-company-slug))
           company-data    (:company-data data)
           active-category (keyword (:active-category data))
@@ -227,16 +230,30 @@
                             1 (if (> ww 413) (str card-width "px") "auto"))]
       (dom/div {:class (str "topic-list group" (when-not sharing-mode " no-sharing"))
                 :key "topic-list"}
+        (when show-su-preview
+          (om/build su-preview {:selected-topics share-selected-topics
+                                :company-data company-data}
+                               {:opts {:dismiss-su-preview #(om/set-state! owner :show-su-preview false)}}))
         (when sharing-mode
           (dom/div {:class "sharing-header"}
             (dom/div {:class "sharing-header-inner group"
                       :style #js {:width internal-width}}
               (dom/div {:class "sharing-header-left"}
-                (dom/label {:class "selected-topics"} "NO TOPICS SELECTED"))
-              (dom/div {:class "sharing-header-center"})
+                (dom/label {:class "selected-topics"}
+                  (if (zero? (count share-selected-topics))
+                    "NO TOPICS SELECTED"
+                    (str (count share-selected-topics) " TOPIC" (when (> (count share-selected-topics) 1) "S") " SELECTED"))))
+              (dom/div {:class "sharing-header-center"}
+                (when (pos? (count share-selected-topics))
+                  (dom/button {:class "share-snapshot-bt"
+                               :on-click #(om/set-state! owner :show-su-preview true)}
+                    "PREVIEW UPDATE")))
               (dom/div {:class "sharing-header-right"}
-                (icon :simple-remove)))))
-        (when (and (not (:read-only company-data))
+                (dom/button {:class "close-share"
+                             :on-click #(toggle-sharing-mode owner options)}
+                  (icon :simple-remove {:stroke "4" :accent-color "white"}))))))
+        (when (and (not (responsive/is-mobile))
+                   (not (:read-only company-data))
                    (not sharing-mode))
           (dom/div {:class "sharing-button-container"
                     :style #js {:width internal-width}}
