@@ -54,12 +54,21 @@
      :new-sections-requested (or (:new-sections-requested current-state) false)
      :selected-topic (or (:selected-topic current-state) (:selected-topic data))
      :tr-selected-topic nil
+     :sharing-mode false
      :topic-navigation true
+     :share-selected-topics (:sections (:stakeholder-update company-data))
      :transitioning false}))
 
 (defn topic-click [owner topic selected-metric]
-  (om/set-state! owner :selected-topic topic)
-  (om/set-state! owner :selected-metric selected-metric))
+  (if (om/get-state owner :sharing-mode)
+    (let [share-selected-topics (om/get-state owner :share-selected-topics)
+          new-share-selected-topics (if (utils/in? share-selected-topics (name topic))
+                                      (utils/vec-dissoc share-selected-topics (name topic))
+                                      (vec (concat share-selected-topics [(name topic)])))]
+      (om/set-state! owner :share-selected-topics new-share-selected-topics))
+    (do
+      (om/set-state! owner :selected-topic topic)
+      (om/set-state! owner :selected-metric selected-metric))))
 
 (def scrolled-to-top (atom false))
 
@@ -91,7 +100,9 @@
                        {:opts {:section-name section-name
                                :topic-click (partial topic-click owner section-name)
                                :update-active-topics (partial update-active-topics owner)}})
-      (let [sd (->> section-name keyword (get company-data))]
+      (let [sharing-mode (om/get-state owner :sharing-mode)
+            share-selected-topics (om/get-state owner :share-selected-topics)
+            sd (->> section-name keyword (get company-data))]
         (when-not (and (:read-only company-data) (:placeholder sd))
           (dom/div #js {:className "topic-row"
                        :ref section-name
@@ -100,7 +111,9 @@
                              :section section-name
                              :section-data sd
                              :currency (:currency company-data)
-                             :active-category active-category}
+                             :active-category active-category
+                             :sharing-mode sharing-mode
+                             :share-selected (utils/in? share-selected-topics section-name)}
                              {:opts {:section-name section-name
                                      :topic-click (partial topic-click owner section-name)}})))))))
 
@@ -188,7 +201,7 @@
     (when (om/get-state owner :tr-selected-topic)
       (animate-selected-topic-transition owner)))
 
-  (render-state [_ {:keys [active-topics selected-topic selected-metric tr-selected-topic transitioning]}]
+  (render-state [_ {:keys [active-topics selected-topic selected-metric tr-selected-topic transitioning sharing-mode]}]
     (let [slug            (keyword (router/current-company-slug))
           company-data    (:company-data data)
           active-category (keyword (:active-category data))
@@ -201,9 +214,20 @@
           add-second-column? (= (count category-topics) 1)
           add-third-column? (>= (count category-topics) 2)
           add-topic?      (and (responsive/can-edit?)
-                               (not (:read-only company-data)))]
+                               (not sharing-mode)
+                               (not (:read-only company-data)))
+          internal-width (case columns-num
+                            3 (str (+ (* card-width 3) 40 60) "px")
+                            2 (str (+ (* card-width 2) 20 60) "px")
+                            1 (if (> ww 413) (str card-width "px") "auto"))]
       (dom/div {:class "topic-list group"
                 :key "topic-list"}
+        (when (and (not (:read-only company-data))
+                   (not sharing-mode))
+          (dom/div {:class "sharing-button-container"
+                    :style #js {:width internal-width}}
+            (dom/button {:class "sharing-button"
+                         :on-click #(om/set-state! owner :sharing-mode true)} "SHARE A SNAPSHOT")))
         (when selected-topic
           (dom/div {:class "selected-topic-container"
                     :style #js {:opacity (if selected-topic 1 0)}}
@@ -241,12 +265,13 @@
                                                  :toggle-topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
         ;; Topic list
         (dom/div {:class (utils/class-set {:topic-list-internal true
+                                           :sharing-mode sharing-mode
                                            :group true
                                            :content-loaded (not (:loading data))})}
           (case columns-num
             3
             (dom/div {:class "topics-column-container group"
-                      :style #js {:width (str (+ (* card-width 3) 40 60) "px")}}
+                      :style #js {:width internal-width}}
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
                 (for [idx (range (inc (quot (count category-topics) 3)))
@@ -276,7 +301,7 @@
                   (render-topic owner "add-topic" company-data active-category 3))))
             2
             (dom/div {:class "topics-column-container columns-2 group"
-                      :style #js {:width (str (+ (* card-width 2) 20 60) "px")}}
+                      :style #js {:width internal-width}}
               (dom/div {:class "topics-column"
                         :style #js {:width (str card-width "px")}}
                 (for [idx (range (inc (quot (count category-topics) 2)))
@@ -298,7 +323,7 @@
                   (render-topic owner "add-topic" company-data active-category 2))))
             ; 1 column or default
             (dom/div {:class "topics-column-container columns-1 group"
-                      :style #js {:width (if (> ww 413) (str card-width "px") "auto")}}
+                      :style #js {:width internal-width}}
               (dom/div {:class "topics-column"}
                 (for [section-name category-topics]
                   (render-topic owner section-name company-data active-category))
