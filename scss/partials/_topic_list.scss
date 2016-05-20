@@ -19,8 +19,11 @@ div.topic-list{
   position: relative;
   content: "";
   padding-bottom: 20px;
-  margin-top: #{$navbar_height}px;
   min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
+
+  &.no-sharing {
+    margin-top: #{$navbar_height}px;
+  }
 
   @include mobile(){
     background-color: #d9d9d9;
@@ -30,22 +33,73 @@ div.topic-list{
     background-color: $oc_gray_6;
   }
 
+  div.sharing-header{
+    border-top: 4px solid $oc_yellow;
+    height: 60px;
+    width: 100%;
+    background-color: rgba(78, 90, 107, 0.5);
+
+    div.sharing-header-inner{
+      margin: 0px auto;
+      padding: 20px 30px;
+
+      div.sharing-header-left{
+        float: left;
+        width: 33%;
+        height: 20px;
+
+        label.selected-topics{
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: #ffffff;
+          margin: 0px;
+          padding: 0px;
+        }
+      }
+
+      div.sharing-header-center{
+        float: left;
+        width: 33%;
+        height: 20px;
+      }
+
+      div.sharing-header-right{
+        float: right;
+        width: 33%;
+        height: 20px;
+        svg {
+          color: white;
+        }
+      }
+    }
+  }
+
   div.sharing-button-container {
     height: 30px;
     margin: 0 auto;
     padding: 29px;
+
     button.sharing-button {
       float: right;
       height: 30px;
       padding: 5px 20px;
-      background-color: $oc_yellow;
+      background-color: transparent;
       font-weight: 700;
       font-size: 12px;
       line-height: 1.5;
       letter-spacing: 1px;
       color: $oc_gray_5;
+      opacity: 0.6;
       outline: none;
       border: 0px solid transparent;
+
+      &:hover {
+        outline: none;
+        border: 0px solid transparent;
+        opacity: 1;
+      }
 
       &:active, &:focus{
         outline: none;
