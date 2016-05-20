@@ -1,10 +1,11 @@
 (ns open-company-web.lib.utils
   (:require [om.core :as om :include-macros true]
             [clojure.string]
-            [dommy.core :refer-macros (sel1)]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [cljs.core.async :refer (put!)]
             [cljs-time.format :as cljs-time-format]
             [cljs-time.core :as cljs-time]
+            [goog.style :refer (setStyle)]
             [goog.fx.dom :refer (Scroll)]
             [goog.string :as gstring]
             [goog.i18n.NumberFormat :as nf]
@@ -688,3 +689,11 @@
   (when text
     (let [reg (js/RegExp. "</?[^>]+(>|$)" "g")]
       (.replace text reg ""))))
+
+(defn disable-scroll []
+  (dommy/add-class! (sel1 [:body]) :no-scroll)
+  (setStyle (sel1 [:div.company-dashboard]) #js {:height "90vh" :overflow "hidden"}))
+
+(defn enable-scroll []
+  (dommy/remove-class! (sel1 [:body]) :no-scroll)
+  (setStyle (sel1 [:div.company-dashboard]) #js {:height "auto" :overflow "auto"}))
