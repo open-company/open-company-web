@@ -365,7 +365,7 @@
   "A special variant of `count` that will count emoji strings (:smile:)
    and html spaces (&nbsp;) as single characters."
   [s]
-  (-> (js/emojione.shortnameToUnicode s)
+  (-> (js/emojione.shortnameToUnicode (or s ""))
       (string/replace #"&nbsp;" " ")
       count))
 
