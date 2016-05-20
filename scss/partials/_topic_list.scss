@@ -25,6 +25,12 @@ div.topic-list{
     margin-top: #{$navbar_height}px;
   }
 
+  &:not(.no-sharing) {
+    div.topic-list-internal{
+      margin-top: 123px;
+    }
+  }
+
   @include mobile(){
     background-color: #d9d9d9;
   }
@@ -41,12 +47,12 @@ div.topic-list{
 
     div.sharing-header-inner{
       margin: 0px auto;
-      padding: 20px 30px;
+      padding: 15px 30px;
 
       div.sharing-header-left{
         float: left;
         width: 33%;
-        height: 20px;
+        height: 30px;
 
         label.selected-topics{
           font-weight: 700;
@@ -62,15 +68,40 @@ div.topic-list{
       div.sharing-header-center{
         float: left;
         width: 33%;
-        height: 20px;
+        height: 30px;
+        text-align: center;
+
+        button.share-snapshot-bt{
+          background-color: $oc_yellow;
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: #4e5a6b;
+          ouline: none;
+          border: 0px solid transparent;
+        }
       }
 
       div.sharing-header-right{
         float: right;
+        text-align: right;
         width: 33%;
-        height: 20px;
-        svg {
-          color: white;
+        height: 30px;
+
+        button.close-share {
+          background-color: transparent;
+          width: 30px;
+          height: 30px;
+          outline: none;
+          border: 0px solid black;
+
+          div.svg-icon{
+            float: right;
+            svg{
+              stroke: white !important;
+            }
+          }
         }
       }
     }
