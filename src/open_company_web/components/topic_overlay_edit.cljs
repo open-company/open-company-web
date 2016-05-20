@@ -54,6 +54,10 @@
     (.focus headline)
     (set-end-of-content-editable headline)))
 
+(defn data-check-value [v]
+  (and (not (= v ""))
+       (not (nil? v))))
+
 ;; Finances helpers
 
 (defn finances-get-value [v]
@@ -76,13 +80,19 @@
   (when (= topic "finances")
     {:finances-data (finances-data-map data)}))
 
+(defn finances-row-has-data [row]
+  (or (data-check-value (:cash row))
+      (data-check-value (:costs row))
+      (data-check-value (:revenue row))))
+
 (defn change-finances-data-cb [owner row]
-  (let [fixed-row (finances-fix-row row)
-        period (:period fixed-row)
-        finances-data (om/get-state owner :finances-data)
-        fixed-data (assoc finances-data period fixed-row)]
-    (om/set-state! owner :has-changes true)
-    (om/set-state! owner :finances-data fixed-data)))
+  (when (finances-row-has-data row)
+    (let [fixed-row (finances-fix-row row)
+          period (:period fixed-row)
+          finances-data (om/get-state owner :finances-data)
+          fixed-data (assoc finances-data period fixed-row)]
+      (om/set-state! owner :has-changes (not= finances-data fixed-data))
+      (om/set-state! owner :finances-data fixed-data))))
 
 (defn finances-clean-row [data]
   ; a data entry is good if we have the period and one other value: cash, costs or revenue
@@ -170,15 +180,20 @@
 (defn growth-metadata-edit-cb [owner editing]
   (om/set-state! owner :growth-metadata-editing editing))
 
+(defn growth-row-has-data [row]
+  (or (data-check-value (:value row))
+      (data-check-value (:target row))))
+
 (defn growth-change-data-cb [owner row]
-  (let [{:keys [period slug] :as fixed-row} (growth-fix-row row)
-        growth-data (om/get-state owner :growth-data)
-        fixed-data (if (and (not (:target fixed-row))
-                            (not (:value fixed-row)))
-                     (dissoc growth-data (str period slug))
-                     (assoc growth-data (str period slug) fixed-row))]
-    (om/set-state! owner :has-changes true)
-    (om/set-state! owner :growth-data fixed-data)))
+  (when (growth-row-has-data row)
+    (let [{:keys [period slug] :as fixed-row} (growth-fix-row row)
+          growth-data (om/get-state owner :growth-data)
+          fixed-data (if (and (not (:target fixed-row))
+                              (not (:value fixed-row)))
+                       (dissoc growth-data (str period slug))
+                       (assoc growth-data (str period slug) fixed-row))]
+      (om/set-state! owner :has-changes true)
+      (om/set-state! owner :growth-data fixed-data))))
 
 (defn growth-change-metric-cb [owner data slug properties-map]
   (let [change-slug (and (contains? properties-map :slug)
