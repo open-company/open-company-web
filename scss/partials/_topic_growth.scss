@@ -1,3 +1,10 @@
+div.topic-body-inner{
+  p{ 
+    @include rich-editor-body();
+    padding: 0 20px !important;
+  }
+}
+
 div.section-container{
   div.pillbox-container.growth{
     background-color: transparent;
