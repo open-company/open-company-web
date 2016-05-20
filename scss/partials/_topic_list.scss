@@ -34,6 +34,7 @@ div.topic-list{
     background-color: rgba(255, 255, 255, 0.98);
     width: 100vw;
     height: 100vh;
+    overflow-y: hidden;
     top: 0px;
     left: 0px;
     position: fixed;
@@ -41,8 +42,8 @@ div.topic-list{
     border-top: 4px solid $oc_yellow;
 
     div.selected-topic, div.tr-selected-topic {
-      height: 100vh;
-      width: 100vw;
+      height: 100%;
+      width: 100%;
     }
   }
 
