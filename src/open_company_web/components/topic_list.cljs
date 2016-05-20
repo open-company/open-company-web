@@ -13,6 +13,7 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
+            [open-company-web.components.ui.icon :refer (icon)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -159,6 +160,10 @@
       (.listen AnimationEventType/FINISH #(animation-finished owner))
       (.play))))
 
+(defn toggle-sharing-mode [owner options]
+  (om/set-state! owner :sharing-mode true)
+  ((:toggle-sharing-mode options)))
+
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
@@ -220,14 +225,23 @@
                             3 (str (+ (* card-width 3) 40 60) "px")
                             2 (str (+ (* card-width 2) 20 60) "px")
                             1 (if (> ww 413) (str card-width "px") "auto"))]
-      (dom/div {:class "topic-list group"
+      (dom/div {:class (str "topic-list group" (when-not sharing-mode " no-sharing"))
                 :key "topic-list"}
+        (when sharing-mode
+          (dom/div {:class "sharing-header"}
+            (dom/div {:class "sharing-header-inner group"
+                      :style #js {:width internal-width}}
+              (dom/div {:class "sharing-header-left"}
+                (dom/label {:class "selected-topics"} "NO TOPICS SELECTED"))
+              (dom/div {:class "sharing-header-center"})
+              (dom/div {:class "sharing-header-right"}
+                (icon :simple-remove)))))
         (when (and (not (:read-only company-data))
                    (not sharing-mode))
           (dom/div {:class "sharing-button-container"
                     :style #js {:width internal-width}}
             (dom/button {:class "sharing-button"
-                         :on-click #(om/set-state! owner :sharing-mode true)} "SHARE A SNAPSHOT")))
+                         :on-click #(toggle-sharing-mode owner options)} "SHARE A SNAPSHOT")))
         (when selected-topic
           (dom/div {:class "selected-topic-container"
                     :style #js {:opacity (if selected-topic 1 0)}}
