@@ -131,11 +131,14 @@
                                      :transition-as-of nil})))
       (.play))))
 
+(defn toggle-editing [owner options]
+  (let [editing-mode (om/get-state owner :editing)]
+    (om/set-state! owner :editing (not editing-mode))
+    ((:toggle-topic-navigation options) editing-mode)))
+
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width] :as data} owner options]
 
   (init-state [_]
-    (utils/add-channel "fullscreen-topic-save" (chan))
-    (utils/add-channel "fullscreen-topic-cancel" (chan))
     {:as-of (:updated-at section-data)
      :transition-as-of nil
      :editing false
@@ -154,8 +157,6 @@
       (om/set-state! owner :actual-as-of (:updated-at (:section-data next-props)))))
 
   (will-unmount [_]
-    (utils/remove-channel "fullscreen-topic-save")
-    (utils/remove-channel "fullscreen-topic-cancel")
     (events/unlistenByKey (om/get-state owner :esc-listener-key)))
 
   (did-update [_ _ _]
@@ -191,7 +192,7 @@
                    is-actual?
                    (not editing))
           (dom/div {:class "edit-button"
-                    :on-click #(om/update-state! owner :editing not)}
+                    :on-click #(toggle-editing owner options)}
             (icon :pencil)))
         (when (and can-edit?
                    editing
