@@ -209,6 +209,6 @@ div.fullscreen-topic-edit {
 
   div.topic-body{
     @include rich-editor-body($oc_gray_5);
-    margin-top: 21px;
+    margin-top: 21px !important;
   }
 }
