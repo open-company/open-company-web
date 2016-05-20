@@ -50,6 +50,9 @@
     (om/set-state! owner :navbar-editing false)
     (om/set-state! owner :last-active-category nil)))
 
+(defn toggle-sharing-mode [owner]
+  (om/update-state! owner :sharing-mode not))
+
 (defcomponent company-dashboard [data owner]
 
   (init-state [_]
@@ -62,12 +65,13 @@
        :navbar-editing false
        :editing-topic false
        :save-bt-active false
+       :sharing-mode false
        :columns-num (responsive/columns-num)}))
 
   (did-mount [_]
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
 
-  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active active-category columns-num] :as state}]
+  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active active-category columns-num sharing-mode] :as state}]
     (let [company-data (dis/company-data data)
           navbar-editing-cb (partial set-navbar-editing owner data)
           card-width (responsive/calc-card-width)]
@@ -80,6 +84,7 @@
             (om/build navbar {:save-bt-active save-bt-active
                               :company-data company-data
                               :card-width card-width
+                              :sharing-mode sharing-mode
                               :columns-num columns-num
                               :auth-settings (:auth-settings data)}))
           (when company-data
@@ -95,7 +100,8 @@
                         {:opts {:navbar-editing-cb navbar-editing-cb
                                 :topic-edit-cb (partial topic-edit-cb owner)
                                 :switch-category-cb (partial switch-category-cb owner)
-                                :save-bt-active-cb (partial set-save-bt-active owner)}})
+                                :save-bt-active-cb (partial set-save-bt-active owner)
+                                :toggle-sharing-mode (partial toggle-sharing-mode owner)}})
               ;; topic edit
               (om/build edit-topic {:section editing-topic
                                     :section-data (get company-data (keyword editing-topic))}
