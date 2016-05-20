@@ -194,6 +194,4 @@
           [:script {:type "text/javascript", :src "/lib/clamp/clamp.js?oc_deploy_key"}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]
-          ;; Adobe Typekit
-          [:script {:src "//use.typekit.net/olr5ghy.js" :type "text/javascript"}]
           [:script "try{Typekit.load({ async: true });}catch(e){}"]]})
