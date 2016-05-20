@@ -157,18 +157,20 @@
     (when-not @scrolled-to-top
       (set! (.-scrollTop (.-body js/document)) 0)
       (reset! scrolled-to-top true))
-    (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))
-          swipe-listener (js/Hammer (sel1 [:div#app]))];(.-body js/document))]
-      (om/set-state! owner :kb-listener kb-listener)
-      (om/set-state! owner :swipe-listener swipe-listener)
-      (.on swipe-listener "swipeleft" (fn [e] (switch-topic owner true)))
-      (.on swipe-listener "swiperight" (fn [e] (switch-topic owner false)))))
+    (when-not (utils/is-test-env?)
+      (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))
+            swipe-listener (js/Hammer (sel1 [:div#app]))];(.-body js/document))]
+        (om/set-state! owner :kb-listener kb-listener)
+        (om/set-state! owner :swipe-listener swipe-listener)
+        (.on swipe-listener "swipeleft" (fn [e] (switch-topic owner true)))
+        (.on swipe-listener "swiperight" (fn [e] (switch-topic owner false))))))
 
   (will-unmount [_]
-    (events/unlistenByKey (om/get-state owner :kb-listener))
-    (let [swipe-listener (om/get-state owner :swipe-listener)]
-      (.off swipe-listener "swipeleft")
-      (.off swipe-listener "swiperight")))
+    (when-not (utils/is-test-env?)
+      (events/unlistenByKey (om/get-state owner :kb-listener))
+      (let [swipe-listener (om/get-state owner :swipe-listener)]
+        (.off swipe-listener "swipeleft")
+        (.off swipe-listener "swiperight"))))
 
   (will-receive-props [_ next-props]
     (when-not (= (:company-data next-props) (:company-data data))
