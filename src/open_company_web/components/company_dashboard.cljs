@@ -80,7 +80,8 @@
         (om/build menu data)
         (dom/div {:class "page"}
           ;; Navbar
-          (when company-data
+          (when (and company-data
+                     (not sharing-mode))
             (om/build navbar {:save-bt-active save-bt-active
                               :company-data company-data
                               :card-width card-width
@@ -101,7 +102,7 @@
                                 :topic-edit-cb (partial topic-edit-cb owner)
                                 :switch-category-cb (partial switch-category-cb owner)
                                 :save-bt-active-cb (partial set-save-bt-active owner)
-                                :toggle-sharing-mode (partial toggle-sharing-mode owner)}})
+                                :toggle-sharing-mode #(toggle-sharing-mode owner)}})
               ;; topic edit
               (om/build edit-topic {:section editing-topic
                                     :section-data (get company-data (keyword editing-topic))}
