@@ -135,9 +135,8 @@ div.fullscreen-topic {
       }
 
       div.topic-body{
-        margin-top: 21px;
-
         @include rich-editor-body($oc_gray_5);
+        margin-top: 21px;
       }
 
       div.topic-attribution {
