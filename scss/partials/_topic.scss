@@ -1,243 +1,244 @@
-div.topic-list {
+$bd_color: rgba(217,217,217,0.8); //#d9d9d9; //rgba(249, 215, 72, 0.5);
 
-  div.topic-list-internal.sharing-mode {
-    div.topic {
-      opacity: 0.5;
-      border: 0px solid transparent;
+div.topics-columns.sharing-mode {
+  div.topic {
+    opacity: 0.5;
+    border: 4px solid $bd_color;
+    box-shadow: none;
 
-      &:hover {
-        opacity: 1;
-        border: 0px solid white;
-      }
+    &:hover {
+      opacity: 1;
+      border: 4px solid $bd_color;
+      box-shadow: none;
+    }
 
-      &.sharing-selected {
-        opacity: 1;
-        border: 4px solid $oc_yellow;
-      }
+    &.sharing-selected {
+      opacity: 1;
+      border: 4px solid $oc_yellow;
+    }
+  }
+}
+
+div.topic {
+  margin: 0px;
+  padding: 0px;
+  height: 100%;
+  background-color: #FCFCFC;
+  border-radius: 2px;
+  text-align: left;
+  border: 0px solid transparent;
+  box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
+
+  &.add-topic {
+    height: 94.5px;
+    border-radius: 2px;
+    background-color: rgba(244, 244, 244 , 0.2);
+    border: solid 1px rgba(78, 90, 107, 0.2);
+    text-align: center;
+    position: relative;
+    box-shadow: none;
+
+    &.active {
+      background-color: #ffffff;
+    }
+
+    div.topic-title {
+      opacity: 0.2;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      color: $oc_gray_5;
+      margin-top: 29px;
     }
   }
 
-  div.topic {
-    margin: 0px;
-    padding: 0px;
-    height: 100%;
-    background-color: #FCFCFC;
-    border-radius: 2px;
-    text-align: left;
-    border: 0px solid transparent;
-    box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
+  @include big_web(){
+    cursor: pointer;
+  }
 
-    &.add-topic {
-      height: 94.5px;
-      border-radius: 2px;
-      background-color: rgba(244, 244, 244 , 0.2);
-      border: solid 1px rgba(78, 90, 107, 0.2);
-      text-align: center;
-      position: relative;
-      box-shadow: none;
+  div.topic-anim{
+    position: relative;
+    height: auto;
 
-      &.active {
-        background-color: #ffffff;
-      }
-
-      div.topic-title {
-        opacity: 0.2;
-        font-weight: 700;
-        font-size: 12px;
-        line-height: 1.5;
-        letter-spacing: 1px;
-        color: $oc_gray_5;
-        margin-top: 29px;
-      }
+    & > div.topic-tr-as-of {
+      position: absolute;
+      top: 0;
+      left: 0;
     }
 
-    @include big_web(){
-      cursor: pointer;
-    }
-
-    div.topic-anim{
-      position: relative;
+    & > div {
       height: auto;
 
-      & > div.topic-tr-as-of {
-        position: absolute;
-        top: 0;
-        left: 0;
-      }
+      div.topic-internal{
 
-      & > div {
-        height: auto;
+        & > div{
+          padding: 0px 20px;
+        }
 
-        div.topic-internal{
+        div.topic-header {
 
-          & > div{
-            padding: 0px 20px;
+          .topic-image {
+            width: 30px;
+            height: 30px;
+            float: left;
           }
 
-          div.topic-header {
-
-            .topic-image {
-              width: 30px;
-              height: 30px;
-              float: left;
-            }
-
-            svg path, svg polygon {
-              fill: #8b8a8a;
-            }
+          svg path, svg polygon {
+            fill: #8b8a8a;
           }
+        }
 
-          div.card-header{
-            margin: 0px;
-            padding: 0px;
-            width: 100%;
-            position: relative;
-            padding-top: 10px;
+        div.card-header{
+          margin: 0px;
+          padding: 0px;
+          width: 100%;
+          position: relative;
+          padding-top: 10px;
 
-            &.card-image {
-              max-height: 196px;
-              overflow: hidden;
-              padding-top: 0px;
-            }
-
-            img {
-              width:100%;
-            }
-
-            div.section-container {
-              margin: 10px;
-            }
-
-            div.gradient {
-              position:absolute;
-              z-index:2;
-              right:0; bottom:0; left:0px;
-              width: 100%;
-              height: 20px; /* adjust it to your needs */
-              background: url(data:image/svg+xml;base64,alotofcodehere);
-              background: -moz-linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(255,255,255,1) 70%);
-              background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(70%,rgba(255,255,255,1)));
-              background: -webkit-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
-              background: -o-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
-              background: -ms-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
-              background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
-              pointer-events: none;
-            }
-          }
-
-          div.topic-title {
-            padding-top: 10px;
-            opacity: 0.5;
-            font-weight: 700;
-            font-size: 12px;
-            line-height: 1.5;
-            letter-spacing: 1px;
-            color: $oc_gray_5;
-            text-transform: uppercase;
-          }
-
-          div.topic-headline-inner {
-            padding-top: 15px;
-            font-family: $oc_headers_font;
-            font-size: 20px;
-            line-height: 1.2;
-            color: $oc_gray_5;
-
-            svg.emojione {
-              width: 20px;
-              height: 20px;
-            }
-          }
-
-          div.hidden-topic-body {
-            display: none;
-            padding: 0px;
-            margin: 0px;
-            opacity: 0;
-          }
-
-          div.topic-body {
-            margin-top: 10px;
-            margin-bottom: 20px;
-            color: $oc_gray_5;
-            max-height: 31px;
+          &.card-image {
+            max-height: 196px;
             overflow: hidden;
-            cursor: pointer;
+            padding-top: 0px;
+          }
+
+          img {
+            width:100%;
+          }
+
+          div.section-container {
+            margin: 10px;
+          }
+
+          div.gradient {
+            position:absolute;
+            z-index:2;
+            right:0; bottom:0; left:0px;
+            width: 100%;
+            height: 20px; /* adjust it to your needs */
+            background: url(data:image/svg+xml;base64,alotofcodehere);
+            background: -moz-linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(255,255,255,1) 70%);
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(70%,rgba(255,255,255,1)));
+            background: -webkit-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+            background: -o-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+            background: -ms-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+            background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+            pointer-events: none;
+          }
+        }
+
+        div.topic-title {
+          padding-top: 10px;
+          opacity: 0.5;
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+          text-transform: uppercase;
+        }
+
+        div.topic-headline-inner {
+          padding-top: 15px;
+          font-family: $oc_headers_font;
+          font-size: 20px;
+          line-height: 1.2;
+          color: $oc_gray_5;
+
+          svg.emojione {
+            width: 20px;
+            height: 20px;
+          }
+        }
+
+        div.hidden-topic-body {
+          display: none;
+          padding: 0px;
+          margin: 0px;
+          opacity: 0;
+        }
+
+        div.topic-body {
+          margin-top: 10px;
+          margin-bottom: 20px;
+          color: $oc_gray_5;
+          max-height: 31px;
+          overflow: hidden;
+          cursor: pointer;
+          font-family: $oc_headers_font;
+          font-size: 12px;
+          line-height: 1.3;
+
+          svg.emojione {
+            width: 12px;
+            height: 12px;
+          }
+
+          *{
             font-family: $oc_headers_font;
             font-size: 12px;
             line-height: 1.3;
-
-            svg.emojione {
-              width: 12px;
-              height: 12px;
-            }
-
-            *{
-              font-family: $oc_headers_font;
-              font-size: 12px;
-              line-height: 1.3;
-              max-height: 31px;
-              cursor: pointer;
-            }
-
-            a {
-              text-decoration: none;
-            }
-
-            img{
-              display: none;
-            }
+            max-height: 31px;
+            cursor: pointer;
           }
 
-          div.topic-more {
-            margin-top: 10px;
-            text-align: center;
-
-            img {
-              width: 30px;
-              height: 30px;
-            }
-
-            i {
-              font-size: 6px;
-              margin-left: 3px;
-              line-height: 1;
-              font-weight: 600;
-              color: #bababa;
-            }
+          a {
+            text-decoration: none;
           }
 
-          div.topic-date {
-            font-size: 12px;
-            font-style: italic;
-            color: #A6A6A3; /* gray */
+          img{
+            display: none;
+          }
+        }
 
-            label {
-              margin: 0px;
-              font-weight: normal;
-            }
+        div.topic-more {
+          margin-top: 10px;
+          text-align: center;
+
+          img {
+            width: 30px;
+            height: 30px;
           }
 
-          div.body-navigation-container{
-            @include mobile(){
-              padding: 0px;
-            }
-
-            @include big_web(){
-              padding: 0px 22px;
-            }
-
-            &.close{
-              overflow: hidden;
-              height: 0px;
-            }
-
-            div.topic-body-inner {
-              padding: 0px 22px;
-            }
-
-            @include topic_navigation($x_padding: 22px);
+          i {
+            font-size: 6px;
+            margin-left: 3px;
+            line-height: 1;
+            font-weight: 600;
+            color: #bababa;
           }
+        }
+
+        div.topic-date {
+          font-size: 12px;
+          font-style: italic;
+          color: #A6A6A3; /* gray */
+
+          label {
+            margin: 0px;
+            font-weight: normal;
+          }
+        }
+
+        div.body-navigation-container{
+          @include mobile(){
+            padding: 0px;
+          }
+
+          @include big_web(){
+            padding: 0px 22px;
+          }
+
+          &.close{
+            overflow: hidden;
+            height: 0px;
+          }
+
+          div.topic-body-inner {
+            padding: 0px 22px;
+          }
+
+          @include topic_navigation($x_padding: 22px);
         }
       }
     }
