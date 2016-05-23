@@ -124,6 +124,7 @@
             (om/build navbar {:company-data company-data
                               :card-width card-width
                               :sharing-mode false
+                              :su-preview true
                               :hide-right-menu true
                               :columns-num columns-num
                               :auth-settings (:auth-settings data)}))
@@ -178,4 +179,5 @@
           ;;Footer
           (when company-data
             (om/build footer {:columns-num columns-num
+                              :su-preview true
                               :card-width card-width})))))))
