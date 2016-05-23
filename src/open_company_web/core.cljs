@@ -19,6 +19,7 @@
             [open-company-web.components.su-edit :refer (su-edit)]
             [open-company-web.components.stakeholder-update :refer (stakeholder-update)]
             [open-company-web.components.su-list :refer (su-list)]
+            [open-company-web.components.su-snapshot-preview :refer (su-snapshot-preview)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
@@ -157,6 +158,9 @@
     (defroute company-profile-route (urls/company-profile ":slug") {:as params}
       (company-handler "profile" target company-profile params))
 
+    (defroute su-snapshot-preview-route (urls/stakeholder-update-preview ":slug") {:as params}
+      (company-handler "su-snapshot-preview" target su-snapshot-preview params))
+
     (defroute su-list-route (urls/stakeholder-update-list ":slug") {:as params}
       (company-handler "su-list" target su-list params))
 
@@ -180,6 +184,7 @@
                                  company-route
                                  company-route-slash
                                  company-profile-route
+                                 su-snapshot-preview-route
                                  su-edit-route
                                  su-list-route
                                  stakeholder-update-route
