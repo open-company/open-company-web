@@ -14,6 +14,7 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
+            [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.su-preview :refer (su-preview)]
             [open-company-web.components.ui.icon :refer (icon)]
             [goog.events :as events]
@@ -210,20 +211,12 @@
       (animate-selected-topic-transition owner)))
 
   (render-state [_ {:keys [active-topics selected-topic selected-metric tr-selected-topic transitioning sharing-mode share-selected-topics show-su-preview]}]
-    (let [slug            (keyword (router/current-company-slug))
-          company-data    (:company-data data)
+    (let [company-data    (:company-data data)
           active-category (keyword (:active-category data))
           category-topics (flatten (vals active-topics))
-          win-width       (.-clientWidth (sel1 js/document :body))
           card-width      (:card-width data)
           columns-num     (:columns-num data)
           ww              (.-clientWidth (sel1 js/document :body))
-          add-first-column? (= (count category-topics) 0)
-          add-second-column? (= (count category-topics) 1)
-          add-third-column? (>= (count category-topics) 2)
-          add-topic?      (and (responsive/can-edit?)
-                               (not sharing-mode)
-                               (not (:read-only company-data)))
           internal-width (case columns-num
                             3 (str (+ (* card-width 3) 40 60) "px")
                             2 (str (+ (* card-width 2) 20 60) "px")
@@ -234,6 +227,7 @@
           (om/build su-preview {:selected-topics share-selected-topics
                                 :company-data company-data}
                                {:opts {:dismiss-su-preview #(om/set-state! owner :show-su-preview false)}}))
+        ;; Sharing header
         (when sharing-mode
           (dom/div {:class "sharing-header"}
             (dom/div {:class "sharing-header-inner group"
@@ -252,6 +246,7 @@
                 (dom/button {:class "close-share"
                              :on-click #(toggle-sharing-mode owner options)}
                   (icon :simple-remove {:stroke "4" :accent-color "white"}))))))
+        ;; Activate sharing mode button
         (when (and (not (responsive/is-mobile))
                    (not (:read-only company-data))
                    (not sharing-mode))
@@ -259,6 +254,7 @@
                     :style #js {:width internal-width}}
             (dom/button {:class "sharing-button"
                          :on-click #(toggle-sharing-mode owner options)} "SHARE A SNAPSHOT")))
+        ;; Fullscreen topic
         (when selected-topic
           (dom/div {:class "selected-topic-container"
                     :style #js {:opacity (if selected-topic 1 0)}}
@@ -278,6 +274,7 @@
                                                    :topic-edit-cb (:topic-edit-cb options)
                                                    :remove-topic (partial remove-topic owner)
                                                    :toggle-topic-navigation #(om/set-state! owner :topic-navigation %)}})))
+            ;; Fullscreen topic for transition
             (when tr-selected-topic
               (dom/div #js {:className "tr-selected-topic"
                             :key (str "transition-" tr-selected-topic)
@@ -294,69 +291,15 @@
                                                  :topic-edit-cb (:topic-edit-cb options)
                                                  :remove-topic (partial remove-topic owner)
                                                  :toggle-topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
-        ;; Topic list
-        (dom/div {:class (utils/class-set {:topic-list-internal true
-                                           :sharing-mode sharing-mode
-                                           :group true
-                                           :content-loaded (not (:loading data))})}
-          (case columns-num
-            3
-            (dom/div {:class "topics-column-container group"
-                      :style #js {:width internal-width}}
-              (dom/div {:class "topics-column"
-                        :style #js {:width (str card-width "px")}}
-                (for [idx (range (inc (quot (count category-topics) 3)))
-                  :while (< idx (inc (quot (count category-topics) 2)))
-                  :let [real-idx (* idx 3)
-                        section-name (get (vec category-topics) real-idx)]]
-                  (render-topic owner section-name company-data active-category))
-                (when (and add-first-column? add-topic?)
-                  (render-topic owner "add-topic" company-data active-category 1)))
-              (dom/div {:class "topics-column"
-                        :style #js {:width (str card-width "px")}}
-                (for [idx (range (inc (quot (count category-topics) 3)))
-                  :while (< idx (inc (quot (count category-topics) 2)))
-                  :let [real-idx (inc (* idx 3))
-                        section-name (get (vec category-topics) real-idx)]]
-                  (render-topic owner section-name company-data active-category))
-                (when (and add-second-column? add-topic?)
-                  (render-topic owner "add-topic" company-data active-category 2)))
-              (dom/div {:class "topics-column"
-                        :style #js {:width (str card-width "px")}}
-                (for [idx (range (inc (quot (count category-topics) 3)))
-                  :while (< idx (inc (quot (count category-topics) 2)))
-                  :let [real-idx (+ (* idx 3) 2)
-                        section-name (get (vec category-topics) real-idx)]]
-                  (render-topic owner section-name company-data active-category))
-                (when (and add-third-column? add-topic?)
-                  (render-topic owner "add-topic" company-data active-category 3))))
-            2
-            (dom/div {:class "topics-column-container columns-2 group"
-                      :style #js {:width internal-width}}
-              (dom/div {:class "topics-column"
-                        :style #js {:width (str card-width "px")}}
-                (for [idx (range (inc (quot (count category-topics) 2)))
-                  :while (< idx (inc (quot (count category-topics) 2)))
-                  :let [real-idx (* idx 2)
-                        section-name (get (vec category-topics) real-idx)]]
-                  (render-topic owner section-name company-data active-category))
-                (when (and add-first-column? add-topic?)
-                  (render-topic owner "add-topic" company-data active-category 1)))
-              (dom/div {:class "topics-column"
-                        :style #js {:width (str card-width "px")}}
-                (for [idx (range (inc (quot (count category-topics) 2)))
-                  :while (< idx (inc (quot (count category-topics) 2)))
-                  :let [real-idx (inc (* idx 2))
-                        section-name (get (vec category-topics) real-idx)]]
-                  (render-topic owner section-name company-data active-category))
-                (when (and (not add-first-column?)
-                           add-topic?)
-                  (render-topic owner "add-topic" company-data active-category 2))))
-            ; 1 column or default
-            (dom/div {:class "topics-column-container columns-1 group"
-                      :style #js {:width internal-width}}
-              (dom/div {:class "topics-column"}
-                (for [section-name category-topics]
-                  (render-topic owner section-name company-data active-category))
-                (when add-topic?
-                  (render-topic owner "add-topic" company-data active-category 1))))))))))
+        ;; Topics list columns
+        (om/build topics-columns {:columns-num columns-num
+                                  :card-width card-width
+                                  :sharing-mode sharing-mode
+                                  :total-width internal-width
+                                  :content-loaded (not (:loading data))
+                                  :topics category-topics
+                                  :company-data company-data
+                                  :active-category active-category
+                                  :share-selected-topics share-selected-topics}
+                                 {:opts {:topic-click (partial topic-click owner)
+                                         :update-active-topics (partial update-active-topics owner)}})))))
