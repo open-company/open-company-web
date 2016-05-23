@@ -82,46 +82,6 @@
   (om/set-state! owner :selected-topic nil)
   (om/set-state! owner :selected-metric nil))
 
-(defn sections-for-category [slug active-category]
-  (let [category-data (first (filter #(= (:name %) (name active-category)) (:categories (slug @caches/new-sections))))
-        all-category-sections (:sections category-data)]
-    (apply merge
-           (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
-
-(defn render-topic [owner section-name company-data active-category & [column]]
-  (when section-name
-    (if (= section-name "add-topic")
-      (om/build topic {:loading false
-                       :section "add-topic"
-                       :add-topic true
-                       :column column
-                       :section-data {:title "+ ADD A TOPIC"
-                                      :body ""
-                                      :updated-at 0
-                                      :headline ""}
-                        :currency (:currency company-data)
-                        :active-topics (om/get-state owner :active-topics)
-                        :active-category active-category}
-                       {:opts {:section-name section-name
-                               :topic-click (partial topic-click owner section-name)
-                               :update-active-topics (partial update-active-topics owner)}})
-      (let [sharing-mode (om/get-state owner :sharing-mode)
-            share-selected-topics (om/get-state owner :share-selected-topics)
-            sd (->> section-name keyword (get company-data))]
-        (when-not (and (:read-only company-data) (:placeholder sd))
-          (dom/div #js {:className "topic-row"
-                       :ref section-name
-                       :key (str "topic-row-" (name section-name))}
-            (om/build topic {:loading (:loading company-data)
-                             :section section-name
-                             :section-data sd
-                             :currency (:currency company-data)
-                             :active-category active-category
-                             :sharing-mode sharing-mode
-                             :share-selected (utils/in? share-selected-topics section-name)}
-                             {:opts {:section-name section-name
-                                     :topic-click (partial topic-click owner section-name)}})))))))
-
 (defn switch-topic [owner is-left?]
   (when (and (om/get-state owner :topic-navigation)
              (om/get-state owner :selected-topic)
@@ -212,7 +172,6 @@
 
   (render-state [_ {:keys [active-topics selected-topic selected-metric tr-selected-topic transitioning sharing-mode share-selected-topics show-su-preview]}]
     (let [company-data    (:company-data data)
-          active-category (keyword (:active-category data))
           category-topics (flatten (vals active-topics))
           card-width      (:card-width data)
           columns-num     (:columns-num data)
@@ -273,7 +232,7 @@
                                            {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                    :topic-edit-cb (:topic-edit-cb options)
                                                    :remove-topic (partial remove-topic owner)
-                                                   :toggle-topic-navigation #(om/set-state! owner :topic-navigation %)}})))
+                                                   :topic-navigation #(om/set-state! owner :topic-navigation %)}})))
             ;; Fullscreen topic for transition
             (when tr-selected-topic
               (dom/div #js {:className "tr-selected-topic"
@@ -290,7 +249,7 @@
                                          {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                  :topic-edit-cb (:topic-edit-cb options)
                                                  :remove-topic (partial remove-topic owner)
-                                                 :toggle-topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
+                                                 :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
         ;; Topics list columns
         (om/build topics-columns {:columns-num columns-num
                                   :card-width card-width
@@ -299,7 +258,6 @@
                                   :content-loaded (not (:loading data))
                                   :topics category-topics
                                   :company-data company-data
-                                  :active-category active-category
                                   :share-selected-topics share-selected-topics}
                                  {:opts {:topic-click (partial topic-click owner)
                                          :update-active-topics (partial update-active-topics owner)}})))))
