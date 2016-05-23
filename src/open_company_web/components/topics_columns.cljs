@@ -13,8 +13,8 @@
           sharing-mode          (:sharing-mode props)
           share-selected-topics (:share-selected-topics props)
           company-data          (:company-data props)
-          active-category       (:active-category props)
           topics                (:topics props)
+          su-preview            (:su-preview props)
           topic-click           (or (:topic-click options) identity)
           update-active-topics  (or (:update-active-topics options) identity)
           share-selected?       (utils/in? share-selected-topics section-name)]
@@ -28,8 +28,7 @@
                                         :updated-at 0
                                         :headline ""}
                           :currency (:currency company-data)
-                          :active-topics topics
-                          :active-category active-category}
+                          :active-topics topics}
                          {:opts {:section-name section-name
                                  :topic-click (partial topic-click section-name)
                                  :update-active-topics update-active-topics}})
@@ -42,7 +41,6 @@
                                :section section-name
                                :section-data sd
                                :currency (:currency company-data)
-                               :active-category active-category
                                :sharing-mode sharing-mode
                                :share-selected share-selected?}
                                {:opts {:section-name section-name
@@ -54,9 +52,7 @@
                                       total-width
                                       card-width
                                       topics
-                                      company-data
-                                      active-category
-                                      share-selected-topics] :as data} owner options]
+                                      company-data] :as data} owner options]
   (render [_]
     (let [add-topic?        (and (responsive/can-edit?)
                                  (not sharing-mode)
