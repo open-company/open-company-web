@@ -3,11 +3,11 @@ div.topic-list {
   div.topic-list-internal.sharing-mode {
     div.topic {
       opacity: 0.5;
-      border: 4px solid transparent;
+      border: 0px solid transparent;
 
       &:hover {
         opacity: 1;
-        border: 4px solid white;
+        border: 0px solid white;
       }
 
       &.sharing-selected {
@@ -24,7 +24,7 @@ div.topic-list {
     background-color: #FCFCFC;
     border-radius: 2px;
     text-align: left;
-    border: 4px solid transparent;
+    border: 0px solid transparent;
     box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
 
     &.add-topic {
