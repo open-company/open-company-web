@@ -58,6 +58,8 @@
                           (* 20 (dec columns-num))      ; cards right margin
                           (when (> columns-num 1) 60))] ; x margins if needed
       (dom/nav {:class "oc-navbar group"}
+        (when (:su-preview data)
+          (dom/div {:class "su-snapshot-preview"} (dom/div {:class "preview-title"} "THIS IS A PREVIEW")))
         (dom/div {:class "oc-navbar-header"
                   :style #js {:width (str header-width "px")}}
           (om/build company-avatar data)
