@@ -17,6 +17,9 @@
 (def test-atom {
   :loading false
   :company-data company
+  :columns-num 1
+  :card-width "100px"
+  :topics ["update" "finances"]
   :active-category "progress"})
 
 (deftest test-topic-list-component
