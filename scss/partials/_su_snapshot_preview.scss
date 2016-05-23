@@ -1,0 +1,46 @@
+.animating div.su-sp-content{
+  margin-top: 0px;
+  padding-top: #{$navbar_height}px;
+}
+
+div.su-snapshot-preview {
+  background-color: rgb(217, 217, 217);
+
+  div.su-sp-content {
+    position: relative;
+    content: "";
+    padding-bottom: 20px;
+    min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
+    margin-top: #{$navbar_height}px;
+
+    @include mobile(){
+      background-color: #d9d9d9;
+    }
+
+    @include big_web(){
+      background-color: $oc_gray_6;
+    }
+
+    div.preview-title {
+      width: 100%;
+      text-align: center;
+      font-family: $oc_headers_font;
+      font-size: 20px;
+      line-height: 1.2;
+      text-align: center;
+      color: $oc_gray_5;
+      padding-top: 50px;
+    }
+
+    div.preview-subtitle {
+      width: 100%;
+      text-align: center;
+      font-family: $oc_headers_font;
+      font-size: 12px;
+      line-height: 2.7;
+      color: $oc_gray_5;
+      margin-top: 0px;
+      padding-bottom: 30px;
+    }
+  }
+}
