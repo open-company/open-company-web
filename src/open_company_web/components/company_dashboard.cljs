@@ -1,13 +1,13 @@
 (ns open-company-web.components.company-dashboard
   (:require-macros [cljs.core.async.macros :refer (go)])
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [cljs.core.async :refer (chan <!)]
             [open-company-web.dispatcher :as dis]
-            [open-company-web.components.navbar :refer [navbar]]
-            [open-company-web.components.company-header :refer [company-header]]
-            [open-company-web.components.topic-list :refer [topic-list]]
+            [open-company-web.components.navbar :refer (navbar)]
+            [open-company-web.components.company-header :refer (company-header)]
+            [open-company-web.components.topic-list :refer (topic-list)]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.footer :refer (footer)]
             [open-company-web.components.menu :refer (menu)]
