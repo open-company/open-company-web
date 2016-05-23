@@ -147,7 +147,7 @@
     (and (> topic-list-height popover-max-height)
          (neg? (- topic-list-height popover-offsettop popover-max-height)))))
 
-(defcomponent topic [{:keys [active-category active-topics section-data section currency column sharing-mode share-selected] :as data} owner options]
+(defcomponent topic [{:keys [active-topics section-data section currency column sharing-mode share-selected] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
