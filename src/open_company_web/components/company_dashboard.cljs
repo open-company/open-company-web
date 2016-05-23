@@ -68,6 +68,9 @@
        :sharing-mode false
        :columns-num (responsive/columns-num)}))
 
+  (will-receive-props [_ _]
+    (om/set-state! owner :sharing-mode false))
+
   (did-mount [_]
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
 
@@ -76,6 +79,7 @@
           navbar-editing-cb (partial set-navbar-editing owner data)
           card-width (responsive/calc-card-width)]
       (dom/div {:class (utils/class-set {:company-dashboard true
+                                         :main-scroll true
                                          :navbar-offset (not (responsive/is-mobile))})}
         (om/build menu data)
         (dom/div {:class "page"}
