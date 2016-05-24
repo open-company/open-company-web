@@ -196,10 +196,9 @@
                                 (topic-click options nil))}
         (when show-add-topic-popover
           (let [all-sections (get-all-sections slug)
-                category-topics (flatten (vals active-topics))
                 update-active-topics (:update-active-topics options)
                 list-data {:all-topics all-sections
-                           :active-topics-list category-topics
+                           :active-topics-list active-topics
                            :show-above (show-popover-above? owner)
                            :column column}
                 list-opts {:did-change-active-topics update-active-topics
