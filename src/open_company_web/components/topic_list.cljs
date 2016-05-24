@@ -207,6 +207,7 @@
                   (icon :simple-remove {:stroke "4" :accent-color "white"}))))))
         ;; Activate sharing mode button
         (when (and (not (responsive/is-mobile))
+                   (responsive/can-edit?)
                    (not (:read-only company-data))
                    (not sharing-mode))
           (dom/div {:class "sharing-button-container"

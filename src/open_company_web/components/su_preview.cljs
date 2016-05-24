@@ -59,6 +59,7 @@
                           :on-change #(om/set-state! owner :title (.. % -target -value))
                           :value title})
           (dom/div {:class "su-preview-box"}
+            (dom/div {:class "separator top-separator"})
             (dom/div {:class "su-preview-title"} "PREVIEW")
             (dom/a {:class "preview-button"
                     :href (oc-urls/stakeholder-update-preview)

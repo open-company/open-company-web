@@ -50,7 +50,7 @@ div.su-preview{
     }
 
     div.su-preview-box {
-      margin-top: 51px;
+      margin-top: 25px;
 
       div.su-preview-title {
         font-weight: 700;
@@ -105,6 +105,10 @@ div.su-preview{
         height: 1px;
         opacity: 0.2;
         background-color: rgba(78, 90, 107, 0.5);
+
+        &.top-separator {
+          margin-bottom: 25px;
+        }
       }
 
       div.su-preview-ready{
