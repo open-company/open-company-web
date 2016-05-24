@@ -15,11 +15,13 @@
                           (when (> columns-num 1) 60))]
       (dom/div {:class "footer"}
         (dom/div {:class "footer-cta"}
-          "Powered by OpenCompany"
+          (if (:su-preview data)
+           "Powered by OpenCompany, the simple way to share the big picture."
+           "Powered by OpenCompany")
           (when (:su-preview data)
             (dom/div {}
               (dom/a {:class "io-link"
-                      :href "https://opencompany.io/"} "LEARN MORE"))))
+                      :href "https://opencompany.io/"} "LEARN MORE ➞"))))
         (dom/div {:class "footer-internal"}
           (dom/div {:class "footer-bottom"
                     :style #js {:width (str footer-width "px")}}
