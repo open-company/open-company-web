@@ -200,7 +200,7 @@
                 (when (pos? (count share-selected-topics))
                   (dom/button {:class "share-snapshot-bt"
                                :on-click #(om/set-state! owner :show-su-preview true)}
-                    "PREVIEW UPDATE")))
+                    "PREVIEW AND SHARE")))
               (dom/div {:class "sharing-header-right"}
                 (dom/button {:class "close-share"
                              :on-click #(toggle-sharing-mode owner options)}
