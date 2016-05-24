@@ -12,7 +12,7 @@ div.su-preview{
     top: 50%;
     left: 50%;
     margin-left: 170px;
-    margin-top: -257px;
+    margin-top: -230px;
 
     button {
       background-color: transparent;
@@ -29,11 +29,11 @@ div.su-preview{
 
   div.su-preview-window{
     width: 344px;
-    height: 500px;
+    height: 450px;
     position: absolute;
     top: 50%;
     left: 50%;
-    margin-top: -250px;
+    margin-top: -225px;
     margin-left: -172px;
     border-radius: 2px;
     background-color: #fcfcfc;
@@ -68,6 +68,7 @@ div.su-preview{
         padding: 0px;
         margin:0px;
         margin-top: 15px;
+        display: block;
 
         label{
           padding: 13px;
@@ -97,8 +98,17 @@ div.su-preview{
         }
       }
 
+      div.separator {
+        margin-top: 30px;
+        width: calc(100% + 40px);
+        margin-left: -20px;
+        height: 1px;
+        opacity: 0.2;
+        background-color: rgba(78, 90, 107, 0.5);
+      }
+
       div.su-preview-ready{
-        margin-top: 60px;
+        margin-top: 30px;
         font-weight: 700;
         font-size: 12px;
         letter-spacing: 1px;
