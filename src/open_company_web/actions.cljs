@@ -104,7 +104,7 @@
 
 (defmethod dispatcher/action :su-edit [db [_ {:keys [slug stakeholder-update]}]]
   (-> db
-    (assoc :su-edit stakeholder-update)
+    (assoc-in (dispatcher/latest-stakeholder-update-key slug) stakeholder-update)
     (dissoc :loading)))
 
 (defmethod dispatcher/action :stakeholder-update [db [_ {:keys [slug update-slug response]}]]
