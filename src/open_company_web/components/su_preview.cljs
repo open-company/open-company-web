@@ -67,7 +67,8 @@
               (dom/div {:class "link-circle"}
                 (icon :link-72 {:size 20 :accent-color "rgba(78, 90, 107, 0.5)"}))
               (dom/label {} "VIEW PREVIEW"))
-            (dom/div {:class "su-preview-ready"} "READY TO SHARE")
+            (dom/div {:class "separator"})
+            (dom/div {:class "su-preview-ready"} "READY TO SHARE?")
             (dom/button {:class "ready-slack-button"}
               (dom/div {:class "slack-circle"}
                 (dom/img {:class "slack-icon" :src "/img/Slack_Icon.png"}))
@@ -75,6 +76,6 @@
             (dom/button {:class "ready-mail-button"}
               (dom/div {:class "mail-circle"}
                 (icon :email-84 {:size 20 :accent-color "rgba(78, 90, 107, 0.5)"}))
-              (dom/label {} "SHARE VIA EMAIL")))
+              (dom/label {} "SHARE URL")))
           (dom/button {:class "cancel-button"
                        :on-click #((:dismiss-su-preview options))} "CANCEL"))))))
