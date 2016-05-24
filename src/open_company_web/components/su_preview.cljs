@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy :refer-macros (sel1)]
             [open-company-web.api :as api]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.urls :as oc-urls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.icon :refer (icon)]
@@ -76,8 +77,10 @@
       (om/set-state! owner :email-loading false)
       (om/set-state! owner :posting-su false)
       (om/set-state! owner :su-posted true)
-      ; TODO: open SU link
-      (om/set-state! owner :share-link "test://test")))
+      (utils/after 100
+        #(om/set-state! owner :share-link (str (.. js/document -location -protocol) "//"
+                                               (.. js/document -location -host)
+                                               (subs (:su-edit @dis/app-state) 10))))))
 
   (did-update [_ _ _]
     (when (om/get-state owner :share-link)
@@ -133,11 +136,12 @@
                 (dom/input #js {:type "text"
                                 :className "share-link-input"
                                 :id "share-link-input"
+                                :on-change #(om/set-state! owner :share-link share-link)
                                 :value share-link
                                 :ref "share-link-input"})
                 (dom/button {:class "share-link-button"
                              :data-clipboard-target "#share-link-input"
                              :on-click #(copy-clicked owner)} (if share-link-copied "COPIED ✓" "COPY")))
-              (dom/a {:class "share-link-new-win" :href share-link :target "_blank"})))
+              (dom/a {:class "share-link-new-win" :href share-link :target "_blank"} "Open in new window")))
           (dom/button {:class "cancel-button"
                        :on-click #((:dismiss-su-preview options))} (if su-posted "DONE" "CANCEL")))))))
