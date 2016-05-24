@@ -40,6 +40,11 @@ div.su-preview{
     box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
     padding: 20px;
 
+    &.share-link-copy {
+      height: 230px;
+      margin-top: -115px;
+    }
+
     input.su-title {
       font-family: $oc_headers_font;
       font-size: 20px;
@@ -49,8 +54,64 @@ div.su-preview{
       outline: none;
     }
 
+    img.small-loading {
+      width: 15px;
+      height: 15px;
+    }
+
     div.su-preview-box {
       margin-top: 25px;
+
+      label.share-link-cta{
+        font-weight: 700;
+        font-size: 18px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: $oc_gray_5;
+        cursor: pointer;
+        opacity: 0.5;
+      }
+
+      div.share-link-box {
+        width: 100%;
+
+        input.share-link-input {
+          border: 1px solid rgba(78, 90, 107, 0.1);
+          border-radius: 2px;
+          height: 50px;
+          width: 70%;
+
+          &:active, &:focus {
+            outline: none;
+          }
+        }
+
+        button.share-link-button {
+          margin: 0px;
+          padding: 0px;
+          width: 30%;
+          height: 50px;
+          background-color: $oc_yellow;
+          font-weight: 700;
+          font-size: 14px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+          cursor: pointer;
+          outline: none;
+          border: 0px solid transparent;
+        }
+      }
+
+      a.share-link-new-win{
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: $oc_gray_5;
+        cursor: pointer;
+        opacity: 0.5;
+      }
 
       div.su-preview-title {
         font-weight: 700;
@@ -69,9 +130,11 @@ div.su-preview{
         margin:0px;
         margin-top: 15px;
         display: block;
+        text-align: left;
 
         label{
           padding: 13px;
+          padding-left: 10px;
           font-weight: 700;
           font-size: 12px;
           line-height: 1.5;
@@ -80,6 +143,7 @@ div.su-preview{
           cursor: pointer;
           opacity: 0.5;
         }
+
         div.link-circle{
           border-radius: 22.5px;
           width: 45px;
@@ -127,9 +191,11 @@ div.su-preview{
         padding: 0px;
         margin:0px;
         margin-top: 15px;
+        text-align: left;
 
         label{
           padding-top: 13px;
+          padding-left: 10px;
           font-weight: 700;
           font-size: 12px;
           line-height: 1.5;
@@ -161,9 +227,11 @@ div.su-preview{
         padding: 0px;
         margin:0px;
         margin-top: 15px;
+        text-align: left;
 
         label{
           padding-top: 13px;
+          padding-left: 10px;
           font-weight: 700;
           font-size: 12px;
           line-height: 1.5;
