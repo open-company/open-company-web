@@ -281,13 +281,15 @@
             (let [fixed-body (if success (json->cljs body) {})]
               (dispatcher/dispatch! [:new-section {:response fixed-body :slug slug}]))))))))
 
-(defn share-stakeholder-update []
+(defn share-stakeholder-update [ & [slack-message]]
   (let [slug (keyword (router/current-company-slug))
         company-data (dispatcher/company-data)
         links (:links company-data)
+        post-data (if slack-message (cljs->json {:slack true :note slack-message}) nil)
         share-link (utils/link-for links "share" "POST")]
     (api-post (:href share-link)
-      { :headers  {
+      { :json-params post-data
+        :headers  {
           ; required by Chrome
           "Access-Control-Allow-Headers" "Content-Type"
           ; custom content type
