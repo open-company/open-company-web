@@ -32,7 +32,8 @@
   (patch-stakeholder-update owner))
 
 (defn slack-clicked [owner]
-  (om/set-state! owner :slack-loading true))
+  (om/set-state! owner :slack-loading true)
+  (patch-stakeholder-update owner))
 
 (defn email-clicked [owner]
   (om/set-state! owner :email-loading true)
@@ -77,7 +78,7 @@
       (om/set-state! owner :email-loading false)
       (om/set-state! owner :posting-su false)
       (om/set-state! owner :su-posted true)
-      (utils/after 100
+      (utils/after 600
         #(om/set-state! owner :share-link (str (.. js/document -location -protocol) "//"
                                                (.. js/document -location -host)
                                                (subs (:su-edit @dis/app-state) 10))))))
@@ -98,7 +99,7 @@
                             :ref "title"
                             :placeholder "Update title"
                             :type "text"
-                            :on-change #(om/set-state! owner :title (.. % -target -value))
+                            :onChange #(om/set-state! owner :title (.. % -target -value))
                             :value title}))
           (when-not su-posted
             (dom/div {:class "su-preview-box"}
