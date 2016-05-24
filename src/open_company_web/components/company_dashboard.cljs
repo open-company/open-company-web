@@ -68,9 +68,6 @@
        :sharing-mode false
        :columns-num (responsive/columns-num)}))
 
-  (will-receive-props [_ _]
-    (om/set-state! owner :sharing-mode false))
-
   (did-mount [_]
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
 
