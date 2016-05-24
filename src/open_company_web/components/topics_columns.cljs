@@ -54,7 +54,8 @@
                                       topics
                                       company-data] :as data} owner options]
   (render [_]
-    (let [add-topic?        (and (responsive/can-edit?)
+    (let [add-topic?        (and (not (:hide-add-topic data))
+                                 (responsive/can-edit?)
                                  (not sharing-mode)
                                  (not (:read-only company-data)))
           add-first-column?  (= (count topics) 0)
