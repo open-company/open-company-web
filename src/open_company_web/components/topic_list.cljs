@@ -128,6 +128,9 @@
   (om/update-state! owner :sharing-mode not)
   ((:toggle-sharing-mode options)))
 
+(defn filter-placeholder-sections [topics company-data]
+  (vec (filter #(not (:placeholder (->> % keyword (get company-data)))) topics)))
+
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
@@ -172,11 +175,14 @@
 
   (render-state [_ {:keys [active-topics selected-topic selected-metric tr-selected-topic transitioning sharing-mode share-selected-topics show-su-preview]}]
     (let [company-data    (:company-data data)
-          category-topics (flatten (vals active-topics))
+          topics-list     (flatten (vals active-topics))
+          category-topics (if sharing-mode
+                            (filter-placeholder-sections topics-list company-data)
+                            topics-list)
           card-width      (:card-width data)
           columns-num     (:columns-num data)
           ww              (.-clientWidth (sel1 js/document :body))
-          internal-width (case columns-num
+          total-width     (case columns-num
                             3 (str (+ (* card-width 3) 40 60) "px")
                             2 (str (+ (* card-width 2) 20 60) "px")
                             1 (if (> ww 413) (str card-width "px") "auto"))]
@@ -190,7 +196,7 @@
         (when sharing-mode
           (dom/div {:class "sharing-header"}
             (dom/div {:class "sharing-header-inner group"
-                      :style #js {:width internal-width}}
+                      :style #js {:width total-width}}
               (dom/div {:class "sharing-header-left"}
                 (dom/label {:class "selected-topics"}
                   (if (zero? (count share-selected-topics))
@@ -211,7 +217,7 @@
                    (not (:read-only company-data))
                    (not sharing-mode))
           (dom/div {:class "sharing-button-container"
-                    :style #js {:width internal-width}}
+                    :style #js {:width total-width}}
             (dom/button {:class "sharing-button"
                          :on-click #(toggle-sharing-mode owner options)} "SHARE A SNAPSHOT")))
         ;; Fullscreen topic
@@ -255,7 +261,7 @@
         (om/build topics-columns {:columns-num columns-num
                                   :card-width card-width
                                   :sharing-mode sharing-mode
-                                  :total-width internal-width
+                                  :total-width total-width
                                   :content-loaded (not (:loading data))
                                   :topics category-topics
                                   :company-data company-data
