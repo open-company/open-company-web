@@ -122,7 +122,6 @@
                          2 (str (+ (* card-width 2) 20 60) "px")
                          1 (if (> ww 413) (str card-width "px") "auto"))
           su-subtitle  (str "- " (utils/date-string (js/Date.) true))]
-      (println "su-data:" su-data)
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
                                          :main-scroll true
                                          :navbar-offset (not (responsive/is-mobile))})}
