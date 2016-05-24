@@ -5,6 +5,7 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
@@ -71,12 +72,19 @@
       (.listen AnimationEventType/FINISH #(animation-finished owner))
       (.play))))
 
+(defn stakeholder-update-data [owner]
+  (let [props (om/get-props owner)]
+    (if (om/get-state owner :su-preview)
+      (:stakeholder-update (dis/company-data props))
+      (dis/stakeholder-update-data))))
+
 (defcomponent su-snapshot-preview [data owner options]
 
   (init-state [_]
     (utils/add-channel "fullscreen-topic-save" (chan))
     (utils/add-channel "fullscreen-topic-cancel" (chan))
     {:selected-topic nil
+     :su-preview (utils/in? (:route @router/path) "su-snapshot-preview")
      :selected-metric nil
      :topic-navigation true
      :transitioning false})
@@ -103,9 +111,9 @@
     (when (om/get-state owner :tr-selected-topic)
       (animate-selected-topic-transition owner)))
 
-  (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning]}]
+  (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning su-preview]}]
     (let [company-data (dis/company-data data)
-          su-data      (:stakeholder-update company-data)
+          su-data      (stakeholder-update-data owner)
           columns-num  (responsive/columns-num)
           card-width   (responsive/calc-card-width)
           ww           (.-clientWidth (sel1 js/document :body))
@@ -114,6 +122,7 @@
                          2 (str (+ (* card-width 2) 20 60) "px")
                          1 (if (> ww 413) (str card-width "px") "auto"))
           su-subtitle  (str "- " (utils/date-string (js/Date.) true))]
+      (println "su-data:" su-data)
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
                                          :main-scroll true
                                          :navbar-offset (not (responsive/is-mobile))})}
@@ -124,7 +133,7 @@
             (om/build navbar {:company-data company-data
                               :card-width card-width
                               :sharing-mode false
-                              :su-preview true
+                              :su-preview su-preview
                               :hide-right-menu true
                               :columns-num columns-num
                               :auth-settings (:auth-settings data)}))
