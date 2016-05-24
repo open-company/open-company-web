@@ -118,6 +118,7 @@
     ;; do we have the company data already?
     (when (not (get-in @dis/app-state su-key))
       ;; load the company data from the API
+      (api/get-company slug)
       (api/get-stakeholder-update slug update-slug)
       (let [su-loading-key (conj su-key :loading)]
         (swap! dis/app-state assoc-in su-loading-key true)))
@@ -168,7 +169,7 @@
       (company-handler "su-edit" target su-edit params))
 
     (defroute stakeholder-update-route (urls/stakeholder-update ":slug" ":update-slug") {:as params}
-      (stakeholder-update-handler target stakeholder-update params))
+      (stakeholder-update-handler target su-snapshot-preview params))
 
     (defroute not-found-route "*" []
       ;; render component
