@@ -12,7 +12,13 @@ div.topic-list-edit-container {
 
 .animating div.topic-list{
   margin-top: 0px;
-  padding-top: #{$navbar_height}px;
+  padding-top: 0px;
+  top: 0;
+  position: absolute;
+  height: 100vh;
+  left: 0;
+  margin-left: 0px;
+  width: 100vw;
 }
 
 div.topic-list{
