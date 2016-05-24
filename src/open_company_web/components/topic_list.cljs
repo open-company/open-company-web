@@ -58,9 +58,9 @@
      :new-sections-requested (or (:new-sections-requested current-state) false)
      :selected-topic (or (:selected-topic current-state) (:selected-topic data))
      :tr-selected-topic nil
-     :sharing-mode false
-     :topic-navigation true
-     :show-su-preview false
+     :sharing-mode (or (:sharing-mode current-state) false)
+     :topic-navigation (or (:topic-navigation current-state) true)
+     :show-su-preview (or (:show-su-preview current-state) false)
      :share-selected-topics (:sections (:stakeholder-update company-data))
      :transitioning false}))
 
