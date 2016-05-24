@@ -29,6 +29,9 @@
 (defn su-list-key [company-slug]
   [(keyword company-slug) :su-list])
 
+(defn latest-stakeholder-update-key [company-slug]
+  [(keyword company-slug) :latest-su])
+
 (defn stakeholder-update-key [company-slug update-slug]
   [(keyword company-slug) (keyword update-slug)])
 
@@ -39,6 +42,14 @@
     (company-data data (router/current-company-slug)))
   ([data company-slug]
     (get-in data (company-data-key company-slug))))
+
+(defn latest-stakeholder-update
+  ([]
+    (latest-stakeholder-update @app-state))
+  ([data]
+    (latest-stakeholder-update data (router/current-company-slug)))
+  ([data company-slug]
+    (get-in data [(keyword company-slug) :latest-su])))
 
 (defn stakeholder-update-list-data
   ([]
