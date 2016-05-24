@@ -174,7 +174,8 @@
                                         :content-loaded (not (:loading data))
                                         :topics (:sections su-data)
                                         :su-preview true
-                                        :company-data company-data}
+                                        :company-data company-data
+                                        :hide-add-topic true}
                                        {:opts {:topic-click (partial topic-click owner)}})))
           ;;Footer
           (when company-data
