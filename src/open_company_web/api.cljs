@@ -292,9 +292,9 @@
           "Access-Control-Allow-Headers" "Content-Type"
           ; custom content type
           "content-type" (:type share-link)}}
-      (fn [{:keys [success body]}]
+      (fn [{:keys [success body] :as response}]
         (when success
-          (dispatcher/dispatch! [:su-edit {:slug slug}]))))))
+          (dispatcher/dispatch! [:su-edit {:slug slug :stakeholder-update (get (:headers response) "location")}]))))))
 
 (defn get-su-list []
   (let [slug (keyword (router/current-company-slug))
