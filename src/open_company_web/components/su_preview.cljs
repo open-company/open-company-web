@@ -6,7 +6,8 @@
             [open-company-web.api :as api]
             [open-company-web.urls :as oc-urls]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.ui.icon :refer (icon)]))
+            [open-company-web.components.ui.icon :refer (icon)]
+            [cljsjs.react.dom]))
 
 (defn patch-stakeholder-update [owner]
   (let [title (om/get-state owner :title)
@@ -23,6 +24,12 @@
 (defn preview-clicked [owner]
   (patch-stakeholder-update owner))
 
+(defn focus-title [owner]
+  (let [title (.findDOMNode js/ReactDOM (om/get-ref owner "title"))
+        title-val (.-value title)]
+    (.focus title)
+    (set! (.-value title) title-val)))
+
 (defcomponent su-preview [data owner options]
 
   (init-state [_]
@@ -32,7 +39,8 @@
                 title)}))
 
   (did-mount [_]
-    (utils/disable-scroll))
+    (utils/disable-scroll)
+    (utils/after 600 #(focus-title owner)))
 
   (will-unmount [_]
     (utils/enable-scroll))
@@ -56,14 +64,17 @@
                     :href (oc-urls/stakeholder-update-preview)
                     :target "_blank"
                     :on-click #(preview-clicked owner)}
-              (icon :link-72 {:accent-color "rgba(78, 90, 107, 0.5)"})
+              (dom/div {:class "link-circle"}
+                (icon :link-72 {:size 20 :accent-color "rgba(78, 90, 107, 0.5)"}))
               (dom/label {} "VIEW PREVIEW"))
             (dom/div {:class "su-preview-ready"} "READY TO SHARE")
             (dom/button {:class "ready-slack-button"}
-              (dom/img {:class "slack-icon" :src "/img/Slack_Icon.png"})
+              (dom/div {:class "slack-circle"}
+                (dom/img {:class "slack-icon" :src "/img/Slack_Icon.png"}))
               (dom/label {} "SHARE ON SLACK"))
             (dom/button {:class "ready-mail-button"}
-              (icon :email-84 {:accent-color "rgba(78, 90, 107, 0.5)"})
+              (dom/div {:class "mail-circle"}
+                (icon :email-84 {:size 20 :accent-color "rgba(78, 90, 107, 0.5)"}))
               (dom/label {} "SHARE VIA EMAIL")))
           (dom/button {:class "cancel-button"
                        :on-click #((:dismiss-su-preview options))} "CANCEL"))))))

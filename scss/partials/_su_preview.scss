@@ -70,7 +70,7 @@ div.su-preview{
         margin-top: 15px;
 
         label{
-          padding-top: 13px;
+          padding: 13px;
           font-weight: 700;
           font-size: 12px;
           line-height: 1.5;
@@ -79,17 +79,20 @@ div.su-preview{
           cursor: pointer;
           opacity: 0.5;
         }
-
-        div.svg-icon {
+        div.link-circle{
           border-radius: 22.5px;
-          width: 45px !important;
-          height: 45px !important;
+          width: 45px;
+          height: 45px;
           border: 1px solid rgba(78, 90, 107, 0.1);
+          padding: 11px;
           float: left;
-          padding-top: 6px;
 
-          svg {
-            stroke: rgba(78, 90, 107, 0.5) !important;
+          div.svg-icon {
+            float: left;
+
+            svg {
+              stroke: rgba(78, 90, 107, 0.5) !important;
+            }
           }
         }
       }
@@ -121,13 +124,18 @@ div.su-preview{
           cursor: pointer;
           opacity: 0.5;
         }
-
-        img.slack-icon {
+        div.slack-circle {
           border-radius: 22.5px;
           width: 45px;
           height: 45px;
           border: 1px solid rgba(78, 90, 107, 0.1);
           float: left;
+          padding: 9px;
+
+          img.slack-icon {
+            width: 25px;
+            height: 25px;
+          }
         }
       }
 
@@ -151,16 +159,18 @@ div.su-preview{
           opacity: 0.5;
         }
 
-        div.svg-icon {
+        div.mail-circle{
           border-radius: 22.5px;
-          width: 45px !important;
-          height: 45px !important;
+          width: 45px;
+          height: 45px;
           border: 1px solid rgba(78, 90, 107, 0.1);
           float: left;
-          padding-top: 6px;
+          padding: 11px;
+          div.svg-icon {
 
-          svg {
-            stroke: rgba(78, 90, 107, 0.5) !important;
+            svg {
+              stroke: rgba(78, 90, 107, 0.5) !important;
+            }
           }
         }
       }
