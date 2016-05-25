@@ -48,6 +48,7 @@
                               (min card-width ww))
           chart-opts {:show-title false
                       :show-revisions-navigation false
+                      :switch-metric-cb (:switch-metric-cb options)
                       :chart-size {:width  (- fullscreen-width 40)
                                    :height (if (responsive/is-mobile) 174 295)}}
           chart-data {:section-data topic-data
@@ -144,6 +145,7 @@
      :editing false
      :data-posted false
      :show-save-button false
+     :last-selected-metric selected-metric
      :actual-as-of (:updated-at section-data)})
 
   (did-mount [_]
@@ -167,7 +169,7 @@
     (when (om/get-state owner :transition-as-of)
       (animate-transition owner)))
 
-  (render-state [_ {:keys [as-of transition-as-of actual-as-of editing show-save-button data-posted] :as state}]
+  (render-state [_ {:keys [as-of transition-as-of actual-as-of editing show-save-button data-posted last-selected-metric] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -176,7 +178,8 @@
           revisions-list (get (slug @cache/revisions) section-kw)
           topic-data (utils/select-section-data section-data section-kw as-of)
           is-actual? (= as-of actual-as-of)
-          fullscreen-topic-opts (merge options {:rev-nav #(om/set-state! owner :transition-as-of %)})
+          fullscreen-topic-opts (merge options {:rev-nav #(om/set-state! owner :transition-as-of %)
+                                                :switch-metric-cb #(om/set-state! owner :last-selected-metric %)})
           edit-topic-opts (merge options {:show-save-button #(om/set-state! owner :show-save-button %)
                                           :dismiss-editing #(hide-fullscreen-topic owner options)})
           can-edit? (and (responsive/can-edit?)
@@ -233,7 +236,7 @@
                           :style #js {:opacity 1}}
               (om/build fullscreen-topic-internal {:topic section
                                                    :topic-data topic-data
-                                                   :selected-metric selected-metric
+                                                   :selected-metric last-selected-metric
                                                    :currency currency
                                                    :card-width card-width
                                                    :is-actual is-actual?
