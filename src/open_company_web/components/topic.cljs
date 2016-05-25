@@ -64,7 +64,8 @@
   (render-state [_ {:keys [image-header]}]
     (let [section-kw          (keyword section)
           topic-body          (utils/get-topic-body topic-data section-kw)
-          stripped-topic-body (.replace (utils/strip-HTML-tags topic-body) (js/RegExp. "\\s\\s+" "g") " ")
+          stripped-topic-body (or (utils/strip-HTML-tags topic-body) "")
+          fixed-topic-body    (.replace stripped-topic-body (js/RegExp. "\\s\\s+" "g") " ")
           chart-opts          {:chart-size {:width  260
                                             :height 196}
                                :hide-nav true
@@ -95,7 +96,7 @@
                       :dangerouslySetInnerHTML #js {"__html" topic-body}})
         (dom/div #js {:className "topic-body"
                       :ref "topic-body"
-                      :dangerouslySetInnerHTML (utils/emojify stripped-topic-body)})))))
+                      :dangerouslySetInnerHTML (utils/emojify fixed-topic-body)})))))
 
 (defn topic-click [options selected-metric]
   ((:topic-click options) selected-metric))
