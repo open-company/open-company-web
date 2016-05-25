@@ -142,6 +142,7 @@
     {:as-of (:updated-at section-data)
      :transition-as-of nil
      :editing false
+     :data-posted false
      :show-save-button false
      :actual-as-of (:updated-at section-data)})
 
@@ -153,6 +154,9 @@
 
   (will-receive-props [_ next-props]
     (when-not (= next-props data)
+      (when (om/get-state owner :data-posted)
+        (hide-fullscreen-topic owner options))
+      (om/set-state! owner :data-posted false)
       (om/set-state! owner :as-of (:updated-at (:section-data next-props)))
       (om/set-state! owner :actual-as-of (:updated-at (:section-data next-props)))))
 
@@ -163,7 +167,7 @@
     (when (om/get-state owner :transition-as-of)
       (animate-transition owner)))
 
-  (render-state [_ {:keys [as-of transition-as-of actual-as-of editing show-save-button] :as state}]
+  (render-state [_ {:keys [as-of transition-as-of actual-as-of editing show-save-button data-posted] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -197,10 +201,13 @@
         (when (and can-edit?
                    editing
                    show-save-button)
-          (dom/div {:class "save-button"
-                    :on-click #(when-let [ch (utils/get-channel "fullscreen-topic-save")]
-                                 (put! ch {:click true :event %}))}
-            "POST"))
+          (dom/button {:class "save-button"
+                       :on-click #(when-let [ch (utils/get-channel "fullscreen-topic-save")]
+                                    (om/set-state! owner :data-posted true)
+                                    (put! ch {:click true :event %}))}
+            (if data-posted
+              (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
+              "POST")))
         (dom/div {:class "close"
                   :on-click #(if editing
                               (when-let [ch (utils/get-channel "fullscreen-topic-cancel")]
@@ -252,8 +259,8 @@
                                                        :next-rev tr-next-rev}
                                                       {:opts fullscreen-topic-opts}))))))
         (when editing
-          (dom/div {:class "remove-button"
-                    :on-click (partial remove-topic-click owner options)}
+          (dom/button {:class "remove-button"
+                       :on-click (partial remove-topic-click owner options)}
             (icon :alert {:size 15
                           :accent-color (oc-colors/get-color-by-kw :oc-gray-5)
                           :stroke (oc-colors/get-color-by-kw :oc-gray-5)})
