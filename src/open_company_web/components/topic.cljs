@@ -43,8 +43,7 @@
   (when-not (utils/is-test-env?)
     (when-not (om/get-state owner :image-header)
       (when-let [body (.findDOMNode js/ReactDOM (om/get-ref owner "topic-body"))]
-        (let [cl (js/$clamp body #js {"clamp" 2 "splitOnChars" #js ["." "," " "]})]
-          (utils/after 1000 #(println "aa" cl "->" (.-options cl)))))
+        (js/$clamp body #js {"clamp" 2 "splitOnChars" #js ["." "," " "]}))
       (let [section-kw (keyword section)]
         (when-not (#{:finances :growth} section-kw)
           (when-let [hidden-body (om/get-ref owner "hidden-topic-body")]
