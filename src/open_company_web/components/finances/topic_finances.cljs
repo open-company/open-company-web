@@ -20,6 +20,8 @@
 (defn pillbox-click [owner options e]
   (.preventDefault e)
   (let [tab  (.. e -target -dataset -tab)]
+    (when (fn? (:switch-metric-cb options))
+      ((:switch-metric-cb options) tab))
     (om/update-state! owner :focus (fn [] tab)))
   (.stopPropagation e))
 
@@ -63,7 +65,7 @@
   (will-update [_ next-props _]
     ; this means the section datas have changed from the API or at a upper lever of this component
     (when-not (= next-props data)
-      (om/set-state! owner (get-state owner next-props true))))
+      (om/set-state! owner (get-state owner next-props))))
 
   (render-state [_ {:keys [focus] :as state}]
     (let [finances-row-data (:data section-data)
@@ -73,7 +75,6 @@
                            :read-only true
                            :currency currency}
           subsection-options {:opts options}]
-  
       (if no-data
   
         (dom/div {:class "topic-overlay-body"}
