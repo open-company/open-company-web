@@ -18,7 +18,8 @@
             [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as EventType]
             [goog.events :as events]
-            [goog.style :as gstyle]))
+            [goog.style :as gstyle]
+            [cljsjs.react.dom]))
 
 (defcomponent topic-headline [data owner]
   (render [_]
@@ -41,8 +42,9 @@
 (defn setup-card! [owner section]
   (when-not (utils/is-test-env?)
     (when-not (om/get-state owner :image-header)
-      (when-let [body (om/get-ref owner "topic-body")]
-        (js/$clamp body #js {"clamp" 2 "splitOnChars" #js ["." "," " "]}))
+      (when-let [body (.findDOMNode js/ReactDOM (om/get-ref owner "topic-body"))]
+        (let [cl (js/$clamp body #js {"clamp" 2 "useNativeClamp" false "truncationChar" "…" "splitOnChars" #js ["." "," " "]})]
+          (utils/after 1000 #(println "aa" cl "->" (.-options cl)))))
       (let [section-kw (keyword section)]
         (when-not (#{:finances :growth} section-kw)
           (when-let [hidden-body (om/get-ref owner "hidden-topic-body")]
@@ -63,7 +65,7 @@
   (render-state [_ {:keys [image-header]}]
     (let [section-kw          (keyword section)
           topic-body          (utils/get-topic-body topic-data section-kw)
-          stripped-topic-body (utils/strip-HTML-tags topic-body)
+          stripped-topic-body (.replace (utils/strip-HTML-tags topic-body) (js/RegExp. "\\s\\s+" "g") " ")
           chart-opts          {:chart-size {:width  260
                                             :height 196}
                                :hide-nav true
