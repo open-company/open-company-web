@@ -25,13 +25,14 @@
   (.play
     (new Fade (om/get-ref owner "fullscreen-topic") 0 1 utils/oc-animation-duration)))
 
-(defn hide-fullscreen-topic [owner options]
+(defn hide-fullscreen-topic [owner options & [force-fullscreen-dismiss]]
   ; if it's in editing mode
-  (if (om/get-state owner :editing)
-    ; dismiss the editing
-    (om/set-state! owner :editing false)
-    ; else dismiss the fullscreen topic
-    (do
+  (let [editing (om/get-state owner :editing)]
+    (when editing
+      ((:topic-navigation options) true)
+      (om/set-state! owner :editing false))
+    (when (or (not editing)
+              force-fullscreen-dismiss)
       (utils/enable-scroll)
       (let [fade-out (new Fade (sel1 :div.fullscreen-topic) 1 0 utils/oc-animation-duration)]
         (doto fade-out
@@ -94,7 +95,7 @@
   (when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
     (let [section (om/get-props owner :section)]
       ((:remove-topic options) section))
-    (hide-fullscreen-topic owner options)))
+    (hide-fullscreen-topic owner options true)))
 
 (defn animate-transition [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
@@ -173,7 +174,7 @@
           is-actual? (= as-of actual-as-of)
           fullscreen-topic-opts (merge options {:rev-nav #(om/set-state! owner :transition-as-of %)})
           edit-topic-opts (merge options {:show-save-button #(om/set-state! owner :show-save-button %)
-                                          :dismiss-editing #(om/set-state! owner :editing false)})
+                                          :dismiss-editing #(hide-fullscreen-topic owner options)})
           can-edit? (and (responsive/can-edit?)
                          (not (:read-only data)))]
       ; preload previous revision
