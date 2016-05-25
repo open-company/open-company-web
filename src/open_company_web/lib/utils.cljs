@@ -18,7 +18,7 @@
             [cljsjs.emojione]) ; pulled in for cljsjs externs
   (:import  [goog.i18n NumberFormat]))
 
-(defn abs [n] (when n (max n (- n))))
+(defn abs [n] (if n (max n (- n)) 0))
 
 (def oc-animation-duration 300)
 
