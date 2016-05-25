@@ -24,7 +24,7 @@ div.fullscreen-topic {
     }
   }
 
-  div.save-button {
+  button.save-button {
     position: fixed;
     cursor: pointer;
     z-index: 1040;
@@ -38,10 +38,11 @@ div.fullscreen-topic {
     line-height: 1.5;
     letter-spacing: 1px;
     color: $oc_gray_5;
-    padding: 6px 0 0 32px;
+    outline: none;
+    border: none;
   }
 
-  div.remove-button {
+  button.remove-button {
     position: relative;
     cursor: pointer;
     z-index: 1040;
@@ -57,7 +58,8 @@ div.fullscreen-topic {
     line-height: 1.5;
     letter-spacing: 1px;
     color: $oc_gray_5;
-    padding: 5px 0 0 12px;
+    outline: none;
+    border: none;
 
     div.svg-icon {
       float: left;
