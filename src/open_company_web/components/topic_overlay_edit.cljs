@@ -243,7 +243,7 @@
     {:data fixed-growth-data}))
 
 (defn data-to-save [owner topic]
-  (when-let [body-node (om/get-ref owner "topic-overlay-edit-body")]
+  (when-let [body-node (sel1 [(keyword (str "div#topic-edit-body-" topic))])]
     (let [topic-kw (keyword topic)
          is-data-topic (#{:finances :growth} topic-kw)
          with-title {:title (om/get-state owner :title)}
