@@ -190,7 +190,8 @@
                 :key "topic-list"}
         (when show-su-preview
           (om/build su-preview {:selected-topics share-selected-topics
-                                :company-data company-data}
+                                :company-data company-data
+                                :latest-su (:latest-su data)}
                                {:opts {:dismiss-su-preview #(om/set-state! owner :show-su-preview false)}}))
         ;; Sharing header
         (when sharing-mode

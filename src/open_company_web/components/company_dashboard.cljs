@@ -12,7 +12,6 @@
             [open-company-web.components.footer :refer (footer)]
             [open-company-web.components.menu :refer (menu)]
             [open-company-web.components.edit-topic :refer (edit-topic)]
-            [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [goog.events :as events]
@@ -96,6 +95,7 @@
               (om/build topic-list
                         {:loading (or (:loading company-data) (:loading data))
                          :company-data company-data
+                         :latest-su (dis/latest-stakeholder-update)
                          :card-width card-width
                          :columns-num columns-num
                          :active-category (:active-category state)}
