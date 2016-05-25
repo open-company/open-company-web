@@ -98,7 +98,7 @@ div.fullscreen-topic {
       margin: #{$navbar_height}px auto 30px;
       position: relative;
       overflow: hidden;
-      min-height: calc(100vh - #{$navbar_height}px - 60px - 4px);
+      min-height: calc(100vh - #{$navbar_height}px - 60px);
       padding-top: 2px;
 
       @include mobile(){
