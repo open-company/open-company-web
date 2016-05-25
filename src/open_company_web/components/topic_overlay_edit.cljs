@@ -312,10 +312,8 @@
     (let [save-ch (utils/get-channel "fullscreen-topic-save")]
       (go (loop []
         (let [change (<! save-ch)]
-          (if-let [section-data (data-to-save owner topic)]
-            (do
-              (api/partial-update-section topic section-data)
-              ((:dismiss-editing options)))
+          (when-let [section-data (data-to-save owner topic)]
+            (api/partial-update-section topic section-data)
             (recur))))))
     (let [cancel-ch (utils/get-channel "fullscreen-topic-cancel")]
       (go (loop []
