@@ -42,10 +42,7 @@
 
 (defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric card-width hide-history-navigation] :as data} owner options]
   (render [_]
-    (let [ww (.-clientWidth (sel1 js/document :body))
-          fullscreen-width (if (> ww 575)
-                              575
-                              (min card-width ww))
+    (let [fullscreen-width (utils/fullscreen-topic-width card-width)
           chart-opts {:show-title false
                       :show-revisions-navigation false
                       :switch-metric-cb (:switch-metric-cb options)
