@@ -6,6 +6,7 @@
             [open-company-web.dispatcher :as dispatcher]
             [cognitect.transit :as t]
             [clojure.walk :refer (keywordize-keys stringify-keys)]
+            [open-company-web.lib.cookies :as cook]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.jwt :as j]
             [open-company-web.router :as router]
@@ -27,14 +28,30 @@
   (let [stringified-coll (stringify-keys coll)]
     (clj->js stringified-coll)))
 
+(defn complete-params [params]
+  (if-let [jwt (j/jwt)]
+    (-> (merge {:with-credentials? false} params)
+        (update :headers merge {"Access-Control-Allow-Headers" "Content-Type, Authorization"
+                                "Authorization" (str "Bearer " jwt)}))
+    params))
+
+(defn refresh-jwt []
+  (js/console.info "Refreshing JWToken")
+  (http/get (str auth-endpoint "/refresh-token") (complete-params {})))
+
+(defn update-jwt-cookie! [jwt]
+  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+
 (defn- req [endpoint method path params on-complete]
-  (let [jwt (j/jwt)
-        allow-params (assoc-in params [:headers "Access-Control-Allow-Headers"] "Content-Type, Authorization")
-        jwt-params (when jwt (assoc-in allow-params [:headers "Authorization"] (str "Bearer " jwt)))
-        initial-data {:with-credentials? false}
-        data (when jwt-params (merge initial-data jwt-params))]
+  (let [jwt (j/jwt)]
     (go
-      (let [response (<! (method (str endpoint path) data))]
+      (when (and jwt (j/expired?))
+        (let [res (<! (refresh-jwt))]
+          (if (:success res)
+            (update-jwt-cookie! (-> res :body :jwt))
+            (js/console.warn "Failed to refresh token"))))
+
+      (let [response (<! (method (str endpoint path) (complete-params params)))]
         (on-complete response)))))
 
 (def ^:private api-get (partial req api-endpoint http/get))
