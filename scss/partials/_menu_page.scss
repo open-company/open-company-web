@@ -4,7 +4,7 @@ div.page{
   top: 0px !important;
  
   background: #fff;
-  min-height: calc(100vh - 81px);
+  min-height: calc(100vh - #{$navbar_height}px);
 }
 
 .animating .page {
