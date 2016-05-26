@@ -7,7 +7,6 @@
             [open-company-web.components.ui.login-required :refer (login-required)]))
 
 (defcomponent login [data owner]
-
   (render [_]
     (let [card-width  (responsive/calc-card-width)]
       (dom/div {:class "login fullscreen-page"}
