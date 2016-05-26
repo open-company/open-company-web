@@ -697,3 +697,9 @@
 (defn enable-scroll []
   (dommy/remove-class! (sel1 [:body]) :no-scroll)
   (setStyle (sel1 [:div.main-scroll]) #js {:height "auto" :overflow "auto"}))
+
+(defn fullscreen-topic-width [card-width]
+  (let [ww (.-clientWidth (sel1 js/document :body))]
+    (if (> ww 575)
+      575
+      (min card-width ww))))
