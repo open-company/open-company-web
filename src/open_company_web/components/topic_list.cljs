@@ -20,7 +20,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
-            [goog.fx.dom :refer (Fade)]
+            [goog.fx.dom :refer (Fade Slide)]
             [cljsjs.hammer]))
 
 (defn get-new-sections-if-needed [owner]
@@ -55,6 +55,7 @@
         active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))]
     {:initial-active-topics active-topics
      :active-topics active-topics
+     :card-width (:card-width data)
      :new-sections-requested (or (:new-sections-requested current-state) false)
      :selected-topic (or (:selected-topic current-state) (:selected-topic data))
      :tr-selected-topic nil
@@ -90,6 +91,7 @@
           active-topics (om/get-state owner :active-topics)
           topics-list (flatten (vals active-topics))
           current-idx (.indexOf (vec topics-list) selected-topic)]
+      (om/set-state! owner :animation-direction is-left?)
       (if is-left?
         ;prev
         (let [prev-idx (mod (dec current-idx) (count topics-list))
@@ -114,15 +116,18 @@
                                            :transitioning true
                                            :tr-selected-topic nil}))))
 
-(defn animate-selected-topic-transition [owner]
+(defn animate-selected-topic-transition [owner left?]
   (let [selected-topic (om/get-ref owner "selected-topic")
         tr-selected-topic (om/get-ref owner "tr-selected-topic")
-        fade-anim (new Fade selected-topic 1 0 utils/oc-animation-duration)
+        width (utils/fullscreen-topic-width (om/get-state owner :card-width))
+        fade-anim (new Slide selected-topic #js [0 0] #js [(if left? width (* width -1)) 0] utils/oc-animation-duration)
         cur-state (om/get-state owner)]
-    (.play (new Fade tr-selected-topic 0 1 utils/oc-animation-duration))
     (doto fade-anim
       (.listen AnimationEventType/FINISH #(animation-finished owner))
-      (.play))))
+      (.play))
+    (.play (new Fade selected-topic 1 0 utils/oc-animation-duration))
+    (.play (new Slide tr-selected-topic #js [(if left? (* width -1) width) 0] #js [0 0] utils/oc-animation-duration))
+    (.play (new Fade tr-selected-topic 0 1 utils/oc-animation-duration))))
 
 (defn toggle-sharing-mode [owner options]
   (om/update-state! owner :sharing-mode not)
@@ -171,7 +176,7 @@
 
   (did-update [_ _ _]
     (when (om/get-state owner :tr-selected-topic)
-      (animate-selected-topic-transition owner)))
+      (animate-selected-topic-transition owner (om/get-state owner :animation-direction))))
 
   (render-state [_ {:keys [active-topics selected-topic selected-metric tr-selected-topic transitioning sharing-mode share-selected-topics show-su-preview]}]
     (let [company-data    (:company-data data)
@@ -246,7 +251,8 @@
               (dom/div #js {:className "tr-selected-topic"
                             :key (str "transition-" tr-selected-topic)
                             :ref "tr-selected-topic"
-                            :style #js {:opacity (if tr-selected-topic 0 1)}}
+                            ; :style #js {:opacity (if tr-selected-topic 0 1)}
+                          }
               (om/build fullscreen-topic {:section tr-selected-topic
                                           :section-data (->> tr-selected-topic keyword (get company-data))
                                           :selected-metric selected-metric
