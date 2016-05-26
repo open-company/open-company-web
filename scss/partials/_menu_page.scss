@@ -10,6 +10,7 @@ div.page{
 .animating .page {
   transition: transform .25s ease-in-out;
   -webkit-transition: -webkit-transform .25s ease-in-out;
+  min-height: 100vh;
 }
 
 .animating.left .page {
