@@ -56,6 +56,8 @@ div.su-preview{
     &.share-link-copy {
       height: 230px;
       margin-top: -115px;
+      width: 516px;
+      margin-left: -258px;
     }
 
     &.slack-message {
@@ -96,13 +98,13 @@ div.su-preview{
 
       div.share-link-box {
         width: 100%;
-        margin-top: 10px;
+        margin-top: 20px;
 
         input.share-link-input {
           border: 1px solid rgba(78, 90, 107, 0.1);
           border-radius: 2px;
-          height: 50px;
-          width: 70%;
+          height: 30px;
+          width: 370px;
           font-size: 21px;
           line-height: 1.2;
           color: $oc_gray_5;
@@ -115,8 +117,8 @@ div.su-preview{
         button.share-link-button {
           margin: 0px;
           padding: 0px;
-          width: 30%;
-          height: 50px;
+          width: 106px;
+          height: 30px;
           background-color: $oc_yellow;
           font-weight: 700;
           font-size: 14px;
@@ -125,7 +127,7 @@ div.su-preview{
           color: $oc_gray_5;
           cursor: pointer;
           outline: none;
-          border: 0px solid transparent;
+          border: 1px solid transparent;
 
           &:active, &:focus {
             outline: none;
