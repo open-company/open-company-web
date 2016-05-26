@@ -7,7 +7,8 @@ div.topic-list:not(.no-sharing) {
 div.topics-columns {
   list-style: none;
   padding: 0;
-  width: 100%;
+  width: 100vw;
+  overflow-x: hidden;
 
   div.topics-column-container {
     padding: 20px 30px 20px 30px;
