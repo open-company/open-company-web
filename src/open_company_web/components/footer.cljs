@@ -16,7 +16,7 @@
       (dom/div {:class "footer"}
         (dom/div {:class "footer-cta"}
           (if (:su-preview data)
-           "Powered by OpenCompany, the simple way to share the big picture."
+           "Powered by OpenCompany, where everyone sees the big picture."
            "Powered by OpenCompany")
           (when (:su-preview data)
             (dom/div {}
