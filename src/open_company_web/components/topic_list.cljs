@@ -156,8 +156,8 @@
             swipe-listener (js/Hammer (sel1 [:div#app]))];(.-body js/document))]
         (om/set-state! owner :kb-listener kb-listener)
         (om/set-state! owner :swipe-listener swipe-listener)
-        (.on swipe-listener "swipeleft" (fn [e] (switch-topic owner true)))
-        (.on swipe-listener "swiperight" (fn [e] (switch-topic owner false))))))
+        (.on swipe-listener "swipeleft" (fn [e] (switch-topic owner false)))
+        (.on swipe-listener "swiperight" (fn [e] (switch-topic owner true))))))
 
   (will-unmount [_]
     (utils/remove-channel "fullscreen-topic-save")
