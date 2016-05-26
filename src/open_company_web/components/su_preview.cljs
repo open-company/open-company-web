@@ -61,7 +61,7 @@
     (let [slack-message-ta (.findDOMNode js/ReactDOM (om/get-ref owner "slack-share-textarea"))
           slack-message (.-value slack-message-ta)]
       (om/set-state! owner :slack-patched-posting true)
-      (api/share-stakeholder-update (or slack-message "")))))
+      (utils/after 1000 #(api/share-stakeholder-update (or slack-message ""))))))
 
 (defcomponent su-preview [data owner options]
 
@@ -118,10 +118,7 @@
       ; slack SU posted
       (and (om/get-state owner :slack-patched)
            (om/get-state owner :slack-patched-posting))
-      (do
-        (om/set-state! owner :slack-patched false)
-        (om/set-state! owner :slack-patched-posting false)
-        (om/set-state! owner :slack-patched-posted true))))
+      (om/set-state! owner :slack-patched-posted true)))
 
   (did-update [_ _ _]
     (when (om/get-state owner :share-link)
@@ -210,16 +207,14 @@
                          :on-click #(slack-send-clicked owner options)}
               (cond
                 (and slack-patched
-                     (not slack-patched-posted)
-                     (not slack-patched-posting))
-                  "SEND"
-                (and slack-patched
                      slack-patched-posting
                      (not slack-patched-posted))
                   (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
                 (and slack-patched
                      slack-patched-posting
                      slack-patched-posted)
-                  "SENT ✓")))
+                  "SENT ✓"
+                :else
+                  "SEND")))
           (dom/button {:class "cancel-button"
                        :on-click #(cancel-clicked owner options)} (if su-posted "DONE" "CANCEL")))))))
