@@ -74,7 +74,7 @@
           (dom/div {:class "topic-attribution"}
             (str "- " (:name (:author topic-data)) " / " (utils/date-string (js/Date. (:updated-at topic-data)) true))))
         (when-not hide-history-navigation
-          (dom/div {:class "topic-revisions"}
+          (dom/div {:class "topic-revisions group"}
             (when (:prev-rev data)
               (dom/button {:class "prev"
                            :on-click #((:rev-nav options) (:updated-at (:prev-rev data)))}

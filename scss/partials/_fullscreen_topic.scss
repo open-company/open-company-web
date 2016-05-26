@@ -153,6 +153,10 @@ div.fullscreen-topic {
       div.topic-revisions {
         margin-top: 65px;
 
+        @include mobile(){
+          margin-bottom: 60px;
+        }
+
         button {
           border: 0px;
           outline: none;
