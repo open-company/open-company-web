@@ -12,15 +12,16 @@
   Screenshot of Download window: http://i.imgur.com/ltAj6X1.png
 
   Optional second argument can be used to pass a map of options:
-  - :accent-color (oc-blue)
-  - :size (30px)
-  - :stroke (2px)"
+  - :accent-color (accent color, default: oc-blue)
+  - :color (main color, default: black)
+  - :size (size of the icon, default: 30px)
+  - :stroke (size of the stroke, default: 2px)"
   ([id] (icon id {}))
-  ([id {:keys [accent-color size stroke] :as opts}]
+  ([id {:keys [color accent-color size stroke] :as opts}]
     (when-not id
       (raven/capture-error-with-message "oc-icon/icon: missing ID"))
     (let [fixed-id      (or id "")
-          outline-color (occ/get-color-by-kw :black)
+          outline-color (or color (occ/get-color-by-kw :black))
           accent-color  (or accent-color (occ/get-color-by-kw :black))
           stroke        (or stroke 2)
           size          (or size 30)]
