@@ -21,8 +21,7 @@
             [open-company-web.lib.oc-colors :as oc-colors]))
 
 (defn show-fullscreen-topic [owner]
-  (dommy/add-class! (sel1 [:body]) :no-scroll)
-  (setStyle (sel1 [:div.company-dashboard]) #js {:height "90vh" :overflow "hidden"})
+  (utils/disable-scroll)
   (.play
     (new Fade (om/get-ref owner "fullscreen-topic") 0 1 utils/oc-animation-duration)))
 
@@ -33,15 +32,14 @@
     (om/set-state! owner :editing false)
     ; else dismiss the fullscreen topic
     (do
-      (dommy/remove-class! (sel1 [:body]) :no-scroll)
-      (setStyle (sel1 [:div.company-dashboard]) #js {:height "auto" :overflow "auto"})
+      (utils/enable-scroll)
       (let [fade-out (new Fade (sel1 :div.fullscreen-topic) 1 0 utils/oc-animation-duration)]
         (doto fade-out
           (.listen AnimationEventType/FINISH
             #((:close-overlay-cb options)))
           (.play))))))
 
-(defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric card-width] :as data} owner options]
+(defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric card-width hide-history-navigation] :as data} owner options]
   (render [_]
     (let [ww (.-clientWidth (sel1 js/document :body))
           fullscreen-width (if (> ww 575)
@@ -76,15 +74,16 @@
         (when (:author topic-data)
           (dom/div {:class "topic-attribution"}
             (str "- " (:name (:author topic-data)) " / " (utils/date-string (js/Date. (:updated-at topic-data)) true))))
-        (dom/div {:class "topic-revisions"}
-          (when (:prev-rev data)
-            (dom/button {:class "prev"
-                         :on-click #((:rev-nav options) (:updated-at (:prev-rev data)))}
-              (if (:is-actual data) "VIEW EARLIER UPDATE" "EARLIER")))
-          (when (:next-rev data)
-            (dom/button {:class "next"
-                         :on-click #((:rev-nav options) (:updated-at (:next-rev data)))}
-              "LATER")))))))
+        (when-not hide-history-navigation
+          (dom/div {:class "topic-revisions"}
+            (when (:prev-rev data)
+              (dom/button {:class "prev"
+                           :on-click #((:rev-nav options) (:updated-at (:prev-rev data)))}
+                (if (:is-actual data) "VIEW EARLIER UPDATE" "EARLIER")))
+            (when (:next-rev data)
+              (dom/button {:class "next"
+                           :on-click #((:rev-nav options) (:updated-at (:next-rev data)))}
+                "LATER"))))))))
 
 (defn esc-listener [owner options e]
   (when (= (.-keyCode e) 27)
@@ -134,9 +133,9 @@
 (defn toggle-editing [owner options]
   (let [editing-mode (om/get-state owner :editing)]
     (om/set-state! owner :editing (not editing-mode))
-    ((:toggle-topic-navigation options) editing-mode)))
+    ((:topic-navigation options) editing-mode)))
 
-(defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width] :as data} owner options]
+(defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width hide-history-navigation] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
@@ -230,6 +229,7 @@
                                                    :currency currency
                                                    :card-width card-width
                                                    :is-actual is-actual?
+                                                   :hide-history-navigation hide-history-navigation
                                                    :prev-rev prev-rev
                                                    :next-rev next-rev}
                                                   {:opts fullscreen-topic-opts}))
@@ -246,6 +246,7 @@
                                                        :selected-metric selected-metric
                                                        :currency currency
                                                        :card-width card-width
+                                                       :hide-history-navigation hide-history-navigation
                                                        :prev-rev tr-prev-rev
                                                        :next-rev tr-next-rev}
                                                       {:opts fullscreen-topic-opts}))))))

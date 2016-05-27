@@ -147,7 +147,7 @@
     (and (> topic-list-height popover-max-height)
          (neg? (- topic-list-height popover-offsettop popover-max-height)))))
 
-(defcomponent topic [{:keys [active-category active-topics section-data section currency column] :as data} owner options]
+(defcomponent topic [{:keys [active-topics section-data section currency column sharing-mode share-selected] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
@@ -185,17 +185,20 @@
                   next-rev
                   (not (contains? revisions-list (:updated-at next-rev))))
         (api/load-revision next-rev slug section-kw))
-      (dom/div #js {:className (str "topic group" (when add-topic? (str " add-topic" (when show-add-topic-popover " active"))))
+      (dom/div #js {:className (utils/class-set {:topic true
+                                                 :group true
+                                                 :add-topic add-topic?
+                                                 :sharing-selected (and sharing-mode share-selected)
+                                                 :active (and add-topic? show-add-topic-popover)})
                     :ref "topic"
                     :onClick #(if add-topic?
                                 (add-topic owner)
                                 (topic-click options nil))}
         (when show-add-topic-popover
           (let [all-sections (get-all-sections slug)
-                category-topics (flatten (vals active-topics))
                 update-active-topics (:update-active-topics options)
                 list-data {:all-topics all-sections
-                           :active-topics-list category-topics
+                           :active-topics-list active-topics
                            :show-above (show-popover-above? owner)
                            :column column}
                 list-opts {:did-change-active-topics update-active-topics

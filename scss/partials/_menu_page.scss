@@ -1,0 +1,33 @@
+div.page{
+  position: relative; /* Set the position property so z-index will apply */
+  z-index: 20; /* Make sure this is higher than #menu */
+  top: 0px !important;
+ 
+  background: #fff;
+  min-height: calc(100vh - 81px);
+}
+
+.animating .page {
+  transition: transform .25s ease-in-out;
+  -webkit-transition: -webkit-transform .25s ease-in-out;
+}
+
+.animating.left .page {
+  transform: translate3d( -190px, 0, 0 );
+  -webkit-transform: translate3d( -190px, 0, 0 );
+}
+
+.animating.right .page {
+  transform: translate3d( 190px, 0, 0 );
+  -webkit-transform: translate3d( 190px, 0, 0 );
+}
+
+.menu-visible .page {
+  right: 190px;
+  top: 0px;
+}
+
+.menu-visible:not(.animating) .page nav{
+  left: -190px;
+  top: default;
+}

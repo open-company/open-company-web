@@ -19,6 +19,7 @@
             [open-company-web.components.su-edit :refer (su-edit)]
             [open-company-web.components.stakeholder-update :refer (stakeholder-update)]
             [open-company-web.components.su-list :refer (su-list)]
+            [open-company-web.components.su-snapshot-preview :refer (su-snapshot-preview)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
@@ -117,6 +118,7 @@
     ;; do we have the company data already?
     (when (not (get-in @dis/app-state su-key))
       ;; load the company data from the API
+      (api/get-company slug)
       (api/get-stakeholder-update slug update-slug)
       (let [su-loading-key (conj su-key :loading)]
         (swap! dis/app-state assoc-in su-loading-key true)))
@@ -157,6 +159,9 @@
     (defroute company-profile-route (urls/company-profile ":slug") {:as params}
       (company-handler "profile" target company-profile params))
 
+    (defroute su-snapshot-preview-route (urls/stakeholder-update-preview ":slug") {:as params}
+      (company-handler "su-snapshot-preview" target su-snapshot-preview params))
+
     (defroute su-list-route (urls/stakeholder-update-list ":slug") {:as params}
       (company-handler "su-list" target su-list params))
 
@@ -164,7 +169,7 @@
       (company-handler "su-edit" target su-edit params))
 
     (defroute stakeholder-update-route (urls/stakeholder-update ":slug" ":update-slug") {:as params}
-      (stakeholder-update-handler target stakeholder-update params))
+      (stakeholder-update-handler target su-snapshot-preview params))
 
     (defroute not-found-route "*" []
       ;; render component
@@ -180,6 +185,7 @@
                                  company-route
                                  company-route-slash
                                  company-profile-route
+                                 su-snapshot-preview-route
                                  su-edit-route
                                  su-list-route
                                  stakeholder-update-route
