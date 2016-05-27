@@ -16,6 +16,7 @@ div.su-preview{
 
     &.share-copy-window {
       margin-top: -120px;
+      margin-left: 254px;
     }
 
     &.slack-patched-window {
@@ -107,6 +108,7 @@ div.su-preview{
           font-size: 21px;
           line-height: 1.2;
           color: $oc_gray_5;
+          float: left;
 
           &:active, &:focus {
             outline: none;
@@ -127,6 +129,7 @@ div.su-preview{
           cursor: pointer;
           outline: none;
           border: 1px solid transparent;
+          float: left;
 
           &:active, &:focus {
             outline: none;

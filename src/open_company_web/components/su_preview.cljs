@@ -63,6 +63,10 @@
       (om/set-state! owner :slack-patched-posting true)
       (utils/after 1000 #(api/share-stakeholder-update (or slack-message ""))))))
 
+(defn select-share-link [owner]
+  (when-let [input (.findDOMNode js/ReactDOM (om/get-ref owner "share-link-input"))]
+    (.setSelectionRange input 0 (count (.-value input)))))
+
 (defcomponent su-preview [data owner options]
 
   (init-state [_]
@@ -189,7 +193,8 @@
                 (dom/input #js {:type "text"
                                 :className "share-link-input"
                                 :id "share-link-input"
-                                :on-change #(om/set-state! owner :share-link share-link)
+                                :onFocus #(select-share-link owner)
+                                :onKeyUp #(select-share-link owner)
                                 :value share-link
                                 :ref "share-link-input"})
                 (dom/button {:class "share-link-button"
