@@ -6,6 +6,7 @@
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
             [open-company-web.api :as api]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.caches :as caches]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
@@ -211,7 +212,7 @@
               (dom/div {:class "sharing-header-center"}
                 (when (pos? (count share-selected-topics))
                   (dom/button {:class "share-snapshot-bt"
-                               :on-click #(om/set-state! owner :show-su-preview true)}
+                               :on-click #(router/nav! (oc-urls/stakeholder-update-preview))}
                     "PREVIEW AND SHARE")))
               (dom/div {:class "sharing-header-right"}
                 (dom/button {:class "close-share"
