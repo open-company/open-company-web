@@ -7,7 +7,7 @@
             [cljs.core.async :refer (put!)]
             [dommy.core :as dommy :refer-macros (sel1)]
             [open-company-web.router :as router]
-            [open-company-web.local-settings :as ls]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
@@ -39,10 +39,16 @@
     (let [listener-key (events/listen page EventType/TRANSITIONEND #(on-transition-end owner body))]
       (om/set-state! owner :transition-end-listener listener-key))))
 
+(defn slack-clicked [owner])
+
+(defn email-clicked [owner])
+
 (defcomponent navbar [data owner]
 
   (init-state [_]
-    (utils/add-channel "close-side-menu" (chan)))
+    (utils/add-channel "close-side-menu" (chan))
+    {:slack-loading false
+     :email-loading false})
 
   (did-mount [_]
     (let [close-ch (utils/get-channel "close-side-menu")]
@@ -51,7 +57,7 @@
             (menu-click owner nil)
             (recur))))))
 
-  (render [_]
+  (render-state [_ {:keys [slack-loading email-loading]}]
     (let [columns-num (:columns-num data)
           card-width (:card-width data)
           header-width (+ (* card-width columns-num)    ; cards width
@@ -59,7 +65,27 @@
                           (when (> columns-num 1) 60))] ; x margins if needed
       (dom/nav {:class "oc-navbar group"}
         (when (:su-preview data)
-          (dom/div {:class "su-snapshot-preview"} (dom/div {:class "preview-title"} "THIS IS A PREVIEW")))
+          (dom/div {:class "su-snapshot-preview"}
+            (dom/div {:class "su-snapshot-preview-internal group"
+                      :style #js {:width (str header-width "px")}}
+              (dom/div {:class "su-snapshot-buttons group"}
+                (dom/button {:class "ready-slack-button"
+                           :on-click #(slack-clicked owner)}
+                  (dom/div {:class "slack-circle"}
+                    (if slack-loading
+                      (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
+                      (dom/img {:class "slack-icon" :src "/img/Slack_Icon.png"})))
+                  (dom/label {} "SHARE ON SLACK"))
+                (dom/button {:class "ready-mail-button"
+                           :on-click #(email-clicked owner)}
+                  (dom/div {:class "mail-circle"}
+                    (if email-loading
+                      (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
+                      (icon :email-84 {:size 20 :color "rgba(255, 255, 255, 0.8)" :accent-color "rgba(255, 255, 255, 0.8)"})))
+                  (dom/label {} "SHARE URL")))
+              (dom/button {:class "close-preview"
+                           :on-click #(router/nav! (oc-urls/company))}
+                (icon :simple-remove {:stroke "4" :color "rgba(255, 255, 255, 0.8)" :accent-color "rgba(255, 255, 255, 0.8)"})))))
         (dom/div {:class "oc-navbar-header"
                   :style #js {:width (str header-width "px")}}
           (om/build company-avatar data)

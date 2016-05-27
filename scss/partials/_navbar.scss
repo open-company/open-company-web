@@ -15,17 +15,118 @@ nav.oc-navbar {
     top: 0px;
     left: 0px;
     width: 100%;
-    height: 60px;
+    height: 70px;
     background-color: rgba(78, 90, 107, 0.5);
 
-    div.preview-title {
-      width:200px;
-      margin: 20px auto;
-      font-weight: 700;
-      font-size: 12px;
-      line-height: 1.5;
-      letter-spacing: 1px;
-      color: #ffffff;
+    div.su-snapshot-preview-internal{
+      margin: 10px auto;
+      padding: 0 30px;
+      text-align: center;
+
+      div.su-snapshot-buttons{
+        width: 500px;
+        margin: 0 auto;
+
+        button.ready-slack-button {
+          float: left;
+          outline: none;
+          border: 0px solid transparent;
+          width: 180px;
+          background-color: transparent;
+          padding: 0px;
+          margin:0px;
+          text-align: left;
+
+          &:active, &:focus {
+            outline: none;
+            border: none;
+          }
+
+          label{
+            padding-top: 13px;
+            padding-left: 10px;
+            font-weight: 700;
+            font-size: 12px;
+            line-height: 1.5;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+          }
+          div.slack-circle {
+            border-radius: 22.5px;
+            width: 45px;
+            height: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            float: left;
+            padding: 9px;
+
+            img.slack-icon {
+              width: 25px;
+              height: 25px;
+            }
+          }
+        }
+
+        button.ready-mail-button {
+          float: right;
+          outline: none;
+          border: 0px solid transparent;
+          width: 180px;
+          background-color: transparent;
+          padding: 0px;
+          margin:0px;
+          text-align: left;
+
+          &:active, &:focus {
+            outline: none;
+            border: none;
+          }
+
+          label{
+            padding-top: 13px;
+            padding-left: 10px;
+            font-weight: 700;
+            font-size: 12px;
+            line-height: 1.5;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+          }
+
+          div.mail-circle{
+            border-radius: 22.5px;
+            width: 45px;
+            height: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            float: left;
+            padding: 11px;
+          }
+        }
+      }
+
+      div.preview-title {
+        width: 150px;
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: #ffffff;
+        margin: 0 auto;
+      }
+
+      button.close-preview {
+        float: right;
+        width: 30px;
+        height: 30px;
+        margin: 0;
+        padding: 0;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        display: block;
+        color: white;
+        margin-top: -35px;
+      }
     }
   }
 
