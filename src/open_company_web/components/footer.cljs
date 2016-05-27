@@ -15,9 +15,7 @@
                           (when (> columns-num 1) 60))]
       (dom/div {:class "footer"}
         (dom/div {:class "footer-cta"}
-          (if (:su-preview data)
-           "Powered by OpenCompany, where everyone sees the big picture."
-           "Powered by OpenCompany")
+          "Powered by OpenCompany"
           (when (:su-preview data)
             (dom/div {}
               (dom/a {:class "io-link"
