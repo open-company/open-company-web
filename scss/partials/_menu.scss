@@ -15,7 +15,8 @@ ul#menu {
   z-index: 10; /* Make sure the z-index is lower than the #page */
 
   a {
-    display: block;
+    display: inline-block;
+    white-space: nowrap;
     color: #fff;
     padding: 15px 0;
     border-bottom: 1px solid rgba( 255, 255, 255, 0.05 );

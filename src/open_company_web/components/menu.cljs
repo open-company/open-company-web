@@ -15,9 +15,12 @@
   (cook/remove-cookie! :jwt)
   (.reload js/location))
 
+(defn close-menu []
+  (put! (utils/get-channel "close-side-menu") {:close true}))
+
 (defn profile-click [e]
   (.preventDefault e)
-  (put! (utils/get-channel "close-side-menu") {:close true})
+  (close-menu)
   (router/nav! oc-urls/user-profile))
 
 (defcomponent menu [data owner options]
@@ -25,6 +28,9 @@
     (dom/ul {:id "menu"}
       (when (jwt/jwt)
         (dom/li {} (dom/a {:title "PROFILE" :href oc-urls/user-profile :on-click profile-click} "PROFILE")))
+      (when (and (router/current-company-slug)
+                 (not (utils/in? (:route @router/path) "profile")))
+        (dom/li {} (dom/a {:title "COMPANY PROFILE" :href (oc-urls/company-profile)} "COMPANY PROFILE")))
       (when (jwt/jwt)
         (dom/li {} (dom/a {:title "SIGN OUT" :href oc-urls/logout :on-click logout-click} "SIGN OUT")))
       (when-not (jwt/jwt)

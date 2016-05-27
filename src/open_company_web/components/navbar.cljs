@@ -58,14 +58,17 @@
                           (* 20 (dec columns-num))      ; cards right margin
                           (when (> columns-num 1) 60))] ; x margins if needed
       (dom/nav {:class "oc-navbar group"}
+        (when (:su-preview data)
+          (dom/div {:class "su-snapshot-preview"} (dom/div {:class "preview-title"} "THIS IS A PREVIEW")))
         (dom/div {:class "oc-navbar-header"
                   :style #js {:width (str header-width "px")}}
           (om/build company-avatar data)
-          (dom/ul {:class "nav navbar-nav navbar-right"}
-            (dom/li {}
-              (if (responsive/is-mobile)
-                (dom/div {:on-click (partial menu-click owner)}
-                    (icon "menu-34"))
-                (if (jwt/jwt)
-                  (om/build user-avatar {:menu-click (partial menu-click owner)})
-                  (om/build login-button (assoc data :menu-click (partial menu-click owner))))))))))))
+          (when-not (:hide-right-menu data)
+            (dom/ul {:class "nav navbar-nav navbar-right"}
+              (dom/li {}
+                (if (responsive/is-mobile)
+                  (dom/div {:on-click (partial menu-click owner)}
+                      (icon "menu-34"))
+                  (if (jwt/jwt)
+                    (om/build user-avatar {:menu-click (partial menu-click owner)})
+                    (om/build login-button (assoc data :menu-click (partial menu-click owner)))))))))))))

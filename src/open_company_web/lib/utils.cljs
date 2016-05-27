@@ -1,10 +1,11 @@
 (ns open-company-web.lib.utils
   (:require [om.core :as om :include-macros true]
             [clojure.string]
-            [dommy.core :refer-macros (sel1)]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [cljs.core.async :refer (put!)]
             [cljs-time.format :as cljs-time-format]
             [cljs-time.core :as cljs-time]
+            [goog.style :refer (setStyle)]
             [goog.fx.dom :refer (Scroll)]
             [goog.string :as gstring]
             [goog.i18n.NumberFormat :as nf]
@@ -17,7 +18,7 @@
             [cljsjs.emojione]) ; pulled in for cljsjs externs
   (:import  [goog.i18n NumberFormat]))
 
-(defn abs [n] (when n (max n (- n))))
+(defn abs [n] (if n (max n (- n)) 0))
 
 (def oc-animation-duration 300)
 
@@ -664,7 +665,7 @@
                 :placeholderText "Paste or type a link"
                 :targetCheckbox false
                 :targetCheckboxText "Open in new window"}
-   :placeholder #js {:text placeholder, :hideOnClick true}})
+   :placeholder #js {:text (or placeholder ""), :hideOnClick true}})
 
 (defn after [ms fn]
   (js/setTimeout fn ms))
@@ -688,3 +689,17 @@
   (when text
     (let [reg (js/RegExp. "</?[^>]+(>|$)" "g")]
       (.replace text reg ""))))
+
+(defn disable-scroll []
+  (dommy/add-class! (sel1 [:body]) :no-scroll)
+  (setStyle (sel1 [:div.main-scroll]) #js {:height "90vh" :overflow "hidden"}))
+
+(defn enable-scroll []
+  (dommy/remove-class! (sel1 [:body]) :no-scroll)
+  (setStyle (sel1 [:div.main-scroll]) #js {:height "auto" :overflow "auto"}))
+
+(defn fullscreen-topic-width [card-width]
+  (let [ww (.-clientWidth (sel1 js/document :body))]
+    (if (> ww 575)
+      575
+      (min card-width ww))))
