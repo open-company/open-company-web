@@ -19,23 +19,26 @@ nav.oc-navbar {
     background-color: rgba(78, 90, 107, 0.5);
 
     div.su-snapshot-preview-internal{
-      margin: 10px auto;
+      margin: 18px auto;
       padding: 0 30px;
       text-align: center;
 
       div.su-snapshot-buttons{
-        width: 500px;
+        width: 400px;
         margin: 0 auto;
+        height: 33px;
 
         button.ready-slack-button {
           float: left;
           outline: none;
           border: 0px solid transparent;
           width: 180px;
-          background-color: transparent;
+          background-color: $oc_yellow;
           padding: 0px;
           margin:0px;
           text-align: left;
+          width: 180px;
+          height: 33px;
 
           &:active, &:focus {
             outline: none;
@@ -43,28 +46,31 @@ nav.oc-navbar {
           }
 
           label{
-            padding-top: 13px;
+            padding-top: 8px;
             padding-left: 10px;
             font-weight: 700;
             font-size: 12px;
             line-height: 1.5;
             letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.8);
+            color: $oc_gray_5;
             cursor: pointer;
+            opacity: 0.7;
           }
-          div.slack-circle {
-            border-radius: 22.5px;
-            width: 45px;
-            height: 45px;
-            border: 1px solid rgba(78, 90, 107, 0.1);
-            float: left;
-            padding: 9px;
-            background-color: white;
 
-            img.slack-icon {
-              width: 25px;
-              height: 25px;
-            }
+          i.fa.fa-slack, img.small-loading {
+            font-size: 20px;
+            float: left;
+            margin: 7px 0 0 17px;
+            color: rgba(78, 90, 107, 0.7);
+            width: 20px;
+            height: 20px;
+          }
+
+          img.slack-icon {
+            width: 20px;
+            height: 20px;
+            float: left;
+            margin: 7px 0 0 17px;
           }
         }
 
@@ -73,10 +79,12 @@ nav.oc-navbar {
           outline: none;
           border: 0px solid transparent;
           width: 180px;
-          background-color: transparent;
+          background-color: $oc_yellow;
           padding: 0px;
           margin:0px;
           text-align: left;
+          width: 180px;
+          height: 33px;
 
           &:active, &:focus {
             outline: none;
@@ -84,24 +92,22 @@ nav.oc-navbar {
           }
 
           label{
-            padding-top: 13px;
-            padding-left: 10px;
+            padding-top: 8px;
+            padding-left: 20px;
             font-weight: 700;
             font-size: 12px;
             line-height: 1.5;
             letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.8);
+            color: $oc_gray_5;
             cursor: pointer;
+            opacity: 0.7;
           }
 
-          div.mail-circle{
-            border-radius: 22.5px;
-            width: 45px;
-            height: 45px;
-            border: 1px solid rgba(78, 90, 107, 0.1);
+          div.svg-icon, img.small-loading {
             float: left;
-            padding: 12px;
-            background-color: white;
+            width: 20px;
+            height: 20px;
+            margin: 6px 0 0 33px;
           }
         }
       }

@@ -39,9 +39,11 @@
     (let [listener-key (events/listen page EventType/TRANSITIONEND #(on-transition-end owner body))]
       (om/set-state! owner :transition-end-listener listener-key))))
 
-(defn slack-clicked [owner])
+(defn slack-clicked [owner]
+  (om/set-state! owner :slack-loading true))
 
-(defn email-clicked [owner])
+(defn email-clicked [owner]
+ (om/set-state! owner :email-loading true))
 
 (defcomponent navbar [data owner]
 
@@ -71,17 +73,15 @@
               (dom/div {:class "su-snapshot-buttons group"}
                 (dom/button {:class "ready-slack-button"
                            :on-click #(slack-clicked owner)}
-                  (dom/div {:class "slack-circle"}
-                    (if slack-loading
-                      (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
-                      (dom/img {:class "slack-icon" :src "/img/Slack_Icon.png"})))
+                  (if slack-loading
+                    (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
+                    (dom/i {:class "fa fa-slack"}))
                   (dom/label {} "SHARE ON SLACK"))
                 (dom/button {:class "ready-mail-button"
                            :on-click #(email-clicked owner)}
-                  (dom/div {:class "mail-circle"}
-                    (if email-loading
-                      (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
-                      (icon :email-84 {:size 20 :color "rgba(78, 90, 107, 0.6)" :accent-color "rgba(78, 90, 107, 0.6)"})))
+                  (if email-loading
+                    (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
+                    (icon :email-84 {:size 20 :stroke "4" :color "rgba(78, 90, 107, 0.7)" :accent-color "rgba(78, 90, 107, 0.7)"}))
                   (dom/label {} "SHARE URL")))
               (dom/button {:class "close-preview"
                            :on-click #(router/nav! (oc-urls/company))}
