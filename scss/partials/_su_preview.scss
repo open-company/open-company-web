@@ -21,6 +21,7 @@ div.su-preview{
 
     &.slack-patched-window {
       margin-top: -142px;
+      margin-left: 190px;
     }
 
     button {
@@ -63,7 +64,9 @@ div.su-preview{
 
     &.slack-message {
       height: 275px;
+      width: 384px;
       margin-top: -137px;
+      margin-left: -192px;
 
       div.su-preview-box {
         margin-top: 0px;
@@ -157,6 +160,7 @@ div.su-preview{
         color: $oc_gray_5;
         cursor: pointer;
         opacity: 0.5;
+        margin-bottom: 25px;
       }
 
       textarea.slack-share-textarea {

@@ -203,7 +203,7 @@
               (dom/a {:class "share-link-new-win" :href share-link :target "_blank"} "Open in new window")))
           (when slack-patched
             (dom/div {:class "su-preview-box"}
-              (dom/label {:class "slack-share-cta"} "YOUR SNAPSHOT WILL BE SHARED WITH ALL THE MEMBERS OF YOUR SLACK ORGANIZATION")
+              (dom/label {:class "slack-share-cta"} "SHARE SNAPSHOT WITH THE MEMBERS OF YOUR SLACK ORGANIZATION")
               (dom/textarea #js {:className "slack-share-textarea"
                                  :ref "slack-share-textarea"
                                  :placeholder "Add a note"})))
