@@ -20,6 +20,7 @@
             [open-company-web.components.stakeholder-update :refer (stakeholder-update)]
             [open-company-web.components.su-list :refer (su-list)]
             [open-company-web.components.su-snapshot-preview :refer (su-snapshot-preview)]
+            [open-company-web.components.su-snapshot :refer (su-snapshot)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
@@ -169,7 +170,7 @@
       (company-handler "su-edit" target su-edit params))
 
     (defroute stakeholder-update-route (urls/stakeholder-update ":slug" ":update-slug") {:as params}
-      (stakeholder-update-handler target su-snapshot-preview params))
+      (stakeholder-update-handler target su-snapshot params))
 
     (defroute not-found-route "*" []
       ;; render component
