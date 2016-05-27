@@ -85,6 +85,14 @@
       (set! (.-value preview-title) (.-value preview-title))
       (om/set-state! owner :title-focused true))))
 
+(defn share-slack-clicked [owner]
+  (om/set-state! owner :slack-loading true)
+  (om/set-state! owner :show-su-dialog true))
+
+(defn share-email-clicked [owner]
+ (om/set-state! owner :email-loading true)
+ (om/set-state! owner :show-su-dialog true))
+
 (defcomponent su-snapshot-preview [data owner options]
 
   (init-state [_]
@@ -96,8 +104,10 @@
        :topic-navigation true
        :transitioning false
        :title-focused false
+       :title (or (:title su-data) (utils/su-default-title))
        :show-su-dialog false
-       :title (:title su-data)}))
+       :email-loading false
+       :slack-loading false}))
 
   (did-mount [_]
     (focus-title owner)
@@ -123,7 +133,7 @@
     (when (om/get-state owner :tr-selected-topic)
       (animate-selected-topic-transition owner)))
 
-  (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning title show-su-dialog]}]
+  (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning title show-su-dialog email-loading slack-loading]}]
     (let [company-data (dis/company-data data)
           su-data      (stakeholder-update-data owner)
           columns-num  (responsive/columns-num)
@@ -143,11 +153,16 @@
           (when company-data
             (om/build navbar {:company-data company-data
                               :card-width card-width
+                              :latest-su (dis/latest-stakeholder-update)
                               :sharing-mode false
                               :su-preview true
                               :hide-right-menu true
                               :columns-num columns-num
-                              :auth-settings (:auth-settings data)}))
+                              :auth-settings (:auth-settings data)
+                              :email-loading email-loading
+                              :slack-loading slack-loading}
+                             {:opts {:share-email-cb #(share-email-clicked owner)
+                                     :share-slack-cb #(share-slack-clicked owner)}}))
           ;; SU Snapshot Preview
           (when company-data
             (dom/div {:class "su-sp-content"}
@@ -188,6 +203,7 @@
               (when (:title su-data)
                 (dom/div {:class "preview-title-container"}
                   (dom/input #js {:className "preview-title"
+                                  :id "su-snapshot-preview-title"
                                   :type "text"
                                   :value title
                                   :ref "preview-title"
@@ -197,8 +213,15 @@
               (when show-su-dialog
                 (om/build su-preview {:selected-topics (:sections su-data)
                                       :company-data company-data
-                                      :latest-su (dis/latest-stakeholder-update)}
-                                     {:opts {:dismiss-su-preview #(om/set-state! owner :show-su-preview false)}}))
+                                      :latest-su (dis/latest-stakeholder-update)
+                                      :share-slack slack-loading
+                                      :share-email email-loading
+                                      :su-title title}
+                                     {:opts {:dismiss-su-preview #(om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false
+                                                                                                                    :email-loading false
+                                                                                                                    :slack-loading false}))
+                                             :share-done-cb #(om/set-state! owner (merge (om/get-state owner) {:email-loading false
+                                                                                                               :slack-loading false}))}}))
               (om/build topics-columns {:columns-num columns-num
                                         :card-width card-width
                                         :total-width total-width
