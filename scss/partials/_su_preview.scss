@@ -1,5 +1,7 @@
 div.su-preview{
   position: fixed;
+  top: 0px;
+  left: 0px;
   width: 100vw;
   height: 100vh;
   background-color: rgba(78, 90, 107, 0.5);
@@ -32,12 +34,6 @@ div.su-preview{
       &:active, &:focus {
         outline: none;
         border: none;
-      }
-
-      div.svg-icon{
-        svg{
-          stroke: white !important;
-        }
       }
     }
   }
@@ -211,10 +207,6 @@ div.su-preview{
 
           div.svg-icon {
             float: left;
-
-            svg {
-              stroke: rgba(78, 90, 107, 0.5) !important;
-            }
           }
         }
       }
@@ -315,12 +307,6 @@ div.su-preview{
           border: 1px solid rgba(78, 90, 107, 0.1);
           float: left;
           padding: 11px;
-          div.svg-icon {
-
-            svg {
-              stroke: rgba(78, 90, 107, 0.5) !important;
-            }
-          }
         }
       }
     }
@@ -344,7 +330,6 @@ div.su-preview{
 
       &:active, &:focus {
         outline: none;
-        border: none;
       }
     }
 
@@ -367,7 +352,6 @@ div.su-preview{
 
       &:active, &:focus {
         outline: none;
-        border: none;
       }
     }
   }
