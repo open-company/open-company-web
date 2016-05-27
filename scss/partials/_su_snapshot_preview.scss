@@ -21,16 +21,26 @@ div.su-snapshot-preview {
       background-color: $oc_gray_6;
     }
 
-    div.preview-title {
+    div.preview-title-container {
       width: 100%;
       text-align: center;
-      font-family: $oc_headers_font;
-      font-size: 20px;
-      line-height: 1.2;
-      text-align: center;
-      color: $oc_gray_5;
       padding-top: 50px;
-      text-align: center;
+
+      input.preview-title {
+        font-family: $oc_headers_font;
+        font-size: 20px;
+        line-height: 1.2;
+        color: $oc_gray_5;
+        text-align: center;
+        outline: none;
+        border: 1px solid transparent;
+        background-color: transparent;
+        corner-radius: 2px;
+
+        &:focus {
+          border: 1px solid rgba(78,90,107, 0.2);
+        }
+      }
     }
 
     div.preview-subtitle {
