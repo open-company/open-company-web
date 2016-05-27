@@ -81,7 +81,7 @@
                   (dom/div {:class "mail-circle"}
                     (if email-loading
                       (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
-                      (icon :email-84 {:size 20 :color "rgba(255, 255, 255, 0.8)" :accent-color "rgba(255, 255, 255, 0.8)"})))
+                      (icon :email-84 {:size 20 :color "rgba(78, 90, 107, 0.6)" :accent-color "rgba(78, 90, 107, 0.6)"})))
                   (dom/label {} "SHARE URL")))
               (dom/button {:class "close-preview"
                            :on-click #(router/nav! (oc-urls/company))}
