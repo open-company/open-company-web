@@ -143,11 +143,11 @@
 (def popover-max-height 312)
 
 (defn show-popover-above? [owner]
-  (let [topic-list (sel1 [:div.topic-list])
-        topic-list-height (.-clientHeight topic-list)
-        popover-offsettop (.-offsetTop (om/get-ref owner "topic"))]
-    (and (> topic-list-height popover-max-height)
-         (neg? (- topic-list-height popover-offsettop popover-max-height)))))
+  (let [scroll             (.-scrollTop (.-body js/document))
+        win-height        (- (.-clientHeight (.-documentElement js/document)) (.-clientHeight (sel1 [:nav.oc-navbar])) 4)
+        popover-offsettop (.-offsetTop (om/get-ref owner "topic"))
+        add-topic-pos     (- popover-offsettop scroll)]
+    (> add-topic-pos (/ win-height 2))))
 
 (defcomponent topic [{:keys [active-topics section-data section currency column sharing-mode share-selected] :as data} owner options]
 
