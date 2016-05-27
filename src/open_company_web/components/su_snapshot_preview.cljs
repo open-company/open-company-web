@@ -15,11 +15,13 @@
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.company-header :refer (company-header)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
+            [open-company-web.components.su-preview :refer (su-preview)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
             [goog.fx.dom :refer (Fade)]
-            [cljsjs.hammer]))
+            [cljsjs.hammer]
+            [cljsjs.react.dom]))
 
 (defn close-overlay-cb [owner]
   (om/set-state! owner :transitioning false)
@@ -74,22 +76,31 @@
 
 (defn stakeholder-update-data [owner]
   (let [props (om/get-props owner)]
-    (if (om/get-state owner :su-preview)
-      (:stakeholder-update (dis/company-data props))
-      (dis/stakeholder-update-data))))
+    (:stakeholder-update (dis/company-data props))))
+
+(defn focus-title [owner]
+  (when-not (om/get-state owner :title-focused)
+    (when-let [preview-title (.findDOMNode js/ReactDOM (om/get-ref owner "preview-title"))]
+      (.focus preview-title)
+      (set! (.-value preview-title) (.-value preview-title))
+      (om/set-state! owner :title-focused true))))
 
 (defcomponent su-snapshot-preview [data owner options]
 
   (init-state [_]
     (utils/add-channel "fullscreen-topic-save" (chan))
     (utils/add-channel "fullscreen-topic-cancel" (chan))
-    {:selected-topic nil
-     :su-preview (utils/in? (:route @router/path) "su-snapshot-preview")
-     :selected-metric nil
-     :topic-navigation true
-     :transitioning false})
+    (let [su-data (stakeholder-update-data owner)]
+      {:selected-topic nil
+       :selected-metric nil
+       :topic-navigation true
+       :transitioning false
+       :title-focused false
+       :show-su-dialog false
+       :title (:title su-data)}))
 
   (did-mount [_]
+    (focus-title owner)
     (when-not (utils/is-test-env?)
       (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))
             swipe-listener (js/Hammer (sel1 [:div#app]))];(.-body js/document))]
@@ -108,10 +119,11 @@
         (.off swipe-listener "swiperight"))))
 
   (did-update [_ _ _]
+    (focus-title owner)
     (when (om/get-state owner :tr-selected-topic)
       (animate-selected-topic-transition owner)))
 
-  (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning su-preview]}]
+  (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning title show-su-dialog]}]
     (let [company-data (dis/company-data data)
           su-data      (stakeholder-update-data owner)
           columns-num  (responsive/columns-num)
@@ -132,7 +144,7 @@
             (om/build navbar {:company-data company-data
                               :card-width card-width
                               :sharing-mode false
-                              :su-preview su-preview
+                              :su-preview true
                               :hide-right-menu true
                               :columns-num columns-num
                               :auth-settings (:auth-settings data)}))
@@ -174,14 +186,24 @@
                                                {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                        :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
               (when (:title su-data)
-                (dom/div {:class "preview-title"} (:title su-data)))
+                (dom/div {:class "preview-title-container"}
+                  (dom/input #js {:className "preview-title"
+                                  :type "text"
+                                  :value title
+                                  :ref "preview-title"
+                                  :onChange #(om/set-state! owner :title (.. % -target -value))
+                                  :style #js {:width total-width}})))
               (dom/div {:class "preview-subtitle"} su-subtitle)
+              (when show-su-dialog
+                (om/build su-preview {:selected-topics (:sections su-data)
+                                      :company-data company-data
+                                      :latest-su (dis/latest-stakeholder-update)}
+                                     {:opts {:dismiss-su-preview #(om/set-state! owner :show-su-preview false)}}))
               (om/build topics-columns {:columns-num columns-num
                                         :card-width card-width
                                         :total-width total-width
                                         :content-loaded (not (:loading data))
                                         :topics (:sections su-data)
-                                        :su-preview true
                                         :company-data company-data
                                         :hide-add-topic true}
                                        {:opts {:topic-click (partial topic-click owner)}})))
