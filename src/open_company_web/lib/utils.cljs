@@ -703,3 +703,9 @@
     (if (> ww 575)
       575
       (min card-width ww))))
+
+(defn su-default-title []
+  (let [js-date (js-date)
+        month (month-string (add-zero (.getMonth js-date)))
+        year (.getFullYear js-date)]
+    (str month " " year " Update")))
