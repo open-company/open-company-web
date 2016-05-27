@@ -14,7 +14,6 @@
           share-selected-topics (:share-selected-topics props)
           company-data          (:company-data props)
           topics                (:topics props)
-          su-preview            (:su-preview props)
           topic-click           (or (:topic-click options) identity)
           update-active-topics  (or (:update-active-topics options) identity)
           share-selected?       (utils/in? share-selected-topics section-name)]
