@@ -104,6 +104,10 @@
   p, ul, ol {
     margin: 0;
     margin-bottom: 16px;
+
+    &:empty {
+      margin-bottom: 0px;
+    }
   }
 
   &, & *{
