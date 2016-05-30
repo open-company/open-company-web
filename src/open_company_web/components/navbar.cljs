@@ -64,12 +64,10 @@
               (dom/div {:class "su-snapshot-buttons group"}
                 (dom/button {:class "ready-slack-button"
                            :on-click (:share-slack-cb options)}
-                  (if slack-loading
-                    (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
-                    (dom/i {:class "fa fa-slack"}))
+                  (dom/i {:class "fa fa-slack"})
                   (dom/label {} "SHARE ON SLACK"))
                 (dom/button {:class "ready-mail-button"
-                           :on-click (:share-email-cb options)}
+                           :on-click (:share-link-cb options)}
                   (if email-loading
                     (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
                     (icon :email-84 {:size 20 :stroke "4" :color "rgba(78, 90, 107, 0.7)" :accent-color "rgba(78, 90, 107, 0.7)"}))
