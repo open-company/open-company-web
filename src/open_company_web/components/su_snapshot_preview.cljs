@@ -5,6 +5,7 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [open-company-web.api :as api]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
@@ -22,6 +23,20 @@
             [goog.fx.dom :refer (Fade)]
             [cljsjs.hammer]
             [cljsjs.react.dom]))
+
+(defn post-stakeholder-update [owner]
+  (om/set-state! owner :email-posting true)
+  (api/share-stakeholder-update))
+
+(defn stakeholder-update-data [owner]
+  (let [props (om/get-props owner)]
+    (:stakeholder-update (dis/company-data props))))
+
+(defn patch-stakeholder-update [owner]
+  (let [title  (om/get-state owner :title)
+        topics (:sections (stakeholder-update-data owner))]
+    (api/patch-stakeholder-update {:title (or title "")
+                                   :sections topics})))
 
 (defn close-overlay-cb [owner]
   (om/set-state! owner :transitioning false)
@@ -74,10 +89,6 @@
       (.listen AnimationEventType/FINISH #(animation-finished owner))
       (.play))))
 
-(defn stakeholder-update-data [owner]
-  (let [props (om/get-props owner)]
-    (:stakeholder-update (dis/company-data props))))
-
 (defn focus-title [owner]
   (when-not (om/get-state owner :title-focused)
     (when-let [preview-title (.findDOMNode js/ReactDOM (om/get-ref owner "preview-title"))]
@@ -91,7 +102,7 @@
 
 (defn share-email-clicked [owner]
  (om/set-state! owner :email-loading true)
- (om/set-state! owner :show-su-dialog true))
+ (patch-stakeholder-update owner))
 
 (defcomponent su-snapshot-preview [data owner options]
 
@@ -104,7 +115,7 @@
        :topic-navigation true
        :transitioning false
        :title-focused false
-       :title (or (:title su-data) (utils/su-default-title))
+       :title (if (clojure.string/blank? (:title su-data))  (utils/su-default-title) (:title su-data))
        :show-su-dialog false
        :email-loading false
        :slack-loading false}))
@@ -127,6 +138,12 @@
       (let [swipe-listener (om/get-state owner :swipe-listener)]
         (.off swipe-listener "swipeleft")
         (.off swipe-listener "swiperight"))))
+
+  (will-receive-props [_ _]
+    (when (om/get-state owner :email-loading)
+      (if (om/get-state owner :email-posting)
+        (post-stakeholder-update owner)
+        (om/set-state! owner :show-su-dialog true))))
 
   (did-update [_ _ _]
     (focus-title owner)
