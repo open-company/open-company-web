@@ -6,7 +6,6 @@
             [cljs.core.async :refer (chan <!)]
             [open-company-web.dispatcher :as dis]
             [open-company-web.components.navbar :refer (navbar)]
-            [open-company-web.components.company-header :refer (company-header)]
             [open-company-web.components.topic-list :refer (topic-list)]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.footer :refer (footer)]
