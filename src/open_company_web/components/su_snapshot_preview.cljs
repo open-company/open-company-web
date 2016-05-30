@@ -16,7 +16,7 @@
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.company-header :refer (company-header)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
-            [open-company-web.components.su-preview :refer (su-preview)]
+            [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -254,13 +254,13 @@
                                   :style #js {:width total-width}})))
               (dom/div {:class "preview-subtitle"} su-subtitle)
               (when show-su-dialog
-                (om/build su-preview {:selected-topics (:sections su-data)
-                                      :company-data company-data
-                                      :latest-su (dis/latest-stakeholder-update)
-                                      :share-via-slack slack-loading
-                                      :share-via-link (or link-loading link-posted)
-                                      :su-title title}
-                                     {:opts {:dismiss-su-preview #(dismiss-su-preview owner)}}))
+                (om/build su-preview-dialog {:selected-topics (:sections su-data)
+                                             :company-data company-data
+                                             :latest-su (dis/latest-stakeholder-update)
+                                             :share-via-slack slack-loading
+                                             :share-via-link (or link-loading link-posted)
+                                             :su-title title}
+                                            {:opts {:dismiss-su-preview #(dismiss-su-preview owner)}}))
               (om/build topics-columns {:columns-num columns-num
                                         :card-width card-width
                                         :total-width total-width

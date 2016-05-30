@@ -1,4 +1,4 @@
-(ns open-company-web.components.su-preview
+(ns open-company-web.components.su-preview-dialog
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -50,7 +50,7 @@
   (when-let [input (.findDOMNode js/ReactDOM (om/get-ref owner "share-link-input"))]
     (.setSelectionRange input 0 (count (.-value input)))))
 
-(defcomponent su-preview [data owner options]
+(defcomponent su-preview-dialog [data owner options]
 
   (init-state [_]
     {:share-via-slack (:share-via-slack data)
@@ -81,7 +81,7 @@
 
   (render-state [_ {:keys [share-via-slack share-via-link share-link-copied share-link slack-sending slack-sent]}]
     (let [company-data (:company-data data)]
-      (dom/div {:class "su-preview"}
+      (dom/div {:class "su-preview-dialog"}
         (dom/div {:class (utils/class-set {:su-close-window true
                                            :share-copy-window share-via-link
                                            :slack-patched-window share-via-slack})}

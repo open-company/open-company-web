@@ -16,7 +16,6 @@
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
-            [open-company-web.components.su-preview :refer (su-preview)]
             [open-company-web.components.ui.icon :refer (icon)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -62,7 +61,6 @@
      :tr-selected-topic nil
      :sharing-mode (or (:sharing-mode current-state) false)
      :topic-navigation (or (:topic-navigation current-state) true)
-     :show-su-preview (or (:show-su-preview current-state) false)
      :share-selected-topics (:sections (:stakeholder-update company-data))
      :transitioning false}))
 
@@ -192,7 +190,7 @@
     (when (om/get-state owner :tr-selected-topic)
       (animate-selected-topic-transition owner (om/get-state owner :animation-direction))))
 
-  (render-state [_ {:keys [active-topics selected-topic selected-metric tr-selected-topic transitioning sharing-mode share-selected-topics show-su-preview redirect-to-preview]}]
+  (render-state [_ {:keys [active-topics selected-topic selected-metric tr-selected-topic transitioning sharing-mode share-selected-topics redirect-to-preview]}]
     (let [company-data    (:company-data data)
           topics-list     (flatten (vals active-topics))
           category-topics (if sharing-mode
@@ -207,11 +205,6 @@
                             1 (if (> ww 413) (str card-width "px") "auto"))]
       (dom/div {:class (str "topic-list group" (when-not sharing-mode " no-sharing"))
                 :key "topic-list"}
-        (when show-su-preview
-          (om/build su-preview {:selected-topics share-selected-topics
-                                :company-data company-data
-                                :latest-su (:latest-su data)}
-                               {:opts {:dismiss-su-preview #(om/set-state! owner :show-su-preview false)}}))
         ;; Sharing header
         (when sharing-mode
           (dom/div {:class "sharing-header"}
