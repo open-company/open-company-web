@@ -25,7 +25,7 @@
             [cljsjs.react.dom]))
 
 (defn post-stakeholder-update [owner]
-  (om/set-state! owner :email-posting true)
+  (om/set-state! owner :link-posting true)
   (api/share-stakeholder-update))
 
 (defn stakeholder-update-data [owner]
@@ -100,9 +100,16 @@
   (om/set-state! owner :slack-loading true)
   (om/set-state! owner :show-su-dialog true))
 
-(defn share-email-clicked [owner]
- (om/set-state! owner :email-loading true)
+(defn share-link-clicked [owner]
+ (om/set-state! owner :link-loading true)
  (patch-stakeholder-update owner))
+
+(defn dismiss-su-preview [owner]
+  (om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false
+                                                    :slack-loading false
+                                                    :link-loading false
+                                                    :link-posting false
+                                                    :link-posted false})))
 
 (defcomponent su-snapshot-preview [data owner options]
 
@@ -111,14 +118,17 @@
     (utils/add-channel "fullscreen-topic-cancel" (chan))
     (let [su-data (stakeholder-update-data owner)]
       {:selected-topic nil
+       :tr-selected-topic nil
        :selected-metric nil
        :topic-navigation true
        :transitioning false
        :title-focused false
        :title (if (clojure.string/blank? (:title su-data))  (utils/su-default-title) (:title su-data))
        :show-su-dialog false
-       :email-loading false
-       :slack-loading false}))
+       :link-loading false
+       :slack-loading false
+       :link-posting false
+       :link-posted false}))
 
   (did-mount [_]
     (focus-title owner)
@@ -139,18 +149,34 @@
         (.off swipe-listener "swipeleft")
         (.off swipe-listener "swiperight"))))
 
-  (will-receive-props [_ _]
-    (when (om/get-state owner :email-loading)
-      (if (om/get-state owner :email-posting)
+  (will-receive-props [_ next-props]
+    ; share via link
+    (when (om/get-state owner :link-loading)
+      (if-not (om/get-state owner :link-posting)
         (post-stakeholder-update owner)
-        (om/set-state! owner :show-su-dialog true))))
+        ; show share url dialog
+        (when (not= (dis/latest-stakeholder-update data) (dis/latest-stakeholder-update next-props))
+          (om/set-state! owner :link-loading false)
+          (om/set-state! owner :link-posted true)
+          (om/set-state! owner :show-su-dialog true)))))
 
   (did-update [_ _ _]
     (focus-title owner)
     (when (om/get-state owner :tr-selected-topic)
       (animate-selected-topic-transition owner)))
 
-  (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning title show-su-dialog email-loading slack-loading]}]
+  (render-state [_ {:keys [selected-topic
+                           tr-selected-topic
+                           selected-metric
+                           topic-navigation
+                           transitioning
+                           title-focused
+                           title
+                           show-su-dialog
+                           link-loading
+                           slack-loading
+                           link-posting
+                           link-posted]}]
     (let [company-data (dis/company-data data)
           su-data      (stakeholder-update-data owner)
           columns-num  (responsive/columns-num)
@@ -176,9 +202,9 @@
                               :hide-right-menu true
                               :columns-num columns-num
                               :auth-settings (:auth-settings data)
-                              :email-loading email-loading
+                              :link-loading link-loading
                               :slack-loading slack-loading}
-                             {:opts {:share-email-cb #(share-email-clicked owner)
+                             {:opts {:share-link-cb #(share-link-clicked owner)
                                      :share-slack-cb #(share-slack-clicked owner)}}))
           ;; SU Snapshot Preview
           (when company-data
@@ -231,14 +257,10 @@
                 (om/build su-preview {:selected-topics (:sections su-data)
                                       :company-data company-data
                                       :latest-su (dis/latest-stakeholder-update)
-                                      :share-slack slack-loading
-                                      :share-email email-loading
+                                      :share-via-slack slack-loading
+                                      :share-via-link (or link-loading link-posted)
                                       :su-title title}
-                                     {:opts {:dismiss-su-preview #(om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false
-                                                                                                                    :email-loading false
-                                                                                                                    :slack-loading false}))
-                                             :share-done-cb #(om/set-state! owner (merge (om/get-state owner) {:email-loading false
-                                                                                                               :slack-loading false}))}}))
+                                     {:opts {:dismiss-su-preview #(dismiss-su-preview owner)}}))
               (om/build topics-columns {:columns-num columns-num
                                         :card-width card-width
                                         :total-width total-width
