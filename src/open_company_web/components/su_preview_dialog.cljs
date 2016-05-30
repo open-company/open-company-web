@@ -19,18 +19,12 @@
 (defn copy-clicked [owner]
   (om/set-state! owner :share-link-copied true))
 
-(defn complete-url [su-url]
-  (let [protocol      (.. js/document -location -protocol)
-        host          (.. js/document -location -host)
-        fixed-su-slug (subs su-url 10)] ; remove /companies]
-    (str protocol "//" host fixed-su-slug)))
-
 (defn initial-state [owner]
   (let [data (om/get-props owner)]
     {:share-via-slack (:share-via-slack data)
      :share-via-link (:share-via-link data)
      :share-link-copied false
-     :share-link (when (:latest-su data) (complete-url (:latest-su data)))
+     :share-link (when (:latest-su data) (:latest-su data))
      :slack-sending false
      :slack-sent false}))
 
@@ -56,7 +50,7 @@
     {:share-via-slack (:share-via-slack data)
      :share-via-link (:share-via-link data)
      :share-link-copied false
-     :share-link (when (:latest-su data) (complete-url (:latest-su data)))
+     :share-link (when (:latest-su data) (:latest-su data))
      :slack-sending false
      :slack-sent false})
 

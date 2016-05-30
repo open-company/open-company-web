@@ -294,9 +294,10 @@
           "Access-Control-Allow-Headers" "Content-Type"
           ; custom content type
           "content-type" (:type share-link)}}
-      (fn [{:keys [success body] :as response}]
+      (fn [{:keys [success body]}]
         (when success
-          (dispatcher/dispatch! [:su-edit {:slug slug :stakeholder-update (get (:headers response) "location")}]))))))
+          (let [fixed-body (if success (json->cljs body) {})]
+            (dispatcher/dispatch! [:su-edit {:slug slug :su-slug (:slug fixed-body)}])))))))
 
 (defn get-su-list []
   (let [slug (keyword (router/current-company-slug))
