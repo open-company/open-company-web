@@ -17,7 +17,6 @@
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.company-profile :refer (company-profile)]
             [open-company-web.components.su-edit :refer (su-edit)]
-            [open-company-web.components.stakeholder-update :refer (stakeholder-update)]
             [open-company-web.components.su-list :refer (su-list)]
             [open-company-web.components.su-snapshot-preview :refer (su-snapshot-preview)]
             [open-company-web.components.su-snapshot :refer (su-snapshot)]
