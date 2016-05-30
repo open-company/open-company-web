@@ -61,17 +61,18 @@
           (dom/div {:class "su-snapshot-preview"}
             (dom/div {:class "su-snapshot-preview-internal group"
                       :style #js {:width (str header-width "px")}}
-              (dom/div {:class "su-snapshot-buttons group"}
-                (dom/button {:class "ready-slack-button"
-                           :on-click (:share-slack-cb options)}
-                  (dom/i {:class "fa fa-slack"})
-                  (dom/label {} "SHARE ON SLACK"))
-                (dom/button {:class "ready-mail-button"
-                           :on-click (:share-link-cb options)}
-                  (if email-loading
-                    (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
-                    (icon :email-84 {:size 20 :stroke "4" :color "rgba(78, 90, 107, 0.7)" :accent-color "rgba(78, 90, 107, 0.7)"}))
-                  (dom/label {} "SHARE URL")))
+              (when (> columns-num 1)
+                (dom/div {:class "su-snapshot-buttons group"}
+                  (dom/button {:class "ready-slack-button"
+                             :on-click (:share-slack-cb options)}
+                    (dom/i {:class "fa fa-slack"})
+                    (dom/label {} "SHARE ON SLACK"))
+                  (dom/button {:class "ready-mail-button"
+                             :on-click (:share-link-cb options)}
+                    (if email-loading
+                      (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
+                      (icon :email-84 {:size 20 :stroke "4" :color "rgba(78, 90, 107, 0.7)" :accent-color "rgba(78, 90, 107, 0.7)"}))
+                    (dom/label {} "SHARE URL"))))
               (dom/button {:class "close-preview"
                            :on-click #(router/nav! (oc-urls/company))}
                 (icon :simple-remove {:stroke "4" :color "rgba(255, 255, 255, 0.8)" :accent-color "rgba(255, 255, 255, 0.8)"})))))
