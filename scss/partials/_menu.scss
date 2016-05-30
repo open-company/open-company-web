@@ -7,19 +7,35 @@ ul#menu {
   width: 190px;
   min-height: 100vh;
   border-top: 4px solid $oc_yellow;
-  padding: 15px 25px;
+  padding: 0;
   margin: 0;
  
   list-style: none;
   background: #333;
   z-index: 10; /* Make sure the z-index is lower than the #page */
 
-  a {
-    display: inline-block;
-    white-space: nowrap;
-    color: #fff;
-    padding: 15px 0;
-    border-bottom: 1px solid rgba( 255, 255, 255, 0.05 );
+  li.oc-title {
+    color: white;
+    font-size: 18px;
+    font-family: $oc_headers_font;
+    margin: 0px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    padding-left: 23px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  li.menu-link{
+    padding: 15px 23px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    a {
+      opacity: 0.75;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      color: #ffffff;
+    }
   }
 }
 
