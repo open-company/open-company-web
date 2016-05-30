@@ -80,9 +80,11 @@
     {:selected-topic nil
      :selected-metric nil
      :topic-navigation true
-     :transitioning false})
+     :transitioning false
+     :columns-num (responsive/columns-num)})
 
   (did-mount [_]
+    (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))
     (when-not (utils/is-test-env?)
       (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))
             swipe-listener (js/Hammer (sel1 [:div#app]))];(.-body js/document))]
@@ -104,10 +106,9 @@
     (when (om/get-state owner :tr-selected-topic)
       (animate-selected-topic-transition owner)))
 
-  (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning]}]
+  (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning columns-num]}]
     (let [company-data (dis/company-data data)
           su-data      (dis/stakeholder-update-data)
-          columns-num  (responsive/columns-num)
           card-width   (responsive/calc-card-width)
           ww           (.-clientWidth (sel1 js/document :body))
           total-width  (case columns-num
@@ -123,10 +124,10 @@
           ;; Navbar
           (when company-data
             (om/build navbar {:company-data company-data
-                              :card-width card-width
                               :sharing-mode false
                               :hide-right-menu true
                               :columns-num columns-num
+                              :card-width card-width
                               :auth-settings (:auth-settings data)}))
           ;; SU Snapshot
           (when company-data
@@ -178,6 +179,6 @@
                                        {:opts {:topic-click (partial topic-click owner)}})))
           ;;Footer
           (when company-data
-            (om/build footer {:columns-num columns-num
-                              :su-preview true
-                              :card-width card-width})))))))
+            (om/build footer {:su-preview true
+                              :card-width card-width
+                              :columns-num columns-num})))))))

@@ -14,7 +14,6 @@
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.footer :refer (footer)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
-            [open-company-web.components.company-header :refer (company-header)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
             [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
             [goog.events :as events]
@@ -117,7 +116,8 @@
     (utils/add-channel "fullscreen-topic-save" (chan))
     (utils/add-channel "fullscreen-topic-cancel" (chan))
     (let [su-data (stakeholder-update-data owner)]
-      {:selected-topic nil
+      {:columns-num (responsive/columns-num)
+       :selected-topic nil
        :tr-selected-topic nil
        :selected-metric nil
        :topic-navigation true
@@ -131,6 +131,7 @@
        :link-posted false}))
 
   (did-mount [_]
+    (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))
     (focus-title owner)
     (when-not (utils/is-test-env?)
       (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))
@@ -165,7 +166,8 @@
     (when (om/get-state owner :tr-selected-topic)
       (animate-selected-topic-transition owner)))
 
-  (render-state [_ {:keys [selected-topic
+  (render-state [_ {:keys [columns-num
+                           selected-topic
                            tr-selected-topic
                            selected-metric
                            topic-navigation
@@ -179,7 +181,6 @@
                            link-posted]}]
     (let [company-data (dis/company-data data)
           su-data      (stakeholder-update-data owner)
-          columns-num  (responsive/columns-num)
           card-width   (responsive/calc-card-width)
           ww           (.-clientWidth (sel1 js/document :body))
           total-width  (case columns-num
