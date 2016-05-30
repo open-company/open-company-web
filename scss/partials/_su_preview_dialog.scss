@@ -1,4 +1,4 @@
-div.su-preview-dialog{
+div.su-preview-dialog {
   position: fixed;
   top: 0px;
   left: 0px;
@@ -38,7 +38,7 @@ div.su-preview-dialog{
     }
   }
 
-  div.su-preview-window{
+  div.su-preview-window {
     width: 344px;
     height: 450px;
     position: absolute;
@@ -69,19 +69,10 @@ div.su-preview-dialog{
       }
     }
 
-    input.su-title {
-      font-family: $oc_headers_font;
-      font-size: 20px;
-      line-height: 1.2;
-      color: $oc_gray_5;
-      border: 0px;
-      outline: none;
-    }
-
     div.su-preview-box {
       margin-top: 25px;
 
-      label.share-link-cta{
+      label.share-link-cta {
         font-weight: 700;
         font-size: 12px;
         line-height: 1.5;
@@ -99,7 +90,7 @@ div.su-preview-dialog{
           border-radius: 2px;
           height: 30px;
           width: 370px;
-          font-size: 21px;
+          font-size: 18px;
           line-height: 1.2;
           color: $oc_gray_5;
           float: left;
@@ -132,7 +123,7 @@ div.su-preview-dialog{
         }
       }
 
-      a.share-link-new-win{
+      a.share-link-new-win {
         font-weight: 700;
         font-size: 12px;
         line-height: 1.5;
@@ -166,152 +157,7 @@ div.su-preview-dialog{
         border-radius: 2px;
       }
 
-      div.su-preview-title {
-        font-weight: 700;
-        font-size: 12px;
-        line-height: 1.5;
-        letter-spacing: 1px;
-        color: $oc_gray_5;
-      }
-
-      a.preview-button {
-        outline: none;
-        border: 0px solid transparent;
-        width: 180px;
-        background-color: transparent;
-        padding: 0px;
-        margin:0px;
-        margin-top: 15px;
-        display: block;
-        text-align: left;
-
-        label{
-          padding: 13px;
-          padding-left: 10px;
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
-          cursor: pointer;
-          opacity: 0.5;
-        }
-
-        div.link-circle{
-          border-radius: 22.5px;
-          width: 45px;
-          height: 45px;
-          border: 1px solid rgba(78, 90, 107, 0.1);
-          padding: 11px;
-          float: left;
-
-          div.svg-icon {
-            float: left;
-          }
-        }
-      }
-
-      div.separator {
-        margin-top: 30px;
-        width: calc(100% + 40px);
-        margin-left: -20px;
-        height: 1px;
-        opacity: 0.2;
-        background-color: rgba(78, 90, 107, 0.5);
-
-        &.top-separator {
-          margin-bottom: 25px;
-        }
-      }
-
-      div.su-preview-ready{
-        margin-top: 30px;
-        font-weight: 700;
-        font-size: 12px;
-        letter-spacing: 1px;
-        color: $oc_gray_5;
-      }
-
-      button.ready-slack-button {
-        outline: none;
-        border: 0px solid transparent;
-        width: 180px;
-        background-color: transparent;
-        padding: 0px;
-        margin:0px;
-        margin-top: 15px;
-        text-align: left;
-
-        &:active, &:focus {
-          outline: none;
-          border: none;
-        }
-
-        label{
-          padding-top: 13px;
-          padding-left: 10px;
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
-          cursor: pointer;
-          opacity: 0.5;
-        }
-        div.slack-circle {
-          border-radius: 22.5px;
-          width: 45px;
-          height: 45px;
-          border: 1px solid rgba(78, 90, 107, 0.1);
-          float: left;
-          padding: 9px;
-
-          img.slack-icon {
-            width: 25px;
-            height: 25px;
-          }
-        }
-      }
-
-      button.ready-mail-button {
-        outline: none;
-        border: 0px solid transparent;
-        width: 180px;
-        background-color: transparent;
-        padding: 0px;
-        margin:0px;
-        margin-top: 15px;
-        text-align: left;
-
-        &:active, &:focus {
-          outline: none;
-          border: none;
-        }
-
-        label{
-          padding-top: 13px;
-          padding-left: 10px;
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
-          cursor: pointer;
-          opacity: 0.5;
-        }
-
-        div.mail-circle{
-          border-radius: 22.5px;
-          width: 45px;
-          height: 45px;
-          border: 1px solid rgba(78, 90, 107, 0.1);
-          float: left;
-          padding: 11px;
-        }
-      }
-    }
-
-    button.slack-send-button{
+    button.slack-send-button {
       padding-top: 5px;
       background-color: $oc_yellow;
       width: 106px;
