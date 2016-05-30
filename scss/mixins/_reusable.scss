@@ -110,6 +110,11 @@
     }
   }
 
+  p {
+    margin: 0 0 .88888em 0;
+    padding: 0;
+  }
+
   &, & *{
     margin: 0;
     padding: 0;
@@ -121,12 +126,16 @@
     a {
       cursor: pointer;
       pointer-events: auto;
-      height: 1.4em;
-      display: inline;
-      word-spacing: normal;
+      font-weight: bold;
+      color: inherit;
       text-decoration: none;
-      color: black;
-      border-bottom: 6px solid $oc_yellow;
+      border-bottom: 0 solid rgba(249,215,72,1);
+      box-shadow: inset 0 -6px 0 rgba(249,215,72,1);
+
+      &:hover {
+        background-color: rgba(249,215,72,.5);
+        box-shadow: inset 0 -4px 0 rgba(249,215,72,.5);
+      }
     }
   }
 
