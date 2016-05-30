@@ -87,7 +87,7 @@
           (when share-via-link
             (dom/div {:class "su-preview-box"}
               (dom/label {:class "share-link-cta"} "SHARE THIS PRIVATE URL")
-              (dom/div {:class "share-link-box"}
+              (dom/div {:class "share-link-box group"}
                 (dom/input #js {:type "text"
                                 :className "share-link-input"
                                 :id "share-link-input"
