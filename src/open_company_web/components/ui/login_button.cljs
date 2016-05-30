@@ -10,12 +10,12 @@
 
 (defcomponent login-button [data owner]
   (render [_]
-    (let [full-url (:full-url (:auth-settings data))
+    (let [auth-url (:auth-url (:auth-settings data))
           current-token (router/get-token)]
       (dom/button {:class "login-button"
                    :on-click (fn [e]
                     (.preventDefault e)
                     (when-not (.startsWith current-token oc-urls/login)
                       (cook/set-cookie! :login-redirect current-token (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-                    (set! (.-location js/window) full-url))}
+                    (set! (.-location js/window) auth-url))}
         "Sign in / Sign up"))))
