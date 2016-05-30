@@ -54,8 +54,8 @@ div.su-preview-dialog {
     &.share-link-copy {
       height: 230px;
       margin-top: -115px;
-      width: 516px;
-      margin-left: -258px;
+      width: 680px;
+      margin-left: -340px;
     }
 
     &.slack-message {
@@ -89,7 +89,7 @@ div.su-preview-dialog {
           border: 1px solid rgba(78, 90, 107, 0.1);
           border-radius: 2px;
           height: 30px;
-          width: 370px;
+          width: 534px;
           font-size: 18px;
           line-height: 1.2;
           color: $oc_gray_5;
@@ -156,6 +156,7 @@ div.su-preview-dialog {
         outline: none;
         border-radius: 2px;
       }
+    }
 
     button.slack-send-button {
       padding-top: 5px;
