@@ -308,6 +308,10 @@
       (finances-init-state topic (:data topic-data))
       (growth-init-state topic data current-state))))
 
+(defn reset-and-dismiss [owner options]
+  ((:dismiss-editing options))
+  (om/set-state! owner (get-state owner (om/get-props owner) true)))
+
 (defcomponent topic-overlay-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
 
   (init-state [_]
@@ -320,24 +324,28 @@
       (go (loop []
         (let [change (<! save-ch)]
           (when-let [section-data (data-to-save owner topic)]
+            (om/set-state! owner :has-changes false)
             (api/partial-update-section topic section-data)
             (recur))))))
     (let [cancel-ch (utils/get-channel "fullscreen-topic-cancel")]
       (go (loop []
         (let [change (<! cancel-ch)]
           (if-not (om/get-state owner :has-changes)
-            ((:dismiss-editing options))
+            (reset-and-dismiss owner options)
             (when (js/confirm (str before-unload-message " Are you sure you want to proceed?"))
               ; discard changes
-              ((:dismiss-editing options))))
+              (reset-and-dismiss owner options)))
           (recur))))))
 
   (will-receive-props [_ next-props]
     (when (and (:visible next-props)
                (not (:visible data)))
+      (let [new-state (get-state owner next-props true)]
+        (om/set-state! owner new-state))
       (utils/after 200 #(focus-headline owner)))
-    (when (not= next-props data)
-      (om/set-state! owner (get-state owner next-props))))
+    (when (and (not (om/get-state owner :has-changes))
+               (not= next-props data))
+      (om/set-state! owner (get-state owner next-props true))))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
@@ -359,7 +367,6 @@
                                                  (->  (utils/medium-editor-options placeholder-data)
                                                       (editor/inject-extension editor/file-upload))))]
         (.subscribe med-ed "editableInput" (fn [event editable]
-                                             (println "change med-ed")
                                              (om/set-state! owner :has-changes true)))
         (js/emojiAutocomplete)
         (om/set-state! owner :initial-body (.-innerHTML body-el))
@@ -454,7 +461,8 @@
           (when (= topic "finances")
             (om/build finances-edit {:finances-data finances-data
                                      :change-finances-cb (partial change-finances-data-cb owner)
-                                     :currency currency}))
+                                     :currency currency}
+                                    {:key (:updated-at topic-data)}))
           (when (= topic "growth")
             (dom/div {}
               (om/build growth-edit {:growth-data focus-metric-data
@@ -470,7 +478,7 @@
                                      :cancel-cb #(growth-cancel-cb owner data)
                                      :change-growth-metric-cb (partial growth-change-metric-cb owner data)
                                      :new-growth-section (om/get-state owner :oc-editing)}
-                {:key focus-metric-data})
+                                    {:key focus-metric-data})
               (dom/div {:class "pillbox-container growth"}
                 (for [metric-slug growth-metric-slugs]
                   (let [metric (get growth-metrics metric-slug)
