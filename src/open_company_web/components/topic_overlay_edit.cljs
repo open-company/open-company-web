@@ -20,7 +20,8 @@
             [goog.history.EventType :as EventType]
             [cljs-dynamic-resources.core :as cdr]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [cljsjs.react.dom]))
 
 (defn set-end-of-content-editable [content-editable-element]
   (if (.-createRange js/document)
@@ -45,7 +46,7 @@
     (om/set-state! owner k value)))
 
 (defn focus-headline [owner]
-  (when-let [headline (om/get-ref owner "topic-edit-headline")]
+  (when-let [headline (sel1 [:div.topic-edit-headline])]
     (.focus headline)
     (set-end-of-content-editable headline)))
 
@@ -126,14 +127,14 @@
 (defn growth-metrics-order [metrics-coll]
   (map :slug metrics-coll))
 
-(defn growth-init-state [topic data]
+(defn growth-init-state [topic data current-state]
   (when (= topic "growth")
     (let [topic-data (:topic-data data)
           growth-metric-focus (:growth-metric-focus data)
           all-metrics (:metrics topic-data)
           focus-metric (or growth-metric-focus (:slug (first all-metrics)))]
-      {:growth-focus (or focus-metric growth-utils/new-metric-slug-placeholder)
-       :growth-metadata-editing false
+      {:growth-focus (or (:growth-focus current-state) focus-metric growth-utils/new-metric-slug-placeholder)
+       :growth-metadata-editing (:growth-metadata-editing current-state)
        :growth-new-metric (empty? all-metrics)
        :growth-data (growth-utils/growth-data-map (:data topic-data))
        :growth-metrics (growth-metrics-map all-metrics)
@@ -143,7 +144,7 @@
   (into {} (filter (fn [[k v]] (= (:slug v) focus)) growth-data)))
 
 (defn growth-reset-metrics-cb [topic owner data]
-  (let [state (growth-init-state topic data)]
+  (let [state (growth-init-state topic data (om/get-state owner))]
     (om/set-state! owner :growth-metrics (:growth-metrics state))
     (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))))
 
@@ -214,7 +215,7 @@
     (om/set-state! owner :growth-metrics new-metrics)))
 
 (defn growth-cancel-cb [owner data]
-  (let [state (growth-init-state (:topic data) data)]
+  (let [state (growth-init-state (:topic data) data (om/get-state owner))]
     ; reset the finances fields to the initial values
     (om/set-state! owner :growth-data (:growth-data state))
     (om/set-state! owner :growth-metrics (:growth-metrics state))
@@ -261,13 +262,13 @@
 (defn headline-on-change [owner]
   (when-not (om/get-state owner :show-headline-counter)
     (om/set-state! owner :show-headline-counter true))
-  (let [headline-innerHTML (.-innerHTML (om/get-ref owner "topic-edit-headline"))]
+  (let [headline-innerHTML (.-innerHTML (sel1 [:div.topic-edit-headline]))]
     (when (not= (om/get-state owner :headline) headline-innerHTML)
       (om/set-state! owner :has-changes true)
       (om/set-state! owner :headline headline-innerHTML))))
 
 (defn check-headline-count [owner headline-mex-length e]
-  (when-let [headline (om/get-ref owner "topic-edit-headline")]
+  (when-let [headline (sel1 [:div.topic-edit-headline])]
     (let [headline-value (.-innerText headline)]
       (when (and (not= (.-keyCode e) 8)
                  (not= (.-keyCode e) 16)
@@ -290,23 +291,29 @@
       (string/replace #"&nbsp;" " ")
       count))
 
+(defn get-state [owner data & [initial?]]
+  (let [topic-data    (:topic-data data)
+        topic         (:topic data)
+        current-state (when-not initial? (om/get-state owner))]
+    (merge
+      {:has-changes false
+       :title (:title topic-data)
+       :headline (:headline topic-data)
+       :body (utils/get-topic-body topic-data topic)
+       :note (:note topic-data)
+       :show-headline-counter (:show-headline-counter current-state)
+       :show-title-counter (:show-title-counter current-state)
+       :medium-editor (:medium-editor current-state)
+       :history-listener-id (:history-listener-id current-state)}
+      (finances-init-state topic (:data topic-data))
+      (growth-init-state topic data current-state))))
+
 (defcomponent topic-overlay-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
 
   (init-state [_]
     (cdr/add-style! "/css/medium-editor/medium-editor.css")
     (cdr/add-style! "/css/medium-editor/default.css")
-    (merge
-     {:has-changes false
-      :title (:title topic-data)
-      :headline (:headline topic-data)
-      :body (utils/get-topic-body topic-data topic)
-      :note (:note topic-data)
-      :show-headline-counter false
-      :show-title-counter false
-      :medium-editor nil
-      :history-listener-id nil}
-     (finances-init-state topic (:data topic-data))
-     (growth-init-state topic data)))
+    (get-state owner data true))
 
   (will-mount [_]
     (let [save-ch (utils/get-channel "fullscreen-topic-save")]
@@ -320,10 +327,17 @@
         (let [change (<! cancel-ch)]
           (if-not (om/get-state owner :has-changes)
             ((:dismiss-editing options))
-            (if (js/confirm (str before-unload-message " Are you sure you want to proceed?"))
+            (when (js/confirm (str before-unload-message " Are you sure you want to proceed?"))
               ; discard changes
-              ((:dismiss-editing options))
-              (recur))))))))
+              ((:dismiss-editing options))))
+          (recur))))))
+
+  (will-receive-props [_ next-props]
+    (when (and (:visible next-props)
+               (not (:visible data)))
+      (utils/after 200 #(focus-headline owner)))
+    (when (not= next-props data)
+      (om/set-state! owner (get-state owner next-props))))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
@@ -338,18 +352,18 @@
     (when-not (utils/is-test-env?)
       (reset! prevent-route-dispatch true)
       ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
-      (let [body-el (om/get-ref owner "topic-overlay-edit-body")
+      (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
             slug (keyword (router/current-company-slug))
             placeholder-data (if (:placeholder topic-data) (utils/get-topic-body topic-data topic) "")
             med-ed (new js/MediumEditor body-el (clj->js
                                                  (->  (utils/medium-editor-options placeholder-data)
                                                       (editor/inject-extension editor/file-upload))))]
         (.subscribe med-ed "editableInput" (fn [event editable]
+                                             (println "change med-ed")
                                              (om/set-state! owner :has-changes true)))
         (js/emojiAutocomplete)
         (om/set-state! owner :initial-body (.-innerHTML body-el))
         (om/set-state! owner :medium-editor med-ed))
-      (focus-headline owner)
       (let [win-location (.-location js/window)
             current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
             listener (events/listen @router/history EventType/NAVIGATE
@@ -405,7 +419,8 @@
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
       (dom/div {:class "fullscreen-topic-edit group"
                 :style #js {:width (str (- fullscreen-width 20) "px")}
-                :on-click #(.stopPropagation %)}
+                :on-click #(.stopPropagation %)
+                :key (:updated-at topic-data)}
         (dom/input {:class "topic-edit-title"
                     :id (str "topic-edit-title-" (name topic))
                     :type "text"
