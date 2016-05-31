@@ -11,8 +11,7 @@
     (js/jwt_decode encoded-jwt)))
 
 (defn get-key [k]
-  (when-let [decoded-jwt (js->clj (decode (jwt)))]
-    (decoded-jwt (name k))))
+  (some-> (jwt) decode js->clj (get (name k))))
 
 (defn expired? []
   (let [expire (gdt/fromTimestamp (get-key :expire))]
