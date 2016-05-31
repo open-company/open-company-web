@@ -20,8 +20,15 @@
 
 (defn profile-click [e]
   (.preventDefault e)
+  (.stopPropagation e)
   (close-menu)
   (router/nav! oc-urls/user-profile))
+
+(defn company-profile-click [e]
+  (.preventDefault e)
+  (.stopPropagation e)
+  (close-menu)
+  (router/nav! (oc-urls/company-profile)))
 
 (defcomponent menu [data owner options]
   (render [_]
@@ -31,7 +38,7 @@
         (dom/li {:class "menu-link"} (dom/a {:title "PROFILE" :href oc-urls/user-profile :on-click profile-click} "PROFILE")))
       (when (and (router/current-company-slug)
                  (not (utils/in? (:route @router/path) "profile")))
-        (dom/li {:class "menu-link"} (dom/a {:title "COMPANY PROFILE" :href (oc-urls/company-profile)} "COMPANY PROFILE")))
+        (dom/li {:class "menu-link"} (dom/a {:title "COMPANY PROFILE" :href (oc-urls/company-profile) :on-click company-profile-click} "COMPANY PROFILE")))
       (when (jwt/jwt)
         (dom/li {:class "menu-link"} (dom/a {:title "SIGN OUT" :href oc-urls/logout :on-click logout-click} "SIGN OUT")))
       (when-not (jwt/jwt)
