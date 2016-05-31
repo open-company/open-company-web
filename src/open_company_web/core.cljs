@@ -11,7 +11,7 @@
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]
-            [open-company-web.lib.raven :refer (raven-setup)]
+            [open-company-web.lib.raven :as sentry]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.company-editor :refer (company-editor)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
@@ -29,7 +29,7 @@
 (enable-console-print!)
 
 ;; setup Sentry error reporting
-(defonce raven (raven-setup))
+(defonce raven (sentry/raven-setup))
 
 (defn check-get-params [query-params]
   (when (contains? query-params :browser-type)
@@ -210,7 +210,8 @@
         ; check if the user is logged in
         (login-wall)
         ;; dispatch on the token
-        (route-dispatch! (router/get-token))))))
+        (route-dispatch! (router/get-token)))))
+  (sentry/capture-message "Error: div#app is not defined!"))
 
 ;; setup the router navigation only when handle-url-change and route-disaptch!
 ;; are defined, this is used to avoid crash on tests
