@@ -214,50 +214,53 @@
                                  (put! ch {:click true :event %}))
                               (hide-fullscreen-topic owner options))}
           (icon :simple-remove))
-        (if editing
+        (dom/div {:style #js {:display (when-not editing "none")}}
           (om/build topic-overlay-edit {:topic section
                                         :topic-data topic-data
+                                        :visible editing
                                         :selected-metric selected-metric
                                         :currency currency
                                         :card-width card-width
                                         :is-actual is-actual?
                                         :prev-rev prev-rev
                                         :next-rev next-rev}
-                                       {:opts edit-topic-opts})
-          (dom/div #js {:className "fullscreen-topic-transition group"
-                        :ref "fullscreen-topic-transition"
-                        :style (when-not transition-as-of #js {:height "auto"})}
-            (dom/div #js {:className "fullscreen-topic-as-of group"
-                          :ref "cur-topic"
-                          :key (str "cur-" as-of)
-                          :style #js {:opacity 1}}
-              (om/build fullscreen-topic-internal {:topic section
-                                                   :topic-data topic-data
-                                                   :selected-metric last-selected-metric
-                                                   :currency currency
-                                                   :card-width card-width
-                                                   :is-actual is-actual?
-                                                   :hide-history-navigation hide-history-navigation
-                                                   :prev-rev prev-rev
-                                                   :next-rev next-rev}
-                                                  {:opts fullscreen-topic-opts}))
-            (when transition-as-of
-              (dom/div #js {:className "fullscreen-topic-tr-as-of group"
-                            :ref "tr-topic"
-                            :key (str "tr-" transition-as-of)
-                            :style #js {:opacity 0}}
-                (let [tr-topic-data (utils/select-section-data section-data section-kw transition-as-of)
-                      tr-prev-rev (utils/revision-prev revisions transition-as-of)
-                      tr-next-rev (utils/revision-next revisions transition-as-of)]
-                  (om/build fullscreen-topic-internal {:topic-data tr-topic-data
-                                                       :topic section
-                                                       :selected-metric selected-metric
-                                                       :currency currency
-                                                       :card-width card-width
-                                                       :hide-history-navigation hide-history-navigation
-                                                       :prev-rev tr-prev-rev
-                                                       :next-rev tr-next-rev}
-                                                      {:opts fullscreen-topic-opts}))))))
+                                       {:opts edit-topic-opts
+                                        :key (:updated-at topic-data)}))
+        (dom/div #js {:className "fullscreen-topic-transition group"
+                      :ref "fullscreen-topic-transition"
+                      :style #js {:height (when-not transition-as-of "auto")
+                                  :display (when editing "none")}}
+          (dom/div #js {:className "fullscreen-topic-as-of group"
+                        :ref "cur-topic"
+                        :key (str "cur-" as-of)
+                        :style #js {:opacity 1}}
+            (om/build fullscreen-topic-internal {:topic section
+                                                 :topic-data topic-data
+                                                 :selected-metric last-selected-metric
+                                                 :currency currency
+                                                 :card-width card-width
+                                                 :is-actual is-actual?
+                                                 :hide-history-navigation hide-history-navigation
+                                                 :prev-rev prev-rev
+                                                 :next-rev next-rev}
+                                                {:opts fullscreen-topic-opts}))
+          (when transition-as-of
+            (dom/div #js {:className "fullscreen-topic-tr-as-of group"
+                          :ref "tr-topic"
+                          :key (str "tr-" transition-as-of)
+                          :style #js {:opacity 0}}
+              (let [tr-topic-data (utils/select-section-data section-data section-kw transition-as-of)
+                    tr-prev-rev (utils/revision-prev revisions transition-as-of)
+                    tr-next-rev (utils/revision-next revisions transition-as-of)]
+                (om/build fullscreen-topic-internal {:topic-data tr-topic-data
+                                                     :topic section
+                                                     :selected-metric selected-metric
+                                                     :currency currency
+                                                     :card-width card-width
+                                                     :hide-history-navigation hide-history-navigation
+                                                     :prev-rev tr-prev-rev
+                                                     :next-rev tr-next-rev}
+                                                    {:opts fullscreen-topic-opts})))))
         (when editing
           (dom/button {:class "remove-button"
                        :on-click (partial remove-topic-click owner options)}
