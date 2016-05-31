@@ -71,7 +71,7 @@
                              :on-click (:share-link-cb options)}
                     (if email-loading
                       (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
-                      (icon :email-84 {:size 20 :stroke "4" :color "rgba(78, 90, 107, 0.7)" :accent-color "rgba(78, 90, 107, 0.7)"}))
+                      (icon :link-72 {:size 20 :stroke "4" :color "rgba(78, 90, 107, 0.7)" :accent-color "rgba(78, 90, 107, 0.7)"}))
                     (dom/label {} "SHARE URL"))))
               (dom/button {:class "close-preview"
                            :on-click #(router/nav! (oc-urls/company))}
