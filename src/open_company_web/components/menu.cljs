@@ -20,7 +20,7 @@
   (put! (utils/get-channel "close-side-menu") {:close true})
   (router/nav! oc-urls/user-profile))
 
-(defcomponent menu [data owner options]
+(defcomponent menu [_ owner options]
   (render [_]
     (dom/ul {:id "menu"}
       (when (jwt/jwt)
