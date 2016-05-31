@@ -54,7 +54,7 @@
 (defcomponent login-required [data owner]
   (render [_]
     (dom/div {:class "max-width-3 p4 mx-auto center mb4"}
-      (dom/p {:class "mb2"} "You need to login to view this company's dashboard:")
+      (dom/p {:class "mb2"} "Please log in to view this dashboard.")
       (om/build login-button data))))
 
 (defcomponent company-dashboard [data owner]
