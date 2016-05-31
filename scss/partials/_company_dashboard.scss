@@ -9,6 +9,15 @@ div.company-dashboard {
     background: #fff;
     min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
   }
+
+  div.page-no-navbar{
+    position: relative; /* Set the position property so z-index will apply */
+    z-index: 20; /* Make sure this is higher than #menu */
+    top: 0px !important;
+
+    background: #fff;
+    min-height: calc(100vh - #{$footer_height}px);
+  }
 }
 
 .animating .page {
