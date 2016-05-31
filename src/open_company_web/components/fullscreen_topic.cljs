@@ -225,7 +225,7 @@
                                         :prev-rev prev-rev
                                         :next-rev next-rev}
                                        {:opts edit-topic-opts
-                                        :key (:updated-at topic-data)}))
+                                        :key as-of}))
         (dom/div #js {:className "fullscreen-topic-transition group"
                       :ref "fullscreen-topic-transition"
                       :style #js {:height (when-not transition-as-of "auto")
