@@ -174,7 +174,7 @@
     (utils/remove-channel "fullscreen-topic-cancel")
     (when-not (utils/is-test-env?)
       (events/unlistenByKey (om/get-state owner :kb-listener))
-      (let [swipe-listener (om/get-state owner :swipe-listener)]
+      (when-let [swipe-listener (om/get-state owner :swipe-listener)]
         (.off swipe-listener "swipeleft")
         (.off swipe-listener "swiperight"))))
 
