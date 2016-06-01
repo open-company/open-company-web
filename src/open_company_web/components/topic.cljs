@@ -149,7 +149,7 @@
         add-topic-pos     (- popover-offsettop scroll)]
     (> add-topic-pos (/ win-height 2))))
 
-(defcomponent topic [{:keys [active-topics section-data section currency column sharing-mode share-selected] :as data} owner options]
+(defcomponent topic [{:keys [active-topics section-data section currency column sharing-mode share-selected archived-topics] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
@@ -201,6 +201,7 @@
                 update-active-topics (:update-active-topics options)
                 list-data {:all-topics all-sections
                            :active-topics-list active-topics
+                           :archived-topics archived-topics
                            :show-above (show-popover-above? owner)
                            :column column}
                 list-opts {:did-change-active-topics update-active-topics
