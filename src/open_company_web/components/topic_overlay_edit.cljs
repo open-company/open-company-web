@@ -334,14 +334,14 @@
     (get-state owner data true))
 
   (will-mount [_]
-    (let [save-ch (utils/get-channel "fullscreen-topic-save")]
+    (let [save-ch (utils/get-channel (str "fullscreen-topic-save-" (name topic)))]
       (go (loop []
         (let [change (<! save-ch)]
           (when-let [section-data (data-to-save owner topic)]
             (om/set-state! owner :has-changes false)
             (api/partial-update-section topic section-data)
             (recur))))))
-    (let [cancel-ch (utils/get-channel "fullscreen-topic-cancel")]
+    (let [cancel-ch (utils/get-channel (str "fullscreen-topic-cancel-" (name topic)))]
       (go (loop []
         (let [change (<! cancel-ch)]
           (if-not (om/get-state owner :has-changes)

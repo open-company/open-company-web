@@ -1,7 +1,5 @@
 (ns open-company-web.components.topic-list
-  (:require-macros [cljs.core.async.macros :refer (go)])
-  (:require [cljs.core.async :refer (chan <!)]
-            [om.core :as om :include-macros true]
+  (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
@@ -150,8 +148,6 @@
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
-    (utils/add-channel "fullscreen-topic-save" (chan))
-    (utils/add-channel "fullscreen-topic-cancel" (chan))
     (get-state data nil))
 
   (did-mount [_]
@@ -171,8 +167,6 @@
         (.on swipe-listener "swiperight" (fn [e] (switch-topic owner true))))))
 
   (will-unmount [_]
-    (utils/remove-channel "fullscreen-topic-save")
-    (utils/remove-channel "fullscreen-topic-cancel")
     (when-not (utils/is-test-env?)
       (events/unlistenByKey (om/get-state owner :kb-listener))
       (when-let [swipe-listener (om/get-state owner :swipe-listener)]

@@ -137,6 +137,8 @@
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width hide-history-navigation] :as data} owner options]
 
   (init-state [_]
+    (utils/add-channel (str "fullscreen-topic-save-" (name section)) (chan))
+    (utils/add-channel (str "fullscreen-topic-cancel-" (name section)) (chan))
     {:as-of (:updated-at section-data)
      :transition-as-of nil
      :editing false
@@ -160,6 +162,8 @@
       (om/set-state! owner :actual-as-of (:updated-at (:section-data next-props)))))
 
   (will-unmount [_]
+    (utils/remove-channel (str "fullscreen-topic-save-" (name section)))
+    (utils/remove-channel (str "fullscreen-topic-cancel-" (name section)))
     (events/unlistenByKey (om/get-state owner :esc-listener-key)))
 
   (did-update [_ _ _]
@@ -202,7 +206,7 @@
                    editing
                    show-save-button)
           (dom/button {:class "save-button"
-                       :on-click #(when-let [ch (utils/get-channel "fullscreen-topic-save")]
+                       :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-save-" (name section)))]
                                     (om/set-state! owner :data-posted true)
                                     (put! ch {:click true :event %}))}
             (if data-posted
@@ -210,7 +214,7 @@
               "POST")))
         (dom/div {:class "close"
                   :on-click #(if editing
-                              (when-let [ch (utils/get-channel "fullscreen-topic-cancel")]
+                              (when-let [ch (utils/get-channel (str "fullscreen-topic-cancel-" (name section)))]
                                  (put! ch {:click true :event %}))
                               (hide-fullscreen-topic owner options))}
           (icon :simple-remove))
