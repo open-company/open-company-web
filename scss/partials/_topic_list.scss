@@ -41,13 +41,13 @@ div.topic-list{
 
   div.sharing-header{
     border-top: 4px solid $oc_yellow;
-    height: 60px;
+    height: 64px;
     width: 100%;
     background-color: rgba(78, 90, 107, 0.5);
 
     div.sharing-header-inner{
       margin: 0px auto;
-      padding: 13px 30px;
+      padding: 15px 30px;
 
       div.sharing-header-left{
         float: left;
@@ -62,6 +62,8 @@ div.topic-list{
           color: #ffffff;
           margin: 0px;
           padding: 0px;
+          margin-top: 8px;
+          display: inline-block;
         }
       }
 
