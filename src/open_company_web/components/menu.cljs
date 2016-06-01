@@ -30,7 +30,7 @@
   (close-menu)
   (router/nav! (oc-urls/company-profile)))
 
-(defcomponent menu [data owner options]
+(defcomponent menu [_ owner options]
   (render [_]
     (dom/ul {:id "menu"}
       (dom/li {:class "oc-title"} "OpenCompany")

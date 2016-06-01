@@ -83,6 +83,10 @@
       (-> db
           (assoc-in (dispatcher/company-data-key (:slug updated-body)) updated-body)
           (dissoc :loading)))
+    (= 403 status)
+    (-> db
+        (assoc-in [(keyword slug) :error] :forbidden)
+        (dissoc :loading))
     (= 404 status)
     (do
       (router/redirect-404!)
