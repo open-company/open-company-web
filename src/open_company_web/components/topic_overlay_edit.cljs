@@ -312,6 +312,20 @@
   ((:dismiss-editing options))
   (om/set-state! owner (get-state owner (om/get-props owner) true)))
 
+(defn setup-medium-editor [owner {:keys [topic-data topic] :as data}]
+  ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
+  (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
+        slug (keyword (router/current-company-slug))
+        placeholder-data (if (:placeholder topic-data) (utils/get-topic-body topic-data topic) "")
+        med-ed (new js/MediumEditor body-el (clj->js
+                                             (->  (utils/medium-editor-options placeholder-data)
+                                                  (editor/inject-extension editor/file-upload))))]
+    (.subscribe med-ed "editableInput" (fn [event editable]
+                                         (om/set-state! owner :has-changes true)))
+    (js/emojiAutocomplete)
+    (om/set-state! owner :initial-body (.-innerHTML body-el))
+    (om/set-state! owner :medium-editor med-ed)))
+
 (defcomponent topic-overlay-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
 
   (init-state [_]
@@ -340,6 +354,8 @@
   (will-receive-props [_ next-props]
     (when (and (:visible next-props)
                (not (:visible data)))
+      (when-not (om/get-state owner :medium-editor)
+        (setup-medium-editor owner data))
       (let [new-state (get-state owner next-props true)]
         (om/set-state! owner new-state))
       (utils/after 200 #(focus-headline owner)))
@@ -359,18 +375,7 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (reset! prevent-route-dispatch true)
-      ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
-      (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
-            slug (keyword (router/current-company-slug))
-            placeholder-data (if (:placeholder topic-data) (utils/get-topic-body topic-data topic) "")
-            med-ed (new js/MediumEditor body-el (clj->js
-                                                 (->  (utils/medium-editor-options placeholder-data)
-                                                      (editor/inject-extension editor/file-upload))))]
-        (.subscribe med-ed "editableInput" (fn [event editable]
-                                             (om/set-state! owner :has-changes true)))
-        (js/emojiAutocomplete)
-        (om/set-state! owner :initial-body (.-innerHTML body-el))
-        (om/set-state! owner :medium-editor med-ed))
+      (setup-medium-editor owner data)
       (let [win-location (.-location js/window)
             current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
             listener (events/listen @router/history EventType/NAVIGATE
