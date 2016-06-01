@@ -6,9 +6,10 @@
             [cljs.core.async :refer (chan <!)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
-            [open-company-web.components.ui.login-button :refer [login-button]]
-            [open-company-web.components.topic-list :refer [topic-list]]
+            [open-company-web.router :as router]
             [open-company-web.components.navbar :refer (navbar)]
+            [open-company-web.components.topic-list :refer (topic-list)]
+            [open-company-web.components.ui.login-button :refer [login-button]]
             [open-company-web.components.footer :refer (footer)]
             [open-company-web.components.menu :refer (menu)]
             [open-company-web.components.edit-topic :refer (edit-topic)]
@@ -57,7 +58,6 @@
     (dom/div {:class "max-width-3 p4 mx-auto center mb4"}
       (dom/p {:class "mb2"} "Please log in to view this dashboard.")
       (om/build login-button data))))
-
 
 (defcomponent company-dashboard [data owner]
 
