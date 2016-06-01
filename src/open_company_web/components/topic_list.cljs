@@ -134,7 +134,9 @@
 (defn filter-placeholder-sections [topics company-data]
   (vec (filter #(not (:placeholder (->> % keyword (get company-data)))) topics)))
 
-(defn preview-and-share-click [owner]
+(defn preview-and-share-click [owner e]
+  (.preventDefault e)
+  (.stopPropagation e)
   (let [props (om/get-props owner)
         company-data (:company-data props)
         su-data (:stakeholder-update company-data)
@@ -175,7 +177,7 @@
 
   (will-receive-props [_ next-props]
     (when (om/get-state owner :redirect-to-preview)
-      (router/nav! (oc-urls/stakeholder-update-preview)))
+      (utils/after 100 #(router/nav! (oc-urls/stakeholder-update-preview))))
     (when-not (= (:company-data next-props) (:company-data data))
       (om/set-state! owner (get-state next-props (om/get-state owner))))
     (when-not (:read-only (:company-data next-props))
@@ -213,7 +215,7 @@
               (dom/div {:class "sharing-header-center"}
                 (when (pos? (count share-selected-topics))
                   (dom/button {:class "share-snapshot-bt"
-                               :on-click #(preview-and-share-click owner)}
+                               :on-click (partial preview-and-share-click owner)}
                     (when redirect-to-preview
                       (dom/img {:class "small-loading" :src "/img/small_loading.gif"}))
                     "PREVIEW AND SHARE")))
