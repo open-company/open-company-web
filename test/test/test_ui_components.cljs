@@ -1,6 +1,5 @@
 (ns test.test-ui-components
   (:require [doo.runner :refer-macros [doo-tests]]
-            [test.open-company-web.components.ui.currency-picker]
             [test.open-company-web.components.ui.link]
             [test.open-company-web.components.login]
             [test.open-company-web.components.ui.login-button]
@@ -18,7 +17,6 @@
 ;; we don't run out of memory on CI server
 
 (doo-tests
-  'test.open-company-web.components.ui.currency-picker
   'test.open-company-web.components.ui.link
   'test.open-company-web.components.login
   'test.open-company-web.components.ui.login-button

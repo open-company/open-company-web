@@ -12,15 +12,24 @@ div.topic-list-edit-container {
 
 .animating div.topic-list{
   margin-top: 0px;
-  padding-top: #{$navbar_height}px;
+  padding-top: 0px;
+  top: 0;
+  position: absolute;
+  height: 100vh;
+  left: 0;
+  margin-left: 0px;
+  width: 100vw;
 }
 
 div.topic-list{
   position: relative;
   content: "";
   padding-bottom: 20px;
-  margin-top: #{$navbar_height}px;
   min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
+
+  &.no-sharing {
+    margin-top: #{$navbar_height}px;
+  }
 
   @include mobile(){
     background-color: #d9d9d9;
@@ -30,74 +39,124 @@ div.topic-list{
     background-color: $oc_gray_6;
   }
 
-  div.selected-topic-container{
-    background-color: rgba(255, 255, 255, 0.98);
-    width: 100vw;
-    height: 100vh;
-    overflow-y: hidden;
-    top: 0px;
-    left: 0px;
-    position: fixed;
-    z-index: 1036;
+  div.sharing-header{
     border-top: 4px solid $oc_yellow;
-
-    div.selected-topic, div.tr-selected-topic {
-      height: 100%;
-      width: 100%;
-    }
-  }
-
-  div.topic-list-internal {
-    list-style: none;
-    padding: 0;
+    height: 60px;
     width: 100%;
+    background-color: rgba(78, 90, 107, 0.5);
 
-    div.topics-column-container {
-      padding: 20px 30px 20px 30px;
-      margin: 0 auto;
+    div.sharing-header-inner{
+      margin: 0px auto;
+      padding: 13px 30px;
 
-      @media screen and (max-width: 413px){
-        margin-left: 9px;
-        margin-right: 9px;
-        width: auto;
-      }
-
-      div.topics-column {
-        min-width: 302px;
-        max-width: 500px;
-        margin-right: 20px;
+      div.sharing-header-left{
         float: left;
+        width: 33%;
+        height: 30px;
 
-        &:last-child {
-          margin-right: 0px;
-        }
-
-        div.topic-row{
-          height: auto;
-          padding-bottom: 22px;
+        label.selected-topics{
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: #ffffff;
+          margin: 0px;
+          padding: 0px;
         }
       }
 
-      &.columns-1 {
-        padding: 20px 0px 20px 0px;
-        div.topics-column{
-          margin: 0 auto;
-          float: none;
+      div.sharing-header-center{
+        float: left;
+        width: 33%;
+        height: 30px;
+        text-align: center;
 
-          div.topic-row{
-            padding-bottom: 12px;
+        button.share-snapshot-bt{
+          padding: 6px 20px;
+          background-color: $oc_yellow;
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: #4e5a6b;
+          outline: none;
+          border: 0px solid transparent;
+        }
+      }
+
+      div.sharing-header-right{
+        float: right;
+        text-align: right;
+        width: 33%;
+        height: 30px;
+
+        button.close-share {
+          background-color: transparent;
+          width: 30px;
+          height: 30px;
+          outline: none;
+          border: 0px solid black;
+
+          div.svg-icon{
+            float: right;
+            svg{
+              stroke: white !important;
+            }
           }
         }
       }
     }
+  }
 
-    &.content-loaded:empty {
-      text-align: center;
-      font-size: 18px;
-      padding-top: 100px;
-      color: rgba(0, 0, 0, 0.4);
-      font-family: $oc_main_font;
-      height: 200px;
+  div.sharing-button-container {
+    height: 30px;
+    margin: 0 auto;
+    padding: 29px;
+
+    button.sharing-button {
+      float: right;
+      height: 30px;
+      padding: 5px 20px;
+      background-color: transparent;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      color: $oc_gray_5;
+      opacity: 0.6;
+      outline: none;
+      border: 0px solid transparent;
+
+      &:hover {
+        outline: none;
+        border: 0px solid transparent;
+        opacity: 1;
+      }
+
+      &:active, &:focus{
+        outline: none;
+        border: 0px solid transparent;
+      }
     }
+  }
+}
+
+div.selected-topic-container{
+  background-color: rgba(255, 255, 255, 0.98);
+  width: 100vw;
+  height: 100vh;
+  overflow-y: hidden;
+  top: 0px;
+  left: 0px;
+  position: fixed;
+  z-index: 1036;
+  border-top: 4px solid $oc_yellow;
+
+  div.selected-topic, div.tr-selected-topic {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
   }
 }

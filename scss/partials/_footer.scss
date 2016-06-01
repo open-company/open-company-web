@@ -1,7 +1,6 @@
 div.footer {
   background-color: white;
   padding-top: 54px;
-  height: #{$footer_height}px;
 
   div.footer-cta {
     font-family: $oc_headers_font;
@@ -10,6 +9,30 @@ div.footer {
     color: $oc_gray_5;
     text-align: center;
     margin: 0 10px;
+
+    div {
+      text-align: center;
+
+      a.io-link {
+        width: 322px;
+        height: 50px;
+        border: solid 3px rgba(78, 90, 107, 0.2);
+        background-color: white;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: rgba(78,90,107, 0.5);
+        display: inline-block;
+        padding-top: 14px;
+        margin-top: 24px;
+
+        &:hover {
+          text-decoration: none;
+        }
+      }
+    }
   }
 
   div.footer-internal{

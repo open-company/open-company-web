@@ -8,8 +8,7 @@
             [open-company-web.lib.oc-colors :as occ]))
 
 (defn get-label [cur-symbol costs]
-  (when costs
-    (str cur-symbol (.toLocaleString (js/parseFloat (str costs))))))
+  (str cur-symbol (.toLocaleString (js/parseFloat (str (or costs "0"))))))
 
 (defcomponent costs [data owner options]
   

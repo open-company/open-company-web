@@ -1,19 +1,17 @@
 (ns open-company-web.components.company-dashboard
   (:require-macros [cljs.core.async.macros :refer (go)])
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [cljs.core.async :refer (chan <!)]
             [open-company-web.dispatcher :as dis]
-            [open-company-web.components.navbar :refer [navbar]]
-            [open-company-web.components.company-header :refer [company-header]]
-            [open-company-web.components.ui.login-button :refer [login-button]]
-            [open-company-web.components.topic-list :refer [topic-list]]
+            [open-company-web.router :as router]
             [open-company-web.components.navbar :refer (navbar)]
+            [open-company-web.components.topic-list :refer (topic-list)]
+            [open-company-web.components.ui.login-button :refer [login-button]]
             [open-company-web.components.footer :refer (footer)]
             [open-company-web.components.menu :refer (menu)]
             [open-company-web.components.edit-topic :refer (edit-topic)]
-            [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [goog.events :as events]
@@ -51,6 +49,10 @@
     (om/set-state! owner :navbar-editing false)
     (om/set-state! owner :last-active-category nil)))
 
+
+(defn toggle-sharing-mode [owner]
+  (om/update-state! owner :sharing-mode not))
+
 (defcomponent login-required [data owner]
   (render [_]
     (dom/div {:class "max-width-3 p4 mx-auto center mb4"}
@@ -69,27 +71,31 @@
        :navbar-editing false
        :editing-topic false
        :save-bt-active false
+       :sharing-mode false
        :columns-num (responsive/columns-num)}))
 
   (did-mount [_]
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
 
-  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active active-category columns-num] :as state}]
+  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active active-category columns-num sharing-mode] :as state}]
     (let [company-data (dis/company-data data)
           navbar-editing-cb (partial set-navbar-editing owner data)
           card-width (responsive/calc-card-width)]
       (dom/div {:class (utils/class-set {:company-dashboard true
+                                         :main-scroll true
                                          :navbar-offset (not (responsive/is-mobile))})}
-        (om/build menu {})
+        (om/build menu data)
         (if (get-in data [(keyword (router/current-company-slug)) :error])
           (dom/div {:class "page-no-navbar py4"}
             (om/build login-required data))
           (dom/div {:class "page"}
             ;; Navbar
-            (when company-data
+            (when (and company-data
+                       (not sharing-mode))
               (om/build navbar {:save-bt-active save-bt-active
                                 :company-data company-data
                                 :card-width card-width
+                                :sharing-mode sharing-mode
                                 :columns-num columns-num
                                 :auth-settings (:auth-settings data)}))
             (when company-data
@@ -99,18 +105,22 @@
                 (om/build topic-list
                           {:loading (or (:loading company-data) (:loading data))
                            :company-data company-data
+                           :latest-su (dis/latest-stakeholder-update)
                            :card-width card-width
                            :columns-num columns-num
                            :active-category (:active-category state)}
                           {:opts {:navbar-editing-cb navbar-editing-cb
                                   :topic-edit-cb (partial topic-edit-cb owner)
                                   :switch-category-cb (partial switch-category-cb owner)
-                                  :save-bt-active-cb (partial set-save-bt-active owner)}})
+                                  :save-bt-active-cb (partial set-save-bt-active owner)
+                                  :toggle-sharing-mode #(toggle-sharing-mode owner)}})
                 ;; topic edit
                 (om/build edit-topic {:section editing-topic
                                       :section-data (get company-data (keyword editing-topic))}
                           {:opts {:navbar-editing-cb navbar-editing-cb
                                   :save-bt-active-cb (partial set-save-bt-active owner)
-                                  :dismiss-topic-editing-cb (partial dismiss-topic-editing-cb owner)}})))))
-        (om/build footer {:columns-num columns-num
-                          :card-width card-width})))))
+                                  :dismiss-topic-editing-cb (partial dismiss-topic-editing-cb owner)}})))
+            ;;Footer
+            (when company-data
+              (om/build footer {:columns-num columns-num
+                                :card-width card-width}))))))))

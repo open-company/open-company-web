@@ -3,7 +3,7 @@
 ;; Sentry
 (def local-dsn "https://747713ae92c246d1a64bbce9aab3da34@app.getsentry.com/73174") ; insert your Sentry public dsn here
 
-(def local-whitelist-array ["locahost" "127.0.0.1"])
+(def local-whitelist-array ["localhost" "127.0.0.1"])
 
 ;; API
 (def api-server-domain "http://localhost:3000")

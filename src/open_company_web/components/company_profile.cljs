@@ -5,8 +5,6 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.ui.link :refer (link)]
             [open-company-web.components.navbar :refer (navbar)]
-            [om-bootstrap.nav :as n]
-            [om-bootstrap.panel :as p]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
             [open-company-web.urls :as oc-urls]

@@ -21,34 +21,31 @@
             [open-company-web.lib.oc-colors :as oc-colors]))
 
 (defn show-fullscreen-topic [owner]
-  (dommy/add-class! (sel1 [:body]) :no-scroll)
-  (setStyle (sel1 [:div.company-dashboard]) #js {:height "90vh" :overflow "hidden"})
+  (utils/disable-scroll)
   (.play
     (new Fade (om/get-ref owner "fullscreen-topic") 0 1 utils/oc-animation-duration)))
 
-(defn hide-fullscreen-topic [owner options]
+(defn hide-fullscreen-topic [owner options & [force-fullscreen-dismiss]]
   ; if it's in editing mode
-  (if (om/get-state owner :editing)
-    ; dismiss the editing
-    (om/set-state! owner :editing false)
-    ; else dismiss the fullscreen topic
-    (do
-      (dommy/remove-class! (sel1 [:body]) :no-scroll)
-      (setStyle (sel1 [:div.company-dashboard]) #js {:height "auto" :overflow "auto"})
+  (let [editing (om/get-state owner :editing)]
+    (when editing
+      ((:topic-navigation options) true)
+      (om/set-state! owner :editing false))
+    (when (or (not editing)
+              force-fullscreen-dismiss)
+      (utils/enable-scroll)
       (let [fade-out (new Fade (sel1 :div.fullscreen-topic) 1 0 utils/oc-animation-duration)]
         (doto fade-out
           (.listen AnimationEventType/FINISH
             #((:close-overlay-cb options)))
           (.play))))))
 
-(defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric card-width] :as data} owner options]
+(defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric card-width hide-history-navigation] :as data} owner options]
   (render [_]
-    (let [ww (.-clientWidth (sel1 js/document :body))
-          fullscreen-width (if (> ww 575)
-                              575
-                              (min card-width ww))
+    (let [fullscreen-width (utils/fullscreen-topic-width card-width)
           chart-opts {:show-title false
                       :show-revisions-navigation false
+                      :switch-metric-cb (:switch-metric-cb options)
                       :chart-size {:width  (- fullscreen-width 40)
                                    :height (if (responsive/is-mobile) 174 295)}}
           chart-data {:section-data topic-data
@@ -76,15 +73,16 @@
         (when (:author topic-data)
           (dom/div {:class "topic-attribution"}
             (str "- " (:name (:author topic-data)) " / " (utils/date-string (js/Date. (:updated-at topic-data)) true))))
-        (dom/div {:class "topic-revisions"}
-          (when (:prev-rev data)
-            (dom/button {:class "prev"
-                         :on-click #((:rev-nav options) (:updated-at (:prev-rev data)))}
-              (if (:is-actual data) "VIEW EARLIER UPDATE" "EARLIER")))
-          (when (:next-rev data)
-            (dom/button {:class "next"
-                         :on-click #((:rev-nav options) (:updated-at (:next-rev data)))}
-              "LATER")))))))
+        (when-not hide-history-navigation
+          (dom/div {:class "topic-revisions group"}
+            (when (:prev-rev data)
+              (dom/button {:class "prev"
+                           :on-click #((:rev-nav options) (:updated-at (:prev-rev data)))}
+                (if (:is-actual data) "VIEW EARLIER UPDATE" "EARLIER")))
+            (when (:next-rev data)
+              (dom/button {:class "next"
+                           :on-click #((:rev-nav options) (:updated-at (:next-rev data)))}
+                "LATER"))))))))
 
 (defn esc-listener [owner options e]
   (when (= (.-keyCode e) 27)
@@ -95,7 +93,7 @@
   (when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
     (let [section (om/get-props owner :section)]
       ((:remove-topic options) section))
-    (hide-fullscreen-topic owner options)))
+    (hide-fullscreen-topic owner options true)))
 
 (defn animate-transition [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
@@ -134,15 +132,17 @@
 (defn toggle-editing [owner options]
   (let [editing-mode (om/get-state owner :editing)]
     (om/set-state! owner :editing (not editing-mode))
-    ((:toggle-topic-navigation options) editing-mode)))
+    ((:topic-navigation options) editing-mode)))
 
-(defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width] :as data} owner options]
+(defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width hide-history-navigation] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
      :transition-as-of nil
      :editing false
+     :data-posted false
      :show-save-button false
+     :last-selected-metric selected-metric
      :actual-as-of (:updated-at section-data)})
 
   (did-mount [_]
@@ -153,6 +153,9 @@
 
   (will-receive-props [_ next-props]
     (when-not (= next-props data)
+      (when (om/get-state owner :data-posted)
+        (hide-fullscreen-topic owner options))
+      (om/set-state! owner :data-posted false)
       (om/set-state! owner :as-of (:updated-at (:section-data next-props)))
       (om/set-state! owner :actual-as-of (:updated-at (:section-data next-props)))))
 
@@ -163,7 +166,7 @@
     (when (om/get-state owner :transition-as-of)
       (animate-transition owner)))
 
-  (render-state [_ {:keys [as-of transition-as-of actual-as-of editing show-save-button] :as state}]
+  (render-state [_ {:keys [as-of transition-as-of actual-as-of editing show-save-button data-posted last-selected-metric] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -172,9 +175,10 @@
           revisions-list (get (slug @cache/revisions) section-kw)
           topic-data (utils/select-section-data section-data section-kw as-of)
           is-actual? (= as-of actual-as-of)
-          fullscreen-topic-opts (merge options {:rev-nav #(om/set-state! owner :transition-as-of %)})
+          fullscreen-topic-opts (merge options {:rev-nav #(om/set-state! owner :transition-as-of %)
+                                                :switch-metric-cb #(om/set-state! owner :last-selected-metric %)})
           edit-topic-opts (merge options {:show-save-button #(om/set-state! owner :show-save-button %)
-                                          :dismiss-editing #(om/set-state! owner :editing false)})
+                                          :dismiss-editing #(hide-fullscreen-topic owner options)})
           can-edit? (and (responsive/can-edit?)
                          (not (:read-only data)))]
       ; preload previous revision
@@ -197,61 +201,69 @@
         (when (and can-edit?
                    editing
                    show-save-button)
-          (dom/div {:class "save-button"
-                    :on-click #(when-let [ch (utils/get-channel "fullscreen-topic-save")]
-                                 (put! ch {:click true :event %}))}
-            "POST"))
+          (dom/button {:class "save-button"
+                       :on-click #(when-let [ch (utils/get-channel "fullscreen-topic-save")]
+                                    (om/set-state! owner :data-posted true)
+                                    (put! ch {:click true :event %}))}
+            (if data-posted
+              (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
+              "POST")))
         (dom/div {:class "close"
                   :on-click #(if editing
                               (when-let [ch (utils/get-channel "fullscreen-topic-cancel")]
                                  (put! ch {:click true :event %}))
                               (hide-fullscreen-topic owner options))}
           (icon :simple-remove))
-        (if editing
+        (dom/div {:style #js {:display (when-not editing "none")}}
           (om/build topic-overlay-edit {:topic section
                                         :topic-data topic-data
+                                        :visible editing
                                         :selected-metric selected-metric
                                         :currency currency
                                         :card-width card-width
                                         :is-actual is-actual?
                                         :prev-rev prev-rev
                                         :next-rev next-rev}
-                                       {:opts edit-topic-opts})
-          (dom/div #js {:className "fullscreen-topic-transition group"
-                        :ref "fullscreen-topic-transition"
-                        :style (when-not transition-as-of #js {:height "auto"})}
-            (dom/div #js {:className "fullscreen-topic-as-of group"
-                          :ref "cur-topic"
-                          :key (str "cur-" as-of)
-                          :style #js {:opacity 1}}
-              (om/build fullscreen-topic-internal {:topic section
-                                                   :topic-data topic-data
-                                                   :selected-metric selected-metric
-                                                   :currency currency
-                                                   :card-width card-width
-                                                   :is-actual is-actual?
-                                                   :prev-rev prev-rev
-                                                   :next-rev next-rev}
-                                                  {:opts fullscreen-topic-opts}))
-            (when transition-as-of
-              (dom/div #js {:className "fullscreen-topic-tr-as-of group"
-                            :ref "tr-topic"
-                            :key (str "tr-" transition-as-of)
-                            :style #js {:opacity 0}}
-                (let [tr-topic-data (utils/select-section-data section-data section-kw transition-as-of)
-                      tr-prev-rev (utils/revision-prev revisions transition-as-of)
-                      tr-next-rev (utils/revision-next revisions transition-as-of)]
-                  (om/build fullscreen-topic-internal {:topic-data tr-topic-data
-                                                       :topic section
-                                                       :selected-metric selected-metric
-                                                       :currency currency
-                                                       :card-width card-width
-                                                       :prev-rev tr-prev-rev
-                                                       :next-rev tr-next-rev}
-                                                      {:opts fullscreen-topic-opts}))))))
+                                       {:opts edit-topic-opts
+                                        :key as-of}))
+        (dom/div #js {:className "fullscreen-topic-transition group"
+                      :ref "fullscreen-topic-transition"
+                      :style #js {:height (when-not transition-as-of "auto")
+                                  :display (when editing "none")}}
+          (dom/div #js {:className "fullscreen-topic-as-of group"
+                        :ref "cur-topic"
+                        :key (str "cur-" as-of)
+                        :style #js {:opacity 1}}
+            (om/build fullscreen-topic-internal {:topic section
+                                                 :topic-data topic-data
+                                                 :selected-metric last-selected-metric
+                                                 :currency currency
+                                                 :card-width card-width
+                                                 :is-actual is-actual?
+                                                 :hide-history-navigation hide-history-navigation
+                                                 :prev-rev prev-rev
+                                                 :next-rev next-rev}
+                                                {:opts fullscreen-topic-opts}))
+          (when transition-as-of
+            (dom/div #js {:className "fullscreen-topic-tr-as-of group"
+                          :ref "tr-topic"
+                          :key (str "tr-" transition-as-of)
+                          :style #js {:opacity 0}}
+              (let [tr-topic-data (utils/select-section-data section-data section-kw transition-as-of)
+                    tr-prev-rev (utils/revision-prev revisions transition-as-of)
+                    tr-next-rev (utils/revision-next revisions transition-as-of)]
+                (om/build fullscreen-topic-internal {:topic-data tr-topic-data
+                                                     :topic section
+                                                     :selected-metric selected-metric
+                                                     :currency currency
+                                                     :card-width card-width
+                                                     :hide-history-navigation hide-history-navigation
+                                                     :prev-rev tr-prev-rev
+                                                     :next-rev tr-next-rev}
+                                                    {:opts fullscreen-topic-opts})))))
         (when editing
-          (dom/div {:class "remove-button"
-                    :on-click (partial remove-topic-click owner options)}
+          (dom/button {:class "remove-button"
+                       :on-click (partial remove-topic-click owner options)}
             (icon :alert {:size 15
                           :accent-color (oc-colors/get-color-by-kw :oc-gray-5)
                           :stroke (oc-colors/get-color-by-kw :oc-gray-5)})
