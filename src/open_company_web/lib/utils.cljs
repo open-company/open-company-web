@@ -709,3 +709,15 @@
         month (month-string (add-zero (.getMonth js-date)))
         year (.getFullYear js-date)]
     (str month " " year " Update")))
+
+(defn my-uuid
+  "Generate a 4 char UUID"
+  []
+  (.substring
+    (.toString
+      (.floor js/Math (* (+ 1 (.random js/Math)) 0x10000)) 16) 1))
+
+(defn guid
+  "Generate v4 GUID based on this http://stackoverflow.com/a/2117523"
+  []
+  (str (my-uuid) (my-uuid) "-" (my-uuid) "-" (my-uuid) "-" (my-uuid) "-" (my-uuid) (my-uuid) (my-uuid)))
