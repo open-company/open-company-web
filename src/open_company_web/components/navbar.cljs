@@ -27,6 +27,11 @@
     (dommy/toggle-class! :menu-visible))
   (events/unlistenByKey (om/get-state owner :transition-end-listener)))
 
+(defn close-preview-clicked [e]
+  (.preventDefault e)
+  (.stopPropagation e)
+  (router/nav! (oc-urls/company)))
+
 (defn menu-click [owner e]
   (when e
     (.preventDefault e))
@@ -74,7 +79,7 @@
                       (icon :link-72 {:size 20 :stroke "4" :color "rgba(78, 90, 107, 0.7)" :accent-color "rgba(78, 90, 107, 0.7)"}))
                     (dom/label {} "SHARE URL"))))
               (dom/button {:class "close-preview"
-                           :on-click #(router/nav! (oc-urls/company))}
+                           :on-click close-preview-clicked}
                 (icon :simple-remove {:stroke "4" :color "rgba(255, 255, 255, 0.8)" :accent-color "rgba(255, 255, 255, 0.8)"})))))
         (dom/div {:class "oc-navbar-header"
                   :style #js {:width (str header-width "px")}}
