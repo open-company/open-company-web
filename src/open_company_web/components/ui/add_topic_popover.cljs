@@ -31,13 +31,18 @@
 (defn on-click-in [owner options e]
   (.stopPropagation e))
 
-(defn get-state [{:keys [active-topics-list all-topics]} old-state]
+(defn get-state [{:keys [active-topics-list all-topics archived-topics] :as data} old-state]
   (let [topics-list (map name (keys all-topics))
-        unactive-topics (map name (reduce utils/vec-dissoc topics-list active-topics-list))
+        archived-topics-list (vec (map :section archived-topics))
+        reduce-dissoc (partial reduce utils/vec-dissoc)
+        unactive-topics (map name (-> topics-list
+                                      (reduce-dissoc active-topics-list)
+                                      (reduce-dissoc archived-topics-list)))
         unactive-equal? (= (set unactive-topics) (set (:unactive-topics old-state)))]
     {:active-topics active-topics-list
+     :archived-topics-list archived-topics-list
      :unactive-topics (if unactive-equal? (:unactive-topics old-state) unactive-topics)
-     :highlighted-topic -1}))
+     :highlighted-topic nil}))
 
 (defn add-topic-click [owner options topic]
   (let [all-topics (om/get-props owner :all-topics)
@@ -63,7 +68,7 @@
       (cond
         (= key-code enter-key-code)
         ; enter key: select topic
-        (let [topic (get (vec unactive-topics) (om/get-state owner :highlighted-topic))]
+        (when-let [topic (om/get-state owner :highlighted-topic)]
           (add-topic-click owner options topic))
         (= key-code esc-key-code)
         (dismiss-popover options)
@@ -88,7 +93,7 @@
 (defn history-nav [options]
   ((:dismiss-popover options)))
 
-(defcomponent add-topic-popover [{:keys [all-topics active-topics-list column show-above] :as data} owner options]
+(defcomponent add-topic-popover [{:keys [all-topics active-topics-list column show-above archived-topics] :as data} owner options]
 
   (init-state [_]
     (when (empty? @caches/new-sections)
@@ -115,7 +120,7 @@
     (events/unlistenByKey (om/get-state owner :kb-listener))
     (events/unlistenByKey (om/get-state owner :nav-listener)))
 
-  (render-state [_ {:keys [active-topics unactive-topics highlighted-topic]}]
+  (render-state [_ {:keys [active-topics unactive-topics highlighted-topic archived-topics-list]}]
     (dom/div {:class (utils/class-set {:add-topic-popover true
                                        (str "column-" column) true
                                        :show-above show-above})
@@ -123,14 +128,29 @@
               :on-click (partial on-click-in owner options)}
       (dom/div {:class "triangle"})
       (dom/div {:class "add-topic-popover-header"} "CHOOSE A TOPIC")
-      (dom/div {:class "add-topic-popover-subheader"} "SUGGESTED TOPICS")
-      (dom/div #js {:className "topics-to-add"
-                    :ref "topics-to-add"}
-        (for [idx (range (count unactive-topics))
-              :let [topic (get (vec unactive-topics) idx)
-                    topic-data (->> topic keyword (get all-topics))]]
-          (dom/div #js {:className (str "potential-topic" (when (= highlighted-topic idx) " highlighted"))
-                        :ref (str "potential-topic-" idx)
-                        :onMouseOver #(om/set-state! owner :highlighted-topic idx)
-                        :onClick #(add-topic-click owner options topic)}
-            (:title topic-data)))))))
+      (dom/div {:class "add-topic-popover-scroll group"}
+        (dom/div {:class "add-topic-popover-subheader"} "SUGGESTED TOPICS")
+        (dom/div #js {:className "topics-to-add"
+                      :ref "topics-to-add"}
+          (for [idx (range (count unactive-topics))
+                :let [topic (get (vec unactive-topics) idx)
+                      topic-data (->> topic keyword (get all-topics))]]
+            (dom/div #js {:className (str "potential-topic" (when (= highlighted-topic topic) " highlighted"))
+                          :ref (str "potential-topic-unactive-" idx)
+                          :onMouseOver #(om/set-state! owner :highlighted-topic topic)
+                          :onClick #(add-topic-click owner options topic)}
+              (:title topic-data))))
+        (when (set archived-topics-list)
+          (dom/div {:class "add-topic-popover-subheader"} "ARCHIVED TOPICS"))
+        (when (set archived-topics-list)
+          (dom/div #js {:className "topics-to-add"
+                        :ref "topics-to-add"}
+            (for [idx (range (count archived-topics-list))
+                  :let [topic (get (vec archived-topics-list) idx)
+                        topic-data (->> topic keyword (get all-topics))
+                        topic-title (:title (first (filter #(= (:section %) topic) archived-topics)))]]
+              (dom/div #js {:className (str "potential-topic" (when (= highlighted-topic topic) " highlighted"))
+                            :ref (str "potential-topic-archived-" idx)
+                            :onMouseOver #(om/set-state! owner :highlighted-topic topic)
+                            :onClick #(add-topic-click owner options topic)}
+                topic-title))))))))
