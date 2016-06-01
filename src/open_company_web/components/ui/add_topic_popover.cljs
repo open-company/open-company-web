@@ -141,9 +141,9 @@
                           :onMouseOver #(om/set-state! owner :highlighted-topic topic)
                           :onClick #(add-topic-click owner options topic)}
               (:title topic-data))))
-        (when (set archived-topics-list)
+        (when (pos? (count archived-topics-list))
           (dom/div {:class "add-topic-popover-subheader"} "ARCHIVED TOPICS"))
-        (when (set archived-topics-list)
+        (when (pos? (count archived-topics-list))
           (dom/div #js {:className "topics-to-add"
                         :ref "topics-to-add"}
             (for [idx (range (count archived-topics-list))
