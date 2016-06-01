@@ -22,6 +22,7 @@
                          :section "add-topic"
                          :add-topic true
                          :column column
+                         :archived-topics (:archived company-data)
                          :section-data {:title "+ ADD A TOPIC"
                                         :body ""
                                         :updated-at 0
