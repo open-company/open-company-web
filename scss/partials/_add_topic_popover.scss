@@ -112,5 +112,36 @@ div.add-topic-popover {
         }
       }
     }
+
+    div.add-custom-topic{
+      text-align: left;
+      padding: 7px 0px 25px 20px;
+      opacity: 0.3;
+      font-family: $oc_headers_font;
+      font-size: 14px;
+      line-height: 1.7;
+      color: $oc_gray_5;
+    }
+
+    div.add-custom-topic-container {
+      text-align: left;
+      padding: 7px 0px 25px 20px;
+
+      input {
+        opacity: 0.3;
+        font-family: $oc_headers_font;
+        font-size: 14px;
+        line-height: 1.7;
+        color: $oc_gray_5;
+        outline: none;
+        border: 1px solid rgba(78, 90, 107, 0.5);
+        border-radius: 2px;
+        color: black;
+
+        &:active, &:focus {
+          outline: none;
+        }
+      }
+    }
   }
 }
