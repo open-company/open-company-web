@@ -62,7 +62,8 @@
      :sharing-mode (or (:sharing-mode current-state) false)
      :topic-navigation (or (:topic-navigation current-state) true)
      :share-selected-topics (:sections (:stakeholder-update company-data))
-     :transitioning false}))
+     :transitioning false
+     :redirect-to-preview false}))
 
 (defn topic-click [owner topic selected-metric]
   (if (om/get-state owner :sharing-mode)
@@ -260,8 +261,7 @@
               (dom/div #js {:className "tr-selected-topic"
                             :key (str "transition-" tr-selected-topic)
                             :ref "tr-selected-topic"
-                            ; :style #js {:opacity (if tr-selected-topic 0 1)}
-                          }
+                            :style #js {:opacity (if tr-selected-topic 0 1)}}
               (om/build fullscreen-topic {:section tr-selected-topic
                                           :section-data (->> tr-selected-topic keyword (get company-data))
                                           :selected-metric selected-metric
