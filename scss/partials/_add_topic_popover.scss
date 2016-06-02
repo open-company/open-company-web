@@ -121,11 +121,21 @@ div.add-topic-popover {
       font-size: 14px;
       line-height: 1.7;
       color: $oc_gray_5;
+      height: 59px;
+
+      &:first-child {
+        padding: 12px 0px 12px 20px;
+        height: 51px;
+      }
     }
 
     div.add-custom-topic-container {
       text-align: left;
       padding: 7px 0px 25px 20px;
+
+      &:first-child {
+        padding: 12px 0px 12px 20px;
+      }
 
       input {
         font-family: $oc_headers_font;
@@ -135,6 +145,7 @@ div.add-topic-popover {
         border: 1px solid rgba(78, 90, 107, 0.3);
         border-radius: 2px;
         color: black;
+        height: 27px;
 
         &:active, &:focus {
           outline: none;
