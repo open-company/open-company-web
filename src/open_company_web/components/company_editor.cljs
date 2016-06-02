@@ -12,7 +12,7 @@
     (utils/update-page-title "OpenCompany - Setup Your Company")
     (swap! dis/app-state assoc-in [:company-editor :name] (jwt/get-key :org-name)))
   (render [_]
-    (dom/div {}
+    (dom/div {:class "company-editor"}
       (dom/div {:class "col-12 p3"}
         (dom/a {:href "/" :class "btn-reset btn-outline"} "Back to Opencompany.com"))
       (dom/div {:class "container"}
