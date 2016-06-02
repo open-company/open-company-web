@@ -124,6 +124,7 @@
             sections (:sections company-data)
             new-sections (update-in sections [:progress] #(conj % topic-name))
             new-topic-data {:title topic-title :headline "" :body ""}]
+        (dis/set-force-edit-topic topic-name)
         (api/patch-sections new-sections new-topic-data topic-name))
       (= key-code esc-key-code)
       ; ESC: exit adding topic
