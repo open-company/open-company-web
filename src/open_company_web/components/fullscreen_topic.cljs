@@ -6,6 +6,7 @@
             [open-company-web.api :as api]
             [open-company-web.caches :as cache]
             [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
@@ -139,9 +140,11 @@
   (init-state [_]
     (utils/add-channel (str "fullscreen-topic-save-" (name section)) (chan))
     (utils/add-channel (str "fullscreen-topic-cancel-" (name section)) (chan))
+    (when (:fullscreen-force-edit data)
+      (dis/set-force-edit-topic nil))
     {:as-of (:updated-at section-data)
      :transition-as-of nil
-     :editing false
+     :editing (:fullscreen-force-edit data)
      :data-posted false
      :show-save-button false
      :last-selected-metric selected-metric
