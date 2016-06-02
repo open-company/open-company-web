@@ -40,10 +40,10 @@ div.add-topic-popover {
 
   // show the popover above the add topic card
   &.show-above {
-    top: -247px;
+    top: -217px;
 
     div.triangle {
-      top: 285px;
+      top: 254px;
     }
 
     &.column-1 {
@@ -72,35 +72,44 @@ div.add-topic-popover {
     padding-top: 12px;
   }
 
-  div.add-topic-popover-subheader {
-    opacity: 0.2;
-    font-weight: 700;
-    font-size: 12px;
-    line-height: 1.5;
-    letter-spacing: 1px;
-    color: $oc_gray_5;
-    padding: 15px 0 0 19px;
-    text-align: left;
-  }
-
-  div.topics-to-add{
-    text-align: left;
+  div.add-topic-popover-scroll {
     max-height: 237px;
     overflow: scroll;
-    padding-bottom: 6px;
-    overflow-x: hidden;
+    width: 200px;
 
-    div.potential-topic {
-      font-family: $oc_headers_font;
-      font-size: 14px;
-      line-height: 1.7;
+    div.add-topic-popover-subheader {
+      opacity: 0.2;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 1px;
       color: $oc_gray_5;
-      padding-top: 6px;
-      padding-left: 19px;
-      background-color: #ffffff;
+      padding: 7px 0 7px 19px;
+      text-align: left;
 
-      &.highlighted {
-        background-color: rgba(78, 90, 107, 0.2);
+      &:first-child {
+        padding-top: 15px;
+      }
+    }
+
+    div.topics-to-add{
+      text-align: left;
+      padding-bottom: 6px;
+      overflow-x: hidden;
+
+      div.potential-topic {
+        font-family: $oc_headers_font;
+        font-size: 14px;
+        line-height: 1.7;
+        color: $oc_gray_5;
+        padding-top: 3px;
+        padding-bottom: 3px;
+        padding-left: 19px;
+        background-color: #ffffff;
+
+        &.highlighted {
+          background-color: rgba(78, 90, 107, 0.2);
+        }
       }
     }
   }

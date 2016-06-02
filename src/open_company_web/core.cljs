@@ -11,14 +11,15 @@
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]
-            [open-company-web.lib.raven :refer (raven-setup)]
+            [open-company-web.lib.raven :as sentry]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.company-editor :refer (company-editor)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.company-profile :refer (company-profile)]
             [open-company-web.components.su-edit :refer (su-edit)]
-            [open-company-web.components.stakeholder-update :refer (stakeholder-update)]
             [open-company-web.components.su-list :refer (su-list)]
+            [open-company-web.components.su-snapshot-preview :refer (su-snapshot-preview)]
+            [open-company-web.components.su-snapshot :refer (su-snapshot)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
@@ -28,7 +29,7 @@
 (enable-console-print!)
 
 ;; setup Sentry error reporting
-(defonce raven (raven-setup))
+(defonce raven (sentry/raven-setup))
 
 (defn check-get-params [query-params]
   (when (contains? query-params :browser-type)
@@ -117,6 +118,7 @@
     ;; do we have the company data already?
     (when (not (get-in @dis/app-state su-key))
       ;; load the company data from the API
+      (api/get-company slug)
       (api/get-stakeholder-update slug update-slug)
       (let [su-loading-key (conj su-key :loading)]
         (swap! dis/app-state assoc-in su-loading-key true)))
@@ -157,6 +159,9 @@
     (defroute company-profile-route (urls/company-profile ":slug") {:as params}
       (company-handler "profile" target company-profile params))
 
+    (defroute su-snapshot-preview-route (urls/stakeholder-update-preview ":slug") {:as params}
+      (company-handler "su-snapshot-preview" target su-snapshot-preview params))
+
     (defroute su-list-route (urls/stakeholder-update-list ":slug") {:as params}
       (company-handler "su-list" target su-list params))
 
@@ -164,7 +169,7 @@
       (company-handler "su-edit" target su-edit params))
 
     (defroute stakeholder-update-route (urls/stakeholder-update ":slug" ":update-slug") {:as params}
-      (stakeholder-update-handler target stakeholder-update params))
+      (stakeholder-update-handler target su-snapshot params))
 
     (defroute not-found-route "*" []
       ;; render component
@@ -180,6 +185,7 @@
                                  company-route
                                  company-route-slash
                                  company-profile-route
+                                 su-snapshot-preview-route
                                  su-edit-route
                                  su-list-route
                                  stakeholder-update-route
@@ -204,7 +210,8 @@
         ; check if the user is logged in
         (login-wall)
         ;; dispatch on the token
-        (route-dispatch! (router/get-token))))))
+        (route-dispatch! (router/get-token)))))
+  (sentry/capture-message "Error: div#app is not defined!"))
 
 ;; setup the router navigation only when handle-url-change and route-disaptch!
 ;; are defined, this is used to avoid crash on tests

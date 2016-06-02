@@ -15,19 +15,33 @@
   (cook/remove-cookie! :jwt)
   (.reload js/location))
 
+(defn close-menu []
+  (put! (utils/get-channel "close-side-menu") {:close true}))
+
 (defn profile-click [e]
   (.preventDefault e)
-  (put! (utils/get-channel "close-side-menu") {:close true})
+  (.stopPropagation e)
+  (close-menu)
   (router/nav! oc-urls/user-profile))
+
+(defn company-profile-click [e]
+  (.preventDefault e)
+  (.stopPropagation e)
+  (close-menu)
+  (router/nav! (oc-urls/company-profile)))
 
 (defcomponent menu [_ owner options]
   (render [_]
     (dom/ul {:id "menu"}
+      (dom/li {:class "oc-title"} "OpenCompany")
       (when (jwt/jwt)
-        (dom/li {} (dom/a {:title "PROFILE" :href oc-urls/user-profile :on-click profile-click} "PROFILE")))
+        (dom/li {:class "menu-link"} (dom/a {:title "PROFILE" :href oc-urls/user-profile :on-click profile-click} "PROFILE")))
+      (when (and (router/current-company-slug)
+                 (not (utils/in? (:route @router/path) "profile")))
+        (dom/li {:class "menu-link"} (dom/a {:title "COMPANY PROFILE" :href (oc-urls/company-profile) :on-click company-profile-click} "COMPANY PROFILE")))
       (when (jwt/jwt)
-        (dom/li {} (dom/a {:title "SIGN OUT" :href oc-urls/logout :on-click logout-click} "SIGN OUT")))
+        (dom/li {:class "menu-link"} (dom/a {:title "SIGN OUT" :href oc-urls/logout :on-click logout-click} "SIGN OUT")))
       (when-not (jwt/jwt)
-        (dom/li {} (dom/a {:title "SIGN IN / SIGN UP" :href oc-urls/login} "SIGN IN / SIGN UP")))
+        (dom/li {:class "menu-link"} (dom/a {:title "SIGN IN / SIGN UP" :href oc-urls/login} "SIGN IN / SIGN UP")))
       ; (dom/li {} (dom/a {:title "ABOUT US" :href oc-urls/about} "ABOUT US"))
-      (dom/li {} (dom/a {:title "CONTACT" :href oc-urls/contact-mail-to} "CONTACT")))))
+      (dom/li {:class "menu-link"} (dom/a {:title "CONTACT" :href oc-urls/contact-mail-to} "CONTACT")))))

@@ -107,9 +107,7 @@ div.fullscreen-topic-edit {
       margin-top: 10px;
 
       div.table-container{
-        width: 100%;
-        background-color: rgba(78, 90, 107, 0.05);
-        padding: 21px 10px 0px 10px;
+        padding: 21px 0px 0px 0px;
       }
 
       table.table{
@@ -117,6 +115,7 @@ div.fullscreen-topic-edit {
         max-width: 100%;
         width: auto;
         float: left;
+        background-color: rgba(78, 90, 107, 0.05);
 
         * {
           border: 0px solid transparent;

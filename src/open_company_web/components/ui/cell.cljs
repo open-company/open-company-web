@@ -38,11 +38,17 @@
 (defn check-value [current initial]
   (or (= current initial) (and (s/blank? initial) (s/blank? current))))
 
+(defn trim-commas [v]
+  (if (string? v)
+    (.replace v (new js/RegExp "," "g") "")
+    v))
+
 (defn exit-cell [e owner data]
   (let [raw-value (.. e -target -value)
-        parsed-value (if (s/blank? raw-value)
-                       raw-value
-                       (.parseFloat js/window raw-value))
+        cleaned-value (trim-commas raw-value)
+        parsed-value (if (s/blank? cleaned-value)
+                       cleaned-value
+                       (.parseFloat js/window cleaned-value))
         init-value (om/get-state owner :inital-value)
         ; if the value is the same as it was at the start
         ; go to the :display state, else go to :draft
@@ -61,10 +67,11 @@
     (to-state owner data state)))
 
 (defn safe-parse-float [value]
-  (let [flv (js/parseFloat value)]
-    (if (js/isNaN flv)
+  (let [cleaned-value (trim-commas value)
+        float-value (js/parseFloat cleaned-value)]
+    (if (js/isNaN float-value)
       0
-      flv)))
+      float-value)))
 
 (defcomponent cell [data owner]
 
@@ -83,9 +90,8 @@
         (.setTimeout js/window #(to-state owner data :edit) 100)
         (recur)))))
 
-  (render [_]
-    (let [value (om/get-state owner :value)
-          flv (safe-parse-float value)
+  (render-state [_ {:keys [value cell-state]}]
+    (let [flv (safe-parse-float value)
           prefix (:prefix data)
           currency (:currency data)
           formatted-value (if currency
@@ -96,10 +102,9 @@
                          formatted-value)
           final-value (if (and (not (s/blank? formatted-value)) (:suffix data))
                         (str prefix-value (:suffix data))
-                        prefix-value)
-          state (om/get-state owner :cell-state)]
+                        prefix-value)]
       (dom/div {:class "comp-cell"}
-        (case state
+        (case cell-state
 
           :new
           (dom/div {:class "comp-cell-int state-new"

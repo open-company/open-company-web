@@ -1,7 +1,8 @@
 div.topic-body-inner{
   p{
     @include rich-editor-body();
-    padding: 0 20px !important;
+    padding: 5px 20px !important;
+    line-height: 1.2 !important;
   }
 }
 div.section-container{

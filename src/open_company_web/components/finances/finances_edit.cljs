@@ -32,10 +32,12 @@
                      (when next-period
                        (signal-tab next-period :cash))))
           burn (- (:revenue finances-data) (:costs finances-data))
-          burn-prefix (if (neg? burn) (str "-" prefix) prefix)
+          burn-prefix (if (or (zero? burn) (pos? burn)) prefix (str "-" prefix))
           burn-rate (if (js/isNaN burn)
                       "calculated"
-                      (str burn-prefix (utils/thousands-separator (utils/abs burn))))
+                      (if (zero? burn)
+                        (str burn-prefix "0")
+                        (str burn-prefix (utils/thousands-separator (utils/abs burn)))))
           runway-days (:runway finances-data)
           runway (cond
                    (nil? runway-days) "calculated"
@@ -83,9 +85,8 @@
                           :key :costs
                           :tab-cb tab-cb}))
         ;; Burn
-        (when (:show-burn data)
-          (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
-            burn-rate))
+        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
+          burn-rate)
         ;; Runway
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
                 runway)))))
@@ -111,8 +112,7 @@
       (om/set-state! owner :finances-data (:finances-data next-props))))
 
   (render-state [_ {:keys [finances-data stop]}]
-    (let [currency (:currency data)
-          show-burn (some #(pos? (:revenue %)) finances-data)]
+    (let [currency (:currency data)]
       ; real component
       (dom/div {:class "finances"}
         (dom/div {:class "composed-section-edit finances-body edit"}
@@ -124,8 +124,7 @@
                   (dom/th {} "Cash")
                   (dom/th {} "Revenue")
                   (dom/th {} "Costs")
-                  (when show-burn
-                    (dom/th {} "Burn"))
+                  (dom/th {} "Cash flow")
                   (dom/th {} "Runway")))
               (dom/tbody {}
                 (let [current-period (utils/current-period)]
@@ -142,7 +141,6 @@
                                                    :needs-year (or (= idx 0)
                                                                    (= idx (dec stop)))
                                                    :currency currency
-                                                   :show-burn show-burn
                                                    :change-cb #(replace-row-in-data data row-data %1 %2)}))))
                 (dom/tr {}
                   (dom/td {}
@@ -150,6 +148,5 @@
                   (dom/td {})
                   (dom/td {})
                   (dom/td {})
-                  (when show-burn
-                    (dom/th {} ""))
+                  (dom/th {})
                   (dom/td {}))))))))))

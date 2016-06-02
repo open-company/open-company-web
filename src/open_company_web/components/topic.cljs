@@ -18,7 +18,8 @@
             [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as EventType]
             [goog.events :as events]
-            [goog.style :as gstyle]))
+            [goog.style :as gstyle]
+            [cljsjs.react.dom]))
 
 (defcomponent topic-headline [data owner]
   (render [_]
@@ -41,7 +42,7 @@
 (defn setup-card! [owner section]
   (when-not (utils/is-test-env?)
     (when-not (om/get-state owner :image-header)
-      (when-let [body (om/get-ref owner "topic-body")]
+      (when-let [body (.findDOMNode js/ReactDOM (om/get-ref owner "topic-body"))]
         (js/$clamp body #js {"clamp" 2 "splitOnChars" #js ["." "," " "]}))
       (let [section-kw (keyword section)]
         (when-not (#{:finances :growth} section-kw)
@@ -63,7 +64,8 @@
   (render-state [_ {:keys [image-header]}]
     (let [section-kw          (keyword section)
           topic-body          (utils/get-topic-body topic-data section-kw)
-          stripped-topic-body (utils/strip-HTML-tags topic-body)
+          stripped-topic-body (or (utils/strip-HTML-tags topic-body) "")
+          fixed-topic-body    (.replace stripped-topic-body (js/RegExp. "\\s\\s+" "g") " ")
           chart-opts          {:chart-size {:width  260
                                             :height 196}
                                :hide-nav true
@@ -94,7 +96,7 @@
                       :dangerouslySetInnerHTML #js {"__html" topic-body}})
         (dom/div #js {:className "topic-body"
                       :ref "topic-body"
-                      :dangerouslySetInnerHTML (utils/emojify stripped-topic-body)})))))
+                      :dangerouslySetInnerHTML (utils/emojify fixed-topic-body)})))))
 
 (defn topic-click [options selected-metric]
   ((:topic-click options) selected-metric))
@@ -141,13 +143,13 @@
 (def popover-max-height 312)
 
 (defn show-popover-above? [owner]
-  (let [topic-list (sel1 [:div.topic-list])
-        topic-list-height (.-clientHeight topic-list)
-        popover-offsettop (.-offsetTop (om/get-ref owner "topic"))]
-    (and (> topic-list-height popover-max-height)
-         (neg? (- topic-list-height popover-offsettop popover-max-height)))))
+  (let [scroll             (.-scrollTop (.-body js/document))
+        win-height        (- (.-clientHeight (.-documentElement js/document)) (.-clientHeight (sel1 [:nav.oc-navbar])) 4)
+        popover-offsettop (.-offsetTop (om/get-ref owner "topic"))
+        add-topic-pos     (- popover-offsettop scroll)]
+    (> add-topic-pos (/ win-height 2))))
 
-(defcomponent topic [{:keys [active-category active-topics section-data section currency column] :as data} owner options]
+(defcomponent topic [{:keys [active-topics section-data section currency column sharing-mode share-selected archived-topics] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
@@ -185,17 +187,21 @@
                   next-rev
                   (not (contains? revisions-list (:updated-at next-rev))))
         (api/load-revision next-rev slug section-kw))
-      (dom/div #js {:className (str "topic group" (when add-topic? (str " add-topic" (when show-add-topic-popover " active"))))
+      (dom/div #js {:className (utils/class-set {:topic true
+                                                 :group true
+                                                 :add-topic add-topic?
+                                                 :sharing-selected (and sharing-mode share-selected)
+                                                 :active (and add-topic? show-add-topic-popover)})
                     :ref "topic"
                     :onClick #(if add-topic?
                                 (add-topic owner)
                                 (topic-click options nil))}
         (when show-add-topic-popover
           (let [all-sections (get-all-sections slug)
-                category-topics (flatten (vals active-topics))
                 update-active-topics (:update-active-topics options)
                 list-data {:all-topics all-sections
-                           :active-topics-list category-topics
+                           :active-topics-list active-topics
+                           :archived-topics archived-topics
                            :show-above (show-popover-above? owner)
                            :column column}
                 list-opts {:did-change-active-topics update-active-topics
