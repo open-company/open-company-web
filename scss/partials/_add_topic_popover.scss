@@ -108,7 +108,7 @@ div.add-topic-popover {
         background-color: #ffffff;
 
         &.highlighted {
-          background-color: rgba(78, 90, 107, 0.2);
+          background-color: rgba(249, 215, 72, 0.2);
         }
       }
     }
@@ -128,13 +128,11 @@ div.add-topic-popover {
       padding: 7px 0px 25px 20px;
 
       input {
-        opacity: 0.3;
         font-family: $oc_headers_font;
         font-size: 14px;
         line-height: 1.7;
-        color: $oc_gray_5;
         outline: none;
-        border: 1px solid rgba(78, 90, 107, 0.5);
+        border: 1px solid rgba(78, 90, 107, 0.3);
         border-radius: 2px;
         color: black;
 
