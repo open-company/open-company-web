@@ -324,7 +324,8 @@
                                          (om/set-state! owner :has-changes true)))
     (js/emojiAutocomplete)
     (om/set-state! owner :initial-body (.-innerHTML body-el))
-    (om/set-state! owner :medium-editor med-ed)))
+    (om/set-state! owner :medium-editor med-ed))
+  (utils/after 200 #(focus-headline owner)))
 
 (defcomponent topic-overlay-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
 
@@ -391,6 +392,7 @@
         (om/set-state! owner :history-listener-id listener))))
 
   (did-update [_ _ prev-state]
+    (setup-medium-editor owner data)
     (let [has-changes (om/get-state owner :has-changes)]
       (when-not (= (:has-changes prev-state) has-changes)
         ((:show-save-button options) has-changes))))
