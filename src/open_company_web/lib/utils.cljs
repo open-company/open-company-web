@@ -313,6 +313,10 @@
         delete (link-for links "delete" "DELETE")]
     (or (nil? update) (nil? partial-update))))
 
+(defn as-of-now []
+  (let [date (js-date)]
+    (.toISOString date)))
+
 (defn fix-finances [section-body]
   (let [finances-data (if (contains? section-body :data) (:data section-body) [])
         fixed-finances (calc-burnrate-runway finances-data)
@@ -328,7 +332,10 @@
   (let [read-only (if force-write
                     false
                     (or read-only (readonly? (:links section-body)) false))
-        with-read-only (-> section-body
+        with-updated-at (if (contains? section-body :updated-at)
+                          section-body
+                          (assoc section-body :updated-at (as-of-now)))
+        with-read-only (-> with-updated-at
                         (assoc :section (name section-name))
                         (assoc :as-of (:updated-at section-body))
                         (assoc :read-only read-only))]
@@ -374,10 +381,6 @@
                               (let [idx (.indexOf (to-array revisions) r)]
                                 (get revisions (dec idx)))))
                           revisions)))))
-
-(defn as-of-now []
-  (let [date (js-date)]
-    (.toISOString date)))
 
 (defn px [n]
   (str n "px"))
