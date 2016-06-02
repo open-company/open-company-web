@@ -80,16 +80,19 @@
           (dismiss-popover options)
           :else
           ; arrow key: change focus and scroll the parent div
-          (let [cur-highlighted  (om/get-state owner :highlighted-topic)
-                idx-fn           (cond
-                                   (= key-code down-arrow-key-code) inc
-                                   (= key-code up-arrow-key-code) dec)
-                min-idx          0
-                max-idx          (dec (count unactive-topics))
-                next-highlighted (min (max (idx-fn cur-highlighted) min-idx) max-idx)
-                topics-to-add    (om/get-ref owner "topics-to-add")
-                new-topic-div    (om/get-ref owner (str "potential-topic-" next-highlighted))]
-            (set! (.-scrollTop topics-to-add) (- (.-offsetTop new-topic-div) (.-offsetTop topics-to-add)))
+          (let [all-topics            (vec (concat (vec (om/get-state owner :unactive-topics)) (vec (om/get-state owner :archived-topics-list))))
+                cur-highlighted-topic (om/get-state owner :highlighted-topic)
+                cur-highlighted       (.indexOf (to-array all-topics) cur-highlighted-topic)
+                idx-fn                (cond
+                                        (= key-code down-arrow-key-code) inc
+                                        (= key-code up-arrow-key-code) dec)
+                min-idx               0
+                max-idx               (dec (count all-topics))
+                next-highlighted-idx  (min (max (idx-fn cur-highlighted) min-idx) max-idx)
+                next-highlighted      (get all-topics next-highlighted-idx)
+                new-topic-div         (om/get-ref owner (str "potential-topic-" next-highlighted))
+                topics-to-add        (om/get-ref owner "add-topic-popover-scroll")]
+            (set! (.-scrollTop topics-to-add) (- (.-offsetTop new-topic-div) (.-offsetTop topics-to-add) 40))
             (cond
               (= key-code down-arrow-key-code)
               (om/set-state! owner :highlighted-topic next-highlighted)
@@ -115,8 +118,9 @@
             topic-title (om/get-state owner :custom-topic-title)
             company-data (dis/company-data)
             sections (:sections company-data)
-            new-sections (update-in sections [:progress] #(conj % topic-name))]
-        (api/patch-sections new-sections))
+            new-sections (update-in sections [:progress] #(conj % topic-name))
+            new-topic-data {:title topic-title :headline "" :body ""}]
+        (api/patch-sections new-sections new-topic-data topic-name))
       (= key-code esc-key-code)
       ; ESC: exit adding topic
       (om/set-state! owner :adding-custom-topic false))))
@@ -161,29 +165,31 @@
               :on-click (partial on-click-in owner options)}
       (dom/div {:class "triangle"})
       (dom/div {:class "add-topic-popover-header"} "CHOOSE A TOPIC")
-      (dom/div {:class "add-topic-popover-scroll group"}
+      (dom/div #js {:className "add-topic-popover-scroll group"
+                    :ref "add-topic-popover-scroll"}
         (dom/div {:class "add-topic-popover-subheader"} "SUGGESTED TOPICS")
-        (dom/div #js {:className "topics-to-add"
-                      :ref "topics-to-add"}
+        (dom/div {:class "topics-to-add"}
           (for [idx (range (count unactive-topics))
                 :let [topic (get (vec unactive-topics) idx)
                       topic-data (->> topic keyword (get all-topics))]]
             (dom/div #js {:className (str "potential-topic" (when (= highlighted-topic topic) " highlighted"))
-                          :ref (str "potential-topic-unactive-" idx)
+                          :ref (str "potential-topic-" topic)
+                          :data-topic topic
                           :onMouseOver #(om/set-state! owner :highlighted-topic topic)
                           :onClick #(add-topic-click owner options topic)}
+
               (:title topic-data))))
         (when (pos? (count archived-topics-list))
           (dom/div {:class "add-topic-popover-subheader"} "ARCHIVED TOPICS"))
         (when (pos? (count archived-topics-list))
-          (dom/div #js {:className "topics-to-add"
-                        :ref "topics-to-add"}
+          (dom/div {:class "topics-to-add"}
             (for [idx (range (count archived-topics-list))
                   :let [topic (get (vec archived-topics-list) idx)
                         topic-data (->> topic keyword (get all-topics))
                         topic-title (:title (first (filter #(= (:section %) topic) archived-topics)))]]
               (dom/div #js {:className (str "potential-topic" (when (= highlighted-topic topic) " highlighted"))
-                            :ref (str "potential-topic-archived-" idx)
+                            :ref (str "potential-topic-" topic)
+                            :data-topic topic
                             :onMouseOver #(om/set-state! owner :highlighted-topic topic)
                             :onClick #(add-topic-click owner options topic)}
                 topic-title))))
