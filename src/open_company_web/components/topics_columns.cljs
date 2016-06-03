@@ -44,21 +44,36 @@
   {:delta (- (apply max (:total-heights partition)) (apply min (:total-heights partition)))
    :arrangement (:arrangement partition)})
 
-(defn calc-partitions [owner]
-  (let [columns-num (om/get-props owner :columns-num)
-        topics-row (sel [:div.topic-row])
-        topics (vec (map #(hash-map :topic (keyword (.-topic (.-dataset %))) :height (.-clientHeight %)) topics-row))
-        add-topic (add-topic? owner)
-        partitions (combo/partitions topics :max columns-num :min columns-num)
-        heights (map calc-total-height partitions)
-        fixed-heights (if add-topic
+(defn real-calcs [topics add-topic columns-num]
+  (println (js/Date.) "combo/partitions" topics)
+  (let [partitions (combo/partitions topics :max columns-num :min columns-num)]
+    (println (js/Date.) "calc-total-height")
+    (let [heights (map calc-total-height partitions)]
+      (when add-topic
+        (println (js/Date.) "calc-with-add-a-topic"))
+      (let [fixed-heights (if add-topic
                         (map calc-with-add-a-topic heights)
-                        heights)
-        deltas (map calc-delta-height fixed-heights)
-        best-layout (apply min-key :delta deltas)
-        out (map #(map :topic %) (:arrangement best-layout))
-        max-lenght (apply max (map count out))]
-    (apply concat (map (fn [x] (apply conj [] (map (fn [v] (get (vec v) x)) out))) (range max-lenght)))))
+                        heights)]
+        (println (js/Date.) "calc-delta-height")
+        (let [deltas (map calc-delta-height fixed-heights)]
+          (println (js/Date.) "min-key")
+          (let [best-layout (apply min-key :delta deltas)]
+            (println (js/Date.) "final calcs (get :arrangement and calc max vec lenght)")
+            (let [out (map #(map :topic %) (:arrangement best-layout))
+                  max-lenght (apply max (map count out))]
+            (println (js/Date.) "init last calculation (map the result to a single array with one of each)")
+            (let [last-calc (apply concat (map (fn [x] (apply conj [] (map (fn [v] (get (vec v) x)) out))) (range max-lenght)))]
+              (println (js/Date.) "retur value")
+              last-calc))))))))
+
+(defn calc-partitions [owner]
+  (println (js/Date.) "init calc-partitions")
+  (let [columns-num (om/get-props owner :columns-num)
+        topics-row (sel [:div.topic-row])]
+    (println (js/Date.) "get all card divs" (count topics-row))
+    (let [topics (vec (map #(hash-map :topic (keyword (.-topic (.-dataset %))) :height (.-clientHeight %)) topics-row))
+          add-topic (add-topic? owner)]
+      (real-calcs topics add-topic columns-num))))
 
 (defn img-onload-cb [owner src]
   (when-not (utils/in? (om/get-state owner :imgs) src)
