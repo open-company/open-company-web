@@ -46,24 +46,24 @@
 
 (defn real-calcs [topics add-topic columns-num]
   (println (js/Date.) "combo/partitions" topics)
-  (let [partitions (combo/partitions topics :max columns-num :min columns-num)]
+  (let [partitions (apply list (combo/partitions topics :max columns-num :min columns-num))]
     (println (js/Date.) "calc-total-height")
-    (let [heights (map calc-total-height partitions)]
+    (let [heights (apply list (map calc-total-height partitions))]
       (when add-topic
         (println (js/Date.) "calc-with-add-a-topic"))
       (let [fixed-heights (if add-topic
-                        (map calc-with-add-a-topic heights)
+                        (apply list (map calc-with-add-a-topic heights))
                         heights)]
         (println (js/Date.) "calc-delta-height")
-        (let [deltas (map calc-delta-height fixed-heights)]
+        (let [deltas (apply list (map calc-delta-height fixed-heights))]
           (println (js/Date.) "min-key")
-          (let [best-layout (apply min-key :delta deltas)]
+          (let [best-layout (apply list (apply min-key :delta deltas))]
             (println (js/Date.) "final calcs (get :arrangement and calc max vec lenght)")
             (let [out (map #(map :topic %) (:arrangement best-layout))
                   max-lenght (apply max (map count out))]
             (println (js/Date.) "init last calculation (map the result to a single array with one of each)")
             (let [last-calc (apply concat (map (fn [x] (apply conj [] (map (fn [v] (get (vec v) x)) out))) (range max-lenght)))]
-              (println (js/Date.) "retur value")
+              (println (js/Date.) "retur value" last-calc)
               last-calc))))))))
 
 (defn calc-partitions [owner]
