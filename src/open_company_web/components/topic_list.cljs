@@ -62,7 +62,7 @@
      :tr-selected-topic nil
      :sharing-mode (or (:sharing-mode current-state) false)
      :topic-navigation (or (:topic-navigation current-state) true)
-     :share-selected-topics (:sections (:stakeholder-update company-data))
+     :share-selected-topics (map keyword (:sections (:stakeholder-update company-data)))
      :transitioning false
      :redirect-to-preview false
      :fullscreen-force-edit false}))
