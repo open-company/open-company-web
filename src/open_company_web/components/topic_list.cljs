@@ -199,9 +199,10 @@
   (render-state [_ {:keys [active-topics selected-topic selected-metric tr-selected-topic transitioning sharing-mode share-selected-topics redirect-to-preview fullscreen-force-edit]}]
     (let [company-data    (:company-data data)
           topics-list     (flatten (vals active-topics))
-          category-topics (if sharing-mode
-                            (filter-placeholder-sections topics-list company-data)
-                            topics-list)
+          category-topics (map keyword
+                            (if sharing-mode
+                              (filter-placeholder-sections topics-list company-data)
+                              topics-list))
           card-width      (:card-width data)
           columns-num     (:columns-num data)
           ww              (.-clientWidth (sel1 js/document :body))
