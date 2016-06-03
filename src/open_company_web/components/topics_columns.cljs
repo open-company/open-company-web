@@ -87,7 +87,7 @@
                                         :updated-at 0
                                         :headline ""}
                           :currency (:currency company-data)
-                          :active-topics topics}
+                          :active-topics (map name topics)}
                          {:opts {:section-name section-name
                                  :topic-click (partial topic-click section-name)
                                  :update-active-topics update-active-topics}})
@@ -120,6 +120,10 @@
       (when-not (om/get-state owner :best-partition)
         (om/set-state! owner :best-partition (calc-partitions owner)))
       (om/set-state! owner :best-partition (vec topics))))
+
+  (will-receive-props [_ next-props]
+    (when (not= (:topics next-props) (:topics data))
+      (om/set-state! owner :best-partition false)))
 
   (render-state [_ {:keys [best-partition]}]
     (let [show-add-topic     (add-topic? owner)
