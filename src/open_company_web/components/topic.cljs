@@ -84,7 +84,7 @@
               (= section "growth")
               (om/build topic-growth {:section-data topic-data :section section} {:opts chart-opts})
               :else
-              (dom/img {:src image-header}))))
+              (dom/img {:src image-header :class "topic-header-img" :on-load #((:img-onload-cb options) image-header)}))))
         ;; Topic title
         (dom/div {:class "topic-title"} (:title topic-data))
         ;; Topic headline
