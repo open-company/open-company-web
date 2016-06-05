@@ -39,13 +39,16 @@
         new-categories (apply merge (map #(hash-map (first %) (utils/vec-dissoc (second %) topic)) old-categories))]
     (api/patch-sections new-categories)))
 
-(defn update-active-topics [owner category-name new-topic]
+(defn update-active-topics [owner category-name new-topic & [section-data]]
   (let [company-data (om/get-props owner :company-data)
         old-categories (:sections company-data)
         old-topics (get-active-topics company-data category-name)
         new-topics (concat old-topics [new-topic])
         new-categories (assoc old-categories (keyword category-name) new-topics)]
-    (api/patch-sections new-categories)))
+    (dispatcher/set-force-edit-topic new-topic)
+    (if section-data
+      (api/patch-sections new-categories section-data new-topic)
+      (api/patch-sections new-categories))))
 
 (defn get-state [data current-state]
   (let [company-data (:company-data data)
@@ -184,8 +187,10 @@
     (when-not (:read-only (:company-data next-props))
       (get-new-sections-if-needed owner))
     (when (:force-edit-topic next-props)
-      (om/set-state! owner :fullscreen-force-edit true)
-      (om/set-state! owner :selected-topic (dispatcher/force-edit-topic))))
+      (let [company-data (:company-data next-props)]
+        (when (contains? company-data (keyword (:force-edit-topic next-props)))
+          (om/set-state! owner :fullscreen-force-edit true)
+          (om/set-state! owner :selected-topic (dispatcher/force-edit-topic))))))
 
   (did-update [_ _ _]
     (when (om/get-state owner :tr-selected-topic)
@@ -240,7 +245,6 @@
         (when selected-topic
           (dom/div {:class "selected-topic-container"
                     :style #js {:opacity (if selected-topic 1 0)}}
-            (when selected-topic
               (dom/div #js {:className "selected-topic"
                             :key (str "transition-" selected-topic)
                             :ref "selected-topic"
@@ -256,7 +260,7 @@
                                            {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                    :topic-edit-cb (:topic-edit-cb options)
                                                    :remove-topic (partial remove-topic owner)
-                                                   :topic-navigation #(om/set-state! owner :topic-navigation %)}})))
+                                                   :topic-navigation #(om/set-state! owner :topic-navigation %)}}))
             ;; Fullscreen topic for transition
             (when tr-selected-topic
               (dom/div #js {:className "tr-selected-topic"
