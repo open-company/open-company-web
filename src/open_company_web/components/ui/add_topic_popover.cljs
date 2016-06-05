@@ -56,7 +56,7 @@
 (defn add-topic-click [owner options topic]
   (let [all-topics (om/get-props owner :all-topics)
         topic-data (->> topic keyword (get all-topics))
-        category-name (:category topic-data)]
+        category-name (or (:category topic-data) "progress")]
     ((:did-change-active-topics options) category-name topic)
     (dismiss-popover options)))
 
@@ -111,21 +111,17 @@
   (.stopPropagation e)
   (om/set-state! owner :adding-custom-topic true))
 
-(defn custom-topic-key-down [owner e]
+(defn custom-topic-key-down [owner options e]
   (.stopPropagation e)
   (let [key-code (.-keyCode e)]
     (cond
       (and (= key-code enter-key-code)
            (pos? (count (om/get-state owner :custom-topic-title))))
-      ; TODO: add title
+      ; ENTER: add custom topic
       (let [topic-name (str "custom-" (utils/my-uuid))
             topic-title (om/get-state owner :custom-topic-title)
-            company-data (dis/company-data)
-            sections (:sections company-data)
-            new-sections (update-in sections [:progress] #(conj % topic-name))
-            new-topic-data {:title topic-title :headline "" :body ""}]
-        (dis/set-force-edit-topic topic-name)
-        (api/patch-sections new-sections new-topic-data topic-name))
+            new-topic-data {:title (str topic-title) :headline "" :body ""}]
+        ((:did-change-active-topics options) :progress topic-name new-topic-data))
       (= key-code esc-key-code)
       ; ESC: exit adding topic
       (om/set-state! owner :adding-custom-topic false))))
@@ -225,5 +221,5 @@
                             :ref "add-custom-topic-input"
                             :value custom-topic-title
                             :onChange #(om/set-state! owner :custom-topic-title (.-value (.-target %)))
-                            :onKeyDown  (partial custom-topic-key-down owner)
+                            :onKeyDown  (partial custom-topic-key-down owner options)
                             :placeholder "Topic title"})))))))
