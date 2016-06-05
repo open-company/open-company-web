@@ -392,7 +392,8 @@
         (om/set-state! owner :history-listener-id listener))))
 
   (did-update [_ _ prev-state]
-    (setup-medium-editor owner data)
+    (when-not (om/get-state owner :medium-editor)
+      (setup-medium-editor owner data))
     (let [has-changes (om/get-state owner :has-changes)]
       (when-not (= (:has-changes prev-state) has-changes)
         ((:show-save-button options) has-changes))))
