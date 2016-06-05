@@ -141,7 +141,8 @@
     (utils/add-channel (str "fullscreen-topic-save-" (name section)) (chan))
     (utils/add-channel (str "fullscreen-topic-cancel-" (name section)) (chan))
     (when (:fullscreen-force-edit data)
-      (dis/set-force-edit-topic nil))
+      (dis/set-force-edit-topic nil)
+      ((:topic-navigation options) false))
     {:as-of (:updated-at section-data)
      :transition-as-of nil
      :editing (:fullscreen-force-edit data)
