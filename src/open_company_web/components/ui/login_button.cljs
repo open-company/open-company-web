@@ -15,7 +15,7 @@
       (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
     (set! (.-location js/window) auth-url)))
 
-(defcomponent login-button [{:keys [auth-settings]} _]
+(defcomponent login-button [{:keys [auth-settings]} owner]
   (render [_]
     (dom/button {:class "login-button" :on-click #(login! (:auth-url auth-settings) %)}
       "Sign in / Sign up")))
