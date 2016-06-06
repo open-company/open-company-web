@@ -15,17 +15,7 @@
             [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.ui.user-avatar :refer (user-avatar)]
             [open-company-web.components.ui.login-button :refer (login-button)]
-            [open-company-web.components.ui.company-avatar :refer (company-avatar)]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]))
-
-(defn on-transition-end [owner body]
-  (doto body
-    (dommy/remove-class! :left)
-    (dommy/remove-class! :right)
-    (dommy/remove-class! :animating)
-    (dommy/toggle-class! :menu-visible))
-  (events/unlistenByKey (om/get-state owner :transition-end-listener)))
+            [open-company-web.components.ui.company-avatar :refer (company-avatar)]))
 
 (defn close-preview-clicked [e]
   (.preventDefault e)
@@ -35,17 +25,9 @@
 (defn menu-click [owner e]
   (when e
     (.preventDefault e))
-  (let [body (sel1 [:body])
-        page (sel1 [:div.page])
-        menu (sel1 [:ul#menu])]
-    (dommy/add-class! body :animating)
-    (if (dommy/has-class? body :menu-visible)
-      (dommy/add-class! body :right)
-      (dommy/add-class! body :left))
-    (let [listener-key (events/listen page EventType/TRANSITIONEND #(on-transition-end owner body))]
-      (om/set-state! owner :transition-end-listener listener-key))))
+  (dis/toggle-menu))
 
-(defcomponent navbar [{:keys [company-data columns-num card-width latest-su email-loading slack-loading] :as data} owner options]
+(defcomponent navbar [{:keys [company-data columns-num card-width latest-su email-loading slack-loading menu-open] :as data} owner options]
 
   (init-state [_]
     (utils/add-channel "close-side-menu" (chan)))
