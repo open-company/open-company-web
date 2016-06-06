@@ -106,6 +106,7 @@
                           {:loading (or (:loading company-data) (:loading data))
                            :company-data company-data
                            :latest-su (dis/latest-stakeholder-update)
+                           :force-edit-topic (:force-edit-topic data)
                            :card-width card-width
                            :columns-num columns-num
                            :active-category (:active-category state)}
