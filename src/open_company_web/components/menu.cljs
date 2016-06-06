@@ -13,14 +13,15 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
+(defn close-menu []
+  (dis/toggle-menu))
+
 (defn logout-click [e]
   (.preventDefault e)
   (.stopPropagation e)
   (cook/remove-cookie! :jwt)
-  (.reload js/location))
-
-(defn close-menu []
-  (dis/toggle-menu))
+  (close-menu)
+  (utils/after (+ utils/oc-animation-duration 100) #(.reload js/location)))
 
 (defn user-profile-click [e]
   (.preventDefault e)
