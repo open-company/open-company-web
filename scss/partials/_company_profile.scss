@@ -1,31 +1,6 @@
 /* Company profile */
 
 div.company-profile{
-  border-top: 4px solid $oc_yellow;
-  width: 100%;
-  height: auto;
-  background-color: white;
-  position: relative;
-
-  div.back-to-dashboard-row {
-    margin-top: 5px;
-    padding: 20px;
-
-    button.back-to-dashboard {
-      width: 200px;
-      height: 30px;
-      border: solid 1px rgba(78, 90, 107, 0.2);
-      font-weight: 700;
-      font-size: 12px;
-      line-height: 1.5;
-      letter-spacing: 1px;
-      color: rgba(78,90,107, 0.5);
-      margin: 0px;
-      padding: 0px;
-      background-color: white;
-      outline: none;
-    }
-  }
 
   div.profile-container {
     width: 600px;
