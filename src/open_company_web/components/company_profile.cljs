@@ -4,7 +4,7 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.ui.link :refer (link)]
-            [open-company-web.components.navbar :refer (navbar)]
+            [open-company-web.components.footer :refer (footer)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
             [open-company-web.urls :as oc-urls]
@@ -88,98 +88,63 @@
 
       (utils/update-page-title (str "OpenCompany - " company-name))
 
-      (dom/div {:class "profile-container"}
+      (dom/div {:class "profile-container group"}
+        (dom/div {:class "company-settings"} "Company Settings")
         ;; Company
-        (dom/div {:class "row"}
-          (dom/form {:class "form-horizontal"}
+        (dom/div {:class "company-form"}
 
-            ;; Company name
-            (dom/div {:class "form-group"}
-              (dom/label {:for "name" :class "col-sm-3 control-label oc-header"} "Company name")
-              (dom/div {:class "col-sm-3"}
-                (dom/input {
-                  :type "text"
-                  :id "name"
-                  :value company-name
-                  :on-change #(om/set-state! owner :company-name (.. % -target -value))
-                  :on-blur (fn [e]
-                             (utils/handle-change data company-name :company-name)
-                             (utils/save-values "save-company"))
-                  :class "form-control"}))
-              (dom/p {:class "help-block"} "Casual company name (leave out Inc., LLC, etc.)"))
+          ;; Company name
+          (dom/div {:class "company-name-title"} "COMPANY NAME")
+          (dom/input {:class "company-name"
+                      :type "text"
+                      :id "name"
+                      :value company-name
+                      :on-change #(om/set-state! owner :company-name (.. % -target -value))
+                      :on-blur (fn [e]
+                                 (utils/handle-change data company-name :company-name)
+                                 (utils/save-values "save-company"))})
 
-            ; Slug
-            (dom/div {:class "form-group"}
-              (dom/label {:for "slug" :class "col-sm-3 control-label oc-header"} "Company slug")
-              (dom/div {:class "col-sm-3"}
-                (dom/input {
-                  :type "text"
-                  :value (:slug data)
-                  :id "slug"
-                  :class "form-control"
-                  :disabled true}))
-              (dom/p {:class "help-block"} (str "https://opencompany.com/" (:slug data))))
+          ; Slug
+          (dom/div {:class "company-slug-title"} "COMPANY SLUG")
+          (dom/div {:class "company-slug"} (name slug))
 
-            ;; Currency
-            (dom/div {:class "form-group"}
-              (dom/label {:for "currency" :class "col-sm-3 control-label oc-header"} "Currency")
-              (dom/div {:class "col-sm-5"}
-                (dom/select {
-                  :type "file"
-                  :id "currency"
-                  :value (:currency data)
-                  :on-change (fn [e]
-                               (utils/change-value data e :currency)
-                               (utils/save-values "save-company"))
-                  :class "form-control"}
-                    (for [currency (sorted-iso4217)]
-                      (let [symbol (:symbol currency)
-                            display-symbol (or symbol (:code currency))
-                            label (str (:text currency) " " display-symbol)]
-                        (om/build currency-option {:value (:code currency) :text label})))))
-              (dom/p {:class "help-block"} "Currency for company finances"))
+          ;; Currency
+          (dom/div {:class "company-currency-title"} "DISPLAY CURRENCY IN")
+          (dom/select {:id "currency"
+                       :value (:currency data)
+                       :on-change (fn [e]
+                                   (utils/change-value data e :currency)
+                                   (utils/save-values "save-company"))
+                       :class "company-currency form-control"}
+            (for [currency (sorted-iso4217)]
+              (let [symbol (:symbol currency)
+                    display-symbol (or symbol (:code currency))
+                    label (str (:text currency) " " display-symbol)]
+                (om/build currency-option {:value (:code currency) :text label}))))
 
-            ;; Company logo
-            (dom/div {:class "form-group logo-container"}
-              (dom/label {:for "logo" :class "col-sm-3 control-label oc-header"} "Logo")
-              (dom/div {:class "col-sm-6"}
-                (dom/input {
-                  :type "text"
-                  :value logo
-                  :id "logo"
-                  :class "form-control"
-                  :maxLength 255
-                  :on-change #(om/set-state! owner :logo (.. % -target -value))
-                  :on-blur #(utils/save-values "save-company")
-                  :placeholder "http://example.com/logo.png"}))
-              (dom/div {:class "help-block logo-help-block"}
-                (when (:logo data)
-                  (dom/img {:class "logo-preview"
-                           :src (:logo data)}))
-                "180 pixels wide by 180 pixels high, or logo will be scaled"))
+          ;; Company logo
+          (dom/div {:class "company-logo-title"} "LOGO (180x180px)")
+          (dom/input {:type "text"
+                      :value logo
+                      :id "logo"
+                      :class "company-logo"
+                      :maxLength 255
+                      :on-change #(om/set-state! owner :logo (.. % -target -value))
+                      :on-blur #(utils/save-values "save-company")
+                      :placeholder "http://example.com/logo.png"})
 
-            ;; Company description
-            (dom/div {:class "form-group"}
-              (dom/label {:for "description" :class "col-sm-3 control-label oc-header"} "Description")
-              (dom/div {:class "col-sm-6"}
-                (dom/textarea {
-                  :value description
-                  :id "description"
-                  :class "form-control"
-                  :max-length 250
-                  :on-change #(om/set-state! owner :description (.. % -target -value))
-                  :on-blur (fn [e]
-                             (utils/handle-change data description :description)
-                             (utils/save-values "save-company"))}))
-              (dom/p {:class "help-block"} "Description of the company"))
-            (dom/div {:class "form-group"}
-              (dom/button {:class "btn btn-save"
-                           :on-click (fn [e]
-                                      (.preventDefault e)
-                                      (router/history-back!))} "Done")
-              (dom/img {:class (utils/class-set {:loading-spinner true
-                                                 :loading loading})
-                      :src "/img/loading.gif"}))))))))
+          ;; Company description
+          (dom/div {:class "company-description-title"} "DESCRIPTION")
+          (dom/textarea {:value description
+                         :id "description"
+                         :class "company-description"
+                         :max-length 250
+                         :on-change #(om/set-state! owner :description (.. % -target -value))
+                         :on-blur (fn [e]
+                                   (utils/handle-change data description :description)
+                                   (utils/save-values "save-company"))})
+          (dom/div {:class "save-button-container"}
+            (dom/button {:class "save-button"} "SAVE")))))))
 
 (defcomponent company-profile [data owner]
 
@@ -187,24 +152,22 @@
     (let [company-data (dis/company-data data)]
 
       (when (:read-only company-data)
-       (router/redirect! (oc-urls/company)))
+        (router/redirect! (oc-urls/company)))
 
-      (dom/div {:class "company-container container"}
+      (dom/div {:class "company-profile"}
 
-        ;; Company / user header
-        (om/build navbar data)
+        (dom/div {:class "back-to-dashboard-row"}
+          (dom/button {:class "back-to-dashboard"
+                       :on-click #(router/nav! (oc-urls/company))} "← BACK TO DASHBOARD"))
 
-        (dom/div {:class "navbar-offset container-fluid"}
-
-          ;; White space
-          (dom/div {:class "col-md-1"})
-
-          (dom/div {:class "col-md-9 main"}
-
-            (if (:loading data)
+        (if (:loading data)
               
-              ;; The data is still loading
-              (dom/div (dom/h4 "Loading data..."))
+          ;; The data is still loading
+          (dom/div (dom/h4 "Loading data..."))
 
-              ;; Company profile
-              (om/build company-profile-form company-data))))))))
+          ;; Company profile
+          (om/build company-profile-form company-data))
+
+        (om/build footer data)))))
+
+
