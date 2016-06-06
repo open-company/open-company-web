@@ -10,11 +10,17 @@
 (defcomponent company-editor [data owner]
   (did-mount [_]
     (utils/update-page-title "OpenCompany - Setup Your Company")
-    (swap! dis/app-state assoc-in [:company-editor :name] (jwt/get-key :org-name)))
+    (when-not (-> data :company-editor :name)
+      ;; using utils/after here because we can't dispatch inside another dispatch.
+      ;; ultimately we should switch to some event-loop impl that works like a proper queue
+      ;; and does not have these limitations
+      (utils/after 1 #(dis/dispatch! [:input [:company-editor :name] (jwt/get-key :org-name)]))))
   (render [_]
     (dom/div {:class "company-editor"}
       (dom/div {:class "col-12 p3"}
-        (dom/a {:href "/" :class "btn-reset btn-outline"} "Back to Opencompany.com"))
+        (dom/button {:on-click #(dis/dispatch! [:logout])
+                     :class "btn-reset btn-outline"}
+          "Back to Opencompany.com"))
       (dom/div {:class "container"}
         (dom/div {:class "col-md-7 col-md-offset-2 p0"}
           (dom/h2 {:class "domine mb3"} "Get Started"))

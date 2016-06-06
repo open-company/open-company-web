@@ -25,6 +25,10 @@
   (js/console.log "Full event: " (pr-str payload))
   db)
 
+(defmethod dispatcher/action :logout [db _]
+  (cook/remove-cookie! :jwt)
+  (router/redirect! "/"))
+
 (defmethod dispatcher/action :input [db [_ path value]]
   (assoc-in db path value))
 
