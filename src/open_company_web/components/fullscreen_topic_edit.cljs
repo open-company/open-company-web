@@ -1,4 +1,4 @@
-(ns open-company-web.components.topic-overlay-edit
+(ns open-company-web.components.fullscreen-topic-edit
   (:require-macros [cljs.core.async.macros :refer (go)])
   (:require [cljs.core.async :refer (chan <!)]
             [om.core :as om :include-macros true]
@@ -244,7 +244,7 @@
     {:data fixed-growth-data}))
 
 (defn data-to-save [owner topic]
-  (when-let [body-node (sel1 [(keyword (str "div#topic-edit-body-" topic))])]
+  (when-let [body-node (sel1 [(keyword (str "div#topic-edit-body-" (name topic)))])]
     (let [topic-kw (keyword topic)
          is-data-topic (#{:finances :growth} topic-kw)
          with-title {:title (om/get-state owner :title)}
@@ -327,7 +327,7 @@
     (om/set-state! owner :medium-editor med-ed))
   (utils/after 200 #(focus-headline owner)))
 
-(defcomponent topic-overlay-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
+(defcomponent fullscreen-topic-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
 
   (init-state [_]
     (cdr/add-style! "/css/medium-editor/medium-editor.css")
