@@ -26,9 +26,13 @@ ul#menu {
   }
 
   li.menu-link{
-    padding: 15px 23px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
     a {
+      display: block;
+      width: 190px;
+      height: 53px;
+      padding: 15px 23px;
       opacity: 0.75;
       font-weight: 700;
       font-size: 12px;
