@@ -31,7 +31,7 @@
   (.preventDefault e)
   (.stopPropagation e)
   (close-menu)
-  (router/nav! (oc-urls/company-profile)))
+  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/company-profile))))
 
 (defn on-transition-end [owner body]
   (doto body
