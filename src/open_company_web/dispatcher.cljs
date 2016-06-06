@@ -77,3 +77,9 @@
 
 (defn toggle-menu []
   (swap! app-state update :menu-open not))
+
+(defn save-last-company-slug []
+  (swap! app-state assoc :last-slug (router/current-company-slug)))
+
+(defn last-company-slug []
+  (:last-slug @app-state))
