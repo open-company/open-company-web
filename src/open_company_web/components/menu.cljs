@@ -6,6 +6,7 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]
@@ -19,13 +20,14 @@
   (.reload js/location))
 
 (defn close-menu []
-  (put! (utils/get-channel "close-side-menu") {:close true}))
+  (dis/toggle-menu))
 
-(defn profile-click [e]
+(defn user-profile-click [e]
   (.preventDefault e)
   (.stopPropagation e)
+  (dis/save-last-company-slug)
   (close-menu)
-  (router/nav! oc-urls/user-profile))
+  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! oc-urls/user-profile)))
 
 (defn company-profile-click [e]
   (.preventDefault e)
@@ -71,7 +73,7 @@
     (dom/ul {:id "menu"}
       (dom/li {:class "oc-title"} "OpenCompany")
       (when (jwt/jwt)
-        (dom/li {:class "menu-link"} (dom/a {:title "PROFILE" :href oc-urls/user-profile :on-click profile-click} "PROFILE")))
+        (dom/li {:class "menu-link"} (dom/a {:title "PROFILE" :href oc-urls/user-profile :on-click user-profile-click} "PROFILE")))
       (when (and (router/current-company-slug)
                  (not (utils/in? (:route @router/path) "profile")))
         (dom/li {:class "menu-link"} (dom/a {:title "COMPANY PROFILE" :href (oc-urls/company-profile) :on-click company-profile-click} "COMPANY PROFILE")))
