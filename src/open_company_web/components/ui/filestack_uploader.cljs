@@ -14,7 +14,8 @@
 (def placeholder-id (str (random-uuid)))
 
 (defn img-on-load [img]
-  (set! (.-height (.-dataset img)) (.-clientHeight img)))
+  (set! (.-height (.-dataset img)) (.-clientHeight img))
+  (set! (.-width (.-dataset img)) (.-clientWidth img)))
 
 (defn upload-file! [editor owner file]
   (let [success-cb  (fn [success]
