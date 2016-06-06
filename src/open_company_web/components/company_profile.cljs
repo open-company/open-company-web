@@ -4,6 +4,7 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.components.ui.link :refer (link)]
+            [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.footer :refer (footer)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
@@ -154,11 +155,9 @@
       (when (:read-only company-data)
         (router/redirect! (oc-urls/company)))
 
-      (dom/div {:class "company-profile"}
+      (dom/div {:class "company-profile fullscreen-page"}
 
-        (dom/div {:class "back-to-dashboard-row"}
-          (dom/button {:class "back-to-dashboard"
-                       :on-click #(router/nav! (oc-urls/company))} "← BACK TO DASHBOARD"))
+        (om/build back-to-dashboard-btn {})
 
         (if (:loading data)
               
