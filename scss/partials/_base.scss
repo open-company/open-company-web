@@ -24,6 +24,14 @@ html, body {
   width: 100vw;
 }
 
+div.fullscreen-page {
+  position: relative;
+  background-color: white;
+  min-height: 100vh;
+  border-top: 4px solid $oc_yellow;
+  width: 100%;
+}
+
 img.small-loading {
   width: 15px;
   height: 15px;
