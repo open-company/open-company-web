@@ -1,7 +1,5 @@
 (ns open-company-web.components.navbar
-  (:require-macros [cljs.core.async.macros :refer (go)])
-  (:require [cljs.core.async :refer (chan <!)]
-            [om.core :as om :include-macros true]
+  (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [cljs.core.async :refer (put!)]
@@ -28,16 +26,6 @@
   (dis/toggle-menu))
 
 (defcomponent navbar [{:keys [company-data columns-num card-width latest-su email-loading slack-loading menu-open] :as data} owner options]
-
-  (init-state [_]
-    (utils/add-channel "close-side-menu" (chan)))
-
-  (did-mount [_]
-    (let [close-ch (utils/get-channel "close-side-menu")]
-      (go (loop []
-          (let [change (<! close-ch)]
-            (menu-click owner nil)
-            (recur))))))
 
   (render [_]
     (let [header-width (+ (* card-width columns-num)    ; cards width
