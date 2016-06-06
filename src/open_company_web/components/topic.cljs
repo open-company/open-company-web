@@ -21,6 +21,12 @@
             [goog.style :as gstyle]
             [cljsjs.react.dom]))
 
+(defcomponent topic-image-header [{:keys [image-header]} owner options]
+  (render [_]
+    (dom/img {:src image-header
+              :class "topic-header-img"
+              :on-load #((:img-onload-cb options) image-header)})))
+
 (defcomponent topic-headline [data owner]
   (render [_]
     (dom/div {:class "topic-headline-inner"
@@ -84,7 +90,7 @@
               (= section "growth")
               (om/build topic-growth {:section-data topic-data :section section} {:opts chart-opts})
               :else
-              (dom/img {:src image-header :class "topic-header-img" :on-load #((:img-onload-cb options) image-header)}))))
+              (om/build topic-image-header {:image-header image-header} {:opts options}))))
         ;; Topic title
         (dom/div {:class "topic-title"} (:title topic-data))
         ;; Topic headline
