@@ -13,11 +13,16 @@
 
 (def placeholder-id (str (random-uuid)))
 
+(defn img-on-load [img]
+  (set! (.-height (.-dataset img)) (.-clientHeight img)))
+
 (defn upload-file! [editor owner file]
   (let [success-cb  (fn [success]
                       (let [url    (.-url success)
-                            node   (gdom/createDom "img" #js {:src url})
+                            node   (gdom/createDom "img")
                             marker (gdom/getElement placeholder-id)]
+                        (set! (.-onload node) #(img-on-load node))
+                        (set! (.-src node) url)
                         (gdom/replaceNode node marker))
                       (gstyle/setStyle (gdom/getElement "file-upload-ui") #js {:display "none"})
                       (om/set-state! owner {}))
