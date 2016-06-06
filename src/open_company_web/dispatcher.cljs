@@ -2,7 +2,7 @@
   (:require [cljs-flux.dispatcher :as flux]
             [open-company-web.router :as router]))
 
-(defonce app-state (atom {:loading false}))
+(defonce app-state (atom {:loading false :menu-open false}))
 
 (defmulti action (fn [db [action-type & _]] action-type))
 
@@ -74,3 +74,6 @@
   (if topic
     (swap! app-state assoc-in [:force-edit-topic] topic)
     (swap! app-state dissoc :force-edit-topic)))
+
+(defn toggle-menu []
+  (swap! app-state update :menu-open not))

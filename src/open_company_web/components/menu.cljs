@@ -3,11 +3,14 @@
             [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.lib.cookies :as cook]))
+            [open-company-web.lib.cookies :as cook]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]))
 
 (defn logout-click [e]
   (.preventDefault e)
@@ -30,7 +33,40 @@
   (close-menu)
   (router/nav! (oc-urls/company-profile)))
 
-(defcomponent menu [_ owner options]
+(defn on-transition-end [owner body]
+  (doto body
+    (dommy/remove-class! :left)
+    (dommy/remove-class! :right)
+    (dommy/remove-class! :animating)
+    (dommy/toggle-class! :menu-visible))
+  (events/unlistenByKey (om/get-state owner :transition-end-listener)))
+
+(defn toggle-menu [owner close?]
+  (let [body (sel1 [:body])
+        page (sel1 [:div.page])]
+    (dommy/add-class! body :animating)
+    (if (dommy/has-class? body :menu-visible)
+      (dommy/add-class! body :right)
+      (dommy/add-class! body :left))
+    (let [listener-key (events/listen page EventType/TRANSITIONEND #(on-transition-end owner body))]
+      (om/set-state! owner :transition-end-listener listener-key))))
+
+(defcomponent menu [data owner options]
+
+  (did-mount [_]
+    (when (:menu-open data)
+      (let [body (sel1 [:body])]
+        (dommy/add-class! body :menu-visible))))
+
+  (will-receive-props [_ next-props]
+    (cond
+      (and (:menu-open data)
+           (not (:menu-open next-props)))
+      (toggle-menu owner true)
+      (and (not (:menu-open data))
+           (:menu-open next-props))
+      (toggle-menu owner false)))
+
   (render [_]
     (dom/ul {:id "menu"}
       (dom/li {:class "oc-title"} "OpenCompany")

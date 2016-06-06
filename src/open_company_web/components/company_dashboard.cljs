@@ -59,7 +59,7 @@
       (dom/p {:class "mb2"} "Please log in to view this dashboard.")
       (om/build login-button data))))
 
-(defcomponent company-dashboard [data owner]
+(defcomponent company-dashboard [{:keys [menu-open] :as data} owner]
 
   (init-state [_]
     (let [url-hash (.. js/window -location -hash)
@@ -97,6 +97,7 @@
                                 :card-width card-width
                                 :sharing-mode sharing-mode
                                 :columns-num columns-num
+                                :menu-open menu-open
                                 :auth-settings (:auth-settings data)}))
             (when company-data
               ;; Topic list or topic editing (old editing stuff)
