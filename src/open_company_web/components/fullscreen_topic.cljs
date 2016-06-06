@@ -11,7 +11,7 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
-            [open-company-web.components.topic-overlay-edit :refer (topic-overlay-edit)]
+            [open-company-web.components.fullscreen-topic-edit :refer (fullscreen-topic-edit)]
             [open-company-web.components.ui.icon :refer (icon)]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [goog.style :refer (setStyle)]
@@ -223,17 +223,17 @@
                               (hide-fullscreen-topic owner options))}
           (icon :simple-remove))
         (dom/div {:style #js {:display (when-not editing "none")}}
-          (om/build topic-overlay-edit {:topic section
-                                        :topic-data topic-data
-                                        :visible editing
-                                        :selected-metric selected-metric
-                                        :currency currency
-                                        :card-width card-width
-                                        :is-actual is-actual?
-                                        :prev-rev prev-rev
-                                        :next-rev next-rev}
-                                       {:opts edit-topic-opts
-                                        :key as-of}))
+          (om/build fullscreen-topic-edit {:topic section
+                                           :topic-data topic-data
+                                           :visible editing
+                                           :selected-metric selected-metric
+                                           :currency currency
+                                           :card-width card-width
+                                           :is-actual is-actual?
+                                           :prev-rev prev-rev
+                                           :next-rev next-rev}
+                                          {:opts edit-topic-opts
+                                           :key as-of}))
         (dom/div #js {:className "fullscreen-topic-transition group"
                       :ref "fullscreen-topic-transition"
                       :style #js {:height (when-not transition-as-of "auto")
