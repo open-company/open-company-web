@@ -3,30 +3,31 @@
             [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]))
 
-(defn logout-click [e]
+(defn stop [e]
   (.preventDefault e)
-  (.stopPropagation e)
-  (cook/remove-cookie! :jwt)
-  (.reload js/location))
+  (.stopPropagation e))
+
+(defn logout-click [e]
+  (stop e)
+  (dis/dispatch! [:logout]))
 
 (defn close-menu []
   (put! (utils/get-channel "close-side-menu") {:close true}))
 
 (defn profile-click [e]
-  (.preventDefault e)
-  (.stopPropagation e)
+  (stop e)
   (close-menu)
   (router/nav! oc-urls/user-profile))
 
 (defn company-profile-click [e]
-  (.preventDefault e)
-  (.stopPropagation e)
+  (stop e)
   (close-menu)
   (router/nav! (oc-urls/company-profile)))
 
