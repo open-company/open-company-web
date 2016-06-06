@@ -1,35 +1,105 @@
 div.user-profile {
-  margin-top: 10px;
-  width: 500px;
-  margin: 20px auto;
-  div.panel-heading {
-    font-size: 12px;
-    h4 {
-      margin: 2px 0;
-      font-weight: bold;
-      font-size: 16px;
+  div.user-profile-internal {
+    position: relative;
+    width: 509px;
+    left: 50%;
+    margin-left: -254px;
+    height: 450px;
+    margin-top: 80px;
+
+    div.user-profile-title {
+      height: 74px;
+      font-family: $oc_headers_font;
+      font-size: 26px;
+      line-height: 1.4;
+      color: $oc_gray_5;
     }
-  }
 
-  div.panel-body span.user-profile-label {
-    width: 150px;
-    float: left;
-    font-size: 14px;
-    font-weight: bold;
-  }
+    div.user-profile-content {
+      padding: 28px;
+      height: 280px;
+      background-color: rgba(78, 90, 107, 0.05);
 
-  img.user-avatar {
-    max-width: 30px;
-    max-height: 30px;
-    margin-right: 10px;
-  }
+      div.left-column{
+        width: 50%;
+        float: left;
 
-  div.page{
-    position: relative; /* Set the position property so z-index will apply */
-    z-index: 20; /* Make sure this is higher than #menu */
-    top: 0px !important;
-   
-    background: #fff;
-    min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
+        div.user-profile-name-title {
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+        }
+
+        div.user-profile-name {
+          margin-top: 6px;
+          height: 32px;
+          font-family: $oc_headers_font;
+          font-size: 18px;
+          line-height: 1.8;
+          color: $oc_gray_5;
+        }
+
+        div.user-profile-org-title {
+          margin-top: 25px;
+          height: 18px;
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+        }
+
+        div.user-profile-org {
+          margin-top: 6px;
+          height: 32px;
+          font-family: $oc_headers_font;
+          font-size: 18px;
+          line-height: 1.8;
+          color: $oc_gray_5;
+        }
+
+        div.user-profile-email-title {
+          margin-top: 25px;
+          height: 18px;
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+        }
+
+        div.user-profile-email {
+          margin-top: 6px;
+          height: 32px;
+          font-family: $oc_headers_font;
+          font-size: 18px;
+          line-height: 1.8;
+          color: $oc_gray_5;
+        }
+      }
+
+      div.right-column {
+        float: left;
+        width: 50%;
+        padding-left: 25px;
+
+        div.user-profile-avatar-title {
+          height: 18px;
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+        }
+
+        img.user-profile-avatar {
+          margin-top: 11px;
+          max-width: 100px;
+          max-height: 100px;
+        }
+      }
+    }
   }
 }
