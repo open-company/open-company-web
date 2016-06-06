@@ -39,13 +39,16 @@
         new-categories (apply merge (map #(hash-map (first %) (utils/vec-dissoc (second %) topic)) old-categories))]
     (api/patch-sections new-categories)))
 
-(defn update-active-topics [owner category-name new-topic]
+(defn update-active-topics [owner category-name new-topic & [section-data]]
   (let [company-data (om/get-props owner :company-data)
         old-categories (:sections company-data)
         old-topics (get-active-topics company-data category-name)
         new-topics (concat old-topics [new-topic])
         new-categories (assoc old-categories (keyword category-name) new-topics)]
-    (api/patch-sections new-categories)))
+    (dispatcher/set-force-edit-topic new-topic)
+    (if section-data
+      (api/patch-sections new-categories section-data new-topic)
+      (api/patch-sections new-categories))))
 
 (defn get-state [data current-state]
   (let [company-data (:company-data data)
@@ -61,7 +64,8 @@
      :topic-navigation (or (:topic-navigation current-state) true)
      :share-selected-topics (:sections (:stakeholder-update company-data))
      :transitioning false
-     :redirect-to-preview false}))
+     :redirect-to-preview false
+     :fullscreen-force-edit false}))
 
 (defn topic-click [owner topic selected-metric]
   (if (om/get-state owner :sharing-mode)
@@ -181,13 +185,18 @@
     (when-not (= (:company-data next-props) (:company-data data))
       (om/set-state! owner (get-state next-props (om/get-state owner))))
     (when-not (:read-only (:company-data next-props))
-      (get-new-sections-if-needed owner)))
+      (get-new-sections-if-needed owner))
+    (when (:force-edit-topic next-props)
+      (let [company-data (:company-data next-props)]
+        (when (contains? company-data (keyword (:force-edit-topic next-props)))
+          (om/set-state! owner :fullscreen-force-edit true)
+          (om/set-state! owner :selected-topic (dispatcher/force-edit-topic))))))
 
   (did-update [_ _ _]
     (when (om/get-state owner :tr-selected-topic)
       (animate-selected-topic-transition owner (om/get-state owner :animation-direction))))
 
-  (render-state [_ {:keys [active-topics selected-topic selected-metric tr-selected-topic transitioning sharing-mode share-selected-topics redirect-to-preview]}]
+  (render-state [_ {:keys [active-topics selected-topic selected-metric tr-selected-topic transitioning sharing-mode share-selected-topics redirect-to-preview fullscreen-force-edit]}]
     (let [company-data    (:company-data data)
           topics-list     (flatten (vals active-topics))
           category-topics (if sharing-mode
@@ -236,13 +245,13 @@
         (when selected-topic
           (dom/div {:class "selected-topic-container"
                     :style #js {:opacity (if selected-topic 1 0)}}
-            (when selected-topic
               (dom/div #js {:className "selected-topic"
                             :key (str "transition-" selected-topic)
                             :ref "selected-topic"
                             :style #js {:opacity 1 :backgroundColor "rgba(255, 255, 255, 0.98)"}}
                 (om/build fullscreen-topic {:section selected-topic
                                             :section-data (->> selected-topic keyword (get company-data))
+                                            :fullscreen-force-edit fullscreen-force-edit
                                             :selected-metric selected-metric
                                             :read-only (:read-only company-data)
                                             :card-width card-width
@@ -251,7 +260,7 @@
                                            {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                    :topic-edit-cb (:topic-edit-cb options)
                                                    :remove-topic (partial remove-topic owner)
-                                                   :topic-navigation #(om/set-state! owner :topic-navigation %)}})))
+                                                   :topic-navigation #(om/set-state! owner :topic-navigation %)}}))
             ;; Fullscreen topic for transition
             (when tr-selected-topic
               (dom/div #js {:className "tr-selected-topic"

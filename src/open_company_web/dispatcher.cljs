@@ -66,3 +66,11 @@
     (stakeholder-update-data data (router/current-company-slug) (router/current-stakeholder-update-slug)))
   ([data company-slug update-slug]
     (get-in data (stakeholder-update-key company-slug update-slug))))
+
+(defn force-edit-topic []
+  (:force-edit-topic @app-state))
+
+(defn set-force-edit-topic [topic]
+  (if topic
+    (swap! app-state assoc-in [:force-edit-topic] topic)
+    (swap! app-state dissoc :force-edit-topic)))
