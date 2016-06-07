@@ -117,3 +117,7 @@ svg.emojione {
 *::-moz-selection {
   background: rgba(249,215,72, 0.5);
 }
+
+.navbar-offset {
+  margin-top: #{$navbar_height}px;
+}

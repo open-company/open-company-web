@@ -7,9 +7,10 @@
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.router :as router]
+            [open-company-web.lib.jwt :as jwt]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-list :refer (topic-list)]
-            [open-company-web.components.ui.login-button :refer [login-button]]
+            [open-company-web.components.ui.login-button :as login]
             [open-company-web.components.footer :refer (footer)]
             [open-company-web.components.menu :refer (menu)]
             [open-company-web.components.edit-topic :refer (edit-topic)]
@@ -56,8 +57,19 @@
 (defcomponent login-required [data owner]
   (render [_]
     (dom/div {:class "max-width-3 p4 mx-auto center mb4"}
-      (dom/p {:class "mb2"} "Please log in to view this dashboard.")
-      (om/build login-button data))))
+      (if (jwt/jwt)
+        (dom/p {:class "mb2"}
+          "Sorry, you don't have access to this company's dashboard."
+          (dom/br)
+          (dom/br)
+          (dom/small
+              (dom/a {:href "#"
+                      :on-click #(login/login! (:auth-url (:auth-settings data)) %)}
+               "Sign in with a different Slack account ")
+            "to access different dashboards."))
+        (dom/div
+          (dom/p {:class "mb2"} "Please log in to view this dashboard.")
+          (om/build login/login-button data))))))
 
 (defcomponent company-dashboard [data owner]
 
@@ -120,8 +132,7 @@
                                       :section-data (get company-data (keyword editing-topic))}
                           {:opts {:navbar-editing-cb navbar-editing-cb
                                   :save-bt-active-cb (partial set-save-bt-active owner)
-                                  :dismiss-topic-editing-cb (partial dismiss-topic-editing-cb owner)}})))
-            ;;Footer
-            (when company-data
-              (om/build footer {:columns-num columns-num
-                                :card-width card-width}))))))))
+                                  :dismiss-topic-editing-cb (partial dismiss-topic-editing-cb owner)}})))))
+        ;;Footer
+        (om/build footer {:columns-num columns-num
+                          :card-width card-width})))))

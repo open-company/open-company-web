@@ -7,6 +7,14 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]))
 
+(defn create-company-clicked [owner e]
+  (.preventDefault e)
+  (let [data         (om/get-props owner)
+        company-name (-> data :company-editor :name)]
+    (if (clojure.string/blank? company-name)
+      (js/alert "Please insert a company name")
+      (dis/dispatch! [:company-submit]))))
+
 (defcomponent company-editor [data owner]
   (did-mount [_]
     (utils/update-page-title "OpenCompany - Setup Your Company")
@@ -32,18 +40,25 @@
                           :class "domine h4 p2 bg-white-05 md-col-9 border-none"
                           :placeholder "Simple name without the Inc., LLC, etc."
                           :value (-> data :company-editor :name)
-                          :on-change #(dis/dispatch! [:input [:company-editor :name] (.. % -target -value)])})
+                          :on-change #(dis/dispatch! [:input [:company-editor :name] (.. % -target -value)])}))
 
-              ;; Slug preview/input
-              #_(dom/div {:class "md-col-9 py2 overflow-scroll"}
-                  (dom/label {:class "caps h6 bold block"} "Slug")
-                  (dom/span {:class "domine h4 pl2 py2 bg-white-05"} "opencompany.com/")
-                  (dom/input {:type "text"
-                              :class "domine h4 pr2 py2 bg-white-05 border-none"
-                              :placeholder "..."
-                              :value (or (-> data :company-editor :slug) (-> data :company-editor :name))
-                              :on-change #(dis/dispatch! [:input [:company-editor :slug] (.. % -target -value)])})))
-            (dom/div {:class "right-align pt3"}
-              (dom/button {:class "btn-reset btn-solid"
-                           :on-click #(do (.preventDefault %) (dis/dispatch! [:company-submit]))}
-                "Setup Your Company"))))))))
+            ;; Slug preview/input
+            #_(dom/div {:class "md-col-9 py2 overflow-scroll"}
+                (dom/label {:class "caps h6 bold block"} "Slug")
+                (dom/span {:class "domine h4 pl2 py2 bg-white-05"} "opencompany.com/")
+                (dom/input {:type "text"
+                            :class "domine h4 pr2 py2 bg-white-05 border-none"
+                            :placeholder "..."
+                            :value (or (-> data :company-editor :slug) (-> data :company-editor :name))
+                            :on-change #(dis/dispatch! [:input [:company-editor :slug] (.. % -target -value)])})))
+          ;; Description
+          #_(dom/div {:class "form-group"}
+              (dom/label {:class "col"} "Description")
+              (dom/input {:type "text"
+                          :class "form-control"
+                          :placeholder "Simple company description or tagline (e.g. 'A messaging app for teams')"
+                          :value (-> data :company-editor :description)
+                          :on-change #(dis/dispatch! [:input [:company-editor :description] (.. % -target -value)])}))
+            (dom/button {:class "btn-reset btn-solid"
+                         :on-click (partial create-company-clicked owner)}
+                        "Setup Your Company"))))))
