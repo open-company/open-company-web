@@ -13,6 +13,7 @@
             [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.ui.user-avatar :refer (user-avatar)]
             [open-company-web.components.ui.login-button :refer (login-button)]
+            [open-company-web.components.ui.small-loading :refer (small-loading)]
             [open-company-web.components.ui.company-avatar :refer (company-avatar)]))
 
 (defn close-preview-clicked [e]
@@ -45,7 +46,7 @@
                   (dom/button {:class "ready-mail-button"
                              :on-click (:share-link-cb options)}
                     (if email-loading
-                      (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
+                      (om/build small-loading {:animating true})
                       (icon :link-72 {:size 20 :stroke "4" :color "rgba(78, 90, 107, 0.7)" :accent-color "rgba(78, 90, 107, 0.7)"}))
                     (dom/label {} "SHARE URL"))))
               (dom/button {:class "close-preview"
