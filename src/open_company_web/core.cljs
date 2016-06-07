@@ -194,8 +194,7 @@
     (defn login-wall []
       ;; load the login settings from auth server
       ;; if the user is not logged in yet
-      (when-not (or (jwt/jwt)
-                    (contains? @dis/app-state :auth-settings))
+      (when-not (:auth-settings @dis/app-state)
         (api/get-auth-settings)))
 
     (defn handle-url-change [e]
