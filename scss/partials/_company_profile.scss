@@ -185,6 +185,11 @@ div.company-profile{
           line-height: 1.5;
           letter-spacing: 1px;
           color: $oc_gray_5;
+
+          div.small-loading-container {
+            float: left;
+            margin-left: 15px;
+          }
         }
       }
     }
