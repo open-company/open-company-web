@@ -76,7 +76,7 @@
           ;; redirect to the initial path
           (router/redirect! login-redirect))
         ;; redirect to / if no cookie is set
-        (router/redirect! "/")))
+        (router/redirect! urls/home)))
     (do
       (when (contains? (:query-params params) :login-redirect)
         (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
@@ -136,6 +136,8 @@
       (home-handler target params))
 
     (defroute company-create-route urls/create-company {:as params}
+      (when-not (jwt/jwt)
+        (router/redirect! urls/login))
       (pre-routing (:query-params params))
       (om/root company-editor dis/app-state {:target target}))
 
