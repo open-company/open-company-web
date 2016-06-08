@@ -18,6 +18,11 @@
 (defn find-dom-node [r]
   (.findDOMNode js/ReactDOM r))
 
+(defn remove-listeners [owner]
+  (events/unlistenByKey (om/get-state owner :click-out-listener))
+  (events/unlistenByKey (om/get-state owner :kb-listener))
+  (events/unlistenByKey (om/get-state owner :nav-listener)))
+
 (defn is-child-of-popover [el]
   (loop [cur-el el]
     (if (= (.-id cur-el) "add-topic-popover")
@@ -26,13 +31,14 @@
         (recur (.-parentNode cur-el))
         false))))
 
-(defn dismiss-popover [options]
+(defn dismiss-popover [owner options]
+  (remove-listeners owner)
   (.replaceState js/history #js {} "Dashboard" (oc-urls/company))
   ((:dismiss-popover options)))
 
 (defn on-click-out [owner options e]
   (when (not (is-child-of-popover (.-target e)))
-    (dismiss-popover options)))
+    (dismiss-popover owner options)))
 
 (defn on-click-in [owner options e]
   (.stopPropagation e))
@@ -57,8 +63,8 @@
   (let [all-topics (om/get-props owner :all-topics)
         topic-data (->> topic keyword (get all-topics))
         category-name (or (:category topic-data) "progress")]
-    ((:did-change-active-topics options) category-name topic)
-    (dismiss-popover options)))
+    (dismiss-popover owner options)
+    ((:did-change-active-topics options) category-name topic)))
 
 (def down-arrow-key-code 40)
 (def up-arrow-key-code 38)
@@ -81,7 +87,7 @@
           (when-let [topic (om/get-state owner :highlighted-topic)]
             (add-topic-click owner options topic))
           (= key-code esc-key-code)
-          (dismiss-popover options)
+          (dismiss-popover owner options)
           :else
           ; arrow key: change focus and scroll the parent div
           (let [all-topics            (vec (concat (vec (om/get-state owner :unactive-topics)) (vec (om/get-state owner :archived-topics-list))))
@@ -121,6 +127,7 @@
       (let [topic-name (str "custom-" (utils/my-uuid))
             topic-title (om/get-state owner :custom-topic-title)
             new-topic-data {:title (str topic-title) :headline "" :body ""}]
+        (dismiss-popover owner options)
         ((:did-change-active-topics options) :progress topic-name new-topic-data))
       (= key-code esc-key-code)
       ; ESC: exit adding topic
@@ -162,9 +169,7 @@
       (om/set-state! owner (get-state next-props (om/get-state owner)))))
 
   (will-unmount [_]
-    (events/unlistenByKey (om/get-state owner :click-out-listener))
-    (events/unlistenByKey (om/get-state owner :kb-listener))
-    (events/unlistenByKey (om/get-state owner :nav-listener)))
+    (remove-listeners owner))
 
   (did-update [_ _ prev-state]
     (fix-position owner)
