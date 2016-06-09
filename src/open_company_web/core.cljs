@@ -128,10 +128,11 @@
       (home-handler target params))
 
     (defroute company-create-route urls/create-company {:as params}
-      (when-not (jwt/jwt)
-        (router/redirect! urls/login))
-      (pre-routing (:query-params params))
-      (om/root company-editor dis/app-state {:target target}))
+      (if (jwt/jwt)
+        (do
+          (pre-routing (:query-params params))
+          (om/root company-editor dis/app-state {:target target}))
+        (login-handler target params)))
 
     (defroute list-page-route urls/companies {:as params}
       (home-handler target params))
