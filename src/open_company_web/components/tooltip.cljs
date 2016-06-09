@@ -15,15 +15,16 @@
 (defcomponent tooltip [data owner options]
 
   (did-mount [_]
+    (om/set-state! owner :shown true)
     (let [click-listener (events/listen (sel1 [:body]) EventType/CLICK (partial on-click-out owner options))]
       (om/set-state! owner :click-listener click-listener)))
 
   (will-unmount [_]
     (events/unlistenByKey (om/get-state owner :click-listener)))
 
-  (render [_]
+  (render-state [_ {:keys [shown]}]
     (dom/div {:class "tooltip-container"}
-      (dom/div {:class "tooltip-box"
+      (dom/div {:class (str "tooltip-box" (when shown " shown"))
                 :on-click (partial on-click-in owner options)}
         (dom/div {:class "triangle"})
         (dom/div {:class "tooltip-cta"} (:cta data))))))
