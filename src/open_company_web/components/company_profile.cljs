@@ -132,7 +132,7 @@
                          :max-length 250
                          :on-change #(om/set-state! owner :description (.. % -target -value))})
           (dom/div {:class "save-button-container"}
-            (dom/button {:class "save-button"
+            (dom/button {:class "save-button btn-reset btn-outline"
                          :on-click #(save-company-clicked owner)}
                           (om/build small-loading {:animating loading})
                           "SAVE")))))))

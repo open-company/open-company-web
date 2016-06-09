@@ -178,13 +178,11 @@ div.company-profile{
           height: 30px;
           background-color: $oc_yellow;
           position: absolute;
-          border: none;
-          outline: none;
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
+          opacity: .8;
+
+          &:hover {
+            opacity: 1;
+          }
 
           div.small-loading-container {
             float: left;
