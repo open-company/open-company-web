@@ -15,6 +15,16 @@ div.user-profile {
       color: $oc_gray_5;
     }
 
+    div.user-profile-disclaimer {
+      width: 509px;
+      height: 64px;
+      font-family: $oc_headers_font;
+      font-size: 18px;
+      line-height: 1.8;
+      color: $oc_gray_5;
+      margin-top: 32px;
+    }
+
     div.user-profile-content {
       padding: 28px;
       height: 280px;

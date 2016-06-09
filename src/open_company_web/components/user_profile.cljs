@@ -24,5 +24,7 @@
           (dom/div {:class "right-column"}
             (dom/div {:class "user-profile-avatar-title"} "AVATAR")
             (when (jwt/get-key :avatar)
-              (dom/img {:class "user-profile-avatar" :src (jwt/get-key :avatar)})))))
+              (dom/img {:class "user-profile-avatar" :src (jwt/get-key :avatar)}))))
+        (dom/div {:class "user-profile-disclaimer"}
+          "Your OpenCompany profile is linked to your Slack account – update your profile on Slack to see profile updates."))
       (om/build footer data))))
