@@ -65,6 +65,7 @@
   (let [category-topics (get-category-topics company-data active-topics sharing-mode)]
     (and (jwt/jwt)
          (not (:read-only company-data))
+         (not (responsive/is-mobile))
          (or (empty? category-topics)
              (zero? (count (filter #(not (->> % keyword (get company-data) :placeholder)) category-topics)))))))
 
