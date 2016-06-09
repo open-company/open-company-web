@@ -20,6 +20,7 @@
             [open-company-web.components.su-list :refer (su-list)]
             [open-company-web.components.su-snapshot-preview :refer (su-snapshot-preview)]
             [open-company-web.components.su-snapshot :refer (su-snapshot)]
+            [open-company-web.components.home :refer (home)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
@@ -47,8 +48,21 @@
  (check-get-params query-params)
  (inject-loading))
 
-;; Company list
+;; home
 (defn home-handler [target params]
+  (pre-routing (:query-params params))
+  ;; clean the caches
+  (utils/clean-company-caches)
+  ;; save route
+  (router/set-route! [] {})
+  ;; load data from api
+  (swap! dis/app-state assoc :loading true)
+  (api/get-entry-point)
+  ;; render component
+  (om/root home dis/app-state {:target target}))
+
+;; Company list
+(defn list-companies-handler [target params]
   (pre-routing (:query-params params))
   ;; clean the caches
   (utils/clean-company-caches)
@@ -135,10 +149,10 @@
         (login-handler target params)))
 
     (defroute list-page-route urls/companies {:as params}
-      (home-handler target params))
+      (list-companies-handler target params))
 
     (defroute list-page-route-slash (str urls/companies "/") {:as params}
-      (home-handler target params))
+      (list-companies-handler target params))
 
     (defroute user-profile-route urls/user-profile {:as params}
       (utils/clean-company-caches)

@@ -18,8 +18,9 @@
 
 (defroutes resources
   (GET "/404" [] (not-found))
-  (GET "/" [] (index))
+  (GET "/" [] (app-shell))
   (GET ["/:path" :path #"[^\.]+"] [path] (app-shell)))
+
 
 ;; Some routes like /, /404 and similar can't have their content-type
 ;; derived automatically, because of that we set it with the middleware below
