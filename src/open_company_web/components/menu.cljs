@@ -74,10 +74,10 @@
     (dom/ul {:id "menu"}
       (dom/li {:class "oc-title"} "OpenCompany")
       (when (jwt/jwt)
-        (dom/li {:class "menu-link"} (dom/a {:title "PROFILE" :href oc-urls/user-profile :on-click user-profile-click} "PROFILE")))
+        (dom/li {:class "menu-link"} (dom/a {:title "USER INFO" :href oc-urls/user-profile :on-click user-profile-click} "USER INFO")))
       (when (and (router/current-company-slug)
                  (not (utils/in? (:route @router/path) "profile")))
-        (dom/li {:class "menu-link"} (dom/a {:title "COMPANY PROFILE" :href (oc-urls/company-profile) :on-click company-profile-click} "COMPANY PROFILE")))
+        (dom/li {:class "menu-link"} (dom/a {:title "COMPANY SETTINGS" :href (oc-urls/company-profile) :on-click company-profile-click} "COMPANY SETTINGS")))
       (when (jwt/jwt)
         (dom/li {:class "menu-link"} (dom/a {:title "SIGN OUT" :href oc-urls/logout :on-click logout-click} "SIGN OUT")))
       (when-not (jwt/jwt)
