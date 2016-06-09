@@ -100,7 +100,7 @@
                       :value company-name
                       :on-change #(om/set-state! owner :company-name (.. % -target -value))})
           ; Slug
-          (dom/div {:class "company-slug-title"} "COMPANY SLUG")
+          (dom/div {:class "company-slug-title"} "DASHBOARD URL")
           (dom/div {:class "company-slug"} (name slug))
           ;; Currency
           (dom/div {:class "company-currency-title"} "DISPLAY CURRENCY IN")
@@ -115,7 +115,7 @@
                 (om/build currency-option {:value (:code currency) :text label}))))
 
           ;; Company logo
-          (dom/div {:class "company-logo-title"} "LOGO (180x180px)")
+          (dom/div {:class "company-logo-title"} "SQUARE COMPANY LOGO URL (approx. 180x180px)")
           (dom/input {:type "text"
                       :value logo
                       :id "logo"
