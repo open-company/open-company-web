@@ -4,7 +4,7 @@ div.company-profile{
 
   div.profile-container {
     width: 600px;
-    height: 731px;
+    height: 567px;
     left: 50%;
     position: relative;
     margin-left: -300px;
@@ -31,9 +31,9 @@ div.company-profile{
     }
 
     div.company-form{
-      height: 657px;
-      background-color: rgba(78, 90, 107, 0.05);
       padding: 27px;
+      background-color: rgba(78, 90, 107, 0.05);
+      height: 492px;
 
       div.company-name-title {
         font-weight: 700;
@@ -76,6 +76,7 @@ div.company-profile{
         color: $oc_gray_5;
         background-color: rgba(255, 255, 255, 0.5);
         padding: 4px 10px;
+        opacity: .5;
       }
 
       div.company-currency-title {

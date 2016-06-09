@@ -10,8 +10,9 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.urls :as oc-urls]
             [open-company-web.api :as api]
+            [open-company-web.local-settings :as ls]
             [cljs.core.async :refer (put! chan <!)]
-            [open-company-web.dispatcher :as dis :refer (app-state)]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.lib.iso4217 :refer (iso4217 sorted-iso4217)]))
 
 (defn- save-company-data [company-data logo logo-width logo-height]
@@ -22,7 +23,6 @@
     (api/patch-company slug {:name (:name company-data)
                              :slug slug
                              :currency (:currency company-data)
-                             :description (:description company-data)
                              :logo-width (js/parseInt fixed-logo-width)
                              :logo-height (js/parseInt fixed-logo-height)
                              :logo fixed-logo})))
@@ -45,10 +45,9 @@
 
 (defn save-company-clicked [owner]
   (let [logo         (om/get-state owner :logo)
-        old-company-data (om/get-props owner)
+        old-company-data (dis/company-data (om/get-props owner))
         new-company-data {:name (om/get-state owner :company-name)
-                          :currency (om/get-state owner :currency)
-                          :description (om/get-state owner :description)}]
+                          :currency (om/get-state owner :currency)}]
     (om/set-state! owner :loading true)
     ; if the log has changed
     (if (not= logo (om/get-state owner :initial-logo))
@@ -71,12 +70,12 @@
 (defcomponent company-profile-form [data owner]
 
   (init-state [_]
-    {:initial-logo (:logo data)
-     :logo (:logo data)
-     :company-name (:name data)
-     :currency (:currency data)
-     :loading false
-     :description (:description data)})
+    (let [company-data (dis/company-data data)]
+      {:initial-logo (:logo data)
+       :logo (:logo data)
+       :company-name (:name data)
+       :currency (:currency data)
+       :loading false}))
 
   (will-receive-props [_ next-props]
     (om/set-state! owner :loading false)
@@ -101,7 +100,7 @@
                       :on-change #(om/set-state! owner :company-name (.. % -target -value))})
           ; Slug
           (dom/div {:class "company-slug-title"} "DASHBOARD URL")
-          (dom/div {:class "company-slug"} (name slug))
+          (dom/div {:class "company-slug"} (str ls/web-server "/" (name slug)))
           ;; Currency
           (dom/div {:class "company-currency-title"} "DISPLAY CURRENCY IN")
           (dom/select {:id "currency"
@@ -123,14 +122,6 @@
                       :maxLength 255
                       :on-change #(om/set-state! owner :logo (.. % -target -value))
                       :placeholder "http://example.com/logo.png"})
-
-          ;; Company description
-          (dom/div {:class "company-description-title"} "DESCRIPTION")
-          (dom/textarea {:value description
-                         :id "description"
-                         :class "company-description"
-                         :max-length 250
-                         :on-change #(om/set-state! owner :description (.. % -target -value))})
           (dom/div {:class "save-button-container"}
             (dom/button {:class "save-button btn-reset btn-solid"
                          :on-click #(save-company-clicked owner)}
