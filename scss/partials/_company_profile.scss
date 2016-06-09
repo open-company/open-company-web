@@ -176,13 +176,7 @@ div.company-profile{
         button.save-button {
           width: 108px;
           height: 30px;
-          background-color: $oc_yellow;
           position: absolute;
-          opacity: .8;
-
-          &:hover {
-            opacity: 1;
-          }
 
           div.small-loading-container {
             float: left;
