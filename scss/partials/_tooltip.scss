@@ -16,6 +16,12 @@ div.tooltip-container {
     margin-top: -56px;
     background-color: rgba(77, 89, 106, 0.8);
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: 230ms;
+
+    &.shown {
+      opacity: 1;
+    }
 
     div.triangle {
       @include triangle(right, $oc_yellow, 6px);
