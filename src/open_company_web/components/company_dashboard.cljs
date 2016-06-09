@@ -94,8 +94,7 @@
           navbar-editing-cb (partial set-navbar-editing owner data)
           card-width (responsive/calc-card-width)]
       (dom/div {:class (utils/class-set {:company-dashboard true
-                                         :main-scroll true
-                                         :navbar-offset (not (responsive/is-mobile))})}
+                                         :main-scroll true})}
         (om/build menu data)
         (if (get-in data [(keyword (router/current-company-slug)) :error])
           (dom/div {:class "page-no-navbar py4"}
