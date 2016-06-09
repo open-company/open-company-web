@@ -64,6 +64,7 @@
 (defn should-show-add-topic-tooltip [company-data active-topics sharing-mode]
   (let [category-topics (get-category-topics company-data active-topics sharing-mode)]
     (and (jwt/jwt)
+         (not (:read-only company-data))
          (or (empty? category-topics)
              (zero? (count (filter #(not (->> % keyword (get company-data) :placeholder)) category-topics)))))))
 
