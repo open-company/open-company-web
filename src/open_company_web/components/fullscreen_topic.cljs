@@ -210,7 +210,7 @@
         (when (and can-edit?
                    editing
                    show-save-button)
-          (dom/button {:class "save-button"
+          (dom/button {:class "save-button btn-reset btn-solid"
                        :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-save-" (name section)))]
                                     (om/set-state! owner :data-posted true)
                                     (put! ch {:click true :event %}))}
@@ -271,9 +271,10 @@
                                                      :next-rev tr-next-rev}
                                                     {:opts fullscreen-topic-opts})))))
         (when editing
-          (dom/button {:class "remove-button"
-                       :on-click (partial remove-topic-click owner options)}
+          (dom/span {:class "relative remove-button btn-reset btn-outline"
+                     :on-click (partial remove-topic-click owner options)}
             (icon :alert {:size 15
+                          :class "inline mr2"
                           :accent-color (oc-colors/get-color-by-kw :oc-gray-5)
-                          :stroke (oc-colors/get-color-by-kw :oc-gray-5)})
-            "ARCHIVE THIS TOPIC"))))))
+                          :color (oc-colors/get-color-by-kw :oc-gray-5)})
+            "Archive this topic"))))))

@@ -4,6 +4,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
@@ -16,23 +17,21 @@
 (defn close-menu []
   (dis/toggle-menu))
 
-(defn logout-click [e]
+(defn stop [e]
   (.preventDefault e)
-  (.stopPropagation e)
-  (cook/remove-cookie! :jwt)
-  (close-menu)
-  (utils/after (+ utils/oc-animation-duration 100) #(.reload js/location)))
+  (.stopPropagation e))
+
+(defn logout-click [e]
+  (stop e)
+  (dis/dispatch! [:logout]))
 
 (defn user-profile-click [e]
-  (.preventDefault e)
-  (.stopPropagation e)
-  (dis/save-last-company-slug)
+  (stop e)
   (close-menu)
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! oc-urls/user-profile)))
 
 (defn company-profile-click [e]
-  (.preventDefault e)
-  (.stopPropagation e)
+  (stop e)
   (close-menu)
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/company-profile))))
 
