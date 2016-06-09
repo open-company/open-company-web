@@ -16,5 +16,5 @@
 (defcomponent back-to-dashboard-btn [data owner]
   (render [_]
     (dom/div {:class "back-to-dashboard-row"}
-      (dom/button {:class "back-to-dashboard"
+      (dom/button {:class "back-to-dashboard btn-reset btn-outline"
                    :on-click (partial btn-clicked)} "← BACK TO DASHBOARD"))))
