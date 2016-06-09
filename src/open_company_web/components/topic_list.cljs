@@ -87,8 +87,10 @@
      :transitioning false
      :redirect-to-preview false
      :fullscreen-force-edit false
-     :add-topic-tooltip-already-shown (or (:add-topic-tooltip-already-shown current-state) false)
-     :show-add-topic-tooltip show-add-topic-tooltip}))
+     :add-topic-tooltip-dismissed (or (:add-topic-tooltip-dismissed current-state) false)
+     :show-add-topic-tooltip show-add-topic-tooltip
+     :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
+     :second-tooltip-dismissed (or (:second-tooltip-dismissed current-state) false)}))
 
 (defn topic-click [owner topic selected-metric]
   (if (om/get-state owner :sharing-mode)
@@ -171,6 +173,11 @@
     (api/patch-stakeholder-update {:title title :sections share-selected-topics})
     (om/set-state! owner :redirect-to-preview true)))
 
+(defn should-show-first-edit-tooltip [company-data category-topics]
+  ; show first edit tooltip if there is only one section and is a placeholder section
+  (and (= (count category-topics) 1)
+       (->> category-topics first keyword (get company-data) :placeholder)))
+
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
@@ -210,7 +217,10 @@
       (let [company-data (:company-data next-props)]
         (when (contains? company-data (keyword (:force-edit-topic next-props)))
           (om/set-state! owner :fullscreen-force-edit true)
-          (om/set-state! owner :selected-topic (dispatcher/force-edit-topic))))))
+          (om/set-state! owner :selected-topic (dispatcher/force-edit-topic))
+          ; show second tooltip of needed
+          (when (= (count (flatten (vals (:sections company-data)))) 1)
+            (om/set-state! owner :show-second-add-topic-tooltip true))))))
 
   (did-update [_ _ _]
     (when (om/get-state owner :tr-selected-topic)
@@ -226,7 +236,9 @@
                            redirect-to-preview
                            fullscreen-force-edit
                            show-add-topic-tooltip
-                           add-topic-tooltip-already-shown]}]
+                           add-topic-tooltip-dismissed
+                           show-second-add-topic-tooltip
+                           second-tooltip-dismissed]}]
     (let [company-data    (:company-data data)
           category-topics (get-category-topics company-data active-topics sharing-mode)
           card-width      (:card-width data)
@@ -283,7 +295,8 @@
                                             :read-only (:read-only company-data)
                                             :card-width card-width
                                             :currency (:currency company-data)
-                                            :animate (not transitioning)}
+                                            :animate (not transitioning)
+                                            :show-first-edit-tooltip (should-show-first-edit-tooltip company-data category-topics)}
                                            {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                    :topic-edit-cb (:topic-edit-cb options)
                                                    :remove-topic (partial remove-topic owner)
@@ -316,8 +329,14 @@
                                   :share-selected-topics share-selected-topics}
                                  {:opts {:topic-click (partial topic-click owner)
                                          :update-active-topics (partial update-active-topics owner)}})
-        (when (and (not add-topic-tooltip-already-shown)
+        (when (and (not add-topic-tooltip-dismissed)
                    show-add-topic-tooltip)
           (om/build tooltip
             {:cta (str "HI " (jwt/get-key :name) ", WELCOME TO OPENCOMPANY! TO GET STARTED, ADD A TOPIC.")}
-            {:opts {:dismiss-tooltip #(om/set-state! owner :add-topic-tooltip-already-shown true)}}))))))
+            {:opts {:dismiss-tooltip #(om/set-state! owner :add-topic-tooltip-dismissed true)}}))
+        (when (and show-second-add-topic-tooltip
+                   (not selected-topic)
+                   (not second-tooltip-dismissed))
+          (om/build tooltip
+            {:cta "GREAT! YOU ADDED A TOPIC. ADD ANOTHER AND YOU'LL START TO SEE THE BIG PICTURE."}
+            {:opts {:dismiss-tooltip #(om/set-state! owner :second-tooltip-dismissed true)}}))))))

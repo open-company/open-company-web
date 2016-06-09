@@ -16,6 +16,7 @@
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
+            [open-company-web.components.tooltip :refer (tooltip)]
             [goog.events :as events]
             [goog.history.EventType :as EventType]
             [cljs-dynamic-resources.core :as cdr]
@@ -304,7 +305,8 @@
        :show-headline-counter (:show-headline-counter current-state)
        :show-title-counter (:show-title-counter current-state)
        :medium-editor (:medium-editor current-state)
-       :history-listener-id (:history-listener-id current-state)}
+       :history-listener-id (:history-listener-id current-state)
+       :tooltip-dismissed false}
       (finances-init-state topic (:data topic-data))
       (growth-init-state topic data current-state))))
 
@@ -327,7 +329,7 @@
     (om/set-state! owner :medium-editor med-ed))
   (utils/after 200 #(focus-headline owner)))
 
-(defcomponent topic-overlay-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
+(defcomponent topic-overlay-edit [{:keys [card-width topic topic-data currency focus show-first-edit-tooltip] :as data} owner options]
 
   (init-state [_]
     (cdr/add-style! "/css/medium-editor/medium-editor.css")
@@ -411,7 +413,9 @@
                            growth-metrics
                            show-headline-counter
                            show-title-counter
-                           growth-metric-slugs]}]
+                           growth-metric-slugs
+                           ; tooltip
+                           tooltip-dismissed]}]
     (let [topic-kw (keyword topic)
           title-length-limit 20
           topic-body (utils/get-topic-body topic-data topic-kw)
@@ -515,4 +519,11 @@
                     :ref "topic-overlay-edit-body"
                     :id (str "topic-edit-body-" (name topic))
                     :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
-          (om/build filestack-uploader (om/get-state owner :medium-editor)))))))
+          (om/build filestack-uploader (om/get-state owner :medium-editor)))
+        (when (and show-first-edit-tooltip
+                   (not tooltip-dismissed))
+          (om/build tooltip
+            {:cta "WHAT WOULD YOU LIKE TO SAY? YOU CAN ADD TEXT, EMOJI AND IMAGES."}
+            {:opts {:dismiss-tooltip #(doto owner
+                                        (om/set-state! :tooltip-dismissed true)
+                                        (focus-headline))}}))))))
