@@ -93,7 +93,7 @@
      :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
      :second-tooltip-dismissed (or (:second-tooltip-dismissed current-state) false)
      :show-share-su-tooltip (or (:show-share-su-tooltip current-state) false)
-     :share-su-tooltip-dismissed (or (:share-tooltip-dismissed current-state) false)
+     :share-su-tooltip-dismissed (or (:share-su-tooltip-dismissed current-state) false)
      :show-share-snapshot-tooltip (or (:show-share-snapshot-tooltip current-state) false)
      :share-snapshot-tooltip-dismissed (or (:share-snapshot-tooltip-dismissed current-state) false)}))
 
@@ -364,7 +364,7 @@
                    (not share-su-tooltip-dismissed))
           (om/build tooltip
             {:cta "SHARE YOUR STORY WITH YOUR TEAM, INVESTORS AND THE CROWD."}
-            {:opts {:dismiss-tooltip #(om/set-state! owner :share-tooltip-dismissed true)}}))
+            {:opts {:dismiss-tooltip #(om/set-state! owner :share-su-tooltip-dismissed true)}}))
         (when (and show-share-snapshot-tooltip
                    (not share-snapshot-tooltip-dismissed))
           (om/build tooltip
