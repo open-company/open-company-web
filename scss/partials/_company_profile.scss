@@ -1,55 +1,202 @@
 /* Company profile */
 
-div.profile-container {
-  padding-top: 65px;
+div.company-profile{
+  div.company-profile-container {
+    min-height: calc(100vh - 477px);
 
-  img.loading-spinner {
-    margin-left: 25px;
-    margin-bottom: 10px;
-    width: 50px;
-    opacity: 0;
+    div.profile-container {
+      width: 600px;
+      height: 567px;
+      left: 50%;
+      position: relative;
+      margin-left: -300px;
+      margin-top: 80px;
+      margin-bottom: 80px;
 
-    &.loading {
-      opacity: 1;
-    }
-  }
+      div.company-settings {
+        font-family: $oc_headers_font;
+        font-size: 26px;
+        line-height: 1.4;
+        color: $oc_gray_5;
+        height: 74px;
 
-  p.help-block {
-    font-size: 12px;
-    width: auto;
-  }
+        span {
+          float: left;
+        }
 
-  div.logo-container {
-    div.help-block{
-      &.logo-help-block {
-        margin-top: 40px;
-        margin-left: 240px;
-        @media screen and (max-width: 1200px){
-          margin-left: 200px;
+        div.small-loading-container {
+          float: left;
+          margin-left: 20px;
         }
       }
-      span{
-        width: 100px;
+
+      img.loading-spinner {
+        margin-left: 25px;
+        margin-bottom: 10px;
+        width: 50px;
+        opacity: 0;
+
+        &.loading {
+          opacity: 1;
+        }
+      }
+
+      div.company-form{
+        padding: 27px;
+        background-color: rgba(78, 90, 107, 0.05);
+        height: 492px;
+
+        div.company-name-title {
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+        }
+
+        input.company-name {
+          margin-top: 15px;
+          width: 380px;
+          height: 40px;
+          font-family: $oc_headers_font;
+          font-size: 18px;
+          line-height: 1.8;
+          color: $oc_gray_5;
+          background-color: rgba(255, 255, 255, 0.5);
+          border: none;
+          outline: none;
+          padding: 4px 10px;
+        }
+
+        div.company-slug-title {
+          margin-top: 30px;
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+        }
+
+        div.company-slug {
+          margin-top: 15px;
+          width: 380px;
+          height: 40px;
+          font-family: $oc_headers_font;
+          font-size: 18px;
+          line-height: 1.8;
+          color: $oc_gray_5;
+          background-color: rgba(255, 255, 255, 0.5);
+          padding: 4px 10px;
+          opacity: .5;
+        }
+
+        div.company-currency-title {
+          margin-top: 30px;
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+        }
+
+        select.company-currency {
+          display: inline-block;
+          margin-top: 15px;
+          width: 380px;
+          height: 40px;
+          font-family: $oc_headers_font;
+          font-size: 18px;
+          line-height: 1.8;
+          color: $oc_gray_5;
+          background-color: rgba(255, 255, 255, 0.5);
+          padding: 4px 10px;
+          overflow: visible !important;
+          border: none;
+          outline: none;
+          box-shadow: none;
+
+          -webkit-appearance: menulist;
+          align-items: center;
+          white-space: pre;
+          -webkit-rtl-ordering: logical;
+          cursor: default;
+
+          text-rendering: auto;
+          letter-spacing: normal;
+          word-spacing: normal;
+          text-transform: none;
+          text-indent: 0px;
+          text-shadow: none;
+          display: inline-block;
+          text-align: start;
+          margin: 0em 0em 0em 0em;
+        }
+
+        div.company-logo-title {
+          margin-top: 30px;
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+        }
+
+        input.company-logo {
+          margin-top: 15px;
+          width: 546px;
+          height: 40px;
+          font-family: $oc_headers_font;
+          font-size: 18px;
+          line-height: 1.8;
+          color: $oc_gray_5;
+          background-color: rgba(255, 255, 255, 0.5);
+          border: none;
+          outline: none;
+          padding: 4px 10px;
+        }
+
+        div.company-description-title {
+          margin-top: 30px;
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+        }
+
+        textarea.company-description {
+          margin-top: 15px;
+          width: 380px;
+          height: 80px;
+          font-family: $oc_headers_font;
+          font-size: 18px;
+          line-height: 1.8;
+          color: $oc_gray_5;
+          background-color: rgba(255, 255, 255, 0.5);
+          border: none;
+          outline: none;
+          padding: 4px 10px;
+        }
+
+        div.save-button-container{
+          position: absolute;
+          text-align: right;
+          width: 100%;
+          bottom: 60px;
+          right: 138px;
+
+          button.save-button {
+            width: 108px;
+            height: 30px;
+            position: absolute;
+
+            div.small-loading-container {
+              float: left;
+              margin-left: 15px;
+            }
+          }
+        }
       }
     }
-  }
-
-  button.btn.btn-save {
-    border: 1px solid rgba(0, 0, 0, 0.4);
-    font-size: 10px;
-    margin-right: 20px;
-    height: 34px;
-    width: 59px;
-    border-radius: 4px;
-    margin-left: 242px;
-    background-color: $oc_green;
-    color: white;
-    padding-top: 10px;
-  }
-
-  img.logo-preview {
-    margin-right: 10px;
-    max-width: 40px;
-    max-height: 40px;
   }
 }

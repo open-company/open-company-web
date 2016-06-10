@@ -13,6 +13,7 @@
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.topic-overlay-edit :refer (topic-overlay-edit)]
             [open-company-web.components.ui.icon :refer (icon)]
+            [open-company-web.components.ui.small-loading :refer (small-loading)]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [goog.style :refer (setStyle)]
             [goog.events :as events]
@@ -214,7 +215,7 @@
                                     (om/set-state! owner :data-posted true)
                                     (put! ch {:click true :event %}))}
             (if data-posted
-              (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
+              (om/build small-loading {:animating true})
               "POST")))
         (dom/div {:class "close"
                   :on-click #(if editing

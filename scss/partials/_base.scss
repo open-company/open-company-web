@@ -22,9 +22,12 @@ html, body {
   width: 100vw;
 }
 
-img.small-loading {
-  width: 15px;
-  height: 15px;
+div.fullscreen-page {
+  position: relative;
+  background-color: white;
+  min-height: 100vh;
+  border-top: 4px solid $oc_yellow;
+  width: 100%;
 }
 
 .no-scroll {
@@ -129,4 +132,8 @@ div.page-no-navbar{
 
 .navbar-offset {
   margin-top: #{$navbar_height}px;
+}
+
+.animating .navbar-offset {
+  margin-top: 0px;
 }

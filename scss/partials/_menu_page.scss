@@ -7,28 +7,28 @@ div.page{
   min-height: calc(100vh - #{$navbar_height}px);
 }
 
-.animating .page {
+body.animating div.page {
   transition: transform .25s ease-in-out;
   -webkit-transition: -webkit-transform .25s ease-in-out;
   min-height: 100vh;
 }
 
-.animating.left .page {
+body.animating.left div.page {
   transform: translate3d( -190px, 0, 0 );
   -webkit-transform: translate3d( -190px, 0, 0 );
 }
 
-.animating.right .page {
+body.animating.right div.page {
   transform: translate3d( 190px, 0, 0 );
   -webkit-transform: translate3d( 190px, 0, 0 );
 }
 
-.menu-visible .page {
+body.menu-visible div.page {
   right: 190px;
   top: 0px;
 }
 
-.menu-visible:not(.animating) .page nav{
+body.menu-visible:not(.animating) div.page nav{
   left: -190px;
   top: default;
 }

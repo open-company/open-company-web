@@ -8,6 +8,7 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.icon :refer (icon)]
+            [open-company-web.components.ui.small-loading :refer (small-loading)]
             [cljsjs.react.dom]
             [cljsjs.clipboard]))
 
@@ -111,7 +112,7 @@
               (cond
                 (and slack-sending
                      (not slack-sent))
-                (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
+                (om/build small-loading {:animating true})
                 (and slack-sending
                      slack-sent)
                 "SENT ✓"
