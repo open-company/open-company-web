@@ -4,7 +4,7 @@ div.user-profile {
     width: 509px;
     left: 50%;
     margin-left: -254px;
-    height: 450px;
+    min-height: calc(100vh - 397px);
     margin-top: 80px;
 
     div.user-profile-title {

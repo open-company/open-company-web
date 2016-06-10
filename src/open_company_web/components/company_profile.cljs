@@ -150,6 +150,7 @@
           (dom/div (dom/h4 "Loading data..."))
 
           ;; Company profile
-          (om/build company-profile-form data))
+          (dom/div {:class "company-profile-container"}
+            (om/build company-profile-form data)))
 
         (om/build footer data)))))
