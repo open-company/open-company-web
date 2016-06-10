@@ -133,3 +133,7 @@ div.page-no-navbar{
 .navbar-offset {
   margin-top: #{$navbar_height}px;
 }
+
+.animating .navbar-offset {
+  margin-top: 0px;
+}
