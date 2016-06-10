@@ -17,6 +17,15 @@ div.company-profile{
       line-height: 1.4;
       color: $oc_gray_5;
       height: 74px;
+
+      span {
+        float: left;
+      }
+
+      div.small-loading-container {
+        float: left;
+        margin-left: 20px;
+      }
     }
 
     img.loading-spinner {

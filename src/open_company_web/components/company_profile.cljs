@@ -67,27 +67,31 @@
       :disabled (and (contains? :value data) (= (count (:value data)) 0))}
       (:text data))))
 
+(defn get-state [data current-state]
+  (let [company-data (dis/company-data data)]
+    {:initial-logo (:logo data)
+     :logo (or (:logo current-state) (:logo company-data))
+     :company-name (or (:company-name current-state) (:name company-data))
+     :currency (or (:currency current-state) (:currency company-data))
+     :loading false}))
+
 (defcomponent company-profile-form [data owner]
 
   (init-state [_]
-    (let [company-data (dis/company-data data)]
-      {:initial-logo (:logo data)
-       :logo (:logo data)
-       :company-name (:name data)
-       :currency (:currency data)
-       :loading false}))
+    (get-state data nil))
 
   (will-receive-props [_ next-props]
-    (om/set-state! owner :loading false)
-    (om/set-state! owner :initial-logo (:logo data)))
+    (om/set-state! owner (get-state next-props nil)))
 
   (render-state [_ {:keys [company-name logo currency description loading]}]
     (let [slug (keyword (router/current-company-slug))]
 
       (utils/update-page-title (str "OpenCompany - " company-name))
-
       (dom/div {:class "profile-container group"}
-        (dom/div {:class "company-settings"} "Company Settings")
+        (dom/div {:class "company-settings"}
+          (dom/span {} "Company Settings")
+          (when-not company-name
+            (om/build small-loading {:animating true})))
         ;; Company
         (dom/div {:class "company-form"}
 
@@ -146,8 +150,6 @@
           (dom/div (dom/h4 "Loading data..."))
 
           ;; Company profile
-          (om/build company-profile-form company-data))
+          (om/build company-profile-form data))
 
         (om/build footer data)))))
-
-
