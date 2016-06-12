@@ -3,15 +3,12 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1 sel)]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.topic :refer (topic)]
-            [open-company-web.lib.combinatronics :as combo]))
+            [open-company-web.components.topic :refer (topic)]))
 
 ;; Calc best topics layout based on heights
-
-(def inter-topic-gap 22)
-(def add-a-topic-height 95)
 
 (defn add-topic? [owner]
   (let [data (om/get-props owner)
@@ -22,64 +19,125 @@
          (not sharing-mode)
          (not (:read-only company-data)))))
 
-(defn calc-total-height
-  "Calculate the total height for each column as the sum of all the topics in that column, including the gaps between topics."
-  [partition]
-  {:total-heights (map #(reduce + %) (->> partition
-                     (map #(map :height %))
-             (map #(conj % (* inter-topic-gap (- (count %) 1))))))
-   :arrangement partition})
+(def inter-topic-gap 22)
+(def add-a-topic-height 95)
 
-(defn calc-with-add-a-topic
-  "Account for the size of the 'Add a Topic' button in the last column of this particular arrangement of topics into columns."
-  [partition]
-  (let [heights (:total-heights partition)
-        last-height (+ (last heights) inter-topic-gap add-a-topic-height)]
-    {:total-heights (conj (vec (drop-last heights)) last-height)
-     :arrangement (:arrangement partition)}))
+(def topic-default-height-no-body 95)
+(def topic-default-height-with-body 109)
+(def data-topic-default-zero-height 142)
+(def data-topic-default-one-height 282)
+(def data-topic-default-more-height 388)
+(def topic-body-height 29)
+(def topic-header-image-max-height 196)
+(def add-topic-height 94)
 
-(defn calc-delta-height
-  "Calculate the delta between the shortest and tallest column, for this particular arrangement of topics into columns."
-  [partition]
-  {:delta (- (apply max (:total-heights partition)) (apply min (:total-heights partition)))
-   :arrangement (:arrangement partition)})
+(defn headline-height [headline card-width]
+  (if (clojure.string/blank? headline)
+    0
+    (let [$headline (js/$ (str "<div class=\"topic\">"
+                                  "<div class=\"topic-anim\">"
+                                    "<div>"
+                                      "<div class=\"topic-internal\">"
+                                        "<div class=\"topic-headline-inner\" style=\"width: " card-width "px;\">"
+                                          (utils/emojify headline true)
+                                        "</div>"
+                                      "</div>"
+                                    "</div>"
+                                  "</div>"
+                                "</div>"))]
+      (.appendTo $headline (.-body js/document))
+      (let [height (.height $headline)]
+        (.detach $headline)
+        height))))
 
-(defn real-calcs [topics add-topic columns-num]
-  (println (js/Date.) "combo/partitions" topics)
-  (let [partitions (apply list (combo/partitions topics :max columns-num :min columns-num))]
-    (println (js/Date.) "calc-total-height")
-    (let [heights (apply list (map calc-total-height partitions))]
-      (when add-topic
-        (println (js/Date.) "calc-with-add-a-topic"))
-      (let [fixed-heights (if add-topic
-                        (apply list (map calc-with-add-a-topic heights))
-                        heights)]
-        (println (js/Date.) "calc-delta-height")
-        (let [deltas (apply list (map calc-delta-height fixed-heights))]
-          (println (js/Date.) "min-key")
-          (let [best-layout (apply list (apply min-key :delta deltas))]
-            (println (js/Date.) "final calcs (get :arrangement and calc max vec lenght)")
-            (let [out (map #(map :topic %) (:arrangement best-layout))
-                  max-lenght (apply max (map count out))]
-            (println (js/Date.) "init last calculation (map the result to a single array with one of each)")
-            (let [last-calc (apply concat (map (fn [x] (apply conj [] (map (fn [v] (get (vec v) x)) out))) (range max-lenght)))]
-              (println (js/Date.) "retur value" last-calc)
-              last-calc))))))))
+(defn get-topic-height [topic-body]
+  (if (clojure.string/blank? topic-body)
+    topic-default-height-no-body
+    topic-default-height-with-body))
 
-(defn calc-partitions [owner]
-  (println (js/Date.) "init calc-partitions")
-  (let [columns-num (om/get-props owner :columns-num)
-        topics-row (sel [:div.topic-row])]
-    (println (js/Date.) "get all card divs" (count topics-row))
-    (let [topics (vec (map #(hash-map :topic (keyword (.-topic (.-dataset %))) :height (.-clientHeight %)) topics-row))
-          add-topic (add-topic? owner)]
-      (real-calcs topics add-topic columns-num))))
+(defn data-topic-height [owner topic topic-data]
+  (if (= topic :finances)
+    (cond
+      (= (count (:data topic-data)) 0)
+      data-topic-default-zero-height
+      (= (count (:data topic-data)) 1)
+      data-topic-default-one-height
+      (> (count (:data topic-data)) 1)
+      data-topic-default-more-height)
+    (let [data (:data topic-data)
+          selected-metric (or (om/get-props owner :selected-metric) (:slug (first (:metrics topic-data))))
+          metric-data (filter #(= (:slug %) selected-metric) data)]
+      (cond
+        (= (count metric-data) 0)
+        data-topic-default-zero-height
+        (= (count metric-data) 1)
+        data-topic-default-one-height
+        (> (count metric-data) 1)
+        data-topic-default-more-height))))
 
-(defn img-onload-cb [owner src]
-  (when-not (utils/in? (om/get-state owner :imgs) src)
-    (om/update-state! owner :imgs #(concat % [src]))
-    (om/set-state! owner :best-partition (calc-partitions owner))))
+(defn calc-column-height [owner data topics]
+  (let [card-width (om/get-props owner :card-width)
+        company-data (:company-data data)]
+    (for [topic topics
+          :let [topic-kw (keyword topic)
+                topic-data (get company-data topic-kw)
+                is-data-topic (#{:finances :growth} topic-kw)]]
+      (cond
+        (= topic "add-topic")
+        add-topic-height
+        (#{:finances :growth} topic-kw)
+        (let [headline-height (headline-height (:headline topic-data) card-width)
+              body-height (if (clojure.string/blank? (:body (:notes topic-data)))
+                            0
+                            topic-body-height)
+              start-height (data-topic-height owner topic topic-data)]
+          (+ start-height headline-height body-height))
+        :else
+        (let [topic-body (:body topic-data)
+              rendered-body (js/$ (str "<div>" topic-body "</div>"))
+              img (.find rendered-body "img")
+              temp-height (get-topic-height topic-body)
+              headline (headline-height (:headline topic-data) card-width)
+              image-height (if (and img (.get img 0))
+                             (min (.-height (.-dataset (.get img 0))) topic-header-image-max-height)
+                             0)]
+          (+ temp-height headline image-height))))))
 
+(defn get-shortest-column [owner data current-layout]
+  (let [columns-num (:columns-num data)
+        frst-clmn (apply + (calc-column-height owner data (:1 current-layout)))
+        scnd-clmn (apply + (calc-column-height owner data (:2 current-layout)))
+        thrd-clmn (apply + (calc-column-height owner data (:3 current-layout)))
+        min-height (if (= columns-num 3)
+                    (min frst-clmn scnd-clmn thrd-clmn)
+                    (min frst-clmn scnd-clmn))]
+    (cond
+      (= min-height frst-clmn)
+      :1
+      (= min-height scnd-clmn)
+      :2
+      (= min-height thrd-clmn)
+      :3)))
+
+(defn calc-layout [owner data]
+  (let [columns-num (:columns-num data)
+        show-add-topic (add-topic? owner)
+        topics (to-array (concat (:topics data) ["add-topic"]))
+        final-layout (loop [idx 3
+                            layout (if (= columns-num 3)
+                                      {:1 [(first topics)]
+                                       :2 [(second topics)]
+                                       :3 [(get topics 2)]}
+                                      {:1 [(first topics)]
+                                       :2 [(second topics)]})]
+                        (let [shortest-column (get-shortest-column owner data layout)
+                              new-column (conj (get layout shortest-column) (get topics idx))
+                              new-layout (assoc layout shortest-column new-column)]
+                          (if (< (inc idx) (count topics))
+                            (recur (inc idx)
+                                   new-layout)
+                            new-layout)))]
+    final-layout))
 
 (defn render-topic [owner options section-name & [column]]
   (when section-name
@@ -119,8 +177,7 @@
                                :sharing-mode sharing-mode
                                :share-selected share-selected?}
                                {:opts {:section-name section-name
-                                       :topic-click (partial topic-click section-name)
-                                       :img-onload-cb (partial img-onload-cb owner)}}))))))))
+                                       :topic-click (partial topic-click section-name)}}))))))))
 
 (defcomponent topics-columns [{:keys [columns-num
                                       sharing-mode
@@ -130,23 +187,22 @@
                                       topics
                                       company-data] :as data} owner options]
 
-  (did-update [_ _ _]
-    (if (> columns-num 1)
-      (when-not (om/get-state owner :best-partition)
-        (om/set-state! owner :best-partition (calc-partitions owner)))
-      (om/set-state! owner :best-partition (vec topics))))
+  (did-mount [_]
+    (when (> columns-num 1)
+      (om/set-state! owner :best-layout (calc-layout owner data))))
 
   (will-receive-props [_ next-props]
-    (when (not= (:topics next-props) (:topics data))
-      (om/set-state! owner :best-partition false)))
+    (when (or (not= (:topics next-props) (:topics data))
+              (not= (:columns-num next-props) (:columns-num data)))
+      (om/set-state! owner :best-layout (calc-layout owner next-props))))
 
-  (render-state [_ {:keys [best-partition]}]
+  (render-state [_ {:keys [best-layout]}]
     (let [show-add-topic     (add-topic? owner)
           add-first-column?  (= (count topics) 0)
           add-second-column? (= (count topics) 1)
           add-third-column?  (>= (count topics) 2)
           partial-render-topic (partial render-topic owner options)
-          render-topics      (if best-partition (vec best-partition) (vec topics))]
+          render-topics      (vec topics)]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :sharing-mode sharing-mode
@@ -158,58 +214,37 @@
                     :style #js {:width total-width}}
             (dom/div {:class "topics-column"
                       :style #js {:width (str card-width "px")}}
-              (for [idx (range (inc (quot (count render-topics) 3)))
-                :while (< idx (inc (quot (count render-topics) 2)))
-                :let [real-idx (* idx 3)
-                      section-name (get (vec render-topics) real-idx)]]
-                (partial-render-topic section-name))
-              (when (and add-first-column? show-add-topic)
-                (partial-render-topic "add-topic" 1)))
+              (for [idx (range (count (:1 best-layout)))
+                :let [section-name (name (get (:1 best-layout) idx))]]
+                (partial-render-topic section-name (when (= section-name "add-topic") 1))))
             (dom/div {:class "topics-column"
                       :style #js {:width (str card-width "px")}}
-              (for [idx (range (inc (quot (count render-topics) 3)))
-                :while (< idx (inc (quot (count render-topics) 2)))
-                :let [real-idx (inc (* idx 3))
-                      section-name (get (vec render-topics) real-idx)]]
-                (partial-render-topic section-name))
-              (when (and add-second-column? show-add-topic)
-                (partial-render-topic "add-topic" 2)))
+              (for [idx (range (count (:2 best-layout)))
+                :let [section-name (name (get (:2 best-layout) idx))]]
+                (partial-render-topic section-name (when (= section-name "add-topic") 2))))
             (dom/div {:class "topics-column"
                       :style #js {:width (str card-width "px")}}
-              (for [idx (range (inc (quot (count render-topics) 3)))
-                :while (< idx (inc (quot (count render-topics) 2)))
-                :let [real-idx (+ (* idx 3) 2)
-                      section-name (get (vec render-topics) real-idx)]]
-                (partial-render-topic section-name))
-              (when (and add-third-column? show-add-topic)
-                (partial-render-topic "add-topic" 3))))
+              (for [idx (range (count (:3 best-layout)))
+                :let [section-name (name (get (:3 best-layout) idx))]]
+                (partial-render-topic section-name (when (= section-name "add-topic") 3)))))
           2
           (dom/div {:class "topics-column-container columns-2 group"
                     :style #js {:width total-width}}
             (dom/div {:class "topics-column"
                       :style #js {:width (str card-width "px")}}
-              (for [idx (range (inc (quot (count render-topics) 2)))
-                :while (< idx (inc (quot (count render-topics) 2)))
-                :let [real-idx (* idx 2)
-                      section-name (get (vec render-topics) real-idx)]]
-                (partial-render-topic section-name))
-              (when (and add-first-column? show-add-topic)
-                (partial-render-topic "add-topic" 1)))
+              (for [idx (range (count (:1 best-layout)))
+                :let [section-name (name (get (:1 best-layout) idx))]]
+                (partial-render-topic section-name (when (= section-name "add-topic") 1))))
             (dom/div {:class "topics-column"
                       :style #js {:width (str card-width "px")}}
-              (for [idx (range (inc (quot (count render-topics) 2)))
-                :while (< idx (inc (quot (count render-topics) 2)))
-                :let [real-idx (inc (* idx 2))
-                      section-name (get (vec render-topics) real-idx)]]
-                (partial-render-topic section-name))
-              (when (and (not add-first-column?)
-                         show-add-topic)
-                (partial-render-topic "add-topic" 2))))
+              (for [idx (range (count (:2 best-layout)))
+                :let [section-name (name (get (:2 best-layout) idx))]]
+                (partial-render-topic section-name (when (= section-name "add-topic") 2)))))
           ; 1 column or default
           (dom/div {:class "topics-column-container columns-1 group"
                     :style #js {:width total-width}}
             (dom/div {:class "topics-column"}
-              (for [section-name topics]
-                (partial-render-topic section-name))
+              (for [section topics]
+                (partial-render-topic (name section)))
               (when show-add-topic
                 (partial-render-topic "add-topic" 1)))))))))
