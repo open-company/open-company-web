@@ -9,6 +9,11 @@ $.append = function(){};
 $.position = function(){};
 $.position.top = {};
 $.position.left = {};
+$.appendTo = function(){};
+$.detach = function(){};
+$.height = function(){};
+$.find = function(){};
+$.data = function(){};
 // Location
 var location = {};
 location.reload = function(){};
