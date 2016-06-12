@@ -282,6 +282,7 @@
         ;; Topics list columns
         (om/build topics-columns {:columns-num columns-num
                                   :card-width card-width
+                                  :selected-metric selected-metric
                                   :sharing-mode sharing-mode
                                   :total-width total-width
                                   :content-loaded (not (:loading data))
