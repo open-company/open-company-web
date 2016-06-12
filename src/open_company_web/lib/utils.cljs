@@ -677,7 +677,7 @@
   "Take a string containing either Unicode emoji (mobile device keyboard), short code emoji (web app),
   or ASCII emoji (old skool) and convert it to HTML string ready to be added to the DOM (dangerously)
   with emoji image tags via the Emoji One lib and resources."
-  [text]
+  [text & [plain-text]]
   ;; use an SVG sprite map
   (set! (.-imageType js/emojione) "svg")
   (set! (.-sprites js/emojione) true)
@@ -686,7 +686,9 @@
   (set! (.-ascii js/emojione) true)
   (let [text-string (or text "") ; handle nil
         unicode-string (.toImage js/emojione text-string)]
-    #js {"__html" unicode-string}))
+    (if plain-text
+      unicode-string
+      #js {"__html" unicode-string})))
 
 (defn strip-HTML-tags [text]
   (when text
