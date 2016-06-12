@@ -99,7 +99,7 @@
               temp-height (get-topic-height topic-body)
               headline (headline-height (:headline topic-data) card-width)
               image-height (if (and img (.get img 0))
-                             (min (.-height (.-dataset (.get img 0))) topic-header-image-max-height)
+                             (min (.data img "height") topic-header-image-max-height)
                              0)]
           (+ temp-height headline image-height))))))
 
