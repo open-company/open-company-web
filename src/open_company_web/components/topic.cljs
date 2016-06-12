@@ -24,8 +24,7 @@
 (defcomponent topic-image-header [{:keys [image-header]} owner options]
   (render [_]
     (dom/img {:src image-header
-              :class "topic-header-img"
-              :on-load #((:img-onload-cb options) image-header)})))
+              :class "topic-header-img"})))
 
 (defcomponent topic-headline [data owner]
   (render [_]
