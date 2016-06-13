@@ -272,8 +272,8 @@
                                                      :next-rev tr-next-rev}
                                                     {:opts fullscreen-topic-opts})))))
         (when editing
-          (dom/span {:class "relative remove-button btn-reset btn-outline"
-                     :on-click (partial remove-topic-click owner options)}
+          (dom/button {:class "relative remove-button btn-reset btn-outline"
+                       :on-click (partial remove-topic-click owner options)}
             (icon :alert {:size 15
                           :class "inline mr2"
                           :accent-color (oc-colors/get-color-by-kw :oc-gray-5)
