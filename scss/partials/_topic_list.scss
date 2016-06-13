@@ -27,6 +27,10 @@ div.topic-list{
   padding-bottom: 20px;
   min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
 
+  &.sharing-mode {
+    min-height: calc(100vh - #{$footer_height}px);
+  }
+
   &.no-sharing {
     margin-top: #{$navbar_height}px;
   }
