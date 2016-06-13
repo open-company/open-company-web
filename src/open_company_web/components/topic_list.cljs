@@ -18,6 +18,7 @@
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.tooltip :refer (tooltip)]
             [open-company-web.components.ui.icon :refer (icon)]
+            [open-company-web.components.ui.small-loading :refer (small-loading)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -86,7 +87,7 @@
      :topic-navigation (or (:topic-navigation current-state) true)
      :share-selected-topics (:sections (:stakeholder-update company-data))
      :transitioning false
-     :redirect-to-preview false
+     :redirect-to-preview (or (:redirect-to-preview current-state) false)
      :fullscreen-force-edit false
      :add-topic-tooltip-dismissed (or (:add-topic-tooltip-dismissed current-state) false)
      :show-add-topic-tooltip show-add-topic-tooltip
@@ -283,7 +284,7 @@
                   (dom/button {:class "share-snapshot-bt"
                                :on-click (partial preview-and-share-click owner)}
                     (when redirect-to-preview
-                      (dom/img {:class "small-loading" :src "/img/small_loading.gif"}))
+                      (om/build small-loading {:animating true}))
                     "PREVIEW AND SHARE")))
               (dom/div {:class "sharing-header-right"}
                 (dom/button {:class "close-share"
