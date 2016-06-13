@@ -85,10 +85,10 @@
                           :key :costs
                           :tab-cb tab-cb}))
         ;; Burn
-        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
+        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new :dark true})}
           burn-rate)
         ;; Runway
-        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
+        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new :dark true})}
                 runway)))))
 
 (defn replace-row-in-data [data row k v]
@@ -124,8 +124,8 @@
                   (dom/th {} "Cash")
                   (dom/th {} "Revenue")
                   (dom/th {} "Costs")
-                  (dom/th {} "Cash flow")
-                  (dom/th {} "Runway")))
+                  (dom/th {:class "dark"} "Cash flow")
+                  (dom/th {:class "dark"} "Runway")))
               (dom/tbody {}
                 (let [current-period (utils/current-period)]
                   (for [idx (range stop)]
@@ -148,5 +148,5 @@
                   (dom/td {})
                   (dom/td {})
                   (dom/td {})
-                  (dom/th {})
+                  (dom/td {})
                   (dom/td {}))))))))))
