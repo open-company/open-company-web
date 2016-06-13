@@ -136,8 +136,9 @@
                           (if (< (inc idx) (count topics))
                             (recur (inc idx)
                                    new-layout)
-                            new-layout)))]
-    final-layout))
+                            new-layout)))
+        clean-layout (apply merge (for [[k v] final-layout] {k (vec (remove nil? v))}))]
+    clean-layout))
 
 (defn render-topic [owner options section-name & [column]]
   (when section-name
@@ -201,50 +202,33 @@
           add-first-column?  (= (count topics) 0)
           add-second-column? (= (count topics) 1)
           add-third-column?  (>= (count topics) 2)
-          partial-render-topic (partial render-topic owner options)
-          render-topics      (vec topics)]
+          partial-render-topic (partial render-topic owner options)]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :sharing-mode sharing-mode
                                          :group true
                                          :content-loaded content-loaded})}
-        (case columns-num
-          3
+        (cond
+          ;; render 2 or 3 column layout
+          (> columns-num 1)
           (dom/div {:class "topics-column-container group"
                     :style #js {:width total-width}}
-            (dom/div {:class "topics-column"
-                      :style #js {:width (str card-width "px")}}
-              (for [idx (range (count (:1 best-layout)))
-                :let [section-name (name (get (:1 best-layout) idx))]]
-                (partial-render-topic section-name (when (= section-name "add-topic") 1))))
-            (dom/div {:class "topics-column"
-                      :style #js {:width (str card-width "px")}}
-              (for [idx (range (count (:2 best-layout)))
-                :let [section-name (name (get (:2 best-layout) idx))]]
-                (partial-render-topic section-name (when (= section-name "add-topic") 2))))
-            (dom/div {:class "topics-column"
-                      :style #js {:width (str card-width "px")}}
-              (for [idx (range (count (:3 best-layout)))
-                :let [section-name (name (get (:3 best-layout) idx))]]
-                (partial-render-topic section-name (when (= section-name "add-topic") 3)))))
-          2
-          (dom/div {:class "topics-column-container columns-2 group"
-                    :style #js {:width total-width}}
-            (dom/div {:class "topics-column"
-                      :style #js {:width (str card-width "px")}}
-              (for [idx (range (count (:1 best-layout)))
-                :let [section-name (name (get (:1 best-layout) idx))]]
-                (partial-render-topic section-name (when (= section-name "add-topic") 1))))
-            (dom/div {:class "topics-column"
-                      :style #js {:width (str card-width "px")}}
-              (for [idx (range (count (:2 best-layout)))
-                :let [section-name (name (get (:2 best-layout) idx))]]
-                (partial-render-topic section-name (when (= section-name "add-topic") 2)))))
-          ; 1 column or default
+            (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
+              (let [column (get best-layout kw)]
+                (when (pos? (count column))
+                  (dom/div {:class "topics-column"
+                            :style #js {:width (str card-width "px")}}
+                    (for [idx (range (count column))
+                      :let [section-kw (get column idx)
+                            section-name (name section-kw)]]
+                      (partial-render-topic section-name
+                                            (when (= section-name "add-topic") (int (name kw))))))))))
+          ;; 1 column or default
+          :else
           (dom/div {:class "topics-column-container columns-1 group"
                     :style #js {:width total-width}}
             (dom/div {:class "topics-column"}
-              (for [section topics]
+              (for [section (vec topics)]
                 (partial-render-topic (name section)))
               (when show-add-topic
                 (partial-render-topic "add-topic" 1)))))))))
