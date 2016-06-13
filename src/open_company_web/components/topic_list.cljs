@@ -267,7 +267,7 @@
                             3 (str (+ (* card-width 3) 40 60) "px")
                             2 (str (+ (* card-width 2) 20 60) "px")
                             1 (if (> ww 413) (str card-width "px") "auto"))]
-      (dom/div {:class (str "topic-list group" (when-not sharing-mode " no-sharing"))
+      (dom/div {:class (str "topic-list group" (if sharing-mode " sharing-mode" " no-sharing"))
                 :key "topic-list"}
         ;; Sharing header
         (when sharing-mode
