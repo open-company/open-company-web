@@ -1,7 +1,5 @@
 (ns open-company-web.components.navbar
-  (:require-macros [cljs.core.async.macros :refer (go)])
-  (:require [cljs.core.async :refer (chan <!)]
-            [om.core :as om :include-macros true]
+  (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [cljs.core.async :refer (put!)]
@@ -15,17 +13,8 @@
             [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.ui.user-avatar :refer (user-avatar)]
             [open-company-web.components.ui.login-button :refer (login-button)]
-            [open-company-web.components.ui.company-avatar :refer (company-avatar)]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]))
-
-(defn on-transition-end [owner body]
-  (doto body
-    (dommy/remove-class! :left)
-    (dommy/remove-class! :right)
-    (dommy/remove-class! :animating)
-    (dommy/toggle-class! :menu-visible))
-  (events/unlistenByKey (om/get-state owner :transition-end-listener)))
+            [open-company-web.components.ui.small-loading :refer (small-loading)]
+            [open-company-web.components.ui.company-avatar :refer (company-avatar)]))
 
 (defn close-preview-clicked [e]
   (.preventDefault e)
@@ -35,27 +24,9 @@
 (defn menu-click [owner e]
   (when e
     (.preventDefault e))
-  (let [body (sel1 [:body])
-        page (sel1 [:div.page])
-        menu (sel1 [:ul#menu])]
-    (dommy/add-class! body :animating)
-    (if (dommy/has-class? body :menu-visible)
-      (dommy/add-class! body :right)
-      (dommy/add-class! body :left))
-    (let [listener-key (events/listen page EventType/TRANSITIONEND #(on-transition-end owner body))]
-      (om/set-state! owner :transition-end-listener listener-key))))
+  (dis/toggle-menu))
 
-(defcomponent navbar [{:keys [company-data columns-num card-width latest-su email-loading slack-loading] :as data} owner options]
-
-  (init-state [_]
-    (utils/add-channel "close-side-menu" (chan)))
-
-  (did-mount [_]
-    (let [close-ch (utils/get-channel "close-side-menu")]
-      (go (loop []
-          (let [change (<! close-ch)]
-            (menu-click owner nil)
-            (recur))))))
+(defcomponent navbar [{:keys [company-data columns-num card-width latest-su email-loading slack-loading menu-open] :as data} owner options]
 
   (render [_]
     (let [header-width (+ (* card-width columns-num)    ; cards width
@@ -75,7 +46,7 @@
                   (dom/button {:class "ready-mail-button"
                              :on-click (:share-link-cb options)}
                     (if email-loading
-                      (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
+                      (om/build small-loading {:animating true})
                       (icon :link-72 {:size 20 :stroke "4" :color "rgba(78, 90, 107, 0.7)" :accent-color "rgba(78, 90, 107, 0.7)"}))
                     (dom/label {} "SHARE URL"))))
               (dom/button {:class "close-preview"

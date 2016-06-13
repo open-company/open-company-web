@@ -9,7 +9,7 @@
             [open-company-web.router :as router]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-list :refer (topic-list)]
-            [open-company-web.components.ui.login-button :refer [login-button]]
+            [open-company-web.components.ui.login-required :refer (login-required)]
             [open-company-web.components.footer :refer (footer)]
             [open-company-web.components.menu :refer (menu)]
             [open-company-web.components.edit-topic :refer (edit-topic)]
@@ -53,13 +53,7 @@
 (defn toggle-sharing-mode [owner]
   (om/update-state! owner :sharing-mode not))
 
-(defcomponent login-required [data owner]
-  (render [_]
-    (dom/div {:class "max-width-3 p4 mx-auto center mb4"}
-      (dom/p {:class "mb2"} "Please log in to view this dashboard.")
-      (om/build login-button data))))
-
-(defcomponent company-dashboard [data owner]
+(defcomponent company-dashboard [{:keys [menu-open] :as data} owner]
 
   (init-state [_]
     (let [url-hash (.. js/window -location -hash)
@@ -82,8 +76,7 @@
           navbar-editing-cb (partial set-navbar-editing owner data)
           card-width (responsive/calc-card-width)]
       (dom/div {:class (utils/class-set {:company-dashboard true
-                                         :main-scroll true
-                                         :navbar-offset (not (responsive/is-mobile))})}
+                                         :main-scroll true})}
         (om/build menu data)
         (if (get-in data [(keyword (router/current-company-slug)) :error])
           (dom/div {:class "page-no-navbar py4"}
@@ -97,6 +90,7 @@
                                 :card-width card-width
                                 :sharing-mode sharing-mode
                                 :columns-num columns-num
+                                :menu-open menu-open
                                 :auth-settings (:auth-settings data)}))
             (when company-data
               ;; Topic list or topic editing (old editing stuff)
@@ -120,8 +114,7 @@
                                       :section-data (get company-data (keyword editing-topic))}
                           {:opts {:navbar-editing-cb navbar-editing-cb
                                   :save-bt-active-cb (partial set-save-bt-active owner)
-                                  :dismiss-topic-editing-cb (partial dismiss-topic-editing-cb owner)}})))
-            ;;Footer
-            (when company-data
-              (om/build footer {:columns-num columns-num
-                                :card-width card-width}))))))))
+                                  :dismiss-topic-editing-cb (partial dismiss-topic-editing-cb owner)}})))))
+        ;;Footer
+        (om/build footer {:columns-num columns-num
+                          :card-width card-width})))))

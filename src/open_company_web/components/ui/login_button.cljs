@@ -8,14 +8,14 @@
             [open-company-web.router :as router]
             [open-company-web.local-settings :as ls]))
 
-(defcomponent login-button [data owner]
+(defn login! [auth-url e]
+  (let [current (router/get-token)]
+    (.preventDefault e)
+    (when-not (.startsWith current oc-urls/login)
+      (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+    (set! (.-location js/window) auth-url)))
+
+(defcomponent login-button [{:keys [auth-settings]} owner]
   (render [_]
-    (let [auth-url (:auth-url (:auth-settings data))
-          current-token (router/get-token)]
-      (dom/button {:class "login-button"
-                   :on-click (fn [e]
-                    (.preventDefault e)
-                    (when-not (.startsWith current-token oc-urls/login)
-                      (cook/set-cookie! :login-redirect current-token (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-                    (set! (.-location js/window) auth-url))}
-        "Sign in / Sign up"))))
+    (dom/button {:class "btn-reset btn-outline" :on-click #(login! (:auth-url auth-settings) %)}
+      "Sign in / Sign up")))

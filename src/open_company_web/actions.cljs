@@ -3,6 +3,7 @@
             [clojure.string :as string]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.cookies :as cook]
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
@@ -16,10 +17,17 @@
 ;; The extended multimethod `action` is defined in the dispatcher
 ;; namespace to avoid cyclical dependencies between namespaces
 
+(defn- log [& args]
+  (js/console.log (apply pr-str args)))
+
 (defmethod dispatcher/action :default [db payload]
   (js/console.warn "No handler defined for" (str (first payload)))
   (js/console.log "Full event: " (pr-str payload))
   db)
+
+(defmethod dispatcher/action :logout [db _]
+  (cook/remove-cookie! :jwt)
+  (router/redirect! "/"))
 
 (defmethod dispatcher/action :input [db [_ path value]]
   (assoc-in db path value))
@@ -28,11 +36,14 @@
   (let [create-link    (med/find-first #(= (:rel %) "company-create") links)
         slug           (fn [co] (last (string/split (:href co) #"/")))
         [first second] (filter #(= (:rel %) "company") links)]
-    (cond
-      (and first (not second)) (router/nav! (oc-urls/company (slug first)))
-      (and first second)       (router/nav! oc-urls/companies)
-      create-link              (router/nav! oc-urls/create-company)))
-  db)
+    (let [login-redirect (cook/get-cookie :login-redirect)]
+      (cond
+        (and create-link (not first)) (router/nav! oc-urls/create-company)
+        login-redirect                (do (cook/remove-cookie! :login-redirect)
+                                          (router/redirect! login-redirect))
+        (and first (not second))      (router/nav! (oc-urls/company (slug first)))
+        (and first second)            (router/nav! oc-urls/companies)
+        )) db))
 
 (defmethod dispatcher/action :company-submit [db _]
   (api/post-company (:company-editor db))

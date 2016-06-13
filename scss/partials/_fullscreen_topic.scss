@@ -30,41 +30,12 @@ div.fullscreen-topic {
     z-index: 1040;
     top: 20px;
     right: 70px;
-    width: 95px;
-    height: 30px;
-    background-color: #f9d748;
-    font-weight: 700;
-    font-size: 12px;
-    line-height: 1.5;
-    letter-spacing: 1px;
-    color: $oc_gray_5;
-    outline: none;
-    border: none;
   }
 
-  button.remove-button {
-    position: relative;
-    cursor: pointer;
+  .remove-button {
     z-index: 1040;
     bottom: 10px;
-    left: 50px;
-    width: 188px;
-    height: 30px;
-    opacity: 0.2;
-    border: solid 1px rgba(78, 90, 107, 0.5);
-    opacity: 0.5;
-    font-weight: 700;
-    font-size: 12px;
-    line-height: 1.5;
-    letter-spacing: 1px;
-    color: $oc_gray_5;
-    outline: none;
-    background-color: transparent;
-
-    div.svg-icon {
-      float: left;
-      margin-right: 8px;
-    }
+    left: 15px;
   }
 
   div.close {

@@ -20,6 +20,7 @@
             [open-company-web.components.su-list :refer (su-list)]
             [open-company-web.components.su-snapshot-preview :refer (su-snapshot-preview)]
             [open-company-web.components.su-snapshot :refer (su-snapshot)]
+            [open-company-web.components.home :refer (home)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
@@ -47,8 +48,21 @@
  (check-get-params query-params)
  (inject-loading))
 
-;; Company list
+;; home
 (defn home-handler [target params]
+  (pre-routing (:query-params params))
+  ;; clean the caches
+  (utils/clean-company-caches)
+  ;; save route
+  (router/set-route! [] {})
+  ;; load data from api
+  (swap! dis/app-state assoc :loading true)
+  (api/get-entry-point)
+  ;; render component
+  (om/root home dis/app-state {:target target}))
+
+;; Company list
+(defn list-companies-handler [target params]
   (pre-routing (:query-params params))
   ;; clean the caches
   (utils/clean-company-caches)
@@ -68,15 +82,7 @@
   (if (contains? (:query-params params) :jwt)
     (do ; contains :jwt so auth went well
       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-      ;; redirect to dashboard
-      (if-let [login-redirect (cook/get-cookie :login-redirect)]
-        (do
-          ;; remove the login redirect cookie
-          (cook/remove-cookie! :login-redirect)
-          ;; redirect to the initial path
-          (router/redirect! login-redirect))
-        ;; redirect to / if no cookie is set
-        (router/redirect! "/")))
+      (api/get-entry-point))
     (do
       (when (contains? (:query-params params) :login-redirect)
         (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
@@ -136,14 +142,17 @@
       (home-handler target params))
 
     (defroute company-create-route urls/create-company {:as params}
-      (pre-routing (:query-params params))
-      (om/root company-editor dis/app-state {:target target}))
+      (if (jwt/jwt)
+        (do
+          (pre-routing (:query-params params))
+          (om/root company-editor dis/app-state {:target target}))
+        (login-handler target params)))
 
     (defroute list-page-route urls/companies {:as params}
-      (home-handler target params))
+      (list-companies-handler target params))
 
     (defroute list-page-route-slash (str urls/companies "/") {:as params}
-      (home-handler target params))
+      (list-companies-handler target params))
 
     (defroute user-profile-route urls/user-profile {:as params}
       (utils/clean-company-caches)
@@ -194,8 +203,7 @@
     (defn login-wall []
       ;; load the login settings from auth server
       ;; if the user is not logged in yet
-      (when-not (or (jwt/jwt)
-                    (contains? @dis/app-state :auth-settings))
+      (when-not (:auth-settings @dis/app-state)
         (api/get-auth-settings)))
 
     (defn handle-url-change [e]

@@ -13,6 +13,7 @@
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.fullscreen-topic-edit :refer (fullscreen-topic-edit)]
             [open-company-web.components.ui.icon :refer (icon)]
+            [open-company-web.components.ui.small-loading :refer (small-loading)]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [goog.style :refer (setStyle)]
             [goog.events :as events]
@@ -135,7 +136,7 @@
     (om/set-state! owner :editing (not editing-mode))
     ((:topic-navigation options) editing-mode)))
 
-(defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width hide-history-navigation] :as data} owner options]
+(defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width hide-history-navigation show-first-edit-tooltip] :as data} owner options]
 
   (init-state [_]
     (utils/add-channel (str "fullscreen-topic-save-" (name section)) (chan))
@@ -209,12 +210,12 @@
         (when (and can-edit?
                    editing
                    show-save-button)
-          (dom/button {:class "save-button"
+          (dom/button {:class "save-button btn-reset btn-solid"
                        :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-save-" (name section)))]
                                     (om/set-state! owner :data-posted true)
                                     (put! ch {:click true :event %}))}
             (if data-posted
-              (dom/img {:class "small-loading" :src "/img/small_loading.gif"})
+              (om/build small-loading {:animating true})
               "POST")))
         (dom/div {:class "close"
                   :on-click #(if editing
@@ -231,7 +232,8 @@
                                            :card-width card-width
                                            :is-actual is-actual?
                                            :prev-rev prev-rev
-                                           :next-rev next-rev}
+                                           :next-rev next-rev
+                                           :show-first-edit-tooltip show-first-edit-tooltip}
                                           {:opts edit-topic-opts
                                            :key as-of}))
         (dom/div #js {:className "fullscreen-topic-transition group"
@@ -270,9 +272,10 @@
                                                      :next-rev tr-next-rev}
                                                     {:opts fullscreen-topic-opts})))))
         (when editing
-          (dom/button {:class "remove-button"
-                       :on-click (partial remove-topic-click owner options)}
+          (dom/span {:class "relative remove-button btn-reset btn-outline"
+                     :on-click (partial remove-topic-click owner options)}
             (icon :alert {:size 15
+                          :class "inline mr2"
                           :accent-color (oc-colors/get-color-by-kw :oc-gray-5)
-                          :stroke (oc-colors/get-color-by-kw :oc-gray-5)})
-            "ARCHIVE THIS TOPIC"))))))
+                          :color (oc-colors/get-color-by-kw :oc-gray-5)})
+            "Archive this topic"))))))
