@@ -124,13 +124,15 @@ div.su-preview-dialog {
       }
 
       a.share-link-new-win {
+        opacity: 0.5;
         font-weight: 700;
         font-size: 12px;
         line-height: 1.5;
+        letter-spacing: 1px;
         color: $oc_gray_5;
         cursor: pointer;
-        opacity: 0.5;
         text-decoration: underline;
+        text-transform: uppercase;
       }
 
 

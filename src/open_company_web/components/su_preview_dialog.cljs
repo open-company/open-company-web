@@ -99,7 +99,7 @@
                 (dom/button {:class "share-link-button"
                              :data-clipboard-target "#share-link-input"
                              :on-click #(copy-clicked owner)} (if share-link-copied "COPIED ✓" "COPY")))
-              (dom/a {:class "share-link-new-win" :href share-link :target "_blank"} "Open in new window")))
+              (dom/a {:class "share-link-new-win" :href share-link :target "_blank"} "OPEN IN NEW WINDOW")))
           (when share-via-slack
             (dom/div {:class "su-preview-box"}
               (dom/label {:class "slack-share-cta"} "SHARE THIS SNAPSHOT WITH THE MEMBERS OF YOUR SLACK TEAM")
