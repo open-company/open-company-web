@@ -3,7 +3,7 @@
   '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
     [adzerk/boot-reload "0.4.8" :scope "test"]
     [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
-    [tolitius/boot-check "0.1.1" :scope "test"]
+    [tolitius/boot-check "0.1.2" :scope "test"]
 
     [org.clojure/clojurescript "1.9.36"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
 
@@ -11,7 +11,7 @@
     [org.omcljs/om "0.9.0" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
 
     [cljs-http "0.1.41"] ; HTTP for cljs https://github.com/r0man/cljs-http
-    [prismatic/schema "1.1.1"] ; Dependency of om-tools https://github.com/Prismatic/schema
+    [prismatic/schema "1.1.2"] ; Dependency of om-tools https://github.com/Prismatic/schema
     [prismatic/plumbing "0.5.3"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [prismatic/om-tools "0.4.0"] ; Tools for Om https://github.com/Prismatic/om-tools
     [secretary "2.0.0.1-41b949"] ; Client-side router https://github.com/gf3/secretary
