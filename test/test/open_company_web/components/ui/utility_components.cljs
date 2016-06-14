@@ -1,12 +1,11 @@
 (ns test.open-company-web.components.ui.utility-components
-    (:require [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
+    (:require [cljs.test :refer-macros (deftest async testing is are use-fixtures)]
               [cljs-react-test.simulate :as sim]
               [cljs-react-test.utils :as tu]
               [om.core :as om :include-macros true]
-              [dommy.core :as dommy :refer-macros [sel1 sel]]
-              [open-company-web.components.ui.utility-components :refer [editable-pen]]
-              [om.dom :as dom :include-macros true]
-              [open-company-web.data.users :refer [users]]))
+              [dommy.core :as dommy :refer-macros (sel1 sel)]
+              [open-company-web.components.ui.utility-components :refer (editable-pen)]
+              [om.dom :as dom :include-macros true]))
 
 (enable-console-print!)
 
