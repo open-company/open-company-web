@@ -24,7 +24,7 @@
           (dom/div {:class "footer-bottom"
                     :style #js {:width (str footer-width "px")}}
             (when-not (responsive/is-mobile)
-              (dom/a {:class "oc-logo" :href oc-urls/home} (dom/img {:src "/img/oc-logo-grey.svg"})))
+              (dom/a {:class "oc-logo" :href oc-urls/home} (dom/img {:src "/img/oc-wordmark.svg"})))
             ; (dom/a {:class "footer-link" :href oc-urls/about} (str "ABOUT"  (when-not (responsive/is-mobile) " US")))
             (dom/a {:class "footer-link" :href oc-urls/contact-mail-to} (str "CONTACT" (when-not (responsive/is-mobile) " US")))
             (when (responsive/is-mobile)
