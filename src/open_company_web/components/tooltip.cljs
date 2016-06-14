@@ -6,9 +6,6 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defn on-click-in [owner options e]
-  (.stopPropagation e))
-
 (defn on-click-out [owner options e]
   ((:dismiss-tooltip options)))
 
@@ -24,7 +21,6 @@
 
   (render-state [_ {:keys [shown]}]
     (dom/div {:class "tooltip-container"}
-      (dom/div {:class (str "tooltip-box" (when shown " shown"))
-                :on-click (partial on-click-in owner options)}
+      (dom/div {:class (str "tooltip-box" (when shown " shown"))}
         (dom/div {:class "triangle"})
         (dom/div {:class "tooltip-cta"} (:cta data))))))
