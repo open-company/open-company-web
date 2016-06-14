@@ -10,28 +10,3 @@ div.company-dashboard {
     min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
   }
 }
-
-.animating .page {
-  transition: transform .25s ease-in-out;
-  -webkit-transition: -webkit-transform .25s ease-in-out;
-}
-
-.animating.left .page {
-  transform: translate3d( -190px, 0, 0 );
-  -webkit-transform: translate3d( -190px, 0, 0 );
-}
-
-.animating.right .page {
-  transform: translate3d( 190px, 0, 0 );
-  -webkit-transform: translate3d( 190px, 0, 0 );
-}
-
-.menu-visible .page {
-  right: 190px;
-  top: 0px;
-}
-
-.menu-visible:not(.animating) .page nav{
-  left: -190px;
-  top: default;
-}
