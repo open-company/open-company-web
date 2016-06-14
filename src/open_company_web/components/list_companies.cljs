@@ -31,7 +31,7 @@
                             :columns-num columns-num
                             :menu-open menu-open
                             :auth-settings (:auth-settings data)})
-          (dom/div {:class "navbar-offset"}
+          (dom/div {:class "navbar-offset group"}
             (if (:loading data)
               (dom/h4 "Loading companies...")
               (if (pos? (count company-list))
