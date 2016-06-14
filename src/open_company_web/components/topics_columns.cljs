@@ -122,7 +122,7 @@
 (defn calc-layout [owner data]
   (let [columns-num (:columns-num data)
         show-add-topic (add-topic? owner)
-        topics (to-array (concat (:topics data) ["add-topic"]))
+        topics (to-array (:topics data))
         final-layout (loop [idx 3
                             layout (if (= columns-num 3)
                                       {:1 [(first topics)]
@@ -199,9 +199,6 @@
 
   (render-state [_ {:keys [best-layout]}]
     (let [show-add-topic     (add-topic? owner)
-          add-first-column?  (= (count topics) 0)
-          add-second-column? (= (count topics) 1)
-          add-third-column?  (>= (count topics) 2)
           partial-render-topic (partial render-topic owner options)]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
@@ -215,14 +212,29 @@
                     :style #js {:width total-width}}
             (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
               (let [column (get best-layout kw)]
-                (when (pos? (count column))
-                  (dom/div {:class "topics-column"
-                            :style #js {:width (str card-width "px")}}
+                (dom/div {:class "topics-column"
+                          :style #js {:width (str card-width "px")}}
+                  (when (pos? (count column))
                     (for [idx (range (count column))
                       :let [section-kw (get column idx)
                             section-name (name section-kw)]]
                       (partial-render-topic section-name
-                                            (when (= section-name "add-topic") (int (name kw))))))))))
+                                            (when (= section-name "add-topic") (int (name kw))))))
+                  (when (and show-add-topic
+                             (= kw :1)
+                             (= (count topics) 0))
+                    (partial-render-topic "add-topic" 1))
+                  (when (and show-add-topic
+                             (= kw :2)
+                             (or (and (= (count topics) 1)
+                                      (= columns-num 3))
+                                 (and (>= (count topics) 1)
+                                      (= columns-num 2))))
+                    (partial-render-topic "add-topic" 2))
+                  (when (and show-add-topic
+                             (= kw :3)
+                             (>= (count topics) 2))
+                    (partial-render-topic "add-topic" 3))))))
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
