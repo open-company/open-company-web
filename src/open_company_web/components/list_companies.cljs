@@ -32,10 +32,9 @@
                             :menu-open menu-open
                             :auth-settings (:auth-settings data)})
           (dom/div {:class "navbar-offset"}
-            (dom/h1 "Companies:")
             (if (:loading data)
               (dom/h4 "Loading companies...")
               (if (pos? (count company-list))
-                (dom/ul
+                (dom/ul {:class "companies"}
                   (om/build-all list-page-item company-list))
                 (dom/h2 "No companies found.")))))))))
