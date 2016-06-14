@@ -174,4 +174,8 @@
   *::-moz-selection {
     background: rgba(249,215,72, 0.5);
   }
+
+  &::after{ //placeholder
+    white-space: inherit;
+  }
 }

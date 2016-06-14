@@ -271,6 +271,8 @@
 (defn check-headline-count [owner headline-mex-length e]
   (when-let [headline (sel1 [:div.topic-edit-headline])]
     (let [headline-value (.-innerText headline)]
+      (when (pos? (count headline-value))
+        (om/set-state! owner :tooltip-dismissed true))
       (when (and (not= (.-keyCode e) 8)
                  (not= (.-keyCode e) 16)
                  (not= (.-keyCode e) 17)
@@ -418,7 +420,7 @@
                            tooltip-dismissed]}]
     (let [topic-kw (keyword topic)
           title-length-limit 20
-          topic-body (utils/get-topic-body topic-data topic-kw)
+          topic-body (if-not (:placeholder topic-data) (utils/get-topic-body topic-data topic-kw) "")
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height utils/overlay-max-win-height)
           max-height (min (- 650 126) (- win-height 126))
