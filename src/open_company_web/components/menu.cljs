@@ -27,6 +27,7 @@
 
 (defn user-profile-click [e]
   (stop e)
+  (dis/save-last-company-slug)
   (close-menu)
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! oc-urls/user-profile)))
 
