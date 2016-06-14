@@ -189,8 +189,7 @@
                          1 (if (> ww 413) (str card-width "px") "auto"))
           su-subtitle  (str "- " (utils/date-string (js/Date.) true))]
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
-                                         :main-scroll true
-                                         :navbar-offset (not (responsive/is-mobile))})}
+                                         :main-scroll true})}
         (om/build menu data)
         (dom/div {:class "page"}
           ;; Navbar
