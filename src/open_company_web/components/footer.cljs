@@ -18,8 +18,8 @@
           "Powered by OpenCompany"
           (when (:su-preview data)
             (dom/div {}
-              (dom/a {:class "io-link"
-                      :href "https://opencompany.io/"} "LEARN MORE ➞"))))
+              (dom/a {:class "com-link"
+                      :href "https://opencompany.com/"} "LEARN MORE ➞"))))
         (dom/div {:class "footer-internal"}
           (dom/div {:class "footer-bottom"
                     :style #js {:width (str footer-width "px")}}

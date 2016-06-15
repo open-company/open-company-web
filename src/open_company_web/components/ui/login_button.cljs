@@ -17,5 +17,5 @@
 
 (defcomponent login-button [{:keys [auth-settings]} owner]
   (render [_]
-    (dom/button {:class "btn-reset btn-outline" :on-click #(login! (:auth-url auth-settings) %)}
+    (dom/button {:class "btn-reset btn-outline" :on-click #(login! (:extended-scopes-url auth-settings) %)}
       "Sign in / Sign up")))
