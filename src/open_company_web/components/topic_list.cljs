@@ -98,7 +98,7 @@
      :show-share-snapshot-tooltip (or (:show-share-snapshot-tooltip current-state) false)
      :share-snapshot-tooltip-dismissed (or (:share-snapshot-tooltip-dismissed current-state) false)}))
 
-(defn topic-click [owner topic selected-metric]
+(defn topic-click [owner topic selected-metric & [force-edit]]
   (if (om/get-state owner :sharing-mode)
     (let [share-selected-topics (om/get-state owner :share-selected-topics)
           new-share-selected-topics (if (utils/in? share-selected-topics (name topic))
@@ -106,6 +106,8 @@
                                       (vec (concat share-selected-topics [(name topic)])))]
       (om/set-state! owner :share-selected-topics new-share-selected-topics))
     (do
+      (when force-edit
+        (om/set-state! owner :fullscreen-force-edit true))
       (om/set-state! owner :selected-topic topic)
       (om/set-state! owner :selected-metric selected-metric))))
 
@@ -170,8 +172,7 @@
   ((:toggle-sharing-mode options)))
 
 (defn preview-and-share-click [owner e]
-  (.preventDefault e)
-  (.stopPropagation e)
+  (utils/event-stop e)
   (let [props (om/get-props owner)
         company-data (:company-data props)
         su-data (:stakeholder-update company-data)
