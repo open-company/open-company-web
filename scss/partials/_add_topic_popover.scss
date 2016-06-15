@@ -107,11 +107,11 @@ div.add-topic-popover {
         padding-top: 3px;
         padding-bottom: 3px;
         padding-left: 19px;
-        background-color: #ffffff;
-
-        &.highlighted {
+        background-color: white;
+      }
+      
+      div.potential-topic:hover {
           background-color: rgba(249, 215, 72, 0.2);
-        }
       }
     }
 
@@ -133,17 +133,17 @@ div.add-topic-popover {
     padding: 10px 0px 10px 20px;
     position: absolute;
     bottom: 0px;
-    height: 45px;
+    height: 40px;
     width: 100%;
     background-color: white;
 
     label {
-      opacity: 0.3;
       font-family: $oc_headers_font;
       font-size: 14px;
       line-height: 1.7;
       color: $oc_gray_5;
       height: 30px;
+      font-weight: normal;
     }
 
     input {
@@ -160,5 +160,9 @@ div.add-topic-popover {
         outline: none;
       }
     }
+  }
+
+  div.add-custom-topic-container:hover {
+    background-color: rgba(249, 215, 72, 0.2);
   }
 }
