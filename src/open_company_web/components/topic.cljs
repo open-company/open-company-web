@@ -89,7 +89,8 @@
               (dom/img {:src image-header}))))
         ;; Topic title
         (dom/div {:class "topic-title"} (:title topic-data))
-        (when (and (responsive/can-edit?)
+        (when (and (not (:add-topic data))
+                   (responsive/can-edit?)
                    (not (responsive/is-mobile))
                    (not (:read-only topic-data)))
           (dom/button {:class "topic-pencil-button btn-reset"
