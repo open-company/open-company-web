@@ -15,6 +15,7 @@
 (def test-atom {
   :auth-settings {
     :auth-url "https://slack.com/oauth/authorize?client_id=&redirect_uri=/slack-oauth&state=open-company-auth&scope=identify,read,post"
+    :extended-scopes-url "https://slack.com/oauth/authorize?client_id=&redirect_uri=/slack-oauth&state=open-company-auth&scope=identify,read,post"
     :redirectURI "/slack-oauth"
     :state "open-company-auth"
     }

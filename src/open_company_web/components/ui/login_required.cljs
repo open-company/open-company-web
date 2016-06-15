@@ -15,7 +15,7 @@
           (dom/br)
           (dom/small
               (dom/a {:href "#"
-                      :on-click #(login/login! (:auth-url (:auth-settings data)) %)}
+                      :on-click #(login/login! (:extended-scopes-url (:auth-settings data)) %)}
                "Sign in with a different Slack account ")
             "to access different dashboards."))
         (dom/div
