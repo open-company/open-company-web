@@ -216,13 +216,17 @@
                                     (put! ch {:click true :event %}))}
             (if data-posted
               (om/build small-loading {:animating true})
-              "POST")))
-        (dom/div {:class "close"
-                  :on-click #(if editing
-                              (when-let [ch (utils/get-channel (str "fullscreen-topic-cancel-" (name section)))]
-                                 (put! ch {:click true :event %}))
-                              (hide-fullscreen-topic owner options))}
-          (icon :simple-remove))
+              "SAVE")))
+        (if editing
+          (dom/button {:class "btn-reset btn-outline close-editing"
+                       :key "close"
+                       :title "Dismiss edit"
+                       :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-cancel-" (name section)))]
+                                    (put! ch {:click true :event %}))} "CANCEL")
+          (dom/button {:class "close btn-reset btn-outline"
+                       :key "close-editing"
+                       :title "ESC"
+                       :on-click #(hide-fullscreen-topic owner options)} (icon :simple-remove)))
         (dom/div {:style #js {:display (when-not editing "none")}}
           (om/build topic-overlay-edit {:topic section
                                         :topic-data topic-data
