@@ -724,3 +724,7 @@
   "Generate v4 GUID based on this http://stackoverflow.com/a/2117523"
   []
   (str (my-uuid) (my-uuid) "-" (my-uuid) "-" (my-uuid) "-" (my-uuid) "-" (my-uuid) (my-uuid) (my-uuid)))
+
+(defn event-stop [e]
+  (.preventDefault e)
+  (.stopPropagation e))

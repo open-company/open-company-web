@@ -114,8 +114,7 @@
   ((:dismiss-popover options)))
 
 (defn add-custom-topic [owner e]
-  (.preventDefault e)
-  (.stopPropagation e)
+  (utils/event-stop e)
   (om/set-state! owner :adding-custom-topic true))
 
 (defn custom-topic-key-down [owner options e]

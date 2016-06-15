@@ -22,6 +22,7 @@
                          :section "add-topic"
                          :add-topic true
                          :column column
+                         :read-only-company false
                          :archived-topics (:archived company-data)
                          :section-data {:title "+ ADD A TOPIC"
                                         :body ""
@@ -40,6 +41,7 @@
               (om/build topic {:loading (:loading company-data)
                                :section section-name
                                :section-data sd
+                               :read-only-company (:read-only company-data)
                                :currency (:currency company-data)
                                :sharing-mode sharing-mode
                                :share-selected share-selected?}
