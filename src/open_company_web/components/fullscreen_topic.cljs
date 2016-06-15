@@ -187,7 +187,7 @@
           fullscreen-topic-opts (merge options {:rev-nav #(om/set-state! owner :transition-as-of %)
                                                 :switch-metric-cb #(om/set-state! owner :last-selected-metric %)})
           edit-topic-opts (merge options {:show-save-button #(om/set-state! owner :show-save-button %)
-                                          :dismiss-editing #(hide-fullscreen-topic owner options)})
+                                          :dismiss-editing #(hide-fullscreen-topic owner options (:fullscreen-force-edit data))})
           can-edit? (and (responsive/can-edit?)
                          (not (:read-only data)))]
       ; preload previous revision
@@ -212,6 +212,7 @@
                    show-save-button)
           (dom/button {:class "save-button btn-reset btn-solid"
                        :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-save-" (name section)))]
+                                    (hide-fullscreen-topic owner options true)
                                     (om/set-state! owner :data-posted true)
                                     (put! ch {:click true :event %}))}
             (if data-posted
