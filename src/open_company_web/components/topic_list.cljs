@@ -109,7 +109,8 @@
       (when force-edit
         (om/set-state! owner :fullscreen-force-edit true))
       (om/set-state! owner :selected-topic topic)
-      (om/set-state! owner :selected-metric selected-metric))))
+      (om/set-state! owner :selected-metric selected-metric)
+      (utils/after 100 #(om/set-state! owner :fullscreen-force-edit false)))))
 
 (def scrolled-to-top (atom false))
 
