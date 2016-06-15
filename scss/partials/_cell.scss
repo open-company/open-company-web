@@ -10,6 +10,11 @@
     span, input {
       width: 100%;
       text-align: right;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      padding: 0;
+      margin: 0;
     }
   }
 
@@ -20,6 +25,7 @@
     span.placeholder {
       color: rgba(0, 0, 0, 0.4);
       font-size: 12px;
+      font-weight: 400;
     }
   }
 
@@ -28,6 +34,8 @@
 
     span {
       color: black;
+      font-size: 12px;
+      font-weight: 400;
     }
   }
 
@@ -37,6 +45,8 @@
 
     span {
       color: black;
+      font-size: 12px;
+      font-weight: 400;
     }
   }
 
@@ -48,6 +58,8 @@
       border: 0px solid black;
       outline: none;
       text-align: left;
+      font-size: 12px;
+      font-weight: 400;
     }
   }
 
