@@ -365,9 +365,9 @@
                    (not share-su-tooltip-dismissed))
           (om/build tooltip
             {:cta "YOUR BIG PICTURE IS COMING TOGETHER. YOU CAN SHARE A SNAPSHOT OF SELECTED TOPICS WITH YOUR TEAM, INVESTORS OR THE CROWD WHEN YOU'RE READY."}
-            {:opts {:class "medium" :dismiss-tooltip #(om/set-state! owner :share-su-tooltip-dismissed true)}}))
+            {:opts {:class "large" :dismiss-tooltip #(om/set-state! owner :share-su-tooltip-dismissed true)}}))
         (when (and show-share-snapshot-tooltip
                    (not share-snapshot-tooltip-dismissed))
           (om/build tooltip
-            {:cta "CHOOSE TOPICS TO SHARE IN YOUR SNAPSHOT. A SNAPSHOT CONTAINS SELECTED TOPICS CAPTURED IN THAT MOMENT IN TIME AND SHARED VIA SLACK, EMAIL OR THE WEB. USE THEM FOR ALL-HANDS, INVESTOR UPDATES, OR WHENEVER YOU'D LIKE TO ENGAGE YOUR STAKEHOLDERS."}
+            {:cta "CHOOSE TOPICS TO SHARE VIA SLACK, EMAIL OR THE WEB. SNAPSHOTS ARE GREAT FOR TEAM AND INVESTOR UPDATES, OR TO ENGAGE THE CROWD."}
             {:opts {:class "large" :dismiss-tooltip #(dismiss-share-snapshot-tooltip owner)}}))))))

@@ -48,17 +48,6 @@ div.tooltip-container {
   }
 }
 
-div.tooltip-container.medium {
-  height: 163px;
-}
-
 div.tooltip-container.large {
-  height: 203px;
-  width: 276px;
-
-  div.tooltip-box {
-    div.tooltip-cta {
-      width: 242px;
-    }
-  }
+  height: 163px;
 }
