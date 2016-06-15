@@ -21,6 +21,6 @@
         (dom/div
           (dom/p {:class "mb2"}
             (if welcome
-              "OpenCompany, See the big picture"
+              "OpenCompany, See the big picture."
               "Please log in to view this dashboard."))
           (om/build login/login-button data))))))

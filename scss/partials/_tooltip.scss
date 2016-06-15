@@ -1,6 +1,6 @@
 div.tooltip-container {
   position: fixed;
-  width: 221px;
+  width: 226px;
   height: 113px;
   left: 50%;
   top: 50%;
@@ -40,10 +40,25 @@ div.tooltip-container {
       color: white;
       width: 192px;
       height: 88px;
-      padding: 0px 5px 25px 0px;
+      padding: 0px 10px 25px 0px;
       margin-left: 29px;
       margin-top: -15px;
       text-transform: uppercase;
+    }
+  }
+}
+
+div.tooltip-container.medium {
+  height: 163px;
+}
+
+div.tooltip-container.large {
+  height: 203px;
+  width: 276px;
+
+  div.tooltip-box {
+    div.tooltip-cta {
+      width: 242px;
     }
   }
 }

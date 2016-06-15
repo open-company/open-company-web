@@ -20,7 +20,7 @@
     (events/unlistenByKey (om/get-state owner :click-listener)))
 
   (render-state [_ {:keys [shown]}]
-    (dom/div {:class "tooltip-container"}
+    (dom/div {:class (str "tooltip-container " (:class options))}
       (dom/div {:class (str "tooltip-box" (when shown " shown"))}
         (dom/div {:class "triangle"})
         (dom/div {:class "tooltip-cta"} (:cta data))))))
