@@ -26,7 +26,7 @@
             (when-not (responsive/is-mobile)
               (dom/a {:class "oc-logo" :href oc-urls/home} (dom/img {:src "/img/oc-wordmark.svg"})))
             ; (dom/a {:class "footer-link" :href oc-urls/about} (str "ABOUT"  (when-not (responsive/is-mobile) " US")))
-            (dom/a {:class "footer-link" :href oc-urls/contact-mail-to} (str "CONTACT" (when-not (responsive/is-mobile) " US")))
+            (dom/a {:class "footer-link" :href oc-urls/contact-mail-to} "CONTACT")
             (when (responsive/is-mobile)
               (dom/a {:class "twitter" :target "_blank" :href oc-urls/oc-twitter :alt "twitter"}
                 (dom/img {:src "/img/twitter.svg"})))

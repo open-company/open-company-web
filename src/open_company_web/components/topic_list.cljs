@@ -277,7 +277,7 @@
               (dom/div {:class "sharing-header-left"}
                 (dom/label {:class "selected-topics"}
                   (if (zero? (count share-selected-topics))
-                    "NO TOPICS SELECTED"
+                    "CLICK A TOPIC TO SELECT IT"
                     (str (count share-selected-topics) " TOPIC" (when (> (count share-selected-topics) 1) "S") " SELECTED"))))
               (dom/div {:class "sharing-header-center"}
                 (when (pos? (count share-selected-topics))
@@ -364,10 +364,10 @@
                    (not selected-topic)
                    (not share-su-tooltip-dismissed))
           (om/build tooltip
-            {:cta "SHARE A SNAPSHOT WITH YOUR TEAM, INVESTORS OR THE CROWD."}
-            {:opts {:dismiss-tooltip #(om/set-state! owner :share-su-tooltip-dismissed true)}}))
+            {:cta "YOUR BIG PICTURE IS COMING TOGETHER. YOU CAN SHARE A SNAPSHOT OF SELECTED TOPICS WITH YOUR TEAM, INVESTORS OR THE CROWD WHEN YOU'RE READY."}
+            {:opts {:class "medium" :dismiss-tooltip #(om/set-state! owner :share-su-tooltip-dismissed true)}}))
         (when (and show-share-snapshot-tooltip
                    (not share-snapshot-tooltip-dismissed))
           (om/build tooltip
-            {:cta "CHOOSE WHICH TOPICS YOU'D LIKE TO INCLUDE."}
-            {:opts {:dismiss-tooltip #(dismiss-share-snapshot-tooltip owner)}}))))))
+            {:cta "CHOOSE TOPICS TO SHARE IN YOUR SNAPSHOT. A SNAPSHOT CONTAINS SELECTED TOPICS CAPTURED IN THAT MOMENT IN TIME AND SHARED VIA SLACK, EMAIL OR THE WEB. USE THEM FOR ALL-HANDS, INVESTOR UPDATES, OR WHENEVER YOU'D LIKE TO ENGAGE YOUR STAKEHOLDERS."}
+            {:opts {:class "large" :dismiss-tooltip #(dismiss-share-snapshot-tooltip owner)}}))))))
