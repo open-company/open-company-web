@@ -7,13 +7,15 @@
             [open-company-web.caches :as caches]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
-            [open-company-web.lib.utils :as utils]
             [open-company-web.local-settings :as ls]
-            [open-company-web.components.ui.icon :as i]
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.oc-colors :as oc-colors]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
-            [open-company-web.components.ui.add-topic-popover :refer (add-topic-popover)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
+            [open-company-web.components.ui.icon :as i]
+            [open-company-web.components.ui.add-topic-popover :refer (add-topic-popover)]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as EventType]
@@ -31,14 +33,6 @@
         topic-scroll-top (utils/offset-top topic)]
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
-(defn pillbox-click-cb [owner metric-slug e]
-  (.stopPropagation e)
-  (.preventDefault e)
-  (om/set-state! owner :selected-metric metric-slug)
-  (let [section (om/get-props owner :section)
-        topic-click-cb (om/get-props owner :topic-click)]
-    (topic-click-cb metric-slug)))
-
 (defn setup-card! [owner section]
   (when-not (utils/is-test-env?)
     (when-not (om/get-state owner :image-header)
@@ -49,6 +43,13 @@
           (when-let [hidden-body (om/get-ref owner "hidden-topic-body")]
             (when-let [first-image (sel1 hidden-body [:img])]
               (om/set-state! owner :image-header (.-src first-image)))))))))
+
+(defn pencil-click [owner options e]
+  (utils/event-stop e)
+  (when-not (om/get-props owner :add-topic)
+    (let [section (om/get-props owner :section)
+          topic-click-cb (:topic-click options)]
+      (topic-click-cb nil true))))
 
 (defcomponent topic-internal [{:keys [topic-data section currency prev-rev next-rev] :as data} owner options]
 
@@ -71,7 +72,8 @@
                                :hide-nav true
                                :pillboxes-first false
                                :topic-click (:topic-click options)}
-          is-growth-finances? (#{:growth :finances} section-kw)]
+          is-growth-finances? (#{:growth :finances} section-kw)
+          gray-color          (oc-colors/get-color-by-kw :oc-gray-5)]
       (dom/div #js {:className "topic-internal group"
                     :ref "topic-internal"}
         (when (or is-growth-finances?
@@ -87,6 +89,14 @@
               (dom/img {:src image-header}))))
         ;; Topic title
         (dom/div {:class "topic-title"} (:title topic-data))
+        (when (and (responsive/can-edit?)
+                   (not (responsive/is-mobile))
+                   (not (:read-only topic-data)))
+          (dom/button {:class "topic-pencil-button btn-reset"
+                       :on-click (partial pencil-click owner options)}
+            (i/icon :pencil {:size 16
+                             :color gray-color
+                             :accent-color gray-color})))
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
@@ -233,9 +243,10 @@
                       tr-prev-rev (utils/revision-prev revisions transition-as-of)
                       tr-next-rev (utils/revision-next revisions transition-as-of)]
                   (om/build topic-internal {:section section
+                                            :add-topic add-topic?
                                             :topic-data tr-topic-data
                                             :currency currency
-                                            :topic-click #()
+                                            :read-only-company (:read-only-company data)
                                             :prev-rev tr-prev-rev
                                             :next-rev tr-next-rev}
                                            {:opts (merge options {:rev-click #()})})))))))))
