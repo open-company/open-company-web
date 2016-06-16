@@ -12,6 +12,7 @@
 (defcomponent list-page-item [data owner]
   (render [_]
     (dom/li
+      (dom/img {:class "company-logo" :src (:logo data)})
       (om/build link {:href (oc-urls/company (:slug data)) :name (:name data)}))))
 
 (defcomponent list-companies [{:keys [menu-open] :as data} owner]
