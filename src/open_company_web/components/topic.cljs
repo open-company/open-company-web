@@ -51,7 +51,7 @@
           topic-click-cb (:topic-click options)]
       (topic-click-cb nil true))))
 
-(defcomponent topic-internal [{:keys [topic-data section currency prev-rev next-rev add-topic]} owner options]
+(defcomponent topic-internal [{:keys [topic-data section currency prev-rev next-rev add-topic sharing-mode]} owner options]
 
   (init-state [_]
     {:image-header nil})
@@ -92,7 +92,8 @@
         (when (and (not add-topic)
                    (responsive/can-edit?)
                    (not (responsive/is-mobile))
-                   (not (:read-only topic-data)))
+                   (not (:read-only topic-data))
+                   (not sharing-mode))
           (dom/button {:class "topic-pencil-button btn-reset"
                        :on-click (partial pencil-click owner options)}
             (i/icon :pencil {:size 16
@@ -228,6 +229,7 @@
             (om/build topic-internal {:section section
                                       :topic-data topic-data
                                       :add-topic add-topic?
+                                      :sharing-mode sharing-mode
                                       :currency currency
                                       :read-only-company (:read-only-company data)
                                       :topic-click (partial topic-click options)
@@ -248,6 +250,7 @@
                   (om/build topic-internal {:section section
                                             :topic-data tr-topic-data
                                             :add-topic add-topic?
+                                            :sharing-mode sharing-mode
                                             :currency currency
                                             :read-only-company (:read-only-company data)
                                             :prev-rev tr-prev-rev
