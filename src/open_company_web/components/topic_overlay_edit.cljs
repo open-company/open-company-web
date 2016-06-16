@@ -313,13 +313,13 @@
 
 (defn body-clicked [owner e]
   (when-let [topic-body (sel1 [:div.topic-body])]
-    (let [body-line (sel1 [:div.topic-body-line])
-          fullscreen-topic (sel1 [:div.fullscreen-topic])]
-      (when (and (>= (.-clientY e) (- (top-position body-line) 20))
-                 (not (click-inside e topic-body)))
-        (.focus topic-body)
-        (set-end-of-content-editable topic-body)
-        (set! (.-scrollTop fullscreen-topic) (.-scrollHeight fullscreen-topic))))))
+    (when-let [fullscreen-topic (sel1 [:div.fullscreen-topic])]
+      (let [body-line (sel1 [:div.topic-body-line])]
+        (when (and (>= (.-clientY e) (- (top-position body-line) 20))
+                   (not (click-inside e topic-body)))
+          (.focus topic-body)
+          (set-end-of-content-editable topic-body)
+          (set! (.-scrollTop fullscreen-topic) (.-scrollHeight fullscreen-topic)))))))
 
 (defn setup-body-listener [owner]
   (events/listen (.-body js/document) EventType/CLICK (partial body-clicked owner)))
