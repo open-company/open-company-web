@@ -59,9 +59,10 @@
 
 (defn get-category-topics [company-data active-topics sharing-mode]
   (let [topics-list   (flatten (vals active-topics))]
-    (if sharing-mode
-      (filter-placeholder-sections topics-list company-data)
-      topics-list)))
+    (map keyword
+      (if sharing-mode
+          (filter-placeholder-sections topics-list company-data)
+          topics-list))))
 
 (defn should-show-add-topic-tooltip [company-data active-topics sharing-mode]
   (let [category-topics (get-category-topics company-data active-topics sharing-mode)]
@@ -343,6 +344,7 @@
         ;; Topics list columns
         (om/build topics-columns {:columns-num columns-num
                                   :card-width card-width
+                                  :selected-metric selected-metric
                                   :sharing-mode sharing-mode
                                   :total-width total-width
                                   :content-loaded (not (:loading data))

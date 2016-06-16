@@ -1,10 +1,10 @@
-(ns test.open-company-web.components.topic-overlay
+(ns test.open-company-web.components.fullscreen-topic-edit
     (:require [cljs.test :refer-macros (deftest async testing is are use-fixtures)]
               [cljs-react-test.simulate :as sim]
               [cljs-react-test.utils :as tu]
               [om.core :as om :include-macros true]
               [dommy.core :as dommy :refer-macros (sel1 sel)]
-              [open-company-web.components.topic-overlay :refer (topic-overlay)]
+              [open-company-web.components.fullscreen-topic-edit :refer (fullscreen-topic-edit)]
               [om.dom :as dom :include-macros true]
               [open-company-web.data.company :refer (company)]
               [open-company-web.router :as router]))
@@ -15,20 +15,18 @@
 (def ^:dynamic c)
 
 (def test-atom {
-  :section "values"
-  :section-data (:values company)
-  :selected-metric nil
+  :topic "values"
+  :topic-data (:values company)
+  :focus nil
   :currency "USD"})
 
-(deftest test-topic-overlay-component
-  (testing "Topic overlay component"
+(deftest test-fullscreen-topic-edit-component
+  (testing "Fullscreen topic edit component"
     (router/set-route! ["companies" "buffer"]
                        {:slug "buffer"})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
-          _ (om/root topic-overlay app-state {:target c})
-          topic-overlay-node (sel1 c [:div.topic-overlay])
-          topic-overlay-internal-node (sel1 c [:div.topic-overlay-internal])]
-      (is (not (nil? topic-overlay-node)))
-      (is (not (nil? topic-overlay-internal-node)))
+          _ (om/root fullscreen-topic-edit app-state {:target c})
+          fullscreen-topic-edit-node (sel1 c [:div.fullscreen-topic-edit])]
+      (is (not (nil? fullscreen-topic-edit-node)))
       (tu/unmount! c))))
