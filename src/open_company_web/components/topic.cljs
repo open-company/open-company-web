@@ -145,7 +145,8 @@
       (.play))))
 
 (defn add-topic [owner]
-  (om/set-state! owner :show-add-topic-popover true))
+  (when-not (om/get-state owner :show-add-topic-popover)
+    (om/set-state! owner :show-add-topic-popover true)))
 
 (defn get-all-sections [slug]
   (let [categories-data (:categories (slug @caches/new-sections))

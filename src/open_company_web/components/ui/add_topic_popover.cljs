@@ -20,9 +20,13 @@
 
 (defn remove-listeners [owner]
   (events/unlistenByKey (om/get-state owner :click-out-listener))
+  (om/set-state! owner :click-out-listener nil)
   (events/unlistenByKey (om/get-state owner :kb-listener))
+  (om/set-state! owner :kb-listener nil)
   (events/unlistenByKey (om/get-state owner :nav-listener))
-  (events/unlistenByKey (om/get-state owner :scroll-listener)))
+  (om/set-state! owner :nav-listener nil)
+  (events/unlistenByKey (om/get-state owner :scroll-listener))
+  (om/set-state! owner :scroll-listener nil))
 
 (defn is-child-of-popover [el]
   (loop [cur-el el]
@@ -38,7 +42,7 @@
   ((:dismiss-popover options)))
 
 (defn on-click-out [owner options e]
-  (when (not (is-child-of-popover (.-target e)))
+  (when-not (is-child-of-popover (.-target e))
     (dismiss-popover owner options)))
 
 (defn on-click-in [owner options e]
@@ -149,6 +153,21 @@
   (let [add-topic-popover-scroll (om/get-ref owner "add-topic-popover-scroll")]
     (println "scroll:" (.-scrollTop add-topic-popover-scroll))))
 
+(defn add-listeners [owner options]
+  (when-not (om/get-state owner :click-out-listener)
+    (let [click-listener (events/listen (sel1 [:body]) EventType/CLICK (partial on-click-out owner options))]
+      (om/set-state! owner :click-out-listener click-listener)))
+  (when-not (om/get-state owner :kb-listener)
+    (let [kb-listener (events/listen (sel1 [:body]) EventType/KEYDOWN (partial kb-key-down owner options))]
+      (om/set-state! owner :kb-listener kb-listener)))
+  (when-not (om/get-state owner :nav-listener)
+    (let [nav-listener (events/listen @router/history HistoryEventType/NAVIGATE (partial history-nav options))]
+      (om/set-state! owner :nav-listener nav-listener)))
+  (when-not (om/get-state owner :scroll-listener)
+    (let [add-topic-popover-scroll (om/get-ref owner "add-topic-popover-scroll")
+          scroll-listener (events/listen add-topic-popover-scroll EventType/SCROLL #(scrolled owner))]
+      (om/set-state! owner :scroll-listener scroll-listener))))
+
 (defcomponent add-topic-popover [{:keys [all-topics active-topics-list column show-above archived-topics] :as data} owner options]
 
   (init-state [_]
@@ -160,18 +179,11 @@
     (.pushState js/history #js {} "Add topic" (str (oc-urls/company) "#add-topic")))
 
   (did-mount [_]
-    (let [click-listener (events/listen (sel1 [:body]) EventType/CLICK (partial on-click-out owner options))
-          kb-listener (events/listen (sel1 [:body]) EventType/KEYDOWN (partial kb-key-down owner options))
-          nav-listener (events/listen @router/history HistoryEventType/NAVIGATE (partial history-nav options))
-          add-topic-popover-scroll (om/get-ref owner "add-topic-popover-scroll")
-          scroll-listener (events/listen add-topic-popover-scroll EventType/SCROLL #(scrolled owner))]
-      (om/set-state! owner :click-out-listener click-listener)
-      (om/set-state! owner :kb-listener kb-listener)
-      (om/set-state! owner :nav-listener nav-listener)
-      (om/set-state! owner :scroll-listener scroll-listener))
+    (add-listeners owner options)
     (fix-position owner))
 
   (will-receive-props [_ next-props]
+    (add-listeners owner options)
     (when-not (= next-props data)
       (om/set-state! owner (get-state next-props (om/get-state owner)))))
 
@@ -179,6 +191,7 @@
     (remove-listeners owner))
 
   (did-update [_ _ prev-state]
+    (add-listeners owner options)
     (fix-position owner)
     (when (and (om/get-state owner :adding-custom-topic)
                (not (:adding-custom-topic prev-state)))
