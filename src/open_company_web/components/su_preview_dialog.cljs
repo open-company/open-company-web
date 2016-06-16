@@ -124,7 +124,7 @@
           (when (and share-via-slack slack-sent)
             (dom/div {}
               (dom/label {:class "slack-sent-title"} "Messages sent!")
-              (dom/label {:class "slack-sent-description"} "Your Slack team just received a notice about the new snapshot.")
+              (dom/label {:class "slack-sent-description"} "Your Slack team will receive a notice about the new snapshot.")
               (dom/div {:class "center"}
                 (dom/button {:class "btn-reset btn-solid back-to-dashboard"
                              :on-click #(router/nav! (oc-urls/company))} "VIEW YOUR DASHBOARD →"))))
