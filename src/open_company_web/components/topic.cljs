@@ -51,7 +51,7 @@
           topic-click-cb (:topic-click options)]
       (topic-click-cb nil true))))
 
-(defcomponent topic-internal [{:keys [topic-data section currency prev-rev next-rev] :as data} owner options]
+(defcomponent topic-internal [{:keys [topic-data section currency prev-rev next-rev add-topic]} owner options]
 
   (init-state [_]
     {:image-header nil})
@@ -89,7 +89,7 @@
               (dom/img {:src image-header}))))
         ;; Topic title
         (dom/div {:class "topic-title"} (:title topic-data))
-        (when (and (not (:add-topic data))
+        (when (and (not add-topic)
                    (responsive/can-edit?)
                    (not (responsive/is-mobile))
                    (not (:read-only topic-data)))
@@ -227,7 +227,9 @@
                         :style #js {:opacity 1 :width "100%" :height "auto"}}
             (om/build topic-internal {:section section
                                       :topic-data topic-data
+                                      :add-topic add-topic?
                                       :currency currency
+                                      :read-only-company (:read-only-company data)
                                       :topic-click (partial topic-click options)
                                       :prev-rev prev-rev
                                       :next-rev next-rev}
@@ -244,8 +246,8 @@
                       tr-prev-rev (utils/revision-prev revisions transition-as-of)
                       tr-next-rev (utils/revision-next revisions transition-as-of)]
                   (om/build topic-internal {:section section
-                                            :add-topic add-topic?
                                             :topic-data tr-topic-data
+                                            :add-topic add-topic?
                                             :currency currency
                                             :read-only-company (:read-only-company data)
                                             :prev-rev tr-prev-rev
