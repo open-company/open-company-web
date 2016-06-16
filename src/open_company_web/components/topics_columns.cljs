@@ -24,7 +24,7 @@
 
 (def topic-default-height-no-body 95)
 (def topic-default-height-with-body 109)
-(def data-topic-default-zero-height 142)
+(def data-topic-default-zero-height 105)
 (def data-topic-default-one-height 282)
 (def data-topic-default-more-height 388)
 (def topic-body-height 29)

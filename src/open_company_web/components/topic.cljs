@@ -11,7 +11,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.oc-colors :as oc-colors]
             [open-company-web.lib.responsive :as responsive]
-            [open-company-web.components.finances.utils :as finances-utils]
+            [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.ui.icon :as i]
@@ -69,16 +69,26 @@
 
   (render-state [_ {:keys [image-header]}]
     (let [section-kw          (keyword section)
-          topic-body          (utils/get-topic-body topic-data section-kw)
-          stripped-topic-body (or (utils/strip-HTML-tags topic-body) "")
-          fixed-topic-body    (.replace stripped-topic-body (js/RegExp. "\\s\\s+" "g") " ")
           chart-opts          {:chart-size {:width  260
                                             :height 196}
                                :hide-nav true
                                :pillboxes-first false
                                :topic-click (:topic-click options)}
           is-growth-finances? (#{:growth :finances} section-kw)
-          gray-color          (oc-colors/get-color-by-kw :oc-gray-5)]
+          gray-color          (oc-colors/get-color-by-kw :oc-gray-5)
+          finances-row-data   (:data topic-data)
+          growth-data         (growth-utils/growth-data-map (:data topic-data))
+          no-data             (or (and (= section-kw :finances)
+                                       (or (empty? finances-row-data)
+                                        (utils/no-finances-data? finances-row-data)))
+                                  (and (= section-kw :growth)
+                                       (utils/no-growth-data? growth-data)))
+          topic-body          (utils/get-topic-body topic-data section-kw)
+          stripped-topic-body (or (utils/strip-HTML-tags topic-body) "")
+          fixed-topic-body    (.replace stripped-topic-body (js/RegExp. "\\s\\s+" "g") " ")
+          no-data-topic-body  (if (and no-data (clojure.string/blank? fixed-topic-body))
+                                (str "Information on " section " is not yet available.")
+                                fixed-topic-body)]
       (dom/div #js {:className "topic-internal group"
                     :ref "topic-internal"}
         (when (or is-growth-finances?
@@ -110,10 +120,10 @@
         ;; Topic body: first 2 lines
         (dom/div #js {:className "hidden-topic-body"
                       :ref "hidden-topic-body"
-                      :dangerouslySetInnerHTML #js {"__html" topic-body}})
+                      :dangerouslySetInnerHTML #js {"__html" fixed-topic-body}})
         (dom/div #js {:className "topic-body"
                       :ref "topic-body"
-                      :dangerouslySetInnerHTML (utils/emojify fixed-topic-body)})))))
+                      :dangerouslySetInnerHTML (utils/emojify no-data-topic-body)})))))
 
 (defn topic-click [options selected-metric]
   ((:topic-click options) selected-metric))
