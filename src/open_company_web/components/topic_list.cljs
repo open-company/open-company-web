@@ -230,14 +230,16 @@
     (when-not (:read-only (:company-data next-props))
       (get-new-sections-if-needed owner))
     (when (:force-edit-topic next-props)
-      (let [company-data (:company-data next-props)]
+      (let [company-data (:company-data next-props)
+            topics (flatten (vals (:sections company-data)))
+            no-placeholder-sections (filter-placeholder-sections topics company-data)]
         (when (contains? company-data (keyword (:force-edit-topic next-props)))
           (om/set-state! owner :fullscreen-force-edit true)
           (om/set-state! owner :selected-topic (dispatcher/force-edit-topic))
           ; show second tooltip of needed
           (when (= (count (flatten (vals (:sections company-data)))) 1)
             (om/set-state! owner :show-second-add-topic-tooltip true))
-          (when (= (count (flatten (vals (:sections company-data)))) 2)
+          (when (= (count no-placeholder-sections) 2)
             (om/set-state! owner :show-share-su-tooltip true))))))
 
   (did-update [_ _ _]
@@ -298,7 +300,7 @@
                    (responsive/can-edit?)
                    (not (:read-only company-data))
                    (not sharing-mode)
-                   (> (count category-topics) 1))
+                   (> (count (filter-placeholder-sections category-topics company-data)) 1))
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
             (dom/button {:class "sharing-button"
