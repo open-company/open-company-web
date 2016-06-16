@@ -1,7 +1,7 @@
 (ns open-company-web.core
   (:require [om.core :as om :include-macros true]
             [secretary.core :as secretary :refer-macros (defroute)]
-            [dommy.core :refer-macros (sel1)]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [open-company-web.actions]
             [open-company-web.api :as api]
             [open-company-web.urls :as urls]
@@ -45,6 +45,9 @@
     (om/root loading dis/app-state {:target target})))
 
 (defn pre-routing [query-params]
+ (if (jwt/jwt)
+   (dommy/add-class! (sel1 [:body]) :small-footer)
+   (dommy/remove-class! (sel1 [:body]) :small-footer))
  (check-get-params query-params)
  (inject-loading))
 

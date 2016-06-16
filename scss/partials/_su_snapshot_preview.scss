@@ -3,6 +3,14 @@
   padding-top: #{$navbar_height}px;
 }
 
+body.small-footer {
+  div.su-snapshot-preview {
+    div.su-sp-content {
+      min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px);
+    }
+  }
+}
+
 div.su-snapshot-preview {
   background-color: rgb(217, 217, 217);
 

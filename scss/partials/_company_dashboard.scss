@@ -10,3 +10,11 @@ div.company-dashboard {
     min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
   }
 }
+
+body.small-footer {
+  div.company-dashboard {
+    div.page {
+      min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px);
+    }
+  }
+}

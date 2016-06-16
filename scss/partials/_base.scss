@@ -130,6 +130,12 @@ div.page-no-navbar{
   min-height: calc(100vh - #{$footer_height}px);
 }
 
+body.small-footer {
+  div.page-no-navbar {
+    min-height: calc(100vh - #{$footer_small_height}px);
+  }
+}
+
 .navbar-offset {
   margin-top: #{$navbar_height}px;
 }

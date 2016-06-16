@@ -3,6 +3,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.urls :as oc-urls]
+            [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.icon :refer (icon)]))
 
@@ -14,12 +15,13 @@
                           (* 20 (dec columns-num))      ; cards right margin
                           (when (> columns-num 1) 60))]
       (dom/div {:class "footer"}
-        (dom/div {:class "footer-cta"}
-          "Powered by OpenCompany"
-          (when (:su-preview data)
-            (dom/div {}
-              (dom/a {:class "com-link"
-                      :href "https://opencompany.com/"} "LEARN MORE ➞"))))
+        (when-not (jwt/jwt)
+          (dom/div {:class "footer-cta"}
+            "Powered by OpenCompany"
+            (when (:su-preview data)
+              (dom/div {}
+                (dom/a {:class "com-link"
+                        :href "https://opencompany.com/"} "LEARN MORE ➞")))))
         (dom/div {:class "footer-internal"}
           (dom/div {:class "footer-bottom"
                     :style #js {:width (str footer-width "px")}}
