@@ -45,12 +45,16 @@
     (.replace v (new js/RegExp "," "g") "")
     v))
 
-(defn exit-cell [e owner data]
-  (let [raw-value (.. e -target -value)
-        cleaned-value (trim-commas raw-value)
+(defn parse-value [v]
+  (let [cleaned-value (trim-commas v)
         parsed-value (if (s/blank? cleaned-value)
                        cleaned-value
-                       (.parseFloat js/window cleaned-value))
+                       (.parseFloat js/window cleaned-value))]
+    parsed-value))
+
+(defn exit-cell [e owner data]
+  (let [raw-value (.. e -target -value)
+        parsed-value (parse-value raw-value)
         init-value (om/get-state owner :inital-value)
         ; if the value is the same as it was at the start
         ; go to the :display state, else go to :draft
@@ -84,6 +88,10 @@
       {:cell-state (initial-cell-state data)
        :inital-value (:value data)
        :value value}))
+
+  (did-update [_ _ prev-state]
+    (when-not (= (:value prev-state) (om/get-state owner :value))
+      ((:draft-cb data) (parse-value (om/get-state owner :value)))))
 
   (did-mount [_]
     (go (loop []
