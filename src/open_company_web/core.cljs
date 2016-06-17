@@ -101,11 +101,13 @@
 ;; Component specific to a company
 (defn company-handler [route target component params]
   (let [slug (:slug (:params params))
+        section (:section (:params params))
+        edit?   (= route "section-edit")
         query-params (:query-params params)]
     (pre-routing query-params)
     (utils/clean-company-caches)
     ;; save the route
-    (router/set-route! [slug route] {:slug slug :query-params query-params})
+    (router/set-route! [slug section route (when edit? "edit")] {:slug slug :section section :edit edit? :query-params query-params})
     ;; do we have the company data already?
     (when-not (dis/company-data)
       ;; load the company data from the API
@@ -162,6 +164,12 @@
       (pre-routing (:query-params params))
       (om/root user-profile dis/app-state {:target target}))
 
+    (defroute company-section-route (urls/company-section ":slug" ":section") {:as params}
+      (company-handler "section" target company-dashboard params))
+
+    (defroute company-section-edit-route (urls/company-section-edit ":slug" ":section") {:as params}
+      (company-handler "section-edit" target company-dashboard params))
+
     (defroute company-route (urls/company ":slug") {:as params}
       (company-handler "dashboard" target company-dashboard params))
 
@@ -196,6 +204,8 @@
                                  user-profile-route
                                  company-route
                                  company-route-slash
+                                 company-section-route
+                                 company-section-edit-route
                                  company-profile-route
                                  su-snapshot-preview-route
                                  su-edit-route
