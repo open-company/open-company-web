@@ -6,6 +6,7 @@
             [open-company-web.api :as api]
             [open-company-web.caches :as cache]
             [open-company-web.router :as router]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
@@ -26,21 +27,6 @@
   (utils/disable-scroll)
   (.play
     (new Fade (om/get-ref owner "fullscreen-topic") 0 1 utils/oc-animation-duration)))
-
-(defn hide-fullscreen-topic [owner options & [force-fullscreen-dismiss]]
-  ; if it's in editing mode
-  (let [editing (om/get-state owner :editing)]
-    (when editing
-      ((:topic-navigation options) true)
-      (om/set-state! owner :editing false))
-    (when (or (not editing)
-              force-fullscreen-dismiss)
-      (utils/enable-scroll)
-      (let [fade-out (new Fade (sel1 :div.fullscreen-topic) 1 0 utils/oc-animation-duration)]
-        (doto fade-out
-          (.listen AnimationEventType/FINISH
-            #((:close-overlay-cb options)))
-          (.play))))))
 
 (defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric card-width hide-history-navigation] :as data} owner options]
   (render [_]
@@ -86,6 +72,35 @@
                            :on-click #((:rev-nav options) (:updated-at (:next-rev data)))}
                 "LATER"))))))))
 
+(defn start-editing [owner options]
+  (let [editing (om/get-state owner :editing)
+        section (om/get-props owner :section)]
+    (.pushState js/history nil (str "Edit " (name section)) (oc-urls/company-section-edit (router/current-company-slug) (name section)))
+    (when-not editing
+      ((:topic-navigation options) false)
+      (om/set-state! owner :editing true))))
+
+(defn exit-editing [owner options]
+  (let [editing (om/get-state owner :editing)
+        section (om/get-props owner :section)]
+    (.pushState js/history nil (name section) (oc-urls/company-section (router/current-company-slug) (name section)))
+    (when editing
+      ((:topic-navigation options) true)
+      (om/set-state! owner :editing false))))
+
+(defn hide-fullscreen-topic [owner options & [force-fullscreen-dismiss]]
+  ; if it's in editing mode
+  (let [editing (om/get-state owner :editing)]
+    (exit-editing owner options)
+    (when (or (not editing)
+              force-fullscreen-dismiss)
+      (utils/enable-scroll)
+      (let [fade-out (new Fade (sel1 :div.fullscreen-topic) 1 0 utils/oc-animation-duration)]
+        (doto fade-out
+          (.listen AnimationEventType/FINISH
+            #((:close-overlay-cb options)))
+          (.play))))))
+
 (defn esc-listener [owner options e]
   (when (= (.-keyCode e) 27)
     (hide-fullscreen-topic owner options)))
@@ -130,11 +145,6 @@
                                     {:as-of (:transition-as-of current-state)
                                      :transition-as-of nil})))
       (.play))))
-
-(defn toggle-editing [owner options]
-  (let [editing-mode (om/get-state owner :editing)]
-    (om/set-state! owner :editing (not editing-mode))
-    ((:topic-navigation options) editing-mode)))
 
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width hide-history-navigation show-first-edit-tooltip] :as data} owner options]
 
@@ -205,7 +215,7 @@
                    is-actual?
                    (not editing))
           (dom/div {:class "edit-button"
-                    :on-click #(toggle-editing owner options)}
+                    :on-click #(start-editing owner options)}
             (icon :pencil)))
         (when (and can-edit?
                    editing
