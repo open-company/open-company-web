@@ -58,6 +58,16 @@
   ([slug category]
     (str "/" (name slug) "#" (name category))))
 
+(defn company-section
+  "Section url"
+  ([] (company-section (router/current-company-slug) (router/current-section)))
+  ([company-slug section-name] (str "/" (name company-slug) "/" (name section-name))))
+
+(defn company-section-edit
+  "section url edit mode"
+  ([] (company-section-edit (router/current-company-slug) (router/current-section)))
+  ([company-slug section-name] (str "/" (name company-slug) "/" (name section-name) "/edit")))
+
 ;; Stakeholder update
 
 (defn stakeholder-update-list
