@@ -81,3 +81,9 @@
 
 (defn current-stakeholder-update-slug []
   (:update-slug @path))
+
+(defn current-section []
+  (:section @path))
+
+(defn section-editing? []
+  (some #(= "edit" %) (:route @path)))
