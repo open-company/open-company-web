@@ -78,7 +78,7 @@
         active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))
         sharing-mode (or (:sharing-mode current-state) false)
         show-add-topic-tooltip (should-show-add-topic-tooltip company-data active-topics sharing-mode)
-        selected-topic (or (:selected-topic current-state) (router/current-section))]
+        selected-topic (if (nil? current-state) (router/current-section) (:selected-topic current-state))]
     {:initial-active-topics active-topics
      :active-topics active-topics
      :card-width (:card-width data)
@@ -90,7 +90,7 @@
      :share-selected-topics (:sections (:stakeholder-update company-data))
      :transitioning false
      :redirect-to-preview (or (:redirect-to-preview current-state) false)
-     :fullscreen-force-edit (or (:fullscreen-force-edit current-state) (router/section-editing?))
+     :fullscreen-force-edit (if (nil? current-state) (router/section-editing?) (:fullscreen-force-edit current-state))
      :add-topic-tooltip-dismissed (or (:add-topic-tooltip-dismissed current-state) false)
      :show-add-topic-tooltip show-add-topic-tooltip
      :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
@@ -123,7 +123,8 @@
   (.pushState js/history nil "Dashboard" (oc-urls/company (router/current-company-slug)))
   (om/set-state! owner :transitioning false)
   (om/set-state! owner :selected-topic nil)
-  (om/set-state! owner :selected-metric nil))
+  (om/set-state! owner :selected-metric nil)
+  (om/set-state! owner :fullscreen-force-edit false))
 
 (defn switch-topic [owner is-left?]
   (when (and (om/get-state owner :topic-navigation)
