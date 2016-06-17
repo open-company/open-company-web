@@ -168,7 +168,9 @@
       (company-handler "section" target company-dashboard params))
 
     (defroute company-section-edit-route (urls/company-section-edit ":slug" ":section") {:as params}
-      (company-handler "section-edit" target company-dashboard params))
+      (if (jwt/jwt)
+        (company-handler "section-edit" target company-dashboard params)
+        (router/redirect! (urls/company-section (:slug (:params params)) (:section (:params params))))))
 
     (defroute company-route (urls/company ":slug") {:as params}
       (company-handler "dashboard" target company-dashboard params))
