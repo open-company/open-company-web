@@ -5,7 +5,7 @@
     [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
     [tolitius/boot-check "0.1.2" :scope "test"]
 
-    [org.clojure/clojurescript "1.9.36"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
+    [org.clojure/clojurescript "1.9.76"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
 
     ;; --- DO NOT UPDATE OM, the 1.x.x code requires changes on our part
     [org.omcljs/om "0.9.0" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
