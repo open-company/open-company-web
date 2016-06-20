@@ -156,7 +156,7 @@
       ((:topic-navigation options) false))
     {:as-of (:updated-at section-data)
      :transition-as-of nil
-     :editing (:fullscreen-force-edit data)
+     :editing (and (:fullscreen-force-edit data) (not (:read-only section-data)))
      :data-posted false
      :show-save-button false
      :last-selected-metric selected-metric
