@@ -120,7 +120,7 @@
         ;; Topic body: first 2 lines
         (dom/div #js {:className "hidden-topic-body"
                       :ref "hidden-topic-body"
-                      :dangerouslySetInnerHTML #js {"__html" fixed-topic-body}})
+                      :dangerouslySetInnerHTML #js {"__html" topic-body}})
         (dom/div #js {:className "topic-body"
                       :ref "topic-body"
                       :dangerouslySetInnerHTML (utils/emojify no-data-topic-body)})))))
