@@ -151,7 +151,8 @@
 
 (defn scrolled [owner]
   (let [add-topic-popover-scroll (om/get-ref owner "add-topic-popover-scroll")]
-    (println "scroll:" (.-scrollTop add-topic-popover-scroll))))
+    ; (println "scroll:" (.-scrollTop add-topic-popover-scroll))
+    ))
 
 (defn add-listeners [owner options]
   (when-not (om/get-state owner :click-out-listener)
