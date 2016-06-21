@@ -97,9 +97,9 @@
                                              :card-image (not is-growth-finances?)})}
             (cond
               (= section "finances")
-              (om/build topic-finances {:section-data topic-data :section section} {:opts chart-opts})
+              (om/build topic-finances {:section-data topic-data :section section :currency currency} {:opts chart-opts})
               (= section "growth")
-              (om/build topic-growth {:section-data topic-data :section section} {:opts chart-opts})
+              (om/build topic-growth {:section-data topic-data :section section :currency currency} {:opts chart-opts})
               :else
               (om/build topic-image-header {:image-header image-header} {:opts options}))))
         ;; Topic title
