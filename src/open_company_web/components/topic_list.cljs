@@ -348,6 +348,7 @@
                                   :card-width card-width
                                   :selected-metric selected-metric
                                   :sharing-mode sharing-mode
+                                  :show-fast-editing true
                                   :total-width total-width
                                   :content-loaded (not (:loading data))
                                   :topics category-topics
