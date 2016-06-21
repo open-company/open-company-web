@@ -4,7 +4,7 @@
             [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [dommy.core :as dommy :refer-macros (sel1)]
+            [dommy.core :as dommy :refer-macros (sel1 sel)]
             [open-company-web.api :as api]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
@@ -18,6 +18,7 @@
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
             [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
+            [cljs-dynamic-resources.core :as cdr]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -34,8 +35,9 @@
     (:stakeholder-update (dis/company-data props))))
 
 (defn patch-stakeholder-update [owner]
-  (let [title  (om/get-state owner :title)
-        topics (:sections (stakeholder-update-data owner))]
+  (let [title       (om/get-state owner :title)
+        topic-nodes (sel [:div.topic-row])
+        topics      (vec (for [t topic-nodes] (.-topic (.-dataset t))))]
     (api/patch-stakeholder-update {:title (or title "")
                                    :sections topics})))
 
@@ -112,11 +114,23 @@
                                                     :link-posting false
                                                     :link-posted false})))
 
+(defn setup-sortable [owner options]
+  (when (and (om/get-state owner :did-mount)
+             (om/get-state owner :sortable-loaded))
+    (when-let [list-node (sel1 [:div.topics-column])]
+      (.create js/Sortable list-node #js {:handle ".topic-internal"
+                                          :onStart #(dommy/add-class! list-node :dragging)
+                                          :onEnd #(dommy/remove-class! list-node :dragging)}))))
+
 (defcomponent su-snapshot-preview [data owner options]
 
   (init-state [_]
     (utils/add-channel "fullscreen-topic-save" (chan))
     (utils/add-channel "fullscreen-topic-cancel" (chan))
+    (cdr/add-script! "/lib/Sortable.js/Sortable.js"
+                     (fn []
+                       (om/set-state! owner :sortable-loaded true)
+                       (setup-sortable owner options)))
     (let [su-data (stakeholder-update-data owner)]
       {:columns-num (responsive/columns-num)
        :selected-topic nil
@@ -133,6 +147,8 @@
        :link-posted false}))
 
   (did-mount [_]
+    (om/set-state! owner :did-mount true)
+    (setup-sortable owner options)
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))
     (focus-title owner)
     (when-not (utils/is-test-env?)
@@ -165,6 +181,7 @@
 
   (did-update [_ _ _]
     (focus-title owner)
+    (setup-sortable owner options)
     (when (om/get-state owner :tr-selected-topic)
       (animate-selected-topic-transition owner)))
 
@@ -189,11 +206,11 @@
                          3 (str (+ (* card-width 3) 40 60) "px")
                          2 (str (+ (* card-width 2) 20 60) "px")
                          1 (if (> ww 413) (str card-width "px") "auto"))
-          su-subtitle  (str "- " (utils/date-string (js/Date.) true))]
+          su-subtitle  (str "— " (utils/date-string (js/Date.) true))]
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
                                          :main-scroll true})}
         (om/build menu data)
-        (dom/div {:class "page"}
+        (dom/div {:class "page snapshot-page"}
           (dom/div {:class "su-snapshot-header"}
             (om/build back-to-dashboard-btn {})
             (dom/div {:class "share-su"}
@@ -241,6 +258,9 @@
                                                 :animate false}
                                                {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                        :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
+              (dom/div {:class "su-sp-company-header"}
+                (dom/img {:class "company-logo" :src (:logo company-data)})
+                (dom/span {:class "company-name"} (:name company-data)))
               (when (:title su-data)
                 (dom/div {:class "preview-title-container"}
                   (dom/input #js {:className "preview-title"

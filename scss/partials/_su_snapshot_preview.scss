@@ -3,8 +3,12 @@
   padding-top: #{$navbar_height}px;
 }
 
+div.page.snapshot-page {
+  background-color: #f9f9f9 !important;
+}
+
 div.su-snapshot-preview {
-  background-color: white;
+  background-color: #f9f9f9;
   border-top: 4px solid $oc_yellow;
 
   div.su-snapshot-header {
@@ -63,15 +67,36 @@ div.su-snapshot-preview {
     content: "";
     padding-bottom: 20px;
     min-height: calc(100vh - #{$footer_height}px);
-    background-color: white;
+
+    div.su-sp-company-header {
+      margin-top: 60px;
+      height: 50px;
+      text-align: center;
+
+      img.company-logo {
+        max-height: 50px;
+        max-width: 150px;
+        margin-top: -5px;
+      }
+
+      span.company-name {
+        margin-top: 0px;
+        margin-left: 16px;
+        font-weight: 700;
+        font-size: 24px;
+        line-height: 1.2;
+        color: $oc_gray_5;
+      }
+    }
 
     div.preview-title-container {
       width: 100%;
       text-align: center;
-      padding-top: 50px;
+      padding-top: 17px;
 
       input.preview-title {
         font-family: $oc_headers_font;
+        font-weight: 400;
         font-size: 20px;
         line-height: 1.2;
         color: $oc_gray_5;
@@ -95,17 +120,29 @@ div.su-snapshot-preview {
     }
   }
 
-  div.topic {
-    background-color: white;
-    border-radius: 2px;
-    box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
+  div.topic-row {
+    padding-bottom: 33px !important;
 
-    div.card-header {
-      background-color: #f6f7f7;
+    &.sortable-ghost {
+
+      div.topic {
+        background-color: rgba(78, 90, 107, 0.2);
+        border-radius: 2px;
+      }
     }
 
-    div.pillbox-container{
-      text-align: left;
+    div.topic {
+      background-color: white;
+      border-radius: 2px;
+      box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
+
+      div.card-header {
+        background-color: #f6f7f7;
+      }
+
+      div.pillbox-container{
+        text-align: left;
+      }
     }
   }
 }
