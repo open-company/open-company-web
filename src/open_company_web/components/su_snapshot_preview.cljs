@@ -13,6 +13,8 @@
             [open-company-web.components.menu :refer (menu)]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.footer :refer (footer)]
+            [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
+            [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
             [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
@@ -189,24 +191,19 @@
                          1 (if (> ww 413) (str card-width "px") "auto"))
           su-subtitle  (str "- " (utils/date-string (js/Date.) true))]
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
-                                         :main-scroll true
-                                         :navbar-offset (not (responsive/is-mobile))})}
+                                         :main-scroll true})}
         (om/build menu data)
         (dom/div {:class "page"}
-          ;; Navbar
-          (when company-data
-            (om/build navbar {:company-data company-data
-                              :card-width card-width
-                              :latest-su (dis/latest-stakeholder-update)
-                              :sharing-mode false
-                              :su-preview true
-                              :hide-right-menu true
-                              :columns-num columns-num
-                              :auth-settings (:auth-settings data)
-                              :link-loading link-loading
-                              :slack-loading slack-loading}
-                             {:opts {:share-link-cb #(share-link-clicked owner)
-                                     :share-slack-cb #(share-slack-clicked owner)}}))
+          (dom/div {:class "su-snapshot-header"}
+            (om/build back-to-dashboard-btn {})
+            (dom/div {:class "share-su"}
+              (dom/label {} "SHARE TO")
+              (dom/button {:class "share-su-button btn-reset share-slack"}
+                (dom/img {:src "/img/Slack_Icon.png"}))
+              (dom/button {:class "share-su-button btn-reset share-mail"}
+                (icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))
+              (dom/button {:class "share-su-button btn-reset share-link"}
+                (icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))))
           ;; SU Snapshot Preview
           (when company-data
             (dom/div {:class "su-sp-content"}
@@ -262,7 +259,7 @@
                                              :share-via-link (or link-loading link-posted)
                                              :su-title title}
                                             {:opts {:dismiss-su-preview #(dismiss-su-preview owner)}}))
-              (om/build topics-columns {:columns-num columns-num
+              (om/build topics-columns {:columns-num 1
                                         :card-width card-width
                                         :total-width total-width
                                         :content-loaded (not (:loading data))

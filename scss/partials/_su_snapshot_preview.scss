@@ -4,22 +4,66 @@
 }
 
 div.su-snapshot-preview {
-  background-color: rgb(217, 217, 217);
+  background-color: white;
+  border-top: 4px solid $oc_yellow;
+
+  div.su-snapshot-header {
+    height: 60px;
+    background-color: rgba(78, 90, 107, 0.5);
+
+    div.back-to-dashboard-row {
+      float: left;
+      width: 240px;
+      margin-top: 0px;
+      padding-top: 0px;
+
+      button {
+        border-color: white;
+        color: white;
+      }
+    }
+
+    div.share-su {
+      float: right;
+      padding: 10px 20px;
+      height: 60px;
+
+      label {
+        color: white;
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        margin-top: 13px;
+        float: left;
+      }
+
+      button.share-su-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 20px;
+        background-color: white;
+        margin-left: 8px;
+        float: left;
+
+        img {
+          width: 20px;
+          height: 20px;
+        }
+
+        div.svg-icon {
+          padding: 0px 4px;
+        }
+      }
+    }
+  }
 
   div.su-sp-content {
     position: relative;
     content: "";
     padding-bottom: 20px;
-    min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
-    margin-top: #{$navbar_height}px;
-
-    @include mobile(){
-      background-color: #d9d9d9;
-    }
-
-    @include big_web(){
-      background-color: $oc_gray_6;
-    }
+    min-height: calc(100vh - #{$footer_height}px);
+    background-color: white;
 
     div.preview-title-container {
       width: 100%;
@@ -48,6 +92,20 @@ div.su-snapshot-preview {
       color: $oc_gray_5;
       margin-top: 0px;
       padding-bottom: 30px;
+    }
+  }
+
+  div.topic {
+    background-color: white;
+    border-radius: 2px;
+    box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
+
+    div.card-header {
+      background-color: #f6f7f7;
+    }
+
+    div.pillbox-container{
+      text-align: left;
     }
   }
 }
