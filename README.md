@@ -30,6 +30,8 @@ To get started, head to: [OpenCompany](https://opencompany.com/)
 
 The OpenCompany Web Application provides a Web UI for creating and consuming open company content and data.
 
+![OpenCompany Screenshot](https://open-company-assets.s3.amazonaws.com/oc-screenshot.png)
+
 
 ## Local Setup
 
