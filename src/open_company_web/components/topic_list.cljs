@@ -299,7 +299,7 @@
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
             (dom/button {:class "sharing-button"
-                         :on-click #(toggle-sharing-mode owner options)} "SHARE A SNAPSHOT")))
+                         :on-click #(toggle-sharing-mode owner options)} "SHARE A SNAPSHOT " (dom/i {:class "fa fa-share"}))))
         ;; Fullscreen topic
         (when selected-topic
           (dom/div {:class "selected-topic-container"

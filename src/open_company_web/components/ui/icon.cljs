@@ -15,7 +15,8 @@
   - :accent-color (accent color, default: oc-blue)
   - :color (main color, default: black)
   - :size (size of the icon, default: 30px)
-  - :stroke (size of the stroke, default: 2px)"
+  - :stroke (size of the stroke, default: 2px)
+  - :class (class/es to add to the div)"
   ([id] (icon id {}))
   ([id {:keys [color accent-color size stroke class] :as opts}]
    (when-not id
