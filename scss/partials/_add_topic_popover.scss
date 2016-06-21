@@ -72,23 +72,26 @@ div.add-topic-popover {
     padding-top: 12px;
   }
 
-  div.add-topic-popover-subheader {
-    opacity: 0.2;
-    font-weight: 700;
-    font-size: 12px;
-    line-height: 1.5;
-    letter-spacing: 1px;
-    color: $oc_gray_5;
-    padding: 7px 0 7px 19px;
-    text-align: left;
-    width: 200px;
-  }
-
   div.add-topic-popover-scroll {
-    max-height: 195px;
+    max-height: 237px;
     overflow: scroll;
     width: 200px;
     margin-bottom: 50px;
+
+    div.add-topic-popover-subheader {
+      opacity: 0.2;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      color: $oc_gray_5;
+      padding: 7px 0 7px 19px;
+      text-align: left;
+
+      &:first-child {
+        padding-top: 15px;
+      }
+    }
 
     &::-webkit-scrollbar{
       display: none;
@@ -98,6 +101,10 @@ div.add-topic-popover {
       text-align: left;
       padding-bottom: 6px;
       overflow-x: hidden;
+
+      &.fixed-header {
+        padding-top: 32px;
+      }
 
       div.potential-topic {
         font-family: $oc_headers_font;

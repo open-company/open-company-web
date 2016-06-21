@@ -5,7 +5,7 @@
     [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
     [tolitius/boot-check "0.1.2" :scope "test"]
 
-    [org.clojure/clojurescript "1.9.36"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
+    [org.clojure/clojurescript "1.9.76"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
 
     ;; --- DO NOT UPDATE OM, the 1.x.x code requires changes on our part
     [org.omcljs/om "0.9.0" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
@@ -39,7 +39,7 @@
 (def static-site-deps
   '[[hiccup "1.0.5" :scope "test"]
     [perun "0.3.0" :scope "test"]
-    [compojure "1.5.0" :scope "test"]
+    [compojure "1.5.1" :scope "test"]
     [pandeiro/boot-http "0.7.3" :scope "test"]
     [deraen/boot-sass "0.2.1" :scope "test"]
     [org.slf4j/slf4j-nop "1.7.21" :scope "test"]])
