@@ -57,11 +57,11 @@
       (dom/div {:class "flex"}
         (dom/input {:id "file-upload-ui--select-trigger" :style {:display "none"} :type "file"
                     :on-change #(upload-file! editor owner (-> % .-target .-files (aget 0)))})
-        (dom/button {:class "btn-reset p0"
+        (dom/button {:class "btn-reset p0 file-upload-btn"
                      :style {:margin-right "13px"
                              :transition ".2s"
                              :transform (if (om/get-state owner :state) "rotate(135deg)")}
-                     :on-click (fn [_] (om/update-state! owner :state #(if % nil :show-options)))}
+                     :on-click (fn [e] (utils/event-stop e) (om/update-state! owner :state #(if % nil :show-options)))}
           (i/icon :circle-add {:size 24}))
         (case (:state (om/get-state owner))
           :show-options
