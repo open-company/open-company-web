@@ -1,5 +1,6 @@
 (ns open-company-web.components.fullscreen-topic-edit
-  (:require-macros [cljs.core.async.macros :refer (go)])
+  (:require-macros [cljs.core.async.macros :refer (go)]
+                   [if-let.core :refer (if-let* when-let*)])
   (:require [cljs.core.async :refer (chan <!)]
             [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
@@ -303,26 +304,22 @@
              (.-offsetParent element))
       yPos)))
 
-(defn click-inside [e el]
-  (loop [element (.-target e)]
-    (if element
-      (if (= element el)
-        true
-        (recur (.-parentElement element)))
-      false)))
-
 (defn body-clicked [owner e]
-  (when-let [topic-body (sel1 [:div.topic-body])]
-    (when-let [fullscreen-topic (sel1 [:div.fullscreen-topic])]
-      (let [body-line (sel1 [:div.topic-body-line])]
-        (when (and (>= (.-clientY e) (- (top-position body-line) 20))
-                   (not (click-inside e topic-body)))
-          (.focus topic-body)
-          (set-end-of-content-editable topic-body)
-          (set! (.-scrollTop fullscreen-topic) (.-scrollHeight fullscreen-topic)))))))
+  (when-let* [topic-body (sel1 [:div.topic-body])
+              fullscreen-topic (sel1 [:div.fullscreen-topic])
+              body-line (sel1 [:div.topic-body-line])
+              add-image-btn (sel1 [:button.file-upload-btn])]
+    (when (and (>= (+ (.-clientY e) (.-scrollTop fullscreen-topic)) (- (top-position body-line) 24))
+               (not (utils/event-inside? e topic-body))
+               (or (nil? add-image-btn)
+                   (and add-image-btn
+                        (not (utils/event-inside? e add-image-btn)))))
+      (.focus topic-body)
+      (set-end-of-content-editable topic-body)
+      (set! (.-scrollTop fullscreen-topic) (.-scrollHeight fullscreen-topic)))))
 
 (defn setup-body-listener [owner]
-  (events/listen (.-body js/document) EventType/CLICK (partial body-clicked owner)))
+  (events/listen (sel1 [:div.fullscreen-topic]) EventType/CLICK (partial body-clicked owner)))
 
 (defn get-state [owner data current-state]
   (let [topic-data    (:topic-data data)
