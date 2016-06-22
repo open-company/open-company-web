@@ -68,6 +68,10 @@
   ([] (company-section-edit (router/current-company-slug) (router/current-section)))
   ([company-slug section-name] (str "/" (name company-slug) "/" (name section-name) "/edit")))
 
+(defn company-section-revision
+  ([] (company-section (router/current-company-slug) (router/current-section)))
+  ([revision] (str (company-section (router/current-company-slug) (router/current-section)) "?as-of=" revision)))
+
 ;; Stakeholder update
 
 (defn stakeholder-update-list
