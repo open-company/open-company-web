@@ -108,6 +108,13 @@
     (utils/clean-company-caches)
     ;; save the route
     (router/set-route! [slug section route (when edit? "edit")] {:slug slug :section section :edit edit? :query-params query-params})
+    ;; load revision if needed
+    (when (:as-of query-params)
+      (api/load-revision {:updated-at (:as-of query-params)
+                          :href (str "/companies" (urls/company-section-revision (:as-of query-params)))
+                          :type (api/content-type "section")}
+                         slug
+                         section))
     ;; do we have the company data already?
     (when-not (dis/company-data)
       ;; load the company data from the API
