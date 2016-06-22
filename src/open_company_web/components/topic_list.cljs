@@ -323,6 +323,7 @@
                 (om/build fullscreen-topic {:section selected-topic
                                             :section-data (->> selected-topic keyword (get company-data))
                                             :fullscreen-force-edit fullscreen-force-edit
+                                            :cached-key (dispatcher/revision (router/current-company-slug) (router/current-section) (router/current-as-of))
                                             :selected-metric selected-metric
                                             :read-only (:read-only company-data)
                                             :card-width card-width
