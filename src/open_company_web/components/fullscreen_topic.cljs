@@ -184,7 +184,7 @@
       (when (om/get-state owner :data-posted)
         (hide-fullscreen-topic owner options))
       (om/set-state! owner :data-posted false)
-      (om/set-state! owner :as-of (router/current-as-of))
+      (om/set-state! owner :as-of (or (router/current-as-of) (:updated-at (:section-data next-props))))
       (om/set-state! owner :actual-as-of (:updated-at (:section-data next-props)))))
 
   (will-unmount [_]
