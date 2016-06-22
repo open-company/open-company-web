@@ -112,6 +112,13 @@
       ((:remove-topic options) section))
     (hide-fullscreen-topic owner options true)))
 
+(defn revision-navigation [owner as-of]
+  (let [actual-as-of (om/get-state owner :actual-as-of)
+        section (name (om/get-props owner :section))]
+    (if (= as-of actual-as-of)
+      (.pushState js/history nil section (oc-urls/company-section-revision))
+      (.pushState js/history nil (str section " revision " as-of) (oc-urls/company-section-revision as-of)))))
+
 (defn animate-transition [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
         tr-topic (om/get-ref owner "tr-topic")
@@ -141,9 +148,11 @@
     (doto appear-animation
       (events/listen
         AnimationEventType/FINISH
-        #(om/set-state! owner (merge current-state
+        (fn []
+          (revision-navigation owner (:transition-as-of current-state))
+          (om/set-state! owner (merge current-state
                                     {:as-of (:transition-as-of current-state)
-                                     :transition-as-of nil})))
+                                     :transition-as-of nil}))))
       (.play))))
 
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width hide-history-navigation show-first-edit-tooltip] :as data} owner options]
