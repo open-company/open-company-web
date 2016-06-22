@@ -163,13 +163,15 @@
     (when (:fullscreen-force-edit data)
       (dis/set-force-edit-topic nil)
       ((:topic-navigation options) false))
-    {:as-of (:updated-at section-data)
-     :transition-as-of nil
-     :editing (and (:fullscreen-force-edit data) (not (:read-only section-data)))
-     :data-posted false
-     :show-save-button false
-     :last-selected-metric selected-metric
-     :actual-as-of (:updated-at section-data)})
+    (let [actual-as-of (:updated-at section-data)
+          current-as-of (or (router/current-as-of) actual-as-of)]
+      {:as-of current-as-of
+       :transition-as-of nil
+       :editing (and (:fullscreen-force-edit data) (not (:read-only section-data)))
+       :data-posted false
+       :show-save-button false
+       :last-selected-metric selected-metric
+       :actual-as-of actual-as-of}))
 
   (did-mount [_]
     (om/set-state! owner :esc-listener-key
@@ -182,7 +184,7 @@
       (when (om/get-state owner :data-posted)
         (hide-fullscreen-topic owner options))
       (om/set-state! owner :data-posted false)
-      (om/set-state! owner :as-of (:updated-at (:section-data next-props)))
+      (om/set-state! owner :as-of (router/current-as-of))
       (om/set-state! owner :actual-as-of (:updated-at (:section-data next-props)))))
 
   (will-unmount [_]
