@@ -35,8 +35,11 @@
 (defn stakeholder-update-key [company-slug update-slug]
   [(keyword company-slug) (keyword update-slug)])
 
+(defn section-revisions-key [slug section]
+  [:revisions (keyword slug) (keyword section)])
+
 (defn revision-key [slug section as-of]
-  [:revisions (keyword slug) (keyword section) (str as-of)])
+  (vec (conj (section-revisions-key slug section) (str as-of))))
 
 (defn company-data
   ([]
@@ -90,3 +93,7 @@
 (defn revision
   ([slug section as-of] (revision slug section as-of @app-state))
   ([slug section as-of data] (get-in data (revision-key slug section as-of))))
+
+(defn section-revisions
+  ([slug section] (section-revisions slug section @app-state))
+  ([slug section data] (get-in data (section-revisions-key slug section))))
