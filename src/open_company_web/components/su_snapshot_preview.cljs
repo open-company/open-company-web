@@ -264,6 +264,7 @@
               (om/build topics-columns {:columns-num columns-num
                                         :card-width card-width
                                         :total-width total-width
+                                        :show-fast-editing false
                                         :content-loaded (not (:loading data))
                                         :topics (:sections su-data)
                                         :company-data company-data

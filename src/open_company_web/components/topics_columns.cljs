@@ -154,6 +154,7 @@
         (om/build topic {:loading false
                          :section "add-topic"
                          :add-topic true
+                         :show-fast-editing false
                          :column column
                          :read-only-company false
                          :archived-topics (:archived company-data)
@@ -174,6 +175,7 @@
                           :key (str "topic-row-" (name section-name))}
               (om/build topic {:loading (:loading company-data)
                                :section section-name
+                               :show-fast-editing (om/get-props owner :show-fast-editing)
                                :section-data sd
                                :read-only-company (:read-only company-data)
                                :currency (:currency company-data)

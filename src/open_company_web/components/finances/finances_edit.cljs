@@ -37,7 +37,7 @@
                       "calculated"
                       (if (zero? burn)
                         (str burn-prefix "0")
-                        (str burn-prefix (utils/thousands-separator (utils/abs burn)))))
+                        (str burn-prefix (utils/thousands-separator (utils/abs burn) currency))))
           runway-days (:runway finances-data)
           runway (cond
                    (nil? runway-days) "calculated"

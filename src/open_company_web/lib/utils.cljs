@@ -730,3 +730,11 @@
 (defn event-stop [e]
   (.preventDefault e)
   (.stopPropagation e))
+
+(defn event-inside? [e el]
+  (loop [element (.-target e)]
+    (if element
+      (if (= element el)
+        true
+        (recur (.-parentElement element)))
+      false)))
