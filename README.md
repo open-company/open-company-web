@@ -5,7 +5,7 @@
 [![Roadmap on Trello](http://img.shields.io/badge/roadmap-trello-blue.svg?style=flat)](https://trello.com/b/3naVWHgZ/open-company-development)
 
 
-## Overview
+## Background
 
 > Transparency, honesty, kindness, good stewardship, even humor, work in businesses at all times.
 
@@ -21,9 +21,16 @@ To maintain transparency, OpenCompany information is always accessible and easy 
 
 Transparency expectations are changing. Startups need to change as well if they are going to attract and retain savvy employees and investors. Just as open source changed the way we build software, transparency changes how we build successful startups with information that is open, interactive, and always accessible. The OpenCompany platform turns transparency into a competitive advantage.
 
-Like the open companies we promote and support, the [OpenCompany](https://opencompany.com/) platform is completely transparent. The company supporting this effort, OpenCompany, Inc., is an open company. The [platform](https://github.com/open-company/open-company-web) is open source software, and open company data is [open data](https://en.wikipedia.org/wiki/Open_data) accessible through the [platform API](https://github.com/open-company/open-company-api).
+Like the open companies we promote and support, the [OpenCompany](https://opencompany.com/) platform is completely transparent. The company supporting this effort, OpenCompany, LLC, is an open company. The [platform](https://github.com/open-company/open-company-web) is open source software, and open company data is [open data](https://en.wikipedia.org/wiki/Open_data) accessible through the [platform API](https://github.com/open-company/open-company-api).
 
 To get started, head to: [OpenCompany](https://opencompany.com/)
+
+
+## Overview
+
+The OpenCompany Web Application provides a Web UI for creating and consuming open company content and data.
+
+![OpenCompany Screenshot](https://open-company-assets.s3.amazonaws.com/oc-screenshot.png)
 
 
 ## Local Setup
@@ -35,13 +42,17 @@ Most of the dependencies are internal, meaning [Boot](https://github.com/boot-cl
 * [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) - a Java 8 JRE is needed to run Clojure
 * [Boot](https://github.com/boot-clj/boot) - A Clojure build and dependency management tool
 
-Chances are your system already has Java 8 installed. You can verify this with:
+#### Java
+
+Chances are your system already has Java 8+ installed. You can verify this with:
 
 ```console
 java -version
 ```
 
-If you do not have Java 8 [download it](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and follow the installation instructions.
+If you do not have Java 8+ [download it](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and follow the installation instructions.
+
+#### Boot
 
 Installing Boot is easy, for the most up to date instructions, check out the [Boot README](https://github.com/boot-clj/boot#install).
 You can verify your install with:
@@ -49,6 +60,7 @@ You can verify your install with:
 ```console
 boot -V
 ```
+
 
 ## Usage
 
@@ -78,8 +90,11 @@ boot prod-build
 
 Open `target/public/app-shell.html` in your browser. Using production rather than dev, you will not get the live reloading nor a REPL.
 
+#### Browser Support
 
-## Design
+Latest Chrome, Firefox, Safari and Edge.
+
+#### App State Design
 
 The app-state has the following structure:
 
@@ -107,7 +122,7 @@ This way it will be very simple to change the structure of the app-state in the 
 to change it in one place.
 
 
-## Tests
+## Testing
 
 Install [PhantomJS](https://http://phantomjs.org/) downloading the latest binary [here](https://github.com/eugene1g/phantomjs/releases), the one from their site is currently broken.
 
@@ -129,11 +144,6 @@ For more info on testing:
 - React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/cljs-react-test)
 
 
-## Browser Support
-
-Latest Chrome, Firefox, Safari and Edge.
-
-
 ## Participation
 
 Please note that this project is released with a [Contributor Code of Conduct](https://github.com/open-company/open-company-web/blob/mainline/CODE-OF-CONDUCT.md). By participating in this project you agree to abide by its terms.
@@ -143,4 +153,4 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 Distributed under the [Mozilla Public License v2.0](http://www.mozilla.org/MPL/2.0/).
 
-Copyright © 2015-2016 OpenCompany, Inc.
+Copyright © 2015-2016 OpenCompany, LLC.
