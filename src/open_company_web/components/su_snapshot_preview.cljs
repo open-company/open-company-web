@@ -29,14 +29,12 @@
   (om/set-state! owner :link-posting true)
   (api/share-stakeholder-update))
 
-(defn stakeholder-update-data [owner]
-  (let [props (om/get-props owner)]
-    (:stakeholder-update (dis/company-data props))))
+(defn stakeholder-update-data [data]
+  (:stakeholder-update (dis/company-data data)))
 
 (defn patch-stakeholder-update [owner]
-  (let [title       (om/get-state owner :title)
-        topic-nodes (sel [:div.topic-row])
-        topics      (vec (for [t topic-nodes] (.-topic (.-dataset t))))]
+  (let [title  (om/get-state owner :title)
+        topics (om/get-state owner :su-topics)]
     (api/patch-stakeholder-update {:title (or title "")
                                    :sections topics})))
 
@@ -119,7 +117,14 @@
     (when-let [list-node (sel1 [:div.topics-column])]
       (.create js/Sortable list-node #js {:handle ".topic-internal"
                                           :onStart #(dommy/add-class! list-node :dragging)
-                                          :onEnd #(dommy/remove-class! list-node :dragging)}))))
+                                          :onEnd (fn [_]
+                                                    (let [topic-nodes (sel [:div.topic-row])
+                                                          topics      (vec (for [t topic-nodes] (.-topic (.-dataset t))))]
+                                                      (om/set-state! owner :su-topics topics))
+                                                    (dommy/remove-class! list-node :dragging))}))))
+
+(defn add-su-section [owner topic]
+  (om/update-state! owner :su-topics #(conj % topic)))
 
 (defcomponent su-snapshot-preview [data owner options]
 
@@ -130,8 +135,9 @@
                      (fn []
                        (om/set-state! owner :sortable-loaded true)
                        (setup-sortable owner options)))
-    (let [su-data (stakeholder-update-data owner)]
+    (let [su-data (stakeholder-update-data data)]
       {:columns-num (responsive/columns-num)
+       :su-topics (:sections su-data)
        :selected-topic nil
        :tr-selected-topic nil
        :selected-metric nil
@@ -168,6 +174,8 @@
         (.off swipe-listener "swiperight"))))
 
   (will-receive-props [_ next-props]
+    (when-not (= (dis/company-data data) (dis/company-data next-props))
+      (om/set-state! owner :su-topics (:sections (stakeholder-update-data next-props))))
     ; share via link
     (when (om/get-state owner :link-loading)
       (if-not (om/get-state owner :link-posting)
@@ -196,15 +204,15 @@
                            link-loading
                            slack-loading
                            link-posting
-                           link-posted]}]
+                           link-posted
+                           su-topics]}]
     (let [company-data (dis/company-data data)
-          su-data      (stakeholder-update-data owner)
+          su-data      (stakeholder-update-data data)
           card-width   (responsive/calc-card-width)
           ww           (.-clientWidth (sel1 js/document :body))
-          column-num   1
           total-width  (if (> ww 413) (str card-width "px") "auto")
           su-subtitle  (str "— " (utils/date-string (js/Date.) true))
-          topics-to-add (reduce utils/vec-dissoc (flatten (vals (:sections company-data))) (:sections su-data))]
+          topics-to-add (reduce utils/vec-dissoc (flatten (vals (:sections company-data))) su-topics)]
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
                                          :main-scroll true})}
         (om/build menu data)
@@ -281,7 +289,7 @@
                                         :card-width card-width
                                         :total-width total-width
                                         :content-loaded (not (:loading data))
-                                        :topics (:sections su-data)
+                                        :topics su-topics
                                         :company-data company-data
                                         :hide-add-topic true}
                                        {:opts {:topic-click (partial topic-click owner)}})))
@@ -292,6 +300,7 @@
                         :style #js {:width total-width}}
                 (dom/div {:class "add-header"} "ADD TOPICS")
                 (for [topic topics-to-add]
-                  (dom/div {:class "add-section"}
+                  (dom/div {:class "add-section"
+                            :on-click #(add-su-section owner topic)}
                     (i/icon :check-square-09 {:accent-color "transparent" :size 16 :color "black"})
                     (dom/div {:class "section-name"} (name topic))))))))))))
