@@ -184,8 +184,9 @@
       (when (om/get-state owner :data-posted)
         (hide-fullscreen-topic owner options))
       (om/set-state! owner :data-posted false)
-      (om/set-state! owner :as-of (or (router/current-as-of) (:updated-at (:section-data next-props))))
-      (om/set-state! owner :actual-as-of (:updated-at (:section-data next-props)))))
+      (when-not (= (:updated-at (:section-data next-props)) (:updated-at section-data))
+        (om/set-state! owner :as-of (:updated-at (:section-data next-props)))
+        (om/set-state! owner :actual-as-of (:updated-at (:section-data next-props))))))
 
   (will-unmount [_]
     (utils/remove-channel (str "fullscreen-topic-save-" (name section)))
