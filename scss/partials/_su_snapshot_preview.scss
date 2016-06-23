@@ -66,7 +66,7 @@ div.su-snapshot-preview {
     position: relative;
     content: "";
     padding-bottom: 20px;
-    min-height: calc(100vh - #{$footer_height}px);
+    min-height: calc(100vh);
 
     div.su-sp-company-header {
       margin-top: 60px;
@@ -123,17 +123,20 @@ div.su-snapshot-preview {
   div.topic-row {
     padding-bottom: 33px !important;
 
+
     &.sortable-ghost {
 
       div.topic {
         background-color: rgba(78, 90, 107, 0.2);
         border-radius: 2px;
+        border: 4px solid $oc_yellow;
       }
     }
 
     div.topic {
       background-color: white;
       border-radius: 2px;
+      border: 4px solid transparent;
       box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
 
       div.card-header {
@@ -142,6 +145,54 @@ div.su-snapshot-preview {
 
       div.pillbox-container{
         text-align: left;
+      }
+    }
+  }
+
+  div.su-preview-add-section-container {
+    background-color: rgba(78, 90, 107, 0.05);
+    padding-top: 60px;
+    padding-bottom: 60px;
+
+    div.su-preview-add-section {
+      margin: 0px auto;
+
+      div.add-header {
+        height: 40px;
+        background-color: #4e5a6b;
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: #ffffff;
+        padding: 10px 19px;
+      }
+
+      div.add-section {
+        height: 40px;
+        padding: 10px 24px;
+        background-color: white;
+        cursor: pointer;
+
+        &:hover {
+          background-color: rgba(78, 90, 107, 0.1);
+        }
+
+        div.svg-icon {
+          width: 16px;
+          height: 16px;
+          float: left;
+        }
+
+        div.section-name {
+          float: left;
+          font-family: $oc_headers_font;
+          font-size: 14px;
+          line-height: 1.7;
+          color: $oc_gray_5;
+          margin-left: 10px;
+          text-transform: capitalize;
+        }
       }
     }
   }

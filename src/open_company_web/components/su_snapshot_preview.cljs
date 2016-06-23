@@ -12,9 +12,8 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.menu :refer (menu)]
             [open-company-web.components.navbar :refer (navbar)]
-            [open-company-web.components.footer :refer (footer)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
-            [open-company-web.components.ui.icon :refer (icon)]
+            [open-company-web.components.ui.icon :as i]
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
             [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
@@ -202,11 +201,10 @@
           su-data      (stakeholder-update-data owner)
           card-width   (responsive/calc-card-width)
           ww           (.-clientWidth (sel1 js/document :body))
-          total-width  (case columns-num
-                         3 (str (+ (* card-width 3) 40 60) "px")
-                         2 (str (+ (* card-width 2) 20 60) "px")
-                         1 (if (> ww 413) (str card-width "px") "auto"))
-          su-subtitle  (str "— " (utils/date-string (js/Date.) true))]
+          column-num   1
+          total-width  (if (> ww 413) (str card-width "px") "auto")
+          su-subtitle  (str "— " (utils/date-string (js/Date.) true))
+          topics-to-add (reduce utils/vec-dissoc (flatten (vals (:sections company-data))) (:sections su-data))]
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
                                          :main-scroll true})}
         (om/build menu data)
@@ -218,9 +216,9 @@
               (dom/button {:class "share-su-button btn-reset share-slack"}
                 (dom/img {:src "/img/Slack_Icon.png"}))
               (dom/button {:class "share-su-button btn-reset share-mail"}
-                (icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))
+                (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))
               (dom/button {:class "share-su-button btn-reset share-link"}
-                (icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))))
+                (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))))
           ;; SU Snapshot Preview
           (when company-data
             (dom/div {:class "su-sp-content"}
@@ -287,8 +285,13 @@
                                         :company-data company-data
                                         :hide-add-topic true}
                                        {:opts {:topic-click (partial topic-click owner)}})))
-          ;;Footer
-          (when company-data
-            (om/build footer {:columns-num columns-num
-                              :su-preview true
-                              :card-width card-width})))))))
+          ;; Add section container
+          (when (pos? (count topics-to-add))
+            (dom/div {:class "su-preview-add-section-container"}
+              (dom/div {:class "su-preview-add-section"
+                        :style #js {:width total-width}}
+                (dom/div {:class "add-header"} "ADD TOPICS")
+                (for [topic topics-to-add]
+                  (dom/div {:class "add-section"}
+                    (i/icon :check-square-09 {:accent-color "transparent" :size 16 :color "black"})
+                    (dom/div {:class "section-name"} (name topic))))))))))))
