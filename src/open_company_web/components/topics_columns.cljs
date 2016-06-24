@@ -174,6 +174,8 @@
               (om/build topic {:loading (:loading company-data)
                                :section section-name
                                :section-data sd
+                               :card-width (:card-width props)
+                               :show-share-remove (:show-share-remove props)
                                :currency (:currency company-data)
                                :sharing-mode sharing-mode
                                :share-selected share-selected?}
