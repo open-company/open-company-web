@@ -37,9 +37,6 @@
     (api/patch-stakeholder-update {:title (or title "")
                                    :sections topics})))
 
-(defn topic-click [owner topic selected-metric]
-  (println "topic-click"))
-
 (defn switch-topic [owner is-left?]
   (when (and (om/get-state owner :topic-navigation)
              (om/get-state owner :selected-topic)
@@ -261,8 +258,7 @@
                                         :company-data company-data
                                         :show-share-remove true
                                         :hide-add-topic true}
-                                       {:opts {:topic-click (partial topic-click owner)
-                                               :share-remove-click (fn [topic] (om/update-state! owner :su-topics #(utils/vec-dissoc % topic)))}})))
+                                       {:opts {:share-remove-click (fn [topic] (om/update-state! owner :su-topics #(utils/vec-dissoc % topic)))}})))
           ;; Add section container
           (when (pos? (count topics-to-add))
             (dom/div {:class "su-preview-add-section-container"}
