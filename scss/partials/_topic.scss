@@ -59,6 +59,7 @@ div.topic {
     height: 30px;
     position: absolute;
     top: 0;
+    display: none;
 
     button.share-remove {
       width: 30px;
@@ -67,7 +68,7 @@ div.topic {
       background-color: white;
 
       div.svg-icon {
-        padding-left: 10px;
+        padding-left: 3px;
         margin-top: -10px;
       }
     }
