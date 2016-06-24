@@ -180,6 +180,7 @@
                                :sharing-mode sharing-mode
                                :share-selected share-selected?}
                                {:opts {:section-name section-name
+                                       :share-remove-click (:share-remove-click options)
                                        :topic-click (partial topic-click section-name)}}))))))))
 
 (defcomponent topics-columns [{:keys [columns-num
