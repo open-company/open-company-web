@@ -55,7 +55,11 @@
             (when-let [first-image (sel1 hidden-body [:img])]
               (om/set-state! owner :image-header (.-src first-image)))))))))
 
-(defcomponent topic-internal [{:keys [topic-data section currency prev-rev next-rev] :as data} owner options]
+(defcomponent topic-internal [{:keys [topic-data
+                                      section
+                                      currency
+                                      prev-rev
+                                      next-rev] :as data} owner options]
 
   (init-state [_]
     {:image-header nil})
@@ -154,7 +158,16 @@
         add-topic-pos     (- popover-offsettop scroll)]
     (> add-topic-pos (/ win-height 2))))
 
-(defcomponent topic [{:keys [active-topics section-data section currency column sharing-mode share-selected archived-topics] :as data} owner options]
+(defcomponent topic [{:keys [active-topics
+                             section-data
+                             section
+                             currency
+                             column
+                             sharing-mode
+                             share-selected
+                             archived-topics
+                             show-share-remove
+                             card-width] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
@@ -201,6 +214,13 @@
                     :onClick #(if add-topic?
                                 (add-topic owner)
                                 (topic-click options nil))}
+        (when (and show-share-remove
+                   (not add-topic?))
+          (dom/div {:class "share-remove-container hidden"
+                    :id (str "share-remove-" (name section))
+                    :style #js {:left (str (+ card-width 20) "px")}}
+            (dom/button {:class "btn-reset share-remove"}
+              (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.5)" :size 12 :stroke 4 :accent-color "rgba(78, 90, 107, 0.5)"}))))
         (when show-add-topic-popover
           (let [all-sections (get-all-sections slug)
                 update-active-topics (:update-active-topics options)
