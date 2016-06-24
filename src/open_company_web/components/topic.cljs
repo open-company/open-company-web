@@ -216,10 +216,11 @@
                                 (topic-click options nil))}
         (when (and show-share-remove
                    (not add-topic?))
-          (dom/div {:class "share-remove-container hidden"
+          (dom/div {:class "share-remove-container"
                     :id (str "share-remove-" (name section))
-                    :style #js {:left (str (+ card-width 20) "px")}}
-            (dom/button {:class "btn-reset share-remove"}
+                    :style #js {:left (str (+ card-width 10) "px")}}
+            (dom/button {:class "btn-reset share-remove"
+                         :on-click #(when (contains? options :share-remove-click) ((:share-remove-click options) (name section)))}
               (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.5)" :size 12 :stroke 4 :accent-color "rgba(78, 90, 107, 0.5)"}))))
         (when show-add-topic-popover
           (let [all-sections (get-all-sections slug)
