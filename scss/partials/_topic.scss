@@ -28,6 +28,7 @@ div.topic {
   text-align: left;
   border: 0px solid transparent;
   box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
+  position: relative;
 
   &.add-topic {
     height: 94.5px;
@@ -50,6 +51,25 @@ div.topic {
       letter-spacing: 1px;
       color: $oc_gray_5;
       margin-top: 29px;
+    }
+  }
+
+  div.share-remove-container{
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 0;
+
+    button.share-remove {
+      width: 30px;
+      height: 30px;
+      border-radius: 15px;
+      background-color: white;
+
+      div.svg-icon {
+        padding-left: 10px;
+        margin-top: -10px;
+      }
     }
   }
 
