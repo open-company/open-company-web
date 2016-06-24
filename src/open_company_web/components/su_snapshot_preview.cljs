@@ -15,7 +15,6 @@
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.topics-columns :refer (topics-columns)]
-            [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
             [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
             [cljs-dynamic-resources.core :as cdr]
             [goog.events :as events]
@@ -38,14 +37,8 @@
     (api/patch-stakeholder-update {:title (or title "")
                                    :sections topics})))
 
-(defn close-overlay-cb [owner]
-  (om/set-state! owner :transitioning false)
-  (om/set-state! owner :selected-topic nil)
-  (om/set-state! owner :selected-metric nil))
-
 (defn topic-click [owner topic selected-metric]
-  (om/set-state! owner :selected-topic topic)
-  (om/set-state! owner :selected-metric selected-metric))
+  (println "topic-click"))
 
 (defn switch-topic [owner is-left?]
   (when (and (om/get-state owner :topic-navigation)
@@ -72,22 +65,6 @@
       (switch-topic owner false))
     (when (= key-code 37)
       (switch-topic owner true))))
-
-(defn animation-finished [owner]
-  (let [cur-state (om/get-state owner)]
-    (om/set-state! owner (merge cur-state {:selected-topic (:tr-selected-topic cur-state)
-                                           :transitioning true
-                                           :tr-selected-topic nil}))))
-
-(defn animate-selected-topic-transition [owner]
-  (let [selected-topic (om/get-ref owner "selected-topic")
-        tr-selected-topic (om/get-ref owner "tr-selected-topic")
-        fade-anim (new Fade selected-topic 1 0 utils/oc-animation-duration)
-        cur-state (om/get-state owner)]
-    (.play (new Fade tr-selected-topic 0 1 utils/oc-animation-duration))
-    (doto fade-anim
-      (.listen AnimationEventType/FINISH #(animation-finished owner))
-      (.play))))
 
 (defn focus-title [owner]
   (when-not (om/get-state owner :title-focused)
@@ -126,6 +103,41 @@
 (defn add-su-section [owner topic]
   (om/update-state! owner :su-topics #(conj % topic)))
 
+(defn top-position [el]
+  (loop [yPos 0
+         element el]
+    (if element
+      (recur (+ yPos (.-offsetTop element))
+             (.-offsetParent element))
+      yPos)))
+
+(defn mouse-moved [owner e]
+  (let [y-pos (+ (.-clientY e) (.-scrollTop (.-body js/document)))
+        all-topics (sel [:div.topic-row])
+        hover-topic (loop [idx 0
+                           topic (get all-topics idx)
+                           last-topic nil]
+                      ; (println "   - idx:" idx)
+                      ; (println "   - topic:" (.-topic (.-dataset topic)) "-" (top-position topic))
+                      ; (println "   - last-topic:" last-topic)
+                      ; (println "   " (.-topic (.-dataset topic)) ": " y-pos "<" (top-position topic) "=" (< y-pos (top-position topic)))
+                      (if (< y-pos (top-position topic))
+                        last-topic
+                        (if (>= (inc idx) (count all-topics))
+                          nil
+                          (recur (inc idx)
+                                 (get all-topics (inc idx))
+                                 topic))))]
+
+    (println "hide all:" (count (sel [:div.share-remove-container])))
+    (for [topic (sel [:div.share-remove-container])]
+      (dommy/add-class! topic :hidden))
+    (when hover-topic
+      (println "show for:" (.-topic (.-dataset hover-topic)) "=>" (sel1 [(str "div#share-remove-" (.-topic (.-dataset hover-topic)))]))
+      (dommy/remove-class! (sel1 [(str "div#share-remove-" (.-topic (.-dataset hover-topic)))]) :hidden)
+      ; (om/set-state! owner :show-share-remove (.-topic (.-dataset hover-topic)))
+      )))
+
 (defcomponent su-snapshot-preview [data owner options]
 
   (init-state [_]
@@ -138,11 +150,6 @@
     (let [su-data (stakeholder-update-data data)]
       {:columns-num (responsive/columns-num)
        :su-topics (:sections su-data)
-       :selected-topic nil
-       :tr-selected-topic nil
-       :selected-metric nil
-       :topic-navigation true
-       :transitioning false
        :title-focused false
        :title (if (clojure.string/blank? (:title su-data))  (utils/su-default-title) (:title su-data))
        :show-su-dialog false
@@ -162,7 +169,9 @@
         (om/set-state! owner :kb-listener kb-listener)
         (om/set-state! owner :swipe-listener swipe-listener)
         (.on swipe-listener "swipeleft" (fn [e] (switch-topic owner true)))
-        (.on swipe-listener "swiperight" (fn [e] (switch-topic owner false))))))
+        (.on swipe-listener "swiperight" (fn [e] (switch-topic owner false))))
+      (let [mouse-move-listener (events/listen js/window EventType/MOUSEMOVE (partial mouse-moved owner))]
+        )))
 
   (will-unmount [_]
     (utils/remove-channel "fullscreen-topic-save")
@@ -188,16 +197,9 @@
 
   (did-update [_ _ _]
     (focus-title owner)
-    (setup-sortable owner options)
-    (when (om/get-state owner :tr-selected-topic)
-      (animate-selected-topic-transition owner)))
+    (setup-sortable owner options))
 
   (render-state [_ {:keys [columns-num
-                           selected-topic
-                           tr-selected-topic
-                           selected-metric
-                           topic-navigation
-                           transitioning
                            title-focused
                            title
                            show-su-dialog
@@ -230,40 +232,6 @@
           ;; SU Snapshot Preview
           (when company-data
             (dom/div {:class "su-sp-content"}
-              ;; Fullscreen topic
-              (when selected-topic
-                (dom/div {:class "selected-topic-container"
-                          :style #js {:opacity (if selected-topic 1 0)}}
-                  (dom/div #js {:className "selected-topic"
-                                :key (str "transition-" selected-topic)
-                                :ref "selected-topic"
-                                :style #js {:opacity 1 :backgroundColor "rgba(255, 255, 255, 0.98)"}}
-                    (om/build fullscreen-topic {:section selected-topic
-                                                :section-data (->> selected-topic keyword (get company-data))
-                                                :selected-metric selected-metric
-                                                :read-only true
-                                                :card-width card-width
-                                                :currency (:currency company-data)
-                                                :hide-history-navigation true
-                                                :animate (not transitioning)}
-                                               {:opts {:close-overlay-cb #(close-overlay-cb owner)
-                                                       :topic-navigation #(om/set-state! owner :topic-navigation %)}}))
-                  ;; Fullscreen topic for transition
-                  (when tr-selected-topic
-                    (dom/div #js {:className "tr-selected-topic"
-                                  :key (str "transition-" tr-selected-topic)
-                                  :ref "tr-selected-topic"
-                                  :style #js {:opacity (if tr-selected-topic 0 1)}}
-                    (om/build fullscreen-topic {:section tr-selected-topic
-                                                :section-data (->> tr-selected-topic keyword (get company-data))
-                                                :selected-metric selected-metric
-                                                :read-only (:read-only company-data)
-                                                :card-width card-width
-                                                :currency (:currency company-data)
-                                                :hide-history-navigation true
-                                                :animate false}
-                                               {:opts {:close-overlay-cb #(close-overlay-cb owner)
-                                                       :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
               (dom/div {:class "su-sp-company-header"}
                 (dom/img {:class "company-logo" :src (:logo company-data)})
                 (dom/span {:class "company-name"} (:name company-data)))
@@ -291,8 +259,10 @@
                                         :content-loaded (not (:loading data))
                                         :topics su-topics
                                         :company-data company-data
+                                        :show-share-remove true
                                         :hide-add-topic true}
-                                       {:opts {:topic-click (partial topic-click owner)}})))
+                                       {:opts {:topic-click (partial topic-click owner)
+                                               :share-remove-click (fn [topic] (om/update-state! owner :su-topics #(utils/vec-dissoc % topic)))}})))
           ;; Add section container
           (when (pos? (count topics-to-add))
             (dom/div {:class "su-preview-add-section-container"}
