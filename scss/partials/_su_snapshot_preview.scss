@@ -122,16 +122,23 @@ div.su-snapshot-preview {
 
   div.topic-row {
     padding-bottom: 33px !important;
+    padding-right: 50px;
+    padding-left: 50px;
 
-
-    &.sortable-ghost {
-
-      div.topic {
-        background-color: rgba(78, 90, 107, 0.2);
-        border-radius: 2px;
-        border: 4px solid $oc_yellow;
+    &:hover {
+      div.share-remove-container {
+        display: block;
       }
     }
+
+    // &.sortable-ghost {
+
+    //   div.topic {
+    //     background-color: rgba(78, 90, 107, 0.2);
+    //     border-radius: 2px;
+    //     border: 4px solid $oc_yellow;
+    //   }
+    // }
 
     div.topic {
       background-color: white;
