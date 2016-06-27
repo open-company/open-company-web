@@ -166,6 +166,10 @@
     (when (and (router/section-editing?)
                (:read-only section-data))
       (utils/after 100 #(router/nav! (oc-urls/company-section))))
+    (let [company-data (dis/company-data)]
+      (when (and company-data
+                 (not (contains? company-data (keyword section))))
+        (router/redirect-404!)))
     (let [actual-as-of (:updated-at section-data)
           current-as-of (or (router/current-as-of) actual-as-of)]
       {:as-of current-as-of
