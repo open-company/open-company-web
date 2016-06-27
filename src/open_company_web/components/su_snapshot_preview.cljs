@@ -25,7 +25,7 @@
 
 (defn post-stakeholder-update [owner]
   (om/set-state! owner :link-posting true)
-  (api/share-stakeholder-update))
+  (api/share-stakeholder-update {}))
 
 (defn stakeholder-update-data [owner]
   (let [props (om/get-props owner)]
@@ -96,8 +96,13 @@
       (om/set-state! owner :title-focused true))))
 
 (defn share-slack-clicked [owner]
-  (om/set-state! owner :slack-loading true)
-  (om/set-state! owner :show-su-dialog true))
+  (om/set-state! owner :show-su-dialog :slack)
+  (om/set-state! owner :slack-loading true))
+
+(defn share-email-clicked [owner]
+ (om/set-state! owner :show-su-dialog :email)
+ (om/set-state! owner :email-loading true)
+ (patch-stakeholder-update owner))
 
 (defn share-link-clicked [owner]
  (om/set-state! owner :link-loading true)
@@ -107,6 +112,7 @@
   (om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false
                                                     :slack-loading false
                                                     :link-loading false
+                                                    :email-loading false
                                                     :link-posting false
                                                     :link-posted false})))
 
@@ -175,6 +181,7 @@
                            title-focused
                            title
                            show-su-dialog
+                           email-loading
                            link-loading
                            slack-loading
                            link-posting
@@ -203,8 +210,10 @@
                               :columns-num columns-num
                               :auth-settings (:auth-settings data)
                               :link-loading link-loading
-                              :slack-loading slack-loading}
+                              :slack-loading slack-loading
+                              :email-loading email-loading}
                              {:opts {:share-link-cb #(share-link-clicked owner)
+                                     :share-email-cb #(share-email-clicked owner)
                                      :share-slack-cb #(share-slack-clicked owner)}}))
           ;; SU Snapshot Preview
           (when company-data
@@ -258,6 +267,7 @@
                                              :company-data company-data
                                              :latest-su (dis/latest-stakeholder-update)
                                              :share-via-slack slack-loading
+                                             :share-via-email email-loading
                                              :share-via-link (or link-loading link-posted)
                                              :su-title title}
                                             {:opts {:dismiss-su-preview #(dismiss-su-preview owner)}}))
