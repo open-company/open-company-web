@@ -8,8 +8,8 @@
             [open-company-web.router :as router]
             [open-company-web.urls :as oc-urls]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.ui.icon :refer (icon)]
-            [open-company-web.components.ui.small-loading :refer (small-loading)]
+            [open-company-web.components.ui.icon :as i]
+            [open-company-web.components.ui.small-loading :as loading]
             [cljsjs.react.dom]
             [cljsjs.clipboard]))
 
