@@ -1,7 +1,7 @@
 ;; boot show --updates
 (def cljs-deps
   '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
-    [adzerk/boot-reload "0.4.10" :scope "test"]
+    [adzerk/boot-reload "0.4.11" :scope "test"]
     [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
     [tolitius/boot-check "0.1.2" :scope "test"]
 
