@@ -30,7 +30,7 @@
 (defn company-profile-click [e]
   (utils/event-stop e)
   (close-menu)
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/company-profile))))
+  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/company-settings))))
 
 (defn on-transition-end [owner body]
   (doto body
@@ -73,7 +73,7 @@
         (dom/li {:class "menu-link"} (dom/a {:title "USER INFO" :href oc-urls/user-profile :on-click user-profile-click} "USER INFO")))
       (when (and (router/current-company-slug)
                  (not (utils/in? (:route @router/path) "profile")))
-        (dom/li {:class "menu-link"} (dom/a {:title "COMPANY SETTINGS" :href (oc-urls/company-profile) :on-click company-profile-click} "COMPANY SETTINGS")))
+        (dom/li {:class "menu-link"} (dom/a {:title "COMPANY SETTINGS" :href (oc-urls/company-settings) :on-click company-profile-click} "COMPANY SETTINGS")))
       (when (jwt/jwt)
         (dom/li {:class "menu-link"} (dom/a {:title "SIGN OUT" :href oc-urls/logout :on-click logout-click} "SIGN OUT")))
       (when-not (jwt/jwt)

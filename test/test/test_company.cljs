@@ -1,6 +1,6 @@
 (ns test.test-company
   (:require [doo.runner :refer-macros [doo-tests]]
-            [test.open-company-web.components.company-profile]
+            [test.open-company-web.components.company-settings]
             [test.open-company-web.components.company-editor]
             [test.open-company-web.components.ui.revisions-navigator]
             [test.open-company-web.components.ui.company-avatar]
@@ -29,7 +29,7 @@
 ;; we don't run out of memory on CI server
 
 (doo-tests
-  'test.open-company-web.components.company-profile
+  'test.open-company-web.components.company-settings
   'test.open-company-web.components.company-editor
   'test.open-company-web.components.ui.revisions-navigator
   'test.open-company-web.components.ui.company-avatar

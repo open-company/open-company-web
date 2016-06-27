@@ -19,7 +19,7 @@
             is-profile-page (utils/in? (:route @router/path) "profile")
             read-only-company (:read-only company-data)
             company-home (if (or read-only-company is-profile-page)
-                            (oc-urls/company-profile)
+                            (oc-urls/company-settings)
                             (oc-urls/company))
             company-logo (:logo company-data)]
         (dom/div {:class (utils/class-set {:company-avatar true

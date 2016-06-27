@@ -15,7 +15,7 @@
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.company-editor :refer (company-editor)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
-            [open-company-web.components.company-profile :refer (company-profile)]
+            [open-company-web.components.company-settings :refer (company-settings)]
             [open-company-web.components.su-edit :refer (su-edit)]
             [open-company-web.components.su-list :refer (su-list)]
             [open-company-web.components.su-snapshot-preview :refer (su-snapshot-preview)]
@@ -171,6 +171,9 @@
       (pre-routing (:query-params params))
       (om/root user-profile dis/app-state {:target target}))
 
+    (defroute company-settings-route (urls/company-settings ":slug") {:as params}
+      (company-handler "profile" target company-settings params))
+
     (defroute company-section-route (urls/company-section ":slug" ":section") {:as params}
       (company-handler "section" target company-dashboard params))
 
@@ -184,9 +187,6 @@
 
     (defroute company-route-slash (str (urls/company ":slug") "/") {:as params}
       (company-handler "dashboard" target company-dashboard params))
-
-    (defroute company-profile-route (urls/company-profile ":slug") {:as params}
-      (company-handler "profile" target company-profile params))
 
     (defroute su-snapshot-preview-route (urls/stakeholder-update-preview ":slug") {:as params}
       (company-handler "su-snapshot-preview" target su-snapshot-preview params))
@@ -211,11 +211,11 @@
                                  list-page-route
                                  company-create-route
                                  user-profile-route
+                                 company-settings-route
                                  company-route
                                  company-route-slash
                                  company-section-route
                                  company-section-edit-route
-                                 company-profile-route
                                  su-snapshot-preview-route
                                  su-edit-route
                                  su-list-route

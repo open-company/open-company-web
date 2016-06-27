@@ -45,12 +45,12 @@
   ([slug]
    (str "/" (name slug))))
 
-(defn company-profile
+(defn company-settings
   "Company profile url"
   ([]
-    (company-profile (router/current-company-slug)))
+    (company-settings (router/current-company-slug)))
   ([slug]
-    (str "/" (name slug) "/profile")))
+    (str "/" (name slug) "/settings")))
 
 (defn company-category
   ([category]
