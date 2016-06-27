@@ -424,7 +424,7 @@
       (when-not (om/get-state owner :body-click)
         (om/set-state! owner :body-click (setup-body-listener owner)))
       (let [win-location (.-location js/window)
-            current-token (oc-urls/company-section-edit)
+            current-token (oc-urls/company-section-edit (router/current-company-slug) (name topic))
             listener (events/listen @router/history HistoryEventType/NAVIGATE
                        #(when-not (= (.-token %) current-token)
                           (if (om/get-state owner :has-changes)
