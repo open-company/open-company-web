@@ -75,8 +75,6 @@
 (defcomponent su-snapshot [data owner options]
 
   (init-state [_]
-    (utils/add-channel "fullscreen-topic-save" (chan))
-    (utils/add-channel "fullscreen-topic-cancel" (chan))
     {:selected-topic nil
      :selected-metric nil
      :topic-navigation true
@@ -94,8 +92,6 @@
         (.on swipe-listener "swiperight" (fn [e] (switch-topic owner false))))))
 
   (will-unmount [_]
-    (utils/remove-channel "fullscreen-topic-save")
-    (utils/remove-channel "fullscreen-topic-cancel")
     (when-not (utils/is-test-env?)
       (events/unlistenByKey (om/get-state owner :kb-listener))
       (let [swipe-listener (om/get-state owner :swipe-listener)]
@@ -116,9 +112,7 @@
                          2 (str (+ (* card-width 2) 20 60) "px")
                          1 (if (> ww 413) (str card-width "px") "auto"))
           su-subtitle  (str "- " (utils/date-string (js/Date.) true))]
-      (dom/div {:class (utils/class-set {:su-snapshot true
-                                         :main-scroll true
-                                         :navbar-offset (not (responsive/is-mobile))})}
+      (dom/div {:class "su-snapshot main-scroll"}
         (om/build menu data)
         (dom/div {:class "page"}
           ;; Navbar
@@ -142,6 +136,7 @@
                                 :style #js {:opacity 1 :backgroundColor "rgba(255, 255, 255, 0.98)"}}
                     (om/build fullscreen-topic {:section selected-topic
                                                 :section-data (->> selected-topic keyword (get company-data))
+                                                :change-url false
                                                 :selected-metric selected-metric
                                                 :read-only true
                                                 :card-width card-width

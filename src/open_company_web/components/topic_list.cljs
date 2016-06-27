@@ -322,6 +322,7 @@
                             :style #js {:opacity 1 :backgroundColor "rgba(255, 255, 255, 0.98)"}}
                 (om/build fullscreen-topic {:section selected-topic
                                             :section-data (->> selected-topic keyword (get company-data))
+                                            :change-url true
                                             :fullscreen-force-edit fullscreen-force-edit
                                             :revision-updates (dispatcher/section-revisions (router/current-company-slug) (router/current-section))
                                             :selected-metric selected-metric
