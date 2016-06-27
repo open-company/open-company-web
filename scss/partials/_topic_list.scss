@@ -84,23 +84,6 @@ div.topic-list{
         width: 33%;
         height: 30px;
         text-align: center;
-
-        button.share-snapshot-bt{
-          padding: 6.5px 20px;
-          background-color: $oc_yellow;
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: #4e5a6b;
-          outline: none;
-          border: 0px solid transparent;
-
-          div.small-loading-container {
-            margin-right: 10px;
-            float: left;
-          }
-        }
       }
 
       div.sharing-header-right{
