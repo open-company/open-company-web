@@ -325,12 +325,13 @@
         (set! (.-scrollTop fullscreen-topic) (.-scrollHeight fullscreen-topic))))))
 
 (defn setup-body-listener [owner]
-  (events/listen (sel1 [:div.fullscreen-topic]) EventType/CLICK (partial body-clicked owner)))
+  (when-let [fullscreen-topic (sel1 [:div.fullscreen-topic])]
+    (events/listen fullscreen-topic EventType/CLICK (partial body-clicked owner))))
 
 (defn get-state [owner data current-state]
   (let [topic-data    (:topic-data data)
         topic         (:topic data)
-        body-click    (if (and (nil? current-state) (:visible data))
+        body-click    (if (and (nil? (:body-click current-state)) (:visible data))
                         (setup-body-listener owner)
                         (:body-click current-state))]
     (merge
@@ -385,11 +386,7 @@
     (let [cancel-ch (utils/get-channel (str "fullscreen-topic-cancel-" (name topic)))]
       (go (loop []
         (let [change (<! cancel-ch)]
-          (if-not (om/get-state owner :has-changes)
-            (reset-and-dismiss owner options)
-            (when (js/confirm (str before-unload-message " Are you sure you want to proceed?"))
-              ; discard changes
-              (reset-and-dismiss owner options)))
+          (reset-and-dismiss owner options)
           (recur))))))
 
   (will-receive-props [_ next-props]
@@ -400,9 +397,7 @@
         (setup-medium-editor owner data))
       (let [new-state (get-state owner next-props (om/get-state owner))]
         (om/set-state! owner new-state))
-      (utils/after 200 #(focus-headline owner))
-      (let [body-click-listener (setup-body-listener owner)]
-        (om/set-state! owner :body-click body-click-listener)))
+      (utils/after 200 #(focus-headline owner)))
     ; goes hidden
     (when (and (not (:visible next-props))
                (:visible data))
@@ -424,6 +419,8 @@
     (when-not (utils/is-test-env?)
       (reset! prevent-route-dispatch true)
       (setup-medium-editor owner data)
+      (when-not (om/get-state owner :body-click)
+        (om/set-state! owner :body-click (setup-body-listener owner)))
       (let [win-location (.-location js/window)
             current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
             listener (events/listen @router/history HistoryEventType/NAVIGATE
