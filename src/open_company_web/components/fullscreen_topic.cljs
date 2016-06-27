@@ -150,7 +150,8 @@
      :data-posted false
      :show-save-button false
      :last-selected-metric selected-metric
-     :actual-as-of (:updated-at section-data)})
+     :actual-as-of (:updated-at section-data)
+     :edit-rand (rand 4)})
 
   (did-mount [_]
     (om/set-state! owner :esc-listener-key
@@ -175,7 +176,7 @@
     (when (om/get-state owner :transition-as-of)
       (animate-transition owner)))
 
-  (render-state [_ {:keys [as-of transition-as-of actual-as-of editing show-save-button data-posted last-selected-metric] :as state}]
+  (render-state [_ {:keys [as-of transition-as-of actual-as-of editing show-save-button data-posted last-selected-metric edit-rand] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -223,12 +224,14 @@
                        :key "close"
                        :title "Dismiss edit"
                        :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-cancel-" (name section)))]
+                                    (om/set-state! owner :edit-rand (rand 4))
                                     (put! ch {:click true :event %}))} "CANCEL")
           (dom/button {:class "close btn-reset btn-outline"
                        :key "close-editing"
                        :title "ESC"
                        :on-click #(hide-fullscreen-topic owner options)} (icon :simple-remove)))
-        (dom/div {:style #js {:display (when-not editing "none")}}
+        (dom/div {:style #js {:display (when-not editing "none")}
+                  :key (str as-of edit-rand)}
           (om/build fullscreen-topic-edit {:topic section
                                            :topic-data topic-data
                                            :visible editing
@@ -239,8 +242,7 @@
                                            :prev-rev prev-rev
                                            :next-rev next-rev
                                            :show-first-edit-tooltip show-first-edit-tooltip}
-                                          {:opts edit-topic-opts
-                                           :key as-of}))
+                                          {:opts edit-topic-opts}))
         (dom/div #js {:className "fullscreen-topic-transition group"
                       :ref "fullscreen-topic-transition"
                       :style #js {:height (when-not transition-as-of "auto")
