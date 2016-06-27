@@ -163,6 +163,9 @@
     (when (:fullscreen-force-edit data)
       (dis/set-force-edit-topic nil)
       ((:topic-navigation options) false))
+    (when (and (router/section-editing?)
+               (:read-only section-data))
+      (utils/after 100 #(router/nav! (oc-urls/company-section))))
     (let [actual-as-of (:updated-at section-data)
           current-as-of (or (router/current-as-of) actual-as-of)]
       {:as-of current-as-of
