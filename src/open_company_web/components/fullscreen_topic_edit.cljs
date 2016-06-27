@@ -305,24 +305,25 @@
       yPos)))
 
 (defn body-clicked [owner e]
-  (when-let* [topic-body (sel1 [:div.topic-body])
-              fullscreen-topic (sel1 [:div.fullscreen-topic])
-              body-line (sel1 [:div.topic-body-line])]
-    (let [file-upload-ui (sel1 [:div#file-upload-ui])
-          add-image-btn (sel1 [:button.file-upload-btn])]
-      (when (and (>= (+ (.-clientY e) (.-scrollTop fullscreen-topic)) (- (top-position body-line) 24))
-                 (not (utils/event-inside? e topic-body))
-                 ; click is not on the add image button
-                 (or (nil? add-image-btn)
-                     (and add-image-btn
-                          (not (utils/event-inside? e add-image-btn))))
-                 ; click is not in the file upload ui
-                 (or (nil? file-upload-ui)
-                     (and file-upload-ui
-                          (not (utils/event-inside? e file-upload-ui)))))
-        (.focus topic-body)
-        (set-end-of-content-editable topic-body)
-        (set! (.-scrollTop fullscreen-topic) (.-scrollHeight fullscreen-topic))))))
+  (when (om/get-props owner :visible)
+    (when-let* [topic-body (sel1 [:div.topic-body])
+                fullscreen-topic (sel1 [:div.fullscreen-topic])
+                body-line (sel1 [:div.topic-body-line])]
+      (let [file-upload-ui (sel1 [:div#file-upload-ui])
+            add-image-btn (sel1 [:button.file-upload-btn])]
+        (when (and (>= (+ (.-clientY e) (.-scrollTop fullscreen-topic)) (- (top-position body-line) 24))
+                   (not (utils/event-inside? e topic-body))
+                   ; click is not on the add image button
+                   (or (nil? add-image-btn)
+                       (and add-image-btn
+                            (not (utils/event-inside? e add-image-btn))))
+                   ; click is not in the file upload ui
+                   (or (nil? file-upload-ui)
+                       (and file-upload-ui
+                            (not (utils/event-inside? e file-upload-ui)))))
+          (.focus topic-body)
+          (set-end-of-content-editable topic-body)
+          (set! (.-scrollTop fullscreen-topic) (.-scrollHeight fullscreen-topic)))))))
 
 (defn setup-body-listener [owner]
   (when-let [fullscreen-topic (sel1 [:div.fullscreen-topic])]
