@@ -104,8 +104,9 @@
     (let [flv (safe-parse-float value)
           prefix (:prefix data)
           currency (:currency data)
+          decimals (or (:decimals data) 2)
           formatted-value (if currency
-                            (utils/thousands-separator flv currency)
+                            (utils/thousands-separator flv currency decimals)
                             (utils/thousands-separator flv))
           prefix-value (if (and (not (s/blank? formatted-value)) (:prefix data))
                          (str (:prefix data) formatted-value)

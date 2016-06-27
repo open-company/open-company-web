@@ -37,7 +37,7 @@
                       "calculated"
                       (if (zero? burn)
                         (str burn-prefix "0")
-                        (str burn-prefix (utils/thousands-separator (utils/abs burn) currency))))
+                        (str burn-prefix (utils/thousands-separator (utils/abs burn) currency 0))))
           runway-days (:runway finances-data)
           runway (cond
                    (nil? runway-days) "calculated"
@@ -57,6 +57,7 @@
         ;; cash
         (dom/td {}
           (om/build cell {:value (:cash finances-data)
+                          :decimals 0
                           :placeholder (if is-new "at month end" "")
                           :currency currency
                           :cell-state cell-state
@@ -67,6 +68,7 @@
         ;; revenue
         (dom/td {}
           (om/build cell {:value (:revenue finances-data)
+                          :decimals 0
                           :placeholder (if is-new "entire month" "")
                           :currency currency
                           :cell-state cell-state
@@ -77,6 +79,7 @@
         ;; costs
         (dom/td {}
           (om/build cell {:value (:costs finances-data)
+                          :decimals 0
                           :placeholder (if is-new "entire month" "")
                           :currency currency
                           :cell-state cell-state
