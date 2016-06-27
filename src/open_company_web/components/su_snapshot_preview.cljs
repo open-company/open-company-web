@@ -46,12 +46,16 @@
       (om/set-state! owner :title-focused true))))
 
 (defn share-slack-clicked [owner]
+  (patch-stakeholder-update owner)
   (om/set-state! owner :slack-loading true)
   (om/set-state! owner :show-su-dialog true))
 
 (defn share-link-clicked [owner]
  (om/set-state! owner :link-loading true)
  (patch-stakeholder-update owner))
+
+(defn share-email-clicked [owner]
+  (patch-stakeholder-update owner))
 
 (defn dismiss-su-preview [owner]
   (om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false
@@ -150,11 +154,14 @@
             (om/build back-to-dashboard-btn {})
             (dom/div {:class "share-su"}
               (dom/label {} "SHARE TO")
-              (dom/button {:class "share-su-button btn-reset share-slack"}
+              (dom/button {:class "share-su-button btn-reset share-slack"
+                           :on-click #(share-slack-clicked owner)}
                 (dom/img {:src "/img/Slack_Icon.png"}))
-              (dom/button {:class "share-su-button btn-reset share-mail"}
+              (dom/button {:class "share-su-button btn-reset share-mail"
+                           :on-click #(share-email-clicked owner)}
                 (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))
-              (dom/button {:class "share-su-button btn-reset share-link"}
+              (dom/button {:class "share-su-button btn-reset share-link"
+                           :on-click #(share-link-clicked owner)}
                 (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))))
           ;; SU Snapshot Preview
           (when company-data
@@ -188,7 +195,12 @@
                                         :company-data company-data
                                         :show-share-remove true
                                         :hide-add-topic true}
-                                       {:opts {:share-remove-click (fn [topic] (om/update-state! owner :su-topics #(utils/vec-dissoc % topic)))}})))
+                                       {:opts {:share-remove-click (fn [topic]
+                                                                      (let [fade-anim (Fade. (sel1 [(str "div#topic-" topic)]) 1 0 utils/oc-animation-duration)]
+                                                                        (doto fade-anim
+                                                                          (events/listen AnimationEventType/FINISH
+                                                                            (fn [](om/update-state! owner :su-topics (fn [t] (utils/vec-dissoc t topic)))))
+                                                                          (.play))))}})))
           ;; Add section container
           (when (pos? (count topics-to-add))
             (dom/div {:class "su-preview-add-section-container"}

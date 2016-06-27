@@ -211,6 +211,7 @@
                                                  :sharing-selected (and sharing-mode share-selected)
                                                  :active (and add-topic? show-add-topic-popover)})
                     :ref "topic"
+                    :id (str "topic-" (name section))
                     :onClick #(if add-topic?
                                 (add-topic owner)
                                 (topic-click options nil))}
