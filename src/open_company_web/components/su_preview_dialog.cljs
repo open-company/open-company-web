@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [open-company-web.api :as api]
             [open-company-web.dispatcher :as dis]
@@ -18,47 +19,133 @@
         slack-message (.-value slack-textarea)]
     (api/share-stakeholder-update slack-message)))
 
-(defn copy-clicked [owner]
-  (om/set-state! owner :share-link-copied true))
+(defn send-clicked [type owner options]
+  (if (om/get-state owner :sent)
+    ((:dismiss-su-preview options))
+    (let [post-data {type (get-in @dis/app-state [:stakeholder-update/share type] "")}]
+      (om/set-state! owner :sending true)
+      (api/share-stakeholder-update post-data))))
 
-(defn initial-state [owner]
-  (let [data (om/get-props owner)]
-    {:share-via-slack (:share-via-slack data)
-     :share-via-link (:share-via-link data)
-     :share-link-copied false
-     :share-link (when (:latest-su data) (:latest-su data))
-     :slack-sending false
-     :slack-sent false}))
-
-(defn cancel-clicked [owner options]
-  (om/set-state! owner (initial-state owner))
-  ((:dismiss-su-preview options)))
-
-(defn slack-send-clicked [owner options]
-  (if (om/get-state owner :slack-sent)
-    (cancel-clicked owner options)
-    (let [slack-message-ta (.findDOMNode js/ReactDOM (om/get-ref owner "slack-share-textarea"))
-          slack-message (.-value slack-message-ta)]
-      (om/set-state! owner :slack-sending true)
-      (api/share-stakeholder-update (or slack-message "")))))
-
-(defn select-share-link [owner]
-  (when-let [input (.findDOMNode js/ReactDOM (om/get-ref owner "share-link-input"))]
+(defn select-share-link [event]
+  (when-let [input (.-target event)]
     (.setSelectionRange input 0 (count (.-value input)))))
+
+;; Rum Mixins
+
+(def emoji-autocomplete
+  {:did-mount (fn [s] (js/emojiAutocomplete) s)})
+
+(defn clipboard-mixin [btn-selector]
+  {:did-mount    (fn [s] (assoc s ::clipboard (js/Clipboard. btn-selector)))
+   :will-unmount (fn [s] (.destroy (::clipboard s)) s)})
+
+;; Modal components
+
+(rum/defc modal-title < rum/static
+  [title icon-id]
+  [:h3.m0.p3
+   {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.5)"}}
+   (i/icon icon-id {:class "inline mr2"
+                    :color :oc-gray-3
+                    :accent-color :oc-gray-3})
+   title])
+
+(rum/defc email-dialog < rum/static emoji-autocomplete
+  [{:keys [share-link initial-subject]}]
+  (dis/dispatch! [:input [:stakeholder-update/share :email :subject] initial-subject])
+  [:div
+   (modal-title "Share via Email" :email-84)
+   [:div.p3
+    [:label.block.small-caps.bold.mb2 "To"]
+    [:input.p1.col-12.mb3
+     {:type "text"
+      :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :to] (.. % -target -value)])
+      :placeholder "comma delimited email list"}]
+    [:label.block.small-caps.bold.mb2 "Subject"]
+    [:input.p1.col-12.mb3
+     {:type "text"
+      :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :subject] (.. % -target -value)])
+      :default-value initial-subject}]
+    [:label.block.small-caps.bold.mb2 "Your Message"]
+    [:textarea.p1.col-12.mb2.emoji-autocomplete
+     {:type "text"
+      :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :note] (.. % -target -value)])
+      :placeholder "Type a message that will be shown introducing this update."}]]])
+
+(rum/defc slack-dialog < rum/static emoji-autocomplete
+  []
+  [:div
+   (modal-title "Share via Slack" :link-72)
+   [:div.p3
+    [:label.block.small-caps.bold.mb2 "Your Note"]
+    [:textarea.p1.col-12.mb2.emoji-autocomplete
+     {:type "text"
+      :on-change #(dis/dispatch! [:input [:stakeholder-update/share :slack :note] (.. % -target -value)])
+      :placeholder "Provide a note to go with this update."}]]])
+
+(rum/defcs link-dialog < (rum/local false ::copied)
+                         (clipboard-mixin ".js-copy-btn")
+  [{:keys [::copied] :as _state} link]
+  [:div
+   (modal-title  "Share via URL" :link-72)
+   [:div.p3
+    [:label.block.small-caps.bold.mb2 "Share this private URL"]
+    [:div.flex
+     [:input.p1.flex-auto
+      {:type "text"
+       :id "share-link-input"
+       :on-focus select-share-link
+       :on-key-up select-share-link
+       :value link}]
+     [:button {:class "btn-reset btn-solid js-copy-btn"
+               :data-clipboard-target "#share-link-input"
+               :on-click #(reset! copied true)}
+      (if @copied "COPIED ✓" "COPY")]]
+    [:div.block.mt2.h6
+     [:a {:href link :target "_blank"} "Open in New Window"]]]])
+
+(rum/defc modal-actions [send-fn cancel-fn state]
+  [:div.p3.right-align
+   [:button.btn-reset.btn-outline
+    {:class (when-not (= :no-submit state) "mr1")
+     :on-click cancel-fn}
+    (if (= :no-submit state) "DONE" "CANCEL")]
+   (when-not (= :no-submit state)
+     [:button.btn-reset.btn-solid
+      {:on-click send-fn}
+      (case state
+        :sent "SENT ✓"
+        :sending (loading/small-loading {})
+        "Send")])])
+
+(rum/defc confirmation < rum/static
+  [style]
+  [:div
+   (case style
+     :email (modal-title "Email Sent!" :email-84)
+     :slack (modal-title "Shared via Slack!" :link-72))
+   [:div.p3
+    [:p.domine
+     (case style
+       :email "Your email has been sent! Recipients will get an email of your snapshot."
+       :slack "Your snapshot will be sent to all team members of your Slack organization momentarily.")]
+    [:div.right-align.mt3
+     [:button.btn-reset.btn-solid
+      {:on-click #(router/nav! (oc-urls/company))}
+      "Back to your dashboard →"]]]])
+
 
 (defcomponent su-preview-dialog [data owner options]
 
   (init-state [_]
-    {:share-via-slack (:share-via-slack data)
-     :share-via-link (:share-via-link data)
-     :share-link-copied false
-     :share-link (when (:latest-su data) (:latest-su data))
-     :slack-sending false
-     :slack-sent false})
+    {:share-via (cond (:share-via-email data) :email
+                      (:share-via-slack data) :slack
+                      (:share-via-link data)  :link)
+     :share-link (:latest-su data)
+     :sending false
+     :sent false})
 
   (did-mount [_]
-    (when (om/get-state owner :share-link)
-      (js/Clipboard. ".share-link-button"))
     (utils/disable-scroll))
 
   (will-unmount [_]
@@ -66,68 +153,34 @@
 
   (will-receive-props [_ next-props]
     ; slack SU posted
-    (when (and (om/get-state owner :share-via-slack)
-               (om/get-state owner :slack-sending)
-               (not (om/get-state owner :slack-sent)))
-      (om/set-state! owner :slack-sent true)))
+    (when (and (#{:email :slack} (om/get-state owner :share-via))
+               (om/get-state owner :sending)
+               (not (om/get-state owner :sent)))
+      (om/set-state! owner :sent true)))
 
-  (did-update [_ _ _]
-    (when (om/get-state owner :share-link)
-      (js/Clipboard. ".share-link-button")))
-
-  (render-state [_ {:keys [share-via-slack share-via-link share-link-copied share-link slack-sending slack-sent]}]
-    (let [company-data (:company-data data)]
+  (render-state [_ {:keys [share-via share-link sending sent] :as state}]
+    (let [company-data (:company-data data)
+          cancel-fn    (:dismiss-su-preview options)]
       (dom/div {:class "su-preview-dialog"}
-        (dom/div {:class (utils/class-set {:su-close-window true
-                                           :share-copy-window share-via-link
-                                           :slack-patched-window (and share-via-slack (not slack-sent))
-                                           :slack-sent (and share-via-slack slack-sent)})}
-          (dom/button {:on-click #(cancel-clicked owner options)}
-            (icon :simple-remove {:stroke "4" :color "white" :accent-color "white"})))
         (dom/div {:class (utils/class-set {:su-preview-window true
-                                           :share-link-copy share-via-link
-                                           :slack-message (and share-via-slack (not slack-sent))
-                                           :slack-sent (and share-via-slack slack-sent)})}
-          (when share-via-link
-            (dom/div {:class "su-preview-box"}
-              (dom/label {:class "share-link-cta"} "SHARE THIS PRIVATE URL")
-              (dom/div {:class "share-link-box group"}
-                (dom/input #js {:type "text"
-                                :className "share-link-input"
-                                :id "share-link-input"
-                                :onFocus #(select-share-link owner)
-                                :onKeyUp #(select-share-link owner)
-                                :value share-link
-                                :ref "share-link-input"})
-                (dom/button {:class "share-link-button"
-                             :data-clipboard-target "#share-link-input"
-                             :on-click #(copy-clicked owner)} (if share-link-copied "COPIED ✓" "COPY")))
-              (dom/a {:class "share-link-new-win" :href share-link :target "_blank"} "PREVIEW IN NEW WINDOW")))
-          (when (and share-via-slack (not slack-sent))
-            (dom/div {:class "su-preview-box"}
-              (dom/label {:class "slack-share-cta"} "SHARE THIS SNAPSHOT WITH THE MEMBERS OF YOUR SLACK TEAM")
-              (dom/textarea #js {:className "slack-share-textarea"
-                                 :ref "slack-share-textarea"
-                                 :placeholder "Add a note"})))
-          (when (and share-via-slack (not slack-sent))
-            (dom/button {:class "slack-send-button"
-                         :on-click #(slack-send-clicked owner options)}
-              (cond
-                (and slack-sending
-                     (not slack-sent))
-                (om/build small-loading {:animating true})
-                (and slack-sending
-                     slack-sent)
-                "SENT ✓"
-                :else
-                "SEND")))
-          (when (and share-via-slack slack-sent)
-            (dom/div {}
-              (dom/label {:class "slack-sent-title"} "Messages sent!")
-              (dom/label {:class "slack-sent-description"} "Your Slack team will receive a notice about the new snapshot.")
-              (dom/div {:class "center"}
-                (dom/button {:class "btn-reset btn-solid back-to-dashboard"
-                             :on-click #(router/nav! (oc-urls/company))} "VIEW YOUR DASHBOARD →"))))
-          (when (not slack-sent)
-            (dom/button {:class "cancel-button"
-                         :on-click #(cancel-clicked owner options)} (if share-via-link "DONE" "CANCEL"))))))))
+                                           :share-link-copy (= share-via :link)
+                                           :share-email     (= share-via :email)
+                                           :slack-message   (= share-via :slack)})}
+          (dom/button
+              {:class "absolute top-0 btn-reset" :style {:left "100%"}
+               :on-click #(cancel-fn)}
+            (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
+          (if sent
+            (confirmation share-via)
+            (dom/div
+              (case share-via
+                :link  (link-dialog share-link)
+                :email (email-dialog {:initial-subject (str "[" (:name company-data) "] "  (:su-title data))
+                                      :share-link      share-link})
+                :slack (slack-dialog))
+              (modal-actions
+               #(send-clicked share-via owner options)
+               cancel-fn
+               (cond (= share-via :link)      :no-submit
+                     (and sending (not sent)) :sending
+                     (and sending sent)       :sent)))))))))
