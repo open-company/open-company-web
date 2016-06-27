@@ -35,13 +35,12 @@
       (dom/nav {:class "oc-navbar group"}
         (when (:su-preview data)
           (dom/div {:class "su-snapshot-preview"}
-            (dom/div {:class "su-snapshot-preview-internal group"
-                      :style #js {:width (str header-width "px")}}
+            (dom/div {:class "su-snapshot-preview-internal mx-auto group"
+                      :style {:width (str header-width "px")}}
               (when (> columns-num 1)
                 (dom/div {:class "su-snapshot-buttons group"}
                   (dom/button {:class "btn-reset btn-solid mx1"
                                :on-click (:share-slack-cb options)}
-
                     (if slack-loading
                       (loading/small-loading)
                       (dom/i {:class "fa fa-slack mr1"}))

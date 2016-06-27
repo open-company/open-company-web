@@ -18,7 +18,7 @@
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.tooltip :refer (tooltip)]
             [open-company-web.components.ui.icon :refer (icon)]
-            [open-company-web.components.ui.small-loading :refer (small-loading)]
+            [open-company-web.components.ui.small-loading :as loading]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -293,10 +293,10 @@
                     (str (count share-selected-topics) " TOPIC" (when (> (count share-selected-topics) 1) "S") " SELECTED"))))
               (dom/div {:class "sharing-header-center"}
                 (when (pos? (count share-selected-topics))
-                  (dom/button {:class "share-snapshot-bt"
+                  (dom/button {:class "btn-reset btn-solid"
                                :on-click (partial preview-and-share-click owner)}
                     (when redirect-to-preview
-                      (om/build small-loading {:animating true}))
+                      (loading/small-loading))
                     "PREVIEW AND SHARE")))
               (dom/div {:class "sharing-header-right"}
                 (dom/button {:class "close-share"
