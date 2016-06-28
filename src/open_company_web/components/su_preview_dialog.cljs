@@ -58,16 +58,18 @@
                          (reset! invalid (and @invalid inv))
                          (on-change emails)))]
     [:div.mb3
+     [:label.block.small-caps.bold.mb2
+      "To"
+      (cond
+        (= [""] @invalid) [:span.red.py1 " — Required"]
+        (seq @invalid)    [:span.red.py1 " — Not a valid email address"]) ]
      [:input.domine.npt.p1.col-12
       {:type      "text"
        :class     (when @invalid "b--red")
        :value     @input
        :on-blur   #(do (reset! invalid (invalid? @input)) true)
        :on-change #(update! (.. % -target -value))
-       :placeholder "comma delimited email list"}]
-     (cond
-       (= [""] @invalid) [:span.block.red.py1 "Please provide one or more email addresses."]
-       (seq @invalid)    [:span.block.red.py1 "The following addresses are not valid: " (string/join ", " @invalid)])]))
+       :placeholder "comma delimited email list"}]]))
 
 (rum/defc email-dialog < rum/static emoji-autocomplete
   [{:keys [share-link initial-subject]}]
@@ -75,7 +77,6 @@
   [:div
    (modal-title "Share via Email" :email-84)
    [:div.p3
-    [:label.block.small-caps.bold.mb2 "To"]
     (multi-email-input (fn [val] (dis/dispatch! [:input [:stakeholder-update/share :email :to] val])))
     [:label.block.small-caps.bold.mb2 "Subject"]
     [:input.domine.npt.p1.col-12.mb3
