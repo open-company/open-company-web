@@ -134,3 +134,6 @@
       (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
       (assoc-in (dispatcher/company-data-key slug) (utils/fix-sections company-data))
       (dissoc :loading))))
+
+(defmethod dispatcher/action :stakeholder-update/reset-share [db _]
+  (dissoc db :stakeholder-update/share))

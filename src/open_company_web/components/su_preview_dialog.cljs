@@ -22,9 +22,11 @@
 (defn send-clicked [type owner options]
   (if (om/get-state owner :sent)
     ((:dismiss-su-preview options))
-    (let [post-data {type (get-in @dis/app-state [:stakeholder-update/share type] "")}]
+    (let [post-data (get-in @dis/app-state [:stakeholder-update/share type])
+          emojied   (update post-data :note (fnil utils/unicode-emojis ""))]
       (om/set-state! owner :sending true)
-      (api/share-stakeholder-update post-data))))
+      (dis/dispatch! [:stakeholder-update/reset-share])
+      (api/share-stakeholder-update {type emojied}))))
 
 (defn select-share-link [event]
   (when-let [input (.-target event)]
