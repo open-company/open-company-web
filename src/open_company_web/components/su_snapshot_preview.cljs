@@ -17,7 +17,6 @@
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
             [open-company-web.components.tooltip :refer (tooltip)]
-            [cljs-dynamic-resources.core :as cdr]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
