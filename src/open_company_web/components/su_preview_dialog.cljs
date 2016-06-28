@@ -3,6 +3,8 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [rum.core :as rum]
+            [clojure.string :as string]
+            [goog.format.EmailAddress :as email]
             [open-company-web.api :as api]
             [open-company-web.dispatcher :as dis]
             [open-company-web.router :as router]
@@ -13,14 +15,14 @@
             [cljsjs.react.dom]
             [cljsjs.clipboard]))
 
-(defn send-clicked [type owner options]
-  (if (om/get-state owner :sent)
-    ((:dismiss-su-preview options))
-    (let [post-data (get-in @dis/app-state [:stakeholder-update/share type])
-          emojied   (update post-data :note (fnil utils/unicode-emojis ""))]
-      (om/set-state! owner :sending true)
-      (dis/dispatch! [:stakeholder-update/reset-share])
-      (api/share-stakeholder-update {type emojied}))))
+(defn valid-email? [addr] (email/isValidAddress addr))
+
+(defn send-clicked [type]
+  (let [post-data (get-in @dis/app-state [:stakeholder-update/share type])
+        emojied   (update post-data :note (fnil utils/unicode-emojis ""))]
+    (dis/dispatch! [:stakeholder-update/reset-share])
+    (dis/dispatch! [:stakeholder-update/validate-share type])
+    (api/share-stakeholder-update {type emojied})))
 
 (defn select-share-link [event]
   (when-let [input (.-target event)]
@@ -46,6 +48,27 @@
                     :accent-color :oc-gray-3})
    title])
 
+(rum/defcs multi-email-input < (rum/local nil ::invalid)
+                               (rum/local nil ::input)
+  [{:keys [::invalid ::input]} on-change]
+  (let [invalid?     (fn [emails] (seq (remove valid-email? (string/split emails #"[,;\s]+"))))
+        update!      (fn [emails]
+                       (reset! input emails)
+                       (let [inv (invalid? emails)]
+                         (reset! invalid (and @invalid inv))
+                         (on-change emails)))]
+    [:div.mb3
+     [:input.domine.npt.p1.col-12
+      {:type      "text"
+       :class     (when @invalid "b--red")
+       :value     @input
+       :on-blur   #(do (reset! invalid (invalid? @input)) true)
+       :on-change #(update! (.. % -target -value))
+       :placeholder "comma delimited email list"}]
+     (cond
+       (= [""] @invalid) [:span.block.red.py1 "Please provide one or more email addresses."]
+       (seq @invalid)    [:span.block.red.py1 "The following addresses are not valid: " (string/join ", " @invalid)])]))
+
 (rum/defc email-dialog < rum/static emoji-autocomplete
   [{:keys [share-link initial-subject]}]
   (dis/dispatch! [:input [:stakeholder-update/share :email :subject] initial-subject])
@@ -53,10 +76,7 @@
    (modal-title "Share via Email" :email-84)
    [:div.p3
     [:label.block.small-caps.bold.mb2 "To"]
-    [:input.p1.col-12.mb3
-     {:type "text"
-      :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :to] (.. % -target -value)])
-      :placeholder "comma delimited email list"}]
+    (multi-email-input (fn [val] (dis/dispatch! [:input [:stakeholder-update/share :email :to] val])))
     [:label.block.small-caps.bold.mb2 "Subject"]
     [:input.domine.npt.p1.col-12.mb3
      {:type "text"
@@ -100,16 +120,29 @@
     [:div.block.mt2.h6
      [:a {:href link :target "_blank"} "Open in New Window"]]]])
 
-(rum/defc modal-actions [send-fn cancel-fn state]
+;; This is very hacky and should by replaced by a more
+;; versatile/generic form validation system
+(def email-field
+  (rum/derived-atom
+   [dis/app-state]
+   ::email-field
+   (fn [app-state]
+     (get-in app-state [:stakeholder-update/share :email :to]))))
+
+(rum/defc modal-actions < rum/reactive
+  [send-fn cancel-fn type]
   [:div.p3.right-align
    [:button.btn-reset.btn-outline
-    {:class (when-not (= :no-submit state) "mr1")
+    {:class (when-not (= :link type) "mr1")
      :on-click cancel-fn}
-    (if (= :no-submit state) "DONE" "CANCEL")]
-   (when-not (= :no-submit state)
+    (if (= :link type) "DONE" "CANCEL")]
+   (when-not (= :link type)
      [:button.btn-reset.btn-solid
-      {:on-click send-fn}
-      (case state
+      {:on-click send-fn
+       :disabled (if (= :email type)
+                   (->> (string/split (rum/react email-field) #"[,;\s]+")
+                        (every? valid-email?) not))}
+      (case type
         :sent "SENT ✓"
         :sending (loading/small-loading {})
         "Send")])])
@@ -172,8 +205,11 @@
                                       :share-link      share-link})
                 :slack (slack-dialog))
               (modal-actions
-               #(send-clicked share-via owner options)
+               (if sent
+                 cancel-fn
+                 #(do (om/set-state! owner :sending true)
+                      (send-clicked share-via)))
                cancel-fn
-               (cond (= share-via :link)      :no-submit
-                     (and sending (not sent)) :sending
-                     (and sending sent)       :sent)))))))))
+               (cond (and sending (not sent)) :sending
+                     (and sending sent)       :sent
+                     :else                    share-via)))))))))
