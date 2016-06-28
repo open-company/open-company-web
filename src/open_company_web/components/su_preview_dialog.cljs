@@ -5,6 +5,7 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [open-company-web.api :as api]
             [open-company-web.dispatcher :as dis]
+            [open-company-web.router :as router]
             [open-company-web.urls :as oc-urls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.icon :refer (icon)]
@@ -79,12 +80,14 @@
       (dom/div {:class "su-preview-dialog"}
         (dom/div {:class (utils/class-set {:su-close-window true
                                            :share-copy-window share-via-link
-                                           :slack-patched-window share-via-slack})}
+                                           :slack-patched-window (and share-via-slack (not slack-sent))
+                                           :slack-sent (and share-via-slack slack-sent)})}
           (dom/button {:on-click #(cancel-clicked owner options)}
             (icon :simple-remove {:stroke "4" :color "white" :accent-color "white"})))
         (dom/div {:class (utils/class-set {:su-preview-window true
                                            :share-link-copy share-via-link
-                                           :slack-message share-via-slack})}
+                                           :slack-message (and share-via-slack (not slack-sent))
+                                           :slack-sent (and share-via-slack slack-sent)})}
           (when share-via-link
             (dom/div {:class "su-preview-box"}
               (dom/label {:class "share-link-cta"} "SHARE THIS PRIVATE URL")
@@ -99,14 +102,14 @@
                 (dom/button {:class "share-link-button"
                              :data-clipboard-target "#share-link-input"
                              :on-click #(copy-clicked owner)} (if share-link-copied "COPIED ✓" "COPY")))
-              (dom/a {:class "share-link-new-win" :href share-link :target "_blank"} "Open in new window")))
-          (when share-via-slack
+              (dom/a {:class "share-link-new-win" :href share-link :target "_blank"} "PREVIEW IN NEW WINDOW")))
+          (when (and share-via-slack (not slack-sent))
             (dom/div {:class "su-preview-box"}
               (dom/label {:class "slack-share-cta"} "SHARE THIS SNAPSHOT WITH THE MEMBERS OF YOUR SLACK TEAM")
               (dom/textarea #js {:className "slack-share-textarea"
                                  :ref "slack-share-textarea"
                                  :placeholder "Add a note"})))
-          (when share-via-slack
+          (when (and share-via-slack (not slack-sent))
             (dom/button {:class "slack-send-button"
                          :on-click #(slack-send-clicked owner options)}
               (cond
@@ -118,5 +121,13 @@
                 "SENT ✓"
                 :else
                 "SEND")))
-          (dom/button {:class "cancel-button"
-                       :on-click #(cancel-clicked owner options)} (if share-via-link "DONE" "CANCEL")))))))
+          (when (and share-via-slack slack-sent)
+            (dom/div {}
+              (dom/label {:class "slack-sent-title"} "Messages sent!")
+              (dom/label {:class "slack-sent-description"} "Your Slack team will receive a notice about the new snapshot.")
+              (dom/div {:class "center"}
+                (dom/button {:class "btn-reset btn-solid back-to-dashboard"
+                             :on-click #(router/nav! (oc-urls/company))} "VIEW YOUR DASHBOARD →"))))
+          (when (not slack-sent)
+            (dom/button {:class "cancel-button"
+                         :on-click #(cancel-clicked owner options)} (if share-via-link "DONE" "CANCEL"))))))))

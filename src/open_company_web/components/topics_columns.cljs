@@ -24,7 +24,7 @@
 
 (def topic-default-height-no-body 95)
 (def topic-default-height-with-body 109)
-(def data-topic-default-zero-height 142)
+(def data-topic-default-zero-height 105)
 (def data-topic-default-one-height 282)
 (def data-topic-default-more-height 388)
 (def topic-body-height 29)
@@ -154,7 +154,9 @@
         (om/build topic {:loading false
                          :section "add-topic"
                          :add-topic true
+                         :show-fast-editing false
                          :column column
+                         :read-only-company false
                          :archived-topics (:archived company-data)
                          :section-data {:title "+ ADD A TOPIC"
                                         :body ""
@@ -173,9 +175,11 @@
                           :key (str "topic-row-" (name section-name))}
               (om/build topic {:loading (:loading company-data)
                                :section section-name
+                               :show-fast-editing (om/get-props owner :show-fast-editing)
                                :section-data sd
                                :card-width (:card-width props)
                                :show-share-remove (:show-share-remove props)
+                               :read-only-company (:read-only company-data)
                                :currency (:currency company-data)
                                :sharing-mode sharing-mode
                                :share-selected share-selected?}

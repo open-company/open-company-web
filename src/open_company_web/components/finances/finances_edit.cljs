@@ -37,7 +37,7 @@
                       "calculated"
                       (if (zero? burn)
                         (str burn-prefix "0")
-                        (str burn-prefix (utils/thousands-separator (utils/abs burn)))))
+                        (str burn-prefix (utils/thousands-separator (utils/abs burn) currency 0))))
           runway-days (:runway finances-data)
           runway (cond
                    (nil? runway-days) "calculated"
@@ -57,6 +57,7 @@
         ;; cash
         (dom/td {}
           (om/build cell {:value (:cash finances-data)
+                          :decimals 0
                           :placeholder (if is-new "at month end" "")
                           :currency currency
                           :cell-state cell-state
@@ -67,6 +68,7 @@
         ;; revenue
         (dom/td {}
           (om/build cell {:value (:revenue finances-data)
+                          :decimals 0
                           :placeholder (if is-new "entire month" "")
                           :currency currency
                           :cell-state cell-state
@@ -77,6 +79,7 @@
         ;; costs
         (dom/td {}
           (om/build cell {:value (:costs finances-data)
+                          :decimals 0
                           :placeholder (if is-new "entire month" "")
                           :currency currency
                           :cell-state cell-state
@@ -85,10 +88,10 @@
                           :key :costs
                           :tab-cb tab-cb}))
         ;; Burn
-        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
+        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new :dark true})}
           burn-rate)
         ;; Runway
-        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new})}
+        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new :dark true})}
                 runway)))))
 
 (defn replace-row-in-data [data row k v]
@@ -124,8 +127,8 @@
                   (dom/th {} "Cash")
                   (dom/th {} "Revenue")
                   (dom/th {} "Costs")
-                  (dom/th {} "Cash flow")
-                  (dom/th {} "Runway")))
+                  (dom/th {:class "dark"} "Cash flow")
+                  (dom/th {:class "dark"} "Runway")))
               (dom/tbody {}
                 (let [current-period (utils/current-period)]
                   (for [idx (range stop)]
@@ -148,5 +151,5 @@
                   (dom/td {})
                   (dom/td {})
                   (dom/td {})
-                  (dom/th {})
+                  (dom/td {})
                   (dom/td {}))))))))))

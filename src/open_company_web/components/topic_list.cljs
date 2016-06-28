@@ -18,6 +18,7 @@
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.tooltip :refer (tooltip)]
             [open-company-web.components.ui.icon :refer (icon)]
+            [open-company-web.components.ui.small-loading :refer (small-loading)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -82,7 +83,7 @@
      :topic-navigation (or (:topic-navigation current-state) true)
      :share-selected-topics (:sections (:stakeholder-update company-data))
      :transitioning false
-     :redirect-to-preview false
+     :redirect-to-preview (or (:redirect-to-preview current-state) false)
      :fullscreen-force-edit false
      :add-topic-tooltip-dismissed (or (:add-topic-tooltip-dismissed current-state) false)
      :show-add-topic-tooltip show-add-topic-tooltip
@@ -91,9 +92,12 @@
      :show-share-su-tooltip (or (:show-share-su-tooltip current-state) false)
      :share-su-tooltip-dismissed (or (:share-su-tooltip-dismissed current-state) false)}))
 
-(defn topic-click [owner topic selected-metric]
+(defn topic-click [owner topic selected-metric & [force-edit]]
+  (when force-edit
+    (om/set-state! owner :fullscreen-force-edit true))
   (om/set-state! owner :selected-topic topic)
-  (om/set-state! owner :selected-metric selected-metric))
+  (om/set-state! owner :selected-metric selected-metric)
+  (utils/after 100 #(om/set-state! owner :fullscreen-force-edit false)))
 
 (def scrolled-to-top (atom false))
 
@@ -149,8 +153,7 @@
     (.play (new Fade tr-selected-topic 0 1 utils/oc-animation-duration))))
 
 (defn preview-and-share-click [owner e]
-  (.preventDefault e)
-  (.stopPropagation e)
+  (utils/event-stop e)
   (let [props (om/get-props owner)
         company-data (:company-data props)
         su-data (:stakeholder-update company-data)
@@ -202,14 +205,16 @@
     (when-not (:read-only (:company-data next-props))
       (get-new-sections-if-needed owner))
     (when (:force-edit-topic next-props)
-      (let [company-data (:company-data next-props)]
+      (let [company-data (:company-data next-props)
+            topics (flatten (vals (:sections company-data)))
+            no-placeholder-sections (filter-placeholder-sections topics company-data)]
         (when (contains? company-data (keyword (:force-edit-topic next-props)))
           (om/set-state! owner :fullscreen-force-edit true)
           (om/set-state! owner :selected-topic (dispatcher/force-edit-topic))
           ; show second tooltip of needed
           (when (= (count (flatten (vals (:sections company-data)))) 1)
             (om/set-state! owner :show-second-add-topic-tooltip true))
-          (when (= (count (flatten (vals (:sections company-data)))) 2)
+          (when (= (count no-placeholder-sections) 2)
             (om/set-state! owner :show-share-su-tooltip true))))))
 
   (did-update [_ _ _]
@@ -245,7 +250,7 @@
         (when (and (not (responsive/is-mobile))
                    (responsive/can-edit?)
                    (not (:read-only company-data))
-                   (> (count category-topics) 1))
+                   (> (count (filter-placeholder-sections category-topics company-data)) 1))
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
             (dom/button {:class "sharing-button"
@@ -292,6 +297,7 @@
         (om/build topics-columns {:columns-num columns-num
                                   :card-width card-width
                                   :selected-metric selected-metric
+                                  :show-fast-editing true
                                   :total-width total-width
                                   :content-loaded (not (:loading data))
                                   :topics category-topics
@@ -314,5 +320,10 @@
                    (not selected-topic)
                    (not share-su-tooltip-dismissed))
           (om/build tooltip
-            {:cta "SHARE A SNAPSHOT WITH YOUR TEAM, INVESTORS OR THE CROWD."}
-            {:opts {:dismiss-tooltip #(om/set-state! owner :share-su-tooltip-dismissed true)}}))))))
+            {:cta "YOUR BIG PICTURE IS COMING TOGETHER. YOU CAN SHARE A SNAPSHOT OF SELECTED TOPICS WITH YOUR TEAM, INVESTORS OR THE CROWD WHEN YOU'RE READY."}
+            {:opts {:class "large" :dismiss-tooltip #(om/set-state! owner :share-su-tooltip-dismissed true)}}))
+        (when (and show-share-snapshot-tooltip
+                   (not share-snapshot-tooltip-dismissed))
+          (om/build tooltip
+            {:cta "CHOOSE TOPICS TO SHARE VIA SLACK, EMAIL OR THE WEB. SNAPSHOTS ARE GREAT FOR TEAM AND INVESTOR UPDATES, OR TO ENGAGE THE CROWD."}
+            {:opts {:class "large" :dismiss-tooltip #(dismiss-share-snapshot-tooltip owner)}}))))))

@@ -88,12 +88,7 @@
                            :currency currency
                            :read-only true
                            :total-metrics (count growth-metrics)}]
-      (if no-data
-  
-        (dom/div {:class "topic-overlay-body"}
-          (dom/div {:class "topic-body-inner group"}
-            (dom/p "Information on growth is not yet available.")))
-
+      (when-not no-data
         (dom/div {:class "section-container"
                   :id "section-growth"
                   :key (name section)}

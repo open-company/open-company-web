@@ -8,9 +8,9 @@ div.page{
 }
 
 body.animating div.page {
-  transition: transform .25s ease-in-out;
-  -webkit-transition: -webkit-transform .25s ease-in-out;
-  min-height: 100vh;
+  transition: transform $oc_animation_duration ease-in-out;
+  -webkit-transition: -webkit-transform $oc_animation_duration ease-in-out;
+  min-height: calc(100vh + #{$navbar_height}px);
 }
 
 body.animating.left div.page {
@@ -31,4 +31,8 @@ body.menu-visible div.page {
 body.menu-visible:not(.animating) div.page nav{
   left: -190px;
   top: default;
+}
+
+body.animating div#app {
+  min-height: 100vh;
 }

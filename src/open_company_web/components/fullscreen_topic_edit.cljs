@@ -1,5 +1,6 @@
 (ns open-company-web.components.fullscreen-topic-edit
-  (:require-macros [cljs.core.async.macros :refer (go)])
+  (:require-macros [cljs.core.async.macros :refer (go)]
+                   [if-let.core :refer (if-let* when-let*)])
   (:require [cljs.core.async :refer (chan <!)]
             [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
@@ -18,7 +19,8 @@
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [open-company-web.components.tooltip :refer (tooltip)]
             [goog.events :as events]
-            [goog.history.EventType :as EventType]
+            [goog.events.EventType :as EventType]
+            [goog.history.EventType :as HistoryEventType]
             [cljs-dynamic-resources.core :as cdr]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [clojure.string :as string]
@@ -271,6 +273,8 @@
 (defn check-headline-count [owner headline-mex-length e]
   (when-let [headline (sel1 [:div.topic-edit-headline])]
     (let [headline-value (.-innerText headline)]
+      (when (pos? (count headline-value))
+        (om/set-state! owner :tooltip-dismissed true))
       (when (and (not= (.-keyCode e) 8)
                  (not= (.-keyCode e) 16)
                  (not= (.-keyCode e) 17)
@@ -292,10 +296,45 @@
       (string/replace #"&nbsp;" " ")
       count))
 
-(defn get-state [owner data & [initial?]]
+(defn top-position [el]
+  (loop [yPos 0
+         element el]
+    (if element
+      (recur (+ yPos (- (.-offsetTop element) (.-scrollTop element)) (.-clientTop element))
+             (.-offsetParent element))
+      yPos)))
+
+(defn body-clicked [owner e]
+  (when (om/get-props owner :visible)
+    (when-let* [topic-body (sel1 [:div.topic-body])
+                fullscreen-topic (sel1 [:div.fullscreen-topic])
+                body-line (sel1 [:div.topic-body-line])]
+      (let [file-upload-ui (sel1 [:div#file-upload-ui])
+            add-image-btn (sel1 [:button.file-upload-btn])]
+        (when (and (>= (+ (.-clientY e) (.-scrollTop fullscreen-topic)) (- (top-position body-line) 24))
+                   (not (utils/event-inside? e topic-body))
+                   ; click is not on the add image button
+                   (or (nil? add-image-btn)
+                       (and add-image-btn
+                            (not (utils/event-inside? e add-image-btn))))
+                   ; click is not in the file upload ui
+                   (or (nil? file-upload-ui)
+                       (and file-upload-ui
+                            (not (utils/event-inside? e file-upload-ui)))))
+          (.focus topic-body)
+          (set-end-of-content-editable topic-body)
+          (set! (.-scrollTop fullscreen-topic) (.-scrollHeight fullscreen-topic)))))))
+
+(defn setup-body-listener [owner]
+  (when-let [fullscreen-topic (sel1 [:div.fullscreen-topic])]
+    (events/listen fullscreen-topic EventType/CLICK (partial body-clicked owner))))
+
+(defn get-state [owner data current-state]
   (let [topic-data    (:topic-data data)
         topic         (:topic data)
-        current-state (when-not initial? (om/get-state owner))]
+        body-click    (if (and (nil? (:body-click current-state)) (:visible data))
+                        (setup-body-listener owner)
+                        (:body-click current-state))]
     (merge
       {:has-changes false
        :title (:title topic-data)
@@ -306,13 +345,14 @@
        :show-title-counter (:show-title-counter current-state)
        :medium-editor (:medium-editor current-state)
        :history-listener-id (:history-listener-id current-state)
-       :tooltip-dismissed false}
+       :tooltip-dismissed false
+       :body-click body-click}
       (finances-init-state topic (:data topic-data))
       (growth-init-state topic data current-state))))
 
 (defn reset-and-dismiss [owner options]
   ((:dismiss-editing options))
-  (om/set-state! owner (get-state owner (om/get-props owner) true)))
+  (om/set-state! owner (get-state owner (om/get-props owner) (om/get-state owner))))
 
 (defn setup-medium-editor [owner {:keys [topic-data topic] :as data}]
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
@@ -334,7 +374,7 @@
   (init-state [_]
     (cdr/add-style! "/css/medium-editor/medium-editor.css")
     (cdr/add-style! "/css/medium-editor/default.css")
-    (get-state owner data true))
+    (get-state owner data nil))
 
   (will-mount [_]
     (let [save-ch (utils/get-channel (str "fullscreen-topic-save-" (name topic)))]
@@ -347,24 +387,25 @@
     (let [cancel-ch (utils/get-channel (str "fullscreen-topic-cancel-" (name topic)))]
       (go (loop []
         (let [change (<! cancel-ch)]
-          (if-not (om/get-state owner :has-changes)
-            (reset-and-dismiss owner options)
-            (when (js/confirm (str before-unload-message " Are you sure you want to proceed?"))
-              ; discard changes
-              (reset-and-dismiss owner options)))
+          (reset-and-dismiss owner options)
           (recur))))))
 
   (will-receive-props [_ next-props]
+    ;become visible
     (when (and (:visible next-props)
                (not (:visible data)))
       (when-not (om/get-state owner :medium-editor)
         (setup-medium-editor owner data))
-      (let [new-state (get-state owner next-props true)]
+      (let [new-state (get-state owner next-props (om/get-state owner))]
         (om/set-state! owner new-state))
       (utils/after 200 #(focus-headline owner)))
+    ; goes hidden
+    (when (and (not (:visible next-props))
+               (:visible data))
+      (events/unlistenByKey (om/get-state owner :body-click)))
     (when (and (not (om/get-state owner :has-changes))
                (not= next-props data))
-      (om/set-state! owner (get-state owner next-props true))))
+      (om/set-state! owner (get-state owner next-props (om/get-state owner)))))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
@@ -379,9 +420,11 @@
     (when-not (utils/is-test-env?)
       (reset! prevent-route-dispatch true)
       (setup-medium-editor owner data)
+      (when-not (om/get-state owner :body-click)
+        (om/set-state! owner :body-click (setup-body-listener owner)))
       (let [win-location (.-location js/window)
             current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
-            listener (events/listen @router/history EventType/NAVIGATE
+            listener (events/listen @router/history HistoryEventType/NAVIGATE
                        #(when-not (= (.-token %) current-token)
                           (if (om/get-state owner :has-changes)
                             (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
@@ -418,7 +461,7 @@
                            tooltip-dismissed]}]
     (let [topic-kw (keyword topic)
           title-length-limit 20
-          topic-body (utils/get-topic-body topic-data topic-kw)
+          topic-body (if-not (:placeholder topic-data) (utils/get-topic-body topic-data topic-kw) "")
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height utils/overlay-max-win-height)
           max-height (min (- 650 126) (- win-height 126))
@@ -469,7 +512,7 @@
                                            :transparent (not show-headline-counter)})}
           (dom/label {:class "bold"} (- headline-length-limit (count-chars headline))))
         (dom/div {:class "separator"})
-        (dom/div {:class "topic-overlay-edit-data"} ;
+        (dom/div {:class "topic-overlay-edit-data"}
           (when (= topic "finances")
             (om/build finances-edit {:finances-data finances-data
                                      :change-finances-cb (partial change-finances-data-cb owner)
@@ -514,7 +557,7 @@
                                         (.stopPropagation e)
                                         (om/set-state! owner :growth-new-metric true)
                                         (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
-        (dom/div {:class "relative"}
+        (dom/div {:class "relative topic-body-line"}
           (dom/div {:className "topic-body emoji-autocomplete"
                     :ref "topic-overlay-edit-body"
                     :id (str "topic-edit-body-" (name topic))

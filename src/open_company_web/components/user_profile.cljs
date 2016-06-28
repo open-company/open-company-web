@@ -13,7 +13,7 @@
       (om/build back-to-dashboard-btn {})
       (dom/div {:class "user-profile-internal"}
         (dom/div {:class "user-profile-title"} "User Info")
-        (dom/div {:class "user-profile-content"}
+        (dom/div {:class "user-profile-content group"}
           (dom/div {:class "left-column"}
             (dom/div {:class "user-profile-name-title"} "NAME")
             (dom/div {:class "user-profile-name"} (jwt/get-key :real-name))

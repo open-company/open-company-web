@@ -27,7 +27,6 @@ div.user-profile {
 
     div.user-profile-content {
       padding: 28px;
-      height: 280px;
       background-color: rgba(78, 90, 107, 0.05);
 
       div.left-column{
@@ -44,7 +43,6 @@ div.user-profile {
 
         div.user-profile-name {
           margin-top: 6px;
-          height: 32px;
           font-family: $oc_headers_font;
           font-size: 18px;
           line-height: 1.8;
@@ -63,7 +61,6 @@ div.user-profile {
 
         div.user-profile-org {
           margin-top: 6px;
-          height: 32px;
           font-family: $oc_headers_font;
           font-size: 18px;
           line-height: 1.8;
@@ -82,7 +79,6 @@ div.user-profile {
 
         div.user-profile-email {
           margin-top: 6px;
-          height: 32px;
           font-family: $oc_headers_font;
           font-size: 18px;
           line-height: 1.8;

@@ -92,6 +92,23 @@ div.topic {
       height: auto;
 
       div.topic-internal{
+        position: relative;
+
+        &:hover {
+          button.topic-pencil-button {
+            opacity: 0.8;
+          }
+        }
+
+        button.topic-pencil-button {
+          width: 30px;
+          height: 30px;
+          position: absolute;
+          top: 5px;
+          right: 10px;
+          opacity: 0;
+          transition: 230ms;
+        }
 
         & > div{
           padding: 0px 20px;

@@ -21,6 +21,16 @@ div.topic-list-edit-container {
   width: 100vw;
 }
 
+body.small-footer{
+  div.topic-list {
+    min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px);
+
+    &.sharing-mode {
+      min-height: calc(100vh - #{$footer_small_height}px);
+    }
+  }
+}
+
 div.topic-list{
   position: relative;
   content: "";
@@ -83,6 +93,7 @@ div.topic-list{
 
           div.small-loading-container {
             margin-right: 10px;
+            float: left;
           }
         }
       }

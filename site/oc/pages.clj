@@ -163,7 +163,7 @@
           [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"}]
           ;; Emoji One Autocomplete CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css?oc_deploy_key"}]
-          ;; Google fonts OpenSans
+          ;; Google fonts Domine and OpenSans
           [:link {:type "text/css", :rel "stylesheet", :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]]
    :body [:body
           [:div#app [:div.oc-loading.active [:div.oc-loading-internal]]]

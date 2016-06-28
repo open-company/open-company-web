@@ -76,6 +76,7 @@ div.add-topic-popover {
     max-height: 237px;
     overflow: scroll;
     width: 200px;
+    margin-bottom: 50px;
 
     div.add-topic-popover-subheader {
       opacity: 0.2;
@@ -92,10 +93,18 @@ div.add-topic-popover {
       }
     }
 
+    &::-webkit-scrollbar{
+      display: none;
+    }
+
     div.topics-to-add{
       text-align: left;
       padding-bottom: 6px;
       overflow-x: hidden;
+
+      &.fixed-header {
+        padding-top: 32px;
+      }
 
       div.potential-topic {
         font-family: $oc_headers_font;
@@ -105,52 +114,62 @@ div.add-topic-popover {
         padding-top: 3px;
         padding-bottom: 3px;
         padding-left: 19px;
-        background-color: #ffffff;
-
-        &.highlighted {
+        background-color: white;
+      }
+      
+      div.potential-topic:hover {
           background-color: rgba(249, 215, 72, 0.2);
-        }
       }
     }
 
     div.add-custom-topic{
       text-align: left;
       padding: 7px 0px 25px 20px;
-      opacity: 0.3;
-      font-family: $oc_headers_font;
-      font-size: 14px;
-      line-height: 1.7;
-      color: $oc_gray_5;
-      height: 59px;
+      position: fixed;
+      bottom: 0px;
 
       &:first-child {
         padding: 12px 0px 12px 20px;
         height: 51px;
       }
     }
+  }
 
-    div.add-custom-topic-container {
-      text-align: left;
-      padding: 7px 0px 25px 20px;
+  div.add-custom-topic-container {
+    text-align: left;
+    padding: 10px 0px 10px 20px;
+    position: absolute;
+    bottom: 0px;
+    height: 40px;
+    width: 100%;
+    background-color: white;
 
-      &:first-child {
-        padding: 12px 0px 12px 20px;
-      }
+    label {
+      font-family: $oc_headers_font;
+      font-size: 14px;
+      line-height: 1.7;
+      color: $oc_gray_5;
+      height: 30px;
+      font-weight: normal;
+    }
 
-      input {
-        font-family: $oc_headers_font;
-        font-size: 14px;
-        line-height: 1.7;
+    input {
+      font-family: $oc_headers_font;
+      font-size: 14px;
+      line-height: 1.7;
+      outline: none;
+      border: 1px solid rgba(78, 90, 107, 0.3);
+      border-radius: 2px;
+      color: black;
+      height: 30px;
+
+      &:active, &:focus {
         outline: none;
-        border: 1px solid rgba(78, 90, 107, 0.3);
-        border-radius: 2px;
-        color: black;
-        height: 27px;
-
-        &:active, &:focus {
-          outline: none;
-        }
       }
     }
+  }
+
+  div.add-custom-topic-container:hover {
+    background-color: rgba(249, 215, 72, 0.2);
   }
 }

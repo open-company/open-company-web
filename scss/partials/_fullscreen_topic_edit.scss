@@ -171,7 +171,7 @@ div.fullscreen-topic-edit {
           padding-top: 13px;
         }
 
-        tr th:last-child, tr td:last-child {
+        tr th:last-child, tr th.dark, tr td:last-child, tr td.dark {
           background-color: rgba(78, 90, 107, 0.1);
         }
 

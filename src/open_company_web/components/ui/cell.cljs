@@ -20,9 +20,11 @@
 (defn- to-state [owner data state]
   (om/set-state! owner :cell-state state)
   (when (= state :edit)
-    (.setTimeout js/window #(let [input (om/get-ref owner "edit-field")]
-                              (when input
-                                (.focus (.findDOMNode js/ReactDOM input)))) 10)))
+    (utils/after 10 #(let [input (.findDOMNode js/ReactDOM (om/get-ref owner "edit-field"))
+                           value (.-value input)]
+                       (when input
+                         (.focus (.findDOMNode js/ReactDOM input))
+                         (set! (.-value input) value))))))
 
 (defn- initial-cell-state
   "Get the initial state for the cell.
@@ -43,12 +45,16 @@
     (.replace v (new js/RegExp "," "g") "")
     v))
 
-(defn exit-cell [e owner data]
-  (let [raw-value (.. e -target -value)
-        cleaned-value (trim-commas raw-value)
+(defn parse-value [v]
+  (let [cleaned-value (trim-commas v)
         parsed-value (if (s/blank? cleaned-value)
                        cleaned-value
-                       (.parseFloat js/window cleaned-value))
+                       (.parseFloat js/window cleaned-value))]
+    parsed-value))
+
+(defn exit-cell [e owner data]
+  (let [raw-value (.. e -target -value)
+        parsed-value (parse-value raw-value)
         init-value (om/get-state owner :inital-value)
         ; if the value is the same as it was at the start
         ; go to the :display state, else go to :draft
@@ -83,6 +89,10 @@
        :inital-value (:value data)
        :value value}))
 
+  (did-update [_ _ prev-state]
+    (when-not (= (:value prev-state) (om/get-state owner :value))
+      ((:draft-cb data) (parse-value (om/get-state owner :value)))))
+
   (did-mount [_]
     (go (loop []
       (let [ch (utils/get-channel (str (:period data) (:key data)))
@@ -94,8 +104,9 @@
     (let [flv (safe-parse-float value)
           prefix (:prefix data)
           currency (:currency data)
+          decimals (or (:decimals data) 2)
           formatted-value (if currency
-                            (utils/thousands-separator flv currency)
+                            (utils/thousands-separator flv currency decimals)
                             (utils/thousands-separator flv))
           prefix-value (if (and (not (s/blank? formatted-value)) (:prefix data))
                          (str (:prefix data) formatted-value)

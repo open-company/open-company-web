@@ -150,7 +150,8 @@
      :data-posted false
      :show-save-button false
      :last-selected-metric selected-metric
-     :actual-as-of (:updated-at section-data)})
+     :actual-as-of (:updated-at section-data)
+     :edit-rand (rand 4)})
 
   (did-mount [_]
     (om/set-state! owner :esc-listener-key
@@ -175,7 +176,7 @@
     (when (om/get-state owner :transition-as-of)
       (animate-transition owner)))
 
-  (render-state [_ {:keys [as-of transition-as-of actual-as-of editing show-save-button data-posted last-selected-metric] :as state}]
+  (render-state [_ {:keys [as-of transition-as-of actual-as-of editing show-save-button data-posted last-selected-metric edit-rand] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -187,7 +188,7 @@
           fullscreen-topic-opts (merge options {:rev-nav #(om/set-state! owner :transition-as-of %)
                                                 :switch-metric-cb #(om/set-state! owner :last-selected-metric %)})
           edit-topic-opts (merge options {:show-save-button #(om/set-state! owner :show-save-button %)
-                                          :dismiss-editing #(hide-fullscreen-topic owner options)})
+                                          :dismiss-editing #(hide-fullscreen-topic owner options (:fullscreen-force-edit data))})
           can-edit? (and (responsive/can-edit?)
                          (not (:read-only data)))]
       ; preload previous revision
@@ -212,18 +213,25 @@
                    show-save-button)
           (dom/button {:class "save-button btn-reset btn-solid"
                        :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-save-" (name section)))]
+                                    (hide-fullscreen-topic owner options true)
                                     (om/set-state! owner :data-posted true)
                                     (put! ch {:click true :event %}))}
             (if data-posted
               (om/build small-loading {:animating true})
-              "POST")))
-        (dom/div {:class "close"
-                  :on-click #(if editing
-                              (when-let [ch (utils/get-channel (str "fullscreen-topic-cancel-" (name section)))]
-                                 (put! ch {:click true :event %}))
-                              (hide-fullscreen-topic owner options))}
-          (icon :simple-remove))
-        (dom/div {:style #js {:display (when-not editing "none")}}
+              "SAVE")))
+        (if editing
+          (dom/button {:class "btn-reset btn-outline close-editing"
+                       :key "close"
+                       :title "Dismiss edit"
+                       :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-cancel-" (name section)))]
+                                    (om/set-state! owner :edit-rand (rand 4))
+                                    (put! ch {:click true :event %}))} "CANCEL")
+          (dom/button {:class "close btn-reset btn-outline"
+                       :key "close-editing"
+                       :title "ESC"
+                       :on-click #(hide-fullscreen-topic owner options)} (icon :simple-remove)))
+        (dom/div {:style #js {:display (when-not editing "none")}
+                  :key (str as-of edit-rand)}
           (om/build fullscreen-topic-edit {:topic section
                                            :topic-data topic-data
                                            :visible editing
@@ -234,8 +242,7 @@
                                            :prev-rev prev-rev
                                            :next-rev next-rev
                                            :show-first-edit-tooltip show-first-edit-tooltip}
-                                          {:opts edit-topic-opts
-                                           :key as-of}))
+                                          {:opts edit-topic-opts}))
         (dom/div #js {:className "fullscreen-topic-transition group"
                       :ref "fullscreen-topic-transition"
                       :style #js {:height (when-not transition-as-of "auto")
@@ -272,8 +279,8 @@
                                                      :next-rev tr-next-rev}
                                                     {:opts fullscreen-topic-opts})))))
         (when editing
-          (dom/span {:class "relative remove-button btn-reset btn-outline"
-                     :on-click (partial remove-topic-click owner options)}
+          (dom/button {:class "relative remove-button btn-reset btn-outline"
+                       :on-click (partial remove-topic-click owner options)}
             (icon :alert {:size 15
                           :class "inline mr2"
                           :accent-color (oc-colors/get-color-by-kw :oc-gray-5)

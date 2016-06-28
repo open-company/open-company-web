@@ -29,21 +29,33 @@ div.fullscreen-topic {
     cursor: pointer;
     z-index: 1040;
     top: 20px;
-    right: 70px;
+    right: 180px;
   }
 
   .remove-button {
     z-index: 1040;
-    bottom: 10px;
-    left: 15px;
+    left: 30px;
+    bottom: 30px;
   }
 
-  div.close {
+  button.close {
     position: fixed;
     cursor: pointer;
     z-index: 1040;
     top: 20px;
     right: 20px;
+    margin: 0px;
+    padding: 0px;
+  }
+
+  button.close-editing {
+    position: fixed;
+    cursor: pointer;
+    z-index: 1040;
+    top: 20px;
+    right: 40px;
+    margin-top: 0px;
+    height: 32px;
   }
 
   div.fullscreen-topic-transition{
