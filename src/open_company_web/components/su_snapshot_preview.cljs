@@ -65,9 +65,12 @@
                                                     :link-posted false})))
 
 (defn setup-sortable [owner options]
-    (when-let [list-node (js/jQuery (sel1 [:div.topics-column]))]
-      (.sortable list-node #js {:cursor "move"
-                                :opacity 1})))
+  (when-let [list-node (js/jQuery (sel1 [:div.topics-column]))]
+    (.sortable list-node #js {:scroll true
+                              :forcePlaceholderSize true
+                              :placeholder "sortable-placeholder"
+                              :handle ".topic"
+                              :opacity 1})))
 
 (defn add-su-section [owner topic]
   (om/update-state! owner :su-topics #(conj % topic)))

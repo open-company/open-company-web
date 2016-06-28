@@ -131,14 +131,22 @@ div.su-snapshot-preview {
       }
     }
 
-    // &.sortable-ghost {
+    &.ui-sortable-helper {
+      background-color: transparent;
 
-    //   div.topic {
-    //     background-color: rgba(78, 90, 107, 0.2);
-    //     border-radius: 2px;
-    //     border: 4px solid $oc_yellow;
-    //   }
-    // }
+      div.share-remove-container {
+        display: none;
+      }
+
+      div.topic {
+        border: 4px solid $oc_yellow;
+        transition: transform .25s ease-in-out;
+        -webkit-transition: -webkit-transform .25s ease-in-out;
+        -ms-transform: rotate(7deg); /* IE 9 */
+        -webkit-transform: rotate(7deg); /* Chrome, Safari, Opera */
+        transform: rotate(7deg);
+      }
+    }
 
     div.topic {
       background-color: white;
@@ -203,4 +211,8 @@ div.su-snapshot-preview {
       }
     }
   }
+}
+
+div.sortable-placeholder {
+  background-color: rgba(78, 90, 107, 0.2);
 }
