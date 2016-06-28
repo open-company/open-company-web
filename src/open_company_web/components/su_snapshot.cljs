@@ -7,6 +7,7 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.menu :refer (menu)]
@@ -24,11 +25,13 @@
 (defn close-overlay-cb [owner]
   (om/set-state! owner :transitioning false)
   (om/set-state! owner :selected-topic nil)
-  (om/set-state! owner :selected-metric nil))
+  (om/set-state! owner :selected-metric nil)
+  (.pushState js/history nil "Stakeholder update" (oc-urls/stakeholder-update (router/current-company-slug) (router/current-stakeholder-update-slug))))
 
 (defn topic-click [owner topic selected-metric]
   (om/set-state! owner :selected-topic topic)
-  (om/set-state! owner :selected-metric selected-metric))
+  (om/set-state! owner :selected-metric selected-metric)
+  (.pushState js/history nil (name topic) (oc-urls/stakeholder-update-section  (router/current-company-slug) (router/current-stakeholder-update-slug) topic)))
 
 (defn switch-topic [owner is-left?]
   (when (and (om/get-state owner :topic-navigation)
@@ -57,7 +60,9 @@
       (switch-topic owner true))))
 
 (defn animation-finished [owner]
-  (let [cur-state (om/get-state owner)]
+  (let [cur-state (om/get-state owner)
+        new-topic (:tr-selected-topic cur-state)]
+    (.pushState js/history nil (name new-topic) (oc-urls/stakeholder-update-section (router/current-company-slug) (router/current-stakeholder-update-slug) new-topic))
     (om/set-state! owner (merge cur-state {:selected-topic (:tr-selected-topic cur-state)
                                            :transitioning true
                                            :tr-selected-topic nil}))))
@@ -75,7 +80,7 @@
 (defcomponent su-snapshot [data owner options]
 
   (init-state [_]
-    {:selected-topic nil
+    {:selected-topic (router/current-section)
      :selected-metric nil
      :topic-navigation true
      :transitioning false
