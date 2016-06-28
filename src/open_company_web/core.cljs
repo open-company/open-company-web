@@ -127,12 +127,13 @@
 (defn stakeholder-update-handler [target component params]
   (let [slug (:slug (:params params))
         update-slug (:update-slug (:params params))
+        update-section (:section (:params params))
         query-params (:query-params params)
         su-key (dis/stakeholder-update-key slug update-slug)]
     (pre-routing query-params)
     (utils/clean-company-caches)
     ;; save the route
-    (router/set-route! [slug "updates" update-slug] {:slug slug :update-slug update-slug :query-params query-params})
+    (router/set-route! [slug "updates" update-slug update-section] {:slug slug :update-slug update-slug :query-params query-params :section update-section})
     ;; do we have the company data already?
     (when (not (get-in @dis/app-state su-key))
       ;; load the company data from the API
@@ -200,6 +201,9 @@
     (defroute stakeholder-update-route (urls/stakeholder-update ":slug" ":update-slug") {:as params}
       (stakeholder-update-handler target su-snapshot params))
 
+    (defroute stakeholder-update-section-route (urls/stakeholder-update-section ":slug" ":update-slug" ":section") {:as params}
+      (stakeholder-update-handler target su-snapshot params))
+
     (defroute not-found-route "*" []
       ;; render component
       (router/redirect-404!))
@@ -220,6 +224,7 @@
                                  su-edit-route
                                  su-list-route
                                  stakeholder-update-route
+                                 stakeholder-update-section-route
                                  not-found-route]))
 
     (defn login-wall []
