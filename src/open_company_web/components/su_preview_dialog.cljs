@@ -58,12 +58,12 @@
       :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :to] (.. % -target -value)])
       :placeholder "comma delimited email list"}]
     [:label.block.small-caps.bold.mb2 "Subject"]
-    [:input.p1.col-12.mb3
+    [:input.domine.npt.p1.col-12.mb3
      {:type "text"
       :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :subject] (.. % -target -value)])
       :default-value initial-subject}]
     [:label.block.small-caps.bold.mb2 "Your Message"]
-    [:textarea.p1.col-12.mb2.emoji-autocomplete
+    [:textarea.domine.npt.p1.col-12.mb2.emoji-autocomplete
      {:type "text"
       :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :note] (.. % -target -value)])
       :placeholder "Type a message that will be shown introducing this update."}]]])
@@ -74,7 +74,7 @@
    (modal-title "Share via Slack" :link-72)
    [:div.p3
     [:label.block.small-caps.bold.mb2 "Your Note"]
-    [:textarea.p1.col-12.mb2.emoji-autocomplete
+    [:textarea.npt.p1.col-12.mb2.emoji-autocomplete
      {:type "text"
       :on-change #(dis/dispatch! [:input [:stakeholder-update/share :slack :note] (.. % -target -value)])
       :placeholder "Provide a note to go with this update."}]]])
@@ -87,7 +87,7 @@
    [:div.p3
     [:label.block.small-caps.bold.mb2 "Share this private URL"]
     [:div.flex
-     [:input.p1.flex-auto
+     [:input.domine.npt.p1.flex-auto
       {:type "text"
        :id "share-link-input"
        :on-focus select-share-link
@@ -115,14 +115,14 @@
         "Send")])])
 
 (rum/defc confirmation < rum/static
-  [style]
+  [type]
   [:div
-   (case style
+   (case type
      :email (modal-title "Email Sent!" :email-84)
      :slack (modal-title "Shared via Slack!" :link-72))
    [:div.p3
     [:p.domine
-     (case style
+     (case type
        :email "Your email has been sent! Recipients will get an email of your snapshot."
        :slack "Your snapshot will be sent to all team members of your Slack organization momentarily.")]
     [:div.right-align.mt3

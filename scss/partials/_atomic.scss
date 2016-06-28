@@ -1,8 +1,19 @@
+// - buttons
+// - inputs
+// - typography
+// - colors
+
+// buttons
+
 .btn-reset {
   cursor: pointer;
   outline: none;
   border-width: 0;
   background-color: transparent;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: .6
+  }
 }
 
 .btn-outline {
@@ -31,9 +42,23 @@
   padding: .5rem 2rem;
 }
 
-.bg-gray { background-color: $oc-gray_1 }
+// inputs (npt used as prefix)
 
-.bg-white-05 { background-color: rgba(255,255,255,.5) }
+.npt {
+  border: 1px solid rgba(78, 90, 107, 0.1);
+  border-radius: 2px;
+  font-size: 18px;
+  line-height: 1.2;
+  color: $oc_gray_5;
+  transition: $oc_animation_duration;
+
+  &:active, &:focus {
+    border-color: rgba(78, 90, 107, 0.5);
+    outline: none;
+  }
+}
+
+// typography
 
 .domine { font-family: 'Domine', Georgia, serif; }
 
@@ -45,3 +70,11 @@
   letter-spacing: 1px;
   color: $oc_gray_5;
 }
+
+// colors
+
+.b--red {border-color: $oc_red_regular}
+.red {color: $oc_red_regular}
+
+.bg-gray { background-color: $oc-gray_1 }
+.bg-white-05 { background-color: rgba(255,255,255,.5) }
