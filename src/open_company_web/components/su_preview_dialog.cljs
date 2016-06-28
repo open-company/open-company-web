@@ -3,7 +3,6 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [rum.core :as rum]
-            [dommy.core :as dommy :refer-macros (sel1)]
             [open-company-web.api :as api]
             [open-company-web.dispatcher :as dis]
             [open-company-web.router :as router]
@@ -13,11 +12,6 @@
             [open-company-web.components.ui.small-loading :as loading]
             [cljsjs.react.dom]
             [cljsjs.clipboard]))
-
-(defn post-stakeholder-update [owner]
-  (let [slack-textarea (.findDOMNode js/ReactDOM (om/get-ref owner "slack-share-textarea"))
-        slack-message (.-value slack-textarea)]
-    (api/share-stakeholder-update slack-message)))
 
 (defn send-clicked [type owner options]
   (if (om/get-state owner :sent)
@@ -164,10 +158,7 @@
     (let [company-data (:company-data data)
           cancel-fn    (:dismiss-su-preview options)]
       (dom/div {:class "su-preview-dialog"}
-        (dom/div {:class (utils/class-set {:su-preview-window true
-                                           :share-link-copy (= share-via :link)
-                                           :share-email     (= share-via :email)
-                                           :slack-message   (= share-via :slack)})}
+        (dom/div {:class "su-preview-window"}
           (dom/button
               {:class "absolute top-0 btn-reset" :style {:left "100%"}
                :on-click #(cancel-fn)}
