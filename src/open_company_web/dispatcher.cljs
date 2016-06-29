@@ -75,8 +75,9 @@
     (swap! app-state assoc-in [:force-edit-topic] topic)
     (swap! app-state dissoc :force-edit-topic)))
 
-(defn toggle-menu []
-  (swap! app-state update :menu-open not))
+(defn toggle-menu
+  ([] (swap! app-state update :menu-open not))
+  ([force?] (swap! app-state assoc :menu-open force?)))
 
 (defn save-last-company-slug []
   (swap! app-state assoc :last-slug (router/current-company-slug)))
