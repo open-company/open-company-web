@@ -4,18 +4,26 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.components.navbar :refer (navbar)]
+            [open-company-web.components.ui.small-loading :refer (small-loading)]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]))
 
 (defn create-company-clicked [owner e]
-  (.preventDefault e)
-  (let [data         (om/get-props owner)
-        company-name (-> data :company-editor :name)]
-    (if (clojure.string/blank? company-name)
-      (js/alert "Please insert a company name")
-      (dis/dispatch! [:company-submit]))))
+  (utils/event-stop e)
+  (when-not (om/get-state owner :loading)
+    (let [data         (om/get-props owner)
+          company-name (-> data :company-editor :name)]
+      (if (clojure.string/blank? company-name)
+        (js/alert "Please insert a company name")
+        (do
+          (om/set-state! owner :loading true)
+          (dis/dispatch! [:company-submit]))))))
 
 (defcomponent company-editor [data owner]
+
+  (init-state [_]
+    {:loading false})
+
   (did-mount [_]
     (utils/update-page-title "OpenCompany - Setup Your Company")
     (when-not (-> data :company-editor :name)
@@ -23,7 +31,8 @@
       ;; ultimately we should switch to some event-loop impl that works like a proper queue
       ;; and does not have these limitations
       (utils/after 1 #(dis/dispatch! [:input [:company-editor :name] (jwt/get-key :org-name)]))))
-  (render [_]
+
+  (render-state [_ {:keys [loading]}]
     (dom/div {:class "company-editor"}
       (dom/div {:class "col-12 p3"}
         (dom/button {:on-click #(dis/dispatch! [:logout])
@@ -33,7 +42,7 @@
         (dom/div {:class "col-md-7 col-md-offset-2 p0"}
           (dom/h2 {:class "domine mb3"} "Get Started"))
         (dom/div {:class "col-md-7 col-md-offset-2 bg-gray p3"}
-          (dom/form {}
+          (dom/form {:on-submit (partial create-company-clicked owner)}
             (dom/div {:class "form-group"}
               (dom/label {:class "caps h6 bold block"} "Company Name")
               (dom/input {:type "text"
@@ -61,4 +70,6 @@
                           :on-change #(dis/dispatch! [:input [:company-editor :description] (.. % -target -value)])}))
             (dom/button {:class "btn-reset btn-solid"
                          :on-click (partial create-company-clicked owner)}
-                        "Setup Your Company"))))))
+                        (when loading
+                          (om/build small-loading {:animating true :css-float "left mt1"}))
+                        (dom/label {:class (str "mt1" (when loading " ml2"))} "Setup Your Company")))))))
