@@ -71,5 +71,5 @@
             (dom/button {:class "btn-reset btn-solid"
                          :on-click (partial create-company-clicked owner)}
                         (when loading
-                          (om/build small-loading {:animating true :css-float "left mt1"}))
+                          (om/build small-loading {:animating true :css-classes "left mt1"}))
                         (dom/label {:class (str "mt1" (when loading " ml2"))} "Setup Your Company")))))))
