@@ -106,10 +106,15 @@
   (reset! _mobile fixed-browser-type)))
 
 (defn is-mobile []
+ "Check if it's mobile based only on screen size"
  ; fake the browser type for the moment
  (when (neg? @_mobile)
   (set-browser-type!))
  @_mobile)
 
 (defn can-edit? []
+  "Check if it's mobile based only on the UserAgent"
   (not userAgent/MOBILE))
+
+(defn user-agent-mobile? []
+  userAgent/MOBILE)
