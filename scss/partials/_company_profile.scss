@@ -2,7 +2,7 @@
 
 div.company-profile{
   div.company-profile-container {
-    min-height: calc(100vh - 477px);
+    min-height: calc(100vh - 124px - #{$footer_height}px + #{$top_border_height}px);
 
     div.profile-container {
       width: 600px;

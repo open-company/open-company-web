@@ -1,11 +1,12 @@
 div.user-profile {
+
   div.user-profile-internal {
     position: relative;
     width: 509px;
     left: 50%;
     margin-left: -254px;
-    min-height: calc(100vh - 397px);
-    margin-top: 80px;
+    padding-top: 80px;
+    min-height: calc(100vh - #{$footer_small_height}px - 95px + #{$top_border_height}px);
 
     div.user-profile-title {
       height: 74px;
