@@ -82,7 +82,7 @@ div.su-preview-dialog {
     }
 
     div.su-preview-box {
-      margin-top: 25px;
+      margin-top: 5px;
 
       label.share-link-cta {
         font-weight: 700;
@@ -95,12 +95,12 @@ div.su-preview-dialog {
 
       div.share-link-box {
         width: 100%;
-        margin-top: 20px;
+        margin-top: 35px;
 
         input.share-link-input {
           border: 1px solid rgba(78, 90, 107, 0.1);
           border-radius: 2px;
-          height: 30px;
+          height: 40px;
           width: 514px;
           font-size: 18px;
           line-height: 1.2;
@@ -116,10 +116,10 @@ div.su-preview-dialog {
           margin: 0px;
           padding: 0px;
           width: 106px;
-          height: 30px;
+          height: 40px;
           background-color: $oc_yellow;
           font-weight: 700;
-          font-size: 14px;
+          font-size: 12px;
           line-height: 1.5;
           letter-spacing: 1px;
           color: $oc_gray_5;
@@ -136,6 +136,8 @@ div.su-preview-dialog {
       }
 
       a.share-link-new-win {
+        margin-top: 14px;
+        display: block;
         opacity: 0.5;
         font-weight: 700;
         font-size: 12px;

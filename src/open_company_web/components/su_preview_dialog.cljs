@@ -90,7 +90,7 @@
                                            :slack-sent (and share-via-slack slack-sent)})}
           (when share-via-link
             (dom/div {:class "su-preview-box"}
-              (dom/label {:class "share-link-cta"} "SHARE THIS PRIVATE URL")
+              (dom/label {:class "share-link-cta"} "Share this Private URL")
               (dom/div {:class "share-link-box group"}
                 (dom/input #js {:type "text"
                                 :className "share-link-input"
