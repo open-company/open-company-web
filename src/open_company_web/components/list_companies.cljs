@@ -3,17 +3,19 @@
               [om-tools.core :as om-core :refer-macros (defcomponent)]
               [om-tools.dom :as dom :include-macros true]
               [open-company-web.urls :as oc-urls]
+              [open-company-web.router :as router]
               [open-company-web.lib.utils :as utils]
               [open-company-web.lib.responsive :as responsive]
               [open-company-web.components.menu :refer (menu)]
-              [open-company-web.components.ui.link :refer (link)]
               [open-company-web.components.navbar :refer (navbar)]))
 
 (defcomponent list-page-item [data owner]
   (render [_]
     (dom/li
-      (dom/img {:class "company-logo" :src (:logo data)})
-      (om/build link {:href (oc-urls/company (:slug data)) :name (:name data)}))))
+      (dom/a {:href (oc-urls/company (:slug data))
+              :on-click (fn [e] (utils/event-stop e) (router/nav! (oc-urls/company (:slug data))))}
+        (dom/img {:class "company-logo" :src (:logo data)})
+        (:name data)))))
 
 (defcomponent list-companies [{:keys [menu-open] :as data} owner]
 

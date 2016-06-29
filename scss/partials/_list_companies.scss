@@ -25,20 +25,24 @@ div.list-companies {
         border: 1px solid rgba(78, 90, 107, 0.5);
         box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
 
-        img.company-logo{
-          min-width: 20px;
-          max-width: 65px;
-          height: 20px;
-          float: left;
-          margin-left: 10px;
-          margin-top: 15px;
-        }
-
         a {
           color: $oc_gray_5;
           padding: 15px;
           display: inline-block;
-          margin-left: 0px;
+          width: 100%;
+
+          img.company-logo{
+            min-width: 20px;
+            max-width: 65px;
+            height: 20px;
+            float: left;
+            margin-left: 10px;
+            // margin-top: 15px;
+          }
+
+          span {
+            margin-left: 10px;
+          }
         }
       }
     }
