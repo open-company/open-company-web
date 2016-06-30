@@ -136,8 +136,7 @@
     (router/set-route! [slug "updates" update-slug update-section] {:slug slug :update-slug update-slug :query-params query-params :section update-section})
     ;; do we have the company data already?
     (when (not (get-in @dis/app-state su-key))
-      ;; load the company data from the API
-      (api/get-company slug)
+      ;; load the Stakeholder Update data from the API
       (api/get-stakeholder-update slug update-slug)
       (let [su-loading-key (conj su-key :loading)]
         (swap! dis/app-state assoc-in su-loading-key true)))
