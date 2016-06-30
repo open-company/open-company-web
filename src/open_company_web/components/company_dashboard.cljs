@@ -79,7 +79,7 @@
                                          :main-scroll true})}
         (om/build menu data)
         (if (get-in data [(keyword (router/current-company-slug)) :error])
-          (dom/div {:class "page-no-navbar py4"}
+          (dom/div {:class "fullscreen-page"}
             (om/build login-required data))
           (dom/div {:class "page"}
             ;; Navbar
