@@ -106,4 +106,4 @@
   ([update-slug section]
     (stakeholder-update-section (router/current-company-slug) update-slug section))
   ([slug update-slug section]
-    (str "/" (name slug) "/updates/" (name update-slug) "/" section)))
+    (str "/" (name slug) "/updates/" (name update-slug) "/" (name section))))
