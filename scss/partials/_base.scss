@@ -121,21 +121,6 @@ svg.emojione {
   background: rgba(249,215,72, 0.5);
 }
 
-div.page-no-navbar{
-  position: relative; /* Set the position property so z-index will apply */
-  z-index: 20; /* Make sure this is higher than #menu */
-  top: 0px !important;
-
-  background: #fff;
-  min-height: calc(100vh - #{$footer_height}px);
-}
-
-body.small-footer {
-  div.page-no-navbar {
-    min-height: calc(100vh - #{$footer_small_height}px);
-  }
-}
-
 .navbar-offset {
   margin-top: #{$navbar_height}px;
 }
