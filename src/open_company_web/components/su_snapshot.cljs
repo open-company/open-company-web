@@ -140,7 +140,7 @@
                                 :ref "selected-topic"
                                 :style #js {:opacity 1 :backgroundColor "rgba(255, 255, 255, 0.98)"}}
                     (om/build fullscreen-topic {:section selected-topic
-                                                :section-data (->> selected-topic keyword (get company-data))
+                                                :section-data (->> selected-topic keyword (get su-data))
                                                 :change-url false
                                                 :selected-metric selected-metric
                                                 :read-only true
@@ -157,7 +157,7 @@
                                   :ref "tr-selected-topic"
                                   :style #js {:opacity (if tr-selected-topic 0 1)}}
                     (om/build fullscreen-topic {:section tr-selected-topic
-                                                :section-data (->> tr-selected-topic keyword (get company-data))
+                                                :section-data (->> tr-selected-topic keyword (get su-data))
                                                 :selected-metric selected-metric
                                                 :read-only (:read-only company-data)
                                                 :card-width card-width
