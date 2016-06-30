@@ -174,6 +174,7 @@
                                         :total-width total-width
                                         :content-loaded (not (:loading data))
                                         :topics (:sections su-data)
+                                        :topics-data su-data
                                         :company-data company-data
                                         :hide-add-topic true}
                                        {:opts {:topic-click (partial topic-click owner)}})))

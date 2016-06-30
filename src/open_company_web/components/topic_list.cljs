@@ -362,6 +362,7 @@
                                   :content-loaded (not (:loading data))
                                   :topics category-topics
                                   :company-data company-data
+                                  :topics-data company-data
                                   :share-selected-topics share-selected-topics}
                                  {:opts {:topic-click (partial topic-click owner)
                                          :update-active-topics (partial update-active-topics owner)}})
