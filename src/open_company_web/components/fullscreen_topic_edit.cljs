@@ -495,8 +495,9 @@
                                     (om/set-state! owner :show-title-counter true))
                                   (change-value owner :title e))})
           (dom/div {:class (utils/class-set {:topic-edit-title-count true
+                                             :char-counter true
                                              :transparent (not show-title-counter)})}
-            (dom/label {:class "bold"} (- title-length-limit (count title))))
+            (dom/label {} (- title-length-limit (count title))))
         (dom/div {:className "topic-edit-headline emoji-autocomplete"
                   :ref "topic-edit-headline"
                   :contentEditable true
@@ -509,8 +510,9 @@
                   :on-focus    #(check-headline-count owner headline-length-limit %)
                   :dangerouslySetInnerHTML (clj->js {"__html" (:headline topic-data)})})
         (dom/div {:class (utils/class-set {:topic-edit-headline-count true
+                                           :char-counter true
                                            :transparent (not show-headline-counter)})}
-          (dom/label {:class "bold"} (- headline-length-limit (count-chars headline))))
+          (dom/label {} (- headline-length-limit (count-chars headline))))
         (dom/div {:class "separator"})
         (dom/div {:class "topic-overlay-edit-data"}
           (when (= topic "finances")
