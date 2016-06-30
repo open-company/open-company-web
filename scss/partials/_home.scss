@@ -2,4 +2,10 @@ div.home {
   background-color: white;
   min-height: 100vh;
   border-top: 4px solid $oc_yellow;
+
+  div.home-internal {
+    min-height: calc(100vh - #{$footer_height}px - 83px - 8px);
+    background-color: #fff;
+    padding: 0 30px;
+  }
 }
