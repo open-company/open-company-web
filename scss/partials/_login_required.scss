@@ -1,0 +1,39 @@
+div.login-required {
+  background-color: white;
+  min-height: 100vh;
+  border-top: 4px solid $oc_yellow;
+  background-color: #fff;
+
+  p.login-rquired-cta {
+    font-family: $oc_headers_font;
+    font-size: 26px;
+    line-height: 1.4;
+    color: $oc_gray_5;
+    margin-top: 150px;
+  }
+
+  a.login-button {
+    margin-top: 30px;
+    display: block;
+  }
+
+  div.logo-container {
+    margin-top: 185px;
+
+    img.logo-gold {
+      width: 130px;
+      height: 180px;
+    }
+
+    div.logo-cta {
+      // margin-top: 52px;
+      font-family: Domine-Regular;
+      font-size: 18px;
+      line-height: 1.8;
+      text-align: center;
+      color: $oc_gray_5;
+      max-width: 400px;
+      margin: 52px auto;
+    }
+  }
+}
