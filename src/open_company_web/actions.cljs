@@ -128,6 +128,9 @@
       (dissoc :loading))))
 
 (defmethod dispatcher/action :stakeholder-update [db [_ {:keys [slug update-slug response]}]]
-  (-> db
-    (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
-    (dissoc :loading)))
+  (let [company-data-keys [:logo :logo-width :logo-height :name :slug :currency]
+        company-data      (select-keys response company-data-keys)]
+    (-> db
+      (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
+      (assoc-in (dispatcher/company-data-key slug) (utils/fix-sections company-data))
+      (dissoc :loading))))
