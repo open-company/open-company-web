@@ -9,85 +9,215 @@ div.fullscreen-topic-edit {
     margin-top: 40px;
   }
 
-  input.topic-edit-title {
-    opacity: 0.5;
-    font-weight: 700;
-    font-size: 12px;
-    line-height: 1.5;
-    letter-spacing: 1px;
-    color: $oc_gray_5;
-    text-transform: uppercase;
-    border: 0px;
-    width: 100%;
-    padding: 0px;
+  div.fullscreen-topic-edit-top-box {
+    border-radius: 4px;
+    background-color: #ffffff;
+    border: solid 2px rgba(78, 90, 107, 0.2);
+    padding: 26px 30px;
 
-    &:active, &:focus{
-      border: 0px;
-      outline: none;
-      box-shadow: none;
-    }
-  }
-
-  div.topic-edit-title-count {
-    float: right;
-    text-align: right;
-    width: 57px;
-    height: 16px;
-    margin-top: 0px;
-    margin-right: 54px;
-  }
-
-  div.topic-edit-headline{
-    font-family: $oc_headers_font;
-    font-size: 26px;
-    line-height: 1.4;
-    color: $oc_gray_5;
-    border: 0px;
-    width: 100%;
-    padding: 0px;
-    margin: 0px;
-    margin-top: 18px;
-    height: auto;
-
-    &:empty:before{
-      content: attr(placeholder);
-      display: block; /* For Firefox */
+    input.topic-edit-title {
       opacity: 0.5;
-    }
-
-    &:active, &:focus{
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      color: $oc_gray_5;
+      text-transform: uppercase;
       border: 0px;
-      outline: none;
-      box-shadow: none;
+      width: 100%;
+      padding: 0px;
+
+      &:active, &:focus{
+        border: 0px;
+        outline: none;
+        box-shadow: none;
+      }
     }
-  }
 
-  textarea.topic-edit-headline {
-    font-family: $oc_headers_font;
-    font-size: 26px;
-    line-height: 1.4;
-    color: $oc_gray_5;
-    border: 0px;
-    width: 100%;
-    padding: 0px;
-    margin: 0px;
-    margin-top: 2px;
-    height: auto;
+    div.topic-edit-title-count {
+      float: right;
+      text-align: right;
+      width: 57px;
+      height: 16px;
+      margin-top: 0px;
+      margin-right: 54px;
+    }
 
-    &:active, &:focus{
+    div.topic-edit-headline{
+      font-family: $oc_headers_font;
+      font-size: 26px;
+      line-height: 1.4;
+      color: $oc_gray_5;
       border: 0px;
-      outline: none;
-      box-shadow: none;
-    }
-  }
+      width: 100%;
+      padding: 0px;
+      margin: 0px;
+      margin-top: 18px;
+      height: auto;
 
-  div.topic-edit-headline-count{
-    float: right;
-    text-align: right;
-    width: 57px;
-    height: 16px;
-    margin-top: 0px;
-    margin-right: 54px;
+      &:empty:before{
+        content: attr(placeholder);
+        display: block; /* For Firefox */
+        opacity: 0.5;
+      }
+
+      &:active, &:focus{
+        border: 0px;
+        outline: none;
+        box-shadow: none;
+      }
+    }
+
+    textarea.topic-edit-headline {
+      font-family: $oc_headers_font;
+      font-size: 26px;
+      line-height: 1.4;
+      color: $oc_gray_5;
+      border: 0px;
+      width: 100%;
+      padding: 0px;
+      margin: 0px;
+      margin-top: 2px;
+      height: auto;
+
+      &:active, &:focus{
+        border: 0px;
+        outline: none;
+        box-shadow: none;
+      }
+    }
+
+    div.topic-edit-headline-count{
+      float: right;
+      text-align: right;
+      width: 57px;
+      height: 16px;
+      margin-top: 0px;
+      margin-right: 54px;
+    }
+
+    div.topic-growth-finances{
+      margin-top: 10px;
+    }
+
+    div.topic-overlay-edit-data {
+
+      div.finances, div.growth {
+        margin-top: 10px;
+
+        div.table-container{
+          padding: 21px 0px 0px 0px;
+        }
+
+        table.table{
+          border-spacing: 10px;
+          max-width: 100%;
+          width: auto;
+          float: left;
+          background-color: rgba(78, 90, 107, 0.05);
+
+          * {
+            border: 0px solid transparent;
+          }
+
+          thead tr th {
+            font-weight: 700;
+            font-size: 12px;
+            line-height: 1.5;
+            letter-spacing: 1px;
+            color: $oc_gray_5;
+            text-transform: uppercase;
+
+            &:first-child {
+              min-width: 100px;
+            }
+          }
+
+          tr:last-child td:last-child {
+            opacity: 0;
+          }
+
+          tr td.no-cell:first-child {
+            padding-top: 12px;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: rgba(78, 90, 107, 0.5);
+          }
+
+          td.no-cell {
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: rgba(78,90,107, 0.5);
+            text-transform: uppercase;
+          }
+
+          td div.comp-cell {
+            opacity: 0.5;
+            background-color: #ffffff;
+            padding-top: 4px;
+          }
+
+          td.no-cell, td div.comp-cell div.comp-cell-int {
+            font-weight: normal;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: #4e5a6b;
+          }
+
+          td.no-cell:last-child {
+            padding-top: 13px;
+          }
+
+          tr th:last-child, tr th.dark, tr td:last-child, tr td.dark {
+            background-color: rgba(78, 90, 107, 0.1);
+          }
+
+          a.more {
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: rgba(78, 90, 107, 0.5);
+          }
+        }
+      }
+
+      div.growth-body {
+        table.table {
+          margin-left: 40px;
+          width: 400px;
+          td.no-cell:first-child, tr:first-child{
+            width: 150px;
+          }
+        }
+      }
+
+      div.pillbox-container.growth{
+        background-color: transparent;
+        padding: 12px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        text-align: center;
+        width: 100%;
+
+        @include pillbox();
+      }
+    }
+
+    div.topic-edit-snippet {
+      @include rich-editor-body($oc_gray_5);
+      margin-top: 21px !important;
+    }
+
+    div.topic-edit-snippet-count{
+      float: right;
+      text-align: right;
+      width: 57px;
+      height: 16px;
+      margin-top: 0px;
+      margin-right: 54px;
+    }
   }
 
   div.separator {
@@ -95,115 +225,6 @@ div.fullscreen-topic-edit {
     width: 30px;
     height: 2px;
     background-color: rgba(77, 89, 106, 0.2);
-  }
-
-  div.topic-growth-finances{
-    margin-top: 10px;
-  }
-
-  div.topic-overlay-edit-data {
-
-    div.finances, div.growth {
-      margin-top: 10px;
-
-      div.table-container{
-        padding: 21px 0px 0px 0px;
-      }
-
-      table.table{
-        border-spacing: 10px;
-        max-width: 100%;
-        width: auto;
-        float: left;
-        background-color: rgba(78, 90, 107, 0.05);
-
-        * {
-          border: 0px solid transparent;
-        }
-
-        thead tr th {
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
-          text-transform: uppercase;
-
-          &:first-child {
-            min-width: 100px;
-          }
-        }
-
-        tr:last-child td:last-child {
-          opacity: 0;
-        }
-
-        tr td.no-cell:first-child {
-          padding-top: 12px;
-          font-weight: 700;
-          font-size: 12px;
-          letter-spacing: 1px;
-          color: rgba(78, 90, 107, 0.5);
-        }
-
-        td.no-cell {
-          font-weight: 700;
-          font-size: 12px;
-          letter-spacing: 1px;
-          color: rgba(78,90,107, 0.5);
-          text-transform: uppercase;
-        }
-
-        td div.comp-cell {
-          opacity: 0.5;
-          background-color: #ffffff;
-          padding-top: 4px;
-        }
-
-        td.no-cell, td div.comp-cell div.comp-cell-int {
-          font-weight: normal;
-          font-size: 12px;
-          letter-spacing: 1px;
-          color: #4e5a6b;
-        }
-
-        td.no-cell:last-child {
-          padding-top: 13px;
-        }
-
-        tr th:last-child, tr th.dark, tr td:last-child, tr td.dark {
-          background-color: rgba(78, 90, 107, 0.1);
-        }
-
-        a.more {
-          font-weight: 700;
-          font-size: 12px;
-          letter-spacing: 1px;
-          color: rgba(78, 90, 107, 0.5);
-        }
-      }
-    }
-
-    div.growth-body {
-      table.table {
-        margin-left: 40px;
-        width: 400px;
-        td.no-cell:first-child, tr:first-child{
-          width: 150px;
-        }
-      }
-    }
-
-    div.pillbox-container.growth{
-      background-color: transparent;
-      padding: 12px;
-      margin-top: 10px;
-      margin-bottom: 10px;
-      text-align: center;
-      width: 100%;
-
-      @include pillbox();
-    }
   }
 
   div.topic-body{
