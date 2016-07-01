@@ -34,7 +34,7 @@
           chart-opts {:show-title false
                       :show-revisions-navigation false
                       :switch-metric-cb (:switch-metric-cb options)
-                      :chart-size {:width  (- fullscreen-width 40)
+                      :chart-size {:width  (- fullscreen-width 100)
                                    :height (if (responsive/is-mobile) 174 295)}}
           chart-data {:section-data topic-data
                       :section (keyword topic)
@@ -44,18 +44,23 @@
                       :read-only true}]
       (dom/div {:class "fullscreen-topic-internal group"
                 :style #js {:width (str (- fullscreen-width 20) "px")}}
-        (dom/div {:class "topic-title"} (:title topic-data))
-        (dom/div {:class "topic-headline"
-                  :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
-        (dom/div {:class "separator"})
-        (when (or (= topic "growth") (= topic "finances"))
-          (dom/div {:class "topic-growth-finances"}
-            (cond
-              (= topic "growth")
-              (om/build topic-growth chart-data {:opts chart-opts})
-              (= topic "finances")
-              (om/build topic-finances chart-data {:opts chart-opts}))
-            (dom/div {:class "separator"})))
+        (dom/div {:class "fullscreen-topic-top-box"}
+          (when (:image-url topic-data)
+            (dom/div {:class "topic-header-image"}
+              (dom/img {:src (:image-url topic-data)})))
+          (dom/div {:class "topic-title"} (:title topic-data))
+          (dom/div {:class "topic-headline"
+                    :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
+          (dom/div {:class "topic-snippet"
+                    :dangerouslySetInnerHTML (utils/emojify (:snippet topic-data))})
+          (when (or (= topic "growth") (= topic "finances"))
+            (dom/div {:class "topic-growth-finances"}
+              (cond
+                (= topic "growth")
+                (om/build topic-growth chart-data {:opts chart-opts})
+                (= topic "finances")
+                (om/build topic-finances chart-data {:opts chart-opts}))
+              (dom/div {:class "separator"}))))
         (dom/div {:class "topic-body"
                   :dangerouslySetInnerHTML (utils/emojify (utils/get-topic-body topic-data topic))})
         (when (:author topic-data)
