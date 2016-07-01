@@ -178,4 +178,9 @@
   &::after{ //placeholder
     white-space: inherit;
   }
+
+  p:last-child{
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+  }
 }
