@@ -62,6 +62,7 @@ div.fullscreen-topic {
     position: relative;
     height: auto;
     overflow: hidden;
+    background-color: #f9f9f9;
 
     div.fullscreen-topic-as-of {
       height: auto;
@@ -76,7 +77,7 @@ div.fullscreen-topic {
     }
 
     div.fullscreen-topic-internal {
-      max-width: 575px;
+      max-width: 650px;
       min-width: 302px;
       margin: #{$navbar_height}px auto 30px;
       position: relative;
@@ -88,28 +89,51 @@ div.fullscreen-topic {
         margin-top: 40px;
       }
 
-      div.topic-title {
-        opacity: 0.5;
-        font-weight: 700;
-        font-size: 12px;
-        line-height: 1.5;
-        letter-spacing: 1px;
-        color: $oc_gray_5;
-        text-transform: uppercase;
-        margin: 0px;
-        padding-top: 2px;
-      }
+      div.fullscreen-topic-top-box{
+        border-radius: 4px;
+        background-color: #ffffff;
+        border: solid 2px rgba(78, 90, 107, 0.2);
+        padding: 26px 30px;
 
-      div.topic-headline {
-        margin-top: 18px;
-        font-family: $oc_headers_font;
-        font-size: 26px;
-        line-height: 1.4;
-        color: $oc_gray_5;
-      }
+        div.topic-header-image {
+          text-align: center;
 
-      div.topic-growth-finances{
-        margin-top: 10px;
+          img {
+            max-width: 590px;
+          }
+        }
+
+        div.topic-title {
+          opacity: 0.5;
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+          text-transform: uppercase;
+          margin: 0px;
+          padding-top: 2px;
+        }
+
+        div.topic-headline {
+          margin-top: 18px;
+          font-family: $oc_headers_font;
+          font-size: 26px;
+          line-height: 1.4;
+          color: $oc_gray_5;
+        }
+
+        div.topic-snippet{
+          margin-top: 12px;
+          font-family: $oc_headers_font;
+          font-size: 18px;
+          line-height: 1.8;
+          color: rgba(78, 90, 107, 0.5);
+        }
+
+        div.topic-growth-finances{
+          margin-top: 10px;
+        }
       }
 
       div.separator {
@@ -122,6 +146,15 @@ div.fullscreen-topic {
       div.topic-body{
         @include rich-editor-body($oc_gray_5);
         margin-top: 21px !important;
+        margin-top: 34px;
+
+        &, & * {
+          padding: 0px 30px;
+          font-family: $oc_headers_font;
+          font-size: 18px;
+          line-height: 1.8;
+          color: rgba(78, 90, 107, 0.5);
+        }
       }
 
       div.topic-attribution {
@@ -131,10 +164,12 @@ div.fullscreen-topic {
         line-height: 1.8;
         color: $oc_gray_5;
         opacity: 0.5;
+        padding: 0px 30px;
       }
 
       div.topic-revisions {
         margin-top: 65px;
+        padding: 0px 30px;
 
         @include mobile(){
           margin-bottom: 60px;
