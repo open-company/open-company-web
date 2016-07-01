@@ -188,7 +188,5 @@
           [:script {:src "/lib/js-utils/svg-utils.js?oc_deploy_key" :type "text/javascript"}]
           ;; TODO Remove w/ externs
           [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js?oc_deploy_key"}]
-          ;; Clamp JS
-          [:script {:type "text/javascript", :src "/lib/clamp/clamp.js?oc_deploy_key"}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]]})
