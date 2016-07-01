@@ -15,6 +15,14 @@ div.fullscreen-topic-edit {
     border: solid 2px rgba(78, 90, 107, 0.2);
     padding: 26px 30px;
 
+    .char-counter {
+      font-weight: 800;
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      color: rgba(78, 90, 107, 0.2);
+    }
+
     input.topic-edit-title {
       opacity: 0.5;
       font-weight: 700;

@@ -544,6 +544,7 @@
                       :on-focus #(om/set-state! owner :show-title-counter true)
                       :on-change #(change-value owner :title %)})
             (dom/div {:class (utils/class-set {:topic-edit-title-count true
+                                               :char-counter true
                                                :transparent (not show-title-counter)})}
               (dom/label {:class "bold"} (- title-length-limit (count title))))
           (dom/div {:className "topic-edit-headline emoji-autocomplete"
@@ -557,6 +558,7 @@
                     :on-focus    #(check-headline-count owner headline-length-limit %)
                     :dangerouslySetInnerHTML (clj->js {"__html" (:headline topic-data)})})
           (dom/div {:class (utils/class-set {:topic-edit-headline-count true
+                                             :char-counter true
                                              :transparent (not show-headline-counter)})}
             (dom/label {:class "bold"} (- headline-length-limit (count-chars headline))))
           (when is-data-topic
@@ -616,6 +618,7 @@
                     :on-focus    #(check-snippet-count owner %)
                     :dangerouslySetInnerHTML (clj->js {"__html" snippet})})
           (dom/div {:class (utils/class-set {:topic-edit-snippet-count true
+                                             :char-counter true
                                              :transparent (not show-snippet-counter)})}
             (dom/label {:class "bold"} (- snippet-length-limit (snippet-count-chars)))))
         (dom/div {:class "relative topic-body-line"}
