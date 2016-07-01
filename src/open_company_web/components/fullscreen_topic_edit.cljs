@@ -248,13 +248,16 @@
     {:data fixed-growth-data}))
 
 (defn data-to-save [owner topic]
-  (when-let [body-node (sel1 [(keyword (str "div#topic-edit-body-" (name topic)))])]
+  (when-let* [body-node (sel1 [(keyword (str "div#topic-edit-body-" (name topic)))])
+              snippet-node (sel1 [(keyword (str "div#topic-edit-snippet-" (name topic)))])]
     (let [topic-kw (keyword topic)
          is-data-topic (#{:finances :growth} topic-kw)
          with-title {:title (om/get-state owner :title)}
          with-headline (merge with-title {:headline (om/get-state owner :headline)})
+         snippet (.-innerHTML snippet-node)
+         with-snippet (merge with-headline {:snippet snippet})
          body (.-innerHTML body-node)
-         with-body (merge with-headline (if is-data-topic {:notes {:body body}} {:body body}))
+         with-body (merge with-snippet (if is-data-topic {:notes {:body body}} {:body body}))
          with-finances-data (if (= topic-kw :finances)
                               (merge with-body {:data (finances-clean-data (om/get-state owner :finances-data))})
                               with-body)
@@ -271,7 +274,7 @@
       (om/set-state! owner :has-changes true)
       (om/set-state! owner :headline headline-innerHTML))))
 
-(defn check-headline-count [owner headline-mex-length e]
+(defn check-headline-count [owner headline-max-length e]
   (when-let [headline (sel1 [:div.topic-edit-headline])]
     (let [headline-value (.-innerText headline)]
       (when (pos? (count headline-value))
@@ -285,9 +288,34 @@
                  (not= (.-keyCode e) 27)
                  (not= (.-keyCode e) 37)
                  (not= (.-keyCode e) 39)
-                 (>= (count headline-value) headline-mex-length))
+                 (>= (count headline-value) headline-max-length))
         (.preventDefault e))
       (headline-on-change owner))))
+
+(defn snippet-on-change [owner]
+  (when-not (om/get-state owner :show-snippet-counter)
+    (om/set-state! owner :show-snippet-counter true))
+  (let [snippet-innerHTML (.-innerHTML (sel1 [:div.topic-edit-snippet]))]
+    (when (not= (om/get-state owner :snippet) snippet-innerHTML)
+      (om/set-state! owner :has-changes true))))
+
+(def snippet-length-limit 500)
+
+(defn check-snippet-count [owner e]
+  (when-let [snippet (sel1 [:div.topic-edit-snippet])]
+    (let [snippet-value (.-innerText snippet)]
+      (when (and (not= (.-keyCode e) 8)
+                 (not= (.-keyCode e) 16)
+                 (not= (.-keyCode e) 17)
+                 (not= (.-keyCode e) 40)
+                 (not= (.-keyCode e) 38)
+                 (not= (.-keyCode e) 13)
+                 (not= (.-keyCode e) 27)
+                 (not= (.-keyCode e) 37)
+                 (not= (.-keyCode e) 39)
+                 (>= (count snippet-value) snippet-length-limit))
+        (.preventDefault e))
+      (snippet-on-change owner))))
 
 (defn count-chars
   "A special variant of `count` that will count emoji strings (:smile:)
@@ -296,6 +324,15 @@
   (-> (js/emojione.shortnameToUnicode (or s ""))
       (string/replace #"&nbsp;" " ")
       count))
+
+(defn snippet-count-chars
+  "A special variant of `count` that will count emoji strings (:smile:)
+   and html spaces (&nbsp;) as single characters."
+  []
+  (when-let [snippet-node (sel1 [:div.topic-edit-snippet])]
+    (-> (js/emojione.shortnameToUnicode (or (.-innerText snippet-node) ""))
+        (string/replace #"&nbsp;" " ")
+        count)))
 
 (defn top-position [el]
   (loop [yPos 0
@@ -340,10 +377,12 @@
       {:has-changes false
        :title (:title topic-data)
        :headline (:headline topic-data)
+       :snippet (:snippet topic-data)
        :body (utils/get-topic-body topic-data topic)
        :note (:note topic-data)
        :show-headline-counter (:show-headline-counter current-state)
        :show-title-counter (:show-title-counter current-state)
+       :show-snippet-counter (:show-snippet-counter current-state)
        :medium-editor (:medium-editor current-state)
        :history-listener-id (:history-listener-id current-state)
        :tooltip-dismissed false
@@ -358,16 +397,23 @@
 (defn setup-medium-editor [owner {:keys [topic-data topic] :as data}]
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
   (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
-        slug (keyword (router/current-company-slug))
-        placeholder-data (if (:placeholder topic-data) (utils/get-topic-body topic-data topic) "")
         med-ed (new js/MediumEditor body-el (clj->js
-                                             (->  (utils/medium-editor-options placeholder-data)
+                                             (->  (utils/medium-editor-options "")
                                                   (editor/inject-extension editor/file-upload))))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
-    (js/emojiAutocomplete)
     (om/set-state! owner :initial-body (.-innerHTML body-el))
     (om/set-state! owner :medium-editor med-ed))
+  (let [snippet-el (sel1 (str "div#topic-edit-snippet-" (name topic)))
+        placeholder-data (if (:placeholder topic-data) (utils/get-topic-body topic-data topic) "")
+        med-ed (new js/MediumEditor snippet-el (clj->js
+                                                 (->  (utils/medium-editor-options placeholder-data)
+                                                      (editor/inject-extension editor/file-upload))))]
+    (.subscribe med-ed "editableInput" (fn [event editable]
+                                         (om/set-state! owner :has-changes true)))
+    (om/set-state! owner :initial-snippet (.-innerHTML snippet-el))
+    (om/set-state! owner :snippet-medium-editor med-ed))
+  (js/emojiAutocomplete)
   (utils/after 200 #(focus-headline owner)))
 
 (defcomponent fullscreen-topic-edit [{:keys [card-width topic topic-data currency focus show-first-edit-tooltip] :as data} owner options]
@@ -447,6 +493,7 @@
   (render-state [_ {:keys [has-changes
                            title
                            headline
+                           snippet
                            body
                            ; finances states
                            finances-data
@@ -457,10 +504,12 @@
                            growth-metrics
                            show-headline-counter
                            show-title-counter
+                           show-snippet-counter
                            growth-metric-slugs
                            ; tooltip
                            tooltip-dismissed]}]
     (let [topic-kw (keyword topic)
+          is-data-topic (#{:finances :growth} topic-kw)
           title-length-limit 20
           topic-body (if-not (:placeholder topic-data) (utils/get-topic-body topic-data topic-kw) "")
           win-height (.-clientHeight (.-body js/document))
@@ -484,80 +533,91 @@
                 :style #js {:width (str (- fullscreen-width 20) "px")}
                 :on-click #(.stopPropagation %)
                 :key (:updated-at topic-data)}
-        (dom/input {:class "topic-edit-title"
-                    :id (str "topic-edit-title-" (name topic))
-                    :type "text"
-                    :placeholder "Title"
-                    :on-blur #(om/set-state! owner :show-title-counter false)
-                    :max-length title-length-limit
-                    :value title
-                    :on-change (fn [e]
-                                  (when (not show-title-counter)
-                                    (om/set-state! owner :show-title-counter true))
-                                  (change-value owner :title e))})
-          (dom/div {:class (utils/class-set {:topic-edit-title-count true
-                                             :transparent (not show-title-counter)})}
-            (dom/label {:class "bold"} (- title-length-limit (count title))))
-        (dom/div {:className "topic-edit-headline emoji-autocomplete"
-                  :ref "topic-edit-headline"
-                  :contentEditable true
-                  :id (str "topic-edit-headline-" (name topic))
-                  :placeholder "Headline"
-                  :on-blur #(do (check-headline-count owner headline-length-limit %)
-                                (om/set-state! owner :show-headline-counter false))
-                  :on-key-up   #(check-headline-count owner headline-length-limit %)
-                  :on-key-down #(check-headline-count owner headline-length-limit %)
-                  :on-focus    #(check-headline-count owner headline-length-limit %)
-                  :dangerouslySetInnerHTML (clj->js {"__html" (:headline topic-data)})})
-        (dom/div {:class (utils/class-set {:topic-edit-headline-count true
-                                           :transparent (not show-headline-counter)})}
-          (dom/label {:class "bold"} (- headline-length-limit (count-chars headline))))
-        (dom/div {:class "separator"})
-        (dom/div {:class "topic-overlay-edit-data"}
-          (when (= topic "finances")
-            (om/build finances-edit {:finances-data finances-data
-                                     :change-finances-cb (partial change-finances-data-cb owner)
-                                     :currency currency}
-                                    {:key (:updated-at topic-data)}))
-          (when (= topic "growth")
-            (dom/div {}
-              (om/build growth-edit {:growth-data focus-metric-data
-                                     :metric-slug growth-focus
-                                     :metadata-edit-cb (partial growth-metadata-edit-cb owner)
-                                     :new-metric growth-new-metric
-                                     :metrics growth-metrics
-                                     :metric-count (count focus-metric-data)
-                                     :change-growth-cb (partial growth-change-data-cb owner)
-                                     :delete-metric-cb (partial growth-delete-metric-cb owner data)
-                                     :save-metadata-cb (partial growth-save-metrics-metadata-cb owner data)
-                                     :reset-metrics-cb #(growth-reset-metrics-cb topic owner data)
-                                     :cancel-cb #(growth-cancel-cb owner data)
-                                     :change-growth-metric-cb (partial growth-change-metric-cb owner data)
-                                     :new-growth-section (om/get-state owner :oc-editing)}
-                                    {:key focus-metric-data})
-              (dom/div {:class "pillbox-container growth"}
-                (for [metric-slug growth-metric-slugs]
-                  (let [metric (get growth-metrics metric-slug)
-                        mname (:name metric)
-                        metric-classes (utils/class-set {:pillbox true
-                                                         metric-slug true
-                                                         :active (= growth-focus metric-slug)})]
-                    (dom/label {:class metric-classes
-                                :title (:description metric)
-                                :data-tab metric-slug
-                                :on-click (fn [e]
-                                            (.stopPropagation e)
-                                            (om/set-state! owner :growth-new-metric false)
-                                            (om/set-state! owner :growth-focus metric-slug))} mname)))
-                (dom/label {:class (utils/class-set {:pillbox true
-                                                     growth-utils/new-metric-slug-placeholder true
-                                                     :active (= growth-focus growth-utils/new-metric-slug-placeholder)})
-                            :title "Add a new metric"
-                            :data-tab growth-utils/new-metric-slug-placeholder
-                            :on-click (fn [e]
-                                        (.stopPropagation e)
-                                        (om/set-state! owner :growth-new-metric true)
-                                        (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
+        (dom/div {:class "fullscreen-topic-edit-top-box"}
+          (dom/input {:class "topic-edit-title"
+                      :id (str "topic-edit-title-" (name topic))
+                      :type "text"
+                      :placeholder "Title"
+                      :on-blur #(om/set-state! owner :show-title-counter false)
+                      :max-length title-length-limit
+                      :value title
+                      :on-focus #(om/set-state! owner :show-title-counter true)
+                      :on-change #(change-value owner :title %)})
+            (dom/div {:class (utils/class-set {:topic-edit-title-count true
+                                               :transparent (not show-title-counter)})}
+              (dom/label {:class "bold"} (- title-length-limit (count title))))
+          (dom/div {:className "topic-edit-headline emoji-autocomplete"
+                    :contentEditable true
+                    :id (str "topic-edit-headline-" (name topic))
+                    :placeholder "Headline"
+                    :on-blur #(do (check-headline-count owner headline-length-limit %)
+                                  (om/set-state! owner :show-headline-counter false))
+                    :on-key-up   #(check-headline-count owner headline-length-limit %)
+                    :on-key-down #(check-headline-count owner headline-length-limit %)
+                    :on-focus    #(check-headline-count owner headline-length-limit %)
+                    :dangerouslySetInnerHTML (clj->js {"__html" (:headline topic-data)})})
+          (dom/div {:class (utils/class-set {:topic-edit-headline-count true
+                                             :transparent (not show-headline-counter)})}
+            (dom/label {:class "bold"} (- headline-length-limit (count-chars headline))))
+          (when is-data-topic
+            (dom/div {:class "separator"}))
+          (dom/div {:class "topic-overlay-edit-data"}
+            (when (= topic "finances")
+              (om/build finances-edit {:finances-data finances-data
+                                       :change-finances-cb (partial change-finances-data-cb owner)
+                                       :currency currency}
+                                      {:key (:updated-at topic-data)}))
+            (when (= topic "growth")
+              (dom/div {}
+                (om/build growth-edit {:growth-data focus-metric-data
+                                       :metric-slug growth-focus
+                                       :metadata-edit-cb (partial growth-metadata-edit-cb owner)
+                                       :new-metric growth-new-metric
+                                       :metrics growth-metrics
+                                       :metric-count (count focus-metric-data)
+                                       :change-growth-cb (partial growth-change-data-cb owner)
+                                       :delete-metric-cb (partial growth-delete-metric-cb owner data)
+                                       :save-metadata-cb (partial growth-save-metrics-metadata-cb owner data)
+                                       :reset-metrics-cb #(growth-reset-metrics-cb topic owner data)
+                                       :cancel-cb #(growth-cancel-cb owner data)
+                                       :change-growth-metric-cb (partial growth-change-metric-cb owner data)
+                                       :new-growth-section (om/get-state owner :oc-editing)}
+                                      {:key focus-metric-data})
+                (dom/div {:class "pillbox-container growth"}
+                  (for [metric-slug growth-metric-slugs]
+                    (let [metric (get growth-metrics metric-slug)
+                          mname (:name metric)
+                          metric-classes (utils/class-set {:pillbox true
+                                                           metric-slug true
+                                                           :active (= growth-focus metric-slug)})]
+                      (dom/label {:class metric-classes
+                                  :title (:description metric)
+                                  :data-tab metric-slug
+                                  :on-click (fn [e]
+                                              (.stopPropagation e)
+                                              (om/set-state! owner :growth-new-metric false)
+                                              (om/set-state! owner :growth-focus metric-slug))} mname)))
+                  (dom/label {:class (utils/class-set {:pillbox true
+                                                       growth-utils/new-metric-slug-placeholder true
+                                                       :active (= growth-focus growth-utils/new-metric-slug-placeholder)})
+                              :title "Add a new metric"
+                              :data-tab growth-utils/new-metric-slug-placeholder
+                              :on-click (fn [e]
+                                          (.stopPropagation e)
+                                          (om/set-state! owner :growth-new-metric true)
+                                          (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
+          (dom/div {:class "separator"})
+          (dom/div {:class "topic-edit-snippet emoji-autocomplete"
+                    :id (str "topic-edit-snippet-" (name topic))
+                    :on-blur #(do (check-snippet-count owner %)
+                                  (om/set-state! owner :show-snippet-counter false))
+                    :on-key-up   #(check-snippet-count owner %)
+                    :on-key-down #(check-snippet-count owner %)
+                    :on-focus    #(check-snippet-count owner %)
+                    :dangerouslySetInnerHTML (clj->js {"__html" snippet})})
+          (dom/div {:class (utils/class-set {:topic-edit-snippet-count true
+                                             :transparent (not show-snippet-counter)})}
+            (dom/label {:class "bold"} (- snippet-length-limit (snippet-count-chars)))))
         (dom/div {:class "relative topic-body-line"}
           (dom/div {:className "topic-body emoji-autocomplete"
                     :ref "topic-overlay-edit-body"
