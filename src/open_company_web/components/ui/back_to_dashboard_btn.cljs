@@ -6,15 +6,18 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.urls :as oc-urls]))
 
-(defn btn-clicked [e]
-  (let [company-slug (or (router/current-company-slug) (dis/last-company-slug))
-        redirect-url (if company-slug
-                        (oc-urls/company company-slug)
-                        oc-urls/home)]
-    (router/nav! redirect-url)))
+(defn btn-clicked [owner e]
+  (let [click-cb (om/get-props owner :click-cb)]
+    (if (fn? click-cb)
+      (click-cb)
+      (let [company-slug (or (router/current-company-slug) (dis/last-company-slug))
+            redirect-url (if company-slug
+                            (oc-urls/company company-slug)
+                            oc-urls/home)]
+        (router/nav! redirect-url)))))
 
 (defcomponent back-to-dashboard-btn [data owner]
   (render [_]
     (dom/div {:class "back-to-dashboard-row"}
       (dom/button {:class "back-to-dashboard btn-reset btn-outline"
-                   :on-click (partial btn-clicked)} "← BACK TO DASHBOARD"))))
+                   :on-click (partial btn-clicked owner)} "← BACK TO DASHBOARD"))))
