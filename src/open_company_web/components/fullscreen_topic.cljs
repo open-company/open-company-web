@@ -15,6 +15,7 @@
             [open-company-web.components.fullscreen-topic-edit :refer (fullscreen-topic-edit)]
             [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.ui.small-loading :refer (small-loading)]
+            [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [goog.style :refer (setStyle)]
             [goog.events :as events]
@@ -241,6 +242,7 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (str "fullscreen-topic" (when (:animate data) " initial"))
                     :ref "fullscreen-topic"}
+        (om/build back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options)})
         (when (and can-edit?
                    is-actual?
                    (not editing))
@@ -258,17 +260,13 @@
             (if data-posted
               (om/build small-loading {:animating true})
               "SAVE")))
-        (if editing
+        (when editing
           (dom/button {:class "btn-reset btn-outline close-editing"
                        :key "close"
                        :title "Dismiss edit"
                        :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-cancel-" (name section)))]
                                     (om/set-state! owner :edit-rand (rand 4))
-                                    (put! ch {:click true :event %}))} "CANCEL")
-          (dom/button {:class "close btn-reset btn-outline"
-                       :key "close-editing"
-                       :title "ESC"
-                       :on-click #(hide-fullscreen-topic owner options)} (icon :simple-remove)))
+                                    (put! ch {:click true :event %}))} "CANCEL"))
         (dom/div {:style #js {:display (when-not editing "none")}
                   :key (str as-of edit-rand)}
           (om/build fullscreen-topic-edit {:topic section
