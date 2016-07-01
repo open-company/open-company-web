@@ -23,7 +23,7 @@
             [goog.style :as gstyle]
             [cljsjs.react.dom]))
 
-(defcomponent topic-image-header [{:keys [image-header]} owner options]
+(defcomponent topic-image-header [{:keys [image-header image-size]} owner options]
   (render [_]
     (dom/img {:src image-header
               :class "topic-header-img"})))
@@ -37,17 +37,6 @@
   (let [body-scroll (.-scrollTop (.-body js/document))
         topic-scroll-top (utils/offset-top topic)]
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
-
-(defn setup-card! [owner section]
-  (when-not (utils/is-test-env?)
-    (when-not (om/get-state owner :image-header)
-      (when-let [body (.findDOMNode js/ReactDOM (om/get-ref owner "topic-body"))]
-        (js/$clamp body #js {"clamp" 2 "splitOnChars" #js ["." "," " "]}))
-      (let [section-kw (keyword section)]
-        (when-not (#{:finances :growth} section-kw)
-          (when-let [hidden-body (om/get-ref owner "hidden-topic-body")]
-            (when-let [first-image (sel1 hidden-body [:img])]
-              (om/set-state! owner :image-header (.-src first-image)))))))))
 
 (defn pencil-click [owner options e]
   (utils/event-stop e)
@@ -65,16 +54,7 @@
                                       sharing-mode
                                       show-fast-editing]} owner options]
 
-  (init-state [_]
-    {:image-header nil})
-
-  (did-mount [_]
-    (setup-card! owner section))
-
-  (did-update [_ _ _]
-    (setup-card! owner section))
-
-  (render-state [_ {:keys [image-header]}]
+  (render [_]
     (let [section-kw          (keyword section)
           chart-opts          {:chart-size {:width  260
                                             :height 196}
@@ -90,12 +70,11 @@
                                         (utils/no-finances-data? finances-row-data)))
                                   (and (= section-kw :growth)
                                        (utils/no-growth-data? growth-data)))
-          topic-body          (utils/get-topic-body topic-data section-kw)
-          stripped-topic-body (or (utils/strip-HTML-tags topic-body) "")
-          fixed-topic-body    (.replace stripped-topic-body (js/RegExp. "\\s\\s+" "g") " ")
-          no-data-topic-body  (if (and no-data (clojure.string/blank? fixed-topic-body))
-                                (str "Information on " section " is not yet available.")
-                                fixed-topic-body)]
+          snippet             (:snippet topic-data)
+          image-header        (:image-url topic-data)
+          image-header-size   {:width (:image-width topic-data)
+                               :height (:image-height topic-data)}
+          topic-body          (utils/get-topic-body topic-data section)]
       (dom/div #js {:className "topic-internal group"
                     :ref "topic-internal"}
         (when (or is-growth-finances?
@@ -108,7 +87,7 @@
               (= section "growth")
               (om/build topic-growth {:section-data topic-data :section section :currency currency} {:opts chart-opts})
               :else
-              (om/build topic-image-header {:image-header image-header} {:opts options}))))
+              (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options}))))
         ;; Topic title
         (dom/div {:class "topic-title"} (:title topic-data))
         (when (and show-fast-editing
@@ -125,13 +104,11 @@
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
-        ;; Topic body: first 2 lines
-        (dom/div #js {:className "hidden-topic-body"
-                      :ref "hidden-topic-body"
-                      :dangerouslySetInnerHTML #js {"__html" topic-body}})
-        (dom/div #js {:className "topic-body"
-                      :ref "topic-body"
-                      :dangerouslySetInnerHTML (utils/emojify no-data-topic-body)})))))
+        (dom/div #js {:className "topic-body topic-snippet"
+                      :ref "topic-snippet"
+                      :dangerouslySetInnerHTML (utils/emojify snippet)})
+        (when-not (clojure.string/blank? topic-body)
+          (dom/div #js {:className "topic-read-more"} "READ MORE"))))))
 
 (defn topic-click [options selected-metric]
   ((:topic-click options) selected-metric))
