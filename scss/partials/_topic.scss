@@ -200,6 +200,8 @@ div.topic {
           a {
             text-decoration: none;
             pointer-events: none;
+            box-shadow: inset 0 -1px 0 $oc_gray_5;
+            font-weight: normal;
           }
 
           img{
