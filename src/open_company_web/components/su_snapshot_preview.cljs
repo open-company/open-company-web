@@ -268,6 +268,7 @@
                                         :content-loaded (not (:loading data))
                                         :topics (:sections su-data)
                                         :company-data company-data
+                                        :topics-data company-data
                                         :hide-add-topic true}
                                        {:opts {:topic-click (partial topic-click owner)}})))
           ;;Footer

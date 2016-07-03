@@ -11,6 +11,7 @@
             [open-company-web.router :as router]
             [open-company-web.api :as api]
             [open-company-web.caches :as caches]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.finances.utils :as finances-utils]
@@ -423,7 +424,7 @@
       (when-not (om/get-state owner :body-click)
         (om/set-state! owner :body-click (setup-body-listener owner)))
       (let [win-location (.-location js/window)
-            current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
+            current-token (oc-urls/company-section-edit (router/current-company-slug) (name topic))
             listener (events/listen @router/history HistoryEventType/NAVIGATE
                        #(when-not (= (.-token %) current-token)
                           (if (om/get-state owner :has-changes)

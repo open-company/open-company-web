@@ -17,7 +17,7 @@
 (def ^:private auth-endpoint ls/auth-server-domain)
 
 (defn- content-type [type]
-  (str "application/vnd.open-company." type ".v1+json"))
+  (str "application/vnd.open-company." type ".v1+json;charset=UTF-8"))
 
 (defn- json->cljs [json]
   (let [reader (t/reader :json)]
@@ -162,7 +162,8 @@
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})
                 dispatch-body {:body body
-                               :section section
+                               :as-of (:updated-at revision)
+                               :section (keyword section)
                                :slug (keyword slug)}]
             (dispatcher/dispatch! [:revision dispatch-body]))))))
 

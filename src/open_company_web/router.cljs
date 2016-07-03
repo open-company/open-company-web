@@ -6,8 +6,6 @@
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]))
 
-(enable-console-print!)
-
 (def path (atom {}))
 
 (defn set-route! [route parts]
@@ -81,3 +79,12 @@
 
 (defn current-stakeholder-update-slug []
   (:update-slug @path))
+
+(defn current-section []
+  (:section @path))
+
+(defn section-editing? []
+  (some #(= "edit" %) (:route @path)))
+
+(defn current-as-of []
+  (:as-of (:query-params @path)))
