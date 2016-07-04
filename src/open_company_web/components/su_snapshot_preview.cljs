@@ -197,6 +197,7 @@
                                         :topics su-topics
                                         :company-data company-data
                                         :show-share-remove true
+                                        :topics-data company-data
                                         :hide-add-topic true}
                                        {:opts {:share-remove-click (fn [topic]
                                                                       (let [fade-anim (Fade. (sel1 [(str "div#topic-" topic)]) 1 0 utils/oc-animation-duration)]

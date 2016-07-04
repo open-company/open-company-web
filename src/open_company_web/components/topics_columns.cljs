@@ -77,10 +77,10 @@
 
 (defn calc-column-height [owner data topics]
   (let [card-width (om/get-props owner :card-width)
-        company-data (:company-data data)]
+        topics-data (:topics-data data)]
     (for [topic topics
           :let [topic-kw (keyword topic)
-                topic-data (get company-data topic-kw)
+                topic-data (get topics-data topic-kw)
                 is-data-topic (#{:finances :growth} topic-kw)]]
       (cond
         (= topic "add-topic")
@@ -146,6 +146,7 @@
           sharing-mode          (:sharing-mode props)
           share-selected-topics (:share-selected-topics props)
           company-data          (:company-data props)
+          topics-data           (:topics-data props)
           topics                (:topics props)
           topic-click           (or (:topic-click options) identity)
           update-active-topics  (or (:update-active-topics options) identity)
@@ -167,7 +168,7 @@
                          {:opts {:section-name section-name
                                  :topic-click (partial topic-click section-name)
                                  :update-active-topics update-active-topics}})
-        (let [sd (->> section-name keyword (get company-data))]
+        (let [sd (->> section-name keyword (get topics-data))]
           (when-not (and (:read-only company-data) (:placeholder sd))
             (dom/div #js {:className "topic-row"
                           :data-topic (name section-name)
@@ -193,7 +194,8 @@
                                       total-width
                                       card-width
                                       topics
-                                      company-data] :as data} owner options]
+                                      company-data
+                                      topics-data] :as data} owner options]
 
   (did-mount [_]
     (when (> columns-num 1)

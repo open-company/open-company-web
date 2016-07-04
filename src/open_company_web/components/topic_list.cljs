@@ -74,17 +74,18 @@
         categories (:categories company-data)
         active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))
         show-add-topic-tooltip (should-show-add-topic-tooltip company-data active-topics)]
+        selected-topic (if (nil? current-state) (router/current-section) (:selected-topic current-state))]
     {:initial-active-topics active-topics
      :active-topics active-topics
      :card-width (:card-width data)
      :new-sections-requested (or (:new-sections-requested current-state) false)
-     :selected-topic (or (:selected-topic current-state) (:selected-topic data))
+     :selected-topic selected-topic
      :tr-selected-topic nil
      :topic-navigation (or (:topic-navigation current-state) true)
      :share-selected-topics (:sections (:stakeholder-update company-data))
      :transitioning false
      :redirect-to-preview (or (:redirect-to-preview current-state) false)
-     :fullscreen-force-edit false
+     :fullscreen-force-edit (if (nil? current-state) (router/section-editing?) (:fullscreen-force-edit current-state))
      :add-topic-tooltip-dismissed (or (:add-topic-tooltip-dismissed current-state) false)
      :show-add-topic-tooltip show-add-topic-tooltip
      :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
@@ -93,6 +94,9 @@
      :share-su-tooltip-dismissed (or (:share-su-tooltip-dismissed current-state) false)}))
 
 (defn topic-click [owner topic selected-metric & [force-edit]]
+  (if force-edit
+        (.pushState js/history nil (str "Edit " (name topic)) (oc-urls/company-section-edit (router/current-company-slug) (name topic)))
+        (.pushState js/history nil (name topic) (oc-urls/company-section (router/current-company-slug) (name topic))))
   (when force-edit
     (om/set-state! owner :fullscreen-force-edit true))
   (om/set-state! owner :selected-topic topic)
@@ -102,9 +106,11 @@
 (def scrolled-to-top (atom false))
 
 (defn close-overlay-cb [owner]
+  (.pushState js/history nil "Dashboard" (oc-urls/company (router/current-company-slug)))
   (om/set-state! owner :transitioning false)
   (om/set-state! owner :selected-topic nil)
-  (om/set-state! owner :selected-metric nil))
+  (om/set-state! owner :selected-metric nil)
+  (om/set-state! owner :fullscreen-force-edit false))
 
 (defn switch-topic [owner is-left?]
   (when (and (om/get-state owner :topic-navigation)
@@ -135,6 +141,7 @@
 
 (defn animation-finished [owner]
   (let [cur-state (om/get-state owner)]
+    (.pushState js/history nil (name (:tr-selected-topic cur-state)) (oc-urls/company-section (router/current-company-slug) (:tr-selected-topic cur-state)))
     (om/set-state! owner (merge cur-state {:selected-topic (:tr-selected-topic cur-state)
                                            :transitioning true
                                            :tr-selected-topic nil}))))
@@ -265,7 +272,9 @@
                             :style #js {:opacity 1 :backgroundColor "rgba(255, 255, 255, 0.98)"}}
                 (om/build fullscreen-topic {:section selected-topic
                                             :section-data (->> selected-topic keyword (get company-data))
+                                            :change-url true
                                             :fullscreen-force-edit fullscreen-force-edit
+                                            :revision-updates (dispatcher/section-revisions (router/current-company-slug) (router/current-section))
                                             :selected-metric selected-metric
                                             :read-only (:read-only company-data)
                                             :card-width card-width
@@ -302,6 +311,7 @@
                                   :content-loaded (not (:loading data))
                                   :topics category-topics
                                   :company-data company-data
+                                  :topics-data company-data
                                   :share-selected-topics share-selected-topics}
                                  {:opts {:topic-click (partial topic-click owner)
                                          :update-active-topics (partial update-active-topics owner)}})
