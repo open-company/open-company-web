@@ -3,6 +3,7 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.jwt :as jwt]
+            [open-company-web.lib.oc-colors :as occ]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.ui.small-loading :refer (small-loading)]
             [open-company-web.dispatcher :as dis]
@@ -33,7 +34,8 @@
       (utils/after 1 #(dis/dispatch! [:input [:company-editor :name] (jwt/get-key :org-name)]))))
 
   (render-state [_ {:keys [loading]}]
-    (dom/div {:class "company-editor"}
+    (dom/div {:class "company-editor"
+              :style #js {:border-top (str "4px solid " (occ/get-color-by-kw :yellow))}}
       (dom/div {:class "col-12 p3"}
         (dom/button {:on-click #(dis/dispatch! [:logout])
                      :class "btn-reset btn-outline"}
