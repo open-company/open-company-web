@@ -1,34 +1,42 @@
 div.login-required {
   background-color: white;
   background-color: #fff;
-  margin-top: 150px;
 
-  p.login-rquired-cta {
-    font-size: 26px;
-    line-height: 1.4;
-    color: $oc_gray_5;
-  }
+  div.welcome {
+    margin-top: 150px;
 
-  a.login-button {
-    margin-top: 30px;
-    display: block;
-  }
-
-  div.logo-container {
-    margin-top: 185px;
-
-    img.logo-gold {
-      width: 130px;
-      height: 180px;
+    p.login-rquired-cta {
+      font-size: 26px;
+      line-height: 1.4;
+      color: $oc_gray_5;
     }
 
-    div.logo-cta {
-      font-size: 18px;
-      line-height: 1.8;
-      text-align: center;
-      color: $oc_gray_5;
-      max-width: 400px;
-      margin: 52px auto;
+    h4.login-error-message {
+      color: $oc_red;
+      font-size: 14px;
+    }
+
+    a.login-button {
+      margin-top: 30px;
+      display: block;
+    }
+
+    div.logo-container {
+      margin-top: 185px;
+
+      img.logo-gold {
+        width: 130px;
+        height: 180px;
+      }
+
+      div.logo-cta {
+        font-size: 18px;
+        line-height: 1.8;
+        text-align: center;
+        color: $oc_gray_5;
+        max-width: 400px;
+        margin: 52px auto;
+      }
     }
   }
 }

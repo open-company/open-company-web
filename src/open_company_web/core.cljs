@@ -24,7 +24,7 @@
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
-            [open-company-web.components.login :refer (login)]
+            [open-company-web.components.ui.login-required :refer (login-required)]
             [open-company-web.components.ui.loading :refer (loading)]))
 
 (enable-console-print!)
@@ -98,7 +98,7 @@
         ;login went bad, add the error message to the app-state
         (swap! dis/app-state assoc :access (:access (:query-params params))))
       ;; render component
-      (om/root login dis/app-state {:target target}))))
+      (om/root login-required dis/app-state {:target target}))))
 
 ;; Component specific to a company
 (defn company-handler [route target component params]

@@ -11,19 +11,25 @@
     (dom/div {:class "login-required"}
       (when-not welcome
         (om/build back-to-dashboard-btn {:button-cta "OPENCOMPANY.COM"}))
-      (dom/div {:class "center mx-auto max-width-3"}
-        (dom/div (dom/p {:class "login-rquired-cta"}
-          (cond 
-            (jwt/jwt)
-              "Sorry, you don't have access to this company dashboard. Please sign in with a different Slack account."
-            welcome
-              "OpenCompany, See the Big Picture"
-            :else
-              "Please sign in to access this company dashboard."))
-            (dom/a {:href "#"
-                    :class "login-button"
-                    :on-click #(login/login! (:extended-scopes-url (:auth-settings data)) %)}
-              (dom/img {:src "https://api.slack.com/img/sign_in_with_slack.png"})))
-          (dom/div {:class "logo-container"}
-            (dom/img {:class "logo-gold" :src "/img/oc-logo-gold.svg"})
-            (dom/div {:class "logo-cta"} "OpenCompany makes it easy to see the big picture. Companies are strongest when everyone knows what matters most."))))))
+      (dom/div {:class "center mx-auto max-width-3 welcome"}
+        (dom/div
+          (dom/p {:class "login-rquired-cta"}
+            (cond
+              (jwt/jwt)
+                "Sorry, you don't have access to this company dashboard. Please sign in with a different Slack account."
+              welcome
+                "OpenCompany, See the Big Picture"
+              :else
+                "Please sign in to access this company dashboard."))
+          (if-let [access (:access data)]
+            (let [msg (if (= access "denied")
+              "OpenCompany requires verification with your Slack team. Please allow access."
+              "There is a temporary error validating with Slack. Please try again later.")]
+              (dom/h4 {:class "login-error-message"} msg)))
+          (dom/a {:href "#"
+                  :class "login-button"
+                  :on-click #(login/login! (:extended-scopes-url (:auth-settings data)) %)}
+            (dom/img {:src "https://api.slack.com/img/sign_in_with_slack.png"})))
+        (dom/div {:class "logo-container"}
+          (dom/img {:class "logo-gold" :src "/img/oc-logo-gold.svg"})
+          (dom/div {:class "logo-cta"} "OpenCompany makes it easy to see the big picture. Companies are strongest when everyone knows what matters most."))))))
