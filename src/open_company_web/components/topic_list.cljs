@@ -73,7 +73,7 @@
   (let [company-data (:company-data data)
         categories (:categories company-data)
         active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))
-        show-add-topic-tooltip (should-show-add-topic-tooltip company-data active-topics)]
+        show-add-topic-tooltip (should-show-add-topic-tooltip company-data active-topics)
         selected-topic (if (nil? current-state) (router/current-section) (:selected-topic current-state))]
     {:initial-active-topics active-topics
      :active-topics active-topics
