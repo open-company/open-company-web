@@ -82,6 +82,8 @@
     font-size: 12px;
     color: rgba(78, 90, 107, 0.5);
     cursor: pointer;
+    text-transform: uppercase;
+    font-family: $oc_headers_font;
 
     &.active {
       background-color: #ffffff;
