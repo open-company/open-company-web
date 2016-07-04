@@ -1,10 +1,10 @@
-(ns test.open-company-web.components.company-profile
+(ns test.open-company-web.components.company-settings
   (:require [cljs.test :refer-macros (deftest async testing is are use-fixtures)]
             [cljs-react-test.simulate :as sim]
             [cljs-react-test.utils :as tu]
             [om.core :as om :include-macros true]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
-            [open-company-web.components.company-profile :refer (company-profile)]
+            [open-company-web.components.company-settings :refer (company-settings)]
             [om.dom :as dom :include-macros true]
             [open-company-web.data.company :refer (company)]
             [open-company-web.router :as router]))
@@ -21,13 +21,13 @@
   :buffer company
 })
 
-(deftest test-profile-component
-  (testing "Profile component"
+(deftest test-company-settings-component
+  (testing "Company Settings component"
     (router/set-route! ["companies" "buffer" "finances" "cash"]
                        {:slug "buffer" :section "finances" :tab "cash"})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
-          _ (om/root company-profile app-state {:target c})
-          profile-node (sel1 c [:div.profile-container])]
-      (is (not (nil? profile-node)))
+          _ (om/root company-settings app-state {:target c})
+          settings-node (sel1 c [:div.settings-container])]
+      (is (not (nil? settings-node)))
       (tu/unmount! c))))

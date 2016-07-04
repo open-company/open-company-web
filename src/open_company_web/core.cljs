@@ -15,7 +15,7 @@
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.company-editor :refer (company-editor)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
-            [open-company-web.components.company-profile :refer (company-profile)]
+            [open-company-web.components.company-settings :refer (company-settings)]
             [open-company-web.components.su-edit :refer (su-edit)]
             [open-company-web.components.su-list :refer (su-list)]
             [open-company-web.components.su-snapshot-preview :refer (su-snapshot-preview)]
@@ -103,11 +103,20 @@
 ;; Component specific to a company
 (defn company-handler [route target component params]
   (let [slug (:slug (:params params))
+        section (:section (:params params))
+        edit?   (= route "section-edit")
         query-params (:query-params params)]
     (pre-routing query-params)
     (utils/clean-company-caches)
     ;; save the route
-    (router/set-route! [slug route] {:slug slug :query-params query-params})
+    (router/set-route! [slug section route (when edit? "edit")] {:slug slug :section section :edit edit? :query-params query-params})
+    ;; load revision if needed
+    (when (:as-of query-params)
+      (api/load-revision {:updated-at (:as-of query-params)
+                          :href (str "/companies" (urls/company-section-revision (:as-of query-params)))
+                          :type (api/content-type "section")}
+                         slug
+                         section))
     ;; do we have the company data already?
     (when-not (dis/company-data)
       ;; load the company data from the API
@@ -120,16 +129,16 @@
 (defn stakeholder-update-handler [target component params]
   (let [slug (:slug (:params params))
         update-slug (:update-slug (:params params))
+        update-section (:section (:params params))
         query-params (:query-params params)
         su-key (dis/stakeholder-update-key slug update-slug)]
     (pre-routing query-params)
     (utils/clean-company-caches)
     ;; save the route
-    (router/set-route! [slug "updates" update-slug] {:slug slug :update-slug update-slug :query-params query-params})
+    (router/set-route! [slug "updates" update-slug update-section] {:slug slug :update-slug update-slug :query-params query-params :section update-section})
     ;; do we have the company data already?
     (when (not (get-in @dis/app-state su-key))
-      ;; load the company data from the API
-      (api/get-company slug)
+      ;; load the Stakeholder Update data from the API
       (api/get-stakeholder-update slug update-slug)
       (let [su-loading-key (conj su-key :loading)]
         (swap! dis/app-state assoc-in su-loading-key true)))
@@ -164,14 +173,22 @@
       (pre-routing (:query-params params))
       (om/root user-profile dis/app-state {:target target}))
 
+    (defroute company-settings-route (urls/company-settings ":slug") {:as params}
+      (company-handler "profile" target company-settings params))
+
+    (defroute company-section-route (urls/company-section ":slug" ":section") {:as params}
+      (company-handler "section" target company-dashboard params))
+
+    (defroute company-section-edit-route (urls/company-section-edit ":slug" ":section") {:as params}
+      (if (jwt/jwt)
+        (company-handler "section-edit" target company-dashboard params)
+        (router/redirect! (urls/company-section (:slug (:params params)) (:section (:params params))))))
+
     (defroute company-route (urls/company ":slug") {:as params}
       (company-handler "dashboard" target company-dashboard params))
 
     (defroute company-route-slash (str (urls/company ":slug") "/") {:as params}
       (company-handler "dashboard" target company-dashboard params))
-
-    (defroute company-profile-route (urls/company-profile ":slug") {:as params}
-      (company-handler "profile" target company-profile params))
 
     (defroute su-snapshot-preview-route (urls/stakeholder-update-preview ":slug") {:as params}
       (company-handler "su-snapshot-preview" target su-snapshot-preview params))
@@ -185,6 +202,9 @@
     (defroute stakeholder-update-route (urls/stakeholder-update ":slug" ":update-slug") {:as params}
       (stakeholder-update-handler target su-snapshot params))
 
+    (defroute stakeholder-update-section-route (urls/stakeholder-update-section ":slug" ":update-slug" ":section") {:as params}
+      (stakeholder-update-handler target su-snapshot params))
+
     (defroute not-found-route "*" []
       ;; render component
       (router/redirect-404!))
@@ -196,13 +216,16 @@
                                  list-page-route
                                  company-create-route
                                  user-profile-route
+                                 company-settings-route
                                  company-route
                                  company-route-slash
-                                 company-profile-route
+                                 company-section-route
+                                 company-section-edit-route
                                  su-snapshot-preview-route
                                  su-edit-route
                                  su-list-route
                                  stakeholder-update-route
+                                 stakeholder-update-section-route
                                  not-found-route]))
 
     (defn login-wall []

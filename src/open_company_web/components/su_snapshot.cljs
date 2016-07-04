@@ -1,12 +1,11 @@
 (ns open-company-web.components.su-snapshot
-  (:require-macros [cljs.core.async.macros :refer (go)])
-  (:require [cljs.core.async :refer (chan <!)]
-            [om.core :as om :include-macros true]
+  (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.menu :refer (menu)]
@@ -24,11 +23,13 @@
 (defn close-overlay-cb [owner]
   (om/set-state! owner :transitioning false)
   (om/set-state! owner :selected-topic nil)
-  (om/set-state! owner :selected-metric nil))
+  (om/set-state! owner :selected-metric nil)
+  (.pushState js/history nil "Stakeholder update" (oc-urls/stakeholder-update (router/current-company-slug) (router/current-stakeholder-update-slug))))
 
 (defn topic-click [owner topic selected-metric]
   (om/set-state! owner :selected-topic topic)
-  (om/set-state! owner :selected-metric selected-metric))
+  (om/set-state! owner :selected-metric selected-metric)
+  (.pushState js/history nil (name topic) (oc-urls/stakeholder-update-section  (router/current-company-slug) (router/current-stakeholder-update-slug) topic)))
 
 (defn switch-topic [owner is-left?]
   (when (and (om/get-state owner :topic-navigation)
@@ -57,7 +58,9 @@
       (switch-topic owner true))))
 
 (defn animation-finished [owner]
-  (let [cur-state (om/get-state owner)]
+  (let [cur-state (om/get-state owner)
+        new-topic (:tr-selected-topic cur-state)]
+    (.pushState js/history nil (name new-topic) (oc-urls/stakeholder-update-section (router/current-company-slug) (router/current-stakeholder-update-slug) new-topic))
     (om/set-state! owner (merge cur-state {:selected-topic (:tr-selected-topic cur-state)
                                            :transitioning true
                                            :tr-selected-topic nil}))))
@@ -75,9 +78,7 @@
 (defcomponent su-snapshot [data owner options]
 
   (init-state [_]
-    (utils/add-channel "fullscreen-topic-save" (chan))
-    (utils/add-channel "fullscreen-topic-cancel" (chan))
-    {:selected-topic nil
+    {:selected-topic (router/current-section)
      :selected-metric nil
      :topic-navigation true
      :transitioning false
@@ -95,8 +96,6 @@
         (.on swipe-listener "swiperight" (fn [e] (switch-topic owner false))))))
 
   (will-unmount [_]
-    (utils/remove-channel "fullscreen-topic-save")
-    (utils/remove-channel "fullscreen-topic-cancel")
     (when (and (not (utils/is-test-env?))
                (responsive/user-agent-mobile?))
       (events/unlistenByKey (om/get-state owner :kb-listener))
@@ -118,9 +117,7 @@
                          2 (str (+ (* card-width 2) 20 60) "px")
                          1 (if (> ww 413) (str card-width "px") "auto"))
           su-subtitle  (str "- " (utils/date-string (js/Date.) true))]
-      (dom/div {:class (utils/class-set {:su-snapshot true
-                                         :main-scroll true
-                                         :navbar-offset (not (responsive/is-mobile))})}
+      (dom/div {:class "su-snapshot main-scroll"}
         (om/build menu data)
         (dom/div {:class "page"}
           ;; Navbar
@@ -143,7 +140,8 @@
                                 :ref "selected-topic"
                                 :style #js {:opacity 1 :backgroundColor "rgba(255, 255, 255, 0.98)"}}
                     (om/build fullscreen-topic {:section selected-topic
-                                                :section-data (->> selected-topic keyword (get company-data))
+                                                :section-data (->> selected-topic keyword (get su-data))
+                                                :change-url false
                                                 :selected-metric selected-metric
                                                 :read-only true
                                                 :card-width card-width
@@ -159,7 +157,7 @@
                                   :ref "tr-selected-topic"
                                   :style #js {:opacity (if tr-selected-topic 0 1)}}
                     (om/build fullscreen-topic {:section tr-selected-topic
-                                                :section-data (->> tr-selected-topic keyword (get company-data))
+                                                :section-data (->> tr-selected-topic keyword (get su-data))
                                                 :selected-metric selected-metric
                                                 :read-only (:read-only company-data)
                                                 :card-width card-width
@@ -176,6 +174,7 @@
                                         :total-width total-width
                                         :content-loaded (not (:loading data))
                                         :topics (:sections su-data)
+                                        :topics-data su-data
                                         :company-data company-data
                                         :hide-add-topic true}
                                        {:opts {:topic-click (partial topic-click owner)}})))

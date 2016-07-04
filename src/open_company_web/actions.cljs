@@ -71,12 +71,14 @@
         (dissoc :loading))))
 
 (defmethod dispatcher/action :revision [db [_ body]]
-  (when body
+  (if body
     (let [fixed-section (utils/fix-section (:body body) (:section body) true)
-          assoc-in-coll [(:slug body) (:section body) (:updated-at fixed-section)]]
+          assoc-in-coll [(:slug body) (:section body) (:as-of body)]
+          assoc-in-coll-2 (dispatcher/revision-key (:slug body) (:section body) (:as-of body))
+          next-db (assoc-in db assoc-in-coll-2 true)]
       (swap! cache/revisions assoc-in assoc-in-coll fixed-section)
-      (dissoc db :loading))) ; remove loading key
-  db)
+      (dissoc next-db :loading))
+    db))
 
 (defmethod dispatcher/action :section [db [_ body]]
   (if body
@@ -126,6 +128,9 @@
       (dissoc :loading))))
 
 (defmethod dispatcher/action :stakeholder-update [db [_ {:keys [slug update-slug response]}]]
-  (-> db
-    (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
-    (dissoc :loading)))
+  (let [company-data-keys [:logo :logo-width :logo-height :name :slug :currency]
+        company-data      (select-keys response company-data-keys)]
+    (-> db
+      (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
+      (assoc-in (dispatcher/company-data-key slug) (utils/fix-sections company-data))
+      (dissoc :loading))))

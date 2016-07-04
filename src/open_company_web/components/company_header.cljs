@@ -7,7 +7,6 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.components.ui.link :refer (link)]
             [open-company-web.components.ui.company-avatar :refer (company-avatar)]
-            [open-company-web.components.category-nav :refer (category-nav)]
             [open-company-web.router :as router]
             [open-company-web.lib.cookies :as cook]
             [open-company-web.local-settings :as ls]
@@ -169,8 +168,4 @@
               (dom/div {:class "company-description"} (:description company-data))
               ;; View navigation
               (let [link-name (if stakeholder-update "Dashboard" "Stakeholder Updates")]
-                (om/build link {:class "nav-link" :href link-url :name link-name}))))))
-
-      (when-not (:editing-topic data)
-        ;; Category navigation
-        (om/build category-nav data)))))
+                (om/build link {:class "nav-link" :href link-url :name link-name})))))))))

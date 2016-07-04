@@ -1,4 +1,4 @@
-(ns open-company-web.components.company-profile
+(ns open-company-web.components.company-settings
   (:require-macros [cljs.core.async.macros :refer (go)])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
@@ -75,7 +75,7 @@
      :currency (or (:currency current-state) (:currency company-data))
      :loading false}))
 
-(defcomponent company-profile-form [data owner]
+(defcomponent company-settings-form [data owner]
 
   (init-state [_]
     (get-state data nil))
@@ -87,7 +87,7 @@
     (let [slug (keyword (router/current-company-slug))]
 
       (utils/update-page-title (str "OpenCompany - " company-name))
-      (dom/div {:class "profile-container group"}
+      (dom/div {:class "settings-container group"}
         (dom/div {:class "company-settings"}
           (dom/span {} "Company Settings")
           (when-not company-name
@@ -132,7 +132,7 @@
                           (om/build small-loading {:animating loading})
                           "SAVE")))))))
 
-(defcomponent company-profile [data owner]
+(defcomponent company-settings [data owner]
 
   (render [_]
     (let [company-data (dis/company-data data)]
@@ -140,7 +140,7 @@
       (when (:read-only company-data)
         (router/redirect! (oc-urls/company)))
 
-      (dom/div {:class "company-profile fullscreen-page"}
+      (dom/div {:class "main-company-settings fullscreen-page"}
 
         (om/build back-to-dashboard-btn {})
 
@@ -150,7 +150,7 @@
           (dom/div (dom/h4 "Loading data..."))
 
           ;; Company profile
-          (dom/div {:class "company-profile-container"}
-            (om/build company-profile-form data)))
+          (dom/div {:class "company-settings-container"}
+            (om/build company-settings-form data)))
 
         (om/build footer data)))))
