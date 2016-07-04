@@ -90,7 +90,7 @@
                                            :slack-sent (and share-via-slack slack-sent)})}
           (when share-via-link
             (dom/div {:class "su-preview-box"}
-              (dom/label {:class "share-link-cta"} "Share this Private URL")
+              (dom/label {:class "share-label link-share-label"} "Share this Private URL")
               (dom/div {:class "share-link-box group"}
                 (dom/input #js {:type "text"
                                 :className "share-link-input"
@@ -105,10 +105,10 @@
               (dom/a {:class "share-link-new-win" :href share-link :target "_blank"} "PREVIEW IN NEW WINDOW")))
           (when (and share-via-slack (not slack-sent))
             (dom/div {:class "su-preview-box"}
-              (dom/label {:class "slack-share-cta"} "SHARE THIS SNAPSHOT WITH THE MEMBERS OF YOUR SLACK TEAM")
+              (dom/label {:class "share-label slack-share-label"} "Share with Your Slack Team")
               (dom/textarea #js {:className "slack-share-textarea"
                                  :ref "slack-share-textarea"
-                                 :placeholder "Add a note"})))
+                                 :placeholder "Add an optional note"})))
           (when (and share-via-slack (not slack-sent))
             (dom/button {:class "slack-send-button"
                          :on-click #(slack-send-clicked owner options)}
@@ -123,7 +123,7 @@
                 "SEND")))
           (when (and share-via-slack slack-sent)
             (dom/div {}
-              (dom/label {:class "slack-sent-title"} "Messages sent!")
+              (dom/label {:class "share-label"} "Messages Sent!")
               (dom/label {:class "slack-sent-description"} "Your Slack team will receive a notice about the new snapshot.")
               (dom/div {:class "center"}
                 (dom/button {:class "btn-reset btn-solid back-to-dashboard"

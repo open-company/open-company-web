@@ -7,6 +7,14 @@ div.su-preview-dialog {
   background-color: rgba(78, 90, 107, 0.5);
   z-index: 1038;
 
+  label.share-label {
+    font-family: $oc_headers_font;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 1.2;
+    color: $oc_gray_5;
+  }
+
   div.su-close-window {
     width: 30px;
     height: 30px;
@@ -84,15 +92,6 @@ div.su-preview-dialog {
     div.su-preview-box {
       margin-top: 5px;
 
-      label.share-link-cta {
-        font-weight: 700;
-        font-size: 12px;
-        line-height: 1.5;
-        letter-spacing: 1px;
-        color: $oc_gray_5;
-        cursor: pointer;
-      }
-
       div.share-link-box {
         width: 100%;
         margin-top: 35px;
@@ -150,14 +149,7 @@ div.su-preview-dialog {
       }
 
 
-      label.slack-share-cta {
-        font-weight: 700;
-        font-size: 16px;
-        line-height: 1.5;
-        letter-spacing: 1px;
-        color: $oc_gray_5;
-        cursor: pointer;
-        opacity: 0.5;
+      label.slack-share-label {
         margin-bottom: 25px;
       }
 
@@ -166,20 +158,12 @@ div.su-preview-dialog {
         height: 100px;
         border: 1px solid rgba(78, 90, 107, 0.1);
         font-family: $oc_headers_font;
-        font-size: 14px;
+        font-size: 18px;
         line-height: 1.2;
         color: $oc_gray_5;
         outline: none;
         border-radius: 2px;
       }
-    }
-
-    label.slack-sent-title {
-      font-family: $oc_headers_font;
-      font-size: 20px;
-      line-height: 1.2;
-      color: $oc_gray_5;
-      font-weight: 400;
     }
 
     label.slack-sent-description {
