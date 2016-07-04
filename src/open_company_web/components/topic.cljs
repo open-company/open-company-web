@@ -193,8 +193,7 @@
                              sharing-mode
                              share-selected
                              archived-topics
-                             show-share-remove
-                             card-width] :as data} owner options]
+                             show-share-remove] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
@@ -245,8 +244,7 @@
         (when (and show-share-remove
                    (not add-topic?))
           (dom/div {:class "share-remove-container"
-                    :id (str "share-remove-" (name section))
-                    :style #js {:left (str (+ card-width 10) "px")}}
+                    :id (str "share-remove-" (name section))}
             (dom/button {:class "btn-reset share-remove"
                          :on-click #(when (contains? options :share-remove-click) ((:share-remove-click options) (name section)))}
               (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.5)" :size 12 :stroke 4 :accent-color "rgba(78, 90, 107, 0.5)"}))))
