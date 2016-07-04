@@ -1,15 +1,13 @@
 div.login-required {
   background-color: white;
-  min-height: 100vh;
-  border-top: 4px solid $oc_yellow;
   background-color: #fff;
+  margin-top: 150px;
 
   p.login-rquired-cta {
     font-family: $oc_headers_font;
     font-size: 26px;
     line-height: 1.4;
     color: $oc_gray_5;
-    margin-top: 150px;
   }
 
   a.login-button {
