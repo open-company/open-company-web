@@ -13,6 +13,7 @@ div.list-companies {
 
   div.navbar-offset {
     padding-top: 50px;
+    min-height: calc(100vh - #{$footer_height}px + 5px);
 
     ul.companies {
       list-style-type: none;
@@ -37,7 +38,6 @@ div.list-companies {
             height: 20px;
             float: left;
             margin-left: 10px;
-            // margin-top: 15px;
           }
 
           span {
