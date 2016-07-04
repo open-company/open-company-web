@@ -8,7 +8,6 @@ div.su-preview-dialog {
   z-index: 1038;
 
   label.share-label {
-    font-family: $oc_headers_font;
     font-weight: 400;
     font-size: 20px;
     line-height: 1.2;
@@ -31,7 +30,7 @@ div.su-preview-dialog {
 
     &.slack-patched-window {
       margin-top: -142px;
-      margin-left: 190px;
+      margin-left: 200px;
     }
 
     &.slack-sent {
@@ -157,7 +156,6 @@ div.su-preview-dialog {
         width: 100%;
         height: 100px;
         border: 1px solid rgba(78, 90, 107, 0.1);
-        font-family: $oc_headers_font;
         font-size: 18px;
         line-height: 1.2;
         color: $oc_gray_5;
@@ -168,7 +166,6 @@ div.su-preview-dialog {
 
     label.slack-sent-description {
       margin-top: 11px;
-      font-family: $oc_headers_font;
       font-weight: 400;
       font-size: 12px;
       line-height: 1.3;

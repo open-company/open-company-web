@@ -118,7 +118,6 @@
   &, & *{
     margin: 0;
     padding: 0;
-    font-family: $oc_headers_font;
     font-size: 18px;
     line-height: 1.8;
     color: $oc_gray_5;
@@ -145,7 +144,7 @@
   }
 
   h1, h2, h3, h4, h5 {
-    font-weight: 800;
+    font-weight: 700;
     text-size: 19px;
   }
 

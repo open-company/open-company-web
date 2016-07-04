@@ -107,7 +107,6 @@ div.add-topic-popover {
       }
 
       div.potential-topic {
-        font-family: $oc_headers_font;
         font-size: 14px;
         line-height: 1.7;
         color: $oc_gray_5;
@@ -145,7 +144,6 @@ div.add-topic-popover {
     background-color: white;
 
     label {
-      font-family: $oc_headers_font;
       font-size: 14px;
       line-height: 1.7;
       color: $oc_gray_5;
@@ -154,7 +152,6 @@ div.add-topic-popover {
     }
 
     input {
-      font-family: $oc_headers_font;
       font-size: 14px;
       line-height: 1.7;
       outline: none;

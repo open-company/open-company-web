@@ -14,22 +14,22 @@ body.animating div.page {
 }
 
 body.animating.left div.page {
-  transform: translate3d( -190px, 0, 0 );
-  -webkit-transform: translate3d( -190px, 0, 0 );
+  transform: translate3d( -200px, 0, 0 );
+  -webkit-transform: translate3d( -200px, 0, 0 );
 }
 
 body.animating.right div.page {
-  transform: translate3d( 190px, 0, 0 );
-  -webkit-transform: translate3d( 190px, 0, 0 );
+  transform: translate3d( 200px, 0, 0 );
+  -webkit-transform: translate3d( 200px, 0, 0 );
 }
 
 body.menu-visible div.page {
-  right: 190px;
+  right: 200px;
   top: 0px;
 }
 
 body.menu-visible:not(.animating) div.page nav{
-  left: -190px;
+  left: -200px;
   top: default;
 }
 

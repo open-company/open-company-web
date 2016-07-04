@@ -22,6 +22,7 @@ div.fullscreen-topic-edit {
 
   input.topic-edit-title {
     opacity: 0.5;
+    font-family: $oc_headers_font;
     font-weight: 700;
     font-size: 12px;
     line-height: 1.5;
@@ -49,7 +50,6 @@ div.fullscreen-topic-edit {
   }
 
   div.topic-edit-headline{
-    font-family: $oc_headers_font;
     font-size: 26px;
     line-height: 1.4;
     color: $oc_gray_5;
@@ -74,7 +74,6 @@ div.fullscreen-topic-edit {
   }
 
   textarea.topic-edit-headline {
-    font-family: $oc_headers_font;
     font-size: 26px;
     line-height: 1.4;
     color: $oc_gray_5;

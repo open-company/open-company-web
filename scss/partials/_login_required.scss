@@ -4,7 +4,6 @@ div.login-required {
   margin-top: 150px;
 
   p.login-rquired-cta {
-    font-family: $oc_headers_font;
     font-size: 26px;
     line-height: 1.4;
     color: $oc_gray_5;
@@ -24,8 +23,6 @@ div.login-required {
     }
 
     div.logo-cta {
-      // margin-top: 52px;
-      font-family: Domine-Regular;
       font-size: 18px;
       line-height: 1.8;
       text-align: center;

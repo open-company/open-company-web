@@ -4,7 +4,7 @@ ul#menu {
   top: 0;
   right: 0;
  
-  width: 190px;
+  width: 200px;
   min-height: 100vh;
   border-top: 4px solid $oc_yellow;
   padding: 0;
@@ -17,7 +17,7 @@ ul#menu {
   li.oc-title {
     color: white;
     font-size: 18px;
-    font-family: $oc_headers_font;
+    font-weight: 700;
     margin: 0px;
     padding-top: 40px;
     padding-bottom: 40px;
@@ -30,7 +30,7 @@ ul#menu {
 
     a {
       display: block;
-      width: 190px;
+      width: 200px;
       height: 53px;
       padding: 15px 23px;
       opacity: 0.75;

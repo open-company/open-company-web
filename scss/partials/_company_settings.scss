@@ -14,7 +14,6 @@ div.main-company-settings{
       margin-bottom: 80px;
 
       div.company-settings {
-        font-family: $oc_headers_font;
         font-size: 26px;
         line-height: 1.4;
         color: $oc_gray_5;
@@ -46,7 +45,8 @@ div.main-company-settings{
         background-color: rgba(78, 90, 107, 0.05);
         height: 492px;
 
-        div.company-name-title {
+        .settings-title {
+          font-family: $oc_headers_font;
           font-weight: 700;
           font-size: 12px;
           line-height: 1.5;
@@ -58,7 +58,6 @@ div.main-company-settings{
           margin-top: 15px;
           width: 380px;
           height: 40px;
-          font-family: $oc_headers_font;
           font-size: 18px;
           line-height: 1.8;
           color: $oc_gray_5;
@@ -70,18 +69,12 @@ div.main-company-settings{
 
         div.company-slug-title {
           margin-top: 30px;
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
         }
 
         div.company-slug {
           margin-top: 15px;
           width: 380px;
           height: 40px;
-          font-family: $oc_headers_font;
           font-size: 18px;
           line-height: 1.8;
           color: $oc_gray_5;
@@ -92,11 +85,6 @@ div.main-company-settings{
 
         div.company-currency-title {
           margin-top: 30px;
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
         }
 
         select.company-currency {
@@ -104,7 +92,6 @@ div.main-company-settings{
           margin-top: 15px;
           width: 380px;
           height: 40px;
-          font-family: $oc_headers_font;
           font-size: 18px;
           line-height: 1.8;
           color: $oc_gray_5;
@@ -134,22 +121,17 @@ div.main-company-settings{
 
         div.company-logo-title {
           margin-top: 30px;
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
         }
 
         input.company-logo {
           margin-top: 15px;
           width: 546px;
           height: 40px;
-          font-family: $oc_headers_font;
           font-size: 18px;
           line-height: 1.8;
           color: $oc_gray_5;
           background-color: rgba(255, 255, 255, 0.5);
+          color: rgba(78, 90, 107, 0.5);
           border: none;
           outline: none;
           padding: 4px 10px;
@@ -157,18 +139,12 @@ div.main-company-settings{
 
         div.company-description-title {
           margin-top: 30px;
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
         }
 
         textarea.company-description {
           margin-top: 15px;
           width: 380px;
           height: 80px;
-          font-family: $oc_headers_font;
           font-size: 18px;
           line-height: 1.8;
           color: $oc_gray_5;
