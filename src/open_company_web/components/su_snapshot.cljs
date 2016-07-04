@@ -36,9 +36,8 @@
              (om/get-state owner :selected-topic)
              (nil? (om/get-state owner :tr-selected-topic)))
     (let [selected-topic (om/get-state owner :selected-topic)
-          company-data   (dis/company-data (om/get-props owner))
-          topics         (:sections (:stakeholder-update company-data))
-          current-idx    (.indexOf (vec topics) selected-topic)]
+          topics         (:sections (dis/stakeholder-update-data))
+          current-idx    (.indexOf (to-array topics) selected-topic)]
       (if is-left?
         ;prev
         (let [prev-idx (mod (dec current-idx) (count topics))
