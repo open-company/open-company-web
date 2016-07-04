@@ -20,10 +20,10 @@
               welcome
                 "OpenCompany, See the Big Picture"
               (= (:access data) "denied")
-                (dom/h4 {:class "login-error-message"}
+                (dom/div {:class "login-error-message"}
                   "OpenCompany requires verification with your Slack team. Please allow access.")  
               (:access data)
-                (dom/h4 {:class "login-error-message"}
+                (dom/div {:class "login-error-message"}
                   "There is a temporary error validating with Slack. Please try again later.")
               :else
                 "Please sign in to access this company dashboard."))
