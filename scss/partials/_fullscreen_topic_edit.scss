@@ -2,6 +2,7 @@
   label {
     opacity: 0.5;
     font-weight: 700;
+    font-family: $oc_headers_font;
     font-size: 12px;
     line-height: 1.5;
     letter-spacing: 1px;
@@ -133,6 +134,7 @@ div.fullscreen-topic-edit {
 
         thead tr th {
           font-weight: 700;
+          font-family: $oc_headers_font;
           font-size: 12px;
           line-height: 1.5;
           letter-spacing: 1px;
@@ -151,6 +153,7 @@ div.fullscreen-topic-edit {
         tr td.no-cell:first-child {
           padding-top: 12px;
           font-weight: 700;
+          font-family: $oc_headers_font;
           font-size: 12px;
           letter-spacing: 1px;
           color: rgba(78, 90, 107, 0.5);
@@ -158,6 +161,7 @@ div.fullscreen-topic-edit {
 
         td.no-cell {
           font-weight: 700;
+          font-family: $oc_headers_font;
           font-size: 12px;
           letter-spacing: 1px;
           color: rgba(78,90,107, 0.5);
@@ -187,6 +191,7 @@ div.fullscreen-topic-edit {
 
         a.more {
           font-weight: 700;
+          font-family: $oc_headers_font;
           font-size: 12px;
           letter-spacing: 1px;
           color: rgba(78, 90, 107, 0.5);

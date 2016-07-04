@@ -70,6 +70,7 @@ div.topic-list{
 
         label.selected-topics{
           font-weight: 700;
+          font-family: $oc_headers_font;
           font-size: 12px;
           line-height: 1.5;
           letter-spacing: 1px;
@@ -91,6 +92,7 @@ div.topic-list{
           padding: 6.5px 20px;
           background-color: $oc_yellow;
           font-weight: 700;
+          font-family: $oc_headers_font;
           font-size: 12px;
           line-height: 1.5;
           letter-spacing: 1px;
@@ -140,6 +142,7 @@ div.topic-list{
       padding: 5px 20px;
       background-color: transparent;
       font-weight: 700;
+      font-family: $oc_headers_font;
       font-size: 12px;
       line-height: 1.5;
       letter-spacing: 1px;

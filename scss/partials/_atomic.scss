@@ -10,6 +10,7 @@
   border: solid 1px rgba(78, 90, 107, 0.5);
   opacity: 0.5;
   font-weight: 700;
+  font-family: $oc_headers_font;
   font-size: 0.75rem;
   letter-spacing: .1em;
   color: $oc_gray_5;
@@ -23,6 +24,7 @@
 .btn-solid {
   background-color: $oc_yellow;
   font-weight: 700;
+  font-family: $oc_headers_font;
   font-size: 0.75rem;
   letter-spacing: .1em;
   color: $oc_gray_5;
