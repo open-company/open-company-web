@@ -1,5 +1,4 @@
 div.login-required {
-  background-color: white;
   background-color: #fff;
 
   div.welcome {
@@ -11,9 +10,8 @@ div.login-required {
       color: $oc_gray_5;
     }
 
-    h4.login-error-message {
+    div.login-error-message {
       color: $oc_red;
-      font-size: 14px;
     }
 
     a.login-button {
