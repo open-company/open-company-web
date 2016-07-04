@@ -74,8 +74,8 @@
     2 c2-min-card-delta
     1 c1-min-card-delta))
 
-(defn calc-card-width []
-  (let [columns (columns-num)
+(defn calc-card-width [& [force-columns]]
+  (let [columns (or force-columns (columns-num))
         ww (win-width columns)
         ;; get params based on columns number
         min-win-width (get-min-win-width columns)
