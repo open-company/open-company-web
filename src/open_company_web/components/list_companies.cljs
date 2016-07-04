@@ -7,7 +7,8 @@
               [open-company-web.lib.utils :as utils]
               [open-company-web.lib.responsive :as responsive]
               [open-company-web.components.menu :refer (menu)]
-              [open-company-web.components.navbar :refer (navbar)]))
+              [open-company-web.components.navbar :refer (navbar)]
+              [open-company-web.components.footer :refer (footer)]))
 
 (defcomponent list-page-item [data owner]
   (render [_]
@@ -41,4 +42,6 @@
                 (if (pos? (count company-list))
                   (dom/ul {:class "companies"}
                     (om/build-all list-page-item company-list))
-                  (dom/h2 "No companies found."))))))))))
+                  (dom/h2 "No companies found."))))
+            (om/build footer {:card-width card-width
+                              :columns-num columns-num})))))))
