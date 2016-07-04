@@ -1,7 +1,5 @@
 (ns open-company-web.components.su-snapshot-preview
-  (:require-macros [cljs.core.async.macros :refer (go)])
-  (:require [cljs.core.async :refer (chan <!)]
-            [om.core :as om :include-macros true]
+  (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
@@ -157,12 +155,15 @@
             (dom/div {:class "share-su"}
               (dom/label {} "SHARE TO")
               (dom/button {:class "share-su-button btn-reset share-slack"
+                           :disabled (zero? (count su-topics))
                            :on-click #(share-slack-clicked owner)}
                 (dom/img {:src "/img/Slack_Icon.png"}))
               (dom/button {:class "share-su-button btn-reset share-mail"
+                           :disabled (zero? (count su-topics))
                            :on-click #(share-email-clicked owner)}
                 (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))
               (dom/button {:class "share-su-button btn-reset share-link"
+                           :disabled (zero? (count su-topics))
                            :on-click #(share-link-clicked owner)}
                 (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))))
           ;; SU Snapshot Preview
