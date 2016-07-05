@@ -90,6 +90,7 @@ div.fullscreen-topic {
 
       div.topic-title {
         opacity: 0.5;
+        font-family: $oc_headers_font;
         font-weight: 700;
         font-size: 12px;
         line-height: 1.5;
@@ -102,7 +103,6 @@ div.fullscreen-topic {
 
       div.topic-headline {
         margin-top: 18px;
-        font-family: $oc_headers_font;
         font-size: 26px;
         line-height: 1.4;
         color: $oc_gray_5;
@@ -126,7 +126,6 @@ div.fullscreen-topic {
 
       div.topic-attribution {
         margin-top: 10px;
-        font-family: $oc_headers_font;
         font-size: 16px;
         line-height: 1.8;
         color: $oc_gray_5;
@@ -146,6 +145,7 @@ div.fullscreen-topic {
           background-color: transparent;
           opacity: 0.5;
           font-weight: 700;
+          font-family: $oc_headers_font;
           font-size: 12px;
           line-height: 1.5;
           letter-spacing: 1px;

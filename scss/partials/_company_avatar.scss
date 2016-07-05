@@ -1,8 +1,7 @@
 div.company-avatar {
   float: left;
 
-  a, 
-  a:hover {
+  a, a:hover {
     text-decoration: none;
   }
 
@@ -29,7 +28,6 @@ div.company-avatar {
     }
 
     span.company-name {
-      font-family: $oc_headers_font;
       font-weight: 700;
       font-size: 24px;
       line-height: 1.2;

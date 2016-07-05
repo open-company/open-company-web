@@ -1,8 +1,11 @@
-button.btn-outline {
-  margin-top: 12px;
-}
+div.login {
+  background-color: white;
+  min-height: 100vh;
+  border-top: 4px solid $oc_yellow;
 
-h4.login-error-message {
-  color: red;
-  font-size: 14px;
+  div.login-internal {
+    min-height: calc(100vh - #{$footer_height}px - 57px - 4px);
+    background-color: #fff;
+    padding: 0 30px;
+  }
 }

@@ -13,6 +13,7 @@
             [open-company-web.components.footer :refer (footer)]
             [open-company-web.components.menu :refer (menu)]
             [open-company-web.components.edit-topic :refer (edit-topic)]
+            [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [goog.events :as events]
@@ -75,7 +76,7 @@
                                          :main-scroll true})}
         (om/build menu data)
         (if (get-in data [(keyword (router/current-company-slug)) :error])
-          (dom/div {:class "page-no-navbar py4"}
+          (dom/div {:class (str "fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
             (om/build login-required data))
           (dom/div {:class "page"}
             ;; Navbar

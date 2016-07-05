@@ -99,7 +99,25 @@
     (om/set-state! owner :did-mount true)
     (setup-sortable owner options)
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))
-    (focus-title owner))
+    (focus-title owner)
+    (when (and (not (utils/is-test-env?))
+               (responsive/user-agent-mobile?))
+      (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))
+            swipe-listener (js/Hammer (sel1 [:div#app]))];(.-body js/document))]
+        (om/set-state! owner :kb-listener kb-listener)
+        (om/set-state! owner :swipe-listener swipe-listener)
+        (.on swipe-listener "swipeleft" (fn [e] (switch-topic owner true)))
+        (.on swipe-listener "swiperight" (fn [e] (switch-topic owner false))))))
+
+  (will-unmount [_]
+    (utils/remove-channel "fullscreen-topic-save")
+    (utils/remove-channel "fullscreen-topic-cancel")
+    (when (and (not (utils/is-test-env?))
+               (responsive/user-agent-mobile?))
+      (events/unlistenByKey (om/get-state owner :kb-listener))
+      (let [swipe-listener (om/get-state owner :swipe-listener)]
+        (.off swipe-listener "swipeleft")
+        (.off swipe-listener "swiperight"))))
 
   (will-receive-props [_ next-props]
     (when-not (= (dis/company-data data) (dis/company-data next-props))

@@ -45,11 +45,13 @@
     (om/root loading dis/app-state {:target target})))
 
 (defn pre-routing [query-params]
- (if (jwt/jwt)
-   (dommy/add-class! (sel1 [:body]) :small-footer)
-   (dommy/remove-class! (sel1 [:body]) :small-footer))
- (check-get-params query-params)
- (inject-loading))
+  ; make sure the menu is closed
+  (utils/after 100 #(dis/toggle-menu false))
+  (if (jwt/jwt)
+    (dommy/add-class! (sel1 [:body]) :small-footer)
+    (dommy/remove-class! (sel1 [:body]) :small-footer))
+  (check-get-params query-params)
+  (inject-loading))
 
 ;; home
 (defn home-handler [target params]
