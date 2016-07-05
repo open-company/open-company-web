@@ -41,8 +41,8 @@
 
 (rum/defc modal-title < rum/static
   [title icon-id]
-  [:h3.m0.p3
-   {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.5)"}}
+  [:h3.m0.px3.py25.gray5
+   {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.1)"}}
    (i/icon icon-id {:class "inline mr2"
                     :color :oc-gray-3
                     :accent-color :oc-gray-3})
@@ -84,7 +84,7 @@
       :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :subject] (.. % -target -value)])
       :default-value initial-subject}]
     [:label.block.small-caps.bold.mb2 "Your Message"]
-    [:textarea.domine.npt.p1.col-12.mb2.emoji-autocomplete
+    [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh
      {:type "text"
       :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :note] (.. % -target -value)])
       :placeholder "optional"}]]])
@@ -95,7 +95,7 @@
    (modal-title "Share to Slack" :link-72)
    [:div.p3
     [:label.block.small-caps.bold.mb2 "Your Note"]
-    [:textarea.npt.p1.col-12.mb2.emoji-autocomplete
+    [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh
      {:type "text"
       :on-change #(dis/dispatch! [:input [:stakeholder-update/share :slack :note] (.. % -target -value)])
       :placeholder "Provide a note to go with this update."}]]])
@@ -118,8 +118,10 @@
                :data-clipboard-target "#share-link-input"
                :on-click #(reset! copied true)}
       (if @copied "COPIED ✓" "COPY")]]
-    [:div.block.mt2.h6
-     [:a {:href link :target "_blank"} "Open in New Window"]]]])
+    [:div.block.mt2
+     [:a.small-caps.underline.bold.dimmed-gray
+      {:href link :target "_blank"}
+      "Open in New Window"]]]])
 
 ;; This is very hacky and should by replaced by a more
 ;; versatile/generic form validation system
@@ -132,7 +134,7 @@
 
 (rum/defc modal-actions < rum/reactive
   [send-fn cancel-fn type]
-  [:div.p3.right-align
+  [:div.px3.pb3.right-align
    [:button.btn-reset.btn-outline
     {:class (when-not (= :link type) "mr1")
      :on-click cancel-fn}

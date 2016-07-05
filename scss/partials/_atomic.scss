@@ -58,6 +58,8 @@
   }
 }
 
+.ta-mh { min-height: 7rem }
+
 // typography
 
 .domine { font-family: 'Domine', Georgia, serif; }
@@ -73,8 +75,27 @@
 
 // colors
 
+.gray5 {color: $oc_gray_5}
+
 .b--red {border-color: $oc_red_regular}
 .red {color: $oc_red_regular}
 
-.bg-gray { background-color: $oc-gray_1 }
+.bg-gray { background-color: $oc_gray_1 }
 .bg-white-05 { background-color: rgba(255,255,255,.5) }
+
+.dimmed-gray {
+  color: $oc_gray_5;
+  opacity: .5;
+  transition: $oc_animation_duration;
+  &:hover {
+    color: $oc_gray_5;
+    opacity: .8;
+  }
+}
+
+// pad helpers
+
+// additional intermediate step between p2 & p3
+.p25 {padding: 1.5rem}
+.px25 {padding-left: 1.5rem; padding-right: 1.5rem}
+.py25 {padding-top: 1.5rem; padding-bottom: 1.5rem}
