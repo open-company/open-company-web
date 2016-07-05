@@ -18,7 +18,7 @@
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.tooltip :refer (tooltip)]
             [open-company-web.components.ui.icon :refer (icon)]
-            [open-company-web.components.ui.small-loading :refer (small-loading)]
+            [open-company-web.components.ui.small-loading :as loading]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]

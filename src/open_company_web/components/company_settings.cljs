@@ -3,7 +3,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.components.ui.small-loading :refer (small-loading)]
+            [open-company-web.components.ui.small-loading :as loading]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.footer :refer (footer)]
             [open-company-web.router :as router]
@@ -91,7 +91,7 @@
         (dom/div {:class "company-settings"}
           (dom/span {} "Company Settings")
           (when-not company-name
-            (om/build small-loading {:animating true})))
+            (loading/small-loading)))
         ;; Company
         (dom/div {:class "company-form"}
 
@@ -129,8 +129,9 @@
           (dom/div {:class "save-button-container"}
             (dom/button {:class "save-button btn-reset btn-solid"
                          :on-click #(save-company-clicked owner)}
-                          (om/build small-loading {:animating loading})
-                          "SAVE")))))))
+              (when loading
+                (loading/small-loading))
+              "SAVE")))))))
 
 (defcomponent company-settings [data owner]
 

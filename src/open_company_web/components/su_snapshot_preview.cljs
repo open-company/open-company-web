@@ -24,7 +24,7 @@
 
 (defn post-stakeholder-update [owner]
   (om/set-state! owner :link-posting true)
-  (api/share-stakeholder-update))
+  (api/share-stakeholder-update {}))
 
 (defn stakeholder-update-data [data]
   (:stakeholder-update (dis/company-data data)))
@@ -43,9 +43,19 @@
       (om/set-state! owner :title-focused true))))
 
 (defn share-slack-clicked [owner]
+<<<<<<< HEAD
   (patch-stakeholder-update owner)
   (om/set-state! owner :slack-loading true)
   (om/set-state! owner :show-su-dialog true))
+=======
+  (om/set-state! owner :show-su-dialog :slack)
+  (om/set-state! owner :slack-loading true))
+
+(defn share-email-clicked [owner]
+ (om/set-state! owner :show-su-dialog :email)
+ (om/set-state! owner :email-loading true)
+ (patch-stakeholder-update owner))
+>>>>>>> mainline
 
 (defn share-link-clicked [owner]
  (om/set-state! owner :link-loading true)
@@ -58,6 +68,7 @@
   (om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false
                                                     :slack-loading false
                                                     :link-loading false
+                                                    :email-loading false
                                                     :link-posting false
                                                     :link-posted false})))
 
@@ -127,6 +138,7 @@
                            title-focused
                            title
                            show-su-dialog
+                           email-loading
                            link-loading
                            slack-loading
                            link-posting
@@ -187,6 +199,7 @@
                                              :company-data company-data
                                              :latest-su (dis/latest-stakeholder-update)
                                              :share-via-slack slack-loading
+                                             :share-via-email email-loading
                                              :share-via-link (or link-loading link-posted)
                                              :su-title title}
                                             {:opts {:dismiss-su-preview #(dismiss-su-preview owner)}}))

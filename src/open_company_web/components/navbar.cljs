@@ -10,7 +10,7 @@
             [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.ui.user-avatar :refer (user-avatar)]
             [open-company-web.components.ui.login-button :refer (login-button)]
-            [open-company-web.components.ui.small-loading :refer (small-loading)]
+            [open-company-web.components.ui.small-loading :as loading]
             [open-company-web.components.ui.company-avatar :refer (company-avatar)]))
 
 (defn menu-click [owner e]
@@ -18,7 +18,7 @@
     (.preventDefault e))
   (dis/toggle-menu))
 
-(defcomponent navbar [{:keys [company-data columns-num card-width latest-su email-loading slack-loading menu-open] :as data} owner options]
+(defcomponent navbar [{:keys [company-data columns-num card-width latest-su link-loading email-loading slack-loading menu-open] :as data} owner options]
 
   (render [_]
     (let [header-width (+ (* card-width columns-num)    ; cards width
@@ -33,7 +33,7 @@
               (dom/li {}
                 (if (responsive/is-mobile)
                   (dom/div {:on-click (partial menu-click owner)}
-                      (icon "menu-34"))
+                    (icon "menu-34"))
                   (if (jwt/jwt)
                     (om/build user-avatar {:menu-click (partial menu-click owner)})
                     (om/build login-button (assoc data :menu-click (partial menu-click owner)))))))))))))
