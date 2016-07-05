@@ -1,7 +1,5 @@
 (ns open-company-web.components.su-snapshot
-  (:require-macros [cljs.core.async.macros :refer (go)])
-  (:require [cljs.core.async :refer (chan <!)]
-            [om.core :as om :include-macros true]
+  (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy :refer-macros (sel1)]
@@ -87,7 +85,8 @@
 
   (did-mount [_]
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))
-    (when-not (utils/is-test-env?)
+    (when (and (not (utils/is-test-env?))
+               (responsive/user-agent-mobile?))
       (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))
             swipe-listener (js/Hammer (sel1 [:div#app]))];(.-body js/document))]
         (om/set-state! owner :kb-listener kb-listener)
@@ -96,7 +95,8 @@
         (.on swipe-listener "swiperight" (fn [e] (switch-topic owner false))))))
 
   (will-unmount [_]
-    (when-not (utils/is-test-env?)
+    (when (and (not (utils/is-test-env?))
+               (responsive/user-agent-mobile?))
       (events/unlistenByKey (om/get-state owner :kb-listener))
       (let [swipe-listener (om/get-state owner :swipe-listener)]
         (.off swipe-listener "swipeleft")

@@ -133,7 +133,8 @@
   (did-mount [_]
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))
     (focus-title owner)
-    (when-not (utils/is-test-env?)
+    (when (and (not (utils/is-test-env?))
+               (responsive/user-agent-mobile?))
       (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))
             swipe-listener (js/Hammer (sel1 [:div#app]))];(.-body js/document))]
         (om/set-state! owner :kb-listener kb-listener)
@@ -144,7 +145,8 @@
   (will-unmount [_]
     (utils/remove-channel "fullscreen-topic-save")
     (utils/remove-channel "fullscreen-topic-cancel")
-    (when-not (utils/is-test-env?)
+    (when (and (not (utils/is-test-env?))
+               (responsive/user-agent-mobile?))
       (events/unlistenByKey (om/get-state owner :kb-listener))
       (let [swipe-listener (om/get-state owner :swipe-listener)]
         (.off swipe-listener "swipeleft")

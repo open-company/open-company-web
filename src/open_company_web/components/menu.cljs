@@ -77,6 +77,4 @@
       (when (jwt/jwt)
         (dom/li {:class "menu-link"} (dom/a {:title "SIGN OUT" :href oc-urls/logout :on-click logout-click} "SIGN OUT")))
       (when-not (jwt/jwt)
-        (dom/li {:class "menu-link"} (dom/a {:title "SIGN IN / SIGN UP" :href oc-urls/login} "SIGN IN / SIGN UP")))
-      ; (dom/li {} (dom/a {:title "ABOUT US" :href oc-urls/about} "ABOUT US"))
-      (dom/li {:class "menu-link"} (dom/a {:title "CONTACT" :href oc-urls/contact-mail-to} "CONTACT")))))
+        (dom/li {:class "menu-link"} (dom/a {:title "SIGN IN / SIGN UP" :href oc-urls/login} "SIGN IN / SIGN UP"))))))
