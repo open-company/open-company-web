@@ -1,10 +1,8 @@
 (ns open-company-web.components.su-snapshot-preview
-  (:require-macros [cljs.core.async.macros :refer (go)])
-  (:require [cljs.core.async :refer (chan <!)]
-            [om.core :as om :include-macros true]
+  (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [dommy.core :as dommy :refer-macros (sel1)]
+            [dommy.core :as dommy :refer-macros (sel1 sel)]
             [open-company-web.api :as api]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
@@ -12,10 +10,11 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.menu :refer (menu)]
             [open-company-web.components.navbar :refer (navbar)]
-            [open-company-web.components.footer :refer (footer)]
+            [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
+            [open-company-web.components.ui.icon :as i]
             [open-company-web.components.topics-columns :refer (topics-columns)]
-            [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
             [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
+            [open-company-web.components.tooltip :refer (tooltip)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -25,68 +24,16 @@
 
 (defn post-stakeholder-update [owner]
   (om/set-state! owner :link-posting true)
-  (api/share-stakeholder-update))
+  (api/share-stakeholder-update {}))
 
-(defn stakeholder-update-data [owner]
-  (let [props (om/get-props owner)]
-    (:stakeholder-update (dis/company-data props))))
+(defn stakeholder-update-data [data]
+  (:stakeholder-update (dis/company-data data)))
 
 (defn patch-stakeholder-update [owner]
   (let [title  (om/get-state owner :title)
-        topics (:sections (stakeholder-update-data owner))]
+        topics (om/get-state owner :su-topics)]
     (api/patch-stakeholder-update {:title (or title "")
                                    :sections topics})))
-
-(defn close-overlay-cb [owner]
-  (om/set-state! owner :transitioning false)
-  (om/set-state! owner :selected-topic nil)
-  (om/set-state! owner :selected-metric nil))
-
-(defn topic-click [owner topic selected-metric]
-  (om/set-state! owner :selected-topic topic)
-  (om/set-state! owner :selected-metric selected-metric))
-
-(defn switch-topic [owner is-left?]
-  (when (and (om/get-state owner :topic-navigation)
-             (om/get-state owner :selected-topic)
-             (nil? (om/get-state owner :tr-selected-topic)))
-    (let [selected-topic (om/get-state owner :selected-topic)
-          company-data   (dis/company-data (om/get-props owner))
-          topics         (:sections (:stakeholder-update company-data))
-          current-idx    (.indexOf (vec topics) selected-topic)]
-      (if is-left?
-        ;prev
-        (let [prev-idx (mod (dec current-idx) (count topics))
-              prev-topic (get (vec topics) prev-idx)]
-          (om/set-state! owner :tr-selected-topic prev-topic))
-        ;next
-        (let [next-idx (mod (inc current-idx) (count topics))
-              next-topic (get (vec topics) next-idx)]
-          (om/set-state! owner :tr-selected-topic next-topic))))))
-
-(defn kb-listener [owner e]
-  (let [key-code (.-keyCode e)]
-    (when (= key-code 39)
-      ;next
-      (switch-topic owner false))
-    (when (= key-code 37)
-      (switch-topic owner true))))
-
-(defn animation-finished [owner]
-  (let [cur-state (om/get-state owner)]
-    (om/set-state! owner (merge cur-state {:selected-topic (:tr-selected-topic cur-state)
-                                           :transitioning true
-                                           :tr-selected-topic nil}))))
-
-(defn animate-selected-topic-transition [owner]
-  (let [selected-topic (om/get-ref owner "selected-topic")
-        tr-selected-topic (om/get-ref owner "tr-selected-topic")
-        fade-anim (new Fade selected-topic 1 0 utils/oc-animation-duration)
-        cur-state (om/get-state owner)]
-    (.play (new Fade tr-selected-topic 0 1 utils/oc-animation-duration))
-    (doto fade-anim
-      (.listen AnimationEventType/FINISH #(animation-finished owner))
-      (.play))))
 
 (defn focus-title [owner]
   (when-not (om/get-state owner :title-focused)
@@ -96,8 +43,14 @@
       (om/set-state! owner :title-focused true))))
 
 (defn share-slack-clicked [owner]
-  (om/set-state! owner :slack-loading true)
-  (om/set-state! owner :show-su-dialog true))
+  (patch-stakeholder-update owner)
+  (om/set-state! owner :show-su-dialog :slack)
+  (om/set-state! owner :slack-loading true))
+
+(defn share-email-clicked [owner]
+ (om/set-state! owner :show-su-dialog :email)
+ (om/set-state! owner :email-loading true)
+ (patch-stakeholder-update owner))
 
 (defn share-link-clicked [owner]
  (om/set-state! owner :link-loading true)
@@ -107,52 +60,58 @@
   (om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false
                                                     :slack-loading false
                                                     :link-loading false
+                                                    :email-loading false
                                                     :link-posting false
                                                     :link-posted false})))
+
+(defn setup-sortable [owner options]
+  (when-let [list-node (js/jQuery (sel1 [:div.topics-column]))]
+    (.sortable list-node #js {:scroll true
+                              :forcePlaceholderSize true
+                              :placeholder "sortable-placeholder"
+                              :handle ".topic"
+                              :opacity 1})))
+
+(defn add-su-section [owner topic]
+  (om/update-state! owner :su-topics #(conj % topic)))
+
+(defn title-from-section-name [owner section]
+  (let [company-data (dis/company-data (om/get-props owner))]
+    (->> section keyword (get company-data) :title)))
 
 (defcomponent su-snapshot-preview [data owner options]
 
   (init-state [_]
-    (utils/add-channel "fullscreen-topic-save" (chan))
-    (utils/add-channel "fullscreen-topic-cancel" (chan))
-    (let [su-data (stakeholder-update-data owner)]
+    (let [company-data (dis/company-data data)
+          su-data (stakeholder-update-data data)
+          su-sections (if (empty? (:sections su-data))
+                        (flatten (vals (:sections company-data)))
+                        (:sections su-data))]
       {:columns-num (responsive/columns-num)
-       :selected-topic nil
-       :tr-selected-topic nil
-       :selected-metric nil
-       :topic-navigation true
-       :transitioning false
+       :su-topics su-sections
        :title-focused false
        :title (if (clojure.string/blank? (:title su-data))  (utils/su-default-title) (:title su-data))
        :show-su-dialog false
        :link-loading false
        :slack-loading false
        :link-posting false
-       :link-posted false}))
+       :link-posted false
+       :su-tooltip-dismissed false}))
 
   (did-mount [_]
+    (om/set-state! owner :did-mount true)
+    (setup-sortable owner options)
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))
-    (focus-title owner)
-    (when (and (not (utils/is-test-env?))
-               (responsive/user-agent-mobile?))
-      (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))
-            swipe-listener (js/Hammer (sel1 [:div#app]))];(.-body js/document))]
-        (om/set-state! owner :kb-listener kb-listener)
-        (om/set-state! owner :swipe-listener swipe-listener)
-        (.on swipe-listener "swipeleft" (fn [e] (switch-topic owner true)))
-        (.on swipe-listener "swiperight" (fn [e] (switch-topic owner false))))))
-
-  (will-unmount [_]
-    (utils/remove-channel "fullscreen-topic-save")
-    (utils/remove-channel "fullscreen-topic-cancel")
-    (when (and (not (utils/is-test-env?))
-               (responsive/user-agent-mobile?))
-      (events/unlistenByKey (om/get-state owner :kb-listener))
-      (let [swipe-listener (om/get-state owner :swipe-listener)]
-        (.off swipe-listener "swipeleft")
-        (.off swipe-listener "swiperight"))))
+    (focus-title owner))
 
   (will-receive-props [_ next-props]
+    (when-not (= (dis/company-data data) (dis/company-data next-props))
+      (let [company-data (dis/company-data next-props)
+            su-data      (stakeholder-update-data next-props)
+            su-sections  (if (empty? (:sections su-data))
+                           (flatten (vals (:sections company-data)))
+                           (:sections su-data))]
+        (om/set-state! owner :su-topics su-sections)))
     ; share via link
     (when (om/get-state owner :link-loading)
       (if-not (om/get-state owner :link-posting)
@@ -165,86 +124,58 @@
 
   (did-update [_ _ _]
     (focus-title owner)
-    (when (om/get-state owner :tr-selected-topic)
-      (animate-selected-topic-transition owner)))
+    (setup-sortable owner options))
 
   (render-state [_ {:keys [columns-num
-                           selected-topic
-                           tr-selected-topic
-                           selected-metric
-                           topic-navigation
-                           transitioning
                            title-focused
                            title
                            show-su-dialog
+                           email-loading
                            link-loading
                            slack-loading
                            link-posting
-                           link-posted]}]
+                           link-posted
+                           su-topics
+                           su-tooltip-dismissed]}]
     (let [company-data (dis/company-data data)
-          su-data      (stakeholder-update-data owner)
-          card-width   (responsive/calc-card-width)
+          su-data      (stakeholder-update-data data)
+          card-width   (responsive/calc-card-width 1)
           ww           (.-clientWidth (sel1 js/document :body))
-          total-width  (case columns-num
-                         3 (str (+ (* card-width 3) 40 60) "px")
-                         2 (str (+ (* card-width 2) 20 60) "px")
-                         1 (if (> ww 413) (str card-width "px") "auto"))
-          su-subtitle  (str "- " (utils/date-string (js/Date.) true))]
+          total-width  (if (> ww 413) (str (min ww (+ card-width 100)) "px") "auto")
+          su-subtitle  (str "— " (utils/date-string (js/Date.) true))
+          su-sections  (:sections su-data)
+          topics-to-add (sort #(compare (title-from-section-name owner %1) (title-from-section-name owner %2)) (reduce utils/vec-dissoc (flatten (vals (:sections company-data))) su-topics))]
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
                                          :main-scroll true})}
+        (when (and (seq company-data)
+                   (empty? (:sections su-data))
+                   (not su-tooltip-dismissed))
+          (om/build tooltip {:cta "THIS IS A PREVIEW OF YOUR SNAPSHOT. DRAG TOPICS TO REORDER, OR CLICK THE X TO REMOVE A TOPIC."}
+                            {:opts {:dismiss-tooltip #(om/set-state! owner :su-tooltip-dismissed true)}}))
         (om/build menu data)
-        (dom/div {:class "page"}
-          ;; Navbar
-          (when company-data
-            (om/build navbar {:company-data company-data
-                              :card-width card-width
-                              :latest-su (dis/latest-stakeholder-update)
-                              :sharing-mode false
-                              :su-preview true
-                              :hide-right-menu true
-                              :columns-num columns-num
-                              :auth-settings (:auth-settings data)
-                              :link-loading link-loading
-                              :slack-loading slack-loading}
-                             {:opts {:share-link-cb #(share-link-clicked owner)
-                                     :share-slack-cb #(share-slack-clicked owner)}}))
+        (dom/div {:class "page snapshot-page"}
+          (dom/div {:class "su-snapshot-header"}
+            (om/build back-to-dashboard-btn {})
+            (dom/div {:class "share-su"}
+              (dom/label {} "SHARE TO")
+              (dom/button {:class "share-su-button btn-reset share-slack"
+                           :disabled (zero? (count su-topics))
+                           :on-click #(share-slack-clicked owner)}
+                (dom/img {:src "/img/Slack_Icon.png"}))
+              (dom/button {:class "share-su-button btn-reset share-mail"
+                           :disabled (zero? (count su-topics))
+                           :on-click #(share-email-clicked owner)}
+                (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))
+              (dom/button {:class "share-su-button btn-reset share-link"
+                           :disabled (zero? (count su-topics))
+                           :on-click #(share-link-clicked owner)}
+                (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))))
           ;; SU Snapshot Preview
           (when company-data
             (dom/div {:class "su-sp-content"}
-              ;; Fullscreen topic
-              (when selected-topic
-                (dom/div {:class "selected-topic-container"
-                          :style #js {:opacity (if selected-topic 1 0)}}
-                  (dom/div #js {:className "selected-topic"
-                                :key (str "transition-" selected-topic)
-                                :ref "selected-topic"
-                                :style #js {:opacity 1 :backgroundColor "rgba(255, 255, 255, 0.98)"}}
-                    (om/build fullscreen-topic {:section selected-topic
-                                                :section-data (->> selected-topic keyword (get company-data))
-                                                :selected-metric selected-metric
-                                                :read-only true
-                                                :card-width card-width
-                                                :currency (:currency company-data)
-                                                :hide-history-navigation true
-                                                :animate (not transitioning)}
-                                               {:opts {:close-overlay-cb #(close-overlay-cb owner)
-                                                       :topic-navigation #(om/set-state! owner :topic-navigation %)}}))
-                  ;; Fullscreen topic for transition
-                  (when tr-selected-topic
-                    (dom/div #js {:className "tr-selected-topic"
-                                  :key (str "transition-" tr-selected-topic)
-                                  :ref "tr-selected-topic"
-                                  :style #js {:opacity (if tr-selected-topic 0 1)}}
-                    (om/build fullscreen-topic {:section tr-selected-topic
-                                                :section-data (->> tr-selected-topic keyword (get company-data))
-                                                :selected-metric selected-metric
-                                                :read-only (:read-only company-data)
-                                                :card-width card-width
-                                                :currency (:currency company-data)
-                                                :hide-history-navigation true
-                                                :animate false}
-                                               {:opts {:close-overlay-cb #(close-overlay-cb owner)
-                                                       :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
+              (dom/div {:class "su-sp-company-header"}
+                (dom/img {:class "company-logo" :src (:logo company-data)})
+                (dom/span {:class "company-name"} (:name company-data)))
               (when (:title su-data)
                 (dom/div {:class "preview-title-container"}
                   (dom/input #js {:className "preview-title"
@@ -260,21 +191,35 @@
                                              :company-data company-data
                                              :latest-su (dis/latest-stakeholder-update)
                                              :share-via-slack slack-loading
+                                             :share-via-email email-loading
                                              :share-via-link (or link-loading link-posted)
                                              :su-title title}
                                             {:opts {:dismiss-su-preview #(dismiss-su-preview owner)}}))
-              (om/build topics-columns {:columns-num columns-num
+              (om/build topics-columns {:columns-num 1
                                         :card-width card-width
                                         :total-width total-width
                                         :show-fast-editing false
                                         :content-loaded (not (:loading data))
-                                        :topics (:sections su-data)
+                                        :topics su-topics
                                         :company-data company-data
+                                        :show-share-remove true
                                         :topics-data company-data
                                         :hide-add-topic true}
-                                       {:opts {:topic-click (partial topic-click owner)}})))
-          ;;Footer
-          (when company-data
-            (om/build footer {:columns-num columns-num
-                              :su-preview true
-                              :card-width card-width})))))))
+                                       {:opts {:share-remove-click (fn [topic]
+                                                                      (let [fade-anim (Fade. (sel1 [(str "div#topic-" topic)]) 1 0 utils/oc-animation-duration)]
+                                                                        (doto fade-anim
+                                                                          (events/listen AnimationEventType/FINISH
+                                                                            (fn [](om/update-state! owner :su-topics (fn [t] (utils/vec-dissoc t topic)))))
+                                                                          (.play))))}})))
+          ;; Add section container
+          (when (pos? (count topics-to-add))
+            (dom/div {:class "su-preview-add-section-container"}
+              (dom/div {:class "su-preview-add-section"
+                        :style #js {:width total-width}}
+                (dom/div {:class "add-header"} "ADD TOPICS")
+                (for [topic topics-to-add
+                      :let [title (->> topic keyword (get company-data) :title)]]
+                  (dom/div {:class "add-section"
+                            :on-click #(add-su-section owner topic)}
+                    (i/icon :check-square-09 {:accent-color "transparent" :size 16 :color "black"})
+                    (dom/div {:class "section-name"} title)))))))))))

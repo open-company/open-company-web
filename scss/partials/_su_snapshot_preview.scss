@@ -11,30 +11,105 @@ body.small-footer {
   }
 }
 
+div.page.snapshot-page {
+  background-color: #f9f9f9 !important;
+}
+
 div.su-snapshot-preview {
-  background-color: rgb(217, 217, 217);
+  background-color: #f9f9f9;
+  border-top: 4px solid $oc_yellow;
+
+  div.su-snapshot-header {
+    height: 60px;
+    background-color: rgba(78, 90, 107, 0.5);
+
+    div.back-to-dashboard-row {
+      float: left;
+      width: 240px;
+      margin-top: 13px;
+      padding-top: 0px;
+
+      button {
+        border-color: white;
+        color: white;
+      }
+    }
+
+    div.share-su {
+      float: right;
+      padding: 9px 20px 11px 0;
+      height: 60px;
+
+      label {
+        color: white;
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        margin-top: 13px;
+        float: left;
+      }
+
+      button.share-su-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 20px;
+        background-color: white;
+        margin-left: 8px;
+        float: left;
+        cursor: pointer;
+
+        &:disabled{
+          opacity: 0.4;
+          cursor: default;
+        }
+
+        img {
+          width: 20px;
+          height: 20px;
+        }
+
+        div.svg-icon {
+          padding: 0px 4px;
+        }
+      }
+    }
+  }
 
   div.su-sp-content {
     position: relative;
     content: "";
     padding-bottom: 20px;
-    min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
-    margin-top: #{$navbar_height}px;
+    min-height: calc(100vh);
 
-    @include mobile(){
-      background-color: #d9d9d9;
-    }
+    div.su-sp-company-header {
+      margin-top: 60px;
+      height: 50px;
+      text-align: center;
 
-    @include big_web(){
-      background-color: $oc_gray_6;
+      img.company-logo {
+        max-height: 50px;
+        max-width: 150px;
+        margin-top: -5px;
+      }
+
+      span.company-name {
+        margin-top: 0px;
+        margin-left: 16px;
+        font-weight: 700;
+        font-size: 24px;
+        line-height: 1.2;
+        color: $oc_gray_5;
+      }
     }
 
     div.preview-title-container {
       width: 100%;
       text-align: center;
-      padding-top: 50px;
+      padding-top: 17px;
 
       input.preview-title {
+        font-weight: 400;
         font-size: 20px;
         line-height: 1.2;
         color: $oc_gray_5;
@@ -56,4 +131,104 @@ div.su-snapshot-preview {
       padding-bottom: 30px;
     }
   }
+
+  div.topics-column {
+    max-width: 600px !important;
+  
+
+    div.topic-row {
+      padding-bottom: 33px !important;
+      padding-right: 50px;
+      padding-left: 50px;
+
+      &:hover {
+        div.share-remove-container {
+          display: block;
+        }
+      }
+
+      &.ui-sortable-helper {
+        background-color: transparent;
+
+        div.share-remove-container {
+          display: none;
+        }
+
+        div.topic {
+          border: 4px solid $oc_yellow;
+          transition: transform .25s ease-in-out;
+          -webkit-transition: -webkit-transform .25s ease-in-out;
+          -ms-transform: rotate(7deg); /* IE 9 */
+          -webkit-transform: rotate(7deg); /* Chrome, Safari, Opera */
+          transform: rotate(7deg);
+        }
+      }
+
+      div.topic {
+        background-color: white;
+        border-radius: 2px;
+        border: 0px solid transparent;
+        box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
+
+        div.pillbox-container{
+          text-align: left;
+        }
+      }
+    }
+  }
+
+  div.su-preview-add-section-container {
+    background-color: rgba(78, 90, 107, 0.05);
+    padding-top: 60px;
+    padding-bottom: 60px;
+
+    div.su-preview-add-section {
+      margin: 0px auto;
+
+      div.add-header {
+        height: 40px;
+        background-color: #4e5a6b;
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: #ffffff;
+        padding: 10px 19px;
+      }
+
+      div.add-section {
+        height: 40px;
+        padding: 10px 24px;
+        background-color: white;
+        cursor: pointer;
+
+        &:hover {
+          background-color: rgba(78, 90, 107, 0.1);
+        }
+
+        div.svg-icon {
+          width: 16px;
+          height: 16px;
+          float: left;
+        }
+
+        div.section-name {
+          float: left;
+          font-family: $oc_headers_font;
+          font-size: 14px;
+          line-height: 1.7;
+          color: $oc_gray_5;
+          margin-left: 10px;
+          text-transform: capitalize;
+        }
+      }
+    }
+  }
+}
+
+div.sortable-placeholder {
+  background-color: rgba(78, 90, 107, 0.2);
+  margin-bottom: 33px;
+  margin-left: 50px;
+  margin-right: 50px;
 }

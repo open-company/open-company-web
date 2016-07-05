@@ -14,6 +14,7 @@ $.detach = function(){};
 $.height = function(){};
 $.find = function(){};
 $.data = function(){};
+$.sortable = function(){};
 // Location
 var location = {};
 location.reload = function(){};

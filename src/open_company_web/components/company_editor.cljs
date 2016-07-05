@@ -5,7 +5,7 @@
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.oc-colors :as occ]
             [open-company-web.components.navbar :refer (navbar)]
-            [open-company-web.components.ui.small-loading :refer (small-loading)]
+            [open-company-web.components.ui.small-loading :as loading]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]))
 
@@ -46,7 +46,7 @@
         (dom/div {:class "col-md-7 col-md-offset-2 bg-gray p3"}
           (dom/form {:on-submit (partial create-company-clicked owner)}
             (dom/div {:class "form-group"}
-              (dom/label {:class "caps h6 bold block"} "Company Name")
+              (dom/label {:class "small-caps h6 bold block"} "Company Name")
               (dom/input {:type "text"
                           :class "domine h4 p2 bg-white-05 md-col-9 border-none"
                           :placeholder "Simple name without the Inc., LLC, etc."
@@ -73,5 +73,5 @@
             (dom/button {:class "btn-reset btn-solid"
                          :on-click (partial create-company-clicked owner)}
                         (when loading
-                          (om/build small-loading {:animating true :css-classes "left mt1"}))
+                          (loading/small-loading {:class "left mt1"}))
                         (dom/label {:class (str "mt1" (when loading " ml2"))} "Setup Your Company")))))))

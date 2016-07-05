@@ -18,7 +18,7 @@
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.tooltip :refer (tooltip)]
             [open-company-web.components.ui.icon :refer (icon)]
-            [open-company-web.components.ui.small-loading :refer (small-loading)]
+            [open-company-web.components.ui.small-loading :as loading]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -57,15 +57,12 @@
 (defn filter-placeholder-sections [topics company-data]
   (vec (filter #(not (:placeholder (->> % keyword (get company-data)))) topics)))
 
-(defn get-category-topics [company-data active-topics sharing-mode]
+(defn get-category-topics [company-data active-topics]
   (let [topics-list   (flatten (vals active-topics))]
-    (map keyword
-      (if sharing-mode
-          (filter-placeholder-sections topics-list company-data)
-          topics-list))))
+    (map keyword topics-list)))
 
-(defn should-show-add-topic-tooltip [company-data active-topics sharing-mode]
-  (let [category-topics (get-category-topics company-data active-topics sharing-mode)]
+(defn should-show-add-topic-tooltip [company-data active-topics]
+  (let [category-topics (get-category-topics company-data active-topics)]
     (and (jwt/jwt)
          (not (:read-only company-data))
          (not (responsive/is-mobile))
@@ -76,8 +73,7 @@
   (let [company-data (:company-data data)
         categories (:categories company-data)
         active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))
-        sharing-mode (or (:sharing-mode current-state) false)
-        show-add-topic-tooltip (should-show-add-topic-tooltip company-data active-topics sharing-mode)
+        show-add-topic-tooltip (should-show-add-topic-tooltip company-data active-topics)
         selected-topic (if (nil? current-state) (router/current-section) (:selected-topic current-state))]
     {:initial-active-topics active-topics
      :active-topics active-topics
@@ -85,7 +81,6 @@
      :new-sections-requested (or (:new-sections-requested current-state) false)
      :selected-topic selected-topic
      :tr-selected-topic nil
-     :sharing-mode sharing-mode
      :topic-navigation (or (:topic-navigation current-state) true)
      :share-selected-topics (:sections (:stakeholder-update company-data))
      :transitioning false
@@ -96,26 +91,17 @@
      :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
      :second-tooltip-dismissed (or (:second-tooltip-dismissed current-state) false)
      :show-share-su-tooltip (or (:show-share-su-tooltip current-state) false)
-     :share-su-tooltip-dismissed (or (:share-su-tooltip-dismissed current-state) false)
-     :show-share-snapshot-tooltip (or (:show-share-snapshot-tooltip current-state) false)
-     :share-snapshot-tooltip-dismissed (or (:share-snapshot-tooltip-dismissed current-state) false)}))
+     :share-su-tooltip-dismissed (or (:share-su-tooltip-dismissed current-state) false)}))
 
 (defn topic-click [owner topic selected-metric & [force-edit]]
-  (if (om/get-state owner :sharing-mode)
-    (let [share-selected-topics (om/get-state owner :share-selected-topics)
-          new-share-selected-topics (if (utils/in? share-selected-topics (name topic))
-                                      (utils/vec-dissoc share-selected-topics (name topic))
-                                      (vec (concat share-selected-topics [(name topic)])))]
-      (om/set-state! owner :share-selected-topics new-share-selected-topics))
-    (do
-      (if force-edit
+  (if force-edit
         (.pushState js/history nil (str "Edit " (name topic)) (oc-urls/company-section-edit (router/current-company-slug) (name topic)))
         (.pushState js/history nil (name topic) (oc-urls/company-section (router/current-company-slug) (name topic))))
-      (when force-edit
-        (om/set-state! owner :fullscreen-force-edit true))
-      (om/set-state! owner :selected-topic topic)
-      (om/set-state! owner :selected-metric selected-metric)
-      (utils/after 100 #(om/set-state! owner :fullscreen-force-edit false)))))
+  (when force-edit
+    (om/set-state! owner :fullscreen-force-edit true))
+  (om/set-state! owner :selected-topic topic)
+  (om/set-state! owner :selected-metric selected-metric)
+  (utils/after 100 #(om/set-state! owner :fullscreen-force-edit false)))
 
 (def scrolled-to-top (atom false))
 
@@ -173,13 +159,6 @@
     (.play (new Slide tr-selected-topic #js [(if left? (* width -1) width) 0] #js [0 0] utils/oc-animation-duration))
     (.play (new Fade tr-selected-topic 0 1 utils/oc-animation-duration))))
 
-(defn toggle-sharing-mode [owner options]
-  (when (and (not (om/get-state owner :sharing-mode))
-             (not (cook/get-cookie "sst-shown")))
-    (om/set-state! owner :show-share-snapshot-tooltip true))
-  (om/update-state! owner :sharing-mode not)
-  ((:toggle-sharing-mode options)))
-
 (defn preview-and-share-click [owner e]
   (utils/event-stop e)
   (let [props (om/get-props owner)
@@ -196,10 +175,6 @@
   ; show first edit tooltip if there is only one section and is a placeholder section
   (and (= (count category-topics) 1)
        (->> category-topics first keyword (get company-data) :placeholder)))
-
-(defn dismiss-share-snapshot-tooltip [owner]
-  (om/set-state! owner :share-snapshot-tooltip-dismissed true)
-  (cook/set-cookie! "sst-shown" true))
 
 (defcomponent topic-list [data owner options]
 
@@ -260,7 +235,6 @@
                            selected-metric
                            tr-selected-topic
                            transitioning
-                           sharing-mode
                            share-selected-topics
                            redirect-to-preview
                            fullscreen-force-edit
@@ -269,11 +243,9 @@
                            show-second-add-topic-tooltip
                            second-tooltip-dismissed
                            show-share-su-tooltip
-                           share-su-tooltip-dismissed
-                           show-share-snapshot-tooltip
-                           share-snapshot-tooltip-dismissed]}]
+                           share-su-tooltip-dismissed]}]
     (let [company-data    (:company-data data)
-          category-topics (get-category-topics company-data active-topics sharing-mode)
+          category-topics (get-category-topics company-data active-topics)
           card-width      (:card-width data)
           columns-num     (:columns-num data)
           ww              (.-clientWidth (sel1 js/document :body))
@@ -281,39 +253,17 @@
                             3 (str (+ (* card-width 3) 40 60) "px")
                             2 (str (+ (* card-width 2) 20 60) "px")
                             1 (if (> ww 413) (str card-width "px") "auto"))]
-      (dom/div {:class (str "topic-list group" (if sharing-mode " sharing-mode" " no-sharing"))
+      (dom/div {:class "topic-list group"
                 :key "topic-list"}
-        ;; Sharing header
-        (when sharing-mode
-          (dom/div {:class "sharing-header"}
-            (dom/div {:class "sharing-header-inner group"
-                      :style #js {:width total-width}}
-              (dom/div {:class "sharing-header-left"}
-                (dom/label {:class "selected-topics"}
-                  (if (zero? (count share-selected-topics))
-                    "CLICK A TOPIC TO SELECT IT"
-                    (str (count share-selected-topics) " TOPIC" (when (> (count share-selected-topics) 1) "S") " SELECTED"))))
-              (dom/div {:class "sharing-header-center"}
-                (when (pos? (count share-selected-topics))
-                  (dom/button {:class "share-snapshot-bt"
-                               :on-click (partial preview-and-share-click owner)}
-                    (when redirect-to-preview
-                      (om/build small-loading {:animating true}))
-                    "PREVIEW AND SHARE")))
-              (dom/div {:class "sharing-header-right"}
-                (dom/button {:class "close-share"
-                             :on-click #(toggle-sharing-mode owner options)}
-                  (icon :simple-remove {:stroke "4" :accent-color "white"}))))))
         ;; Activate sharing mode button
         (when (and (not (responsive/is-mobile))
                    (responsive/can-edit?)
                    (not (:read-only company-data))
-                   (not sharing-mode)
                    (> (count (filter-placeholder-sections category-topics company-data)) 1))
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
             (dom/button {:class "sharing-button"
-                         :on-click #(toggle-sharing-mode owner options)} "SHARE A SNAPSHOT")))
+                         :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} "SHARE A SNAPSHOT " (dom/i {:class "fa fa-share"}))))
         ;; Fullscreen topic
         (when selected-topic
           (dom/div {:class "selected-topic-container"
@@ -358,7 +308,6 @@
         (om/build topics-columns {:columns-num columns-num
                                   :card-width card-width
                                   :selected-metric selected-metric
-                                  :sharing-mode sharing-mode
                                   :show-fast-editing true
                                   :total-width total-width
                                   :content-loaded (not (:loading data))
@@ -384,9 +333,4 @@
                    (not share-su-tooltip-dismissed))
           (om/build tooltip
             {:cta "YOUR BIG PICTURE IS COMING TOGETHER. YOU CAN SHARE A SNAPSHOT OF SELECTED TOPICS WITH YOUR TEAM, INVESTORS OR THE CROWD WHEN YOU'RE READY."}
-            {:opts {:class "large" :dismiss-tooltip #(om/set-state! owner :share-su-tooltip-dismissed true)}}))
-        (when (and show-share-snapshot-tooltip
-                   (not share-snapshot-tooltip-dismissed))
-          (om/build tooltip
-            {:cta "CHOOSE TOPICS TO SHARE VIA SLACK, EMAIL OR THE WEB. SNAPSHOTS ARE GREAT FOR TEAM AND INVESTOR UPDATES, OR TO ENGAGE THE CROWD."}
-            {:opts {:class "large" :dismiss-tooltip #(dismiss-share-snapshot-tooltip owner)}}))))))
+            {:opts {:class "large" :dismiss-tooltip #(om/set-state! owner :share-su-tooltip-dismissed true)}}))))))

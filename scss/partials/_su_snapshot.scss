@@ -12,21 +12,34 @@ body.small-footer {
 }
 
 div.su-snapshot {
-  background-color: rgb(217, 217, 217);
+  border-top: 4px solid $oc_yellow;
 
   div.su-sp-content {
     position: relative;
     content: "";
     padding-bottom: 20px;
     min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
-    margin-top: #{$navbar_height}px;
+    background-color: #f9f9f9;
+    padding-top: 60px;
 
-    @include mobile(){
-      background-color: #d9d9d9;
-    }
+    div.su-sp-company-header {
+      height: 50px;
+      text-align: center;
 
-    @include big_web(){
-      background-color: $oc_gray_6;
+      img.company-logo {
+        max-height: 50px;
+        max-width: 150px;
+        margin-top: -5px;
+      }
+
+      span.company-name {
+        margin-top: 0px;
+        margin-left: 16px;
+        font-weight: 700;
+        font-size: 24px;
+        line-height: 1.2;
+        color: $oc_gray_5;
+      }
     }
 
     div.su-snapshot-title {
