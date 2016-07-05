@@ -69,13 +69,13 @@
        :value     @input
        :on-blur   #(do (reset! invalid (invalid? @input)) true)
        :on-change #(update! (.. % -target -value))
-       :placeholder "comma delimited email list"}]]))
+       :placeholder "investor@vc.com,advisor@smarty.com"}]]))
 
 (rum/defc email-dialog < rum/static emoji-autocomplete
   [{:keys [share-link initial-subject]}]
   (dis/dispatch! [:input [:stakeholder-update/share :email :subject] initial-subject])
   [:div
-   (modal-title "Share via Email" :email-84)
+   (modal-title "Share to Email" :email-84)
    [:div.p3
     (multi-email-input (fn [val] (dis/dispatch! [:input [:stakeholder-update/share :email :to] val])))
     [:label.block.small-caps.bold.mb2 "Subject"]
@@ -87,12 +87,12 @@
     [:textarea.domine.npt.p1.col-12.mb2.emoji-autocomplete
      {:type "text"
       :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :note] (.. % -target -value)])
-      :placeholder "Type a message that will be shown introducing this update."}]]])
+      :placeholder "optional"}]]])
 
 (rum/defc slack-dialog < rum/static emoji-autocomplete
   []
   [:div
-   (modal-title "Share via Slack" :link-72)
+   (modal-title "Share to Slack" :link-72)
    [:div.p3
     [:label.block.small-caps.bold.mb2 "Your Note"]
     [:textarea.npt.p1.col-12.mb2.emoji-autocomplete
@@ -104,9 +104,9 @@
                          (clipboard-mixin ".js-copy-btn")
   [{:keys [::copied] :as _state} link]
   [:div
-   (modal-title  "Share via URL" :link-72)
+   (modal-title  "Share Link" :link-72)
    [:div.p3
-    [:label.block.small-caps.bold.mb2 "Share this private URL"]
+    [:label.block.small-caps.bold.mb2 "Share this private link"]
     [:div.flex
      [:input.domine.npt.p1.flex-auto
       {:type "text"
