@@ -4,7 +4,7 @@ div.login {
   border-top: 4px solid $oc_yellow;
 
   div.login-internal {
-    min-height: calc(100vh - #{$footer_height}px - 203px - 4px);
+    min-height: calc(100vh - #{$footer_height}px - 57px - 4px);
     background-color: #fff;
     padding: 0 30px;
   }
