@@ -673,6 +673,9 @@
 (defn after [ms fn]
   (js/setTimeout fn ms))
 
+(defn unicode-emojis [txt]
+  (js/emojione.shortnameToUnicode txt))
+
 (defn emojify
   "Take a string containing either Unicode emoji (mobile device keyboard), short code emoji (web app),
   or ASCII emoji (old skool) and convert it to HTML string ready to be added to the DOM (dangerously)

@@ -43,5 +43,10 @@ function emojiAutocomplete() {
         ],{
             zIndex: 1100,
             maxCount: 20
-        });
+        }).on({'textComplete:select': function (e, value, strategy) {
+          // This will make sure React inputs receive a change event
+          // after the textcompletion has inserted new contents
+          var event = new Event('input', { bubbles: true });
+          strategy.el.dispatchEvent(event);
+        }})
 };
