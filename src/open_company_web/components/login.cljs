@@ -11,7 +11,7 @@
     (let [card-width  (responsive/calc-card-width)]
       (dom/div {:class "login fullscreen-page"}
         (dom/div {:class "login-internal"}
-          (om/build login-required data))
+          (login-required data))
         (om/build footer {:su-preview false
                           :card-width card-width
                           :columns-num (responsive/columns-num)})))))

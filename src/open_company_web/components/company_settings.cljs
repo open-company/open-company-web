@@ -143,7 +143,7 @@
 
       (dom/div {:class "main-company-settings fullscreen-page"}
 
-        (om/build back-to-dashboard-btn {})
+        (back-to-dashboard-btn {})
 
         (if (:loading data)
               
