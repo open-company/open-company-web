@@ -41,7 +41,7 @@
 
 (rum/defc modal-title < rum/static
   [title icon-id]
-  [:h3.m0.px3.py25.gray5
+  [:h3.m0.px3.py25.gray5.domine
    {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.1)"}}
    (i/icon icon-id {:class "inline mr2"
                     :color :oc-gray-3
