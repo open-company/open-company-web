@@ -85,28 +85,28 @@
      {:type "text"
       :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :subject] (.. % -target -value)])
       :default-value initial-subject}]
-    [:label.block.small-caps.bold.mb2 "Your Message"]
+    [:label.block.small-caps.bold.mb2 "Your Note"]
     [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh
      {:type "text"
       :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :note] (.. % -target -value)])
-      :placeholder "optional"}]]])
+      :placeholder "Optional note to go with this update."}]]])
 
 (rum/defc slack-dialog < rum/static emoji-autocomplete
   []
   [:div
-   (modal-title "Share to Slack" :slack)
+   (modal-title "Share to Your Slack Team" :slack)
    [:div.p3
     [:label.block.small-caps.bold.mb2 "Your Note"]
     [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh
      {:type "text"
       :on-change #(dis/dispatch! [:input [:stakeholder-update/share :slack :note] (.. % -target -value)])
-      :placeholder "Provide a note to go with this update."}]]])
+      :placeholder "Optional note to go with this update."}]]])
 
 (rum/defcs link-dialog < (rum/local false ::copied)
                          (clipboard-mixin ".js-copy-btn")
   [{:keys [::copied] :as _state} link]
   [:div
-   (modal-title  "Share Link" :link-72)
+   (modal-title  "Share a Link" :link-72)
    [:div.p3
     [:label.block.small-caps.bold.mb2 "Share this private link"]
     [:div.flex
