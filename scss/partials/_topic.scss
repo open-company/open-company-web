@@ -41,19 +41,20 @@ div.topic {
     font-family: $oc_headers_font;
 
     div.topic-title {
-      color: rgba(78, 90, 107, 0.2);
+      color: rgba(78, 90, 107, 0.2) !important;
     }
 
     &:hover {
       background-color: #ffffff;
-      color: rgba(78, 90, 107, 0.2);
+      color: rgba(78, 90, 107, 0.2) !important;
     }
 
     &.active {
       background-color: #ffffff;
       border: 1px solid rgba(78, 90, 107, 0.8);
+
       div.topic-title {
-        color: $oc_gray_5;
+        color: $oc_gray_5 !important;
       }
     }
 
