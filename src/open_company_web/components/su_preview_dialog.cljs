@@ -43,9 +43,11 @@
   [title icon-id]
   [:h3.m0.px3.py25.gray5.domine
    {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.1)"}}
-   (i/icon icon-id {:class "inline mr2"
-                    :color :oc-gray-3
-                    :accent-color :oc-gray-3})
+   (if (= :slack icon-id)
+     [:i {:class "fa fa-slack mr2"}]
+     (i/icon icon-id {:class "inline mr2"
+                      :color :oc-gray-3
+                      :accent-color :oc-gray-3}))
    title])
 
 (rum/defcs multi-email-input < (rum/local nil ::invalid)
@@ -92,7 +94,7 @@
 (rum/defc slack-dialog < rum/static emoji-autocomplete
   []
   [:div
-   (modal-title "Share to Slack" :link-72)
+   (modal-title "Share to Slack" :slack)
    [:div.p3
     [:label.block.small-caps.bold.mb2 "Your Note"]
     [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh
