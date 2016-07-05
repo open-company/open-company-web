@@ -46,7 +46,7 @@
         (dom/div {:class "col-md-7 col-md-offset-2 bg-gray p3"}
           (dom/form {:on-submit (partial create-company-clicked owner)}
             (dom/div {:class "form-group"}
-              (dom/label {:class "caps h6 bold block"} "Company Name")
+              (dom/label {:class "small-caps h6 bold block"} "Company Name")
               (dom/input {:type "text"
                           :class "domine h4 p2 bg-white-05 md-col-9 border-none"
                           :placeholder "Simple name without the Inc., LLC, etc."
