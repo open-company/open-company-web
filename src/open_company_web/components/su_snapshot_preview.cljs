@@ -43,11 +43,7 @@
       (om/set-state! owner :title-focused true))))
 
 (defn share-slack-clicked [owner]
-<<<<<<< HEAD
   (patch-stakeholder-update owner)
-  (om/set-state! owner :slack-loading true)
-  (om/set-state! owner :show-su-dialog true))
-=======
   (om/set-state! owner :show-su-dialog :slack)
   (om/set-state! owner :slack-loading true))
 
@@ -55,14 +51,10 @@
  (om/set-state! owner :show-su-dialog :email)
  (om/set-state! owner :email-loading true)
  (patch-stakeholder-update owner))
->>>>>>> mainline
 
 (defn share-link-clicked [owner]
  (om/set-state! owner :link-loading true)
  (patch-stakeholder-update owner))
-
-(defn share-email-clicked [owner]
-  (patch-stakeholder-update owner))
 
 (defn dismiss-su-preview [owner]
   (om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false
