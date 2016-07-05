@@ -2,6 +2,8 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [open-company-web.urls :as oc-urls]
+            [open-company-web.router :as router]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.components.ui.login-button :as login]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]))
@@ -10,7 +12,7 @@
   (render [_]
     (dom/div {:class "login-required"}
       (when-not welcome
-        (om/build back-to-dashboard-btn {:button-cta "OPENCOMPANY.COM"}))
+        (om/build back-to-dashboard-btn {:button-cta "OPENCOMPANY.COM" :click-cb #(router/redirect! oc-urls/home)}))
       (dom/div {:class "center mx-auto max-width-3 welcome"}
         (dom/div
           (dom/p {:class "login-rquired-cta"}
