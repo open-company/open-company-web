@@ -15,14 +15,14 @@
         (dom/div {:class "user-profile-title"} "User Info")
         (dom/div {:class "user-profile-content group"}
           (dom/div {:class "left-column"}
-            (dom/div {:class "user-profile-name-title"} "NAME")
+            (dom/div {:class "user-profile-name-title data-title"} "NAME")
             (dom/div {:class "user-profile-name"} (jwt/get-key :real-name))
-            (dom/div {:class "user-profile-org-title"} "ORGANIZATION")
+            (dom/div {:class "user-profile-org-title data-title"} "ORGANIZATION")
             (dom/div {:class "user-profile-org"} (jwt/get-key :org-name))
-            (dom/div {:class "user-profile-email-title"} "EMAIL")
+            (dom/div {:class "user-profile-email-title data-title"} "EMAIL")
             (dom/div {:class "user-profile-email"} (jwt/get-key :email)))
           (dom/div {:class "right-column"}
-            (dom/div {:class "user-profile-avatar-title"} "AVATAR")
+            (dom/div {:class "user-profile-avatar-title data-title"} "AVATAR")
             (when (jwt/get-key :avatar)
               (dom/img {:class "user-profile-avatar" :src (jwt/get-key :avatar)}))))
         (dom/div {:class "user-profile-disclaimer"}

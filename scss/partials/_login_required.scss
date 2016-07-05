@@ -1,0 +1,40 @@
+div.login-required {
+  background-color: #fff;
+
+  div.welcome {
+    margin-top: 150px;
+
+    p.login-rquired-cta {
+      font-size: 26px;
+      line-height: 1.4;
+      color: $oc_gray_5;
+    }
+
+    div.login-error-message {
+      color: $oc_red;
+    }
+
+    a.login-button {
+      margin-top: 30px;
+      display: block;
+    }
+
+    div.logo-container {
+      margin-top: 185px;
+
+      img.logo-gold {
+        width: 130px;
+        height: 180px;
+      }
+
+      div.logo-cta {
+        font-size: 18px;
+        line-height: 1.8;
+        text-align: center;
+        color: $oc_gray_5;
+        max-width: 400px;
+        margin: 52px auto;
+      }
+    }
+  }
+}

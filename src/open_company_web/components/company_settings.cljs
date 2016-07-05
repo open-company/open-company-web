@@ -96,17 +96,17 @@
         (dom/div {:class "company-form"}
 
           ;; Company name
-          (dom/div {:class "company-name-title"} "COMPANY NAME")
+          (dom/div {:class "company-name-title settings-title"} "COMPANY NAME")
           (dom/input {:class "company-name"
                       :type "text"
                       :id "name"
                       :value company-name
                       :on-change #(om/set-state! owner :company-name (.. % -target -value))})
           ; Slug
-          (dom/div {:class "company-slug-title"} "DASHBOARD URL")
+          (dom/div {:class "company-slug-title settings-title"} "DASHBOARD URL")
           (dom/div {:class "company-slug"} (str ls/web-server "/" (name slug)))
           ;; Currency
-          (dom/div {:class "company-currency-title"} "DISPLAY CURRENCY IN")
+          (dom/div {:class "company-currency-title settings-title"} "DISPLAY CURRENCY IN")
           (dom/select {:id "currency"
                        :value currency
                        :on-change #(om/set-state! owner :currency (.. % -target -value))
@@ -118,7 +118,7 @@
                 (om/build currency-option {:value (:code currency) :text label}))))
 
           ;; Company logo
-          (dom/div {:class "company-logo-title"} "SQUARE COMPANY LOGO URL (approx. 180x180px)")
+          (dom/div {:class "company-logo-title settings-title"} "SQUARE COMPANY LOGO URL (approx. 180x180px)")
           (dom/input {:type "text"
                       :value logo
                       :id "logo"

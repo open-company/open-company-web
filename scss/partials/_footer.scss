@@ -13,7 +13,6 @@ div.footer {
   padding-top: 54px;
 
   div.footer-cta {
-    font-family: $oc_headers_font;
     font-size: 18px;
     line-height: 1.3;
     color: $oc_gray_5;
@@ -30,6 +29,7 @@ div.footer {
         background-color: white;
         text-decoration: none;
         font-weight: 700;
+        font-family: $oc_headers_font;
         font-size: 12px;
         line-height: 1.5;
         letter-spacing: 1px;
@@ -75,6 +75,7 @@ div.footer {
       a.footer-link {
         opacity: 0.5;
         font-weight: 700;
+        font-family: $oc_headers_font;
         font-size: 12px;
         line-height: 1.5;
         letter-spacing: 1px;
