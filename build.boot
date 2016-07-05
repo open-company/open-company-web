@@ -1,5 +1,4 @@
 ;; boot show --updates
-(def react-version "0.14.7-0")
 (def cljs-deps
   '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
     [adzerk/boot-reload "0.4.11" :scope "test"]
@@ -29,8 +28,8 @@
     [medley "0.8.2"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
 
     ;; --- DO NOT UPDATE REACT, the 15.x.x code requires changes on our part
-    [cljsjs/react react-version] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
-    [cljsjs/react-dom react-version] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
+    [cljsjs/react "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
+    [cljsjs/react-dom "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
 
     [cljsjs/raven "2.1.0-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "3.5.16-0"] ; d3 externs https://clojars.org/cljsjs/d3
@@ -83,7 +82,7 @@
 (deftask test! []
   (set-env! :source-paths #(conj % "test")
             :dependencies #(into % '[[cljs-react-test "0.1.4-SNAPSHOT" :scope "test" :exclusions [cljsjs/react-with-addons]]
-                                     [cljsjs/react-with-addons react-version]]))
+                                     [cljsjs/react-with-addons "0.14.7-0"]]))
   (test-cljs :js-env :phantom
              :exit? true
              :update-fs? true
