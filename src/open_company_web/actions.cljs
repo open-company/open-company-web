@@ -134,3 +134,9 @@
       (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
       (assoc-in (dispatcher/company-data-key slug) (utils/fix-sections company-data))
       (dissoc :loading))))
+
+;; Front of Card Edit section
+(defmethod dispatcher/action :start-foce [db [_ section-key]]
+  (if section-key
+    (assoc db :foce-key section-key)
+    (dissoc db :foce-key)))
