@@ -22,7 +22,6 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
-            [cljs-dynamic-resources.core :as cdr]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [clojure.string :as string]
             [cljsjs.react.dom]))
@@ -419,8 +418,6 @@
 (defcomponent fullscreen-topic-edit [{:keys [card-width topic topic-data currency focus show-first-edit-tooltip] :as data} owner options]
 
   (init-state [_]
-    (cdr/add-style! "/css/medium-editor/medium-editor.css")
-    (cdr/add-style! "/css/medium-editor/default.css")
     (get-state owner data nil))
 
   (will-mount [_]
