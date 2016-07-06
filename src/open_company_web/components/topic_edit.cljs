@@ -22,35 +22,39 @@
 
 (defn pencil-click [owner options e]
   (utils/event-stop e)
-  (when-not (om/get-props owner :add-topic)
-    (let [section (om/get-props owner :section)
-          topic-click-cb (:topic-click options)]
-      (topic-click-cb nil true))))
+  (let [section (om/get-props owner :section)
+        topic-click-cb (:topic-click options)]
+    (topic-click-cb nil true)))
 
 (defn setup-edit [owner]
   (let [section-name (name (om/get-props owner :section))
         topic-data (om/get-props owner :topic-data)
         topic (om/get-props owner :section)]
-    (when-let [headline-el (sel1 [(str "div#foce-headline-" section-name)])]
-      (new js/MediumEditor headline-el (clj->js (utils/medium-editor-options "Headline"))))
+    (when-let [headline-el    (sel1 [(str "div#foce-headline-" section-name)])]
+      (let [headline-editor (new js/MediumEditor headline-el (clj->js (utils/medium-editor-options "Headline")))]
+        (.subscribe headline-editor "editableInput" (fn [event editable] (dis/dispatch! [:foce-input :headline (.-innerHTML headline-el)])))))
     (when-let [snippet-el (sel1 [(str "div#foce-snippet-" section-name)])]
-      (let [snippet-placeholder (if (:placeholder topic-data) (utils/get-topic-body topic-data topic) "")]
-        (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options snippet-placeholder)))))))
+      (let [snippet-placeholder (if (:placeholder topic-data) (utils/get-topic-body topic-data topic) "")
+            snippet-editor      (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options snippet-placeholder)))]
+        (.subscribe snippet-editor "editableInput" (fn [event editable] (dis/dispatch! [:foce-input :snippet (.-innerHTML snippet-el)])))))
+    (js/emojiAutocomplete)))
 
-(defcomponent topic-edit [{:keys [topic-data
-                                  section
-                                  currency
+(defcomponent topic-edit [{:keys [currency
                                   prev-rev
-                                  next-rev
-                                  add-topic
-                                  sharing-mode
-                                  show-fast-editing]} owner options]
+                                  next-rev]} owner options]
+
+  (init-state [_]
+    (let [topic-data          (dis/foce-section-data)]
+      {:initial-headline (:headline topic-data)
+       :initial-snippet  (:snippet topic-data)}))
 
   (did-mount [_]
     (utils/after 1000 #(setup-edit owner)))
 
-  (render [_]
-    (let [section-kw          (keyword section)
+  (render-state [_ {:keys [initial-headline initial-snippet]}]
+    (let [section             (dis/foce-section-key)
+          topic-data          (dis/foce-section-data)
+          section-kw          (keyword section)
           chart-opts          {:chart-size {:width  260
                                             :height 196}
                                :hide-nav true
@@ -65,7 +69,6 @@
                                         (utils/no-finances-data? finances-row-data)))
                                   (and (= section-kw :growth)
                                        (utils/no-growth-data? growth-data)))
-          snippet             (:snippet topic-data)
           image-header        (:image-url topic-data)
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
@@ -78,43 +81,44 @@
               (dom/img {:src image-header
                         :class "topic-header-img"}))
             (when image-header
-              (dom/button {:class "btn-reset remove-header"}
+              (dom/button {:class "btn-reset remove-header"
+                           :on-click #(do
+                                        (dis/dispatch! [:foce-input :image-url nil])
+                                        (dis/dispatch! [:foce-input :image-height 0])
+                                        (dis/dispatch! [:foce-input :image-width 0]))}
                 (i/icon :simple-remove {:size 16
                                         :color (oc-colors/get-color-by-kw :oc-gray-5)
                                         :accent-color (oc-colors/get-color-by-kw :oc-gray-5)})))))
         ;; Topic title
         (dom/input {:class "topic-title"
                     :value (:title topic-data)
-                    :type "text"})
+                    :type "text"
+                    :on-change #(dis/dispatch! [:foce-input :title (.. % -target -value)])})
         ;; Topic headline
-        (dom/div {:class "topic-headline-inner"
+        (dom/div {:class "topic-headline-inner emoji-autocomplete"
                   :id (str "foce-headline-" (name section))
-                  :dangerouslySetInnerHTML #js {"__html" (:headline topic-data)}})
-        (dom/div #js {:className "topic-body topic-snippet"
+                  :dangerouslySetInnerHTML #js {"__html" initial-headline}})
+        (dom/div #js {:className "topic-body topic-snippet emoji-autocomplete"
                       :ref "topic-snippet"
                       :id (str "foce-snippet-" (name section))
-                      :dangerouslySetInnerHTML #js {"__html" snippet}})
+                      :dangerouslySetInnerHTML #js {"__html" initial-snippet}})
         (dom/div {:class "topic-foce-buttons"}
-          (dom/button {:class "btn-reset camera"}
-            (i/icon :camera-20 {:size 16
-                                :color (oc-colors/get-color-by-kw :oc-gray-5)
-                                :accent-color (oc-colors/get-color-by-kw :oc-gray-5)}))
+          (when-not image-header
+            (dom/button {:class "btn-reset camera"}
+              (i/icon :camera-20 {:size 16
+                                  :color (oc-colors/get-color-by-kw :oc-gray-5)
+                                  :accent-color (oc-colors/get-color-by-kw :oc-gray-5)})))
           (dom/button {:class "btn-reset add-image"}
             (i/icon :simple-add {:size 16
                                  :color (oc-colors/get-color-by-kw :oc-gray-5)
                                  :accent-color (oc-colors/get-color-by-kw :oc-gray-5)}))
-          (when (and show-fast-editing
-                   (not add-topic)
-                   (responsive/can-edit?)
-                   (not (responsive/is-mobile))
-                   (not (:read-only topic-data))
-                   (not sharing-mode))
-            (dom/button {:class "topic-pencil-button btn-reset"
-                         :on-click (partial pencil-click owner options)}
-              (i/icon :pencil {:size 16
-                               :color gray-color
-                               :accent-color gray-color}))))
+          (dom/button {:class "topic-pencil-button btn-reset"
+                       :on-click (partial pencil-click owner options)}
+            (i/icon :pencil {:size 16
+                             :color gray-color
+                             :accent-color gray-color})))
         (dom/div {:class "topic-foce-footer"}
           (dom/button {:class "btn-reset btn-outline"
                        :on-click #(do (utils/event-stop %) (dis/dispatch! [:start-foce nil]))} "CANCEL")
-          (dom/button {:class "btn-reset btn-solid"} "SAVE"))))))
+          (dom/button {:class "btn-reset btn-solid"
+                       :disabled false} "SAVE"))))))
