@@ -44,7 +44,7 @@
   (when-not (om/get-props owner :add-topic)
     (let [section (om/get-props owner :section)
           topic-click-cb (:topic-click options)]
-      (topic-click-cb nil true))))
+      (topic-click-cb))))
 
 (defcomponent topic-internal [{:keys [topic-data
                                       section
@@ -53,7 +53,7 @@
                                       next-rev
                                       add-topic
                                       sharing-mode
-                                      show-fast-editing]} owner options]
+                                      show-fast-editing] :as data} owner options]
 
   (render [_]
     (let [section-kw          (keyword section)
@@ -75,8 +75,10 @@
           image-header        (:image-url topic-data)
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
-          topic-body          (utils/get-topic-body topic-data section)]
+          topic-body          (utils/get-topic-body topic-data section)
+          topic-click-cb      (:topic-click data)]
       (dom/div #js {:className "topic-internal group"
+                    :onClick #(topic-click-cb)
                     :ref "topic-internal"}
         (when (or is-growth-finances?
                   image-header)
@@ -111,9 +113,11 @@
         (when-not (clojure.string/blank? topic-body)
           (dom/div #js {:className "topic-read-more"} "READ MORE"))))))
 
-(defn topic-click [section-kw options selected-metric]
-  ; ((:topic-click options) selected-metric)
-  (dis/dispatch! [:start-foce section-kw]))
+(defn topic-click [owner]
+  (let [section-kw (keyword (om/get-props owner :section))
+        company-data (dis/company-data)
+        section-data (get company-data section-kw)]
+    (dis/dispatch! [:start-foce section-kw section-data])))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
@@ -208,9 +212,8 @@
                                                  :sharing-selected (and sharing-mode share-selected)
                                                  :active (and add-topic? show-add-topic-popover)})
                     :ref "topic"
-                    :onClick #(if add-topic?
-                                (add-topic owner)
-                                (topic-click section-kw options nil))}
+                    :onClick #(when add-topic?
+                                (add-topic owner))}
         (when show-add-topic-popover
           (let [all-sections (get-all-sections slug)
                 update-active-topics (:update-active-topics options)
@@ -237,8 +240,8 @@
                                     :show-fast-editing (:show-fast-editing data)
                                     :currency currency
                                     :read-only-company (:read-only-company data)
-                                    :topic-click (partial topic-click options)
-                                    :foce-edit (:foce-edit data)
+                                    :foce-key (:foce-key data)
+                                    :foce-data (:foce-data data)
                                     :prev-rev prev-rev
                                     :next-rev next-rev}
                                    {:opts (merge options {:rev-click (fn [e rev]
@@ -253,7 +256,7 @@
                                         :show-fast-editing (:show-fast-editing data)
                                         :currency currency
                                         :read-only-company (:read-only-company data)
-                                        :topic-click (partial topic-click options)
+                                        :topic-click (partial topic-click owner)
                                         :prev-rev prev-rev
                                         :next-rev next-rev}
                                        {:opts (merge options {:rev-click (fn [e rev]
