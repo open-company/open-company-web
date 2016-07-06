@@ -104,3 +104,6 @@
 (defn revisions
   ([slug] (revisions slug @app-state))
   ([slug data] (get-in data (revisions-key slug))))
+
+(defn foce-section-key
+ [] (:foce-key @app-state))
