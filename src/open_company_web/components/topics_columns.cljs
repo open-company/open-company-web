@@ -173,7 +173,8 @@
                                :read-only-company (:read-only company-data)
                                :currency (:currency company-data)
                                :sharing-mode sharing-mode
-                               :foce-edit (:foce-edit props)
+                               :foce-key (:foce-key props)
+                               :foce-data (:foce-data props)
                                :share-selected share-selected?}
                                {:opts {:section-name section-name
                                        :topic-click (partial topic-click section-name)}}))))))))

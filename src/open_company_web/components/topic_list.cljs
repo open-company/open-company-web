@@ -363,7 +363,8 @@
                                   :topics category-topics
                                   :company-data company-data
                                   :topics-data company-data
-                                  :foce-edit (:foce-edit data)
+                                  :foce-key (:foce-key data)
+                                  :foce-data (:foce-data data)
                                   :share-selected-topics share-selected-topics}
                                  {:opts {:topic-click (partial topic-click owner)
                                          :update-active-topics (partial update-active-topics owner)}})
