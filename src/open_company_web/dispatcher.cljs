@@ -105,5 +105,8 @@
   ([slug] (revisions slug @app-state))
   ([slug data] (get-in data (revisions-key slug))))
 
-(defn foce-section-key
- [] (:foce-key @app-state))
+(defn foce-section-key []
+  (:foce-key @app-state))
+
+(defn foce-section-data []
+  (:foce-data @app-state))
