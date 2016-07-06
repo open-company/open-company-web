@@ -36,14 +36,7 @@ div.topic-list{
   content: "";
   padding-bottom: 20px;
   min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
-
-  &.sharing-mode {
-    min-height: calc(100vh - #{$footer_height}px);
-  }
-
-  &.no-sharing {
-    margin-top: #{$navbar_height}px;
-  }
+  margin-top: #{$navbar_height}px;
 
   @include mobile(){
     background-color: #d9d9d9;
@@ -55,8 +48,6 @@ div.topic-list{
 
   div.sharing-header{
     border-top: 4px solid $oc_yellow;
-    height: 64px;
-    width: 100%;
     background-color: rgba(78, 90, 107, 0.5);
 
     div.sharing-header-inner{
@@ -70,6 +61,7 @@ div.topic-list{
 
         label.selected-topics{
           font-weight: 700;
+          font-family: $oc_headers_font;
           font-size: 12px;
           line-height: 1.5;
           letter-spacing: 1px;
@@ -84,25 +76,7 @@ div.topic-list{
       div.sharing-header-center{
         float: left;
         width: 33%;
-        height: 30px;
         text-align: center;
-
-        button.share-snapshot-bt{
-          padding: 6.5px 20px;
-          background-color: $oc_yellow;
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: #4e5a6b;
-          outline: none;
-          border: 0px solid transparent;
-
-          div.small-loading-container {
-            margin-right: 10px;
-            float: left;
-          }
-        }
       }
 
       div.sharing-header-right{
@@ -140,6 +114,7 @@ div.topic-list{
       padding: 5px 20px;
       background-color: transparent;
       font-weight: 700;
+      font-family: $oc_headers_font;
       font-size: 12px;
       line-height: 1.5;
       letter-spacing: 1px;

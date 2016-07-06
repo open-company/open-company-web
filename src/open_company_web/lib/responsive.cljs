@@ -74,8 +74,8 @@
     2 c2-min-card-delta
     1 c1-min-card-delta))
 
-(defn calc-card-width []
-  (let [columns (columns-num)
+(defn calc-card-width [& [force-columns]]
+  (let [columns (or force-columns (columns-num))
         ww (win-width columns)
         ;; get params based on columns number
         min-win-width (get-min-win-width columns)
@@ -106,10 +106,15 @@
   (reset! _mobile fixed-browser-type)))
 
 (defn is-mobile []
+ "Check if it's mobile based only on screen size"
  ; fake the browser type for the moment
  (when (neg? @_mobile)
   (set-browser-type!))
  @_mobile)
 
 (defn can-edit? []
+  "Check if it's mobile based only on the UserAgent"
   (not userAgent/MOBILE))
+
+(defn user-agent-mobile? []
+  userAgent/MOBILE)

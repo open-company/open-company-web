@@ -2,23 +2,18 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.components.ui.login-button :refer (login-button)]))
+            [open-company-web.lib.jwt :as jwt]
+            [open-company-web.lib.responsive :as responsive]
+            [open-company-web.components.footer :refer (footer)]
+            [open-company-web.components.ui.login-required :refer (login-required)]))
 
 (defcomponent login [data owner]
+
   (render [_]
-    (dom/div {:class "row"}
-      (dom/div {:class "login-container col-md-5 col-md-offset-1"}
-        (dom/h1 "OpenCompany login with Slack:")
-        (case
-
-          (:loading data)
-          (dom/h2 "Loading...")
-
-          (and (not (:loading data)) (contains? data :auth-settings))
-          (dom/div {}
-            (if-let [access (:access data)]
-              (let [msg (if (= access "denied")
-                "OpenCompany requires verification with your Slack team. Please allow access."
-                "There is a temporary error validating with Slack. Please try again later.")]
-                (dom/h4 {:class "login-error-message"} msg)))
-            (om/build login-button data)))))))
+    (let [card-width  (responsive/calc-card-width)]
+      (dom/div {:class "login fullscreen-page"}
+        (dom/div {:class "login-internal"}
+          (om/build login-required data))
+        (om/build footer {:su-preview false
+                          :card-width card-width
+                          :columns-num (responsive/columns-num)})))))

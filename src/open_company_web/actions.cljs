@@ -29,9 +29,6 @@
   (cook/remove-cookie! :jwt)
   (router/redirect! "/"))
 
-(defmethod dispatcher/action :input [db [_ path value]]
-  (assoc-in db path value))
-
 (defmethod dispatcher/action :entry [db [_ {:keys [links]}]]
   (let [create-link    (med/find-first #(= (:rel %) "company-create") links)
         slug           (fn [co] (last (string/split (:href co) #"/")))
@@ -150,3 +147,13 @@
             (vec (concat [:foce-data] k))
             [:foce-data k])]
     (assoc-in db p v)))
+
+;; This should be turned into a proper form library
+;; Lomakeets FormState ideas seem like a good start:
+;; https://github.com/metosin/lomakkeet/blob/master/src/cljs/lomakkeet/core.cljs
+
+(defmethod dispatcher/action :input [db [_ path value]]
+  (assoc-in db path value))
+
+(defmethod dispatcher/action :stakeholder-update/reset-share [db _]
+  (dissoc db :stakeholder-update/share))

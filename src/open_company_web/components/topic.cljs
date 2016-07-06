@@ -168,7 +168,15 @@
         add-topic-pos     (- popover-offsettop scroll)]
     (> add-topic-pos (/ win-height 2))))
 
-(defcomponent topic [{:keys [active-topics section-data section currency column sharing-mode share-selected archived-topics] :as data} owner options]
+(defcomponent topic [{:keys [active-topics
+                             section-data
+                             section
+                             currency
+                             column
+                             sharing-mode
+                             share-selected
+                             archived-topics
+                             show-share-remove] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
@@ -212,8 +220,16 @@
                                                  :sharing-selected (and sharing-mode share-selected)
                                                  :active (and add-topic? show-add-topic-popover)})
                     :ref "topic"
+                    :id (str "topic-" (name section))
                     :onClick #(when add-topic?
                                 (add-topic owner))}
+        (when (and show-share-remove
+                   (not add-topic?))
+          (dom/div {:class "share-remove-container"
+                    :id (str "share-remove-" (name section))}
+            (dom/button {:class "btn-reset share-remove"
+                         :on-click #(when (contains? options :share-remove-click) ((:share-remove-click options) (name section)))}
+              (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.5)" :size 12 :stroke 4 :accent-color "rgba(78, 90, 107, 0.5)"}))))
         (when show-add-topic-popover
           (let [all-sections (get-all-sections slug)
                 update-active-topics (:update-active-topics options)

@@ -1,16 +1,17 @@
 div.user-profile {
+
   div.user-profile-internal {
     position: relative;
     width: 509px;
     left: 50%;
     margin-left: -254px;
-    min-height: calc(100vh - 397px);
-    margin-top: 80px;
+    padding-top: 80px;
+    min-height: calc(100vh - #{$footer_small_height}px - 95px + #{$top_border_height}px);
 
     div.user-profile-title {
       height: 74px;
-      font-family: $oc_headers_font;
       font-size: 26px;
+      font-weight: 400;
       line-height: 1.4;
       color: $oc_gray_5;
     }
@@ -18,32 +19,33 @@ div.user-profile {
     div.user-profile-disclaimer {
       width: 509px;
       height: 64px;
-      font-family: $oc_headers_font;
       font-size: 18px;
       line-height: 1.8;
       color: $oc_gray_5;
       margin-top: 32px;
+      margin-bottom: 20px;
+      font-weight: 400;
     }
 
     div.user-profile-content {
       padding: 28px;
       background-color: rgba(78, 90, 107, 0.05);
 
+      .data-title {
+        font-family: $oc_headers_font;
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: $oc_gray_5;
+      }
+
       div.left-column{
         width: 50%;
         float: left;
 
-        div.user-profile-name-title {
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
-        }
-
         div.user-profile-name {
           margin-top: 6px;
-          font-family: $oc_headers_font;
           font-size: 18px;
           line-height: 1.8;
           color: $oc_gray_5;
@@ -51,17 +53,10 @@ div.user-profile {
 
         div.user-profile-org-title {
           margin-top: 25px;
-          height: 18px;
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
         }
 
         div.user-profile-org {
           margin-top: 6px;
-          font-family: $oc_headers_font;
           font-size: 18px;
           line-height: 1.8;
           color: $oc_gray_5;
@@ -69,17 +64,10 @@ div.user-profile {
 
         div.user-profile-email-title {
           margin-top: 25px;
-          height: 18px;
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
         }
 
         div.user-profile-email {
           margin-top: 6px;
-          font-family: $oc_headers_font;
           font-size: 18px;
           line-height: 1.8;
           color: $oc_gray_5;
@@ -90,15 +78,6 @@ div.user-profile {
         float: left;
         width: 50%;
         padding-left: 25px;
-
-        div.user-profile-avatar-title {
-          height: 18px;
-          font-weight: 700;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
-        }
 
         img.user-profile-avatar {
           margin-top: 11px;

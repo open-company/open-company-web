@@ -10,6 +10,7 @@ div.d3-dot-container{
     text.dot-chart-label{
       font-size: 24px;
       font-weight: 700;
+      font-family: $oc_headers_font;
       opacity: 0.75;
 
       &.small {
@@ -21,6 +22,7 @@ div.d3-dot-container{
       font-size: 12px;
       opacity: 0.75;
       font-weight: 700;
+      font-family: $oc_headers_font;
       letter-spacing: 1px;
       line-height: 1.5;
 

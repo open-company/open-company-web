@@ -141,7 +141,7 @@
     (om/set-state! owner k v)))
 
 (defn share-click [owner]
-  (api/share-stakeholder-update))
+  (api/share-stakeholder-update {}))
 
 (defcomponent su-edit [data owner]
 

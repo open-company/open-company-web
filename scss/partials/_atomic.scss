@@ -1,13 +1,27 @@
+// - buttons
+// - inputs
+// - typography
+// - colors
+
+// buttons
+
 .btn-reset {
   cursor: pointer;
   outline: none;
   border-width: 0;
   background-color: transparent;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: .6
+  }
 }
 
 .btn-outline {
   padding: .3rem 2rem;
+  border: solid 1px rgba(78, 90, 107, 0.5);
+  opacity: 0.5;
   font-weight: 700;
+  font-family: $oc_headers_font;
   font-size: 0.75rem;
   letter-spacing: .1em;
   color: $oc_gray_5;
@@ -30,7 +44,9 @@
 
 .btn-solid {
   background-color: $oc_yellow;
+  border: solid 1px $oc_yellow;
   font-weight: 700;
+  font-family: $oc_headers_font;
   font-size: 0.75rem;
   letter-spacing: .1em;
   color: $oc_gray_5;
@@ -50,10 +66,61 @@
   }
 }
 
-.bg-gray { background-color: $oc-gray_1 }
+// inputs (npt used as prefix)
 
-.bg-white-05 { background-color: rgba(255,255,255,.5) }
+.npt {
+  border: 1px solid rgba(78, 90, 107, 0.1);
+  border-radius: 2px;
+  font-size: 18px;
+  line-height: 1.2;
+  color: $oc_gray_5;
+  transition: $oc_animation_duration;
+
+  &:active, &:focus {
+    border-color: rgba(78, 90, 107, 0.5);
+    outline: none;
+  }
+}
+
+.ta-mh { min-height: 7rem }
+
+// typography
 
 .domine { font-family: 'Domine', Georgia, serif; }
 
 .open-sans {font-family: 'Open Sans', Arial, sans-serif; }
+
+.small-caps {
+  font-family: 'Open Sans', Arial, sans-serif;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: $oc_gray_5;
+}
+
+// colors
+
+.gray5 {color: $oc_gray_5}
+
+.b--red {border-color: $oc_red_regular}
+.red {color: $oc_red_regular}
+
+.bg-gray { background-color: $oc_gray_1 }
+.bg-white-05 { background-color: rgba(255,255,255,.5) }
+
+.dimmed-gray {
+  color: $oc_gray_5;
+  opacity: .5;
+  transition: $oc_animation_duration;
+  &:hover {
+    color: $oc_gray_5;
+    opacity: .8;
+  }
+}
+
+// pad helpers
+
+// additional intermediate step between p2 & p3
+.p25 {padding: 1.5rem}
+.px25 {padding-left: 1.5rem; padding-right: 1.5rem}
+.py25 {padding-top: 1.5rem; padding-bottom: 1.5rem}

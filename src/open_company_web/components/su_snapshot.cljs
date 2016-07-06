@@ -1,7 +1,5 @@
 (ns open-company-web.components.su-snapshot
-  (:require-macros [cljs.core.async.macros :refer (go)])
-  (:require [cljs.core.async :refer (chan <!)]
-            [om.core :as om :include-macros true]
+  (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy :refer-macros (sel1)]
@@ -10,7 +8,6 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
-            [open-company-web.components.menu :refer (menu)]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.footer :refer (footer)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
@@ -38,9 +35,8 @@
              (om/get-state owner :selected-topic)
              (nil? (om/get-state owner :tr-selected-topic)))
     (let [selected-topic (om/get-state owner :selected-topic)
-          company-data   (dis/company-data (om/get-props owner))
-          topics         (:sections (:stakeholder-update company-data))
-          current-idx    (.indexOf (vec topics) selected-topic)]
+          topics         (:sections (dis/stakeholder-update-data))
+          current-idx    (.indexOf (to-array topics) selected-topic)]
       (if is-left?
         ;prev
         (let [prev-idx (mod (dec current-idx) (count topics))
@@ -88,7 +84,8 @@
 
   (did-mount [_]
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))
-    (when-not (utils/is-test-env?)
+    (when (and (not (utils/is-test-env?))
+               (responsive/user-agent-mobile?))
       (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))
             swipe-listener (js/Hammer (sel1 [:div#app]))];(.-body js/document))]
         (om/set-state! owner :kb-listener kb-listener)
@@ -97,7 +94,8 @@
         (.on swipe-listener "swiperight" (fn [e] (switch-topic owner false))))))
 
   (will-unmount [_]
-    (when-not (utils/is-test-env?)
+    (when (and (not (utils/is-test-env?))
+               (responsive/user-agent-mobile?))
       (events/unlistenByKey (om/get-state owner :kb-listener))
       (let [swipe-listener (om/get-state owner :swipe-listener)]
         (.off swipe-listener "swipeleft")
@@ -110,24 +108,12 @@
   (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning columns-num]}]
     (let [company-data (dis/company-data data)
           su-data      (dis/stakeholder-update-data)
-          card-width   (responsive/calc-card-width)
+          card-width   (responsive/calc-card-width 1)
           ww           (.-clientWidth (sel1 js/document :body))
-          total-width  (case columns-num
-                         3 (str (+ (* card-width 3) 40 60) "px")
-                         2 (str (+ (* card-width 2) 20 60) "px")
-                         1 (if (> ww 413) (str card-width "px") "auto"))
+          total-width  (if (> ww 413) (str (min ww (+ card-width 100)) "px") "auto")
           su-subtitle  (str "- " (utils/date-string (js/Date.) true))]
       (dom/div {:class "su-snapshot main-scroll"}
-        (om/build menu data)
         (dom/div {:class "page"}
-          ;; Navbar
-          (when company-data
-            (om/build navbar {:company-data company-data
-                              :sharing-mode false
-                              :hide-right-menu true
-                              :columns-num columns-num
-                              :card-width card-width
-                              :auth-settings (:auth-settings data)}))
           ;; SU Snapshot
           (when company-data
             (dom/div {:class "su-sp-content"}
@@ -166,10 +152,13 @@
                                                 :animate false}
                                                {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                        :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
+              (dom/div {:class "su-sp-company-header"}
+                (dom/img {:class "company-logo" :src (:logo company-data)})
+                (dom/span {:class "company-name"} (:name company-data)))
               (when (:title su-data)
                 (dom/div {:class "su-snapshot-title"} (:title su-data)))
               (dom/div {:class "su-snapshot-subtitle"} su-subtitle)
-              (om/build topics-columns {:columns-num columns-num
+              (om/build topics-columns {:columns-num 1
                                         :card-width card-width
                                         :total-width total-width
                                         :content-loaded (not (:loading data))
@@ -182,4 +171,4 @@
           (when company-data
             (om/build footer {:su-preview true
                               :card-width card-width
-                              :columns-num columns-num})))))))
+                              :columns-num 1})))))))

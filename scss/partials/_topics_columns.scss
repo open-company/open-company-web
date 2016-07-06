@@ -1,13 +1,7 @@
-div.topic-list:not(.no-sharing) {
-  div.topics-columns{
-    margin-top: 123px;
-  }
-}
-
 div.topics-columns {
-  list-style: none;
   padding: 0;
   width: 100vw;
+  overflow-x: auto;
 
   div.topics-column-container {
     padding: 20px 30px 20px 30px;

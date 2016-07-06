@@ -1,13 +1,21 @@
+.char-counter {
+  label {
+    opacity: 0.5;
+    font-weight: 700;
+    font-family: $oc_headers_font;
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 1px;
+    color: rgba(78, 90, 107, 0.5);
+  }
+}
+
 div.fullscreen-topic-edit {
   max-width: 575px;
   min-width: 302px;
   margin: #{$navbar_height}px auto 30px;
   position: relative;
   min-height: calc(100vh - #{$navbar_height}px - 60px - 4px);
-
-  @include mobile(){
-    margin-top: 40px;
-  }
 
   div.fullscreen-topic-edit-top-box {
     border-radius: 4px;
@@ -25,6 +33,7 @@ div.fullscreen-topic-edit {
 
     input.topic-edit-title {
       opacity: 0.5;
+      font-family: $oc_headers_font;
       font-weight: 700;
       font-size: 12px;
       line-height: 1.5;
@@ -52,6 +61,58 @@ div.fullscreen-topic-edit {
     }
 
     div.topic-edit-headline{
+      font-size: 26px;
+      line-height: 1.4;
+      color: $oc_gray_5;
+      border: 0px;
+      width: 100%;
+      padding: 0px;
+      margin: 0px;
+      margin-top: 18px;
+      height: auto;
+
+      &:empty:before{
+        content: attr(placeholder);
+        display: block; /* For Firefox */
+        opacity: 0.5;
+        font-weight: 700;
+        font-family: $oc_headers_font;
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: $oc_gray_5;
+        text-transform: uppercase;
+        border: 0px;
+        width: 100%;
+        padding: 0px;
+
+        &:active, &:focus{
+          border: 0px;
+          outline: none;
+          box-shadow: none;
+        }
+      }
+    }
+
+    textarea.topic-edit-headline {
+      font-size: 26px;
+      line-height: 1.4;
+      color: $oc_gray_5;
+      border: 0px;
+      width: 100%;
+      padding: 0px;
+      margin: 0px;
+      margin-top: 2px;
+      height: auto;
+
+      &:active, &:focus{
+        border: 0px;
+        outline: none;
+        box-shadow: none;
+      }
+    }
+
+    div.topic-edit-headline{
       font-family: $oc_headers_font;
       font-size: 26px;
       line-height: 1.4;
@@ -68,25 +129,6 @@ div.fullscreen-topic-edit {
         display: block; /* For Firefox */
         opacity: 0.5;
       }
-
-      &:active, &:focus{
-        border: 0px;
-        outline: none;
-        box-shadow: none;
-      }
-    }
-
-    textarea.topic-edit-headline {
-      font-family: $oc_headers_font;
-      font-size: 26px;
-      line-height: 1.4;
-      color: $oc_gray_5;
-      border: 0px;
-      width: 100%;
-      padding: 0px;
-      margin: 0px;
-      margin-top: 2px;
-      height: auto;
 
       &:active, &:focus{
         border: 0px;
@@ -130,6 +172,7 @@ div.fullscreen-topic-edit {
 
           thead tr th {
             font-weight: 700;
+            font-weight: $oc_headers_font;
             font-size: 12px;
             line-height: 1.5;
             letter-spacing: 1px;
@@ -148,6 +191,7 @@ div.fullscreen-topic-edit {
           tr td.no-cell:first-child {
             padding-top: 12px;
             font-weight: 700;
+            font-weight: $oc_headers_font;
             font-size: 12px;
             letter-spacing: 1px;
             color: rgba(78, 90, 107, 0.5);
@@ -155,6 +199,7 @@ div.fullscreen-topic-edit {
 
           td.no-cell {
             font-weight: 700;
+            font-weight: $oc_headers_font;
             font-size: 12px;
             letter-spacing: 1px;
             color: rgba(78,90,107, 0.5);
@@ -184,6 +229,7 @@ div.fullscreen-topic-edit {
 
           a.more {
             font-weight: 700;
+            font-weight: $oc_headers_font;
             font-size: 12px;
             letter-spacing: 1px;
             color: rgba(78, 90, 107, 0.5);

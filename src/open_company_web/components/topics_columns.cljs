@@ -170,6 +170,8 @@
                                :section section-name
                                :show-fast-editing (om/get-props owner :show-fast-editing)
                                :section-data sd
+                               :card-width (:card-width props)
+                               :show-share-remove (:show-share-remove props)
                                :read-only-company (:read-only company-data)
                                :currency (:currency company-data)
                                :sharing-mode sharing-mode
@@ -177,6 +179,7 @@
                                :foce-data (:foce-data props)
                                :share-selected share-selected?}
                                {:opts {:section-name section-name
+                                       :share-remove-click (:share-remove-click options)
                                        :topic-click (partial topic-click section-name)}}))))))))
 
 (defcomponent topics-columns [{:keys [columns-num

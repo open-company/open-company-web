@@ -17,5 +17,5 @@
 
 (defcomponent login-button [{:keys [auth-settings]} owner]
   (render [_]
-    (dom/button {:class "btn-reset btn-outline" :on-click #(login! (:extended-scopes-url auth-settings) %)}
-      "Sign in / Sign up")))
+    (dom/button {:class "btn-reset" :on-click #(login! (:extended-scopes-url auth-settings) %)}
+      (dom/img {:src "https://api.slack.com/img/sign_in_with_slack.png"}))))

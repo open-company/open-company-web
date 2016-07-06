@@ -538,13 +538,16 @@
                       :on-blur #(om/set-state! owner :show-title-counter false)
                       :max-length title-length-limit
                       :value title
-                      :on-focus #(om/set-state! owner :show-title-counter true)
-                      :on-change #(change-value owner :title %)})
-            (dom/div {:class (utils/class-set {:topic-edit-title-count true
-                                               :char-counter true
-                                               :transparent (not show-title-counter)})}
-              (dom/label {:class "bold"} (- title-length-limit (count title))))
+                      :on-change (fn [e]
+                                    (when (not show-title-counter)
+                                      (om/set-state! owner :show-title-counter true))
+                                    (change-value owner :title e))})
+          (dom/div {:class (utils/class-set {:topic-edit-title-count true
+                                             :char-counter true
+                                             :transparent (not show-title-counter)})}
+            (dom/label {} (- title-length-limit (count title))))
           (dom/div {:className "topic-edit-headline emoji-autocomplete"
+                    :ref "topic-edit-headline"
                     :contentEditable true
                     :id (str "topic-edit-headline-" (name topic))
                     :placeholder "Headline"
@@ -557,7 +560,7 @@
           (dom/div {:class (utils/class-set {:topic-edit-headline-count true
                                              :char-counter true
                                              :transparent (not show-headline-counter)})}
-            (dom/label {:class "bold"} (- headline-length-limit (count-chars headline))))
+            (dom/label {} (- headline-length-limit (count-chars headline))))
           (when is-data-topic
             (dom/div {:class "separator"}))
           (dom/div {:class "topic-overlay-edit-data"}

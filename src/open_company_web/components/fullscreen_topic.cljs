@@ -16,6 +16,7 @@
             [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.ui.small-loading :refer (small-loading)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
+            [open-company-web.components.ui.small-loading :as loading]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [goog.style :refer (setStyle)]
             [goog.events :as events]
@@ -258,7 +259,7 @@
                                     (om/set-state! owner :data-posted true)
                                     (put! ch {:click true :event %}))}
             (if data-posted
-              (om/build small-loading {:animating true})
+              (loading/small-loading)
               "SAVE")))
         (when editing
           (dom/button {:class "btn-reset btn-outline close-editing"
