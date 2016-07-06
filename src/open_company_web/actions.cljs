@@ -136,7 +136,17 @@
       (dissoc :loading))))
 
 ;; Front of Card Edit section
-(defmethod dispatcher/action :start-foce [db [_ section-key]]
+(defmethod dispatcher/action :start-foce [db [_ section-key section-data]]
   (if section-key
-    (assoc db :foce-key section-key)
-    (dissoc db :foce-key)))
+    (-> db
+        (assoc :foce-key section-key)
+        (assoc :foce-data section-data))
+    (-> db
+        (dissoc :foce-key)
+        (dissoc :foce-data))))
+
+(defmethod dispatcher/action :foce-input [db [_ k v]]
+  (let [p (if (seq? k)
+            (vec (concat [:foce-data] k))
+            [:foce-data k])]
+    (assoc-in db p v)))
