@@ -104,6 +104,7 @@
                            :revision-updates (dis/revisions (router/current-company-slug))
                            :card-width card-width
                            :columns-num columns-num
+                           :foce-edit (dis/foce-section-key)
                            :active-category (:active-category state)}
                           {:opts {:navbar-editing-cb navbar-editing-cb
                                   :topic-edit-cb (partial topic-edit-cb owner)
