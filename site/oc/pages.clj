@@ -165,6 +165,9 @@
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css?oc_deploy_key"}]
           ;; Google fonts Domine and OpenSans
           [:link {:type "text/css", :rel "stylesheet", :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]]
+          ;;  Medium Editor css
+          [:link {:type "text/css", :rel "stylesheet", :href "/css/medium-editor/medium-editor.css?oc_deploy_key"}]]
+          [:link {:type "text/css", :rel "stylesheet", :href "/css/medium-editor/default.css?oc_deploy_key"}]]
    :body [:body
           [:div#app [:div.oc-loading.active [:div.oc-loading-internal]]]
           [:div#oc-loading]
