@@ -9,7 +9,6 @@
     ;; Skip ClojureScript 1.9.93 as it breaks source maps
     [org.clojure/clojurescript "1.9.89"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
 
-    ;; --- DO NOT UPDATE OM, the 1.x.x code requires changes on our part
     [org.omcljs/om "1.0.0-alpha37" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
     [rum "0.10.3" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
 
