@@ -14,6 +14,7 @@
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
+            [open-company-web.components.topic-edit :refer (topic-edit)]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.add-topic-popover :refer (add-topic-popover)]
             [goog.fx.dom :refer (Fade)]
@@ -110,8 +111,9 @@
         (when-not (clojure.string/blank? topic-body)
           (dom/div #js {:className "topic-read-more"} "READ MORE"))))))
 
-(defn topic-click [options selected-metric]
-  ((:topic-click options) selected-metric))
+(defn topic-click [section-kw options selected-metric]
+  ; ((:topic-click options) selected-metric)
+  (dis/dispatch! [:start-foce section-kw]))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
@@ -208,7 +210,7 @@
                     :ref "topic"
                     :onClick #(if add-topic?
                                 (add-topic owner)
-                                (topic-click options nil))}
+                                (topic-click section-kw options nil))}
         (when show-add-topic-popover
           (let [all-sections (get-all-sections slug)
                 update-active-topics (:update-active-topics options)
@@ -227,20 +229,38 @@
                         :ref "cur-topic"
                         :key (str "cur-" as-of)
                         :style #js {:opacity 1 :width "100%" :height "auto"}}
-            (om/build topic-internal {:section section
-                                      :topic-data topic-data
-                                      :add-topic add-topic?
-                                      :sharing-mode sharing-mode
-                                      :show-fast-editing (:show-fast-editing data)
-                                      :currency currency
-                                      :read-only-company (:read-only-company data)
-                                      :topic-click (partial topic-click options)
-                                      :prev-rev prev-rev
-                                      :next-rev next-rev}
-                                     {:opts (merge options {:rev-click (fn [e rev]
-                                                                          (scroll-to-topic-top (om/get-ref owner "topic"))
-                                                                          (om/set-state! owner :transition-as-of (:updated-at rev))
-                                                                          (.stopPropagation e))})}))
+            (if (= (dis/foce-section-key) section-kw)
+              (om/build topic-edit {:section section
+                                    :topic-data topic-data
+                                    :add-topic add-topic?
+                                    :sharing-mode sharing-mode
+                                    :show-fast-editing (:show-fast-editing data)
+                                    :currency currency
+                                    :read-only-company (:read-only-company data)
+                                    :topic-click (partial topic-click options)
+                                    :foce-edit (:foce-edit data)
+                                    :prev-rev prev-rev
+                                    :next-rev next-rev}
+                                   {:opts (merge options {:rev-click (fn [e rev]
+                                                                        (scroll-to-topic-top (om/get-ref owner "topic"))
+                                                                        (om/set-state! owner :transition-as-of (:updated-at rev))
+                                                                        (.stopPropagation e))})
+                                    :key (str "topic-foce-" section)})
+              (om/build topic-internal {:section section
+                                        :topic-data topic-data
+                                        :add-topic add-topic?
+                                        :sharing-mode sharing-mode
+                                        :show-fast-editing (:show-fast-editing data)
+                                        :currency currency
+                                        :read-only-company (:read-only-company data)
+                                        :topic-click (partial topic-click options)
+                                        :prev-rev prev-rev
+                                        :next-rev next-rev}
+                                       {:opts (merge options {:rev-click (fn [e rev]
+                                                                            (scroll-to-topic-top (om/get-ref owner "topic"))
+                                                                            (om/set-state! owner :transition-as-of (:updated-at rev))
+                                                                            (.stopPropagation e))})
+                                        :key (str "topic-" section)}))
             (when transition-as-of
               (dom/div #js {:className "topic-tr-as-of group"
                             :ref "tr-topic"
@@ -257,4 +277,4 @@
                                             :read-only-company (:read-only-company data)
                                             :prev-rev tr-prev-rev
                                             :next-rev tr-next-rev}
-                                           {:opts (merge options {:rev-click #()})})))))))))
+                                           {:opts (merge options {:rev-click #()})}))))))))))
