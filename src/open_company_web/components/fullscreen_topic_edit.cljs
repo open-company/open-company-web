@@ -454,15 +454,15 @@
       (om/set-state! owner (get-state owner next-props (om/get-state owner)))))
 
   (will-unmount [_]
-    ; disable front of card editing
-    (dis/dispatch! [:start-foce nil])
     (when-not (utils/is-test-env?)
       ; re enable the route dispatcher
       (reset! prevent-route-dispatch false)
       ; remove the onbeforeunload handler
       (set! (.-onbeforeunload js/window) nil)
       ; remove history change listener
-      (events/unlistenByKey (om/get-state owner :history-listener-id))))
+      (events/unlistenByKey (om/get-state owner :history-listener-id))
+      ; disable front of card editing
+      (utils/after 100 #(dis/dispatch! [:start-foce nil]))))
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
