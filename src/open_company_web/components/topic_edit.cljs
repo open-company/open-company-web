@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
             [open-company-web.dispatcher :as dis]
+            [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.oc-colors :as oc-colors]
             [open-company-web.lib.responsive :as responsive]
@@ -13,7 +14,9 @@
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
-            [cljsjs.medium-editor])) ; pulled in for cljsjs externs
+            [cljsjs.medium-editor] ; pulled in for cljsjs externs
+            [goog.dom :as gdom]
+            [clojure.string :as string]))
 
 (def title-max-length 20)
 (def headline-max-length 100)
@@ -27,7 +30,7 @@
         topic-scroll-top (utils/offset-top topic)]
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
-(defn pencil-click [owner options e]
+(defn start-fullscreen-editing-click [owner options e]
   (utils/event-stop e)
   (let [section (om/get-props owner :section)
         topic-click-cb (:topic-click options)]
@@ -42,7 +45,7 @@
         (.subscribe headline-editor
                     "editableInput"
                     (fn [event editable]
-                      (dis/dispatch! [:foce-input :headline (.-innerHTML headline-el)])
+                      (dis/dispatch! [:foce-input {:headline (.-innerHTML headline-el)}])
                       (let [v (.-innerText headline-el)
                             remaining-chars (- headline-max-length (count v))]
                         (om/set-state! owner :char-count remaining-chars)
@@ -53,7 +56,7 @@
         (.subscribe snippet-editor
                     "editableInput"
                     (fn [event editable]
-                      (dis/dispatch! [:foce-input :snippet (.-innerHTML snippet-el)])
+                      (dis/dispatch! [:foce-input {:snippet (.-innerHTML snippet-el)}])
                       (let [v (.-innerText snippet-el)
                             remaining-chars (- snippet-max-length (count v))]
                         (om/set-state! owner :char-count remaining-chars)
@@ -90,6 +93,30 @@
                  (>= (count snippet-value) snippet-max-length))
         (.preventDefault e)))))
 
+(defn img-on-load [img]
+  (dis/dispatch! [:foce-input {:image-width (.-clientHeight img)
+                               :image-height (.-clientWidth img)}]))
+
+(defn upload-file! [owner file]
+  (let [success-cb  (fn [success]
+                      (let [url    (.-url success)
+                            node   (gdom/createDom "img")]
+                        (set! (.-onload node) #(img-on-load node))
+                        (set! (.-src node) url)
+                        (dis/dispatch! [:foce-input {:image-url url}]))
+                      (om/set-state! owner :file-upload-state nil)
+                      (om/set-state! owner :file-upload-progress 0))
+        error-cb    (fn [error] (js/console.log "error" error))
+        progress-cb (fn [progress]
+                      (let [state (om/get-state owner)]
+                        (om/set-state! owner (merge state {:file-upload-state :show-progress
+                                                           :file-upload-progress progress}))))]
+    (cond
+      (and (string? file) (not (string/blank? file)))
+      (js/filepicker.storeUrl file success-cb error-cb progress-cb)
+      file
+      (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
+
 (defcomponent topic-edit [{:keys [currency
                                   prev-rev
                                   next-rev]} owner options]
@@ -99,13 +126,16 @@
       {:initial-headline (:headline topic-data)
        :initial-snippet  (:snippet topic-data)
        :char-count nil
-       :char-count-alert false}))
+       :char-count-alert false
+       :file-upload-state nil
+       :file-upload-progress 0}))
 
   (did-mount [_]
+    (js/filepicker.setKey ls/filestack-key)
     (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
     (setup-edit owner))
 
-  (render-state [_ {:keys [initial-headline initial-snippet char-count char-count-alert]}]
+  (render-state [_ {:keys [initial-headline initial-snippet char-count char-count-alert file-upload-state file-upload-progress]}]
     (let [section             (dis/foce-section-key)
           topic-data          (dis/foce-section-data)
           section-kw          (keyword section)
@@ -124,8 +154,6 @@
                                   (and (= section-kw :growth)
                                        (utils/no-growth-data? growth-data)))
           image-header        (:image-url topic-data)
-          image-header-size   {:width (:image-width topic-data)
-                               :height (:image-height topic-data)}
           topic-body          (utils/get-topic-body topic-data section)]
       (dom/div #js {:className "topic-foce group"
                     :ref "topic-internal"}
@@ -137,9 +165,7 @@
             (when image-header
               (dom/button {:class "btn-reset remove-header"
                            :on-click #(do
-                                        (dis/dispatch! [:foce-input :image-url nil])
-                                        (dis/dispatch! [:foce-input :image-height 0])
-                                        (dis/dispatch! [:foce-input :image-width 0]))}
+                                        (dis/dispatch! [:foce-input {:image-url nil :image-height 0 :image-width 0}]))}
                 (i/icon :simple-remove {:size 16
                                         :color (oc-colors/get-color-by-kw :oc-gray-5)
                                         :accent-color (oc-colors/get-color-by-kw :oc-gray-5)})))))
@@ -151,17 +177,13 @@
                     :on-blur #(om/set-state! owner :char-count nil)
                     :on-change #(let [v (.. % -target -value)
                                       remaining-chars (- title-max-length (count v))]
-                                  (dis/dispatch! [:foce-input :title v])
+                                  (dis/dispatch! [:foce-input {:title v}])
                                   (om/set-state! owner :char-count remaining-chars)
                                   (om/set-state! owner :char-count-alert (< remaining-chars title-alert-limit)))})
-        (dom/button {:class "topic-pencil-button btn-reset"
-                     :on-click (partial pencil-click owner options)}
-          (i/icon :pencil {:size 16
-                           :color gray-color
-                           :accent-color gray-color}))
         ;; Topic headline
         (dom/div {:class "topic-headline-inner emoji-autocomplete"
                   :id (str "foce-headline-" (name section))
+                  :key "foce-headline"
                   :on-key-up   #(check-headline-count owner %)
                   :on-key-down #(check-headline-count owner %)
                   :on-focus    #(check-headline-count owner %)
@@ -171,6 +193,7 @@
                   :dangerouslySetInnerHTML #js {"__html" initial-headline}})
         (dom/div #js {:className "topic-body topic-snippet emoji-autocomplete"
                       :id (str "foce-snippet-" (name section))
+                      :key "foce-snippet"
                       :ref "topic-snippet"
                       :onKeyUp   #(check-snippet-count owner %)
                       :onKeyDown #(check-snippet-count owner %)
@@ -180,28 +203,47 @@
                                  (om/set-state! owner :char-count nil))
                       :dangerouslySetInnerHTML #js {"__html" initial-snippet}})
         (dom/div {:class "topic-foce-buttons group"}
+          (dom/button {:class "btn-reset"
+                       :title "Archive topic"
+                       :type "button"
+                       :data-toggle "tooltip"
+                       :data-placement "top"
+                       :on-click #(when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
+                                    (dis/dispatch! [:topic-archive section]))}
+            (i/icon :trash {:size 16
+                            :color (oc-colors/get-color-by-kw :oc-gray-5)
+                            :accent-color (oc-colors/get-color-by-kw :oc-gray-5)}))
           (dom/button {:class "btn-reset add-content"
                        :title "Add more content"
                        :type "button"
                        :data-toggle "tooltip"
-                       :data-placement "top"}
+                       :data-placement "top"
+                       :on-click (partial start-fullscreen-editing-click owner options)}
             (i/icon :simple-add {:size 16
                                  :color (oc-colors/get-color-by-kw :oc-gray-5)
                                  :accent-color (oc-colors/get-color-by-kw :oc-gray-5)}))
-          (when-not image-header
-            (dom/button {:class "btn-reset camera"
-                         :title "Add an image"
-                         :type "button"
-                         :data-toggle "tooltip"
-                         :data-placement "top"}
-              (i/icon :camera-20 {:size 16
-                                  :color (oc-colors/get-color-by-kw :oc-gray-5)
-                                  :accent-color (oc-colors/get-color-by-kw :oc-gray-5)}))))
+          (dom/input {:id "file-upload-ui--select-trigger"
+                      :style {:display "none"}
+                      :type "file"
+                      :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
+          (dom/button {:class "btn-reset camera"
+                       :title "Add an image"
+                       :type "button"
+                       :data-toggle "tooltip"
+                       :data-placement "top"
+                       :style {:display (if (and (not image-header) (nil? file-upload-state)) "block" "none")}
+                       :on-click #(.click (sel1 [:input#file-upload-ui--select-trigger]))}
+            (i/icon :camera-20 {:size 16
+                                :color (oc-colors/get-color-by-kw :oc-gray-5)
+                                :accent-color (oc-colors/get-color-by-kw :oc-gray-5)}))
+          (when (= file-upload-state :show-progress)
+            (dom/span {:class "file-upload-progress"} (str file-upload-progress "%"))))
         (dom/div {:class "topic-foce-footer group"}
           (dom/div {:class "topic-foce-footer-left"}
             (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
           (dom/div {:class "topic-foce-footer-right"}
             (dom/button {:class "btn-reset btn-solid"
-                         :disabled false} "SAVE")
+                         :disabled (= file-upload-state :show-progress)
+                         :on-click #(dis/dispatch! [:foce-save])} "SAVE")
             (dom/button {:class "btn-reset btn-outline"
                          :on-click #(do (utils/event-stop %) (dis/dispatch! [:start-foce nil]))} "CANCEL")))))))
