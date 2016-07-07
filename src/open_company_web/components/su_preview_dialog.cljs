@@ -18,10 +18,9 @@
 (defn valid-email? [addr] (email/isValidAddress addr))
 
 (defn send-clicked [type]
-  (let [post-data (get-in @dis/app-state [:stakeholder-update/share type])
+  (let [post-data (get-in @dis/app-state [:su-share type])
         emojied   (update post-data :note (fnil utils/unicode-emojis ""))]
-    (dis/dispatch! [:stakeholder-update/reset-share])
-    (dis/dispatch! [:stakeholder-update/validate-share type])
+    (dis/dispatch! [:su-share/reset])
     (api/share-stakeholder-update {type emojied})))
 
 (defn select-share-link [event]
@@ -83,12 +82,12 @@
     [:label.block.small-caps.bold.mb2 "Subject"]
     [:input.domine.npt.p1.col-12.mb3
      {:type "text"
-      :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :subject] (.. % -target -value)])
+      :on-change #(dis/dispatch! [:input [:su-share :email :subject] (.. % -target -value)])
       :default-value initial-subject}]
     [:label.block.small-caps.bold.mb2 "Your Note"]
     [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh
      {:type "text"
-      :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :note] (.. % -target -value)])
+      :on-change #(dis/dispatch! [:input [:su-share :email :note] (.. % -target -value)])
       :placeholder "Optional note to go with this update."}]]])
 
 (rum/defc slack-dialog < rum/static emoji-autocomplete
@@ -99,7 +98,7 @@
     [:label.block.small-caps.bold.mb2 "Your Note"]
     [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh
      {:type "text"
-      :on-change #(dis/dispatch! [:input [:stakeholder-update/share :slack :note] (.. % -target -value)])
+      :on-change #(dis/dispatch! [:input [:su-share :slack :note] (.. % -target -value)])
       :placeholder "Optional note to go with this update."}]]])
 
 (rum/defcs link-dialog < (rum/local false ::copied)
@@ -132,7 +131,7 @@
    [dis/app-state]
    ::email-field
    (fn [app-state]
-     (get-in app-state [:stakeholder-update/share :email :to]))))
+     (get-in app-state [:su-share :email :to]))))
 
 (rum/defc modal-actions < rum/reactive
   [send-fn cancel-fn type]
