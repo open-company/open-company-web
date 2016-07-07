@@ -1,8 +1,24 @@
 (ns open-company-web.dispatcher
   (:require [cljs-flux.dispatcher :as flux]
+            [org.martinklepsch.derivatives :as drv]
             [open-company-web.router :as router]))
 
 (defonce app-state (atom {:loading false :menu-open false}))
+
+(defonce drv
+  ;; A variant of `org.martinklepsch.derivatives/drv` that works by
+  ;; encapsulating global state instead of passing it down the component
+  ;; tree using React's childContext
+  (let [spec {:base     [[] app-state]
+              :su-share [[:base] (fn [base] (:su-share base))]}
+        {:keys [get! release!]} (drv/derivatives-manager spec)]
+    (fn drv [drv-k]
+      (let [token (random-uuid)]
+        {:will-mount   (fn [s]
+                         (assoc-in s [::drv/derivatives drv-k] (get! drv-k token)))
+         :will-unmount (fn [s]
+                         (release! drv-k token)
+                         (update s ::drv/derivatives dissoc drv-k))}))))
 
 (defmulti action (fn [db [action-type & _]] action-type))
 
