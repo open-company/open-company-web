@@ -12,6 +12,7 @@
             [open-company-web.api :as api]
             [open-company-web.caches :as caches]
             [open-company-web.urls :as oc-urls]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.finances.utils :as finances-utils]
@@ -132,7 +133,8 @@
 
 (defn growth-init-state [topic data current-state]
   (when (= topic "growth")
-    (let [topic-data (:topic-data data)
+    (let [topic         (:topic data)
+          topic-data    (if (= (name (dis/foce-section-key)) topic) (dis/foce-section-data) (:topic-data data))
           growth-metric-focus (:growth-metric-focus data)
           all-metrics (:metrics topic-data)
           focus-metric (or growth-metric-focus (:slug (first all-metrics)))]
@@ -224,7 +226,8 @@
     (om/set-state! owner :growth-metrics (:growth-metrics state))
     (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))
     (when (om/get-state owner :growth-new-metric)
-      (let [topic-data (:topic-data data)
+      (let [topic        (:topic data)
+            topic-data   (if (= (name (dis/foce-section-key)) topic) (dis/foce-section-data) (:topic-data data))
             first-metric (:slug (first (:metrics topic-data)))]
         (om/set-state! owner :growth-focus first-metric)))
     ; and the editing state flags
@@ -248,11 +251,12 @@
 
 (defn data-to-save [owner topic]
   (when-let* [body-node (sel1 [(keyword (str "div#topic-edit-body-" (name topic)))])
-              snippet-node (sel1 [(keyword (str "div#topic-edit-snippet-" (name topic)))])]
+              snippet-node (sel1 [(keyword (str "div#topic-edit-snippet-" (name topic)))])
+              headline-node (sel1 [(keyword (str "div#topic-edit-headline-" (name topic)))])]
     (let [topic-kw (keyword topic)
          is-data-topic (#{:finances :growth} topic-kw)
          with-title {:title (om/get-state owner :title)}
-         with-headline (merge with-title {:headline (om/get-state owner :headline)})
+         with-headline (merge with-title {:headline (.-innerHTML headline-node)})
          snippet (.-innerHTML snippet-node)
          with-snippet (merge with-headline {:snippet snippet})
          body (.-innerHTML body-node)
@@ -270,8 +274,7 @@
     (om/set-state! owner :show-headline-counter true))
   (let [headline-innerHTML (.-innerHTML (sel1 [:div.topic-edit-headline]))]
     (when (not= (om/get-state owner :headline) headline-innerHTML)
-      (om/set-state! owner :has-changes true)
-      (om/set-state! owner :headline headline-innerHTML))))
+      (om/set-state! owner :has-changes true))))
 
 (defn check-headline-count [owner headline-max-length e]
   (when-let [headline (sel1 [:div.topic-edit-headline])]
@@ -324,14 +327,13 @@
       (string/replace #"&nbsp;" " ")
       count))
 
-(defn snippet-count-chars
-  "A special variant of `count` that will count emoji strings (:smile:)
-   and html spaces (&nbsp;) as single characters."
-  []
+(defn headline-count-chars []
+  (when-let [headline-node (sel1 [:div.topic-edit-headline])]
+    (count-chars (.-innerHTML headline-node))))
+
+(defn snippet-count-chars []
   (when-let [snippet-node (sel1 [:div.topic-edit-snippet])]
-    (-> (js/emojione.shortnameToUnicode (or (.-innerText snippet-node) ""))
-        (string/replace #"&nbsp;" " ")
-        count)))
+    (count-chars (.-innerHTML snippet-node))))
 
 (defn top-position [el]
   (loop [yPos 0
@@ -367,8 +369,8 @@
     (events/listen fullscreen-topic EventType/CLICK (partial body-clicked owner))))
 
 (defn get-state [owner data current-state]
-  (let [topic-data    (:topic-data data)
-        topic         (:topic data)
+  (let [topic         (:topic data)
+        topic-data    (if (= (name (dis/foce-section-key)) topic) (dis/foce-section-data) (:topic-data data))
         body-click    (if (and (nil? (:body-click current-state)) (:visible data))
                         (setup-body-listener owner)
                         (:body-click current-state))]
@@ -452,6 +454,8 @@
       (om/set-state! owner (get-state owner next-props (om/get-state owner)))))
 
   (will-unmount [_]
+    ; disable front of card editing
+    (dis/dispatch! [:start-foce nil])
     (when-not (utils/is-test-env?)
       ; re enable the route dispatcher
       (reset! prevent-route-dispatch false)
@@ -556,11 +560,11 @@
                     :on-key-up   #(check-headline-count owner headline-length-limit %)
                     :on-key-down #(check-headline-count owner headline-length-limit %)
                     :on-focus    #(check-headline-count owner headline-length-limit %)
-                    :dangerouslySetInnerHTML (clj->js {"__html" (:headline topic-data)})})
+                    :dangerouslySetInnerHTML (clj->js {"__html" headline})})
           (dom/div {:class (utils/class-set {:topic-edit-headline-count true
                                              :char-counter true
                                              :transparent (not show-headline-counter)})}
-            (dom/label {} (- headline-length-limit (count-chars headline))))
+            (dom/label {} (- headline-length-limit (headline-count-chars))))
           (when is-data-topic
             (dom/div {:class "separator"}))
           (dom/div {:class "topic-overlay-edit-data"}
