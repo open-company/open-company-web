@@ -68,7 +68,15 @@
 
 // inputs (npt used as prefix)
 
+.outline-none {
+  outline: none;
+  &:active, &:focus {
+    outline: none;
+  }
+}
+
 .npt {
+  background-color: white;
   border: 1px solid rgba(78, 90, 107, 0.1);
   border-radius: 2px;
   font-size: 18px;
