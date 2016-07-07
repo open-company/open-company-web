@@ -118,7 +118,7 @@
   (.stopPropagation e)
   (when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
     (let [section (om/get-props owner :section)]
-      ((:remove-topic options) section))
+      (dis/dispatch! [:topic-archive section]))
     (hide-fullscreen-topic owner options true)))
 
 (defn revision-navigation [owner as-of]
