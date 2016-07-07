@@ -220,10 +220,22 @@ div.topic {
       }
 
       div.topic-foce-buttons {
+        span.file-upload-progress {
+          float: right;
+          margin-top: 7px;
+          padding-bottom: 0px;
+          margin-bottom: 0px;
+          // opacity: 0.5;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: rgba(78, 90, 107, 0.5);
+        }
 
         button {
           margin-left: 7px;
           float: right;
+          margin-bottom: 5px;
         }
       }
 
