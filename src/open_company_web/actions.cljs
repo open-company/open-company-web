@@ -142,11 +142,9 @@
         (dissoc :foce-key)
         (dissoc :foce-data))))
 
-(defmethod dispatcher/action :foce-input [db [_ k v]]
-  (let [p (if (seq? k)
-            (vec (concat [:foce-data] k))
-            [:foce-data k])]
-    (assoc-in db p v)))
+(defmethod dispatcher/action :foce-input [db [_ topic-data-map]]
+  (let [old-data (:foce-data db)]
+    (assoc db :foce-data (merge old-data topic-data-map))))
 
 ;; This should be turned into a proper form library
 ;; Lomakeets FormState ideas seem like a good start:
@@ -157,3 +155,16 @@
 
 (defmethod dispatcher/action :stakeholder-update/reset-share [db _]
   (dissoc db :stakeholder-update/share))
+
+(defmethod dispatcher/action :topic-archive [db [_ topic]]
+  (let [company-data (dispatcher/company-data)
+        old-categories (:sections company-data)
+        new-categories (apply merge (map #(hash-map (first %) (utils/vec-dissoc (second %) (name topic))) old-categories))]
+    (api/patch-sections new-categories))
+  db)
+
+(defmethod dispatcher/action :foce-save [db [_]]
+  (api/partial-update-section (:section (:foce-data db)) (dissoc (:foce-data db) :section))
+  (-> db
+      (dissoc :foce-key)
+      (dissoc :foce-data)))
