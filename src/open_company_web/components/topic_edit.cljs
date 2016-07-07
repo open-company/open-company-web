@@ -102,7 +102,8 @@
        :char-count-alert false}))
 
   (did-mount [_]
-    (utils/after 1000 #(setup-edit owner)))
+    (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+    (setup-edit owner))
 
   (render-state [_ {:keys [initial-headline initial-snippet char-count char-count-alert]}]
     (let [section             (dis/foce-section-key)
@@ -181,16 +182,18 @@
         (dom/div {:class "topic-foce-buttons group"}
           (dom/button {:class "btn-reset add-content"
                        :title "Add more content"
+                       :type "button"
                        :data-toggle "tooltip"
-                       :data-placeholder "top"}
+                       :data-placement "top"}
             (i/icon :simple-add {:size 16
                                  :color (oc-colors/get-color-by-kw :oc-gray-5)
                                  :accent-color (oc-colors/get-color-by-kw :oc-gray-5)}))
           (when-not image-header
             (dom/button {:class "btn-reset camera"
                          :title "Add an image"
+                         :type "button"
                          :data-toggle "tooltip"
-                         :data-placeholder "top"}
+                         :data-placement "top"}
               (i/icon :camera-20 {:size 16
                                   :color (oc-colors/get-color-by-kw :oc-gray-5)
                                   :accent-color (oc-colors/get-color-by-kw :oc-gray-5)}))))
