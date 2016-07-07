@@ -82,7 +82,7 @@
   font-size: 18px;
   line-height: 1.2;
   color: $oc_gray_5;
-  transition: $oc_animation_duration;
+  transition: border-color $oc_animation_duration;
 
   &:active, &:focus {
     border-color: rgba(78, 90, 107, 0.5);
