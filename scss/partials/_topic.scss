@@ -249,7 +249,7 @@ div.topic {
         }
       }
 
-      div.topic-read-more {
+      button.topic-read-more {
         opacity: 0.5;
         font-weight: 800;
         font-size: 12px;
@@ -257,8 +257,7 @@ div.topic {
         letter-spacing: 1px;
         color: $oc_gray_5;
         text-decoration: underline;
-        margin-top: 0px;
-        margin-bottom: 28px;
+        margin: 0px 15px 28px 15px;
       }
     }
   }
