@@ -66,7 +66,7 @@
               if it is valid otherwise false
   :container-node (default :div) Provide a different node for the container
   :input-node (default :input) Provide a different node for the input field"
-  < (rum/local [] ::show-input?) (rum/local [] ::items) (rum/local [] ::input)
+  < (rum/local true ::show-input?) (rum/local [] ::items) (rum/local "" ::input)
   [s {:keys [item-render on-change submitted
              valid-item? container-node input-node]
       :or {valid-item? identity
@@ -102,19 +102,20 @@
        [:div {:style {:visibility "hidden" :pointer-events "none"}} [input-node {:class "col-12"}]]
 
        ;; Render actual input to add new items
-       :else [input-node
-              {:type      "text"
-               :class     (when-not (seq @*items) "col-12")
-               :placeholder (when-not (seq @*items) "investor@vc.com advisor@smart.com")
-               :auto-focus true
-               :value      @*input
-               :on-key-down #(do
-                               (when (and (= 8 (.-keyCode %)) (empty? @*input))
-                                 (on-change (swap! *items (comp vec drop-last)))))
-               :on-blur   #(do (submit! (.. % -target -value))
-                               (reset! *show-input? false)
-                               nil)
-               :on-change #(maybe-submit (.. % -target -value))}])]))
+       @*show-input?
+       [input-node
+        {:type      "text"
+         :class     (when-not (seq @*items) "col-12")
+         :placeholder (when-not (seq @*items) "investor@vc.com advisor@smart.com")
+         :auto-focus true
+         :value      @*input
+         :on-key-down #(do
+                         (when (and (= 8 (.-keyCode %)) (empty? @*input))
+                           (on-change (swap! *items (comp vec drop-last)))))
+         :on-blur   #(do (submit! (.. % -target -value))
+                         (reset! *show-input? false)
+                         nil)
+         :on-change #(maybe-submit (.. % -target -value))}])]))
 
 (rum/defc email-item [v delete! submitted?]
   [:div.inline-block.mr1.mb1.rounded
@@ -140,8 +141,8 @@
           (not (every? valid-email? to-field))
           [:span.red.py1 " — Not a valid email address"]))]
      (item-input {:item-render email-item
-                  :container-node :div.npt.p1.mb3
-                  :input-node :input.border-none.outline-none
+                  :container-node :div.npt.pt1.pr1.pl1.mb3
+                  :input-node :input.border-none.outline-none.mr.mb1
                   :valid-item? valid-email?
                   :on-change (fn [val] (dis/dispatch! [:input [:su-share :email :to] val]))})]
     [:label.block.small-caps.bold.mb2 "Subject"]
