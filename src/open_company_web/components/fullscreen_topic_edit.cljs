@@ -134,7 +134,7 @@
 (defn growth-init-state [topic data current-state]
   (when (= topic "growth")
     (let [topic         (:topic data)
-          topic-data    (if (= (name (dis/foce-section-key)) topic) (dis/foce-section-data) (:topic-data data))
+          topic-data    (if ((and (dis/foce-section-key) (= (name (dis/foce-section-key)) topic))) (dis/foce-section-data) (:topic-data data))
           growth-metric-focus (:growth-metric-focus data)
           all-metrics (:metrics topic-data)
           focus-metric (or growth-metric-focus (:slug (first all-metrics)))]
@@ -227,7 +227,7 @@
     (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))
     (when (om/get-state owner :growth-new-metric)
       (let [topic        (:topic data)
-            topic-data   (if (= (name (dis/foce-section-key)) topic) (dis/foce-section-data) (:topic-data data))
+            topic-data   (if (and (dis/foce-section-key) (= (name (dis/foce-section-key)) topic)) (dis/foce-section-data) (:topic-data data))
             first-metric (:slug (first (:metrics topic-data)))]
         (om/set-state! owner :growth-focus first-metric)))
     ; and the editing state flags
@@ -370,7 +370,7 @@
 
 (defn get-state [owner data current-state]
   (let [topic         (:topic data)
-        topic-data    (if (= (name (dis/foce-section-key)) topic) (dis/foce-section-data) (:topic-data data))
+        topic-data    (if (and (dis/foce-section-key) (= (name (dis/foce-section-key)) topic)) (dis/foce-section-data) (:topic-data data))
         body-click    (if (and (nil? (:body-click current-state)) (:visible data))
                         (setup-body-listener owner)
                         (:body-click current-state))]
