@@ -37,12 +37,6 @@
 (defn get-active-topics [company-data category]
   (get-in company-data [:sections (keyword category)]))
 
-(defn remove-topic [owner topic]
-  (let [company-data (om/get-props owner :company-data)
-        old-categories (:sections company-data)
-        new-categories (apply merge (map #(hash-map (first %) (utils/vec-dissoc (second %) topic)) old-categories))]
-    (api/patch-sections new-categories)))
-
 (defn update-active-topics [owner category-name new-topic & [section-data]]
   (let [company-data (om/get-props owner :company-data)
         old-categories (:sections company-data)
@@ -285,7 +279,6 @@
                                             :show-first-edit-tooltip (should-show-first-edit-tooltip company-data category-topics)}
                                            {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                    :topic-edit-cb (:topic-edit-cb options)
-                                                   :remove-topic (partial remove-topic owner)
                                                    :topic-navigation #(om/set-state! owner :topic-navigation %)}}))
             ;; Fullscreen topic for transition
             (when tr-selected-topic
@@ -302,7 +295,6 @@
                                           :animate false}
                                          {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                  :topic-edit-cb (:topic-edit-cb options)
-                                                 :remove-topic (partial remove-topic owner)
                                                  :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
         ;; Topics list columns
         (om/build topics-columns {:columns-num columns-num
