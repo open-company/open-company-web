@@ -151,7 +151,7 @@
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
-          [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"}]
+          [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" :integrity "sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" :crossorigin "anonymous"}]
           ;; Normalize.css //necolas.github.io/normalize.css/
           ;; TODO inline this into app.main.css
           [:link {:rel "stylesheet" :href "/css/normalize.css?oc_deploy_key"}]
@@ -175,12 +175,14 @@
           [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
           ;; jQuery needed by Emoji One autocomplete
           [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.3.4/jquery.textcomplete.min.js" :type "text/javascript"}]
-          ;; Bootstrap JavaScript //getbootstrap.com/
-          [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"  :type "text/javascript"}]
           ;; jQuery scrollTo plugin
           [:script {:src "/lib/scrollTo/scrollTo.min.js?oc_deploy_key" :type "text/javascript"}]
           ;; jQuery UI
           [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js" :type "text/javascript"}]
+          ;; Resolve jQuery UI and Bootstrap tooltip conflict
+          [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
+          ;; Bootstrap JavaScript //getf.com/
+          [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"  :type "text/javascript" :integrity "sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" :crossorigin "anonymous"}]
           ;; Emoji One Autocomplete
           [:script {:src "/js/emojione/autocomplete.js?oc_deploy_key" :type "text/javascript"}]
           ;; JWT Decode lib
