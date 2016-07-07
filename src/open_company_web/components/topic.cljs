@@ -41,10 +41,11 @@
 
 (defn pencil-click [owner options e]
   (utils/event-stop e)
-  (when-not (om/get-props owner :add-topic)
-    (let [section (om/get-props owner :section)
-          topic-click-cb (:topic-click options)]
-      (topic-click-cb))))
+  ((:topic-click options) nil true))
+
+(defn fullscreen-topic [options selected-metric e]
+  (utils/event-stop e)
+  ((:topic-click options) selected-metric))
 
 (defcomponent topic-internal [{:keys [topic-data
                                       section
@@ -111,7 +112,8 @@
                       :ref "topic-snippet"
                       :dangerouslySetInnerHTML (utils/emojify snippet)})
         (when-not (clojure.string/blank? topic-body)
-          (dom/div #js {:className "topic-read-more"} "READ MORE"))))))
+          (dom/button {:class "btn-reset topic-read-more"
+                       :onClick (partial fullscreen-topic options nil)} "READ MORE"))))))
 
 (defn topic-click [owner]
   (let [section-kw (keyword (om/get-props owner :section))
