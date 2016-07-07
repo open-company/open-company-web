@@ -10,7 +10,7 @@
     [org.clojure/clojurescript "1.9.89"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
 
     [org.omcljs/om "1.0.0-alpha37" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
-    [rum "0.10.3" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
+    [rum "0.10.4" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
 
     [cljs-http "0.1.41"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/schema "1.1.2"] ; Dependency of om-tools https://github.com/Prismatic/schema
