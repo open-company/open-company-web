@@ -8,7 +8,6 @@
             [open-company-web.components.ui.add-topic-popover :refer (add-topic-popover)]))
 
 (defn add-topic-click [owner]
-  (println "add-topic-click")
   (when-not (om/get-state owner :show-add-topic-popover)
     (om/set-state! owner :show-add-topic-popover true)))
 
@@ -20,7 +19,6 @@
     (> add-topic-pos (/ win-height 2))))
 
 (defn get-all-sections [slug]
-  (println "aa" @caches/new-sections)
   (let [categories-data (:categories (slug @caches/new-sections))
         all-category-sections (apply concat
                                      (for [category categories-data]
