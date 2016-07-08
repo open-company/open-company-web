@@ -15,7 +15,6 @@
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.ui.icon :as i]
-            [open-company-web.components.ui.add-topic-popover :refer (add-topic-popover)]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as EventType]
@@ -51,17 +50,15 @@
 
 (defn pencil-click [owner options e]
   (utils/event-stop e)
-  (when-not (om/get-props owner :add-topic)
-    (let [section (om/get-props owner :section)
-          topic-click-cb (:topic-click options)]
-      (topic-click-cb nil true))))
+  (let [section (om/get-props owner :section)
+        topic-click-cb (:topic-click options)]
+    (topic-click-cb nil true)))
 
 (defcomponent topic-internal [{:keys [topic-data
                                       section
                                       currency
                                       prev-rev
                                       next-rev
-                                      add-topic
                                       sharing-mode
                                       show-fast-editing]} owner options]
 
@@ -112,7 +109,6 @@
         ;; Topic title
         (dom/div {:class "topic-title"} (:title topic-data))
         (when (and show-fast-editing
-                   (not add-topic)
                    (responsive/can-edit?)
                    (not (responsive/is-mobile))
                    (not (:read-only topic-data))
@@ -162,10 +158,6 @@
                                      :transition-as-of nil})))
       (.play))))
 
-(defn add-topic [owner]
-  (when-not (om/get-state owner :show-add-topic-popover)
-    (om/set-state! owner :show-add-topic-popover true)))
-
 (defn get-all-sections [slug]
   (let [categories-data (:categories (slug @caches/new-sections))
         all-category-sections (apply concat
@@ -175,15 +167,6 @@
                                          (map #(assoc % :category cat-name) sections))))]
     (apply merge
            (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
-
-(def popover-max-height 312)
-
-(defn show-popover-above? [owner]
-  (let [scroll             (.-scrollTop (.-body js/document))
-        win-height        (- (.-clientHeight (.-documentElement js/document)) (.-clientHeight (sel1 [:nav.oc-navbar])) 4)
-        popover-offsettop (.-offsetTop (om/get-ref owner "topic"))
-        add-topic-pos     (- popover-offsettop scroll)]
-    (> add-topic-pos (/ win-height 2))))
 
 (defcomponent topic [{:keys [active-topics
                              section-data
@@ -198,8 +181,7 @@
   (init-state [_]
     {:as-of (:updated-at section-data)
      :actual-as-of (:updated-at section-data)
-     :transition-as-of nil
-     :show-add-topic-popover false})
+     :transition-as-of nil})
 
   (will-update [_ next-props _]
     (let [new-as-of (:updated-at (:section-data next-props))
@@ -214,15 +196,15 @@
     (when (om/get-state owner :transition-as-of)
       (animate-revision-navigation owner)))
 
-  (render-state [_ {:keys [editing as-of actual-as-of transition-as-of show-add-topic-popover] :as state}]
+  (render-state [_ {:keys [editing as-of actual-as-of transition-as-of] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
           next-rev (utils/revision-next revisions as-of)
           slug (keyword (router/current-company-slug))
-          revisions-list (section-kw (slug @caches/revisions))
-          topic-data (utils/select-section-data section-data section-kw as-of)
-          add-topic? (:add-topic data)]
+          all-revisions (slug @caches/revisions)
+          revisions-list (section-kw all-revisions)
+          topic-data (utils/select-section-data section-data section-kw as-of)]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -233,32 +215,16 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
-                                                 :add-topic add-topic?
-                                                 :sharing-selected (and sharing-mode share-selected)
-                                                 :active (and add-topic? show-add-topic-popover)})
+                                                 :sharing-selected (and sharing-mode share-selected)})
                     :ref "topic"
                     :id (str "topic-" (name section))
-                    :onClick #(if add-topic?
-                                (add-topic owner)
-                                (topic-click options nil))}
-        (when (and show-share-remove
-                   (not add-topic?))
+                    :onClick #(topic-click options nil)}
+        (when show-share-remove
           (dom/div {:class "share-remove-container"
                     :id (str "share-remove-" (name section))}
             (dom/button {:class "btn-reset share-remove"
                          :on-click #(when (contains? options :share-remove-click) ((:share-remove-click options) (name section)))}
               (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.5)" :size 12 :stroke 4 :accent-color "rgba(78, 90, 107, 0.5)"}))))
-        (when show-add-topic-popover
-          (let [all-sections (get-all-sections slug)
-                update-active-topics (:update-active-topics options)
-                list-data {:all-topics all-sections
-                           :active-topics-list active-topics
-                           :archived-topics archived-topics
-                           :show-above (show-popover-above? owner)
-                           :column column}
-                list-opts {:did-change-active-topics update-active-topics
-                           :dismiss-popover #(om/set-state! owner :show-add-topic-popover false)}]
-            (om/build add-topic-popover list-data {:opts list-opts})))
         (dom/div #js {:className "topic-anim group"
                       :key (str "topic-anim-" as-of "-" transition-as-of)
                       :ref "topic-anim"}
@@ -268,7 +234,6 @@
                         :style #js {:opacity 1 :width "100%" :height "auto"}}
             (om/build topic-internal {:section section
                                       :topic-data topic-data
-                                      :add-topic add-topic?
                                       :sharing-mode sharing-mode
                                       :show-fast-editing (:show-fast-editing data)
                                       :currency currency
@@ -290,7 +255,6 @@
                       tr-next-rev (utils/revision-next revisions transition-as-of)]
                   (om/build topic-internal {:section section
                                             :topic-data tr-topic-data
-                                            :add-topic add-topic?
                                             :sharing-mode sharing-mode
                                             :currency currency
                                             :read-only-company (:read-only-company data)
