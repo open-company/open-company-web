@@ -203,16 +203,14 @@
                                  (om/set-state! owner :char-count nil))
                       :dangerouslySetInnerHTML #js {"__html" initial-snippet}})
         (dom/div {:class "topic-foce-buttons group"}
-          (dom/button {:class "btn-reset"
+          (dom/button {:class "btn-reset archive-topic"
                        :title "Archive topic"
                        :type "button"
                        :data-toggle "tooltip"
                        :data-placement "top"
                        :on-click #(when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
                                     (dis/dispatch! [:topic-archive section]))}
-            (i/icon :trash {:size 16
-                            :color (oc-colors/get-color-by-kw :oc-gray-5)
-                            :accent-color (oc-colors/get-color-by-kw :oc-gray-5)}))
+            (dom/i {:class "fa fa-archive"}))
           (dom/button {:class "btn-reset add-content"
                        :title "Add more content"
                        :type "button"

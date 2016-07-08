@@ -320,8 +320,5 @@
         (when editing
           (dom/button {:class "relative remove-button btn-reset btn-outline"
                        :on-click (partial remove-topic-click owner options)}
-            (icon :alert {:size 15
-                          :class "inline mr2"
-                          :accent-color (oc-colors/get-color-by-kw :oc-gray-5)
-                          :color (oc-colors/get-color-by-kw :oc-gray-5)})
+            (dom/i {:class "fa fa-archive"})
             "Archive this topic"))))))
