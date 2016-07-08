@@ -211,6 +211,7 @@
           partial-render-topic (partial render-topic owner options)]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
+                                         :overflow-visible true
                                          :sharing-mode sharing-mode
                                          :group true
                                          :content-loaded content-loaded})}
