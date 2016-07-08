@@ -21,33 +21,6 @@ div.fullscreen-topic {
     }
   }
 
-  button.save-button {
-    position: fixed;
-    cursor: pointer;
-    z-index: 1040;
-    top: 20px;
-    right: 180px;
-  }
-
-  .remove-button {
-    z-index: 1040;
-    left: 30px;
-    bottom: 30px;
-    i.fa-archive {
-      margin-right: 5px;
-    }
-  }
-
-  button.close-editing {
-    position: fixed;
-    cursor: pointer;
-    z-index: 1040;
-    top: 20px;
-    right: 40px;
-    margin-top: 0px;
-    height: 32px;
-  }
-
   div.back-to-dashboard-row {
     position: fixed;
     top: 0px;
