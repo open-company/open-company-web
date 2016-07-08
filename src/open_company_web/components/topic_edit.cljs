@@ -204,7 +204,7 @@
                       :dangerouslySetInnerHTML #js {"__html" initial-snippet}})
         (dom/div {:class "topic-foce-buttons group"}
           (dom/button {:class "btn-reset archive-topic"
-                       :title "Archive topic"
+                       :title "Archive this topic"
                        :type "button"
                        :data-toggle "tooltip"
                        :data-placement "top"
@@ -212,14 +212,14 @@
                                     (dis/dispatch! [:topic-archive section]))}
             (dom/i {:class "fa fa-archive"}))
           (dom/button {:class "btn-reset add-content"
-                       :title "Add more content"
+                       :title (if (clojure.string/blank? topic-body)
+                                "Add supporting content"
+                                "Edit supporting content")
                        :type "button"
                        :data-toggle "tooltip"
                        :data-placement "top"
                        :on-click (partial start-fullscreen-editing-click owner options)}
-            (i/icon :simple-add {:size 16
-                                 :color (oc-colors/get-color-by-kw :oc-gray-5)
-                                 :accent-color (oc-colors/get-color-by-kw :oc-gray-5)}))
+            (dom/i {:class "fa fa-plus-square"}))
           (dom/input {:id "file-upload-ui--select-trigger"
                       :style {:display "none"}
                       :type "file"
@@ -231,9 +231,7 @@
                        :data-placement "top"
                        :style {:display (if (and (not image-header) (nil? file-upload-state)) "block" "none")}
                        :on-click #(.click (sel1 [:input#file-upload-ui--select-trigger]))}
-            (i/icon :camera-20 {:size 16
-                                :color (oc-colors/get-color-by-kw :oc-gray-5)
-                                :accent-color (oc-colors/get-color-by-kw :oc-gray-5)}))
+            (dom/i {:class "fa fa-camera"}))
           (when (= file-upload-state :show-progress)
             (dom/span {:class "file-upload-progress"} (str file-upload-progress "%"))))
         (dom/div {:class "topic-foce-footer group"}
