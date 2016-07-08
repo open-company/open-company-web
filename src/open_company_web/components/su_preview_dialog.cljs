@@ -141,7 +141,7 @@
           (not (every? valid-email? to-field))
           [:span.red.py1 " — Not a valid email address"]))]
      (item-input {:item-render email-item
-                  :container-node :div.npt.pt1.pr1.pl1.mb3
+                  :container-node :div.npt.pt1.pr1.pl1.mb3.mh4.overflow-scroll
                   :input-node :input.border-none.outline-none.mr.mb1
                   :valid-item? valid-email?
                   :on-change (fn [val] (dis/dispatch! [:input [:su-share :email :to] val]))})]
