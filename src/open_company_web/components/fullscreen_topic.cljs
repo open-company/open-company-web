@@ -253,8 +253,7 @@
         (when (and can-edit?
                    editing
                    (or show-save-button
-                       (and (dis/foce-section-key)
-                            (= (name (dis/foce-section-key)) section))))
+                       (= (dis/foce-section-key) section-kw)))
           (dom/button {:class "save-button btn-reset btn-solid"
                        :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-save-" (name section)))]
                                     (hide-fullscreen-topic owner options true)
