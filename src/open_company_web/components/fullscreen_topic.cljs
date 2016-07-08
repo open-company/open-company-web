@@ -168,8 +168,6 @@
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width hide-history-navigation show-first-edit-tooltip] :as data} owner options]
 
   (init-state [_]
-    (utils/add-channel (str "fullscreen-topic-save-" (name section)) (chan))
-    (utils/add-channel (str "fullscreen-topic-cancel-" (name section)) (chan))
     (when (:fullscreen-force-edit data)
       (dis/set-force-edit-topic nil)
       ((:topic-navigation options) false))
@@ -209,8 +207,6 @@
         (om/set-state! owner :actual-as-of (:updated-at (:section-data next-props))))))
 
   (will-unmount [_]
-    (utils/remove-channel (str "fullscreen-topic-save-" (name section)))
-    (utils/remove-channel (str "fullscreen-topic-cancel-" (name section)))
     (events/unlistenByKey (om/get-state owner :esc-listener-key)))
 
   (did-update [_ _ _]
@@ -243,32 +239,13 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (str "fullscreen-topic" (when (:animate data) " initial"))
                     :ref "fullscreen-topic"}
-        (om/build back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options)})
+        (om/build back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)})
         (when (and can-edit?
                    is-actual?
                    (not editing))
           (dom/div {:class "edit-button"
                     :on-click #(start-editing owner options)}
             (icon :pencil)))
-        (when (and can-edit?
-                   editing
-                   (or show-save-button
-                       (= (dis/foce-section-key) section-kw)))
-          (dom/button {:class "save-button btn-reset btn-solid"
-                       :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-save-" (name section)))]
-                                    (hide-fullscreen-topic owner options true)
-                                    (om/set-state! owner :data-posted true)
-                                    (put! ch {:click true :event %}))}
-            (if data-posted
-              (loading/small-loading)
-              "SAVE")))
-        (when editing
-          (dom/button {:class "btn-reset btn-outline close-editing"
-                       :key "close"
-                       :title "Dismiss edit"
-                       :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-cancel-" (name section)))]
-                                    (om/set-state! owner :edit-rand (rand 4))
-                                    (put! ch {:click true :event %}))} "CANCEL"))
         (dom/div {:style #js {:display (when-not editing "none")}
                   :key (str as-of edit-rand)}
           (om/build fullscreen-topic-edit {:topic section
@@ -316,9 +293,4 @@
                                                      :hide-history-navigation hide-history-navigation
                                                      :prev-rev tr-prev-rev
                                                      :next-rev tr-next-rev}
-                                                    {:opts fullscreen-topic-opts})))))
-        (when editing
-          (dom/button {:class "relative remove-button btn-reset btn-outline"
-                       :on-click (partial remove-topic-click owner options)}
-            (dom/i {:class "fa fa-archive"})
-            "Archive this topic"))))))
+                                                    {:opts fullscreen-topic-opts})))))))))
