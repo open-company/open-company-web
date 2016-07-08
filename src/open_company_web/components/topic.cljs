@@ -39,13 +39,17 @@
         topic-scroll-top (utils/offset-top topic)]
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
-(defn pencil-click [owner options e]
-  (utils/event-stop e)
-  ((:topic-click options) nil true))
+(defn fullscreen-topic [data selected-metric & [e]]
+  (when e
+    (utils/event-stop e))
+  ((:topic-click data) selected-metric))
 
-(defn fullscreen-topic [options selected-metric e]
+(defn start-foce-click [owner e]
   (utils/event-stop e)
-  ((:topic-click options) selected-metric))
+  (let [section-kw (keyword (om/get-props owner :section))
+        company-data (dis/company-data)
+        section-data (get company-data section-kw)]
+    (dis/dispatch! [:start-foce section-kw section-data])))
 
 (defcomponent topic-internal [{:keys [topic-data
                                       section
@@ -62,7 +66,7 @@
                                             :height 196}
                                :hide-nav true
                                :pillboxes-first false
-                               :topic-click (:topic-click options)}
+                               :topic-click (partial fullscreen-topic data)}
           is-growth-finances? (#{:growth :finances} section-kw)
           gray-color          (oc-colors/get-color-by-kw :oc-gray-5)
           finances-row-data   (:data topic-data)
@@ -76,10 +80,9 @@
           image-header        (:image-url topic-data)
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
-          topic-body          (utils/get-topic-body topic-data section)
-          topic-click-cb      (:topic-click data)]
+          topic-body          (utils/get-topic-body topic-data section)]
       (dom/div #js {:className "topic-internal group"
-                    :onClick #(topic-click-cb)
+                    :onClick (partial fullscreen-topic options nil)
                     :ref "topic-internal"}
         (when (or is-growth-finances?
                   image-header)
@@ -101,7 +104,7 @@
                    (not (:read-only topic-data))
                    (not sharing-mode))
           (dom/button {:class "topic-pencil-button btn-reset"
-                       :on-click (partial pencil-click owner options)}
+                       :on-click #(start-foce-click owner %)}
             (i/icon :pencil {:size 16
                              :color gray-color
                              :accent-color gray-color})))
@@ -114,12 +117,6 @@
         (when-not (clojure.string/blank? topic-body)
           (dom/button {:class "btn-reset topic-read-more"
                        :onClick (partial fullscreen-topic options nil)} "READ MORE"))))))
-
-(defn topic-click [owner]
-  (let [section-kw (keyword (om/get-props owner :section))
-        company-data (dis/company-data)
-        section-data (get company-data section-kw)]
-    (dis/dispatch! [:start-foce section-kw section-data])))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
@@ -274,7 +271,7 @@
                                         :show-fast-editing (:show-fast-editing data)
                                         :currency currency
                                         :read-only-company (:read-only-company data)
-                                        :topic-click (partial topic-click owner)
+                                        :topic-click (:topic-click options)
                                         :prev-rev prev-rev
                                         :next-rev next-rev}
                                        {:opts (merge options {:rev-click (fn [e rev]
