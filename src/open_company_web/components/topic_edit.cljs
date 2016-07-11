@@ -1,4 +1,5 @@
 (ns open-company-web.components.topic-edit
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
@@ -37,10 +38,11 @@
     (topic-click-cb nil true)))
 
 (defn setup-edit [owner]
-  (let [section-name (name (om/get-props owner :section))
-        topic-data (om/get-props owner :topic-data)
-        topic (om/get-props owner :section)]
-    (when-let [headline-el    (sel1 [(str "div#foce-headline-" section-name)])]
+  (when-let* [section-name (name (om/get-props owner :section))
+              headline-el    (sel1 [(str "div#foce-headline-" section-name)])
+              snippet-el (sel1 [(str "div#foce-snippet-" section-name)])]
+    (let [topic-data (om/get-props owner :topic-data)
+          topic (om/get-props owner :section)]
       (let [headline-editor (new js/MediumEditor headline-el (clj->js (utils/medium-editor-options "Headline")))]
         (.subscribe headline-editor
                     "editableInput"
@@ -49,8 +51,7 @@
                       (let [v (.-innerText headline-el)
                             remaining-chars (- headline-max-length (count v))]
                         (om/set-state! owner :char-count remaining-chars)
-                        (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit)))))))
-    (when-let [snippet-el (sel1 [(str "div#foce-snippet-" section-name)])]
+                        (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))))))
       (let [snippet-placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
             snippet-editor      (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options snippet-placeholder)))]
         (.subscribe snippet-editor
@@ -60,8 +61,8 @@
                       (let [v (.-innerText snippet-el)
                             remaining-chars (- snippet-max-length (count v))]
                         (om/set-state! owner :char-count remaining-chars)
-                        (om/set-state! owner :char-count-alert (< remaining-chars snippet-alert-limit)))))))
-    (js/emojiAutocomplete)))
+                        (om/set-state! owner :char-count-alert (< remaining-chars snippet-alert-limit))))))
+      (js/emojiAutocomplete))))
 
 (defn check-headline-count [owner e]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
