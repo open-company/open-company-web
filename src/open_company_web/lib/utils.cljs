@@ -741,3 +741,16 @@
         true
         (recur (.-parentElement element)))
       false)))
+
+(defn to-end-of-content-editable [content-editable-element]
+  (if (.-createRange js/document)
+    (let [rg (.createRange js/document)]
+      (.selectNodeContents rg content-editable-element)
+      (.collapse rg false)
+      (let [selection (.getSelection js/window)]
+        (.removeAllRanges selection)
+        (.addRange selection rg)))
+    (let [rg (.createTextRange (.-body js/document))]
+      (.moveToElementText rg content-editable-element)
+      (.collapse rg false)
+      (.select rg))))
