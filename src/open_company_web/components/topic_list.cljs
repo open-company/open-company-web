@@ -45,9 +45,11 @@
         new-topics (concat old-topics [new-topic])
         new-categories (assoc old-categories (keyword category-name) new-topics)
         new-topic-kw (keyword new-topic)]
-    (if section-data
-      (dispatcher/dispatch! [:start-foce new-topic-kw section-data])
-      (om/set-state! owner :new-topic-foce new-topic-kw))
+    (if (#{:finances :growth} new-topic-kw)
+      (dispatcher/dispatch! [:force-fullscreen-edit new-topic])
+      (if section-data
+        (dispatcher/dispatch! [:start-foce new-topic-kw section-data])
+        (om/set-state! owner :new-topic-foce new-topic-kw)))
     (if section-data
       (api/patch-sections new-categories section-data new-topic)
       (api/patch-sections new-categories))))
