@@ -1,4 +1,5 @@
 (ns open-company-web.components.topic-list
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -42,8 +43,11 @@
         old-categories (:sections company-data)
         old-topics (get-active-topics company-data category-name)
         new-topics (concat old-topics [new-topic])
-        new-categories (assoc old-categories (keyword category-name) new-topics)]
-    (dispatcher/set-force-edit-topic new-topic)
+        new-categories (assoc old-categories (keyword category-name) new-topics)
+        new-topic-kw (keyword new-topic)]
+    (if section-data
+      (dispatcher/dispatch! [:start-foce new-topic-kw section-data])
+      (om/set-state! owner :new-topic-foce new-topic-kw))
     (if section-data
       (api/patch-sections new-categories section-data new-topic)
       (api/patch-sections new-categories))))
@@ -201,6 +205,9 @@
         (.off swipe-listener "swiperight"))))
 
   (will-receive-props [_ next-props]
+    (when-let* [new-topic-foce (om/get-state owner :new-topic-foce)
+                new-topic-data (-> next-props :company-data new-topic-foce)]
+      (dispatcher/dispatch! [:start-foce new-topic-foce new-topic-data]))
     (when (om/get-state owner :redirect-to-preview)
       (utils/after 100 #(router/nav! (oc-urls/stakeholder-update-preview))))
     (when-not (= (:company-data next-props) (:company-data data))
