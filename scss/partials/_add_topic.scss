@@ -1,0 +1,41 @@
+div.topic.add-topic {
+  height: 94.5px;
+  border-radius: 2px;
+  background-color: rgba(244, 244, 244 , 0.2);
+  border: solid 1px rgba(78, 90, 107, 0.2);
+  text-align: center;
+  position: relative;
+  box-shadow: none;
+  font-weight: 700;
+  font-family: $oc_headers_font;
+  cursor: pointer;
+
+  div.topic-title {
+    color: rgba(78, 90, 107, 0.2) !important;
+  }
+
+  &:hover {
+    background-color: #ffffff;
+    color: rgba(78, 90, 107, 0.2) !important;
+  }
+
+  &.active {
+    background-color: #ffffff;
+    border: 1px solid rgba(78, 90, 107, 0.8);
+
+    div.topic-title {
+      color: $oc_gray_5 !important;
+    }
+  }
+
+  div.topic-title {
+    opacity: 0.2;
+    font-weight: 700;
+    font-family: $oc_headers_font;
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 1px;
+    color: $oc_gray_5;
+    margin-top: 37px;
+  }
+}
