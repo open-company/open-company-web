@@ -424,11 +424,12 @@
   (js/emojiAutocomplete)
   (utils/after 200 #(focus-headline owner)))
 
-(defn save-data [owner]
-  (let [topic (om/get-state owner :topic)]
+(defn save-data [owner options]
+  (let [topic (om/get-props owner :topic)]
     (when-let [section-data (data-to-save owner topic)]
       (om/set-state! owner :has-changes false)
-      (api/partial-update-section topic section-data))))
+      (api/partial-update-section topic section-data)
+      ((:dismiss-editing options)))))
 
 (defn remove-topic-click [owner options e]
   (.stopPropagation e)
@@ -690,7 +691,7 @@
           "Archive this topic")
       (when has-changes
         (dom/button {:class "save-button btn-reset btn-solid"
-                     :on-click #(save-data owner)}
+                     :on-click #(save-data owner options)}
           "SAVE"))
       (dom/button {:class "btn-reset btn-outline close-editing"
                      :key "close"
