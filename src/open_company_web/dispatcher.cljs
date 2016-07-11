@@ -79,11 +79,6 @@
 (defn force-edit-topic []
   (:force-edit-topic @app-state))
 
-(defn set-force-edit-topic [topic]
-  (if topic
-    (swap! app-state assoc-in [:force-edit-topic] topic)
-    (swap! app-state dissoc :force-edit-topic)))
-
 (defn toggle-menu
   ([] (swap! app-state update :menu-open not))
   ([force?] (swap! app-state assoc :menu-open force?)))
