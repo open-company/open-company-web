@@ -31,21 +31,7 @@
             [goog.dom :as gdom]
             [cljsjs.react.dom]))
 
-(defn set-end-of-content-editable [content-editable-element]
-  (if (.-createRange js/document)
-    (let [rg (.createRange js/document)]
-      (.selectNodeContents rg content-editable-element)
-      (.collapse rg false)
-      (let [selection (.getSelection js/window)]
-        (.removeAllRanges selection)
-        (.addRange selection rg)))
-    (let [rg (.createTextRange (.-body js/document))]
-      (.moveToElementText rg content-editable-element)
-      (.collapse rg false)
-      (.select rg))))
-
 (def before-unload-message "You have unsaved edits.")
-
 
 (defn change-value [owner k e]
   (let [target (.-target e)
@@ -56,7 +42,7 @@
 (defn focus-headline [owner]
   (when-let [headline (sel1 [:div.topic-edit-headline])]
     (.focus headline)
-    (set-end-of-content-editable headline)))
+    (utils/to-end-of-content-editable headline)))
 
 (defn data-check-value [v]
   (and (not (= v ""))
@@ -365,7 +351,7 @@
                        (and file-upload-ui
                             (not (utils/event-inside? e file-upload-ui)))))
           (.focus topic-body)
-          (set-end-of-content-editable topic-body)
+          (utils/to-end-of-content-editable topic-body)
           (set! (.-scrollTop fullscreen-topic) (.-scrollHeight fullscreen-topic)))))))
 
 (defn setup-body-listener [owner]

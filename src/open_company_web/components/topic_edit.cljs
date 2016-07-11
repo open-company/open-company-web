@@ -122,7 +122,8 @@
 
 (defn focus-headline []
   (when-let [headline (sel1 [(str "div#foce-headline-" (name (dis/foce-section-key)))])]
-    (.focus headline)))
+    (.focus headline)
+    (utils/to-end-of-content-editable headline)))
 
 (defcomponent topic-edit [{:keys [currency
                                   prev-rev
@@ -194,6 +195,7 @@
         (dom/div {:class "topic-headline-inner emoji-autocomplete"
                   :id (str "foce-headline-" (name section))
                   :key "foce-headline"
+                  :contentEdit true
                   :on-key-up   #(check-headline-count owner %)
                   :on-key-down #(check-headline-count owner %)
                   :on-focus    #(check-headline-count owner %)
@@ -205,6 +207,7 @@
                       :id (str "foce-snippet-" (name section))
                       :key "foce-snippet"
                       :ref "topic-snippet"
+                      :contentEdit true
                       :style #js {:minHeight (if (:placeholder topic-data) "75px" "0px")}
                       :onKeyUp   #(check-snippet-count owner %)
                       :onKeyDown #(check-snippet-count owner %)
