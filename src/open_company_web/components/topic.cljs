@@ -106,7 +106,8 @@
                    (not (responsive/is-mobile))
                    (not (:read-only topic-data))
                    (not sharing-mode))
-          (dom/button {:class "topic-pencil-button btn-reset"
+          (dom/button {:class (str "topic-pencil-button btn-reset")
+                       :style {:top (if image-header (str (min 196 (:image-height topic-data)) "px") "5px")}
                        :on-click #(pencil-click owner %)}
             (i/icon :pencil {:size 16
                              :color gray-color
@@ -193,7 +194,8 @@
           slug (keyword (router/current-company-slug))
           all-revisions (slug @caches/revisions)
           revisions-list (section-kw all-revisions)
-          topic-data (utils/select-section-data section-data section-kw as-of)]
+          topic-data (utils/select-section-data section-data section-kw as-of)
+          is-foce (= (dis/foce-section-key) section-kw)]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -207,7 +209,8 @@
                                                  :sharing-selected (and sharing-mode share-selected)})
                     :ref "topic"
                     :id (str "topic-" (name section))
-                    :onClick #(topic-click options nil)}
+                    :onClick #(when (and (:topic-click options) (not is-foce))
+                                ((:topic-click options) nil false))}
         (when show-share-remove
           (dom/div {:class "share-remove-container"
                     :id (str "share-remove-" (name section))}
@@ -221,7 +224,7 @@
                         :ref "cur-topic"
                         :key (str "cur-" as-of)
                         :style #js {:opacity 1 :width "100%" :height "auto"}}
-            (if (= (dis/foce-section-key) section-kw)
+            (if is-foce
               (om/build topic-edit {:section section
                                     :topic-data topic-data
                                     :sharing-mode sharing-mode
