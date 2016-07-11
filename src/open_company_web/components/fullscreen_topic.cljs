@@ -169,7 +169,7 @@
 
   (init-state [_]
     (when (:fullscreen-force-edit data)
-      (dis/set-force-edit-topic nil)
+      (dis/dispatch! [:force-fullscreen-edit nil])
       ((:topic-navigation options) false))
     (when (and (router/section-editing?)
                (:read-only section-data))
