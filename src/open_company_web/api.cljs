@@ -49,7 +49,7 @@
         (let [res (<! (refresh-jwt))]
           (if (:success res)
             (update-jwt-cookie! (-> res :body :jwt))
-            (js/console.warn "Failed to refresh token"))))
+            (dispatcher/dispatch! [:logout]))))
 
       (let [response (<! (method (str endpoint path) (complete-params params)))]
         (on-complete response)))))
