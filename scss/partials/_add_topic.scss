@@ -10,13 +10,8 @@ div.topic.add-topic {
   font-family: $oc_headers_font;
   cursor: pointer;
 
-  div.topic-title {
-    color: rgba(78, 90, 107, 0.2) !important;
-  }
-
   &:hover {
     background-color: #ffffff;
-    color: rgba(78, 90, 107, 0.2) !important;
   }
 
   &.active {
@@ -24,7 +19,7 @@ div.topic.add-topic {
     border: 1px solid rgba(78, 90, 107, 0.8);
 
     div.topic-title {
-      color: $oc_gray_5 !important;
+      opacity: 1;
     }
   }
 
