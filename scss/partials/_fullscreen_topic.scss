@@ -100,10 +100,9 @@ div.fullscreen-topic {
 
         div.topic-snippet{
           margin-top: 12px;
-          font-family: $oc_headers_font;
-          font-size: 18px;
+          @include rich-editor-body(rgba(78, 90, 107, 0.5));
           line-height: 1.8;
-          color: rgba(78, 90, 107, 0.5);
+          font-size: 18px;
         }
 
         div.topic-growth-finances{
@@ -119,17 +118,11 @@ div.fullscreen-topic {
       }
 
       div.topic-body{
-        @include rich-editor-body($oc_gray_5);
+        @include rich-editor-body(rgba(78, 90, 107, 0.5));
         margin-top: 21px !important;
-        margin-top: 34px;
-
-        &, & * {
-          padding: 0px 30px;
-          font-family: $oc_headers_font;
-          font-size: 18px;
-          line-height: 1.8;
-          color: rgba(78, 90, 107, 0.5);
-        }
+        line-height: 1.8;
+        font-size: 18px;
+        padding: 0px 30px !important;
       }
 
       div.topic-attribution {
