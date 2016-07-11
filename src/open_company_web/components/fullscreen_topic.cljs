@@ -83,8 +83,7 @@
 (defn start-editing [owner options]
   (let [editing (om/get-state owner :editing)
         section (om/get-props owner :section)]
-    (when (om/get-props owner :change-url)
-      (.pushState js/history nil (str "Edit " (name section)) (oc-urls/company-section-edit (router/current-company-slug) (name section))))
+    (.pushState js/history nil (str "Edit " (name section)) (oc-urls/company-section-edit (router/current-company-slug) (name section)))
     (when-not editing
       ((:topic-navigation options) false)
       (om/set-state! owner :editing true))))
@@ -92,8 +91,7 @@
 (defn exit-editing [owner options]
   (let [editing (om/get-state owner :editing)
         section (om/get-props owner :section)]
-    (when (om/get-props owner :change-url)
-      (.pushState js/history nil (name section) (oc-urls/company-section (router/current-company-slug) (name section))))
+    (.pushState js/history nil (name section) (oc-urls/company-section (router/current-company-slug) (name section)))
     (when editing
       ((:topic-navigation options) true)
       (om/set-state! owner :editing false))))
@@ -123,12 +121,11 @@
     (hide-fullscreen-topic owner options true)))
 
 (defn revision-navigation [owner as-of]
-  (when (om/get-props owner :change-url)
-    (let [actual-as-of (om/get-state owner :actual-as-of)
-          section (name (om/get-props owner :section))]
-      (if (= as-of actual-as-of)
-        (.pushState js/history nil section (oc-urls/company-section-revision))
-        (.pushState js/history nil (str section " revision " as-of) (oc-urls/company-section-revision as-of))))))
+  (let [actual-as-of (om/get-state owner :actual-as-of)
+        section (name (om/get-props owner :section))]
+    (if (= as-of actual-as-of)
+      (.pushState js/history nil section (oc-urls/company-section-revision))
+      (.pushState js/history nil (str section " revision " as-of) (oc-urls/company-section-revision as-of)))))
 
 (defn animate-transition [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
