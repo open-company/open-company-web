@@ -300,8 +300,10 @@ div.fullscreen-topic-edit {
       }
 
       div.topic-edit-snippet {
-        @include rich-editor-body($oc_gray_5);
         margin-top: 21px !important;
+        @include rich-editor-body(rgba(78, 90, 107, 0.5));
+        line-height: 1.8;
+        font-size: 18px;
       }
 
       div.topic-edit-snippet-count{
@@ -325,8 +327,10 @@ div.fullscreen-topic-edit {
       padding: 0px 30px;
 
       div.topic-body{
-        @include rich-editor-body($oc_gray_5);
         margin-top: 21px !important;
+        @include rich-editor-body(rgba(78, 90, 107, 0.5));
+        line-height: 1.8;
+        font-size: 18px;
       }
     }
   }
