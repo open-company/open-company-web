@@ -51,7 +51,7 @@
                         (om/set-state! owner :char-count remaining-chars)
                         (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit)))))))
     (when-let [snippet-el (sel1 [(str "div#foce-snippet-" section-name)])]
-      (let [snippet-placeholder (if (:placeholder topic-data) (utils/get-topic-body topic-data topic) "")
+      (let [snippet-placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
             snippet-editor      (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options snippet-placeholder)))]
         (.subscribe snippet-editor
                     "editableInput"
@@ -119,14 +119,18 @@
       file
       (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
 
+(defn focus-headline []
+  (when-let [headline (sel1 [(str "div#foce-headline-" (name (dis/foce-section-key)))])]
+    (.focus headline)))
+
 (defcomponent topic-edit [{:keys [currency
                                   prev-rev
                                   next-rev]} owner options]
 
   (init-state [_]
-    (let [topic-data          (dis/foce-section-data)]
+    (let [topic-data (dis/foce-section-data)]
       {:initial-headline (:headline topic-data)
-       :initial-snippet  (:snippet topic-data)
+       :initial-snippet  (if (:placeholder topic-data) "" (:snippet topic-data))
        :char-count nil
        :char-count-alert false
        :file-upload-state nil
@@ -135,7 +139,8 @@
   (did-mount [_]
     (js/filepicker.setKey ls/filestack-key)
     (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-    (setup-edit owner))
+    (setup-edit owner)
+    (utils/after 100 #(focus-headline)))
 
   (render-state [_ {:keys [initial-headline initial-snippet char-count char-count-alert file-upload-state file-upload-progress]}]
     (let [section             (dis/foce-section-key)
@@ -176,6 +181,7 @@
         (dom/input {:class "topic-title"
                     :value (:title topic-data)
                     :max-length title-max-length
+                    :placeholder (:name topic-data)
                     :type "text"
                     :on-blur #(om/set-state! owner :char-count nil)
                     :on-change #(let [v (.. % -target -value)
@@ -198,6 +204,7 @@
                       :id (str "foce-snippet-" (name section))
                       :key "foce-snippet"
                       :ref "topic-snippet"
+                      :style #js {:minHeight (if (:placeholder topic-data) "75px" "0px")}
                       :onKeyUp   #(check-snippet-count owner %)
                       :onKeyDown #(check-snippet-count owner %)
                       :onFocus    #(check-snippet-count owner %)
