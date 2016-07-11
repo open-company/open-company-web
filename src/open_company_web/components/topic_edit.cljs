@@ -95,13 +95,15 @@
 
 (defn img-on-load [img]
   (dis/dispatch! [:foce-input {:image-width (.-clientHeight img)
-                               :image-height (.-clientWidth img)}]))
+                               :image-height (.-clientWidth img)}])
+  (gdom/removeNode img))
 
 (defn upload-file! [owner file]
   (let [success-cb  (fn [success]
                       (let [url    (.-url success)
                             node   (gdom/createDom "img")]
                         (set! (.-onload node) #(img-on-load node))
+                        (gdom/append (.-body js/document) node)
                         (set! (.-src node) url)
                         (dis/dispatch! [:foce-input {:image-url url}]))
                       (om/set-state! owner :file-upload-state nil)
@@ -166,9 +168,10 @@
               (dom/button {:class "btn-reset remove-header"
                            :on-click #(do
                                         (dis/dispatch! [:foce-input {:image-url nil :image-height 0 :image-width 0}]))}
-                (i/icon :simple-remove {:size 16
-                                        :color (oc-colors/get-color-by-kw :oc-gray-5)
-                                        :accent-color (oc-colors/get-color-by-kw :oc-gray-5)})))))
+                (i/icon :simple-remove {:size 15
+                                        :stroke 4
+                                        :color "white"
+                                        :accent-color "white"})))))
         ;; Topic title
         (dom/input {:class "topic-title"
                     :value (:title topic-data)
@@ -203,7 +206,7 @@
                                  (om/set-state! owner :char-count nil))
                       :dangerouslySetInnerHTML #js {"__html" initial-snippet}})
         (dom/div {:class "topic-foce-buttons group"}
-          (dom/button {:class "btn-reset archive-topic"
+          (dom/button {:class "btn-reset archive-topic right"
                        :title "Archive this topic"
                        :type "button"
                        :data-toggle "tooltip"
@@ -211,20 +214,11 @@
                        :on-click #(when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
                                     (dis/dispatch! [:topic-archive section]))}
             (dom/i {:class "fa fa-archive"}))
-          (dom/button {:class "btn-reset add-content"
-                       :title (if (clojure.string/blank? topic-body)
-                                "Add supporting content"
-                                "Edit supporting content")
-                       :type "button"
-                       :data-toggle "tooltip"
-                       :data-placement "top"
-                       :on-click (partial start-fullscreen-editing-click owner options)}
-            (dom/i {:class "fa fa-plus-square"}))
           (dom/input {:id "file-upload-ui--select-trigger"
                       :style {:display "none"}
                       :type "file"
                       :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
-          (dom/button {:class "btn-reset camera"
+          (dom/button {:class "btn-reset camera left"
                        :title "Add an image"
                        :type "button"
                        :data-toggle "tooltip"
@@ -233,8 +227,18 @@
                        :on-click #(.click (sel1 [:input#file-upload-ui--select-trigger]))}
             (dom/i {:class "fa fa-camera"}))
           (when (= file-upload-state :show-progress)
-            (dom/span {:class "file-upload-progress"} (str file-upload-progress "%"))))
+            (dom/span {:class "file-upload-progress left"} (str file-upload-progress "%")))
+          (dom/button {:class "btn-reset add-content left"
+                       :title (if (clojure.string/blank? topic-body)
+                                "Add supporting content"
+                                "Edit supporting content")
+                       :type "button"
+                       :data-toggle "tooltip"
+                       :data-placement "top"
+                       :on-click (partial start-fullscreen-editing-click owner options)}
+            (dom/i {:class "fa fa-plus-square"})))
         (dom/div {:class "topic-foce-footer group"}
+          (dom/div {:class "divider"})
           (dom/div {:class "topic-foce-footer-left"}
             (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
           (dom/div {:class "topic-foce-footer-right"}
