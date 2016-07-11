@@ -168,3 +168,8 @@
   (-> db
       (dissoc :foce-key)
       (dissoc :foce-data)))
+
+(defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
+  (if topic
+    (assoc-in db [:force-edit-topic] topic)
+    (dissoc db :force-edit-topic)))
