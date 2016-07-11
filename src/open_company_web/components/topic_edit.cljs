@@ -195,7 +195,7 @@
         (dom/div {:class "topic-headline-inner emoji-autocomplete"
                   :id (str "foce-headline-" (name section))
                   :key "foce-headline"
-                  :contentEdit true
+                  :contentEditable true
                   :on-key-up   #(check-headline-count owner %)
                   :on-key-down #(check-headline-count owner %)
                   :on-focus    #(check-headline-count owner %)
@@ -207,7 +207,7 @@
                       :id (str "foce-snippet-" (name section))
                       :key "foce-snippet"
                       :ref "topic-snippet"
-                      :contentEdit true
+                      :contentEditable true
                       :style #js {:minHeight (if (:placeholder topic-data) "75px" "0px")}
                       :onKeyUp   #(check-snippet-count owner %)
                       :onKeyDown #(check-snippet-count owner %)

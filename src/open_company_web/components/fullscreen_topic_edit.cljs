@@ -643,6 +643,7 @@
             (dom/div {:class "separator"})
             (dom/div {:class "topic-edit-snippet emoji-autocomplete"
                       :id (str "topic-edit-snippet-" (name topic))
+                      :contentEditable true
                       :on-blur #(do (check-snippet-count owner %)
                                     (om/set-state! owner :show-snippet-counter false))
                       :on-key-up   #(check-snippet-count owner %)
@@ -668,6 +669,7 @@
           (dom/div {:class "relative topic-body-line"}
             (dom/div {:className "topic-body emoji-autocomplete"
                       :ref "topic-overlay-edit-body"
+                      :contentEditable true
                       :id (str "topic-edit-body-" (name topic))
                       :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
             (om/build filestack-uploader (om/get-state owner :medium-editor))))
