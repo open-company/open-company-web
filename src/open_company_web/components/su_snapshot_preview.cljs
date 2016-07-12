@@ -25,7 +25,8 @@
 (defn ordered-topics-list []
   (let [topics (sel [:div.topic-row])
         topics-list (for [topic topics] (.-topic (.-dataset topic)))]
-    (vec topics-list)))
+    (println "topics:" topics-list "->" (vec (remove nil? topics-list)))
+    (vec (remove nil? topics-list))))
 
 (defn post-stakeholder-update [owner]
   (om/set-state! owner :link-posting true)
