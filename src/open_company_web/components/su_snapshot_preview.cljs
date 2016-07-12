@@ -24,8 +24,7 @@
 
 (defn ordered-topics-list []
   (let [topics (sel [:div.topic-row])
-        topics-list (for [topic topics] (.. topic -dataset -topic))]
-    (println "topics:" topics "topics-list" topics-list "->" (vec (remove nil? topics-list)))
+        topics-list (for [topic topics] (.data (js/jQuery topic) "topic"))]
     (vec (remove nil? topics-list))))
 
 (defn post-stakeholder-update [owner]
