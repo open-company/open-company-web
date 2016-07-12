@@ -365,12 +365,18 @@
 
 (defn get-state [owner data current-state]
   (let [topic         (:topic data)
+        current-topic-data (:topic-data data)
         topic-data    (if (= (dis/foce-section-key) (keyword topic)) (dis/foce-section-data) (:topic-data data))
         body-click    (if (and (nil? (:body-click current-state)) (:visible data))
                         (setup-body-listener owner)
                         (:body-click current-state))]
     (merge
-      {:has-changes false
+      {:has-changes (or (not= (:image-url current-topic-data) (:image-url topic-data))
+                        (not= (:title current-topic-data) (:title topic-data))
+                        (not= (:headline current-topic-data) (:headline topic-data))
+                        (not= (:snippet current-topic-data) (:snippet topic-data))
+                        (not= (:body current-topic-data) (:body topic-data))
+                        (not= (:body (:notes current-topic-data)) (:body (:notes topic-data))))
        :title (:title topic-data)
        :headline (:headline topic-data)
        :image-url (:image-url topic-data)
