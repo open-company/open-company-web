@@ -44,6 +44,16 @@
     (.focus headline)
     (utils/to-end-of-content-editable headline)))
 
+(defn scroll-to-bottom []
+  (let [fullscreen-topic (sel1 [:div.fullscreen-topic])]
+    (set! (.-scrollTop fullscreen-topic) (.-scrollHeight fullscreen-topic))))
+
+(defn focus-body [owner]
+  (when-let [body (sel1 [:div.topic-body])]
+    (.focus body)
+    (utils/to-end-of-content-editable body)
+    (scroll-to-bottom)))
+
 (defn data-check-value [v]
   (and (not (= v ""))
        (not (nil? v))))
@@ -401,7 +411,7 @@
 (defn setup-medium-editor [owner {:keys [topic-data topic] :as data}]
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
   (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
-        placeholder (if (:placeholder topic-data) (utils/get-topic-body topic-data topic) "")
+        placeholder "Anything else to add? You can add more text and images here."
         med-ed (new js/MediumEditor body-el (clj->js
                                              (->  (utils/medium-editor-options placeholder)
                                                   (editor/inject-extension editor/file-upload))))]
@@ -419,7 +429,9 @@
     (om/set-state! owner :initial-snippet (.-innerHTML snippet-el))
     (om/set-state! owner :snippet-medium-editor med-ed))
   (js/emojiAutocomplete)
-  (utils/after 200 #(focus-headline owner)))
+  (if (dis/foce-section-key)
+    (utils/after 200 #(focus-body owner))
+    (utils/after 200 #(focus-headline owner))))
 
 (defn save-data [owner options]
   (let [topic (om/get-props owner :topic)]
@@ -698,7 +710,7 @@
                       :type "file"
                       :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})))
           (dom/div {:class "relative topic-body-line"}
-            (dom/div {:class "add-more-below"} "ADD MORE BELOW")
+            (dom/div {:class "add-more-below"} "ADD EXTRA BELOW")
             (dom/div {:className "topic-body emoji-autocomplete"
                       :ref "topic-overlay-edit-body"
                       :contentEditable true
