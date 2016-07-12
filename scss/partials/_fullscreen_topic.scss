@@ -100,7 +100,7 @@ div.fullscreen-topic {
 
         div.topic-snippet{
           margin-top: 12px;
-          @include rich-editor-body(rgba(78, 90, 107, 0.5));
+          @include rich-editor-body($oc_gray_5);
           line-height: 1.8;
           font-size: 18px;
         }
@@ -118,7 +118,7 @@ div.fullscreen-topic {
       }
 
       div.topic-body{
-        @include rich-editor-body(rgba(78, 90, 107, 0.5));
+        @include rich-editor-body($oc_gray_5);
         margin-top: 21px !important;
         line-height: 1.8;
         font-size: 18px;

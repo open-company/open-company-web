@@ -363,7 +363,7 @@ div.fullscreen-topic-edit {
 
       div.topic-body{
         margin-top: 17px !important;
-        @include rich-editor-body(rgba(78, 90, 107, 1));
+        @include rich-editor-body($oc_gray_5);
         line-height: 1.8;
         font-size: 18px;
       }
