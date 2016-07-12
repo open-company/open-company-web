@@ -217,24 +217,25 @@
                                  (om/set-state! owner :char-count nil))
                       :dangerouslySetInnerHTML #js {"__html" initial-snippet}})
         (dom/div {:class "topic-foce-buttons group"}
-          (dom/button {:class "btn-reset archive-topic right"
-                       :title "Archive this topic"
-                       :type "button"
-                       :data-toggle "tooltip"
-                       :data-placement "top"
-                       :on-click #(when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
-                                    (dis/dispatch! [:topic-archive section]))}
-            (dom/i {:class "fa fa-archive"}))
+          (when-not (:placeholder topic-data)
+            (dom/button {:class "btn-reset archive-topic right"
+                         :title "Archive this topic"
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :on-click #(when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
+                                      (dis/dispatch! [:topic-archive section]))}
+              (dom/i {:class "fa fa-archive"})))
           (dom/input {:id "file-upload-ui--select-trigger"
                       :style {:display "none"}
                       :type "file"
                       :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
           (dom/button {:class "btn-reset camera left"
-                       :title "Add an image"
+                       :title (if (not image-header) "Add an image" "Replace image")
                        :type "button"
                        :data-toggle "tooltip"
                        :data-placement "top"
-                       :style {:display (if (and (not image-header) (nil? file-upload-state)) "block" "none")}
+                       :style {:display (if (nil? file-upload-state) "block" "none")}
                        :on-click #(om/set-state! owner :file-upload-state :type-picker)}
               (dom/i {:class "fa fa-camera"}))
           (cond
@@ -265,14 +266,12 @@
             :else
             nil)
           (dom/button {:class "btn-reset add-content left"
-                       :title (if (clojure.string/blank? topic-body)
-                                "Add supporting content"
-                                "Edit supporting content")
+                       :title "Expanded view"
                        :type "button"
                        :data-toggle "tooltip"
                        :data-placement "top"
                        :on-click (partial start-fullscreen-editing-click owner options)}
-            (dom/i {:class "fa fa-plus-square"})))
+            (dom/i {:class "fa fa-expand"})))
         (dom/div {:class "topic-foce-footer group"}
           (dom/div {:class "divider"})
           (dom/div {:class "topic-foce-footer-left"}
