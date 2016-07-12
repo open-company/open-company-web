@@ -65,7 +65,7 @@ div.topic {
 
           div.svg-icon {
             margin-top: -8px;
-            margin-left: 1px;
+            margin-left: 2px;
           }
         }
 
@@ -103,6 +103,7 @@ div.topic {
       input.topic-title {
         padding-top: 10px;
         opacity: 0.5;
+        font-family: $oc_headers_font;
         font-weight: 700;
         font-size: 12px;
         line-height: 1.5;
@@ -130,8 +131,7 @@ div.topic {
       }
 
       div.topic-headline-inner {
-        padding-top: 15px;
-        font-family: $oc_headers_font;
+        padding-top: 14px;
         font-size: 20px;
         line-height: 1.2;
         color: $oc_gray_5;
@@ -161,7 +161,7 @@ div.topic {
         margin-bottom: 10px;
         color: $oc_gray_5;
         overflow: hidden;
-        font-family: $oc_headers_font;
+        font-weight: 400;
         font-size: 12px;
         line-height: 1.3;
         cursor: text;
@@ -173,7 +173,7 @@ div.topic {
         }
 
         *{
-          font-family: $oc_headers_font;
+          font-weight: 400;
           font-size: 12px;
           line-height: 1.3;
         }
@@ -229,6 +229,16 @@ div.topic {
       }
 
       div.topic-foce-buttons {
+        div.type-picker{
+          font-size: 12px;
+          padding-top: 6px;
+
+          a {
+            color: black;
+            text-decoration: underline;
+          }
+        }
+
         span.file-upload-progress {
           margin-top: 7px;
           padding-bottom: 0px;

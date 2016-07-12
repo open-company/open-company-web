@@ -144,7 +144,7 @@
     (setup-edit owner)
     (utils/after 100 #(focus-headline)))
 
-  (render-state [_ {:keys [initial-headline initial-snippet char-count char-count-alert file-upload-state file-upload-progress]}]
+  (render-state [_ {:keys [initial-headline initial-snippet char-count char-count-alert file-upload-state file-upload-progress upload-remote-url]}]
     (let [section             (dis/foce-section-key)
           topic-data          (dis/foce-section-data)
           section-kw          (keyword section)
@@ -235,10 +235,35 @@
                        :data-toggle "tooltip"
                        :data-placement "top"
                        :style {:display (if (and (not image-header) (nil? file-upload-state)) "block" "none")}
-                       :on-click #(.click (sel1 [:input#file-upload-ui--select-trigger]))}
-            (dom/i {:class "fa fa-camera"}))
-          (when (= file-upload-state :show-progress)
-            (dom/span {:class "file-upload-progress left"} (str file-upload-progress "%")))
+                       :on-click #(om/set-state! owner :file-upload-state :type-picker)}
+              (dom/i {:class "fa fa-camera"}))
+          (cond
+            (= file-upload-state :show-url-field)
+            (dom/div {:class "upload-remote-url-container left"}
+              (dom/input {:type "text"
+                          ; :style {:width 300}
+                          :auto-focus true
+                          :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
+                          :value upload-remote-url})
+              (dom/button {:style {:font-size "14px" :margin-left "1rem"}
+                           :class "underline btn-reset p0"
+                           :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
+                "add")
+              (dom/button {:style {:font-size "14px" :margin-left "1rem" :opacity "0.5"}
+                           :class "underline btn-reset p0"
+                           :on-click #(om/set-state! owner :file-upload-state :type-picker)}
+                "cancel"))
+            (= file-upload-state :type-picker)
+            (dom/div {:class "type-picker left"}
+              (dom/a {:class "upload-image underline"
+                      :on-click #(.click (sel1 [:input#file-upload-ui--select-trigger]))} "Select an image")
+              " or "
+              (dom/a {:class "insert-url underline"
+                      :on-click #(om/set-state! owner :file-upload-state :show-url-field)} "provide an image URL"))
+            (= file-upload-state :show-progress)
+            (dom/span {:class "file-upload-progress left"} (str file-upload-progress "%"))
+            :else
+            nil)
           (dom/button {:class "btn-reset add-content left"
                        :title (if (clojure.string/blank? topic-body)
                                 "Add supporting content"
