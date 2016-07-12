@@ -6,7 +6,7 @@
 body.small-footer {
   div.su-snapshot-preview {
     div.su-sp-content {
-      min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px);
+      min-height: calc(100vh - #{$navbar_height}px - 200px);
     }
   }
 }
@@ -194,6 +194,7 @@ div.su-snapshot-preview {
         letter-spacing: 1px;
         color: #ffffff;
         padding: 10px 19px;
+        border-top: 2px solid $oc_yellow;
       }
 
       div.add-section {
