@@ -21,7 +21,7 @@
             (= (:access data) "denied")
             [:div.block.red
              "OpenCompany requires verification with your Slack team. Please allow access."
-             [:p.my2.h5 "If Slack did not allow you to authorize the OpenCompany, try "
+             [:p.my2.h5 "If Slack did not allow you to authorize OpenCompany, try "
               [:button.p0.btn-reset.underline
                {:on-click #(login/login! (:basic-scopes-url (:auth-settings data)) %)}
                 "this link instead."]]]
