@@ -109,9 +109,7 @@
           (dom/button {:class (str "topic-pencil-button btn-reset")
                        :style {:top (if image-header (str (min 196 (:image-height topic-data)) "px") "5px")}
                        :on-click #(pencil-click owner %)}
-            (i/icon :pencil {:size 16
-                             :color gray-color
-                             :accent-color gray-color})))
+            (dom/i {:class "fa fa-pencil"})))
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
