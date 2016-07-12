@@ -206,7 +206,7 @@
             (dom/div
               (case share-via
                 :link  (link-dialog share-link)
-                :email (email-dialog {:initial-subject (str "[" (:name company-data) "] "  (:su-title data))
+                :email (email-dialog {:initial-subject (str (:name company-data) " "  (:su-title data))
                                       :share-link      share-link})
                 :slack (slack-dialog))
               (modal-actions
