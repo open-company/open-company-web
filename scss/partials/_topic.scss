@@ -70,7 +70,7 @@ div.topic {
 
       &:hover {
         button.topic-pencil-button {
-          opacity: 0.8;
+          opacity: 1;
         }
       }
 
@@ -82,6 +82,7 @@ div.topic {
         right: 10px;
         opacity: 0;
         transition: 230ms;
+        color: rgba(78, 90, 107, 0.5);
       }
 
       & > div{
@@ -217,7 +218,8 @@ div.topic {
         letter-spacing: 1px;
         color: $oc_gray_5;
         text-decoration: underline;
-        margin: 0px 15px 28px 15px;
+        margin: 0px 20px 28px 20px;
+        padding: 0;
       }
     }
   }
