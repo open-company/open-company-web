@@ -161,7 +161,7 @@
    [:div.p3
     [:p.domine
      (case type
-       :email "Your email has been sent! Recipients will get an email of your snapshot."
+       :email "Recipients will get an email of your snapshot."
        :slack "Your snapshot will be sent to all team members of your Slack organization momentarily.")]
     [:div.right-align.mt3
      [:button.btn-reset.btn-solid
