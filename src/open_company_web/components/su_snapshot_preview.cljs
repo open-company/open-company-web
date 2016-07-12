@@ -74,6 +74,7 @@
     (.sortable list-node #js {:scroll true
                               :forcePlaceholderSize true
                               :placeholder "sortable-placeholder"
+                              :axis "y"
                               :handle ".topic"
                               :stop #(om/set-state! owner :su-topics (ordered-topics-list))
                               :opacity 1})))
