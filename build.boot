@@ -6,7 +6,8 @@
     [tolitius/boot-check "0.1.2" :scope "test"]
 
     [org.clojure/clojure "1.9.0-alpha9"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
-    [org.clojure/clojurescript "1.9.93"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
+    ;; Skip ClojureScript 1.9.93 as it breaks source maps
+    [org.clojure/clojurescript "1.9.89"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
 
     ;; --- DO NOT UPDATE OM, the 1.x.x code requires changes on our part
     [org.omcljs/om "0.9.0" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
