@@ -367,7 +367,7 @@
                             (not (utils/event-inside? e file-upload-ui)))))
           (.focus topic-body)
           (utils/to-end-of-content-editable topic-body)
-          (set! (.-scrollTop fullscreen-topic) (.-scrollHeight fullscreen-topic)))))))
+          (scroll-to-bottom))))))
 
 (defn setup-body-listener [owner]
   (when-let [fullscreen-topic (sel1 [:div.fullscreen-topic])]
