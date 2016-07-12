@@ -395,17 +395,18 @@
 (defn setup-medium-editor [owner {:keys [topic-data topic] :as data}]
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
   (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
+        placeholder (if (:placeholder topic-data) (utils/get-topic-body topic-data topic) "")
         med-ed (new js/MediumEditor body-el (clj->js
-                                             (->  (utils/medium-editor-options "")
+                                             (->  (utils/medium-editor-options placeholder)
                                                   (editor/inject-extension editor/file-upload))))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
     (om/set-state! owner :initial-body (.-innerHTML body-el))
     (om/set-state! owner :medium-editor med-ed))
   (let [snippet-el (sel1 (str "div#topic-edit-snippet-" (name topic)))
-        placeholder-data (if (:placeholder topic-data) (utils/get-topic-body topic-data topic) "")
+        placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
         med-ed (new js/MediumEditor snippet-el (clj->js
-                                                 (->  (utils/medium-editor-options placeholder-data)
+                                                 (->  (utils/medium-editor-options placeholder)
                                                       (editor/inject-extension editor/file-upload))))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
