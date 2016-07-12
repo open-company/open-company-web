@@ -2,7 +2,6 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.footer :refer (footer)]
             [open-company-web.components.ui.login-required :refer (login-required)]))
