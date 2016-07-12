@@ -6,20 +6,20 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
+            [open-company-web.api :as api]
+            [open-company-web.urls :as oc-urls]
+            [open-company-web.caches :as caches]
+            [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dis]
+            [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.medium-editor-exts :as editor]
-            [open-company-web.router :as router]
-            [open-company-web.api :as api]
-            [open-company-web.caches :as caches]
-            [open-company-web.urls :as oc-urls]
-            [open-company-web.dispatcher :as dis]
             [open-company-web.lib.oc-colors :as oc-colors]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.components.growth.utils :as growth-utils]
-            [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [open-company-web.components.tooltip :refer (tooltip)]
             [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
@@ -247,8 +247,9 @@
          is-data-topic (#{:finances :growth} topic-kw)
          with-title {:title (om/get-state owner :title)}
          with-headline (merge with-title {:headline (.-innerHTML headline-node)})
+         with-header-image (merge with-headline {:image-url (om/get-state owner :image-url) :image-width (om/get-state owner :image-width) :image-height (om/get-state owner :image-height)})
          snippet (.-innerHTML snippet-node)
-         with-snippet (merge with-headline {:snippet snippet})
+         with-snippet (merge with-header-image {:snippet snippet})
          body (.-innerHTML body-node)
          with-body (merge with-snippet (if is-data-topic {:notes {:body body}} {:body body}))
          with-finances-data (if (= topic-kw :finances)
@@ -259,9 +260,10 @@
                             with-finances-data)]
       with-growth-data)))
 
+(def title-alert-limit 3)
+(def headline-alert-limit 10)
+
 (defn headline-on-change [owner]
-  (when-not (om/get-state owner :show-headline-counter)
-    (om/set-state! owner :show-headline-counter true))
   (let [headline-innerHTML (.-innerHTML (sel1 [:div.topic-edit-headline]))]
     (when (not= (om/get-state owner :headline) headline-innerHTML)
       (om/set-state! owner :has-changes true))))
@@ -282,16 +284,17 @@
                  (not= (.-keyCode e) 39)
                  (>= (count headline-value) headline-max-length))
         (.preventDefault e))
+      (om/set-state! owner :char-count (- headline-max-length (count headline-value)))
+      (om/set-state! owner :char-count-alert (< (- headline-max-length (count headline-value)) headline-alert-limit))
       (headline-on-change owner))))
 
 (defn snippet-on-change [owner]
-  (when-not (om/get-state owner :show-snippet-counter)
-    (om/set-state! owner :show-snippet-counter true))
   (let [snippet-innerHTML (.-innerHTML (sel1 [:div.topic-edit-snippet]))]
     (when (not= (om/get-state owner :snippet) snippet-innerHTML)
       (om/set-state! owner :has-changes true))))
 
 (def snippet-length-limit 500)
+(def snippet-alert-limit 50)
 
 (defn check-snippet-count [owner e]
   (when-let [snippet (sel1 [:div.topic-edit-snippet])]
@@ -307,6 +310,8 @@
                  (not= (.-keyCode e) 39)
                  (>= (count snippet-value) snippet-length-limit))
         (.preventDefault e))
+      (om/set-state! owner :char-count (- snippet-length-limit (count snippet-value)))
+      (om/set-state! owner :char-count-alert (< (- snippet-length-limit (count snippet-value)) snippet-alert-limit))
       (snippet-on-change owner))))
 
 (defn count-chars
@@ -374,13 +379,12 @@
        :snippet (:snippet topic-data)
        :body (utils/get-topic-body topic-data topic)
        :note (:note topic-data)
-       :show-headline-counter (:show-headline-counter current-state)
        :show-title-counter (:show-title-counter current-state)
-       :show-snippet-counter (:show-snippet-counter current-state)
        :medium-editor (:medium-editor current-state)
        :history-listener-id (:history-listener-id current-state)
        :tooltip-dismissed false
-       :body-click body-click}
+       :body-click body-click
+       :char-count (:char-count current-state)}
       (finances-init-state topic (:data topic-data))
       (growth-init-state topic data current-state))))
 
@@ -436,8 +440,9 @@
                         (set! (.-src node) url)
                         (om/set-state! owner :image-url url))
                       (om/set-state! owner :file-upload-state nil)
-                      (om/set-state! owner :file-upload-progress 0))
-        error-cb    (fn [error] (js/console.log "error" error))
+                      (om/set-state! owner :file-upload-progress nil)
+                      (om/set-state! owner :has-changes true))
+        error-cb    (fn [error] (om/set-state! owner :file-upload-progress nil) (js/console.log "error" error))
         progress-cb (fn [progress]
                       (let [state (om/get-state owner)]
                         (om/set-state! owner (merge state {:file-upload-state :show-progress
@@ -484,6 +489,8 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (reset! prevent-route-dispatch true)
+      (js/filepicker.setKey ls/filestack-key)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
       (setup-medium-editor owner data)
       (when-not (om/get-state owner :body-click)
         (om/set-state! owner :body-click (setup-body-listener owner)))
@@ -513,6 +520,11 @@
                            image-height
                            snippet
                            body
+                           char-count
+                           char-count-alert
+                           file-upload-state
+                           file-upload-progress
+                           upload-remote-url
                            ; finances states
                            finances-data
                            ; growth states
@@ -520,9 +532,7 @@
                            growth-new-metric
                            growth-data
                            growth-metrics
-                           show-headline-counter
                            show-title-counter
-                           show-snippet-counter
                            growth-metric-slugs
                            ; tooltip
                            tooltip-dismissed]}]
@@ -556,43 +566,33 @@
             (when image-url
               (dom/div {:class "topic-header-image"}
                 (dom/img {:src image-url})
-                (dom/button {:class "btn-reset remove-header-image"
-                             :on-click #(om/set-state! owner (merge (om/get-state owner) {:image-url nil
-                                                                                          :image-width 0
-                                                                                          :image-height 0}))}
-                  (icon :simple-remove {:size 16
-                                             :color (oc-colors/get-color-by-kw :oc-gray-5)
-                                             :accent-color (oc-colors/get-color-by-kw :oc-gray-5)}))))
+                (dom/button {:class "btn-reset remove-header"
+                             :on-click #(om/set-state! owner (merge (om/get-state owner) {:image-url nil :image-width 0 :image-height 0 :has-changes true}))}
+                  (icon :simple-remove {:size 15
+                                          :stroke 4
+                                          :color "white"
+                                          :accent-color "white"}))))
             (dom/input {:class "topic-edit-title"
                         :id (str "topic-edit-title-" (name topic))
                         :type "text"
                         :placeholder "Title"
-                        :on-blur #(om/set-state! owner :show-title-counter false)
+                        :on-blur #(om/set-state! owner :char-count nil)
                         :max-length title-length-limit
                         :value title
                         :on-change (fn [e]
-                                      (when (not show-title-counter)
-                                        (om/set-state! owner :show-title-counter true))
+                                      (om/set-state! owner :char-count (- title-length-limit (count title)))
+                                      (om/set-state! owner :char-count-alert (< (- title-length-limit (count title)) title-alert-limit))
                                       (change-value owner :title e))})
-            (dom/div {:class (utils/class-set {:topic-edit-title-count true
-                                               :char-counter true
-                                               :transparent (not show-title-counter)})}
-              (dom/label {} (- title-length-limit (count title))))
             (dom/div {:className "topic-edit-headline emoji-autocomplete"
                       :ref "topic-edit-headline"
                       :contentEditable true
                       :id (str "topic-edit-headline-" (name topic))
                       :placeholder "Headline"
                       :on-blur #(do (check-headline-count owner headline-length-limit %)
-                                    (om/set-state! owner :show-headline-counter false))
+                                    (om/set-state! owner :char-count nil))
                       :on-key-up   #(check-headline-count owner headline-length-limit %)
                       :on-key-down #(check-headline-count owner headline-length-limit %)
-                      :on-focus    #(check-headline-count owner headline-length-limit %)
                       :dangerouslySetInnerHTML (clj->js {"__html" headline})})
-            (dom/div {:class (utils/class-set {:topic-edit-headline-count true
-                                               :char-counter true
-                                               :transparent (not show-headline-counter)})}
-              (dom/label {} (- headline-length-limit (headline-count-chars))))
             (when is-data-topic
               (dom/div {:class "separator"}))
             (dom/div {:class "topic-overlay-edit-data"}
@@ -645,28 +645,53 @@
                       :id (str "topic-edit-snippet-" (name topic))
                       :contentEditable true
                       :on-blur #(do (check-snippet-count owner %)
-                                    (om/set-state! owner :show-snippet-counter false))
+                                    (om/set-state! owner :char-count nil))
                       :on-key-up   #(check-snippet-count owner %)
                       :on-key-down #(check-snippet-count owner %)
-                      :on-focus    #(check-snippet-count owner %)
                       :dangerouslySetInnerHTML (clj->js {"__html" snippet})})
-            (dom/div {:class (utils/class-set {:topic-edit-snippet-count true
-                                               :char-counter true
-                                               :transparent (not show-snippet-counter)})}
-              (dom/label {:class "bold"} (- snippet-length-limit (snippet-count-chars))))
             (dom/div {:class "topc-edit-top-box-footer"}
-              (when image-url
-                (dom/button {:class "btn-reset add-image"
-                             :on-click #(.click (sel1 [:input#topic-edit-upload-ui--select-trigger]))}
-                  (icon :camera-20 {:size 16
-                                    :color (oc-colors/get-color-by-kw :oc-gray-5)
-                                    :accent-color (oc-colors/get-color-by-kw :oc-gray-5)})))
-              (dom/div {:class "char-count"} "10")
+              (dom/div {:class (str "char-count" (when char-count-alert " red"))} char-count)
+              (dom/button {:class "btn-reset add-image"
+                           :title "Add an image"
+                           :type "button"
+                           :data-toggle "tooltip"
+                           :data-placement "top"
+                           :style {:display (if (and (not image-url) (nil? file-upload-state)) "block" "none")}
+                           :on-click #(om/set-state! owner :file-upload-state :type-picker)}
+                (dom/i {:class "fa fa-camera"}))
+              (cond
+                (= file-upload-state :show-url-field)
+                (dom/div {:class "upload-remote-url-container left"}
+                  (dom/input {:type "text"
+                              ; :style {:width 300}
+                              :auto-focus true
+                              :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
+                              :value upload-remote-url})
+                  (dom/button {:style {:font-size "14px" :margin-left "1rem"}
+                               :class "underline btn-reset p0"
+                               :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
+                    "add")
+                  (dom/button {:style {:font-size "14px" :margin-left "1rem" :opacity "0.5"}
+                               :class "underline btn-reset p0"
+                               :on-click #(om/set-state! owner :file-upload-state :type-picker)}
+                    "cancel"))
+                (= file-upload-state :type-picker)
+                (dom/div {:class "type-picker left"}
+                  (dom/a {:class "upload-image underline"
+                          :on-click #(.click (sel1 [:input#topic-edit-upload-ui--select-trigger]))} "Select an image")
+                  " or "
+                  (dom/a {:class "insert-url underline"
+                          :on-click #(om/set-state! owner :file-upload-state :show-url-field)} "provide an image URL"))
+                (= file-upload-state :show-progress)
+                (dom/span {:class "file-upload-progress left"} (str file-upload-progress "%"))
+                :else
+                nil)
               (dom/input {:id "topic-edit-upload-ui--select-trigger"
                       :style {:display "none"}
                       :type "file"
                       :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})))
           (dom/div {:class "relative topic-body-line"}
+            (dom/div {:class "add-more-below"} "ADD MORE BELOW")
             (dom/div {:className "topic-body emoji-autocomplete"
                       :ref "topic-overlay-edit-body"
                       :contentEditable true
@@ -681,7 +706,7 @@
         (dom/button {:class "save-button btn-reset btn-solid"
                      :on-click #(save-data owner options)}
           "SAVE"))
-      (dom/button {:class "btn-reset btn-outline close-editing"
+      (dom/button {:class (str "btn-reset btn-outline close-editing" (when has-changes " has-save"))
                      :key "close"
                      :title "Dismiss edit"
                      :on-click #(reset-and-dismiss owner options)} "CANCEL")
