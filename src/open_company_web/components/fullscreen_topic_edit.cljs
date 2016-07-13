@@ -722,18 +722,18 @@
                       :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
             (om/build filestack-uploader (om/get-state owner :medium-editor))))
         (dom/button {:class "relative remove-button btn-reset btn-outline"
-                     :style {:left (str (+ (- (/ ww 2) (/ fullscreen-width 2)) 40) "px")}
+                     :style {:left (str (+ (- (/ ww 2) (/ fullscreen-width 2)) 10) "px")}
                      :on-click #(remove-topic-click owner options %)}
           (dom/i {:class "fa fa-archive"})
           "Archive this topic")
       (when has-changes
         (dom/button {:class "save-button btn-reset btn-solid"
-                     :style {:left (str (- (+ (/ ww 2) (/ fullscreen-width 2)) 100 10 30) "px")}
+                     :style {:left (str (- (+ (/ ww 2) (/ fullscreen-width 2)) 100 10) "px")}
                      :on-click #(save-data owner options)}
           "SAVE"))
       (dom/button {:class (str "btn-reset btn-outline close-editing" (when has-changes " has-save"))
                      :key "close"
-                     :style {:left (str (- (+ (/ ww 2) (/ fullscreen-width 2)) 120 10 30 (when has-changes (+ 100 20))) "px")}
+                     :style {:left (str (- (+ (/ ww 2) (/ fullscreen-width 2)) 120 10 (when has-changes (+ 100 20))) "px")}
                      :title "Dismiss edit"
                      :on-click #(reset-and-dismiss owner options)} "CANCEL")
       (when (and show-first-edit-tooltip
