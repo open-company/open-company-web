@@ -49,7 +49,7 @@
                     (gstyle/setStyle el #js {:position "absolute"
                                              :display "block"
                                              :opacity 1
-                                             :top (str (+ top-v 40) "px")
+                                             :top (str top-v "px")
                                              :left "-35px"})))
         show-btn (fn [_]
                    (utils/after 100
