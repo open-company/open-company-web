@@ -47,7 +47,8 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (assert ls/filestack-key "FileStack API Key required")
-      (js/filepicker.setKey ls/filestack-key)))
+      (js/filepicker.setKey ls/filestack-key)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (render-state [this _]
     (dom/div {:id "file-upload-ui"
@@ -61,21 +62,34 @@
                      :style {:margin-right "13px"
                              :transition ".2s"
                              :transform (if (om/get-state owner :state) "rotate(135deg)")}
-                     :on-click (fn [e] (utils/event-stop e) (om/update-state! owner :state #(if % nil :show-options)))}
+                     :on-click (fn [e]
+                                  (utils/event-stop e)
+                                  (om/update-state! owner :state #(if % nil :show-options)))}
           (i/icon :circle-add {:size 24}))
         (case (:state (om/get-state owner))
           :show-options
-          (dom/div (dom/button {:style {:font-size "14px"} :class "underline btn-reset p0"
-                                :on-click (fn [_]
-                                            (insert-marker!)
-                                            (.click (gdom/getElement "file-upload-ui--select-trigger")))}
-                     "Select an image")
+          (dom/div
+            (dom/button {:class "btn-reset"
+                         :style {:font-size "14px"}
+                         :title "Add an image"
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :on-click (fn [_]
+                                     (insert-marker!)
+                                     (.click (gdom/getElement "file-upload-ui--select-trigger")))}
+              (dom/i {:class "fa fa-camera"}))
             (dom/span {:style {:font-size "14px"}} " or ")
-            (dom/button {:style {:font-size "14px"} :class "underline btn-reset p0"
+            (dom/button {:style {:font-size "14px"}
+                         :class "btn-reset"
+                         :title "Provide an image link"
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
                          :on-click (fn [_]
                                      (insert-marker!)
                                      (om/set-state! owner :state :show-url-field))}
-                "provide an image URL"))
+                (dom/i {:class "fa fa-code"})))
           :show-progress
           (dom/span (str "Uploading... " (om/get-state owner :progress) "%"))
           :show-url-field
