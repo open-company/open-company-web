@@ -77,7 +77,7 @@
   [{:keys [share-link initial-subject]}]
   (dis/dispatch! [:input [:stakeholder-update/share :email :subject] initial-subject])
   [:div
-   (modal-title "Share to Email" :email-84)
+   (modal-title "Share by Email" :email-84)
    [:div.p3
     (multi-email-input (fn [val] (dis/dispatch! [:input [:stakeholder-update/share :email :to] val])))
     [:label.block.small-caps.bold.mb2 "Subject"]
