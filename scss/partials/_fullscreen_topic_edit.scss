@@ -383,8 +383,8 @@ div.fullscreen-topic-edit {
     float: left;
     position: fixed;
     bottom: 20px;
-    opacity: 1;
     background-color: white;
+    opacity: 0.8;
 
     &:hover {
       background-color: white;
@@ -398,6 +398,11 @@ div.fullscreen-topic-edit {
     cursor: pointer;
     position: fixed;
     bottom: 20px;
+    opacity: 0.8;
+
+    &:disabled{
+      opacity: 0.4;
+    }
   }
 
   button.close-editing {
@@ -406,8 +411,8 @@ div.fullscreen-topic-edit {
     position: fixed;
     right: 20px;
     bottom: 20px;
-    opacity: 1;
     background-color: white;
+    opacity: 0.8;
 
     &:hover {
       background-color: white;
