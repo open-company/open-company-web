@@ -139,6 +139,15 @@ div.topic {
         border: none;
         cursor: text;
 
+        &:after {
+          font-size: 20px;
+          line-height: 1.2;
+          color: $oc_gray_5;
+          font-style: italic;
+          font-family: $oc_main_font;
+          opacity: 0.5;
+        }
+
         &:active {
           outline: none;
         }
@@ -166,6 +175,15 @@ div.topic {
         line-height: 1.3;
         cursor: text;
         min-height: 20px;
+
+        &:after {
+          font-style: italic;
+          font-family: $oc_main_font;
+          font-weight: 400;
+          font-size: 12px;
+          color: $oc_gray_5;
+          opacity: 0.5;
+        }
 
         svg.emojione {
           width: 12px;
