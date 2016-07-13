@@ -207,10 +207,10 @@
                       :key "foce-snippet"
                       :ref "topic-snippet"
                       :contentEditable true
-                      :style #js {:minHeight (if (:placeholder topic-data) "75px" "0px")}
+                      :style #js {:minHeight (if (:placeholder topic-data) "100px" "0px")}
                       :onKeyUp   #(check-snippet-count owner %)
                       :onKeyDown #(check-snippet-count owner %)
-                      :onFocus    #(check-snippet-count owner %)
+                      :onFocus   #(check-snippet-count owner %)
                       :onBlur #(do
                                  (check-snippet-count owner %)
                                  (om/set-state! owner :char-count nil))
@@ -225,7 +225,7 @@
                          :on-click #(when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
                                       (dis/dispatch! [:topic-archive section]))}
               (dom/i {:class "fa fa-archive"})))
-          (dom/input {:id "file-upload-ui--select-trigger"
+          (dom/input {:id "foce-file-upload-ui--select-trigger"
                       :style {:display "none"}
                       :type "file"
                       :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
@@ -235,7 +235,7 @@
                        :data-toggle "tooltip"
                        :data-placement "top"
                        :style {:display (if (nil? file-upload-state) "block" "none")}
-                       :on-click #(.click (sel1 [:input#file-upload-ui--select-trigger]))}
+                       :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
               (dom/i {:class "fa fa-camera"}))
           (dom/button {:class "btn-reset image-url left"
                        :title "Provide an image link"
