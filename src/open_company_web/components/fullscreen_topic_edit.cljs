@@ -414,7 +414,7 @@
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
   (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
         med-ed (new js/MediumEditor body-el (clj->js
-                                             (->  (utils/medium-editor-options "")
+                                             (->  (utils/medium-editor-options "Additional info you’d like to add...")
                                                   (editor/inject-extension editor/file-upload))))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
@@ -715,7 +715,6 @@
                       :type "file"
                       :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})))
           (dom/div {:class "relative topic-body-line"}
-            (dom/div {:class "add-more-below"} "Additional info you’d like to add...")
             (dom/div {:className "topic-body emoji-autocomplete"
                       :ref "topic-overlay-edit-body"
                       :contentEditable true
