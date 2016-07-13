@@ -149,7 +149,7 @@
 (defn animate-selected-topic-transition [owner left?]
   (let [selected-topic (om/get-ref owner "selected-topic")
         tr-selected-topic (om/get-ref owner "tr-selected-topic")
-        width (utils/fullscreen-topic-width (om/get-state owner :card-width))
+        width (responsive/fullscreen-topic-width (om/get-state owner :card-width))
         fade-anim (new Slide selected-topic #js [0 0] #js [(if left? width (* width -1)) 0] utils/oc-animation-duration)
         cur-state (om/get-state owner)]
     (doto fade-anim
