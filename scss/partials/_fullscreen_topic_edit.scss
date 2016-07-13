@@ -1,12 +1,15 @@
 div.fullscreen-topic-edit {
   position: relative;
   min-height: calc(100vh - #{$navbar_height}px - 60px - 4px);
+  max-width: 575px;
+  min-width: 302px;
+  margin: 0 auto;
 
   div.fullscreen-topic-internal{
     max-width: 575px;
     min-width: 302px;
-    margin: #{$navbar_height}px auto 30px;
-
+    margin-top: 30px;
+    margin-bottom: 70px;
 
     div.fullscreen-topic-edit-top-box {
       border-radius: 4px;
@@ -50,6 +53,11 @@ div.fullscreen-topic-edit {
         button.add-image {
           float: left;
           color: rgba(78, 90, 107, 0.5);
+        }
+
+        button.image-url{
+          float: left;
+          color: rgba(78, 90, 107, 0.5); 
         }
 
         span.file-upload-progress {
@@ -374,8 +382,13 @@ div.fullscreen-topic-edit {
   button.remove-button {
     float: left;
     position: fixed;
-    left: 20px;
     bottom: 20px;
+    opacity: 1;
+    background-color: white;
+
+    &:hover {
+      background-color: white;
+    }
     i.fa-archive {
       margin-right: 5px;
     }
@@ -384,7 +397,6 @@ div.fullscreen-topic-edit {
   button.save-button {
     cursor: pointer;
     position: fixed;
-    right: 20px;
     bottom: 20px;
   }
 
@@ -394,6 +406,12 @@ div.fullscreen-topic-edit {
     position: fixed;
     right: 20px;
     bottom: 20px;
+    opacity: 1;
+    background-color: white;
+
+    &:hover {
+      background-color: white;
+    }
 
     &.has-save {
       right: 150px;
