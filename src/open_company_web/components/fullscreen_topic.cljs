@@ -230,7 +230,7 @@
                                                 :switch-metric-cb #(om/set-state! owner :last-selected-metric %)
                                                 :start-editing #(start-editing owner options)})
           edit-topic-opts (merge options {:show-save-button #(om/set-state! owner :show-save-button %)
-                                          :dismiss-editing #(hide-fullscreen-topic owner options true)})
+                                          :dismiss-editing #(hide-fullscreen-topic owner options (:fullscreen-force-edit data))})
           can-edit? (and (responsive/can-edit?)
                          (not (:read-only data)))
           fullscreen-width (responsive/fullscreen-topic-width card-width)]
