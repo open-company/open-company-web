@@ -118,3 +118,9 @@
 
 (defn user-agent-mobile? []
   userAgent/MOBILE)
+
+(defn fullscreen-topic-width [card-width]
+  (let [ww (.-clientWidth (sel1 js/document :body))]
+    (if (> ww 575)
+      575
+      (min card-width ww))))
