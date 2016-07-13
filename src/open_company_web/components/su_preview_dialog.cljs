@@ -71,7 +71,7 @@
        :value     @input
        :on-blur   #(do (reset! invalid (invalid? @input)) true)
        :on-change #(update! (.. % -target -value))
-       :placeholder "investor@vc.com,advisor@smarty.com"}]]))
+       :placeholder "investor@vc.com, advisor@smart.com"}]]))
 
 (rum/defc email-dialog < rum/static emoji-autocomplete
   [{:keys [share-link initial-subject]}]
