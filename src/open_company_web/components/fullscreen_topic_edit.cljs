@@ -716,7 +716,7 @@
                       :type "file"
                       :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})))
           (dom/div {:class "relative topic-body-line"}
-            (dom/div {:class "add-more-below"} "ADD EXTRA BELOW")
+            (dom/div {:class "add-more-below"} "Additional info you’d like to add...")
             (dom/div {:className "topic-body emoji-autocomplete"
                       :ref "topic-overlay-edit-body"
                       :contentEditable true
