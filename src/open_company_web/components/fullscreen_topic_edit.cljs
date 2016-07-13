@@ -13,8 +13,9 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.lib.medium-editor-exts :as editor]
             [open-company-web.lib.oc-colors :as oc-colors]
+            [open-company-web.lib.responsive :as responsive]
+            [open-company-web.lib.medium-editor-exts :as editor]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.finances.utils :as finances-utils]
@@ -449,19 +450,23 @@
 
 (defn img-on-load [owner img]
   (om/set-state! owner (merge (om/get-state owner) {:image-width (.-clientWidht img)
-                                                    :image-height (.-clientHeight img)})))
+                                                    :image-height (.-clientHeight img)}))
+  (gdom/removeNode img))
 
 (defn upload-file! [owner file]
   (let [success-cb  (fn [success]
                       (let [url    (.-url success)
                             node   (gdom/createDom "img")]
+                        (gdom/append (.-body js/document) node)
                         (set! (.-onload node) #(img-on-load owner node))
                         (set! (.-src node) url)
-                        (om/set-state! owner :image-url url))
-                      (om/set-state! owner :file-upload-state nil)
+                      (om/set-state! owner (merge (om/get-state owner) {:image-url url
+                                                                        :file-upload-state nil
+                                                                        :file-upload-progress nil
+                                                                        :has-changes true}))))
+        error-cb    (fn [error]
                       (om/set-state! owner :file-upload-progress nil)
-                      (om/set-state! owner :has-changes true))
-        error-cb    (fn [error] (om/set-state! owner :file-upload-progress nil) (js/console.log "error" error))
+                      (js/console.log "error" error))
         progress-cb (fn [progress]
                       (let [state (om/get-state owner)]
                         (om/set-state! owner (merge state {:file-upload-state :show-progress
@@ -570,16 +575,14 @@
                                   80
                                   100)
           ww (.-clientWidth (sel1 js/document :body))
-          fullscreen-width (if (> ww 575)
-                              575
-                              (min card-width ww))]
+          fullscreen-width (responsive/fullscreen-topic-width card-width)]
       ; set the onbeforeunload handler only if there are changes
       (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
       (dom/div {:class "fullscreen-topic-edit group"
+                :style #js {:width (str (- fullscreen-width 20) "px")}
                 :key (:updated-at topic-data)}
         (dom/div {:class "fullscreen-topic-internal group"
-                  :style #js {:width (str (- fullscreen-width 20) "px")}
                   :on-click #(.stopPropagation %)}
           (dom/div {:class "fullscreen-topic-edit-top-box"}
             (when image-url
@@ -671,13 +674,21 @@
             (dom/div {:class "topc-edit-top-box-footer"}
               (dom/div {:class (str "char-count" (when char-count-alert " red"))} char-count)
               (dom/button {:class "btn-reset add-image"
-                           :title "Add an image"
+                           :title (if (not image-url) "Add an image" "Replace image")
                            :type "button"
                            :data-toggle "tooltip"
                            :data-placement "top"
-                           :style {:display (if (and (not image-url) (nil? file-upload-state)) "block" "none")}
-                           :on-click #(om/set-state! owner :file-upload-state :type-picker)}
+                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :on-click #(.click (sel1 [:input#topic-edit-upload-ui--select-trigger]))}
                 (dom/i {:class "fa fa-camera"}))
+              (dom/button {:class "btn-reset image-url"
+                           :title "Provide an image link"
+                           :type "button"
+                           :data-toggle "tooltip"
+                           :data-placement "top"
+                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
+                (dom/i {:class "fa fa-code"}))
               (cond
                 (= file-upload-state :show-url-field)
                 (dom/div {:class "upload-remote-url-container left"}
@@ -692,19 +703,12 @@
                     "add")
                   (dom/button {:style {:font-size "14px" :margin-left "1rem" :opacity "0.5"}
                                :class "underline btn-reset p0"
-                               :on-click #(om/set-state! owner :file-upload-state :type-picker)}
+                               :on-click #(om/set-state! owner :file-upload-state nil)}
                     "cancel"))
-                (= file-upload-state :type-picker)
-                (dom/div {:class "type-picker left"}
-                  (dom/a {:class "upload-image underline"
-                          :on-click #(.click (sel1 [:input#topic-edit-upload-ui--select-trigger]))} "Select an image")
-                  " or "
-                  (dom/a {:class "insert-url underline"
-                          :on-click #(om/set-state! owner :file-upload-state :show-url-field)} "provide an image URL"))
                 (= file-upload-state :show-progress)
                 (dom/span {:class "file-upload-progress left"} (str file-upload-progress "%"))
                 :else
-                nil)
+                (dom/span {} ""))
               (dom/input {:id "topic-edit-upload-ui--select-trigger"
                       :style {:display "none"}
                       :type "file"
@@ -718,15 +722,18 @@
                       :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
             (om/build filestack-uploader (om/get-state owner :medium-editor))))
         (dom/button {:class "relative remove-button btn-reset btn-outline"
+                     :style {:left (str (+ (- (/ ww 2) (/ fullscreen-width 2)) 40) "px")}
                      :on-click #(remove-topic-click owner options %)}
           (dom/i {:class "fa fa-archive"})
           "Archive this topic")
       (when has-changes
         (dom/button {:class "save-button btn-reset btn-solid"
+                     :style {:left (str (- (+ (/ ww 2) (/ fullscreen-width 2)) 100 10 30) "px")}
                      :on-click #(save-data owner options)}
           "SAVE"))
       (dom/button {:class (str "btn-reset btn-outline close-editing" (when has-changes " has-save"))
                      :key "close"
+                     :style {:left (str (- (+ (/ ww 2) (/ fullscreen-width 2)) 120 10 30 (when has-changes (+ 100 20))) "px")}
                      :title "Dismiss edit"
                      :on-click #(reset-and-dismiss owner options)} "CANCEL")
       (when (and show-first-edit-tooltip
