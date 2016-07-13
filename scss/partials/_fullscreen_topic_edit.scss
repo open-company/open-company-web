@@ -134,58 +134,6 @@ div.fullscreen-topic-edit {
       }
 
       div.topic-edit-headline{
-        font-size: 26px;
-        line-height: 1.4;
-        color: $oc_gray_5;
-        border: 0px;
-        width: 100%;
-        padding: 0px;
-        margin: 0px;
-        margin-top: 18px;
-        height: auto;
-
-        &:empty:before{
-          content: attr(placeholder);
-          display: block; /* For Firefox */
-          opacity: 0.5;
-          font-weight: 700;
-          font-family: $oc_headers_font;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
-          text-transform: uppercase;
-          border: 0px;
-          width: 100%;
-          padding: 0px;
-
-          &:active, &:focus{
-            border: 0px;
-            outline: none;
-            box-shadow: none;
-          }
-        }
-      }
-
-      textarea.topic-edit-headline {
-        font-size: 26px;
-        line-height: 1.4;
-        color: $oc_gray_5;
-        border: 0px;
-        width: 100%;
-        padding: 0px;
-        margin: 0px;
-        margin-top: 2px;
-        height: auto;
-
-        &:active, &:focus{
-          border: 0px;
-          outline: none;
-          box-shadow: none;
-        }
-      }
-
-      div.topic-edit-headline{
         font-family: $oc_headers_font;
         font-size: 26px;
         line-height: 1.4;
@@ -197,10 +145,18 @@ div.fullscreen-topic-edit {
         margin-top: 18px;
         height: auto;
 
-        &:empty:before{
-          content: attr(placeholder);
-          display: block; /* For Firefox */
+        &:after{
+          font-style: italic;
+          font-family: $oc_headers_font;
+          font-size: 26px;
+          line-height: 24px;
+          color: $oc_gray_5;
           opacity: 0.5;
+        }
+
+        &:empty:after {
+          content: attr(placeholder);
+          display: block;
         }
 
         &:active, &:focus{
@@ -337,6 +293,20 @@ div.fullscreen-topic-edit {
         @include rich-editor-body(rgba(78, 90, 107, 1));
         line-height: 1.8;
         font-size: 18px;
+        min-height: 100px;
+
+        &:after {
+          font-family: $oc_main_font;
+          font-weight: 400;
+          font-size: 18px;
+          font-style: italic;
+          opacity: 0.5;
+          color: $oc_gray_5;
+          margin-top: 0px;
+          padding-top: 0px;
+          height: auto;
+          display: block;
+        }
       }
 
       div.topic-edit-snippet-count{
@@ -375,6 +345,16 @@ div.fullscreen-topic-edit {
         @include rich-editor-body($oc_gray_5);
         line-height: 1.8;
         font-size: 18px;
+        min-height: 100px;
+
+        &:after {
+          font-style: italic;
+          opacity: 0.5;
+          font-family: $oc_main_font;
+          font-weight: 400;
+          font-size: 18px;
+          line-height: 1.8;
+        }
       }
     }
   }

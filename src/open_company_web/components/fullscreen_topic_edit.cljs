@@ -380,7 +380,8 @@
         topic-data    (if (= (dis/foce-section-key) (keyword topic)) (dis/foce-section-data) (:topic-data data))
         body-click    (if (and (nil? (:body-click current-state)) (:visible data))
                         (setup-body-listener owner)
-                        (:body-click current-state))]
+                        (:body-click current-state))
+        is-placeholder-topic (:placeholder current-topic-data)]
     (merge
       {:has-changes (or (not= (:image-url current-topic-data) (:image-url topic-data))
                         (not= (:title current-topic-data) (:title topic-data))
@@ -393,7 +394,7 @@
        :image-url (:image-url topic-data)
        :image-width (:image-width topic-data)
        :image-height (:image-height topic-data)
-       :snippet (:snippet topic-data)
+       :snippet (if is-placeholder-topic "" (:snippet topic-data))
        :body (utils/get-topic-body topic-data topic)
        :note (:note topic-data)
        :show-title-counter (:show-title-counter current-state)
@@ -508,7 +509,8 @@
       ; remove history change listener
       (events/unlistenByKey (om/get-state owner :history-listener-id))
       ; disable front of card editing
-      (utils/after 100 #(dis/dispatch! [:start-foce nil]))))
+      (when-not (:placeholder topic-data)
+        (utils/after 100 #(dis/dispatch! [:start-foce nil])))))
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -672,7 +674,6 @@
                       :on-key-down #(check-snippet-count owner %)
                       :dangerouslySetInnerHTML (clj->js {"__html" snippet})})
             (dom/div {:class "topc-edit-top-box-footer"}
-              (dom/div {:class (str "char-count" (when char-count-alert " red"))} char-count)
               (dom/button {:class "btn-reset add-image"
                            :title (if (not image-url) "Add an image" "Replace image")
                            :type "button"
@@ -689,6 +690,7 @@
                            :style {:display (if (nil? file-upload-state) "block" "none")}
                            :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
                 (dom/i {:class "fa fa-code"}))
+              (dom/div {:class (str "char-count" (when char-count-alert " red"))} char-count)
               (cond
                 (= file-upload-state :show-url-field)
                 (dom/div {:class "upload-remote-url-container left"}
