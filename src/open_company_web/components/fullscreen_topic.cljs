@@ -30,9 +30,9 @@
   (.play
     (new Fade (om/get-ref owner "fullscreen-topic") 0 1 utils/oc-animation-duration)))
 
-(defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric card-width hide-history-navigation] :as data} owner options]
+(defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric card-width hide-history-navigation can-edit is-actual] :as data} owner options]
   (render [_]
-    (let [fullscreen-width (utils/fullscreen-topic-width card-width)
+    (let [fullscreen-width (responsive/fullscreen-topic-width card-width)
           chart-opts {:show-title false
                       :show-revisions-navigation false
                       :switch-metric-cb (:switch-metric-cb options)
@@ -50,7 +50,13 @@
           (when (:image-url topic-data)
             (dom/div {:class "topic-header-image"}
               (dom/img {:src (:image-url topic-data)})))
-          (dom/div {:class "topic-title"} (:title topic-data))
+          (dom/div {:class "group"}
+            (dom/div {:class "topic-title left"} (:title topic-data))
+            (when (and can-edit
+                       is-actual)
+              (dom/div {:class "edit-button"
+                        :on-click #((:start-editing options))}
+                (dom/i {:class "fa fa-pencil"}))))
           (dom/div {:class "topic-headline"
                     :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
           (when (or (= topic "growth") (= topic "finances"))
@@ -221,11 +227,13 @@
           topic-data (utils/select-section-data section-data section-kw as-of)
           is-actual? (= as-of actual-as-of)
           fullscreen-topic-opts (merge options {:rev-nav #(om/set-state! owner :transition-as-of %)
-                                                :switch-metric-cb #(om/set-state! owner :last-selected-metric %)})
+                                                :switch-metric-cb #(om/set-state! owner :last-selected-metric %)
+                                                :start-editing #(start-editing owner options)})
           edit-topic-opts (merge options {:show-save-button #(om/set-state! owner :show-save-button %)
                                           :dismiss-editing #(hide-fullscreen-topic owner options (:fullscreen-force-edit data))})
           can-edit? (and (responsive/can-edit?)
-                         (not (:read-only data)))]
+                         (not (:read-only data)))
+          fullscreen-width (responsive/fullscreen-topic-width card-width)]
       ; preload previous revision
       (when (and prev-rev
                  (not (contains? revisions-list (:updated-at prev-rev))))
@@ -237,13 +245,9 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (str "fullscreen-topic" (when (:animate data) " initial"))
                     :ref "fullscreen-topic"}
-        (om/build back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)})
-        (when (and can-edit?
-                   is-actual?
-                   (not editing))
-          (dom/div {:class "edit-button"
-                    :on-click #(start-editing owner options)}
-            (icon :pencil)))
+        (dom/div {:class "btd-container"
+                  :style {:width (str (+ fullscreen-width 50) "px")}}
+          (om/build back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)}))
         (dom/div {:style #js {:display (when-not editing "none")}
                   :key (str as-of edit-rand)}
           (om/build fullscreen-topic-edit {:topic section
@@ -271,6 +275,7 @@
                                                  :currency currency
                                                  :card-width card-width
                                                  :is-actual is-actual?
+                                                 :can-edit can-edit?
                                                  :hide-history-navigation hide-history-navigation
                                                  :prev-rev prev-rev
                                                  :next-rev next-rev}
