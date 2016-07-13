@@ -2,18 +2,17 @@ div.fullscreen-topic {
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: #f9f9f9;
+  background-color: white;
 
   &.initial {
     opacity: 0;
   }
 
   div.edit-button {
-    position: fixed;
+    position: relative;
     cursor: pointer;
     z-index: 1040;
-    top: 20px;
-    right: 20px;
+    float: right;
     opacity: 0.2;
 
     &:hover {
@@ -21,15 +20,19 @@ div.fullscreen-topic {
     }
   }
 
-  div.back-to-dashboard-row {
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    z-index: 1040;
-    padding-top: 20px;
+  div.btd-container{
+    height: 50px;
+    margin: 0 auto;
 
-    button.back-to-dashboard {
-      margin-top: 0px;
+    div.back-to-dashboard-row {
+      z-index: 1040;
+      margin-left: 45px;
+
+      button.back-to-dashboard {
+        margin-top: 0px;
+        opacity: 1;
+        background-color: white;
+      }
     }
   }
 
@@ -53,7 +56,7 @@ div.fullscreen-topic {
     div.fullscreen-topic-internal {
       max-width: 650px;
       min-width: 302px;
-      margin: #{$navbar_height}px auto 30px;
+      margin: 30px auto;
       position: relative;
       overflow: hidden;
       min-height: calc(100vh - #{$navbar_height}px - 60px - 4px);
@@ -96,6 +99,11 @@ div.fullscreen-topic {
           font-size: 26px;
           line-height: 1.4;
           color: $oc_gray_5;
+
+          svg.emojione {
+            height: 26px;
+            width: 26px;
+          }
         }
 
         div.topic-snippet{
