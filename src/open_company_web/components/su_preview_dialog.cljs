@@ -161,8 +161,8 @@
    [:div.p3
     [:p.domine
      (case type
-       :email "Your email has been sent! Recipients will get an email of your snapshot."
-       :slack "Your snapshot will be sent to all team members of your Slack organization momentarily.")]
+       :email "Recipients will get your update by email."
+       :slack "Members of your Slack organization will get your update.")]
     [:div.right-align.mt3
      [:button.btn-reset.btn-solid
       {:on-click #(router/nav! (oc-urls/company))}
