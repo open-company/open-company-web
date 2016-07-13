@@ -134,7 +134,7 @@ div.su-snapshot-preview {
 
   div.topics-column {
     max-width: 600px !important;
-  
+    overflow: auto;
 
     div.topic-row {
       padding-bottom: 33px !important;

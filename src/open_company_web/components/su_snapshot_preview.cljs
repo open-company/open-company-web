@@ -24,8 +24,8 @@
 
 (defn ordered-topics-list []
   (let [topics (sel [:div.topic-row])
-        topics-list (for [topic topics] (.-topic (.-dataset topic)))]
-    (vec topics-list)))
+        topics-list (for [topic topics] (.data (js/jQuery topic) "topic"))]
+    (vec (remove nil? topics-list))))
 
 (defn post-stakeholder-update [owner]
   (om/set-state! owner :link-posting true)
@@ -74,6 +74,7 @@
     (.sortable list-node #js {:scroll true
                               :forcePlaceholderSize true
                               :placeholder "sortable-placeholder"
+                              :axis "y"
                               :handle ".topic"
                               :stop #(om/set-state! owner :su-topics (ordered-topics-list))
                               :opacity 1})))
