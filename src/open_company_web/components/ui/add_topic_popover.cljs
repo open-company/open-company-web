@@ -112,7 +112,7 @@
               (= key-code up-arrow-key-code)
               (om/set-state! owner :highlighted-topic next-highlighted))))))))
 
-(defn history-nav [options]
+(defn history-nav [owner options]
   (remove-listeners owner)
   ((:dismiss-popover options)))
 
