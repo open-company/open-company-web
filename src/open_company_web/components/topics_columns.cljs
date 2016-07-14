@@ -116,7 +116,7 @@
   (let [columns-num (:columns-num data)
         show-add-topic (add-topic? owner)
         topics (to-array (:topics data))
-        final-layout (loop [idx 3
+        final-layout (loop [idx (if (= columns-num 3) 3 2)
                             layout (if (= columns-num 3)
                                       {:1 [(first topics)]
                                        :2 [(second topics)]
