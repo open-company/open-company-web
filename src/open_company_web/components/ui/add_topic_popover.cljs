@@ -131,7 +131,7 @@
       ; ENTER: add custom topic
       (let [topic-name (str "custom-" (utils/my-uuid))
             topic-title (om/get-state owner :custom-topic-title)
-            new-topic-data {:title (str topic-title) :headline "" :body "" :section topic-name}]
+            new-topic-data {:title (str topic-title) :headline "" :body "" :section topic-name :placeholder true}]
         (dismiss-popover owner options)
         ((:did-change-active-topics options) :progress topic-name new-topic-data))
       (= key-code esc-key-code)
