@@ -276,6 +276,6 @@
               (dom/button {:class "btn-reset btn-outline"
                            :on-click #(do
                                         (utils/event-stop %)
-                                        (dis/dispatch! [:start-foce nil])
-                                        (when (:placeholder topic-data)
-                                          (dis/dispatch! [:topic-archive (name section)])))} "CANCEL"))))))))
+                                        (if (:placeholder topic-data)
+                                          (dis/dispatch! [:topic-archive (name section)])
+                                          (dis/dispatch! [:start-foce nil])))} "CANCEL"))))))))
