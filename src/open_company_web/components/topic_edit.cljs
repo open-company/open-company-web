@@ -39,7 +39,6 @@
 
 (defn setup-edit [owner]
   (when-let* [section-name (name (om/get-props owner :section))
-              headline-el    (sel1 [(str "div#foce-headline-" section-name)])
               snippet-el (sel1 [(str "div#foce-snippet-" section-name)])]
     (let [topic-data (om/get-props owner :topic-data)
           topic (om/get-props owner :section)]
