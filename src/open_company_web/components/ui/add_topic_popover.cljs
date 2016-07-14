@@ -156,13 +156,17 @@
       (setStyle triangle #js {:top triangle-top}))))
 
 (defn add-listeners [owner options]
+  (println "add-topic-popover/add-listeners")
   (when-not (om/get-state owner :click-out-listener)
+    (println "   adding click out listener")
     (let [click-listener (events/listen (sel1 [:body]) EventType/CLICK (partial on-click-out owner options))]
       (om/set-state! owner :click-out-listener click-listener)))
   (when-not (om/get-state owner :kb-listener)
+    (println "   adding kb listener")
     (let [kb-listener (events/listen (sel1 [:body]) EventType/KEYDOWN (partial kb-key-down owner options))]
       (om/set-state! owner :kb-listener kb-listener)))
   (when-not (om/get-state owner :nav-listener)
+    (println "   adding nav listener")
     (let [nav-listener (events/listen @router/history HistoryEventType/NAVIGATE #(history-nav owner options))]
       (om/set-state! owner :nav-listener nav-listener))))
 
