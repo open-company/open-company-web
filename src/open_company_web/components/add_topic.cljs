@@ -8,7 +8,9 @@
             [open-company-web.components.ui.add-topic-popover :refer (add-topic-popover)]))
 
 (defn add-topic-click [owner]
+  (println "add-topic/add-topic-click")
   (when-not (om/get-state owner :show-add-topic-popover)
+    (println "   will show popover")
     (om/set-state! owner :show-add-topic-popover true)))
 
 (defn show-popover-above? [owner]
@@ -28,12 +30,17 @@
     (apply merge
            (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
 
+(defn dismiss-popover [owner]
+  (println "add-topic/dismiss-popover")
+  (om/set-state! owner :show-add-topic-popover false))
+
 (defcomponent add-topic [{:keys [active-topics archived-topics column] :as data} owner options]
 
   (init-state [_]
     {:show-add-topic-popover false})
 
   (render-state [_ {:keys [show-add-topic-popover]}]
+    (println "add-topic render show-add-topic-popover:" show-add-topic-popover)
     (dom/div #js {:className (str "topic group add-topic" (when show-add-topic-popover " active"))
                   :onClick #(add-topic-click owner)
                   :ref "topic"}
@@ -48,5 +55,5 @@
                          :show-above (show-popover-above? owner)
                          :column column}
               list-opts {:did-change-active-topics update-active-topics
-                         :dismiss-popover #(om/set-state! owner :show-add-topic-popover false)}]
+                         :dismiss-popover #(dismiss-popover owner)}]
           (om/build add-topic-popover list-data {:opts list-opts}))))))
