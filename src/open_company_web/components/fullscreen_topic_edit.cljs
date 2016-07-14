@@ -422,9 +422,7 @@
     (om/set-state! owner :medium-editor med-ed))
   (let [snippet-el (sel1 (str "div#topic-edit-snippet-" (name topic)))
         placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
-        med-ed (new js/MediumEditor snippet-el (clj->js
-                                                 (->  (utils/medium-editor-options placeholder)
-                                                      (editor/inject-extension editor/file-upload))))]
+        med-ed (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options placeholder)))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
     (om/set-state! owner :initial-snippet (.-innerHTML snippet-el))
