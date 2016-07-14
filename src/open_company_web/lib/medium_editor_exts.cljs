@@ -58,7 +58,9 @@
                             el  (when (pos? (.-rangeCount sel))
                                   (.-commonAncestorContainer (.getRangeAt sel 0)))]
                         (when (and sel el)
-                          (pos-btn (.-top (.position (js/$ el))))))))
+                          (if (and (empty-paragraph? el) (.-offsetTop el))
+                            (pos-btn (.-offsetTop el))
+                            (hide-btn))))))
                    true)]
     (utils/after 1000 #(show-btn nil))
     {:name "file-upload"
