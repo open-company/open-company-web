@@ -43,15 +43,6 @@
               snippet-el (sel1 [(str "div#foce-snippet-" section-name)])]
     (let [topic-data (om/get-props owner :topic-data)
           topic (om/get-props owner :section)]
-      (let [headline-editor (new js/MediumEditor headline-el (clj->js (utils/medium-editor-options "Headline")))]
-        (.subscribe headline-editor
-                    "editableInput"
-                    (fn [event editable]
-                      (dis/dispatch! [:foce-input {:headline (.-innerHTML headline-el)}])
-                      (let [v (.-innerText headline-el)
-                            remaining-chars (- headline-max-length (count v))]
-                        (om/set-state! owner :char-count remaining-chars)
-                        (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))))))
       (let [snippet-placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
             snippet-editor      (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options snippet-placeholder)))]
         (.subscribe snippet-editor
@@ -194,6 +185,7 @@
         (dom/div {:class "topic-headline-inner emoji-autocomplete"
                   :id (str "foce-headline-" (name section))
                   :key "foce-headline"
+                  :placeholder "Headline"
                   :contentEditable true
                   :on-key-up   #(check-headline-count owner %)
                   :on-key-down #(check-headline-count owner %)
