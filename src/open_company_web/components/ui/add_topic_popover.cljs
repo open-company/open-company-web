@@ -66,8 +66,8 @@
   (let [all-topics (om/get-props owner :all-topics)
         topic-data (->> topic keyword (get all-topics))
         category-name (or (:category topic-data) "progress")]
-    (dismiss-popover owner options)
-    ((:did-change-active-topics options) category-name topic)))
+    ((:did-change-active-topics options) category-name topic)
+    (dismiss-popover owner options)))
 
 (def down-arrow-key-code 40)
 (def up-arrow-key-code 38)
@@ -113,6 +113,7 @@
               (om/set-state! owner :highlighted-topic next-highlighted))))))))
 
 (defn history-nav [options]
+  (remove-listeners owner)
   ((:dismiss-popover options)))
 
 (defn add-custom-topic [owner e]
@@ -155,7 +156,7 @@
     (let [kb-listener (events/listen (sel1 [:body]) EventType/KEYDOWN (partial kb-key-down owner options))]
       (om/set-state! owner :kb-listener kb-listener)))
   (when-not (om/get-state owner :nav-listener)
-    (let [nav-listener (events/listen @router/history HistoryEventType/NAVIGATE (partial history-nav options))]
+    (let [nav-listener (events/listen @router/history HistoryEventType/NAVIGATE #(history-nav owner options))]
       (om/set-state! owner :nav-listener nav-listener))))
 
 (defcomponent add-topic-popover [{:keys [all-topics active-topics-list column show-above archived-topics] :as data} owner options]
