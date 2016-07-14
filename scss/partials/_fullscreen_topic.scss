@@ -29,8 +29,15 @@ div.fullscreen-topic {
 
       button.back-to-dashboard {
         margin-top: 0px;
-        opacity: 0.8;
+        opacity: 1;
         background-color: white;
+        color: rgba(78,90,107,0.8);
+        border: 1px solid rgba(78,90,107,0.8);
+
+        &:hover {
+          color: rgba(78,90,107,1);
+          border: 1px solid rgba(78,90,107,1);
+        }
       }
     }
   }

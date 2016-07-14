@@ -364,10 +364,13 @@ div.fullscreen-topic-edit {
     position: fixed;
     bottom: 20px;
     background-color: white;
-    opacity: 0.8;
+    opacity: 1;
+    color: rgba(78,90,107,0.8);
+    border: 1px solid rgba(78,90,107,0.8);
 
     &:hover {
-      background-color: white;
+      color: rgba(78,90,107,1);
+      border: 1px solid rgba(78,90,107,1);
     }
     i.fa-archive {
       margin-right: 5px;
@@ -378,10 +381,18 @@ div.fullscreen-topic-edit {
     cursor: pointer;
     position: fixed;
     bottom: 20px;
-    opacity: 0.8;
+    opacity: 1;
+    color: rgba(78,90,107,0.8);
+    border: 1px solid rgba(78,90,107,0.8);
+
+    &:hover {
+      color: rgba(78,90,107,1);
+      border: 1px solid rgba(78,90,107,1);
+    }
 
     &:disabled{
-      opacity: 0.4;
+      color: rgba(78,90,107,0.3);
+      border: 1px solid rgba(78,90,107,0.3);
     }
   }
 
@@ -392,10 +403,13 @@ div.fullscreen-topic-edit {
     right: 20px;
     bottom: 20px;
     background-color: white;
-    opacity: 0.8;
+    opacity: 1;
+    color: rgba(78,90,107,0.8);
+    border: 1px solid rgba(78,90,107,0.8);
 
     &:hover {
-      background-color: white;
+      color: rgba(78,90,107,1);
+      border: 1px solid rgba(78,90,107,1);
     }
 
     &.has-save {
