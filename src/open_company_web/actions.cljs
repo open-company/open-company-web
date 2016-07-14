@@ -161,7 +161,9 @@
         old-categories (:sections company-data)
         new-categories (apply merge (map #(hash-map (first %) (utils/vec-dissoc (second %) (name topic))) old-categories))]
     (api/patch-sections new-categories))
-  db)
+  (-> db
+    (dissoc :foce-key)
+    (dissoc :foce-data)))
 
 (defmethod dispatcher/action :foce-save [db [_]]
   (let [slug (keyword (router/current-company-slug))
