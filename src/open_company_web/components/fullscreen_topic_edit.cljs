@@ -407,6 +407,8 @@
       (growth-init-state topic data current-state))))
 
 (defn reset-and-dismiss [owner options]
+  (when (:placeholder (om/get-props owner :topic-data))
+    (dis/dispatch! [:topic-archive (om/get-props owner :topic)]))
   ((:dismiss-editing options))
   (om/set-state! owner (get-state owner (om/get-props owner) (om/get-state owner))))
 
@@ -436,7 +438,7 @@
   (let [topic (om/get-props owner :topic)]
     (when-let [section-data (data-to-save owner topic)]
       (om/set-state! owner :has-changes false)
-      (api/partial-update-section topic section-data)
+      (dis/dispatch! [:save-topic topic section-data])
       ((:dismiss-editing options)))))
 
 (defn remove-topic-click [owner options e]
@@ -719,11 +721,12 @@
                       :id (str "topic-edit-body-" (name topic))
                       :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
             (om/build filestack-uploader (om/get-state owner :medium-editor))))
-        (dom/button {:class "relative remove-button btn-reset btn-outline"
-                     :style {:left (str (+ (- (/ ww 2) (/ fullscreen-width 2)) 10) "px")}
-                     :on-click #(remove-topic-click owner options %)}
-          (dom/i {:class "fa fa-archive"})
-          "Archive this topic")
+        (when-not (:placeholdet topic-data)
+          (dom/button {:class "relative remove-button btn-reset btn-outline"
+                       :style {:left (str (+ (- (/ ww 2) (/ fullscreen-width 2)) 10) "px")}
+                       :on-click #(remove-topic-click owner options %)}
+            (dom/i {:class "fa fa-archive"})
+            "Archive this topic"))
       (dom/button {:class "save-button btn-reset btn-solid"
                    :style {:left (str (- (+ (/ ww 2) (/ fullscreen-width 2)) 100 10) "px")}
                    :disabled (not has-changes)
