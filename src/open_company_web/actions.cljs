@@ -164,12 +164,25 @@
   db)
 
 (defmethod dispatcher/action :foce-save [db [_]]
-  (api/partial-update-section (:section (:foce-data db)) (dissoc (:foce-data db) :section))
-  (-> db
-      (dissoc :foce-key)
-      (dissoc :foce-data)))
+  (let [slug (keyword (router/current-company-slug))
+        topic (:foce-key db)
+        topic-data (:foce-data db)
+        old-section-data (get (dispatcher/company-data db slug) (keyword topic))
+        new-data (dissoc (merge old-section-data topic-data) :placeholder)]
+    (api/partial-update-section (:section (:foce-data db)) new-data)
+    (-> db
+        (dissoc :foce-key)
+        (dissoc :foce-data)
+        (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) new-data))))
 
 (defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
   (if topic
     (assoc-in db [:force-edit-topic] topic)
     (dissoc db :force-edit-topic)))
+
+(defmethod dispatcher/action :save-topic [db [_ topic topic-data]]
+  (let [slug (keyword (router/current-company-slug))
+        old-section-data (get (dispatcher/company-data db slug) (keyword topic))
+        new-data (dissoc (merge old-section-data topic-data) :placeholder)]
+    (api/partial-update-section topic new-data)
+    (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic)) (merge old-section-data topic-data))))
