@@ -54,6 +54,14 @@
                         (om/set-state! owner :char-count-alert (< remaining-chars snippet-alert-limit))))))
       (js/emojiAutocomplete))))
 
+(defn headline-on-change [owner]
+  (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
+    (dis/dispatch! [:foce-input {:headline (.-innerHTML headline)}])
+    (let [headline-text   (.-innerText headline)
+          remaining-chars (- headline-max-length (count headline-text))]
+      (om/set-state! owner :char-count remaining-chars)
+      (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit)))))
+
 (defn check-headline-count [owner e]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
     (let [headline-value (.-innerText headline)]
@@ -67,7 +75,8 @@
                  (not= (.-keyCode e) 37)
                  (not= (.-keyCode e) 39)
                  (>= (count headline-value) headline-max-length))
-        (.preventDefault e)))))
+        (.preventDefault e))))
+  (headline-on-change owner))
 
 (defn check-snippet-count [owner e]
   (when-let [snippet (sel1 (str "div#foce-snippet-" (name (dis/foce-section-key))))]
@@ -153,115 +162,120 @@
                                        (utils/no-growth-data? growth-data)))
           image-header        (:image-url topic-data)
           topic-body          (utils/get-topic-body topic-data section)]
-      (dom/div #js {:className "topic-foce group"
-                    :ref "topic-internal"}
-        (when image-header
-          (dom/div {:class "card-header card-image"}
-            (when image-header
-              (dom/img {:src image-header
-                        :class "topic-header-img"}))
-            (when image-header
-              (dom/button {:class "btn-reset remove-header"
+      (when section
+        (dom/div #js {:className "topic-foce group"
+                      :ref "topic-internal"}
+          (when image-header
+            (dom/div {:class "card-header card-image"}
+              (when image-header
+                (dom/img {:src image-header
+                          :class "topic-header-img"}))
+              (when image-header
+                (dom/button {:class "btn-reset remove-header"
+                             :on-click #(do
+                                          (dis/dispatch! [:foce-input {:image-url nil :image-height 0 :image-width 0}]))}
+                  (i/icon :simple-remove {:size 15
+                                          :stroke 4
+                                          :color "white"
+                                          :accent-color "white"})))))
+          ;; Topic title
+          (dom/input {:class "topic-title"
+                      :value (:title topic-data)
+                      :max-length title-max-length
+                      :placeholder (:name topic-data)
+                      :type "text"
+                      :on-blur #(om/set-state! owner :char-count nil)
+                      :on-change #(let [v (.. % -target -value)
+                                        remaining-chars (- title-max-length (count v))]
+                                    (dis/dispatch! [:foce-input {:title v}])
+                                    (om/set-state! owner :char-count remaining-chars)
+                                    (om/set-state! owner :char-count-alert (< remaining-chars title-alert-limit)))})
+          ;; Topic headline
+          (dom/div {:class "topic-headline-inner emoji-autocomplete"
+                    :id (str "foce-headline-" (name section))
+                    :key "foce-headline"
+                    :placeholder "Headline"
+                    :contentEditable true
+                    :on-key-up   #(check-headline-count owner %)
+                    :on-key-down #(check-headline-count owner %)
+                    :on-focus    #(check-headline-count owner %)
+                    :onBlur #(do
+                               (check-headline-count owner %)
+                               (om/set-state! owner :char-count nil))
+                    :dangerouslySetInnerHTML #js {"__html" initial-headline}})
+          (dom/div #js {:className "topic-body topic-snippet emoji-autocomplete"
+                        :id (str "foce-snippet-" (name section))
+                        :key "foce-snippet"
+                        :ref "topic-snippet"
+                        :contentEditable true
+                        :style #js {:minHeight (if (:placeholder topic-data) "100px" "0px")}
+                        :onKeyUp   #(check-snippet-count owner %)
+                        :onKeyDown #(check-snippet-count owner %)
+                        :onFocus   #(check-snippet-count owner %)
+                        :onBlur #(do
+                                   (check-snippet-count owner %)
+                                   (om/set-state! owner :char-count nil))
+                        :dangerouslySetInnerHTML #js {"__html" initial-snippet}})
+          (dom/div {:class "topic-foce-buttons group"}
+            (dom/input {:id "foce-file-upload-ui--select-trigger"
+                        :style {:display "none"}
+                        :type "file"
+                        :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
+            (dom/button {:class "btn-reset camera left"
+                         :title (if (not image-header) "Add an image" "Replace image")
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :style {:display (if (nil? file-upload-state) "block" "none")}
+                         :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
+                (dom/i {:class "fa fa-camera"}))
+            (dom/button {:class "btn-reset image-url left"
+                         :title "Provide an image link"
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :style {:display (if (nil? file-upload-state) "block" "none")}
+                         :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
+                (dom/i {:class "fa fa-code"}))
+            (cond
+              (= file-upload-state :show-url-field)
+              (dom/div {:class "upload-remote-url-container left"}
+                (dom/input {:type "text"
+                            ; :style {:width 300}
+                            :auto-focus true
+                            :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
+                            :value upload-remote-url})
+                (dom/button {:style {:font-size "14px" :margin-left "1rem"}
+                             :class "underline btn-reset p0"
+                             :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
+                  "add")
+                (dom/button {:style {:font-size "14px" :margin-left "1rem" :opacity "0.5"}
+                             :class "underline btn-reset p0"
+                             :on-click #(om/set-state! owner :file-upload-state nil)}
+                  "cancel"))
+              (= file-upload-state :show-progress)
+              (dom/span {:class "file-upload-progress left"} (str file-upload-progress "%"))
+              :else
+              (dom/span {} ""))
+            (dom/button {:class "btn-reset add-content left"
+                         :title "Expanded view"
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :style {:display (if (nil? file-upload-state) "block" "none")}
+                         :on-click (partial start-fullscreen-editing-click owner options)}
+              (dom/i {:class "fa fa-expand"})))
+          (dom/div {:class "topic-foce-footer group"}
+            (dom/div {:class "divider"})
+            (dom/div {:class "topic-foce-footer-left"}
+              (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
+            (dom/div {:class "topic-foce-footer-right"}
+              (dom/button {:class "btn-reset btn-solid"
+                           :disabled (= file-upload-state :show-progress)
+                           :on-click #(dis/dispatch! [:foce-save])} "SAVE")
+              (dom/button {:class "btn-reset btn-outline"
                            :on-click #(do
-                                        (dis/dispatch! [:foce-input {:image-url nil :image-height 0 :image-width 0}]))}
-                (i/icon :simple-remove {:size 15
-                                        :stroke 4
-                                        :color "white"
-                                        :accent-color "white"})))))
-        ;; Topic title
-        (dom/input {:class "topic-title"
-                    :value (:title topic-data)
-                    :max-length title-max-length
-                    :placeholder (:name topic-data)
-                    :type "text"
-                    :on-blur #(om/set-state! owner :char-count nil)
-                    :on-change #(let [v (.. % -target -value)
-                                      remaining-chars (- title-max-length (count v))]
-                                  (dis/dispatch! [:foce-input {:title v}])
-                                  (om/set-state! owner :char-count remaining-chars)
-                                  (om/set-state! owner :char-count-alert (< remaining-chars title-alert-limit)))})
-        ;; Topic headline
-        (dom/div {:class "topic-headline-inner emoji-autocomplete"
-                  :id (str "foce-headline-" (name section))
-                  :key "foce-headline"
-                  :placeholder "Headline"
-                  :contentEditable true
-                  :on-key-up   #(check-headline-count owner %)
-                  :on-key-down #(check-headline-count owner %)
-                  :on-focus    #(check-headline-count owner %)
-                  :onBlur #(do
-                             (check-headline-count owner %)
-                             (om/set-state! owner :char-count nil))
-                  :dangerouslySetInnerHTML #js {"__html" initial-headline}})
-        (dom/div #js {:className "topic-body topic-snippet emoji-autocomplete"
-                      :id (str "foce-snippet-" (name section))
-                      :key "foce-snippet"
-                      :ref "topic-snippet"
-                      :contentEditable true
-                      :style #js {:minHeight (if (:placeholder topic-data) "100px" "0px")}
-                      :onKeyUp   #(check-snippet-count owner %)
-                      :onKeyDown #(check-snippet-count owner %)
-                      :onFocus   #(check-snippet-count owner %)
-                      :onBlur #(do
-                                 (check-snippet-count owner %)
-                                 (om/set-state! owner :char-count nil))
-                      :dangerouslySetInnerHTML #js {"__html" initial-snippet}})
-        (dom/div {:class "topic-foce-buttons group"}
-          (dom/input {:id "foce-file-upload-ui--select-trigger"
-                      :style {:display "none"}
-                      :type "file"
-                      :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
-          (dom/button {:class "btn-reset camera left"
-                       :title (if (not image-header) "Add an image" "Replace image")
-                       :type "button"
-                       :data-toggle "tooltip"
-                       :data-placement "top"
-                       :style {:display (if (nil? file-upload-state) "block" "none")}
-                       :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
-              (dom/i {:class "fa fa-camera"}))
-          (dom/button {:class "btn-reset image-url left"
-                       :title "Provide an image link"
-                       :type "button"
-                       :data-toggle "tooltip"
-                       :data-placement "top"
-                       :style {:display (if (nil? file-upload-state) "block" "none")}
-                       :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
-              (dom/i {:class "fa fa-code"}))
-          (cond
-            (= file-upload-state :show-url-field)
-            (dom/div {:class "upload-remote-url-container left"}
-              (dom/input {:type "text"
-                          ; :style {:width 300}
-                          :auto-focus true
-                          :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
-                          :value upload-remote-url})
-              (dom/button {:style {:font-size "14px" :margin-left "1rem"}
-                           :class "underline btn-reset p0"
-                           :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
-                "add")
-              (dom/button {:style {:font-size "14px" :margin-left "1rem" :opacity "0.5"}
-                           :class "underline btn-reset p0"
-                           :on-click #(om/set-state! owner :file-upload-state nil)}
-                "cancel"))
-            (= file-upload-state :show-progress)
-            (dom/span {:class "file-upload-progress left"} (str file-upload-progress "%"))
-            :else
-            (dom/span {} ""))
-          (dom/button {:class "btn-reset add-content left"
-                       :title "Expanded view"
-                       :type "button"
-                       :data-toggle "tooltip"
-                       :data-placement "top"
-                       :style {:display (if (nil? file-upload-state) "block" "none")}
-                       :on-click (partial start-fullscreen-editing-click owner options)}
-            (dom/i {:class "fa fa-expand"})))
-        (dom/div {:class "topic-foce-footer group"}
-          (dom/div {:class "divider"})
-          (dom/div {:class "topic-foce-footer-left"}
-            (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
-          (dom/div {:class "topic-foce-footer-right"}
-            (dom/button {:class "btn-reset btn-solid"
-                         :disabled (= file-upload-state :show-progress)
-                         :on-click #(dis/dispatch! [:foce-save])} "SAVE")
-            (dom/button {:class "btn-reset btn-outline"
-                         :on-click #(do (utils/event-stop %) (dis/dispatch! [:start-foce nil]))} "CANCEL")))))))
+                                        (utils/event-stop %)
+                                        (dis/dispatch! [:start-foce nil])
+                                        (when (:placeholder topic-data)
+                                          (dis/dispatch! [:topic-archive (name section)])))} "CANCEL"))))))))
