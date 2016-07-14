@@ -48,7 +48,7 @@
     (if (#{:finances :growth} new-topic-kw)
       (dispatcher/dispatch! [:force-fullscreen-edit new-topic])
       (if section-data
-        (dispatcher/dispatch! [:start-foce new-topic-kw section-data])
+        (dispatcher/dispatch! [:start-foce new-topic-kw (or section-data {:section new-topic :placeholder true})])
         (om/set-state! owner :new-topic-foce new-topic-kw)))
     (if section-data
       (api/patch-sections new-categories section-data new-topic)
