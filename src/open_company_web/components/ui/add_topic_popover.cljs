@@ -19,13 +19,10 @@
   (.findDOMNode js/ReactDOM r))
 
 (defn remove-listeners [owner]
-  (println "removing click out listener:" (om/get-state owner :click-out-listener))
   (events/unlistenByKey (om/get-state owner :click-out-listener))
   (om/set-state! owner :click-out-listener nil)
-  (println "removing kb listener:" (om/get-state owner :kb-listener))
   (events/unlistenByKey (om/get-state owner :kb-listener))
   (om/set-state! owner :kb-listener nil)
-  (println "removing nav listener:" (om/get-state owner :nav-listener))
   (events/unlistenByKey (om/get-state owner :nav-listener))
   (om/set-state! owner :nav-listener nil))
 
@@ -38,13 +35,9 @@
         false))))
 
 (defn dismiss-popover [owner options]
-  (println "dismiss-popover")
   (remove-listeners owner)
-  (println "listeners removed")
   (.replaceState js/history #js {} "Dashboard" (oc-urls/company))
-  (println "navigate to dashboard")
-  ((:dismiss-popover options))
-  (println "dismiss popover cb called"))
+  ((:dismiss-popover options)))
 
 (defn on-click-out [owner options e]
   (when-not (is-child-of-popover (.-target e))
@@ -158,17 +151,13 @@
       (setStyle triangle #js {:top triangle-top}))))
 
 (defn add-listeners [owner options]
-  (println "add-topic-popover/add-listeners")
   (when-not (om/get-state owner :click-out-listener)
-    (println "   adding click out listener")
     (let [click-listener (events/listen (sel1 [:body]) EventType/CLICK (partial on-click-out owner options))]
       (om/set-state! owner :click-out-listener click-listener)))
   (when-not (om/get-state owner :kb-listener)
-    (println "   adding kb listener")
     (let [kb-listener (events/listen (sel1 [:body]) EventType/KEYDOWN (partial kb-key-down owner options))]
       (om/set-state! owner :kb-listener kb-listener)))
   (when-not (om/get-state owner :nav-listener)
-    (println "   adding nav listener")
     (let [nav-listener (events/listen @router/history HistoryEventType/NAVIGATE #(history-nav owner options))]
       (om/set-state! owner :nav-listener nav-listener))))
 
