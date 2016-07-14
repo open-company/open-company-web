@@ -721,7 +721,7 @@
                       :id (str "topic-edit-body-" (name topic))
                       :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
             (om/build filestack-uploader (om/get-state owner :medium-editor))))
-        (when-not (:placeholdet topic-data)
+        (when-not (:placeholder topic-data)
           (dom/button {:class "relative remove-button btn-reset btn-outline"
                        :style {:left (str (+ (- (/ ww 2) (/ fullscreen-width 2)) 10) "px")}
                        :on-click #(remove-topic-click owner options %)}
