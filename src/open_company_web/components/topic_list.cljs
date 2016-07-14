@@ -266,7 +266,7 @@
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
             (dom/button {:class "sharing-button"
-                         :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} "SHARE A SNAPSHOT " (dom/i {:class "fa fa-share"}))))
+                         :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} "SHARE AN UPDATE " (dom/i {:class "fa fa-share"}))))
         ;; Fullscreen topic
         (when selected-topic
           (dom/div {:class "selected-topic-container"
@@ -334,5 +334,5 @@
                    (not selected-topic)
                    (not share-su-tooltip-dismissed))
           (om/build tooltip
-            {:cta "YOUR BIG PICTURE IS COMING TOGETHER. YOU CAN SHARE A SNAPSHOT OF SELECTED TOPICS WITH YOUR TEAM, INVESTORS OR THE CROWD WHEN YOU'RE READY."}
+            {:cta "YOUR BIG PICTURE IS COMING TOGETHER. YOU CAN SHARE AN UPDATE OF SELECTED TOPICS WITH YOUR TEAM, INVESTORS OR THE CROWD WHEN YOU'RE READY."}
             {:opts {:class "large" :dismiss-tooltip #(om/set-state! owner :share-su-tooltip-dismissed true)}}))))))

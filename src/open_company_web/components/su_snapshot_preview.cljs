@@ -22,6 +22,11 @@
             [cljsjs.hammer]
             [cljsjs.react.dom]))
 
+(defn ordered-topics-list []
+  (let [topics (sel [:div.topic-row])
+        topics-list (for [topic topics] (.data (js/jQuery topic) "topic"))]
+    (vec (remove nil? topics-list))))
+
 (defn post-stakeholder-update [owner]
   (om/set-state! owner :link-posting true)
   (api/share-stakeholder-update {}))
@@ -69,7 +74,9 @@
     (.sortable list-node #js {:scroll true
                               :forcePlaceholderSize true
                               :placeholder "sortable-placeholder"
+                              :axis "y"
                               :handle ".topic"
+                              :stop #(om/set-state! owner :su-topics (ordered-topics-list))
                               :opacity 1})))
 
 (defn add-su-section [owner topic]
@@ -150,7 +157,7 @@
         (when (and (seq company-data)
                    (empty? (:sections su-data))
                    (not su-tooltip-dismissed))
-          (om/build tooltip {:cta "THIS IS A PREVIEW OF YOUR SNAPSHOT. DRAG TOPICS TO REORDER, OR CLICK THE X TO REMOVE A TOPIC."}
+          (om/build tooltip {:cta "THIS IS A PREVIEW OF YOUR UPDATE. DRAG TOPICS TO REORDER, OR CLICK THE X TO REMOVE A TOPIC."}
                             {:opts {:dismiss-tooltip #(om/set-state! owner :su-tooltip-dismissed true)}}))
         (om/build menu data)
         (dom/div {:class "page snapshot-page"}
@@ -172,7 +179,8 @@
                 (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))))
           ;; SU Snapshot Preview
           (when company-data
-            (dom/div {:class "su-sp-content"}
+            (dom/div {:class "su-sp-content"
+                      :key (apply str su-topics)}
               (dom/div {:class "su-sp-company-header"}
                 (dom/img {:class "company-logo" :src (:logo company-data)})
                 (dom/span {:class "company-name"} (:name company-data)))
@@ -209,7 +217,7 @@
                                                                       (let [fade-anim (Fade. (sel1 [(str "div#topic-" topic)]) 1 0 utils/oc-animation-duration)]
                                                                         (doto fade-anim
                                                                           (events/listen AnimationEventType/FINISH
-                                                                            (fn [](om/update-state! owner :su-topics (fn [t] (utils/vec-dissoc t topic)))))
+                                                                            (fn [] (om/set-state! owner :su-topics (utils/vec-dissoc (om/get-state owner :su-topics) topic))))
                                                                           (.play))))}})))
           ;; Add section container
           (when (pos? (count topics-to-add))
