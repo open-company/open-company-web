@@ -19,10 +19,13 @@
   (.findDOMNode js/ReactDOM r))
 
 (defn remove-listeners [owner]
+  (println "removing click out listener:" (om/get-state owner :click-out-listener))
   (events/unlistenByKey (om/get-state owner :click-out-listener))
   (om/set-state! owner :click-out-listener nil)
+  (println "removing kb listener:" (om/get-state owner :kb-listener))
   (events/unlistenByKey (om/get-state owner :kb-listener))
   (om/set-state! owner :kb-listener nil)
+  (println "removing nav listener:" (om/get-state owner :nav-listener))
   (events/unlistenByKey (om/get-state owner :nav-listener))
   (om/set-state! owner :nav-listener nil))
 
@@ -35,9 +38,13 @@
         false))))
 
 (defn dismiss-popover [owner options]
+  (println "dismiss-popover")
   (remove-listeners owner)
+  (println "listeners removed")
   (.replaceState js/history #js {} "Dashboard" (oc-urls/company))
-  ((:dismiss-popover options)))
+  (println "navigate to dashboard")
+  ((:dismiss-popover options))
+  (println "dismiss popover cb called"))
 
 (defn on-click-out [owner options e]
   (when-not (is-child-of-popover (.-target e))
