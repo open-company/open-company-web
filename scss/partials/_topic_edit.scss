@@ -139,7 +139,9 @@ div.topic {
         border: none;
         cursor: text;
 
-        &:after {
+        &:empty:after {
+          content: attr(placeholder);
+          display: block;
           font-size: 20px;
           line-height: 1.2;
           color: $oc_gray_5;
@@ -166,7 +168,7 @@ div.topic {
       }
 
       div.topic-body {
-        margin-top: 10px;
+        margin-top: 15px;
         margin-bottom: 10px;
         color: $oc_gray_5;
         overflow: hidden;
@@ -247,6 +249,8 @@ div.topic {
       }
 
       div.topic-foce-buttons {
+        margin-top: 25px;
+
         div.type-picker{
           font-size: 12px;
           padding-top: 6px;
