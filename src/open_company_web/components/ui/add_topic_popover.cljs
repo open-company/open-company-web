@@ -69,7 +69,9 @@
      :adding-custom-topic false
      :custom-topic-title ""}))
 
-(defn add-topic-click [owner options topic]
+(defn add-topic-click [owner options topic e]
+  (when e
+    (utils/event-stop e))
   (let [all-topics (om/get-props owner :all-topics)
         topic-data (->> topic keyword (get all-topics))
         category-name (or (:category topic-data) "progress")]
@@ -95,7 +97,7 @@
           (= key-code enter-key-code)
           ; enter key: select topic
           (when-let [topic (om/get-state owner :highlighted-topic)]
-            (add-topic-click owner options topic))
+            (add-topic-click owner options topic nil))
           (= key-code esc-key-code)
           (dismiss-popover owner options)
           :else
@@ -225,7 +227,7 @@
                               :ref (str "potential-topic-" topic)
                               :data-topic topic
                               :onMouseOver #(om/set-state! owner :highlighted-topic topic)
-                              :onClick #(add-topic-click owner options topic)}
+                              :onClick (partial add-topic-click owner options topic)}
 
                   (:title topic-data)))))
             (when has-archived-topics
@@ -240,7 +242,7 @@
                                 :ref (str "potential-topic-" topic)
                                 :data-topic topic
                                 :onMouseOver #(om/set-state! owner :highlighted-topic topic)
-                                :onClick #(add-topic-click owner options topic)}
+                                :onClick (partial add-topic-click owner options topic)}
                     topic-title)))))
         (dom/div {:class "add-custom-topic-container"
                   :on-click #(when-not adding-custom-topic (add-custom-topic owner %))}
