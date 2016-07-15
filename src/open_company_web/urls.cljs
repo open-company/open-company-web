@@ -70,7 +70,8 @@
 
 (defn company-section-revision
   ([] (company-section (router/current-company-slug) (router/current-section)))
-  ([revision] (str (company-section (router/current-company-slug) (router/current-section)) "?as-of=" revision)))
+  ([revision] (str (company-section (router/current-company-slug) (router/current-section)) "?as-of=" revision))
+  ([company-slug section-name revision] (str (company-section company-slug section-name) "?as-of=" revision)))
 
 ;; Stakeholder update
 
