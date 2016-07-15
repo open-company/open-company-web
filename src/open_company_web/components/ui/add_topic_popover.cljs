@@ -150,6 +150,19 @@
       (setStyle add-topic-popover #js {:top popover-top})
       (setStyle triangle #js {:top triangle-top}))))
 
+(defn topic-list
+  "Drop down menu entries for each topic in the provided `topics` sequence."
+  [topics all-topics highlighted-topic owner options]
+  (for [idx (range (count topics))
+      :let [topic (get (vec topics) idx)
+            topic-data (->> topic keyword (get all-topics))]]
+    (dom/div #js {:className (str "potential-topic" (when (= highlighted-topic topic) " highlighted"))
+                  :ref (str "potential-topic-" topic)
+                  :data-topic topic
+                  :onMouseOver #(om/set-state! owner :highlighted-topic topic)
+                  :onClick (partial add-topic-click owner options topic)}
+      (:title topic-data))))
+
 (defn add-listeners [owner options]
   (when-not (om/get-state owner :click-out-listener)
     (let [click-listener (events/listen (sel1 [:body]) EventType/CLICK (partial on-click-out owner options))]
@@ -209,30 +222,12 @@
             (dom/div {:class "add-topic-popover-subheader"} "SUGGESTED TOPICS"))
           (when has-inactive-topics
             (dom/div {:class "topics-to-add first-content"}
-              (for [idx (range (count inactive-topics))
-                    :let [topic (get (vec inactive-topics) idx)
-                          topic-data (->> topic keyword (get all-topics))]]
-                (dom/div #js {:className (str "potential-topic" (when (= highlighted-topic topic) " highlighted"))
-                              :ref (str "potential-topic-" topic)
-                              :data-topic topic
-                              :onMouseOver #(om/set-state! owner :highlighted-topic topic)
-                              :onClick (partial add-topic-click owner options topic)}
-
-                  (:title topic-data)))))
-            (when has-archived-topics
-              (dom/div {:class "add-topic-popover-subheader"} "ARCHIVED TOPICS"))
-            (when has-archived-topics
-              (dom/div {:class "topics-to-add"}
-                (for [idx (range (count archived-topics-list))
-                      :let [topic (get (vec archived-topics-list) idx)
-                            topic-data (->> topic keyword (get all-topics))
-                            topic-title (:title (first (filter #(= (:section %) topic) archived-topics)))]]
-                  (dom/div #js {:className (str "potential-topic" (when (= highlighted-topic topic) " highlighted"))
-                                :ref (str "potential-topic-" topic)
-                                :data-topic topic
-                                :onMouseOver #(om/set-state! owner :highlighted-topic topic)
-                                :onClick (partial add-topic-click owner options topic)}
-                    topic-title)))))
+              (topic-list inactive-topics all-topics highlighted-topic owner options)))
+          (when has-archived-topics
+            (dom/div {:class "add-topic-popover-subheader"} "ARCHIVED TOPICS"))
+          (when has-archived-topics
+            (dom/div {:class "topics-to-add"}
+              (topic-list archived-topics-list all-topics highlighted-topic owner options))))
         (dom/div {:class "add-custom-topic-container"
                   :on-click #(when-not adding-custom-topic (add-custom-topic owner %))}
           (if-not adding-custom-topic
