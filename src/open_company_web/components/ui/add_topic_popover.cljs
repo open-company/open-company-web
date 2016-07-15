@@ -156,12 +156,15 @@
   (for [idx (range (count topics))
       :let [topic (get (vec topics) idx)
             topic-data (->> topic keyword (get all-topics))]]
-    (dom/div #js {:className (str "potential-topic" (when (= highlighted-topic topic) " highlighted"))
-                  :ref (str "potential-topic-" topic)
-                  :data-topic topic
-                  :onMouseOver #(om/set-state! owner :highlighted-topic topic)
-                  :onClick (partial add-topic-click owner options topic)}
-      (:title topic-data))))
+    (let [title (:title topic-data)]
+      ; TEMP: remove finance/growth
+      (when-not (or (= title "Finances") (= title "Growth"))
+        (dom/div #js {:className (str "potential-topic" (when (= highlighted-topic topic) " highlighted"))
+                      :ref (str "potential-topic-" topic)
+                      :data-topic topic
+                      :onMouseOver #(om/set-state! owner :highlighted-topic topic)
+                      :onClick (partial add-topic-click owner options topic)}
+          title)))))
 
 (defn add-listeners [owner options]
   (when-not (om/get-state owner :click-out-listener)
