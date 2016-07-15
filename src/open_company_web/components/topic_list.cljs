@@ -107,10 +107,10 @@
 
 (defn close-overlay-cb [owner]
   (.pushState js/history nil "Dashboard" (oc-urls/company (router/current-company-slug)))
-  (om/set-state! owner :transitioning false)
-  (om/set-state! owner :selected-topic nil)
-  (om/set-state! owner :selected-metric nil)
-  (om/set-state! owner :fullscreen-force-edit false))
+  (om/set-state! owner (merge (om/get-state owner) {:transitioning false
+                                                    :selected-topic nil
+                                                    :selected-metric nil
+                                                    :fullscreen-force-edit false})))
 
 (defn switch-topic [owner is-left?]
   (when (and (om/get-state owner :topic-navigation)
