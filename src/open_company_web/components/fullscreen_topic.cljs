@@ -107,7 +107,8 @@
   (let [editing (om/get-state owner :editing)]
     (exit-editing owner options)
     (when (or (not editing)
-              force-fullscreen-dismiss)
+              force-fullscreen-dismiss
+              (om/get-props owner :fullscreen-force-edit))
       (utils/enable-scroll)
       (let [fade-out (new Fade (sel1 :div.fullscreen-topic) 1 0 utils/oc-animation-duration)]
         (doto fade-out
@@ -130,8 +131,8 @@
   (let [actual-as-of (om/get-state owner :actual-as-of)
         section (name (om/get-props owner :section))]
     (if (= as-of actual-as-of)
-      (.pushState js/history nil section (oc-urls/company-section-revision))
-      (.pushState js/history nil (str section " revision " as-of) (oc-urls/company-section-revision as-of)))))
+      (.pushState js/history nil section (oc-urls/company-section (router/current-company-slug) (om/get-props owner :section)))
+      (.pushState js/history nil (str section " revision " as-of) (oc-urls/company-section-revision (router/current-company-slug) (om/get-props owner :section) as-of)))))
 
 (defn animate-transition [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
@@ -230,7 +231,7 @@
                                                 :switch-metric-cb #(om/set-state! owner :last-selected-metric %)
                                                 :start-editing #(start-editing owner options)})
           edit-topic-opts (merge options {:show-save-button #(om/set-state! owner :show-save-button %)
-                                          :dismiss-editing #(hide-fullscreen-topic owner options (:fullscreen-force-edit data))})
+                                          :dismiss-editing (partial hide-fullscreen-topic owner options)})
           can-edit? (and (responsive/can-edit?)
                          (not (:read-only data)))
           fullscreen-width (responsive/fullscreen-topic-width card-width)]

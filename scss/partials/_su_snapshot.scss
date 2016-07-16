@@ -6,7 +6,7 @@
 body.small-footer {
   div.su-snapshot {
     div.su-sp-content {
-      min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px);
+      min-height: calc(100vh - #{$footer_small_height}px - #{$top_border_height * 2}px);
     }
   }
 }

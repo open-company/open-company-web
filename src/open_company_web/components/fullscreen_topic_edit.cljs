@@ -396,7 +396,7 @@
        :image-height (:image-height topic-data)
        :snippet (if is-placeholder-topic "" (:snippet topic-data))
        :body (utils/get-topic-body topic-data topic)
-       :note (:note topic-data)
+       :notes (:notes topic-data)
        :show-title-counter (:show-title-counter current-state)
        :medium-editor (:medium-editor current-state)
        :history-listener-id (:history-listener-id current-state)
@@ -407,10 +407,12 @@
       (growth-init-state topic data current-state))))
 
 (defn reset-and-dismiss [owner options]
-  (when (:placeholder (om/get-props owner :topic-data))
-    (dis/dispatch! [:topic-archive (om/get-props owner :topic)]))
-  ((:dismiss-editing options))
-  (om/set-state! owner (get-state owner (om/get-props owner) (om/get-state owner))))
+  (let [props (om/get-props owner)
+        placeholder-section (:placeholder (:topic-data props))]
+    (when placeholder-section
+      (dis/dispatch! [:topic-archive (om/get-props owner :topic)]))
+    ((:dismiss-editing options) placeholder-section)
+    (om/set-state! owner (get-state owner props (om/get-state owner)))))
 
 (defn setup-medium-editor [owner {:keys [topic-data topic] :as data}]
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
@@ -442,11 +444,12 @@
       ((:dismiss-editing options)))))
 
 (defn remove-topic-click [owner options e]
-  (.stopPropagation e)
+  (when e
+    (utils/event-stop e))
   (when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
     (let [section (om/get-props owner :topic)]
       (dis/dispatch! [:topic-archive section]))
-    ((:dismiss-editing options))))
+    ((:dismiss-editing options) true)))
 
 (defn img-on-load [owner img]
   (om/set-state! owner (merge (om/get-state owner) {:image-width (.-clientWidht img)
@@ -477,6 +480,18 @@
       file
       (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
 
+(defn set-float-buttons-position! [owner]
+  (when-let* [fdm #(js/jQuery (.findDOMNode js/ReactDOM %))
+              fullscreen-topic-edit (fdm (om/get-ref owner "fullscreen-topic-edit"))
+              save-button           (fdm (om/get-ref owner "save-button"))
+              cancel-button         (fdm (om/get-ref owner "cancel-button"))
+              archive-button        (fdm (om/get-ref owner "archive-button"))
+              fte-left              (.-left (.offset fullscreen-topic-edit))
+              fte-width             (.width fullscreen-topic-edit)]
+    (.css archive-button #js {:left (str fte-left "px")})
+    (.css save-button #js {:left (str (- (+ fte-left fte-width) 100) "px")})
+    (.css cancel-button #js {:left (str (- (+ fte-left fte-width) 100 20 120) "px")})))
+
 (defcomponent fullscreen-topic-edit [{:keys [card-width topic topic-data currency focus show-first-edit-tooltip] :as data} owner options]
 
   (init-state [_]
@@ -488,7 +503,16 @@
                (not (:visible data)))
       (when-not (om/get-state owner :medium-editor)
         (setup-medium-editor owner data))
-      (let [new-state (get-state owner next-props (om/get-state owner))]
+      (let [new-state (get-state owner next-props (om/get-state owner))
+            headline-el (sel1 (str "div#topic-edit-headline-" (name (:topic next-props))))
+            snippet-el (sel1 (str "div#topic-edit-snippet-" (name (:topic next-props))))
+            body-el (sel1 (str "div#topic-edit-body-" (name (:topic next-props))))
+            body (if (#{:finances :growth} (keyword topic)) (:body new-state) (:body (:notes new-state)))]
+        (set! (.-innerHTML headline-el) (:headline new-state))
+        (set! (.-innerHTML snippet-el) (:snippet new-state))
+        (if (#{:finances :growth} (keyword topic))
+          (set! (.-innerHTML body-el) (:body (:notes new-state)))
+          (set! (.-innerHTML body-el) (:body new-state)))
         (om/set-state! owner new-state))
       (utils/after 200 #(focus-headline owner)))
     ; goes hidden
@@ -513,6 +537,7 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
+      (set-float-buttons-position! owner)
       (reset! prevent-route-dispatch true)
       (js/filepicker.setKey ls/filestack-key)
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
@@ -535,7 +560,8 @@
 
   (did-update [_ _ prev-state]
     (when-not (om/get-state owner :medium-editor)
-      (setup-medium-editor owner data)))
+      (setup-medium-editor owner data))
+    (set-float-buttons-position! owner))
 
   (render-state [_ {:keys [has-changes
                            title
@@ -580,9 +606,10 @@
       ; set the onbeforeunload handler only if there are changes
       (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
-      (dom/div {:class "fullscreen-topic-edit group"
-                :style #js {:width (str (- fullscreen-width 20) "px")}
-                :key (:updated-at topic-data)}
+      (dom/div #js {:className "fullscreen-topic-edit group"
+                    :ref "fullscreen-topic-edit"
+                    :style #js {:width (str (- fullscreen-width 20) "px")}
+                    :key (:updated-at topic-data)}
         (dom/div {:class "fullscreen-topic-internal group"
                   :on-click #(.stopPropagation %)}
           (dom/div {:class "fullscreen-topic-edit-top-box"}
@@ -716,27 +743,30 @@
                       :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})))
           (dom/div {:class "relative topic-body-line"}
             (dom/div {:className "topic-body emoji-autocomplete"
-                      :ref "topic-overlay-edit-body"
                       :contentEditable true
                       :id (str "topic-edit-body-" (name topic))
                       :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
             (om/build filestack-uploader (om/get-state owner :medium-editor))))
         (when-not (:placeholder topic-data)
-          (dom/button {:class "relative remove-button btn-reset btn-outline"
-                       :style {:left (str (+ (- (/ ww 2) (/ fullscreen-width 2)) 10) "px")}
-                       :on-click #(remove-topic-click owner options %)}
+          (dom/button #js {:className "relative archive-button btn-reset btn-outline"
+                           :ref "archive-button"
+                           :onClick #(remove-topic-click owner options %)}
             (dom/i {:class "fa fa-archive"})
             "Archive this topic"))
-      (dom/button {:class "save-button btn-reset btn-solid"
-                   :style {:left (str (- (+ (/ ww 2) (/ fullscreen-width 2)) 100 10) "px")}
-                   :disabled (not has-changes)
-                   :on-click #(save-data owner options)}
+      (dom/button #js {:className "save-button btn-reset btn-solid"
+                       :ref "save-button"
+                       :disabled (not has-changes)
+                       :onClick #(do
+                                   (save-data owner options)
+                                   (utils/event-stop %))}
         "SAVE")
-      (dom/button {:class (str "btn-reset btn-outline close-editing" (when has-changes " has-save"))
-                     :key "close"
-                     :style {:left (str (- (+ (/ ww 2) (/ fullscreen-width 2)) 120 10 120) "px")}
-                     :title "Dismiss edit"
-                     :on-click #(reset-and-dismiss owner options)} "CANCEL")
+      (dom/button #js {:className (str "btn-reset btn-outline cancel-button" (when has-changes " has-save"))
+                       :key "cancel-button"
+                       :ref "cancel-button"
+                       :title "Dismiss edit"
+                       :onClick #(do
+                                   (reset-and-dismiss owner options)
+                                   (utils/event-stop %))} "CANCEL")
       (when (and show-first-edit-tooltip
                  (not tooltip-dismissed))
         (om/build tooltip
