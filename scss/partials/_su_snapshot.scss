@@ -19,7 +19,7 @@ div.su-snapshot {
     content: "";
     padding-bottom: 20px;
     min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
-    background-color: #f9f9f9;
+    background-color: $oc_gray_6;
     padding-top: 60px;
 
     div.su-sp-company-header {
