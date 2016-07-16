@@ -6,6 +6,7 @@
             [open-company-web.components.ui.small-loading :as loading]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.footer :refer (footer)]
+            [open-company-web.components.stripe :as stripe]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
             [open-company-web.urls :as oc-urls]
@@ -86,30 +87,30 @@
     (let [slug (keyword (router/current-company-slug))]
 
       (utils/update-page-title (str "OpenCompany - " company-name))
-      (dom/div {:class "settings-container group"}
+      (dom/div {:class "lg-col-5 md-col-7 col-11 mx-auto mt4 mb4 settings-container group"}
         (dom/div {:class "company-settings"}
           (dom/span {} "Company Settings")
           (when-not company-name
             (loading/small-loading)))
         ;; Company
-        (dom/div {:class "company-form"}
+        (dom/div {:class "company-form p3"}
 
           ;; Company name
-          (dom/div {:class "company-name-title settings-title"} "COMPANY NAME")
-          (dom/input {:class "company-name"
+          (dom/div {:class "small-caps bold mb1"} "COMPANY NAME")
+          (dom/input {:class "npt col-8 p1 mb3"
                       :type "text"
                       :id "name"
                       :value company-name
                       :on-change #(om/set-state! owner :company-name (.. % -target -value))})
           ; Slug
-          (dom/div {:class "company-slug-title settings-title"} "DASHBOARD URL")
-          (dom/div {:class "company-slug"} (str ls/web-server "/" (name slug)))
+          (dom/div {:class "small-caps bold mb1"} "DASHBOARD URL")
+          (dom/div {:class "npt npt-disabled col-8 p1 mb3"} (str ls/web-server "/" (name slug)))
           ;; Currency
-          (dom/div {:class "company-currency-title settings-title"} "DISPLAY CURRENCY IN")
+          (dom/div {:class "small-caps bold mb1"} "DISPLAY CURRENCY IN")
           (dom/select {:id "currency"
                        :value currency
                        :on-change #(om/set-state! owner :currency (.. % -target -value))
-                       :class "company-currency form-control"}
+                       :class "npt col-8 p1 mb3 company-currency"}
             (for [currency (sorted-iso4217)]
               (let [symbol (:symbol currency)
                     display-symbol (or symbol (:code currency))
@@ -119,16 +120,16 @@
                           {:react-key (:code currency)}))))
 
           ;; Company logo
-          (dom/div {:class "company-logo-title settings-title"} "SQUARE COMPANY LOGO URL (approx. 180x180px)")
+          (dom/div {:class "small-caps bold mb1"} "SQUARE COMPANY LOGO URL (approx. 180x180px)")
           (dom/input {:type "text"
                       :value logo
                       :id "logo"
-                      :class "company-logo"
+                      :class "npt col-10 p1 mb3"
                       :maxLength 255
                       :on-change #(om/set-state! owner :logo (.. % -target -value))
                       :placeholder "http://example.com/logo.png"})
-          (dom/div {:class "save-button-container"}
-            (dom/button {:class "save-button btn-reset btn-solid"
+          (dom/div {:class "mt2 right-align"}
+            (dom/button {:class "btn-reset btn-solid"
                          :on-click #(save-company-clicked owner)}
               (if loading
                 (loading/small-loading)
@@ -147,7 +148,7 @@
         (back-to-dashboard-btn {})
 
         (if (:loading data)
-              
+
           ;; The data is still loading
           (dom/div (dom/h4 "Loading data..."))
 
