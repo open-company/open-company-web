@@ -12,11 +12,11 @@ body.small-footer {
 }
 
 div.page.snapshot-page {
-  background-color: #f9f9f9 !important;
+  background-color: $oc_gray_6 !important;
 }
 
 div.su-snapshot-preview {
-  background-color: #f9f9f9;
+  background-color: $oc_gray_6;
   border-top: 4px solid $oc_yellow;
 
   div.su-snapshot-header {
