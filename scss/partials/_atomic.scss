@@ -82,10 +82,15 @@
   line-height: 1.2;
   color: $oc_gray_5;
   transition: border-color $oc_animation_duration;
+  background-color: white;
 
   &:active, &:focus {
     border-color: rgba(78, 90, 107, 0.5);
     outline: none;
+  }
+
+  &:disabled, &.npt-disabled {
+    color: transparentize($oc_gray_5, 0.6)
   }
 }
 
