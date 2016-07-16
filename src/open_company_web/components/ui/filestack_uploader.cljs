@@ -47,7 +47,10 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (assert ls/filestack-key "FileStack API Key required")
-      (js/filepicker.setKey ls/filestack-key)
+      (js/filepicker.setKey ls/filestack-key)))
+
+  (did-update [_ _ prev-state]
+    (when (and (not (utils/is-test-env?)) (= (om/get-state owner :state) :show-options))
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (render-state [this _]
@@ -68,7 +71,7 @@
           (i/icon :circle-add {:size 24}))
         (case (:state (om/get-state owner))
           :show-options
-          (dom/div
+          (dom/div {:style #js {:margin "1px 0 0 22px"}}
             (dom/button {:class "btn-reset"
                          :style {:font-size "14px"}
                          :title "Add an image"
