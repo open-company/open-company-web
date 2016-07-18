@@ -148,7 +148,7 @@
     text-size: 19px;
   }
 
-  ul, ol {
+  ul {
     padding-left: 30px;
     list-style-type: none;
 
@@ -159,6 +159,19 @@
       color: $oc_yellow;
       padding-right: 0.5em;
     }
+  }
+
+  ol {
+    padding-left: 30px;
+    counter-reset: item;
+  }
+  ol li {
+    display: block;
+  }
+  ol li:before {
+      content: counter(item) ". ";
+      counter-increment: item;
+      color: $oc_yellow;
   }
 
   img {
