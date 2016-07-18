@@ -128,6 +128,9 @@
                       :maxLength 255
                       :on-change #(om/set-state! owner :logo (.. % -target -value))
                       :placeholder "http://example.com/logo.png"})
+          (dom/div {:class "small-caps bold mb1"} "Subscription")
+          (dom/p {} "Support the ongoing development of this platform")
+          (stripe/stripe-checkout)
           (dom/div {:class "mt2 right-align"}
             (dom/button {:class "btn-reset btn-solid"
                          :on-click #(save-company-clicked owner)}

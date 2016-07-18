@@ -11,6 +11,9 @@
 ;; Auth
 (def auth-server-domain "http://localhost:3003")
 
+;; Pay
+(def pay-server-domain "http://localhost:3004")
+
 ;; Web
 (def web-server "localhost:3559")
 
