@@ -247,7 +247,7 @@
       (dom/div #js {:className (str "fullscreen-topic" (when (:animate data) " initial"))
                     :ref "fullscreen-topic"}
         (dom/div {:class "btd-container"
-                  :style {:width (str (+ fullscreen-width 20) "px")}}
+                  :style {:width (str (+ fullscreen-width 20) "px") :opacity (if editing 0 1)}}
           (om/build back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)}))
         (dom/div {:style #js {:display (when-not editing "none")}
                   :key (str as-of edit-rand)}
