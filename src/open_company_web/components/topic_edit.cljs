@@ -51,7 +51,8 @@
                       (let [v (.-innerText snippet-el)
                             remaining-chars (- snippet-max-length (count v))]
                         (om/set-state! owner :char-count remaining-chars)
-                        (om/set-state! owner :char-count-alert (< remaining-chars snippet-alert-limit))))))
+                        (om/set-state! owner :char-count-alert (< remaining-chars snippet-alert-limit))
+                        (om/set-state! owner :negative-snippet-char-count (neg? remaining-chars))))))
       (js/emojiAutocomplete))))
 
 (defn headline-on-change [owner]
@@ -60,7 +61,8 @@
     (let [headline-text   (.-innerText headline)
           remaining-chars (- headline-max-length (count headline-text))]
       (om/set-state! owner :char-count remaining-chars)
-      (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit)))))
+      (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))
+      (om/set-state! owner :negative-headline-char-count (neg? remaining-chars)))))
 
 (defn check-headline-count [owner e]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
@@ -142,7 +144,7 @@
     (setup-edit owner)
     (utils/after 100 #(focus-headline)))
 
-  (render-state [_ {:keys [initial-headline initial-snippet char-count char-count-alert file-upload-state file-upload-progress upload-remote-url]}]
+  (render-state [_ {:keys [initial-headline initial-snippet char-count char-count-alert file-upload-state file-upload-progress upload-remote-url negative-snippet-char-count negative-headline-char-count]}]
     (let [section             (dis/foce-section-key)
           topic-data          (dis/foce-section-data)
           section-kw          (keyword section)
@@ -267,7 +269,7 @@
               (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
             (dom/div {:class "topic-foce-footer-right"}
               (dom/button {:class "btn-reset btn-solid"
-                           :disabled (= file-upload-state :show-progress)
+                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count negative-snippet-char-count)
                            :on-click #(dis/dispatch! [:foce-save])} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
                            :on-click #(do

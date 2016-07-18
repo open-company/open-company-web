@@ -295,8 +295,10 @@
                  (not= (.-keyCode e) 39)
                  (>= (count headline-value) headline-max-length))
         (.preventDefault e))
-      (om/set-state! owner :char-count (- headline-max-length (count headline-value)))
-      (om/set-state! owner :char-count-alert (< (- headline-max-length (count headline-value)) headline-alert-limit))
+      (let [remaining-chars (- headline-max-length (count headline-value))]
+        (om/set-state! owner :char-count remaining-chars)
+        (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))
+        (om/set-state! owner :negative-headline-char-count (neg? remaining-chars)))
       (headline-on-change owner))))
 
 (defn snippet-on-change [owner]
@@ -321,8 +323,10 @@
                  (not= (.-keyCode e) 39)
                  (>= (count snippet-value) snippet-length-limit))
         (.preventDefault e))
-      (om/set-state! owner :char-count (- snippet-length-limit (count snippet-value)))
-      (om/set-state! owner :char-count-alert (< (- snippet-length-limit (count snippet-value)) snippet-alert-limit))
+      (let [remaining-chars (- snippet-length-limit (count snippet-value))]
+        (om/set-state! owner :char-count (- snippet-length-limit (count snippet-value)))
+        (om/set-state! owner :char-count-alert (< (- snippet-length-limit (count snippet-value)) snippet-alert-limit))
+        (om/set-state! owner :negative-snippet-char-count (neg? remaining-chars)))
       (snippet-on-change owner))))
 
 (defn count-chars
@@ -573,6 +577,8 @@
                            body
                            char-count
                            char-count-alert
+                           negative-headline-char-count
+                           negative-snippet-char-count
                            file-upload-state
                            file-upload-progress
                            upload-remote-url
@@ -751,7 +757,7 @@
             "Archive this topic"))
       (dom/button #js {:className "save-button btn-reset btn-solid"
                        :ref "save-button"
-                       :disabled (not has-changes)
+                       :disabled (or (not has-changes) negative-headline-char-count negative-snippet-char-count)
                        :onClick #(do
                                    (save-data owner options)
                                    (utils/event-stop %))}
