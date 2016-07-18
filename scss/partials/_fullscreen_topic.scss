@@ -2,21 +2,17 @@ div.fullscreen-topic {
   width: 100%;
   height: 100%;
   overflow: auto;
+  background-color: white;
 
   &.initial {
     opacity: 0;
   }
 
-  @include mobile(){
-    background-color: rgba(255, 255, 255, 1);
-  }
-
   div.edit-button {
-    position: fixed;
+    position: relative;
     cursor: pointer;
     z-index: 1040;
-    top: 20px;
-    right: 70px;
+    float: right;
     opacity: 0.2;
 
     &:hover {
@@ -24,38 +20,26 @@ div.fullscreen-topic {
     }
   }
 
-  button.save-button {
-    position: fixed;
-    cursor: pointer;
-    z-index: 1040;
-    top: 20px;
-    right: 180px;
-  }
+  div.btd-container{
+    height: 50px;
+    margin: 0 auto;
 
-  .remove-button {
-    z-index: 1040;
-    left: 30px;
-    bottom: 30px;
-  }
+    div.back-to-dashboard-row {
+      z-index: 1040;
 
-  button.close {
-    position: fixed;
-    cursor: pointer;
-    z-index: 1040;
-    top: 20px;
-    right: 20px;
-    margin: 0px;
-    padding: 0px;
-  }
+      button.back-to-dashboard {
+        margin-top: 0px;
+        opacity: 1;
+        background-color: white;
+        color: rgba(78,90,107,0.8);
+        border: 1px solid rgba(78,90,107,0.8);
 
-  button.close-editing {
-    position: fixed;
-    cursor: pointer;
-    z-index: 1040;
-    top: 20px;
-    right: 40px;
-    margin-top: 0px;
-    height: 32px;
+        &:hover {
+          color: rgba(78,90,107,1);
+          border: 1px solid rgba(78,90,107,1);
+        }
+      }
+    }
   }
 
   div.fullscreen-topic-transition{
@@ -76,9 +60,9 @@ div.fullscreen-topic {
     }
 
     div.fullscreen-topic-internal {
-      max-width: 575px;
+      max-width: 650px;
       min-width: 302px;
-      margin: #{$navbar_height}px auto 30px;
+      margin: 30px auto;
       position: relative;
       overflow: hidden;
       min-height: calc(100vh - #{$navbar_height}px - 60px - 4px);
@@ -88,28 +72,56 @@ div.fullscreen-topic {
         margin-top: 40px;
       }
 
-      div.topic-title {
-        opacity: 0.5;
-        font-family: $oc_headers_font;
-        font-weight: 700;
-        font-size: 12px;
-        line-height: 1.5;
-        letter-spacing: 1px;
-        color: $oc_gray_5;
-        text-transform: uppercase;
-        margin: 0px;
-        padding-top: 2px;
-      }
+      div.fullscreen-topic-top-box{
+        border-radius: 4px;
+        background-color: #ffffff;
+        border: solid 2px rgba(78, 90, 107, 0.2);
+        padding: 26px 30px;
 
-      div.topic-headline {
-        margin-top: 18px;
-        font-size: 26px;
-        line-height: 1.4;
-        color: $oc_gray_5;
-      }
+        div.topic-header-image {
+          text-align: center;
 
-      div.topic-growth-finances{
-        margin-top: 10px;
+          img {
+            max-width: 490px;
+          }
+        }
+
+        div.topic-title {
+          opacity: 0.5;
+          font-family: $oc_headers_font;
+          font-weight: 700;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+          text-transform: uppercase;
+          margin: 0px;
+          padding-top: 2px;
+        }
+
+        div.topic-headline {
+          margin-top: 18px;
+          font-family: $oc_headers_font;
+          font-size: 26px;
+          line-height: 1.4;
+          color: $oc_gray_5;
+
+          svg.emojione {
+            height: 26px;
+            width: 26px;
+          }
+        }
+
+        div.topic-snippet{
+          margin-top: 12px;
+          @include rich-editor-body($oc_gray_5);
+          line-height: 1.8;
+          font-size: 18px;
+        }
+
+        div.topic-growth-finances{
+          margin-top: 10px;
+        }
       }
 
       div.separator {
@@ -122,6 +134,9 @@ div.fullscreen-topic {
       div.topic-body{
         @include rich-editor-body($oc_gray_5);
         margin-top: 21px !important;
+        line-height: 1.8;
+        font-size: 18px;
+        padding: 0px 30px !important;
       }
 
       div.topic-attribution {
@@ -130,10 +145,12 @@ div.fullscreen-topic {
         line-height: 1.8;
         color: $oc_gray_5;
         opacity: 0.5;
+        padding: 0px 30px;
       }
 
       div.topic-revisions {
         margin-top: 65px;
+        padding: 0px 30px;
 
         @include mobile(){
           margin-bottom: 60px;

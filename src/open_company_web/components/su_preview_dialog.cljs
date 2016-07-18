@@ -71,13 +71,13 @@
        :value     @input
        :on-blur   #(do (reset! invalid (invalid? @input)) true)
        :on-change #(update! (.. % -target -value))
-       :placeholder "investor@vc.com,advisor@smarty.com"}]]))
+       :placeholder "investor@vc.com, advisor@smart.com"}]]))
 
 (rum/defc email-dialog < rum/static emoji-autocomplete
   [{:keys [share-link initial-subject]}]
   (dis/dispatch! [:input [:stakeholder-update/share :email :subject] initial-subject])
   [:div
-   (modal-title "Share to Email" :email-84)
+   (modal-title "Share by Email" :email-84)
    [:div.p3
     (multi-email-input (fn [val] (dis/dispatch! [:input [:stakeholder-update/share :email :to] val])))
     [:label.block.small-caps.bold.mb2 "Subject"]
@@ -161,8 +161,8 @@
    [:div.p3
     [:p.domine
      (case type
-       :email "Recipients will get an email of your snapshot."
-       :slack "Your snapshot will be sent to all team members of your Slack organization momentarily.")]
+       :email "Recipients will get your update by email."
+       :slack "Members of your Slack organization will get your update.")]
     [:div.right-align.mt3
      [:button.btn-reset.btn-solid
       {:on-click #(router/nav! (oc-urls/company))}

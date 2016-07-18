@@ -157,7 +157,7 @@
         (when (and (seq company-data)
                    (empty? (:sections su-data))
                    (not su-tooltip-dismissed))
-          (om/build tooltip {:cta "THIS IS A PREVIEW OF YOUR SNAPSHOT. DRAG TOPICS TO REORDER, OR CLICK THE X TO REMOVE A TOPIC."}
+          (om/build tooltip {:cta "THIS IS A PREVIEW OF YOUR UPDATE. DRAG TOPICS TO REORDER, OR CLICK THE X TO REMOVE A TOPIC."}
                             {:opts {:dismiss-tooltip #(om/set-state! owner :su-tooltip-dismissed true)}}))
         (om/build menu data)
         (dom/div {:class "page snapshot-page"}

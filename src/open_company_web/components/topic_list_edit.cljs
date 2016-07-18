@@ -67,25 +67,25 @@
         item-name (:transition-topic current-state)]
     (when item-name
       (let [active-topics (om/get-state owner :active-topics)
-            unactive-topics (om/get-state owner :unactive-topics)
+            inactive-topics (om/get-state owner :inactive-topics)
             is-active (utils/in? active-topics item-name)
             new-active-topics (if is-active
                                 (utils/vec-dissoc active-topics item-name)
                                 (conj active-topics item-name))
-            new-unactive-topics (if is-active
-                                  (concat [item-name] unactive-topics)
-                                  (utils/vec-dissoc unactive-topics item-name))]
+            new-inactive-topics (if is-active
+                                  (concat [item-name] inactive-topics)
+                                  (utils/vec-dissoc inactive-topics item-name))]
     (om/set-state! owner (merge current-state {:active-topics (vec new-active-topics)
-                                               :unactive-topics (vec new-unactive-topics)
+                                               :inactive-topics (vec new-inactive-topics)
                                                :transition-topic nil}))
     (did-change-active-topics new-active-topics)))))
 
 (defn get-state [{:keys [active-topics-list all-topics]} old-state]
   (let [topics-list (map name (keys all-topics))
-        unactive-topics (map name (reduce utils/vec-dissoc topics-list active-topics-list))
-        unactive-equal? (= (set unactive-topics) (set (:unactive-topics old-state)))]
+        inactive-topics (map name (reduce utils/vec-dissoc topics-list active-topics-list))
+        inactive-equal? (= (set inactive-topics) (set (:inactive-topics old-state)))]
     {:active-topics active-topics-list
-     :unactive-topics (if unactive-equal? (:unactive-topics old-state) unactive-topics)
+     :inactive-topics (if inactive-equal? (:inactive-topics old-state) inactive-topics)
      :sortable-loaded (or (:sortable-loaded old-state) false)
      :did-mount (or (:did-mount old-state) false)}))
 
@@ -118,7 +118,7 @@
       (om/set-state! owner (get-state next-props (om/get-state owner))))
     (setup-sortable owner options))
 
-  (render-state [_ {:keys [unactive-topics active-topics transition-topic]}]
+  (render-state [_ {:keys [inactive-topics active-topics transition-topic]}]
     (let [slug (keyword (router/current-company-slug))]
       (if (empty? (slug @caches/new-sections))
         (dom/h2 {} "Loading sections...")
@@ -149,27 +149,27 @@
                                   :item-data (get all-topics (keyword transition-topic))
                                   :checkbox-click-cb #(topic-on-click transition-topic owner (:did-change-active-topics options) %)
                                   :active-topics (conj active-topics transition-topic)}))))
-          (when (seq unactive-topics)
+          (when (seq inactive-topics)
             (dom/div {:class "topic-list-separator"}))
           (dom/div {}
-            (dom/ul #js {:className "topic-list-unactive"
-                         :key (apply str unactive-topics)}
+            (dom/ul #js {:className "topic-list-inactive"
+                         :key (apply str inactive-topics)}
               (when (and transition-topic
-                         (not (utils/in? unactive-topics transition-topic)))
+                         (not (utils/in? inactive-topics transition-topic)))
                 (dom/li #js {:data-itemname transition-topic
-                             :key (str "unactive-" transition-topic)
-                             :className "topic-list-edit-li topic-unactive tt-expand"}
+                             :key (str "inactive-" transition-topic)
+                             :className "topic-list-edit-li topic-inactive tt-expand"}
                   (om/build item {:id transition-topic
                                   :transition true
                                   :item-data (get all-topics (keyword transition-topic))
                                   :checkbox-click-cb #(topic-on-click transition-topic owner (:did-change-active-topics options) %)
                                   :active-topics (utils/vec-dissoc active-topics transition-topic)})))
-              (for [item-name unactive-topics]
+              (for [item-name inactive-topics]
                 (when (not= transition-topic item-name)
                   (dom/li #js {:data-itemname item-name
-                               :key (str "unactive-" item-name)
+                               :key (str "inactive-" item-name)
                                :className (utils/class-set {:topic-list-edit-li true
-                                                            :topic-unactive true
+                                                            :topic-inactive true
                                                             :tt-collapse (= item-name transition-topic)})}
                     (om/build item {:id item-name
                                     :item-data (get all-topics (keyword item-name))

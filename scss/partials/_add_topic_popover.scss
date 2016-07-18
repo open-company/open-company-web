@@ -110,6 +110,8 @@ div.add-topic-popover {
       div.potential-topic {
         font-size: 14px;
         line-height: 1.7;
+        font-family: $oc_main_font;
+        font-weight: 400;
         color: $oc_gray_5;
         padding-top: 3px;
         padding-bottom: 3px;
@@ -143,11 +145,14 @@ div.add-topic-popover {
     height: 40px;
     width: 100%;
     background-color: white;
+    font-family: $oc_main_font;
+    font-weight: 400;
 
     label {
       font-size: 14px;
       line-height: 1.7;
       color: $oc_gray_5;
+      opacity: 0.3;
       height: 30px;
       font-weight: normal;
     }

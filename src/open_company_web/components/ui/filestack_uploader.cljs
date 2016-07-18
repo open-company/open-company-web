@@ -49,7 +49,11 @@
       (assert ls/filestack-key "FileStack API Key required")
       (js/filepicker.setKey ls/filestack-key)))
 
-  (render-state [this _]
+  (did-update [_ _ prev-state]
+    (when (and (not (utils/is-test-env?)) (= (om/get-state owner :state) :show-options))
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+
+  (render-state [this {:keys [state]}]
     (dom/div {:id "file-upload-ui"
               :style (merge {:transition ".2s"}
                             (when (:state (om/get-state owner))
@@ -61,25 +65,39 @@
                      :style {:margin-right "13px"
                              :transition ".2s"
                              :transform (if (om/get-state owner :state) "rotate(135deg)")}
-                     :on-click (fn [e] (utils/event-stop e) (om/update-state! owner :state #(if % nil :show-options)))}
+                     :on-click (fn [e]
+                                  (utils/event-stop e)
+                                  (om/update-state! owner :state #(if % nil :show-options)))}
           (i/icon :circle-add {:size 24}))
-        (case (:state (om/get-state owner))
-          :show-options
-          (dom/div (dom/button {:style {:font-size "14px"} :class "underline btn-reset p0"
-                                :on-click (fn [_]
-                                            (insert-marker!)
-                                            (.click (gdom/getElement "file-upload-ui--select-trigger")))}
-                     "Select an image")
+          (dom/div {:style #js {:margin "1px 0 0 22px"
+                                :display (if (= state :show-options) "block" "none")}}
+            (dom/button {:class "btn-reset oc-gray-5"
+                         :style {:font-size "14px" :opacity "0.5"}
+                         :title "Add an image"
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :on-click (fn [_]
+                                     (insert-marker!)
+                                     (.click (gdom/getElement "file-upload-ui--select-trigger")))}
+              (dom/i {:class "fa fa-camera"}))
             (dom/span {:style {:font-size "14px"}} " or ")
-            (dom/button {:style {:font-size "14px"} :class "underline btn-reset p0"
+            (dom/button {:style {:font-size "14px" :opacity "0.5"}
+                         :class "btn-reset oc-gray-5"
+                         :title "Provide an image link"
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
                          :on-click (fn [_]
                                      (insert-marker!)
                                      (om/set-state! owner :state :show-url-field))}
-                "provide an image URL"))
-          :show-progress
-          (dom/span (str "Uploading... " (om/get-state owner :progress) "%"))
-          :show-url-field
-          (dom/div (dom/input {:type "text" :style {:width 300} :auto-focus true
+                (dom/i {:class "fa fa-code"})))
+          (dom/span {:style {:display (if (= state :show-progress) "block" "none")}}
+            (str "Uploading... " (om/get-state owner :progress) "%"))
+          (dom/div {:style {:display (if (= state :show-url-field) "block" "none")}}
+            (dom/input {:type "text"
+                               :style {:width 300}
+                               :auto-focus true
                                :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
                                :value (om/get-state owner :url)})
             (dom/button {:style {:font-size "14px" :margin-left "1rem"} :class "underline btn-reset p0"
@@ -90,5 +108,4 @@
                          :on-click (fn [_]
                                      (gdom/removeNode (gdom/getElement placeholder-id))
                                      (om/set-state! owner {}))}
-              "cancel"))
-          (dom/span))))))
+              "cancel"))))))

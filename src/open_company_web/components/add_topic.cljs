@@ -8,8 +8,7 @@
             [open-company-web.components.ui.add-topic-popover :refer (add-topic-popover)]))
 
 (defn add-topic-click [owner]
-  (when-not (om/get-state owner :show-add-topic-popover)
-    (om/set-state! owner :show-add-topic-popover true)))
+  (om/set-state! owner :show-add-topic-popover true))
 
 (defn show-popover-above? [owner]
   (let [scroll             (.-scrollTop (.-body js/document))
@@ -27,6 +26,9 @@
                                          (map #(assoc % :category cat-name) sections))))]
     (apply merge
            (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
+
+(defn dismiss-popover [owner]
+  (om/set-state! owner :show-add-topic-popover false))
 
 (defcomponent add-topic [{:keys [active-topics archived-topics column] :as data} owner options]
 
@@ -48,5 +50,5 @@
                          :show-above (show-popover-above? owner)
                          :column column}
               list-opts {:did-change-active-topics update-active-topics
-                         :dismiss-popover #(om/set-state! owner :show-add-topic-popover false)}]
+                         :dismiss-popover #(dismiss-popover owner)}]
           (om/build add-topic-popover list-data {:opts list-opts}))))))

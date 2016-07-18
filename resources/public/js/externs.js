@@ -15,6 +15,10 @@ $.height = function(){};
 $.find = function(){};
 $.data = function(){};
 $.sortable = function(){};
+$.tooltip = function(){};
+$.offset = function(){};
+$.offset.top = {};
+$.offset.left = {};
 // Location
 var location = {};
 location.reload = function(){};
