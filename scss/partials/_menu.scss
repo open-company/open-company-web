@@ -11,7 +11,7 @@ ul#menu {
   margin: 0;
  
   list-style: none;
-  background: #333;
+  background: $oc_gray_5;
   z-index: 10; /* Make sure the z-index is lower than the #page */
 
   li.oc-title {
