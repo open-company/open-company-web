@@ -107,7 +107,7 @@
                    (not (:read-only topic-data))
                    (not sharing-mode))
           (dom/button {:class (str "topic-pencil-button btn-reset")
-                       :style {:top (if image-header (str (min 196 (:image-height topic-data)) "px") "5px")}
+                       :style {:top (if image-header (str (:image-height topic-data) "px") "5px")}
                        :on-click #(pencil-click owner %)}
             (dom/i {:class "fa fa-pencil"})))
         ;; Topic headline
