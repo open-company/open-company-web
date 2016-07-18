@@ -717,30 +717,26 @@
                            :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
                 (dom/i {:class "fa fa-code"}))
               (dom/div {:class (str "char-count" (when char-count-alert " red"))} char-count)
-              (cond
-                (= file-upload-state :show-url-field)
-                (dom/div {:class "upload-remote-url-container left"}
-                  (dom/input {:type "text"
-                              ; :style {:width 300}
-                              :auto-focus true
-                              :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
-                              :value upload-remote-url})
-                  (dom/button {:style {:font-size "14px" :margin-left "1rem"}
-                               :class "underline btn-reset p0"
-                               :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
-                    "add")
-                  (dom/button {:style {:font-size "14px" :margin-left "1rem" :opacity "0.5"}
-                               :class "underline btn-reset p0"
-                               :on-click #(om/set-state! owner :file-upload-state nil)}
-                    "cancel"))
-                (= file-upload-state :show-progress)
-                (dom/span {:class "file-upload-progress left"} (str file-upload-progress "%"))
-                :else
-                (dom/span {} ""))
+              (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
+                (dom/input {:type "text"
+                            ; :style {:width 300}
+                            :auto-focus true
+                            :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
+                            :value upload-remote-url})
+                (dom/button {:style {:font-size "14px" :margin-left "1rem"}
+                             :class "underline btn-reset p0"
+                             :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
+                  "add")
+                (dom/button {:style {:font-size "14px" :margin-left "1rem" :opacity "0.5"}
+                             :class "underline btn-reset p0"
+                             :on-click #(om/set-state! owner :file-upload-state nil)}
+                  "cancel"))
+              (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
+                (str file-upload-progress "%"))
               (dom/input {:id "topic-edit-upload-ui--select-trigger"
-                      :style {:display "none"}
-                      :type "file"
-                      :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})))
+                          :style {:display "none"}
+                          :type "file"
+                          :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})))
           (dom/div {:class "relative topic-body-line"}
             (dom/div {:className "topic-body emoji-autocomplete"
                       :contentEditable true

@@ -237,11 +237,8 @@
                          :style {:display (if (nil? file-upload-state) "block" "none")}
                          :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
                 (dom/i {:class "fa fa-code"}))
-            (cond
-              (= file-upload-state :show-url-field)
-              (dom/div {:class "upload-remote-url-container left"}
+            (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
                 (dom/input {:type "text"
-                            ; :style {:width 300}
                             :auto-focus true
                             :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
                             :value upload-remote-url})
@@ -253,10 +250,8 @@
                              :class "underline btn-reset p0"
                              :on-click #(om/set-state! owner :file-upload-state nil)}
                   "cancel"))
-              (= file-upload-state :show-progress)
-              (dom/span {:class "file-upload-progress left"} (str file-upload-progress "%"))
-              :else
-              (dom/span {} ""))
+            (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
+              (str file-upload-progress "%"))
             (dom/button {:class "btn-reset add-content left"
                          :title "Expanded view"
                          :type "button"
