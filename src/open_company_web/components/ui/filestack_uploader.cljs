@@ -53,7 +53,7 @@
     (when (and (not (utils/is-test-env?)) (= (om/get-state owner :state) :show-options))
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
-  (render-state [this {:keys [state]}]
+  (render-state [this {:keys [state url]}]
     (dom/div {:id "file-upload-ui"
               :style (merge {:transition ".2s"}
                             (when (:state (om/get-state owner))
@@ -98,10 +98,11 @@
             (dom/input {:type "text"
                                :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
                                :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
-                               :value (om/get-state owner :url)})
+                               :value url})
             (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
-                         :class "btn-reset btn-outline"
-                         :on-click #(upload-file! editor owner (om/get-state owner :url))}
+                         :class "btn-reset btn-solid"
+                         :disabled (clojure.string/blank? url)
+                         :on-click #(upload-file! editor owner url)}
               "add")
             (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
                          :class "btn-reset btn-outline"

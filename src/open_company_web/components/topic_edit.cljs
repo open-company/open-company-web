@@ -243,7 +243,8 @@
                             :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
                             :value upload-remote-url})
                 (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
-                             :class "btn-reset btn-outline"
+                             :class "btn-reset btn-solid"
+                             :disabled (clojure.string/blank? upload-remote-url)
                              :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
                   "add")
                 (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
