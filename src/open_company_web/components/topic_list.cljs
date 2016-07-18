@@ -176,6 +176,8 @@
   (and (= (count category-topics) 1)
        (->> category-topics first keyword (get company-data) :placeholder)))
 
+(def min-no-placeholder-section-enable-share 1)
+
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
@@ -262,7 +264,7 @@
         (when (and (not (responsive/is-mobile))
                    (responsive/can-edit?)
                    (not (:read-only company-data))
-                   (> (count (filter-placeholder-sections category-topics company-data)) 1))
+                   (>= (count (filter-placeholder-sections category-topics company-data)) min-no-placeholder-section-enable-share))
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
             (dom/button {:class "sharing-button"
