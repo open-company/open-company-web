@@ -96,15 +96,15 @@
             (str "Uploading... " (om/get-state owner :progress) "%"))
           (dom/div {:style {:display (if (= state :show-url-field) "block" "none")}}
             (dom/input {:type "text"
-                               :style {:width 300}
-                               :auto-focus true
+                               :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
                                :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
                                :value (om/get-state owner :url)})
-            (dom/button {:style {:font-size "14px" :margin-left "1rem"} :class "underline btn-reset p0"
+            (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                         :class "btn-reset btn-outline"
                          :on-click #(upload-file! editor owner (om/get-state owner :url))}
               "add")
-            (dom/button {:style {:font-size "14px" :margin-left "1rem" :opacity "0.5"}
-                         :class "underline btn-reset p0"
+            (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                         :class "btn-reset btn-outline"
                          :on-click (fn [_]
                                      (gdom/removeNode (gdom/getElement placeholder-id))
                                      (om/set-state! owner {}))}
