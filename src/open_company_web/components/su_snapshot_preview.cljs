@@ -167,7 +167,7 @@
               (dom/button {:class "btn-reset btn-solid share-su-button"
                            :on-click #(om/set-state! owner :show-su-dialog :prompt)
                            :disabled (zero? (count su-topics))}
-                "SHARE UPDATE " (dom/i {:class "fa fa-share"}))))
+                "SHARE " (dom/i {:class "fa fa-share"}))))
           ;; SU Snapshot Preview
           (when company-data
             (dom/div {:class "su-sp-content"
