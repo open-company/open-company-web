@@ -116,7 +116,7 @@
         (dom/div #js {:className "topic-body topic-snippet"
                       :ref "topic-snippet"
                       :dangerouslySetInnerHTML (utils/emojify snippet)})
-        (when-not (clojure.string/blank? topic-body)
+        (when-not (clojure.string/blank? (utils/strip-HTML-tags topic-body))
           (dom/button {:class "btn-reset topic-read-more"
                        :onClick (partial fullscreen-topic data nil false)} "READ MORE"))))))
 
