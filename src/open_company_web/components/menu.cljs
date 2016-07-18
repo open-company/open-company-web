@@ -68,7 +68,9 @@
 
   (render [_]
     (dom/ul {:id "menu"}
-      (dom/li {:class "oc-title"} (dom/img {:src "/img/oc-wordmark-white.svg" :style {:height "25px"}}))
+      (dom/li {:class "oc-title"}
+        (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
+          (dom/img {:src "/img/oc-wordmark-white.svg" :style {:height "25px"}})))
       (when (jwt/jwt)
         (dom/li {:class "menu-link"} (dom/a {:title "USER INFO" :href oc-urls/user-profile :on-click user-profile-click} "USER INFO")))
       (when (and (router/current-company-slug)
