@@ -164,19 +164,10 @@
           (dom/div {:class "su-snapshot-header"}
             (om/build back-to-dashboard-btn {})
             (dom/div {:class "share-su"}
-              (dom/label {} "SHARE TO")
-              (dom/button {:class "share-su-button btn-reset share-slack"
-                           :disabled (zero? (count su-topics))
-                           :on-click #(share-slack-clicked owner)}
-                (dom/img {:src "/img/Slack_Icon.png"}))
-              (dom/button {:class "share-su-button btn-reset share-mail"
-                           :disabled (zero? (count su-topics))
-                           :on-click #(share-email-clicked owner)}
-                (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))
-              (dom/button {:class "share-su-button btn-reset share-link"
-                           :disabled (zero? (count su-topics))
-                           :on-click #(share-link-clicked owner)}
-                (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))))
+              (dom/button {:class "btn-reset btn-solid share-su-button"
+                           :on-click #(om/set-state! owner :show-su-dialog :prompt)
+                           :disabled (zero? (count su-topics))}
+                "SHARE SNAPSHOT " (dom/i {:class "fa fa-share"}))))
           ;; SU Snapshot Preview
           (when company-data
             (dom/div {:class "su-sp-content"

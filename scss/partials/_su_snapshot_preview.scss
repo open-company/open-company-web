@@ -51,26 +51,11 @@ div.su-snapshot-preview {
       }
 
       button.share-su-button {
-        width: 40px;
-        height: 40px;
-        border-radius: 20px;
-        background-color: white;
-        margin-left: 8px;
-        float: left;
-        cursor: pointer;
+        margin-top: 5px;
 
         &:disabled{
           opacity: 0.4;
           cursor: default;
-        }
-
-        img {
-          width: 20px;
-          height: 20px;
-        }
-
-        div.svg-icon {
-          padding: 0px 4px;
         }
       }
     }

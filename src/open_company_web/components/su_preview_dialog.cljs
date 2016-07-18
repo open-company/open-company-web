@@ -125,6 +125,24 @@
       {:href link :target "_blank"}
       "Open in New Window"]]]])
 
+(rum/defcs prompt-dialog < rum/static
+ [_ prompt-cb]
+ [:div
+  (modal-title "Share Update")
+  [:div.p3
+    [:div.group.pt1
+      [:button.btn-reset {:on-click #(prompt-cb :slack)}
+        [:div.circle35.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
+        [:span.left.ml1.gray5.h6 {:style {:opacity "0.5"}} "SHARE TO SLACK"]]]
+    [:div.group.pt1
+      [:button.btn-reset {:on-click #(prompt-cb :email)}
+        [:div.circle35.left (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
+        [:span.left.ml1.gray5.h6 {:style {:opacity "0.5"}} "SHARE BY EMAIL"]]]
+    [:div.group.pt1
+      [:button.btn-reset {:on-click #(prompt-cb :link)}
+        [:div.circle35.left (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
+        [:span.left.ml1.gray5.h6 {:style {:opacity "0.5"}} "SHARE A LINK"]]]]])
+
 ;; This is very hacky and should by replaced by a more
 ;; versatile/generic form validation system
 (def email-field
@@ -138,10 +156,10 @@
   [send-fn cancel-fn type]
   [:div.px3.pb3.right-align
    [:button.btn-reset.btn-outline
-    {:class (when-not (= :link type) "mr1")
+    {:class (when-not (or (= :link type) (= :prompt type)) "mr1")
      :on-click cancel-fn}
     (if (= :link type) "DONE" "CANCEL")]
-   (when-not (= :link type)
+   (when-not (or (= :link type) (= :prompt type))
      [:button.btn-reset.btn-solid
       {:on-click send-fn
        :disabled (if (= :email type)
@@ -174,7 +192,8 @@
   (init-state [_]
     {:share-via (cond (:share-via-email data) :email
                       (:share-via-slack data) :slack
-                      (:share-via-link data)  :link)
+                      (:share-via-link data)  :link
+                      :else                   :prompt)
      :share-link (:latest-su data)
      :sending false
      :sent false})
@@ -205,10 +224,11 @@
             (confirmation share-via)
             (dom/div
               (case share-via
-                :link  (link-dialog share-link)
-                :email (email-dialog {:initial-subject (str (:name company-data) " "  (:su-title data))
-                                      :share-link      share-link})
-                :slack (slack-dialog))
+                :prompt (prompt-dialog #(om/set-state! owner :share-via %))
+                :link   (link-dialog share-link)
+                :email  (email-dialog {:initial-subject (str (:name company-data) " "  (:su-title data))
+                                       :share-link      share-link})
+                :slack  (slack-dialog))
               (modal-actions
                (if sent
                  cancel-fn
