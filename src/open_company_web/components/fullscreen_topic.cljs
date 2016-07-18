@@ -14,6 +14,8 @@
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.fullscreen-topic-edit :refer (fullscreen-topic-edit)]
             [open-company-web.components.ui.icon :refer (icon)]
+            [open-company-web.components.ui.small-loading :refer (small-loading)]
+            [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.ui.small-loading :as loading]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [goog.style :refer (setStyle)]
@@ -28,13 +30,13 @@
   (.play
     (new Fade (om/get-ref owner "fullscreen-topic") 0 1 utils/oc-animation-duration)))
 
-(defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric card-width hide-history-navigation] :as data} owner options]
+(defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric card-width hide-history-navigation can-edit is-actual] :as data} owner options]
   (render [_]
-    (let [fullscreen-width (utils/fullscreen-topic-width card-width)
+    (let [fullscreen-width (responsive/fullscreen-topic-width card-width)
           chart-opts {:show-title false
                       :show-revisions-navigation false
                       :switch-metric-cb (:switch-metric-cb options)
-                      :chart-size {:width  (- fullscreen-width 40)
+                      :chart-size {:width  (- fullscreen-width 100)
                                    :height (if (responsive/is-mobile) 174 295)}}
           chart-data {:section-data topic-data
                       :section (keyword topic)
@@ -44,18 +46,30 @@
                       :read-only true}]
       (dom/div {:class "fullscreen-topic-internal group"
                 :style #js {:width (str (- fullscreen-width 20) "px")}}
-        (dom/div {:class "topic-title"} (:title topic-data))
-        (dom/div {:class "topic-headline"
-                  :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
-        (dom/div {:class "separator"})
-        (when (or (= topic "growth") (= topic "finances"))
-          (dom/div {:class "topic-growth-finances"}
-            (cond
-              (= topic "growth")
-              (om/build topic-growth chart-data {:opts chart-opts})
-              (= topic "finances")
-              (om/build topic-finances chart-data {:opts chart-opts}))
-            (dom/div {:class "separator"})))
+        (dom/div {:class "fullscreen-topic-top-box"}
+          (when (:image-url topic-data)
+            (dom/div {:class "topic-header-image"}
+              (dom/img {:src (:image-url topic-data)})))
+          (dom/div {:class "group"}
+            (dom/div {:class "topic-title left"} (:title topic-data))
+            (when (and can-edit
+                       is-actual)
+              (dom/div {:class "edit-button"
+                        :on-click #((:start-editing options))}
+                (dom/i {:class "fa fa-pencil"}))))
+          (dom/div {:class "topic-headline"
+                    :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
+          (when (or (= topic "growth") (= topic "finances"))
+            (dom/div {:class "topic-growth-finances"}
+              (cond
+                (= topic "growth")
+                (om/build topic-growth chart-data {:opts chart-opts})
+                (= topic "finances")
+                (om/build topic-finances chart-data {:opts chart-opts}))
+              (when-not (clojure.string/blank? (:snippet topic-data))
+                (dom/div {:class "separator"}))))
+          (dom/div {:class "topic-snippet"
+                    :dangerouslySetInnerHTML (utils/emojify (:snippet topic-data))}))
         (dom/div {:class "topic-body"
                   :dangerouslySetInnerHTML (utils/emojify (utils/get-topic-body topic-data topic))})
         (when (:author topic-data)
@@ -83,8 +97,7 @@
 (defn exit-editing [owner options]
   (let [editing (om/get-state owner :editing)
         section (om/get-props owner :section)]
-    (when (om/get-state owner :change-url)
-      (.pushState js/history nil (name section) (oc-urls/company-section (router/current-company-slug) (name section))))
+    (.pushState js/history nil (name section) (oc-urls/company-section (router/current-company-slug) (name section)))
     (when editing
       ((:topic-navigation options) true)
       (om/set-state! owner :editing false))))
@@ -94,7 +107,8 @@
   (let [editing (om/get-state owner :editing)]
     (exit-editing owner options)
     (when (or (not editing)
-              force-fullscreen-dismiss)
+              force-fullscreen-dismiss
+              (om/get-props owner :fullscreen-force-edit))
       (utils/enable-scroll)
       (let [fade-out (new Fade (sel1 :div.fullscreen-topic) 1 0 utils/oc-animation-duration)]
         (doto fade-out
@@ -110,16 +124,15 @@
   (.stopPropagation e)
   (when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
     (let [section (om/get-props owner :section)]
-      ((:remove-topic options) section))
+      (dis/dispatch! [:topic-archive section]))
     (hide-fullscreen-topic owner options true)))
 
 (defn revision-navigation [owner as-of]
-  (when (om/get-props owner :change-url)
-    (let [actual-as-of (om/get-state owner :actual-as-of)
-          section (name (om/get-props owner :section))]
-      (if (= as-of actual-as-of)
-        (.pushState js/history nil section (oc-urls/company-section-revision))
-        (.pushState js/history nil (str section " revision " as-of) (oc-urls/company-section-revision as-of))))))
+  (let [actual-as-of (om/get-state owner :actual-as-of)
+        section (name (om/get-props owner :section))]
+    (if (= as-of actual-as-of)
+      (.pushState js/history nil section (oc-urls/company-section (router/current-company-slug) (om/get-props owner :section)))
+      (.pushState js/history nil (str section " revision " as-of) (oc-urls/company-section-revision (router/current-company-slug) (om/get-props owner :section) as-of)))))
 
 (defn animate-transition [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
@@ -160,10 +173,8 @@
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width hide-history-navigation show-first-edit-tooltip] :as data} owner options]
 
   (init-state [_]
-    (utils/add-channel (str "fullscreen-topic-save-" (name section)) (chan))
-    (utils/add-channel (str "fullscreen-topic-cancel-" (name section)) (chan))
     (when (:fullscreen-force-edit data)
-      (dis/set-force-edit-topic nil)
+      (dis/dispatch! [:force-fullscreen-edit nil])
       ((:topic-navigation options) false))
     (when (and (router/section-editing?)
                (:read-only section-data))
@@ -201,8 +212,6 @@
         (om/set-state! owner :actual-as-of (:updated-at (:section-data next-props))))))
 
   (will-unmount [_]
-    (utils/remove-channel (str "fullscreen-topic-save-" (name section)))
-    (utils/remove-channel (str "fullscreen-topic-cancel-" (name section)))
     (events/unlistenByKey (om/get-state owner :esc-listener-key)))
 
   (did-update [_ _ _]
@@ -219,11 +228,13 @@
           topic-data (utils/select-section-data section-data section-kw as-of)
           is-actual? (= as-of actual-as-of)
           fullscreen-topic-opts (merge options {:rev-nav #(om/set-state! owner :transition-as-of %)
-                                                :switch-metric-cb #(om/set-state! owner :last-selected-metric %)})
+                                                :switch-metric-cb #(om/set-state! owner :last-selected-metric %)
+                                                :start-editing #(start-editing owner options)})
           edit-topic-opts (merge options {:show-save-button #(om/set-state! owner :show-save-button %)
-                                          :dismiss-editing #(hide-fullscreen-topic owner options (:fullscreen-force-edit data))})
+                                          :dismiss-editing (partial hide-fullscreen-topic owner options)})
           can-edit? (and (responsive/can-edit?)
-                         (not (:read-only data)))]
+                         (not (:read-only data)))
+          fullscreen-width (responsive/fullscreen-topic-width card-width)]
       ; preload previous revision
       (when (and prev-rev
                  (not (contains? revisions-list (:updated-at prev-rev))))
@@ -235,34 +246,9 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (str "fullscreen-topic" (when (:animate data) " initial"))
                     :ref "fullscreen-topic"}
-        (when (and can-edit?
-                   is-actual?
-                   (not editing))
-          (dom/div {:class "edit-button"
-                    :on-click #(start-editing owner options)}
-            (icon :pencil)))
-        (when (and can-edit?
-                   editing
-                   show-save-button)
-          (dom/button {:class "save-button btn-reset btn-solid"
-                       :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-save-" (name section)))]
-                                    (hide-fullscreen-topic owner options true)
-                                    (om/set-state! owner :data-posted true)
-                                    (put! ch {:click true :event %}))}
-            (if data-posted
-              (loading/small-loading)
-              "SAVE")))
-        (if editing
-          (dom/button {:class "btn-reset btn-outline close-editing"
-                       :key "close"
-                       :title "Dismiss edit"
-                       :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-cancel-" (name section)))]
-                                    (om/set-state! owner :edit-rand (rand 4))
-                                    (put! ch {:click true :event %}))} "CANCEL")
-          (dom/button {:class "close btn-reset btn-outline"
-                       :key "close-editing"
-                       :title "ESC"
-                       :on-click #(hide-fullscreen-topic owner options)} (icon :simple-remove)))
+        (dom/div {:class "btd-container"
+                  :style {:width (str (+ fullscreen-width 20) "px")}}
+          (om/build back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)}))
         (dom/div {:style #js {:display (when-not editing "none")}
                   :key (str as-of edit-rand)}
           (om/build fullscreen-topic-edit {:topic section
@@ -290,6 +276,7 @@
                                                  :currency currency
                                                  :card-width card-width
                                                  :is-actual is-actual?
+                                                 :can-edit can-edit?
                                                  :hide-history-navigation hide-history-navigation
                                                  :prev-rev prev-rev
                                                  :next-rev next-rev}
@@ -310,12 +297,4 @@
                                                      :hide-history-navigation hide-history-navigation
                                                      :prev-rev tr-prev-rev
                                                      :next-rev tr-next-rev}
-                                                    {:opts fullscreen-topic-opts})))))
-        (when editing
-          (dom/button {:class "relative remove-button btn-reset btn-outline"
-                       :on-click (partial remove-topic-click owner options)}
-            (icon :alert {:size 15
-                          :class "inline mr2"
-                          :accent-color (oc-colors/get-color-by-kw :oc-gray-5)
-                          :color (oc-colors/get-color-by-kw :oc-gray-5)})
-            "Archive this topic"))))))
+                                                    {:opts fullscreen-topic-opts})))))))))

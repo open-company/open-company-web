@@ -1,4 +1,5 @@
 (ns open-company-web.components.topic-list
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -37,19 +38,18 @@
 (defn get-active-topics [company-data category]
   (get-in company-data [:sections (keyword category)]))
 
-(defn remove-topic [owner topic]
-  (let [company-data (om/get-props owner :company-data)
-        old-categories (:sections company-data)
-        new-categories (apply merge (map #(hash-map (first %) (utils/vec-dissoc (second %) topic)) old-categories))]
-    (api/patch-sections new-categories)))
-
 (defn update-active-topics [owner category-name new-topic & [section-data]]
   (let [company-data (om/get-props owner :company-data)
         old-categories (:sections company-data)
         old-topics (get-active-topics company-data category-name)
         new-topics (concat old-topics [new-topic])
-        new-categories (assoc old-categories (keyword category-name) new-topics)]
-    (dispatcher/set-force-edit-topic new-topic)
+        new-categories (assoc old-categories (keyword category-name) new-topics)
+        new-topic-kw (keyword new-topic)]
+    (if (#{:finances :growth} new-topic-kw)
+      (dispatcher/dispatch! [:force-fullscreen-edit new-topic])
+      (if section-data
+        (dispatcher/dispatch! [:start-foce new-topic-kw (or section-data {:section new-topic :placeholder true})])
+        (om/set-state! owner :new-topic-foce new-topic-kw)))
     (if section-data
       (api/patch-sections new-categories section-data new-topic)
       (api/patch-sections new-categories))))
@@ -107,10 +107,10 @@
 
 (defn close-overlay-cb [owner]
   (.pushState js/history nil "Dashboard" (oc-urls/company (router/current-company-slug)))
-  (om/set-state! owner :transitioning false)
-  (om/set-state! owner :selected-topic nil)
-  (om/set-state! owner :selected-metric nil)
-  (om/set-state! owner :fullscreen-force-edit false))
+  (om/set-state! owner (merge (om/get-state owner) {:transitioning false
+                                                    :selected-topic nil
+                                                    :selected-metric nil
+                                                    :fullscreen-force-edit false})))
 
 (defn switch-topic [owner is-left?]
   (when (and (om/get-state owner :topic-navigation)
@@ -149,7 +149,7 @@
 (defn animate-selected-topic-transition [owner left?]
   (let [selected-topic (om/get-ref owner "selected-topic")
         tr-selected-topic (om/get-ref owner "tr-selected-topic")
-        width (utils/fullscreen-topic-width (om/get-state owner :card-width))
+        width (responsive/fullscreen-topic-width (om/get-state owner :card-width))
         fade-anim (new Slide selected-topic #js [0 0] #js [(if left? width (* width -1)) 0] utils/oc-animation-duration)
         cur-state (om/get-state owner)]
     (doto fade-anim
@@ -207,6 +207,9 @@
         (.off swipe-listener "swiperight"))))
 
   (will-receive-props [_ next-props]
+    (when-let* [new-topic-foce (om/get-state owner :new-topic-foce)
+                new-topic-data (-> next-props :company-data new-topic-foce)]
+      (dispatcher/dispatch! [:start-foce new-topic-foce new-topic-data]))
     (when (om/get-state owner :redirect-to-preview)
       (utils/after 100 #(router/nav! (oc-urls/stakeholder-update-preview))))
     (when-not (= (:company-data next-props) (:company-data data))
@@ -263,7 +266,7 @@
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
             (dom/button {:class "sharing-button"
-                         :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} "SHARE A SNAPSHOT " (dom/i {:class "fa fa-share"}))))
+                         :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} "SHARE AN UPDATE " (dom/i {:class "fa fa-share"}))))
         ;; Fullscreen topic
         (when selected-topic
           (dom/div {:class "selected-topic-container"
@@ -274,7 +277,6 @@
                             :style #js {:opacity 1 :backgroundColor "rgba(255, 255, 255, 0.98)"}}
                 (om/build fullscreen-topic {:section selected-topic
                                             :section-data (->> selected-topic keyword (get company-data))
-                                            :change-url true
                                             :fullscreen-force-edit fullscreen-force-edit
                                             :revision-updates (dispatcher/section-revisions (router/current-company-slug) (router/current-section))
                                             :selected-metric selected-metric
@@ -285,7 +287,6 @@
                                             :show-first-edit-tooltip (should-show-first-edit-tooltip company-data category-topics)}
                                            {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                    :topic-edit-cb (:topic-edit-cb options)
-                                                   :remove-topic (partial remove-topic owner)
                                                    :topic-navigation #(om/set-state! owner :topic-navigation %)}}))
             ;; Fullscreen topic for transition
             (when tr-selected-topic
@@ -302,7 +303,6 @@
                                           :animate false}
                                          {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                  :topic-edit-cb (:topic-edit-cb options)
-                                                 :remove-topic (partial remove-topic owner)
                                                  :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
         ;; Topics list columns
         (om/build topics-columns {:columns-num columns-num
@@ -314,6 +314,8 @@
                                   :topics category-topics
                                   :company-data company-data
                                   :topics-data company-data
+                                  :foce-key (:foce-key data)
+                                  :foce-data (:foce-data data)
                                   :share-selected-topics share-selected-topics}
                                  {:opts {:topic-click (partial topic-click owner)
                                          :update-active-topics (partial update-active-topics owner)}})
@@ -332,5 +334,5 @@
                    (not selected-topic)
                    (not share-su-tooltip-dismissed))
           (om/build tooltip
-            {:cta "YOUR BIG PICTURE IS COMING TOGETHER. YOU CAN SHARE A SNAPSHOT OF SELECTED TOPICS WITH YOUR TEAM, INVESTORS OR THE CROWD WHEN YOU'RE READY."}
+            {:cta "YOUR BIG PICTURE IS COMING TOGETHER. YOU CAN SHARE AN UPDATE OF SELECTED TOPICS WITH YOUR TEAM, INVESTORS OR THE CROWD WHEN YOU'RE READY."}
             {:opts {:class "large" :dismiss-tooltip #(om/set-state! owner :share-su-tooltip-dismissed true)}}))))))

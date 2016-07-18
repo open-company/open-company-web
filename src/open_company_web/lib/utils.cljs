@@ -706,12 +706,6 @@
   (dommy/remove-class! (sel1 [:body]) :no-scroll)
   (setStyle (sel1 [:div.main-scroll]) #js {:height "auto" :overflow "auto"}))
 
-(defn fullscreen-topic-width [card-width]
-  (let [ww (.-clientWidth (sel1 js/document :body))]
-    (if (> ww 575)
-      575
-      (min card-width ww))))
-
 (defn su-default-title []
   (let [js-date (js-date)
         month (month-string (add-zero (.getMonth js-date)))
@@ -741,3 +735,16 @@
         true
         (recur (.-parentElement element)))
       false)))
+
+(defn to-end-of-content-editable [content-editable-element]
+  (if (.-createRange js/document)
+    (let [rg (.createRange js/document)]
+      (.selectNodeContents rg content-editable-element)
+      (.collapse rg false)
+      (let [selection (.getSelection js/window)]
+        (.removeAllRanges selection)
+        (.addRange selection rg)))
+    (let [rg (.createTextRange (.-body js/document))]
+      (.moveToElementText rg content-editable-element)
+      (.collapse rg false)
+      (.select rg))))

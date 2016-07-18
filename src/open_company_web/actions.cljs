@@ -132,6 +132,20 @@
       (assoc-in (dispatcher/company-data-key slug) (utils/fix-sections company-data))
       (dissoc :loading))))
 
+;; Front of Card Edit section
+(defmethod dispatcher/action :start-foce [db [_ section-key section-data]]
+  (if section-key
+    (-> db
+        (assoc :foce-key section-key)
+        (assoc :foce-data section-data))
+    (-> db
+        (dissoc :foce-key)
+        (dissoc :foce-data))))
+
+(defmethod dispatcher/action :foce-input [db [_ topic-data-map]]
+  (let [old-data (:foce-data db)]
+    (assoc db :foce-data (merge old-data topic-data-map))))
+
 ;; This should be turned into a proper form library
 ;; Lomakeets FormState ideas seem like a good start:
 ;; https://github.com/metosin/lomakkeet/blob/master/src/cljs/lomakkeet/core.cljs
@@ -141,3 +155,36 @@
 
 (defmethod dispatcher/action :stakeholder-update/reset-share [db _]
   (dissoc db :stakeholder-update/share))
+
+(defmethod dispatcher/action :topic-archive [db [_ topic]]
+  (let [company-data (dispatcher/company-data)
+        old-categories (:sections company-data)
+        new-categories (apply merge (map #(hash-map (first %) (utils/vec-dissoc (second %) (name topic))) old-categories))]
+    (api/patch-sections new-categories))
+  (-> db
+    (dissoc :foce-key)
+    (dissoc :foce-data)))
+
+(defmethod dispatcher/action :foce-save [db [_]]
+  (let [slug (keyword (router/current-company-slug))
+        topic (:foce-key db)
+        topic-data (:foce-data db)
+        old-section-data (get (dispatcher/company-data db slug) (keyword topic))
+        new-data (dissoc (merge old-section-data topic-data) :placeholder)]
+    (api/partial-update-section (:section (:foce-data db)) new-data)
+    (-> db
+        (dissoc :foce-key)
+        (dissoc :foce-data)
+        (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) new-data))))
+
+(defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
+  (if topic
+    (assoc-in db [:force-edit-topic] topic)
+    (dissoc db :force-edit-topic)))
+
+(defmethod dispatcher/action :save-topic [db [_ topic topic-data]]
+  (let [slug (keyword (router/current-company-slug))
+        old-section-data (get (dispatcher/company-data db slug) (keyword topic))
+        new-data (dissoc (merge old-section-data topic-data) :placeholder)]
+    (api/partial-update-section topic new-data)
+    (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic)) (merge old-section-data topic-data))))

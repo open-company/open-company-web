@@ -15,7 +15,6 @@
             [open-company-web.components.su-edit-header :refer (su-edit-header)]
             [open-company-web.components.su-edit-footer :refer (su-edit-footer)]
             [open-company-web.components.ui.link :refer (link)]
-            [cljs-dynamic-resources.core :as cdr]
             [goog.style :refer (setStyle)]
             [goog.events :as events]
             [goog.history.EventType :as EventType]
@@ -147,8 +146,6 @@
 (defcomponent su-edit [data owner]
 
   (init-state [_]
-    (cdr/add-style! "/css/medium-editor/medium-editor.css")
-    (cdr/add-style! "/css/medium-editor/default.css")
     (get-state data nil))
 
   (will-unmount [_]
