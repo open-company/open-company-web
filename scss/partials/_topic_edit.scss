@@ -172,10 +172,10 @@ div.topic {
         color: $oc_gray_5;
         overflow: hidden;
         font-weight: 400;
-        font-size: 15px;
-        line-height: 22px;
         cursor: text;
         min-height: 20px;
+        font-size: 15px;
+        line-height: 22px;
 
         &:after {
           font-style: italic;
@@ -193,7 +193,7 @@ div.topic {
 
         *{
           font-weight: 400;
-          font-size: 12px;
+          font-size: 15px;
           line-height: 22px;
         }
 
