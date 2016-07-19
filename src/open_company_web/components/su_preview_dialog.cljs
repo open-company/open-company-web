@@ -43,11 +43,12 @@
   [title icon-id]
   [:h3.m0.px3.py25.gray5.domine
    {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.1)"}}
-   (if (= :slack icon-id)
-     [:i {:class "fa fa-slack mr2"}]
-     (i/icon icon-id {:class "inline mr2"
-                      :color :oc-gray-3
-                      :accent-color :oc-gray-3}))
+   (when icon-id
+     (if (= :slack icon-id)
+       [:i {:class "fa fa-slack mr2"}]
+       (i/icon icon-id {:class "inline mr2"
+                        :color :oc-gray-3
+                        :accent-color :oc-gray-3})))
    title])
 
 (rum/defcs multi-email-input < (rum/local nil ::invalid)
@@ -129,19 +130,19 @@
 (rum/defcs prompt-dialog < rum/static
  [_ prompt-cb]
  [:div
-  (modal-title "Share Update")
+  (modal-title "Share Update" nil)
   [:div.p3
-    [:div.group.pt1
+    [:div.group
       [:button.btn-reset {:on-click #(prompt-cb :slack)}
-        [:div.circle35.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
+        [:div.circle50.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
         [:span.left.ml1.gray5.h6 {:style {:opacity "0.5"}} "SHARE TO SLACK"]]]
-    [:div.group.pt1
+    [:div.group
       [:button.btn-reset {:on-click #(prompt-cb :email)}
-        [:div.circle35.left (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
+        [:div.circle50.left (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
         [:span.left.ml1.gray5.h6 {:style {:opacity "0.5"}} "SHARE BY EMAIL"]]]
-    [:div.group.pt1
+    [:div.group
       [:button.btn-reset {:on-click #(prompt-cb :link)}
-        [:div.circle35.left (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
+        [:div.circle50.left (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
         [:span.left.ml1.gray5.h6 {:style {:opacity "0.5"}} "SHARE A LINK"]]]]])
 
 ;; This is very hacky and should by replaced by a more
