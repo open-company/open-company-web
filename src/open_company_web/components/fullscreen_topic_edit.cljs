@@ -709,7 +709,7 @@
                            :type "button"
                            :data-toggle "tooltip"
                            :data-placement "top"
-                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
                            :on-click #(.click (sel1 [:input#topic-edit-upload-ui--select-trigger]))}
                 (dom/i {:class "fa fa-camera"}))
               (dom/button {:class "btn-reset image-url"
@@ -717,7 +717,7 @@
                            :type "button"
                            :data-toggle "tooltip"
                            :data-placement "top"
-                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
                            :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
                 (dom/i {:class "fa fa-code"}))
               (dom/div {:class (str "char-count" (when char-count-alert " red"))} char-count)
