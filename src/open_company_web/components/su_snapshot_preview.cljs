@@ -47,19 +47,9 @@
       (set! (.-value preview-title) (.-value preview-title))
       (om/set-state! owner :title-focused true))))
 
-(defn share-slack-clicked [owner]
-  (patch-stakeholder-update owner)
-  (om/set-state! owner :show-su-dialog :slack)
-  (om/set-state! owner :slack-loading true))
-
-(defn share-email-clicked [owner]
- (om/set-state! owner :show-su-dialog :email)
- (om/set-state! owner :email-loading true)
- (patch-stakeholder-update owner))
-
-(defn share-link-clicked [owner]
- (om/set-state! owner :link-loading true)
- (patch-stakeholder-update owner))
+(defn share-clicked [owner]
+ (patch-stakeholder-update owner)
+ (om/set-state! owner :show-su-dialog :prompt))
 
 (defn dismiss-su-preview [owner]
   (om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false
@@ -165,7 +155,7 @@
             (om/build back-to-dashboard-btn {})
             (dom/div {:class "share-su"}
               (dom/button {:class "btn-reset btn-solid share-su-button"
-                           :on-click #(om/set-state! owner :show-su-dialog :prompt)
+                           :on-click #(share-clicked owner)
                            :disabled (zero? (count su-topics))}
                 "SHARE " (dom/i {:class "fa fa-share"}))))
           ;; SU Snapshot Preview

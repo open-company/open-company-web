@@ -103,6 +103,7 @@
       :placeholder "Optional note to go with this update."}]]])
 
 (rum/defcs link-dialog < (rum/local false ::copied)
+                         (rum/local false ::clipboard)
                          (clipboard-mixin ".js-copy-btn")
   [{:keys [::copied] :as _state} link]
   [:div
@@ -206,6 +207,9 @@
 
   (will-receive-props [_ next-props]
     ; slack SU posted
+    (when (and (= (om/get-state owner :share-via) :link)
+               (:latest-su next-props))
+      (om/set-state! owner :share-link (:latest-su next-props)))
     (when (and (#{:email :slack} (om/get-state owner :share-via))
                (om/get-state owner :sending)
                (not (om/get-state owner :sent)))
@@ -224,17 +228,20 @@
             (confirmation share-via)
             (dom/div
               (case share-via
-                :prompt (prompt-dialog #(om/set-state! owner :share-via %))
+                :prompt (prompt-dialog #(do
+                                          (when (= % :link)
+                                            (api/share-stakeholder-update {}))
+                                          (om/set-state! owner :share-via %)))
                 :link   (link-dialog share-link)
                 :email  (email-dialog {:initial-subject (str (:name company-data) " "  (:su-title data))
                                        :share-link      share-link})
                 :slack  (slack-dialog))
               (modal-actions
-               (if sent
-                 cancel-fn
-                 #(do (om/set-state! owner :sending true)
-                      (send-clicked share-via)))
-               cancel-fn
-               (cond (and sending (not sent)) :sending
-                     (and sending sent)       :sent
-                     :else                    share-via)))))))))
+                (if sent
+                  cancel-fn
+                  #(do (om/set-state! owner :sending true)
+                       (send-clicked share-via)))
+                cancel-fn
+                (cond (and sending (not sent)) :sending
+                      (and sending sent)       :sent
+                      :else                    share-via)))))))))
