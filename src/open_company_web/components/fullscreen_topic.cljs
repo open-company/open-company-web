@@ -13,8 +13,9 @@
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.fullscreen-topic-edit :refer (fullscreen-topic-edit)]
+            [open-company-web.components.ui.icon :refer (icon)]
+            [open-company-web.components.ui.small-loading :refer (small-loading)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
-            [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.small-loading :as loading]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
             [goog.style :refer (setStyle)]
@@ -245,40 +246,9 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (str "fullscreen-topic" (when (:animate data) " initial"))
                     :ref "fullscreen-topic"}
-<<<<<<< dd9ab6689077f5118b84169c7bdf94b60b57787b
         (dom/div {:class "btd-container"
                   :style {:width (str (+ fullscreen-width 20) "px")}}
           (om/build back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)}))
-=======
-        (when (and can-edit?
-                   is-actual?
-                   (not editing))
-          (dom/div {:class "edit-button"
-                    :on-click #(start-editing owner options)}
-            (i/icon :pencil)))
-        (when (and can-edit?
-                   editing
-                   show-save-button)
-          (dom/button {:class "save-button btn-reset btn-solid"
-                       :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-save-" (name section)))]
-                                    (hide-fullscreen-topic owner options true)
-                                    (om/set-state! owner :data-posted true)
-                                    (put! ch {:click true :event %}))}
-            (if data-posted
-              (loading/small-loading)
-              "SAVE")))
-        (if editing
-          (dom/button {:class "btn-reset btn-outline close-editing"
-                       :key "close"
-                       :title "Dismiss edit"
-                       :on-click #(when-let [ch (utils/get-channel (str "fullscreen-topic-cancel-" (name section)))]
-                                    (om/set-state! owner :edit-rand (rand 4))
-                                    (put! ch {:click true :event %}))} "CANCEL")
-          (dom/button {:class "close btn-reset btn-outline"
-                       :key "close-editing"
-                       :title "ESC"
-                       :on-click #(hide-fullscreen-topic owner options)} (i/icon :simple-remove)))
->>>>>>> minor code cleanup
         (dom/div {:style #js {:display (when-not editing "none")}
                   :key (str as-of edit-rand)}
           (om/build fullscreen-topic-edit {:topic section
@@ -327,16 +297,4 @@
                                                      :hide-history-navigation hide-history-navigation
                                                      :prev-rev tr-prev-rev
                                                      :next-rev tr-next-rev}
-<<<<<<< dd9ab6689077f5118b84169c7bdf94b60b57787b
                                                     {:opts fullscreen-topic-opts})))))))))
-=======
-                                                    {:opts fullscreen-topic-opts})))))
-        (when editing
-          (dom/button {:class "relative remove-button btn-reset btn-outline"
-                       :on-click (partial remove-topic-click owner options)}
-            (i/icon :alert {:size 15
-                          :class "inline mr2"
-                          :accent-color (oc-colors/get-color-by-kw :oc-gray-5)
-                          :color (oc-colors/get-color-by-kw :oc-gray-5)})
-            "Archive this topic"))))))
->>>>>>> minor code cleanup
