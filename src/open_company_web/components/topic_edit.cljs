@@ -96,8 +96,8 @@
         (.preventDefault e)))))
 
 (defn img-on-load [img]
-  (dis/dispatch! [:foce-input {:image-width (.-clientHeight img)
-                               :image-height (.-clientWidth img)}])
+  (dis/dispatch! [:foce-input {:image-width (.-clientWidth img)
+                               :image-height (.-clientHeight img)}])
   (gdom/removeNode img))
 
 (defn upload-file! [owner file]

@@ -456,7 +456,7 @@
     ((:dismiss-editing options) true)))
 
 (defn img-on-load [owner img]
-  (om/set-state! owner (merge (om/get-state owner) {:image-width (.-clientWidht img)
+  (om/set-state! owner (merge (om/get-state owner) {:image-width (.-clientWidth img)
                                                     :image-height (.-clientHeight img)}))
   (gdom/removeNode img))
 

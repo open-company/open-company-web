@@ -59,6 +59,7 @@
 (defcomponent topic-internal [{:keys [topic-data
                                       section
                                       currency
+                                      card-width
                                       prev-rev
                                       next-rev
                                       sharing-mode
@@ -84,7 +85,10 @@
           image-header        (:image-url topic-data)
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
-          topic-body          (utils/get-topic-body topic-data section)]
+          topic-body          (utils/get-topic-body topic-data section)
+          image-height        (if image-header
+                                (str (utils/image-height-aspect-ratio (:image-width topic-data) (:image-height topic-data) card-width) "px")
+                                "5px")]
       (dom/div #js {:className "topic-internal group"
                     :onClick (partial fullscreen-topic data nil false)
                     :ref "topic-internal"}
@@ -107,7 +111,7 @@
                    (not (:read-only topic-data))
                    (not sharing-mode))
           (dom/button {:class (str "topic-pencil-button btn-reset")
-                       :style {:top (if image-header (str (:image-height topic-data) "px") "5px")}
+                       :style {:top image-height}
                        :on-click #(pencil-click owner %)}
             (dom/i {:class "fa fa-pencil"})))
         ;; Topic headline
@@ -161,6 +165,7 @@
                              section
                              currency
                              column
+                             card-width
                              sharing-mode
                              share-selected
                              archived-topics
@@ -228,6 +233,7 @@
                                     :sharing-mode sharing-mode
                                     :show-fast-editing (:show-fast-editing data)
                                     :currency currency
+                                    :card-width card-width
                                     :read-only-company (:read-only-company data)
                                     :foce-key (:foce-key data)
                                     :foce-data (:foce-data data)
@@ -243,6 +249,7 @@
                                         :sharing-mode sharing-mode
                                         :show-fast-editing (:show-fast-editing data)
                                         :currency currency
+                                        :card-width card-width
                                         :read-only-company (:read-only-company data)
                                         :topic-click (:topic-click options)
                                         :prev-rev prev-rev
