@@ -484,18 +484,6 @@
       file
       (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
 
-(defn set-float-buttons-position! [owner]
-  (when-let* [fdm #(js/jQuery (.findDOMNode js/ReactDOM %))
-              fullscreen-topic-edit (fdm (om/get-ref owner "fullscreen-topic-edit"))
-              save-button           (fdm (om/get-ref owner "save-button"))
-              cancel-button         (fdm (om/get-ref owner "cancel-button"))
-              archive-button        (fdm (om/get-ref owner "archive-button"))
-              fte-left              (.-left (.offset fullscreen-topic-edit))
-              fte-width             (.width fullscreen-topic-edit)]
-    (.css archive-button #js {:left (str fte-left "px")})
-    (.css save-button #js {:left (str (- (+ fte-left fte-width) 100) "px")})
-    (.css cancel-button #js {:left (str (- (+ fte-left fte-width) 100 20 120) "px")})))
-
 (defcomponent fullscreen-topic-edit [{:keys [card-width topic topic-data currency focus show-first-edit-tooltip] :as data} owner options]
 
   (init-state [_]
@@ -541,7 +529,6 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (set-float-buttons-position! owner)
       (reset! prevent-route-dispatch true)
       (js/filepicker.setKey ls/filestack-key)
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
@@ -564,8 +551,7 @@
 
   (did-update [_ _ prev-state]
     (when-not (om/get-state owner :medium-editor)
-      (setup-medium-editor owner data))
-    (set-float-buttons-position! owner))
+      (setup-medium-editor owner data)))
 
   (render-state [_ {:keys [has-changes
                            title
@@ -616,6 +602,18 @@
                     :ref "fullscreen-topic-edit"
                     :style #js {:width (str (- fullscreen-width 20) "px")}
                     :key (:updated-at topic-data)}
+        (dom/div {:style {:opacity "1"
+                          :margin "27px 0px"}
+                  :class "group"}
+          (dom/button {:class "btn-reset btn-solid right ml1 save-button"
+                       :disabled (or (not has-changes) negative-headline-char-count negative-snippet-char-count)
+                       :onClick #(do
+                                  (save-data owner options)
+                                  (utils/event-stop %))} "SAVE")
+          (dom/button {:class "btn-reset btn-outline right ml1 cancel-button"
+                       :onClick #(do
+                                  (reset-and-dismiss owner options)
+                                  (utils/event-stop %))} "CANCEL"))
         (dom/div {:class "fullscreen-topic-internal group"
                   :on-click #(.stopPropagation %)}
           (dom/div {:class "fullscreen-topic-edit-top-box"}
@@ -755,20 +753,6 @@
                            :onClick #(remove-topic-click owner options %)}
             (dom/i {:class "fa fa-archive"})
             "Archive this topic"))
-      (dom/button #js {:className "save-button btn-reset btn-solid"
-                       :ref "save-button"
-                       :disabled (or (not has-changes) negative-headline-char-count negative-snippet-char-count)
-                       :onClick #(do
-                                   (save-data owner options)
-                                   (utils/event-stop %))}
-        "SAVE")
-      (dom/button #js {:className (str "btn-reset btn-outline cancel-button" (when has-changes " has-save"))
-                       :key "cancel-button"
-                       :ref "cancel-button"
-                       :title "Dismiss edit"
-                       :onClick #(do
-                                   (reset-and-dismiss owner options)
-                                   (utils/event-stop %))} "CANCEL")
       (when (and show-first-edit-tooltip
                  (not tooltip-dismissed))
         (om/build tooltip
