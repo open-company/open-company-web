@@ -46,12 +46,12 @@
 (defn on-click-in [owner options e]
   (.stopPropagation e))
 
-(defn get-state [{:keys [active-topics-list all-topics archived-topics] :as data} old-state]
+(defn get-state [{:keys [topic-order active-topics-list all-topics archived-topics] :as data} old-state]
   (let [topics-list (map name (keys all-topics))
         sorted-archived-topics (sort #(compare (:title %1) (:title %2)) archived-topics)
         archived-topics-list (vec (map :section sorted-archived-topics))
         reduce-dissoc (partial reduce utils/vec-dissoc)
-        inactive-topics (map name (-> topics-list
+        inactive-topics (map name (-> topic-order
                                       (reduce-dissoc active-topics-list)
                                       (reduce-dissoc archived-topics-list)))
         inactive-equal? (= (set inactive-topics) (set (:inactive-topics old-state)))]
