@@ -22,7 +22,7 @@
       (dom/div {:class "home fullscreen-page"}
         (dom/div {:class "home-internal"}
           (when-not (jwt/jwt)
-            (om/build login-required (assoc data :welcome true))))
+            (login-required (assoc data :welcome true))))
         (om/build footer {:su-preview false
                           :card-width card-width
                           :columns-num columns-num})))))

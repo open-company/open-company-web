@@ -35,7 +35,7 @@
 
   (render-state [_ {:keys [loading]}]
     (dom/div {:class "company-editor"
-              :style #js {:border-top (str "4px solid " (occ/get-color-by-kw :yellow))}}
+              :style {:border-top (str "4px solid " (occ/get-color-by-kw :yellow))}}
       (dom/div {:class "col-12 p3"}
         (dom/button {:on-click #(dis/dispatch! [:logout])
                      :class "btn-reset btn-outline"}
