@@ -18,9 +18,7 @@
             [test.open-company-web.components.company-header]
             [test.open-company-web.components.topic-list]
             [test.open-company-web.components.topic]
-            [test.open-company-web.components.edit-topic]
             [test.open-company-web.components.topic-body]
-            [test.open-company-web.components.expanded-topic]
             [test.open-company-web.components.fullscreen-topic-edit]))
 
 (enable-console-print!)
@@ -47,7 +45,5 @@
   'test.open-company-web.components.company-header
   'test.open-company-web.components.topic-list
   'test.open-company-web.components.topic
-  'test.open-company-web.components.edit-topic
   'test.open-company-web.components.topic-body
-  'test.open-company-web.components.expanded-topic
   'test.open-company-web.components.fullscreen-topic-edit)

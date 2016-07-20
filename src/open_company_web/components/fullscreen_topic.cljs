@@ -249,7 +249,7 @@
         (when-not editing
           (dom/div {:class "btd-container"
                     :style {:width (str (+ fullscreen-width 20) "px")}}
-            (om/build back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)})))
+            (back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)})))
         (dom/div {:style #js {:display (when-not editing "none")}
                   :key (str as-of edit-rand)}
           (om/build fullscreen-topic-edit {:topic section
