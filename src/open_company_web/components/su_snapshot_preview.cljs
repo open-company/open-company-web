@@ -162,7 +162,7 @@
         (om/build menu data)
         (dom/div {:class "page snapshot-page"}
           (dom/div {:class "su-snapshot-header"}
-            (om/build back-to-dashboard-btn {})
+            (back-to-dashboard-btn {})
             (dom/div {:class "share-su"}
               (dom/label {} "SHARE TO")
               (dom/button {:class "share-su-button btn-reset share-slack"
