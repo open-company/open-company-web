@@ -668,7 +668,7 @@
                 :placeholderText "Paste or type a link"
                 :targetCheckbox false
                 :targetCheckboxText "Open in new window"}
-   :placeholder #js {:text (or placeholder ""), :hideOnClick true}})
+   :placeholder #js {:text (or placeholder ""), :hideOnClick false}})
 
 (defn after [ms fn]
   (js/setTimeout fn ms))

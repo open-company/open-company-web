@@ -177,13 +177,17 @@ div.topic {
         font-size: 15px;
         line-height: 22px;
 
-        &:after {
+        &:empty:after {
+          content: attr(placeholder);
+          font-size: 15px;
+          line-height: 22px;
+          color: $oc_gray_5;
           font-style: italic;
           font-family: $oc_main_font;
           font-weight: 400;
-          font-size: 12px;
-          color: $oc_gray_5;
           opacity: 0.5;
+          margin-top: 0px;
+          padding-top: 0px;
         }
 
         svg.emojione {

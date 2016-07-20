@@ -40,20 +40,17 @@
 (defn setup-edit [owner]
   (when-let* [section-name (name (om/get-props owner :section))
               snippet-el (sel1 [(str "div#foce-snippet-" section-name)])]
-    (let [topic-data (om/get-props owner :topic-data)
-          topic (om/get-props owner :section)]
-      (let [snippet-placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
-            snippet-editor      (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options snippet-placeholder)))]
-        (.subscribe snippet-editor
-                    "editableInput"
-                    (fn [event editable]
-                      (dis/dispatch! [:foce-input {:snippet (.-innerHTML snippet-el)}])
-                      (let [v (.-innerText snippet-el)
-                            remaining-chars (- snippet-max-length (count v))]
-                        (om/set-state! owner :char-count remaining-chars)
-                        (om/set-state! owner :char-count-alert (< remaining-chars snippet-alert-limit))
-                        (om/set-state! owner :negative-snippet-char-count (neg? remaining-chars))))))
-      (js/emojiAutocomplete))))
+    (let [snippet-editor      (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options "")))]
+      (.subscribe snippet-editor
+                  "editableInput"
+                  (fn [event editable]
+                    (dis/dispatch! [:foce-input {:snippet (.-innerHTML snippet-el)}])
+                    (let [v (.-innerText snippet-el)
+                          remaining-chars (- snippet-max-length (count v))]
+                      (om/set-state! owner :char-count remaining-chars)
+                      (om/set-state! owner :char-count-alert (< remaining-chars snippet-alert-limit))
+                      (om/set-state! owner :negative-snippet-char-count (neg? remaining-chars))))))
+    (js/emojiAutocomplete)))
 
 (defn headline-on-change [owner]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
@@ -132,6 +129,7 @@
   (init-state [_]
     (let [topic-data (dis/foce-section-data)]
       {:initial-headline (:headline topic-data)
+       :snippet-placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
        :initial-snippet  (if (:placeholder topic-data) "" (:snippet topic-data))
        :char-count nil
        :char-count-alert false
@@ -144,7 +142,7 @@
     (setup-edit owner)
     (utils/after 100 #(focus-headline)))
 
-  (render-state [_ {:keys [initial-headline initial-snippet char-count char-count-alert file-upload-state file-upload-progress upload-remote-url negative-snippet-char-count negative-headline-char-count]}]
+  (render-state [_ {:keys [initial-headline initial-snippet snippet-placeholder char-count char-count-alert file-upload-state file-upload-progress upload-remote-url negative-snippet-char-count negative-headline-char-count]}]
     (let [section             (dis/foce-section-key)
           topic-data          (dis/foce-section-data)
           section-kw          (keyword section)
@@ -209,6 +207,8 @@
                         :id (str "foce-snippet-" (name section))
                         :key "foce-snippet"
                         :ref "topic-snippet"
+                        :data-placeholder snippet-placeholder
+                        :placeholder snippet-placeholder
                         :contentEditable true
                         :style #js {:minHeight (if (:placeholder topic-data) "100px" "0px")}
                         :onKeyUp   #(check-snippet-count owner %)
