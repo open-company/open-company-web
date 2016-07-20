@@ -9,14 +9,13 @@
     ;; Skip ClojureScript 1.9.93 as it breaks source maps
     [org.clojure/clojurescript "1.9.89"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
 
-    ;; --- DO NOT UPDATE OM, the 1.x.x code requires changes on our part
-    [org.omcljs/om "0.9.0" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
-    [rum "0.9.1" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
+    [org.omcljs/om "1.0.0-alpha37" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
+    [rum "0.10.4" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
 
     [cljs-http "0.1.41"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/schema "1.1.2"] ; Dependency of om-tools https://github.com/Prismatic/schema
     [prismatic/plumbing "0.5.3"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
-    [prismatic/om-tools "0.4.0"] ; Tools for Om https://github.com/Prismatic/om-tools
+    [org.clojars.martinklepsch/om-tools "0.4.0-w-select"] ; Tools for Om https://github.com/plumatic/om-tools/pull/91
     [secretary "2.0.0.1-41b949"] ; Client-side router https://github.com/gf3/secretary
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
@@ -30,7 +29,7 @@
     ;; --- DO NOT UPDATE REACT, the 15.x.x code requires changes on our part
     [cljsjs/react "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/react-dom "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
-    
+
     [cljsjs/raven "2.1.0-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "3.5.16-0"] ; d3 externs https://clojars.org/cljsjs/d3
     [cljsjs/medium-editor "5.15.0-1"] ; Medium editor https://clojars.org/cljsjs/medium-editor
@@ -81,7 +80,8 @@
 
 (deftask test! []
   (set-env! :source-paths #(conj % "test")
-            :dependencies #(conj % '[cljs-react-test "0.1.3-SNAPSHOT" :scope "test"]))
+            :dependencies #(into % '[[cljs-react-test "0.1.4-SNAPSHOT" :scope "test" :exclusions [cljsjs/react-with-addons]]
+                                     [cljsjs/react-with-addons "0.14.7-0"]]))
   (test-cljs :js-env :phantom
              :exit? true
              :update-fs? true

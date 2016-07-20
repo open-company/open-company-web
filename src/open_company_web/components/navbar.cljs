@@ -35,5 +35,5 @@
                   (dom/div {:on-click (partial menu-click owner)}
                     (icon "menu-34"))
                   (if (jwt/jwt)
-                    (om/build user-avatar {:menu-click (partial menu-click owner)})
-                    (om/build login-button (assoc data :menu-click (partial menu-click owner)))))))))))))
+                    (user-avatar (partial menu-click owner))
+                    (login-button (:auth-settings data))))))))))))
