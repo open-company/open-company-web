@@ -62,9 +62,8 @@
 
 (defcomponent currency-option [data owner]
   (render [_]
-    (dom/option {
-      :value (or (:value data) (:text data))
-      :disabled (and (contains? :value data) (= (count (:value data)) 0))}
+    (dom/option {:value (or (:value data) (:text data))
+                 :disabled (and (contains? :value data) (= (count (:value data)) 0))}
       (:text data))))
 
 (defn get-state [data current-state]
@@ -115,7 +114,9 @@
               (let [symbol (:symbol currency)
                     display-symbol (or symbol (:code currency))
                     label (str (:text currency) " " display-symbol)]
-                (om/build currency-option {:value (:code currency) :text label}))))
+                (om/build currency-option
+                          {:value (:code currency) :text label}
+                          {:react-key (:code currency)}))))
 
           ;; Company logo
           (dom/div {:class "company-logo-title settings-title"} "SQUARE COMPANY LOGO URL (approx. 180x180px)")
@@ -143,7 +144,7 @@
 
       (dom/div {:class "main-company-settings fullscreen-page"}
 
-        (om/build back-to-dashboard-btn {})
+        (back-to-dashboard-btn {})
 
         (if (:loading data)
               

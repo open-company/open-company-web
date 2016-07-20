@@ -77,7 +77,7 @@
         (om/build menu data)
         (if (get-in data [(keyword (router/current-company-slug)) :error])
           (dom/div {:class (str "fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
-            (om/build login-required data))
+            (login-required data))
           (dom/div {:class "page"}
             ;; Navbar
             (when company-data

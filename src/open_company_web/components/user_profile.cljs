@@ -10,7 +10,7 @@
 (defcomponent user-profile [data owner]
   (render [_]
     (dom/div {:class "user-profile fullscreen-page"}
-      (om/build back-to-dashboard-btn {})
+      (back-to-dashboard-btn {})
       (dom/div {:class "user-profile-internal"}
         (dom/div {:class "user-profile-title"} "User Info")
         (dom/div {:class "user-profile-content group"}
