@@ -605,15 +605,15 @@
         (dom/div {:style {:opacity "1"
                           :margin "27px 0px"}
                   :class "group"}
-          (dom/button {:class "btn-reset btn-solid right ml1 save-button"
+          (dom/button {:class "btn-reset btn-outline left mr1 cancel-button"
+                       :onClick #(do
+                                  (reset-and-dismiss owner options)
+                                  (utils/event-stop %))} "CANCEL")
+          (dom/button {:class "btn-reset btn-solid left mr1 save-button"
                        :disabled (or (not has-changes) negative-headline-char-count negative-snippet-char-count)
                        :onClick #(do
                                   (save-data owner options)
-                                  (utils/event-stop %))} "SAVE")
-          (dom/button {:class "btn-reset btn-outline right ml1 cancel-button"
-                       :onClick #(do
-                                  (reset-and-dismiss owner options)
-                                  (utils/event-stop %))} "CANCEL"))
+                                  (utils/event-stop %))} "SAVE"))
         (dom/div {:class "fullscreen-topic-internal group"
                   :on-click #(.stopPropagation %)}
           (dom/div {:class "fullscreen-topic-edit-top-box"}
@@ -720,6 +720,14 @@
                            :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
                            :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
                 (dom/i {:class "fa fa-code"}))
+              (dom/button #js {:className "btn-reset archive-button right"
+                               :title "Archive this topic"
+                               :type "button"
+                               :data-toggle "tooltip"
+                               :data-placement "top"
+                               :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
+                               :onClick #(remove-topic-click owner options %)}
+                (dom/i {:class "fa fa-archive"}))
               (dom/div {:class (str "char-count" (when char-count-alert " red"))} char-count)
               (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
                 (dom/input {:type "text"
@@ -747,12 +755,6 @@
                       :id (str "topic-edit-body-" (name topic))
                       :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
             (om/build filestack-uploader (om/get-state owner :medium-editor))))
-        (when-not (:placeholder topic-data)
-          (dom/button #js {:className "relative archive-button btn-reset btn-outline"
-                           :ref "archive-button"
-                           :onClick #(remove-topic-click owner options %)}
-            (dom/i {:class "fa fa-archive"})
-            "Archive this topic"))
       (when (and show-first-edit-tooltip
                  (not tooltip-dismissed))
         (om/build tooltip

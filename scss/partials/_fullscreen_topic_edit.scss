@@ -60,6 +60,10 @@ div.fullscreen-topic-edit {
           color: rgba(78, 90, 107, 0.5); 
         }
 
+        button.archive-button {
+          color: rgba(78, 90, 107, 0.5);
+        }
+
         span.file-upload-progress {
           margin-top: 7px;
           padding-bottom: 0px;
@@ -76,6 +80,7 @@ div.fullscreen-topic-edit {
       div.topic-header-image{
         text-align: center;
         position: relative;
+        margin-bottom: 15px;
 
         img {
           max-width: 490px;
@@ -355,26 +360,6 @@ div.fullscreen-topic-edit {
           margin-top: 0px;
         }
       }
-    }
-  }
-
-  button.archive-button {
-    float: left;
-    margin-bottom: 20px;
-    background-color: white;
-    opacity: 1;
-    color: rgba(78,90,107,0.8);
-    border: 1px solid rgba(78,90,107,0.8);
-    width: 240px;
-    height: 30px;
-    transition: none;
-
-    &:hover {
-      color: rgba(78,90,107,1);
-      border: 1px solid rgba(78,90,107,1);
-    }
-    i.fa-archive {
-      margin-right: 5px;
     }
   }
 
