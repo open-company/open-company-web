@@ -286,7 +286,6 @@
                                             :animate (not transitioning)
                                             :show-first-edit-tooltip (should-show-first-edit-tooltip company-data category-topics)}
                                            {:opts {:close-overlay-cb #(close-overlay-cb owner)
-                                                   :topic-edit-cb (:topic-edit-cb options)
                                                    :topic-navigation #(om/set-state! owner :topic-navigation %)}}))
             ;; Fullscreen topic for transition
             (when tr-selected-topic
@@ -302,7 +301,6 @@
                                           :currency (:currency company-data)
                                           :animate false}
                                          {:opts {:close-overlay-cb #(close-overlay-cb owner)
-                                                 :topic-edit-cb (:topic-edit-cb options)
                                                  :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
         ;; Topics list columns
         (om/build topics-columns {:columns-num columns-num
