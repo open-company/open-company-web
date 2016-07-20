@@ -422,7 +422,7 @@
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
   (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
         med-ed (new js/MediumEditor body-el (clj->js
-                                             (->  (utils/medium-editor-options "Anything else you’d like to add...")
+                                             (->  (utils/medium-editor-options "Want to add more? Add it here...")
                                                   (editor/inject-extension editor/file-upload))))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
@@ -709,7 +709,7 @@
                            :type "button"
                            :data-toggle "tooltip"
                            :data-placement "top"
-                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
                            :on-click #(.click (sel1 [:input#topic-edit-upload-ui--select-trigger]))}
                 (dom/i {:class "fa fa-camera"}))
               (dom/button {:class "btn-reset image-url"
@@ -717,7 +717,7 @@
                            :type "button"
                            :data-toggle "tooltip"
                            :data-placement "top"
-                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
                            :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
                 (dom/i {:class "fa fa-code"}))
               (dom/div {:class (str "char-count" (when char-count-alert " red"))} char-count)

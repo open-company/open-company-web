@@ -72,7 +72,7 @@
           (dom/div {:style #js {:margin "1px 0 0 22px"
                                 :display (if (= state :show-options) "block" "none")}}
             (dom/button {:class "btn-reset oc-gray-5"
-                         :style {:font-size "14px" :opacity "0.5"}
+                         :style {:font-size "15px" :opacity "0.5"}
                          :title "Add an image"
                          :type "button"
                          :data-toggle "tooltip"
@@ -80,9 +80,8 @@
                          :on-click (fn [_]
                                      (insert-marker!)
                                      (.click (gdom/getElement "file-upload-ui--select-trigger")))}
-              (dom/i {:class "fa fa-camera"}))
-            (dom/span {:style {:font-size "14px"}} " or ")
-            (dom/button {:style {:font-size "14px" :opacity "0.5"}
+            (dom/i {:class "fa fa-camera"}))
+            (dom/button {:style {:font-size "15px" :opacity "0.5"}
                          :class "btn-reset oc-gray-5"
                          :title "Provide an image link"
                          :type "button"
