@@ -59,23 +59,23 @@
                if this item is valid or not
   :on-change is called with the list of items whenever it updates this may include
              invalid items which are currently being typed out
-  :submitted (optional) can be used to extract a 'submitted' value from the input
-             by default a value is submitted if it ends with one or more whitespace
-             characters, the return value should be sanitized (e.g. trimmed)
+  :match-ptn regex-pattern will be used to extract a 'submitted' value from the input
+  :split-ptn regex-pattern will be used to split a string which might contain multiple values
+             used to match items in pasted strings
   :valid-item? (optional) Takes a value returned by `submitted` and returns true
-              if it is valid otherwise false
+               if it is valid otherwise false
   :container-node (default :div) Provide a different node for the container
   :input-node (default :input) Provide a different node for the input field"
   < (rum/local true ::show-input?) (rum/local [] ::items) (rum/local "" ::input)
-  [s {:keys [item-render on-change submitted
+  [s {:keys [item-render on-change match-ptn split-ptn
              valid-item? container-node input-node]
       :or {valid-item? identity
-           submitted (fn [v] (second (first (re-seq #"(\S+)\s+" v))))
            container-node :div
            input-node :input}}]
-  (let [*items       (::items s)
-        *input       (::input s)
+  (let [*items       (::items s) ; tracking items already entered
+        *input       (::input s) ; tracking value of input field
         *show-input? (::show-input? s)
+        submitted    (fn [v] (second (first (re-seq match-ptn v))))
         remove-item! (fn [v]
                        (on-change (swap! *items #(filterv (comp not #{v}) %))))
         clear-input! (fn [] (reset! *input "") (on-change @*items))
@@ -91,7 +91,7 @@
     [container-node
      {:on-click #(reset! *show-input? true)}
      (for [e @*items]
-       (rum/with-key (item-render e #(remove-item! e) true) e))
+       (rum/with-key (item-render e #(remove-item! e) (valid-item? e)) e))
      (cond
        ;; Render the current input as invalid item
        (and (not @*show-input?) (not (string/blank? @*input)))
@@ -109,9 +109,11 @@
          :placeholder (when-not (seq @*items) "investor@vc.com advisor@smart.com")
          :auto-focus true
          :value      @*input
-         :on-key-down #(do
-                         (when (and (= 8 (.-keyCode %)) (empty? @*input))
-                           (on-change (swap! *items (comp vec drop-last)))))
+         :on-paste   #(let [pasted (string/split (.getData (.-clipboardData %) "Text") split-ptn)]
+                        (.stopPropagation %)
+                        (on-change (swap! *items into pasted)))
+         :on-key-down #(when (and (= 8 (.-keyCode %)) (empty? @*input))
+                         (on-change (swap! *items (comp vec drop-last))))
          :on-blur   #(do (submit! (.. % -target -value))
                          (reset! *show-input? false)
                          nil)
@@ -141,6 +143,8 @@
           (not (every? valid-email? to-field))
           [:span.red.py1 " — Not a valid email address"]))]
      (item-input {:item-render email-item
+                  :match-ptn #"(\S+)[,|\s]+"
+                  :split-ptn #"[,|\s]+"
                   :container-node :div.npt.pt1.pr1.pl1.mb3.mh4.overflow-scroll
                   :input-node :input.border-none.outline-none.mr.mb1
                   :valid-item? valid-email?
