@@ -12,16 +12,16 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.small-loading :as loading]
+            [org.martinklepsch.derivatives :as drv]
             [cljsjs.react.dom]
             [cljsjs.clipboard]))
 
 (defn valid-email? [addr] (email/isValidAddress addr))
 
 (defn send-clicked [type]
-  (let [post-data (get-in @dis/app-state [:stakeholder-update/share type])
+  (let [post-data (get-in @dis/app-state [:su-share type])
         emojied   (update post-data :note (fnil utils/unicode-emojis ""))]
-    (dis/dispatch! [:stakeholder-update/reset-share])
-    (dis/dispatch! [:stakeholder-update/validate-share type])
+    (dis/dispatch! [:su-share/reset])
     (api/share-stakeholder-update {type emojied})))
 
 (defn select-share-link [event]
@@ -51,45 +51,123 @@
                         :accent-color :oc-gray-3})))
    title])
 
-(rum/defcs multi-email-input < (rum/local nil ::invalid)
-                               (rum/local nil ::input)
-  [{:keys [::invalid ::input]} on-change]
-  (let [invalid?     (fn [emails] (seq (remove valid-email? (string/split emails #"[,;\s]+"))))
-        update!      (fn [emails]
-                       (reset! input emails)
-                       (let [inv (invalid? emails)]
-                         (reset! invalid (and @invalid inv))
-                         (on-change emails)))]
-    [:div.mb3
-     [:label.block.small-caps.bold.mb2
-      "To"
-      (cond
-        (= [""] @invalid) [:span.red.py1 " — Required"]
-        (seq @invalid)    [:span.red.py1 " — Not a valid email address"]) ]
-     [:input.domine.npt.p1.col-12
-      {:type      "text"
-       :class     (when @invalid "b--red")
-       :value     @input
-       :on-blur   #(do (reset! invalid (invalid? @input)) true)
-       :on-change #(update! (.. % -target -value))
-       :placeholder "investor@vc.com, advisor@smart.com"}]]))
+;; TODO (mk) Revert the following commit to restore on-change behavior as described by docstring
+;; https://github.com/open-company/open-company-web/pull/161/commits/eb4b29ead8e45388c8edb48d74801b2ba16c1765
+(rum/defcs item-input
+  "An input that accepts multiple items of things
 
-(rum/defc email-dialog < rum/static emoji-autocomplete
-  [{:keys [share-link initial-subject]}]
-  (dis/dispatch! [:input [:stakeholder-update/share :email :subject] initial-subject])
+  Options
+  :item-render Should be a function receiving three arguments: the item,
+               a function to delete the item and a boolean field to indicate
+               if this item is valid or not
+  :on-change is called with the list of items whenever it updates this may include
+             invalid items which are currently being typed out
+  :match-ptn regex-pattern will be used to extract a 'submitted' value from the input
+  :split-ptn regex-pattern will be used to split a string which might contain multiple values
+             used to match items in pasted strings
+  :tab-index (default 0) sets tab-index on container node
+  :valid-item? (optional) Takes a value returned by `submitted` and returns true
+               if it is valid otherwise false
+  :container-node (default :div) Provide a different node for the container
+  :input-node (default :input) Provide a different node for the input field"
+  < (rum/local true ::show-input?) (rum/local [] ::items) (rum/local "" ::input)
+  [s {:keys [item-render on-change match-ptn split-ptn tab-index
+             valid-item? container-node input-node]
+      :or {valid-item? identity
+           tab-index 0
+           container-node :div
+           input-node :input}}]
+  (let [*items       (::items s) ; tracking items already entered
+        *input       (::input s) ; tracking value of input field
+        *show-input? (::show-input? s)
+        submitted    (fn [v] (second (first (re-seq match-ptn v))))
+        remove-item! (fn [v]
+                       (on-change (swap! *items #(filterv (comp not #{v}) %))))
+        clear-input! (fn [] (reset! *input "") (on-change @*items))
+        submit!      (fn [v]
+                       (when (valid-item? v)
+                         (clear-input!)
+                         (on-change (swap! *items #(vec (distinct (conj % v)))))))
+        maybe-submit (fn [v]
+                       (if-let [s' (submitted v)]
+                         (submit! s')
+                         (reset! *input v)))]
+    [container-node
+     {:on-click #(reset! *show-input? true)
+      :on-focus #(reset! *show-input? true)
+      :tab-index tab-index}
+     (for [e @*items]
+       (rum/with-key (item-render e #(remove-item! e) (valid-item? e)) e))
+     (cond
+       ;; Render the current input as invalid item
+       (and (not @*show-input?) (not (string/blank? @*input)))
+       (item-render @*input clear-input! false)
+
+       ;; Render an input to maintain same spacing
+       (and (not @*show-input?) (not (seq @*items)))
+       [:div {:style {:visibility "hidden" :pointer-events "none"}} [input-node {:class "col-12"}]]
+
+       ;; Render actual input to add new items
+       @*show-input?
+       [input-node
+        {:type      "text"
+         :class     (when-not (seq @*items) "col-12")
+         :placeholder (when-not (seq @*items) "investor@vc.com advisor@smart.com")
+         :auto-focus true
+         :value      @*input
+         :on-paste   #(let [pasted (string/split (.getData (.-clipboardData %) "Text") split-ptn)]
+                        (.stopPropagation %)
+                        (on-change (swap! *items into pasted)))
+         :on-key-down #(when (and (= 8 (.-keyCode %)) (empty? @*input))
+                         (on-change (swap! *items (comp vec drop-last))))
+         :on-blur   (fn [e]
+                      (when-not (string/blank? (.. e -target -value))
+                        (clear-input!)
+                        (on-change (swap! *items #(vec (distinct (conj % (.. e -target -value)))))))
+                      (when (seq @*items) (reset! *show-input? false))
+                      nil)
+         :on-change #(maybe-submit (.. % -target -value))}])]))
+
+(rum/defc email-item [v delete! submitted?]
+  [:div.inline-block.mr1.mb1.rounded
+   {:class (when-not submitted? "border b--red")
+    :style (when submitted? {:backgroundColor "rgba(78, 90, 107, 0.1)"})}
+   [:span.inline-block.p1 v
+    [:button.btn-reset.p0.ml1
+     {:on-click #(delete!)}
+     "x"]]])
+
+(rum/defcs email-dialog < rum/static rum/reactive (dis/drv :su-share) emoji-autocomplete
+  [s {:keys [share-link]}]
   [:div
    (modal-title "Share by Email" :email-84)
    [:div.p3
-    (multi-email-input (fn [val] (dis/dispatch! [:input [:stakeholder-update/share :email :to] val])))
+    [:div
+     [:label.block.small-caps.bold.mb2
+      "To"
+      (when-let [to-field (->> (drv/react s :su-share) :email :to)]
+        (cond
+          (not (seq to-field))
+          [:span.red.py1 " — Required"]
+          (not (every? valid-email? to-field))
+          [:span.red.py1 " — Not a valid email address"]))]
+     (item-input {:item-render email-item
+                  :match-ptn #"(\S+)[,|\s]+"
+                  :split-ptn #"[,|\s]+"
+                  :container-node :div.npt.pt1.pr1.pl1.mb3.mh4.overflow-auto
+                  :input-node :input.border-none.outline-none.mr.mb1
+                  :valid-item? valid-email?
+                  :on-change (fn [val] (dis/dispatch! [:input [:su-share :email :to] val]))})]
     [:label.block.small-caps.bold.mb2 "Subject"]
     [:input.domine.npt.p1.col-12.mb3
      {:type "text"
-      :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :subject] (.. % -target -value)])
-      :default-value initial-subject}]
+      :on-change #(dis/dispatch! [:input [:su-share :email :subject] (.. % -target -value)])
+      :value (-> (drv/react s :su-share) :email :subject)}]
     [:label.block.small-caps.bold.mb2 "Your Note"]
     [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh
      {:type "text"
-      :on-change #(dis/dispatch! [:input [:stakeholder-update/share :email :note] (.. % -target -value)])
+      :on-change #(dis/dispatch! [:input [:su-share :email :note] (.. % -target -value)])
+      :value (-> (drv/react s :su-share) :email :note)
       :placeholder "Optional note to go with this update."}]]])
 
 (rum/defc slack-dialog < rum/static emoji-autocomplete
@@ -100,7 +178,7 @@
     [:label.block.small-caps.bold.mb2 "Your Note"]
     [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh
      {:type "text"
-      :on-change #(dis/dispatch! [:input [:stakeholder-update/share :slack :note] (.. % -target -value)])
+      :on-change #(dis/dispatch! [:input [:su-share :slack :note] (.. % -target -value)])
       :placeholder "Optional note to go with this update."}]]])
 
 (rum/defcs link-dialog < (rum/local false ::copied)
@@ -152,10 +230,10 @@
    [dis/app-state]
    ::email-field
    (fn [app-state]
-     (get-in app-state [:stakeholder-update/share :email :to]))))
+     (get-in app-state [:su-share :email :to]))))
 
-(rum/defc modal-actions < rum/reactive
-  [send-fn cancel-fn type]
+(rum/defcs modal-actions < rum/reactive (dis/drv :su-share)
+  [s send-fn cancel-fn type]
   [:div.px3.pb3.right-align
    [:button.btn-reset.btn-outline
     {:class (when-not (or (= :link type) (= :prompt type)) "mr1")
@@ -164,9 +242,9 @@
    (when-not (or (= :link type) (= :prompt type))
      [:button.btn-reset.btn-solid
       {:on-click send-fn
-       :disabled (if (= :email type)
-                   (->> (string/split (rum/react email-field) #"[,;\s]+")
-                        (every? valid-email?) not))}
+       :disabled (when (= :email type)
+                   (let [to (->> (drv/react s :su-share) :email :to)]
+                     (not (and (seq to) (every? valid-email? to)))))}
       (case type
         :sent "SENT ✓"
         :sending (loading/small-loading {})
@@ -201,9 +279,12 @@
      :sent false})
 
   (did-mount [_]
+    (dis/dispatch! [:input [:su-share :email :subject]
+                    (str "[" (:name (:company-data data)) "] " (:su-title data))])
     (utils/disable-scroll))
 
   (will-unmount [_]
+    (dis/dispatch! [:su-share/reset])
     (utils/enable-scroll))
 
   (will-receive-props [_ next-props]
@@ -233,10 +314,9 @@
                                           (when (= % :link)
                                             (api/share-stakeholder-update {}))
                                           (om/set-state! owner :share-via %)))
-                :link   (link-dialog share-link)
-                :email  (email-dialog {:initial-subject (str (:name company-data) " "  (:su-title data))
-                                       :share-link      share-link})
-                :slack  (slack-dialog))
+                :link  (link-dialog share-link)
+                :email (email-dialog {:share-link share-link})
+                :slack (slack-dialog))
               (modal-actions
                 (if sent
                   cancel-fn
