@@ -1,24 +1,10 @@
-.animating div.su-sp-content{
-  margin-top: 0px;
-  padding-top: #{$navbar_height}px;
-}
-
-body.small-footer {
-  div.su-snapshot {
-    div.su-sp-content {
-      min-height: calc(100vh - #{$footer_small_height}px - #{$top_border_height}px);
-    }
-  }
-}
-
 div.su-snapshot {
   border-top: 4px solid $oc_yellow;
 
   div.su-sp-content {
     position: relative;
     content: "";
-    padding-bottom: 20px;
-    min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
+    min-height: calc(100vh - #{$navbar_height}px);
     background-color: $oc_gray_6;
     padding-top: 60px;
 
@@ -64,6 +50,24 @@ div.su-snapshot {
       color: $oc_gray_5;
       margin-top: 0px;
       padding-bottom: 30px;
+    }
+  }
+
+  div.su-sp-footer {
+    text-align: center;
+    padding-top: 26px;
+    padding-bottom: 38px;
+    font-size: 18px;
+    color: $oc_gray_5;
+    font-weight: 400;
+    font-family: $oc_main_font;
+    background-color: $oc_gray_6;
+
+    a {
+      font-family: $oc_main_font;
+      font-weight: 700;
+      text-decoration: underline;
+      color: $oc_gray_5;
     }
   }
 }

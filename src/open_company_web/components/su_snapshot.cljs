@@ -168,8 +168,5 @@
                                         :company-data company-data
                                         :hide-add-topic true}
                                        {:opts {:topic-click (partial topic-click owner)}})))
-          ;;Footer
-          (when company-data
-            (om/build footer {:su-preview true
-                              :card-width card-width
-                              :columns-num 1})))))))
+          (dom/div {:class "su-sp-footer"} "Powered by "
+            (dom/a {:href "https://opencompany.com"} "OpenCompany")))))))
