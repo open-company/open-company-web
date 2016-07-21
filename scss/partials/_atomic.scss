@@ -111,6 +111,9 @@
 }
 
 // colors
+// .{color} - color: {color}
+// .bg-{color} - background-color: {color}
+// .b--{color} - border-color: {color}
 
 .gray5 {color: $oc_gray_5}
 
@@ -147,3 +150,10 @@
 .mh2 {max-height: 3rem}
 .mh3 {max-height: 6rem}
 .mh4 {max-height: 12rem}
+
+// UI atoms
+
+.success {
+  border-color: $oc_green_light;
+  background-color: transparentize($oc_green_light, 0.85)
+}
