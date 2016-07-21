@@ -62,14 +62,16 @@
   :match-ptn regex-pattern will be used to extract a 'submitted' value from the input
   :split-ptn regex-pattern will be used to split a string which might contain multiple values
              used to match items in pasted strings
+  :tab-index (default 0) sets tab-index on container node
   :valid-item? (optional) Takes a value returned by `submitted` and returns true
                if it is valid otherwise false
   :container-node (default :div) Provide a different node for the container
   :input-node (default :input) Provide a different node for the input field"
   < (rum/local true ::show-input?) (rum/local [] ::items) (rum/local "" ::input)
-  [s {:keys [item-render on-change match-ptn split-ptn
+  [s {:keys [item-render on-change match-ptn split-ptn tab-index
              valid-item? container-node input-node]
       :or {valid-item? identity
+           tab-index 0
            container-node :div
            input-node :input}}]
   (let [*items       (::items s) ; tracking items already entered
@@ -88,7 +90,9 @@
                          (submit! s')
                          (reset! *input v)))]
     [container-node
-     {:on-click #(reset! *show-input? true)}
+     {:on-click #(reset! *show-input? true)
+      :on-focus #(reset! *show-input? true)
+      :tab-index tab-index}
      (for [e @*items]
        (rum/with-key (item-render e #(remove-item! e) (valid-item? e)) e))
      (cond
