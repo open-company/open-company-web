@@ -26,6 +26,8 @@
 
 (def oc-github "https://github.com/open-company")
 
+(def subscription-callback "/subscription-completed")
+
 ;; User
 
 (def user-profile "/profile")
