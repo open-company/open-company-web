@@ -15,12 +15,13 @@ div.fullscreen-topic-edit {
       border-radius: 4px;
       background-color: #ffffff;
       border: solid 2px rgba(78, 90, 107, 0.2);
-      padding: 26px 30px;
+      padding: 0px  0px 30px 0px;
 
       div.topc-edit-top-box-footer {
         width: 100%;
         margin-top: 25px;
         height: 20px;
+        padding: 0px 26px;
 
         div.char-count {
           width: 50px;
@@ -80,10 +81,11 @@ div.fullscreen-topic-edit {
       div.topic-header-image{
         text-align: center;
         position: relative;
-        margin-bottom: 15px;
 
         img {
-          max-width: 490px;
+          max-width: 100%;
+          border-top-left-radius: 2px;
+          border-top-right-radius: 2px;
         }
 
         button.remove-header{
@@ -120,7 +122,8 @@ div.fullscreen-topic-edit {
         text-transform: uppercase;
         border: 0px;
         width: 100%;
-        padding: 0px;
+        margin-top: 17px;
+        padding: 0px 26px;
 
         &:active, &:focus{
           border: 0px;
@@ -145,9 +148,9 @@ div.fullscreen-topic-edit {
         color: $oc_gray_5;
         border: 0px;
         width: 100%;
-        padding: 0px;
+        padding: 0px 26px;
         margin: 0px;
-        margin-top: 18px;
+        margin-top: 21px;
         height: auto;
 
         &:after{
@@ -297,6 +300,8 @@ div.fullscreen-topic-edit {
         line-height: 1.8;
         font-size: 18px;
         min-height: 100px;
+        margin-top: 12px !important;
+        padding: 0px 26px !important;
 
         &:after {
           font-family: $oc_main_font;

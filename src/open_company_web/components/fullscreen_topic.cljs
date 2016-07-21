@@ -50,7 +50,7 @@
           (when (:image-url topic-data)
             (dom/div {:class "topic-header-image"}
               (dom/img {:src (:image-url topic-data)})))
-          (dom/div {:class "group"}
+          (dom/div {:class "topic-title-container group"}
             (dom/div {:class "topic-title left"} (:title topic-data))
             (when (and can-edit
                        is-actual)
