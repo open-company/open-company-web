@@ -135,15 +135,15 @@
     [:div.group
       [:button.btn-reset {:on-click #(prompt-cb :slack)}
         [:div.circle50.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
-        [:span.left.ml1.gray5.h6 {:style {:opacity "0.5"}} "SHARE TO SLACK"]]]
+        [:span.left.ml1.gray5.h6 {} "SHARE TO SLACK"]]]
     [:div.group
       [:button.btn-reset {:on-click #(prompt-cb :email)}
         [:div.circle50.left (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
-        [:span.left.ml1.gray5.h6 {:style {:opacity "0.5"}} "SHARE BY EMAIL"]]]
+        [:span.left.ml1.gray5.h6 {} "SHARE BY EMAIL"]]]
     [:div.group
       [:button.btn-reset {:on-click #(prompt-cb :link)}
         [:div.circle50.left (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
-        [:span.left.ml1.gray5.h6 {:style {:opacity "0.5"}} "SHARE A LINK"]]]]])
+        [:span.left.ml1.gray5.h6 {} "SHARE A LINK"]]]]])
 
 ;; This is very hacky and should by replaced by a more
 ;; versatile/generic form validation system
