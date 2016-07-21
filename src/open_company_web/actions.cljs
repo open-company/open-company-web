@@ -154,9 +154,6 @@
 (defmethod dispatcher/action :input [db [_ path value]]
   (assoc-in db path value))
 
-(defmethod dispatcher/action :stakeholder-update/reset-share [db _]
-  (dissoc db :stakeholder-update/share))
-
 (defmethod dispatcher/action :topic-archive [db [_ topic]]
   (let [company-data (dispatcher/company-data)
         old-categories (:sections company-data)
@@ -189,3 +186,6 @@
         new-data (dissoc (merge old-section-data topic-data) :placeholder)]
     (api/partial-update-section topic new-data)
     (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic)) (merge old-section-data topic-data))))
+
+(defmethod dispatcher/action :su-share/reset [db _]
+  (dissoc db :su-share))
