@@ -5,12 +5,14 @@
     [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
     [tolitius/boot-check "0.1.2" :scope "test"]
 
-    [org.clojure/clojure "1.9.0-alpha9"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
+    [org.clojure/clojure "1.9.0-alpha10"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
     ;; Skip ClojureScript 1.9.93 as it breaks source maps
     [org.clojure/clojurescript "1.9.89"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
 
-    [org.omcljs/om "1.0.0-alpha37" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
+    [org.omcljs/om "1.0.0-alpha40" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
+
     [rum "0.10.4" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
+    [org.martinklepsch/derivatives "0.1.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
 
     [cljs-http "0.1.41"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/schema "1.1.2"] ; Dependency of om-tools https://github.com/Prismatic/schema
