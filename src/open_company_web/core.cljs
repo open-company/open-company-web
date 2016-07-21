@@ -152,6 +152,10 @@
     (defroute login-route urls/login {:as params}
       (login-handler target params))
 
+    (defroute subscription-callback-route urls/subscription-callback {}
+      (when-let [s (cook/get-cookie :subscription-callback-slug)]
+        (router/redirect! (urls/company-settings s))))
+
     (defroute home-page-route urls/home {:as params}
       (home-handler target params))
 
@@ -211,6 +215,7 @@
 
     (def route-dispatch!
       (secretary/uri-dispatcher [login-route
+                                 subscription-callback-route
                                  home-page-route
                                  list-page-route-slash
                                  list-page-route
