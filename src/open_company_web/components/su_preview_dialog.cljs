@@ -50,6 +50,8 @@
                       :accent-color :oc-gray-3}))
    title])
 
+;; TODO (mk) Revert the following commit to restore on-change behavior as described by docstring
+;; https://github.com/open-company/open-company-web/pull/161/commits/eb4b29ead8e45388c8edb48d74801b2ba16c1765
 (rum/defcs item-input
   "An input that accepts multiple items of things
 
