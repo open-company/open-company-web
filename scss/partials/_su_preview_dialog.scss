@@ -21,11 +21,11 @@ div.su-preview-dialog {
     button {
 
       .circle50 {
-        border: 1px solid rgba(78, 90, 107, 0.5);
         width: 50px;
         height: 50px;
         border-radius: 25px;
         background-color: white;
+        opacity: 0.8;
 
         & > img {
           margin-top: 14px;
@@ -39,7 +39,7 @@ div.su-preview-dialog {
       }
 
       span {
-        margin-top: 18px;
+        margin-top: 15px;
         opacity: 0.5;
         font-family: $oc_headers_font;
         font-weight: 700;
@@ -47,6 +47,15 @@ div.su-preview-dialog {
         line-height: 1.5;
         letter-spacing: 1px;
         color: $oc_gray_5;
+      }
+
+      &:hover {
+        .circle50{
+          opacity: 0.9;
+        }
+        span {
+          opacity: 0.8; 
+        }
       }
     }
   }
