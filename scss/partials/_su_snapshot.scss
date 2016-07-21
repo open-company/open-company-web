@@ -26,6 +26,10 @@ div.su-snapshot {
       height: 50px;
       text-align: center;
 
+      div {
+        margin-top: 10px;
+      }
+
       img.company-logo {
         max-height: 50px;
         max-width: 150px;
@@ -34,7 +38,6 @@ div.su-snapshot {
 
       span.company-name {
         margin-top: 0px;
-        margin-left: 16px;
         font-weight: 700;
         font-size: 24px;
         line-height: 1.2;
@@ -49,7 +52,7 @@ div.su-snapshot {
       line-height: 1.2;
       text-align: center;
       color: $oc_gray_5;
-      padding-top: 50px;
+      margin-top: 50px;
       text-align: center;
     }
 

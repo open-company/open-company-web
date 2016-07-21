@@ -152,8 +152,10 @@
                                                {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                        :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
               (dom/div {:class "su-sp-company-header"}
-                (dom/img {:class "company-logo" :src (:logo company-data)})
-                (dom/span {:class "company-name"} (:name company-data)))
+                (dom/div {}
+                  (dom/img {:class "company-logo" :src (:logo company-data)}))
+                (dom/div {}
+                  (dom/span {:class "company-name"} (:name company-data))))
               (when (:title su-data)
                 (dom/div {:class "su-snapshot-title"} (:title su-data)))
               (dom/div {:class "su-snapshot-subtitle"} su-subtitle)
