@@ -8,7 +8,9 @@
 (defonce drv
   ;; A variant of `org.martinklepsch.derivatives/drv` that works by
   ;; encapsulating global state instead of passing it down the component
-  ;; tree using React's childContext
+  ;; tree using React's childContext. We're using this instad of the
+  ;; bundled `drv` because our Root components are Om and setting
+  ;; childContext on them is something I didn't want to bother with
   (let [spec {:base     [[] app-state]
               :su-share [[:base] (fn [base] (:su-share base))]}
         {:keys [get! release!]} (drv/derivatives-manager spec)]
