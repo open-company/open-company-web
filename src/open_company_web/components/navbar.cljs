@@ -7,7 +7,7 @@
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
-            [open-company-web.components.ui.icon :refer (icon)]
+            [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.user-avatar :refer (user-avatar)]
             [open-company-web.components.ui.login-button :refer (login-button)]
             [open-company-web.components.ui.small-loading :as loading]
@@ -33,7 +33,7 @@
               (dom/li {}
                 (if (responsive/is-mobile)
                   (dom/div {:on-click (partial menu-click owner)}
-                    (icon "menu-34"))
+                    (i/icon :menu-34 {}))
                   (if (jwt/jwt)
                     (user-avatar (partial menu-click owner))
                     (login-button (:auth-settings data))))))))))))
