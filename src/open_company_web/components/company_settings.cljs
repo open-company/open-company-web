@@ -3,18 +3,51 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [rum.core :as rum]
             [open-company-web.components.ui.small-loading :as loading]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.footer :refer (footer)]
-            [open-company-web.components.stripe :as stripe]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.cookies :as cook]
             [open-company-web.urls :as oc-urls]
             [open-company-web.api :as api]
             [open-company-web.local-settings :as ls]
             [cljs.core.async :refer (put! chan <!)]
             [open-company-web.dispatcher :as dis]
+            [org.martinklepsch.derivatives :as drv]
             [open-company-web.lib.iso4217 :refer (iso4217 sorted-iso4217)]))
+
+(rum/defcs thanks-for-subscribing
+  < {:will-unmount (fn [s] (cook/remove-cookie! :subscription-callback-slug) s)}
+  []
+  [:div.p3.border.mb3.rounded.success
+   [:h2.m0.mb2 "Thank you!"]
+   [:span "If you have any questions you can always reach us "
+    [:a
+     {:href oc-urls/contact-mail-to}
+     "via email."]]])
+
+(rum/defcs subscription-info
+  < {:did-mount (fn [s] (api/get-subscription) s)}
+    (dis/drv :subscription)
+    (dis/drv :jwt)
+    rum/reactive
+  [s slug]
+  [:div
+   [:div.small-caps.bold.mb1 "Subscription"]
+   (if (drv/react s :subscription)
+     [:div
+      [:p.mb2 "Thanks for being an awesome customer"]
+      [:a.btn-reset.btn-solid
+       {:href (:account-url (drv/react s :subscription))}
+       "Manage your subscription"]]
+     [:div
+      [:p.mb2 "Support the ongoing development of this platform"]
+      [:a.btn-reset.btn-solid
+       {:on-click #(cook/set-cookie! :subscription-callback-slug slug (* 60 60 24))
+        :href (str "https://opencompany.recurly.com/subscribe/beta/" (:org-id (drv/react s :jwt)))}
+       "Subscribe"]])])
 
 (defn- save-company-data [company-data logo logo-width logo-height]
   (let [slug (router/current-company-slug)
@@ -93,6 +126,8 @@
           (when-not company-name
             (loading/small-loading)))
         ;; Company
+        (when (cook/get-cookie :subscription-callback-slug)
+          (thanks-for-subscribing))
         (dom/div {:class "company-form p3"}
 
           ;; Company name
@@ -128,9 +163,7 @@
                       :maxLength 255
                       :on-change #(om/set-state! owner :logo (.. % -target -value))
                       :placeholder "http://example.com/logo.png"})
-          (dom/div {:class "small-caps bold mb1"} "Subscription")
-          (dom/p {} "Support the ongoing development of this platform")
-          (stripe/stripe-checkout)
+          (subscription-info (name slug))
           (dom/div {:class "mt2 right-align"}
             (dom/button {:class "btn-reset btn-solid"
                          :on-click #(save-company-clicked owner)}
