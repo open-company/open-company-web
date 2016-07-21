@@ -115,7 +115,7 @@
          :on-key-down #(when (and (= 8 (.-keyCode %)) (empty? @*input))
                          (on-change (swap! *items (comp vec drop-last))))
          :on-blur   #(do (submit! (.. % -target -value))
-                         (reset! *show-input? false)
+                         (when (seq @*items) (reset! *show-input? false))
                          nil)
          :on-change #(maybe-submit (.. % -target -value))}])]))
 
