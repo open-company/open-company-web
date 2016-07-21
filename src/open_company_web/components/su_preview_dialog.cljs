@@ -251,7 +251,7 @@
         "Send")])])
 
 (rum/defc confirmation < rum/static
-  [type]
+  [type cancel-fn]
   [:div
    (case type
      :email (modal-title "Email Sent!" :email-84)
@@ -263,8 +263,8 @@
        :slack "Members of your Slack organization will get your update.")]
     [:div.right-align.mt3
      [:button.btn-reset.btn-solid
-      {:on-click #(router/nav! (oc-urls/company))}
-      "Back to your dashboard →"]]]])
+      {:on-click cancel-fn}
+      "DONE"]]]])
 
 
 (defcomponent su-preview-dialog [data owner options]
@@ -307,7 +307,7 @@
                :on-click #(cancel-fn)}
             (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
           (if sent
-            (confirmation share-via)
+            (confirmation share-via cancel-fn)
             (dom/div
               (case share-via
                 :prompt (prompt-dialog #(do
