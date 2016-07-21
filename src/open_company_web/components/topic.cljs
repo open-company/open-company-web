@@ -85,10 +85,7 @@
           image-header        (:image-url topic-data)
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
-          topic-body          (utils/get-topic-body topic-data section)
-          image-height        (if image-header
-                                (str (utils/image-height-aspect-ratio (:image-width topic-data) (:image-height topic-data) card-width) "px")
-                                "5px")]
+          topic-body          (utils/get-topic-body topic-data section)]
       (dom/div #js {:className "topic-internal group"
                     :onClick (partial fullscreen-topic data nil false)
                     :ref "topic-internal"}
@@ -104,16 +101,16 @@
               :else
               (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options}))))
         ;; Topic title
-        (dom/div {:class "topic-title"} (:title topic-data))
-        (when (and show-fast-editing
+        (dom/div {:class "group"}
+          (dom/div {:class "topic-title"} (:title topic-data))
+          (when (and show-fast-editing
                    (responsive/can-edit?)
                    (not (responsive/is-mobile))
                    (not (:read-only topic-data))
                    (not sharing-mode))
-          (dom/button {:class (str "topic-pencil-button btn-reset")
-                       :style {:top image-height}
-                       :on-click #(pencil-click owner %)}
-            (dom/i {:class "fa fa-pencil"})))
+            (dom/button {:class (str "topic-pencil-button btn-reset")
+                         :on-click #(pencil-click owner %)}
+              (dom/i {:class "fa fa-pencil"}))))
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))

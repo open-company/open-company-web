@@ -748,6 +748,3 @@
       (.moveToElementText rg content-editable-element)
       (.collapse rg false)
       (.select rg))))
-
-(defn image-height-aspect-ratio [original-width original-height constrained-width]
-  (* (/ original-height original-width) constrained-width))
