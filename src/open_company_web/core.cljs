@@ -80,14 +80,13 @@
   ;; render component
   (om/root list-companies dis/app-state {:target target}))
 
-;; Handle successful and unsuccessful logins
+  ;; Handle successful and unsuccessful logins
 (defn login-handler [target params]
   (pre-routing (:query-params params))
   (utils/clean-company-caches)
   (if (contains? (:query-params params) :jwt)
     (do ; contains :jwt so auth went well
       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-      (dis/dispatch! [:jwt (jwt/get-contents)])
       (api/get-entry-point))
     (do
       (when (contains? (:query-params params) :login-redirect)
@@ -250,10 +249,13 @@
         (route-dispatch! (router/get-token)))))
   (sentry/capture-message "Error: div#app is not defined!"))
 
-;; setup the router navigation only when handle-url-change and route-disaptch!
-;; are defined, this is used to avoid crash on tests
-(when (and handle-url-change route-dispatch!)
-  (router/setup-navigation! handle-url-change route-dispatch!))
+(defn init []
+  ;; Persist JWT in App State
+  (dis/dispatch! [:jwt (jwt/get-contents)])
+  ;; setup the router navigation only when handle-url-change and route-disaptch!
+  ;; are defined, this is used to avoid crash on tests
+  (when (and handle-url-change route-dispatch!)
+    (router/setup-navigation! handle-url-change route-dispatch!)))
 
 (defn on-js-reload []
   (.clear js/console)
