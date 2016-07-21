@@ -694,7 +694,6 @@
                                             (.stopPropagation e)
                                             (om/set-state! owner :growth-new-metric true)
                                             (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
-            (dom/div {:class "separator"})
             (dom/div {:class "topic-edit-snippet emoji-autocomplete"
                       :id (str "topic-edit-snippet-" (name topic))
                       :contentEditable true
