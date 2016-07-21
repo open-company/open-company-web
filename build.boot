@@ -11,7 +11,7 @@
 
     [org.omcljs/om "1.0.0-alpha40" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
 
-    [rum "0.10.4" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
+    [rum "0.10.5" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
     [org.martinklepsch/derivatives "0.1.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
 
     [cljs-http "0.1.41"] ; HTTP for cljs https://github.com/r0man/cljs-http
