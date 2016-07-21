@@ -27,7 +27,8 @@
 
 (defmethod dispatcher/action :logout [db _]
   (cook/remove-cookie! :jwt)
-  (router/redirect! "/"))
+  (router/redirect! "/")
+  (dissoc db :jwt))
 
 (defmethod dispatcher/action :entry [db [_ {:keys [links]}]]
   (let [create-link    (med/find-first #(= (:rel %) "company-create") links)

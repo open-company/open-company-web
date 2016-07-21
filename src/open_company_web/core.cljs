@@ -87,6 +87,7 @@
   (if (contains? (:query-params params) :jwt)
     (do ; contains :jwt so auth went well
       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (dis/dispatch! [:jwt (jwt/get-contents)])
       (api/get-entry-point))
     (do
       (when (contains? (:query-params params) :login-redirect)
