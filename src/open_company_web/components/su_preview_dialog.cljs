@@ -86,8 +86,7 @@
         maybe-submit (fn [v]
                        (if-let [s' (submitted v)]
                          (submit! s')
-                         (do (reset! *input v)
-                             (on-change (into @*items (when-not (string/blank? v) [v]))))))]
+                         (reset! *input v)))]
     [container-node
      {:on-click #(reset! *show-input? true)}
      (for [e @*items]
@@ -114,9 +113,12 @@
                         (on-change (swap! *items into pasted)))
          :on-key-down #(when (and (= 8 (.-keyCode %)) (empty? @*input))
                          (on-change (swap! *items (comp vec drop-last))))
-         :on-blur   #(do (submit! (.. % -target -value))
-                         (when (seq @*items) (reset! *show-input? false))
-                         nil)
+         :on-blur   (fn [e]
+                      (when-not (string/blank? (.. e -target -value))
+                        (clear-input!)
+                        (on-change (swap! *items #(vec (distinct (conj % (.. e -target -value)))))))
+                      (when (seq @*items) (reset! *show-input? false))
+                      nil)
          :on-change #(maybe-submit (.. % -target -value))}])]))
 
 (rum/defc email-item [v delete! submitted?]
