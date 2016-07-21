@@ -112,7 +112,7 @@
        [input-node
         {:type      "text"
          :class     (when-not (seq @*items) "col-12")
-         :placeholder (when-not (seq @*items) "investor@vc.com advisor@smart.com")
+         :placeholder (when-not (seq @*items) "investor@vc.com,advisor@smart.com")
          :auto-focus true
          :value      @*input
          :on-paste   #(let [pasted (string/split (.getData (.-clipboardData %) "Text") split-ptn)]
