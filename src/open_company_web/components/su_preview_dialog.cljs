@@ -255,6 +255,7 @@
     (utils/disable-scroll))
 
   (will-unmount [_]
+    (dis/dispatch! [:su-share/reset])
     (utils/enable-scroll))
 
   (will-receive-props [_ next-props]
