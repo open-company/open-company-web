@@ -192,3 +192,15 @@
 
 (defmethod dispatcher/action :su-share/reset [db _]
   (dissoc db :su-share))
+
+;; Store JWT in App DB so it can be easily accessed in actions etc.
+
+(defmethod dispatcher/action :jwt
+  [db [_ jwt-data]]
+  (assoc db :jwt jwt-data))
+
+;; Stripe Payment related actions
+
+(defmethod dispatcher/action :subscription
+  [db [_ {:keys [org-id] :as data}]]
+  (assoc-in db [:subscriptions org-id] data))
