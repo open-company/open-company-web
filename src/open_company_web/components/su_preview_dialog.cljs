@@ -136,7 +136,7 @@
     [:div
      [:label.block.small-caps.bold.mb2
       "To"
-      (let [to-field (->> (drv/react s :su-share) :email :to)]
+      (when-let [to-field (->> (drv/react s :su-share) :email :to)]
         (cond
           (not (seq to-field))
           [:span.red.py1 " — Required"]
