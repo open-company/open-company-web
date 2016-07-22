@@ -43,15 +43,18 @@
      js/document
      (str "<span id=" placeholder-id "></span>"))))
 
-(defcomponent filestack-uploader [editor owner]
+(defcomponent filestack-uploader [editor owner options]
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (assert ls/filestack-key "FileStack API Key required")
       (js/filepicker.setKey ls/filestack-key)))
 
   (did-update [_ _ prev-state]
-    (when (and (not (utils/is-test-env?)) (= (om/get-state owner :state) :show-options))
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+    (when-not (utils/is-test-env?)
+      ; hide placeholder callback when needed
+      ((:hide-placeholder options) (not (nil? (om/get-state owner :state))))
+      (when (= (om/get-state owner :state) :show-options)
+        (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
   (render-state [this {:keys [state url]}]
     (dom/div {:id "file-upload-ui"
@@ -72,11 +75,9 @@
                                   (utils/event-stop e)
                                   (om/update-state! owner :state #(if % nil :show-options)))}
           (i/icon :circle-add {:size 24 :color "rgba(78, 90, 107, 0.5)" :accent-color "rgba(78, 90, 107, 0.5)"}))
-          (dom/div {:style #js {:margin "30px 0 0 0px"
-                                :height "50px"
-                                :width "20px"
+          (dom/div {:style #js {:margin "1px 0 0 30px"
                                 :display (if (= state :show-options) "block" "none")}}
-            (dom/button {:class "btn-reset oc-gray-5 left"
+            (dom/button {:class "btn-reset oc-gray-5"
                          :style {:font-size "15px" :opacity "0.5"}
                          :title "Add an image"
                          :type "button"
@@ -86,7 +87,7 @@
                                      (insert-marker!)
                                      (.click (gdom/getElement "file-upload-ui--select-trigger")))}
             (dom/i {:class "fa fa-camera"}))
-            (dom/button {:class "btn-reset oc-gray-5 left"
+            (dom/button {:class "btn-reset oc-gray-5"
                          :style {:font-size "15px" :opacity "0.5"}
                          :title "Provide an image link"
                          :type "button"

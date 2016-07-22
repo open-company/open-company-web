@@ -656,7 +656,7 @@
              (+ left (or (.-offsetLeft el) 0))
              (.-offsetParent el)))))
 
-(defn medium-editor-options [placeholder]
+(defn medium-editor-options [placeholder hide-on-click]
   {:toolbar #js {:buttons #js ["bold" "italic" "strikethrough" "h2" "orderedlist" "unorderedlist" "anchor"]}
    :buttonLabels "fontawesome"
    :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
@@ -668,7 +668,7 @@
                 :placeholderText "Paste or type a link"
                 :targetCheckbox false
                 :targetCheckboxText "Open in new window"}
-   :placeholder #js {:text (or placeholder ""), :hideOnClick false}})
+   :placeholder #js {:text (or placeholder ""), :hideOnClick hide-on-click}})
 
 (defn after [ms fn]
   (js/setTimeout fn ms))

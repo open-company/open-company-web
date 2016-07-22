@@ -363,6 +363,10 @@ div.fullscreen-topic-edit {
           font-size: 18px;
           margin-top: 0px;
         }
+
+        &.hide-placeholder:after{
+          display: none;
+        }
       }
     }
   }

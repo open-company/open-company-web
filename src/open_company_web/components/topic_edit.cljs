@@ -40,7 +40,7 @@
 (defn setup-edit [owner]
   (when-let* [section-name (name (om/get-props owner :section))
               snippet-el (sel1 [(str "div#foce-snippet-" section-name)])]
-    (let [snippet-editor      (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options "")))]
+    (let [snippet-editor      (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options "" false)))]
       (.subscribe snippet-editor
                   "editableInput"
                   (fn [event editable]

@@ -406,7 +406,8 @@
        :history-listener-id (:history-listener-id current-state)
        :tooltip-dismissed false
        :body-click body-click
-       :char-count (:char-count current-state)}
+       :char-count (:char-count current-state)
+       :hide-placeholder false}
       (finances-init-state topic (:data topic-data))
       (growth-init-state topic data current-state))))
 
@@ -422,7 +423,7 @@
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
   (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
         med-ed (new js/MediumEditor body-el (clj->js
-                                             (->  (utils/medium-editor-options "Want to add more? Add it here...")
+                                             (->  (utils/medium-editor-options "Want to add more? Add it here..." true)
                                                   (editor/inject-extension editor/file-upload))))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
@@ -430,7 +431,7 @@
     (om/set-state! owner :medium-editor med-ed))
   (let [snippet-el (sel1 (str "div#topic-edit-snippet-" (name topic)))
         placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
-        med-ed (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options placeholder)))]
+        med-ed (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options placeholder false)))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
     (om/set-state! owner :initial-snippet (.-innerHTML snippet-el))
@@ -568,6 +569,7 @@
                            file-upload-state
                            file-upload-progress
                            upload-remote-url
+                           hide-placeholder
                            ; finances states
                            finances-data
                            ; growth states
@@ -749,11 +751,11 @@
                           :type "file"
                           :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})))
           (dom/div {:class "relative topic-body-line"}
-            (dom/div {:className "topic-body emoji-autocomplete"
+            (dom/div {:className (str "topic-body emoji-autocomplete" (when hide-placeholder " hide-placeholder"))
                       :contentEditable true
                       :id (str "topic-edit-body-" (name topic))
                       :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
-            (om/build filestack-uploader (om/get-state owner :medium-editor))))
+            (om/build filestack-uploader (om/get-state owner :medium-editor) {:opts {:hide-placeholder #(om/set-state! owner :hide-placeholder %)}})))
       (when (and show-first-edit-tooltip
                  (not tooltip-dismissed))
         (om/build tooltip

@@ -19,7 +19,7 @@
       (reset! prevent-route-dispatch true)
       ; save initial innerHTML and setup MediumEditor
       (let [body-el (om/get-ref owner "outro-body")
-            med-ed (new js/MediumEditor body-el (clj->js (utils/medium-editor-options "Add a conclusion or wrap-up (optional).")))]
+            med-ed (new js/MediumEditor body-el (clj->js (utils/medium-editor-options "Add a conclusion or wrap-up (optional)." false)))]
         (.subscribe med-ed "editableInput" #((:change-cb options) :outro (.-innerHTML body-el)))
         (om/set-state! owner :medium-editor med-ed))))
 
