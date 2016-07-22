@@ -103,12 +103,12 @@
                                :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
                                :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
                                :value url})
-            (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+            (dom/button {:style {:height "32px" :font-size "14px" :margin-left "5px" :padding "0.3rem"}
                          :class "btn-reset btn-solid"
                          :disabled (clojure.string/blank? url)
                          :on-click #(upload-file! editor owner url)}
               "add")
-            (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+            (dom/button {:style {:height "32px" :font-size "14px" :margin-left "5px" :padding "0.3rem"}
                          :class "btn-reset btn-outline"
                          :on-click (fn [_]
                                      (gdom/removeNode (gdom/getElement placeholder-id))
