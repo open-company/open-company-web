@@ -98,7 +98,7 @@
                 (dom/i {:class "fa fa-code"})))
           (dom/span {:style {:display (if (= state :show-progress) "block" "none")}}
             (str "Uploading... " (om/get-state owner :progress) "%"))
-          (dom/div {:style {:display (if (= state :show-url-field) "block" "none")}}
+          (dom/div {:style {:background-color "white" :margin-left "30px" :margin-top "-4px" :display (if (= state :show-url-field) "block" "none")}}
             (dom/input {:type "text"
                                :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
                                :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
