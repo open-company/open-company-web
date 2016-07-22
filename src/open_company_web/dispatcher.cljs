@@ -7,11 +7,13 @@
 
 ;; Derived Data ================================================================
 
-(def drv-spec
-  {:base         [[] app-state]
+(defn drv-spec [db]
+  {:base         [[] db]
    :su-share     [[:base] (fn [base] (:su-share base))]
    :jwt          [[:base] (fn [base] (:jwt base))]
-   :subscription [[:base :jwt] (fn [base jwt] (get-in base [:subscriptions (:org-id jwt)]))]})
+   :subscription [[:base :jwt] (fn [base jwt]
+                                 (prn base)
+                                 (get-in base [:subscriptions (:org-id jwt)]))]})
 
 (def drv
   ;; A variant of `org.martinklepsch.derivatives/drv` that works by
@@ -19,7 +21,7 @@
   ;; tree using React's childContext. We're using this instad of the
   ;; bundled `drv` because our Root components are Om and setting
   ;; childContext on them is something I didn't want to bother with
-  (let [{:keys [get! release!]} (drv/derivatives-manager drv-spec)]
+  (let [{:keys [get! release!]} (drv/derivatives-manager (drv-spec app-state))]
     (fn drv [drv-k]
       (let [token (random-uuid)]
         {:will-mount   (fn [s]
