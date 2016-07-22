@@ -56,22 +56,27 @@
   (render-state [this {:keys [state url]}]
     (dom/div {:id "file-upload-ui"
               :style (merge {:transition ".2s"}
-                            (when (:state (om/get-state owner))
+                            (when state
                               {:right 0}))}
       (dom/div {:class "flex"}
         (dom/input {:id "file-upload-ui--select-trigger" :style {:display "none"} :type "file"
                     :on-change #(upload-file! editor owner (-> % .-target .-files (aget 0)))})
         (dom/button {:class "btn-reset p0 file-upload-btn"
                      :style {:margin-right "13px"
+                             :position "absolute"
+                             :top "0px"
+                             :left "0px"
                              :transition ".2s"
-                             :transform (if (om/get-state owner :state) "rotate(135deg)")}
+                             :transform (when state "rotate(135deg)")}
                      :on-click (fn [e]
                                   (utils/event-stop e)
                                   (om/update-state! owner :state #(if % nil :show-options)))}
-          (i/icon :circle-add {:size 24}))
-          (dom/div {:style #js {:margin "1px 0 0 22px"
+          (i/icon :circle-add {:size 24 :color "rgba(78, 90, 107, 0.5)" :accent-color "rgba(78, 90, 107, 0.5)"}))
+          (dom/div {:style #js {:margin "30px 0 0 0px"
+                                :height "50px"
+                                :width "20px"
                                 :display (if (= state :show-options) "block" "none")}}
-            (dom/button {:class "btn-reset oc-gray-5"
+            (dom/button {:class "btn-reset oc-gray-5 left"
                          :style {:font-size "15px" :opacity "0.5"}
                          :title "Add an image"
                          :type "button"
@@ -81,8 +86,8 @@
                                      (insert-marker!)
                                      (.click (gdom/getElement "file-upload-ui--select-trigger")))}
             (dom/i {:class "fa fa-camera"}))
-            (dom/button {:style {:font-size "15px" :opacity "0.5"}
-                         :class "btn-reset oc-gray-5"
+            (dom/button {:class "btn-reset oc-gray-5 left"
+                         :style {:font-size "15px" :opacity "0.5"}
                          :title "Provide an image link"
                          :type "button"
                          :data-toggle "tooltip"
