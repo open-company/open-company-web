@@ -48,7 +48,7 @@
         [:a.btn-reset.btn-solid
          {:on-click #(cook/set-cookie! :subscription-callback-slug slug (* 60 60 24))
           :href (str "https://opencompany.recurly.com/subscribe/beta/" (:org-id (drv/react s :jwt))
-                     "?email=" (:org-id (drv/react s :jwt)) "&first_name=" fn "&last_name=" ln)}
+                     "?email=" (:email (drv/react s :jwt)) "&first_name=" fn "&last_name=" ln)}
          "Subscribe"])])])
 
 (defn- save-company-data [company-data logo logo-width logo-height]
