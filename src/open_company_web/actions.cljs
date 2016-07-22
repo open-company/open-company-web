@@ -58,6 +58,7 @@
     (let [slug (:slug body)
           response (:response body)]
       (swap! cache/new-sections assoc-in [(keyword slug) :categories] (:categories response))
+      (swap! cache/new-sections assoc-in [(keyword slug) :new-section-order] (:sections response))
       ;; signal to the app-state that the new-sections have been loaded
       (assoc-in db [(keyword slug) :new-sections] (rand 4)))))
 
