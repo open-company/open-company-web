@@ -11,7 +11,7 @@
   {:base         [[] app-state]
    :su-share     [[:base] (fn [base] (:su-share base))]
    :jwt          [[:base] (fn [base] (:jwt base))]
-   :subscription [[:base :jwt] (fn [base jwt] (prn 'passed-jwt jwt) (get-in base [:subscriptions (:org-id jwt)]))]})
+   :subscription [[:base :jwt] (fn [base jwt] (get-in base [:subscriptions (:org-id jwt)]))]})
 
 (def drv
   ;; A variant of `org.martinklepsch.derivatives/drv` that works by
