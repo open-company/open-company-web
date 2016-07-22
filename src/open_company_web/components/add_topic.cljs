@@ -44,7 +44,8 @@
         (let [slug (keyword (router/current-company-slug))
               all-sections (get-all-sections slug)
               update-active-topics (:update-active-topics options)
-              list-data {:all-topics all-sections
+              list-data {:topic-order (:new-section-order (slug @caches/new-sections))
+                         :all-topics all-sections
                          :active-topics-list active-topics
                          :archived-topics archived-topics
                          :show-above (show-popover-above? owner)
