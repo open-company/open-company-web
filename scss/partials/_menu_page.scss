@@ -28,6 +28,17 @@ body.menu-visible div.page {
   top: 0px;
 }
 
+body.animating.small-footer div.footer {
+  bottom: #{$footer_small_height - 10}px;
+}
+
+body.animating div.footer {
+  position: absolute;
+  bottom: #{$footer_height - 4}px;
+  left: 0px;
+  width: 100%;
+}
+
 body.menu-visible:not(.animating) div.page nav{
   left: -200px;
   top: default;
