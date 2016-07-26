@@ -41,6 +41,7 @@
   (events/unlistenByKey (om/get-state owner :transition-end-listener)))
 
 (defn toggle-menu [owner close?]
+  (set! (.. js/document -body -scrollTop) 0)
   (let [body (sel1 [:body])
         page (sel1 [:div.page])]
     (dommy/add-class! body :animating)
