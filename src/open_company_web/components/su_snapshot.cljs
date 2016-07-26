@@ -168,5 +168,6 @@
                                         :company-data company-data
                                         :hide-add-topic true}
                                        {:opts {:topic-click (partial topic-click owner)}})))
-          (dom/div {:class "su-sp-footer"} "Powered by "
-            (dom/a {:href "https://opencompany.com"} "OpenCompany")))))))
+          (when company-data
+            (dom/div {:class "su-sp-footer"} "Powered by "
+              (dom/a {:href "https://opencompany.com"} "OpenCompany"))))))))
