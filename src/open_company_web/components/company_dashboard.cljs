@@ -66,8 +66,8 @@
                            :columns-num columns-num
                            :foce-key (:foce-key data)
                            :foce-data (:foce-data data)
-                           :active-category (:active-category state)}))))
-        ;;Footer
-        (when company-data
-          (om/build footer {:columns-num columns-num
-                            :card-width card-width}))))))
+                           :active-category (:active-category state)}))
+            ;;Footer
+            (when company-data
+              (om/build footer {:columns-num columns-num
+                                :card-width card-width}))))))))
