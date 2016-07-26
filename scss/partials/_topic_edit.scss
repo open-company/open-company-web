@@ -177,7 +177,7 @@ div.topic {
         font-size: 15px;
         line-height: 22px;
 
-        &:empty:after {
+        &:after {
           content: attr(placeholder);
           font-size: 15px;
           line-height: 22px;
