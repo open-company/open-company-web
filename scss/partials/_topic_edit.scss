@@ -178,7 +178,6 @@ div.topic {
         line-height: 22px;
 
         &:after {
-          content: attr(placeholder);
           font-size: 15px;
           line-height: 22px;
           color: $oc_gray_5;
