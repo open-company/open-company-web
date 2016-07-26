@@ -437,9 +437,7 @@
     (om/set-state! owner :initial-snippet (.-innerHTML snippet-el))
     (om/set-state! owner :snippet-medium-editor med-ed))
   (js/emojiAutocomplete)
-  (if (dis/foce-section-key)
-    (utils/after 200 #(focus-body owner))
-    (utils/after 200 #(focus-headline owner))))
+  (utils/after 200 #(focus-headline owner)))
 
 (defn save-data [owner options]
   (let [topic (om/get-props owner :topic)]
