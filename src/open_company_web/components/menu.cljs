@@ -41,6 +41,7 @@
   (events/unlistenByKey (om/get-state owner :transition-end-listener)))
 
 (defn toggle-menu [owner close?]
+  (set! (.. js/document -body -scrollTop) 0)
   (let [body (sel1 [:body])
         page (sel1 [:div.page])]
     (dommy/add-class! body :animating)
@@ -68,7 +69,9 @@
 
   (render [_]
     (dom/ul {:id "menu"}
-      (dom/li {:class "oc-title"} "OpenCompany")
+      (dom/li {:class "oc-title"}
+        (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
+          (dom/img {:src "/img/oc-wordmark-white.svg" :style {:height "25px"}})))
       (when (jwt/jwt)
         (dom/li {:class "menu-link"} (dom/a {:title "USER INFO" :href oc-urls/user-profile :on-click user-profile-click} "USER INFO")))
       (when (and (router/current-company-slug)

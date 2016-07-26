@@ -41,7 +41,7 @@
 (def file-upload
   (let [class "file-upload-btn"
         hide-btn (fn []
-                    (let [el (js/document.getElementById "file-upload-ui")]
+                    (when-let [el (js/document.getElementById "file-upload-ui")]
                           (gstyle/setStyle el #js {:opacity 0})
                           (utils/after 250 #(gstyle/setStyle el #js {:display "none"}))))
         pos-btn (fn [top-v]
@@ -49,8 +49,8 @@
                     (gstyle/setStyle el #js {:position "absolute"
                                              :display "block"
                                              :opacity 1
-                                             :top (str top-v "px")
-                                             :left "-35px"})))
+                                             :top (str (+ top-v 5) "px")
+                                             :left "-5px"})))
         show-btn (fn [_]
                    (utils/after 100
                     (fn []
@@ -68,7 +68,4 @@
                (doseq [el (.getEditorElements this)]
                  (.on (.-base this) el "click" (.bind show-btn this))
                  (.on (.-base this) el "keyup" (.bind show-btn this)))
-               (let [body (first (.getEditorElements this))]
-                 (if (clojure.string/blank? (utils/strip-HTML-tags (.-innerHTML body)))
-                   (utils/after 100 #(pos-btn 0))
-                   (utils/after 100 #(hide-btn))))))}))
+               (utils/after 100 #(hide-btn))))}))

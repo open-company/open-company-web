@@ -8,4 +8,4 @@
   (render [_]
     (dom/div {:class (utils/class-set {:oc-loading true
                                        :active (:loading data)})}
-      (dom/div {:class "oc-loading-internal"}))))
+      (dom/i {:class "fa fa-circle-o-notch fa-spin"}))))

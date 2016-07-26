@@ -47,19 +47,9 @@
       (set! (.-value preview-title) (.-value preview-title))
       (om/set-state! owner :title-focused true))))
 
-(defn share-slack-clicked [owner]
-  (patch-stakeholder-update owner)
-  (om/set-state! owner :show-su-dialog :slack)
-  (om/set-state! owner :slack-loading true))
-
-(defn share-email-clicked [owner]
- (om/set-state! owner :show-su-dialog :email)
- (om/set-state! owner :email-loading true)
- (patch-stakeholder-update owner))
-
-(defn share-link-clicked [owner]
- (om/set-state! owner :link-loading true)
- (patch-stakeholder-update owner))
+(defn share-clicked [owner]
+ (patch-stakeholder-update owner)
+ (om/set-state! owner :show-su-dialog :prompt))
 
 (defn dismiss-su-preview [owner]
   (om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false
@@ -164,26 +154,19 @@
           (dom/div {:class "su-snapshot-header"}
             (back-to-dashboard-btn {})
             (dom/div {:class "share-su"}
-              (dom/label {} "SHARE TO")
-              (dom/button {:class "share-su-button btn-reset share-slack"
-                           :disabled (zero? (count su-topics))
-                           :on-click #(share-slack-clicked owner)}
-                (dom/img {:src "/img/Slack_Icon.png"}))
-              (dom/button {:class "share-su-button btn-reset share-mail"
-                           :disabled (zero? (count su-topics))
-                           :on-click #(share-email-clicked owner)}
-                (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))
-              (dom/button {:class "share-su-button btn-reset share-link"
-                           :disabled (zero? (count su-topics))
-                           :on-click #(share-link-clicked owner)}
-                (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20}))))
+              (dom/button {:class "btn-reset btn-solid share-su-button"
+                           :on-click #(share-clicked owner)
+                           :disabled (zero? (count su-topics))}
+                "SHARE " (dom/i {:class "fa fa-share"}))))
           ;; SU Snapshot Preview
           (when company-data
             (dom/div {:class "su-sp-content"
                       :key (apply str su-topics)}
               (dom/div {:class "su-sp-company-header"}
-                (dom/img {:class "company-logo" :src (:logo company-data)})
-                (dom/span {:class "company-name"} (:name company-data)))
+                (dom/div {}
+                  (dom/img {:class "company-logo" :src (:logo company-data)}))
+                (dom/div {}
+                  (dom/span {:class "company-name"} (:name company-data))))
               (when (:title su-data)
                 (dom/div {:class "preview-title-container"}
                   (dom/input #js {:className "preview-title"

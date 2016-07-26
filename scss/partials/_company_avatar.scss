@@ -12,6 +12,7 @@ div.company-avatar {
       height: 50px;
       border: solid 1px rgba(78, 90, 107, 0.2);
       padding: 5px;
+      text-align: center;
 
       img.company-avatar-img{
         float: left;
@@ -21,9 +22,7 @@ div.company-avatar {
       span.company-avatar-initial {
         font-size: 38px;
         color: $oc_gray_5;
-        margin-left: 7px;
-        margin-top: -8px;
-        float: left;
+        line-height: 1.1;
       }
     }
 

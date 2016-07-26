@@ -152,8 +152,10 @@
                                                {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                        :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
               (dom/div {:class "su-sp-company-header"}
-                (dom/img {:class "company-logo" :src (:logo company-data)})
-                (dom/span {:class "company-name"} (:name company-data)))
+                (dom/div {}
+                  (dom/img {:class "company-logo" :src (:logo company-data)}))
+                (dom/div {}
+                  (dom/span {:class "company-name"} (:name company-data))))
               (when (:title su-data)
                 (dom/div {:class "su-snapshot-title"} (:title su-data)))
               (dom/div {:class "su-snapshot-subtitle"} su-subtitle)
@@ -166,8 +168,6 @@
                                         :company-data company-data
                                         :hide-add-topic true}
                                        {:opts {:topic-click (partial topic-click owner)}})))
-          ;;Footer
           (when company-data
-            (om/build footer {:su-preview true
-                              :card-width card-width
-                              :columns-num 1})))))))
+            (dom/div {:class "su-sp-footer"} "Powered by "
+              (dom/a {:href "https://opencompany.com"} "OpenCompany"))))))))

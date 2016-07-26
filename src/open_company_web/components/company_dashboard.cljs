@@ -56,18 +56,18 @@
                                 :menu-open menu-open
                                 :auth-settings (:auth-settings data)}))
             (when company-data
-              ;; topic list
               (om/build topic-list
-                        {:loading (or (:loading company-data) (:loading data))
-                         :company-data company-data
-                         :latest-su (dis/latest-stakeholder-update)
-                         :force-edit-topic (:force-edit-topic data)
-                         :revision-updates (dis/revisions (router/current-company-slug))
-                         :card-width card-width
-                         :columns-num columns-num
-                         :foce-key (:foce-key data)
-                         :foce-data (:foce-data data)
-                         :active-category (:active-category state)}))))
-        ;;Footer
-        (om/build footer {:columns-num columns-num
-                          :card-width card-width})))))
+                          {:loading (or (:loading company-data) (:loading data))
+                           :company-data company-data
+                           :latest-su (dis/latest-stakeholder-update)
+                           :force-edit-topic (:force-edit-topic data)
+                           :revision-updates (dis/revisions (router/current-company-slug))
+                           :card-width card-width
+                           :columns-num columns-num
+                           :foce-key (:foce-key data)
+                           :foce-data (:foce-data data)
+                           :active-category (:active-category state)}))
+            ;;Footer
+            (when company-data
+              (om/build footer {:columns-num columns-num
+                                :card-width card-width}))))))))

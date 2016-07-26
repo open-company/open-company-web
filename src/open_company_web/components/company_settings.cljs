@@ -130,9 +130,9 @@
           (dom/div {:class "save-button-container"}
             (dom/button {:class "save-button btn-reset btn-solid"
                          :on-click #(save-company-clicked owner)}
-              (when loading
-                (loading/small-loading))
-              "SAVE")))))))
+              (if loading
+                (loading/small-loading)
+                "SAVE"))))))))
 
 (defcomponent company-settings [data owner]
 

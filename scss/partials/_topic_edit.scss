@@ -48,7 +48,6 @@ div.topic {
         padding-top: 10px;
 
         &.card-image {
-          max-height: 196px;
           overflow: hidden;
           padding-top: 0px;
         }
@@ -101,11 +100,11 @@ div.topic {
       }
 
       input.topic-title {
-        padding-top: 10px;
+        padding-top: 13px;
         opacity: 0.5;
         font-family: $oc_headers_font;
         font-weight: 700;
-        font-size: 12px;
+        font-size: 13px;
         line-height: 1.5;
         letter-spacing: 1px;
         color: $oc_gray_5;
@@ -131,9 +130,9 @@ div.topic {
       }
 
       div.topic-headline-inner {
-        padding-top: 14px;
+        padding-top: 13px;
         font-size: 20px;
-        line-height: 1.2;
+        line-height: 25px;
         color: $oc_gray_5;
         outline: none;
         border: none;
@@ -173,29 +172,36 @@ div.topic {
         color: $oc_gray_5;
         overflow: hidden;
         font-weight: 400;
-        font-size: 12px;
-        line-height: 1.3;
         cursor: text;
         min-height: 20px;
+        font-size: 15px;
+        line-height: 22px;
 
         &:after {
+          font-size: 15px;
+          line-height: 22px;
+          color: $oc_gray_5;
           font-style: italic;
           font-family: $oc_main_font;
           font-weight: 400;
-          font-size: 12px;
-          color: $oc_gray_5;
           opacity: 0.5;
+          margin-top: 0px;
+          padding-top: 0px;
         }
 
         svg.emojione {
-          width: 12px;
-          height: 12px;
+          width: 15px;
+          height: 15px;
         }
 
         *{
           font-weight: 400;
-          font-size: 12px;
-          line-height: 1.3;
+          font-size: 15px;
+          line-height: 22px;
+        }
+
+        b{
+          font-weight: 700;
         }
 
         a {
@@ -276,7 +282,7 @@ div.topic {
         button {
           margin-bottom: 5px;
           color: rgba(78, 90, 107, 0.5);
-          font-size: 18px;
+          font-size: 15px;
         }
 
         button.left {

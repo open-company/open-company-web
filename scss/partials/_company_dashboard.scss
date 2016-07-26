@@ -18,3 +18,17 @@ body.small-footer {
     }
   }
 }
+
+body.animating {
+  div.company-dashboard {
+    min-height: calc(100vh);
+  }
+}
+
+body.small-footer.animating {
+  div.company-dashboard {
+    div.page {
+      min-height: calc(100vh);
+    }
+  }
+}

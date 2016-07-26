@@ -295,8 +295,10 @@
                  (not= (.-keyCode e) 39)
                  (>= (count headline-value) headline-max-length))
         (.preventDefault e))
-      (om/set-state! owner :char-count (- headline-max-length (count headline-value)))
-      (om/set-state! owner :char-count-alert (< (- headline-max-length (count headline-value)) headline-alert-limit))
+      (let [remaining-chars (- headline-max-length (count headline-value))]
+        (om/set-state! owner :char-count remaining-chars)
+        (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))
+        (om/set-state! owner :negative-headline-char-count (neg? remaining-chars)))
       (headline-on-change owner))))
 
 (defn snippet-on-change [owner]
@@ -321,8 +323,10 @@
                  (not= (.-keyCode e) 39)
                  (>= (count snippet-value) snippet-length-limit))
         (.preventDefault e))
-      (om/set-state! owner :char-count (- snippet-length-limit (count snippet-value)))
-      (om/set-state! owner :char-count-alert (< (- snippet-length-limit (count snippet-value)) snippet-alert-limit))
+      (let [remaining-chars (- snippet-length-limit (count snippet-value))]
+        (om/set-state! owner :char-count (- snippet-length-limit (count snippet-value)))
+        (om/set-state! owner :char-count-alert (< (- snippet-length-limit (count snippet-value)) snippet-alert-limit))
+        (om/set-state! owner :negative-snippet-char-count (neg? remaining-chars)))
       (snippet-on-change owner))))
 
 (defn count-chars
@@ -402,7 +406,8 @@
        :history-listener-id (:history-listener-id current-state)
        :tooltip-dismissed false
        :body-click body-click
-       :char-count (:char-count current-state)}
+       :char-count (:char-count current-state)
+       :hide-placeholder false}
       (finances-init-state topic (:data topic-data))
       (growth-init-state topic data current-state))))
 
@@ -418,7 +423,7 @@
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
   (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
         med-ed (new js/MediumEditor body-el (clj->js
-                                             (->  (utils/medium-editor-options "Anything else you’d like to add...")
+                                             (->  (utils/medium-editor-options "Want to add more? Add it here..." true)
                                                   (editor/inject-extension editor/file-upload))))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
@@ -426,15 +431,13 @@
     (om/set-state! owner :medium-editor med-ed))
   (let [snippet-el (sel1 (str "div#topic-edit-snippet-" (name topic)))
         placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
-        med-ed (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options placeholder)))]
+        med-ed (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options placeholder false)))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
     (om/set-state! owner :initial-snippet (.-innerHTML snippet-el))
     (om/set-state! owner :snippet-medium-editor med-ed))
   (js/emojiAutocomplete)
-  (if (dis/foce-section-key)
-    (utils/after 200 #(focus-body owner))
-    (utils/after 200 #(focus-headline owner))))
+  (utils/after 200 #(focus-headline owner)))
 
 (defn save-data [owner options]
   (let [topic (om/get-props owner :topic)]
@@ -452,7 +455,7 @@
     ((:dismiss-editing options) true)))
 
 (defn img-on-load [owner img]
-  (om/set-state! owner (merge (om/get-state owner) {:image-width (.-clientWidht img)
+  (om/set-state! owner (merge (om/get-state owner) {:image-width (.-clientWidth img)
                                                     :image-height (.-clientHeight img)}))
   (gdom/removeNode img))
 
@@ -479,18 +482,6 @@
       (js/filepicker.storeUrl file success-cb error-cb progress-cb)
       file
       (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
-
-(defn set-float-buttons-position! [owner]
-  (when-let* [fdm #(js/jQuery (.findDOMNode js/ReactDOM %))
-              fullscreen-topic-edit (fdm (om/get-ref owner "fullscreen-topic-edit"))
-              save-button           (fdm (om/get-ref owner "save-button"))
-              cancel-button         (fdm (om/get-ref owner "cancel-button"))
-              archive-button        (fdm (om/get-ref owner "archive-button"))
-              fte-left              (.-left (.offset fullscreen-topic-edit))
-              fte-width             (.width fullscreen-topic-edit)]
-    (.css archive-button #js {:left (str fte-left "px")})
-    (.css save-button #js {:left (str (- (+ fte-left fte-width) 100) "px")})
-    (.css cancel-button #js {:left (str (- (+ fte-left fte-width) 100 20 120) "px")})))
 
 (defcomponent fullscreen-topic-edit [{:keys [card-width topic topic-data currency focus show-first-edit-tooltip] :as data} owner options]
 
@@ -537,7 +528,6 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (set-float-buttons-position! owner)
       (reset! prevent-route-dispatch true)
       (js/filepicker.setKey ls/filestack-key)
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
@@ -560,8 +550,7 @@
 
   (did-update [_ _ prev-state]
     (when-not (om/get-state owner :medium-editor)
-      (setup-medium-editor owner data))
-    (set-float-buttons-position! owner))
+      (setup-medium-editor owner data)))
 
   (render-state [_ {:keys [has-changes
                            title
@@ -573,9 +562,12 @@
                            body
                            char-count
                            char-count-alert
+                           negative-headline-char-count
+                           negative-snippet-char-count
                            file-upload-state
                            file-upload-progress
                            upload-remote-url
+                           hide-placeholder
                            ; finances states
                            finances-data
                            ; growth states
@@ -610,6 +602,18 @@
                     :ref "fullscreen-topic-edit"
                     :style #js {:width (str (- fullscreen-width 20) "px")}
                     :key (:updated-at topic-data)}
+        (dom/div {:style {:opacity "1"
+                          :margin "27px 0px"}
+                  :class "group"}
+          (dom/button {:class "btn-reset btn-outline left mr1 cancel-button"
+                       :onClick #(do
+                                  (reset-and-dismiss owner options)
+                                  (utils/event-stop %))} "CANCEL")
+          (dom/button {:class "btn-reset btn-solid left mr1 save-button"
+                       :disabled (or (not has-changes) negative-headline-char-count negative-snippet-char-count)
+                       :onClick #(do
+                                  (save-data owner options)
+                                  (utils/event-stop %))} "SAVE"))
         (dom/div {:class "fullscreen-topic-internal group"
                   :on-click #(.stopPropagation %)}
           (dom/div {:class "fullscreen-topic-edit-top-box"}
@@ -690,7 +694,6 @@
                                             (.stopPropagation e)
                                             (om/set-state! owner :growth-new-metric true)
                                             (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
-            (dom/div {:class "separator"})
             (dom/div {:class "topic-edit-snippet emoji-autocomplete"
                       :id (str "topic-edit-snippet-" (name topic))
                       :contentEditable true
@@ -705,7 +708,7 @@
                            :type "button"
                            :data-toggle "tooltip"
                            :data-placement "top"
-                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
                            :on-click #(.click (sel1 [:input#topic-edit-upload-ui--select-trigger]))}
                 (dom/i {:class "fa fa-camera"}))
               (dom/button {:class "btn-reset image-url"
@@ -713,22 +716,30 @@
                            :type "button"
                            :data-toggle "tooltip"
                            :data-placement "top"
-                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
                            :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
                 (dom/i {:class "fa fa-code"}))
+              (dom/button #js {:className "btn-reset archive-button right"
+                               :title "Archive this topic"
+                               :type "button"
+                               :data-toggle "tooltip"
+                               :data-placement "top"
+                               :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
+                               :onClick #(remove-topic-click owner options %)}
+                (dom/i {:class "fa fa-archive"}))
               (dom/div {:class (str "char-count" (when char-count-alert " red"))} char-count)
               (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
                 (dom/input {:type "text"
-                            ; :style {:width 300}
-                            :auto-focus true
+                            :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
                             :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
                             :value upload-remote-url})
-                (dom/button {:style {:font-size "14px" :margin-left "1rem"}
-                             :class "underline btn-reset p0"
+                (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                             :class "btn-reset btn-solid"
+                             :disabled (clojure.string/blank? upload-remote-url)
                              :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
                   "add")
-                (dom/button {:style {:font-size "14px" :margin-left "1rem" :opacity "0.5"}
-                             :class "underline btn-reset p0"
+                (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                             :class "btn-reset btn-outline"
                              :on-click #(om/set-state! owner :file-upload-state nil)}
                   "cancel"))
               (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
@@ -738,31 +749,11 @@
                           :type "file"
                           :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})))
           (dom/div {:class "relative topic-body-line"}
-            (dom/div {:className "topic-body emoji-autocomplete"
+            (dom/div {:className (str "topic-body emoji-autocomplete" (when hide-placeholder " hide-placeholder"))
                       :contentEditable true
                       :id (str "topic-edit-body-" (name topic))
                       :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
-            (om/build filestack-uploader (om/get-state owner :medium-editor))))
-        (when-not (:placeholder topic-data)
-          (dom/button #js {:className "relative archive-button btn-reset btn-outline"
-                           :ref "archive-button"
-                           :onClick #(remove-topic-click owner options %)}
-            (dom/i {:class "fa fa-archive"})
-            "Archive this topic"))
-      (dom/button #js {:className "save-button btn-reset btn-solid"
-                       :ref "save-button"
-                       :disabled (not has-changes)
-                       :onClick #(do
-                                   (save-data owner options)
-                                   (utils/event-stop %))}
-        "SAVE")
-      (dom/button #js {:className (str "btn-reset btn-outline cancel-button" (when has-changes " has-save"))
-                       :key "cancel-button"
-                       :ref "cancel-button"
-                       :title "Dismiss edit"
-                       :onClick #(do
-                                   (reset-and-dismiss owner options)
-                                   (utils/event-stop %))} "CANCEL")
+            (om/build filestack-uploader (om/get-state owner :medium-editor) {:opts {:hide-placeholder #(om/set-state! owner :hide-placeholder %)}})))
       (when (and show-first-edit-tooltip
                  (not tooltip-dismissed))
         (om/build tooltip

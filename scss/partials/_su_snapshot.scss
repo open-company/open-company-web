@@ -1,30 +1,20 @@
-.animating div.su-sp-content{
-  margin-top: 0px;
-  padding-top: #{$navbar_height}px;
-}
-
-body.small-footer {
-  div.su-snapshot {
-    div.su-sp-content {
-      min-height: calc(100vh - #{$footer_small_height}px - #{$top_border_height}px);
-    }
-  }
-}
-
 div.su-snapshot {
   border-top: 4px solid $oc_yellow;
 
   div.su-sp-content {
     position: relative;
     content: "";
-    padding-bottom: 20px;
-    min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
+    min-height: calc(100vh - #{$navbar_height}px);
     background-color: $oc_gray_6;
     padding-top: 60px;
 
     div.su-sp-company-header {
       height: 50px;
       text-align: center;
+
+      div {
+        margin-top: 10px;
+      }
 
       img.company-logo {
         max-height: 50px;
@@ -34,7 +24,6 @@ div.su-snapshot {
 
       span.company-name {
         margin-top: 0px;
-        margin-left: 16px;
         font-weight: 700;
         font-size: 24px;
         line-height: 1.2;
@@ -49,7 +38,7 @@ div.su-snapshot {
       line-height: 1.2;
       text-align: center;
       color: $oc_gray_5;
-      padding-top: 50px;
+      margin-top: 50px;
       text-align: center;
     }
 
@@ -61,6 +50,24 @@ div.su-snapshot {
       color: $oc_gray_5;
       margin-top: 0px;
       padding-bottom: 30px;
+    }
+  }
+
+  div.su-sp-footer {
+    text-align: center;
+    padding-top: 26px;
+    padding-bottom: 38px;
+    font-size: 18px;
+    color: $oc_gray_5;
+    font-weight: 400;
+    font-family: $oc_main_font;
+    background-color: $oc_gray_6;
+
+    a {
+      font-family: $oc_main_font;
+      font-weight: 700;
+      text-decoration: underline;
+      color: $oc_gray_5;
     }
   }
 }

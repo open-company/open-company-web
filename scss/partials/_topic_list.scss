@@ -12,18 +12,17 @@ div.topic-list-edit-container {
 
 .animating div.topic-list{
   margin-top: 0px;
-  padding-top: 0px;
-  top: 0;
-  position: absolute;
-  height: 100vh;
-  left: 0;
-  margin-left: 0px;
-  width: 100vw;
+  padding-top: #{$navbar_height}px;
+  min-height: calc(100vh - #{$footer_height}px);
+}
+
+.small-footer.animating div.topic-list {
+  min-height: calc(100vh - #{$footer_small_height}px);
 }
 
 body.small-footer{
   div.topic-list {
-    min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px);
+    min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px - 1px);
 
     &.sharing-mode {
       min-height: calc(100vh - #{$footer_small_height}px);

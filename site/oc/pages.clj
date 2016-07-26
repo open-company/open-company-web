@@ -169,7 +169,7 @@
           [:link {:type "text/css", :rel "stylesheet", :href "/css/medium-editor/medium-editor.css?oc_deploy_key"}]
           [:link {:type "text/css", :rel "stylesheet", :href "/css/medium-editor/default.css?oc_deploy_key"}]]
    :body [:body
-          [:div#app [:div.oc-loading.active [:div.oc-loading-internal]]]
+          [:div#app [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
           [:div#oc-loading]
           ;; jQuery needed by Bootstrap JavaScript
           [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]

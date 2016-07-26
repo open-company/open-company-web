@@ -43,11 +43,12 @@
   [title icon-id]
   [:h3.m0.px3.py25.gray5.domine
    {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.1)"}}
-   (if (= :slack icon-id)
-     [:i {:class "fa fa-slack mr2"}]
-     (i/icon icon-id {:class "inline mr2"
-                      :color :oc-gray-3
-                      :accent-color :oc-gray-3}))
+   (when icon-id
+     (if (= :slack icon-id)
+       [:i {:class "fa fa-slack mr2"}]
+       (i/icon icon-id {:class "inline mr2"
+                        :color :oc-gray-3
+                        :accent-color :oc-gray-3})))
    title])
 
 ;; TODO (mk) Revert the following commit to restore on-change behavior as described by docstring
@@ -111,7 +112,7 @@
        [input-node
         {:type      "text"
          :class     (when-not (seq @*items) "col-12")
-         :placeholder (when-not (seq @*items) "investor@vc.com advisor@smart.com")
+         :placeholder (when-not (seq @*items) "investor@vc.com,advisor@smart.com")
          :auto-focus true
          :value      @*input
          :on-paste   #(let [pasted (string/split (.getData (.-clipboardData %) "Text") split-ptn)]
@@ -181,6 +182,7 @@
       :placeholder "Optional note to go with this update."}]]])
 
 (rum/defcs link-dialog < (rum/local false ::copied)
+                         (rum/local false ::clipboard)
                          (clipboard-mixin ".js-copy-btn")
   [{:keys [::copied] :as _state} link]
   [:div
@@ -203,6 +205,24 @@
       {:href link :target "_blank"}
       "Open in New Window"]]]])
 
+(rum/defcs prompt-dialog < rum/static
+ [_ prompt-cb]
+ [:div
+  (modal-title "Share Update" nil)
+  [:div.p3
+    [:div.group
+      [:button.btn-reset {:on-click #(prompt-cb :slack)}
+        [:div.circle50.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
+        [:span.left.ml1.gray5.h6 {} "SHARE TO SLACK"]]]
+    [:div.group
+      [:button.btn-reset {:on-click #(prompt-cb :email)}
+        [:div.circle50.left (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
+        [:span.left.ml1.gray5.h6 {} "SHARE BY EMAIL"]]]
+    [:div.group
+      [:button.btn-reset {:on-click #(prompt-cb :link)}
+        [:div.circle50.left (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
+        [:span.left.ml1.gray5.h6 {} "SHARE A LINK"]]]]])
+
 ;; This is very hacky and should by replaced by a more
 ;; versatile/generic form validation system
 (def email-field
@@ -216,10 +236,10 @@
   [s send-fn cancel-fn type]
   [:div.px3.pb3.right-align
    [:button.btn-reset.btn-outline
-    {:class (when-not (= :link type) "mr1")
+    {:class (when-not (or (= :link type) (= :prompt type)) "mr1")
      :on-click cancel-fn}
     (if (= :link type) "DONE" "CANCEL")]
-   (when-not (= :link type)
+   (when-not (or (= :link type) (= :prompt type))
      [:button.btn-reset.btn-solid
       {:on-click send-fn
        :disabled (when (= :email type)
@@ -231,7 +251,7 @@
         "Send")])])
 
 (rum/defc confirmation < rum/static
-  [type]
+  [type cancel-fn]
   [:div
    (case type
      :email (modal-title "Email Sent!" :email-84)
@@ -243,8 +263,8 @@
        :slack "Members of your Slack organization will get your update.")]
     [:div.right-align.mt3
      [:button.btn-reset.btn-solid
-      {:on-click #(router/nav! (oc-urls/company))}
-      "Back to your dashboard →"]]]])
+      {:on-click cancel-fn}
+      "DONE"]]]])
 
 
 (defcomponent su-preview-dialog [data owner options]
@@ -252,7 +272,8 @@
   (init-state [_]
     {:share-via (cond (:share-via-email data) :email
                       (:share-via-slack data) :slack
-                      (:share-via-link data)  :link)
+                      (:share-via-link data)  :link
+                      :else                   :prompt)
      :share-link (:latest-su data)
      :sending false
      :sent false})
@@ -268,6 +289,9 @@
 
   (will-receive-props [_ next-props]
     ; slack SU posted
+    (when (and (= (om/get-state owner :share-via) :link)
+               (:latest-su next-props))
+      (om/set-state! owner :share-link (:latest-su next-props)))
     (when (and (#{:email :slack} (om/get-state owner :share-via))
                (om/get-state owner :sending)
                (not (om/get-state owner :sent)))
@@ -283,18 +307,22 @@
                :on-click #(cancel-fn)}
             (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
           (if sent
-            (confirmation share-via)
+            (confirmation share-via cancel-fn)
             (dom/div
               (case share-via
+                :prompt (prompt-dialog #(do
+                                          (when (= % :link)
+                                            (api/share-stakeholder-update {}))
+                                          (om/set-state! owner :share-via %)))
                 :link  (link-dialog share-link)
                 :email (email-dialog {:share-link share-link})
                 :slack (slack-dialog))
               (modal-actions
-               (if sent
-                 cancel-fn
-                 #(do (om/set-state! owner :sending true)
-                      (send-clicked share-via)))
-               cancel-fn
-               (cond (and sending (not sent)) :sending
-                     (and sending sent)       :sent
-                     :else                    share-via)))))))))
+                (if sent
+                  cancel-fn
+                  #(do (om/set-state! owner :sending true)
+                       (send-clicked share-via)))
+                cancel-fn
+                (cond (and sending (not sent)) :sending
+                      (and sending sent)       :sent
+                      :else                    share-via)))))))))

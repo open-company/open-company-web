@@ -40,19 +40,17 @@
 (defn setup-edit [owner]
   (when-let* [section-name (name (om/get-props owner :section))
               snippet-el (sel1 [(str "div#foce-snippet-" section-name)])]
-    (let [topic-data (om/get-props owner :topic-data)
-          topic (om/get-props owner :section)]
-      (let [snippet-placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
-            snippet-editor      (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options snippet-placeholder)))]
-        (.subscribe snippet-editor
-                    "editableInput"
-                    (fn [event editable]
-                      (dis/dispatch! [:foce-input {:snippet (.-innerHTML snippet-el)}])
-                      (let [v (.-innerText snippet-el)
-                            remaining-chars (- snippet-max-length (count v))]
-                        (om/set-state! owner :char-count remaining-chars)
-                        (om/set-state! owner :char-count-alert (< remaining-chars snippet-alert-limit))))))
-      (js/emojiAutocomplete))))
+    (let [snippet-editor      (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options "" false)))]
+      (.subscribe snippet-editor
+                  "editableInput"
+                  (fn [event editable]
+                    (dis/dispatch! [:foce-input {:snippet (.-innerHTML snippet-el)}])
+                    (let [v (.-innerText snippet-el)
+                          remaining-chars (- snippet-max-length (count v))]
+                      (om/set-state! owner :char-count remaining-chars)
+                      (om/set-state! owner :char-count-alert (< remaining-chars snippet-alert-limit))
+                      (om/set-state! owner :negative-snippet-char-count (neg? remaining-chars))))))
+    (js/emojiAutocomplete)))
 
 (defn headline-on-change [owner]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
@@ -60,7 +58,8 @@
     (let [headline-text   (.-innerText headline)
           remaining-chars (- headline-max-length (count headline-text))]
       (om/set-state! owner :char-count remaining-chars)
-      (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit)))))
+      (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))
+      (om/set-state! owner :negative-headline-char-count (neg? remaining-chars)))))
 
 (defn check-headline-count [owner e]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
@@ -94,8 +93,8 @@
         (.preventDefault e)))))
 
 (defn img-on-load [img]
-  (dis/dispatch! [:foce-input {:image-width (.-clientHeight img)
-                               :image-height (.-clientWidth img)}])
+  (dis/dispatch! [:foce-input {:image-width (.-clientWidth img)
+                               :image-height (.-clientHeight img)}])
   (gdom/removeNode img))
 
 (defn upload-file! [owner file]
@@ -130,6 +129,7 @@
   (init-state [_]
     (let [topic-data (dis/foce-section-data)]
       {:initial-headline (:headline topic-data)
+       :snippet-placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
        :initial-snippet  (if (:placeholder topic-data) "" (:snippet topic-data))
        :char-count nil
        :char-count-alert false
@@ -142,7 +142,7 @@
     (setup-edit owner)
     (utils/after 100 #(focus-headline)))
 
-  (render-state [_ {:keys [initial-headline initial-snippet char-count char-count-alert file-upload-state file-upload-progress upload-remote-url]}]
+  (render-state [_ {:keys [initial-headline initial-snippet snippet-placeholder char-count char-count-alert file-upload-state file-upload-progress upload-remote-url negative-snippet-char-count negative-headline-char-count]}]
     (let [section             (dis/foce-section-key)
           topic-data          (dis/foce-section-data)
           section-kw          (keyword section)
@@ -207,6 +207,8 @@
                         :id (str "foce-snippet-" (name section))
                         :key "foce-snippet"
                         :ref "topic-snippet"
+                        :data-placeholder snippet-placeholder
+                        :placeholder snippet-placeholder
                         :contentEditable true
                         :style #js {:minHeight (if (:placeholder topic-data) "100px" "0px")}
                         :onKeyUp   #(check-snippet-count owner %)
@@ -239,15 +241,16 @@
                 (dom/i {:class "fa fa-code"}))
             (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
                 (dom/input {:type "text"
-                            :auto-focus true
+                            :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
                             :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
                             :value upload-remote-url})
-                (dom/button {:style {:font-size "14px" :margin-left "1rem"}
-                             :class "underline btn-reset p0"
+                (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                             :class "btn-reset btn-solid"
+                             :disabled (clojure.string/blank? upload-remote-url)
                              :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
                   "add")
-                (dom/button {:style {:font-size "14px" :margin-left "1rem" :opacity "0.5"}
-                             :class "underline btn-reset p0"
+                (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                             :class "btn-reset btn-outline"
                              :on-click #(om/set-state! owner :file-upload-state nil)}
                   "cancel"))
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
@@ -266,7 +269,7 @@
               (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
             (dom/div {:class "topic-foce-footer-right"}
               (dom/button {:class "btn-reset btn-solid"
-                           :disabled (= file-upload-state :show-progress)
+                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count negative-snippet-char-count)
                            :on-click #(dis/dispatch! [:foce-save])} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
                            :on-click #(do

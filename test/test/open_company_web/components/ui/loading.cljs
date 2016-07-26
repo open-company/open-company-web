@@ -23,7 +23,7 @@
           app-state (atom test-atom)
           _ (om/root loading app-state {:target c})
           loading-node (sel1 c [:div.oc-loading])
-          loading-internal-node (sel1 [:div.oc-loading-internal])]
+          loading-internal-node (sel1 [:i.fa.fa-circle-o-notch])]
       (is (not (nil? loading-node)))
       (is (not (nil? loading-internal-node)))
       (tu/unmount! c))))

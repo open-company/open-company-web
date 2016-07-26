@@ -50,7 +50,7 @@
           (when (:image-url topic-data)
             (dom/div {:class "topic-header-image"}
               (dom/img {:src (:image-url topic-data)})))
-          (dom/div {:class "group"}
+          (dom/div {:class "topic-title-container group"}
             (dom/div {:class "topic-title left"} (:title topic-data))
             (when (and can-edit
                        is-actual)
@@ -246,9 +246,10 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (str "fullscreen-topic" (when (:animate data) " initial"))
                     :ref "fullscreen-topic"}
-        (dom/div {:class "btd-container"
-                  :style {:width (str (+ fullscreen-width 20) "px")}}
-          (back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)}))
+        (when-not editing
+          (dom/div {:class "btd-container"
+                    :style {:width (str (+ fullscreen-width 20) "px")}}
+            (back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)})))
         (dom/div {:style #js {:display (when-not editing "none")}
                   :key (str as-of edit-rand)}
           (om/build fullscreen-topic-edit {:topic section

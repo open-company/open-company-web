@@ -51,26 +51,11 @@ div.su-snapshot-preview {
       }
 
       button.share-su-button {
-        width: 40px;
-        height: 40px;
-        border-radius: 20px;
-        background-color: white;
-        margin-left: 8px;
-        float: left;
-        cursor: pointer;
+        margin-top: 5px;
 
         &:disabled{
           opacity: 0.4;
           cursor: default;
-        }
-
-        img {
-          width: 20px;
-          height: 20px;
-        }
-
-        div.svg-icon {
-          padding: 0px 4px;
         }
       }
     }
@@ -87,6 +72,10 @@ div.su-snapshot-preview {
       height: 50px;
       text-align: center;
 
+      div {
+        margin-top: 10px;
+      }
+
       img.company-logo {
         max-height: 50px;
         max-width: 150px;
@@ -95,7 +84,6 @@ div.su-snapshot-preview {
 
       span.company-name {
         margin-top: 0px;
-        margin-left: 16px;
         font-weight: 700;
         font-size: 24px;
         line-height: 1.2;
@@ -106,7 +94,7 @@ div.su-snapshot-preview {
     div.preview-title-container {
       width: 100%;
       text-align: center;
-      padding-top: 17px;
+      margin-top: 50px;
 
       input.preview-title {
         font-weight: 400;

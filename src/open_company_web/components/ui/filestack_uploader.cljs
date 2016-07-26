@@ -43,36 +43,42 @@
      js/document
      (str "<span id=" placeholder-id "></span>"))))
 
-(defcomponent filestack-uploader [editor owner]
+(defcomponent filestack-uploader [editor owner options]
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (assert ls/filestack-key "FileStack API Key required")
       (js/filepicker.setKey ls/filestack-key)))
 
   (did-update [_ _ prev-state]
-    (when (and (not (utils/is-test-env?)) (= (om/get-state owner :state) :show-options))
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+    (when-not (utils/is-test-env?)
+      ; hide placeholder callback when needed
+      ((:hide-placeholder options) (not (nil? (om/get-state owner :state))))
+      (when (= (om/get-state owner :state) :show-options)
+        (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
-  (render-state [this {:keys [state]}]
+  (render-state [this {:keys [state url]}]
     (dom/div {:id "file-upload-ui"
               :style (merge {:transition ".2s"}
-                            (when (:state (om/get-state owner))
+                            (when state
                               {:right 0}))}
       (dom/div {:class "flex"}
         (dom/input {:id "file-upload-ui--select-trigger" :style {:display "none"} :type "file"
                     :on-change #(upload-file! editor owner (-> % .-target .-files (aget 0)))})
         (dom/button {:class "btn-reset p0 file-upload-btn"
                      :style {:margin-right "13px"
+                             :position "absolute"
+                             :top "0px"
+                             :left "0px"
                              :transition ".2s"
-                             :transform (if (om/get-state owner :state) "rotate(135deg)")}
+                             :transform (when state "rotate(135deg)")}
                      :on-click (fn [e]
                                   (utils/event-stop e)
                                   (om/update-state! owner :state #(if % nil :show-options)))}
-          (i/icon :circle-add {:size 24}))
-          (dom/div {:style #js {:margin "1px 0 0 22px"
+          (i/icon :circle-add {:size 24 :color "rgba(78, 90, 107, 0.5)" :accent-color "rgba(78, 90, 107, 0.5)"}))
+          (dom/div {:style #js {:margin "1px 0 0 30px"
                                 :display (if (= state :show-options) "block" "none")}}
             (dom/button {:class "btn-reset oc-gray-5"
-                         :style {:font-size "14px" :opacity "0.5"}
+                         :style {:font-size "15px" :opacity "0.5"}
                          :title "Add an image"
                          :type "button"
                          :data-toggle "tooltip"
@@ -80,10 +86,9 @@
                          :on-click (fn [_]
                                      (insert-marker!)
                                      (.click (gdom/getElement "file-upload-ui--select-trigger")))}
-              (dom/i {:class "fa fa-camera"}))
-            (dom/span {:style {:font-size "14px"}} " or ")
-            (dom/button {:style {:font-size "14px" :opacity "0.5"}
-                         :class "btn-reset oc-gray-5"
+            (dom/i {:class "fa fa-camera"}))
+            (dom/button {:class "btn-reset oc-gray-5"
+                         :style {:font-size "15px" :opacity "0.5"}
                          :title "Provide an image link"
                          :type "button"
                          :data-toggle "tooltip"
@@ -94,17 +99,18 @@
                 (dom/i {:class "fa fa-code"})))
           (dom/span {:style {:display (if (= state :show-progress) "block" "none")}}
             (str "Uploading... " (om/get-state owner :progress) "%"))
-          (dom/div {:style {:display (if (= state :show-url-field) "block" "none")}}
+          (dom/div {:style {:background-color "white" :margin-left "30px" :margin-top "-4px" :display (if (= state :show-url-field) "block" "none")}}
             (dom/input {:type "text"
-                               :style {:width 300}
-                               :auto-focus true
+                               :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
                                :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
-                               :value (om/get-state owner :url)})
-            (dom/button {:style {:font-size "14px" :margin-left "1rem"} :class "underline btn-reset p0"
-                         :on-click #(upload-file! editor owner (om/get-state owner :url))}
+                               :value url})
+            (dom/button {:style {:height "32px" :font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                         :class "btn-reset btn-solid"
+                         :disabled (clojure.string/blank? url)
+                         :on-click #(upload-file! editor owner url)}
               "add")
-            (dom/button {:style {:font-size "14px" :margin-left "1rem" :opacity "0.5"}
-                         :class "underline btn-reset p0"
+            (dom/button {:style {:height "32px" :font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                         :class "btn-reset btn-outline"
                          :on-click (fn [_]
                                      (gdom/removeNode (gdom/getElement placeholder-id))
                                      (om/set-state! owner {}))}

@@ -9,18 +9,26 @@ body.animating div.list-companies div.page {
   }
 }
 
+body.small-footer {
+  div.list-companies {
+    div.navbar-offset {
+      min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px + 1px);
+    }
+  }
+}
+
 div.list-companies {
 
   div.navbar-offset {
     padding-top: 50px;
-    min-height: calc(100vh - #{$footer_height}px + 5px);
+    min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
 
     ul.companies {
       list-style-type: none;
 
       li {
         float: left;
-        width: 250px;
+        width: 380px;
         height: 50px;
         margin: 10px 10px 10px 0;
         border: 1px solid rgba(78, 90, 107, 0.5);
@@ -38,6 +46,11 @@ div.list-companies {
             height: 20px;
             float: left;
             margin-left: 10px;
+          }
+
+          span.company-logo{
+            font-size: 24px;
+            line-height: 0.7;
           }
 
           span {

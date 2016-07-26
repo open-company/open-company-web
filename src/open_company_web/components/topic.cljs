@@ -59,6 +59,7 @@
 (defcomponent topic-internal [{:keys [topic-data
                                       section
                                       currency
+                                      card-width
                                       prev-rev
                                       next-rev
                                       sharing-mode
@@ -100,23 +101,23 @@
               :else
               (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options}))))
         ;; Topic title
-        (dom/div {:class "topic-title"} (:title topic-data))
-        (when (and show-fast-editing
+        (dom/div {:class "group"}
+          (dom/div {:class "topic-title"} (:title topic-data))
+          (when (and show-fast-editing
                    (responsive/can-edit?)
                    (not (responsive/is-mobile))
                    (not (:read-only topic-data))
                    (not sharing-mode))
-          (dom/button {:class (str "topic-pencil-button btn-reset")
-                       :style {:top (if image-header (str (min 196 (:image-height topic-data)) "px") "5px")}
-                       :on-click #(pencil-click owner %)}
-            (dom/i {:class "fa fa-pencil"})))
+            (dom/button {:class (str "topic-pencil-button btn-reset")
+                         :on-click #(pencil-click owner %)}
+              (dom/i {:class "fa fa-pencil"}))))
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
         (dom/div #js {:className "topic-body topic-snippet"
                       :ref "topic-snippet"
                       :dangerouslySetInnerHTML (utils/emojify snippet)})
-        (when-not (clojure.string/blank? topic-body)
+        (when-not (clojure.string/blank? (utils/strip-HTML-tags topic-body))
           (dom/button {:class "btn-reset topic-read-more"
                        :onClick (partial fullscreen-topic data nil false)} "READ MORE"))))))
 
@@ -161,6 +162,7 @@
                              section
                              currency
                              column
+                             card-width
                              sharing-mode
                              share-selected
                              archived-topics
@@ -228,6 +230,7 @@
                                     :sharing-mode sharing-mode
                                     :show-fast-editing (:show-fast-editing data)
                                     :currency currency
+                                    :card-width card-width
                                     :read-only-company (:read-only-company data)
                                     :foce-key (:foce-key data)
                                     :foce-data (:foce-data data)
@@ -243,6 +246,7 @@
                                         :sharing-mode sharing-mode
                                         :show-fast-editing (:show-fast-editing data)
                                         :currency currency
+                                        :card-width card-width
                                         :read-only-company (:read-only-company data)
                                         :topic-click (:topic-click options)
                                         :prev-rev prev-rev

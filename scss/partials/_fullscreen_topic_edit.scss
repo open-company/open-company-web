@@ -15,12 +15,13 @@ div.fullscreen-topic-edit {
       border-radius: 4px;
       background-color: #ffffff;
       border: solid 2px rgba(78, 90, 107, 0.2);
-      padding: 26px 30px;
+      padding: 0px  0px 30px 0px;
 
       div.topc-edit-top-box-footer {
         width: 100%;
         margin-top: 25px;
         height: 20px;
+        padding: 0px 26px;
 
         div.char-count {
           width: 50px;
@@ -60,6 +61,10 @@ div.fullscreen-topic-edit {
           color: rgba(78, 90, 107, 0.5); 
         }
 
+        button.archive-button {
+          color: rgba(78, 90, 107, 0.5);
+        }
+
         span.file-upload-progress {
           margin-top: 7px;
           padding-bottom: 0px;
@@ -78,7 +83,9 @@ div.fullscreen-topic-edit {
         position: relative;
 
         img {
-          max-width: 490px;
+          max-width: 100%;
+          border-top-left-radius: 2px;
+          border-top-right-radius: 2px;
         }
 
         button.remove-header{
@@ -108,14 +115,15 @@ div.fullscreen-topic-edit {
         opacity: 0.5;
         font-family: $oc_headers_font;
         font-weight: 700;
-        font-size: 12px;
+        font-size: 13px;
         line-height: 1.5;
         letter-spacing: 1px;
         color: $oc_gray_5;
         text-transform: uppercase;
         border: 0px;
         width: 100%;
-        padding: 0px;
+        margin-top: 17px;
+        padding: 0px 26px;
 
         &:active, &:focus{
           border: 0px;
@@ -140,16 +148,15 @@ div.fullscreen-topic-edit {
         color: $oc_gray_5;
         border: 0px;
         width: 100%;
-        padding: 0px;
+        padding: 0px 26px;
         margin: 0px;
-        margin-top: 18px;
+        margin-top: 21px;
         height: auto;
 
         &:after{
           font-style: italic;
           font-family: $oc_headers_font;
           font-size: 26px;
-          line-height: 24px;
           color: $oc_gray_5;
           opacity: 0.5;
         }
@@ -289,11 +296,12 @@ div.fullscreen-topic-edit {
       }
 
       div.topic-edit-snippet {
-        margin-top: 21px !important;
         @include rich-editor-body(rgba(78, 90, 107, 1));
         line-height: 1.8;
         font-size: 18px;
         min-height: 100px;
+        margin-top: 12px !important;
+        padding: 0px 26px !important;
 
         &:after {
           font-family: $oc_main_font;
@@ -341,7 +349,7 @@ div.fullscreen-topic-edit {
       }
 
       div.topic-body{
-        margin-top: 17px !important;
+        margin-top: 37px !important;
         @include rich-editor-body($oc_gray_5);
         line-height: 1.8;
         font-size: 18px;
@@ -353,42 +361,21 @@ div.fullscreen-topic-edit {
           font-family: $oc_main_font;
           font-weight: 400;
           font-size: 18px;
-          line-height: 1.8;
           margin-top: 0px;
+        }
+
+        &.hide-placeholder:after{
+          display: none;
         }
       }
     }
   }
 
-  button.archive-button {
-    float: left;
-    position: fixed;
-    bottom: 20px;
-    background-color: white;
-    opacity: 1;
-    color: rgba(78,90,107,0.8);
-    border: 1px solid rgba(78,90,107,0.8);
-    width: 240px;
-    height: 30px;
-    transition: none;
-
-    &:hover {
-      color: rgba(78,90,107,1);
-      border: 1px solid rgba(78,90,107,1);
-    }
-    i.fa-archive {
-      margin-right: 5px;
-    }
-  }
-
   button.save-button {
     cursor: pointer;
-    position: fixed;
-    bottom: 20px;
     opacity: 1;
     color: rgba(78,90,107,0.8);
     border: 1px solid rgba(78,90,107,0.8);
-    width: 100px;
     height: 30px;
     transition: none;
 
@@ -405,14 +392,10 @@ div.fullscreen-topic-edit {
 
   button.cancel-button {
     cursor: pointer;
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
     background-color: white;
     opacity: 1;
     color: rgba(78,90,107,0.8);
     border: 1px solid rgba(78,90,107,0.8);
-    width: 120px;
     height: 30px;
     transition: none;
 

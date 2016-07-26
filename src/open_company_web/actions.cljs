@@ -155,13 +155,15 @@
   (assoc-in db path value))
 
 (defmethod dispatcher/action :topic-archive [db [_ topic]]
-  (let [company-data (dispatcher/company-data)
+  (let [slug (keyword (router/current-company-slug))
+        company-data (dispatcher/company-data)
         old-categories (:sections company-data)
         new-categories (apply merge (map #(hash-map (first %) (utils/vec-dissoc (second %) (name topic))) old-categories))]
-    (api/patch-sections new-categories))
-  (-> db
-    (dissoc :foce-key)
-    (dissoc :foce-data)))
+    (api/patch-sections new-categories)
+    (-> db
+      (dissoc :foce-key)
+      (dissoc :foce-data)
+      (assoc-in (conj (dispatcher/company-data-key slug) :sections) new-categories))))
 
 (defmethod dispatcher/action :foce-save [db [_]]
   (let [slug (keyword (router/current-company-slug))
