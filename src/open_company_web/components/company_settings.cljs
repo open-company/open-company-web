@@ -30,8 +30,8 @@
 
 (rum/defcs subscription-info
   < {:did-mount (fn [s] (api/get-subscription) s)}
-    (dis/drv :subscription)
-    (dis/drv :jwt)
+    (drv/drv :subscription)
+    (drv/drv :jwt)
     rum/reactive
   [s slug]
   [:div

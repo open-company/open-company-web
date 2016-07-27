@@ -4,6 +4,7 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [open-company-web.rum-utils :as ru]
             [open-company-web.actions]
             [open-company-web.api :as api]
             [open-company-web.urls :as urls]
@@ -31,18 +32,11 @@
 
 (enable-console-print!)
 
-(rum/defcs drv-wrap-inner
-  < (drv/drv :base)
-    rum/reactive
-  [s om-component]
-  ;; (prn 'base (keys (drv/react s :base)))
-  ;; (js/console.log "om-component" om-component)
-  (om/build om-component (drv/react s :base)))
-
-(rum/defc drv-wrap
-  < (drv/rum-derivatives (dis/drv-spec dis/app-state))
-  [om-component]
-  (drv-wrap-inner om-component))
+(defn drv-root [om-component target]
+  (ru/drv-root {:state dis/app-state
+                :drv-spec (dis/drv-spec dis/app-state)
+                :component om-component
+                :target target}))
 
 ;; setup Sentry error reporting
 (defonce raven (sentry/raven-setup))
@@ -57,7 +51,7 @@
 
 (defn inject-loading []
   (let [target (sel1 [:div#oc-loading])]
-    (rum/mount (drv-wrap loading) target)))
+    (drv-root loading target)))
 
 (defn pre-routing [query-params]
   ; make sure the menu is closed
@@ -79,8 +73,7 @@
   (swap! dis/app-state assoc :loading true)
   (api/get-entry-point)
   ;; render component
-  (rum/mount (drv-wrap home) target)
-  #_(om/root home dis/app-state {:target target}))
+  (drv-root home target))
 
 ;; Company list
 (defn list-companies-handler [target params]
@@ -94,8 +87,7 @@
   (api/get-entry-point)
   (api/get-companies)
   ;; render component
-  (rum/mount (drv-wrap list-companies) target)
-  #_(om/root list-companies dis/app-state {:target target}))
+  (drv-root list-companies target))
 
 ;; Handle successful and unsuccessful logins
 (defn login-handler [target params]
@@ -115,8 +107,7 @@
         ;login went bad, add the error message to the app-state
         (swap! dis/app-state assoc :access (:access (:query-params params))))
       ;; render component
-      (rum/mount (drv-wrap login) target)
-      #_(om/root login dis/app-state {:target target}))))
+      (drv-root login target))))
 
 ;; Component specific to a company
 (defn company-handler [route target component params]
@@ -141,8 +132,7 @@
       (api/get-company slug)
       (swap! dis/app-state assoc :loading true))
     ;; render component
-    (rum/mount (drv-wrap component) target)
-    #_(om/root component dis/app-state {:target target})))
+    (drv-root component target)))
 
 ;; Component specific to a stakeholder update
 (defn stakeholder-update-handler [target component params]
@@ -162,8 +152,7 @@
       (let [su-loading-key (conj su-key :loading)]
         (swap! dis/app-state assoc-in su-loading-key true)))
     ;; render component
-    (rum/mount (drv-wrap component) target)
-    #_(om/root component dis/app-state {:target target})))
+    (drv-root component target)))
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
@@ -183,8 +172,7 @@
       (if (jwt/jwt)
         (do
           (pre-routing (:query-params params))
-          (rum/mount (drv-wrap company-editor) target)
-          #_(om/root company-editor dis/app-state {:target target}))
+          (drv-root company-editor target))
         (login-handler target params)))
 
     (defroute list-page-route urls/companies {:as params}
@@ -196,8 +184,7 @@
     (defroute user-profile-route urls/user-profile {:as params}
       (utils/clean-company-caches)
       (pre-routing (:query-params params))
-      (rum/mount (drv-wrap user-profile) target)
-      #_(om/root user-profile dis/app-state {:target target}))
+      (drv-root user-profile target))
 
     (defroute company-settings-route (urls/company-settings ":slug") {:as params}
       (company-handler "profile" target company-settings params))
