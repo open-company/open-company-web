@@ -30,6 +30,7 @@
   (when caret-pos
     (let [hex-num      (js/parseInt (.-unicode emoji) 16)
           unicode-char (js/String.fromCharCode hex-num)]
+      (println "emoji:" emoji)
       (println "hex-num:" hex-num "unicode-char:" unicode-char)
       (js/pasteHtmlAtCaret unicode-char @caret-pos false))))
 
