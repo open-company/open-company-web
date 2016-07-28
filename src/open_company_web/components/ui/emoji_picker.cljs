@@ -7,7 +7,9 @@
             [cljsjs.react.dom]
             [open-company-web.lib.react-utils :as react-utils]
             [goog.events :as events]
-            [goog.events.EventType :as EventType]))
+            [goog.events.EventType :as EventType]
+            [goog.object :as googobj]
+            [open-company-web.lib.utils :as utils]))
 
 
 
@@ -28,17 +30,19 @@
 
 (defn replace-with-emoji [emoji]
   (when caret-pos
-    (let [hex-num      (js/parseInt (.-unicode emoji) 16)
-          unicode-char (js/String.fromCharCode hex-num)]
-      (println "emoji:" emoji)
-      (println "hex-num:" hex-num "unicode-char:" unicode-char)
-      (js/pasteHtmlAtCaret unicode-char @caret-pos false))))
+    (let [unicode      (googobj/get emoji "unicode")
+          hex-num      (js/parseInt unicode 16)
+          unicode-char (js/String.fromCharCode hex-num)
+          shortname    (googobj/get emoji "shortname")
+          emojified    (utils/emojify shortname)]
+      (js/pasteHtmlAtCaret (str unicode-char " - " (googobj/get emojified "__html")) @caret-pos false))))
 
 (defcomponent emoji-picker
   "Render an emoji button that reveal a picker for emoji.
    It will add the selected emoji in place of the current selection if
    the current activeElement has the class emojiable."
   [data owner]
+
   (init-state [_]
     {:visible false
      :click-listener nil})
