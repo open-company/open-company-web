@@ -39,6 +39,7 @@
     [cljsjs/hammer "2.0.4-5"] ; Touch handler http://hammerjs.github.io/
     [cljsjs/emojione "2.1.4-1"] ; Emojione http://emojione.com
     [cljsjs/clipboard "1.5.9-0"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
+    [cljsjs/emojione-picker "0.3.6-1"] ; EmojionePicker cljsjs package https://github.com/tommoor/emojione-picker
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"]
     [lockedon/if-let "0.1.0"]]) ; More than one binding for if/when macros https://github.com/LockedOn/if-let
 
@@ -74,7 +75,10 @@
 (task-options!
  from-jars {:imports #{['cljsjs/emojione
                         "cljsjs/emojione/common/sprites/emojione.sprites.svg"
-                        "public/img/emojione.sprites.svg"]}})
+                        "public/img/emojione.sprites.svg"]
+                        ['cljsjs/emojione-picker
+                        "cljsjs/emojione-picker/common/emojione-picker.css"
+                        "public/css/emojione-picker.css"]}})
 
 ;; We use a bunch of edn files in `resources/pages` to declare a "page"
 ;; these edn files can hold additional information about the page such
