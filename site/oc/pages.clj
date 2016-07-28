@@ -167,7 +167,9 @@
           [:link {:type "text/css", :rel "stylesheet", :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
           ;;  Medium Editor css
           [:link {:type "text/css", :rel "stylesheet", :href "/css/medium-editor/medium-editor.css?oc_deploy_key"}]
-          [:link {:type "text/css", :rel "stylesheet", :href "/css/medium-editor/default.css?oc_deploy_key"}]]
+          [:link {:type "text/css", :rel "stylesheet", :href "/css/medium-editor/default.css?oc_deploy_key"}]
+          ;; EmojionePicker css from cljsjs
+          [:link {:type "text/css", :rel "stylesheet", :href "/css/emojione-picker.css?oc_deploy_key"}]]
    :body [:body
           [:div#app [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
           [:div#oc-loading]
@@ -189,9 +191,8 @@
           [:script {:src "/lib/jwt-decode/jwt-decode.min.js?oc_deploy_key" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
           [:script {:src "/js/oc.js?oc_deploy_key" :type "text/javascript"}]
-          ;; ClojureScript generated JavaScript
-          [:script {:src "/lib/js-utils/svg-utils.js?oc_deploy_key" :type "text/javascript"}]
-          ;; TODO Remove w/ externs
+          ;; Utilities
           [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js?oc_deploy_key"}]
+          [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js?oc_deploy_key"}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]]})
