@@ -15,6 +15,7 @@
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
+            [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [goog.dom :as gdom]
             [clojure.string :as string]))
@@ -191,7 +192,7 @@
                                     (om/set-state! owner :char-count remaining-chars)
                                     (om/set-state! owner :char-count-alert (< remaining-chars title-alert-limit)))})
           ;; Topic headline
-          (dom/div {:class "topic-headline-inner emoji-autocomplete"
+          (dom/div {:class "topic-headline-inner emoji-autocomplete emojiable"
                     :id (str "foce-headline-" (name section))
                     :key "foce-headline"
                     :placeholder "Headline"
@@ -199,11 +200,11 @@
                     :on-key-up   #(check-headline-count owner %)
                     :on-key-down #(check-headline-count owner %)
                     :on-focus    #(check-headline-count owner %)
-                    :onBlur #(do
-                               (check-headline-count owner %)
-                               (om/set-state! owner :char-count nil))
+                    :on-blur #(do
+                                (check-headline-count owner %)
+                                (om/set-state! owner :char-count nil))
                     :dangerouslySetInnerHTML #js {"__html" initial-headline}})
-          (dom/div #js {:className "topic-body topic-snippet emoji-autocomplete"
+          (dom/div #js {:className "topic-body topic-snippet emoji-autocomplete emojiable"
                         :id (str "foce-snippet-" (name section))
                         :key "foce-snippet"
                         :ref "topic-snippet"
@@ -223,6 +224,8 @@
                         :style {:display "none"}
                         :type "file"
                         :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
+            (dom/div {:class "left mr2"}
+              (om/build emoji-picker {}))
             (dom/button {:class "btn-reset camera left"
                          :title (if (not image-header) "Add an image" "Replace image")
                          :type "button"
