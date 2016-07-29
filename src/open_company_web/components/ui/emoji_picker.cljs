@@ -35,12 +35,12 @@
           unicode-char (js/String.fromCharCode hex-num)
           shortname    (googobj/get emoji "shortname")
           emojified    (utils/emojify shortname)]
-      (js/pasteHtmlAtCaret (str unicode-char " - " (googobj/get emojified "__html")) @caret-pos false))))
+      (js/pasteHtmlAtCaret (googobj/get emojified "__html") @caret-pos false))))
 
 (defcomponent emoji-picker
   "Render an emoji button that reveal a picker for emoji.
    It will add the selected emoji in place of the current selection if
-   the current activeElement has the class emojiable."
+   the current activeElement has the class `emojiable`."
   [data owner]
 
   (init-state [_]
