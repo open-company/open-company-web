@@ -33,7 +33,7 @@ function emojiAutocomplete() {
               return '<svg class="emojione"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="'+this.spritePath+'.svg#emoji-' +emojiStrategy[shortname].unicode+ '"></use></svg>';
             },
             PNGImageFromShortname: function(shortname){
-              return '<img class="emojione" src="//cdn.jsdelivr.net/emojione/assets/png/'+emojiStrategy[shortname].unicode+'.png">';
+              return '<img class="emojione" src="//cdn.jsdelivr.net/emojione/assets/png/' +emojiStrategy[shortname].unicode+ '.png">';
             },
             template: function (shortname) {
               // Load emoji images one by one
