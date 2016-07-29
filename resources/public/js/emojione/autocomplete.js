@@ -43,7 +43,6 @@ function emojiAutocomplete() {
               // return this.SVGImageFromShortname(shortname)+' :'+shortname+':';
             },
             replace: function (shortname) {
-                console.log(open_company_web.lib.utils.emojify(':'+shortname+':'));
                 return open_company_web.lib.utils.emojify(':'+shortname+':')['__html'];
             },
             index: 1
