@@ -23,6 +23,7 @@
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.components.tooltip :refer (tooltip)]
             [open-company-web.components.ui.icon :refer (icon)]
+            [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -637,7 +638,7 @@
                                       (om/set-state! owner :char-count (- title-length-limit (count title)))
                                       (om/set-state! owner :char-count-alert (< (- title-length-limit (count title)) title-alert-limit))
                                       (change-value owner :title e))})
-            (dom/div {:className "topic-edit-headline emoji-autocomplete"
+            (dom/div {:className "topic-edit-headline emoji-autocomplete emojiable"
                       :ref "topic-edit-headline"
                       :contentEditable true
                       :id (str "topic-edit-headline-" (name topic))
@@ -694,7 +695,7 @@
                                             (.stopPropagation e)
                                             (om/set-state! owner :growth-new-metric true)
                                             (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
-            (dom/div {:class "topic-edit-snippet emoji-autocomplete"
+            (dom/div {:class "topic-edit-snippet emoji-autocomplete emojiable"
                       :id (str "topic-edit-snippet-" (name topic))
                       :contentEditable true
                       :on-blur #(do (check-snippet-count owner %)
@@ -703,6 +704,8 @@
                       :on-key-down #(check-snippet-count owner %)
                       :dangerouslySetInnerHTML (clj->js {"__html" snippet})})
             (dom/div {:class "topc-edit-top-box-footer"}
+              (dom/div {:class "left mr2"}
+                (om/build emoji-picker {}))
               (dom/button {:class "btn-reset add-image"
                            :title (if (not image-url) "Add an image" "Replace image")
                            :type "button"
@@ -749,7 +752,7 @@
                           :type "file"
                           :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})))
           (dom/div {:class "relative topic-body-line"}
-            (dom/div {:className (str "topic-body emoji-autocomplete" (when hide-placeholder " hide-placeholder"))
+            (dom/div {:className (str "topic-body emoji-autocomplete emojiable" (when hide-placeholder " hide-placeholder"))
                       :contentEditable true
                       :id (str "topic-edit-body-" (name topic))
                       :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
