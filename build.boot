@@ -74,8 +74,8 @@
 
 (task-options!
  from-jars {:imports #{['cljsjs/emojione
-                        "cljsjs/emojione/common/sprites/emojione.sprites.svg"
-                        "public/img/emojione.sprites.svg"]
+                        "cljsjs/emojione/common/sprites/emojione.sprites.png"
+                        "public/img/emojione.sprites.png"]
                         ['cljsjs/emojione-picker
                         "cljsjs/emojione-picker/common/emojione-picker.css"
                         "public/css/emojione-picker.css"]}})
