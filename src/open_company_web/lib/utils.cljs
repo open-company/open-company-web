@@ -682,9 +682,9 @@
   with emoji image tags via the Emoji One lib and resources."
   [text & [plain-text]]
   ;; use an SVG sprite map
-  (set! (.-imageType js/emojione) "svg")
+  (set! (.-imageType js/emojione) "png")
   (set! (.-sprites js/emojione) true)
-  (set! (.-imagePathSVGSprites js/emojione) "/img/emojione.sprites.svg")
+  (set! (.-imagePathPNGSprites js/emojione) "/img/emojione.sprites.png")
   ;; convert textual emoji's into SVG elements
   (set! (.-ascii js/emojione) true)
   (let [text-string (or text "") ; handle nil
