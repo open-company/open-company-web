@@ -360,7 +360,8 @@
                 fullscreen-topic (sel1 [:div.fullscreen-topic])
                 body-line (sel1 [:div.topic-body-line])]
       (let [file-upload-ui (sel1 [:div#file-upload-ui])
-            add-image-btn (sel1 [:button.file-upload-btn])]
+            add-image-btn (sel1 [:button.file-upload-btn])
+            emoji-picker  (sel1 [:div.emoji-picker])]
         (when (and (>= (+ (.-clientY e) (.-scrollTop fullscreen-topic)) (- (top-position body-line) 24))
                    (not (utils/event-inside? e topic-body))
                    ; click is not on the add image button
@@ -370,7 +371,11 @@
                    ; click is not in the file upload ui
                    (or (nil? file-upload-ui)
                        (and file-upload-ui
-                            (not (utils/event-inside? e file-upload-ui)))))
+                            (not (utils/event-inside? e file-upload-ui))))
+                   ; click is not inside emojione-picker
+                   (or (nil? emoji-picker)
+                       (and emoji-picker
+                            (not (utils/event-inside? e emoji-picker)))))
           (.focus topic-body)
           (utils/to-end-of-content-editable topic-body)
           (scroll-to-bottom))))))
