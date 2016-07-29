@@ -93,6 +93,12 @@
   }
 }
 
+@mixin emoji-size($size: 16px){
+  width: $size;
+  height: $size;
+  font-size: $size;
+}
+
 @mixin rich-editor-body($text_color: #444444){
   border: 0px solid transparent;
 
@@ -137,9 +143,8 @@
     }
   }
 
-  svg.emojione {
-    width: 18px;
-    height: 18px;
+  .emojione {
+    @include emoji-size(18px);
   }
 
   h1, h2, h3, h4, h5 {

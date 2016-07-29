@@ -107,9 +107,8 @@ span.num.red {
 }
 
 /* Emoji One */
-svg.emojione {
-  height: 18px;
-  width: 18px;
+.emojione {
+  @include emoji-size(18px);
   display: inline-block;
   vertical-align: text-top;
 }

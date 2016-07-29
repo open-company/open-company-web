@@ -158,9 +158,8 @@ div.topic {
         line-height: 25px;
         color: $oc_gray_5;
 
-        svg.emojione {
-          width: 20px;
-          height: 20px;
+        .emojione {
+          @include emoji-size(20px);
         }
       }
 
@@ -181,9 +180,8 @@ div.topic {
         font-size: 15px;
         line-height: 22px;
 
-        svg.emojione {
-          width: 15px;
-          height: 15px;
+        .emojione {
+          @include emoji-size(15px);
         }
 
         *{

@@ -153,9 +153,8 @@ div.topic {
           outline: none;
         }
 
-        svg.emojione {
-          width: 20px;
-          height: 20px;
+        .emojione {
+          @include emoji-size(20px);
         }
       }
 
@@ -189,9 +188,8 @@ div.topic {
           padding-top: 0px;
         }
 
-        svg.emojione {
-          width: 15px;
-          height: 15px;
+        .emojione {
+          @include emoji-size(15px);
         }
 
         *{

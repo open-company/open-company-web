@@ -113,9 +113,8 @@ div.fullscreen-topic {
           color: $oc_gray_5;
           padding: 0px 26px;
 
-          svg.emojione {
-            height: 26px;
-            width: 26px;
+          .emojione {
+            @include emoji-size(26px);
           }
         }
 
