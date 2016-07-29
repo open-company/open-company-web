@@ -3,6 +3,7 @@ function emojiAutocomplete() {
 
     $(".emoji-autocomplete").textcomplete([ {
             match: /\B:([\-+\w]{1,30})$/,
+            spritePath: '/img/emojione.sprites',
             search: function (term, callback) {
                 var results = [];
                 var results2 = [];
@@ -28,15 +29,22 @@ function emojiAutocomplete() {
 
                 callback(newResults);
             },
+            SVGImageFromShortname: function(shortname){
+              return '<svg class="emojione"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="'+this.spritePath+'.svg#emoji-' +emojiStrategy[shortname].unicode+ '"></use></svg>';
+            },
+            PNGImageFromShortname: function(shortname){
+              return '<img class="emojione" src="//cdn.jsdelivr.net/emojione/assets/png/'+emojiStrategy[shortname].unicode+'.png">';
+            },
             template: function (shortname) {
               // Load emoji images one by one
-              // return '<img class="emojione" src="//cdn.jsdelivr.net/emojione/assets/png/'+emojiStrategy[shortname].unicode+'.png"> :'+shortname+':';
+              return this.PNGImageFromShortname(shortname)+' :'+shortname+':';
 
               // Load emoji images all at once (sprite)
-              return '<svg class="emojione"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/img/emojione.sprites.svg#emoji-' +emojiStrategy[shortname].unicode+ '"></use></svg> :'+shortname+':';
+              // return this.SVGImageFromShortname(shortname)+' :'+shortname+':';
             },
             replace: function (shortname) {
-                return ':'+shortname+': ';
+                console.log(open_company_web.lib.utils.emojify(':'+shortname+':'));
+                return open_company_web.lib.utils.emojify(':'+shortname+':')['__html'];
             },
             index: 1
         }
