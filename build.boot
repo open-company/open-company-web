@@ -62,13 +62,15 @@
          '[adzerk.boot-reload :refer [reload]]
          '[tolitius.boot-check :as check]
          '[deraen.boot-sass :refer [sass]]
+         '[medley.core :as med]
          '[io.perun :as p]
          '[boot.util :as util])
 
 (deftask from-jars
   "Import files from jars (e.g. CLJSJS) and move them to the desired location in the fileset."
   [i imports IMPORT #{[sym str str]} "Tuples describing imports: [jar-symbol path-in-jar target-path]"]
-  (let [add-jar-args (into {} (for [[j p]   imports] [j (re-pattern (str "^" p "$"))]))
+  (let [re-union     (fn [paths] (re-pattern (clojure.string/join "|" (map #(str "^" % "$") paths))))
+        add-jar-args (med/map-vals #(re-union (map second %)) (group-by first imports))
         move-args    (into {} (for [[_ p t] imports] [(re-pattern (str "^" p "$")) t]))]
     (sift :add-jar add-jar-args :move move-args)))
 
