@@ -748,3 +748,6 @@
       (.moveToElementText rg content-editable-element)
       (.collapse rg false)
       (.select rg))))
+
+(defn aspect-ration-image-height [original-width original-height final-width]
+  (* (/ original-height original-width) final-width))

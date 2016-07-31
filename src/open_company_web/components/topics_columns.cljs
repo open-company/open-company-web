@@ -23,36 +23,34 @@
 (def inter-topic-gap 22)
 (def add-a-topic-height 95)
 
-(def topic-default-height 95)
-(def data-topic-default-zero-height 105)
-(def data-topic-default-one-height 282)
-(def data-topic-default-more-height 388)
+(def topic-default-height 70)
+(def data-topic-default-zero-height 74)
+(def data-topic-default-one-height 251)
+(def data-topic-default-more-height 357)
 (def topic-body-height 29)
-(def topic-header-image-max-height 196)
 (def add-topic-height 94)
+(def read-more-height 15)
 
 (defn headline-snippet-height [headline snippet card-width]
-  (if (and (clojure.string/blank? headline)
-           (clojure.string/blank? snippet))
-    0
-    (let [$headline (js/$ (str "<div class=\"topic\">"
-                                  "<div class=\"topic-anim\">"
-                                    "<div>"
-                                      "<div class=\"topic-internal\">"
-                                        "<div class=\"topic-headline-inner\" style=\"width: " card-width "px;\">"
-                                          (utils/emojify headline true)
-                                        "</div>"
-                                        "<div class=\"topic-body topic-snippet\" style=\"width: " card-width "px;\">"
-                                          (utils/emojify snippet true)
-                                        "</div>"
+  (let [$headline (js/$ (str "<div class=\"topic\">"
+                                "<div class=\"topic-anim\">"
+                                  "<div>"
+                                    "<div class=\"topic-internal\">"
+                                      (when-not (clojure.string/blank? headline)
+                                        (str "<div class=\"topic-headline-inner\" style=\"width: " card-width "px;\">"
+                                               (utils/emojify headline true)
+                                             "</div>"))
+                                      "<div class=\"topic-body topic-snippet\" style=\"width: " card-width "px;\">"
+                                        (utils/emojify snippet true)
                                       "</div>"
                                     "</div>"
                                   "</div>"
-                                "</div>"))]
-      (.appendTo $headline (.-body js/document))
-      (let [height (.height $headline)]
-        (.detach $headline)
-        height))))
+                                "</div>"
+                              "</div>"))]
+    (.appendTo $headline (.-body js/document))
+    (let [height (.height $headline)]
+      (.detach $headline)
+      height)))
 
 (defn data-topic-height [owner topic topic-data]
   (if (= topic :finances)
@@ -74,7 +72,7 @@
         (> (count metric-data) 1)
         data-topic-default-more-height))))
 
-(defn calc-column-height [owner data topics]
+(defn calc-column-height [owner data topics clmn]
   (let [card-width (om/get-props owner :card-width)
         topics-data (:topics-data data)]
     (for [topic topics
@@ -86,21 +84,20 @@
         add-topic-height
         (#{:finances :growth} topic-kw)
         (let [headline-height (headline-snippet-height (:headline topic-data) (:snippet topic-data) card-width)
-              body-height (if (clojure.string/blank? (:body (:notes topic-data)))
-                            0
-                            topic-body-height)
-              start-height (data-topic-height owner topic topic-data)]
-          (+ start-height headline-height body-height))
+              start-height (data-topic-height owner topic topic-data)
+              read-more    (if (clojure.string/blank? (utils/strip-HTML-tags (utils/get-topic-body topic-data topic))) 0 read-more-height)]
+          (+ start-height headline-height read-more))
         :else
-        (let [topic-image-height      (min (:image-height topic-data) topic-header-image-max-height)
-              headline-snippet-height (headline-snippet-height (:headline topic-data) (:snippet topic-data) card-width)]
-          (+ topic-default-height headline-snippet-height topic-image-height))))))
+        (let [topic-image-height      (if (:image-url topic-data) (utils/aspect-ration-image-height (:image-width topic-data) (:image-height topic-data) card-width) 0)
+              headline-snippet-height (headline-snippet-height (:headline topic-data) (:snippet topic-data) card-width)
+              read-more               (if (clojure.string/blank? (utils/strip-HTML-tags (utils/get-topic-body topic-data topic))) 0 read-more-height)]
+          (+ topic-default-height headline-snippet-height topic-image-height read-more))))))
 
 (defn get-shortest-column [owner data current-layout]
   (let [columns-num (:columns-num data)
-        frst-clmn (apply + (calc-column-height owner data (:1 current-layout)))
-        scnd-clmn (apply + (calc-column-height owner data (:2 current-layout)))
-        thrd-clmn (apply + (calc-column-height owner data (:3 current-layout)))
+        frst-clmn (apply + (calc-column-height owner data (:1 current-layout) 1))
+        scnd-clmn (apply + (calc-column-height owner data (:2 current-layout) 2))
+        thrd-clmn (apply + (calc-column-height owner data (:3 current-layout) 3))
         min-height (if (= columns-num 3)
                     (min frst-clmn scnd-clmn thrd-clmn)
                     (min frst-clmn scnd-clmn))]
