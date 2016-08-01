@@ -129,9 +129,9 @@
 
   (init-state [_]
     (let [topic-data (dis/foce-section-data)]
-      {:initial-headline (:headline topic-data)
+      {:initial-headline (utils/emojify (:headline topic-data))
        :snippet-placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
-       :initial-snippet  (if (:placeholder topic-data) "" (:snippet topic-data))
+       :initial-snippet (if (:placeholder topic-data) "" (utils/emojify (:snippet topic-data)))
        :char-count nil
        :char-count-alert false
        :file-upload-state nil
@@ -203,7 +203,7 @@
                     :on-blur #(do
                                 (check-headline-count owner %)
                                 (om/set-state! owner :char-count nil))
-                    :dangerouslySetInnerHTML #js {"__html" initial-headline}})
+                    :dangerouslySetInnerHTML initial-headline})
           (dom/div #js {:className "topic-body topic-snippet emoji-autocomplete emojiable"
                         :id (str "foce-snippet-" (name section))
                         :key "foce-snippet"
@@ -218,7 +218,7 @@
                         :onBlur #(do
                                    (check-snippet-count owner %)
                                    (om/set-state! owner :char-count nil))
-                        :dangerouslySetInnerHTML #js {"__html" initial-snippet}})
+                        :dangerouslySetInnerHTML initial-snippet})
           (dom/div {:class "topic-foce-buttons group"}
             (dom/input {:id "foce-file-upload-ui--select-trigger"
                         :style {:display "none"}
