@@ -168,10 +168,10 @@
           ;;  Medium Editor css
           [:link {:type "text/css", :rel "stylesheet", :href "/css/medium-editor/medium-editor.css?oc_deploy_key"}]
           [:link {:type "text/css", :rel "stylesheet", :href "/css/medium-editor/default.css?oc_deploy_key"}]
-          ;; EmojionePicker css from cljsjs
-          [:link {:type "text/css", :rel "stylesheet", :href "/css/emojione-picker.css?oc_deploy_key"}]
           ;; Emojione Sprites CSS
-          [:link {:type "text/css", :rel "stylesheet", :href "/css/emojione-sprites.css?oc_deploy_key"}]]
+          [:link {:type "text/css", :rel "stylesheet", :href "/css/emojione.css?oc_deploy_key"}]
+          ;; EmojionePicker css from cljsjs
+          [:link {:type "text/css", :rel "stylesheet", :href "/css/emojione-picker.css?oc_deploy_key"}]]
    :body [:body
           [:div#app [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
           [:div#oc-loading]
