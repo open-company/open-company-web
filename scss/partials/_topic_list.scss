@@ -22,7 +22,7 @@ div.topic-list-edit-container {
 
 body.small-footer{
   div.topic-list {
-    min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px - 1px);
+    min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px);
 
     &.sharing-mode {
       min-height: calc(100vh - #{$footer_small_height}px);
