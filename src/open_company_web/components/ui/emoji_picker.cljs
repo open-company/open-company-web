@@ -18,11 +18,14 @@
 
 (def caret-pos (atom nil))
 
-(defn is-emojiable-focused []
-  (>= (.indexOf (.-className (.-activeElement js/document)) "emojiable") 0))
+(def default-emojiable-class "emojiable")
 
-(defn save-caret-position [e]
-  (if (is-emojiable-focused)
+(defn is-emojiable-focused [& [emojiable-class]]
+  (let [emojiable-class (or emojiable-class default-emojiable-class)]
+    (>= (.indexOf (.-className (.-activeElement js/document)) emojiable-class) 0)))
+
+(defn save-caret-position [owner e]
+  (if (is-emojiable-focused (om/get-props owner :editor-class))
     (if (.-getSelection js/window)
       (reset! caret-pos (js/window.getSelection))
       (reset! caret-pos (js/document.selection)))
@@ -39,7 +42,8 @@
 (defcomponent emoji-picker
   "Render an emoji button that reveal a picker for emoji.
    It will add the selected emoji in place of the current selection if
-   the current activeElement has the class `emojiable`."
+   the current activeElement has the class `emojiable` or the custom class
+   passed via component props in :editor-class."
   [data owner]
 
   (init-state [_]
@@ -65,7 +69,7 @@
                    :type "button"
                    :data-toggle "tooltip"
                    :data-placement "top"
-                   :on-mouse-down #(save-caret-position %)
+                   :on-mouse-down (partial save-caret-position owner)
                    :on-click #(when @caret-pos
                                 (om/update-state! owner :visible not))}
         (dom/i {:class "fa fa-smile-o"}))
