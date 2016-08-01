@@ -258,11 +258,12 @@
     (let [topic-kw (keyword topic)
          is-data-topic (#{:finances :growth} topic-kw)
          with-title {:title (om/get-state owner :title)}
-         with-headline (merge with-title {:headline (.-innerHTML headline-node)})
+         headline (utils/emoji-images-to-unicode (.-innerHTML headline-node))
+         with-headline (merge with-title {:headline headline})
          with-header-image (merge with-headline {:image-url (om/get-state owner :image-url) :image-width (om/get-state owner :image-width) :image-height (om/get-state owner :image-height)})
-         snippet (.-innerHTML snippet-node)
+         snippet (utils/emoji-images-to-unicode (.-innerHTML snippet-node))
          with-snippet (merge with-header-image {:snippet snippet})
-         body (.-innerHTML body-node)
+         body (utils/emoji-images-to-unicode (.-innerHTML body-node))
          with-body (merge with-snippet (if is-data-topic {:notes {:body body}} {:body body}))
          with-finances-data (if (= topic-kw :finances)
                               (merge with-body {:data (finances-clean-data (om/get-state owner :finances-data))})
@@ -400,12 +401,12 @@
                         (not= (:body current-topic-data) (:body topic-data))
                         (not= (:body (:notes current-topic-data)) (:body (:notes topic-data))))
        :title (:title topic-data)
-       :headline (:headline topic-data)
+       :headline (utils/emojify (:headline topic-data))
        :image-url (:image-url topic-data)
        :image-width (:image-width topic-data)
        :image-height (:image-height topic-data)
-       :snippet (if is-placeholder-topic "" (:snippet topic-data))
-       :body (utils/get-topic-body topic-data topic)
+       :snippet (if is-placeholder-topic "" (utils/emojify (:snippet topic-data)))
+       :body (utils/emojify (utils/get-topic-body topic-data topic))
        :notes (:notes topic-data)
        :show-title-counter (:show-title-counter current-state)
        :medium-editor (:medium-editor current-state)
@@ -588,7 +589,7 @@
     (let [topic-kw (keyword topic)
           is-data-topic (#{:finances :growth} topic-kw)
           title-length-limit 20
-          topic-body (if-not (:placeholder topic-data) (utils/get-topic-body topic-data topic-kw) "")
+          topic-body (if-not (:placeholder topic-data) (utils/emojify (utils/get-topic-body topic-data topic-kw)) "")
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height utils/overlay-max-win-height)
           max-height (min (- 650 126) (- win-height 126))
@@ -652,7 +653,7 @@
                                     (om/set-state! owner :char-count nil))
                       :on-key-up   #(check-headline-count owner headline-length-limit %)
                       :on-key-down #(check-headline-count owner headline-length-limit %)
-                      :dangerouslySetInnerHTML (clj->js {"__html" headline})})
+                      :dangerouslySetInnerHTML headline})
             (when is-data-topic
               (dom/div {:class "separator"}))
             (dom/div {:class "topic-overlay-edit-data"}
@@ -707,9 +708,9 @@
                                     (om/set-state! owner :char-count nil))
                       :on-key-up   #(check-snippet-count owner %)
                       :on-key-down #(check-snippet-count owner %)
-                      :dangerouslySetInnerHTML (clj->js {"__html" snippet})})
+                      :dangerouslySetInnerHTML snippet})
             (dom/div {:class "topc-edit-top-box-footer"}
-              (dom/div {:class "left mr2"}
+              (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
                 (om/build emoji-picker {}))
               (dom/button {:class "btn-reset add-image"
                            :title (if (not image-url) "Add an image" "Replace image")
@@ -760,7 +761,7 @@
             (dom/div {:className (str "topic-body emoji-autocomplete emojiable" (when hide-placeholder " hide-placeholder"))
                       :contentEditable true
                       :id (str "topic-edit-body-" (name topic))
-                      :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
+                      :dangerouslySetInnerHTML topic-body})
             (om/build filestack-uploader (om/get-state owner :medium-editor) {:opts {:hide-placeholder #(om/set-state! owner :hide-placeholder %)}})))
       (when (and show-first-edit-tooltip
                  (not tooltip-dismissed))
