@@ -12,6 +12,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.small-loading :as loading]
+            [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
             [org.martinklepsch.derivatives :as drv]
             [cljsjs.react.dom]
             [cljsjs.clipboard]))
@@ -176,10 +177,13 @@
    (modal-title "Share to Your Slack Team" :slack)
    [:div.p3
     [:label.block.small-caps.bold.mb2 "Your Note"]
-    [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh
+    [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh.emojiable
      {:type "text"
       :on-change #(dis/dispatch! [:input [:su-share :slack :note] (.. % -target -value)])
-      :placeholder "Optional note to go with this update."}]]])
+      :placeholder "Optional note to go with this update."}]
+    [:div.left
+      {:style {:color "rgba(78, 90, 107, 0.5)"}}
+      (om/build emoji-picker {})]]])
 
 (rum/defcs link-dialog < (rum/local false ::copied)
                          (rum/local false ::clipboard)
