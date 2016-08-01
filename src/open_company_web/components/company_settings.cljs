@@ -35,15 +35,15 @@
     rum/reactive
   [s slug]
   [:div
-   [:div.small-caps.bold.mb1 "Subscription"]
+   [:div.small-caps.bold.mb1 "Subscription Plan"]
    (if (drv/react s :subscription)
      [:div
-      [:p.mb2 "Thanks for being an awesome customer"]
+      [:p.mb2 "You are on the OpenCompany Beta Plan."]
       [:a.btn-reset.btn-solid
        {:href (:account-url (drv/react s :subscription))}
        "Manage your subscription"]]
      [:div
-      [:p.mb2 "Support the ongoing development of this platform"]
+      [:p.mb2 "You are on a 14-day trial."]
       (let [[fn ln] (-> (drv/react s :jwt) :real-name (string/split #"\s" 2))]
         [:a.btn-reset.btn-solid
          {:on-click #(cook/set-cookie! :subscription-callback-slug slug (* 60 60 24))
@@ -122,15 +122,19 @@
     (let [slug (keyword (router/current-company-slug))]
 
       (utils/update-page-title (str "OpenCompany - " company-name))
+
       (dom/div {:class "lg-col-5 md-col-7 col-11 mx-auto mt4 mb4 settings-container group"}
-        (dom/div {:class "company-settings"}
+
+        ;; Thank you message
+        (when (cook/get-cookie :subscription-callback-slug)
+          (thanks-for-subscribing))
+        
+        (dom/div {:class "settings-form-label company-settings"}
           (dom/span {} "Company Settings")
           (when-not company-name
             (loading/small-loading)))
-        ;; Company
-        (when (cook/get-cookie :subscription-callback-slug)
-          (thanks-for-subscribing))
-        (dom/div {:class "company-form p3"}
+        
+        (dom/div {:class "settings-form p3"}
 
           ;; Company name
           (dom/div {:class "small-caps bold mb1"} "COMPANY NAME")
@@ -157,7 +161,7 @@
                           {:react-key (:code currency)}))))
 
           ;; Company logo
-          (dom/div {:class "small-caps bold mb1"} "SQUARE COMPANY LOGO URL (approx. 180x180px)")
+          (dom/div {:class "small-caps bold mb1"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
           (dom/input {:type "text"
                       :value logo
                       :id "logo"
@@ -165,13 +169,22 @@
                       :maxLength 255
                       :on-change #(om/set-state! owner :logo (.. % -target -value))
                       :placeholder "http://example.com/logo.png"})
-          (subscription-info (name slug))
+          ;; Save button
           (dom/div {:class "mt2 right-align"}
             (dom/button {:class "btn-reset btn-solid"
                          :on-click #(save-company-clicked owner)}
               (if loading
                 (loading/small-loading)
-                "SAVE"))))))))
+                "SAVE"))))
+
+        (dom/div {:class "settings-form-label subscription-settings-label"}
+          (dom/span {} "Account")
+
+          (when-not company-name
+            (loading/small-loading)))
+
+          (dom/div {:class "settings-form p3"}
+            (subscription-info (name slug)))))))
 
 (defcomponent company-settings [data owner]
 

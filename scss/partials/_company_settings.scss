@@ -1,22 +1,32 @@
 /* Company settings */
 
-div.main-company-settings{
+body.small-footer {
+  div.main-company-settings {
+    div.company-settings-container {
+      /* 138px is the total height above and below the settings */
+      min-height: calc(100vh - 138px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px + 1px);
+    }
+  }
+}
+
+div.main-company-settings {
   div.company-settings-container {
     div.settings-container {
-      div.company-settings {
+
+      div.settings-form-label {
         font-size: 26px;
         line-height: 1.4;
         color: $oc_gray_5;
-        height: 74px;
+        height: 54px;
 
-        span {
-          float: left;
-        }
+          div.small-loading-container {
+            float: left;
+            margin-left: 20px;
+          }
+      }
 
-        div.small-loading-container {
-          float: left;
-          margin-left: 20px;
-        }
+      div.subscription-settings-label {
+        margin-top: 45px;
       }
 
       img.loading-spinner {
@@ -30,7 +40,7 @@ div.main-company-settings{
         }
       }
 
-      div.company-form{
+      div.settings-form{
         background-color: rgba(78, 90, 107, 0.05);
 
         select.company-currency {
