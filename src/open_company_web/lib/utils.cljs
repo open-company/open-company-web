@@ -676,6 +676,9 @@
 (defn unicode-emojis [txt]
   (js/emojione.shortnameToUnicode txt))
 
+(defn unicode-char [unicode]
+  (js/encodeURI (str "&#x" unicode ";")))
+
 (defn emojify
   "Take a string containing either Unicode emoji (mobile device keyboard), short code emoji (web app),
   or ASCII emoji (old skool) and convert it to HTML string ready to be added to the DOM (dangerously)
@@ -683,8 +686,6 @@
   [text & [plain-text]]
   ;; use an SVG sprite map
   (set! (.-imageType js/emojione) "png")
-  (set! (.-sprites js/emojione) true)
-  (set! (.-imagePathPNGSprites js/emojione) "/img/emojione.sprites.png")
   ;; convert textual emoji's into SVG elements
   (set! (.-ascii js/emojione) true)
   (let [text-string (or text "") ; handle nil
@@ -751,3 +752,14 @@
 
 (defn aspect-ration-image-height [original-width original-height final-width]
   (* (/ original-height original-width) final-width))
+
+(defn emoji-images-to-unicode [html]
+  (let [div (.createElement js/document "div")]
+    (set! (.-id div) "temp-emojing")
+    (set! (.-innerHTML div) html)
+    (.appendChild (.-body js/document) div)
+    (.replaceWith (js/$ "#temp-emojing img.emojione") (fn [_ _] (this-as this (.-alt this))))
+    (let [$div       (js/$ "#temp-emojing")
+          inner-html (.html $div)]
+      (.remove $div)
+      inner-html)))
