@@ -5,11 +5,11 @@
             [cljsjs.emojione-picker]
             [cljsjs.react]
             [cljsjs.react.dom]
+            [open-company-web.lib.utils :as utils]
             [open-company-web.lib.react-utils :as react-utils]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
-            [goog.object :as googobj]
-            [open-company-web.lib.utils :as utils]))
+            [goog.object :as googobj]))
 
 
 
@@ -31,11 +31,10 @@
 (defn replace-with-emoji [emoji]
   (when caret-pos
     (let [unicode      (googobj/get emoji "unicode")
-          hex-num      (js/parseInt unicode 16)
-          unicode-char (js/String.fromCharCode hex-num)
-          shortname    (googobj/get emoji "shortname")
-          emojified    (utils/emojify shortname)]
-      (js/pasteHtmlAtCaret (googobj/get emojified "__html") @caret-pos false))))
+          unicode-c    (utils/unicode-char unicode)
+          shortname    (subs (googobj/get emoji "shortname") 1 (dec (count (googobj/get emoji "shortname"))))
+          new-html     (str "<img class=\"emojione\" alt=\"" unicode-c "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/" unicode ".png?" (.-cacheBustParam js/emojione) "\"/>")]
+      (js/pasteHtmlAtCaret new-html @caret-pos false))))
 
 (defcomponent emoji-picker
   "Render an emoji button that reveal a picker for emoji.
