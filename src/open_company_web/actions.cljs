@@ -169,8 +169,10 @@
   (let [slug (keyword (router/current-company-slug))
         topic (:foce-key db)
         topic-data (:foce-data db)
+        with-fixed-headline (assoc topic-data :headline (utils/emoji-images-to-unicode (:headline topic-data)))
+        with-fixed-snippet (assoc with-fixed-headline :snippet (utils/emoji-images-to-unicode (:snippet with-fixed-headline)))
         old-section-data (get (dispatcher/company-data db slug) (keyword topic))
-        new-data (dissoc (merge old-section-data topic-data) :placeholder)]
+        new-data (dissoc (merge old-section-data with-fixed-snippet) :placeholder)]
     (api/partial-update-section (:section (:foce-data db)) new-data)
     (-> db
         (dissoc :foce-key)
