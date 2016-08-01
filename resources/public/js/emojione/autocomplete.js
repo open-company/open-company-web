@@ -29,11 +29,18 @@ function emojiAutocomplete() {
 
                 callback(newResults);
             },
+            unicodeFromShortname: function(shortname){
+              return emojiStrategy[shortname].unicode;
+            },
+            imageTemplate: function(shortname, unicode){
+              return '<img class="emojione" alt="'+open_company_web.lib.utils.unicode_char(unicode)+'" src="//cdn.jsdelivr.net/emojione/assets/png/' +unicode+ '.png" />';
+            },
             SVGImageFromShortname: function(shortname){
               return '<svg class="emojione"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="'+this.spritePath+'.svg#emoji-' +emojiStrategy[shortname].unicode+ '"></use></svg>';
             },
             PNGImageFromShortname: function(shortname){
-              return '<img class="emojione" src="//cdn.jsdelivr.net/emojione/assets/png/' +emojiStrategy[shortname].unicode+ '.png">';
+              var unicode = this.unicodeFromShortname(shortname);
+              return this.imageTemplate(shortname, unicode);
             },
             template: function (shortname) {
               // Load emoji images one by one
@@ -43,7 +50,8 @@ function emojiAutocomplete() {
               // return this.SVGImageFromShortname(shortname)+' :'+shortname+':';
             },
             replace: function (shortname) {
-                return open_company_web.lib.utils.emojify(':'+shortname+':')['__html'];
+                var unicode = this.unicodeFromShortname(shortname);
+                return this.imageTemplate(shortname, unicode);
             },
             index: 1
         }
