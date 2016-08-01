@@ -5,6 +5,7 @@
             [om-tools.dom :as dom :include-macros true]
             [rum.core :as rum]
             [clojure.string :as string]
+            [open-company-web.local-settings :as ls]
             [open-company-web.components.ui.small-loading :as loading]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.footer :as footer]
@@ -47,7 +48,7 @@
       (let [[fn ln] (-> (drv/react s :jwt) :real-name (string/split #"\s" 2))]
         [:a.btn-reset.btn-solid
          {:on-click #(cook/set-cookie! :subscription-callback-slug slug (* 60 60 24))
-          :href (str "https://opencompany.recurly.com/subscribe/beta/" (:org-id (drv/react s :jwt))
+          :href (str "https://" ls/recurly-id ".recurly.com/subscribe/beta/" (:org-id (drv/react s :jwt))
                      "?email=" (:email (drv/react s :jwt)) "&first_name=" fn "&last_name=" ln)}
          "Subscribe"])])])
 
