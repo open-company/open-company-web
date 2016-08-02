@@ -10,8 +10,6 @@
             [cljsjs.react]
             [cljsjs.react.dom]))
 
-
-
 (defn on-click-out [s e]
   (when-not (utils/event-inside? e (sel1 [:div.emoji-picker]))
     (reset! (::visible s) false)))
@@ -32,10 +30,11 @@
 
 (defn replace-with-emoji [caret-pos editor-class emoji]
   (when @caret-pos
-    (let [unicode      (googobj/get emoji "unicode")
-          unicode-c    (utils/unicode-char unicode)
-          shortname    (subs (googobj/get emoji "shortname") 1 (dec (count (googobj/get emoji "shortname"))))
-          new-html     (str "<img class=\"emojione\" alt=\"" unicode-c "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/" unicode ".png?" (googobj/get js/emojione "cacheBustParam") "\"/>")]
+    (let [unicodes  (googobj/get emoji "unicode")
+          unicode   (first (clojure.string/split unicodes #"-"))
+          unicode-c (utils/unicode-char unicode)
+          shortname (subs (googobj/get emoji "shortname") 1 (dec (count (googobj/get emoji "shortname"))))
+          new-html  (str "<img class=\"emojione\" alt=\"" unicode-c "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/" unicode ".png?" (googobj/get js/emojione "cacheBustParam") "\"/>")]
       (js/pasteHtmlAtCaret new-html @caret-pos false))))
 
 (rum/defcs emoji-picker <
