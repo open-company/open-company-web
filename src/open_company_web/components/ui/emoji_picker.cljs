@@ -16,30 +16,32 @@
   (when-not (utils/event-inside? e (sel1 [:div.emoji-picker]))
     (reset! (::visible s) false)))
 
-(def caret-pos (atom nil))
-
 (def default-emojiable-class "emojiable")
 
 (defn is-emojiable-focused [editor-class]
   (>= (.indexOf (.-className (.-activeElement js/document)) editor-class) 0))
 
-(defn save-caret-position [editor-class e]
-  (if (is-emojiable-focused editor-class)
-    (if (.-getSelection js/window)
-      (reset! caret-pos (js/window.getSelection))
-      (reset! caret-pos (js/document.selection)))
-    (reset! caret-pos nil)))
+(defn save-caret-position [s editor-class]
+  (let [caret-pos (::caret-pos s)]
+    (if (is-emojiable-focused editor-class)
+      (do (reset! (::last-active-element s) (.-activeElement js/document))
+        (if (.-getSelection js/window)
+          (reset! caret-pos (js/window.getSelection))
+          (reset! caret-pos (js/document.selection))))
+      (reset! caret-pos nil))))
 
-(defn replace-with-emoji [emoji]
+(defn replace-with-emoji [caret-pos editor-class emoji]
   (when @caret-pos
     (let [unicode      (googobj/get emoji "unicode")
           unicode-c    (utils/unicode-char unicode)
           shortname    (subs (googobj/get emoji "shortname") 1 (dec (count (googobj/get emoji "shortname"))))
-          new-html     (str "<img class=\"emojione\" alt=\"" unicode-c "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/" unicode ".png?" (.-cacheBustParam js/emojione) "\"/>")]
+          new-html     (str "<img class=\"emojione\" alt=\"" unicode-c "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/" unicode ".png?" (googobj/get js/emojione "cacheBustParam") "\"/>")]
       (js/pasteHtmlAtCaret new-html @caret-pos false))))
 
 (rum/defcs emoji-picker <
   (rum/local false ::visible)
+  (rum/local false ::caret-pos)
+  (rum/local false ::last-active-element)
   {:did-mount (fn [s] (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                       (let [click-listener (events/listen (.-body js/document) EventType/CLICK (partial on-click-out s))]
                         (assoc s ::click-listener click-listener)))
@@ -51,7 +53,9 @@
    passed via component props in :editor-class."
   [s {:keys [emojiable-class]}]
   (let [fix-emojiable-class (or emojiable-class default-emojiable-class)
-        visible (::visible s)]
+        visible (::visible s)
+        caret-pos (::caret-pos s)
+        last-active-element (::last-active-element s)]
     [:div.emoji-picker.relative
       {:style {:width "15px"
                :z-index 1047
@@ -62,7 +66,7 @@
          :type "button"
          :data-toggle "tooltip"
          :data-placement "top"
-         :on-mouse-down (partial save-caret-position fix-emojiable-class)
+         :on-mouse-down #(save-caret-position s fix-emojiable-class)
          :on-click #(do
                       (utils/event-stop %)
                       (when @caret-pos
@@ -70,6 +74,9 @@
          [:i.fa.fa-smile-o]]
       [:div.picker-container.absolute
         {:style {:display (if @visible "block" "none")
-                 :top "15px"
+                 :top "25px"
                  :left "0"}}
-        (react-utils/build js/EmojionePicker {:search true :onChange #(replace-with-emoji %)})]]))
+        (react-utils/build js/EmojionePicker {:search true :onChange (fn [emoji]
+                                                                       (replace-with-emoji caret-pos fix-emojiable-class emoji)
+                                                                       (reset! visible false)
+                                                                       (.focus @last-active-element))})]]))
