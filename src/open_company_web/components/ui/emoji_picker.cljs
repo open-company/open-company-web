@@ -59,7 +59,7 @@
         last-active-element (::last-active-element s)]
     [:div.emoji-picker.relative
       {:style {:width "15px"
-               :z-index 1047
+               :z-index 1020
                :height "15px"}}
       [:button.emoji-button.btn-reset
         {:style {:font-size "15px"}
