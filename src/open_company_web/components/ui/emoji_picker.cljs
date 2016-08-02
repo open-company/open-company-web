@@ -42,9 +42,10 @@
   (rum/local false ::visible)
   (rum/local false ::caret-pos)
   (rum/local false ::last-active-element)
-  {:did-mount (fn [s] (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-                      (let [click-listener (events/listen (.-body js/document) EventType/CLICK (partial on-click-out s))]
-                        (assoc s ::click-listener click-listener)))
+  {:did-mount (fn [s] (when-not (utils/is-test-env?)
+                        (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+                        (let [click-listener (events/listen (.-body js/document) EventType/CLICK (partial on-click-out s))]
+                          (assoc s ::click-listener click-listener))))
    :will-unmount (fn [s] (events/unlistenByKey (::click-listener s))
                          (dissoc s ::click-listener))}
   "Render an emoji button that reveal a picker for emoji.
