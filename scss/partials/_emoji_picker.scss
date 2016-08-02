@@ -1,0 +1,7 @@
+div.emoji-picker {
+  button.emoji-button{
+    &:hover {
+      color: $oc_yellow !important;
+    }
+  }
+}
