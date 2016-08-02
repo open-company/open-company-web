@@ -18,6 +18,7 @@
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [goog.dom :as gdom]
+            [goog.object :as googobj]
             [clojure.string :as string]))
 
 (def title-max-length 20)
@@ -38,19 +39,29 @@
         topic-click-cb (:topic-click options)]
     (topic-click-cb nil true)))
 
+(defn force-hide-placeholder [owner]
+  (let [editor       (om/get-state owner :snippet-editor)
+        section-name (name (om/get-props owner :section))
+        snippet-el   (sel1 [(str "div#foce-snippet-" section-name)])]
+    (utils/medium-editor-hide-placeholder editor snippet-el)))
+
+(defn snippet-on-change [owner snippet-el]
+  (dis/dispatch! [:foce-input {:snippet (.-innerHTML snippet-el)}])
+  (let [v (.-innerText snippet-el)
+        remaining-chars (- snippet-max-length (count v))]
+    (om/set-state! owner :char-count remaining-chars)
+    (om/set-state! owner :char-count-alert (< remaining-chars snippet-alert-limit))
+    (om/set-state! owner :negative-snippet-char-count (neg? remaining-chars))))
+
 (defn setup-edit [owner]
   (when-let* [section-name (name (om/get-props owner :section))
               snippet-el (sel1 [(str "div#foce-snippet-" section-name)])]
-    (let [snippet-editor      (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options "" false)))]
+    (let [snippet-editor (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options "" false)))]
       (.subscribe snippet-editor
                   "editableInput"
                   (fn [event editable]
-                    (dis/dispatch! [:foce-input {:snippet (.-innerHTML snippet-el)}])
-                    (let [v (.-innerText snippet-el)
-                          remaining-chars (- snippet-max-length (count v))]
-                      (om/set-state! owner :char-count remaining-chars)
-                      (om/set-state! owner :char-count-alert (< remaining-chars snippet-alert-limit))
-                      (om/set-state! owner :negative-snippet-char-count (neg? remaining-chars))))))
+                    (snippet-on-change owner snippet-el)))
+      (om/set-state! owner :snippet-editor snippet-editor))
     (js/emojiAutocomplete)))
 
 (defn headline-on-change [owner]
@@ -91,7 +102,8 @@
                  (not= (.-keyCode e) 37)
                  (not= (.-keyCode e) 39)
                  (>= (count snippet-value) snippet-max-length))
-        (.preventDefault e)))))
+        (.preventDefault e)))
+    (snippet-on-change owner snippet)))
 
 (defn img-on-load [img]
   (dis/dispatch! [:foce-input {:image-width (.-clientWidth img)
@@ -131,7 +143,7 @@
     (let [topic-data (dis/foce-section-data)]
       {:initial-headline (utils/emojify (:headline topic-data))
        :snippet-placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
-       :initial-snippet (if (:placeholder topic-data) #js {:__html ""} (utils/emojify (:snippet topic-data)))
+       :initial-snippet (utils/emojify (if (:placeholder topic-data) "" (:snippet topic-data)))
        :char-count nil
        :char-count-alert false
        :file-upload-state nil
@@ -225,7 +237,8 @@
                         :type "file"
                         :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
             (dom/div {:class "left mr2"}
-              (emoji-picker {}))
+              (emoji-picker {:add-emoji-cb (fn [editor emoji] (when (= editor (sel1 (str "div#foce-snippet-" (name section-kw))))
+                                                                (force-hide-placeholder owner)))}))
             (dom/button {:class "btn-reset camera left"
                          :title (if (not image-header) "Add an image" "Replace image")
                          :type "button"
@@ -249,7 +262,7 @@
                             :value upload-remote-url})
                 (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
                              :class "btn-reset btn-solid"
-                             :disabled (clojure.string/blank? upload-remote-url)
+                             :disabled (string/blank? upload-remote-url)
                              :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
                   "add")
                 (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
