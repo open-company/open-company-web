@@ -1,5 +1,8 @@
 div.emoji-picker {
   button.emoji-button{
+    font-size: 17px !important;
+    padding-top: 1px;
+
     &:hover {
       color: $oc_yellow !important;
     }
