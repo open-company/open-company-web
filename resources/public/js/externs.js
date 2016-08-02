@@ -19,6 +19,8 @@ $.tooltip = function(){};
 $.offset = function(){};
 $.offset.top = {};
 $.offset.left = {};
+$.replaceWith = function(){};
+$.html = function(){};
 // Location
 var location = {};
 location.reload = function(){};
