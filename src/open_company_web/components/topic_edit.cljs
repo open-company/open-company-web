@@ -225,7 +225,7 @@
                         :type "file"
                         :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
             (dom/div {:class "left mr2"}
-              (om/build emoji-picker {}))
+              (emoji-picker {}))
             (dom/button {:class "btn-reset camera left"
                          :title (if (not image-header) "Add an image" "Replace image")
                          :type "button"

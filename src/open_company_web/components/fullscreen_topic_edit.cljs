@@ -711,7 +711,7 @@
                       :dangerouslySetInnerHTML snippet})
             (dom/div {:class "topc-edit-top-box-footer"}
               (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
-                (om/build emoji-picker {}))
+                (emoji-picker {}))
               (dom/button {:class "btn-reset add-image"
                            :title (if (not image-url) "Add an image" "Replace image")
                            :type "button"
