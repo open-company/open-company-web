@@ -770,4 +770,5 @@
     (fn [_ _]
       (this-as this
         (when (googobj/containsKey this "hideOnClick")
-          (.hidePlaceholder this editor-el))))))
+          (let [hidePlaceholder (googobj/get this "hidePlaceholder")]
+            (hidePlaceholder editor-el)))))))
