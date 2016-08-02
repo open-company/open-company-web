@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel1)]
             [rum.core :as rum]
             [clojure.string :as string]
             [goog.format.EmailAddress :as email]
@@ -177,13 +178,13 @@
    (modal-title "Share to Your Slack Team" :slack)
    [:div.p3
     [:label.block.small-caps.bold.mb2 "Your Note"]
-    [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh.emojiable
-     {:type "text"
-      :on-change #(dis/dispatch! [:input [:su-share :slack :note] (.. % -target -value)])
-      :placeholder "Optional note to go with this update."}]
+    [:div.domine.npt.p1.col-12.emoji-autocomplete.ta-mh.emojiable.slack-note
+     {:content-editable true
+      :placeholder "Optional note to go with this update."
+      :on-key-down #(dis/dispatch! [:input [:su-share :slack :note] (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.slack-note])))])}]
     [:div.left
       {:style {:color "rgba(78, 90, 107, 0.5)"}}
-      (om/build emoji-picker {})]]])
+      (emoji-picker {})]]])
 
 (rum/defcs link-dialog < (rum/local false ::copied)
                          (rum/local false ::clipboard)
