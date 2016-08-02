@@ -9,6 +9,7 @@
             [goog.fx.dom :refer (Scroll)]
             [goog.string :as gstring]
             [goog.i18n.NumberFormat :as nf]
+            [goog.object :as googobj]
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
             [open-company-web.lib.cookies :as cook]
@@ -763,3 +764,10 @@
           inner-html (.html $div)]
       (.remove $div)
       inner-html)))
+
+(defn medium-editor-hide-placeholder [editor editor-el]
+  (.each (js/$ (googobj/get editor "extensions"))
+    (fn [_ _]
+      (this-as this
+        (when (googobj/containsKey this "hideOnClick")
+          (.hidePlaceholder this editor-el))))))
