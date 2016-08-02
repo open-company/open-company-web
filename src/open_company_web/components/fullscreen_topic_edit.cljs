@@ -406,7 +406,7 @@
        :image-url (:image-url topic-data)
        :image-width (:image-width topic-data)
        :image-height (:image-height topic-data)
-       :snippet (if is-placeholder-topic "" (utils/emojify (:snippet topic-data)))
+       :snippet (utils/emojify (if is-placeholder-topic "" (:snippet topic-data)))
        :body (utils/emojify (utils/get-topic-body topic-data topic))
        :notes (:notes topic-data)
        :show-title-counter (:show-title-counter current-state)
@@ -427,6 +427,11 @@
     ((:dismiss-editing options) placeholder-section)
     (om/set-state! owner (get-state owner props (om/get-state owner)))))
 
+(defn force-hide-placeholder [owner]
+  (let [editor       (om/get-state owner :snippet-medium-editor)
+        snippet-el   (sel1 (str "div#topic-edit-snippet-" (name (om/get-props owner :topic))))]
+    (utils/medium-editor-hide-placeholder editor snippet-el)))
+
 (defn setup-medium-editor [owner {:keys [topic-data topic] :as data}]
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
   (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
@@ -435,14 +440,14 @@
                                                   (editor/inject-extension editor/file-upload))))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
-    (om/set-state! owner :initial-body (.-innerHTML body-el))
+    (om/set-state! owner :initial-body #js {"__html" (.-innerHTML body-el)})
     (om/set-state! owner :medium-editor med-ed))
   (let [snippet-el (sel1 (str "div#topic-edit-snippet-" (name topic)))
         placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
         med-ed (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options placeholder false)))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
-    (om/set-state! owner :initial-snippet (.-innerHTML snippet-el))
+    (om/set-state! owner :initial-snippet #js {"__html" (.-innerHTML snippet-el)})
     (om/set-state! owner :snippet-medium-editor med-ed))
   (js/emojiAutocomplete)
   (utils/after 200 #(focus-headline owner)))
@@ -590,7 +595,7 @@
     (let [topic-kw (keyword topic)
           is-data-topic (#{:finances :growth} topic-kw)
           title-length-limit 20
-          topic-body (if-not (:placeholder topic-data) (utils/emojify (utils/get-topic-body topic-data topic-kw)) "")
+          topic-body (utils/emojify (if-not (:placeholder topic-data) (utils/get-topic-body topic-data topic-kw) ""))
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height utils/overlay-max-win-height)
           max-height (min (- 650 126) (- win-height 126))
@@ -712,7 +717,9 @@
                           :dangerouslySetInnerHTML snippet})
             (dom/div {:class "topc-edit-top-box-footer"}
               (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
-                (emoji-picker {}))
+                (emoji-picker {:add-emoji-cb (fn [editor emoji]
+                                               (when (= editor (sel1 (str "div#topic-edit-snippet-" (name topic))))
+                                                 (force-hide-placeholder owner)))}))
               (dom/button {:class "btn-reset add-image"
                            :title (if (not image-url) "Add an image" "Replace image")
                            :type "button"
