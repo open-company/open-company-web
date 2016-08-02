@@ -51,7 +51,7 @@
    It will add the selected emoji in place of the current selection if
    the current activeElement has the class `emojiable` or the custom class
    passed via component props in :editor-class."
-  [s {:keys [emojiable-class]}]
+  [s {:keys [emojiable-class add-emoji-cb]}]
   (let [fix-emojiable-class (or emojiable-class default-emojiable-class)
         visible (::visible s)
         caret-pos (::caret-pos s)
@@ -80,4 +80,6 @@
           (react-utils/build js/EmojionePicker {:search true :onChange (fn [emoji]
                                                                          (replace-with-emoji caret-pos fix-emojiable-class emoji)
                                                                          (reset! visible false)
-                                                                         (.focus @last-active-element))}))]]))
+                                                                         (.focus @last-active-element)
+                                                                         (when add-emoji-cb
+                                                                            (add-emoji-cb @last-active-element emoji)))}))]]))
