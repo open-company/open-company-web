@@ -30,11 +30,11 @@
 
 (defn replace-with-emoji [caret-pos editor-class emoji]
   (when @caret-pos
-    (let [unicodes  (googobj/get emoji "unicode")
-          unicode   (first (clojure.string/split unicodes #"-"))
-          unicode-c (utils/unicode-char unicode)
+    (let [unicode-str (googobj/get emoji "unicode")
+          unicodes  (clojure.string/split unicode-str #"-")
+          unicode-c (apply str (map utils/unicode-char unicodes))
           shortname (subs (googobj/get emoji "shortname") 1 (dec (count (googobj/get emoji "shortname"))))
-          new-html  (str "<img class=\"emojione\" alt=\"" unicode-c "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/" unicode ".png?" (googobj/get js/emojione "cacheBustParam") "\"/>")]
+          new-html  (str "<img class=\"emojione\" alt=\"" unicode-c "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/" unicode-str ".png?" (googobj/get js/emojione "cacheBustParam") "\"/>")]
       (js/pasteHtmlAtCaret new-html @caret-pos false))))
 
 (rum/defcs emoji-picker <
