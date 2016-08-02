@@ -131,7 +131,7 @@
     (let [topic-data (dis/foce-section-data)]
       {:initial-headline (utils/emojify (:headline topic-data))
        :snippet-placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
-       :initial-snippet (if (:placeholder topic-data) "" (utils/emojify (:snippet topic-data)))
+       :initial-snippet (if (:placeholder topic-data) #js {:__html ""} (utils/emojify (:snippet topic-data)))
        :char-count nil
        :char-count-alert false
        :file-upload-state nil
@@ -192,24 +192,24 @@
                                     (om/set-state! owner :char-count remaining-chars)
                                     (om/set-state! owner :char-count-alert (< remaining-chars title-alert-limit)))})
           ;; Topic headline
-          (dom/div {:class "topic-headline-inner emoji-autocomplete emojiable"
-                    :id (str "foce-headline-" (name section))
-                    :key "foce-headline"
-                    :placeholder "Headline"
-                    :contentEditable true
-                    :on-key-up   #(check-headline-count owner %)
-                    :on-key-down #(check-headline-count owner %)
-                    :on-focus    #(check-headline-count owner %)
-                    :on-blur #(do
-                                (check-headline-count owner %)
-                                (om/set-state! owner :char-count nil))
-                    :dangerouslySetInnerHTML initial-headline})
+          (dom/div #js {:className "topic-headline-inner emoji-autocomplete emojiable"
+                        :id (str "foce-headline-" (name section))
+                        :key "foce-headline"
+                        :placeholder "Headline"
+                        :contentEditable true
+                        :onKeyUp   #(check-headline-count owner %)
+                        :onKeyDown #(check-headline-count owner %)
+                        :onFocus    #(check-headline-count owner %)
+                        :onBlur #(do
+                                    (check-headline-count owner %)
+                                    (om/set-state! owner :char-count nil))
+                        :dangerouslySetInnerHTML initial-headline})
           (dom/div #js {:className "topic-body topic-snippet emoji-autocomplete emojiable"
                         :id (str "foce-snippet-" (name section))
                         :key "foce-snippet"
                         :ref "topic-snippet"
-                        :data-placeholder snippet-placeholder
                         :placeholder snippet-placeholder
+                        :data-placeholder snippet-placeholder
                         :contentEditable true
                         :style #js {:minHeight (if (:placeholder topic-data) "100px" "0px")}
                         :onKeyUp   #(check-snippet-count owner %)
