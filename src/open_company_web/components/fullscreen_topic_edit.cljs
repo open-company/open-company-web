@@ -28,6 +28,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
+            [goog.object :as googobj]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [clojure.string :as string]
             [goog.dom :as gdom]
@@ -506,11 +507,11 @@
             snippet-el (sel1 (str "div#topic-edit-snippet-" (name (:topic next-props))))
             body-el (sel1 (str "div#topic-edit-body-" (name (:topic next-props))))
             body (if (#{:finances :growth} (keyword topic)) (:body new-state) (:body (:notes new-state)))]
-        (set! (.-innerHTML headline-el) (:headline new-state))
-        (set! (.-innerHTML snippet-el) (:snippet new-state))
+        (set! (.-innerHTML headline-el) (googobj/get (:headline new-state) "__html"))
+        (set! (.-innerHTML snippet-el) (googobj/get (:snippet new-state) "__html"))
         (if (#{:finances :growth} (keyword topic))
-          (set! (.-innerHTML body-el) (:body (:notes new-state)))
-          (set! (.-innerHTML body-el) (:body new-state)))
+          (set! (.-innerHTML body-el) (googobj/get (:body (:notes new-state)) "__html"))
+          (set! (.-innerHTML body-el) (googobj/get (:body new-state) "__html")))
         (om/set-state! owner new-state))
       (utils/after 200 #(focus-headline owner)))
     ; goes hidden
@@ -644,16 +645,16 @@
                                       (om/set-state! owner :char-count (- title-length-limit (count title)))
                                       (om/set-state! owner :char-count-alert (< (- title-length-limit (count title)) title-alert-limit))
                                       (change-value owner :title e))})
-            (dom/div {:className "topic-edit-headline emoji-autocomplete emojiable"
-                      :ref "topic-edit-headline"
-                      :contentEditable true
-                      :id (str "topic-edit-headline-" (name topic))
-                      :placeholder "Headline"
-                      :on-blur #(do (check-headline-count owner headline-length-limit %)
-                                    (om/set-state! owner :char-count nil))
-                      :on-key-up   #(check-headline-count owner headline-length-limit %)
-                      :on-key-down #(check-headline-count owner headline-length-limit %)
-                      :dangerouslySetInnerHTML headline})
+            (dom/div #js {:className "topic-edit-headline emoji-autocomplete emojiable"
+                          :ref "topic-edit-headline"
+                          :contentEditable true
+                          :id (str "topic-edit-headline-" (name topic))
+                          :placeholder "Headline"
+                          :onBlur #(do (check-headline-count owner headline-length-limit %)
+                                        (om/set-state! owner :char-count nil))
+                          :onKeyUp   #(check-headline-count owner headline-length-limit %)
+                          :onKeyDown #(check-headline-count owner headline-length-limit %)
+                          :dangerouslySetInnerHTML headline})
             (when is-data-topic
               (dom/div {:class "separator"}))
             (dom/div {:class "topic-overlay-edit-data"}
@@ -701,14 +702,14 @@
                                             (.stopPropagation e)
                                             (om/set-state! owner :growth-new-metric true)
                                             (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
-            (dom/div {:class "topic-edit-snippet emoji-autocomplete emojiable"
-                      :id (str "topic-edit-snippet-" (name topic))
-                      :contentEditable true
-                      :on-blur #(do (check-snippet-count owner %)
-                                    (om/set-state! owner :char-count nil))
-                      :on-key-up   #(check-snippet-count owner %)
-                      :on-key-down #(check-snippet-count owner %)
-                      :dangerouslySetInnerHTML snippet})
+            (dom/div #js {:className "topic-edit-snippet emoji-autocomplete emojiable"
+                          :id (str "topic-edit-snippet-" (name topic))
+                          :contentEditable true
+                          :onBlur #(do (check-snippet-count owner %)
+                                        (om/set-state! owner :char-count nil))
+                          :onKeyUp   #(check-snippet-count owner %)
+                          :onKeyDown #(check-snippet-count owner %)
+                          :dangerouslySetInnerHTML snippet})
             (dom/div {:class "topc-edit-top-box-footer"}
               (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
                 (emoji-picker {}))
@@ -758,10 +759,10 @@
                           :type "file"
                           :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})))
           (dom/div {:class "relative topic-body-line"}
-            (dom/div {:className (str "topic-body emoji-autocomplete emojiable" (when hide-placeholder " hide-placeholder"))
-                      :contentEditable true
-                      :id (str "topic-edit-body-" (name topic))
-                      :dangerouslySetInnerHTML topic-body})
+            (dom/div #js {:className (str "topic-body emoji-autocomplete emojiable" (when hide-placeholder " hide-placeholder"))
+                          :contentEditable true
+                          :id (str "topic-edit-body-" (name topic))
+                          :dangerouslySetInnerHTML topic-body})
             (om/build filestack-uploader (om/get-state owner :medium-editor) {:opts {:hide-placeholder #(om/set-state! owner :hide-placeholder %)}})))
       (when (and show-first-edit-tooltip
                  (not tooltip-dismissed))
