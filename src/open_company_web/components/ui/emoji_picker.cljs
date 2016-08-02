@@ -28,8 +28,8 @@
           (reset! caret-pos (js/document.selection))))
       (reset! caret-pos nil))))
 
-(defn replace-with-emoji [caret-pos editor-class emoji]
-  (when @caret-pos
+(defn replace-with-emoji [caret-pos last-active-element editor-class emoji]
+  (when (and @caret-pos (= (googobj/get @caret-pos "focusNode") @last-active-element))
     (let [unicode-str (googobj/get emoji "unicode")
           unicodes  (clojure.string/split unicode-str #"-")
           unicode-c (apply str (map utils/unicode-char unicodes))
@@ -78,7 +78,7 @@
                  :left "0"}}
         (when-not (utils/is-test-env?)
           (react-utils/build js/EmojionePicker {:search true :onChange (fn [emoji]
-                                                                         (replace-with-emoji caret-pos fix-emojiable-class emoji)
+                                                                         (replace-with-emoji caret-pos last-active-element fix-emojiable-class emoji)
                                                                          (reset! visible false)
                                                                          (.focus @last-active-element)
                                                                          (when add-emoji-cb
