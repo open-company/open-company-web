@@ -166,11 +166,13 @@
       :on-change #(dis/dispatch! [:input [:su-share :email :subject] (.. % -target -value)])
       :value (-> (drv/react s :su-share) :email :subject)}]
     [:label.block.small-caps.bold.mb2 "Your Note"]
-    [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh
-     {:type "text"
-      :on-change #(dis/dispatch! [:input [:su-share :email :note] (.. % -target -value)])
-      :value (-> (drv/react s :su-share) :email :note)
-      :placeholder "Optional note to go with this update."}]]])
+    [:div.domine.npt.p1.col-12.emoji-autocomplete.ta-mh.emojiable.email-note
+     {:content-editable true
+      :on-key-down #(dis/dispatch! [:input [:su-share :email :note] (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.slack-note])))])
+      :placeholder "Optional note to go with this update."}]
+    [:div.left
+      {:style {:color "rgba(78, 90, 107, 0.5)"}}
+      (emoji-picker {})]]])
 
 (rum/defc slack-dialog < rum/static emoji-autocomplete
   []
