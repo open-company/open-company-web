@@ -86,9 +86,6 @@
                                :height (:image-height topic-data)}
           topic-body          (utils/get-topic-body topic-data section-kw)
           truncated-body      (.truncate js/$ topic-body (clj->js {:length 500 :words true}))]
-      (println "section" section-kw)
-      (println "body" topic-body)
-      (println "truncated body:" truncated-body)
       (dom/div #js {:className "topic-internal group"
                     :onClick (partial fullscreen-topic data nil false)
                     :ref "topic-internal"}
