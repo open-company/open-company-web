@@ -1,21 +1,21 @@
 ;; boot show --updates
 (def cljs-deps
   '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
-    [adzerk/boot-reload "0.4.11" :scope "test"]
+    [adzerk/boot-reload "0.4.12" :scope "test"]
     [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
-    [tolitius/boot-check "0.1.2" :scope "test"]
+    [tolitius/boot-check "0.1.3" :scope "test"]
 
     [org.clojure/clojure "1.9.0-alpha10"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
     ;; Skip ClojureScript 1.9.93 as it breaks source maps
     [org.clojure/clojurescript "1.9.89"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
 
-    [org.omcljs/om "1.0.0-alpha40" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
+    [org.omcljs/om "1.0.0-alpha41" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
 
-    [rum "0.10.4" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
+    [rum "0.10.5" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
     [org.martinklepsch/derivatives "0.1.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
 
     [cljs-http "0.1.41"] ; HTTP for cljs https://github.com/r0man/cljs-http
-    [prismatic/schema "1.1.2"] ; Dependency of om-tools https://github.com/Prismatic/schema
+    [prismatic/schema "1.1.3"] ; Dependency of om-tools https://github.com/Prismatic/schema
     [prismatic/plumbing "0.5.3"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [org.clojars.martinklepsch/om-tools "0.4.0-w-select"] ; Tools for Om https://github.com/plumatic/om-tools/pull/91
     [secretary "2.0.0.1-41b949"] ; Client-side router https://github.com/gf3/secretary
@@ -45,7 +45,7 @@
 (def static-site-deps
   '[[hiccup "1.0.5" :scope "test"]
     [perun "0.3.0" :scope "test"]
-    [compojure "1.5.1" :scope "test"]
+    [compojure "1.6.0-beta1" :scope "test"]
     [pandeiro/boot-http "0.7.3" :scope "test"]
     [deraen/boot-sass "0.2.1" :scope "test"]
     [org.slf4j/slf4j-nop "1.7.21" :scope "test"]])

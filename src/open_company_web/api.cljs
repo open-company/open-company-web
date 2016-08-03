@@ -17,6 +17,8 @@
 
 (def ^:private auth-endpoint ls/auth-server-domain)
 
+(def ^:private pay-endpoint ls/pay-server-domain)
+
 (defn- content-type [type]
   (str "application/vnd.open-company." type ".v1+json;charset=UTF-8"))
 
@@ -61,6 +63,9 @@
 
 (def ^:private auth-get (partial req auth-endpoint http/get))
 
+(def ^:private pay-get (partial req pay-endpoint http/get))
+(def ^:private pay-post (partial req pay-endpoint http/post))
+
 (defn dispatch-body [action response]
   (let [body (if (:success response) (json->cljs (:body response)) {})]
     (dispatcher/dispatch! [action body])))
@@ -69,6 +74,13 @@
   (api-get "/" nil (fn [response]
                      (let [body (if (:success response) (:body response) {})]
                        (dispatcher/dispatch! [:entry body])))))
+
+(defn get-subscription [company-uuid]
+  (pay-get (str "/subscriptions/" company-uuid)
+           nil
+           (fn [response]
+             (let [body (if (:success response) (:body response) {})]
+               (dispatcher/dispatch! [:subscription body])))))
 
 (defn get-companies []
   (api-get "/companies" nil #(dispatch-body :companies %)))
