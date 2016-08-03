@@ -4,12 +4,15 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
+            [open-company-web.urls :as oc-urls]
+            [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.oc-colors :as oc-colors]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.medium-editor-exts :as editor]
+            [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
@@ -17,6 +20,9 @@
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [goog.dom :as gdom]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
+            [goog.history.EventType :as HistoryEventType]
             [clojure.string :as string]))
 
 (def title-max-length 20)
@@ -25,6 +31,8 @@
 (def title-alert-limit 3)
 (def headline-alert-limit 10)
 (def snippet-alert-limit 50)
+
+(def before-unload-message "You have unsaved edits.")
 
 (defn scroll-to-topic-top [topic]
   (let [body-scroll (.-scrollTop (.-body js/document))
@@ -44,6 +52,7 @@
       (.subscribe snippet-editor
                   "editableInput"
                   (fn [event editable]
+                    (om/set-state! owner :has-changes true)
                     (dis/dispatch! [:foce-input {:snippet (.-innerHTML snippet-el)}])
                     (let [v (.-innerText snippet-el)
                           remaining-chars (- snippet-max-length (count v))]
@@ -53,6 +62,7 @@
     (js/emojiAutocomplete)))
 
 (defn headline-on-change [owner]
+  (om/set-state! owner :has-changes true)
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
     (dis/dispatch! [:foce-input {:headline (.-innerHTML headline)}])
     (let [headline-text   (.-innerText headline)
@@ -92,7 +102,8 @@
                  (>= (count snippet-value) snippet-max-length))
         (.preventDefault e)))))
 
-(defn img-on-load [img]
+(defn img-on-load [owner img]
+  (om/set-state! owner :has-changes true)
   (dis/dispatch! [:foce-input {:image-width (.-clientWidth img)
                                :image-height (.-clientHeight img)}])
   (gdom/removeNode img))
@@ -101,11 +112,13 @@
   (let [success-cb  (fn [success]
                       (let [url    (.-url success)
                             node   (gdom/createDom "img")]
-                        (set! (.-onload node) #(img-on-load node))
+                        (set! (.-onload node) #(img-on-load owner node))
                         (gdom/append (.-body js/document) node)
                         (set! (.-src node) url)
                         (dis/dispatch! [:foce-input {:image-url url}]))
-                      (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil :file-upload-progress nil})))
+                      (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil
+                                                                        :file-upload-progress nil
+                                                                        :has-changes true})))
         error-cb    (fn [error] (js/console.log "error" error))
         progress-cb (fn [progress]
                       (let [state (om/get-state owner)]
@@ -133,16 +146,41 @@
        :initial-snippet  (if (:placeholder topic-data) "" (:snippet topic-data))
        :char-count nil
        :char-count-alert false
+       :has-changes false
        :file-upload-state nil
        :file-upload-progress 0}))
 
-  (did-mount [_]
-    (js/filepicker.setKey ls/filestack-key)
-    (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-    (setup-edit owner)
-    (utils/after 100 #(focus-headline)))
+  (will-unmount [_]
+    (when-not (utils/is-test-env?)
+      ; re enable the route dispatcher
+      (reset! prevent-route-dispatch false)
+      ; remove the onbeforeunload handler
+      (set! (.-onbeforeunload js/window) nil)
+      ; remove history change listener
+      (events/unlistenByKey (om/get-state owner :history-listener-id))))
 
-  (render-state [_ {:keys [initial-headline initial-snippet snippet-placeholder char-count char-count-alert file-upload-state file-upload-progress upload-remote-url negative-snippet-char-count negative-headline-char-count]}]
+  (did-mount [_]
+    (when-not (utils/is-test-env?)
+      (js/filepicker.setKey ls/filestack-key)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+      (setup-edit owner)
+      (utils/after 100 #(focus-headline))
+      (reset! prevent-route-dispatch true)
+      (let [win-location (.-location js/window)
+            current-token (oc-urls/company (router/current-company-slug))
+            listener (events/listen @router/history HistoryEventType/NAVIGATE
+                       #(when-not (= (.-token %) current-token)
+                          (if (om/get-state owner :has-changes)
+                            (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
+                              ; dispatch the current url
+                              (@router/route-dispatcher (router/get-token))
+                              ; go back to the previous token
+                              (.setToken @router/history current-token))
+                            ; dispatch the current url
+                            (@router/route-dispatcher (router/get-token)))))]
+        (om/set-state! owner :history-listener-id listener))))
+
+  (render-state [_ {:keys [initial-headline initial-snippet snippet-placeholder char-count char-count-alert file-upload-state file-upload-progress upload-remote-url negative-snippet-char-count negative-headline-char-count has-changes]}]
     (let [section             (dis/foce-section-key)
           topic-data          (dis/foce-section-data)
           section-kw          (keyword section)
@@ -162,6 +200,9 @@
                                        (utils/no-growth-data? growth-data)))
           image-header        (:image-url topic-data)
           topic-body          (utils/get-topic-body topic-data section)]
+      ; set the onbeforeunload handler only if there are changes
+      (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
+        (set! (.-onbeforeunload js/window) onbeforeunload-cb))
       (when section
         (dom/div #js {:className "topic-foce group"
                       :ref "topic-internal"}
@@ -173,6 +214,7 @@
               (when image-header
                 (dom/button {:class "btn-reset remove-header"
                              :on-click #(do
+                                          (om/set-state! owner :has-changes true)
                                           (dis/dispatch! [:foce-input {:image-url nil :image-height 0 :image-width 0}]))}
                   (i/icon :simple-remove {:size 15
                                           :stroke 4
@@ -188,6 +230,7 @@
                       :on-change #(let [v (.. % -target -value)
                                         remaining-chars (- title-max-length (count v))]
                                     (dis/dispatch! [:foce-input {:title v}])
+                                    (om/set-state! owner :has-changes true)
                                     (om/set-state! owner :char-count remaining-chars)
                                     (om/set-state! owner :char-count-alert (< remaining-chars title-alert-limit)))})
           ;; Topic headline
