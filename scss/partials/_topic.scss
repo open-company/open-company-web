@@ -29,6 +29,7 @@ div.topic {
   border: 0px solid transparent;
   box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
   position: relative;
+  transition: opacity 0.5s;
 
   &.no-foce {
     opacity: 0.5;
