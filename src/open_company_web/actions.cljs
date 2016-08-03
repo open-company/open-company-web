@@ -202,5 +202,7 @@
 ;; Stripe Payment related actions
 
 (defmethod dispatcher/action :subscription
-  [db [_ {:keys [org-id] :as data}]]
-  (assoc-in db [:subscriptions org-id] data))
+  [db [_ {:keys [uuid] :as data}]]
+  (if uuid
+    (assoc-in db [:subscription uuid] data)
+    (assoc db :subscription nil)))

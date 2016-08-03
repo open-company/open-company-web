@@ -30,25 +30,28 @@
      "via email."]]])
 
 (rum/defcs subscription-info
-  < {:did-mount (fn [s] (api/get-subscription) s)}
+  < {:did-mount (fn [s] (api/get-subscription (last (:rum/args s))) s)}
     (drv/drv :subscription)
     (drv/drv :jwt)
     rum/reactive
-  [s slug]
+  [s slug company-uuid]
   [:div
    [:div.small-caps.bold.mb1 "Subscription Plan"]
    (if (drv/react s :subscription)
      [:div
       [:p.mb2 "You are on the OpenCompany Beta Plan."]
-      [:a.btn-reset.btn-solid
-       {:href (:account-url (drv/react s :subscription))}
-       "Manage your subscription"]]
+      [:p.mb2 "To cancel your plan, "
+        [:a {:href oc-urls/contact-mail-to} "contact us"]
+        "."]]
+      ; [:a.btn-reset.btn-solid
+      ;  {:href (get-in (drv/react s :subscription) [company-uuid :account-url])}
+      ;  "Manage your subscription"]]
      [:div
       [:p.mb2 "You are on a 14-day trial."]
       (let [[fn ln] (-> (drv/react s :jwt) :real-name (string/split #"\s" 2))]
         [:a.btn-reset.btn-solid
          {:on-click #(cook/set-cookie! :subscription-callback-slug slug (* 60 60 24))
-          :href (str "https://" ls/recurly-id ".recurly.com/subscribe/beta/" (:org-id (drv/react s :jwt))
+          :href (str "https://" ls/recurly-id ".recurly.com/subscribe/local/" company-uuid
                      "?email=" (:email (drv/react s :jwt)) "&first_name=" fn "&last_name=" ln)}
          "Subscribe"])])])
 
@@ -105,7 +108,8 @@
 
 (defn get-state [data current-state]
   (let [company-data (dis/company-data data)]
-    {:initial-logo (:logo data)
+    {:uuid (:uuid company-data)
+     :initial-logo (:logo data)
      :logo (or (:logo current-state) (:logo company-data))
      :company-name (or (:company-name current-state) (:name company-data))
      :currency (or (:currency current-state) (:currency company-data))
@@ -119,7 +123,8 @@
   (will-receive-props [_ next-props]
     (om/set-state! owner (get-state next-props nil)))
 
-  (render-state [_ {:keys [company-name logo currency description loading]}]
+  (render-state [_ {company-uuid :uuid company-name :company-name logo :logo
+                    currency :currency loading :loading}]
     (let [slug (keyword (router/current-company-slug))]
 
       (utils/update-page-title (str "OpenCompany - " company-name))
@@ -180,12 +185,12 @@
 
         (dom/div {:class "settings-form-label subscription-settings-label"}
           (dom/span {} "Account")
-
-          (when-not company-name
+          (when-not company-uuid
             (loading/small-loading)))
 
-          (dom/div {:class "settings-form p3"}
-            (subscription-info (name slug)))))))
+        (when company-uuid
+            (dom/div {:class "settings-form p3"}
+              (subscription-info (name slug) company-uuid)))))))
 
 (defcomponent company-settings [data owner]
 

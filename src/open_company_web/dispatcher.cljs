@@ -11,7 +11,7 @@
   {:base         [[] db]
    :su-share     [[:base] (fn [base] (:su-share base))]
    :jwt          [[:base] (fn [base] (:jwt base))]
-   :subscription [[:base :jwt] (fn [base jwt] (get-in base [:subscriptions (:org-id jwt)]))]})
+   :subscription [[:base] (fn [base] (:subscription base))]})
 
 ;; Action Loop =================================================================
 

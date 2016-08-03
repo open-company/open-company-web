@@ -75,8 +75,8 @@
                      (let [body (if (:success response) (:body response) {})]
                        (dispatcher/dispatch! [:entry body])))))
 
-(defn get-subscription []
-  (pay-get (str "/subscriptions/" (j/get-key :org-id))
+(defn get-subscription [company-uuid]
+  (pay-get (str "/subscriptions/" company-uuid)
            nil
            (fn [response]
              (let [body (if (:success response) (:body response) {})]
