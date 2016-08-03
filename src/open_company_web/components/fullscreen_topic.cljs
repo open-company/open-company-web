@@ -65,11 +65,7 @@
                 (= topic "growth")
                 (om/build topic-growth chart-data {:opts chart-opts})
                 (= topic "finances")
-                (om/build topic-finances chart-data {:opts chart-opts}))
-              (when-not (clojure.string/blank? (:snippet topic-data))
-                (dom/div {:class "separator"}))))
-          (dom/div {:class "topic-snippet"
-                    :dangerouslySetInnerHTML (utils/emojify (:snippet topic-data))}))
+                (om/build topic-finances chart-data {:opts chart-opts})))))
         (dom/div {:class "topic-body"
                   :dangerouslySetInnerHTML (utils/emojify (utils/get-topic-body topic-data topic))})
         (when (:author topic-data)
