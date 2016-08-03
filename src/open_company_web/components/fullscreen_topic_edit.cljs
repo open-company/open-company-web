@@ -498,7 +498,7 @@
             headline-el (sel1 (str "div#topic-edit-headline-" (name (:topic next-props))))
             snippet-el (sel1 (str "div#topic-edit-snippet-" (name (:topic next-props))))
             body-el (sel1 (str "div#topic-edit-body-" (name (:topic next-props))))
-            body (if (#{:finances :growth} (keyword topic)) (:body new-state) (:body (:notes new-state)))]
+            body (if (#{:finances :growth} (keyword topic)) (:body (:notes new-state)) (:body new-state))]
         (set! (.-innerHTML headline-el) (:headline new-state))
         (set! (.-innerHTML snippet-el) (:snippet new-state))
         (if (#{:finances :growth} (keyword topic))

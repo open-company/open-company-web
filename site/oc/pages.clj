@@ -175,6 +175,8 @@
           [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
           ;; jQuery needed by Emoji One autocomplete
           [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.3.4/jquery.textcomplete.min.js" :type "text/javascript"}]
+          ;; Truncate html string
+          [:script {:type "text/javascript" :src "/lib/truncate/jquery.truncate.js"}]
           ;; jQuery scrollTo plugin
           [:script {:src "/lib/scrollTo/scrollTo.min.js?oc_deploy_key" :type "text/javascript"}]
           ;; jQuery UI

@@ -81,11 +81,14 @@
                                         (utils/no-finances-data? finances-row-data)))
                                   (and (= section-kw :growth)
                                        (utils/no-growth-data? growth-data)))
-          snippet             (:snippet topic-data)
           image-header        (:image-url topic-data)
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
-          topic-body          (utils/get-topic-body topic-data section)]
+          topic-body          (utils/get-topic-body topic-data section-kw)
+          truncated-body      (.truncate js/$ topic-body (clj->js {:length 500 :words true}))]
+      (println "section" section-kw)
+      (println "body" topic-body)
+      (println "truncated body:" truncated-body)
       (dom/div #js {:className "topic-internal group"
                     :onClick (partial fullscreen-topic data nil false)
                     :ref "topic-internal"}
@@ -114,10 +117,10 @@
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
-        (dom/div #js {:className "topic-body topic-snippet"
-                      :ref "topic-snippet"
-                      :dangerouslySetInnerHTML (utils/emojify snippet)})
-        (when-not (clojure.string/blank? (utils/strip-HTML-tags topic-body))
+        (dom/div #js {:className "topic-body topic-body"
+                      :ref "topic-body"
+                      :dangerouslySetInnerHTML (utils/emojify truncated-body)})
+        (when (> (count (utils/strip-HTML-tags topic-body)) 500)
           (dom/button {:class "btn-reset topic-read-more"
                        :onClick (partial fullscreen-topic data nil false)} "READ MORE"))))))
 

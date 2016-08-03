@@ -21,10 +21,10 @@
 
 (def title-max-length 20)
 (def headline-max-length 100)
-(def snippet-max-length 500)
+(def body-max-length 500)
 (def title-alert-limit 3)
 (def headline-alert-limit 10)
-(def snippet-alert-limit 50)
+(def body-alert-limit 50)
 
 (defn scroll-to-topic-top [topic]
   (let [body-scroll (.-scrollTop (.-body js/document))
@@ -38,18 +38,17 @@
     (topic-click-cb nil true)))
 
 (defn setup-edit [owner]
-  (when-let* [section-name (name (om/get-props owner :section))
-              snippet-el (sel1 [(str "div#foce-snippet-" section-name)])]
-    (let [snippet-editor      (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options "" false)))]
-      (.subscribe snippet-editor
+  (when-let* [section-kw   (keyword (om/get-props owner :section))
+              section-name (name section-kw)
+              body-el      (sel1 [(str "div#foce-body-" section-name)])]
+    (let [body-editor      (new js/MediumEditor body-el (clj->js (utils/medium-editor-options "" false)))]
+      (.subscribe body-editor
                   "editableInput"
                   (fn [event editable]
-                    (dis/dispatch! [:foce-input {:snippet (.-innerHTML snippet-el)}])
-                    (let [v (.-innerText snippet-el)
-                          remaining-chars (- snippet-max-length (count v))]
-                      (om/set-state! owner :char-count remaining-chars)
-                      (om/set-state! owner :char-count-alert (< remaining-chars snippet-alert-limit))
-                      (om/set-state! owner :negative-snippet-char-count (neg? remaining-chars))))))
+                    (let [inner-html (.-innerHTML body-el)]
+                      (dis/dispatch! [:foce-input (if (#{:finances :growth} section-key)
+                                                    {:notes {:body (.-innerHTML body-el)}}
+                                                    {:body (.-innerHTML body-el)})])))))
     (js/emojiAutocomplete)))
 
 (defn headline-on-change [owner]
@@ -77,9 +76,9 @@
         (.preventDefault e))))
   (headline-on-change owner))
 
-(defn check-snippet-count [owner e]
-  (when-let [snippet (sel1 (str "div#foce-snippet-" (name (dis/foce-section-key))))]
-    (let [snippet-value (.-innerText snippet)]
+(defn check-body-count [owner e]
+  (when-let [body (sel1 (str "div#foce-body-" (name (dis/foce-section-key))))]
+    (let [body-value (.-innerText body)]
       (when (and (not= (.-keyCode e) 8)
                  (not= (.-keyCode e) 16)
                  (not= (.-keyCode e) 17)
@@ -89,7 +88,7 @@
                  (not= (.-keyCode e) 27)
                  (not= (.-keyCode e) 37)
                  (not= (.-keyCode e) 39)
-                 (>= (count snippet-value) snippet-max-length))
+                 (>= (count body-value) body-max-length))
         (.preventDefault e)))))
 
 (defn img-on-load [img]
@@ -127,10 +126,12 @@
                                   next-rev]} owner options]
 
   (init-state [_]
-    (let [topic-data (dis/foce-section-data)]
+    (let [topic      (dis/foce-section-key)
+          topic-data (dis/foce-section-data)
+          body       (utils/get-topic-body topic-data topic)]
       {:initial-headline (:headline topic-data)
-       :snippet-placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
-       :initial-snippet  (if (:placeholder topic-data) "" (:snippet topic-data))
+       :body-placeholder (if (:placeholder topic-data) body "")
+       :initial-body  (if (:placeholder topic-data) "" body)
        :char-count nil
        :char-count-alert false
        :file-upload-state nil
@@ -142,7 +143,7 @@
     (setup-edit owner)
     (utils/after 100 #(focus-headline)))
 
-  (render-state [_ {:keys [initial-headline initial-snippet snippet-placeholder char-count char-count-alert file-upload-state file-upload-progress upload-remote-url negative-snippet-char-count negative-headline-char-count]}]
+  (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert file-upload-state file-upload-progress upload-remote-url negative-body-char-count negative-headline-char-count]}]
     (let [section             (dis/foce-section-key)
           topic-data          (dis/foce-section-data)
           section-kw          (keyword section)
@@ -203,21 +204,21 @@
                                (check-headline-count owner %)
                                (om/set-state! owner :char-count nil))
                     :dangerouslySetInnerHTML #js {"__html" initial-headline}})
-          (dom/div #js {:className "topic-body topic-snippet emoji-autocomplete"
-                        :id (str "foce-snippet-" (name section))
-                        :key "foce-snippet"
-                        :ref "topic-snippet"
-                        :data-placeholder snippet-placeholder
-                        :placeholder snippet-placeholder
+          (dom/div #js {:className "topic-body emoji-autocomplete"
+                        :id (str "foce-body-" (name section))
+                        :key "foce-body"
+                        :ref "topic-body"
+                        :data-placeholder body-placeholder
+                        :placeholder body-placeholder
                         :contentEditable true
                         :style #js {:minHeight (if (:placeholder topic-data) "100px" "0px")}
-                        :onKeyUp   #(check-snippet-count owner %)
-                        :onKeyDown #(check-snippet-count owner %)
-                        :onFocus   #(check-snippet-count owner %)
+                        :onKeyUp   #(check-body-count owner %)
+                        :onKeyDown #(check-body-count owner %)
+                        :onFocus   #(check-body-count owner %)
                         :onBlur #(do
-                                   (check-snippet-count owner %)
+                                   (check-body-count owner %)
                                    (om/set-state! owner :char-count nil))
-                        :dangerouslySetInnerHTML #js {"__html" initial-snippet}})
+                        :dangerouslySetInnerHTML #js {"__html" initial-body}})
           (dom/div {:class "topic-foce-buttons group"}
             (dom/input {:id "foce-file-upload-ui--select-trigger"
                         :style {:display "none"}
@@ -269,7 +270,7 @@
               (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
             (dom/div {:class "topic-foce-footer-right"}
               (dom/button {:class "btn-reset btn-solid"
-                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count negative-snippet-char-count)
+                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count negative-body-char-count)
                            :on-click #(dis/dispatch! [:foce-save])} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
                            :on-click #(do
