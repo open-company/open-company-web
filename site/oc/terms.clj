@@ -52,7 +52,7 @@
             [:li "OpenCompany is an Open Source Software (OSS) project, but may contain proprietary and confidential information that is protected by applicable intellectual property and other laws. Subject to the terms and conditions of this TOS, OpenCompany only grants you a personal, non-sublicensable and non-exclusive license to use the object code of any non OSS solely in connection with the Service. Any rights not expressly granted herein are reserved."]
             [:li "OpenCompany reserves the right to use your name as a reference for marketing or promotional purposes on the Site and in other communication with existing or potential OpenCompany customers. For example, we might list your company on one of our webpages under lists of OpenCompany customers. We don’t want to list customers who don’t want to be listed, so you may send an email to "
               [:a {:href contact-mail-to} contact-email]
-              "stating that you do not wish to be used as a reference."]
+              " stating that you do not wish to be used as a reference."]
             [:li "OpenCompany may make available, in its sole discretion, the OpenCompany Application Programming Interface and related documentation, data, code, and other materials provided with the API (collectively “"
               [:strong "API"]
               "”). You undertake use of the API at your own risk, and such use of this API will be governed by this TOS. You hereby agree to be bound by those terms, and acknowledge that violation of OpenCompany’s TOS is grounds for termination of Your Account."]]]
