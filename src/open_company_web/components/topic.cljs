@@ -39,9 +39,10 @@
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
 (defn fullscreen-topic [data selected-metric force-editing & [e]]
-  (when e
-    (utils/event-stop e))
-  ((:topic-click data) selected-metric force-editing))
+  (when (not (:foce-active data))
+    (when e
+      (utils/event-stop e))
+    ((:topic-click data) selected-metric force-editing)))
 
 (defn start-foce-click [owner]
   (let [section-kw (keyword (om/get-props owner :section))
@@ -107,7 +108,8 @@
                    (responsive/can-edit?)
                    (not (responsive/is-mobile))
                    (not (:read-only topic-data))
-                   (not sharing-mode))
+                   (not sharing-mode)
+                   (not (:foce-active data)))
             (dom/button {:class (str "topic-pencil-button btn-reset")
                          :on-click #(pencil-click owner %)}
               (dom/i {:class "fa fa-pencil"}))))
@@ -195,6 +197,7 @@
           all-revisions (slug @caches/revisions)
           revisions-list (section-kw all-revisions)
           topic-data (utils/select-section-data section-data section-kw as-of)
+          foce-active (not (nil? (dis/foce-section-key)))
           is-foce (= (dis/foce-section-key) section-kw)]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
@@ -206,10 +209,11 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
+                                                 :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
                     :ref "topic"
                     :id (str "topic-" (name section))
-                    :onClick #(when (and (:topic-click options) (not is-foce))
+                    :onClick #(when (and (:topic-click options) (not foce-active))
                                 ((:topic-click options) nil false))}
         (when show-share-remove
           (dom/div {:class "share-remove-container"
@@ -249,6 +253,8 @@
                                         :card-width card-width
                                         :read-only-company (:read-only-company data)
                                         :topic-click (:topic-click options)
+                                        :is-foce is-foce
+                                        :foce-active foce-active
                                         :prev-rev prev-rev
                                         :next-rev next-rev}
                                        {:opts (merge options {:rev-click (fn [e rev]
