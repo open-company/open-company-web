@@ -42,22 +42,7 @@
   [:nav.navbar.navbar-default
    {:role "navigation"}
    [:div.navbar-header
-    [:a.navbar-brand {:href "/"} [:strong "open"] "company"]
-    ;; Hamburger menu for mobile
-    [:button.navbar-toggle.collapsed
-     {:aria-expanded "false", :data-target "#bs-example-navbar-collapse-1",
-      :data-toggle "collapse", :type "button"}
-     [:span.sr-only "Toggle navigation"]
-     [:span.icon-bar]
-     [:span.icon-bar]
-     [:span.icon-bar]]]
-   [:div#bs-example-navbar-collapse-1.collapse.navbar-collapse
-    [:ul.nav.navbar-nav.navbar-right
-     [:li [:a {:href "/"} "Home"]]
-     [:li [:a {:href "/pricing.html"} "Pricing"]]
-     [:li [:a {:href "http://newsletter.opencompany.com/"} "Newsletter"]]
-     [:li [:a {:href "/about.html"} "About"]]
-     [:li [:a {:href contact-mail-to} "Contact"]]]]])
+    [:a.navbar-brand {:href "/"} [:strong "open"] "company"]]])
 
 (defn tagline []
   [:div.tagline.text-center
@@ -92,13 +77,7 @@
        [:i.fa.fa-twitter]]]
      [:li
       [:a {:href "https://github.com/open-company"}
-       [:i.fa.fa-github-alt]]]]
-    [:ul.nav.navbar-nav.navbar-right
-     [:li [:a {:href "/"} "Home"]]
-     [:li [:a {:href "/pricing.html"} "Pricing"]]
-     [:li [:a {:href "http://newsletter.opencompany.com/"} "Newsletter"]]
-     [:li [:a {:href "/about.html"} "About"]]
-     [:li [:a {:href contact-mail-to} "Contact"]]]]])
+       [:i.fa.fa-github-alt]]]]]])
 
 
 (defn read-edn [entry]
