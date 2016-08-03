@@ -36,6 +36,10 @@
     rum/reactive
   [s slug company-uuid]
   [:div
+    ;; Thank you message when they have a cookie and a subscription
+    (when (and (cook/get-cookie :subscription-callback-slug)
+               (drv/react s :subscription))
+      (thanks-for-subscribing))
    [:div.small-caps.bold.mb1 "Subscription Plan"]
    (if (drv/react s :subscription)
      [:div
@@ -130,10 +134,6 @@
       (utils/update-page-title (str "OpenCompany - " company-name))
 
       (dom/div {:class "lg-col-5 md-col-7 col-11 mx-auto mt4 mb4 settings-container group"}
-
-        ;; Thank you message
-        (when (cook/get-cookie :subscription-callback-slug)
-          (thanks-for-subscribing))
         
         (dom/div {:class "settings-form-label company-settings"}
           (dom/span {} "Company Settings")
