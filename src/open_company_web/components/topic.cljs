@@ -38,11 +38,11 @@
         topic-scroll-top (utils/offset-top topic)]
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
-(defn fullscreen-topic [data selected-metric force-editing & [e]]
-  (when (not (:foce-active data))
+(defn fullscreen-topic [owner selected-metric force-editing & [e]]
+  (when (not (om/get-props owner :foce-active))
     (when e
       (utils/event-stop e))
-    ((:topic-click data) selected-metric force-editing)))
+    ((om/get-props owner :topic-click) selected-metric force-editing)))
 
 (defn start-foce-click [owner]
   (let [section-kw (keyword (om/get-props owner :section))
@@ -54,7 +54,7 @@
   (utils/event-stop e)
   (let [section (om/get-props owner :section)]
     (if (#{:growth :finances} (keyword section))
-      (fullscreen-topic (om/get-props owner) nil true)
+      (fullscreen-topic owner nil true)
       (start-foce-click owner))))
 
 (defcomponent topic-internal [{:keys [topic-data
@@ -71,8 +71,7 @@
           chart-opts          {:chart-size {:width  260
                                             :height 196}
                                :hide-nav true
-                               :pillboxes-first false
-                               :topic-click (partial fullscreen-topic data nil false)}
+                               :pillboxes-first false}
           is-growth-finances? (#{:growth :finances} section-kw)
           gray-color          (oc-colors/get-color-by-kw :oc-gray-5)
           finances-row-data   (:data topic-data)
@@ -88,7 +87,7 @@
                                :height (:image-height topic-data)}
           topic-body          (utils/get-topic-body topic-data section)]
       (dom/div #js {:className "topic-internal group"
-                    :onClick (partial fullscreen-topic data nil false)
+                    :onClick (partial fullscreen-topic owner nil false)
                     :ref "topic-internal"}
         (when (or is-growth-finances?
                   image-header)
@@ -96,7 +95,10 @@
                                              :card-image (not is-growth-finances?)})}
             (cond
               (= section "finances")
-              (om/build topic-finances {:section-data topic-data :section section :currency currency} {:opts chart-opts})
+              (om/build topic-finances {:section-data topic-data
+                                        :section section
+                                        :currency currency
+                                        :topic-click (partial fullscreen-topic owner nil false)} {:opts chart-opts})
               (= section "growth")
               (om/build topic-growth {:section-data topic-data :section section :currency currency} {:opts chart-opts})
               :else
@@ -121,7 +123,7 @@
                       :dangerouslySetInnerHTML (utils/emojify snippet)})
         (when-not (clojure.string/blank? (utils/strip-HTML-tags topic-body))
           (dom/button {:class "btn-reset topic-read-more"
-                       :onClick (partial fullscreen-topic data nil false)} "READ MORE"))))))
+                       :onClick (partial fullscreen-topic owner nil false)} "READ MORE"))))))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
