@@ -22,6 +22,7 @@
 
 ;; Recurly
 (def recurly-id "opencompany-staging")
+(def recurly-plan "local")
 
 ;; Deploy key (cache buster)
 (def deploy-key "asd")

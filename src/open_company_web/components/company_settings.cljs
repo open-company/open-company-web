@@ -55,7 +55,7 @@
       (let [[fn ln] (-> (drv/react s :jwt) :real-name (string/split #"\s" 2))]
         [:a.btn-reset.btn-solid
          {:on-click #(cook/set-cookie! :subscription-callback-slug slug (* 60 60 24))
-          :href (str "https://" ls/recurly-id ".recurly.com/subscribe/local/" company-uuid
+          :href (str "https://" ls/recurly-id ".recurly.com/subscribe/" ls/recurly-plan "/" company-uuid
                      "?email=" (:email (drv/react s :jwt)) "&first_name=" fn "&last_name=" ln)}
          "Subscribe"])])])
 
