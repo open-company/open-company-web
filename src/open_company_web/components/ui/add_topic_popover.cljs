@@ -105,7 +105,7 @@
                 next-highlighted-idx  (min (max (idx-fn cur-highlighted) min-idx) max-idx)
                 next-highlighted      (get all-topics next-highlighted-idx)
                 new-topic-div         (om/get-ref owner (str "potential-topic-" next-highlighted))
-                topics-to-add        (om/get-ref owner "add-topic-popover-scroll")]
+                topics-to-add         (om/get-ref owner "add-topic-popover-scroll")]
             (set! (.-scrollTop topics-to-add) (- (.-offsetTop new-topic-div) (.-offsetTop topics-to-add) 40))
             (cond
               (= key-code down-arrow-key-code)
@@ -153,8 +153,8 @@
   "Drop down menu entries for each topic in the provided `topics` sequence."
   [topics all-topics highlighted-topic owner options]
   (for [idx (range (count topics))
-      :let [topic (get (vec topics) idx)
-            topic-data (->> topic keyword (get all-topics))]]
+        :let [topic (get (vec topics) idx)
+              topic-data (->> topic keyword (get all-topics))]]
     (let [title (:title topic-data)]
       ; TEMP: remove finance/growth
       (when-not (or (= title "Finances") (= title "Growth"))
@@ -207,7 +207,9 @@
 
   (render-state [_ {:keys [active-topics inactive-topics highlighted-topic archived-topics-list adding-custom-topic custom-topic-title]}]
     (let [has-archived-topics (pos? (count archived-topics-list))
-          has-inactive-topics (pos? (count inactive-topics))]
+          has-inactive-topics (pos? (count inactive-topics))
+          archived-topics-map (apply merge
+                                (map #(hash-map (keyword (:section %)) %) archived-topics))]
       (dom/div #js {:className (utils/class-set {:add-topic-popover true
                                                  (str "column-" column) true
                                                  :group true
@@ -229,7 +231,7 @@
             (dom/div {:class "add-topic-popover-subheader"} "ARCHIVED TOPICS"))
           (when has-archived-topics
             (dom/div {:class "topics-to-add"}
-              (topic-list archived-topics-list all-topics highlighted-topic owner options))))
+              (topic-list archived-topics-list archived-topics-map highlighted-topic owner options))))
         (dom/div {:class "add-custom-topic-container"
                   :on-click #(when-not adding-custom-topic (add-custom-topic owner %))}
           (if-not adding-custom-topic
