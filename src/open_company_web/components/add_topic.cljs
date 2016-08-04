@@ -35,7 +35,7 @@
      :value @(::topic-title s)
      :on-change #(reset! (::topic-title s) (.. % -target -value))
      :style {:font-size "16px"}
-     :placeholder "Custom topic title"}]
+     :placeholder "Custom topic"}]
    [:button.btn-reset.btn-outline
     {:disabled (string/blank? @(::topic-title s))
      :on-click #(let [topic-name     (str "custom-" (utils/my-uuid))
