@@ -59,7 +59,12 @@ div.topic {
     position: relative;
     height: auto;
 
-    & > div.topic-tr-as-of {
+    div.topic-cur-as-of {
+      position: relative;
+      height: auto;
+    }
+
+    div.topic-tr-as-of {
       position: absolute;
       top: 0;
       left: 0;

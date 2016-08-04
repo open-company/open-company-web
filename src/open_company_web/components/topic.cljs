@@ -197,7 +197,8 @@
   (let [cur-topic (om/get-ref owner "cur-topic")
         tr-topic (om/get-ref owner "tr-topic")
         current-state (om/get-state owner)
-        appear-animation (Fade. tr-topic 0 1 utils/oc-animation-duration)
+        anim-duration utils/oc-animation-duration
+        appear-animation (Fade. tr-topic 0 1 anim-duration)
         cur-size (js/getComputedStyle cur-topic)
         tr-size (js/getComputedStyle tr-topic)
         topic (om/get-ref owner "topic-anim")
@@ -207,9 +208,9 @@
     (.play (Resize. topic
                     #js [(js/parseFloat (.-width topic-size)) (js/parseFloat (.-height cur-size))]
                     #js [(js/parseFloat (.-width topic-size)) (js/parseFloat (.-height tr-size))]
-                    utils/oc-animation-duration))
+                    anim-duration))
     ; disappear current topic
-    (.play (Fade. cur-topic 1 0 utils/oc-animation-duration))
+    (.play (Fade. cur-topic 1 0 anim-duration))
     ; appear the new topic
     (doto appear-animation
       (events/listen
@@ -293,41 +294,43 @@
                       :key (str "topic-anim-" as-of "-" transition-as-of)
                       :ref "topic-anim"}
           (dom/div #js {:className "topic-as-of group"
-                        :ref "cur-topic"
                         :key (str "cur-" as-of)
                         :style #js {:opacity 1 :width "100%" :height "auto"}}
-            (if is-foce
-              (om/build topic-edit {:section section
-                                    :topic-data topic-data
-                                    :sharing-mode sharing-mode
-                                    :show-fast-editing (:show-fast-editing data)
-                                    :currency currency
-                                    :card-width card-width
-                                    :read-only-company (:read-only-company data)
-                                    :foce-key (:foce-key data)
-                                    :foce-data (:foce-data data)
-                                    :prev-rev prev-rev
-                                    :next-rev next-rev}
-                                   {:opts (merge options {:rev-click (fn [e rev]
-                                                                        (scroll-to-topic-top (om/get-ref owner "topic"))
-                                                                        (om/set-state! owner :transition-as-of (:updated-at rev))
-                                                                        (.stopPropagation e))})
-                                    :key (str "topic-foce-" section)})
-              (om/build topic-internal {:section section
-                                        :topic-data topic-data
-                                        :sharing-mode sharing-mode
-                                        :show-fast-editing (:show-fast-editing data)
-                                        :currency currency
-                                        :card-width card-width
-                                        :read-only-company (:read-only-company data)
-                                        :topic-click (:topic-click options)
-                                        :prev-rev prev-rev
-                                        :next-rev next-rev}
-                                       {:opts (merge options {:rev-click (fn [e rev]
-                                                                            (scroll-to-topic-top (om/get-ref owner "topic"))
-                                                                            (om/set-state! owner :transition-as-of (:updated-at rev))
-                                                                            (.stopPropagation e))})
-                                        :key (str "topic-" section)}))
+            (dom/div #js {:className "topic-cur-as-of"
+                          :ref "cur-topic"
+                          :style #js {:opacity 1}}
+              (if is-foce
+                (om/build topic-edit {:section section
+                                      :topic-data topic-data
+                                      :sharing-mode sharing-mode
+                                      :show-fast-editing (:show-fast-editing data)
+                                      :currency currency
+                                      :card-width card-width
+                                      :read-only-company (:read-only-company data)
+                                      :foce-key (:foce-key data)
+                                      :foce-data (:foce-data data)
+                                      :prev-rev prev-rev
+                                      :next-rev next-rev}
+                                     {:opts (merge options {:rev-click (fn [e rev]
+                                                                          (scroll-to-topic-top (om/get-ref owner "topic"))
+                                                                          (om/set-state! owner :transition-as-of (:updated-at rev))
+                                                                          (.stopPropagation e))})
+                                      :key (str "topic-foce-" section)})
+                (om/build topic-internal {:section section
+                                          :topic-data topic-data
+                                          :sharing-mode sharing-mode
+                                          :show-fast-editing (:show-fast-editing data)
+                                          :currency currency
+                                          :card-width card-width
+                                          :read-only-company (:read-only-company data)
+                                          :topic-click (:topic-click options)
+                                          :prev-rev prev-rev
+                                          :next-rev next-rev}
+                                         {:opts (merge options {:rev-click (fn [e rev]
+                                                                              (scroll-to-topic-top (om/get-ref owner "topic"))
+                                                                              (om/set-state! owner :transition-as-of (:updated-at rev))
+                                                                              (.stopPropagation e))})
+                                          :key (str "topic-" section)})))
             (when transition-as-of
               (dom/div #js {:className "topic-tr-as-of group"
                             :ref "tr-topic"
