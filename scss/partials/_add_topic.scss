@@ -12,19 +12,17 @@ div.topic.add-topic {
 
   &:hover {
     background-color: #ffffff;
+    transition: background-color 0.2s;
 
     div.topic-title {
       opacity: 1;
+      transition: opacity 0.2;
     }
   }
 
   &.active {
     background-color: #ffffff;
     border: 1px solid rgba(78, 90, 107, 0.8);
-
-    div.topic-title {
-      opacity: 1;
-    }
   }
 
   div.topic-title {
