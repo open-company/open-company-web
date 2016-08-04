@@ -178,7 +178,7 @@
                 (dom/i {:class "fa fa-caret-left"})))
             (dom/div {:class "topic-attribution"
                     :data-toggle "tooltip"
-                    :data-placement "right"
+                    :data-placement "top"
                     :title (:name (:author topic-data))}
             (time-ago (:updated-at topic-data)))
             (when (:next-rev data)
