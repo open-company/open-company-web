@@ -646,6 +646,12 @@
                                             (.stopPropagation e)
                                             (om/set-state! owner :growth-new-metric true)
                                             (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
+            (dom/div {:class "relative topic-body-line"}
+              (dom/div {:className (str "topic-body emoji-autocomplete" (when hide-placeholder " hide-placeholder"))
+                        :contentEditable true
+                        :id (str "topic-edit-body-" (name topic))
+                        :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
+              (om/build filestack-uploader (om/get-state owner :medium-editor) {:opts {:hide-placeholder #(om/set-state! owner :hide-placeholder %)}}))
             (dom/div {:class "topc-edit-top-box-footer"}
               (dom/button {:class "btn-reset add-image"
                            :title (if (not image-url) "Add an image" "Replace image")
@@ -691,13 +697,7 @@
               (dom/input {:id "topic-edit-upload-ui--select-trigger"
                           :style {:display "none"}
                           :type "file"
-                          :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})))
-          (dom/div {:class "relative topic-body-line"}
-            (dom/div {:className (str "topic-body emoji-autocomplete" (when hide-placeholder " hide-placeholder"))
-                      :contentEditable true
-                      :id (str "topic-edit-body-" (name topic))
-                      :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
-            (om/build filestack-uploader (om/get-state owner :medium-editor) {:opts {:hide-placeholder #(om/set-state! owner :hide-placeholder %)}})))
+                          :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))}))))
       (when (and show-first-edit-tooltip
                  (not tooltip-dismissed))
         (om/build tooltip

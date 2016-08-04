@@ -65,9 +65,9 @@
                 (= topic "growth")
                 (om/build topic-growth chart-data {:opts chart-opts})
                 (= topic "finances")
-                (om/build topic-finances chart-data {:opts chart-opts})))))
-        (dom/div {:class "topic-body"
-                  :dangerouslySetInnerHTML (utils/emojify (utils/get-topic-body topic-data topic))})
+                (om/build topic-finances chart-data {:opts chart-opts}))))
+          (dom/div {:class "topic-body"
+                  :dangerouslySetInnerHTML (utils/emojify (utils/get-topic-body topic-data topic))}))
         (when (:author topic-data)
           (dom/div {:class "topic-attribution"}
             (str "- " (:name (:author topic-data)) " / " (utils/date-string (js/Date. (:updated-at topic-data)) true))))
