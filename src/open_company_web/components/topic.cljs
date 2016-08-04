@@ -170,7 +170,7 @@
           (dom/div {:class "topic-navigation"}
             (when (:prev-rev data)
               (dom/button {:class "topic-navigation-button earlier-update"
-                           :title "View earlier update"
+                           :title "View prior update"
                            :type "button"
                            :data-toggle (if (:prev-rev data) "tooltip" nil)
                            :data-placement "top"
@@ -183,7 +183,7 @@
             (time-ago (:updated-at topic-data)))
             (when (:next-rev data)
               (dom/button {:class "topic-navigation-button later-update"
-                           :title "View later update"
+                           :title "View next update"
                            :type "button"
                            :data-toggle (if (:next-rev data) "tooltip" nil)
                            :data-placement "top"
