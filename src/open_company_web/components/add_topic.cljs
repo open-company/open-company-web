@@ -5,7 +5,8 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
-            [open-company-web.caches :as caches]))
+            [open-company-web.caches :as caches]
+            [open-company-web.components.ui.icon :as i]))
 
 ;; This should be defined as a derivative specifically suited to rendering the
 ;; topic adding component
@@ -65,9 +66,9 @@
       [:div.card.p--card
        [:div.open-sans.small-caps.bold.mb2.gray5
         [:span.mr1 "Suggested Topics"]
-        [:span.dimmed-gray.btn-reset
+        [:span.dimmed-gray.btn-reset.right
          {:on-click #(reset! (::expanded? s) false)}
-         "Cancel"]]
+          (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})]]
        [:div.mxn2.clearfix
         (for [col chunked]
           [:div.col.col-6.px2
@@ -85,6 +86,6 @@
                    (:section-name topic-full)]])))])]
        (custom-topic-input #(do (update-active-topics %1 %2 %3)
                                 (reset! (::expanded? s) false)))])
-    [:div.p3.border.center.btn-reset
+    [:div.topic.group.add-topic
      {:on-click #(reset! (::expanded? s) true)}
-     [:span.small-caps.bold "+ Add Topic"]]))
+     [:div.topic-title.small-caps "+ Add Topic"]]))
