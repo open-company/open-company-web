@@ -179,7 +179,7 @@
             (dom/div {:class "topic-attribution"
                     :data-toggle "tooltip"
                     :data-placement "top"
-                    :title (:name (:author topic-data))}
+                    :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
             (time-ago (:updated-at topic-data)))
             (when (:next-rev data)
               (dom/button {:class "topic-navigation-button later-update"

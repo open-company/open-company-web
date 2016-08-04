@@ -70,7 +70,7 @@
                   :dangerouslySetInnerHTML (utils/emojify (utils/get-topic-body topic-data topic))}))
         (when (:author topic-data)
           (dom/div {:class "topic-attribution"}
-            (str "- " (:name (:author topic-data)) " / " (utils/date-string (js/Date. (:updated-at topic-data)) true))))
+            (str "- " (:name (:author topic-data)) " / " (utils/date-string (js/Date. (:updated-at topic-data)) [:year]))))
         (when-not hide-history-navigation
           (dom/div {:class "topic-revisions group"}
             (when (:prev-rev data)
