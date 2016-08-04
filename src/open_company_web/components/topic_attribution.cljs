@@ -2,7 +2,8 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.components.ui.topic-read-more :refer (topic-read-more)]))
 
 (defn time-ago
   [past-date]
@@ -40,7 +41,8 @@
 
 
 (defcomponent topic-attribution [{:keys [topic-data
-                                         show-read-more
+                                         section
+                                         read-more-cb
                                          prev-rev
                                          next-rev] :as data} owner options]
 
@@ -60,30 +62,29 @@
       (js/clearTimeout (om/get-state owner :self-update))))
 
   (render-state [_ {:keys [force-update]}]
-    (let [topic-body (utils/get-topic-body topic-data section-kw)]
-      (dom/div {:class "topic-attribution-container group"}
-        (dom/div {:class "topic-navigation"}
-          (when prev-rev
-            (dom/button {:class "topic-navigation-button earlier-update"
-                         :title "View prior update"
-                         :type "button"
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :on-click #(when prev-rev ((:rev-click options) % prev-rev))}
-              (dom/i {:class "fa fa-caret-left"})))
-          (dom/div {:class "topic-attribution"
-                  :data-toggle "tooltip"
-                  :data-placement "top"
-                  :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
-          (time-ago (:updated-at topic-data)))
-          (when next-rev
-            (dom/button {:class "topic-navigation-button later-update"
-                         :title "View next update"
-                         :type "button"
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :on-click #(when next-rev ((:rev-click options) % next-rev))}
-              (dom/i {:class "fa fa-caret-right"}))))
-        (when (and read-more-cb (> (count (utils/strip-HTML-tags topic-body)) 500))
-          (dom/button {:class "btn-reset topic-read-more"
-                       :onClick read-more-cb} "READ MORE"))))))
+    (dom/div {:class "topic-attribution-container group"}
+      (dom/div {:class "topic-navigation"}
+        (when prev-rev
+          (dom/button {:class "topic-navigation-button earlier-update"
+                       :title "View prior update"
+                       :type "button"
+                       :data-toggle "tooltip"
+                       :data-placement "top"
+                       :on-click #(when prev-rev ((:rev-click options) % prev-rev))}
+            (dom/i {:class "fa fa-caret-left"})))
+        (dom/div {:class "topic-attribution"
+                :data-toggle "tooltip"
+                :data-placement "top"
+                :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
+        (time-ago (:updated-at topic-data)))
+        (when next-rev
+          (dom/button {:class "topic-navigation-button later-update"
+                       :title "View next update"
+                       :type "button"
+                       :data-toggle "tooltip"
+                       :data-placement "top"
+                       :on-click #(when next-rev ((:rev-click options) % next-rev))}
+            (dom/i {:class "fa fa-caret-right"}))))
+      (when read-more-cb
+        (dom/div {:class "right"}
+          (om/build topic-read-more data))))))

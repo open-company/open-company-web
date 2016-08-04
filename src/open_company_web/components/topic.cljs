@@ -17,6 +17,7 @@
             [open-company-web.components.topic-edit :refer (topic-edit)]
             [open-company-web.components.topic-attribution :refer (topic-attribution)]
             [open-company-web.components.ui.icon :as i]
+            [open-company-web.components.ui.topic-read-more :refer (topic-read-more)]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as EventType]
@@ -118,7 +119,13 @@
         (dom/div #js {:className "topic-body topic-body"
                       :ref "topic-body"
                       :dangerouslySetInnerHTML (utils/emojify truncated-body)})
-        (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic data nil false)) {:opts options})))))
+        ; if it's SU preview or SU show only read-more
+        (println "path:" (:route @router/path))
+        (if (or (utils/in? (:route @router/path) "su-snapshot-preview") (utils/in? (:route @router/path) "su-snapshot"))
+          (dom/div {:class "left"
+                    :style {:margin-bottom "28px"}}
+            (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic data nil false))))
+          (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic data nil false)) {:opts options}))))))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
