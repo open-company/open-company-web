@@ -100,15 +100,21 @@
                                       show-fast-editing] :as data} owner options]
 
   (init-state [_]
-    {:force-update 0})
+    {:force-update 0
+     :self-update nil})
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
       ; force a rerender every minute
-      (js/setInterval #(om/update-state! owner :force-update inc) (* 60 1000))))
+      (om/set-state! owner :self-update (js/setInterval #(om/update-state! owner :force-update inc) (* 60 1000)))))
 
-  (render [_]
+  (will-unmount [_]
+    (when-not (utils/is-test-env?)
+      ; clear self update
+      (js/clearTimeout (om/get-state owner :self-update))))
+
+  (render-state [_ {:keys [force-update]}]
     (let [section-kw          (keyword section)
           chart-opts          {:chart-size {:width  260
                                             :height 196}
