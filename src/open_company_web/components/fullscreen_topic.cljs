@@ -13,6 +13,7 @@
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.fullscreen-topic-edit :refer (fullscreen-topic-edit)]
+            [open-company-web.components.topic-attribution :refer (topic-attribution)]
             [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.ui.small-loading :refer (small-loading)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
@@ -30,7 +31,16 @@
   (.play
     (new Fade (om/get-ref owner "fullscreen-topic") 0 1 utils/oc-animation-duration)))
 
-(defcomponent fullscreen-topic-internal [{:keys [topic topic-data currency selected-metric card-width hide-history-navigation can-edit is-actual] :as data} owner options]
+(defcomponent fullscreen-topic-internal [{:keys [topic
+                                                 topic-data
+                                                 currency
+                                                 selected-metric
+                                                 card-width
+                                                 hide-history-navigation
+                                                 can-edit
+                                                 prev-rev
+                                                 next-rev
+                                                 is-actual] :as data} owner options]
   (render [_]
     (let [fullscreen-width (responsive/fullscreen-topic-width card-width)
           chart-opts {:show-title false
@@ -67,20 +77,9 @@
                 (= topic "finances")
                 (om/build topic-finances chart-data {:opts chart-opts}))))
           (dom/div {:class "topic-body"
-                  :dangerouslySetInnerHTML (utils/emojify (utils/get-topic-body topic-data topic))}))
-        (when (:author topic-data)
-          (dom/div {:class "topic-attribution"}
-            (str "- " (:name (:author topic-data)) " / " (utils/date-string (js/Date. (:updated-at topic-data)) [:year]))))
-        (when-not hide-history-navigation
-          (dom/div {:class "topic-revisions group"}
-            (when (:prev-rev data)
-              (dom/button {:class "prev"
-                           :on-click #((:rev-nav options) (:updated-at (:prev-rev data)))}
-                (if (:is-actual data) "VIEW EARLIER UPDATE" "EARLIER")))
-            (when (:next-rev data)
-              (dom/button {:class "next"
-                           :on-click #((:rev-nav options) (:updated-at (:next-rev data)))}
-                "LATER"))))))))
+                  :dangerouslySetInnerHTML (utils/emojify (utils/get-topic-body topic-data topic))})
+          (when-not hide-history-navigation
+            (om/build topic-attribution data {:opts options})))))))
 
 (defn start-editing [owner options]
   (let [editing (om/get-state owner :editing)
@@ -166,6 +165,11 @@
                                      :transition-as-of nil}))))
       (.play))))
 
+(defn rev-click [owner e revision]
+  (when e
+    (utils/event-stop e))
+  (om/set-state! owner :transition-as-of (:updated-at revision)))
+
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width hide-history-navigation show-first-edit-tooltip] :as data} owner options]
 
   (init-state [_]
@@ -223,7 +227,7 @@
           revisions-list (get (slug @cache/revisions) section-kw)
           topic-data (utils/select-section-data section-data section-kw as-of)
           is-actual? (= as-of actual-as-of)
-          fullscreen-topic-opts (merge options {:rev-nav #(om/set-state! owner :transition-as-of %)
+          fullscreen-topic-opts (merge options {:rev-click (partial rev-click owner)
                                                 :switch-metric-cb #(om/set-state! owner :last-selected-metric %)
                                                 :start-editing #(start-editing owner options)})
           edit-topic-opts (merge options {:show-save-button #(om/set-state! owner :show-save-button %)

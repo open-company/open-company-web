@@ -64,7 +64,6 @@ div.fullscreen-topic {
       min-width: 302px;
       margin: 30px auto;
       position: relative;
-      overflow: hidden;
       min-height: calc(100vh - #{$navbar_height}px - 60px - 4px);
       padding-top: 2px;
 
@@ -76,7 +75,7 @@ div.fullscreen-topic {
         border-radius: 4px;
         background-color: #ffffff;
         border: solid 2px rgba(78, 90, 107, 0.2);
-        padding: 0px 0px 30px 0px;
+        padding: 0px;
 
         div.topic-header-image {
           text-align: center;
@@ -148,43 +147,8 @@ div.fullscreen-topic {
         padding: 0px 30px !important;
       }
 
-      div.topic-attribution {
-        margin-top: 10px;
-        font-size: 16px;
-        line-height: 1.8;
-        color: $oc_gray_5;
-        opacity: 0.5;
+      div.topic-attribution-container {
         padding: 0px 30px;
-      }
-
-      div.topic-revisions {
-        margin-top: 65px;
-        padding: 0px 30px;
-
-        @include mobile(){
-          margin-bottom: 60px;
-        }
-
-        button {
-          border: 0px;
-          outline: none;
-          background-color: transparent;
-          opacity: 0.5;
-          font-weight: 700;
-          font-family: $oc_headers_font;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
-        }
-
-        button.prev {
-          float: left;
-        }
-
-        button.next {
-          float: right;
-        }
       }
     }
   }

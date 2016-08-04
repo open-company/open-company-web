@@ -15,6 +15,7 @@
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.topic-edit :refer (topic-edit)]
+            [open-company-web.components.topic-attribution :refer (topic-attribution)]
             [open-company-web.components.ui.icon :as i]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
@@ -22,40 +23,6 @@
             [goog.events :as events]
             [goog.style :as gstyle]
             [cljsjs.react.dom]))
-
-(defn time-ago
-  [past-date]
-  (let [past-js-date (utils/js-date past-date)
-        past (.getTime past-js-date)
-        now (.getTime (utils/js-date))
-        seconds (.floor js/Math (/ (- now past) 1000))
-        minutes-interval (.floor js/Math (/ seconds 60))
-        hours-interval (.floor js/Math (/ seconds 3600))
-        days-interval (.floor js/Math (/ seconds 86400))
-        weeks-interval (.floor js/Math (/ seconds 604800))
-        months-interval (.floor js/Math (/ seconds 2592000))
-        years-interval (.floor js/Math (/ seconds 31536000))]
-    (cond
-      (> months-interval 24)
-      (str years-interval " " (utils/pluralize "year" years-interval) " ago")
-
-      (> weeks-interval 8)
-      (str months-interval " " (utils/pluralize "month" months-interval) " ago")
-
-      (> days-interval 14)
-      (str weeks-interval " " (utils/pluralize "week" weeks-interval) " ago")
-
-      (> hours-interval 24)
-      (str days-interval " " (utils/pluralize "day" days-interval) " ago")
-
-      (> minutes-interval 60)
-      (str hours-interval " " (utils/pluralize "hour" hours-interval) " ago")
-
-      (> minutes-interval 1)
-      (str minutes-interval " " (utils/pluralize "minute" minutes-interval) " ago")
-
-      :else
-      "just now")))
 
 (defcomponent topic-image-header [{:keys [image-header image-size]} owner options]
   (render [_]
@@ -99,22 +66,7 @@
                                       sharing-mode
                                       show-fast-editing] :as data} owner options]
 
-  (init-state [_]
-    {:force-update 0
-     :self-update nil})
-
-  (did-mount [_]
-    (when-not (utils/is-test-env?)
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-      ; force a rerender every minute
-      (om/set-state! owner :self-update (js/setInterval #(om/update-state! owner :force-update inc) (* 60 1000)))))
-
-  (will-unmount [_]
-    (when-not (utils/is-test-env?)
-      ; clear self update
-      (js/clearTimeout (om/get-state owner :self-update))))
-
-  (render-state [_ {:keys [force-update]}]
+  (render [_]
     (let [section-kw          (keyword section)
           chart-opts          {:chart-size {:width  260
                                             :height 196}
@@ -166,32 +118,7 @@
         (dom/div #js {:className "topic-body topic-body"
                       :ref "topic-body"
                       :dangerouslySetInnerHTML (utils/emojify truncated-body)})
-        (dom/div {:class "topic-attribution-container group"}
-          (dom/div {:class "topic-navigation"}
-            (when (:prev-rev data)
-              (dom/button {:class "topic-navigation-button earlier-update"
-                           :title "View prior update"
-                           :type "button"
-                           :data-toggle (if (:prev-rev data) "tooltip" nil)
-                           :data-placement "top"
-                           :on-click #(when (:prev-rev data) ((:rev-click options) % (:prev-rev data)))}
-                (dom/i {:class "fa fa-caret-left"})))
-            (dom/div {:class "topic-attribution"
-                    :data-toggle "tooltip"
-                    :data-placement "top"
-                    :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
-            (time-ago (:updated-at topic-data)))
-            (when (:next-rev data)
-              (dom/button {:class "topic-navigation-button later-update"
-                           :title "View next update"
-                           :type "button"
-                           :data-toggle (if (:next-rev data) "tooltip" nil)
-                           :data-placement "top"
-                           :on-click #(when (:next-rev data) ((:rev-click options) % (:next-rev data)))}
-                (dom/i {:class "fa fa-caret-right"}))))
-          (when (> (count (utils/strip-HTML-tags topic-body)) 500)
-            (dom/button {:class "btn-reset topic-read-more"
-                         :onClick (partial fullscreen-topic data nil false)} "READ MORE")))))))
+        (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic data nil false)) {:opts options})))))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")

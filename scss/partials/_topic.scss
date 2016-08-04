@@ -218,46 +218,6 @@ div.topic {
           padding-bottom: 0px;
         }
       }
-
-      div.topic-attribution-container {
-        margin: 0px 20px 28px 0px;
-
-        button.topic-read-more {
-          opacity: 0.5;
-          font-weight: 800;
-          font-size: 13px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_5;
-          text-decoration: underline;
-          float: right;
-        }
-
-        div.topic-navigation {
-          float: left;
-
-          div.topic-attribution {
-            font-family: $oc_headers_font;
-            float: left;
-            opacity: 0.5;
-            font-size: 13px;
-            line-height: 1.5;
-            letter-spacing: 1px;
-            color: $oc_gray_5;
-            font-weight: 700;
-            padding-top: 1px;
-          }
-
-          button.topic-navigation-button {
-            background-color: transparent;
-            color: rgba(78, 90, 107, 0.5);
-            border: none;
-            outline: none;
-            float: left;
-            margin-top: -2px;
-          }
-        }
-      }
     }
   }
 }
