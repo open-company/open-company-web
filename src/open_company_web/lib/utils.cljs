@@ -240,7 +240,7 @@
     (str month " " day (when year (str ", " (.getFullYear js-date))))))
 
 (defn pluralize [string n]
-  (if (pos? n)
+  (if (> n 1)
     (str string "s")
     string))
 
