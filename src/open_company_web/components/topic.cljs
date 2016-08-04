@@ -120,7 +120,6 @@
                       :ref "topic-body"
                       :dangerouslySetInnerHTML (utils/emojify truncated-body)})
         ; if it's SU preview or SU show only read-more
-        (println "path:" (:route @router/path))
         (if (or (utils/in? (:route @router/path) "su-snapshot-preview") (utils/in? (:route @router/path) "su-snapshot"))
           (dom/div {:class "left"
                     :style {:margin-bottom "28px"}}
