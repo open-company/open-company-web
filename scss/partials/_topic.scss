@@ -72,6 +72,12 @@ div.topic {
         button.topic-pencil-button {
           opacity: 1;
         }
+
+        div.topic-attribution-container {
+          div.topic-navigation {
+            opacity: 1;
+          }
+        }
       }
 
       button.topic-pencil-button {
@@ -226,7 +232,7 @@ div.topic {
         padding: 0;
       }
 
-      div.topic-attribution-container{
+      div.topic-attribution-container {
         margin: 0px 20px 28px 0px;
 
         div.topic-attribution {
@@ -240,7 +246,8 @@ div.topic {
           float: left;
         }
 
-        div.topic-navigation{
+        div.topic-navigation {
+          opacity: 0;
           button.topic-navigation-button {
             background-color: transparent;
             color: rgba(78, 90, 107, 0.5);

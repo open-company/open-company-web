@@ -165,19 +165,21 @@
             (dom/button {:class "topic-navigation-button"
                          :title "View earlier update"
                          :type "button"
-                         :data-toggle "tooltip"
+                         :data-toggle (if (:prev-rev data) "tooltip" nil)
                          :data-placement "top"
-                         :style {:opacity (if (:prev-rev data) 1 0)}
-                         :on-click #((:rev-click options) % (:prev-rev data))}
+                         :style {:opacity (if (:prev-rev data) 1 0)
+                                 :cursor (if (:prev-rev data) "pointer" "default")}
+                         :on-click #(when (:prev-rev data) ((:rev-click options) % (:prev-rev data)))}
               (dom/i {:class "fa fa-caret-left"}))
             " "
             (dom/button {:class "topic-navigation-button"
                          :title "View later update"
                          :type "button"
-                         :data-toggle "tooltip"
+                         :data-toggle (if (:next-rev data) "tooltip" nil)
                          :data-placement "top"
-                         :style {:opacity (if (:next-rev data) 1 0)}
-                         :on-click #((:rev-click options) % (:next-rev data))}
+                         :style {:opacity (if (:next-rev data) 1 0)
+                                 :cursor (if (:next-rev data) "pointer" "default")}
+                         :on-click #(when (:next-rev data) ((:rev-click options) % (:next-rev data)))}
               (dom/i {:class "fa fa-caret-right"}))))))))
 
 (defn animate-revision-navigation [owner]
