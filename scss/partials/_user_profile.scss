@@ -6,7 +6,8 @@ div.user-profile {
     left: 50%;
     margin-left: -254px;
     padding-top: 80px;
-    min-height: calc(100vh - #{$footer_small_height}px - 95px + #{$top_border_height}px);
+    /* 29px is the height below the user info */
+    min-height: calc(100vh - 29px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px);
 
     div.user-profile-title {
       height: 74px;

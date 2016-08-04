@@ -3,6 +3,12 @@
             [boot.util :as util]
             [hiccup.page :as hp]))
 
+(def contact-email "hello@opencompany.com")
+(def contact-mail-to (str "mailto:" contact-email))
+
+(def options {:contact-email contact-email
+              :contact-mail-to contact-mail-to})
+
 (defn head []
   [:head
    [:meta {:charset "utf-8"}]
@@ -36,23 +42,7 @@
   [:nav.navbar.navbar-default
    {:role "navigation"}
    [:div.navbar-header
-    [:a.navbar-brand {:href "/"} [:strong "open"] "company"]
-    ;; Hamburger menu for mobile
-    [:button.navbar-toggle.collapsed
-     {:aria-expanded "false", :data-target "#bs-example-navbar-collapse-1",
-      :data-toggle "collapse", :type "button"}
-     [:span.sr-only "Toggle navigation"]
-     [:span.icon-bar]
-     [:span.icon-bar]
-     [:span.icon-bar]]]
-   [:div#bs-example-navbar-collapse-1.collapse.navbar-collapse
-    [:ul.nav.navbar-nav.navbar-right
-     [:li [:a {:href "/"} "Home"]]
-     [:li [:a {:href "/pricing.html"} "Pricing"]]
-     [:li
-      [:a {:href "http://newsletter.opencompany.com/"} "Newsletter"]]
-     [:li [:a {:href "/about.html"} "About"]]
-     [:li [:a {:href "mailto:hello@opencompany.com"} "Contact"]]]]])
+    [:a.navbar-brand {:href "/"} [:strong "open"] "company"]]])
 
 (defn tagline []
   [:div.tagline.text-center
@@ -87,13 +77,7 @@
        [:i.fa.fa-twitter]]]
      [:li
       [:a {:href "https://github.com/open-company"}
-       [:i.fa.fa-github-alt]]]]
-    [:ul.nav.navbar-nav.navbar-right
-     [:li [:a {:href "/"} "Home"]]
-     [:li [:a {:href "/pricing.html"} "Pricing"]]
-     [:li [:a {:href "http://newsletter.opencompany.com/"} "Newsletter"]]
-     [:li [:a {:href "/about.html"} "About"]]
-     [:li [:a {:href "mailto:hello@opencompany.com"} "Contact"]]]]])
+       [:i.fa.fa-github-alt]]]]]])
 
 
 (defn read-edn [entry]
@@ -115,10 +99,12 @@
                   (nav)
                   (when (is? :index) (tagline))]]
                 (case page
-                  :index   (pages/index)
-                  :about   (pages/about)
-                  :pricing (pages/pricing)
-                  :404     (pages/not-found))
+                  :index   (pages/index options)
+                  :about   (pages/about options)
+                  :pricing (pages/pricing options)
+                  :404     (pages/not-found options)
+                  :privacy (pages/privacy options)
+                  :terms   (pages/terms options))
                 (if (is? :index :about)
                   (email-capture))
                 (footer)]))))

@@ -27,7 +27,8 @@
 
 (defmethod dispatcher/action :logout [db _]
   (cook/remove-cookie! :jwt)
-  (router/redirect! "/"))
+  (router/redirect! "/")
+  (dissoc db :jwt))
 
 (defmethod dispatcher/action :entry [db [_ {:keys [links]}]]
   (let [create-link    (med/find-first #(= (:rel %) "company-create") links)
@@ -191,3 +192,17 @@
 
 (defmethod dispatcher/action :su-share/reset [db _]
   (dissoc db :su-share))
+
+;; Store JWT in App DB so it can be easily accessed in actions etc.
+
+(defmethod dispatcher/action :jwt
+  [db [_ jwt-data]]
+  (assoc db :jwt jwt-data))
+
+;; Stripe Payment related actions
+
+(defmethod dispatcher/action :subscription
+  [db [_ {:keys [uuid] :as data}]]
+  (if uuid
+    (assoc-in db [:subscription uuid] data)
+    (assoc db :subscription nil)))
