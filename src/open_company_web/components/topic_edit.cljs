@@ -21,10 +21,8 @@
 
 (def title-max-length 20)
 (def headline-max-length 100)
-(def body-max-length 500)
 (def title-alert-limit 3)
 (def headline-alert-limit 10)
-(def body-alert-limit 50)
 
 (defn scroll-to-topic-top [topic]
   (let [body-scroll (.-scrollTop (.-body js/document))
@@ -76,21 +74,6 @@
         (.preventDefault e))))
   (headline-on-change owner))
 
-(defn check-body-count [owner e]
-  (when-let [body (sel1 (str "div#foce-body-" (name (dis/foce-section-key))))]
-    (let [body-value (.-innerText body)]
-      (when (and (not= (.-keyCode e) 8)
-                 (not= (.-keyCode e) 16)
-                 (not= (.-keyCode e) 17)
-                 (not= (.-keyCode e) 40)
-                 (not= (.-keyCode e) 38)
-                 (not= (.-keyCode e) 13)
-                 (not= (.-keyCode e) 27)
-                 (not= (.-keyCode e) 37)
-                 (not= (.-keyCode e) 39)
-                 (>= (count body-value) body-max-length))
-        (.preventDefault e)))))
-
 (defn img-on-load [img]
   (dis/dispatch! [:foce-input {:image-width (.-clientWidth img)
                                :image-height (.-clientHeight img)}])
@@ -121,6 +104,14 @@
     (.focus headline)
     (utils/to-end-of-content-editable headline)))
 
+(defn remove-topic-click [e]
+  (when e
+    (utils/event-stop e))
+  (when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
+    (let [section (dis/foce-section-key)]
+      (dis/dispatch! [:topic-archive section]))
+    (dis/dispatch! [:start-foce nil])))
+
 (defcomponent topic-edit [{:keys [currency
                                   prev-rev
                                   next-rev]} owner options]
@@ -143,7 +134,7 @@
     (setup-edit owner)
     (utils/after 100 #(focus-headline)))
 
-  (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert file-upload-state file-upload-progress upload-remote-url negative-body-char-count negative-headline-char-count]}]
+  (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert file-upload-state file-upload-progress upload-remote-url negative-headline-char-count]}]
     (let [section             (dis/foce-section-key)
           topic-data          (dis/foce-section-data)
           section-kw          (keyword section)
@@ -212,12 +203,6 @@
                         :placeholder body-placeholder
                         :contentEditable true
                         :style #js {:minHeight (if (:placeholder topic-data) "100px" "0px")}
-                        :onKeyUp   #(check-body-count owner %)
-                        :onKeyDown #(check-body-count owner %)
-                        :onFocus   #(check-body-count owner %)
-                        :onBlur #(do
-                                   (check-body-count owner %)
-                                   (om/set-state! owner :char-count nil))
                         :dangerouslySetInnerHTML #js {"__html" initial-body}})
           (dom/div {:class "topic-foce-buttons group"}
             (dom/input {:id "foce-file-upload-ui--select-trigger"
@@ -240,6 +225,14 @@
                          :style {:display (if (nil? file-upload-state) "block" "none")}
                          :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
                 (dom/i {:class "fa fa-code"}))
+            (dom/button {:class "btn-reset archive-button right"
+                         :title "Archive this topic"
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :style {:display (if (nil? file-upload-state) "block" "none")}
+                         :on-click (partial remove-topic-click)}
+                (dom/i {:class "fa fa-archive"}))
             (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
                 (dom/input {:type "text"
                             :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
@@ -270,7 +263,7 @@
               (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
             (dom/div {:class "topic-foce-footer-right"}
               (dom/button {:class "btn-reset btn-solid"
-                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count negative-body-char-count)
+                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count)
                            :on-click #(dis/dispatch! [:foce-save])} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
                            :on-click #(do
