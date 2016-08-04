@@ -46,7 +46,9 @@
                     (let [inner-html (.-innerHTML body-el)]
                       (dis/dispatch! [:foce-input (if (#{:finances :growth} section-kw)
                                                     {:notes {:body (.-innerHTML body-el)}}
-                                                    {:body (.-innerHTML body-el)})])))))
+                                                    {:body (.-innerHTML body-el)})]))
+                    (let [inner-text (.-innerText body-el)]
+                      (om/set-state! owner :char-count (if (> (count inner-text) 500) "Extended\nlength" nil))))))
     (js/emojiAutocomplete)))
 
 (defn headline-on-change [owner]
