@@ -120,7 +120,7 @@
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
           topic-body          (utils/get-topic-body topic-data section-kw)
-          truncated-body      (.truncate js/$ topic-body (clj->js {:length 500 :words true}))]
+          truncated-body      (if (utils/is-test-env?) topic-body (.truncate js/$ topic-body (clj->js {:length 500 :words true})))]
       (dom/div #js {:className "topic-internal group"
                     :onClick (partial fullscreen-topic data nil false)
                     :ref "topic-internal"}
