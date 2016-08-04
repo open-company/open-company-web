@@ -23,6 +23,37 @@
             [goog.style :as gstyle]
             [cljsjs.react.dom]))
 
+(defn time-ago
+  [past-date]
+  (let [past-js-date (utils/js-date past-date)
+        past (.getTime past-js-date)
+        now (.getTime (utils/js-date))
+        seconds (.floor js/Math (/ (- now past) 1000))
+        years-interval (.floor js/Math (/ seconds 31536000))
+        months-interval (.floor js/Math (/ seconds 2592000))
+        weeks-interval (.floor js/Math (/ seconds 604800))
+        days-interval (.floor js/Math (/ seconds 86400))
+        hours-interval (.floor js/Math (/ seconds 3600))
+        minutes-interval (.floor js/Math (/ seconds 60))]
+    (cond
+      (> months-interval 24)
+      (str years-interval " " (utils/pluralize "year" years-interval) " ago")
+
+      (> weeks-interval 8)
+      (str months-interval " " (utils/pluralize "month" months-interval) " ago")
+
+      (> days-interval 14)
+      (str weeks-interval " " (utils/pluralize "week" weeks-interval) " ago")
+
+      (> hours-interval 24)
+      (str days-interval " " (utils/pluralize "day" days-interval) " ago")
+
+      (> minutes-interval 60)
+      (str hours-interval " " (utils/pluralize "hour" hours-interval) " ago")
+
+      :else
+      (str minutes-interval " " (utils/pluralize "minute" minutes-interval) " ago"))))
+
 (defcomponent topic-image-header [{:keys [image-header image-size]} owner options]
   (render [_]
     (dom/img {:src image-header
@@ -64,6 +95,10 @@
                                       next-rev
                                       sharing-mode
                                       show-fast-editing] :as data} owner options]
+
+  (did-mount [_]
+    (when-not (utils/is-test-env?)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (render [_]
     (let [section-kw          (keyword section)
@@ -119,7 +154,13 @@
                       :dangerouslySetInnerHTML (utils/emojify truncated-body)})
         (when (> (count (utils/strip-HTML-tags topic-body)) 500)
           (dom/button {:class "btn-reset topic-read-more"
-                       :onClick (partial fullscreen-topic data nil false)} "READ MORE"))))))
+                       :onClick (partial fullscreen-topic data nil false)} "READ MORE"))
+        (dom/div {:class "topic-attribution-container group"}
+          (dom/div {:class "topic-attribution"
+                    :data-toggle "tooltip"
+                    :data-placement "right"
+                    :title (:name (:author topic-data))}
+            (time-ago (:updated-at topic-data))))))))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")

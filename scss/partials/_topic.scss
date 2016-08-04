@@ -225,6 +225,21 @@ div.topic {
         margin: 0px 20px 28px 20px;
         padding: 0;
       }
+
+      div.topic-attribution-container{
+        margin: 0px 20px 28px 0px;
+
+        div.topic-attribution {
+          font-family: $oc_main_font;
+          opacity: 0.5;
+          font-size: 13px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+          font-weight: 400;
+          float: left;
+        }
+      }
     }
   }
 }
