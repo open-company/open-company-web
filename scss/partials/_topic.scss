@@ -239,6 +239,15 @@ div.topic {
           font-weight: 400;
           float: left;
         }
+
+        div.topic-navigation{
+          button.topic-navigation-button {
+            background-color: transparent;
+            color: rgba(78, 90, 107, 0.5);
+            border: none;
+            outline: none;
+          }
+        }
       }
     }
   }

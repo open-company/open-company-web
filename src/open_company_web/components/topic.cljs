@@ -160,7 +160,25 @@
                     :data-toggle "tooltip"
                     :data-placement "right"
                     :title (:name (:author topic-data))}
-            (time-ago (:updated-at topic-data))))))))
+            (time-ago (:updated-at topic-data)))
+          (dom/div {:class "topic-navigation right"}
+            (dom/button {:class "topic-navigation-button"
+                         :title "View earlier update"
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :style {:opacity (if (:prev-rev data) 1 0)}
+                         :on-click #((:rev-click options) % (:prev-rev data))}
+              (dom/i {:class "fa fa-caret-left"}))
+            " "
+            (dom/button {:class "topic-navigation-button"
+                         :title "View later update"
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :style {:opacity (if (:next-rev data) 1 0)}
+                         :on-click #((:rev-click options) % (:next-rev data))}
+              (dom/i {:class "fa fa-caret-right"}))))))))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
