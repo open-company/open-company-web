@@ -162,29 +162,27 @@
                       :dangerouslySetInnerHTML (utils/emojify truncated-body)})
         (dom/div {:class "topic-attribution-container group"}
           (dom/div {:class "topic-navigation"}
-            (dom/button {:class "topic-navigation-button"
-                         :title "View earlier update"
-                         :type "button"
-                         :data-toggle (if (:prev-rev data) "tooltip" nil)
-                         :data-placement "top"
-                         :style {:opacity (if (:prev-rev data) 1 0)
-                                 :cursor (if (:prev-rev data) "pointer" "default")}
-                         :on-click #(when (:prev-rev data) ((:rev-click options) % (:prev-rev data)))}
-              (dom/i {:class "fa fa-caret-left"}))
+            (when (:prev-rev data)
+              (dom/button {:class "topic-navigation-button"
+                           :title "View earlier update"
+                           :type "button"
+                           :data-toggle (if (:prev-rev data) "tooltip" nil)
+                           :data-placement "top"
+                           :on-click #(when (:prev-rev data) ((:rev-click options) % (:prev-rev data)))}
+                (dom/i {:class "fa fa-caret-left"})))
             (dom/div {:class "topic-attribution"
                     :data-toggle "tooltip"
                     :data-placement "right"
                     :title (:name (:author topic-data))}
             (time-ago (:updated-at topic-data)))
-            (dom/button {:class "topic-navigation-button"
-                         :title "View later update"
-                         :type "button"
-                         :data-toggle (if (:next-rev data) "tooltip" nil)
-                         :data-placement "top"
-                         :style {:opacity (if (:next-rev data) 1 0)
-                                 :cursor (if (:next-rev data) "pointer" "default")}
-                         :on-click #(when (:next-rev data) ((:rev-click options) % (:next-rev data)))}
-              (dom/i {:class "fa fa-caret-right"})))
+            (when (:next-rev data)
+              (dom/button {:class "topic-navigation-button"
+                           :title "View later update"
+                           :type "button"
+                           :data-toggle (if (:next-rev data) "tooltip" nil)
+                           :data-placement "top"
+                           :on-click #(when (:next-rev data) ((:rev-click options) % (:next-rev data)))}
+                (dom/i {:class "fa fa-caret-right"}))))
           (when (> (count (utils/strip-HTML-tags topic-body)) 500)
             (dom/button {:class "btn-reset topic-read-more"
                          :onClick (partial fullscreen-topic data nil false)} "READ MORE")))))))
