@@ -169,7 +169,7 @@
         (dom/div {:class "topic-attribution-container group"}
           (dom/div {:class "topic-navigation"}
             (when (:prev-rev data)
-              (dom/button {:class "topic-navigation-button"
+              (dom/button {:class "topic-navigation-button earlier-update"
                            :title "View earlier update"
                            :type "button"
                            :data-toggle (if (:prev-rev data) "tooltip" nil)
@@ -182,7 +182,7 @@
                     :title (:name (:author topic-data))}
             (time-ago (:updated-at topic-data)))
             (when (:next-rev data)
-              (dom/button {:class "topic-navigation-button"
+              (dom/button {:class "topic-navigation-button later-update"
                            :title "View later update"
                            :type "button"
                            :data-toggle (if (:next-rev data) "tooltip" nil)
