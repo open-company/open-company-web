@@ -7,7 +7,7 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
-            [open-company-web.components.add-topic :refer (add-topic)]))
+            [open-company-web.components.add-topic :as at]))
 
 ;; Calc best topics layout based on heights
 
@@ -142,10 +142,10 @@
           update-active-topics  (or (:update-active-topics options) identity)
           share-selected?       (utils/in? share-selected-topics section-name)]
       (if (= section-name "add-topic")
-        (om/build add-topic {:column column
-                             :archived-topics (:archived company-data)
-                             :active-topics (map name topics)}
-                            {:opts {:update-active-topics update-active-topics}})
+        (at/add-topic {:column column
+                       :archived-topics (mapv (comp keyword :section) (:archived company-data))
+                       :active-topics (vec topics)
+                       :update-active-topics update-active-topics})
         (let [sd (->> section-name keyword (get topics-data))]
           (when-not (and (:read-only company-data) (:placeholder sd))
             (dom/div #js {:className "topic-row"
