@@ -142,6 +142,7 @@ div.fullscreen-topic {
       div.topic-body{
         @include rich-editor-body($oc_gray_5);
         margin-top: 21px !important;
+        margin-bottom: 20px !important;
         line-height: 1.8;
         font-size: 18px;
         padding: 0px 30px !important;

@@ -349,8 +349,9 @@ div.fullscreen-topic-edit {
       }
 
       div.topic-body{
-        margin-top: 37px !important;
         @include rich-editor-body($oc_gray_5);
+        margin-top: 37px !important;
+        margin-bottom: 20px !important;
         line-height: 1.8;
         font-size: 18px;
         min-height: 100px;
