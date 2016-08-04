@@ -183,14 +183,16 @@
                 (loading/small-loading)
                 "SAVE"))))
 
-        (dom/div {:class "settings-form-label subscription-settings-label"}
-          (dom/span {} "Account")
-          (when-not company-uuid
-            (loading/small-loading)))
+        (when false ; hide until Stripe/Recurly accounts are live
 
-        (when company-uuid
-            (dom/div {:class "settings-form p3"}
-              (subscription-info (name slug) company-uuid)))))))
+          (dom/div {:class "settings-form-label subscription-settings-label"}
+            (dom/span {} "Account")
+            (when-not company-uuid
+              (loading/small-loading)))
+
+          (when company-uuid
+              (dom/div {:class "settings-form p3"}
+                (subscription-info (name slug) company-uuid))))))))
 
 (defcomponent company-settings [data owner]
 
