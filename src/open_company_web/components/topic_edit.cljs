@@ -46,7 +46,7 @@
                   "editableInput"
                   (fn [event editable]
                     (let [inner-html (.-innerHTML body-el)]
-                      (dis/dispatch! [:foce-input (if (#{:finances :growth} section-key)
+                      (dis/dispatch! [:foce-input (if (#{:finances :growth} section-kw)
                                                     {:notes {:body (.-innerHTML body-el)}}
                                                     {:body (.-innerHTML body-el)})])))))
     (js/emojiAutocomplete)))
