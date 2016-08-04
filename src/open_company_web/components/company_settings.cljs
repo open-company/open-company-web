@@ -3,17 +3,61 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [rum.core :as rum]
+            [clojure.string :as string]
+            [open-company-web.local-settings :as ls]
             [open-company-web.components.ui.small-loading :as loading]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
-            [open-company-web.components.footer :refer (footer)]
+            [open-company-web.components.footer :as footer]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.cookies :as cook]
             [open-company-web.urls :as oc-urls]
             [open-company-web.api :as api]
             [open-company-web.local-settings :as ls]
-            [cljs.core.async :refer (put! chan <!)]
             [open-company-web.dispatcher :as dis]
-            [open-company-web.lib.iso4217 :refer (iso4217 sorted-iso4217)]))
+            [org.martinklepsch.derivatives :as drv]
+            [open-company-web.lib.iso4217 :as iso4217]))
+
+(rum/defcs thanks-for-subscribing
+  < {:will-unmount (fn [s] (cook/remove-cookie! :subscription-callback-slug) s)}
+  []
+  [:div.p3.border.mb3.rounded.success
+   [:h2.m0.mb2 "Thank you!"]
+   [:span "If you have any questions you can always reach us "
+    [:a
+     {:href oc-urls/contact-mail-to}
+     "via email."]]])
+
+(rum/defcs subscription-info
+  < {:did-mount (fn [s] (api/get-subscription (last (:rum/args s))) s)}
+    (drv/drv :subscription)
+    (drv/drv :jwt)
+    rum/reactive
+  [s slug company-uuid]
+  [:div
+    ;; Thank you message when they have a cookie and a subscription
+    (when (and (cook/get-cookie :subscription-callback-slug)
+               (drv/react s :subscription))
+      (thanks-for-subscribing))
+   [:div.small-caps.bold.mb1 "Subscription Plan"]
+   (if (drv/react s :subscription)
+     [:div
+      [:p.mb2 "You are on the OpenCompany Beta Plan."]
+      [:p.mb2 "To cancel your plan, "
+        [:a {:href oc-urls/contact-mail-to} "contact us"]
+        "."]]
+      ; [:a.btn-reset.btn-solid
+      ;  {:href (get-in (drv/react s :subscription) [company-uuid :account-url])}
+      ;  "Manage your subscription"]]
+     [:div
+      [:p.mb2 "You are on a 14-day trial."]
+      (let [[fn ln] (-> (drv/react s :jwt) :real-name (string/split #"\s" 2))]
+        [:a.btn-reset.btn-solid
+         {:on-click #(cook/set-cookie! :subscription-callback-slug slug (* 60 60 24))
+          :href (str "https://" ls/recurly-id ".recurly.com/subscribe/" ls/recurly-plan "/" company-uuid
+                     "?email=" (:email (drv/react s :jwt)) "&first_name=" fn "&last_name=" ln)}
+         "Subscribe"])])])
 
 (defn- save-company-data [company-data logo logo-width logo-height]
   (let [slug (router/current-company-slug)
@@ -68,7 +112,8 @@
 
 (defn get-state [data current-state]
   (let [company-data (dis/company-data data)]
-    {:initial-logo (:logo data)
+    {:uuid (:uuid company-data)
+     :initial-logo (:logo data)
      :logo (or (:logo current-state) (:logo company-data))
      :company-name (or (:company-name current-state) (:name company-data))
      :currency (or (:currency current-state) (:currency company-data))
@@ -82,35 +127,38 @@
   (will-receive-props [_ next-props]
     (om/set-state! owner (get-state next-props nil)))
 
-  (render-state [_ {:keys [company-name logo currency description loading]}]
+  (render-state [_ {company-uuid :uuid company-name :company-name logo :logo
+                    currency :currency loading :loading}]
     (let [slug (keyword (router/current-company-slug))]
 
       (utils/update-page-title (str "OpenCompany - " company-name))
-      (dom/div {:class "settings-container group"}
-        (dom/div {:class "company-settings"}
+
+      (dom/div {:class "lg-col-5 md-col-7 col-11 mx-auto mt4 mb4 settings-container group"}
+        
+        (dom/div {:class "settings-form-label company-settings"}
           (dom/span {} "Company Settings")
           (when-not company-name
             (loading/small-loading)))
-        ;; Company
-        (dom/div {:class "company-form"}
+        
+        (dom/div {:class "settings-form p3"}
 
           ;; Company name
-          (dom/div {:class "company-name-title settings-title"} "COMPANY NAME")
-          (dom/input {:class "company-name"
+          (dom/div {:class "small-caps bold mb1"} "COMPANY NAME")
+          (dom/input {:class "npt col-8 p1 mb3"
                       :type "text"
                       :id "name"
                       :value company-name
                       :on-change #(om/set-state! owner :company-name (.. % -target -value))})
           ; Slug
-          (dom/div {:class "company-slug-title settings-title"} "DASHBOARD URL")
-          (dom/div {:class "company-slug"} (str ls/web-server "/" (name slug)))
+          (dom/div {:class "small-caps bold mb1"} "DASHBOARD URL")
+          (dom/div {:class "npt npt-disabled col-8 p1 mb3"} (str ls/web-server "/" (name slug)))
           ;; Currency
-          (dom/div {:class "company-currency-title settings-title"} "DISPLAY CURRENCY IN")
+          (dom/div {:class "small-caps bold mb1"} "DISPLAY CURRENCY IN")
           (dom/select {:id "currency"
                        :value currency
                        :on-change #(om/set-state! owner :currency (.. % -target -value))
-                       :class "company-currency form-control"}
-            (for [currency (sorted-iso4217)]
+                       :class "npt col-8 p1 mb3 company-currency"}
+            (for [currency (iso4217/sorted-iso4217)]
               (let [symbol (:symbol currency)
                     display-symbol (or symbol (:code currency))
                     label (str (:text currency) " " display-symbol)]
@@ -119,20 +167,32 @@
                           {:react-key (:code currency)}))))
 
           ;; Company logo
-          (dom/div {:class "company-logo-title settings-title"} "SQUARE COMPANY LOGO URL (approx. 180x180px)")
+          (dom/div {:class "small-caps bold mb1"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
           (dom/input {:type "text"
                       :value logo
                       :id "logo"
-                      :class "company-logo"
+                      :class "npt col-10 p1 mb3"
                       :maxLength 255
                       :on-change #(om/set-state! owner :logo (.. % -target -value))
                       :placeholder "http://example.com/logo.png"})
-          (dom/div {:class "save-button-container"}
-            (dom/button {:class "save-button btn-reset btn-solid"
+          ;; Save button
+          (dom/div {:class "mt2 right-align"}
+            (dom/button {:class "btn-reset btn-solid"
                          :on-click #(save-company-clicked owner)}
               (if loading
                 (loading/small-loading)
-                "SAVE"))))))))
+                "SAVE"))))
+
+        (when false ; hide until Stripe/Recurly accounts are live
+
+          (dom/div {:class "settings-form-label subscription-settings-label"}
+            (dom/span {} "Account")
+            (when-not company-uuid
+              (loading/small-loading)))
+
+          (when company-uuid
+              (dom/div {:class "settings-form p3"}
+                (subscription-info (name slug) company-uuid))))))))
 
 (defcomponent company-settings [data owner]
 
@@ -147,7 +207,7 @@
         (back-to-dashboard-btn {})
 
         (if (:loading data)
-              
+
           ;; The data is still loading
           (dom/div (dom/h4 "Loading data..."))
 
@@ -155,4 +215,4 @@
           (dom/div {:class "company-settings-container"}
             (om/build company-settings-form data)))
 
-        (om/build footer data)))))
+        (om/build footer/footer data)))))

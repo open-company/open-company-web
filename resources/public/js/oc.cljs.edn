@@ -1,2 +1,3 @@
 {:require [open-company-web.core]
+ :init-fns [open-company-web.core/init]
  :compiler-options {:asset-path "/js/oc.out"}}

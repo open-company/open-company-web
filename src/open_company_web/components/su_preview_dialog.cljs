@@ -139,7 +139,7 @@
      {:on-click #(delete!)}
      "x"]]])
 
-(rum/defcs email-dialog < rum/static rum/reactive (dis/drv :su-share) emoji-autocomplete
+(rum/defcs email-dialog < rum/static rum/reactive (drv/drv :su-share) emoji-autocomplete
   [s {:keys [share-link]}]
   [:div
    (modal-title "Share by Email" :email-84)
@@ -212,34 +212,25 @@
       {:href link :target "_blank"}
       "Open in New Window"]]]])
 
-(rum/defcs prompt-dialog < rum/static
- [_ prompt-cb]
- [:div
-  (modal-title "Share Update" nil)
-  [:div.p3
+(rum/defc prompt-dialog < rum/static
+  [prompt-cb]
+  [:div
+   (modal-title "Share Update" nil)
+   [:div.p3
     [:div.group
-      [:button.btn-reset {:on-click #(prompt-cb :slack)}
-        [:div.circle50.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
-        [:span.left.ml1.gray5.h6 {} "SHARE TO SLACK"]]]
+     [:button.btn-reset {:on-click #(prompt-cb :slack)}
+      [:div.circle50.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
+      [:span.left.ml1.gray5.h6 {} "SHARE TO SLACK"]]]
     [:div.group
-      [:button.btn-reset {:on-click #(prompt-cb :email)}
-        [:div.circle50.left (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
-        [:span.left.ml1.gray5.h6 {} "SHARE BY EMAIL"]]]
+     [:button.btn-reset {:on-click #(prompt-cb :email)}
+      [:div.circle50.left (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
+      [:span.left.ml1.gray5.h6 {} "SHARE BY EMAIL"]]]
     [:div.group
-      [:button.btn-reset {:on-click #(prompt-cb :link)}
-        [:div.circle50.left (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
-        [:span.left.ml1.gray5.h6 {} "SHARE A LINK"]]]]])
+     [:button.btn-reset {:on-click #(prompt-cb :link)}
+      [:div.circle50.left (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
+      [:span.left.ml1.gray5.h6 {} "SHARE A LINK"]]]]])
 
-;; This is very hacky and should by replaced by a more
-;; versatile/generic form validation system
-(def email-field
-  (rum/derived-atom
-   [dis/app-state]
-   ::email-field
-   (fn [app-state]
-     (get-in app-state [:su-share :email :to]))))
-
-(rum/defcs modal-actions < rum/reactive (dis/drv :su-share)
+(rum/defcs modal-actions < rum/reactive (drv/drv :su-share)
   [s send-fn cancel-fn type]
   [:div.px3.pb3.right-align
    [:button.btn-reset.btn-outline
@@ -272,7 +263,6 @@
      [:button.btn-reset.btn-solid
       {:on-click cancel-fn}
       "DONE"]]]])
-
 
 (defcomponent su-preview-dialog [data owner options]
 

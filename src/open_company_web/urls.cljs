@@ -13,7 +13,8 @@
 
 (def contact "/contact")
 
-(def contact-mail-to "mailto:hello@opencompany.com")
+(def contact-email "hello@opencompany.com")
+(def contact-mail-to (str "mailto:" contact-email))
 
 (def login "/login")
 
@@ -25,6 +26,8 @@
 (def oc-twitter "https://twitter.com/opencompanyhq")
 
 (def oc-github "https://github.com/open-company")
+
+(def subscription-callback "/subscription-completed")
 
 ;; User
 

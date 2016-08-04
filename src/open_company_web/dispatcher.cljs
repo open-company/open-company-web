@@ -5,22 +5,15 @@
 
 (defonce app-state (atom {:loading false :menu-open false}))
 
-(defonce drv
-  ;; A variant of `org.martinklepsch.derivatives/drv` that works by
-  ;; encapsulating global state instead of passing it down the component
-  ;; tree using React's childContext. We're using this instad of the
-  ;; bundled `drv` because our Root components are Om and setting
-  ;; childContext on them is something I didn't want to bother with
-  (let [spec {:base     [[] app-state]
-              :su-share [[:base] (fn [base] (:su-share base))]}
-        {:keys [get! release!]} (drv/derivatives-manager spec)]
-    (fn drv [drv-k]
-      (let [token (random-uuid)]
-        {:will-mount   (fn [s]
-                         (assoc-in s [::drv/derivatives drv-k] (get! drv-k token)))
-         :will-unmount (fn [s]
-                         (release! drv-k token)
-                         (update s ::drv/derivatives dissoc drv-k))}))))
+;; Derived Data ================================================================
+
+(defn drv-spec [db]
+  {:base         [[] db]
+   :su-share     [[:base] (fn [base] (:su-share base))]
+   :jwt          [[:base] (fn [base] (:jwt base))]
+   :subscription [[:base] (fn [base] (:subscription base))]})
+
+;; Action Loop =================================================================
 
 (defmulti action (fn [db [action-type & _]] action-type))
 

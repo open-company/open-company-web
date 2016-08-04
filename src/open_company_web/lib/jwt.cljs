@@ -10,8 +10,11 @@
   (when (exists? js/jwt_decode)
     (js/jwt_decode encoded-jwt)))
 
+(defn get-contents []
+  (some-> (jwt) decode (js->clj :keywordize-keys true)))
+
 (defn get-key [k]
-  (some-> (jwt) decode js->clj (get (name k))))
+  (-> (get-contents) (get k)))
 
 (defn expired? []
   (let [expire (gdt/fromTimestamp (get-key :expire))]

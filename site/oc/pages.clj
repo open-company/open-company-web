@@ -1,6 +1,14 @@
-(ns oc.pages)
+(ns oc.pages
+  (:require [oc.terms :as terms]
+            [oc.privacy :as privacy]))
 
-(defn index []
+(defn terms [options]
+  (terms/terms options))
+
+(defn privacy [options]
+  (privacy/privacy options))
+
+(defn index [options]
   [:div
    [:div.container.outer.section
     [:div.container.inner
@@ -63,7 +71,7 @@
        [:h2 "Concierge Service"]
        [:p "Support to create beautiful, concise and meaningful updates."]]]]]])
 
-(defn pricing []
+(defn pricing [options]
    [:div.container.outer.section.content
     [:div.row
      [:div.col-md-12.pricing-header
@@ -111,7 +119,7 @@
      ;; "<!--         <div class=\"col-md-4 sm-12\">\n          <h2>Team</h2>\n          <p>Internal distribution with Slack.</p>\n        </div>\n        <div class=\"col-md-4 sm-12\">\n          <h2>Stakeholders</h2>\n          <p>Periodic stakeholder updates distributed automatically.</p>\n        </div>\n        <div class=\"col-md-4 sm-12\">\n          <h2>Concierge</h2>\n          <p>Beautiful stakeholder updates, hand-crafted by content creation professionals.</p>\n        </div>\n -->"
      ]])
 
-(defn about []
+(defn about [options]
   [:div.container.outer.section.content.about
    [:div.container.inner
     [:div.row
@@ -124,7 +132,7 @@
       [:p "We can't build this open platform in a vacuum. Our goal is to work with everyone in the startup community: founders, employees and investors. Together we can define how the next generation of great startups will be created. We hope you'll join our community and contribute your experience and opinions."]
       [:p "We’re also looking for awesome people that are interested in startup transparency. We are a fully distributed team working from our home offices around the world. Join us."]]]]])
 
-(defn not-found []
+(defn not-found [{contact-mail-to :contact-mail-to contact-email :contact-email}]
   [:div.container.outer.section.content.about
    [:div.container.inner
     [:div.row
@@ -136,7 +144,7 @@
         "You seem to have come accross a page that does not yet exist."
         [:br]
         "Please try again or contact support: "
-        [:a {:href "mailto:support@opencompany.com"} "support@opencompany.com"]]
+        [:a {:href contact-mail-to} contact-email]]
        [:a.btn {:href "/"} "Return To Home"]
        [:script {:src "/js/set-path.js"}]]]]]])
 
