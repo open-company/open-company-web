@@ -87,13 +87,11 @@
         (let [headline-height (headline-body-height (:headline topic-data) (utils/truncated-body topic-body) card-width)
               start-height (data-topic-height owner topic topic-data)
               read-more    (if (clojure.string/blank? (utils/strip-HTML-tags (utils/get-topic-body topic-data topic))) 0 read-more-height)]
-          (println "data-topic" topic (+ start-height headline-height read-more))
           (+ start-height headline-height read-more))
         :else
         (let [topic-image-height      (if (:image-url topic-data) (utils/aspect-ration-image-height (:image-width topic-data) (:image-height topic-data) card-width) 0)
               headline-body-height (headline-body-height (:headline topic-data) (utils/truncated-body topic-body) card-width)
               read-more               (if (clojure.string/blank? (utils/strip-HTML-tags (utils/get-topic-body topic-data topic))) 0 read-more-height)]
-          (println "topic" topic (+ topic-default-height headline-body-height topic-image-height read-more))
           (+ topic-default-height headline-body-height topic-image-height read-more))))))
 
 (defn get-shortest-column [owner data current-layout]
