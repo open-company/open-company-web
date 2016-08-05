@@ -150,8 +150,7 @@
       (doto add-image-el
         (.tooltip "hide")
         (.attr "data-original-title" add-image-tooltip)
-        (.tooltip "fixTitle")
-        (.tooltip "show"))))
+        (.tooltip "fixTitle"))))
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert file-upload-state file-upload-progress upload-remote-url negative-headline-char-count]}]
     (let [section             (dis/foce-section-key)
