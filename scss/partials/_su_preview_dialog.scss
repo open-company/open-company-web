@@ -1,18 +1,17 @@
 div.su-preview-dialog {
-  position: fixed;
+  position: absolute;
   top: 0px;
   left: 0px;
   width: 100vw;
-  height: 100vh;
+  height: 100%;
   background-color: rgba(78, 90, 107, 0.5);
   z-index: 1038;
 
   div.su-preview-window {
     width: 460px;
     position: absolute;
-    top: 50%;
+    top: 100px;
     left: 50%;
-    margin-top: -225px;
     margin-left: -230px;
     border-radius: 2px;
     background-color: #fcfcfc;

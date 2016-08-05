@@ -5,6 +5,8 @@
             [rum.core :as rum]
             [clojure.string :as string]
             [goog.format.EmailAddress :as email]
+            [goog.dom :as gdom]
+            [goog.style :as gstyle]
             [open-company-web.api :as api]
             [open-company-web.dispatcher :as dis]
             [open-company-web.router :as router]
@@ -257,6 +259,13 @@
       {:on-click cancel-fn}
       "DONE"]]]])
 
+(defn setup-scroll-height []
+  (let [main-scroll       (gdom/getElementByClass "main-scroll")
+        su-preview-window (js/$ ".su-preview-window")
+        window-height     (+ (.height su-preview-window) (* (.-top (.offset su-preview-window)) 2))]
+    (gstyle/setStyle (.-body js/document) #js {:overflow "hidden"})
+    (gstyle/setStyle main-scroll #js {:height (str window-height "px")})))
+
 (defcomponent su-preview-dialog [data owner options]
 
   (init-state [_]
@@ -271,11 +280,15 @@
   (did-mount [_]
     (dis/dispatch! [:input [:su-share :email :subject]
                     (str "[" (:name (:company-data data)) "] " (:su-title data))])
-    (utils/disable-scroll))
+    (setup-scroll-height))
+
+  (did-update [_ _ _]
+    (setup-scroll-height))
 
   (will-unmount [_]
     (dis/dispatch! [:su-share/reset])
-    (utils/enable-scroll))
+    (.css (js/$ js/document.-body) #js {:overflow "auto"})
+    (.css (js/$ ".main-scroll") #js {:height "auto"}))
 
   (will-receive-props [_ next-props]
     ; slack SU posted

@@ -3,14 +3,6 @@
   padding-top: #{$navbar_height}px;
 }
 
-body.small-footer {
-  div.su-snapshot-preview {
-    div.su-sp-content {
-      min-height: calc(100vh - #{$navbar_height}px - 200px);
-    }
-  }
-}
-
 div.page.snapshot-page {
   background-color: $oc_gray_6 !important;
 }
@@ -62,13 +54,10 @@ div.su-snapshot-preview {
   }
 
   div.su-sp-content {
-    position: relative;
-    content: "";
     padding-bottom: 20px;
     min-height: calc(100vh);
 
     div.su-sp-company-header {
-      margin-top: 60px;
       height: 50px;
       text-align: center;
 
