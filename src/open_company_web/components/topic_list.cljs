@@ -181,6 +181,8 @@
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
+    ;; make sure when topic-list component is initialized that there is no foce active
+    (dispatcher/dispatch! [:start-foce nil])
     (get-state owner data nil))
 
   (did-mount [_]
@@ -268,7 +270,7 @@
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
             (dom/button {:class "sharing-button"
-                         :on-click #(do (dispatcher/dispatch! [:start-foce nil]) (router/nav! (oc-urls/stakeholder-update-preview)))} "SHARE AN UPDATE " (dom/i {:class "fa fa-share"}))))
+                         :on-click #(router/nav! (oc-urls/stakeholder-update-preview (router/current-company-slug)))} "SHARE AN UPDATE " (dom/i {:class "fa fa-share"}))))
         ;; Fullscreen topic
         (when selected-topic
           (dom/div {:class "selected-topic-container"
