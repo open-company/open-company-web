@@ -20,6 +20,7 @@ $.offset = function(){};
 $.offset.top = {};
 $.offset.left = {};
 $.truncate = function(){};
+$.attr = function(){};
 // Location
 var location = {};
 location.reload = function(){};

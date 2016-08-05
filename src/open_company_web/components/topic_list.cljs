@@ -218,18 +218,18 @@
       (om/set-state! owner (get-state owner next-props (om/get-state owner))))
     (when-not (:read-only (:company-data next-props))
       (get-new-sections-if-needed owner))
-    (when (:force-edit-topic next-props)
-      (let [company-data (:company-data next-props)
-            topics (flatten (vals (:sections company-data)))
-            no-placeholder-sections (filter-placeholder-sections topics company-data)]
-        (when (contains? company-data (keyword (:force-edit-topic next-props)))
-          (om/set-state! owner :fullscreen-force-edit true)
-          (om/set-state! owner :selected-topic (dispatcher/force-edit-topic))
-          ; show second tooltip of needed
-          (when (= (count (flatten (vals (:sections company-data)))) 1)
-            (om/set-state! owner :show-second-add-topic-tooltip true))
-          (when (= (count no-placeholder-sections) 2)
-            (om/set-state! owner :show-share-su-tooltip true))))))
+    (let [company-data (:company-data next-props)
+          topics (flatten (vals (:sections company-data)))
+          no-placeholder-sections (filter-placeholder-sections topics company-data)]
+      (when (and (:force-edit-topic next-props) (contains? company-data (keyword (:force-edit-topic next-props))))
+        (om/set-state! owner :fullscreen-force-edit true)
+        (om/set-state! owner :selected-topic (dispatcher/force-edit-topic)))
+      ; show second tooltip if needed
+      (when (= (count no-placeholder-sections) 1)
+        (om/set-state! owner :show-second-add-topic-tooltip true))
+      ; show share tooltip if needed
+      (when (= (count no-placeholder-sections) 2)
+        (om/set-state! owner :show-share-su-tooltip true))))
 
   (did-update [_ _ _]
     (when (om/get-state owner :tr-selected-topic)

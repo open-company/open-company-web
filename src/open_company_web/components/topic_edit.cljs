@@ -114,6 +114,11 @@
       (dis/dispatch! [:topic-archive section]))
     (dis/dispatch! [:start-foce nil])))
 
+(defn- add-image-tooltip [image-header]
+  (if (or (not image-header) (string/blank? image-header))
+    "Add an image"
+    "Replace image"))
+
 (defcomponent topic-edit [{:keys [currency
                                   prev-rev
                                   next-rev]} owner options]
@@ -135,6 +140,18 @@
     (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
     (setup-edit owner)
     (utils/after 100 #(focus-headline)))
+
+  (did-update [_ _ _]
+    (let [section           (dis/foce-section-key)
+          topic-data        (dis/foce-section-data)
+          image-header      (:image-url topic-data)
+          add-image-tooltip (add-image-tooltip image-header)
+          add-image-el      (js/$ (gdom/getElementByClass "camera"))]
+      (doto add-image-el
+        (.tooltip "hide")
+        (.attr "data-original-title" add-image-tooltip)
+        (.tooltip "fixTitle")
+        (.tooltip "show"))))
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert file-upload-state file-upload-progress upload-remote-url negative-headline-char-count]}]
     (let [section             (dis/foce-section-key)
@@ -212,7 +229,7 @@
                         :type "file"
                         :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
             (dom/button {:class "btn-reset camera left"
-                         :title (if (not image-header) "Add an image" "Replace image")
+                         :title (add-image-tooltip image-header)
                          :type "button"
                          :data-toggle "tooltip"
                          :data-placement "top"
@@ -227,14 +244,15 @@
                          :style {:display (if (nil? file-upload-state) "block" "none")}
                          :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
                 (dom/i {:class "fa fa-code"}))
-            (dom/button {:class "btn-reset archive-button right"
-                         :title "Archive this topic"
-                         :type "button"
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :style {:display (if (nil? file-upload-state) "block" "none")}
-                         :on-click (partial remove-topic-click)}
-                (dom/i {:class "fa fa-archive"}))
+            (when-not (:placeholder topic-data)
+              (dom/button {:class "btn-reset archive-button right"
+                           :title "Archive this topic"
+                           :type "button"
+                           :data-toggle "tooltip"
+                           :data-placement "top"
+                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :on-click (partial remove-topic-click)}
+                  (dom/i {:class "fa fa-archive"})))
             (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
                 (dom/input {:type "text"
                             :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
@@ -242,7 +260,7 @@
                             :value upload-remote-url})
                 (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
                              :class "btn-reset btn-solid"
-                             :disabled (clojure.string/blank? upload-remote-url)
+                             :disabled (string/blank? upload-remote-url)
                              :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
                   "add")
                 (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
