@@ -12,19 +12,20 @@ div.topic.add-topic {
 
   &:hover {
     background-color: #ffffff;
+    transition: background-color 0.2s;
+
+    div.topic-title {
+      opacity: 1;
+      transition: opacity 0.2;
+    }
   }
 
   &.active {
     background-color: #ffffff;
     border: 1px solid rgba(78, 90, 107, 0.8);
-
-    div.topic-title {
-      opacity: 1;
-    }
   }
 
   div.topic-title {
-    opacity: 0.2;
     font-weight: 700;
     font-family: $oc_headers_font;
     font-size: 12px;
@@ -32,5 +33,6 @@ div.topic.add-topic {
     letter-spacing: 1px;
     color: $oc_gray_5;
     margin-top: 37px;
+    opacity: 0.2;
   }
 }
