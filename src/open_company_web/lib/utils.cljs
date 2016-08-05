@@ -327,21 +327,17 @@
     section-with-notes))
 
 (defn fix-section 
-  "Add `:section` name, `:as-of` and `:read-only` keys to the section map"
+  "Add `:section` name and `:as-of` keys to the section map"
   [section-body section-name & [read-only force-write]]
-  (let [read-only (if force-write
-                    false
-                    (or read-only (readonly? (:links section-body)) false))
-        with-updated-at (if (contains? section-body :updated-at)
+  (let [with-updated-at (if (contains? section-body :updated-at)
                           section-body
                           (assoc section-body :updated-at (as-of-now)))
-        with-read-only (-> with-updated-at
-                        (assoc :section (name section-name))
-                        (assoc :as-of (:updated-at section-body))
-                        (assoc :read-only read-only))]
+        with-keys       (-> with-updated-at
+                          (assoc :section (name section-name))
+                          (assoc :as-of (:updated-at section-body)))]
     (if (= section-name :finances)
-      (fix-finances with-read-only)
-      with-read-only)))
+      (fix-finances with-keys)
+      with-keys)))
 
 (defn fix-sections [company-data]
   "Add section name in each section and a section sorter"
