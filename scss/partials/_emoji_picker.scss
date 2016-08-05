@@ -7,4 +7,8 @@ div.emoji-picker {
       color: $oc_yellow !important;
     }
   }
+
+  .emoji-dialog .modifiers {
+    display: none;
+  }
 }
