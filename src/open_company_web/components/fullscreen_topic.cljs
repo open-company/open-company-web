@@ -249,7 +249,8 @@
         (when-not editing
           (dom/div {:class "btd-container"
                     :style {:width (str (+ fullscreen-width 20) "px")}}
-            (back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)})))
+            (back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)
+                                    :button-cta (if (utils/in? (:route @router/path) "updates") "BACK TO UPDATE" "BACK TO DASHBOARD")})))
         (dom/div {:style #js {:display (when-not editing "none")}
                   :key (str as-of edit-rand)}
           (om/build fullscreen-topic-edit {:topic section
