@@ -11,6 +11,7 @@
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]
+            [open-company-web.lib.responsive :as responsive]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -75,7 +76,8 @@
       (when (jwt/jwt)
         (dom/li {:class "menu-link"} (dom/a {:title "USER INFO" :href oc-urls/user-profile :on-click user-profile-click} "USER INFO")))
       (when (and (router/current-company-slug)
-                 (not (utils/in? (:route @router/path) "profile")))
+                 (not (utils/in? (:route @router/path) "profile"))
+                 (not (responsive/is-mobile)))
         (dom/li {:class "menu-link"} (dom/a {:title "COMPANY SETTINGS" :href (oc-urls/company-settings) :on-click company-profile-click} "COMPANY SETTINGS")))
       (when (jwt/jwt)
         (dom/li {:class "menu-link"} (dom/a {:title "SIGN OUT" :href oc-urls/logout :on-click logout-click} "SIGN OUT")))
