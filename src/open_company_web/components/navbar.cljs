@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.dispatcher :as dis]
             [open-company-web.urls :as oc-urls]
+            [open-company-web.router :as router]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
@@ -27,7 +28,10 @@
       (dom/nav {:class "oc-navbar group"}
         (dom/div {:class "oc-navbar-header"
                   :style #js {:width (str header-width "px")}}
-          (om/build company-avatar data)
+          (if (utils/in? (:route @router/path) "companies")
+            (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
+              (dom/img {:src "/img/oc-wordmark.svg" :style {:height "25px" :margin-top "12px"}}))
+            (om/build company-avatar data))
           (when-not (:hide-right-menu data)
             (dom/ul {:class "nav navbar-nav navbar-right"}
               (dom/li {}
