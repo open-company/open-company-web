@@ -39,7 +39,7 @@
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
 (defn fullscreen-topic [data selected-metric force-editing & [e]]
-  (when e
+  (when (and e (not= (.-tagName (.-target e)) "A"))
     (utils/event-stop e))
   ((:topic-click data) selected-metric force-editing))
 
