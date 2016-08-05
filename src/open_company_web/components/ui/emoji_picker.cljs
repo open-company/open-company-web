@@ -42,7 +42,6 @@
   (rum/local false ::caret-pos)
   (rum/local false ::last-active-element)
   {:did-mount (fn [s] (when-not (utils/is-test-env?)
-                        (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                         (let [click-listener (events/listen (.-body js/document) EventType/CLICK (partial on-click-out s))]
                           (assoc s ::click-listener click-listener))))
    :will-unmount (fn [s] (events/unlistenByKey (::click-listener s))
@@ -62,10 +61,7 @@
                :height "15px"}}
       [:button.emoji-button.btn-reset
         {:style {:font-size "15px"}
-         :title "Insert emoji"
          :type "button"
-         :data-toggle "tooltip"
-         :data-placement "top"
          :on-mouse-down #(save-caret-position s fix-emojiable-class)
          :on-click #(do
                       (utils/event-stop %)
