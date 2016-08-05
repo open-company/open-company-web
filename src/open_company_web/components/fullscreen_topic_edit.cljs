@@ -23,7 +23,6 @@
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.components.tooltip :refer (tooltip)]
             [open-company-web.components.ui.icon :refer (icon)]
-            [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
@@ -386,7 +385,7 @@
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
   (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
         med-ed (new js/MediumEditor body-el (clj->js
-                                             (->  (utils/medium-editor-options "Want to add more? Add it here..." true)
+                                             (->  (utils/medium-editor-options "" true)
                                                   (editor/inject-extension editor/file-upload))))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
@@ -483,7 +482,6 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (reset! prevent-route-dispatch true)
-      (js/filepicker.setKey ls/filestack-key)
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
       (setup-medium-editor owner data)
       (when-not (om/get-state owner :body-click)
@@ -650,8 +648,7 @@
               (dom/div {:className (str "topic-body emoji-autocomplete" (when hide-placeholder " hide-placeholder"))
                         :contentEditable true
                         :id (str "topic-edit-body-" (name topic))
-                        :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
-              (om/build filestack-uploader (om/get-state owner :medium-editor) {:opts {:hide-placeholder #(om/set-state! owner :hide-placeholder %)}}))
+                        :dangerouslySetInnerHTML (clj->js {"__html" topic-body})}))
             (dom/div {:class "topc-edit-top-box-footer"}
               (dom/button {:class "btn-reset add-image"
                            :title (if (not image-url) "Add an image" "Replace image")
