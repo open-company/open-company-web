@@ -248,7 +248,7 @@
   [:div
    (case type
      :email (modal-title "Email Sent!" :email-84)
-     :slack (modal-title "Shared via Slack!" :link-72))
+     :slack (modal-title "Shared via Slack!" :slack))
    [:div.p3
     [:p.domine
      (case type
@@ -262,7 +262,8 @@
 (defn setup-scroll-height []
   (let [main-scroll       (gdom/getElementByClass "main-scroll")
         su-preview-window (js/$ ".su-preview-window")
-        window-height     (+ (.height su-preview-window) (* (.-top (.offset su-preview-window)) 2))]
+        window-height     (max (+ (.height su-preview-window) (* (.-top (.offset su-preview-window)) 2))
+                               (.height (js/$ js/window)))]
     (gstyle/setStyle (.-body js/document) #js {:overflow "hidden"})
     (gstyle/setStyle main-scroll #js {:height (str window-height "px")})))
 
