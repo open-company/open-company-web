@@ -3,6 +3,7 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.topic-read-more :refer (topic-read-more)]))
 
 (defn time-ago
@@ -64,7 +65,7 @@
   (render-state [_ {:keys [force-update]}]
     (dom/div {:class "topic-attribution-container group"}
       (dom/div {:class "topic-navigation"}
-        (when prev-rev
+        (when (and (not (responsive/is-mobile)) prev-rev)
           (dom/button {:class "topic-navigation-button earlier-update"
                        :title "View prior update"
                        :type "button"
@@ -73,11 +74,11 @@
                        :on-click #(when prev-rev ((:rev-click options) % prev-rev))}
             (dom/i {:class "fa fa-caret-left"})))
         (dom/div {:class "topic-attribution"
-                :data-toggle "tooltip"
+                :data-toggle (when-not (responsive/is-mobile) "tooltip")
                 :data-placement "top"
                 :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
         (time-ago (:updated-at topic-data)))
-        (when next-rev
+        (when (and (not (responsive/is-mobile)) next-rev)
           (dom/button {:class "topic-navigation-button later-update"
                        :title "View next update"
                        :type "button"
