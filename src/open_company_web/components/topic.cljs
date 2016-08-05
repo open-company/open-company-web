@@ -35,11 +35,6 @@
     (dom/div {:class "topic-headline-inner"
               :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
 
-(defn scroll-to-topic-top [topic]
-  (let [body-scroll (.-scrollTop (.-body js/document))
-        topic-scroll-top (utils/offset-top topic)]
-    (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
-
 (defn fullscreen-topic [data selected-metric force-editing & [e]]
   (when e
     (utils/event-stop e))
@@ -135,8 +130,7 @@
         cur-size (js/getComputedStyle cur-topic)
         tr-size (js/getComputedStyle tr-topic)
         topic (om/get-ref owner "topic-anim")
-        topic-size (js/getComputedStyle topic)
-        scroll-top (.-scrollTop topic)]
+        topic-size (js/getComputedStyle topic)]
     ; resize the light box
     (.play (Resize. topic
                     #js [(js/parseFloat (.-width topic-size)) (js/parseFloat (.-height cur-size))]
@@ -201,7 +195,10 @@
           all-revisions (slug @caches/revisions)
           revisions-list (section-kw all-revisions)
           topic-data (utils/select-section-data section-data section-kw as-of)
-          is-foce (= (dis/foce-section-key) section-kw)]
+          is-foce (= (dis/foce-section-key) section-kw)
+          rev-cb (fn [e rev]
+                  (om/set-state! owner :transition-as-of (:updated-at rev))
+                  (utils/event-stop e))]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -244,10 +241,7 @@
                                       :foce-data (:foce-data data)
                                       :prev-rev prev-rev
                                       :next-rev next-rev}
-                                     {:opts (merge options {:rev-click (fn [e rev]
-                                                                          (scroll-to-topic-top (om/get-ref owner "topic"))
-                                                                          (om/set-state! owner :transition-as-of (:updated-at rev))
-                                                                          (.stopPropagation e))})
+                                     {:opts (merge options {:rev-click rev-cb})
                                       :key (str "topic-foce-" section)})
                 (om/build topic-internal {:section section
                                           :topic-data topic-data
@@ -259,10 +253,7 @@
                                           :topic-click (:topic-click options)
                                           :prev-rev prev-rev
                                           :next-rev next-rev}
-                                         {:opts (merge options {:rev-click (fn [e rev]
-                                                                              (scroll-to-topic-top (om/get-ref owner "topic"))
-                                                                              (om/set-state! owner :transition-as-of (:updated-at rev))
-                                                                              (.stopPropagation e))})
+                                         {:opts (merge options {:rev-click rev-cb})
                                           :key (str "topic-" section)})))
             (when transition-as-of
               (dom/div #js {:className "topic-tr-as-of group"
@@ -279,4 +270,4 @@
                                             :read-only-company (:read-only-company data)
                                             :prev-rev tr-prev-rev
                                             :next-rev tr-next-rev}
-                                           {:opts (merge options {:rev-click #()})}))))))))))
+                                           {:opts (merge options {:rev-click rev-cb})}))))))))))

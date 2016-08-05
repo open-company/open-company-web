@@ -751,3 +751,8 @@
 
 (defn aspect-ration-image-height [original-width original-height final-width]
   (* (/ original-height original-width) final-width))
+
+(defn truncated-body [body]
+  (if (is-test-env?)
+    body
+    (.truncate js/$ body (clj->js {:length 500 :words true}))))

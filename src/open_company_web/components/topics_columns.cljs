@@ -31,7 +31,7 @@
 (def add-topic-height 94)
 (def read-more-height 15)
 
-(defn headline-snippet-height [headline snippet card-width]
+(defn headline-body-height [headline body card-width]
   (let [$headline (js/$ (str "<div class=\"topic\">"
                                 "<div class=\"topic-anim\">"
                                   "<div>"
@@ -40,8 +40,8 @@
                                         (str "<div class=\"topic-headline-inner\" style=\"width: " card-width "px;\">"
                                                (utils/emojify headline true)
                                              "</div>"))
-                                      "<div class=\"topic-body topic-snippet\" style=\"width: " card-width "px;\">"
-                                        (utils/emojify snippet true)
+                                      "<div class=\"topic-body\" style=\"width: " card-width "px;\">"
+                                        (utils/emojify body true)
                                       "</div>"
                                     "</div>"
                                   "</div>"
@@ -78,20 +78,23 @@
     (for [topic topics
           :let [topic-kw (keyword topic)
                 topic-data (get topics-data topic-kw)
-                is-data-topic (#{:finances :growth} topic-kw)]]
+                is-data-topic (#{:finances :growth} topic-kw)
+                topic-body (utils/get-topic-body topic-data topic-kw)]]
       (cond
         (= topic "add-topic")
         add-topic-height
         (#{:finances :growth} topic-kw)
-        (let [headline-height (headline-snippet-height (:headline topic-data) (:snippet topic-data) card-width)
+        (let [headline-height (headline-body-height (:headline topic-data) (utils/truncated-body topic-body) card-width)
               start-height (data-topic-height owner topic topic-data)
               read-more    (if (clojure.string/blank? (utils/strip-HTML-tags (utils/get-topic-body topic-data topic))) 0 read-more-height)]
+          (println "data-topic" topic (+ start-height headline-height read-more))
           (+ start-height headline-height read-more))
         :else
         (let [topic-image-height      (if (:image-url topic-data) (utils/aspect-ration-image-height (:image-width topic-data) (:image-height topic-data) card-width) 0)
-              headline-snippet-height (headline-snippet-height (:headline topic-data) (:snippet topic-data) card-width)
+              headline-body-height (headline-body-height (:headline topic-data) (utils/truncated-body topic-body) card-width)
               read-more               (if (clojure.string/blank? (utils/strip-HTML-tags (utils/get-topic-body topic-data topic))) 0 read-more-height)]
-          (+ topic-default-height headline-snippet-height topic-image-height read-more))))))
+          (println "topic" topic (+ topic-default-height headline-body-height topic-image-height read-more))
+          (+ topic-default-height headline-body-height topic-image-height read-more))))))
 
 (defn get-shortest-column [owner data current-layout]
   (let [columns-num (:columns-num data)
