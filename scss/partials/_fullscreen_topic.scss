@@ -110,7 +110,7 @@ div.fullscreen-topic {
           font-family: $oc_headers_font;
           font-size: 26px;
           line-height: 1.4;
-          color: $oc_gray_5;
+          color: $oc_gray_7;
           padding: 0px 26px;
 
           svg.emojione {
@@ -120,7 +120,7 @@ div.fullscreen-topic {
         }
 
         div.topic-snippet{
-          @include rich-editor-body($oc_gray_5);
+          @include rich-editor-body($oc_gray_7);
           line-height: 1.8;
           font-size: 18px;
           margin-top: 12px !important;
@@ -141,7 +141,7 @@ div.fullscreen-topic {
       }
 
       div.topic-body{
-        @include rich-editor-body($oc_gray_5);
+        @include rich-editor-body($oc_gray_7);
         margin-top: 21px !important;
         line-height: 1.8;
         font-size: 18px;
@@ -152,7 +152,7 @@ div.fullscreen-topic {
         margin-top: 10px;
         font-size: 16px;
         line-height: 1.8;
-        color: $oc_gray_5;
+        color: $oc_gray_7;
         opacity: 0.5;
         padding: 0px 30px;
       }
@@ -175,7 +175,7 @@ div.fullscreen-topic {
           font-size: 12px;
           line-height: 1.5;
           letter-spacing: 1px;
-          color: $oc_gray_5;
+          color: $oc_gray_7;
         }
 
         button.prev {

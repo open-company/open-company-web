@@ -145,7 +145,7 @@ div.fullscreen-topic-edit {
         font-family: $oc_headers_font;
         font-size: 26px;
         line-height: 1.4;
-        color: $oc_gray_5;
+        color: $oc_gray_7;
         border: 0px;
         width: 100%;
         padding: 0px 26px;
@@ -157,7 +157,7 @@ div.fullscreen-topic-edit {
           font-style: italic;
           font-family: $oc_headers_font;
           font-size: 26px;
-          color: $oc_gray_5;
+          color: $oc_gray_7;
           opacity: 0.5;
         }
 
@@ -212,7 +212,7 @@ div.fullscreen-topic-edit {
               font-size: 12px;
               line-height: 1.5;
               letter-spacing: 1px;
-              color: $oc_gray_5;
+              color: $oc_gray_7;
               text-transform: uppercase;
 
               &:first-child {
@@ -309,7 +309,7 @@ div.fullscreen-topic-edit {
           font-size: 18px;
           font-style: italic;
           opacity: 0.5;
-          color: $oc_gray_5;
+          color: $oc_gray_7;
           margin-top: 0px;
           padding-top: 0px;
           height: auto;
@@ -350,7 +350,7 @@ div.fullscreen-topic-edit {
 
       div.topic-body{
         margin-top: 37px !important;
-        @include rich-editor-body($oc_gray_5);
+        @include rich-editor-body($oc_gray_7);
         line-height: 1.8;
         font-size: 18px;
         min-height: 100px;
