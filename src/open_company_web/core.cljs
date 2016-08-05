@@ -55,6 +55,7 @@
 
 (defn pre-routing [query-params]
   ; make sure the menu is closed
+  (swap! router/path {})
   (utils/after 100 #(dis/toggle-menu false))
   (if (jwt/jwt)
     (dommy/add-class! (sel1 [:body]) :small-footer)
