@@ -76,6 +76,9 @@
   (let [company-data (dis/company-data (om/get-props owner))]
     (->> section keyword (get company-data) :title)))
 
+(defn filter-placeholder-sections [sections company-data]
+  (filter #(not (->> % keyword (get company-data) :placeholder)) sections))
+
 (defcomponent su-snapshot-preview [data owner options]
 
   (init-state [_]
@@ -83,7 +86,7 @@
           su-data (stakeholder-update-data data)
           su-sections (if (empty? (:sections su-data))
                         (flatten (vals (:sections company-data)))
-                        (:sections su-data))]
+                        (filter-placeholder-sections (:sections su-data) company-data))]
       {:columns-num (responsive/columns-num)
        :su-topics su-sections
        :title-focused false
@@ -107,7 +110,7 @@
             su-data      (stakeholder-update-data next-props)
             su-sections  (if (empty? (:sections su-data))
                            (flatten (vals (:sections company-data)))
-                           (:sections su-data))]
+                           (filter-placeholder-sections (:sections su-data) company-data))]
         (om/set-state! owner :su-topics su-sections)))
     ; share via link
     (when (om/get-state owner :link-loading)
@@ -140,8 +143,8 @@
           ww           (.-clientWidth (sel1 js/document :body))
           total-width  (if (> ww 413) (str (min ww (+ card-width 100)) "px") "auto")
           su-subtitle  (str "— " (utils/date-string (js/Date.) true))
-          su-sections  (:sections su-data)
-          topics-to-add (sort #(compare (title-from-section-name owner %1) (title-from-section-name owner %2)) (reduce utils/vec-dissoc (flatten (vals (:sections company-data))) su-topics))]
+          possible-sections (filter-placeholder-sections (flatten (vals (:sections company-data))) company-data)
+          topics-to-add (sort #(compare (title-from-section-name owner %1) (title-from-section-name owner %2)) (reduce utils/vec-dissoc possible-sections su-topics))]
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
                                          :main-scroll true})}
         (when (and (seq company-data)
