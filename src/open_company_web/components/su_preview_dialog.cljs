@@ -6,6 +6,7 @@
             [rum.core :as rum]
             [clojure.string :as string]
             [goog.format.EmailAddress :as email]
+            [goog.dom :as gdom]
             [open-company-web.api :as api]
             [open-company-web.dispatcher :as dis]
             [open-company-web.router :as router]
@@ -166,13 +167,16 @@
       :on-change #(dis/dispatch! [:input [:su-share :email :subject] (.. % -target -value)])
       :value (-> (drv/react s :su-share) :email :subject)}]
     [:label.block.small-caps.bold.mb2 "Your Note"]
-    [:div.domine.npt.p1.col-12.emoji-autocomplete.ta-mh.emojiable.email-note
-     {:content-editable true
-      :on-key-down #(dis/dispatch! [:input [:su-share :email :note] (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.slack-note])))])
-      :placeholder "Optional note to go with this update."}]
-    [:div.left
-      {:style {:color "rgba(78, 90, 107, 0.5)"}}
-      (emoji-picker {})]]])
+    [:div.npt.group
+      [:div.domine.p1.col-12.emoji-autocomplete.ta-mh.no-outline.emojiable.email-note
+       {:content-editable true
+        :on-key-down #(dis/dispatch! [:input [:su-share :email :note] (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.slack-note])))])
+        :placeholder "Optional note to go with this update."}]
+      [:div.group
+        {:style {:min-height "25px"}
+        [:div.left
+          {:style {:color "rgba(78, 90, 107, 0.5)"}}
+          (emoji-picker {})]]]]])
 
 (rum/defc slack-dialog < rum/static emoji-autocomplete
   []
@@ -180,13 +184,16 @@
    (modal-title "Share to Your Slack Team" :slack)
    [:div.p3
     [:label.block.small-caps.bold.mb2 "Your Note"]
-    [:div.domine.npt.p1.col-12.emoji-autocomplete.ta-mh.emojiable.slack-note
-     {:content-editable true
-      :placeholder "Optional note to go with this update."
-      :on-key-down #(dis/dispatch! [:input [:su-share :slack :note] (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.slack-note])))])}]
-    [:div.left
-      {:style {:color "rgba(78, 90, 107, 0.5)"}}
-      (emoji-picker {})]]])
+    [:div.npt.group
+      [:div.domine.p1.col-12.emoji-autocomplete.ta-mh.no-outline.emojiable.slack-note
+        {:content-editable true
+         :placeholder "Optional note to go with this update."
+         :on-key-down #(dis/dispatch! [:input [:su-share :slack :note] (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.slack-note])))])}]
+      [:div.group
+        {:style {:min-height "25px"}
+        [:div.left
+          {:style {:color "rgba(78, 90, 107, 0.5)"}}
+          (emoji-picker {})]]]]])
 
 (rum/defcs link-dialog < (rum/local false ::copied)
                          (rum/local false ::clipboard)

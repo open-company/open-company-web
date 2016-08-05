@@ -74,6 +74,13 @@
   }
 }
 
+.no-outline {
+  outline: none;
+  &:active, &:focus {
+    outline: none;
+  }
+}
+
 .npt {
   background-color: white;
   border: 1px solid rgba(78, 90, 107, 0.1);
@@ -82,7 +89,6 @@
   line-height: 1.2;
   color: $oc_gray_5;
   transition: border-color $oc_animation_duration;
-  background-color: white;
 
   &:active, &:focus {
     border-color: rgba(78, 90, 107, 0.5);
