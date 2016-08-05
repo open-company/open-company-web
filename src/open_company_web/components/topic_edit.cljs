@@ -254,15 +254,7 @@
                              :on-click #(om/set-state! owner :file-upload-state nil)}
                   "cancel"))
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
-              (str file-upload-progress "%"))
-            (dom/button {:class "btn-reset add-content left"
-                         :title "Expanded view"
-                         :type "button"
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :style {:display (if (nil? file-upload-state) "block" "none")}
-                         :on-click (partial start-fullscreen-editing-click owner options)}
-              (dom/i {:class "fa fa-expand"})))
+              (str file-upload-progress "%")))
           (dom/div {:class "topic-foce-footer group"}
             (dom/div {:class "divider"})
             (dom/div {:class "topic-foce-footer-left"}
