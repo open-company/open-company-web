@@ -30,7 +30,7 @@
 
 (defcomponent topic-headline [data owner]
   (render [_]
-    (dom/div {:class "topic-headline-inner"
+    (dom/div {:class (str "topic-headline-inner" (when (:placeholder data) " italic"))
               :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
 
 (defn scroll-to-topic-top [topic]
@@ -114,7 +114,7 @@
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
-        (dom/div #js {:className "topic-body topic-snippet"
+        (dom/div #js {:className (str "topic-body topic-snippet" (when (:placeholder topic-data) " italic"))
                       :ref "topic-snippet"
                       :dangerouslySetInnerHTML (utils/emojify snippet)})
         (when-not (clojure.string/blank? (utils/strip-HTML-tags topic-body))
