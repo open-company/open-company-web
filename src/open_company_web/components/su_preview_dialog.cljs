@@ -173,7 +173,7 @@
         :on-key-down #(dis/dispatch! [:input [:su-share :email :note] (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.slack-note])))])
         :placeholder "Optional note to go with this update."}]
       [:div.group
-        {:style {:min-height "25px"}
+        {:style {:min-height "25px"}}
         [:div.left
           {:style {:color "rgba(78, 90, 107, 0.5)"}}
           (emoji-picker {})]]]]])
@@ -190,7 +190,7 @@
          :placeholder "Optional note to go with this update."
          :on-key-down #(dis/dispatch! [:input [:su-share :slack :note] (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.slack-note])))])}]
       [:div.group
-        {:style {:min-height "25px"}
+        {:style {:min-height "25px"}}
         [:div.left
           {:style {:color "rgba(78, 90, 107, 0.5)"}}
           (emoji-picker {})]]]]])
