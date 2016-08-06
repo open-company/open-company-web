@@ -22,6 +22,8 @@ $.offset.left = {};
 $.replaceWith = function(){};
 $.html = function(){};
 $.each = function(){};
+$.truncate = function(){};
+$.attr = function(){};
 // Location
 var location = {};
 location.reload = function(){};

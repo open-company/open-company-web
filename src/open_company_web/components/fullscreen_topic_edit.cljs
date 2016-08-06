@@ -254,7 +254,6 @@
 
 (defn data-to-save [owner topic]
   (when-let* [body-node (sel1 [(keyword (str "div#topic-edit-body-" (name topic)))])
-              snippet-node (sel1 [(keyword (str "div#topic-edit-snippet-" (name topic)))])
               headline-node (sel1 [(keyword (str "div#topic-edit-headline-" (name topic)))])]
     (let [topic-kw (keyword topic)
          is-data-topic (#{:finances :growth} topic-kw)
@@ -262,10 +261,8 @@
          headline (utils/emoji-images-to-unicode (.-innerHTML headline-node))
          with-headline (merge with-title {:headline headline})
          with-header-image (merge with-headline {:image-url (om/get-state owner :image-url) :image-width (om/get-state owner :image-width) :image-height (om/get-state owner :image-height)})
-         snippet (utils/emoji-images-to-unicode (.-innerHTML snippet-node))
-         with-snippet (merge with-header-image {:snippet snippet})
          body (utils/emoji-images-to-unicode (.-innerHTML body-node))
-         with-body (merge with-snippet (if is-data-topic {:notes {:body body}} {:body body}))
+         with-body (merge with-header-image (if is-data-topic {:notes {:body body}} {:body body}))
          with-finances-data (if (= topic-kw :finances)
                               (merge with-body {:data (finances-clean-data (om/get-state owner :finances-data))})
                               with-body)
@@ -304,34 +301,6 @@
         (om/set-state! owner :negative-headline-char-count (neg? remaining-chars)))
       (headline-on-change owner))))
 
-(defn snippet-on-change [owner]
-  (let [snippet-innerHTML (.-innerHTML (sel1 [:div.topic-edit-snippet]))]
-    (when (not= (om/get-state owner :snippet) snippet-innerHTML)
-      (om/set-state! owner :has-changes true))))
-
-(def snippet-length-limit 500)
-(def snippet-alert-limit 50)
-
-(defn check-snippet-count [owner e]
-  (when-let [snippet (sel1 [:div.topic-edit-snippet])]
-    (let [snippet-value (.-innerText snippet)]
-      (when (and (not= (.-keyCode e) 8)
-                 (not= (.-keyCode e) 16)
-                 (not= (.-keyCode e) 17)
-                 (not= (.-keyCode e) 40)
-                 (not= (.-keyCode e) 38)
-                 (not= (.-keyCode e) 13)
-                 (not= (.-keyCode e) 27)
-                 (not= (.-keyCode e) 37)
-                 (not= (.-keyCode e) 39)
-                 (>= (count snippet-value) snippet-length-limit))
-        (.preventDefault e))
-      (let [remaining-chars (- snippet-length-limit (count snippet-value))]
-        (om/set-state! owner :char-count (- snippet-length-limit (count snippet-value)))
-        (om/set-state! owner :char-count-alert (< (- snippet-length-limit (count snippet-value)) snippet-alert-limit))
-        (om/set-state! owner :negative-snippet-char-count (neg? remaining-chars)))
-      (snippet-on-change owner))))
-
 (defn count-chars
   "A special variant of `count` that will count emoji strings (:smile:)
    and html spaces (&nbsp;) as single characters."
@@ -343,10 +312,6 @@
 (defn headline-count-chars []
   (when-let [headline-node (sel1 [:div.topic-edit-headline])]
     (count-chars (.-innerHTML headline-node))))
-
-(defn snippet-count-chars []
-  (when-let [snippet-node (sel1 [:div.topic-edit-snippet])]
-    (count-chars (.-innerHTML snippet-node))))
 
 (defn top-position [el]
   (loop [yPos 0
@@ -398,7 +363,6 @@
       {:has-changes (or (not= (:image-url current-topic-data) (:image-url topic-data))
                         (not= (:title current-topic-data) (:title topic-data))
                         (not= (:headline current-topic-data) (:headline topic-data))
-                        (not= (:snippet current-topic-data) (:snippet topic-data))
                         (not= (:body current-topic-data) (:body topic-data))
                         (not= (:body (:notes current-topic-data)) (:body (:notes topic-data))))
        :title (:title topic-data)
@@ -406,7 +370,6 @@
        :image-url (:image-url topic-data)
        :image-width (:image-width topic-data)
        :image-height (:image-height topic-data)
-       :snippet (utils/emojify (if is-placeholder-topic "" (:snippet topic-data)))
        :body (utils/emojify (utils/get-topic-body topic-data topic))
        :notes (:notes topic-data)
        :show-title-counter (:show-title-counter current-state)
@@ -428,27 +391,20 @@
     (om/set-state! owner (get-state owner props (om/get-state owner)))))
 
 (defn force-hide-placeholder [owner]
-  (let [editor       (om/get-state owner :snippet-medium-editor)
-        snippet-el   (sel1 (str "div#topic-edit-snippet-" (name (om/get-props owner :topic))))]
-    (utils/medium-editor-hide-placeholder editor snippet-el)))
+  (let [editor       (om/get-state owner :body-medium-editor)
+        body-el   (sel1 (str "div#topic-edit-body-" (name (om/get-props owner :topic))))]
+    (utils/medium-editor-hide-placeholder editor body-el)))
 
 (defn setup-medium-editor [owner {:keys [topic-data topic] :as data}]
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
   (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
         med-ed (new js/MediumEditor body-el (clj->js
-                                             (->  (utils/medium-editor-options "Want to add more? Add it here..." true)
+                                             (->  (utils/medium-editor-options "" true)
                                                   (editor/inject-extension editor/file-upload))))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
     (om/set-state! owner :initial-body #js {"__html" (.-innerHTML body-el)})
-    (om/set-state! owner :medium-editor med-ed))
-  (let [snippet-el (sel1 (str "div#topic-edit-snippet-" (name topic)))
-        placeholder (if (:placeholder topic-data) (:snippet topic-data) "")
-        med-ed (new js/MediumEditor snippet-el (clj->js (utils/medium-editor-options placeholder false)))]
-    (.subscribe med-ed "editableInput" (fn [event editable]
-                                         (om/set-state! owner :has-changes true)))
-    (om/set-state! owner :initial-snippet #js {"__html" (.-innerHTML snippet-el)})
-    (om/set-state! owner :snippet-medium-editor med-ed))
+    (om/set-state! owner :body-medium-editor med-ed))
   (js/emojiAutocomplete)
   (utils/after 200 #(focus-headline owner)))
 
@@ -509,11 +465,9 @@
         (setup-medium-editor owner data))
       (let [new-state (get-state owner next-props (om/get-state owner))
             headline-el (sel1 (str "div#topic-edit-headline-" (name (:topic next-props))))
-            snippet-el (sel1 (str "div#topic-edit-snippet-" (name (:topic next-props))))
             body-el (sel1 (str "div#topic-edit-body-" (name (:topic next-props))))
-            body (if (#{:finances :growth} (keyword topic)) (:body new-state) (:body (:notes new-state)))]
+            body (if (#{:finances :growth} (keyword topic)) (:body (:notes new-state)) (:body new-state))]
         (set! (.-innerHTML headline-el) (googobj/get (:headline new-state) "__html"))
-        (set! (.-innerHTML snippet-el) (googobj/get (:snippet new-state) "__html"))
         (if (#{:finances :growth} (keyword topic))
           (set! (.-innerHTML body-el) (googobj/get (:body (:notes new-state)) "__html"))
           (set! (.-innerHTML body-el) (googobj/get (:body new-state) "__html")))
@@ -542,7 +496,6 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (reset! prevent-route-dispatch true)
-      (js/filepicker.setKey ls/filestack-key)
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
       (setup-medium-editor owner data)
       (when-not (om/get-state owner :body-click)
@@ -571,12 +524,10 @@
                            image-url
                            image-width
                            image-height
-                           snippet
                            body
                            char-count
                            char-count-alert
                            negative-headline-char-count
-                           negative-snippet-char-count
                            file-upload-state
                            file-upload-progress
                            upload-remote-url
@@ -623,7 +574,7 @@
                                   (reset-and-dismiss owner options)
                                   (utils/event-stop %))} "CANCEL")
           (dom/button {:class "btn-reset btn-solid left mr1 save-button"
-                       :disabled (or (not has-changes) negative-headline-char-count negative-snippet-char-count)
+                       :disabled (or (not has-changes) negative-headline-char-count)
                        :onClick #(do
                                   (save-data owner options)
                                   (utils/event-stop %))} "SAVE"))
@@ -707,23 +658,19 @@
                                             (.stopPropagation e)
                                             (om/set-state! owner :growth-new-metric true)
                                             (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
-            (dom/div #js {:className "topic-edit-snippet emoji-autocomplete emojiable"
-                          :id (str "topic-edit-snippet-" (name topic))
+            (dom/div #js {:className (str "topic-edit-body emoji-autocomplete emojiable" (when hide-placeholder " hide-placeholder"))
+                          :id (str "topic-edit-body-" (name topic))
                           :contentEditable true
-                          :onBlur #(do (check-snippet-count owner %)
-                                        (om/set-state! owner :char-count nil))
-                          :onKeyUp   #(check-snippet-count owner %)
-                          :onKeyDown #(check-snippet-count owner %)
-                          :dangerouslySetInnerHTML snippet})
+                          :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
             (dom/div {:class "topc-edit-top-box-footer"}
               (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
                 (emoji-picker {:add-emoji-cb (fn [editor emoji]
-                                               (when (= editor (sel1 (str "div#topic-edit-snippet-" (name topic))))
+                                               (when (= editor (sel1 (str "div#topic-edit-body-" (name topic))))
                                                  (force-hide-placeholder owner)))
                                :disabled (let [headline (sel1 (str "topic-edit-headline-" (name topic)))
-                                               snippet  (sel1 (str "topic-edit-snippet-" (name topic)))]
+                                               body     (sel1 (str "topic-edit-body-" (name topic)))]
                                                  (not (or (= (.-activeElement js/document) headline)
-                                                          (= (.-activeElement js/document) snippet))))}))
+                                                          (= (.-activeElement js/document) body))))}))
               (dom/button {:class "btn-reset add-image"
                            :title (if (not image-url) "Add an image" "Replace image")
                            :type "button"
@@ -768,13 +715,7 @@
               (dom/input {:id "topic-edit-upload-ui--select-trigger"
                           :style {:display "none"}
                           :type "file"
-                          :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})))
-          (dom/div {:class "relative topic-body-line"}
-            (dom/div #js {:className (str "topic-body emoji-autocomplete emojiable" (when hide-placeholder " hide-placeholder"))
-                          :contentEditable true
-                          :id (str "topic-edit-body-" (name topic))
-                          :dangerouslySetInnerHTML topic-body})
-            (om/build filestack-uploader (om/get-state owner :medium-editor) {:opts {:hide-placeholder #(om/set-state! owner :hide-placeholder %)}})))
+                          :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))}))))
       (when (and show-first-edit-tooltip
                  (not tooltip-dismissed))
         (om/build tooltip

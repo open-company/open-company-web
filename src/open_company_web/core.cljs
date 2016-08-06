@@ -55,6 +55,7 @@
 
 (defn pre-routing [query-params]
   ; make sure the menu is closed
+  (swap! router/path {})
   (utils/after 100 #(dis/toggle-menu false))
   (if (jwt/jwt)
     (dommy/add-class! (sel1 [:body]) :small-footer)
@@ -144,7 +145,7 @@
     (pre-routing query-params)
     (utils/clean-company-caches)
     ;; save the route
-    (router/set-route! [slug "updates" update-slug update-section] {:slug slug :update-slug update-slug :query-params query-params :section update-section})
+    (router/set-route! [slug "su-snapshot" "updates" update-slug update-section] {:slug slug :update-slug update-slug :query-params query-params :section update-section})
     ;; do we have the company data already?
     (when (not (get-in @dis/app-state su-key))
       ;; load the Stakeholder Update data from the API

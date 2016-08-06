@@ -22,6 +22,11 @@ html, body {
   width: 100vw;
 }
 
+.tooltip-inner {
+  white-space:pre-wrap;
+  max-width: none;
+}
+
 div.fullscreen-page {
   position: relative;
   background-color: white;

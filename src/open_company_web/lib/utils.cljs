@@ -235,13 +235,13 @@
     v))
 
 ;; TODO use goog.i18n.DateTimeFormat here
-(defn date-string [js-date & [year]]
-  (let [month (month-string (add-zero (inc (.getMonth js-date))))
+(defn date-string [js-date & [flags]]
+  (let [month (month-string (add-zero (inc (.getMonth js-date))) (when (in? flags :short-month) [:short]))
         day (.getDate js-date)]
-    (str month " " day (when year (str ", " (.getFullYear js-date))))))
+    (str month " " day (when (in? flags :year) (str ", " (.getFullYear js-date))))))
 
 (defn pluralize [string n]
-  (if (pos? n)
+  (if (> n 1)
     (str string "s")
     string))
 
@@ -258,7 +258,7 @@
         hours-interval (.floor js/Math (/ seconds 3600))]
     (cond
       (pos? years-interval)
-      (date-string past-js-date true)
+      (date-string past-js-date [:year])
 
       (pos? months-interval)
       (date-string past-js-date)
@@ -772,3 +772,8 @@
         (when (googobj/containsKey this "hideOnClick")
           (let [hidePlaceholder (googobj/get this "hidePlaceholder")]
             (hidePlaceholder editor-el)))))))
+
+(defn truncated-body [body]
+  (if (is-test-env?)
+    body
+    (.truncate js/$ body (clj->js {:length 500 :words true}))))

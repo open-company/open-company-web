@@ -139,7 +139,7 @@
           card-width   (responsive/calc-card-width 1)
           ww           (.-clientWidth (sel1 js/document :body))
           total-width  (if (> ww 413) (str (min ww (+ card-width 100)) "px") "auto")
-          su-subtitle  (str "— " (utils/date-string (js/Date.) true))
+          su-subtitle  (str "— " (utils/date-string (js/Date.) [:year]))
           su-sections  (:sections su-data)
           topics-to-add (sort #(compare (title-from-section-name owner %1) (title-from-section-name owner %2)) (reduce utils/vec-dissoc (flatten (vals (:sections company-data))) su-topics))]
       (dom/div {:class (utils/class-set {:su-snapshot-preview true

@@ -46,7 +46,6 @@
 
 ; FIXME: remove the warning of history not found
 (defn nav! [token]
-  (swap! path {})
   (.setToken @history token))
 
 (defn redirect! [loc]

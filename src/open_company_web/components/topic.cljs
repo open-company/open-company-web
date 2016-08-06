@@ -15,7 +15,9 @@
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.topic-edit :refer (topic-edit)]
+            [open-company-web.components.topic-attribution :refer (topic-attribution)]
             [open-company-web.components.ui.icon :as i]
+            [open-company-web.components.ui.topic-read-more :refer (topic-read-more)]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
             [goog.fx.Animation.EventType :as EventType]
@@ -33,15 +35,11 @@
     (dom/div #js {:className "topic-headline-inner"
                   :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
 
-(defn scroll-to-topic-top [topic]
-  (let [body-scroll (.-scrollTop (.-body js/document))
-        topic-scroll-top (utils/offset-top topic)]
-    (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
-
-(defn fullscreen-topic [data selected-metric force-editing & [e]]
-  (when e
-    (utils/event-stop e))
-  ((:topic-click data) selected-metric force-editing))
+(defn fullscreen-topic [owner selected-metric force-editing & [e]]
+  (when (not (om/get-props owner :foce-active))
+    (when e
+      (utils/event-stop e))
+    ((om/get-props owner :topic-click) selected-metric force-editing)))
 
 (defn start-foce-click [owner]
   (let [section-kw (keyword (om/get-props owner :section))
@@ -53,7 +51,7 @@
   (utils/event-stop e)
   (let [section (om/get-props owner :section)]
     (if (#{:growth :finances} (keyword section))
-      (fullscreen-topic (om/get-props owner) nil true)
+      (fullscreen-topic owner nil true)
       (start-foce-click owner))))
 
 (defcomponent topic-internal [{:keys [topic-data
@@ -70,8 +68,7 @@
           chart-opts          {:chart-size {:width  260
                                             :height 196}
                                :hide-nav true
-                               :pillboxes-first false
-                               :topic-click (partial fullscreen-topic data nil false)}
+                               :pillboxes-first false}
           is-growth-finances? (#{:growth :finances} section-kw)
           gray-color          (oc-colors/get-color-by-kw :oc-gray-5)
           finances-row-data   (:data topic-data)
@@ -81,13 +78,13 @@
                                         (utils/no-finances-data? finances-row-data)))
                                   (and (= section-kw :growth)
                                        (utils/no-growth-data? growth-data)))
-          snippet             (:snippet topic-data)
           image-header        (:image-url topic-data)
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
-          topic-body          (utils/get-topic-body topic-data section)]
+          topic-body          (utils/get-topic-body topic-data section-kw)
+          truncated-body      (if (utils/is-test-env?) topic-body (.truncate js/$ topic-body (clj->js {:length 500 :words true})))]
       (dom/div #js {:className "topic-internal group"
-                    :onClick (partial fullscreen-topic data nil false)
+                    :onClick (partial fullscreen-topic owner nil false)
                     :ref "topic-internal"}
         (when (or is-growth-finances?
                   image-header)
@@ -95,7 +92,10 @@
                                              :card-image (not is-growth-finances?)})}
             (cond
               (= section "finances")
-              (om/build topic-finances {:section-data topic-data :section section :currency currency} {:opts chart-opts})
+              (om/build topic-finances {:section-data topic-data
+                                        :section section
+                                        :currency currency
+                                        :topic-click (partial fullscreen-topic owner nil false)} {:opts chart-opts})
               (= section "growth")
               (om/build topic-growth {:section-data topic-data :section section :currency currency} {:opts chart-opts})
               :else
@@ -107,37 +107,42 @@
                    (responsive/can-edit?)
                    (not (responsive/is-mobile))
                    (not (:read-only topic-data))
-                   (not sharing-mode))
+                   (not sharing-mode)
+                   (not (:foce-active data)))
             (dom/button {:class (str "topic-pencil-button btn-reset")
                          :on-click #(pencil-click owner %)}
               (dom/i {:class "fa fa-pencil"}))))
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
-        (dom/div #js {:className "topic-body topic-snippet"
-                      :ref "topic-snippet"
-                      :dangerouslySetInnerHTML (utils/emojify snippet)})
-        (when-not (clojure.string/blank? (utils/strip-HTML-tags topic-body))
-          (dom/button {:class "btn-reset topic-read-more"
-                       :onClick (partial fullscreen-topic data nil false)} "READ MORE"))))))
+        (dom/div #js {:className "topic-body topic-body"
+                      :ref "topic-body"
+                      :dangerouslySetInnerHTML (utils/emojify truncated-body)})
+        ; if it's SU preview or SU show only read-more
+        (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
+                (utils/in? (:route @router/path) "su-snapshot"))
+          (dom/div {:class "left"
+                    :style {:margin-bottom "28px"}}
+            (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic data nil false))))
+          (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic data nil false)) {:opts options}))))))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
         tr-topic (om/get-ref owner "tr-topic")
         current-state (om/get-state owner)
-        appear-animation (Fade. tr-topic 0 1 utils/oc-animation-duration)
+        anim-duration utils/oc-animation-duration
+        appear-animation (Fade. tr-topic 0 1 anim-duration)
         cur-size (js/getComputedStyle cur-topic)
         tr-size (js/getComputedStyle tr-topic)
         topic (om/get-ref owner "topic-anim")
-        topic-size (js/getComputedStyle topic)
-        scroll-top (.-scrollTop topic)]
+        topic-size (js/getComputedStyle topic)]
     ; resize the light box
     (.play (Resize. topic
                     #js [(js/parseFloat (.-width topic-size)) (js/parseFloat (.-height cur-size))]
                     #js [(js/parseFloat (.-width topic-size)) (js/parseFloat (.-height tr-size))]
-                    utils/oc-animation-duration))
+                    anim-duration))
     ; disappear current topic
-    (.play (Fade. cur-topic 1 0 utils/oc-animation-duration))
+    (.play (Fade. cur-topic 1 0 anim-duration))
     ; appear the new topic
     (doto appear-animation
       (events/listen
@@ -195,6 +200,10 @@
           all-revisions (slug @caches/revisions)
           revisions-list (section-kw all-revisions)
           topic-data (utils/select-section-data section-data section-kw as-of)
+          rev-cb (fn [e rev]
+                  (om/set-state! owner :transition-as-of (:updated-at rev))
+                  (utils/event-stop e))
+          foce-active (not (nil? (dis/foce-section-key)))
           is-foce (= (dis/foce-section-key) section-kw)]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
@@ -206,10 +215,11 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
+                                                 :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
                     :ref "topic"
                     :id (str "topic-" (name section))
-                    :onClick #(when (and (:topic-click options) (not is-foce))
+                    :onClick #(when (and (:topic-click options) (not foce-active))
                                 ((:topic-click options) nil false))}
         (when show-share-remove
           (dom/div {:class "share-remove-container"
@@ -221,41 +231,39 @@
                       :key (str "topic-anim-" as-of "-" transition-as-of)
                       :ref "topic-anim"}
           (dom/div #js {:className "topic-as-of group"
-                        :ref "cur-topic"
                         :key (str "cur-" as-of)
                         :style #js {:opacity 1 :width "100%" :height "auto"}}
-            (if is-foce
-              (om/build topic-edit {:section section
-                                    :topic-data topic-data
-                                    :sharing-mode sharing-mode
-                                    :show-fast-editing (:show-fast-editing data)
-                                    :currency currency
-                                    :card-width card-width
-                                    :read-only-company (:read-only-company data)
-                                    :foce-key (:foce-key data)
-                                    :foce-data (:foce-data data)
-                                    :prev-rev prev-rev
-                                    :next-rev next-rev}
-                                   {:opts (merge options {:rev-click (fn [e rev]
-                                                                        (scroll-to-topic-top (om/get-ref owner "topic"))
-                                                                        (om/set-state! owner :transition-as-of (:updated-at rev))
-                                                                        (.stopPropagation e))})
-                                    :key (str "topic-foce-" section)})
-              (om/build topic-internal {:section section
-                                        :topic-data topic-data
-                                        :sharing-mode sharing-mode
-                                        :show-fast-editing (:show-fast-editing data)
-                                        :currency currency
-                                        :card-width card-width
-                                        :read-only-company (:read-only-company data)
-                                        :topic-click (:topic-click options)
-                                        :prev-rev prev-rev
-                                        :next-rev next-rev}
-                                       {:opts (merge options {:rev-click (fn [e rev]
-                                                                            (scroll-to-topic-top (om/get-ref owner "topic"))
-                                                                            (om/set-state! owner :transition-as-of (:updated-at rev))
-                                                                            (.stopPropagation e))})
-                                        :key (str "topic-" section)}))
+            (dom/div #js {:className "topic-cur-as-of"
+                          :ref "cur-topic"
+                          :style #js {:opacity 1}}
+              (if is-foce
+                (om/build topic-edit {:section section
+                                      :topic-data topic-data
+                                      :sharing-mode sharing-mode
+                                      :show-fast-editing (:show-fast-editing data)
+                                      :currency currency
+                                      :card-width card-width
+                                      :read-only-company (:read-only-company data)
+                                      :foce-key (:foce-key data)
+                                      :foce-data (:foce-data data)
+                                      :prev-rev prev-rev
+                                      :next-rev next-rev}
+                                     {:opts (merge options {:rev-click rev-cb})
+                                      :key (str "topic-foce-" section)})
+                (om/build topic-internal {:section section
+                                          :topic-data topic-data
+                                          :sharing-mode sharing-mode
+                                          :show-fast-editing (:show-fast-editing data)
+                                          :currency currency
+                                          :card-width card-width
+                                          :read-only-company (:read-only-company data)
+                                          :topic-click (:topic-click options)
+                                          :is-foce is-foce
+                                          :foce-active foce-active
+                                          :prev-rev prev-rev
+                                          :next-rev next-rev}
+                                         {:opts (merge options {:rev-click rev-cb})
+                                          :key (str "topic-" section)})))
             (when transition-as-of
               (dom/div #js {:className "topic-tr-as-of group"
                             :ref "tr-topic"
@@ -271,4 +279,4 @@
                                             :read-only-company (:read-only-company data)
                                             :prev-rev tr-prev-rev
                                             :next-rev tr-next-rev}
-                                           {:opts (merge options {:rev-click #()})}))))))))))
+                                           {:opts (merge options {:rev-click rev-cb})}))))))))))
