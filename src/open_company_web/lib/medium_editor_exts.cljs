@@ -2,6 +2,7 @@
   (:require [open-company-web.lib.utils :as utils]
             [goog.dom :as gdom]
             [goog.style :as gstyle]
+            [goog.object :as gobj]
             [cljsjs.medium-editor]
             [org.martinklepsch.cljsjs-medium-button]))
 
@@ -56,10 +57,11 @@
                     (fn []
                       (let [sel (js/window.getSelection)
                             el  (when (pos? (.-rangeCount sel))
-                                  (.-commonAncestorContainer (.getRangeAt sel 0)))]
+                                  (.-commonAncestorContainer (.getRangeAt sel 0)))
+                            offset-top (gobj/get el "offsetTop" 0)]
                         (when (and sel el)
-                          (if (and (empty-paragraph? el) (.-offsetTop el))
-                            (pos-btn (.-offsetTop el))
+                          (if (and (empty-paragraph? el) offset-top)
+                            (pos-btn offset-top)
                             (hide-btn))))))
                    true)]
     {:name "file-upload"

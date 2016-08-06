@@ -642,14 +642,16 @@
 (defonce overlay-max-win-height 670)
 
 (defn absolute-offset [element]
-  (loop [top 0
-         left 0
+  (loop [left 0
+         top 0
          el element]
-    (if-not el
+    (if-not (and el
+                 (gobj/get el "offsetTop")
+                 (gobj/get el "offsetLeft"))
       {:top top
        :left left}
-      (recur (+ top (or (.-offsetTop el) 0))
-             (+ left (or (.-offsetLeft el) 0))
+      (recur (+ left (gobj/get el "offsetLeft" 0))
+             (+ top (gobj/get el "offsetTop" 0))
              (.-offsetParent el)))))
 
 (defn medium-editor-options [placeholder hide-on-click]

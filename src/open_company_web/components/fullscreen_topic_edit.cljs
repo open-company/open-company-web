@@ -26,9 +26,10 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
+            [goog.dom :as gdom]
+            [goog.object :as gobj]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [clojure.string :as string]
-            [goog.dom :as gdom]
             [cljsjs.react.dom]))
 
 (def before-unload-message "You have unsaved edits.")
@@ -312,9 +313,15 @@
 (defn top-position [el]
   (loop [yPos 0
          element el]
-    (if element
-      (recur (+ yPos (- (.-offsetTop element) (.-scrollTop element)) (.-clientTop element))
-             (.-offsetParent element))
+    (if (and element
+         (gobj/get element "offsetTop")
+         (gobj/get element "scrollTop")
+         (gobj/get element "clientTop")
+         (gobj/get element "offsetParent"))
+      (recur (+ yPos (- (gobj/get element "offsetTop")
+                        (gobj/get element "scrollTop"))
+                     (gobj/get element "clientTop"))
+             (gobj/get element "offsetParent"))
       yPos)))
 
 (defn body-clicked [owner e]

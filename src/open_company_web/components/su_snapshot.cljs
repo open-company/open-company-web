@@ -11,7 +11,6 @@
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.footer :refer (footer)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
-            [open-company-web.components.company-header :refer (company-header)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
