@@ -14,11 +14,13 @@
 (defn add-topic? [owner]
   (let [data (om/get-props owner)
         company-data (:company-data data)
-        sharing-mode (om/get-props owner :sharing-mode)]
+        sharing-mode (om/get-props owner :sharing-mode)
+        foce-active  (dis/foce-section-key)]
     (and (not (:hide-add-topic data))
          (responsive/can-edit?)
          (not sharing-mode)
-         (not (:read-only company-data)))))
+         (not (:read-only company-data))
+         (not foce-active))))
 
 (def inter-topic-gap 22)
 (def add-a-topic-height 95)

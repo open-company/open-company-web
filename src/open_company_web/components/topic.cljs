@@ -35,10 +35,11 @@
     (dom/div {:class "topic-headline-inner"
               :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
 
-(defn fullscreen-topic [data selected-metric force-editing & [e]]
-  (when e
-    (utils/event-stop e))
-  ((:topic-click data) selected-metric force-editing))
+(defn fullscreen-topic [owner selected-metric force-editing & [e]]
+  (when (not (om/get-props owner :foce-active))
+    (when e
+      (utils/event-stop e))
+    ((om/get-props owner :topic-click) selected-metric force-editing)))
 
 (defn start-foce-click [owner]
   (let [section-kw (keyword (om/get-props owner :section))
@@ -50,7 +51,7 @@
   (utils/event-stop e)
   (let [section (om/get-props owner :section)]
     (if (#{:growth :finances} (keyword section))
-      (fullscreen-topic (om/get-props owner) nil true)
+      (fullscreen-topic owner nil true)
       (start-foce-click owner))))
 
 (defcomponent topic-internal [{:keys [topic-data
@@ -67,8 +68,7 @@
           chart-opts          {:chart-size {:width  260
                                             :height 196}
                                :hide-nav true
-                               :pillboxes-first false
-                               :topic-click (partial fullscreen-topic data nil false)}
+                               :pillboxes-first false}
           is-growth-finances? (#{:growth :finances} section-kw)
           gray-color          (oc-colors/get-color-by-kw :oc-gray-5)
           finances-row-data   (:data topic-data)
@@ -84,7 +84,7 @@
           topic-body          (utils/get-topic-body topic-data section-kw)
           truncated-body      (if (utils/is-test-env?) topic-body (.truncate js/$ topic-body (clj->js {:length 500 :words true})))]
       (dom/div #js {:className "topic-internal group"
-                    :onClick (partial fullscreen-topic data nil false)
+                    :onClick (partial fullscreen-topic owner nil false)
                     :ref "topic-internal"}
         (when (or is-growth-finances?
                   image-header)
@@ -92,7 +92,10 @@
                                              :card-image (not is-growth-finances?)})}
             (cond
               (= section "finances")
-              (om/build topic-finances {:section-data topic-data :section section :currency currency} {:opts chart-opts})
+              (om/build topic-finances {:section-data topic-data
+                                        :section section
+                                        :currency currency
+                                        :topic-click (partial fullscreen-topic owner nil false)} {:opts chart-opts})
               (= section "growth")
               (om/build topic-growth {:section-data topic-data :section section :currency currency} {:opts chart-opts})
               :else
@@ -104,7 +107,8 @@
                    (responsive/can-edit?)
                    (not (responsive/is-mobile))
                    (not (:read-only topic-data))
-                   (not sharing-mode))
+                   (not sharing-mode)
+                   (not (:foce-active data)))
             (dom/button {:class (str "topic-pencil-button btn-reset")
                          :on-click #(pencil-click owner %)}
               (dom/i {:class "fa fa-pencil"}))))
@@ -115,7 +119,8 @@
                       :ref "topic-body"
                       :dangerouslySetInnerHTML (utils/emojify truncated-body)})
         ; if it's SU preview or SU show only read-more
-        (if (or (utils/in? (:route @router/path) "su-snapshot-preview") (utils/in? (:route @router/path) "su-snapshot"))
+        (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
+                (utils/in? (:route @router/path) "su-snapshot"))
           (dom/div {:class "left"
                     :style {:margin-bottom "28px"}}
             (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic data nil false))))
@@ -195,10 +200,11 @@
           all-revisions (slug @caches/revisions)
           revisions-list (section-kw all-revisions)
           topic-data (utils/select-section-data section-data section-kw as-of)
-          is-foce (= (dis/foce-section-key) section-kw)
           rev-cb (fn [e rev]
                   (om/set-state! owner :transition-as-of (:updated-at rev))
-                  (utils/event-stop e))]
+                  (utils/event-stop e))
+          foce-active (not (nil? (dis/foce-section-key)))
+          is-foce (= (dis/foce-section-key) section-kw)]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -209,10 +215,11 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
+                                                 :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
                     :ref "topic"
                     :id (str "topic-" (name section))
-                    :onClick #(when (and (:topic-click options) (not is-foce))
+                    :onClick #(when (and (:topic-click options) (not foce-active))
                                 ((:topic-click options) nil false))}
         (when show-share-remove
           (dom/div {:class "share-remove-container"
@@ -251,6 +258,8 @@
                                           :card-width card-width
                                           :read-only-company (:read-only-company data)
                                           :topic-click (:topic-click options)
+                                          :is-foce is-foce
+                                          :foce-active foce-active
                                           :prev-rev prev-rev
                                           :next-rev next-rev}
                                          {:opts (merge options {:rev-click rev-cb})
