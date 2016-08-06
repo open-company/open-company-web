@@ -719,7 +719,11 @@
               (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
                 (emoji-picker {:add-emoji-cb (fn [editor emoji]
                                                (when (= editor (sel1 (str "div#topic-edit-snippet-" (name topic))))
-                                                 (force-hide-placeholder owner)))}))
+                                                 (force-hide-placeholder owner)))
+                               :disabled (let [headline (sel1 (str "topic-edit-headline-" (name topic)))
+                                               snippet  (sel1 (str "topic-edit-snippet-" (name topic)))]
+                                                 (not (or (= (.-activeElement js/document) headline)
+                                                          (= (.-activeElement js/document) snippet))))}))
               (dom/button {:class "btn-reset add-image"
                            :title (if (not image-url) "Add an image" "Replace image")
                            :type "button"

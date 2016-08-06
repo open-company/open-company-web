@@ -50,7 +50,7 @@
    It will add the selected emoji in place of the current selection if
    the current activeElement has the class `emojiable` or the custom class
    passed via component props in :editor-class."
-  [s {:keys [emojiable-class add-emoji-cb]}]
+  [s {:keys [emojiable-class add-emoji-cb disabled]}]
   (let [fix-emojiable-class (or emojiable-class default-emojiable-class)
         visible (::visible s)
         caret-pos (::caret-pos s)
@@ -59,8 +59,9 @@
       {:style {:width "15px"
                :z-index 1020
                :height "15px"}}
-      [:button.emoji-button.btn-reset
-        {:style {:font-size "15px"}
+      [:button
+        {:class (str "emoji-button btn-reset" (when disabled " disabled"))
+         :style {:font-size "15px"}
          :type "button"
          :on-mouse-down #(save-caret-position s fix-emojiable-class)
          :on-click #(do

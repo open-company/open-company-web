@@ -237,8 +237,13 @@
                         :type "file"
                         :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
             (dom/div {:class "left mr2"}
-              (emoji-picker {:add-emoji-cb (fn [editor emoji] (when (= editor (sel1 (str "div#foce-snippet-" (name section-kw))))
-                                                                (force-hide-placeholder owner)))}))
+              (emoji-picker {:add-emoji-cb (fn [editor emoji]
+                                             (when (= editor (sel1 (str "div#foce-snippet-" (name section-kw))))
+                                               (force-hide-placeholder owner)))
+                             :disabled (let [headline (sel1 (str "#foce-headline-" (name section)))
+                                             snippet  (sel1 (str "#foce-snippet-" (name section)))]
+                                         (not (or (= (.-activeElement js/document) headline)
+                                                  (= (.-activeElement js/document) snippet))))}))
             (dom/button {:class "btn-reset camera left"
                          :title (if (not image-header) "Add an image" "Replace image")
                          :type "button"
