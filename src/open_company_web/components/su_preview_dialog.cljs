@@ -280,7 +280,7 @@
 
   (did-mount [_]
     (dis/dispatch! [:input [:su-share :email :subject]
-                    (str "[" (:name (:company-data data)) "] " (:su-title data))])
+                    (str (:name (:company-data data)) " " (:su-title data))])
     (setup-scroll-height))
 
   (did-update [_ _ _]

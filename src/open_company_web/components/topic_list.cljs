@@ -181,6 +181,9 @@
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
+    (when-not (utils/is-test-env?)
+      ;; make sure when topic-list component is initialized that there is no foce active
+      (dispatcher/dispatch! [:start-foce nil]))
     (get-state owner data nil))
 
   (did-mount [_]
@@ -218,18 +221,18 @@
       (om/set-state! owner (get-state owner next-props (om/get-state owner))))
     (when-not (:read-only (:company-data next-props))
       (get-new-sections-if-needed owner))
-    (when (:force-edit-topic next-props)
-      (let [company-data (:company-data next-props)
-            topics (flatten (vals (:sections company-data)))
-            no-placeholder-sections (filter-placeholder-sections topics company-data)]
-        (when (contains? company-data (keyword (:force-edit-topic next-props)))
-          (om/set-state! owner :fullscreen-force-edit true)
-          (om/set-state! owner :selected-topic (dispatcher/force-edit-topic))
-          ; show second tooltip of needed
-          (when (= (count (flatten (vals (:sections company-data)))) 1)
-            (om/set-state! owner :show-second-add-topic-tooltip true))
-          (when (= (count no-placeholder-sections) 2)
-            (om/set-state! owner :show-share-su-tooltip true))))))
+    (let [company-data (:company-data next-props)
+          topics (flatten (vals (:sections company-data)))
+          no-placeholder-sections (filter-placeholder-sections topics company-data)]
+      (when (and (:force-edit-topic next-props) (contains? company-data (keyword (:force-edit-topic next-props))))
+        (om/set-state! owner :fullscreen-force-edit true)
+        (om/set-state! owner :selected-topic (dispatcher/force-edit-topic)))
+      ; show second tooltip if needed
+      (when (= (count no-placeholder-sections) 1)
+        (om/set-state! owner :show-second-add-topic-tooltip true))
+      ; show share tooltip if needed
+      (when (= (count no-placeholder-sections) 2)
+        (om/set-state! owner :show-share-su-tooltip true))))
 
   (did-update [_ _ _]
     (when (om/get-state owner :tr-selected-topic)
@@ -268,7 +271,7 @@
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
             (dom/button {:class "sharing-button"
-                         :on-click #(do (dispatcher/dispatch! [:start-foce nil]) (router/nav! (oc-urls/stakeholder-update-preview)))} "SHARE AN UPDATE " (dom/i {:class "fa fa-share"}))))
+                         :on-click #(router/nav! (oc-urls/stakeholder-update-preview (router/current-company-slug)))} "SHARE AN UPDATE " (dom/i {:class "fa fa-share"}))))
         ;; Fullscreen topic
         (when selected-topic
           (dom/div {:class "selected-topic-container"

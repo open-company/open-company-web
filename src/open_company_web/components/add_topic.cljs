@@ -40,8 +40,6 @@
     {:disabled (string/blank? @(::topic-title s))
      :on-click #(let [topic-name     (str "custom-" (utils/my-uuid))
                       new-topic-data {:title @(::topic-title s)
-                                      :headline ""
-                                      :body ""
                                       :section topic-name
                                       :placeholder true}]
                   (submit-fn :progress topic-name new-topic-data))} "Add"]])
