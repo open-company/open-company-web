@@ -9,6 +9,7 @@
             [goog.fx.dom :refer (Scroll)]
             [goog.string :as gstring]
             [goog.i18n.NumberFormat :as nf]
+            [goog.object :as gobj]
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
             [open-company-web.lib.cookies :as cook]
