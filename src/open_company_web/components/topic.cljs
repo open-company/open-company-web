@@ -123,8 +123,8 @@
                 (utils/in? (:route @router/path) "su-snapshot"))
           (dom/div {:class "left"
                     :style {:margin-bottom "28px"}}
-            (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic data nil false))))
-          (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic data nil false)) {:opts options}))))))
+            (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic owner nil false))))
+          (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic owner nil false)) {:opts options}))))))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
