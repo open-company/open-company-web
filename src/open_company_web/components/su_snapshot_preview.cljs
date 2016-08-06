@@ -151,7 +151,9 @@
                    (empty? (:sections su-data))
                    (not su-tooltip-dismissed))
           (om/build tooltip {:cta "THIS IS A PREVIEW OF YOUR UPDATE. DRAG TOPICS TO REORDER, OR CLICK THE X TO REMOVE A TOPIC."}
-                            {:opts {:dismiss-tooltip #(om/set-state! owner :su-tooltip-dismissed true)}}))
+                            {:opts {:dismiss-tooltip #(do
+                                                       (om/set-state! owner :su-tooltip-dismissed true)
+                                                       (.focus (sel1 [:input#su-snapshot-preview-title])))}}))
         (om/build menu data)
         (dom/div {:class "page snapshot-page"}
           (dom/div {:class "su-snapshot-header"}
