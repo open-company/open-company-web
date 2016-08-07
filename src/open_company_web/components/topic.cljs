@@ -55,6 +55,9 @@
       (fullscreen-topic owner nil true)
       (start-foce-click owner))))
 
+(defn block-a-expand []
+  (.on (js/$ "div.topic-body a") "click" #(.stopPropagation %)))
+
 (defcomponent topic-internal [{:keys [topic-data
                                       section
                                       currency
@@ -63,6 +66,12 @@
                                       next-rev
                                       sharing-mode
                                       show-fast-editing] :as data} owner options]
+
+  (did-mount [_]
+    (block-a-expand))
+
+  (did-update [_ _ _]
+    (block-a-expand))
 
   (render [_]
     (let [section-kw          (keyword section)

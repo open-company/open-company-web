@@ -21,6 +21,7 @@ $.offset.top = {};
 $.offset.left = {};
 $.truncate = function(){};
 $.attr = function(){};
+$.on = function(){};
 // Location
 var location = {};
 location.reload = function(){};
