@@ -142,7 +142,6 @@
 
 (defn email-note-did-change []
   (let [email-notes (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.email-note])))]
-    (println "email-note-did-change" email-notes)
     (dis/dispatch! [:input
                     [:su-share :email :note]
                     email-notes])))
@@ -187,7 +186,6 @@
 
 (defn slack-note-did-change []
   (let [slack-notes (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.slack-note])))]
-    (println "slack-note-did-change" slack-notes)
     (dis/dispatch! [:input
                     [:su-share :slack :note]
                     slack-notes])))
