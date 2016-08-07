@@ -74,7 +74,7 @@
                  :top "25px"
                  :left "0"}}
         (when-not (utils/is-test-env?)
-          (react-utils/build js/EmojionePicker {:search true :onChange (fn [emoji]
+          (react-utils/build js/EmojionePicker {:search "" :onChange (fn [emoji]
                                                                          (replace-with-emoji caret-pos fix-emojiable-class emoji)
                                                                          (reset! visible false)
                                                                          (.focus @last-active-element)
