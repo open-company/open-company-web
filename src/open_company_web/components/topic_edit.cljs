@@ -149,6 +149,14 @@
        :file-upload-state nil
        :file-upload-progress 0}))
 
+  (will-receive-props [_ next-props]
+    ;; update body placeholder when receiving data from API
+    (let [topic        (dis/foce-section-key)
+          company-data (dis/company-data)
+          topic-data   (get company-data (keyword topic))
+          body         (utils/get-topic-body topic-data topic)]
+      (om/set-state! owner :body-placeholder (if (:placeholder topic-data) body ""))))
+
   (will-unmount [_]
     (when-not (utils/is-test-env?)
       ; re enable the route dispatcher
