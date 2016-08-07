@@ -73,8 +73,9 @@
          :on-mouse-down #(save-caret-position s)
          :on-click #(do
                       (utils/event-stop %)
-                      (when @caret-pos
-                        (reset! visible true)))}
+                      (if (and @caret-pos (not @visible))
+                        (reset! visible true)
+                        (reset! visible false)))}
          [:i.fa.fa-smile-o]]
       [:div.picker-container.absolute
         {:style {:display (if @visible "block" "none")
