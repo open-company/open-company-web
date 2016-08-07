@@ -23,6 +23,8 @@
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.components.tooltip :refer (tooltip)]
             [open-company-web.components.ui.icon :refer (icon)]
+            [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
+            [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
@@ -256,9 +258,10 @@
     (let [topic-kw (keyword topic)
          is-data-topic (#{:finances :growth} topic-kw)
          with-title {:title (om/get-state owner :title)}
-         with-headline (merge with-title {:headline (.-innerHTML headline-node)})
+         headline (utils/emoji-images-to-unicode (.-innerHTML headline-node))
+         with-headline (merge with-title {:headline headline})
          with-header-image (merge with-headline {:image-url (om/get-state owner :image-url) :image-width (om/get-state owner :image-width) :image-height (om/get-state owner :image-height)})
-         body (.-innerHTML body-node)
+         body (utils/emoji-images-to-unicode (.-innerHTML body-node))
          with-body (merge with-header-image (if is-data-topic {:notes {:body body}} {:body body}))
          with-finances-data (if (= topic-kw :finances)
                               (merge with-body {:data (finances-clean-data (om/get-state owner :finances-data))})
@@ -330,7 +333,8 @@
                 fullscreen-topic (sel1 [:div.fullscreen-topic])
                 body-line (sel1 [:div.topic-body-line])]
       (let [file-upload-ui (sel1 [:div#file-upload-ui])
-            add-image-btn (sel1 [:button.file-upload-btn])]
+            add-image-btn (sel1 [:button.file-upload-btn])
+            emoji-picker  (sel1 [:div.emoji-picker])]
         (when (and (>= (+ (.-clientY e) (.-scrollTop fullscreen-topic)) (- (top-position body-line) 24))
                    (not (utils/event-inside? e topic-body))
                    ; click is not on the add image button
@@ -340,7 +344,11 @@
                    ; click is not in the file upload ui
                    (or (nil? file-upload-ui)
                        (and file-upload-ui
-                            (not (utils/event-inside? e file-upload-ui)))))
+                            (not (utils/event-inside? e file-upload-ui))))
+                   ; click is not inside emojione-picker
+                   (or (nil? emoji-picker)
+                       (and emoji-picker
+                            (not (utils/event-inside? e emoji-picker)))))
           (.focus topic-body)
           (utils/to-end-of-content-editable topic-body)
           (scroll-to-bottom))))))
@@ -364,11 +372,11 @@
                         (not= (:body current-topic-data) (:body topic-data))
                         (not= (:body (:notes current-topic-data)) (:body (:notes topic-data))))
        :title (:title topic-data)
-       :headline (:headline topic-data)
+       :headline (utils/emojify (:headline topic-data))
        :image-url (:image-url topic-data)
        :image-width (:image-width topic-data)
        :image-height (:image-height topic-data)
-       :body (utils/get-topic-body topic-data topic)
+       :body (utils/emojify (utils/get-topic-body topic-data topic))
        :notes (:notes topic-data)
        :show-title-counter (:show-title-counter current-state)
        :medium-editor (:medium-editor current-state)
@@ -388,6 +396,11 @@
     ((:dismiss-editing options) placeholder-section)
     (om/set-state! owner (get-state owner props (om/get-state owner)))))
 
+(defn force-hide-placeholder [owner]
+  (let [editor       (om/get-state owner :body-medium-editor)
+        body-el   (sel1 (str "div#topic-edit-body-" (name (om/get-props owner :topic))))]
+    (utils/medium-editor-hide-placeholder editor body-el)))
+
 (defn setup-medium-editor [owner {:keys [topic-data topic] :as data}]
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
   (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
@@ -396,8 +409,8 @@
                                                   (editor/inject-extension editor/file-upload))))]
     (.subscribe med-ed "editableInput" (fn [event editable]
                                          (om/set-state! owner :has-changes true)))
-    (om/set-state! owner :initial-body (.-innerHTML body-el))
-    (om/set-state! owner :medium-editor med-ed))
+    (om/set-state! owner :initial-body #js {"__html" (.-innerHTML body-el)})
+    (om/set-state! owner :body-medium-editor med-ed))
   (js/emojiAutocomplete)
   (utils/after 200 #(focus-headline owner)))
 
@@ -460,10 +473,10 @@
             headline-el (sel1 (str "div#topic-edit-headline-" (name (:topic next-props))))
             body-el (sel1 (str "div#topic-edit-body-" (name (:topic next-props))))
             body (if (#{:finances :growth} (keyword topic)) (:body (:notes new-state)) (:body new-state))]
-        (set! (.-innerHTML headline-el) (:headline new-state))
+        (set! (.-innerHTML headline-el) (gobj/get (:headline new-state) "__html"))
         (if (#{:finances :growth} (keyword topic))
-          (set! (.-innerHTML body-el) (:body (:notes new-state)))
-          (set! (.-innerHTML body-el) (:body new-state)))
+          (set! (.-innerHTML body-el) (gobj/get (:body (:notes new-state)) "__html"))
+          (set! (.-innerHTML body-el) (gobj/get (:body new-state) "__html")))
         (om/set-state! owner new-state))
       (utils/after 200 #(focus-headline owner)))
     ; goes hidden
@@ -539,7 +552,7 @@
     (let [topic-kw (keyword topic)
           is-data-topic (#{:finances :growth} topic-kw)
           title-length-limit 20
-          topic-body (if-not (:placeholder topic-data) (utils/get-topic-body topic-data topic-kw) "")
+          topic-body (utils/emojify (if-not (:placeholder topic-data) (utils/get-topic-body topic-data topic-kw) ""))
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height utils/overlay-max-win-height)
           max-height (min (- 650 126) (- win-height 126))
@@ -594,16 +607,16 @@
                                       (om/set-state! owner :char-count (- title-length-limit (count title)))
                                       (om/set-state! owner :char-count-alert (< (- title-length-limit (count title)) title-alert-limit))
                                       (change-value owner :title e))})
-            (dom/div {:className "topic-edit-headline emoji-autocomplete"
-                      :ref "topic-edit-headline"
-                      :contentEditable true
-                      :id (str "topic-edit-headline-" (name topic))
-                      :placeholder "Headline"
-                      :on-blur #(do (check-headline-count owner headline-length-limit %)
-                                    (om/set-state! owner :char-count nil))
-                      :on-key-up   #(check-headline-count owner headline-length-limit %)
-                      :on-key-down #(check-headline-count owner headline-length-limit %)
-                      :dangerouslySetInnerHTML (clj->js {"__html" headline})})
+            (dom/div #js {:className "topic-edit-headline emoji-autocomplete emojiable"
+                          :ref "topic-edit-headline"
+                          :contentEditable true
+                          :id (str "topic-edit-headline-" (name topic))
+                          :placeholder "Headline"
+                          :onBlur #(do (check-headline-count owner headline-length-limit %)
+                                        (om/set-state! owner :char-count nil))
+                          :onKeyUp   #(check-headline-count owner headline-length-limit %)
+                          :onKeyDown #(check-headline-count owner headline-length-limit %)
+                          :dangerouslySetInnerHTML headline})
             (when is-data-topic
               (dom/div {:class "separator"}))
             (dom/div {:class "topic-overlay-edit-data"}
@@ -651,12 +664,19 @@
                                             (.stopPropagation e)
                                             (om/set-state! owner :growth-new-metric true)
                                             (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
-            (dom/div {:class "relative topic-body-line"}
-              (dom/div {:className (str "topic-body emoji-autocomplete" (when hide-placeholder " hide-placeholder"))
-                        :contentEditable true
-                        :id (str "topic-edit-body-" (name topic))
-                        :dangerouslySetInnerHTML (clj->js {"__html" topic-body})}))
+            (dom/div #js {:className (str "topic-edit-body emoji-autocomplete emojiable" (when hide-placeholder " hide-placeholder"))
+                          :id (str "topic-edit-body-" (name topic))
+                          :contentEditable true
+                          :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
             (dom/div {:class "topc-edit-top-box-footer"}
+              (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
+                (emoji-picker {:add-emoji-cb (fn [editor emoji]
+                                               (when (= editor (sel1 (str "div#topic-edit-body-" (name topic))))
+                                                 (force-hide-placeholder owner)))
+                               :disabled (let [headline (sel1 (str "topic-edit-headline-" (name topic)))
+                                               body     (sel1 (str "topic-edit-body-" (name topic)))]
+                                                 (not (or (= (.-activeElement js/document) headline)
+                                                          (= (.-activeElement js/document) body))))}))
               (dom/button {:class "btn-reset add-image"
                            :title (if (not image-url) "Add an image" "Replace image")
                            :type "button"

@@ -3,6 +3,12 @@
   padding-top: #{$navbar_height}px;
 }
 
+div.su-snapshot-preview {
+  div.page {
+    min-height: calc(100vh - #{$top_border_height}px);
+  }
+}
+
 div.page.snapshot-page {
   background-color: $oc_gray_6 !important;
 }
@@ -55,7 +61,6 @@ div.su-snapshot-preview {
 
   div.su-sp-content {
     padding-bottom: 20px;
-    min-height: calc(100vh);
 
     div.su-sp-company-header {
       height: 50px;

@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel1)]
             [rum.core :as rum]
             [clojure.string :as string]
             [goog.format.EmailAddress :as email]
@@ -14,6 +15,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.small-loading :as loading]
+            [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
             [org.martinklepsch.derivatives :as drv]
             [cljsjs.react.dom]
             [cljsjs.clipboard]))
@@ -139,6 +141,13 @@
      {:on-click #(delete!)}
      "x"]]])
 
+(defn email-note-did-change []
+  (let [email-notes (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.email-note])))]
+    (println "email-note-did-change" email-notes)
+    (dis/dispatch! [:input
+                    [:su-share :email :note]
+                    email-notes])))
+
 (rum/defcs email-dialog < rum/static rum/reactive (drv/drv :su-share) emoji-autocomplete
   [s {:keys [share-link]}]
   [:div
@@ -166,11 +175,23 @@
       :on-change #(dis/dispatch! [:input [:su-share :email :subject] (.. % -target -value)])
       :value (-> (drv/react s :su-share) :email :subject)}]
     [:label.block.small-caps.bold.mb2 "Your Note"]
-    [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh
-     {:type "text"
-      :on-change #(dis/dispatch! [:input [:su-share :email :note] (.. % -target -value)])
-      :value (-> (drv/react s :su-share) :email :note)
-      :placeholder "Optional note to go with this update."}]]])
+    [:div.npt.group
+      [:div.domine.p1.col-12.emoji-autocomplete.ta-mh.no-outline.emojiable.email-note
+       {:content-editable true
+        :on-key-down #(email-note-did-change)
+        :placeholder "Optional note to go with this update."}]
+      [:div.group
+        {:style {:min-height "25px"}}
+        [:div.left
+          {:style {:color "rgba(78, 90, 107, 0.5)"}}
+          (emoji-picker {:add-emoji-cb (fn [_] (email-note-did-change))})]]]]])
+
+(defn slack-note-did-change []
+  (let [slack-notes (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.slack-note])))]
+    (println "slack-note-did-change" slack-notes)
+    (dis/dispatch! [:input
+                    [:su-share :slack :note]
+                    slack-notes])))
 
 (rum/defc slack-dialog < rum/static emoji-autocomplete
   []
@@ -178,10 +199,16 @@
    (modal-title "Share to Your Slack Team" :slack)
    [:div.p3
     [:label.block.small-caps.bold.mb2 "Your Note"]
-    [:textarea.domine.npt.p1.col-12.emoji-autocomplete.ta-mh
-     {:type "text"
-      :on-change #(dis/dispatch! [:input [:su-share :slack :note] (.. % -target -value)])
-      :placeholder "Optional note to go with this update."}]]])
+    [:div.npt.group
+      [:div.domine.p1.col-12.emoji-autocomplete.ta-mh.no-outline.emojiable.slack-note
+        {:content-editable true
+         :placeholder "Optional note to go with this update."
+         :on-key-down #(slack-note-did-change)}]
+      [:div.group
+        {:style {:min-height "25px"}}
+        [:div.left
+          {:style {:color "rgba(78, 90, 107, 0.5)"}}
+          (emoji-picker {:add-emoji-cb (fn [_] (slack-note-did-change))})]]]]])
 
 (rum/defcs link-dialog < (rum/local false ::copied)
                          (rum/local false ::clipboard)
