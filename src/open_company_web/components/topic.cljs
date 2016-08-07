@@ -56,7 +56,8 @@
       (start-foce-click owner))))
 
 (defn block-a-expand []
-  (.on (js/$ "div.topic-body a") "click" #(.stopPropagation %)))
+  (when-not (utils/is-test-env?)
+    (.on (js/$ "div.topic-body a") "click" #(.stopPropagation %))))
 
 (defcomponent topic-internal [{:keys [topic-data
                                       section
