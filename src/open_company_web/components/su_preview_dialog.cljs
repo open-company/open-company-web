@@ -177,6 +177,7 @@
       [:div.domine.p1.col-12.emoji-autocomplete.ta-mh.no-outline.emojiable.email-note
        {:content-editable true
         :on-key-down #(email-note-did-change)
+        :on-key-up #(email-note-did-change)
         :placeholder "Optional note to go with this update."}]
       [:div.group
         {:style {:min-height "25px"}}
@@ -200,7 +201,8 @@
       [:div.domine.p1.col-12.emoji-autocomplete.ta-mh.no-outline.emojiable.slack-note
         {:content-editable true
          :placeholder "Optional note to go with this update."
-         :on-key-down #(slack-note-did-change)}]
+         :on-key-down #(slack-note-did-change)
+         :on-key-up #(slack-note-did-change)}]
       [:div.group
         {:style {:min-height "25px"}}
         [:div.left
