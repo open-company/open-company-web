@@ -290,7 +290,8 @@
                         :style {:display "none"}
                         :type "file"
                         :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
-            (dom/div {:class "left mr2"}
+            (dom/div {:class "left mr2"
+                      :style {:display (if (nil? file-upload-state) "block" "none")}}
               (emoji-picker {:add-emoji-cb (fn [editor emoji]
                                              (when (= editor (sel1 (str "div#foce-body-" (name section-kw))))
                                                (force-hide-placeholder owner)))
