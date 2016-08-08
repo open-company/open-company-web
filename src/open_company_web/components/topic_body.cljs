@@ -39,4 +39,4 @@
                                            :chart-size {:width  (if (responsive/is-mobile) 300 480)
                                                         :height (if (responsive/is-mobile) 174 295)}}}))
         (dom/div #js {:className "topic-body-inner group"
-                      :dangerouslySetInnerHTML (clj->js {"__html" (str section-body "<p style='height:1px;margin-top:0px;padding-top:0px;'> </p>")})})))))
+                      :dangerouslySetInnerHTML section-body})))))

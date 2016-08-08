@@ -260,9 +260,11 @@
          with-title {:title (om/get-state owner :title)}
          headline (utils/emoji-images-to-unicode (.-innerHTML headline-node))
          with-headline (merge with-title {:headline headline})
-         with-header-image (merge with-headline {:image-url (om/get-state owner :image-url) :image-width (om/get-state owner :image-width) :image-height (om/get-state owner :image-height)})
+         with-header-image (merge with-headline {:image-url (om/get-state owner :image-url)
+                                                 :image-width (or (om/get-state owner :image-width) 0)
+                                                 :image-height (or (om/get-state owner :image-height) 0)})
          body (utils/emoji-images-to-unicode (.-innerHTML body-node))
-         with-body (merge with-header-image (if is-data-topic {:notes {:body body}} {:body body}))
+         with-body (merge with-header-image {:body body})
          with-finances-data (if (= topic-kw :finances)
                               (merge with-body {:data (finances-clean-data (om/get-state owner :finances-data))})
                               with-body)
@@ -369,15 +371,13 @@
       {:has-changes (or (not= (:image-url current-topic-data) (:image-url topic-data))
                         (not= (:title current-topic-data) (:title topic-data))
                         (not= (:headline current-topic-data) (:headline topic-data))
-                        (not= (:body current-topic-data) (:body topic-data))
-                        (not= (:body (:notes current-topic-data)) (:body (:notes topic-data))))
+                        (not= (:body current-topic-data) (:body topic-data)))
        :title (:title topic-data)
        :headline (utils/emojify (:headline topic-data))
        :image-url (:image-url topic-data)
        :image-width (:image-width topic-data)
        :image-height (:image-height topic-data)
        :body (utils/emojify (:body topic-data))
-       :notes (:notes topic-data)
        :show-title-counter (:show-title-counter current-state)
        :medium-editor (:medium-editor current-state)
        :history-listener-id (:history-listener-id current-state)
@@ -472,11 +472,9 @@
       (let [new-state (get-state owner next-props (om/get-state owner))
             headline-el (sel1 (str "div#topic-edit-headline-" (name (:topic next-props))))
             body-el (sel1 (str "div#topic-edit-body-" (name (:topic next-props))))
-            body (if (#{:finances :growth} (keyword topic)) (:body (:notes new-state)) (:body new-state))]
+            body (:body new-state)]
         (set! (.-innerHTML headline-el) (gobj/get (:headline new-state) "__html"))
-        (if (#{:finances :growth} (keyword topic))
-          (set! (.-innerHTML body-el) (gobj/get (:body (:notes new-state)) "__html"))
-          (set! (.-innerHTML body-el) (gobj/get (:body new-state) "__html")))
+        (set! (.-innerHTML body-el) (gobj/get (:body new-state) "__html"))
         (om/set-state! owner new-state))
       (utils/after 200 #(focus-headline owner)))
     ; goes hidden
@@ -667,7 +665,7 @@
             (dom/div #js {:className (str "topic-edit-body emoji-autocomplete emojiable" (when hide-placeholder " hide-placeholder"))
                           :id (str "topic-edit-body-" (name topic))
                           :contentEditable true
-                          :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
+                          :dangerouslySetInnerHTML topic-body})
             (dom/div {:class "topc-edit-top-box-footer"}
               (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
                 (emoji-picker {:add-emoji-cb (fn [editor emoji]
