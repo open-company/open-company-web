@@ -1,8 +1,10 @@
 div.fullscreen-topic {
   width: 100%;
   height: 100%;
-  overflow: auto;
   background-color: white;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
 
   &.initial {
     opacity: 0;
@@ -23,6 +25,7 @@ div.fullscreen-topic {
   div.btd-container{
     height: 50px;
     margin: 0 auto;
+    width: 100vw;
 
     div.back-to-dashboard-row {
       z-index: 1040;
@@ -68,7 +71,7 @@ div.fullscreen-topic {
       padding-top: 2px;
 
       @include mobile(){
-        margin-top: 40px;
+        margin-bottom: 40px;
       }
 
       div.fullscreen-topic-top-box{

@@ -195,13 +195,13 @@
       (set! (.-scrollTop (.-body js/document)) 0)
       (reset! scrolled-to-top true))
     (when (and (not (utils/is-test-env?))
-               (responsive/user-agent-mobile?))
+               (not (responsive/user-agent-mobile?)))
       (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))]
         (om/set-state! owner :kb-listener kb-listener))))
 
   (will-unmount [_]
     (when (and (not (utils/is-test-env?))
-               (responsive/user-agent-mobile?))
+               (not (responsive/user-agent-mobile?)))
       (events/unlistenByKey (om/get-state owner :kb-listener))))
 
   (will-receive-props [_ next-props]
@@ -255,6 +255,7 @@
                             2 (str (+ (* card-width 2) 20 60) "px")
                             1 (if (> ww 413) (str card-width "px") "auto"))]
       (dom/div {:class "topic-list group"
+                :style {:margin-top (if selected-topic "0px" "84px")}
                 :key "topic-list"}
         ;; Activate sharing mode button
         (when (and (not (responsive/is-mobile))
