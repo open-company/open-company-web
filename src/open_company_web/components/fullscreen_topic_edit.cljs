@@ -667,7 +667,7 @@
             (dom/div #js {:className (str "topic-edit-body emoji-autocomplete emojiable" (when hide-placeholder " hide-placeholder"))
                           :id (str "topic-edit-body-" (name topic))
                           :contentEditable true
-                          :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
+                          :dangerouslySetInnerHTML topic-body})
             (dom/div {:class "topc-edit-top-box-footer"}
               (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
                 (emoji-picker {:add-emoji-cb (fn [editor emoji]
