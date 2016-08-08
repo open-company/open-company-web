@@ -33,6 +33,7 @@
    [:input.npt.mr1.p1.flex-auto
     {:type "text",
      :value @(::topic-title s)
+     :max-length 20
      :on-change #(reset! (::topic-title s) (.. % -target -value))
      :style {:font-size "16px"}
      :placeholder "Custom topic"}]
