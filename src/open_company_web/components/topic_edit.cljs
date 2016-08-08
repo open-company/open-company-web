@@ -81,7 +81,7 @@
         (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))
         (om/set-state! owner :negative-headline-char-count (neg? remaining-chars))))))
 
-(defn check-headline-count [owner e]
+(defn check-headline-count [owner e has-changes]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
     (let [headline-value (.-innerText headline)]
       (when (and (not= (.-keyCode e) 8)
@@ -95,7 +95,8 @@
                  (not= (.-keyCode e) 39)
                  (>= (count headline-value) headline-max-length))
         (.preventDefault e))))
-  (headline-on-change owner))
+  (when has-changes
+    (headline-on-change owner)))
 
 (defn img-on-load [owner img]
   (om/set-state! owner :has-changes true)
@@ -268,11 +269,11 @@
                         :key "foce-headline"
                         :placeholder "Headline"
                         :contentEditable true
-                        :onKeyUp   #(check-headline-count owner %)
-                        :onKeyDown #(check-headline-count owner %)
-                        :onFocus    #(check-headline-count owner %)
+                        :onKeyUp   #(check-headline-count owner % true)
+                        :onKeyDown #(check-headline-count owner % true)
+                        :onFocus    #(check-headline-count owner % false)
                         :onBlur #(do
-                                    (check-headline-count owner %)
+                                    (check-headline-count owner % false)
                                     (om/set-state! owner :char-count nil))
                         :dangerouslySetInnerHTML initial-headline})
           (dom/div #js {:className "topic-body emoji-autocomplete emojiable"
