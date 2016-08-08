@@ -521,7 +521,7 @@
         (om/set-state! owner :history-listener-id listener))))
 
   (did-update [_ _ prev-state]
-    (when-not (om/get-state owner :medium-editor)
+    (when-not (om/get-state owner :body-medium-editor)
       (setup-medium-editor owner data)))
 
   (render-state [_ {:keys [has-changes
