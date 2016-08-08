@@ -77,7 +77,7 @@
                 (= topic "finances")
                 (om/build topic-finances chart-data {:opts chart-opts}))))
           (dom/div {:class "topic-body"
-                  :dangerouslySetInnerHTML (utils/emojify (utils/get-topic-body topic-data topic))})
+                  :dangerouslySetInnerHTML (utils/emojify (:body topic-data))})
           (when-not hide-history-navigation
             (om/build topic-attribution data {:opts options})))))))
 

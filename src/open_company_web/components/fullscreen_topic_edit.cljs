@@ -376,7 +376,7 @@
        :image-url (:image-url topic-data)
        :image-width (:image-width topic-data)
        :image-height (:image-height topic-data)
-       :body (utils/emojify (utils/get-topic-body topic-data topic))
+       :body (utils/emojify (:body topic-data))
        :notes (:notes topic-data)
        :show-title-counter (:show-title-counter current-state)
        :medium-editor (:medium-editor current-state)
@@ -552,7 +552,7 @@
     (let [topic-kw (keyword topic)
           is-data-topic (#{:finances :growth} topic-kw)
           title-length-limit 20
-          topic-body (utils/emojify (if-not (:placeholder topic-data) (utils/get-topic-body topic-data topic-kw) ""))
+          topic-body (utils/emojify (if-not (:placeholder topic-data) (:body topic-data) ""))
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height utils/overlay-max-win-height)
           max-height (min (- 650 126) (- win-height 126))

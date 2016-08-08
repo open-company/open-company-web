@@ -2,7 +2,6 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]))
@@ -11,7 +10,7 @@
 
   (render [_]
     (let [section-kw (keyword section)
-          section-body (utils/get-topic-body section-data section-kw)]
+          section-body (:body section-data)]
       ;; Topic body
       (dom/div {:class "topic-body"}
 

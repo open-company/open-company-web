@@ -150,7 +150,7 @@
   (init-state [_]
     (let [topic      (dis/foce-section-key)
           topic-data (dis/foce-section-data)
-          body       (utils/get-topic-body topic-data topic)]
+          body       (:body topic-data)]
       {:initial-headline (utils/emojify (:headline topic-data))
        :body-placeholder (if (:placeholder topic-data) body "")
        :initial-body  (utils/emojify (if (:placeholder topic-data) "" body))
@@ -165,7 +165,7 @@
     (let [topic        (dis/foce-section-key)
           company-data (dis/company-data)
           topic-data   (get company-data (keyword topic))
-          body         (utils/get-topic-body topic-data topic)]
+          body         (:body topic-data)]
       (om/set-state! owner :body-placeholder (if (:placeholder topic-data) body ""))))
 
   (will-unmount [_]
@@ -228,7 +228,7 @@
                                   (and (= section-kw :growth)
                                        (utils/no-growth-data? growth-data)))
           image-header        (:image-url topic-data)
-          topic-body          (utils/get-topic-body topic-data section)]
+          topic-body          (:body topic-data)]
       ; set the onbeforeunload handler only if there are changes
       (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
