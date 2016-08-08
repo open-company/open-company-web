@@ -14,21 +14,18 @@
   (when-not (utils/event-inside? e (sel1 [:div.emoji-picker]))
     (reset! (::visible s) false)))
 
-(def default-emojiable-class "emojiable")
+(def emojiable-class "emojiable")
 
-(defn is-emojiable-focused [editor-class]
-  (>= (.indexOf (.-className (.-activeElement js/document)) editor-class) 0))
-
-(defn save-caret-position [s editor-class]
+(defn save-caret-position [s]
   (let [caret-pos (::caret-pos s)]
-    (if (is-emojiable-focused editor-class)
+    (if (>= (.indexOf (.-className (.-activeElement js/document)) emojiable-class) 0)
       (do (reset! (::last-active-element s) (.-activeElement js/document))
         (if (.-getSelection js/window)
           (reset! caret-pos (js/window.getSelection))
           (reset! caret-pos (js/document.selection))))
       (reset! caret-pos nil))))
 
-(defn replace-with-emoji [caret-pos editor-class emoji]
+(defn replace-with-emoji [caret-pos emoji]
   (when @caret-pos
     (let [unicode-str (googobj/get emoji "unicode")
           unicodes  (clojure.string/split unicode-str #"-")
@@ -37,37 +34,48 @@
           new-html  (str "<img class=\"emojione\" alt=\"" unicode-c "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/" unicode-str ".png?" (googobj/get js/emojione "cacheBustParam") "\"/>")]
       (js/pasteHtmlAtCaret new-html @caret-pos false))))
 
+(defn check-focus [s _]
+  (let [active-element (googobj/get js/document "activeElement")]
+    (reset! (::disabled s) (< (.indexOf (.-className active-element) emojiable-class) 0))))
+
 (rum/defcs emoji-picker <
   (rum/local false ::visible)
   (rum/local false ::caret-pos)
   (rum/local false ::last-active-element)
+  (rum/local false ::disabled)
   {:did-mount (fn [s] (when-not (utils/is-test-env?)
-                        (let [click-listener (events/listen (.-body js/document) EventType/CLICK (partial on-click-out s))]
-                          (assoc s ::click-listener click-listener))))
+                        (let [click-listener (events/listen (.-body js/document) EventType/CLICK (partial on-click-out s))
+                              focusin (events/listen js/document EventType/FOCUSIN (partial check-focus s))
+                              focusout (events/listen js/document EventType/FOCUSOUT (partial check-focus s))]
+                          (merge s {::click-listener click-listener
+                                    ::focusin-listener focusin
+                                    ::focusout-listener focusout}))))
    :will-unmount (fn [s] (events/unlistenByKey (::click-listener s))
-                         (dissoc s ::click-listener))}
+                         (events/unlistenByKey (::focusin-listener s))
+                         (events/unlistenByKey (::focusout-listener s))
+                         (dissoc s ::click-listener ::focusin-listener ::focusout-listener))}
   "Render an emoji button that reveal a picker for emoji.
    It will add the selected emoji in place of the current selection if
-   the current activeElement has the class `emojiable` or the custom class
-   passed via component props in :editor-class."
-  [s {:keys [emojiable-class add-emoji-cb disabled]}]
-  (let [fix-emojiable-class (or emojiable-class default-emojiable-class)
-        visible (::visible s)
+   the current activeElement has the class `emojiable`."
+  [s {:keys [add-emoji-cb]}]
+  (let [visible (::visible s)
         caret-pos (::caret-pos s)
-        last-active-element (::last-active-element s)]
+        last-active-element (::last-active-element s)
+        disabled (::disabled s)]
     [:div.emoji-picker.relative
       {:style {:width "15px"
                :z-index 1020
                :height "15px"}}
       [:button
-        {:class (str "emoji-button btn-reset" (when disabled " disabled"))
+        {:class (str "emoji-button btn-reset" (when @disabled " disabled"))
          :style {:font-size "15px"}
          :type "button"
-         :on-mouse-down #(save-caret-position s fix-emojiable-class)
+         :on-mouse-down #(save-caret-position s)
          :on-click #(do
                       (utils/event-stop %)
-                      (when @caret-pos
-                        (reset! visible true)))}
+                      (if (and @caret-pos (not @visible))
+                        (reset! visible true)
+                        (reset! visible false)))}
          [:i.fa.fa-smile-o]]
       [:div.picker-container.absolute
         {:style {:display (if @visible "block" "none")
@@ -75,7 +83,7 @@
                  :left "0"}}
         (when-not (utils/is-test-env?)
           (react-utils/build js/EmojionePicker {:search "" :onChange (fn [emoji]
-                                                                         (replace-with-emoji caret-pos fix-emojiable-class emoji)
+                                                                         (replace-with-emoji caret-pos emoji)
                                                                          (reset! visible false)
                                                                          (.focus @last-active-element)
                                                                          (when add-emoji-cb

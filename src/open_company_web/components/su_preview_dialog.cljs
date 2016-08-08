@@ -143,7 +143,6 @@
 
 (defn email-note-did-change []
   (let [email-notes (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.email-note])))]
-    (println "email-note-did-change" email-notes)
     (dis/dispatch! [:input
                     [:su-share :email :note]
                     email-notes])))
@@ -179,6 +178,7 @@
       [:div.domine.p1.col-12.emoji-autocomplete.ta-mh.no-outline.emojiable.email-note
        {:content-editable true
         :on-key-down #(email-note-did-change)
+        :on-key-up #(email-note-did-change)
         :placeholder "Optional note to go with this update."}]
       [:div.group
         {:style {:min-height "25px"}}
@@ -188,7 +188,6 @@
 
 (defn slack-note-did-change []
   (let [slack-notes (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.slack-note])))]
-    (println "slack-note-did-change" slack-notes)
     (dis/dispatch! [:input
                     [:su-share :slack :note]
                     slack-notes])))
@@ -203,7 +202,8 @@
       [:div.domine.p1.col-12.emoji-autocomplete.ta-mh.no-outline.emojiable.slack-note
         {:content-editable true
          :placeholder "Optional note to go with this update."
-         :on-key-down #(slack-note-did-change)}]
+         :on-key-down #(slack-note-did-change)
+         :on-key-up #(slack-note-did-change)}]
       [:div.group
         {:style {:min-height "25px"}}
         [:div.left

@@ -60,10 +60,10 @@
                   "editableInput"
                   (fn [event editable]
                     (om/set-state! owner :has-changes true)
-                    (let [inner-html (.-innerHTML body-el)]
+                    (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
                       (dis/dispatch! [:foce-input (if (#{:finances :growth} section-kw)
-                                                    {:notes {:body (.-innerHTML body-el)}}
-                                                    {:body (.-innerHTML body-el)})]))
+                                                    {:notes {:body emojied-body}}
+                                                    {:body emojied-body})]))
                     (let [inner-text (.-innerText body-el)]
                       (om/set-state! owner :char-count (if (> (count inner-text) 500) "Extended\nlength" nil)))))
       (om/set-state! owner :body-editor body-editor))
@@ -72,12 +72,14 @@
 (defn headline-on-change [owner]
   (om/set-state! owner :has-changes true)
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
-    (dis/dispatch! [:foce-input {:headline (.-innerHTML headline)}])
-    (let [headline-text   (.-innerText headline)
-          remaining-chars (- headline-max-length (count headline-text))]
-      (om/set-state! owner :char-count remaining-chars)
-      (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))
-      (om/set-state! owner :negative-headline-char-count (neg? remaining-chars)))))
+    (let [headline-innerHTML (.-innerHTML headline)
+          emojied-headline (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+      (dis/dispatch! [:foce-input {:headline emojied-headline}])
+      (let [headline-text   (.-innerText headline)
+            remaining-chars (- headline-max-length (count headline-text))]
+        (om/set-state! owner :char-count remaining-chars)
+        (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))
+        (om/set-state! owner :negative-headline-char-count (neg? remaining-chars))))))
 
 (defn check-headline-count [owner e]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
