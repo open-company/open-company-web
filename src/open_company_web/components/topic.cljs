@@ -32,8 +32,8 @@
 
 (defcomponent topic-headline [data owner]
   (render [_]
-    (dom/div {:class (str "topic-headline-inner" (when (:placeholder data) " italic"))
-              :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
+    (dom/div #js {:className (str "topic-headline-inner" (when (:placeholder data) " italic"))
+                  :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
 
 (defn fullscreen-topic [owner selected-metric force-editing & [e]]
   (when (not (om/get-props owner :foce-active))
@@ -134,8 +134,8 @@
                 (utils/in? (:route @router/path) "su-snapshot"))
           (dom/div {:class "left"
                     :style {:margin-bottom "28px"}}
-            (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic data nil false))))
-          (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic data nil false)) {:opts options}))))))
+            (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic owner nil false))))
+          (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic owner nil false)) {:opts options}))))))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")

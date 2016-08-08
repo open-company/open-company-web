@@ -18,8 +18,10 @@
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
+            [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [goog.dom :as gdom]
+            [goog.object :as googobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
@@ -43,6 +45,12 @@
         topic-click-cb (:topic-click options)]
     (topic-click-cb nil true)))
 
+(defn force-hide-placeholder [owner]
+  (let [editor       (om/get-state owner :body-editor)
+        section-name (name (om/get-props owner :section))
+        body-el      (sel1 [(str "div#foce-body-" section-name)])]
+    (utils/medium-editor-hide-placeholder editor body-el)))
+
 (defn setup-edit [owner]
   (when-let* [section-kw   (keyword (om/get-props owner :section))
               section-name (name section-kw)
@@ -52,23 +60,26 @@
                   "editableInput"
                   (fn [event editable]
                     (om/set-state! owner :has-changes true)
-                    (let [inner-html (.-innerHTML body-el)]
+                    (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
                       (dis/dispatch! [:foce-input (if (#{:finances :growth} section-kw)
-                                                    {:notes {:body (.-innerHTML body-el)}}
-                                                    {:body (.-innerHTML body-el)})]))
+                                                    {:notes {:body emojied-body}}
+                                                    {:body emojied-body})]))
                     (let [inner-text (.-innerText body-el)]
-                      (om/set-state! owner :char-count (if (> (count inner-text) 500) "Extended\nlength" nil))))))
+                      (om/set-state! owner :char-count (if (> (count inner-text) 500) "Extended\nlength" nil)))))
+      (om/set-state! owner :body-editor body-editor))
     (js/emojiAutocomplete)))
 
 (defn headline-on-change [owner]
   (om/set-state! owner :has-changes true)
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
-    (dis/dispatch! [:foce-input {:headline (.-innerHTML headline)}])
-    (let [headline-text   (.-innerText headline)
-          remaining-chars (- headline-max-length (count headline-text))]
-      (om/set-state! owner :char-count remaining-chars)
-      (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))
-      (om/set-state! owner :negative-headline-char-count (neg? remaining-chars)))))
+    (let [headline-innerHTML (.-innerHTML headline)
+          emojied-headline (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+      (dis/dispatch! [:foce-input {:headline emojied-headline}])
+      (let [headline-text   (.-innerText headline)
+            remaining-chars (- headline-max-length (count headline-text))]
+        (om/set-state! owner :char-count remaining-chars)
+        (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))
+        (om/set-state! owner :negative-headline-char-count (neg? remaining-chars))))))
 
 (defn check-headline-count [owner e]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
@@ -140,9 +151,9 @@
     (let [topic      (dis/foce-section-key)
           topic-data (dis/foce-section-data)
           body       (utils/get-topic-body topic-data topic)]
-      {:initial-headline (:headline topic-data)
+      {:initial-headline (utils/emojify (:headline topic-data))
        :body-placeholder (if (:placeholder topic-data) body "")
-       :initial-body  (if (:placeholder topic-data) "" body)
+       :initial-body  (utils/emojify (if (:placeholder topic-data) "" body))
        :char-count nil
        :char-count-alert false
        :has-changes false
@@ -252,32 +263,41 @@
                                     (om/set-state! owner :char-count remaining-chars)
                                     (om/set-state! owner :char-count-alert (< remaining-chars title-alert-limit)))})
           ;; Topic headline
-          (dom/div {:class "topic-headline-inner emoji-autocomplete"
-                    :id (str "foce-headline-" (name section))
-                    :key "foce-headline"
-                    :placeholder "Headline"
-                    :contentEditable true
-                    :on-key-up   #(check-headline-count owner %)
-                    :on-key-down #(check-headline-count owner %)
-                    :on-focus    #(check-headline-count owner %)
-                    :onBlur #(do
-                               (check-headline-count owner %)
-                               (om/set-state! owner :char-count nil))
-                    :dangerouslySetInnerHTML #js {"__html" initial-headline}})
-          (dom/div #js {:className "topic-body emoji-autocomplete"
+          (dom/div #js {:className "topic-headline-inner emoji-autocomplete emojiable"
+                        :id (str "foce-headline-" (name section))
+                        :key "foce-headline"
+                        :placeholder "Headline"
+                        :contentEditable true
+                        :onKeyUp   #(check-headline-count owner %)
+                        :onKeyDown #(check-headline-count owner %)
+                        :onFocus    #(check-headline-count owner %)
+                        :onBlur #(do
+                                    (check-headline-count owner %)
+                                    (om/set-state! owner :char-count nil))
+                        :dangerouslySetInnerHTML initial-headline})
+          (dom/div #js {:className "topic-body emoji-autocomplete emojiable"
                         :id (str "foce-body-" (name section))
                         :key "foce-body"
                         :ref "topic-body"
-                        :data-placeholder body-placeholder
                         :placeholder body-placeholder
+                        :data-placeholder body-placeholder
                         :contentEditable true
                         :style #js {:minHeight (if (:placeholder topic-data) "100px" "0px")}
-                        :dangerouslySetInnerHTML #js {"__html" initial-body}})
+                        :onBlur #(om/set-state! owner :char-count nil)
+                        :dangerouslySetInnerHTML initial-body})
           (dom/div {:class "topic-foce-buttons group"}
             (dom/input {:id "foce-file-upload-ui--select-trigger"
                         :style {:display "none"}
                         :type "file"
                         :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
+            (dom/div {:class "left mr2"}
+              (emoji-picker {:add-emoji-cb (fn [editor emoji]
+                                             (when (= editor (sel1 (str "div#foce-body-" (name section-kw))))
+                                               (force-hide-placeholder owner)))
+                             :disabled (let [headline (sel1 (str "#foce-headline-" (name section)))
+                                             body     (sel1 (str "#foce-body-" (name section)))]
+                                         (not (or (= (.-activeElement js/document) headline)
+                                                  (= (.-activeElement js/document) body))))}))
             (dom/button {:class "btn-reset camera left"
                          :title (add-image-tooltip image-header)
                          :type "button"

@@ -39,6 +39,7 @@
     [cljsjs/hammer "2.0.4-5"] ; Touch handler http://hammerjs.github.io/
     [cljsjs/emojione "2.1.4-1"] ; Emojione http://emojione.com
     [cljsjs/clipboard "1.5.9-0"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
+    [cljsjs/emojione-picker "0.3.6-1"] ; EmojionePicker cljsjs package https://github.com/tommoor/emojione-picker
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"]
     [lockedon/if-let "0.1.0"]]) ; More than one binding for if/when macros https://github.com/LockedOn/if-let
 
@@ -61,20 +62,28 @@
          '[adzerk.boot-reload :refer [reload]]
          '[tolitius.boot-check :as check]
          '[deraen.boot-sass :refer [sass]]
+         '[medley.core :as med]
          '[io.perun :as p]
          '[boot.util :as util])
 
 (deftask from-jars
   "Import files from jars (e.g. CLJSJS) and move them to the desired location in the fileset."
   [i imports IMPORT #{[sym str str]} "Tuples describing imports: [jar-symbol path-in-jar target-path]"]
-  (let [add-jar-args (into {} (for [[j p]   imports] [j (re-pattern (str "^" p "$"))]))
+  (let [re-union     (fn [paths] (re-pattern (clojure.string/join "|" (map #(str "^" % "$") paths))))
+        add-jar-args (med/map-vals #(re-union (map second %)) (group-by first imports))
         move-args    (into {} (for [[_ p t] imports] [(re-pattern (str "^" p "$")) t]))]
     (sift :add-jar add-jar-args :move move-args)))
 
 (task-options!
  from-jars {:imports #{['cljsjs/emojione
-                        "cljsjs/emojione/common/sprites/emojione.sprites.svg"
-                        "public/img/emojione.sprites.svg"]}})
+                        "cljsjs/emojione/common/css/emojione.css"
+                        "public/css/emojione.css"]
+                       ['cljsjs/emojione
+                        "cljsjs/emojione/common/css/emojione.min.css"
+                        "public/css/emojione.min.css"]
+                       ['cljsjs/emojione-picker
+                        "cljsjs/emojione-picker/common/emojione-picker.css"
+                        "public/css/emojione-picker.css"]}})
 
 ;; We use a bunch of edn files in `resources/pages` to declare a "page"
 ;; these edn files can hold additional information about the page such

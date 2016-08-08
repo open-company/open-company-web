@@ -675,15 +675,16 @@
 (defn unicode-emojis [txt]
   (js/emojione.shortnameToUnicode txt))
 
+(defn unicode-char [unicode]
+  (js/encodeURI (str "&#x" unicode ";")))
+
 (defn emojify
   "Take a string containing either Unicode emoji (mobile device keyboard), short code emoji (web app),
   or ASCII emoji (old skool) and convert it to HTML string ready to be added to the DOM (dangerously)
   with emoji image tags via the Emoji One lib and resources."
   [text & [plain-text]]
   ;; use an SVG sprite map
-  (set! (.-imageType js/emojione) "svg")
-  (set! (.-sprites js/emojione) true)
-  (set! (.-imagePathSVGSprites js/emojione) "/img/emojione.sprites.svg")
+  (set! (.-imageType js/emojione) "png")
   ;; convert textual emoji's into SVG elements
   (set! (.-ascii js/emojione) true)
   (let [text-string (or text "") ; handle nil
@@ -750,6 +751,25 @@
 
 (defn aspect-ration-image-height [original-width original-height final-width]
   (* (/ original-height original-width) final-width))
+
+(defn emoji-images-to-unicode [html]
+  (let [div (.createElement js/document "div")]
+    (set! (.-id div) "temp-emojing")
+    (set! (.-innerHTML div) html)
+    (.appendChild (.-body js/document) div)
+    (.replaceWith (js/$ "#temp-emojing img.emojione") (fn [_ _] (this-as this (.-alt this))))
+    (let [$div       (js/$ "#temp-emojing")
+          inner-html (.html $div)]
+      (.remove $div)
+      inner-html)))
+
+(defn medium-editor-hide-placeholder [editor editor-el]
+  (.each (js/$ (gobj/get editor "extensions"))
+    (fn [_ _]
+      (this-as this
+        (when (gobj/containsKey this "hideOnClick")
+          (let [hidePlaceholder (gobj/get this "hidePlaceholder")]
+            (hidePlaceholder editor-el)))))))
 
 (defn truncated-body [body]
   (if (is-test-env?)
