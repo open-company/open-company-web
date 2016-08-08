@@ -196,20 +196,13 @@
       (reset! scrolled-to-top true))
     (when (and (not (utils/is-test-env?))
                (responsive/user-agent-mobile?))
-      (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))
-            swipe-listener (js/Hammer (sel1 [:div#app]))];(.-body js/document))]
-        (om/set-state! owner :kb-listener kb-listener)
-        (om/set-state! owner :swipe-listener swipe-listener)
-        (.on swipe-listener "swipeleft" (fn [e] (switch-topic owner false)))
-        (.on swipe-listener "swiperight" (fn [e] (switch-topic owner true))))))
+      (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))]
+        (om/set-state! owner :kb-listener kb-listener))))
 
   (will-unmount [_]
     (when (and (not (utils/is-test-env?))
                (responsive/user-agent-mobile?))
-      (events/unlistenByKey (om/get-state owner :kb-listener))
-      (when-let [swipe-listener (om/get-state owner :swipe-listener)]
-        (.off swipe-listener "swipeleft")
-        (.off swipe-listener "swiperight"))))
+      (events/unlistenByKey (om/get-state owner :kb-listener))))
 
   (will-receive-props [_ next-props]
     (when-let* [new-topic-foce (om/get-state owner :new-topic-foce)
