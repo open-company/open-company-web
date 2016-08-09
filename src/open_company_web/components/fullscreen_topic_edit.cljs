@@ -94,7 +94,7 @@
           period (:period fixed-row)
           finances-data (om/get-state owner :finances-data)
           fixed-data (assoc finances-data period fixed-row)]
-      (om/set-state! owner :has-changes (not= finances-data fixed-data))
+      (om/set-state! owner :has-changes (or (om/get-state owner :has-changes) (not= finances-data fixed-data)))
       (om/set-state! owner :finances-data fixed-data))))
 
 (defn finances-clean-row [data]
@@ -278,7 +278,7 @@
 
 (defn headline-on-change [owner]
   (let [headline-innerHTML (.-innerHTML (sel1 [:div.topic-edit-headline]))]
-    (when (not= (om/get-state owner :headline) headline-innerHTML)
+    (when (not= (gobj/get (om/get-state owner :headline) "__html") headline-innerHTML)
       (om/set-state! owner :has-changes true))))
 
 (defn check-headline-count [owner headline-max-length e]
