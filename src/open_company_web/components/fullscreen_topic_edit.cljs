@@ -615,8 +615,6 @@
                           :onKeyUp   #(check-headline-count owner headline-length-limit %)
                           :onKeyDown #(check-headline-count owner headline-length-limit %)
                           :dangerouslySetInnerHTML headline})
-            (when is-data-topic
-              (dom/div {:class "separator"}))
             (dom/div {:class "topic-overlay-edit-data"}
               (when (= topic "finances")
                 (om/build finances-edit {:finances-data finances-data
