@@ -60,8 +60,7 @@ div.fullscreen-topic {
     }
 
     div.fullscreen-topic-internal {
-      max-width: 650px;
-      min-width: 302px;
+      width: 684px;
       margin: 30px auto;
       position: relative;
       min-height: calc(100vh - #{$navbar_height}px - 60px - 4px);
@@ -129,13 +128,6 @@ div.fullscreen-topic {
           margin-top: 10px;
           padding: 0px 26px;
         }
-      }
-
-      div.separator {
-        margin-top: 20px;
-        width: 30px;
-        height: 2px;
-        background-color: rgba(77, 89, 106, 0.2);
       }
 
       div.topic-body{
