@@ -240,16 +240,8 @@ div.fullscreen-topic-edit {
               opacity: 0;
             }
 
-            tr td.no-cell:first-child {
-              padding-top: 12px;
-              font-weight: 700;
-              font-weight: $oc_headers_font;
-              font-size: 12px;
-              letter-spacing: 1px;
-              color: rgba(78, 90, 107, 0.5);
-            }
-
             td.no-cell {
+              padding-top: 13px;
               font-weight: 700;
               font-weight: $oc_headers_font;
               font-size: 12px;
@@ -264,15 +256,11 @@ div.fullscreen-topic-edit {
               padding-top: 4px;
             }
 
-            td.no-cell, td div.comp-cell div.comp-cell-int {
+            td div.comp-cell div.comp-cell-int {
               font-weight: normal;
               font-size: 12px;
               letter-spacing: 1px;
-              color: #4e5a6b;
-            }
-
-            td.no-cell:last-child {
-              padding-top: 13px;
+              color: $oc_gray_7;
             }
 
             tr th:last-child, tr th.dark, tr td:last-child, tr td.dark {
@@ -315,7 +303,7 @@ div.fullscreen-topic-edit {
         @include rich-editor-body(rgba(78, 90, 107, 1));
         line-height: 1.8;
         font-size: 18px;
-        min-height: 100px;
+        min-height: 50px;
         margin-top: 12px !important;
         padding: 0px 26px !important;
 
