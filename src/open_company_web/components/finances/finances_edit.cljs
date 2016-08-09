@@ -36,7 +36,7 @@
           burn-rate (if (js/isNaN burn)
                       "-"
                       (if (zero? burn)
-                        (str burn-prefix "0")
+                        (str burn-prefix "-")
                         (str burn-prefix (utils/thousands-separator (utils/abs burn) currency 0))))
           runway-days (:runway finances-data)
           runway (cond
@@ -87,12 +87,12 @@
                           :period period
                           :key :costs
                           :tab-cb tab-cb}))
-        ;; Burn
+        ;; Burn / Cash flow
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new :dark true})}
           burn-rate)
         ;; Runway
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new :dark true})}
-                runway)))))
+          runway)))))
 
 (defn replace-row-in-data [data row k v]
   "Find and replace the edited row"
