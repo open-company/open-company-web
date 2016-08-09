@@ -673,22 +673,24 @@
                                                body     (sel1 (str "topic-edit-body-" (name topic)))]
                                                  (not (or (= (.-activeElement js/document) headline)
                                                           (= (.-activeElement js/document) body))))}))
-              (dom/button {:class "btn-reset add-image"
-                           :title (if (not image-url) "Add an image" "Replace image")
-                           :type "button"
-                           :data-toggle "tooltip"
-                           :data-placement "top"
-                           :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
-                           :on-click #(.click (sel1 [:input#topic-edit-upload-ui--select-trigger]))}
-                (dom/i {:class "fa fa-camera"}))
-              (dom/button {:class "btn-reset image-url"
-                           :title "Provide an image link"
-                           :type "button"
-                           :data-toggle "tooltip"
-                           :data-placement "top"
-                           :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
-                           :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
-                (dom/i {:class "fa fa-code"}))
+              (when-not is-data-topic
+                (dom/button {:class "btn-reset add-image"
+                             :title (if (not image-url) "Add an image" "Replace image")
+                             :type "button"
+                             :data-toggle "tooltip"
+                             :data-placement "top"
+                             :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
+                             :on-click #(.click (sel1 [:input#topic-edit-upload-ui--select-trigger]))}
+                  (dom/i {:class "fa fa-camera"})))
+              (when-not is-data-topic
+                (dom/button {:class "btn-reset image-url"
+                             :title "Provide an image link"
+                             :type "button"
+                             :data-toggle "tooltip"
+                             :data-placement "top"
+                             :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
+                             :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
+                  (dom/i {:class "fa fa-code"})))
               (dom/button #js {:className "btn-reset archive-button right"
                                :title "Archive this topic"
                                :type "button"
