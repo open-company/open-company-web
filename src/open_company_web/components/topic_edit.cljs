@@ -325,28 +325,31 @@
                            :style {:display (if (nil? file-upload-state) "block" "none")}
                            :on-click (partial remove-topic-click)}
                   (dom/i {:class "fa fa-archive"})))
-            (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
-                (dom/input {:type "text"
-                            :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
-                            :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
-                            :placeholder "http://site.com/img.png"
-                            :value upload-remote-url})
-                (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
-                             :class "btn-reset btn-solid"
-                             :disabled (string/blank? upload-remote-url)
-                             :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
-                  "add")
-                (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
-                             :class "btn-reset btn-outline"
-                             :on-click #(om/set-state! owner :file-upload-state nil)}
-                  "cancel"))
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
               (str file-upload-progress "%")))
           (dom/div {:class "topic-foce-footer group"}
             (dom/div {:class "divider"})
-            (dom/div {:class "topic-foce-footer-left"}
+            (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))
+                      :style {:display (if file-upload-state "block" "none")}}
+              (dom/input {:type "text"
+                          :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
+                          :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
+                          :placeholder "http://site.com/img.png"
+                          :value upload-remote-url})
+              (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                           :class "btn-reset btn-solid"
+                           :disabled (string/blank? upload-remote-url)
+                           :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
+                "add")
+              (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                           :class "btn-reset btn-outline"
+                           :on-click #(om/set-state! owner :file-upload-state nil)}
+                "cancel"))
+            (dom/div {:class "topic-foce-footer-left"
+                      :style {:display (if (nil? file-upload-state) "block" "none")}}
               (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
-            (dom/div {:class "topic-foce-footer-right"}
+            (dom/div {:class "topic-foce-footer-right"
+                      :style {:display (if (nil? file-upload-state) "block" "none")}}
               (dom/button {:class "btn-reset btn-solid"
                            :disabled (or (= file-upload-state :show-progress) negative-headline-char-count)
                            :on-click #(dis/dispatch! [:foce-save])} "SAVE")

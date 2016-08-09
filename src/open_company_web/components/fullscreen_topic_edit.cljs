@@ -669,7 +669,8 @@
                           :contentEditable true
                           :dangerouslySetInnerHTML topic-body})
             (dom/div {:class "topc-edit-top-box-footer"}
-              (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
+              (dom/div {:class "fullscreen-topic-emoji-picker left mr2"
+                        :style {:display (if (nil? file-upload-ui) "block" "none")}}
                 (emoji-picker {:add-emoji-cb (fn [editor emoji]
                                                (when (= editor (sel1 (str "div#topic-edit-body-" (name topic))))
                                                  (force-hide-placeholder owner)))
