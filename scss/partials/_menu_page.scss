@@ -47,9 +47,3 @@ body.menu-visible:not(.animating) div.page nav{
 body.animating div#app {
   min-height: 100vh;
 }
-
-@include mobile(){
-  div.page {
-    overflow-x: hidden;
-  }
-}

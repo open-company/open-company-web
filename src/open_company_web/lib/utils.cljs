@@ -700,7 +700,7 @@
 
 (defn disable-scroll []
   (dommy/add-class! (sel1 [:body]) :no-scroll)
-  (setStyle (sel1 [:div.main-scroll]) #js {:height "90vh" :overflow "hidden"}))
+  (setStyle (sel1 [:div.main-scroll]) #js {:height "100vh" :overflow "hidden"}))
 
 (defn enable-scroll []
   (dommy/remove-class! (sel1 [:body]) :no-scroll)

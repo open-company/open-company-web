@@ -301,7 +301,7 @@ div.fullscreen-topic-edit {
         }
       }
 
-      div.topic-edit-snippet {
+      div.topic-edit-body {
         @include rich-editor-body(rgba(78, 90, 107, 1));
         line-height: 1.8;
         font-size: 18px;

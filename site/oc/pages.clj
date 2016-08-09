@@ -153,6 +153,7 @@
           [:meta {:charset "utf-8"}]
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
           [:meta {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no", :name "viewport"}]
+          [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
           [:title "OpenCompany - Startup Transparency Made Simple"]
