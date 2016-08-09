@@ -519,7 +519,7 @@
         (om/set-state! owner :history-listener-id listener))))
 
   (did-update [_ _ prev-state]
-    (when-not (om/get-state owner :medium-editor)
+    (when-not (om/get-state owner :body-medium-editor)
       (setup-medium-editor owner data)))
 
   (render-state [_ {:keys [has-changes
@@ -701,6 +701,7 @@
               (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
                 (dom/input {:type "text"
                             :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
+                            :placeholder "http://site.com/img.png"
                             :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
                             :value upload-remote-url})
                 (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}

@@ -185,7 +185,7 @@
       display: relative;
 
       &:before {
-        padding-left: 1.5em;
+        padding-left: 3em;
         content: counter(item) ". ";
         counter-increment: item;
         color: $text_color;

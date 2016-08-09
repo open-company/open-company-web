@@ -29,20 +29,23 @@
 (rum/defcs custom-topic-input
   < (rum/local "" ::topic-title)
   [s submit-fn]
-  [:div.mt1.flex
-   [:input.npt.mr1.p1.flex-auto
-    {:type "text",
-     :value @(::topic-title s)
-     :on-change #(reset! (::topic-title s) (.. % -target -value))
-     :style {:font-size "16px"}
-     :placeholder "Custom topic"}]
-   [:button.btn-reset.btn-outline
-    {:disabled (string/blank? @(::topic-title s))
-     :on-click #(let [topic-name     (str "custom-" (utils/my-uuid))
-                      new-topic-data {:title @(::topic-title s)
-                                      :section topic-name
-                                      :placeholder true}]
-                  (submit-fn :progress topic-name new-topic-data))} "Add"]])
+  (let [add-disabled (string/blank? @(::topic-title s))]
+    [:div.mt1.flex
+     [:input.npt.mr1.p1.flex-auto
+      {:type "text",
+       :value @(::topic-title s)
+       :max-length 20
+       :on-change #(reset! (::topic-title s) (.. % -target -value))
+       :style {:font-size "16px"}
+       :placeholder "Custom topic"}]
+     [:button
+      {:class (str "btn-reset" (if add-disabled " btn-outline" " btn-solid"))
+       :disabled add-disabled
+       :on-click #(let [topic-name     (str "custom-" (utils/my-uuid))
+                        new-topic-data {:title @(::topic-title s)
+                                        :section topic-name
+                                        :placeholder true}]
+                    (submit-fn :progress topic-name new-topic-data))} "Add"]]))
 
 (defn chunk-topics
   "Partition the provided sequences as if they were one with `::archived` inbetween"
