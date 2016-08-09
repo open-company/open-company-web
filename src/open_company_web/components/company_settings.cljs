@@ -152,8 +152,19 @@
           ; Slug
           (dom/div {:class "small-caps bold mb1"} "DASHBOARD URL")
           (dom/div {:class "npt npt-disabled col-8 p1 mb3"} (str ls/web-server "/" (name slug)))
+
+          ;; Company logo
+          (dom/div {:class "small-caps bold mb1"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
+          (dom/input {:type "text"
+                      :value logo
+                      :id "logo"
+                      :class "npt col-10 p1 mb3"
+                      :maxLength 255
+                      :on-change #(om/set-state! owner :logo (.. % -target -value))
+                      :placeholder "http://example.com/logo.png"})
+
           ;; Currency
-          (dom/div {:class "small-caps bold mb1"} "DISPLAY CURRENCY IN")
+          (dom/div {:class "small-caps bold mb1"} "DISPLAY FINANCE & GROWTH CHART CURRENCY AS")
           (dom/select {:id "currency"
                        :value currency
                        :on-change #(om/set-state! owner :currency (.. % -target -value))
@@ -166,15 +177,6 @@
                           {:value (:code currency) :text label}
                           {:react-key (:code currency)}))))
 
-          ;; Company logo
-          (dom/div {:class "small-caps bold mb1"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
-          (dom/input {:type "text"
-                      :value logo
-                      :id "logo"
-                      :class "npt col-10 p1 mb3"
-                      :maxLength 255
-                      :on-change #(om/set-state! owner :logo (.. % -target -value))
-                      :placeholder "http://example.com/logo.png"})
           ;; Save button
           (dom/div {:class "mt2 right-align"}
             (dom/button {:class "btn-reset btn-solid"
