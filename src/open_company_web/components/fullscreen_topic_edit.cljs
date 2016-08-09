@@ -551,6 +551,7 @@
           is-data-topic (#{:finances :growth} topic-kw)
           title-length-limit 20
           topic-body (utils/emojify (if-not (:placeholder topic-data) (:body topic-data) ""))
+          topic-body-placeholder (if (:placeholder topic-data) (:body topic-data) "")
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height utils/overlay-max-win-height)
           max-height (min (- 650 126) (- win-height 126))
@@ -663,6 +664,8 @@
             (dom/div #js {:className (str "topic-edit-body emoji-autocomplete emojiable" (when hide-placeholder " hide-placeholder"))
                           :id (str "topic-edit-body-" (name topic))
                           :contentEditable true
+                          :placeholder topic-body-placeholder
+                          :data-placeholder topic-body-placeholder
                           :dangerouslySetInnerHTML topic-body})
             (dom/div {:class "topc-edit-top-box-footer"}
               (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
