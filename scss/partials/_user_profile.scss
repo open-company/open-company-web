@@ -2,10 +2,15 @@ div.user-profile {
 
   div.user-profile-internal {
     position: relative;
-    width: 509px;
-    left: 50%;
-    margin-left: -254px;
-    padding-top: 80px;
+    @include big_web(){
+      width: 509px;
+      left: 50%;
+      margin-left: -254px;
+      padding-top: 80px;
+    }
+    @include mobile{
+      padding: 20px 20px 20px 20px;
+    }
     /* 29px is the height below the user info */
     min-height: calc(100vh - 29px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px);
 
@@ -18,7 +23,9 @@ div.user-profile {
     }
 
     div.user-profile-disclaimer {
-      width: 509px;
+      @include big_web(){
+        width: 509px;
+      }
       height: 64px;
       font-size: 18px;
       line-height: 1.8;
@@ -42,8 +49,10 @@ div.user-profile {
       }
 
       div.left-column{
-        width: 50%;
-        float: left;
+        @include big_web(){
+          width: 50%;
+          float: left;
+        }
 
         div.user-profile-name {
           margin-top: 6px;
@@ -76,9 +85,11 @@ div.user-profile {
       }
 
       div.right-column {
-        float: left;
-        width: 50%;
-        padding-left: 25px;
+        @include big_web(){
+          float: left;
+          width: 50%;
+          padding-left: 25px;
+        }
 
         img.user-profile-avatar {
           margin-top: 11px;

@@ -81,7 +81,7 @@
         (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))
         (om/set-state! owner :negative-headline-char-count (neg? remaining-chars))))))
 
-(defn check-headline-count [owner e]
+(defn check-headline-count [owner e has-changes]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
     (let [headline-value (.-innerText headline)]
       (when (and (not= (.-keyCode e) 8)
@@ -95,7 +95,8 @@
                  (not= (.-keyCode e) 39)
                  (>= (count headline-value) headline-max-length))
         (.preventDefault e))))
-  (headline-on-change owner))
+  (when has-changes
+    (headline-on-change owner)))
 
 (defn img-on-load [owner img]
   (om/set-state! owner :has-changes true)
@@ -159,6 +160,14 @@
        :has-changes false
        :file-upload-state nil
        :file-upload-progress 0}))
+
+  (will-receive-props [_ next-props]
+    ;; update body placeholder when receiving data from API
+    (let [topic        (dis/foce-section-key)
+          company-data (dis/company-data)
+          topic-data   (get company-data (keyword topic))
+          body         (utils/get-topic-body topic-data topic)]
+      (om/set-state! owner :body-placeholder (if (:placeholder topic-data) body ""))))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
@@ -260,11 +269,11 @@
                         :key "foce-headline"
                         :placeholder "Headline"
                         :contentEditable true
-                        :onKeyUp   #(check-headline-count owner %)
-                        :onKeyDown #(check-headline-count owner %)
-                        :onFocus    #(check-headline-count owner %)
+                        :onKeyUp   #(check-headline-count owner % true)
+                        :onKeyDown #(check-headline-count owner % true)
+                        :onFocus    #(check-headline-count owner % false)
                         :onBlur #(do
-                                    (check-headline-count owner %)
+                                    (check-headline-count owner % false)
                                     (om/set-state! owner :char-count nil))
                         :dangerouslySetInnerHTML initial-headline})
           (dom/div #js {:className "topic-body emoji-autocomplete emojiable"
@@ -282,7 +291,8 @@
                         :style {:display "none"}
                         :type "file"
                         :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
-            (dom/div {:class "left mr2"}
+            (dom/div {:class "left mr2"
+                      :style {:display (if (nil? file-upload-state) "block" "none")}}
               (emoji-picker {:add-emoji-cb (fn [editor emoji]
                                              (when (= editor (sel1 (str "div#foce-body-" (name section-kw))))
                                                (force-hide-placeholder owner)))
@@ -319,6 +329,7 @@
                 (dom/input {:type "text"
                             :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
                             :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
+                            :placeholder "http://site.com/img.png"
                             :value upload-remote-url})
                 (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
                              :class "btn-reset btn-solid"
@@ -330,15 +341,7 @@
                              :on-click #(om/set-state! owner :file-upload-state nil)}
                   "cancel"))
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
-              (str file-upload-progress "%"))
-            (dom/button {:class "btn-reset add-content left"
-                         :title "Expanded view"
-                         :type "button"
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :style {:display (if (nil? file-upload-state) "block" "none")}
-                         :on-click (partial start-fullscreen-editing-click owner options)}
-              (dom/i {:class "fa fa-expand"})))
+              (str file-upload-progress "%")))
           (dom/div {:class "topic-foce-footer group"}
             (dom/div {:class "divider"})
             (dom/div {:class "topic-foce-footer-left"}

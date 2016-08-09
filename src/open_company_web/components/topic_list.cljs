@@ -195,21 +195,14 @@
       (set! (.-scrollTop (.-body js/document)) 0)
       (reset! scrolled-to-top true))
     (when (and (not (utils/is-test-env?))
-               (responsive/user-agent-mobile?))
-      (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))
-            swipe-listener (js/Hammer (sel1 [:div#app]))];(.-body js/document))]
-        (om/set-state! owner :kb-listener kb-listener)
-        (om/set-state! owner :swipe-listener swipe-listener)
-        (.on swipe-listener "swipeleft" (fn [e] (switch-topic owner false)))
-        (.on swipe-listener "swiperight" (fn [e] (switch-topic owner true))))))
+               (not (responsive/user-agent-mobile?)))
+      (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))]
+        (om/set-state! owner :kb-listener kb-listener))))
 
   (will-unmount [_]
     (when (and (not (utils/is-test-env?))
-               (responsive/user-agent-mobile?))
-      (events/unlistenByKey (om/get-state owner :kb-listener))
-      (when-let [swipe-listener (om/get-state owner :swipe-listener)]
-        (.off swipe-listener "swipeleft")
-        (.off swipe-listener "swiperight"))))
+               (not (responsive/user-agent-mobile?)))
+      (events/unlistenByKey (om/get-state owner :kb-listener))))
 
   (will-receive-props [_ next-props]
     (when-let* [new-topic-foce (om/get-state owner :new-topic-foce)
@@ -262,6 +255,7 @@
                             2 (str (+ (* card-width 2) 20 60) "px")
                             1 (if (> ww 413) (str card-width "px") "auto"))]
       (dom/div {:class "topic-list group"
+                :style {:margin-top (if selected-topic "0px" "84px")}
                 :key "topic-list"}
         ;; Activate sharing mode button
         (when (and (not (responsive/is-mobile))

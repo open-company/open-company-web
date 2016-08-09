@@ -24,6 +24,7 @@ $.html = function(){};
 $.each = function(){};
 $.truncate = function(){};
 $.attr = function(){};
+$.on = function(){};
 // Location
 var location = {};
 location.reload = function(){};

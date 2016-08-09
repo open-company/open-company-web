@@ -11,7 +11,6 @@
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-body :refer (topic-body)]
-            [open-company-web.components.company-header :refer [company-header]]
             [open-company-web.components.su-edit-header :refer (su-edit-header)]
             [open-company-web.components.su-edit-footer :refer (su-edit-footer)]
             [open-company-web.components.ui.link :refer (link)]
@@ -207,12 +206,6 @@
           ;; Company / user header
           (when-not (responsive/is-mobile)
             (om/build navbar data))
-            
-          ;; Company header
-          (om/build company-header {
-              :editing-topic true ; no category nav
-              :company-data company-data
-              :stakeholder-update true})
           
           (dom/div #js {:className "update-internal"
                         :ref "update-internal"}

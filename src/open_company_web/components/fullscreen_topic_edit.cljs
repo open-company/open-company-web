@@ -28,10 +28,10 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
-            [goog.object :as googobj]
+            [goog.dom :as gdom]
+            [goog.object :as gobj]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [clojure.string :as string]
-            [goog.dom :as gdom]
             [cljsjs.react.dom]))
 
 (def before-unload-message "You have unsaved edits.")
@@ -316,9 +316,15 @@
 (defn top-position [el]
   (loop [yPos 0
          element el]
-    (if element
-      (recur (+ yPos (- (.-offsetTop element) (.-scrollTop element)) (.-clientTop element))
-             (.-offsetParent element))
+    (if (and element
+         (gobj/get element "offsetTop")
+         (gobj/get element "scrollTop")
+         (gobj/get element "clientTop")
+         (gobj/get element "offsetParent"))
+      (recur (+ yPos (- (gobj/get element "offsetTop")
+                        (gobj/get element "scrollTop"))
+                     (gobj/get element "clientTop"))
+             (gobj/get element "offsetParent"))
       yPos)))
 
 (defn body-clicked [owner e]
@@ -467,10 +473,10 @@
             headline-el (sel1 (str "div#topic-edit-headline-" (name (:topic next-props))))
             body-el (sel1 (str "div#topic-edit-body-" (name (:topic next-props))))
             body (if (#{:finances :growth} (keyword topic)) (:body (:notes new-state)) (:body new-state))]
-        (set! (.-innerHTML headline-el) (googobj/get (:headline new-state) "__html"))
+        (set! (.-innerHTML headline-el) (gobj/get (:headline new-state) "__html"))
         (if (#{:finances :growth} (keyword topic))
-          (set! (.-innerHTML body-el) (googobj/get (:body (:notes new-state)) "__html"))
-          (set! (.-innerHTML body-el) (googobj/get (:body new-state) "__html")))
+          (set! (.-innerHTML body-el) (gobj/get (:body (:notes new-state)) "__html"))
+          (set! (.-innerHTML body-el) (gobj/get (:body new-state) "__html")))
         (om/set-state! owner new-state))
       (utils/after 200 #(focus-headline owner)))
     ; goes hidden
@@ -515,7 +521,7 @@
         (om/set-state! owner :history-listener-id listener))))
 
   (did-update [_ _ prev-state]
-    (when-not (om/get-state owner :medium-editor)
+    (when-not (om/get-state owner :body-medium-editor)
       (setup-medium-editor owner data)))
 
   (render-state [_ {:keys [has-changes
@@ -661,7 +667,7 @@
             (dom/div #js {:className (str "topic-edit-body emoji-autocomplete emojiable" (when hide-placeholder " hide-placeholder"))
                           :id (str "topic-edit-body-" (name topic))
                           :contentEditable true
-                          :dangerouslySetInnerHTML (clj->js {"__html" topic-body})})
+                          :dangerouslySetInnerHTML topic-body})
             (dom/div {:class "topc-edit-top-box-footer"}
               (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
                 (emoji-picker {:add-emoji-cb (fn [editor emoji]
@@ -699,6 +705,7 @@
               (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
                 (dom/input {:type "text"
                             :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
+                            :placeholder "http://site.com/img.png"
                             :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
                             :value upload-remote-url})
                 (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}

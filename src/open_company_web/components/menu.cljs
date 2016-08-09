@@ -11,6 +11,7 @@
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]
+            [open-company-web.lib.responsive :as responsive]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -51,12 +52,27 @@
     (let [listener-key (events/listen page EventType/TRANSITIONEND #(on-transition-end owner body))]
       (om/set-state! owner :transition-end-listener listener-key))))
 
+(defn body-clicked [owner e]
+  ; if the menu is open and the user click on the content (not the menu)
+  ; close the menu
+  (when (and (dommy/has-class? (.-body js/document) :menu-visible)
+             (utils/event-inside? e (sel1 [:div.page])))
+    (utils/event-stop e)
+    (toggle-menu owner true)))
+
 (defcomponent menu [data owner options]
 
   (did-mount [_]
     (when (:menu-open data)
       (let [body (sel1 [:body])]
-        (dommy/add-class! body :menu-visible))))
+        (dommy/add-class! body :menu-visible)))
+    (let [body-click-listener (events/listen (.-body js/document)
+                                             EventType/CLICK
+                                             #(body-clicked owner %))]
+      (om/set-state! owner :body-click-listener body-click-listener)))
+
+  (will-unmount [_]
+    (events/unlistenByKey (om/get-state owner :body-click-listener)))
 
   (will-receive-props [_ next-props]
     (cond
@@ -75,7 +91,8 @@
       (when (jwt/jwt)
         (dom/li {:class "menu-link"} (dom/a {:title "USER INFO" :href oc-urls/user-profile :on-click user-profile-click} "USER INFO")))
       (when (and (router/current-company-slug)
-                 (not (utils/in? (:route @router/path) "profile")))
+                 (not (utils/in? (:route @router/path) "profile"))
+                 (not (responsive/is-mobile)))
         (dom/li {:class "menu-link"} (dom/a {:title "COMPANY SETTINGS" :href (oc-urls/company-settings) :on-click company-profile-click} "COMPANY SETTINGS")))
       (when (jwt/jwt)
         (dom/li {:class "menu-link"} (dom/a {:title "SIGN OUT" :href oc-urls/logout :on-click logout-click} "SIGN OUT")))

@@ -34,8 +34,7 @@ div.topic-list{
   position: relative;
   content: "";
   padding-bottom: 20px;
-  min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
-  margin-top: #{$navbar_height}px;
+  min-height: calc(100vh - #{$footer_height}px);
 
   @include mobile(){
     background-color: #d9d9d9;
@@ -143,7 +142,7 @@ div.selected-topic-container{
   overflow-y: hidden;
   top: 0px;
   left: 0px;
-  position: fixed;
+  position: absolute;
   z-index: 1036;
   border-top: 4px solid $oc_yellow;
 

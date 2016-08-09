@@ -13,7 +13,6 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-body :refer (topic-body)]
-            [open-company-web.components.company-header :refer [company-header]]
             [open-company-web.components.ui.link :refer (link)]
             [clojure.string :as str]
             [goog.style :refer (setStyle)]))
@@ -86,12 +85,6 @@
           ;; Company / user header
           (when-not (responsive/is-mobile)
             (om/build navbar data))
-            
-          ;; Company header
-          (om/build company-header {
-              :editing-topic true ; no category nav
-              :company-data company-data
-              :stakeholder-update true})
           
           (dom/div {:class "update-internal"}
           

@@ -32,14 +32,15 @@
 
 (defcomponent topic-headline [data owner]
   (render [_]
-    (dom/div #js {:className "topic-headline-inner"
+    (dom/div #js {:className (str "topic-headline-inner" (when (:placeholder data) " italic"))
                   :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
 
 (defn fullscreen-topic [owner selected-metric force-editing & [e]]
   (when (not (om/get-props owner :foce-active))
-    (when e
+    (when (and e (not= (.-tagName (.-target e)) "A"))
       (utils/event-stop e))
     ((om/get-props owner :topic-click) selected-metric force-editing)))
+
 
 (defn start-foce-click [owner]
   (let [section-kw (keyword (om/get-props owner :section))
@@ -54,6 +55,10 @@
       (fullscreen-topic owner nil true)
       (start-foce-click owner))))
 
+(defn block-a-expand []
+  (when-not (utils/is-test-env?)
+    (.on (js/$ "div.topic-body a") "click" #(.stopPropagation %))))
+
 (defcomponent topic-internal [{:keys [topic-data
                                       section
                                       currency
@@ -62,6 +67,12 @@
                                       next-rev
                                       sharing-mode
                                       show-fast-editing] :as data} owner options]
+
+  (did-mount [_]
+    (block-a-expand))
+
+  (did-update [_ _ _]
+    (block-a-expand))
 
   (render [_]
     (let [section-kw          (keyword section)
@@ -115,7 +126,7 @@
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
-        (dom/div #js {:className "topic-body topic-body"
+        (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
                       :ref "topic-body"
                       :dangerouslySetInnerHTML (utils/emojify truncated-body)})
         ; if it's SU preview or SU show only read-more

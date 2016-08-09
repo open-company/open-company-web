@@ -9,7 +9,7 @@
             [goog.fx.dom :refer (Scroll)]
             [goog.string :as gstring]
             [goog.i18n.NumberFormat :as nf]
-            [goog.object :as googobj]
+            [goog.object :as gobj]
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
             [open-company-web.lib.cookies :as cook]
@@ -328,21 +328,17 @@
     section-with-notes))
 
 (defn fix-section 
-  "Add `:section` name, `:as-of` and `:read-only` keys to the section map"
+  "Add `:section` name and `:as-of` keys to the section map"
   [section-body section-name & [read-only force-write]]
-  (let [read-only (if force-write
-                    false
-                    (or read-only (readonly? (:links section-body)) false))
-        with-updated-at (if (contains? section-body :updated-at)
+  (let [with-updated-at (if (contains? section-body :updated-at)
                           section-body
                           (assoc section-body :updated-at (as-of-now)))
-        with-read-only (-> with-updated-at
-                        (assoc :section (name section-name))
-                        (assoc :as-of (:updated-at section-body))
-                        (assoc :read-only read-only))]
+        with-keys       (-> with-updated-at
+                          (assoc :section (name section-name))
+                          (assoc :as-of (:updated-at section-body)))]
     (if (= section-name :finances)
-      (fix-finances with-read-only)
-      with-read-only)))
+      (fix-finances with-keys)
+      with-keys)))
 
 (defn fix-sections [company-data]
   "Add section name in each section and a section sorter"
@@ -647,18 +643,20 @@
 (defonce overlay-max-win-height 670)
 
 (defn absolute-offset [element]
-  (loop [top 0
-         left 0
+  (loop [left 0
+         top 0
          el element]
-    (if-not el
+    (if-not (and el
+                 (gobj/get el "offsetTop")
+                 (gobj/get el "offsetLeft"))
       {:top top
        :left left}
-      (recur (+ top (or (.-offsetTop el) 0))
-             (+ left (or (.-offsetLeft el) 0))
+      (recur (+ left (gobj/get el "offsetLeft" 0))
+             (+ top (gobj/get el "offsetTop" 0))
              (.-offsetParent el)))))
 
 (defn medium-editor-options [placeholder hide-on-click]
-  {:toolbar #js {:buttons #js ["bold" "italic" "strikethrough" "h2" "orderedlist" "unorderedlist" "anchor"]}
+  {:toolbar #js {:buttons #js ["bold" "italic" "strikethrough" "orderedlist" "unorderedlist" "anchor"]}
    :buttonLabels "fontawesome"
    :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
    :anchor #js {;; These are the default options for anchor form,
@@ -702,7 +700,7 @@
 
 (defn disable-scroll []
   (dommy/add-class! (sel1 [:body]) :no-scroll)
-  (setStyle (sel1 [:div.main-scroll]) #js {:height "90vh" :overflow "hidden"}))
+  (setStyle (sel1 [:div.main-scroll]) #js {:height "100vh" :overflow "hidden"}))
 
 (defn enable-scroll []
   (dommy/remove-class! (sel1 [:body]) :no-scroll)
@@ -766,11 +764,11 @@
       inner-html)))
 
 (defn medium-editor-hide-placeholder [editor editor-el]
-  (.each (js/$ (googobj/get editor "extensions"))
+  (.each (js/$ (gobj/get editor "extensions"))
     (fn [_ _]
       (this-as this
-        (when (googobj/containsKey this "hideOnClick")
-          (let [hidePlaceholder (googobj/get this "hidePlaceholder")]
+        (when (gobj/containsKey this "hideOnClick")
+          (let [hidePlaceholder (gobj/get this "hidePlaceholder")]
             (hidePlaceholder editor-el)))))))
 
 (defn truncated-body [body]
