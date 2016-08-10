@@ -586,6 +586,8 @@
         (dom/div {:class "fullscreen-topic-internal group"
                   :on-click #(.stopPropagation %)}
           (dom/div {:class "fullscreen-topic-edit-top-box"}
+            
+            ;; Image
             (when image-url
               (dom/div {:class "topic-header-image"}
                 (dom/img {:src image-url})
@@ -595,28 +597,10 @@
                                           :stroke 4
                                           :color "white"
                                           :accent-color "white"}))))
-            (dom/input {:class "topic-edit-title"
-                        :id (str "topic-edit-title-" (name topic))
-                        :type "text"
-                        :placeholder "Title"
-                        :on-blur #(om/set-state! owner :char-count nil)
-                        :max-length title-length-limit
-                        :value title
-                        :on-change (fn [e]
-                                      (om/set-state! owner :char-count (- title-length-limit (count title)))
-                                      (om/set-state! owner :char-count-alert (< (- title-length-limit (count title)) title-alert-limit))
-                                      (change-value owner :title e))})
-            (dom/div #js {:className "topic-edit-headline emoji-autocomplete emojiable"
-                          :ref "topic-edit-headline"
-                          :contentEditable true
-                          :id (str "topic-edit-headline-" (name topic))
-                          :placeholder "Headline"
-                          :onBlur #(do (check-headline-count owner headline-length-limit %)
-                                        (om/set-state! owner :char-count nil))
-                          :onKeyUp   #(check-headline-count owner headline-length-limit %)
-                          :onKeyDown #(check-headline-count owner headline-length-limit %)
-                          :dangerouslySetInnerHTML headline})
-            (dom/div {:class "topic-overlay-edit-data"}
+            
+            ;; Data table
+            (when is-data-topic
+              (dom/div {:class "topic-overlay-edit-data"}
               (when (= topic "finances")
                 (om/build finances-edit {:finances-data finances-data
                                          :change-finances-cb (partial change-finances-data-cb owner)
@@ -660,13 +644,42 @@
                                 :on-click (fn [e]
                                             (.stopPropagation e)
                                             (om/set-state! owner :growth-new-metric true)
-                                            (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
+                                            (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric"))))))
+            
+            ;; Title
+            (dom/input {:class "topic-edit-title"
+                        :id (str "topic-edit-title-" (name topic))
+                        :type "text"
+                        :placeholder "Title"
+                        :on-blur #(om/set-state! owner :char-count nil)
+                        :max-length title-length-limit
+                        :value title
+                        :on-change (fn [e]
+                                      (om/set-state! owner :char-count (- title-length-limit (count title)))
+                                      (om/set-state! owner :char-count-alert (< (- title-length-limit (count title)) title-alert-limit))
+                                      (change-value owner :title e))})
+            
+            ;; Headline
+            (dom/div #js {:className "topic-edit-headline emoji-autocomplete emojiable"
+                          :ref "topic-edit-headline"
+                          :contentEditable true
+                          :id (str "topic-edit-headline-" (name topic))
+                          :placeholder "Headline"
+                          :onBlur #(do (check-headline-count owner headline-length-limit %)
+                                        (om/set-state! owner :char-count nil))
+                          :onKeyUp   #(check-headline-count owner headline-length-limit %)
+                          :onKeyDown #(check-headline-count owner headline-length-limit %)
+                          :dangerouslySetInnerHTML headline})
+            
+            ;; Body
             (dom/div #js {:className (str "topic-edit-body emoji-autocomplete emojiable" (when hide-placeholder " hide-placeholder"))
                           :id (str "topic-edit-body-" (name topic))
                           :contentEditable true
                           :placeholder topic-body-placeholder
                           :data-placeholder topic-body-placeholder
                           :dangerouslySetInnerHTML topic-body})
+            
+            ;; Icons
             (dom/div {:class "topc-edit-top-box-footer"}
               (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
                 (emoji-picker {:add-emoji-cb (fn [editor emoji]
@@ -724,6 +737,7 @@
                           :style {:display "none"}
                           :type "file"
                           :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))}))))
+      ;; Onboarding toolip
       (when (and show-first-edit-tooltip
                  (not tooltip-dismissed))
         (om/build tooltip
