@@ -57,18 +57,13 @@
       (dom/div {:class "fullscreen-topic-internal group"
                 :style #js {:width (str (- fullscreen-width 20) "px")}}
         (dom/div {:class "fullscreen-topic-top-box"}
+
+          ;; Image
           (when (:image-url topic-data)
             (dom/div {:class "topic-header-image"}
               (dom/img {:src (:image-url topic-data)})))
-          (dom/div {:class "topic-title-container group"}
-            (dom/div {:class "topic-title left"} (:title topic-data))
-            (when (and can-edit
-                       is-actual)
-              (dom/div {:class "edit-button"
-                        :on-click #((:start-editing options))}
-                (dom/i {:class "fa fa-pencil"}))))
-          (dom/div {:class "topic-headline"
-                    :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
+          
+          ;; Chart
           (when (or (= topic "growth") (= topic "finances"))
             (dom/div {:class "topic-growth-finances"}
               (cond
@@ -76,8 +71,24 @@
                 (om/build topic-growth chart-data {:opts chart-opts})
                 (= topic "finances")
                 (om/build topic-finances chart-data {:opts chart-opts}))))
+          
+          ;; Title
+          (dom/div {:class "topic-title-container group"}
+            (dom/div {:class "topic-title left"} (:title topic-data))
+            (when (and can-edit
+                       is-actual)
+              (dom/div {:class "edit-button"
+                        :on-click #((:start-editing options))}
+                (dom/i {:class "fa fa-pencil"}))))
+          
+          ;; Headline
+          (dom/div {:class "topic-headline"
+                    :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
+          ;; Body
           (dom/div {:class "topic-body"
                   :dangerouslySetInnerHTML (utils/emojify (:body topic-data))})
+          
+          ;; Attribution
           (when-not hide-history-navigation
             (om/build topic-attribution data {:opts options})))))))
 
