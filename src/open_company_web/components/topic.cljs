@@ -103,7 +103,7 @@
                                              :card-image (not is-growth-finances?)})}
             (cond
               (= section "finances")
-              (om/build topic-finances {:section-data topic-data
+              (om/build topic-finances {:section-data (utils/fix-finances topic-data)
                                         :section section
                                         :currency currency
                                         :topic-click (partial fullscreen-topic owner nil false)} {:opts chart-opts})
