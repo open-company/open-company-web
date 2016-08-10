@@ -152,7 +152,7 @@
                     #js [(js/parseFloat (.-width topic-size)) (js/parseFloat (.-height cur-size))]
                     #js [(js/parseFloat (.-width topic-size)) (js/parseFloat (.-height tr-size))]
                     anim-duration))
-    ; disappear current topic
+    ; make the current topic disappear
     (.play (Fade. cur-topic 1 0 anim-duration))
     ; appear the new topic
     (doto appear-animation
@@ -162,6 +162,7 @@
                                     {:as-of (:transition-as-of current-state)
                                      :transition-as-of nil})))
       (.play))))
+
 
 (defn get-all-sections [slug]
   (let [categories-data (:categories (slug @caches/new-sections))
