@@ -204,12 +204,23 @@ div.fullscreen-topic-edit {
 
       div.topic-overlay-edit-data {
 
-        div.finances, div.growth {
-          margin-top: 10px;
+        div.growth {
+          padding-left: 26px;
 
+          div.table-container{
+            padding: 21px 0 0 0;
+          }
+
+        }
+
+        div.finances {
           div.table-container{
             padding: 21px 11px 0px 11px;
           }
+        }
+        
+        div.finances, div.growth {
+          margin-top: 10px;
 
           table.table{
             border-spacing: 10px;
