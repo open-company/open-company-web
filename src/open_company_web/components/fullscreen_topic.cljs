@@ -205,6 +205,7 @@
        :show-save-button false
        :last-selected-metric selected-metric
        :actual-as-of actual-as-of
+       :source (:src (router/query-params))
        :edit-rand (rand 4)}))
 
   (did-mount [_]
@@ -229,7 +230,7 @@
     (when (om/get-state owner :transition-as-of)
       (animate-transition owner)))
 
-  (render-state [_ {:keys [as-of transition-as-of actual-as-of editing show-save-button data-posted last-selected-metric edit-rand] :as state}]
+  (render-state [_ {:keys [as-of transition-as-of actual-as-of source editing show-save-button data-posted last-selected-metric edit-rand] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -257,7 +258,7 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (str "fullscreen-topic" (when (:animate data) " initial"))
                     :ref "fullscreen-topic"}
-        (when-not editing
+        (when-not (or editing (= "email" source)) ; don't show back when we're editing or came here from an email
           (dom/div {:class "btd-container"
                     :style {:width (str (+ fullscreen-width 20) "px")}}
             (back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)
