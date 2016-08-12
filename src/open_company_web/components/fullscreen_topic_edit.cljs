@@ -21,7 +21,7 @@
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.components.growth.utils :as growth-utils]
-            [open-company-web.components.tooltip :refer (tooltip)]
+            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
@@ -740,7 +740,7 @@
       ;; Onboarding toolip
       (when (and show-first-edit-tooltip
                  (not tooltip-dismissed))
-        (om/build tooltip
+        (om/build onboard-tip
           {:cta "WHAT WOULD YOU LIKE TO SAY? YOU CAN ADD TEXT, EMOJI AND IMAGES."}
           {:opts {:dismiss-tooltip #(doto owner
                                       (om/set-state! :tooltip-dismissed true)

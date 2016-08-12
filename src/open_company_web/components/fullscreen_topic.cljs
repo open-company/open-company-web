@@ -1,7 +1,11 @@
 (ns open-company-web.components.fullscreen-topic
-  (:require [cljs.core.async :refer (chan put!)]
-            [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros (defcomponent)]
+  "
+  Display a topic in full screen in either display, editing or transitioning (history nav.) modes.
+
+  Handle back button, edit button, and history nav transitions.
+  "
+  (:require [om.core :as om :include-macros true]
+            [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.api :as api]
             [open-company-web.caches :as cache]
@@ -14,19 +18,14 @@
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.fullscreen-topic-edit :refer (fullscreen-topic-edit)]
             [open-company-web.components.topic-attribution :refer (topic-attribution)]
-            [open-company-web.components.ui.icon :refer (icon)]
-            [open-company-web.components.ui.small-loading :refer (small-loading)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
-            [open-company-web.components.ui.small-loading :as loading]
-            [dommy.core :as dommy :refer-macros (sel1 sel)]
-            [goog.style :refer (setStyle)]
+            [dommy.core :refer-macros (sel1)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
-            [goog.fx.dom :refer (Fade Resize Scroll)]
-            [open-company-web.lib.oc-colors :as oc-colors]))
+            [goog.fx.dom :refer (Fade Resize Scroll)]))
 
-(defn show-fullscreen-topic [owner]
+(defn- show-fullscreen-topic [owner]
   (utils/disable-scroll)
   (.play
     (new Fade (om/get-ref owner "fullscreen-topic") 0 1 utils/oc-animation-duration)))
@@ -92,7 +91,7 @@
           (when-not hide-history-navigation
             (om/build topic-attribution data {:opts options})))))))
 
-(defn start-editing [owner options]
+(defn- start-editing [owner options]
   (let [editing (om/get-state owner :editing)
         section (om/get-props owner :section)]
     (.pushState js/history nil (str "Edit " (name section)) (oc-urls/company-section-edit (router/current-company-slug) (name section)))
@@ -100,7 +99,7 @@
       ((:topic-navigation options) false)
       (om/set-state! owner :editing true))))
 
-(defn exit-editing [owner options]
+(defn- exit-editing [owner options]
   (let [editing (om/get-state owner :editing)
         section (om/get-props owner :section)]
     (.pushState js/history nil (name section) (oc-urls/company-section (router/current-company-slug) (name section)))
@@ -108,7 +107,7 @@
       ((:topic-navigation options) true)
       (om/set-state! owner :editing false))))
 
-(defn hide-fullscreen-topic [owner options & [force-fullscreen-dismiss]]
+(defn- hide-fullscreen-topic [owner options & [force-fullscreen-dismiss]]
   ; if it's in editing mode
   (let [editing (om/get-state owner :editing)]
     (exit-editing owner options)
@@ -122,25 +121,18 @@
             #((:close-overlay-cb options)))
           (.play))))))
 
-(defn esc-listener [owner options e]
+(defn- esc-listener [owner options e]
   (when (= (.-keyCode e) 27)
     (hide-fullscreen-topic owner options)))
 
-(defn remove-topic-click [owner options e]
-  (.stopPropagation e)
-  (when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
-    (let [section (om/get-props owner :section)]
-      (dis/dispatch! [:topic-archive section]))
-    (hide-fullscreen-topic owner options true)))
-
-(defn revision-navigation [owner as-of]
+(defn- revision-navigation [owner as-of]
   (let [actual-as-of (om/get-state owner :actual-as-of)
         section (name (om/get-props owner :section))]
     (if (= as-of actual-as-of)
       (.pushState js/history nil section (oc-urls/company-section (router/current-company-slug) (om/get-props owner :section)))
       (.pushState js/history nil (str section " revision " as-of) (oc-urls/company-section-revision (router/current-company-slug) (om/get-props owner :section) as-of)))))
 
-(defn animate-transition [owner]
+(defn- animate-transition [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
         tr-topic (om/get-ref owner "tr-topic")
         current-state (om/get-state owner)
@@ -176,7 +168,7 @@
                                      :transition-as-of nil}))))
       (.play))))
 
-(defn rev-click [owner e revision]
+(defn- rev-click [owner e revision]
   (when e
     (utils/event-stop e))
   (om/set-state! owner :transition-as-of (:updated-at revision)))

@@ -1,7 +1,12 @@
 (ns open-company-web.components.topic-list
+  "
+  Display either a dashboard listing of topics in 1-3 columns, or a selected topic full-screen.
+
+  Handle topic selection, topic navigation, and share initiation.
+  "
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros (defcomponent)]
+            [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
             [open-company-web.api :as api]
@@ -10,23 +15,22 @@
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.jwt :as jwt]
-            [open-company-web.lib.oc-colors :as oc-colors]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.lib.cookies :as cook]
             [open-company-web.lib.responsive :as responsive]
-            [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
-            [open-company-web.components.tooltip :refer (tooltip)]
-            [open-company-web.components.ui.icon :refer (icon)]
-            [open-company-web.components.ui.small-loading :as loading]
+            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
             [goog.fx.dom :refer (Fade Slide)]
             [cljsjs.hammer]))
 
-(defn get-new-sections-if-needed [owner]
+(def min-no-placeholder-section-enable-share 1)
+
+(def scrolled-to-top (atom false))
+
+(defn- get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
     (let [slug (keyword (router/current-company-slug))
           company-data (dispatcher/company-data)]
@@ -35,10 +39,10 @@
         (om/update-state! owner :new-sections-requested not)
         (api/get-new-sections)))))
 
-(defn get-active-topics [company-data category]
+(defn- get-active-topics [company-data category]
   (get-in company-data [:sections (keyword category)]))
 
-(defn update-active-topics [owner category-name new-topic & [section-data]]
+(defn- update-active-topics [owner category-name new-topic & [section-data]]
   (let [company-data (om/get-props owner :company-data)
         old-categories (:sections company-data)
         old-topics (get-active-topics company-data category-name)
@@ -54,14 +58,11 @@
       (api/patch-sections new-categories section-data new-topic)
       (api/patch-sections new-categories))))
 
-(defn filter-placeholder-sections [topics company-data]
-  (vec (filter #(not (:placeholder (->> % keyword (get company-data)))) topics)))
-
-(defn get-category-topics [company-data active-topics]
+(defn- get-category-topics [company-data active-topics]
   (let [topics-list   (flatten (vals active-topics))]
     (map keyword topics-list)))
 
-(defn should-show-add-topic-tooltip [company-data active-topics]
+(defn- should-show-add-topic-tooltip? [company-data active-topics]
   (let [category-topics (get-category-topics company-data active-topics)]
     (and (jwt/jwt)
          (not (:read-only company-data))
@@ -73,7 +74,7 @@
   (let [company-data (:company-data data)
         categories (:categories company-data)
         active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))
-        show-add-topic-tooltip (should-show-add-topic-tooltip company-data active-topics)
+        show-add-topic-tooltip (should-show-add-topic-tooltip? company-data active-topics)
         selected-topic (if (nil? current-state) (router/current-section) (:selected-topic current-state))]
     {:initial-active-topics active-topics
      :active-topics active-topics
@@ -93,7 +94,7 @@
      :show-share-su-tooltip (or (:show-share-su-tooltip current-state) false)
      :share-su-tooltip-dismissed (or (:share-su-tooltip-dismissed current-state) false)}))
 
-(defn topic-click [owner topic selected-metric & [force-edit]]
+(defn- topic-click [owner topic selected-metric & [force-edit]]
   (if force-edit
         (.pushState js/history nil (str "Edit " (name topic)) (oc-urls/company-section-edit (router/current-company-slug) (name topic)))
         (.pushState js/history nil (name topic) (oc-urls/company-section (router/current-company-slug) (name topic))))
@@ -103,16 +104,14 @@
   (om/set-state! owner :selected-metric selected-metric)
   (utils/after 100 #(om/set-state! owner :fullscreen-force-edit false)))
 
-(def scrolled-to-top (atom false))
-
-(defn close-overlay-cb [owner]
+(defn- close-overlay-cb [owner]
   (.pushState js/history nil "Dashboard" (oc-urls/company (router/current-company-slug)))
   (om/set-state! owner (merge (om/get-state owner) {:transitioning false
                                                     :selected-topic nil
                                                     :selected-metric nil
                                                     :fullscreen-force-edit false})))
 
-(defn switch-topic [owner is-left?]
+(defn- switch-topic [owner is-left?]
   (when (and (om/get-state owner :topic-navigation)
              (om/get-state owner :selected-topic)
              (nil? (om/get-state owner :tr-selected-topic)))
@@ -131,7 +130,7 @@
               next-topic (get (vec topics-list) next-idx)]
           (om/set-state! owner :tr-selected-topic next-topic))))))
 
-(defn kb-listener [owner e]
+(defn- kb-listener [owner e]
   (let [key-code (.-keyCode e)]
     (when (= key-code 39)
       ;next
@@ -139,14 +138,14 @@
     (when (= key-code 37)
       (switch-topic owner true))))
 
-(defn animation-finished [owner]
+(defn- animation-finished [owner]
   (let [cur-state (om/get-state owner)]
     (.pushState js/history nil (name (:tr-selected-topic cur-state)) (oc-urls/company-section (router/current-company-slug) (:tr-selected-topic cur-state)))
     (om/set-state! owner (merge cur-state {:selected-topic (:tr-selected-topic cur-state)
                                            :transitioning true
                                            :tr-selected-topic nil}))))
 
-(defn animate-selected-topic-transition [owner left?]
+(defn- animate-selected-topic-transition [owner left?]
   (let [selected-topic (om/get-ref owner "selected-topic")
         tr-selected-topic (om/get-ref owner "tr-selected-topic")
         width (responsive/fullscreen-topic-width (om/get-state owner :card-width))
@@ -159,24 +158,10 @@
     (.play (new Slide tr-selected-topic #js [(if left? (* width -1) width) 0] #js [0 0] utils/oc-animation-duration))
     (.play (new Fade tr-selected-topic 0 1 utils/oc-animation-duration))))
 
-(defn preview-and-share-click [owner e]
-  (utils/event-stop e)
-  (let [props (om/get-props owner)
-        company-data (:company-data props)
-        su-data (:stakeholder-update company-data)
-        share-selected-topics (om/get-state owner :share-selected-topics)
-        title (if (clojure.string/blank? (:title su-data))
-                (utils/su-default-title)
-                (:title su-data))]
-    (api/patch-stakeholder-update {:title title :sections share-selected-topics})
-    (om/set-state! owner :redirect-to-preview true)))
-
-(defn should-show-first-edit-tooltip [company-data category-topics]
+(defn- should-show-first-edit-tooltip? [company-data category-topics]
   ; show first edit tooltip if there is only one section and is a placeholder section
   (and (= (count category-topics) 1)
        (->> category-topics first keyword (get company-data) :placeholder)))
-
-(def min-no-placeholder-section-enable-share 1)
 
 (defcomponent topic-list [data owner options]
 
@@ -216,7 +201,7 @@
       (get-new-sections-if-needed owner))
     (let [company-data (:company-data next-props)
           topics (flatten (vals (:sections company-data)))
-          no-placeholder-sections (filter-placeholder-sections topics company-data)]
+          no-placeholder-sections (utils/filter-placeholder-sections topics company-data)]
       (when (and (:force-edit-topic next-props) (contains? company-data (keyword (:force-edit-topic next-props))))
         (om/set-state! owner :fullscreen-force-edit true)
         (om/set-state! owner :selected-topic (dispatcher/force-edit-topic)))
@@ -261,7 +246,7 @@
         (when (and (not (responsive/is-mobile))
                    (responsive/can-edit?)
                    (not (:read-only company-data))
-                   (>= (count (filter-placeholder-sections category-topics company-data)) min-no-placeholder-section-enable-share))
+                   (>= (count (utils/filter-placeholder-sections category-topics company-data)) min-no-placeholder-section-enable-share))
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
             (dom/button {:class "sharing-button"
@@ -283,7 +268,7 @@
                                             :card-width card-width
                                             :currency (:currency company-data)
                                             :animate (not transitioning)
-                                            :show-first-edit-tooltip (should-show-first-edit-tooltip company-data category-topics)}
+                                            :show-first-edit-tooltip (should-show-first-edit-tooltip? company-data category-topics)}
                                            {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                    :topic-navigation #(om/set-state! owner :topic-navigation %)}}))
             ;; Fullscreen topic for transition
@@ -318,18 +303,18 @@
                                          :update-active-topics (partial update-active-topics owner)}})
         (when (and (not add-topic-tooltip-dismissed)
                    show-add-topic-tooltip)
-          (om/build tooltip
+          (om/build onboard-tip
             {:cta (str "HI " (jwt/get-key :name) ", WELCOME TO OPENCOMPANY! TO GET STARTED, ADD A TOPIC.")}
             {:opts {:dismiss-tooltip #(om/set-state! owner :add-topic-tooltip-dismissed true)}}))
         (when (and show-second-add-topic-tooltip
                    (not selected-topic)
                    (not second-tooltip-dismissed))
-          (om/build tooltip
+          (om/build onboard-tip
             {:cta "GREAT! YOU ADDED A TOPIC. ADD ANOTHER AND YOU'LL START TO SEE THE BIG PICTURE."}
             {:opts {:dismiss-tooltip #(om/set-state! owner :second-tooltip-dismissed true)}}))
         (when (and show-share-su-tooltip
                    (not selected-topic)
                    (not share-su-tooltip-dismissed))
-          (om/build tooltip
+          (om/build onbeard-tip
             {:cta "YOUR BIG PICTURE IS COMING TOGETHER. YOU CAN SHARE AN UPDATE OF SELECTED TOPICS WITH YOUR TEAM, INVESTORS OR THE CROWD WHEN YOU'RE READY."}
             {:opts {:class "large" :dismiss-tooltip #(om/set-state! owner :share-su-tooltip-dismissed true)}}))))))

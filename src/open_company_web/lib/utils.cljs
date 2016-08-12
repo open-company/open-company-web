@@ -766,3 +766,6 @@
   (if (is-test-env?)
     body
     (.truncate js/$ body (clj->js {:length 500 :words true}))))
+
+(defn filter-placeholder-sections [topics company-data]
+  (vec (filter #(not (:placeholder (->> % keyword (get company-data)))) topics)))
