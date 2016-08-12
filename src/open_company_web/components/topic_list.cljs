@@ -315,6 +315,6 @@
         (when (and show-share-su-tooltip
                    (not selected-topic)
                    (not share-su-tooltip-dismissed))
-          (om/build onbeard-tip
+          (om/build onboard-tip
             {:cta "YOUR BIG PICTURE IS COMING TOGETHER. YOU CAN SHARE AN UPDATE OF SELECTED TOPICS WITH YOUR TEAM, INVESTORS OR THE CROWD WHEN YOU'RE READY."}
             {:opts {:class "large" :dismiss-tooltip #(om/set-state! owner :share-su-tooltip-dismissed true)}}))))))
