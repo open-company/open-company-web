@@ -78,8 +78,6 @@
       (when-not no-data
         (dom/div {:class "section-container" :id "section-finances"}
           (dom/div {:class "composed-section finances group"}
-            (when (:pillboxes-first options)
-              (render-pillboxes owner options))
             (dom/div {:class (utils/class-set {:composed-section-body true})}
               (case focus
 
@@ -93,5 +91,4 @@
 
                 "runway"
                 (om/build runway subsection-data subsection-options)))
-            (when-not (:pillboxes-first options)
-              (render-pillboxes owner options))))))))
+              (render-pillboxes owner options)))))))

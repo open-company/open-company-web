@@ -53,10 +53,8 @@
   (let [new-row (update row k (fn[_]v))]
     (change-cb new-row)))
 
-(defn get-current-metric-info [data]
-  (let [metric-slug (:metric-slug data)
-        metrics (:metrics data)]
-    (or (get metrics metric-slug) {})))
+(defn get-current-metric-info [metric-slug data]
+  (or (get (:metrics data) metric-slug) {}))
 
 (def batch-size 6)
 
@@ -71,22 +69,23 @@
   ((:save-metadata-cb data) (:metric-slug data))
   (set-metadata-edit owner data false))
 
+(defn filter-growth-data [metric-slug growth-data]
+  (into {} (filter (fn [[k v]] (= (:slug v) metric-slug)) growth-data)))
+
 (defcomponent growth-edit [data owner options]
 
   (init-state [_]
-    {:metadata-edit (:new-metric data)
-     :growth-data (:growth-data data)
+    {:metadata-edit false ; not editing metric metadata
+     :growth-data (:growth-data data) ; all the growth data for all metrics
+     :metric-slug (:initial-focus data) ; the slug of the current metric
      :stop batch-size})
 
   (will-receive-props [_ next-props]
-    (when (or (not= (:growth-data data) (:growth-data next-props))
-              (not= (:metric-slug data) (:metric-slug next-props))
-              (not= (:new-metric data) (:new-metric next-props)))
-      (om/set-state! owner :metadata-edit (:new-metric next-props))
+    (when (not= (:growth-data data) (:growth-data next-props))
       (om/set-state! owner :growth-data (:growth-data next-props))))
 
-  (render-state [_ {:keys [growth-data metadata-edit stop]}]
-    (let [{:keys [interval slug] :as metric-info} (get-current-metric-info data)
+  (render-state [_ {:keys [metric-slug growth-data metrics growth-metric-slugs metadata-edit stop]}]
+    (let [{:keys [interval slug] :as metric-info} (get-current-metric-info metric-slug data)
           prefix (if (= (:unit metric-info) "currency")
                    (utils/get-symbol-for-currency-code (:currency options))
                    "")
@@ -94,7 +93,7 @@
       (dom/div {:class "composed-section-edit growth edit"}
         (if metadata-edit
           (om/build growth-metric-edit {:metric-info metric-info
-                                        :metric-count (:metric-count data)
+                                        :metric-count (count (filter-growth-data metric-slug growth-data))
                                         :metrics (:metrics data)
                                         :new-metric (:new-metric data)
                                         :new-growth-section (:new-growth-section data)
@@ -119,7 +118,9 @@
                                                          (set-metadata-edit owner data false))))
                                         :change-growth-metric-cb (:change-growth-metric-cb data)}
                                         {:opts {:currency (:currency options)}})
-          (dom/div{}
+          
+          (dom/div  
+            ;; metric label and edit pencil
             (when interval
               (dom/div {:class "chart-header-container"}
                 (dom/div {:class "target-actual-container"}
@@ -127,8 +128,9 @@
                     (dom/h3 {:class "actual blue"
                              :on-click #(set-metadata-edit owner data true)}
                       (str (:name metric-info) " ")
-                      (om/build editable-pen {:click-callback #(set-metadata-edit owner data true)}))
-                    (dom/h3 {:class "actual-label gray"} (str (utils/camel-case-str (:interval metric-info)) " " (utils/camel-case-str (:unit metric-info))))))))
+                      (om/build editable-pen {:click-callback #(set-metadata-edit owner data true)}))))))
+            
+            ;; metric editing table
             (dom/div {:class "table-container group"}
               (dom/table {:class "table"
                           :key (str "growth-edit-" slug)}
@@ -161,4 +163,29 @@
                     (dom/tr {}
                       (dom/td {}
                         (dom/a {:class "more" :on-click #(more-months owner data)} "More..."))
-                      (dom/td {})))))))))))
+                      (dom/td {})))))
+
+            ;; metric selection pillboxes
+            (when-not metadata-edit
+              (dom/div {:class "pillbox-container growth"}
+                (for [metric-slug (:growth-metric-slugs data)]
+                  (let [metric (get-in data [:metrics metric-slug])
+                        mname (:name metric)
+                        metric-classes (utils/class-set {:pillbox true
+                                                         metric-slug true
+                                                         :active (= slug metric-slug)})]
+                    (dom/label {:class metric-classes
+                                :title (:description metric)
+                                :data-tab metric-slug
+                                :on-click (fn [e]
+                                            (.stopPropagation e)
+                                            (om/set-state! owner :metric-slug metric-slug))} mname)))
+                (dom/label {:class (utils/class-set {:pillbox true
+                                                     growth-utils/new-metric-slug-placeholder true
+                                                     :active (= slug growth-utils/new-metric-slug-placeholder)})
+                            :title "Add a new metric"
+                            :data-tab growth-utils/new-metric-slug-placeholder
+                            :on-click (fn [e]
+                                        (.stopPropagation e)
+                                        (om/set-state! owner :metadata-edit true)
+                                        (om/set-state! owner :metric-slug growth-utils/new-metric-slug-placeholder))} "+ New metric")))))))))

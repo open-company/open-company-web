@@ -208,7 +208,7 @@ div.fullscreen-topic-edit {
           padding-left: 26px;
 
           div.table-container{
-            padding: 21px 0 0 0;
+            padding: 11px 0 0 0;
           }
 
         }
@@ -218,7 +218,7 @@ div.fullscreen-topic-edit {
             padding: 21px 11px 0px 11px;
           }
         }
-        
+
         div.finances, div.growth {
           margin-top: 10px;
 
@@ -300,10 +300,9 @@ div.fullscreen-topic-edit {
 
         div.pillbox-container.growth{
           background-color: transparent;
-          padding: 12px;
-          margin-top: 10px;
-          margin-bottom: 10px;
-          text-align: center;
+          padding: 12px 26px 12px 0px;
+          margin-top: 0px;
+          margin-bottom: 0px;
           width: 100%;
 
           @include pillbox();

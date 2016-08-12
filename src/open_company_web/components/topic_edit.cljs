@@ -215,7 +215,6 @@
           chart-opts          {:chart-size {:width  260
                                             :height 196}
                                :hide-nav true
-                               :pillboxes-first false
                                :topic-click (:topic-click options)}
           is-growth-finances? (#{:growth :finances} section-kw)
           gray-color          (oc-colors/get-color-by-kw :oc-gray-5)

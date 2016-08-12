@@ -143,13 +143,9 @@
           focus-metric (or growth-metric-focus (:slug (first all-metrics)))]
       {:growth-focus (or (:growth-focus current-state) focus-metric growth-utils/new-metric-slug-placeholder)
        :growth-metadata-editing (:growth-metadata-editing current-state)
-       :growth-new-metric (empty? all-metrics)
        :growth-data (growth-utils/growth-data-map (:data topic-data))
        :growth-metrics (growth-metrics-map all-metrics)
        :growth-metric-slugs (growth-metrics-order all-metrics)})))
-
-(defn filter-growth-data [focus growth-data]
-  (into {} (filter (fn [[k v]] (= (:slug v) focus)) growth-data)))
 
 (defn growth-reset-metrics-cb [topic owner data]
   (let [state (growth-init-state topic data (om/get-state owner))]
@@ -178,8 +174,7 @@
   (let [metrics (om/get-state owner :growth-metrics)
        metrics-order (om/get-state owner :growth-metric-slugs)
        new-metrics (vec (map #(metrics %) metrics-order))]
-    (api/partial-update-section "growth" {:metrics new-metrics})
-    (om/set-state! owner :growth-new-metric false)))
+    (api/partial-update-section "growth" {:metrics new-metrics})))
 
 (defn growth-metadata-edit-cb [owner editing]
   (om/set-state! owner :growth-metadata-editing editing))
@@ -227,14 +222,7 @@
     ; reset the finances fields to the initial values
     (om/set-state! owner :growth-data (:growth-data state))
     (om/set-state! owner :growth-metrics (:growth-metrics state))
-    (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))
-    (when (om/get-state owner :growth-new-metric)
-      (let [topic        (:topic data)
-            topic-data   (if (= (dis/foce-section-key) (keyword topic)) (dis/foce-section-data) (:topic-data data))
-            first-metric (:slug (first (:metrics topic-data)))]
-        (om/set-state! owner :growth-focus first-metric)))
-    ; and the editing state flags
-    (om/set-state! owner :growth-new-metric false)))
+    (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))))
 
 (defn growth-clean-row [data]
   ; a data entry is good if we have the period and one other value: cash, costs or revenue
@@ -540,7 +528,6 @@
                            finances-data
                            ; growth states
                            growth-focus
-                           growth-new-metric
                            growth-data
                            growth-metrics
                            show-title-counter
@@ -556,7 +543,6 @@
           needs-fix? (< win-height utils/overlay-max-win-height)
           max-height (min (- 650 126) (- win-height 126))
           ; growth
-          focus-metric-data (filter-growth-data growth-focus growth-data)
           growth-data (when (= topic "growth") (growth-utils/growth-data-map (:data topic-data)))
           headline-length-limit (if (or (= topic-kw :finances)
                                         (= topic-kw :growth))
@@ -608,12 +594,11 @@
                                         {:key (:updated-at topic-data)}))
               (when (= topic "growth")
                 (dom/div {}
-                  (om/build growth-edit {:growth-data focus-metric-data
-                                         :metric-slug growth-focus
+                  (om/build growth-edit {:growth-data growth-data
+                                         :initial-focus growth-focus
                                          :metadata-edit-cb (partial growth-metadata-edit-cb owner)
-                                         :new-metric growth-new-metric
                                          :metrics growth-metrics
-                                         :metric-count (count focus-metric-data)
+                                         :growth-metric-slugs growth-metric-slugs
                                          :change-growth-cb (partial growth-change-data-cb owner)
                                          :delete-metric-cb (partial growth-delete-metric-cb owner data)
                                          :save-metadata-cb (partial growth-save-metrics-metadata-cb owner data)
@@ -621,30 +606,7 @@
                                          :cancel-cb #(growth-cancel-cb owner data)
                                          :change-growth-metric-cb (partial growth-change-metric-cb owner data)
                                          :new-growth-section (om/get-state owner :oc-editing)}
-                                        {:key focus-metric-data})
-                  (dom/div {:class "pillbox-container growth"}
-                    (for [metric-slug growth-metric-slugs]
-                      (let [metric (get growth-metrics metric-slug)
-                            mname (:name metric)
-                            metric-classes (utils/class-set {:pillbox true
-                                                             metric-slug true
-                                                             :active (= growth-focus metric-slug)})]
-                        (dom/label {:class metric-classes
-                                    :title (:description metric)
-                                    :data-tab metric-slug
-                                    :on-click (fn [e]
-                                                (.stopPropagation e)
-                                                (om/set-state! owner :growth-new-metric false)
-                                                (om/set-state! owner :growth-focus metric-slug))} mname)))
-                    (dom/label {:class (utils/class-set {:pillbox true
-                                                         growth-utils/new-metric-slug-placeholder true
-                                                         :active (= growth-focus growth-utils/new-metric-slug-placeholder)})
-                                :title "Add a new metric"
-                                :data-tab growth-utils/new-metric-slug-placeholder
-                                :on-click (fn [e]
-                                            (.stopPropagation e)
-                                            (om/set-state! owner :growth-new-metric true)
-                                            (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric"))))))
+                                        {:key growth-data})))))
             
             ;; Title
             (dom/input {:class "topic-edit-title"
