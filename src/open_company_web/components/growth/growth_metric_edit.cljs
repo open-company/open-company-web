@@ -12,15 +12,14 @@
             [cuerdas.core :as s]
             [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
 
-(defn show-delete-confirm-popover [owner data]
-  (add-popover {:container-id "delete-metric-confirm"
-                :title (str "Delete " (om/get-state owner :metric-name))
-                :message "Are you sure you want to delete this metric and all the associated data?"
+(defn show-archive-confirm-popover [owner data]
+  (add-popover {:container-id "archive-metric-confirm"
+                :title (str "Archive " (om/get-state owner :metric-name))
+                :message "Archiving removes this metric, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this metric?"
                 :cancel-title "CANCEL"
                 :cancel-cb #(hide-popover nil "delete-metric-confirm")
-                :success-title "DELETE"
-                :success-cb #((:delete-metric-cb data) (om/get-state owner :metric-slug))
-                :success-color-class "red"}))
+                :success-title "ARCHIVE"
+                :success-cb #((:delete-metric-cb data) (om/get-state owner :metric-slug))}))
 
 (defn option-template [state]
   (if-not (.-id state) (.-text state))
@@ -214,23 +213,22 @@
                                         change-cb (:change-growth-metric-cb data)]
                                     (om/set-state! owner :description value)
                                     (when slug
-                                      (change-cb slug {:description value}))))
-                    :placeholder "Daily Average Users"})
+                                      (change-cb slug {:description value}))))})
 
         (dom/div
           ;; add or save button
-          (dom/button {:class "btn-reset btn-solid  mr1 save-button"
+          (dom/button {:class "btn-reset btn-solid mr1 primary-button"
                        :disabled (or (s/blank? (om/get-state owner :metric-slug))
                                      (s/blank? (om/get-state owner :metric-name))
                                      (s/blank? (om/get-state owner :unit))
                                      (s/blank? (om/get-state owner :interval)))
                        :on-click #((:save-cb data))}
             (if (:new-metric data) "ADD METRIC" "SAVE"))
-          ;; delete button
+          ;; archive button
           (when-not (:new-metric data)
-            (dom/button {:class "btn-reset btn-outline mr1"
-                         :title "Delete this metric"
-                         :on-click #(show-delete-confirm-popover owner data)} "DELETE"))
+            (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
+                         :title "Archive this metric"
+                         :on-click #(show-archive-confirm-popover owner data)} "ARCHIVE"))
           ;; cancel button
-          (dom/button {:class "btn-reset btn-outline mr1"
+          (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
                        :on-click (:cancel-cb data)} "CANCEL"))))))

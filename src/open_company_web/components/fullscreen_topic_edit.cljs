@@ -147,28 +147,22 @@
        :growth-metrics (growth-metrics-map all-metrics)
        :growth-metric-slugs (growth-metrics-order all-metrics)})))
 
-(defn growth-delete-metric-cb [owner data metric-slug]
-  (let [all-metrics (vals (om/get-state owner :growth-metrics))
-        new-metrics (vec (filter #(not= (:slug %) metric-slug) all-metrics))
-        new-metrics-map (growth-utils/growth-data-map new-metrics)
-        all-data (vals (om/get-state owner :growth-data))
-        filtered-data (vec (filter #(not= (:slug %) metric-slug) all-data))
-        new-data (growth-utils/growth-data-map filtered-data)
-        metrics-order (growth-metrics-order new-metrics)
-        next-focus (if metrics-order
-                      (first metrics-order)
-                      growth-utils/new-metric-slug-placeholder)]
-    (om/set-state! owner :growth-focus next-focus)
-    (om/set-state! owner :growth-metrics new-metrics-map)
-    (om/set-state! owner :growth-data new-data)
-    (om/set-state! owner :growth-metric-slugs metrics-order)
-    (om/set-state! owner :growth-metadata-editing false)
-    (om/set-state! owner :has-changes true)))
-
 (defn growth-save-metrics-metadata-cb [owner data metric-slug]
   (let [metrics (om/get-state owner :growth-metrics)
        metrics-order (om/get-state owner :growth-metric-slugs)
        new-metrics (vec (map #(metrics %) metrics-order))]
+    (api/partial-update-section "growth" {:metrics new-metrics})))
+
+(defn growth-delete-metric-cb [owner data metric-slug]
+  (let [all-metrics (vals (om/get-state owner :growth-metrics))
+        new-metrics (vec (filter #(not= (:slug %) metric-slug) all-metrics))
+        new-metrics-order (growth-metrics-order new-metrics)
+        next-focus (if new-metrics-order
+                      (first new-metrics-order)
+                      growth-utils/new-metric-slug-placeholder)]
+    (om/set-state! owner :growth-focus next-focus)
+    (om/set-state! owner :growth-metric-slugs new-metrics-order)
+    (om/set-state! owner :growth-metadata-editing false)
     (api/partial-update-section "growth" {:metrics new-metrics})))
 
 (defn growth-metadata-edit-cb [owner editing]
@@ -555,11 +549,11 @@
         (dom/div {:style {:opacity "1"
                           :margin "27px 0px"}
                   :class "group"}
-          (dom/button {:class "btn-reset btn-outline left mr1 cancel-button"
+          (dom/button {:class "btn-reset btn-outline left mr1 secondary-button"
                        :onClick #(do
                                   (reset-and-dismiss owner options)
                                   (utils/event-stop %))} "CANCEL")
-          (dom/button {:class "btn-reset btn-solid left mr1 save-button"
+          (dom/button {:class "btn-reset btn-solid left mr1 primary-button"
                        :disabled (or (not has-changes) negative-headline-char-count)
                        :onClick #(do
                                   (save-data owner options)

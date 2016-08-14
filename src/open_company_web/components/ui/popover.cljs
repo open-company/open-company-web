@@ -16,9 +16,9 @@
       (dom/div {:class "message-container"}
         (dom/p {:class "message"} (:message data)))
       (dom/div {:class "buttons-container"}
-        (dom/button {:class (str "oc-btn oc-success " (:success-color-class data))
+        (dom/button {:class "btn-reset btn-solid mr1 primary-button"
                      :on-click (:success-cb data)} (:success-title data))
-        (dom/button {:class "oc-btn oc-cancel"
+        (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
                      :on-click (:cancel-cb data)} (:cancel-title data))))))
 
 (defn hide-popover [e container-id]
