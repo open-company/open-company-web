@@ -98,7 +98,7 @@
                                         :metric-count (count (filter-growth-data metric-slug growth-data))
                                         :metrics (:metrics data)
                                         :new-growth-section (:new-growth-section data)
-                                        :next-cb #(save-metadata-cb owner data)
+                                        :save-cb #(save-metadata-cb owner data)
                                         :delete-metric-cb (fn [metric-slug]
                                                            (om/set-state! owner :metadata-edit false)
                                                            ((:delete-metric-cb data) metric-slug))

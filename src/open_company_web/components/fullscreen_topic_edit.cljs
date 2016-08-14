@@ -600,7 +600,7 @@
                                          :cancel-cb #(growth-cancel-cb owner data)
                                          :change-growth-metric-cb (partial growth-change-metric-cb owner data)
                                          :new-growth-section (om/get-state owner :oc-editing)}
-                                        {:key growth-data})))))
+                                        {:opts {:currency currency} :key growth-data})))))
             
             ;; Title
             (dom/input {:class "topic-edit-title"

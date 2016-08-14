@@ -201,7 +201,7 @@
                      :default-value (or (om/get-state owner :unit) "A number")
                      :id "mtr-unit"}
           (for [unit units]
-            (dom/option {:value (:unit unit)} (if (= (:unit unit) "currency") "$" (:name unit)))))
+            (dom/option {:value (:unit unit)} (:name unit))))
 
         ;; description
         (dom/div {:class "small-caps bold mb1"} "Description for tooltip")
@@ -217,12 +217,14 @@
                     :placeholder "Daily Average Users"})
 
         (dom/div
+          ;; add or save button
           (dom/button {:class "btn-reset btn-solid  mr1 save-button"
                        :disabled (or (s/blank? (om/get-state owner :metric-slug))
                                      (s/blank? (om/get-state owner :metric-name))
                                      (s/blank? (om/get-state owner :unit))
                                      (s/blank? (om/get-state owner :interval)))
-                       :on-click #((:next-cb data))} (if (:new-metric data) "ADD METRIC" "SAVE"))
+                       :on-click #((:save-cb data))}
+            (if (:new-metric data) "ADD METRIC" "SAVE"))
           ;; delete button
           (when-not (:new-metric data)
             (dom/button {:class "btn-reset btn-outline mr1"
