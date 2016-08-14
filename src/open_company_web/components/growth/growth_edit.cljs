@@ -110,16 +110,23 @@
                                         {:opts {:currency (:currency options)}})
           
           (dom/div  
-            ;; metric label and edit pencil
+            ;; metric label and meta-data edit icon
             (when interval
               (dom/div {:class "chart-header-container"}
                 (dom/div {:class "target-actual-container"}
                   (dom/div {:class "actual-container"}
                     (dom/h3 {:class "actual blue"
                              :on-click #(set-metadata-edit owner data true)}
-                      (str (:name metric-info) " ")
-                      (om/build editable-pen {:click-callback #(set-metadata-edit owner data true)}))))))
-            
+                      (:name metric-info)
+                      (dom/button {:class "btn-reset metadata-edit-button"
+                                   :title "Edit this metric"
+                                   :type "button"
+                                   :data-toggle "tooltip"
+                                   :data-placement "right"
+                                   :style {:font-size "15px"}
+                                   :on-click #(set-metadata-edit owner data true)}
+                        (dom/i {:class "fa fa-cog"})))))))
+
             ;; metric editing table
             (when interval
               (dom/div {:class "table-container group"}

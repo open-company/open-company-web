@@ -17,6 +17,10 @@ div.fullscreen-topic-edit {
       border: solid 2px rgba(78, 90, 107, 0.2);
       padding: 0 0 30px 0;
 
+      button.archive-button, button.metadata-edit-button {
+        color: rgba(78, 90, 107, 0.5);
+      }
+
       div.topic-edit-body {
         padding: 0 30px;
         font-size: 18px;
@@ -75,10 +79,6 @@ div.fullscreen-topic-edit {
         button.image-url{
           float: left;
           color: rgba(78, 90, 107, 0.5); 
-        }
-
-        button.archive-button {
-          color: rgba(78, 90, 107, 0.5);
         }
 
         span.file-upload-progress {
