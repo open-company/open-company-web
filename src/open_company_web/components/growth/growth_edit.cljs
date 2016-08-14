@@ -78,13 +78,14 @@
     {:metadata-edit false ; not editing metric metadata
      :growth-data (:growth-data data) ; all the growth data for all metrics
      :metric-slug (:initial-focus data) ; the slug of the current metric
+     :new-metric false
      :stop batch-size})
 
   (will-receive-props [_ next-props]
     (when (not= (:growth-data data) (:growth-data next-props))
       (om/set-state! owner :growth-data (:growth-data next-props))))
 
-  (render-state [_ {:keys [metric-slug growth-data metrics growth-metric-slugs metadata-edit stop]}]
+  (render-state [_ {:keys [metric-slug growth-data metrics growth-metric-slugs metadata-edit new-metric stop]}]
     (let [{:keys [interval slug] :as metric-info} (get-current-metric-info metric-slug data)
           prefix (if (= (:unit metric-info) "currency")
                    (utils/get-symbol-for-currency-code (:currency options))
@@ -93,29 +94,18 @@
       (dom/div {:class "composed-section-edit growth edit"}
         (if metadata-edit
           (om/build growth-metric-edit {:metric-info metric-info
+                                        :new-metric new-metric
                                         :metric-count (count (filter-growth-data metric-slug growth-data))
                                         :metrics (:metrics data)
-                                        :new-metric (:new-metric data)
                                         :new-growth-section (:new-growth-section data)
                                         :next-cb #(save-metadata-cb owner data)
                                         :delete-metric-cb (fn [metric-slug]
                                                            (om/set-state! owner :metadata-edit false)
                                                            ((:delete-metric-cb data) metric-slug))
                                         :cancel-cb (fn []
-                                                     ; 3 cases
-                                                     (if (or (:new-growth-section data) (:new-metric data))
-                                                       ; newly added growth section
-                                                       ;    - remove the seciton with (:delete-new-section-cb data)
-                                                       ; new metric:
-                                                       ;    - remove the new metric
-                                                       ;    - switch focus
-                                                       ((:cancel-cb data))
-                                                       ; existing metric
-                                                       (do
-                                                         ; - cancel the edited metadata only
-                                                         ((:reset-metrics-cb data))
-                                                         ; - exit the metadata edit state
-                                                         (set-metadata-edit owner data false))))
+                                                     ((:cancel-cb data))
+                                                     (om/set-state! owner :new-metric false)
+                                                     (set-metadata-edit owner data false))
                                         :change-growth-metric-cb (:change-growth-metric-cb data)}
                                         {:opts {:currency (:currency options)}})
           
@@ -167,6 +157,7 @@
 
             ;; metric selection pillboxes
             (when-not metadata-edit
+              ;; existing metrics
               (dom/div {:class "pillbox-container growth"}
                 (for [metric-slug (:growth-metric-slugs data)]
                   (let [metric (get-in data [:metrics metric-slug])
@@ -180,6 +171,7 @@
                                 :on-click (fn [e]
                                             (.stopPropagation e)
                                             (om/set-state! owner :metric-slug metric-slug))} mname)))
+                ;; new metric
                 (dom/label {:class (utils/class-set {:pillbox true
                                                      growth-utils/new-metric-slug-placeholder true
                                                      :active (= slug growth-utils/new-metric-slug-placeholder)})
@@ -188,4 +180,5 @@
                             :on-click (fn [e]
                                         (.stopPropagation e)
                                         (om/set-state! owner :metadata-edit true)
+                                        (om/set-state! owner :new-metric true)
                                         (om/set-state! owner :metric-slug growth-utils/new-metric-slug-placeholder))} "+ New metric")))))))))

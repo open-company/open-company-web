@@ -147,11 +147,6 @@
        :growth-metrics (growth-metrics-map all-metrics)
        :growth-metric-slugs (growth-metrics-order all-metrics)})))
 
-(defn growth-reset-metrics-cb [topic owner data]
-  (let [state (growth-init-state topic data (om/get-state owner))]
-    (om/set-state! owner :growth-metrics (:growth-metrics state))
-    (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))))
-
 (defn growth-delete-metric-cb [owner data metric-slug]
   (let [all-metrics (vals (om/get-state owner :growth-metrics))
         new-metrics (vec (filter #(not= (:slug %) metric-slug) all-metrics))
@@ -602,7 +597,6 @@
                                          :change-growth-cb (partial growth-change-data-cb owner)
                                          :delete-metric-cb (partial growth-delete-metric-cb owner data)
                                          :save-metadata-cb (partial growth-save-metrics-metadata-cb owner data)
-                                         :reset-metrics-cb #(growth-reset-metrics-cb topic owner data)
                                          :cancel-cb #(growth-cancel-cb owner data)
                                          :change-growth-metric-cb (partial growth-change-metric-cb owner data)
                                          :new-growth-section (om/get-state owner :oc-editing)}
