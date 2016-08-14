@@ -121,39 +121,40 @@
                       (om/build editable-pen {:click-callback #(set-metadata-edit owner data true)}))))))
             
             ;; metric editing table
-            (dom/div {:class "table-container group"}
-              (dom/table {:class "table"
-                          :key (str "growth-edit-" slug)}
-                (dom/thead {}
-                  (dom/tr {}
-                    (dom/th {} "")
-                    (dom/th {} "Value")))
-                (dom/tbody {}
-                  (let [current-period (utils/current-growth-period interval)]
-                    (for [idx (range 1 stop)]
-                      (let [period (growth-utils/get-past-period current-period idx interval)
-                            has-value (contains? growth-data (str period slug))
-                            row-data (if has-value
-                                        (get growth-data (str period slug))
-                                        {:period period
-                                         :slug slug
-                                         :value nil
-                                         :new true})
-                            next-period (growth-utils/get-past-period current-period (inc idx) interval)]
-                        (om/build growth-edit-row {:cursor row-data
-                                                   :next-period next-period
-                                                   :is-last (= idx 0)
-                                                   :needs-year (or (= idx 1)
-                                                                   (= idx (dec stop)))
-                                                   :prefix prefix
-                                                   :suffix suffix
-                                                   :interval interval
-                                                   :change-cb (fn [k v]
-                                                        (replace-row-in-data row-data k v (:change-growth-cb data)))}))))
+            (when interval
+              (dom/div {:class "table-container group"}
+                (dom/table {:class "table"
+                            :key (str "growth-edit-" slug)}
+                  (dom/thead {}
+                    (dom/tr {}
+                      (dom/th {} "")
+                      (dom/th {} "Value")))
+                  (dom/tbody {}
+                    (let [current-period (utils/current-growth-period interval)]
+                      (for [idx (range 1 stop)]
+                        (let [period (growth-utils/get-past-period current-period idx interval)
+                              has-value (contains? growth-data (str period slug))
+                              row-data (if has-value
+                                          (get growth-data (str period slug))
+                                          {:period period
+                                           :slug slug
+                                           :value nil
+                                           :new true})
+                              next-period (growth-utils/get-past-period current-period (inc idx) interval)]
+                          (om/build growth-edit-row {:cursor row-data
+                                                     :next-period next-period
+                                                     :is-last (= idx 0)
+                                                     :needs-year (or (= idx 1)
+                                                                     (= idx (dec stop)))
+                                                     :prefix prefix
+                                                     :suffix suffix
+                                                     :interval interval
+                                                     :change-cb (fn [k v]
+                                                          (replace-row-in-data row-data k v (:change-growth-cb data)))}))))
                     (dom/tr {}
                       (dom/td {}
                         (dom/a {:class "more" :on-click #(more-months owner data)} "More..."))
-                      (dom/td {})))))
+                      (dom/td {}))))))
 
             ;; metric selection pillboxes
             (when-not metadata-edit
