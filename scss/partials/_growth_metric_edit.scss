@@ -4,20 +4,12 @@ div.growth-metric-edit{
   padding: 32px;
   margin-top: 21px;
 
+  span.select2 {
+    margin-bottom: 32px;    
+  }
+
   div.growth-metric-edit-row{
     width: 100%;
-
-    span.select2 {
-      opacity: 0.5;
-      span{
-        background-color: #ffffff;
-        font-size: 12px;
-        letter-spacing: 1px;
-        color: $oc_gray_5;
-        border: 0px solid transparent;
-        border-radius: 0px;
-      }
-    }
 
     button {
       height: 30px;

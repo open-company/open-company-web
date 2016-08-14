@@ -99,7 +99,7 @@
                           (when slug
                             (change-cb slug {:unit unit-value}))))))
       ; init interval
-      (doto (js/$ "select.metric-data#mtr-interval")
+      (doto (js/$ "select#mtr-interval")
         (.select2 (clj->js {"placeholder" "Metric interval"
                             "minimumResultsForSearch" -1
                             "templateResult" option-template
@@ -212,6 +212,7 @@
                                   (let [value (.. e -target -value)
                                         slug (om/get-state owner :metric-slug)
                                         change-cb (:change-growth-metric-cb data)]
+                                    (om/set-state! owner :description value)
                                     (when slug
                                       (change-cb slug {:description value}))))
                     :placeholder "Daily Average Users"})

@@ -96,7 +96,7 @@
           (om/build growth-metric-edit {:metric-info metric-info
                                         :new-metric new-metric
                                         :metric-count (count (filter-growth-data metric-slug growth-data))
-                                        :metrics (:metrics data)
+                                        :metrics metrics
                                         :new-growth-section (:new-growth-section data)
                                         :save-cb #(save-metadata-cb owner data)
                                         :delete-metric-cb (fn [metric-slug]
