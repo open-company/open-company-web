@@ -521,6 +521,7 @@
                            growth-metrics
                            show-title-counter
                            growth-metric-slugs
+                           growth-metadata-editing
                            ; tooltip
                            tooltip-dismissed]}]
     (let [topic-kw (keyword topic)
@@ -547,17 +548,21 @@
                     :style #js {:width (str (- fullscreen-width 20) "px")}
                     :key (:updated-at topic-data)}
         (dom/div {:style {:opacity "1"
-                          :margin "27px 0px"}
+                          :margin "27px 0px"
+                          :height "30px" ; so it keeps its height even if the buttons aren't there
+                         }
                   :class "group"}
-          (dom/button {:class "btn-reset btn-outline left mr1 secondary-button"
-                       :onClick #(do
-                                  (reset-and-dismiss owner options)
-                                  (utils/event-stop %))} "CANCEL")
-          (dom/button {:class "btn-reset btn-solid left mr1 primary-button"
-                       :disabled (or (not has-changes) negative-headline-char-count)
-                       :onClick #(do
-                                  (save-data owner options)
-                                  (utils/event-stop %))} "SAVE"))
+          (when-not growth-metadata-editing
+            (dom/button {:class "btn-reset btn-outline left mr1 secondary-button"
+                         :onClick #(do
+                                    (reset-and-dismiss owner options)
+                                    (utils/event-stop %))} "CANCEL"))
+          (when-not growth-metadata-editing
+            (dom/button {:class "btn-reset btn-solid left mr1 primary-button"
+                         :disabled (or (not has-changes) negative-headline-char-count)
+                         :onClick #(do
+                                    (save-data owner options)
+                                    (utils/event-stop %))} "SAVE")))
         (dom/div {:class "fullscreen-topic-internal group"
                   :on-click #(.stopPropagation %)}
           (dom/div {:class "fullscreen-topic-edit-top-box"}

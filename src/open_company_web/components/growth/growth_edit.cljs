@@ -180,6 +180,6 @@
                             :data-tab growth-utils/new-metric-slug-placeholder
                             :on-click (fn [e]
                                         (.stopPropagation e)
-                                        (om/set-state! owner :metadata-edit true)
+                                        (set-metadata-edit owner data true)
                                         (om/set-state! owner :new-metric true)
                                         (om/set-state! owner :metric-slug growth-utils/new-metric-slug-placeholder))} "+ New metric")))))))))
