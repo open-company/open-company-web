@@ -124,7 +124,7 @@ to change it in one place.
 
 ## Testing
 
-Install [PhantomJS](https://http://phantomjs.org/) downloading the latest binary [here](https://github.com/eugene1g/phantomjs/releases), the one from their site is currently broken.
+Install [PhantomJS](https://http://phantomjs.org/) downloading the latest 2.x binary from [here](https://github.com/eugene1g/phantomjs/releases), the one from their site is currently broken.
 
 Then move the `phantomjs` binary somewhere reachable by your `PATH` so you can run:
 
