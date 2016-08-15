@@ -42,7 +42,7 @@
             body (js/$ (.-body js/document))]
         ; add the div to the body
         (.append body popover-ct)
-        ; if the component has not been mount, render it
+        ; if the component has not been mounted, render it
         (.setTimeout js/window
                      (fn []
                        ; render the popover component

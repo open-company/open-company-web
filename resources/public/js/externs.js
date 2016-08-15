@@ -3,6 +3,7 @@ var $ = function(){};
 $.val = function(){};
 $.select2 = function(){};
 $.css = function(){};
+$.fadeIn = function(){};
 $.fadeOut = function(){};
 $.remove = function(){};
 $.append = function(){};
@@ -25,6 +26,7 @@ $.each = function(){};
 $.truncate = function(){};
 $.attr = function(){};
 $.on = function(){};
+$.click = function(){};
 // Location
 var location = {};
 location.reload = function(){};
