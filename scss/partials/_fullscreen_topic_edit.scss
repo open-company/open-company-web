@@ -1,12 +1,12 @@
 div.fullscreen-topic-edit {
   position: relative;
   min-height: calc(100vh - #{$navbar_height}px - 60px - 4px);
-  max-width: 575px;
+  max-width: 684px;
   min-width: 302px;
   margin: 0 auto;
 
   div.fullscreen-topic-internal{
-    max-width: 575px;
+    max-width: 684px;
     min-width: 302px;
     margin-top: 30px;
     margin-bottom: 70px;
@@ -15,7 +15,25 @@ div.fullscreen-topic-edit {
       border-radius: 4px;
       background-color: #ffffff;
       border: solid 2px rgba(78, 90, 107, 0.2);
-      padding: 0px  0px 30px 0px;
+      padding: 0 0 30px 0;
+
+      button.archive-button, button.metadata-edit-button {
+        color: rgba(78, 90, 107, 0.5);
+
+        &:hover {
+          color: rgba(78,90,107,1);
+        }
+      }
+
+      div.topic-edit-body {
+        padding: 0 30px;
+        font-size: 18px;
+        line-height: 1.8;
+        color: $oc_gray_7;
+        font-family: "Domine", Georgia, serif;
+        font-weight: 400;
+        margin-top: 21px !important;
+      }
 
       div.topc-edit-top-box-footer {
         width: 100%;
@@ -65,10 +83,6 @@ div.fullscreen-topic-edit {
         button.image-url{
           float: left;
           color: rgba(78, 90, 107, 0.5); 
-        }
-
-        button.archive-button {
-          color: rgba(78, 90, 107, 0.5);
         }
 
         span.file-upload-progress {
@@ -156,7 +170,7 @@ div.fullscreen-topic-edit {
         width: 100%;
         padding: 0px 26px;
         margin: 0px;
-        margin-top: 21px;
+        margin-top: 18px;
         height: auto;
 
         &:after{
@@ -189,17 +203,29 @@ div.fullscreen-topic-edit {
       }
 
       div.topic-growth-finances{
-        margin-top: 10px;
+        margin-top: 20px;
       }
 
       div.topic-overlay-edit-data {
 
-        div.finances, div.growth {
-          margin-top: 10px;
+        div.growth {
+          padding-left: 26px;
+          padding-right: 26px;
 
           div.table-container{
-            padding: 21px 0px 0px 0px;
+            padding: 11px 0 0 0;
           }
+
+        }
+
+        div.finances {
+          div.table-container{
+            padding: 21px 11px 0px 11px;
+          }
+        }
+
+        div.finances, div.growth {
+          margin-top: 10px;
 
           table.table{
             border-spacing: 10px;
@@ -230,16 +256,8 @@ div.fullscreen-topic-edit {
               opacity: 0;
             }
 
-            tr td.no-cell:first-child {
-              padding-top: 12px;
-              font-weight: 700;
-              font-weight: $oc_headers_font;
-              font-size: 12px;
-              letter-spacing: 1px;
-              color: rgba(78, 90, 107, 0.5);
-            }
-
             td.no-cell {
+              padding-top: 13px;
               font-weight: 700;
               font-weight: $oc_headers_font;
               font-size: 12px;
@@ -254,15 +272,11 @@ div.fullscreen-topic-edit {
               padding-top: 4px;
             }
 
-            td.no-cell, td div.comp-cell div.comp-cell-int {
+            td div.comp-cell div.comp-cell-int {
               font-weight: normal;
               font-size: 12px;
               letter-spacing: 1px;
-              color: #4e5a6b;
-            }
-
-            td.no-cell:last-child {
-              padding-top: 13px;
+              color: $oc_gray_7;
             }
 
             tr th:last-child, tr th.dark, tr td:last-child, tr td.dark {
@@ -291,10 +305,9 @@ div.fullscreen-topic-edit {
 
         div.pillbox-container.growth{
           background-color: transparent;
-          padding: 12px;
-          margin-top: 10px;
-          margin-bottom: 10px;
-          text-align: center;
+          padding: 12px 26px 12px 0px;
+          margin-top: 0px;
+          margin-bottom: 0px;
           width: 100%;
 
           @include pillbox();
@@ -333,13 +346,6 @@ div.fullscreen-topic-edit {
       }
     }
 
-    div.separator {
-      margin-top: 20px;
-      width: 30px;
-      height: 2px;
-      background-color: rgba(77, 89, 106, 0.2);
-    }
-
     div.topic-body-line{
       padding: 0px 30px;
 
@@ -375,44 +381,6 @@ div.fullscreen-topic-edit {
           display: none;
         }
       }
-    }
-  }
-
-  button.save-button {
-    cursor: pointer;
-    opacity: 1;
-    color: rgba(78,90,107,0.8);
-    border: 1px solid rgba(78,90,107,0.8);
-    height: 30px;
-    transition: none;
-
-    &:hover {
-      color: rgba(78,90,107,1);
-      border: 1px solid rgba(78,90,107,1);
-    }
-
-    &:disabled{
-      color: rgba(78,90,107,0.3);
-      border: 1px solid rgba(78,90,107,0.3);
-    }
-  }
-
-  button.cancel-button {
-    cursor: pointer;
-    background-color: white;
-    opacity: 1;
-    color: rgba(78,90,107,0.8);
-    border: 1px solid rgba(78,90,107,0.8);
-    height: 30px;
-    transition: none;
-
-    &:hover {
-      color: rgba(78,90,107,1);
-      border: 1px solid rgba(78,90,107,1);
-    }
-
-    &.has-save {
-      right: 150px;
     }
   }
 }

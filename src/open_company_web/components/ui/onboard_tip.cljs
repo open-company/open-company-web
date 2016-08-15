@@ -1,4 +1,4 @@
-(ns open-company-web.components.tooltip
+(ns open-company-web.components.ui.onboard-tip
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -9,7 +9,7 @@
 (defn on-click-out [owner options e]
   ((:dismiss-tooltip options)))
 
-(defcomponent tooltip [data owner options]
+(defcomponent onboard-tip [data owner options]
 
   (did-mount [_]
     (om/set-state! owner :shown true)

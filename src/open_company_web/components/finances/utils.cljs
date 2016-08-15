@@ -66,8 +66,9 @@
                            (placeholder-data prev-period {:new true}))))]
       (vec fixed-data))))
 
-(defn- get-chart-data [data prefix keyw column-name & [style fill-color pattern tooltip-suffix]]
+(defn- get-chart-data
   "Vector of max *(count fixed-data) elements of [:Label value]"
+  [data prefix keyw column-name & [style fill-color pattern tooltip-suffix]]
   (let [fixed-data (chart-placeholder-data data)
         chart-data (partial chart-data-at-index fixed-data keyw column-name prefix tooltip-suffix)
         placeholder-vect (vec (range (count fixed-data)))
@@ -100,9 +101,10 @@
     (utils/abs runway)
     0))
 
-(defn remove-trailing-zero [string]
+(defn remove-trailing-zero
   "Remove the last zero(s) in a numeric string only after the dot.
    Remote the dot too if it is the last char after removing the zeros"
+  [string]
   (cond
 
     (and (not= (.indexOf string ".") -1) (= (last string) "0"))

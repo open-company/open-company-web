@@ -171,7 +171,7 @@
         topic (:foce-key db)
         topic-data (:foce-data db)
         is-data-topic (#{:finances :growth} (keyword topic))
-        body (if is-data-topic (:notes (:body topic-data)) (:body topic-data))
+        body (:body topic-data)
         with-fixed-headline (assoc topic-data :headline (utils/emoji-images-to-unicode (:headline topic-data)))
         with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))
         old-section-data (get (dispatcher/company-data db slug) (keyword topic))

@@ -34,13 +34,13 @@
           burn (- (:revenue finances-data) (:costs finances-data))
           burn-prefix (if (or (zero? burn) (pos? burn)) prefix (str "-" prefix))
           burn-rate (if (js/isNaN burn)
-                      "calculated"
+                      "-"
                       (if (zero? burn)
-                        (str burn-prefix "0")
+                        (str burn-prefix "-")
                         (str burn-prefix (utils/thousands-separator (utils/abs burn) currency 0))))
           runway-days (:runway finances-data)
           runway (cond
-                   (nil? runway-days) "calculated"
+                   (nil? runway-days) "-"
                    (or (not (:cash finances-data))
                        (not (:costs finances-data))) ""
                    (zero? runway-days) "break-even"
@@ -87,12 +87,12 @@
                           :period period
                           :key :costs
                           :tab-cb tab-cb}))
-        ;; Burn
+        ;; Burn / Cash flow
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new :dark true})}
           burn-rate)
         ;; Runway
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new :dark true})}
-                runway)))))
+          runway)))))
 
 (defn replace-row-in-data [data row k v]
   "Find and replace the edited row"
@@ -147,7 +147,7 @@
                                                    :change-cb #(replace-row-in-data data row-data %1 %2)}))))
                 (dom/tr {}
                   (dom/td {}
-                    (dom/a {:class "more" :on-click #(more-months owner)} "More..."))
+                    (dom/a {:class "more" :on-click #(more-months owner)} "Earlier..."))
                   (dom/td {})
                   (dom/td {})
                   (dom/td {})

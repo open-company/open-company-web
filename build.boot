@@ -6,12 +6,13 @@
     [tolitius/boot-check "0.1.3" :scope "test"]
 
     [org.clojure/clojure "1.9.0-alpha10"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
-    ;; Skip ClojureScript 1.9.93 as it breaks source maps
-    [org.clojure/clojurescript "1.9.89"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
+    [org.clojure/clojurescript "1.9.198"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
 
     [org.omcljs/om "1.0.0-alpha41" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
 
     [rum "0.10.5" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
+
+    ;; Don't upgrade to 0.1.1, errors
     [org.martinklepsch/derivatives "0.1.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
 
     [cljs-http "0.1.41"] ; HTTP for cljs https://github.com/r0man/cljs-http
@@ -26,7 +27,7 @@
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
     [com.andrewmcveigh/cljs-time "0.5.0-alpha1"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     [funcool/cuerdas "0.8.0"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
-    [medley "0.8.2"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
+    [medley "0.8.3"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
 
     ;; --- DO NOT UPDATE REACT, the 15.x.x code requires changes on our part
     [cljsjs/react "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
@@ -137,8 +138,9 @@
         (watch)
         (sass)
         (build-site)
-        (reload :asset-path "/public"
-                :on-jsload 'open-company-web.core/on-js-reload)
+        ; reload is broken with simple/advanced compilation https://github.com/adzerk-oss/boot-reload/issues/89
+        ; (reload :asset-path "/public"
+        ;         :on-jsload 'open-company-web.core/on-js-reload)
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {:externs ["public/js/externs.js"]})))

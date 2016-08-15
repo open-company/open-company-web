@@ -12,15 +12,14 @@
             [cuerdas.core :as s]
             [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
 
-(defn show-delete-confirm-popover [owner data]
-  (add-popover {:container-id "delete-metric-confirm"
-                :title (str "Delete " (om/get-state owner :metric-name))
-                :message "Are you sure you want to delete this metric and all the associated data?"
+(defn show-archive-confirm-popover [owner data]
+  (add-popover {:container-id "archive-metric-confirm"
+                :title (str "Archive " (om/get-state owner :metric-name))
+                :message "Archiving removes this metric, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this metric?"
                 :cancel-title "CANCEL"
                 :cancel-cb #(hide-popover nil "delete-metric-confirm")
-                :success-title "DELETE"
-                :success-cb #((:delete-metric-cb data) (om/get-state owner :metric-slug))
-                :success-color-class "red"}))
+                :success-title "ARCHIVE"
+                :success-cb #((:delete-metric-cb data) (om/get-state owner :metric-slug))}))
 
 (defn option-template [state]
   (if-not (.-id state) (.-text state))
@@ -99,7 +98,7 @@
                           (when slug
                             (change-cb slug {:unit unit-value}))))))
       ; init interval
-      (doto (js/$ "select.metric-data#mtr-interval")
+      (doto (js/$ "select#mtr-interval")
         (.select2 (clj->js {"placeholder" "Metric interval"
                             "minimumResultsForSearch" -1
                             "templateResult" option-template
@@ -123,7 +122,6 @@
         available-metrics (vec (filter #(not (utils/in? slugs (:slug %))) all-metrics))]
     {:intervals (:intervals growth-defaults)
      :units (:units growth-defaults)
-     :prompt (:prompt growth-defaults)
      :metrics available-metrics}))
 
 (def metric-defaults {
@@ -171,74 +169,66 @@
           all-metrics (:metrics data)
           {:keys [metrics intervals prompt] :as presets} (om/get-state owner :presets)
           units (om/get-state owner :units)]
-      (dom/div {:class "growth-metric-edit"}
-        (when (:new-metric data)
-          (dom/div {:class "growth-metric-edit-row group"}
-            (dom/p {} prompt)))
-        ; name and unit
-        (dom/div {:class "growth-metric-edit-row group"}
-          ; name
-          (dom/div {:class "metric-data-container group"}
-            (dom/label {:class "metric-label"} "METRIC NAME")
-            (dom/input {:class "metric-data metric-name"
-                        :type "text"
-                        :value (om/get-state owner :metric-name)
-                        :on-change (fn [e]
-                                     (om/set-state! owner :metric-name (.. e -target -value))
-                                     (change-name owner data))
-                        :id "mtr-name"
-                        :placeholder "Metric name"}))
-          ; interval
-          (dom/div {:class "metric-data-container group"}
-            (dom/label {:class "metric-label" :for "mtr-interval"} "INTERVAL")
-            (dom/select {:class "metric-data metric-interval"
-                         :default-value (om/get-state owner :interval)
-                         :id "mtr-interval"
-                         ; if there are data the interval can't be changed
-                         :disabled (and (pos? (:metric-count data))
-                                        (not (:new-metric data)))
-                         :placeholder "Metric interval"}
-              (for [interval intervals]
-                (dom/option {:value interval} (utils/camel-case-str interval)))))
-          ; unit
-          (dom/div {:class "metric-data-container group"}
-            (dom/label {:class "metric-label" :for "mtr-unit"} "MEASURED AS")
-            (dom/select {:class "metric-data metric-unit"
-                         :default-value (om/get-state owner :unit)
-                         :id "mtr-unit"
-                         :placeholder "Metric unit"}
-              (for [unit units]
-                (let [currency (om/get-state owner :currency)
-                      unit-value (:unit unit)
-                      unit-name (:name unit)]
-                  (dom/option {:key unit-value
-                               :value unit-value} unit-name))))))
-        ;; second row
-        (dom/div {:class "growth-metric-edit-row group"}
-          ;; descriptions
-          (dom/label {:class "metric-label"} "DESCRIPTION")
-          (dom/textarea {:class "metric-data metric-description"
-                         :on-change (fn [e]
-                                      (let [value (.. e -target -value)
-                                            slug (om/get-state owner :metric-slug)
-                                            change-cb (:change-growth-metric-cb data)]
-                                        (when slug
-                                          (change-cb slug {:description value}))))
-                         :placeholder "Metric description"} (om/get-state owner :description)))
-        (dom/div {:class "growth-metric-edit-row group"}
-          (dom/button {:class "save"
+
+      (dom/div {:class "growth-metric-edit p3"}
+
+        ;; name
+        (dom/div {:class "small-caps bold mb1"} "Metric name")
+        (dom/input {:class "npt col-5 p1 mb3"
+          :type "text"
+          :value (om/get-state owner :metric-name)
+          :on-change (fn [e]
+                       (om/set-state! owner :metric-name (.. e -target -value))
+                       (change-name owner data))
+          :id "mtr-name"
+          :placeholder "DAU"})
+
+        ;; interval
+        (dom/div {:class "small-caps bold mb1"} "Interval")
+        (dom/select {:class "npt col-3 p1 mb3"
+                     :default-value (om/get-state owner :interval)
+                     :id "mtr-interval"
+                     ; if there are data the interval can't be changed
+                     :disabled (and (pos? (:metric-count data))
+                                    (not (:new-metric data)))}
+          (for [interval intervals]
+            (dom/option {:value interval} (utils/camel-case-str interval))))
+
+        ;; unit
+        (dom/div {:class "small-caps bold mb1"} "Measured As")
+        (dom/select {:class "npt col-3 p1 mb3"
+                     :default-value (or (om/get-state owner :unit) "A number")
+                     :id "mtr-unit"}
+          (for [unit units]
+            (dom/option {:value (:unit unit)} (:name unit))))
+
+        ;; description
+        (dom/div {:class "small-caps bold mb1"} "Description for tooltip")
+        (dom/input {:class "npt col-10 p1 mb3"
+                    :type "text"
+                    :value (om/get-state owner :description)
+                    :on-change (fn [e]
+                                  (let [value (.. e -target -value)
+                                        slug (om/get-state owner :metric-slug)
+                                        change-cb (:change-growth-metric-cb data)]
+                                    (om/set-state! owner :description value)
+                                    (when slug
+                                      (change-cb slug {:description value}))))})
+
+        (dom/div
+          ;; add or save button
+          (dom/button {:class "btn-reset btn-solid mr1 primary-button"
                        :disabled (or (s/blank? (om/get-state owner :metric-slug))
                                      (s/blank? (om/get-state owner :metric-name))
                                      (s/blank? (om/get-state owner :unit))
                                      (s/blank? (om/get-state owner :interval)))
-                       :on-click #((:next-cb data))} (if (:new-metric data) "ADD METRIC" "SAVE"))
-          ;; delete button
+                       :on-click #((:save-cb data))}
+            "SAVE")
+          ;; archive button
           (when-not (:new-metric data)
-            (dom/button {:class "delete"
-                         :title "Delete this metric"
-                         :on-click #(show-delete-confirm-popover owner data)} "DELETE"))
-          ; cancel button
-          (when-not (and (:new-metric data)
-                         (zero? (count all-metrics)))
-            (dom/button {:class "cancel"
-                         :on-click (:cancel-cb data)} "CANCEL")))))))
+            (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
+                         :title "Archive this metric"
+                         :on-click #(show-archive-confirm-popover owner data)} "ARCHIVE"))
+          ;; cancel button
+          (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
+                       :on-click (:cancel-cb data)} "CANCEL"))))))

@@ -302,8 +302,6 @@
   "Get the section names, as a vector of keywords, in category order and order in the category."
   (vec (map keyword (flatten (remove nil? (map #(get-in company-data [:sections (keyword %)]) (:categories company-data)))))))
 
-(def finances-empty-notes {:notes {:body ""}})
-
 (defn link-for
   ([links rel] (some #(when (= (:rel %) rel) %) links))
   ([links rel method] (some #(when (and (= (:method %) method) (= (:rel %) rel)) %) links)))
@@ -323,9 +321,8 @@
         fixed-finances (calc-burnrate-runway finances-data)
         sort-pred (sort-by-key-pred :period true)
         sorted-finances (sort sort-pred fixed-finances)
-        fixed-section (assoc section-body :data sorted-finances)
-        section-with-notes (merge finances-empty-notes fixed-section)]
-    section-with-notes))
+        fixed-section (assoc section-body :data sorted-finances)]
+    fixed-section))
 
 (defn fix-section 
   "Add `:section` name and `:as-of` keys to the section map"
@@ -596,12 +593,6 @@
 (defn scroll-to-section [section-name]
   (scroll-to-id (str "section-" (name section-name))))
 
-(defn get-topic-body [section-data section]
-  (let [section-kw (keyword section)]
-    (if (#{:finances :growth} section-kw)
-      (get-in section-data [:notes :body])
-      (:body section-data))))
-
 (defn round-2-dec [value decimals]
   ; cut to 2 dec maximum then parse to float to use toString to remove trailing zeros
   (.toLocaleString (js/parseFloat (gstring/format (str "%." decimals "f") value))))
@@ -775,3 +766,6 @@
   (if (is-test-env?)
     body
     (.truncate js/$ body (clj->js {:length 500 :words true}))))
+
+(defn filter-placeholder-sections [topics company-data]
+  (vec (filter #(not (:placeholder (->> % keyword (get company-data)))) topics)))

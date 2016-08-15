@@ -43,17 +43,14 @@
         needs-cash-flow (has-revenues-or-costs finances-row-data)]
     (dom/div {:class "pillbox-container finances"}
       (dom/label {:class cash-classes
-                  :title "Cash"
                   :data-tab "cash"
                   :on-click (partial pillbox-click owner options)} "Cash")
       (when needs-cash-flow
         (dom/label {:class cash-flow-classes
-                    :title first-title
                     :data-tab "cash-flow"
                     :on-click (partial pillbox-click owner options)} first-title))
       (when needs-runway
         (dom/label {:class runway-classes
-                    :title "Runway"
                     :data-tab "runway"
                     :on-click (partial pillbox-click owner options)} "Runway")))))
 
@@ -78,8 +75,6 @@
       (when-not no-data
         (dom/div {:class "section-container" :id "section-finances"}
           (dom/div {:class "composed-section finances group"}
-            (when (:pillboxes-first options)
-              (render-pillboxes owner options))
             (dom/div {:class (utils/class-set {:composed-section-body true})}
               (case focus
 
@@ -93,5 +88,4 @@
 
                 "runway"
                 (om/build runway subsection-data subsection-options)))
-            (when-not (:pillboxes-first options)
-              (render-pillboxes owner options))))))))
+              (render-pillboxes owner options)))))))

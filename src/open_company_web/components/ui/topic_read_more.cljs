@@ -8,8 +8,7 @@
                                        section
                                        read-more-cb] :as data} owner]
   (render [_]
-    (let [section-kw (keyword section)
-          topic-body (utils/get-topic-body topic-data section-kw)]
+    (let [topic-body (:body topic-data)]
       (when (> (count (utils/strip-HTML-tags topic-body)) 500)
         (dom/button {:class "btn-reset topic-read-more"
                      :onClick read-more-cb} "READ MORE")))))
