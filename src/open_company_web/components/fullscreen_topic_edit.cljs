@@ -172,7 +172,13 @@
   (or (data-check-value (:value row))
       (data-check-value (:target row))))
 
-(defn growth-change-data-cb [owner row]
+(defn growth-change-data-cb
+  "
+  Callback for when data is changed in a growth table row.
+  
+  Updates the data, and enables the save button.
+  "
+  [owner row]
   (when (growth-row-has-data row)
     (let [{:keys [period slug] :as fixed-row} (growth-fix-row row)
           growth-data (om/get-state owner :growth-data)
@@ -532,8 +538,6 @@
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height utils/overlay-max-win-height)
           max-height (min (- 650 126) (- win-height 126))
-          ; growth
-          growth-data (when (= topic "growth") (growth-utils/growth-data-map (:data topic-data)))
           headline-length-limit (if (or (= topic-kw :finances)
                                         (= topic-kw :growth))
                                   80
