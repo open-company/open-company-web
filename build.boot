@@ -12,7 +12,8 @@
 
     [rum "0.10.5" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
 
-    [org.martinklepsch/derivatives "0.1.1"] ; Chains of derived data https://github.com/martinklepsch/derivatives
+    ;; Don't upgrade to 0.1.1, errors
+    [org.martinklepsch/derivatives "0.1.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
 
     [cljs-http "0.1.41"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/schema "1.1.3"] ; Dependency of om-tools https://github.com/Prismatic/schema
