@@ -15,10 +15,10 @@ div.fullscreen-topic {
     cursor: pointer;
     z-index: 1040;
     float: right;
-    opacity: 0.2;
+    color: rgba(78,90,107,0.5);
 
     &:hover {
-      opacity: 0.5;
+      color: rgba(78,90,107,1);
     }
   }
 

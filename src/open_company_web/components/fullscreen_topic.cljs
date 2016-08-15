@@ -78,7 +78,10 @@
                        is-actual)
               (dom/div {:class "edit-button"
                         :on-click #((:start-editing options))}
-                (dom/i {:class "fa fa-pencil"}))))
+                (dom/i {:class "fa fa-pencil"
+                        :title "Edit"
+                        :data-toggle "tooltip"
+                        :data-placement "top"}))))
           
           ;; Headline
           (dom/div {:class "topic-headline"

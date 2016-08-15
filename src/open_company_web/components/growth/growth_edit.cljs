@@ -160,7 +160,7 @@
                                                           (replace-row-in-data row-data k v (:change-growth-cb data)))}))))
                     (dom/tr {}
                       (dom/td {}
-                        (dom/a {:class "more" :on-click #(more-months owner data)} "More..."))
+                        (dom/a {:class "more" :on-click #(more-months owner data)} "Earlier..."))
                       (dom/td {}))))))
 
             ;; metric selection pillboxes

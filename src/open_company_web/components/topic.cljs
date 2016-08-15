@@ -121,7 +121,10 @@
                    (not (:foce-active data)))
             (dom/button {:class (str "topic-pencil-button btn-reset")
                          :on-click #(pencil-click owner %)}
-              (dom/i {:class "fa fa-pencil"}))))
+              (dom/i {:class "fa fa-pencil"
+                      :title "Edit"
+                      :data-toggle "tooltip"
+                      :data-placement "top"}))))
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))

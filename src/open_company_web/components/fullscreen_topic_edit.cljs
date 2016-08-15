@@ -543,6 +543,8 @@
       ; set the onbeforeunload handler only if there are changes
       (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
+      
+      ;; Save and cancel buttons
       (dom/div #js {:className "fullscreen-topic-edit group"
                     :ref "fullscreen-topic-edit"
                     :style #js {:width (str (- fullscreen-width 20) "px")}
@@ -636,6 +638,7 @@
             
             ;; Icons
             (dom/div {:class "topc-edit-top-box-footer"}
+              ;; Emoji
               (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
                 (emoji-picker {:add-emoji-cb (fn [editor emoji]
                                                (when (= editor (sel1 (str "div#topic-edit-body-" (name topic))))
@@ -644,6 +647,7 @@
                                                body     (sel1 (str "topic-edit-body-" (name topic)))]
                                                  (not (or (= (.-activeElement js/document) headline)
                                                           (= (.-activeElement js/document) body))))}))
+              ;; Add image
               (when-not is-data-topic
                 (dom/button {:class "btn-reset add-image"
                              :title (if (not image-url) "Add an image" "Replace image")
@@ -653,6 +657,7 @@
                              :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
                              :on-click #(.click (sel1 [:input#topic-edit-upload-ui--select-trigger]))}
                   (dom/i {:class "fa fa-camera"})))
+              ;; Embed image
               (when-not is-data-topic
                 (dom/button {:class "btn-reset image-url"
                              :title "Provide an image link"
@@ -662,6 +667,7 @@
                              :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
                              :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
                   (dom/i {:class "fa fa-code"})))
+              ;; Archive
               (dom/button #js {:className "btn-reset archive-button right"
                                :title "Archive this topic"
                                :type "button"
@@ -670,7 +676,10 @@
                                :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
                                :onClick #(remove-topic-click owner options %)}
                 (dom/i {:class "fa fa-archive"}))
+              
+              ;; Char counter
               (dom/div {:class (str "char-count" (when char-count-alert " red"))} char-count)
+              ;; Image U/L form
               (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
                 (dom/input {:type "text"
                             :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
@@ -692,6 +701,7 @@
                           :style {:display "none"}
                           :type "file"
                           :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))}))))
+      
       ;; Onboarding toolip
       (when (and show-first-edit-tooltip
                  (not tooltip-dismissed))

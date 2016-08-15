@@ -223,7 +223,7 @@
                                      (s/blank? (om/get-state owner :unit))
                                      (s/blank? (om/get-state owner :interval)))
                        :on-click #((:save-cb data))}
-            (if (:new-metric data) "ADD METRIC" "SAVE"))
+            "SAVE")
           ;; archive button
           (when-not (:new-metric data)
             (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
