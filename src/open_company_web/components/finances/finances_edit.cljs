@@ -54,17 +54,6 @@
       (dom/tr {}
         (dom/td {:class "no-cell"}
           (utils/get-period-string (:period finances-data) "monthly" [:short (when needs-year :force-year)]))
-        ;; cash
-        (dom/td {}
-          (om/build cell {:value (:cash finances-data)
-                          :decimals 0
-                          :placeholder (if is-new "at month end" "")
-                          :currency currency
-                          :cell-state cell-state
-                          :draft-cb #(change-cb :cash %)
-                          :period period
-                          :key :cash
-                          :tab-cb tab-cb}))
         ;; revenue
         (dom/td {}
           (om/build cell {:value (:revenue finances-data)
@@ -87,9 +76,17 @@
                           :period period
                           :key :costs
                           :tab-cb tab-cb}))
-        ;; Burn / Cash flow
-        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new :dark true})}
-          burn-rate)
+        ;; cash
+        (dom/td {}
+          (om/build cell {:value (:cash finances-data)
+                          :decimals 0
+                          :placeholder (if is-new "at month end" "")
+                          :currency currency
+                          :cell-state cell-state
+                          :draft-cb #(change-cb :cash %)
+                          :period period
+                          :key :cash
+                          :tab-cb tab-cb}))
         ;; Runway
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new :dark true})}
           runway)))))
@@ -124,10 +121,9 @@
               (dom/thead {}
                 (dom/tr {}
                   (dom/th {} "")
-                  (dom/th {} "Cash")
                   (dom/th {} "Revenue")
-                  (dom/th {} "Costs")
-                  (dom/th {:class "dark"} "Cash flow")
+                  (dom/th {} "Expenses")
+                  (dom/th {} "Cash")
                   (dom/th {:class "dark"} "Runway")))
               (dom/tbody {}
                 (let [current-period (utils/current-period)]
@@ -148,7 +144,6 @@
                 (dom/tr {}
                   (dom/td {}
                     (dom/a {:class "more" :on-click #(more-months owner)} "Earlier..."))
-                  (dom/td {})
                   (dom/td {})
                   (dom/td {})
                   (dom/td {})
