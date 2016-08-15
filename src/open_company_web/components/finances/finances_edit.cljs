@@ -147,7 +147,7 @@
                                                    :change-cb #(replace-row-in-data data row-data %1 %2)}))))
                 (dom/tr {}
                   (dom/td {}
-                    (dom/a {:class "more" :on-click #(more-months owner)} "More..."))
+                    (dom/a {:class "more" :on-click #(more-months owner)} "Earlier..."))
                   (dom/td {})
                   (dom/td {})
                   (dom/td {})
