@@ -11,7 +11,7 @@
 (def dot-stroke 3)
 (def dot-selected-stroke 6)
 
-(def show-dots 5)
+(def show-dots 4)
 
 (defn max-y [data chart-keys]
   (let [filtered-data (map #(select-keys % chart-keys) data)]
