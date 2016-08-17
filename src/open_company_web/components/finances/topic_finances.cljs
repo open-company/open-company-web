@@ -107,48 +107,52 @@
 
   (render-state [_ state]
     (let [finances-row-data (:data section-data)
-          fixed-finances-data (finances-utils/fill-gap-months finances-row-data)
-          sort-pred (utils/sort-by-key-pred :period)
-          sorted-finances (sort sort-pred (vals fixed-finances-data))          
-          no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))
-          sum-revenues (apply + (map utils/abs (map :revenue finances-row-data)))
-          subsection-data {:section-data section-data
-                           :read-only true
-                           :currency currency}
-          subsection-options {:opts options}
-          cur-symbol (utils/get-symbol-for-currency-code currency)
-          fixed-sorted-costs (vec (map #(merge % {:label (get-currency-label cur-symbol (:costs %))
-                                           :sub-label (str "MONTHLY BURN - " (utils/get-month (:period %)) " " (utils/get-year (:period %)))}) sorted-finances))
-          chart-opts {:opts {:chart-height 100
-                             :chart-width (:width (:chart-size options))
-                             :chart-keys [:costs]
-                             :interval "monthly"
-                             :label-color (occ/get-color-by-kw :oc-chart-red)
-                             :sub-label-color (occ/get-color-by-kw :oc-gray-5)
-                             :label-key :label
-                             :sub-label-key :sub-label
-                             :svg-click #(when (:topic-click options) ((:topic-click options) nil))
-                             :chart-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
-                             :chart-selected-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
-                             :chart-fill-polygons false
-                             :extra-info-keys [:cash :runway]
-                             :extra-info-labels {:cash "CASH" :runway "RUNWAY"}
-                             :extra-info-colors {:cash (occ/get-color-by-kw :oc-gray-5-3-quarter)
-                                                 :runway (occ/get-color-by-kw :oc-gray-5-3-quarter)}
-                             :extra-info-presenters {:cash (partial get-currency-label cur-symbol)
-                                                     :runway (partial get-runway-label)}
-                             :hide-nav (:hide-nav options)}}]
+          no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))]
 
       (when-not no-data
-        (dom/div {:class "section-container" :id "section-finances"}          
+        (let [fixed-finances-data (finances-utils/fill-gap-months finances-row-data)
+              sort-pred (utils/sort-by-key-pred :period)
+              sorted-finances (sort sort-pred (vals fixed-finances-data))          
+              sum-revenues (apply + (map utils/abs (map :revenue finances-row-data)))
+              subsection-data {:section-data section-data
+                               :read-only true
+                               :currency currency}
+              subsection-options {:opts options}
+              cur-symbol (utils/get-symbol-for-currency-code currency)
+              fixed-sorted-costs (vec (map #(merge % {:label (get-currency-label cur-symbol (:costs %))
+                                                      :sub-label (str "MONTHLY BURN - "
+                                                                      (utils/get-month (:period %)) " " 
+                                                                      (utils/get-year (:period %)))})
+                                        sorted-finances))
+              chart-opts {:opts {:chart-height 100
+                                 :chart-width (:width (:chart-size options))
+                                 :chart-keys [:costs]
+                                 :interval "monthly"
+                                 :label-color (occ/get-color-by-kw :oc-chart-red)
+                                 :sub-label-color (occ/get-color-by-kw :oc-gray-5)
+                                 :label-key :label
+                                 :sub-label-key :sub-label
+                                 :svg-click #(when (:topic-click options) ((:topic-click options) nil))
+                                 :chart-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
+                                 :chart-selected-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
+                                 :chart-fill-polygons false
+                                 :extra-info-keys [:cash :runway]
+                                 :extra-info-labels {:cash "CASH" :runway "RUNWAY"}
+                                 :extra-info-colors {:cash (occ/get-color-by-kw :oc-gray-5-3-quarter)
+                                                     :runway (occ/get-color-by-kw :oc-gray-5-3-quarter)}
+                                 :extra-info-presenters {:cash (partial get-currency-label cur-symbol)
+                                                         :runway (partial get-runway-label)}
+                                 :hide-nav (:hide-nav options)}}]
 
-          (dom/div {:class "composed-section finances group"}
+          (dom/div {:class "section-container" :id "section-finances"}          
 
-            ;; has the company ever had revenue
-            (if (pos? sum-revenues) 
+            (dom/div {:class "composed-section finances group"}
 
-              ;; post-revenue gets a bar chart
-              (om/build d3-dot-chart {:chart-data fixed-sorted-costs} chart-opts)
+              ;; has the company ever had revenue
+              (if (pos? sum-revenues) 
 
-              ;; pre-revenue gets a line chart
-              (om/build d3-dot-chart {:chart-data fixed-sorted-costs} chart-opts))))))))
+                ;; post-revenue gets a bar chart
+                (om/build d3-dot-chart {:chart-data fixed-sorted-costs} chart-opts)
+
+                ;; pre-revenue gets a line chart
+                (om/build d3-dot-chart {:chart-data fixed-sorted-costs} chart-opts)))))))))
