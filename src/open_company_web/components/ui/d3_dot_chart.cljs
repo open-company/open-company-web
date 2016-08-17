@@ -66,7 +66,7 @@
             (.attr "id" "dot-chart-label-sub")
             (.attr "x" 0)
             (.attr "y" 40)
-            (.attr "fill" (:label-color options))
+            (.attr "fill" (:sub-label-color options))
             (.text sub-label-text))))))
 
 (defn dot-click [owner options idx]
@@ -128,6 +128,7 @@
           scale-fn (scale owner options)
           data-max (max-y (om/get-props owner :chart-data) chart-keys)
           max-y (scale-fn data-max)]
+
       ; for each set of data
       (when (> (count chart-data) 1)
         (doseq [i (range (count chart-data))]
@@ -137,6 +138,7 @@
               (let [chart-key (get chart-keys j)
                     cx (dot-position chart-width i)
                     cy (scale-fn (chart-key data-set))]
+                
                 ; add the line to connect this to the next dot and a polygon below the lines
                 (when (and (chart-key data-set)
                            (< i (dec (count chart-data))))
@@ -144,16 +146,19 @@
                         next-cx (dot-position chart-width (inc i))
                         next-cy (scale-fn (chart-key next-data-set))]
                     (when (chart-key next-data-set)
-                      (-> chart-node
-                          (.append "polygon")
-                          (.attr "class" "chart-polygon")
-                          (.style "fill" (chart-key fill-colors))
-                          (.style "opacity" "0.35")
-                          (.attr "points"
-                            (str (inc cx) "," (get-y cy max-y) " "
-                                 (dec next-cx) "," (get-y next-cy max-y) " "
-                                 (dec next-cx) "," chart-height " "
-                                 (inc cx) "," chart-height " ")))
+                      ;; polygon below line
+                      (when (:chart-fill-polygons options)
+                        (-> chart-node
+                            (.append "polygon")
+                            (.attr "class" "chart-polygon")
+                            (.style "fill" (chart-key fill-colors))
+                            (.style "opacity" "0.35")
+                            (.attr "points"
+                              (str (inc cx) "," (get-y cy max-y) " "
+                                   (dec next-cx) "," (get-y next-cy max-y) " "
+                                   (dec next-cx) "," chart-height " "
+                                   (inc cx) "," chart-height " "))))
+                      ;; connecting line
                       (-> chart-node
                           (.append "line")
                           (.attr "class" "chart-line")
@@ -163,7 +168,7 @@
                           (.attr "y1" (get-y cy max-y))
                           (.attr "x2" (- next-cx 2))
                           (.attr "y2" (get-y next-cy max-y))))))
-                ; add a rect to represent the data
+                ; add a circle to represent the data
                 (-> chart-node
                     (.append "circle")
                     (.attr "class" "chart-dot")
@@ -237,14 +242,17 @@
       (dom/div {:class "d3-dot-container"
                 :style #js {:width (str (+ chart-width 20) "px")
                             :height (str fixed-chart-height "px")}}
+        ;; Previous button
         (dom/div {:class (str "chart-prev" (when hide-chart-nav " hidden"))
                   :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
                               :opacity (if (> start 0) 1 0)}
                   :on-click #(prev-data owner %)}
           (dom/i {:class "fa fa-caret-left"}))
+        ;; Chart
         (dom/svg #js {:className "d3-dot-chart"
                       :ref "d3-dots"
                       :style #js {:marginLeft (str (if hide-chart-nav 10 0) "px")}})
+        ;; Next button
         (dom/div {:class (str "chart-next" (when hide-chart-nav " hidden"))
                   :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
                               :opacity (if (< start (- (count chart-data) show-dots)) 1 0)}

@@ -15,7 +15,7 @@
         abs-cash-flow (utils/abs cash-flow)]
     [(utils/get-period-string (:period obj) "monthly" [:short])
      (:revenue obj)
-     (occ/fill-color :oc-new-chart-green)
+     (occ/fill-color :oc-chart-green)
      (str (utils/get-period-string (:period obj))
           " Revenue: "
           prefix
@@ -27,7 +27,7 @@
           prefix
           (utils/thousands-separator (or (:costs obj) 0)))
      abs-cash-flow
-     (occ/fill-color (if cash-flow-pos? :oc-new-chart-green :red))
+     (occ/fill-color (if cash-flow-pos? :oc-chart-green :red))
      (str (utils/get-period-string (:period obj))
           " Cash flow: "
           (when (neg? cash-flow) "-")
@@ -101,17 +101,17 @@
                              :sub-label-key :sub-label
                              :interval "monthly"
                              :chart-colors (if has-revenues
-                                            {:revenue (occ/get-color-by-kw :oc-new-chart-green)
+                                            {:revenue (occ/get-color-by-kw :oc-chart-green)
                                              :costs (occ/get-color-by-kw :oc-red-light)
                                              :cash-flow #(if (pos? %)
-                                                            (occ/get-color-by-kw :oc-new-chart-green)
+                                                            (occ/get-color-by-kw :oc-chart-green)
                                                             (occ/get-color-by-kw :oc-red-light))}
                                             {:costs (occ/get-color-by-kw :oc-red-light)})
                              :chart-selected-colors (if has-revenues
-                                                      {:revenue (occ/get-color-by-kw :oc-new-chart-green)
+                                                      {:revenue (occ/get-color-by-kw :oc-chart-green)
                                                        :costs (occ/get-color-by-kw :oc-red-regular)
                                                        :cash-flow #(if (pos? %)
-                                                                    (occ/get-color-by-kw :oc-new-chart-green)
+                                                                    (occ/get-color-by-kw :oc-chart-green)
                                                                     (occ/get-color-by-kw :oc-red-regular))}
                                                       {:costs (occ/get-color-by-kw :oc-red-regular)})
                              :svg-click (:topic-click options)

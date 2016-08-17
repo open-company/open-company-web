@@ -11,47 +11,11 @@
 
 (defn get-state [owner data & [initial]]
   (let [section-data (:section-data data)]
-    {:focus (if initial
-              (or (:selected-metric data) "cash")
-              (om/get-state owner :focus))
-     :finances-data (finances-utils/map-placeholder-data (:data section-data))}))
-
-; (defn pillbox-click [owner options e]
-;   (.preventDefault e)
-;   (let [tab  (.. e -target -dataset -tab)]
-;     (when (fn? (:switch-metric-cb options))
-;       ((:switch-metric-cb options) tab))
-;     (om/update-state! owner :focus (fn [] tab)))
-;   (.stopPropagation e))
+    {:finances-data (finances-utils/map-placeholder-data (:data section-data))}))
 
 (defn has-revenues-or-costs [finances-data]
   (some #(or (not (zero? (:revenue %))) (not (zero? (:costs %)))) finances-data))
 
-; (defn render-pillboxes [owner options]
-;   (let [data (om/get-props owner)
-;         section-data (:section-data data)
-;         focus (om/get-state owner :focus)
-;         classes "pillbox"
-;         cash-classes (str classes (when (= focus "cash") " active"))
-;         cash-flow-classes (str classes (when (= focus "cash-flow") " active"))
-;         runway-classes (str classes (when (= focus "runway") " active"))
-;         finances-row-data (:data section-data)
-;         sum-revenues (apply + (map :revenue finances-row-data))
-;         needs-runway (some #(neg? (:runway %)) finances-row-data)
-;         first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
-;         needs-cash-flow (has-revenues-or-costs finances-row-data)]
-;     (dom/div {:class "pillbox-container finances"}
-;       (dom/label {:class cash-classes
-;                   :data-tab "cash"
-;                   :on-click (partial pillbox-click owner options)} "Cash")
-;       (when needs-cash-flow
-;         (dom/label {:class cash-flow-classes
-;                     :data-tab "cash-flow"
-;                     :on-click (partial pillbox-click owner options)} first-title))
-;       (when needs-runway
-;         (dom/label {:class runway-classes
-;                     :data-tab "runway"
-;                     :on-click (partial pillbox-click owner options)} "Runway")))))
 
 (defn chart-data-at-index [data prefix idx]
   (let [data (to-array data)
@@ -61,7 +25,7 @@
         abs-cash-flow (utils/abs cash-flow)]
     [(utils/get-period-string (:period obj) "monthly" [:short])
      (:revenue obj)
-     (occ/fill-color :oc-new-chart-green)
+     (occ/fill-color :oc-chart-green)
      (str (utils/get-period-string (:period obj))
           " Revenue: "
           prefix
@@ -73,7 +37,7 @@
           prefix
           (utils/thousands-separator (or (:costs obj) 0)))
      abs-cash-flow
-     (occ/fill-color (if cash-flow-pos? :oc-new-chart-green :red))
+     (occ/fill-color (if cash-flow-pos? :oc-chart-green :red))
      (str (utils/get-period-string (:period obj))
           " Cash flow: "
           (when (neg? cash-flow) "-")
@@ -145,16 +109,18 @@
           cur-symbol (utils/get-symbol-for-currency-code currency)
           fixed-sorted-costs (vec (map #(merge % {:label (get-label cur-symbol (:costs %))
                                            :sub-label (str "MONTHLY BURN - " (utils/get-month (:period %)) " " (utils/get-year (:period %)))}) sorted-finances))
-          chart-opts {:opts {:chart-height (:height (:chart-size options))
+          chart-opts {:opts {:chart-height 150
                              :chart-width (:width (:chart-size options))
-                             :chart-keys [:value]
+                             :chart-keys [:costs]
                              :interval "monthly"
-                             :label-color (occ/get-color-by-kw :oc-gray-5)
+                             :label-color (occ/get-color-by-kw :oc-chart-red)
+                             :sub-label-color (occ/get-color-by-kw :oc-gray-5)
                              :label-key :label
                              :sub-label-key :sub-label
                              :svg-click #(when (:topic-click options) ((:topic-click options) nil))
-                             :chart-colors {:value (occ/get-color-by-kw :oc-new-chart-blue)}
-                             :chart-selected-colors {:value (occ/get-color-by-kw :oc-new-chart-blue)}
+                             :chart-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
+                             :chart-selected-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
+                             :chart-fill-polygons false
                              :hide-nav (:hide-nav options)}}]
 
       (when-not no-data

@@ -28,8 +28,8 @@
                              :sub-label-key :sub-label
                              :interval "monthly"
                              :svg-click (:topic-click options)
-                             :chart-colors {:cash (occ/get-color-by-kw :oc-new-chart-green)}
-                             :chart-selected-colors {:cash (occ/get-color-by-kw :oc-new-chart-green)}
+                             :chart-colors {:cash (occ/get-color-by-kw :oc-chart-green)}
+                             :chart-selected-colors {:cash (occ/get-color-by-kw :oc-chart-green)}
                              :hide-nav (:hide-nav options)}}]
       (dom/div {:class (utils/class-set {:section true
                                          :cash true
