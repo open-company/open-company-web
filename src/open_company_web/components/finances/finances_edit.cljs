@@ -24,13 +24,13 @@
           next-period (:next-period data)
           tab-cb (fn [_ k]
                    (cond
-                     (= k :cash)
-                     (signal-tab (:period finances-data) :revenue)
                      (= k :revenue)
                      (signal-tab (:period finances-data) :costs)
                      (= k :costs)
+                     (signal-tab (:period finances-data) :cash)
+                     (= k :cash)
                      (when next-period
-                       (signal-tab next-period :cash))))
+                        (signal-tab next-period :revenue))))
           burn (- (:revenue finances-data) (:costs finances-data))
           burn-prefix (if (or (zero? burn) (pos? burn)) prefix (str "-" prefix))
           burn-rate (if (js/isNaN burn)
