@@ -279,12 +279,12 @@
           (dom/div
             (dom/div {:class "extra-info"}
               (dom/div {:class "extra-info-value"}
-                (str (get selected-data-set :cash)))
+                ((:cash (:extra-info-presenters options)) (get selected-data-set :cash)))
               (dom/div {:class "extra-info-label"}
                 "CASH"))
             (dom/div {:class "extra-info"}
               (dom/div {:class "extra-info-value"}
-                (str (get selected-data-set :runway)))
+                ((:runway (:extra-info-presenters options)) (get selected-data-set :runway)))
               (dom/div {:class "extra-info-label"}
                 "RUNWAY"))))
       )

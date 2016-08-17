@@ -1,5 +1,6 @@
 (ns open-company-web.components.finances.topic-finances
-  (:require [om.core :as om :include-macros true]
+  (:require [clojure.string :as s]
+            [om.core :as om :include-macros true]
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.dispatcher :as dispatcher]
@@ -81,8 +82,16 @@
     {:label (when cash-flow (str " Cash flow " cash-flow))
      :color (occ/get-color-by-kw :oc-gray-5)}]))
 
-(defn get-label [cur-symbol costs]
-  (str cur-symbol (.toLocaleString (js/parseFloat (str (or costs "0"))))))
+(defn get-currency-label [cur-symbol value]
+  (str cur-symbol (.toLocaleString (js/parseFloat (str (or value "0"))))))
+
+(defn get-runway-label [value]
+  (finances-utils/get-rounded-runway value [:round]))
+  ;(.log js/console value)
+  ;(case
+    ;(or (s/blank? value) (= value 0)) "-"
+    ;(neg? value) (finances-utils/get-rounded-runway value [:round])
+    ;:else "Pofitable"))
 
 (defcomponent topic-finances [{:keys [section section-data currency] :as data} owner options]
 
@@ -107,7 +116,7 @@
           subsection-options {:opts options}
           currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
-          fixed-sorted-costs (vec (map #(merge % {:label (get-label cur-symbol (:costs %))
+          fixed-sorted-costs (vec (map #(merge % {:label (get-currency-label cur-symbol (:costs %))
                                            :sub-label (str "MONTHLY BURN - " (utils/get-month (:period %)) " " (utils/get-year (:period %)))}) sorted-finances))
           chart-opts {:opts {:chart-height 150
                              :chart-width (:width (:chart-size options))
@@ -125,6 +134,8 @@
                              :extra-info-labels {:cash "CASH" :runway "RUNWAY"}
                              :extra-info-colors {:cash (occ/get-color-by-kw :oc-gray-5)
                                                  :runway (occ/get-color-by-kw :oc-gray-5)}
+                             :extra-info-presenters {:cash (partial get-currency-label cur-symbol)
+                                                     :runway (partial get-runway-label)}
                              :hide-nav (:hide-nav options)}}]
 
       (when-not no-data
