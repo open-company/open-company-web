@@ -25,7 +25,7 @@ div.composed-section {
   div.chart-label-container {
 
     padding-left: 20px;
-    
+
     div.dot-chart-label{
       font-size: 24px;
       font-weight: 700;
@@ -57,7 +57,10 @@ div.composed-section {
     align-items: center;
     justify-content: center;
     width: 100%;
-
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin-bottom: 10px;
+    
     div.extra-info {
 
       font-weight: 700;
