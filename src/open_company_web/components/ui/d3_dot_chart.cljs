@@ -23,7 +23,7 @@
         data-max (max-y all-data chart-keys)
         linear-fn (.. js/d3 -scale linear)
         domain-fn (.domain linear-fn #js [0 data-max])
-        range-fn (.range linear-fn #js [0 (- (:chart-height options) 100)])]
+        range-fn (.range linear-fn #js [0 (- (:chart-height options) 30)])]
     range-fn))
 
 (defn dot-position [chart-width i]
@@ -35,46 +35,6 @@
         all-data (om/get-props owner :chart-data)
         stop (min (count all-data) (+ start show-dots))]
     (subvec all-data start stop)))
-
-(defn render-chart-labels [owner options selected chart-data]
-  (when-let [d3-dots (.select js/d3 (om/get-ref owner "d3-dots"))]
-    ;; clear the old label
-    (.remove (.select d3-dots "#dot-chart-label"))
-    (.remove (.select d3-dots "#dot-chart-label-sub"))
-
-    (let [chart-height (:chart-height options)
-          chart-width (:chart-width options)
-          label-key (:label-key options)
-          sub-label-key (:sub-label-key options)
-          selected-data-set (get chart-data selected)
-          label-text (get selected-data-set label-key)
-          sub-label-text (get selected-data-set sub-label-key)
-          
-          ;; chart label
-          chart-label (-> d3-dots
-                          (.append "text")
-                          (.attr "class" "dot-chart-label")
-                          (.attr "id" "dot-chart-label")
-                          (.attr "x" 0)
-                          (.attr "y" 20)
-                          (.attr "fill" (:label-color options))
-                          (.text label-text))
-          
-          chart-label-width (js/SVGgetWidth chart-label)
-          small? (> chart-label-width 150)]
-      (when small?
-        (.attr chart-label "class" "dot-chart-label small"))
-      
-      ;; chart sub-label
-      (when (and sub-label-key sub-label-text)
-        (-> d3-dots
-            (.append "text")
-            (.attr "class" (str "dot-chart-label-sub" (when small? " small")))
-            (.attr "id" "dot-chart-label-sub")
-            (.attr "x" 0)
-            (.attr "y" 40)
-            (.attr "fill" (:sub-label-color options))
-            (.text sub-label-text))))))
 
 (defn dot-select [owner options idx]
   (.stopPropagation (.-event js/d3))
@@ -102,11 +62,10 @@
           (.attr "stroke-width" dot-selected-stroke)
           (.attr "fill" "white")
           (.attr "r" (if hasvalue dot-radius 0))))
-    (render-chart-labels owner options idx data)
     (om/set-state! owner :selected idx)))
 
 (defn get-y [y max-y]
-  (+ 70 (- max-y y)))
+  (+ 23 (- max-y y)))
 
 (defn d3-calc [owner options]
   (when-let [d3-dots (om/get-ref owner "d3-dots")]
@@ -198,14 +157,12 @@
               (.append "rect")
               (.attr "class" "hover-rect")
               (.attr "width" (/ chart-width show-dots))
-              (.attr "height" (- chart-height 50))
+              (.attr "height" chart-height)
               (.attr "x" (* i (/ chart-width show-dots)))
-              (.attr "y" 50)
+              (.attr "y" 0)
               (.on "mouseover" #(dot-select owner options i))
               (.on "mouseout" #(dot-select owner options (om/get-state owner :selected)))
-              (.attr "fill" "transparent"))))
-      ; add the selected value labels
-      (render-chart-labels owner options selected chart-data))))
+              (.attr "fill" "transparent")))))))
 
 (def chart-step show-dots)
 
@@ -246,10 +203,21 @@
     (let [fixed-chart-height (if (> (count chart-data) 1)
                               chart-height
                               90)
-          hide-chart-nav (:hide-nav options)]
+          hide-chart-nav (:hide-nav options)
+          selected-data-set (get chart-data selected)
+          selected-label (get selected-data-set (:label-key options))
+          selected-sub-label (get selected-data-set (:sub-label-key options))]
       
       (dom/div
-        ;; Top labels
+        ;; Top label / sub-label
+
+        (dom/div {:class "chart-label-container"}
+          (dom/div {:class "dot-chart-label"
+                    :style {:color (:label-color options)}}
+            selected-label)
+          (dom/div {:class "dot-chart-label-sub"
+                    :style {:color (:sub-label-color options)}}
+            selected-sub-label))
 
         ;; D3 Chart w/ nav. buttons
         (dom/div {:class "d3-dot-container"
@@ -273,24 +241,24 @@
             (dom/i {:class "fa fa-caret-right"})))
 
       ;; Bottom extra-info
-      (when (any? (:extra-info options))
+      (when (not (empty? (:extra-info-keys options)))
 
-        (let [selected-data-set (get chart-data selected)]
-          (dom/div {:class "extra-info-section"}
-            (dom/div {:class "extra-info"}
-              (dom/div {:class "extra-info-value"
-                        :style {:color (:cash (:extra-info-colors options))}}
-                ((:cash (:extra-info-presenters options)) (get selected-data-set :cash)))
-              (dom/div {:class "extra-info-label"
-                        :style {:color (:cash (:extra-info-colors options))}}
-                "CASH"))
-            (dom/div {:class "extra-info"}
-              (dom/div {:class "extra-info-value"
-                        :style {:color (:runway (:extra-info-colors options))}}
-                ((:runway (:extra-info-presenters options)) (get selected-data-set :runway)))
-              (dom/div {:class "extra-info-label"
-                        :style {:color (:cash (:extra-info-colors options))}}
-                "RUNWAY"))))
+        (dom/div {:class "extra-info-container"}
+          (dom/div {:class "extra-info"}
+            (dom/div {:class "extra-info-value"
+                      :style {:color (:cash (:extra-info-colors options))}}
+              ((:cash (:extra-info-presenters options)) (get selected-data-set :cash)))
+            (dom/div {:class "extra-info-label"
+                      :style {:color (:cash (:extra-info-colors options))}}
+              "CASH"))
+          (dom/div {:class "extra-info"}
+            (dom/div {:class "extra-info-value"
+                      :style {:color (:runway (:extra-info-colors options))}}
+              ((:runway (:extra-info-presenters options)) (get selected-data-set :runway)))
+            (dom/div {:class "extra-info-label"
+                      :style {:color (:cash (:extra-info-colors options))}}
+              "RUNWAY"))))
+
       )
 
-      ))))
+      )))

@@ -83,7 +83,9 @@
      :color (occ/get-color-by-kw :oc-gray-5)}]))
 
 (defn get-currency-label [cur-symbol value]
-  (str cur-symbol (.toLocaleString (js/parseFloat (str (or value "0"))))))
+  (let [abs-value (utils/abs (or value 0))
+        short-value (utils/with-metric-prefix abs-value)]
+    (str cur-symbol short-value)))
 
 (defn get-runway-label [value]
   (finances-utils/get-rounded-runway value [:round]))
@@ -114,11 +116,10 @@
                            :read-only true
                            :currency currency}
           subsection-options {:opts options}
-          currency (:currency data)
           cur-symbol (utils/get-symbol-for-currency-code currency)
           fixed-sorted-costs (vec (map #(merge % {:label (get-currency-label cur-symbol (:costs %))
                                            :sub-label (str "MONTHLY BURN - " (utils/get-month (:period %)) " " (utils/get-year (:period %)))}) sorted-finances))
-          chart-opts {:opts {:chart-height 150
+          chart-opts {:opts {:chart-height 100
                              :chart-width (:width (:chart-size options))
                              :chart-keys [:costs]
                              :interval "monthly"
@@ -132,8 +133,8 @@
                              :chart-fill-polygons false
                              :extra-info-keys [:cash :runway]
                              :extra-info-labels {:cash "CASH" :runway "RUNWAY"}
-                             :extra-info-colors {:cash (occ/get-color-by-kw :oc-gray-5-half)
-                                                 :runway (occ/get-color-by-kw :oc-gray-5-half)}
+                             :extra-info-colors {:cash (occ/get-color-by-kw :oc-gray-5-3-quarter)
+                                                 :runway (occ/get-color-by-kw :oc-gray-5-3-quarter)}
                              :extra-info-presenters {:cash (partial get-currency-label cur-symbol)
                                                      :runway (partial get-runway-label)}
                              :hide-nav (:hide-nav options)}}]
@@ -146,26 +147,8 @@
             ;; has the company ever had revenue
             (if (pos? sum-revenues) 
 
+              ;; post-revenue gets a bar chart
               (om/build d3-dot-chart {:chart-data fixed-sorted-costs} chart-opts)
 
-              (om/build d3-dot-chart {:chart-data fixed-sorted-costs} chart-opts))
-              
-
-            
-            ;; chart
-            (dom/div {:class (utils/class-set {:composed-section-body true})})
-            
-              ; (case focus
-
-              ;   "cash"
-              ;   (om/build cash subsection-data subsection-options)
-
-              ;   "cash-flow"
-              ;   (if (pos? sum-revenues)
-              ;     (om/build cash-flow subsection-data subsection-options)
-              ;     (om/build costs subsection-data subsection-options))
-
-              ;   "runway"
-              ;   (om/build runway subsection-data subsection-options)))
-              ;(render-pillboxes owner options)
-              ))))))
+              ;; pre-revenue gets a line chart
+              (om/build d3-dot-chart {:chart-data fixed-sorted-costs} chart-opts))))))))

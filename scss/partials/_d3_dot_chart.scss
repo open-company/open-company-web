@@ -1,13 +1,32 @@
-div.d3-dot-container{
-  margin: 0 auto;
+div.composed-section {
 
-  svg{
+  div.d3-dot-container{
+    margin: 0 auto;
 
-    rect.hover-rect {
-      cursor: pointer;
+    svg{
+
+      rect.hover-rect {
+        cursor: pointer;
+      }
     }
 
-    text.dot-chart-label{
+    div.chart-prev {
+      float: left;
+      cursor: pointer;
+      width: 10px;
+    }
+    div.chart-next {
+      float: right;
+      cursor: pointer;
+      width: 10px;
+    }
+  }
+
+  div.chart-label-container {
+
+    padding-left: 20px;
+    
+    div.dot-chart-label{
       font-size: 24px;
       font-weight: 700;
       font-family: $oc_headers_font;
@@ -18,7 +37,7 @@ div.d3-dot-container{
       }
     }
 
-    text.dot-chart-label-sub {
+    div.dot-chart-label-sub {
       font-size: 12px;
       opacity: 0.75;
       font-weight: 700;
@@ -32,30 +51,19 @@ div.d3-dot-container{
     }
   }
 
-  div.chart-prev {
-    float: left;
-    cursor: pointer;
-    width: 10px;
-  }
-  div.chart-next {
-    float: right;
-    cursor: pointer;
-    width: 10px;
-  }
-}
+  div.extra-info-container {
 
-div.composed-section {
-
-  div.extra-info-section {
-
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 
     div.extra-info {
 
-      float: left;
       font-weight: 700;
       font-family: $oc_headers_font;
-      padding-left: 20px;
+      padding-left: 10px;
+      padding-right: 10px;
       text-align: center;
 
       div.extra-info-value {
