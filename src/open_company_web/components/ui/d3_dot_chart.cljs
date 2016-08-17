@@ -276,16 +276,20 @@
       (when (any? (:extra-info options))
 
         (let [selected-data-set (get chart-data selected)]
-          (dom/div
+          (dom/div {:class "extra-info-section"}
             (dom/div {:class "extra-info"}
-              (dom/div {:class "extra-info-value"}
+              (dom/div {:class "extra-info-value"
+                        :style {:color (:cash (:extra-info-colors options))}}
                 ((:cash (:extra-info-presenters options)) (get selected-data-set :cash)))
-              (dom/div {:class "extra-info-label"}
+              (dom/div {:class "extra-info-label"
+                        :style {:color (:cash (:extra-info-colors options))}}
                 "CASH"))
             (dom/div {:class "extra-info"}
-              (dom/div {:class "extra-info-value"}
+              (dom/div {:class "extra-info-value"
+                        :style {:color (:runway (:extra-info-colors options))}}
                 ((:runway (:extra-info-presenters options)) (get selected-data-set :runway)))
-              (dom/div {:class "extra-info-label"}
+              (dom/div {:class "extra-info-label"
+                        :style {:color (:cash (:extra-info-colors options))}}
                 "RUNWAY"))))
       )
 

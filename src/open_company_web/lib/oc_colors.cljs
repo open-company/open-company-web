@@ -27,6 +27,7 @@
   :oc-gray-3 "#8A8A8A"
   :oc-gray-4 "#5B5B5B"
   :oc-gray-5 "#4E5A6B" ;rgb(78,90,107)
+  :oc-gray-5-half "rgba(78,90,107,0.5)"
   ;; Reds
   :oc-red-dark "#9E001A"
   :oc-red-regular "#D72A46"

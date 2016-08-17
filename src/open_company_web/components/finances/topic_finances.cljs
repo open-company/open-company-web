@@ -132,8 +132,8 @@
                              :chart-fill-polygons false
                              :extra-info-keys [:cash :runway]
                              :extra-info-labels {:cash "CASH" :runway "RUNWAY"}
-                             :extra-info-colors {:cash (occ/get-color-by-kw :oc-gray-5)
-                                                 :runway (occ/get-color-by-kw :oc-gray-5)}
+                             :extra-info-colors {:cash (occ/get-color-by-kw :oc-gray-5-half)
+                                                 :runway (occ/get-color-by-kw :oc-gray-5-half)}
                              :extra-info-presenters {:cash (partial get-currency-label cur-symbol)
                                                      :runway (partial get-runway-label)}
                              :hide-nav (:hide-nav options)}}]

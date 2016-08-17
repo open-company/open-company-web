@@ -43,3 +43,28 @@ div.d3-dot-container{
     width: 10px;
   }
 }
+
+div.composed-section {
+
+  div.extra-info-section {
+
+    text-align: center;
+
+    div.extra-info {
+
+      float: left;
+      font-weight: 700;
+      font-family: $oc_headers_font;
+      padding-left: 20px;
+      text-align: center;
+
+      div.extra-info-value {
+        font-size: 20px;
+      }
+
+      div.extra-info-label {
+        font-size: 12px;      
+      }
+    }
+  }
+}
