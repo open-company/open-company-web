@@ -36,17 +36,21 @@
         stop (min (count all-data) (+ start show-dots))]
     (subvec all-data start stop)))
 
-(defn render-chart-label [owner options selected chart-data]
+(defn render-chart-labels [owner options selected chart-data]
   (when-let [d3-dots (.select js/d3 (om/get-ref owner "d3-dots"))]
+    ;; clear the old label
     (.remove (.select d3-dots "#dot-chart-label"))
     (.remove (.select d3-dots "#dot-chart-label-sub"))
-    (let [chart-width (:chart-width options)
+
+    (let [chart-height (:chart-height options)
+          chart-width (:chart-width options)
           label-key (:label-key options)
           sub-label-key (:sub-label-key options)
-          x-pos (dot-position chart-width selected)
           selected-data-set (get chart-data selected)
           label-text (get selected-data-set label-key)
           sub-label-text (get selected-data-set sub-label-key)
+          
+          ;; chart label
           chart-label (-> d3-dots
                           (.append "text")
                           (.attr "class" "dot-chart-label")
@@ -55,10 +59,13 @@
                           (.attr "y" 20)
                           (.attr "fill" (:label-color options))
                           (.text label-text))
+          
           chart-label-width (js/SVGgetWidth chart-label)
           small? (> chart-label-width 150)]
       (when small?
         (.attr chart-label "class" "dot-chart-label small"))
+      
+      ;; chart sub-label
       (when (and sub-label-key sub-label-text)
         (-> d3-dots
             (.append "text")
@@ -69,7 +76,7 @@
             (.attr "fill" (:sub-label-color options))
             (.text sub-label-text))))))
 
-(defn dot-click [owner options idx]
+(defn dot-select [owner options idx]
   (.stopPropagation (.-event js/d3))
   (let [svg-el (om/get-ref owner "d3-dots")
         d3-svg-el (.select js/d3 svg-el)
@@ -95,7 +102,7 @@
           (.attr "stroke-width" dot-selected-stroke)
           (.attr "fill" "white")
           (.attr "r" (if hasvalue dot-radius 0))))
-    (render-chart-label owner options idx data)
+    (render-chart-labels owner options idx data)
     (om/set-state! owner :selected idx)))
 
 (defn get-y [y max-y]
@@ -194,11 +201,11 @@
               (.attr "height" (- chart-height 50))
               (.attr "x" (* i (/ chart-width show-dots)))
               (.attr "y" 50)
-              (.on "mouseover" #(dot-click owner options i))
-              (.on "mouseout" #(dot-click owner options (om/get-state owner :selected)))
+              (.on "mouseover" #(dot-select owner options i))
+              (.on "mouseout" #(dot-select owner options (om/get-state owner :selected)))
               (.attr "fill" "transparent"))))
-      ; add the selected value label
-      (render-chart-label owner options selected chart-data))))
+      ; add the selected value labels
+      (render-chart-labels owner options selected chart-data))))
 
 (def chart-step show-dots)
 
@@ -234,27 +241,52 @@
       (when (or (not= old-props data) (not= old-state (om/get-state owner)))
         (d3-calc owner options))))
 
-  (render-state [_ {:keys [start]}]
+  (render-state [_ {:keys [start selected]}]
+
     (let [fixed-chart-height (if (> (count chart-data) 1)
                               chart-height
                               90)
           hide-chart-nav (:hide-nav options)]
-      (dom/div {:class "d3-dot-container"
-                :style #js {:width (str (+ chart-width 20) "px")
-                            :height (str fixed-chart-height "px")}}
-        ;; Previous button
-        (dom/div {:class (str "chart-prev" (when hide-chart-nav " hidden"))
-                  :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
-                              :opacity (if (> start 0) 1 0)}
-                  :on-click #(prev-data owner %)}
-          (dom/i {:class "fa fa-caret-left"}))
-        ;; Chart
-        (dom/svg #js {:className "d3-dot-chart"
-                      :ref "d3-dots"
-                      :style #js {:marginLeft (str (if hide-chart-nav 10 0) "px")}})
-        ;; Next button
-        (dom/div {:class (str "chart-next" (when hide-chart-nav " hidden"))
-                  :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
-                              :opacity (if (< start (- (count chart-data) show-dots)) 1 0)}
-                  :on-click #(next-data owner %)}
-          (dom/i {:class "fa fa-caret-right"}))))))
+      
+      (dom/div
+        ;; Top labels
+
+        ;; D3 Chart w/ nav. buttons
+        (dom/div {:class "d3-dot-container"
+                  :style #js {:width (str (+ chart-width 20) "px")
+                              :height (str fixed-chart-height "px")}}
+          ;; Previous button
+          (dom/div {:class (str "chart-prev" (when hide-chart-nav " hidden"))
+                    :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
+                                :opacity (if (> start 0) 1 0)}
+                    :on-click #(prev-data owner %)}
+            (dom/i {:class "fa fa-caret-left"}))
+          ;; Chart
+          (dom/svg #js {:className "d3-dot-chart"
+                        :ref "d3-dots"
+                        :style #js {:marginLeft (str (if hide-chart-nav 10 0) "px")}})
+          ;; Next button
+          (dom/div {:class (str "chart-next" (when hide-chart-nav " hidden"))
+                    :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
+                                :opacity (if (< start (- (count chart-data) show-dots)) 1 0)}
+                    :on-click #(next-data owner %)}
+            (dom/i {:class "fa fa-caret-right"})))
+
+      ;; Bottom extra-info
+      (when (any? (:extra-info options))
+
+        (let [selected-data-set (get chart-data selected)]
+          (dom/div
+            (dom/div {:class "extra-info"}
+              (dom/div {:class "extra-info-value"}
+                (str (get selected-data-set :cash)))
+              (dom/div {:class "extra-info-label"}
+                "CASH"))
+            (dom/div {:class "extra-info"}
+              (dom/div {:class "extra-info-value"}
+                (str (get selected-data-set :runway)))
+              (dom/div {:class "extra-info-label"}
+                "RUNWAY"))))
+      )
+
+      ))))

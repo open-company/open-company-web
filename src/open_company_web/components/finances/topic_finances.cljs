@@ -121,6 +121,10 @@
                              :chart-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
                              :chart-selected-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
                              :chart-fill-polygons false
+                             :extra-info-keys [:cash :runway]
+                             :extra-info-labels {:cash "CASH" :runway "RUNWAY"}
+                             :extra-info-colors {:cash (occ/get-color-by-kw :oc-gray-5)
+                                                 :runway (occ/get-color-by-kw :oc-gray-5)}
                              :hide-nav (:hide-nav options)}}]
 
       (when-not no-data
