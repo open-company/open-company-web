@@ -4,7 +4,6 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.oc-colors :as occ]
-            [open-company-web.components.finances.utils :as finances-utils]
             [cljsjs.d3]))
 
 (def dot-radius 5)
@@ -206,11 +205,12 @@
           hide-chart-nav (:hide-nav options)
           selected-data-set (get chart-data selected)
           selected-label (get selected-data-set (:label-key options))
-          selected-sub-label (get selected-data-set (:sub-label-key options))]
+          selected-sub-label (get selected-data-set (:sub-label-key options))
+          extra-info-keys (:extra-info-keys options)]
       
       (dom/div
+        
         ;; Top label / sub-label
-
         (dom/div {:class "chart-label-container"}
           (dom/div {:class "dot-chart-label"
                     :style {:color (:label-color options)}}
@@ -240,25 +240,15 @@
                     :on-click #(next-data owner %)}
             (dom/i {:class "fa fa-caret-right"})))
 
-      ;; Bottom extra-info
-      (when (not (empty? (:extra-info-keys options)))
+        ;; Bottom extra-info
+        (when (not (empty? extra-info-keys))
 
-        (dom/div {:class "extra-info-container"}
-          (dom/div {:class "extra-info"}
-            (dom/div {:class "extra-info-value"
-                      :style {:color (:cash (:extra-info-colors options))}}
-              ((:cash (:extra-info-presenters options)) (get selected-data-set :cash)))
-            (dom/div {:class "extra-info-label"
-                      :style {:color (:cash (:extra-info-colors options))}}
-              "CASH"))
-          (dom/div {:class "extra-info"}
-            (dom/div {:class "extra-info-value"
-                      :style {:color (:runway (:extra-info-colors options))}}
-              ((:runway (:extra-info-presenters options)) (get selected-data-set :runway)))
-            (dom/div {:class "extra-info-label"
-                      :style {:color (:cash (:extra-info-colors options))}}
-              "RUNWAY"))))
-
-      )
-
-      )))
+          (dom/div {:class "extra-info-container"}
+            (for [extra-info-key extra-info-keys]
+              (dom/div {:class "extra-info"}
+                (dom/div {:class "extra-info-value"
+                          :style {:color (get (:extra-info-colors options) extra-info-key)}}
+                  ((get (:extra-info-presenters options) extra-info-key) (get selected-data-set extra-info-key)))
+                (dom/div {:class "extra-info-label"
+                          :style {:color (get (:extra-info-colors options) extra-info-key)}}
+                  (get (:extra-info-labels options) extra-info-key))))))))))
