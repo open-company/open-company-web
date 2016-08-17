@@ -19,7 +19,13 @@
             [cljsjs.emojione]) ; pulled in for cljsjs externs
   (:import  [goog.i18n NumberFormat]))
 
-(defn abs [n] (if n (max n (- n)) 0))
+(defn abs
+  "(abs n) is the absolute value of n"
+  [n]
+  (cond
+   (not (number? n)) n ; non-sensical, so leave it alone
+   (neg? n) (- n)
+   :else n))
 
 (def oc-animation-duration 300)
 

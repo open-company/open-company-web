@@ -229,7 +229,7 @@ div.fullscreen-topic-edit {
         div.finances, div.growth {
           margin-top: 10px;
 
-          table.table{
+          table.table {
             border-spacing: 10px;
             max-width: 100%;
             width: auto;
@@ -240,13 +240,13 @@ div.fullscreen-topic-edit {
               border: 0px solid transparent;
             }
 
-            thead tr th {
+            th {
               font-weight: 700;
-              font-weight: $oc_headers_font;
+              font-family: $oc_headers_font;
               font-size: 12px;
               line-height: 1.5;
               letter-spacing: 1px;
-              color: $oc_gray_7;
+              color: rgba(78,90,107, 0.75);
               text-transform: uppercase;
 
               &:first-child {
@@ -258,14 +258,21 @@ div.fullscreen-topic-edit {
               opacity: 0;
             }
 
-            td.no-cell {
+            td.no-cell, th.no-cell {
               padding-top: 13px;
               font-weight: 700;
-              font-weight: $oc_headers_font;
               font-size: 12px;
               letter-spacing: 1px;
-              color: rgba(78,90,107, 0.5);
+              color: rgba(78,90,107, 0.75);
               text-transform: uppercase;
+            }
+
+            td.no-cell {
+              font-family: $oc_main_font;
+            }
+
+            th.no-cell {
+              font-family: $oc_headers_font;
             }
 
             td div.comp-cell {
@@ -287,7 +294,7 @@ div.fullscreen-topic-edit {
 
             a.more {
               font-weight: 700;
-              font-weight: $oc_headers_font;
+              font-family: $oc_headers_font;
               font-size: 12px;
               letter-spacing: 1px;
               color: rgba(78, 90, 107, 0.5);

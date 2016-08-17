@@ -52,12 +52,13 @@
                          (= period-month "DEC")
                          (:needs-year data))]
       (dom/tr {}
-        (dom/td {:class "no-cell"}
+        (dom/th {:class "no-cell"}
           (utils/get-period-string (:period finances-data) "monthly" [:short (when needs-year :force-year)]))
         ;; revenue
         (dom/td {}
           (om/build cell {:value (:revenue finances-data)
                           :decimals 0
+                          :positive-only true
                           :placeholder (if is-new "entire month" "")
                           :currency currency
                           :cell-state cell-state
@@ -69,6 +70,7 @@
         (dom/td {}
           (om/build cell {:value (:costs finances-data)
                           :decimals 0
+                          :positive-only true
                           :placeholder (if is-new "entire month" "")
                           :currency currency
                           :cell-state cell-state
@@ -80,6 +82,7 @@
         (dom/td {}
           (om/build cell {:value (:cash finances-data)
                           :decimals 0
+                          :positive-only false
                           :placeholder (if is-new "at month end" "")
                           :currency currency
                           :cell-state cell-state
@@ -143,7 +146,7 @@
                                                    :change-cb #(replace-row-in-data data row-data %1 %2)}))))
                 (dom/tr {}
                   (dom/td {}
-                    (dom/a {:class "more" :on-click #(more-months owner)} "Earlier..."))
+                    (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner)} "Earlier..."))
                   (dom/td {})
                   (dom/td {})
                   (dom/td {})

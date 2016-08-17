@@ -39,6 +39,7 @@
             (om/build
               cell
               {:value value
+               :positive-only false
                :placeholder "Value"
                :cell-state cell-state
                :draft-cb #(change-cb :value %)
@@ -160,7 +161,7 @@
                                                           (replace-row-in-data row-data k v (:change-growth-cb data)))}))))
                     (dom/tr {}
                       (dom/td {}
-                        (dom/a {:class "more" :on-click #(more-months owner data)} "Earlier..."))
+                        (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner data)} "Earlier..."))
                       (dom/td {}))))))
 
             ;; metric selection pillboxes

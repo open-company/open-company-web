@@ -55,21 +55,22 @@
 (defn exit-cell [e owner data]
   (let [raw-value (.. e -target -value)
         parsed-value (parse-value raw-value)
+        abs-value (if (:positive-only data) (utils/abs parsed-value) parsed-value)
         init-value (om/get-state owner :inital-value)
         ; if the value is the same as it was at the start
         ; go to the :display state, else go to :draft
-        state (if (check-value parsed-value init-value)
+        state (if (check-value abs-value init-value)
                 :display
                 :draft)
         ; if the value is empty and it was empty got to the :new state
         state (if (and (= state :display)
-                       (s/blank? parsed-value))
+                       (s/blank? abs-value))
                 :new
                 state)]
     (when (or (= state :draft)
             (= state :display)
             (= state :new))
-      ((:draft-cb data) parsed-value))
+      ((:draft-cb data) abs-value))
     (to-state owner data state)))
 
 (defn safe-parse-float [value]
@@ -101,13 +102,15 @@
         (recur)))))
 
   (render-state [_ {:keys [value cell-state]}]
-    (let [flv (safe-parse-float value)
+    (let [safe-value (safe-parse-float value)
+          positive-only (:positive-only data)
+          abs-value (if positive-only (utils/abs safe-value) safe-value)
           prefix (:prefix data)
           currency (:currency data)
           decimals (or (:decimals data) 2)
           formatted-value (if currency
-                            (utils/thousands-separator flv currency decimals)
-                            (utils/thousands-separator flv))
+                            (utils/thousands-separator abs-value currency decimals)
+                            (utils/thousands-separator abs-value))
           prefix-value (if (and (not (s/blank? formatted-value)) (:prefix data))
                          (str (:prefix data) formatted-value)
                          formatted-value)
