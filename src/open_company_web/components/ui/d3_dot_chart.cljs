@@ -222,7 +222,7 @@
           selected-label (get selected-data-set (:label-key options))
           selected-sub-label (get selected-data-set (:sub-label-key options))
           bottom-label-keys (filter #(= :bottom (get-in options [:labels % :position])) (keys (:labels options)))]
-      
+
       (dom/div
         
         ;; Top labels

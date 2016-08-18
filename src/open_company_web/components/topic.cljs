@@ -78,7 +78,7 @@
     (let [section-kw          (keyword section)
           chart-opts          {:chart-size {:width  260
                                             :height 196}
-                               :hide-nav true}
+                               :hide-nav false}
           is-growth-finances? (#{:growth :finances} section-kw)
           gray-color          (oc-colors/get-color-by-kw :oc-gray-5)
           finances-row-data   (:data topic-data)
