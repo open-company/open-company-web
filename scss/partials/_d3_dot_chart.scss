@@ -26,20 +26,18 @@ div.composed-section {
 
     padding-left: 20px;
 
-    div.dot-chart-label{
+    div.chart-label{
       font-size: 24px;
       font-weight: 700;
       font-family: $oc_headers_font;
-      opacity: 0.75;
 
       &.small {
         font-size: 18px;
       }
     }
 
-    div.dot-chart-label-sub {
+    div.chart-label-sub {
       font-size: 12px;
-      opacity: 0.75;
       font-weight: 700;
       font-family: $oc_headers_font;
       letter-spacing: 1px;
@@ -60,7 +58,7 @@ div.composed-section {
     padding-top: 12px;
     padding-bottom: 12px;
     margin-bottom: 10px;
-    
+
     div.extra-info {
 
       font-weight: 700;

@@ -226,8 +226,6 @@
                               90)
           hide-chart-nav (:hide-nav options)
           selected-data-set (get (current-data owner) selected)
-          selected-label (get selected-data-set (:label-key options))
-          selected-sub-label (get selected-data-set (:sub-label-key options))
           labels (:labels options)
           top-label-keys (label-keys-for labels :top)
           bottom-label-keys (label-keys-for labels :bottom)]
@@ -235,13 +233,16 @@
       (dom/div
         
         ;; Top labels
-        (dom/div {:class "chart-label-container"}
-          (dom/div {:class "dot-chart-label"
-                    :style {:color (:label-color options)}}
-            selected-label)
-          (dom/div {:class "dot-chart-label-sub"
-                    :style {:color (:sub-label-color options)}}
-            selected-sub-label))
+        (when (not (empty? top-label-keys))
+          (dom/div {:class "chart-label-container"}
+            (for [label-key top-label-keys]
+              (dom/div {:class "chart-labels"}
+                (dom/div {:class "chart-label"
+                          :style {:color (get-in options [:labels label-key :value-color])}}
+                  ((get-in options [:labels label-key :value-presenter]) label-key selected-data-set))
+                (dom/div {:class "chart-label-sub"
+                          :style {:color (get-in options [:labels label-key :label-color])}}
+                  ((get-in options [:labels label-key :label-presenter]) label-key selected-data-set))))))
 
         ;; D3 Chart w/ optional nav. buttons
         (dom/div {:class "d3-dot-container"
@@ -266,13 +267,12 @@
 
         ;; Bottom labels
         (when (not (empty? bottom-label-keys))
-
           (dom/div {:class "extra-info-container"}
             (for [label-key bottom-label-keys]
               (dom/div {:class "extra-info"}
                 (dom/div {:class "extra-info-value"
                           :style {:color (get-in options [:labels label-key :value-color])}}
-                  ((get-in options [:labels label-key :value-presenter]) (get selected-data-set label-key)))
+                  ((get-in options [:labels label-key :value-presenter]) label-key selected-data-set))
                 (dom/div {:class "extra-info-label"
                           :style {:color (get-in options [:labels label-key :label-color])}}
-                  (get-in options [:labels label-key :label]))))))))))
+                  ((get-in options [:labels label-key :label-presenter]) label-key selected-data-set))))))))))

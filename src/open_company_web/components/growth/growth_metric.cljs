@@ -12,7 +12,7 @@
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
 
-(defn label-from-set [data-set interval metric-unit currency-symbol]
+(defn- label-from-set [data-set interval metric-unit currency-symbol]
   (let [actual-val (:value data-set)
         actual (when actual-val (utils/thousands-separator actual-val))
         period (utils/get-period-string (:period data-set) interval)
@@ -21,7 +21,7 @@
     (when actual-val
       (str fixed-cur-unit actual unit))))
 
-(defn sub-label [period metric-info]
+(defn- sub-label [period metric-info]
   (let [mname (:name metric-info)
         interval (:interval metric-info)
         label (str mname " - ")]
@@ -30,6 +30,17 @@
       (str label (utils/get-weekly-period-day period) " " (utils/get-month period "weekly") " " (utils/get-year period "weekly"))
       :else
       (str label (utils/get-month period) " " (utils/get-year period)))))
+
+(defn- growth-value [selected-key data]
+  (.log js/console (str selected-key))
+  (.log js/console data)
+  (let [value (get data selected-key)]
+    (str value)))
+
+(defn- growth-label [selected-key data]
+  (.log js/console (str selected-key))
+  (.log js/console data)
+  (get data :sub-label))
 
 (defcomponent growth-metric [data owner options]
 
@@ -51,14 +62,18 @@
                              :chart-width (:width (:chart-size options))
                              :chart-keys [:value]
                              :interval interval
-                             :label-color (occ/get-color-by-kw :oc-gray-5)
-                             :sub-label-color (occ/get-color-by-kw :oc-gray-5)
-                             :label-key :label
-                             :sub-label-key :sub-label
                              :svg-click #(when (:topic-click options) ((:topic-click options) nil))
                              :chart-colors {:value (occ/get-color-by-kw :oc-chart-blue)}
                              :chart-selected-colors {:value (occ/get-color-by-kw :oc-chart-blue)}
                              :chart-fill-polygons true
+                             :label-color (occ/get-color-by-kw :oc-gray-5)
+                             :sub-label-color (occ/get-color-by-kw :oc-gray-5)
+                             :labels {:value {:position :top
+                                              :order 1
+                                              :value-presenter growth-value
+                                              :value (occ/get-color-by-kw :oc-gray-5) 
+                                              :label-presenter growth-label
+                                              :label-color (occ/get-color-by-kw :oc-gray-5)}}
                              :hide-nav (:hide-nav options)}}]
 
       (dom/div {:class (utils/class-set {:section true
