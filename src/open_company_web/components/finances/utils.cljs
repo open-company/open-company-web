@@ -116,7 +116,7 @@
     string))
 
 (defn day-label [& [flags]]
- "day")
+  "day")
 
 (defn week-label [flags]
   (if (utils/in? flags :short)
@@ -125,7 +125,7 @@
 
 (defn month-label [flags]
  (if (utils/in? flags :short)
-    "mnth"
+    "mo"
     "month"))
 
 (defn year-label [flags]

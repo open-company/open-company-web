@@ -136,12 +136,20 @@
                                  :chart-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
                                  :chart-selected-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
                                  :chart-fill-polygons false
-                                 :labels {:cash {:position :bottom
+                                 :labels {:costs {:position :top
+                                                  :order 1
+                                                  :label "BURN"
+                                                  :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
+                                                  :value-presenter (partial get-currency-label cur-symbol)
+                                                  :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)} 
+                                          :cash {:position :bottom
+                                                 :order 1
                                                  :label "CASH"
                                                  :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
                                                  :value-presenter (partial get-currency-label cur-symbol)
                                                  :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)} 
                                           :runway {:position :bottom
+                                                   :order 2
                                                    :label "RUNWAY"
                                                    :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
                                                    :value-presenter (partial get-runway-label)

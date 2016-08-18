@@ -15,14 +15,14 @@
 (def show-dots 4)
 (def chart-step show-dots)
 
-(defn max-y [data chart-keys]
+(defn- max-y [data chart-keys]
   (let [filtered-data (map #(select-keys % chart-keys) data)]
     (apply max (vec (flatten (map vals filtered-data))))))
 
-(defn get-y [y max-y]
+(defn- get-y [y max-y]
   (+ 22 (- max-y y)))
 
-(defn scale [owner options]
+(defn- scale [owner options]
   (let [all-data (om/get-props owner :chart-data)
         chart-keys (:chart-keys options)
         data-max (max-y all-data chart-keys)
@@ -31,11 +31,11 @@
         range-fn (.range linear-fn #js [0 (- (:chart-height options) 30)])]
     range-fn))
 
-(defn dot-position [chart-width i]
+(defn- dot-position [chart-width i]
   (let [dot-spacer (/ (- chart-width 20) (dec show-dots))]
     (+ (* i dot-spacer) 10)))
 
-(defn current-data 
+(defn- current-data 
   "Get the subset of the data that's currently being displayed on the chart."
   [owner]
   (let [start (om/get-state owner :start)
@@ -44,7 +44,7 @@
     (subvec all-data start stop)))
 
 (declare dot-select)
-(defn d3-calc [owner options]
+(defn- d3-calc [owner options]
   (when-let [d3-dots (om/get-ref owner "d3-dots")]
     ; clean the chart area
     (.each (.selectAll (.select js/d3 d3-dots) "*")
@@ -143,7 +143,7 @@
 
 ;; ===== Graph Events =====
 
-(defn dot-select 
+(defn- dot-select 
   "
   Handle graph event that (may) select a new point on the graph.
 
@@ -178,20 +178,27 @@
           (.attr "r" (if hasvalue dot-radius 0))))
     (om/set-state! owner :selected idx)))
 
-(defn prev-data [owner e]
+(defn- prev-data [owner e]
   (.stopPropagation e)
   (let [start (om/get-state owner :start)
         next-start (- start chart-step)
         fixed-next-start (max 0 next-start)]
     (om/set-state! owner :start fixed-next-start)))
 
-(defn next-data [owner e]
+(defn- next-data [owner e]
   (.stopPropagation e)
   (let [start (om/get-state owner :start)
         all-data (om/get-props owner :chart-data)
         next-start (+ start chart-step)
         fixed-next-start (min (- (count all-data) show-dots) next-start)]
     (om/set-state! owner :start fixed-next-start)))
+
+(defn- label-keys-for
+  "Return the keys of the labels, in order, for the specified position."
+  [labels position]
+  (->> (keys labels)
+    (filter #(= position (get-in labels [% :position])))
+    (sort-by #(get-in labels [% :order]))))
 
 ;; ===== D3 Chart Component =====
 
@@ -221,7 +228,9 @@
           selected-data-set (get (current-data owner) selected)
           selected-label (get selected-data-set (:label-key options))
           selected-sub-label (get selected-data-set (:sub-label-key options))
-          bottom-label-keys (filter #(= :bottom (get-in options [:labels % :position])) (keys (:labels options)))]
+          labels (:labels options)
+          top-label-keys (label-keys-for labels :top)
+          bottom-label-keys (label-keys-for labels :bottom)]
 
       (dom/div
         
