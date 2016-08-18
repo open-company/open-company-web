@@ -136,13 +136,21 @@
                                  :chart-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
                                  :chart-selected-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
                                  :chart-fill-polygons false
-                                 :extra-info-keys [:cash :runway]
-                                 :extra-info-labels {:cash "CASH" :runway "RUNWAY"}
-                                 :extra-info-colors {:cash (occ/get-color-by-kw :oc-gray-5-3-quarter)
-                                                     :runway (occ/get-color-by-kw :oc-gray-5-3-quarter)}
-                                 :extra-info-presenters {:cash (partial get-currency-label cur-symbol)
-                                                         :runway (partial get-runway-label)}
+                                 :labels {:cash {:position :bottom
+                                                 :label "CASH"
+                                                 :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
+                                                 :value-presenter (partial get-currency-label cur-symbol)
+                                                 :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)} 
+                                          :runway {:position :bottom
+                                                   :label "RUNWAY"
+                                                   :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
+                                                   :value-presenter (partial get-runway-label)
+                                                   :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}}
                                  :hide-nav (:hide-nav options)}}]
+
+          (.log js/console (str fixed-finances-data))
+
+          (.log js/console (str fixed-sorted-costs))
 
           (dom/div {:class "section-container" :id "section-finances"}          
 
