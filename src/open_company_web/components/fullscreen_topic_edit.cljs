@@ -103,7 +103,7 @@
              (or (not (nil? (:cash data)))
                  (not (nil? (:costs data)))
                  (not (nil? (:revenue data)))))
-    (dissoc data :burn-rate :runway :avg-burn-rate :new :value)))
+    (dissoc data :burn-rate :runway :new :value)))
 
 (defn finances-clean-data [finances-data]
   (remove nil? (vec (map (fn [[_ v]] (finances-clean-row v)) finances-data))))

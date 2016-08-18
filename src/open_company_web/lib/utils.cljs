@@ -190,13 +190,6 @@
 (defn calc-burn-rate [revenue costs]
   (- revenue costs))
 
-(defn calc-avg-burn-rate [periods]
-  (when (pos? (count periods))
-    (let [burn-rates (map #(calc-burn-rate (:revenue %) (:costs %)) periods)
-          tot (count burn-rates)]
-      (apply (fn [& items]
-               (/ (apply + items) tot)) burn-rates))))
-
 (defn calc-runway [cash burn-rate]
   (int (* (/ cash burn-rate) 30)))
 
@@ -212,11 +205,9 @@
                 (let [idx (inc (.indexOf (to-array sorted-data) data))
                       start (max 0 (- idx 3))
                       sub-data (subvec sorted-data start idx)
-                      avg-burn-rate (calc-avg-burn-rate sub-data)
                       burn-rate (calc-burn-rate (:revenue data) (:costs data))
                       runway (calc-runway (:cash data) burn-rate)]
                   (merge data {:runway runway
-                               :avg-burn-rate avg-burn-rate
                                :burn-rate burn-rate})))
               sorted-data)))))
 

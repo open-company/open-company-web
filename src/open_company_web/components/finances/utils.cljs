@@ -35,8 +35,7 @@
     :costs nil
     :revenue nil
     :burn-rate nil
-    :runway nil
-    :avg-burn-rate nil}))
+    :runway nil}))
 
 (defn chart-placeholder-data [initial-data]
   (when (seq initial-data)

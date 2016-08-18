@@ -148,10 +148,6 @@
                                                    :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}}
                                  :hide-nav (:hide-nav options)}}]
 
-          (.log js/console (str fixed-finances-data))
-
-          (.log js/console (str fixed-sorted-costs))
-
           (dom/div {:class "section-container" :id "section-finances"}          
 
             (dom/div {:class "composed-section finances group"}
