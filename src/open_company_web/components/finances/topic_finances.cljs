@@ -6,8 +6,7 @@
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.oc-colors :as occ]
             [open-company-web.components.finances.utils :as finances-utils]
-            [open-company-web.components.ui.d3-dot-chart :refer (d3-dot-chart)]
-            [open-company-web.components.ui.d3-column-chart :refer (d3-column-chart)]
+            [open-company-web.components.ui.d3-chart :refer (d3-chart)]
             [open-company-web.lib.utils :as utils]))
 
 (defn get-state [owner data & [initial]]
@@ -164,7 +163,7 @@
               (if (pos? sum-revenues) 
 
                 ;; post-revenue gets a bar chart
-                (om/build d3-dot-chart {:chart-data fixed-sorted-costs} chart-opts)
+                (om/build d3-chart {:chart-data fixed-sorted-costs} chart-opts)
 
                 ;; pre-revenue gets a line chart
-                (om/build d3-dot-chart {:chart-data fixed-sorted-costs} chart-opts)))))))))
+                (om/build d3-chart {:chart-data fixed-sorted-costs} chart-opts)))))))))

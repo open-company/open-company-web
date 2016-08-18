@@ -6,10 +6,6 @@
             [test.open-company-web.components.ui.company-avatar]
             [test.open-company-web.components.ui.user-avatar]
             [test.open-company-web.components.user-profile]
-            [test.open-company-web.components.finances.cash]
-            [test.open-company-web.components.finances.cash-flow]
-            [test.open-company-web.components.finances.costs]
-            [test.open-company-web.components.finances.runway]
             [test.open-company-web.components.finances.finances-edit]
             [test.open-company-web.components.growth.growth-metric]
             [test.open-company-web.components.growth.growth-edit]
@@ -32,10 +28,6 @@
   'test.open-company-web.components.ui.company-avatar
   'test.open-company-web.components.ui.user-avatar
   'test.open-company-web.components.user-profile
-  'test.open-company-web.components.finances.cash
-  'test.open-company-web.components.finances.cash-flow
-  'test.open-company-web.components.finances.costs
-  'test.open-company-web.components.finances.runway
   'test.open-company-web.components.finances.finances-edit
   'test.open-company-web.components.growth.growth-metric
   'test.open-company-web.components.growth.growth-edit

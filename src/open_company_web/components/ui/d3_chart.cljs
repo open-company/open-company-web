@@ -1,4 +1,4 @@
-(ns open-company-web.components.ui.d3-dot-chart
+(ns open-company-web.components.ui.d3-chart
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
@@ -202,7 +202,7 @@
 
 ;; ===== D3 Chart Component =====
 
-(defcomponent d3-dot-chart [{:keys [chart-data] :as data} owner {:keys [chart-width chart-height] :as options}]
+(defcomponent d3-chart [{:keys [chart-data] :as data} owner {:keys [chart-width chart-height] :as options}]
 
   (init-state [_]
     (let [start (max 0 (- (count chart-data) show-dots))
@@ -254,7 +254,7 @@
                     :on-click #(prev-data owner %)}
             (dom/i {:class "fa fa-caret-left"}))
           ;; Chart
-          (dom/svg #js {:className "d3-dot-chart"
+          (dom/svg #js {:className "d3-chart"
                         :ref "d3-dots"
                         :style #js {:marginLeft (str (if hide-chart-nav 10 0) "px")}})
           ;; Next button

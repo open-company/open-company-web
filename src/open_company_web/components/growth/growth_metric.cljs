@@ -3,7 +3,7 @@
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.ui.d3-dot-chart :refer (d3-dot-chart)]
+            [open-company-web.components.ui.d3-chart :refer (d3-chart)]
             [open-company-web.components.ui.utility-components :refer (editable-pen)]
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.router :as router]
@@ -75,4 +75,4 @@
                     (dom/h3 {:class "actual blue"} actual-with-label
                       (om/build editable-pen {:click-callback (:start-data-editing-cb data)}))
                     (dom/h3 {:class "actual-label gray"} (str "as of " period))))))
-            (om/build d3-dot-chart {:chart-data fixed-sorted-metric} chart-opts)))))))
+            (om/build d3-chart {:chart-data fixed-sorted-metric} chart-opts)))))))
