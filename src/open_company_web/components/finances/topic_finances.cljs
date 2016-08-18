@@ -88,7 +88,7 @@
     (str cur-symbol short-value)))
 
 (defn get-runway-label [value]
-  (finances-utils/get-rounded-runway value [:round]))
+  (finances-utils/get-rounded-runway value [:round :short]))
   ;(.log js/console value)
   ;(case
     ;(or (s/blank? value) (= value 0)) "-"
@@ -120,7 +120,7 @@
               subsection-options {:opts options}
               cur-symbol (utils/get-symbol-for-currency-code currency)
               fixed-sorted-costs (vec (map #(merge % {:label (get-currency-label cur-symbol (:costs %))
-                                                      :sub-label (str "MONTHLY BURN - "
+                                                      :sub-label (str "BURN - "
                                                                       (utils/get-month (:period %)) " " 
                                                                       (utils/get-year (:period %)))})
                                         sorted-finances))
