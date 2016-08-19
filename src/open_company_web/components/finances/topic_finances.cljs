@@ -61,10 +61,10 @@
                           :chart-fill-polygons false
                           :hide-nav (:hide-nav options)}
               labels {:costs {:position :top
-                              :order 1
+                              :order 2
                               :value-presenter (partial get-currency-label cur-symbol)
                               :value-color (occ/get-color-by-kw :oc-red-regular)
-                              :label-presenter #(str "BURN")
+                              :label-presenter (if (pos? sum-revenues) #(str "EXPENSES") #(str "BURN"))
                               :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)} 
                       :cash {:position :bottom
                              :order 1
@@ -88,7 +88,7 @@
 
                 ;; post-revenue gets a revenue label and a revenue plot
                 (let [post-labels (merge labels {:revenue {:position :top
-                                                           :order 2
+                                                           :order 1
                                                            :value-presenter (partial get-currency-label cur-symbol)
                                                            :value-color (occ/get-color-by-kw :oc-green-regular)
                                                            :label-presenter #(str "REVENUE")
