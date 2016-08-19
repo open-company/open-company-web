@@ -64,7 +64,7 @@
                               :order 2
                               :value-presenter (partial get-currency-label cur-symbol)
                               :value-color (occ/get-color-by-kw :oc-red-regular)
-                              :label-presenter (if (pos? sum-revenues) #(str "EXPENSES") #(str "BURN"))
+                              :label-presenter (if (pos? sum-revenues) #(str "EXPENSES") #(str "MONTHLY BURN"))
                               :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)} 
                       :cash {:position :bottom
                              :order 1
@@ -93,7 +93,6 @@
                                                            :value-color (occ/get-color-by-kw :oc-green-regular)
                                                            :label-presenter #(str "REVENUE")
                                                            :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}})]
-                  (.log js/console (str sorted-finances))
                   (om/build d3-chart {:chart-data sorted-finances}
                                      {:opts (merge chart-opts {:labels post-labels
                                                                :chart-keys [:costs :revenue]})}))

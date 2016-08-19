@@ -222,7 +222,8 @@
                     :style {:color (get-in labels [label-key :value-color])}}
             ((get-in labels [label-key :value-presenter]) label-key data))
           (dom/div {:class "chart-label"
-                    :style {:color (get-in labels [label-key :label-color])}}
+                    :style {:color (get-in labels [label-key :label-color])
+                            :text-align (if center? "center" "left")}}
             ((get-in labels [label-key :label-presenter]) label-key data)))))))
 
 ;; ===== D3 Chart Component =====
