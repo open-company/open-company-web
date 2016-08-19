@@ -1,0 +1,67 @@
+div.composed-section {
+
+  div.d3-chart-container {
+
+    margin: 0 auto;
+
+    svg {
+      rect.hover-rect {
+        cursor: pointer;
+      }
+    }
+
+    div.chart-prev {
+      float: left;
+      cursor: pointer;
+      width: 10px;
+    }
+
+    div.chart-next {
+      float: right;
+      cursor: pointer;
+      width: 10px;
+    }
+  }
+
+  div.chart-top-label-container, div.chart-bottom-label-container {
+
+    display: flex;
+
+    div.chart-labels {
+      padding-left: 10px;
+      padding-right: 10px;
+      text-align: center;
+    }
+
+    div.chart-value, div.chart-label {
+      font-weight: 700;
+      font-family: $oc_headers_font;
+      letter-spacing: 1px;
+      line-height: 1.5;
+    }
+
+    div.chart-label {
+      font-size: 12px;
+    }
+  }
+
+  div.chart-top-label-container {
+
+    div.chart-value {
+      font-size: 24px;
+    }
+  }
+
+  div.chart-bottom-label-container {
+
+    align-items: center;
+    justify-content: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin-bottom: 10px;
+
+    div.chart-value {
+      font-size: 20px;
+    }
+  }
+}

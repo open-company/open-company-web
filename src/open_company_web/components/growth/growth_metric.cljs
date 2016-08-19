@@ -32,14 +32,10 @@
       (str label (utils/get-month period) " " (utils/get-year period)))))
 
 (defn- growth-value [selected-key data]
-  (.log js/console (str selected-key))
-  (.log js/console data)
   (let [value (get data selected-key)]
     (str value)))
 
 (defn- growth-label [selected-key data]
-  (.log js/console (str selected-key))
-  (.log js/console data)
   (get data :sub-label))
 
 (defcomponent growth-metric [data owner options]

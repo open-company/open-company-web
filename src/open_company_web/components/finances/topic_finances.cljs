@@ -50,33 +50,33 @@
               sorted-finances (sort sort-pred (vals fixed-finances-data))          
               sum-revenues (apply + (map utils/abs (map :revenue finances-row-data)))
               cur-symbol (utils/get-symbol-for-currency-code currency)
-              chart-opts {:opts {:chart-height 100
-                                 :chart-width (:width (:chart-size options))
-                                 :chart-keys [:costs]
-                                 :interval "monthly"
-                                 :svg-click #(when (:topic-click options) ((:topic-click options) nil))
-                                 :chart-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
-                                 :chart-selected-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
-                                 :chart-fill-polygons false
-                                 :labels {:costs {:position :top
-                                                  :order 1
-                                                  :value-presenter (partial get-currency-label cur-symbol)
-                                                  :value-color (occ/get-color-by-kw :oc-red-regular)
-                                                  :label-presenter #(str "MONTHLY BURN")
-                                                  :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)} 
-                                          :cash {:position :bottom
-                                                 :order 1
-                                                 :value-presenter (partial get-currency-label cur-symbol)
-                                                 :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
-                                                 :label-presenter #(str "CASH")
-                                                 :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)} 
-                                          :runway {:position :bottom
-                                                   :order 2
-                                                   :value-presenter (partial get-runway-label)
-                                                   :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
-                                                   :label-presenter #(str "RUNWAY")
-                                                   :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}}
-                                 :hide-nav (:hide-nav options)}}]
+              chart-opts {:chart-height 100
+                          :chart-width (:width (:chart-size options))
+                          :chart-keys [:costs]
+                          :interval "monthly"
+                          :svg-click #(when (:topic-click options) ((:topic-click options) nil))
+                          :chart-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
+                          :chart-selected-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
+                          :chart-fill-polygons false
+                          :hide-nav (:hide-nav options)}
+              labels {:costs {:position :top
+                              :order 1
+                              :value-presenter (partial get-currency-label cur-symbol)
+                              :value-color (occ/get-color-by-kw :oc-red-regular)
+                              :label-presenter #(str "BURN")
+                              :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)} 
+                      :cash {:position :bottom
+                             :order 1
+                             :value-presenter (partial get-currency-label cur-symbol)
+                             :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
+                             :label-presenter #(str "CASH")
+                             :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)} 
+                      :runway {:position :bottom
+                               :order 2
+                               :value-presenter (partial get-runway-label)
+                               :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
+                               :label-presenter #(str "RUNWAY")
+                               :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}}]
 
           (dom/div {:class "section-container" :id "section-finances"}          
 
@@ -85,8 +85,14 @@
               ;; has the company ever had revenue?
               (if (pos? sum-revenues) 
 
-                ;; post-revenue gets a bar chart
-                (om/build d3-chart {:chart-data sorted-finances} chart-opts)
+                ;; post-revenue gets a revenue label and a revenue plot
+                (let [post-labels (merge labels {:revenue {:position :top
+                                                           :order 2
+                                                           :value-presenter (partial get-currency-label cur-symbol)
+                                                           :value-color (occ/get-color-by-kw :oc-green-regular)
+                                                           :label-presenter #(str "REVENUE")
+                                                           :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}})]
+                  (om/build d3-chart {:chart-data sorted-finances} {:opts (merge chart-opts {:labels post-labels})}))
 
-                ;; pre-revenue gets a line chart
-                (om/build d3-chart {:chart-data sorted-finances} chart-opts)))))))))
+                ;; pre-revenue gets just a cost label and plot
+                (om/build d3-chart {:chart-data sorted-finances} {:opts (merge chart-opts {:labels labels})})))))))))
