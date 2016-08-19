@@ -8,12 +8,12 @@
 
 ;; ===== Graph Layout =====
 
-(def dot-radius 5)
-(def dot-stroke 3)
-(def dot-selected-stroke 6)
+(def circle-radius 5)
+(def circle-stroke 3)
+(def circle-selected-stroke 6)
 
-(def show-dots 4)
-(def chart-step show-dots)
+(def show-data-points 4)
+(def chart-step show-data-points)
 
 (defn- max-y [data chart-keys]
   (let [filtered-data (map #(select-keys % chart-keys) data)]
@@ -32,7 +32,7 @@
     range-fn))
 
 (defn- dot-position [chart-width i]
-  (let [dot-spacer (/ (- chart-width 20) (dec show-dots))]
+  (let [dot-spacer (/ (- chart-width 20) (dec show-data-points))]
     (+ (* i dot-spacer) 10)))
 
 (defn- current-data 
@@ -40,10 +40,10 @@
   [owner]
   (let [start (om/get-state owner :start)
         all-data (om/get-props owner :chart-data)
-        stop (min (count all-data) (+ start show-dots))]
+        stop (min (count all-data) (+ start show-data-points))]
     (subvec all-data start stop)))
 
-(declare dot-select)
+(declare data-select)
 (defn- d3-calc [owner options]
   (when-let [d3-dots (om/get-ref owner "d3-dots")]
     ; clean the chart area
@@ -72,9 +72,8 @@
           data-max (max-y (om/get-props owner :chart-data) chart-keys)
           max-y (scale-fn data-max)]
 
-      ; for each set of data
-      (when (> (count chart-data) 1)
-        (doseq [i (range (count chart-data))]
+      (when (> (count chart-data) 1) ; when there is any data to chart
+        (doseq [i (range (count chart-data))] ; for each data point in the dataset
           (let [data-set (get chart-data i)]
             ; for each key in the set
             (doseq [j (range (count chart-keys))]
@@ -106,7 +105,7 @@
                           (.append "line")
                           (.attr "class" "chart-line")
                           (.style "stroke" (chart-key fill-colors))
-                          (.style "stroke-width" dot-stroke)
+                          (.style "stroke-width" circle-stroke)
                           (.attr "x1" (+ cx 2))
                           (.attr "y1" (get-y cy max-y))
                           (.attr "x2" (- next-cx 2))
@@ -114,17 +113,17 @@
                 ; add a circle to represent the data
                 (-> chart-node
                     (.append "circle")
-                    (.attr "class" "chart-dot")
+                    (.attr "class" (str "chart-dot chart-dot-" i))
                     (.attr "r" (if (not (chart-key data-set))
                                 0
-                                dot-radius))
+                                circle-radius))
                     (.attr "stroke" (chart-key fill-colors))
-                    (.attr "stroke-width" (if (= i selected) dot-selected-stroke dot-stroke))
+                    (.attr "stroke-width" (if (= i selected) circle-selected-stroke circle-stroke))
                     (.attr "fill" "white")
                     (.attr "data-fill" (chart-key fill-colors))
                     (.attr "data-hasvalue" (chart-key data-set))
                     (.attr "data-selectedFill" (chart-key fill-selected-colors))
-                    (.attr "id" (str "chart-dot-" i))
+                    (.attr "id" (str "chart-dot-" chart-key "-" i))
                     (.attr "cx" cx)
                     (.attr "cy" (get-y cy max-y))))))))
       ; add the hovering rects
@@ -133,64 +132,71 @@
           (-> chart-node
               (.append "rect")
               (.attr "class" "hover-rect")
-              (.attr "width" (/ chart-width show-dots))
+              (.attr "width" (/ chart-width show-data-points))
               (.attr "height" chart-height)
-              (.attr "x" (* i (/ chart-width show-dots)))
+              (.attr "x" (* i (/ chart-width show-data-points)))
               (.attr "y" 0)
-              (.on "mouseover" #(dot-select owner options i))
-              (.on "mouseout" #(dot-select owner options (om/get-state owner :selected)))
+              (.on "mouseover" #(data-select owner options i))
+              (.on "mouseout" #(data-select owner options (om/get-state owner :selected)))
               (.attr "fill" "transparent")))))))
 
 ;; ===== Graph Events =====
 
-(defn- dot-select 
+(defn- data-select 
   "
   Handle graph event that (may) select a new point on the graph.
 
-  Draw the selected and unselected circles differently, and update the
-  `selected` component state.
+  Redraw the SVG data point circles so selected and unselected circles 
+  can be drawn differently, and update the `selected` component state.
   "
   [owner options idx]
-  (.stopPropagation (.-event js/d3))
+  (.stopPropagation (.-event js/d3)) ; we got this!
   (let [svg-el (om/get-ref owner "d3-dots")
         d3-svg-el (.select js/d3 svg-el)
         chart-width (:chart-width options)
-        data (current-data owner)
-        next-set (get data idx)
-        next-circle (.select d3-svg-el (str "circle#chart-dot-" idx))
+        selected-circles (.selectAll d3-svg-el (str "circle.chart-dot-" idx))
         all-circles (.selectAll d3-svg-el "circle")]
+    
+    ;; draw all the circles normally
     (.each all-circles (fn [d i]
-                        (this-as circle-node
-                          (let [circle (.select js/d3 circle-node)
-                                color (.attr circle "data-fill")
-                                hasvalue (.attr circle "data-hasvalue")]
-                            (-> circle
-                                (.attr "stroke" color)
-                                (.attr "stroke-width" dot-stroke)
-                                (.attr "fill" "white")
-                                (.attr "r" (if hasvalue dot-radius 0)))))))
-    (let [color (.attr next-circle "data-fill")
-          hasvalue (.attr next-circle "data-hasvalue")]
-      (-> next-circle
-          (.attr "stroke" color)
-          (.attr "stroke-width" dot-selected-stroke)
-          (.attr "fill" "white")
-          (.attr "r" (if hasvalue dot-radius 0))))
+      (this-as circle-node
+        (let [circle (.select js/d3 circle-node)
+              color (.attr circle "data-fill")
+              hasvalue (.attr circle "data-hasvalue")]
+          (-> circle
+              (.attr "stroke" color)
+              (.attr "stroke-width" circle-stroke)
+              (.attr "fill" "white")
+              (.attr "r" (if hasvalue circle-radius 0)))))))
+    
+    ;; draw the selected circles specially
+    (.each selected-circles (fn [d i]
+      (this-as circle-node
+        (let [circle (.select js/d3 circle-node)
+              color (.attr circle "data-fill")
+              hasvalue (.attr circle "data-hasvalue")]
+          (-> circle
+              (.attr "stroke" color)
+              (.attr "stroke-width" circle-selected-stroke)
+              (.attr "fill" "white")
+              (.attr "r" (if hasvalue circle-radius 0)))))))
+
+    ;; let the rest of the component know a (potentially) new data point is selected
     (om/set-state! owner :selected idx)))
 
 (defn- prev-data [owner e]
-  (.stopPropagation e)
+  (.stopPropagation e) ; we got this!
   (let [start (om/get-state owner :start)
         next-start (- start chart-step)
         fixed-next-start (max 0 next-start)]
     (om/set-state! owner :start fixed-next-start)))
 
 (defn- next-data [owner e]
-  (.stopPropagation e)
+  (.stopPropagation e) ; we got this!
   (let [start (om/get-state owner :start)
         all-data (om/get-props owner :chart-data)
         next-start (+ start chart-step)
-        fixed-next-start (min (- (count all-data) show-dots) next-start)]
+        fixed-next-start (min (- (count all-data) show-data-points) next-start)]
     (om/set-state! owner :start fixed-next-start)))
 
 ;; ===== Utility Functions =====
@@ -224,8 +230,8 @@
 (defcomponent d3-chart [{:keys [chart-data] :as data} owner {:keys [chart-width chart-height] :as options}]
 
   (init-state [_]
-    (let [start (max 0 (- (count chart-data) show-dots))
-          current-data (vec (take-last show-dots chart-data))]
+    (let [start (max 0 (- (count chart-data) show-data-points))
+          current-data (vec (take-last show-data-points chart-data))]
       {:start start
        :selected (dec (count current-data))}))
 
@@ -274,7 +280,7 @@
           ;; Next button
           (dom/div {:class (str "chart-next" (when hide-chart-nav " hidden"))
                     :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
-                                :opacity (if (< start (- (count chart-data) show-dots)) 1 0)}
+                                :opacity (if (< start (- (count chart-data) show-data-points)) 1 0)}
                     :on-click #(next-data owner %)}
             (dom/i {:class "fa fa-caret-right"})))
 

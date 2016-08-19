@@ -55,8 +55,10 @@
                           :chart-keys [:costs]
                           :interval "monthly"
                           :svg-click #(when (:topic-click options) ((:topic-click options) nil))
-                          :chart-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
-                          :chart-selected-colors {:costs (occ/get-color-by-kw :oc-chart-red)}
+                          :chart-colors {:costs (occ/get-color-by-kw :oc-chart-red)
+                                         :revenue (occ/get-color-by-kw :oc-chart-green)}
+                          :chart-selected-colors {:costs (occ/get-color-by-kw :oc-chart-red)
+                                                  :revenue (occ/get-color-by-kw :oc-chart-green)}
                           :chart-fill-polygons false
                           :hide-nav (:hide-nav options)}
               labels {:costs {:position :top
@@ -92,7 +94,10 @@
                                                            :value-color (occ/get-color-by-kw :oc-green-regular)
                                                            :label-presenter #(str "REVENUE")
                                                            :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}})]
-                  (om/build d3-chart {:chart-data sorted-finances} {:opts (merge chart-opts {:labels post-labels})}))
+                  (om/build d3-chart {:chart-data sorted-finances}
+                                     {:opts (merge chart-opts {:labels post-labels
+                                                               :chart-keys [:costs :revenue]})}))
 
                 ;; pre-revenue gets just a cost label and plot
-                (om/build d3-chart {:chart-data sorted-finances} {:opts (merge chart-opts {:labels labels})})))))))))
+                (om/build d3-chart {:chart-data sorted-finances}
+                                   {:opts (merge chart-opts {:labels labels})})))))))))
