@@ -55,10 +55,10 @@
                           :chart-keys [:costs]
                           :interval "monthly"
                           :svg-click #(when (:topic-click options) ((:topic-click options) nil))
-                          :chart-colors {:costs (occ/get-color-by-kw :oc-chart-red)
-                                         :revenue (occ/get-color-by-kw :oc-chart-green)}
-                          :chart-selected-colors {:costs (occ/get-color-by-kw :oc-chart-red)
-                                                  :revenue (occ/get-color-by-kw :oc-chart-green)}
+                          :chart-colors {:costs (occ/get-color-by-kw :oc-red-regular)
+                                         :revenue (occ/get-color-by-kw :oc-green-regular)}
+                          :chart-selected-colors {:costs (occ/get-color-by-kw :oc-red-regular)
+                                                  :revenue (occ/get-color-by-kw :oc-green-regular)}
                           :chart-fill-polygons false
                           :hide-nav (:hide-nav options)}
               labels {:costs {:position :top
