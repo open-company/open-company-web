@@ -254,16 +254,17 @@
           selected-data-set (get (current-data owner) selected)
           labels (:labels options)
           top-label-keys (label-keys-for labels :top)
-          bottom-label-keys (label-keys-for labels :bottom)]
+          bottom-label-keys (label-keys-for labels :bottom)
+          chart-type (:chart-type options)]
 
-      (dom/div
+      (dom/div {:class chart-type}
         
         ;; Top labels
         (when (not (empty? top-label-keys))
           (labels-for "chart-top-label-container" top-label-keys labels selected-data-set))
 
         ;; D3 Chart w/ optional nav. buttons
-        (dom/div {:class "d3-chart-container"
+        (dom/div {:class "chart-container"
                   :style #js {:width (str (+ chart-width 20) "px")
                               :height (str fixed-chart-height "px")}}
           ;; Previous button
@@ -284,6 +285,13 @@
                                 :opacity (if (< start (- (count chart-data) show-data-points)) 1 0)}
                     :on-click #(next-data owner %)}
             (dom/i {:class "fa fa-caret-right"})))
+
+        ;; X-axis labels
+        ; (when (:x-axis-labels options)
+        ;   (dom/div {:class "x-axis-labels"}
+        ;     (for [i (range show-data-points)]
+        ;       (let [month-label (utils/get-month (:period (get (vec chart-data) (+ start i))))]
+        ;         (dom/div {:class "x-axis-label"} month-label)))))
 
         ;; Bottom labels
         (when (not (empty? bottom-label-keys))

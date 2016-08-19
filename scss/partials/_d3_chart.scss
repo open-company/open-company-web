@@ -1,6 +1,16 @@
 div.composed-section {
 
-  div.d3-chart-container {
+  div.bordered-chart {
+    border-style: solid;
+    border-width: 1px;
+    border-color: $oc_gray_2;
+    border-radius: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding-top: 20px;
+  }
+
+  div.chart-container {
 
     margin: 0 auto;
 
@@ -61,4 +71,5 @@ div.composed-section {
       font-size: 20px;
     }
   }
+
 }

@@ -384,6 +384,26 @@
         section-data
         (((keyword section) (slug @caches/revisions)) as-of)))))
 
+(def quarterly-input-format (cljs-time-format/formatter "yyyy-MM"))
+(def monthly-input-format (cljs-time-format/formatter "yyyy-MM"))
+(def weekly-input-format (cljs-time-format/formatter "yyyy-MM-dd"))
+
+(defn get-formatter [interval]
+  "Get the date formatter from the interval type."
+  (case interval
+    "quarterly"
+    quarterly-input-format
+    "weekly"
+    weekly-input-format
+    ; else
+    monthly-input-format))
+
+(defn date-from-period [period & [interval]]
+  (cljs-time-format/parse (get-formatter interval) period))
+
+(defn period-from-date [date & [interval]]
+  (cljs-time-format/unparse (get-formatter interval) date))
+
 (defn get-quarter-from-month [month & [flags]]
   (let [short-str (in? flags :short)]
     (cond
@@ -404,26 +424,10 @@
         "Q4"
         "October - December"))))
 
-
-(def quarterly-input-format (cljs-time-format/formatter "yyyy-MM"))
-(def monthly-input-format (cljs-time-format/formatter "yyyy-MM"))
-(def weekly-input-format (cljs-time-format/formatter "yyyy-MM-dd"))
-
-(defn get-formatter [interval]
-  "Get the date formatter from the interval type."
-  (case interval
-    "quarterly"
-    quarterly-input-format
-    "weekly"
-    weekly-input-format
-    ; else
-    monthly-input-format))
-
-(defn date-from-period [period & [interval]]
-  (cljs-time-format/parse (get-formatter interval) period))
-
-(defn period-from-date [date & [interval]]
-  (cljs-time-format/unparse (get-formatter interval) date))
+(defn get-quarter-from-period [period & [flags]]
+  (let [date (date-from-period period "quarterly")
+        month (cljs-time/month date)]
+    (get-quarter-from-month month flags)))
 
 (def default-growth-interval "monthly")
 

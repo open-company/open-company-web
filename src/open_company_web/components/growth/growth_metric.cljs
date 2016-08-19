@@ -28,6 +28,8 @@
     (cond
       (= interval "weekly")
       (str label (utils/get-weekly-period-day period) " " (utils/get-month period "weekly") " " (utils/get-year period "weekly"))
+      (= interval "quarterly")
+      (str label (utils/get-quarter-from-period period [:short]) " " (utils/get-year period))
       :else
       (str label (utils/get-month period) " " (utils/get-year period)))))
 
@@ -47,10 +49,12 @@
           actual-with-label (label-from-set actual-set interval metric-unit currency-symbol)
           fixed-sorted-metric (vec (map #(merge % {:label (label-from-set % interval metric-unit currency-symbol)
                                                    :sub-label (sub-label (:period %) metric-info)}) sorted-metric))
-          chart-opts {:opts {:chart-height (:height (:chart-size options))
+          chart-opts {:opts {:chart-type "unbordered-chart"
+                             :chart-height (:height (:chart-size options))
                              :chart-width (:width (:chart-size options))
                              :chart-keys [:value]
                              :interval interval
+                             :x-axis-labels false
                              :svg-click #(when (:topic-click options) ((:topic-click options) nil))
                              :chart-colors {:value (occ/get-color-by-kw :oc-chart-blue)}
                              :chart-selected-colors {:value (occ/get-color-by-kw :oc-chart-blue)}

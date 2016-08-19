@@ -49,10 +49,12 @@
               sorted-finances (sort sort-pred (vals fixed-finances-data))          
               sum-revenues (apply + (map utils/abs (map :revenue finances-row-data)))
               cur-symbol (utils/get-symbol-for-currency-code currency)
-              chart-opts {:chart-height 100
+              chart-opts {:chart-type "bordered-chart"
+                          :chart-height 100
                           :chart-width (:width (:chart-size options))
                           :chart-keys [:costs]
                           :interval "monthly"
+                          :x-axis-labels true
                           :svg-click #(when (:topic-click options) ((:topic-click options) nil))
                           :chart-colors {:costs (occ/get-color-by-kw :oc-red-regular)
                                          :revenue (occ/get-color-by-kw :oc-green-regular)}
