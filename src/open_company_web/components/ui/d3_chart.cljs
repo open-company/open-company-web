@@ -226,7 +226,7 @@
   (let [center? (> (count label-keys) 1)]
     (dom/div {:class class-name
               :style (if center? 
-                        {:align-items :center :justify-content :center}
+                        {:text-align :center :align-items :center :justify-content :center}
                         {:align-items :flex-start :justify-content :flex-start :padding-left "20px"})}
       (for [label-key label-keys]
         (dom/div {:class "chart-labels"}
