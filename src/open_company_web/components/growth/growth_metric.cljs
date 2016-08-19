@@ -31,13 +31,6 @@
       :else
       (str label (utils/get-month period) " " (utils/get-year period)))))
 
-(defn- growth-value [selected-key data]
-  (let [value (get data selected-key)]
-    (str value)))
-
-(defn- growth-label [selected-key data]
-  (get data :sub-label))
-
 (defcomponent growth-metric [data owner options]
 
   (render [_]
@@ -66,9 +59,9 @@
                              :sub-label-color (occ/get-color-by-kw :oc-gray-5)
                              :labels {:value {:position :top
                                               :order 1
-                                              :value-presenter growth-value
+                                              :value-presenter #(:label %2)
                                               :value (occ/get-color-by-kw :oc-gray-5) 
-                                              :label-presenter growth-label
+                                              :label-presenter #(:sub-label %2)
                                               :label-color (occ/get-color-by-kw :oc-gray-5)}}
                              :hide-nav (:hide-nav options)}}]
 
