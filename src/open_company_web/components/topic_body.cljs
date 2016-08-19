@@ -24,8 +24,7 @@
                                   :read-only true}
                                  {:opts {:show-title false
                                          :show-revisions-navigation false
-                                         :chart-size {:width  (if (responsive/is-mobile) 300 480)
-                                                      :height (if (responsive/is-mobile) 174 295)}}})
+                                         :chart-size {:width  (if (responsive/is-mobile) 300 480)}}})
 
           (= section-kw :finances)
           (om/build topic-finances {:section-data section-data
@@ -36,7 +35,6 @@
                                     :read-only true}
                                    {:opts {:show-title false
                                            :show-revisions-navigation false
-                                           :chart-size {:width  (if (responsive/is-mobile) 300 480)
-                                                        :height (if (responsive/is-mobile) 174 295)}}}))
+                                           :chart-size {:width  (if (responsive/is-mobile) 300 480)}}}))
         (dom/div #js {:className "topic-body-inner group"
                       :dangerouslySetInnerHTML (clj->js {"__html" section-body})})))))

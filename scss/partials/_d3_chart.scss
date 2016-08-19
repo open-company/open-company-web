@@ -19,6 +19,18 @@ div.composed-section {
       rect.hover-rect {
         cursor: pointer;
       }
+
+      text.x-axis-label {
+        font-size: 12px;
+        font-weight: 700;
+        font-family: $oc_headers_font;
+        color: $oc_gray_5;
+        opacity: 0.25;
+      }
+
+      text.x-axis-label.selected {
+        opacity: 0.5;
+      }
     }
 
     div.chart-prev {

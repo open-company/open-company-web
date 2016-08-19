@@ -45,8 +45,7 @@
           chart-opts {:show-title false
                       :show-revisions-navigation false
                       :switch-metric-cb (:switch-metric-cb options)
-                      :chart-size {:width  (- fullscreen-width 100)
-                                   :height (if (responsive/is-mobile) 174 295)}}
+                      :chart-size {:width  (- fullscreen-width 100)}}
           chart-data {:section-data topic-data
                       :section (keyword topic)
                       :currency currency

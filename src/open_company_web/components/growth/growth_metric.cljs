@@ -50,7 +50,7 @@
           fixed-sorted-metric (vec (map #(merge % {:label (label-from-set % interval metric-unit currency-symbol)
                                                    :sub-label (sub-label (:period %) metric-info)}) sorted-metric))
           chart-opts {:opts {:chart-type "unbordered-chart"
-                             :chart-height (:height (:chart-size options))
+                             :chart-height 100
                              :chart-width (:width (:chart-size options))
                              :chart-keys [:value]
                              :interval interval

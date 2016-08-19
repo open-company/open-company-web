@@ -20,7 +20,7 @@
     (apply max (vec (flatten (map vals filtered-data))))))
 
 (defn- get-y [y max-y]
-  (+ 22 (- max-y y)))
+  (+ 10 (- max-y y)))
 
 (defn- scale [owner options]
   (let [all-data (om/get-props owner :chart-data)
@@ -28,7 +28,7 @@
         data-max (max-y all-data chart-keys)
         linear-fn (.. js/d3 -scale linear)
         domain-fn (.domain linear-fn #js [0 data-max])
-        range-fn (.range linear-fn #js [0 (- (:chart-height options) 30)])]
+        range-fn (.range linear-fn #js [0 (- (:chart-height options) 35)])]
     range-fn))
 
 (defn- dot-position [chart-width i]
@@ -70,7 +70,8 @@
                                         (.stopPropagation (.-event js/d3)))))
           scale-fn (scale owner options)
           data-max (max-y (om/get-props owner :chart-data) chart-keys)
-          max-y (scale-fn data-max)]
+          max-y (scale-fn data-max)
+          x-axis-labels? (:x-axis-labels options)]
 
       (when (> (count chart-data) 1) ; when there is any data to chart
         (doseq [i (range (count chart-data))] ; for each data point in the dataset
@@ -130,15 +131,26 @@
       (when (> (count chart-data) 1)
         (doseq [i (range (count chart-data))]
           (-> chart-node
-              (.append "rect")
-              (.attr "class" "hover-rect")
-              (.attr "width" (/ chart-width show-data-points))
-              (.attr "height" chart-height)
-              (.attr "x" (* i (/ chart-width show-data-points)))
-              (.attr "y" 0)
-              (.on "mouseover" #(data-select owner options i))
-              (.on "mouseout" #(data-select owner options (om/get-state owner :selected)))
-              (.attr "fill" "transparent")))))))
+            (.append "rect")
+            (.attr "class" "hover-rect")
+            (.attr "width" (/ chart-width show-data-points))
+            (.attr "height" chart-height)
+            (.attr "x" (* i (/ chart-width show-data-points)))
+            (.attr "y" 0)
+            (.on "mouseover" #(data-select owner options i))
+            (.on "mouseout" #(data-select owner options (om/get-state owner :selected)))
+            (.attr "fill" "transparent"))))
+
+      ;; add the x-axis labels
+      (when x-axis-labels?
+        (doseq [i (range (count chart-data))]
+           (let [month-label (utils/get-month (:period (get (vec chart-data) i)))]
+              (-> chart-node
+                (.append "text")
+                (.attr "class" (str "x-axis-label" (if (= i selected) " selected")))
+                (.attr "x" (- (dot-position chart-width i) 10))
+                (.attr "y" (- chart-height 2))
+                (.text month-label))))))))
 
 ;; ===== Graph Events =====
 

@@ -50,7 +50,7 @@
               sum-revenues (apply + (map utils/abs (map :revenue finances-row-data)))
               cur-symbol (utils/get-symbol-for-currency-code currency)
               chart-opts {:chart-type "bordered-chart"
-                          :chart-height 100 ; (:height (:chart-size options))
+                          :chart-height 112
                           :chart-width (:width (:chart-size options))
                           :chart-keys [:costs]
                           :interval "monthly"
