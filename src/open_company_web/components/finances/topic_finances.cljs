@@ -20,11 +20,10 @@
 
 (defn- get-runway-label [selected-key data]
   (let [value (get data selected-key)]
-    (finances-utils/get-rounded-runway value [:round :short])))
-  ;(case
-    ;(or (s/blank? value) (= value 0)) "-"
-    ;(neg? value) (finances-utils/get-rounded-runway value [:round])
-    ;:else "Pofitable"))
+    (cond
+      (or (s/blank? value) (= value 0)) "-"
+      (neg? value) (finances-utils/get-rounded-runway value [:round :short])
+      :else "Pofitable!")))
 
 (defn- get-state [owner data & [initial]]
   (let [section-data (:section-data data)]
@@ -94,6 +93,7 @@
                                                            :value-color (occ/get-color-by-kw :oc-green-regular)
                                                            :label-presenter #(str "REVENUE")
                                                            :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}})]
+                  (.log js/console (str sorted-finances))
                   (om/build d3-chart {:chart-data sorted-finances}
                                      {:opts (merge chart-opts {:labels post-labels
                                                                :chart-keys [:costs :revenue]})}))
