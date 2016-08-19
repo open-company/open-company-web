@@ -46,12 +46,12 @@
 (declare data-select)
 (defn- d3-calc [owner options]
   (when-let [d3-dots (om/get-ref owner "d3-dots")]
-    ; clean the chart area
+    ;; clean the chart area
     (.each (.selectAll (.select js/d3 d3-dots) "*")
            (fn [_ _]
              (this-as el
                (.remove (.select js/d3 el)))))
-    ; render the chart
+    ;; render the chart
     (let [selected (om/get-state owner :selected)
           chart-data (current-data owner)
           fill-colors (:chart-colors options)
@@ -75,13 +75,13 @@
       (when (> (count chart-data) 1) ; when there is any data to chart
         (doseq [i (range (count chart-data))] ; for each data point in the dataset
           (let [data-set (get chart-data i)]
-            ; for each key in the set
+            ;; for each key in the set
             (doseq [j (range (count chart-keys))]
               (let [chart-key (get chart-keys j)
                     cx (dot-position chart-width i)
                     cy (scale-fn (chart-key data-set))]
                 
-                ; add the line to connect this to the next dot and a polygon below the lines
+                ;; add the line to connect this to the next dot and a polygon below the lines
                 (when (and (chart-key data-set)
                            (< i (dec (count chart-data))))
                   (let [next-data-set (get chart-data (inc i))
@@ -110,7 +110,7 @@
                           (.attr "y1" (get-y cy max-y))
                           (.attr "x2" (- next-cx 2))
                           (.attr "y2" (get-y next-cy max-y))))))
-                ; add a circle to represent the data
+                ;; add a circle to represent the data
                 (-> chart-node
                     (.append "circle")
                     (.attr "class" (str "chart-dot chart-dot-" i))
@@ -126,7 +126,7 @@
                     (.attr "id" (str "chart-dot-" chart-key "-" i))
                     (.attr "cx" cx)
                     (.attr "cy" (get-y cy max-y))))))))
-      ; add the hovering rects
+      ;; add the hovering rects
       (when (> (count chart-data) 1)
         (doseq [i (range (count chart-data))]
           (-> chart-node
@@ -259,40 +259,34 @@
 
       (dom/div {:class chart-type}
         
-        ;; Top labels
+        ;; Top row labels
         (when (not (empty? top-label-keys))
           (labels-for "chart-top-label-container" top-label-keys labels selected-data-set))
 
-        ;; D3 Chart w/ optional nav. buttons
-        (dom/div {:class "chart-container"
-                  :style #js {:width (str (+ chart-width 20) "px")
-                              :height (str fixed-chart-height "px")}}
-          ;; Previous button
-          (dom/div {:class (str "chart-prev" (when hide-chart-nav " hidden"))
-                    :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
-                                :opacity (if (> start 0) 1 0)}
-                    :on-click #(prev-data owner %)}
-            (dom/i {:class "fa fa-caret-left"}))
-          
-          ;; Chart
-          (dom/svg #js {:className "d3-chart"
-                        :ref "d3-dots"
-                        :style #js {:marginLeft (str (if hide-chart-nav 10 0) "px")}})
-          
-          ;; Next button
-          (dom/div {:class (str "chart-next" (when hide-chart-nav " hidden"))
-                    :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
-                                :opacity (if (< start (- (count chart-data) show-data-points)) 1 0)}
-                    :on-click #(next-data owner %)}
-            (dom/i {:class "fa fa-caret-right"})))
-
-        ;; X-axis labels
-        ; (when (:x-axis-labels options)
-        ;   (dom/div {:class "x-axis-labels"}
-        ;     (for [i (range show-data-points)]
-        ;       (let [month-label (utils/get-month (:period (get (vec chart-data) (+ start i))))]
-        ;         (dom/div {:class "x-axis-label"} month-label)))))
-
-        ;; Bottom labels
+        ;; Bottom row labels
         (when (not (empty? bottom-label-keys))
-          (labels-for "chart-bottom-label-container" bottom-label-keys labels selected-data-set))))))
+          (labels-for "chart-bottom-label-container" bottom-label-keys labels selected-data-set))
+
+        ;; D3 Chart w/ optional nav. buttons
+        (when (> (count chart-data) 1)
+          (dom/div {:class "chart-container"
+                    :style #js {:width (str (+ chart-width 20) "px")
+                                :height (str fixed-chart-height "px")}}
+            ;; Previous button
+            (dom/div {:class (str "chart-prev" (when hide-chart-nav " hidden"))
+                      :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
+                                  :opacity (if (> start 0) 1 0)}
+                      :on-click #(prev-data owner %)}
+              (dom/i {:class "fa fa-caret-left"}))
+            
+            ;; Chart
+            (dom/svg #js {:className "d3-chart"
+                          :ref "d3-dots"
+                          :style #js {:marginLeft (str (if hide-chart-nav 10 0) "px")}})
+            
+            ;; Next button
+            (dom/div {:class (str "chart-next" (when hide-chart-nav " hidden"))
+                      :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
+                                  :opacity (if (< start (- (count chart-data) show-data-points)) 1 0)}
+                      :on-click #(next-data owner %)}
+              (dom/i {:class "fa fa-caret-right"}))))))))
