@@ -193,12 +193,31 @@
         fixed-next-start (min (- (count all-data) show-dots) next-start)]
     (om/set-state! owner :start fixed-next-start)))
 
+;; ===== Utility Functions =====
+
 (defn- label-keys-for
   "Return the keys of the labels, in order, for the specified position."
   [labels position]
   (->> (keys labels)
     (filter #(= position (get-in labels [% :position])))
     (sort-by #(get-in labels [% :order]))))
+
+(defn- labels-for
+  "Create a container of chart labels for a specified data set."
+  [class-name label-keys labels data]
+  (let [center? (> (count label-keys) 1)]
+    (dom/div {:class class-name
+              :style (if center? 
+                        {:align-items :center :justify-content :center}
+                        {:align-items :flex-start :justify-content :flex-start :padding-left "20px"})}
+      (for [label-key label-keys]
+        (dom/div {:class "chart-labels"}
+          (dom/div {:class "chart-value"
+                    :style {:color (get-in labels [label-key :value-color])}}
+            ((get-in labels [label-key :value-presenter]) label-key data))
+          (dom/div {:class "chart-label"
+                    :style {:color (get-in labels [label-key :label-color])}}
+            ((get-in labels [label-key :label-presenter]) label-key data)))))))
 
 ;; ===== D3 Chart Component =====
 
@@ -228,25 +247,13 @@
           selected-data-set (get (current-data owner) selected)
           labels (:labels options)
           top-label-keys (label-keys-for labels :top)
-          center-top-keys (> (count top-label-keys) 1)
           bottom-label-keys (label-keys-for labels :bottom)]
 
       (dom/div
         
         ;; Top labels
         (when (not (empty? top-label-keys))
-          (dom/div {:class "chart-top-label-container"
-                    :style (if center-top-keys 
-                              {:align-items :center :justify-content :center}
-                              {:align-items :flex-start :justify-content :flex-start :padding-left "20px"})}
-            (for [label-key top-label-keys]
-              (dom/div {:class "chart-labels"}
-                (dom/div {:class "chart-value"
-                          :style {:color (get-in options [:labels label-key :value-color])}}
-                  ((get-in options [:labels label-key :value-presenter]) label-key selected-data-set))
-                (dom/div {:class "chart-label"
-                          :style {:color (get-in options [:labels label-key :label-color])}}
-                  ((get-in options [:labels label-key :label-presenter]) label-key selected-data-set))))))
+          (labels-for "chart-top-label-container" top-label-keys labels selected-data-set))
 
         ;; D3 Chart w/ optional nav. buttons
         (dom/div {:class "d3-chart-container"
@@ -258,10 +265,12 @@
                                 :opacity (if (> start 0) 1 0)}
                     :on-click #(prev-data owner %)}
             (dom/i {:class "fa fa-caret-left"}))
+          
           ;; Chart
           (dom/svg #js {:className "d3-chart"
                         :ref "d3-dots"
                         :style #js {:marginLeft (str (if hide-chart-nav 10 0) "px")}})
+          
           ;; Next button
           (dom/div {:class (str "chart-next" (when hide-chart-nav " hidden"))
                     :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
@@ -271,12 +280,4 @@
 
         ;; Bottom labels
         (when (not (empty? bottom-label-keys))
-          (dom/div {:class "chart-bottom-label-container"}
-            (for [label-key bottom-label-keys]
-              (dom/div {:class "chart-labels"}
-                (dom/div {:class "chart-value"
-                          :style {:color (get-in options [:labels label-key :value-color])}}
-                  ((get-in options [:labels label-key :value-presenter]) label-key selected-data-set))
-                (dom/div {:class "chart-label"
-                          :style {:color (get-in options [:labels label-key :label-color])}}
-                  ((get-in options [:labels label-key :label-presenter]) label-key selected-data-set))))))))))
+          (labels-for "chart-bottom-label-container" bottom-label-keys labels selected-data-set))))))
