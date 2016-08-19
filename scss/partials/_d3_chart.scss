@@ -67,6 +67,16 @@ div.composed-section {
     }
   }
 
+  div.chart-top-label-container.multiple-rows, div.chart-bottom-label-container.multiple-rows {
+    
+    padding-left: 30px;
+    padding-right: 40px;
+
+    div.chart-labels {
+      width: 50%;
+    }
+  }
+
   div.chart-top-label-container {
 
     div.chart-value {

@@ -223,8 +223,9 @@
 (defn- labels-for
   "Create a container of chart labels for a specified data set."
   [class-name label-keys labels data]
-  (let [center? (> (count label-keys) 1)]
-    (dom/div {:class class-name
+  (let [center? (> (count label-keys) 1)
+        multiple-rows? (> (count (keys labels)) 3)]
+    (dom/div {:class (str class-name (if multiple-rows? " multiple-rows"))
               :style (if center? 
                         {:text-align :center :align-items :center :justify-content :center}
                         {:align-items :flex-start :justify-content :flex-start :padding-left "20px"})}
