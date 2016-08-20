@@ -43,8 +43,8 @@
                    (nil? runway-days) "-"
                    (or (not (:cash finances-data))
                        (not (:costs finances-data))) ""
-                   (zero? runway-days) "break-even"
-                   (pos? runway-days) "profitable"
+                   (zero? runway-days) "-"
+                   (pos? runway-days) "-"
                    :else (finances-utils/get-rounded-runway runway-days)) 
           ref-prefix (str (:period finances-data) "-")
           period-month (utils/get-month period)

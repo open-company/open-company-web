@@ -76,12 +76,9 @@
         fixed-runway (assoc fixed-burnrate :runway (utils/calc-runway (:cash fixed-burnrate) (:burn-rate fixed-burnrate)))]
     fixed-runway))
 
-(defn finances-data-map [finances-data]
-  (apply merge (map #(hash-map (:period %) %) finances-data)))
-
 (defn finances-init-state [topic data]
   (when (= topic "finances")
-    {:finances-data (finances-data-map data)}))
+    {:finances-data (finances-utils/finances-data-map data)}))
 
 (defn finances-row-has-data [row]
   (or (data-check-value (:cash row))

@@ -15,9 +15,9 @@
         value (keyw obj)
         label (if has-value
                 (if (and (= keyw :runway) (zero? value))
-                  "Break-even"
+                  "-"
                   (str (utils/get-period-string (:period obj)) " " column-name ": " prefix (utils/thousands-separator (keyw obj)) suffix))
-                "N/A")
+                "-")
         period (utils/get-period-string (:period obj) "monthly" [:short])]
     [period
      value
@@ -171,8 +171,8 @@
         (let [years (quot abs-runway-days (* 30 12))]
           (str years spacer (year-label flags) (pluralize years)))))))
 
-(defn finances-data-map [finances-data-coll]
-  (apply merge (map #(hash-map (:period %) %) finances-data-coll)))
+(defn finances-data-map [finances-data]
+  (apply merge (map #(hash-map (:period %) %) finances-data)))
 
 (defn fill-gap-months [finances-data]
   (let [data-map (finances-data-map finances-data)
