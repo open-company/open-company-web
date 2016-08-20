@@ -98,4 +98,5 @@
               ;; growth metric currently shown
               (when (and focus (seq (:metric-data subsection-data)))
                 (om/build growth-metric subsection-data {:opts options}))
-              (render-pillboxes owner options))))))))
+              (when (> (count growth-metric-slugs) 1)
+                (render-pillboxes owner options)))))))))

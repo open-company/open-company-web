@@ -61,7 +61,7 @@
                              :chart-fill-polygons true
                              :label-color (occ/get-color-by-kw :oc-gray-5)
                              :sub-label-color (occ/get-color-by-kw :oc-gray-5)
-                             :labels {:value {:position :top
+                             :labels {:value {:position :bottom
                                               :order 1
                                               :value-presenter #(:label %2)
                                               :value (occ/get-color-by-kw :oc-gray-5) 
