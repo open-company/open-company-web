@@ -10,11 +10,11 @@
             [cljsjs.react]
             [cljsjs.react.dom]))
 
+(def emojiable-class "emojiable")
+
 (defn on-click-out [s e]
   (when-not (utils/event-inside? e (sel1 [:div.emoji-picker]))
     (reset! (::visible s) false)))
-
-(def emojiable-class "emojiable")
 
 (defn save-caret-position [s]
   (let [caret-pos (::caret-pos s)]
@@ -38,11 +38,19 @@
   (let [active-element (googobj/get js/document "activeElement")]
     (reset! (::disabled s) (< (.indexOf (.-className active-element) emojiable-class) 0))))
 
+;; ===== D3 Chart Component =====
+
+;; Render an emoji button that reveal a picker for emoji.
+;; It will add the selected emoji in place of the current selection if
+;; the current activeElement has the class `emojiable`.
+
 (rum/defcs emoji-picker <
+  
   (rum/local false ::visible)
   (rum/local false ::caret-pos)
   (rum/local false ::last-active-element)
   (rum/local false ::disabled)
+  
   {:did-mount (fn [s] (when-not (utils/is-test-env?)
                         (let [click-listener (events/listen (.-body js/document) EventType/CLICK (partial on-click-out s))
                               focusin (events/listen js/document EventType/FOCUSIN (partial check-focus s))
@@ -50,13 +58,12 @@
                           (merge s {::click-listener click-listener
                                     ::focusin-listener focusin
                                     ::focusout-listener focusout}))))
+  
    :will-unmount (fn [s] (events/unlistenByKey (::click-listener s))
                          (events/unlistenByKey (::focusin-listener s))
                          (events/unlistenByKey (::focusout-listener s))
                          (dissoc s ::click-listener ::focusin-listener ::focusout-listener))}
-  "Render an emoji button that reveal a picker for emoji.
-   It will add the selected emoji in place of the current selection if
-   the current activeElement has the class `emojiable`."
+  
   [s {:keys [add-emoji-cb]}]
   (let [visible (::visible s)
         caret-pos (::caret-pos s)

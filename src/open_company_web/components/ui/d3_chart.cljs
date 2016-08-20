@@ -31,7 +31,10 @@
         range-fn (.range linear-fn #js [0 (- (:chart-height options) 35)])]
     range-fn))
 
-(defn- dot-position [chart-width i]
+(defn- data-x-position
+  "Given the width of the chart and an index of a data point within the displayed data set
+  return the horizontal (x-axis) position of the data point."
+  [chart-width i]
   (let [dot-spacer (/ (- chart-width 20) (dec show-data-points))]
     (+ (* i dot-spacer) 10)))
 
@@ -44,7 +47,9 @@
     (subvec all-data start stop)))
 
 (declare data-select)
-(defn- d3-calc [owner options]
+(defn- d3-render-chart
+  "Render a chart in SVG using D3 for the provided data and start position in the data."
+  [owner options]
   (when-let [d3-chart (om/get-ref owner "d3-chart")]
     ;; clean the chart area
     (.each (.selectAll (.select js/d3 d3-chart) "*")
@@ -79,14 +84,14 @@
             ;; for each key in the set
             (doseq [j (range (count chart-keys))]
               (let [chart-key (get chart-keys j)
-                    cx (dot-position chart-width i)
+                    cx (data-x-position chart-width i)
                     cy (scale-fn (chart-key data-set))]
                 
                 ;; add the line to connect this to the next dot and a polygon below the lines
                 (when (and (chart-key data-set)
                            (< i (dec (count chart-data))))
                   (let [next-data-set (get chart-data (inc i))
-                        next-cx (dot-position chart-width (inc i))
+                        next-cx (data-x-position chart-width (inc i))
                         next-cy (scale-fn (chart-key next-data-set))]
                     (when (chart-key next-data-set)
                       ;; polygon below line
@@ -150,7 +155,7 @@
               (-> chart-node
                 (.append "text")
                 (.attr "class" (str "x-axis-label" (if (= i selected) " selected")))
-                (.attr "x" (- (dot-position chart-width i) 10))
+                (.attr "x" (- (data-x-position chart-width i) 10))
                 (.attr "y" (- chart-height 2))
                 (.text label))))))))
 
@@ -198,14 +203,18 @@
     ;; let the rest of the component know a (potentially) new data point is selected
     (om/set-state! owner :selected idx)))
 
-(defn- prev-data [owner e]
+(defn- prev-data
+  "Handle click to select next data in the set. Update the start state."
+  [owner e]
   (.stopPropagation e) ; we got this!
   (let [start (om/get-state owner :start)
         next-start (- start chart-step)
         fixed-next-start (max 0 next-start)]
     (om/set-state! owner :start fixed-next-start)))
 
-(defn- next-data [owner e]
+(defn- next-data
+  "Handle click to select prior data in the set. Update the start state."
+  [owner e]
   (.stopPropagation e) ; we got this!
   (let [start (om/get-state owner :start)
         all-data (om/get-props owner :chart-data)
@@ -253,12 +262,12 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (d3-calc owner options)))
+      (d3-render-chart owner options)))
 
   (did-update [_ old-props old-state]
     (when-not (utils/is-test-env?)
       (when (or (not= old-props data) (not= old-state (om/get-state owner)))
-        (d3-calc owner options))))
+        (d3-render-chart owner options))))
 
   (render-state [_ {:keys [start selected]}]
 
