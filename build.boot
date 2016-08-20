@@ -5,12 +5,12 @@
     [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
     [tolitius/boot-check "0.1.3" :scope "test"]
 
-    [org.clojure/clojure "1.9.0-alpha10"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
-    [org.clojure/clojurescript "1.9.211"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
+    [org.clojure/clojure "1.9.0-alpha11"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
+    [org.clojure/clojurescript "1.9.225"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
 
     [org.omcljs/om "1.0.0-alpha41" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
 
-    [rum "0.10.5" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
+    [rum "0.10.6" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
 
     ;; Don't upgrade to 0.1.1, errors
     [org.martinklepsch/derivatives "0.1.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
