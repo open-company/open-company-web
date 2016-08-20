@@ -42,10 +42,12 @@
                                                  is-actual] :as data} owner options]
   (render [_]
     (let [fullscreen-width (responsive/fullscreen-topic-width card-width)
+          chart-reduction (if (responsive/is-mobile) 100 250)
+          chart-width (- fullscreen-width chart-reduction)
           chart-opts {:show-title false
                       :show-revisions-navigation false
                       :switch-metric-cb (:switch-metric-cb options)
-                      :chart-size {:width  (- fullscreen-width 100)}}
+                      :chart-size {:width chart-width}}
           chart-data {:section-data topic-data
                       :section (keyword topic)
                       :currency currency

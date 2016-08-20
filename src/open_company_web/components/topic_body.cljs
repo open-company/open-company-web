@@ -23,8 +23,7 @@
                                   :selected-metric selected-metric
                                   :read-only true}
                                  {:opts {:show-title false
-                                         :show-revisions-navigation false
-                                         :chart-size {:width  (if (responsive/is-mobile) 300 480)}}})
+                                         :show-revisions-navigation false}})
 
           (= section-kw :finances)
           (om/build topic-finances {:section-data section-data
@@ -34,7 +33,6 @@
                                     :selected-metric selected-metric
                                     :read-only true}
                                    {:opts {:show-title false
-                                           :show-revisions-navigation false
-                                           :chart-size {:width  (if (responsive/is-mobile) 300 480)}}}))
+                                           :show-revisions-navigation false}}))
         (dom/div #js {:className "topic-body-inner group"
                       :dangerouslySetInnerHTML (clj->js {"__html" section-body})})))))
