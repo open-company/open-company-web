@@ -144,13 +144,15 @@
       ;; add the x-axis labels
       (when x-axis-labels?
         (doseq [i (range (count chart-data))]
-           (let [month-label (utils/get-month (:period (get (vec chart-data) i)))]
+           (let [period (:period (get (vec chart-data) i))
+                 interval (:interval options)
+                 label (utils/get-period-string period interval [:short])]
               (-> chart-node
                 (.append "text")
                 (.attr "class" (str "x-axis-label" (if (= i selected) " selected")))
                 (.attr "x" (- (dot-position chart-width i) 10))
                 (.attr "y" (- chart-height 2))
-                (.text month-label))))))))
+                (.text label))))))))
 
 ;; ===== Graph Events =====
 
