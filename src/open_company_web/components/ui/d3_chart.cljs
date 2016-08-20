@@ -45,9 +45,9 @@
 
 (declare data-select)
 (defn- d3-calc [owner options]
-  (when-let [d3-dots (om/get-ref owner "d3-dots")]
+  (when-let [d3-chart (om/get-ref owner "d3-chart")]
     ;; clean the chart area
-    (.each (.selectAll (.select js/d3 d3-dots) "*")
+    (.each (.selectAll (.select js/d3 d3-chart) "*")
            (fn [_ _]
              (this-as el
                (.remove (.select js/d3 el)))))
@@ -61,7 +61,7 @@
           chart-keys (:chart-keys options)
           ; main chart node
           chart-node (-> js/d3
-                         (.select d3-dots)
+                         (.select d3-chart)
                          (.attr "width" chart-width)
                          (.attr "height" chart-height)
                          (.on "click" (fn []
@@ -165,7 +165,7 @@
   "
   [owner options idx]
   (.stopPropagation (.-event js/d3)) ; we got this!
-  (let [svg-el (om/get-ref owner "d3-dots")
+  (let [svg-el (om/get-ref owner "d3-chart")
         d3-svg-el (.select js/d3 svg-el)
         chart-width (:chart-width options)
         selected-circles (.selectAll d3-svg-el (str "circle.chart-dot-" idx))
@@ -285,23 +285,23 @@
         ;; D3 Chart w/ optional nav. buttons
         (when (> (count chart-data) 1)
           (dom/div {:class "chart-container"
-                    :style #js {:width (str (+ chart-width 20) "px")
-                                :height (str fixed-chart-height "px")}}
+                    :style {:width (str (+ chart-width 20) "px")
+                            :height (str fixed-chart-height "px")}}
             ;; Previous button
             (dom/div {:class (str "chart-prev" (when hide-chart-nav " hidden"))
-                      :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
-                                  :opacity (if (> start 0) 1 0)}
+                      :style {:paddingTop (str (- fixed-chart-height 17) "px")
+                              :opacity (if (> start 0) 1 0)}
                       :on-click #(prev-data owner %)}
               (dom/i {:class "fa fa-caret-left"}))
             
             ;; Chart
-            (dom/svg #js {:className "d3-chart"
-                          :ref "d3-dots"
-                          :style #js {:marginLeft (str (if hide-chart-nav 10 0) "px")}})
+            (dom/svg {:className "d3-chart"
+                      :ref "d3-chart"
+                      :style {:marginLeft (str (if hide-chart-nav 10 0) "px")}})
             
             ;; Next button
             (dom/div {:class (str "chart-next" (when hide-chart-nav " hidden"))
-                      :style #js {:paddingTop (str (- fixed-chart-height 17) "px")
-                                  :opacity (if (< start (- (count chart-data) show-data-points)) 1 0)}
+                      :style {:paddingTop (str (- fixed-chart-height 17) "px")
+                              :opacity (if (< start (- (count chart-data) show-data-points)) 1 0)}
                       :on-click #(next-data owner %)}
               (dom/i {:class "fa fa-caret-right"}))))))))
