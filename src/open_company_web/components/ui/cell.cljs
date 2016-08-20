@@ -12,8 +12,8 @@
 ;; props: 
 ;; - :value an initial value for the component
 ;; - :placeholder an placeholder for the :new state
-;; - :prefix a prefix to show before the formatte value
-;; - :suffic a suffix to show after the formatte value
+;; - :prefix a prefix to show before the formatted value
+;; - :suffix a suffix to show after the formatted value
 ;; - :cell-state (optional) an initial state for the component
 
 
