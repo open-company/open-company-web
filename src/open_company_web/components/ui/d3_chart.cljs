@@ -34,9 +34,15 @@
 (defn- data-x-position
   "Given the width of the chart and an index of a data point within the displayed data set
   return the horizontal (x-axis) position of the data point."
-  [chart-width i]
-  (let [dot-spacer (/ (- chart-width 20) (dec show-data-points))]
-    (+ (* i dot-spacer) 15)))
+  [chart-width i data-count]
+  (let [dot-spacer (/ (- chart-width 20) (dec show-data-points))
+        natural-dot-location (+ (* i dot-spacer) 15)]
+    (if (< data-count show-data-points)
+      ;; we're showing less than a full set of data points, so we need an x offset to center the chart
+      ;; (hard to explain why this calculation works, was worked out empiraclly)
+      (+ natural-dot-location (* (/ dot-spacer 2) (- show-data-points data-count)))
+      ;; we're showing a full set of data points
+      natural-dot-location)))
 
 (defn- current-data 
   "Get the subset of the data that's currently being displayed on the chart."
@@ -59,6 +65,7 @@
     ;; render the chart
     (let [selected (om/get-state owner :selected)
           chart-data (current-data owner)
+          data-count (count chart-data)
           fill-colors (:chart-colors options)
           fill-selected-colors (:chart-selected-colors options)
           chart-width (:chart-width options)
@@ -85,14 +92,14 @@
             ;; for each key in the set
             (doseq [j (range (count chart-keys))]
               (let [chart-key (get chart-keys j)
-                    cx (data-x-position chart-width i)
+                    cx (data-x-position chart-width i data-count)
                     cy (scale-fn (chart-key data-set))]
                 
                 ;; add the line to connect this to the next dot and a polygon below the lines
                 (when (and (chart-key data-set)
                            (< i (dec (count chart-data))))
                   (let [next-data-set (get chart-data (inc i))
-                        next-cx (data-x-position chart-width (inc i))
+                        next-cx (data-x-position chart-width (inc i) data-count)
                         next-cy (scale-fn (chart-key next-data-set))]
                     (when (chart-key next-data-set)
                       ;; polygon below line
@@ -156,7 +163,7 @@
               (-> chart-node
                 (.append "text")
                 (.attr "class" (str "x-axis-label" (if (= i selected) " selected")))
-                (.attr "x" (- (data-x-position chart-width i) 12))
+                (.attr "x" (- (data-x-position chart-width i data-count) 12))
                 (.attr "y" (- chart-height 2))
                 (.text label))))))))
 
@@ -278,9 +285,6 @@
           top-label-keys (label-keys-for labels :top)
           bottom-label-keys (label-keys-for labels :bottom)
           chart-type (:chart-type options)]
-
-
-      (.log js/console (str options))
 
       (dom/div {:class chart-type}
         
