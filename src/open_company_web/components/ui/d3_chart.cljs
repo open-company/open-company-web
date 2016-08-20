@@ -36,7 +36,7 @@
   return the horizontal (x-axis) position of the data point."
   [chart-width i]
   (let [dot-spacer (/ (- chart-width 20) (dec show-data-points))]
-    (+ (* i dot-spacer) 10)))
+    (+ (* i dot-spacer) 15)))
 
 (defn- current-data 
   "Get the subset of the data that's currently being displayed on the chart."
@@ -67,7 +67,8 @@
           ; main chart node
           chart-node (-> js/d3
                          (.select d3-chart)
-                         (.attr "width" chart-width)
+                         ; Make SVG 10px wider to give 5px on each side for month label overrun
+                         (.attr "width" (+ chart-width 10))
                          (.attr "height" chart-height)
                          (.on "click" (fn []
                                         (when (:svg-click options)
@@ -155,7 +156,7 @@
               (-> chart-node
                 (.append "text")
                 (.attr "class" (str "x-axis-label" (if (= i selected) " selected")))
-                (.attr "x" (- (data-x-position chart-width i) 10))
+                (.attr "x" (- (data-x-position chart-width i) 12))
                 (.attr "y" (- chart-height 2))
                 (.text label))))))))
 
@@ -271,15 +272,15 @@
 
   (render-state [_ {:keys [start selected]}]
 
-    (let [fixed-chart-height (if (> (count chart-data) 1)
-                              chart-height
-                              90)
-          hide-chart-nav (:hide-nav options)
+    (let [hide-chart-nav (:hide-nav options)
           selected-data-set (get (current-data owner) selected)
           labels (:labels options)
           top-label-keys (label-keys-for labels :top)
           bottom-label-keys (label-keys-for labels :bottom)
           chart-type (:chart-type options)]
+
+
+      (.log js/console (str options))
 
       (dom/div {:class chart-type}
         
@@ -294,11 +295,11 @@
         ;; D3 Chart w/ optional nav. buttons
         (when (> (count chart-data) 1)
           (dom/div {:class "chart-container"
-                    :style {:width (str (+ chart-width 20) "px")
-                            :height (str fixed-chart-height "px")}}
+                    :style {:width (str (+ chart-width 30) "px")
+                            :height (str chart-height "px")}}
             ;; Previous button
             (dom/div {:class (str "chart-prev" (when hide-chart-nav " hidden"))
-                      :style {:paddingTop (str (- fixed-chart-height 17) "px")
+                      :style {:paddingTop (str (- chart-height 17) "px")
                               :opacity (if (> start 0) 1 0)}
                       :on-click #(prev-data owner %)}
               (dom/i {:class "fa fa-caret-left"}))
@@ -306,11 +307,13 @@
             ;; Chart
             (dom/svg {:className "d3-chart"
                       :ref "d3-chart"
-                      :style {:marginLeft (str (if hide-chart-nav 10 0) "px")}})
+                      ;; either leave space for the nav (0 margin), or take up the space with 10 px of margin
+                      :style {:margin-left (str (if hide-chart-nav 10 0) "px")
+                              :margin-right (str (if hide-chart-nav 10 0) "px")}})
             
             ;; Next button
             (dom/div {:class (str "chart-next" (when hide-chart-nav " hidden"))
-                      :style {:paddingTop (str (- fixed-chart-height 17) "px")
+                      :style {:paddingTop (str (- chart-height 17) "px")
                               :opacity (if (< start (- (count chart-data) show-data-points)) 1 0)}
                       :on-click #(next-data owner %)}
               (dom/i {:class "fa fa-caret-right"}))))))))
