@@ -212,7 +212,7 @@
     (let [section             (dis/foce-section-key)
           topic-data          (dis/foce-section-data)
           section-kw          (keyword section)
-          chart-opts          {:chart-size {:width 260}
+          chart-opts          {:chart-size {:width 230}
                                :hide-nav true
                                :topic-click (:topic-click options)}
           is-growth-finances? (#{:growth :finances} section-kw)

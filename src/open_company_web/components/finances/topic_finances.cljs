@@ -19,11 +19,13 @@
     (str cur-symbol short-value)))
 
 (defn- get-runway-label [selected-key data]
-  (let [value (get data selected-key)]
+  (let [value (get data selected-key)
+        ten-years (* -1 10 365)]
     (cond
       (or (s/blank? value) (= value 0)) "-"
+      (<= value ten-years) ">9yrs"
       (neg? value) (finances-utils/get-rounded-runway value [:round :short])
-      :else "Profitable")))
+      :else "-")))
 
 (defn- get-state [owner data & [initial]]
   (let [section-data (:section-data data)]
@@ -101,11 +103,11 @@
 
                 ;; pre-revenue gets just 3 labels in 1 row
                 (let [ordered-labels (-> labels
-                                      (assoc-in [:cash :position] :top)
+                                      (assoc-in [:cash :position] :bottom)
                                       (assoc-in [:cash :order] 1)
-                                      (assoc-in [:costs :position] :top)
+                                      (assoc-in [:costs :position] :bottom)
                                       (assoc-in [:costs :order] 2)
-                                      (assoc-in [:runway :position] :top)
+                                      (assoc-in [:runway :position] :bottom)
                                       (assoc-in [:runway :order] 3))]
                   (om/build d3-chart {:chart-data sorted-finances}
                                      {:opts (merge chart-opts {:labels ordered-labels})}))))))))))

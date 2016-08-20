@@ -139,16 +139,17 @@
     ""))
 
 (defn get-rounded-runway [runway-days & [flags]]
-  (let [abs-runway-days (utils/abs runway-days)]
+  (let [spacer (if (utils/in? flags :short) "" " ")
+        abs-runway-days (utils/abs runway-days)]
     (cond
       ; days
       (< abs-runway-days 7)
       (let [days (int abs-runway-days)]
-        (str days " " (day-label flags) (pluralize days)))
+        (str days spacer (day-label flags) (pluralize days)))
       ; weeks
       (< abs-runway-days (* 30 3))
       (let [weeks (int (/ abs-runway-days 7))]
-        (str weeks " " (week-label flags) (pluralize weeks)))
+        (str weeks spacer (week-label flags) (pluralize weeks)))
       ; months
       (< abs-runway-days (* 30 12))
       (if (utils/in? flags :round)
@@ -156,9 +157,9 @@
               fixed-months (if (utils/in? flags :remove-trailing-zero)
                              (remove-trailing-zero (str months))
                              (str months))]
-          (str fixed-months " " (month-label flags) (pluralize months)))
+          (str fixed-months spacer (month-label flags) (pluralize months)))
         (let [months (quot abs-runway-days 30)]
-          (str months " " (month-label flags) (pluralize months))))
+          (str months spacer (month-label flags) (pluralize months))))
       ; years
       :else
       (if (utils/in? flags :round)
@@ -166,9 +167,9 @@
               fixed-years (if (utils/in? flags :remove-trailing-zero)
                             (remove-trailing-zero (str years))
                             (str years))]
-          (str fixed-years " " (year-label flags) (pluralize years)))
+          (str fixed-years spacer (year-label flags) (pluralize years)))
         (let [years (quot abs-runway-days (* 30 12))]
-          (str years " " (year-label flags) (pluralize years)))))))
+          (str years spacer (year-label flags) (pluralize years)))))))
 
 (defn finances-data-map [finances-data-coll]
   (apply merge (map #(hash-map (:period %) %) finances-data-coll)))
