@@ -37,7 +37,7 @@
     (get-state owner data true))
 
   (will-update [_ next-props _]
-    ; this means the section datas have changed from the API or at a upper lever of this component
+    ; this means the section datas have changed from the API or at a parent of this component
     (when-not (= next-props data)
       (om/set-state! owner (get-state owner next-props))))
 

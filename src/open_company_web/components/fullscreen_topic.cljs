@@ -48,7 +48,7 @@
                       :show-revisions-navigation false
                       :switch-metric-cb (:switch-metric-cb options)
                       :chart-size {:width chart-width}}
-          chart-data {:section-data topic-data
+          chart-data {:section-data (if (= topic "finances") (utils/fix-finances topic-data) topic-data)
                       :section (keyword topic)
                       :currency currency
                       :actual-as-of (:updated-at topic-data)

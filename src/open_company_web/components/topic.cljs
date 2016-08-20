@@ -80,13 +80,6 @@
                                :hide-nav true}
           is-growth-finances? (#{:growth :finances} section-kw)
           gray-color          (oc-colors/get-color-by-kw :oc-gray-5)
-          finances-row-data   (:data topic-data)
-          growth-data         (growth-utils/growth-data-map (:data topic-data))
-          no-data             (or (and (= section-kw :finances)
-                                       (or (empty? finances-row-data)
-                                        (utils/no-finances-data? finances-row-data)))
-                                  (and (= section-kw :growth)
-                                       (utils/no-growth-data? growth-data)))
           image-header        (:image-url topic-data)
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
