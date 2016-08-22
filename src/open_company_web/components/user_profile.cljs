@@ -26,5 +26,5 @@
             (when (jwt/get-key :avatar)
               (dom/img {:class "user-profile-avatar" :src (jwt/get-key :avatar)}))))
         (dom/div {:class "user-profile-disclaimer"}
-          "This information is from your Slack account – use Slack to update your profile."))
+          "User information is from your Slack account."))
       (om/build footer data))))
