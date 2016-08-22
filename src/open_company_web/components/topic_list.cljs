@@ -311,7 +311,7 @@
             {:id (str "first-topic-" company-slug)
              :once-only true
              :mobile false
-             :desktop "Well done! You added a topic. Add one more topic and you'll see how quickly the big picture comes together."}))
+             :desktop "Add another topic and you'll see how quickly the big picture comes together."}))
         
         (when (and show-share-tooltip
                    (not selected-topic))

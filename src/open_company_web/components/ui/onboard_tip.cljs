@@ -57,7 +57,7 @@
         mobile (:mobile args)
         desktop (:desktop args)]
     
-    (if @dismissed
+    (if (or (not dismissed) @dismissed)
       false ; don't show it, the user dismissed it
       (if (or (skip-on-device? mobile desktop) (already-shown? id once-only))
         false ; don't show it, there is no data for this device type, or this tip ID has already been shown to this user
