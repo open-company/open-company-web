@@ -6,7 +6,7 @@
 
 (defn ravenParameters []
   #js {:whitelistUrls ls/local-whitelist-array
-       :tags #js {:isMobile (responsive/is-mobile)
+       :tags #js {:isMobile (responsive/is-mobile-size?)
                   :hasJWT (not (not (jwt/jwt)))}
        :release ls/deploy-key})
 

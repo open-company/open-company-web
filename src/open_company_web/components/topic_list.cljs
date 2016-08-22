@@ -66,7 +66,6 @@
   (let [category-topics (get-category-topics company-data active-topics)]
     (and (jwt/jwt)
          (not (:read-only company-data))
-         (not (responsive/is-mobile))
          (or (empty? category-topics)
              (zero? (count (filter #(not (->> % keyword (get company-data) :placeholder)) category-topics)))))))
 
@@ -87,17 +86,15 @@
      :transitioning false
      :redirect-to-preview (or (:redirect-to-preview current-state) false)
      :fullscreen-force-edit (if (nil? current-state) (router/section-editing?) (:fullscreen-force-edit current-state))
-     :add-topic-tooltip-dismissed (or (:add-topic-tooltip-dismissed current-state) false)
      :show-add-topic-tooltip show-add-topic-tooltip
      :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
-     :second-tooltip-dismissed (or (:second-tooltip-dismissed current-state) false)
-     :show-share-su-tooltip (or (:show-share-su-tooltip current-state) false)
-     :share-su-tooltip-dismissed (or (:share-su-tooltip-dismissed current-state) false)}))
+     :show-share-tooltip (or (:show-share-tooltip current-state) false)}))
 
 (defn- topic-click [owner topic selected-metric & [force-edit]]
-  (if force-edit
-        (.pushState js/history nil (str "Edit " (name topic)) (oc-urls/company-section-edit (router/current-company-slug) (name topic)))
-        (.pushState js/history nil (name topic) (oc-urls/company-section (router/current-company-slug) (name topic))))
+  (let [company-slug (router/current-company-slug)]
+    (if force-edit
+          (.pushState js/history nil (str "Edit " (name topic)) (oc-urls/company-section-edit company-slug (name topic)))
+          (.pushState js/history nil (name topic) (oc-urls/company-section company-slug (name topic)))))
   (when force-edit
     (om/set-state! owner :fullscreen-force-edit true))
   (om/set-state! owner :selected-topic topic)
@@ -210,7 +207,7 @@
         (om/set-state! owner :show-second-add-topic-tooltip true))
       ; show share tooltip if needed
       (when (= (count no-placeholder-sections) 2)
-        (om/set-state! owner :show-share-su-tooltip true))))
+        (om/set-state! owner :show-share-tooltip true))))
 
   (did-update [_ _ _]
     (when (om/get-state owner :tr-selected-topic)
@@ -225,12 +222,10 @@
                            redirect-to-preview
                            fullscreen-force-edit
                            show-add-topic-tooltip
-                           add-topic-tooltip-dismissed
                            show-second-add-topic-tooltip
-                           second-tooltip-dismissed
-                           show-share-su-tooltip
-                           share-su-tooltip-dismissed]}]
-    (let [company-data    (:company-data data)
+                           show-share-tooltip]}]
+    (let [company-slug    (router/current-company-slug)
+          company-data    (:company-data data)
           category-topics (get-category-topics company-data active-topics)
           card-width      (:card-width data)
           columns-num     (:columns-num data)
@@ -243,14 +238,14 @@
                 :style {:margin-top (if selected-topic "0px" "84px")}
                 :key "topic-list"}
         ;; Activate sharing mode button
-        (when (and (not (responsive/is-mobile))
+        (when (and (not (responsive/is-mobile-size?))
                    (responsive/can-edit?)
                    (not (:read-only company-data))
                    (>= (count (utils/filter-placeholder-sections category-topics company-data)) min-no-placeholder-section-enable-share))
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
             (dom/button {:class "sharing-button"
-                         :on-click #(router/nav! (oc-urls/stakeholder-update-preview (router/current-company-slug)))} "SHARE AN UPDATE " (dom/i {:class "fa fa-share"}))))
+                         :on-click #(router/nav! (oc-urls/stakeholder-update-preview company-slug))} "SHARE AN UPDATE " (dom/i {:class "fa fa-share"}))))
         ;; Fullscreen topic
         (when selected-topic
           (dom/div {:class "selected-topic-container"
@@ -262,7 +257,7 @@
                 (om/build fullscreen-topic {:section selected-topic
                                             :section-data (->> selected-topic keyword (get company-data))
                                             :fullscreen-force-edit fullscreen-force-edit
-                                            :revision-updates (dispatcher/section-revisions (router/current-company-slug) (router/current-section))
+                                            :revision-updates (dispatcher/section-revisions company-slug (router/current-section))
                                             :selected-metric selected-metric
                                             :read-only (:read-only company-data)
                                             :card-width card-width
@@ -301,20 +296,28 @@
                                   :share-selected-topics share-selected-topics}
                                  {:opts {:topic-click (partial topic-click owner)
                                          :update-active-topics (partial update-active-topics owner)}})
-        (when (and (not add-topic-tooltip-dismissed)
-                   show-add-topic-tooltip)
-          (om/build onboard-tip
-            {:cta (str "HI " (jwt/get-key :name) ", WELCOME TO OPENCOMPANY! TO GET STARTED, ADD A TOPIC.")}
-            {:opts {:dismiss-tooltip #(om/set-state! owner :add-topic-tooltip-dismissed true)}}))
+        
+        ;; Onboarding tooltips
+        (when show-add-topic-tooltip
+          (onboard-tip
+            {:id (str "welcome-" company-slug)
+             :once-only false
+             :mobile (str "Hi " (jwt/get-key :name) ", your dashboard can be viewed after it's been created on a desktop browser.")
+             :desktop (str "Hi " (jwt/get-key :name) ", welcome to OpenCompany! To get started, add a topic.")}))
+        
         (when (and show-second-add-topic-tooltip
-                   (not selected-topic)
-                   (not second-tooltip-dismissed))
-          (om/build onboard-tip
-            {:cta "GREAT! YOU ADDED A TOPIC. ADD ANOTHER AND YOU'LL START TO SEE THE BIG PICTURE."}
-            {:opts {:dismiss-tooltip #(om/set-state! owner :second-tooltip-dismissed true)}}))
-        (when (and show-share-su-tooltip
-                   (not selected-topic)
-                   (not share-su-tooltip-dismissed))
-          (om/build onboard-tip
-            {:cta "YOUR BIG PICTURE IS COMING TOGETHER. YOU CAN SHARE AN UPDATE OF SELECTED TOPICS WITH YOUR TEAM, INVESTORS OR THE CROWD WHEN YOU'RE READY."}
-            {:opts {:class "large" :dismiss-tooltip #(om/set-state! owner :share-su-tooltip-dismissed true)}}))))))
+                   (not selected-topic))                   
+          (onboard-tip
+            {:id (str "first-topic-" company-slug)
+             :once-only true
+             :mobile false
+             :desktop "Well done! You added a topic. Add one more topic and you'll see how quickly the big picture comes together."}))
+        
+        (when (and show-share-tooltip
+                   (not selected-topic))
+          (onboard-tip
+            {:id (str "second-topic-" company-slug)
+             :once-only true
+             :mobile false
+             :desktop "It's easy to share information with your employees, investors and customers. Click on \"SHARE AN UPDATE\" above to try it."
+             :css-class "large"}))))))

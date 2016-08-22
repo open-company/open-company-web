@@ -42,7 +42,7 @@
                                                  is-actual] :as data} owner options]
   (render [_]
     (let [fullscreen-width (responsive/fullscreen-topic-width card-width)
-          chart-reduction (if (responsive/is-mobile) 100 250)
+          chart-reduction (if (responsive/is-mobile-size?) 100 250)
           chart-width (- fullscreen-width chart-reduction)
           chart-opts {:show-title false
                       :show-revisions-navigation false

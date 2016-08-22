@@ -202,9 +202,9 @@
         ;; Stakeholder update
         (and (not (contains? data :loading)) company-data)
         (dom/div {:class (utils/class-set {:su-edit true
-                                           :navbar-offset (not (responsive/is-mobile))})}
+                                           :navbar-offset (not (responsive/is-mobile-size?))})}
           ;; Company / user header
-          (when-not (responsive/is-mobile)
+          (when-not (responsive/is-mobile-size?)
             (om/build navbar data))
           
           (dom/div #js {:className "update-internal"
@@ -240,7 +240,7 @@
                                                    :update-content force-content-update}
                                                   {:opts {:change-cb (partial change-cb owner)}})
               ;; Dashboard link
-              (when (responsive/is-mobile)
+              (when (responsive/is-mobile-size?)
                 (dom/div {:class "dashboard-link"}
                   (om/build link {:href (oc-urls/company) :name "View Dashboard"}))))))
 

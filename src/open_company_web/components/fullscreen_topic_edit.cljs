@@ -527,7 +527,8 @@
                            growth-metadata-editing
                            ; tooltip
                            tooltip-dismissed]}]
-    (let [topic-kw (keyword topic)
+    (let [company-slug (router/current-company-slug)
+          topic-kw (keyword topic)
           is-data-topic (#{:finances :growth} topic-kw)
           title-length-limit 20
           topic-body (utils/emojify (if-not (:placeholder topic-data) (:body topic-data) ""))
@@ -707,7 +708,10 @@
       (when (and show-first-edit-tooltip
                  (not tooltip-dismissed))
         (om/build onboard-tip
-          {:cta "WHAT WOULD YOU LIKE TO SAY? YOU CAN ADD TEXT, EMOJI AND IMAGES."}
-          {:opts {:dismiss-tooltip #(doto owner
-                                      (om/set-state! :tooltip-dismissed true)
-                                      (focus-headline))}}))))))
+          {:id (str "content-topic-add-" company-slug)
+           :once-only true
+           :mobile false
+           :desktop "What would you like to say? You can add text, emoji and images."
+           :dismiss-tip-fn #(doto owner
+                              (om/set-state! :tooltip-dismissed true)
+                              (focus-headline))}))))))

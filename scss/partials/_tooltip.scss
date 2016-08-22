@@ -17,12 +17,8 @@ div.tooltip-container {
     height: 100%;
     background-color: rgba(77, 89, 106, 1);
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-    opacity: 0;
+    opacity: 1;
     transition: 230ms;
-
-    &.shown {
-      opacity: 1;
-    }
 
     div.triangle {
       @include triangle(right, $oc_yellow, 6px);

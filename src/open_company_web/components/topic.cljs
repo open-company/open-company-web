@@ -107,7 +107,7 @@
           (dom/div {:class "topic-title"} (:title topic-data))
           (when (and show-fast-editing
                    (responsive/can-edit?)
-                   (not (responsive/is-mobile))
+                   (not (responsive/is-mobile-size?))
                    (not (:read-only topic-data))
                    (not sharing-mode)
                    (not (:foce-active data)))
