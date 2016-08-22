@@ -11,7 +11,7 @@
 
   (render [_]
     (let [section-kw (keyword section)
-          section-body (utils/get-topic-body section-data section-kw)]
+          section-body (:body section-data)]
       ;; Topic body
       (dom/div {:class "topic-body"}
 
@@ -24,20 +24,16 @@
                                   :selected-metric selected-metric
                                   :read-only true}
                                  {:opts {:show-title false
-                                         :show-revisions-navigation false
-                                         :chart-size {:width  (if (responsive/is-mobile) 300 480)
-                                                      :height (if (responsive/is-mobile) 174 295)}}})
+                                         :show-revisions-navigation false}})
 
           (= section-kw :finances)
-          (om/build topic-finances {:section-data section-data
+          (om/build topic-finances {:section-data (utils/fix-finances section-data)
                                     :section section-kw
                                     :currency currency
                                     :actual-as-of (:updated-at section-data)
                                     :selected-metric selected-metric
                                     :read-only true}
                                    {:opts {:show-title false
-                                           :show-revisions-navigation false
-                                           :chart-size {:width  (if (responsive/is-mobile) 300 480)
-                                                        :height (if (responsive/is-mobile) 174 295)}}}))
+                                           :show-revisions-navigation false}}))
         (dom/div #js {:className "topic-body-inner group"
-                      :dangerouslySetInnerHTML (clj->js {"__html" (str section-body "<p style='height:1px;margin-top:0px;padding-top:0px;'> </p>")})})))))
+                      :dangerouslySetInnerHTML (clj->js {"__html" section-body})})))))

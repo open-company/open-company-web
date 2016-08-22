@@ -93,13 +93,10 @@
                   :id "section-growth"
                   :key (name section)}
           (dom/div {:class "composed-section growth group"}
-            ; growth pillboxes
-            (when (:pillboxes-first options)
-              (render-pillboxes owner options))
             ; growth data chart
             (dom/div {:class (utils/class-set {:composed-section-body true})}
               ;; growth metric currently shown
               (when (and focus (seq (:metric-data subsection-data)))
                 (om/build growth-metric subsection-data {:opts options}))
-            (when-not (:pillboxes-first options)
-              (render-pillboxes owner options)))))))))
+              (when (> (count growth-metric-slugs) 1)
+                (render-pillboxes owner options)))))))))

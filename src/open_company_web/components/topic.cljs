@@ -76,23 +76,14 @@
 
   (render [_]
     (let [section-kw          (keyword section)
-          chart-opts          {:chart-size {:width  260
-                                            :height 196}
-                               :hide-nav true
-                               :pillboxes-first false}
+          chart-opts          {:chart-size {:width 230}
+                               :hide-nav true}
           is-growth-finances? (#{:growth :finances} section-kw)
           gray-color          (oc-colors/get-color-by-kw :oc-gray-5)
-          finances-row-data   (:data topic-data)
-          growth-data         (growth-utils/growth-data-map (:data topic-data))
-          no-data             (or (and (= section-kw :finances)
-                                       (or (empty? finances-row-data)
-                                        (utils/no-finances-data? finances-row-data)))
-                                  (and (= section-kw :growth)
-                                       (utils/no-growth-data? growth-data)))
           image-header        (:image-url topic-data)
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
-          topic-body          (utils/get-topic-body topic-data section-kw)
+          topic-body          (:body topic-data)
           truncated-body      (if (utils/is-test-env?) topic-body (.truncate js/$ topic-body (clj->js {:length 500 :words true})))]
       (dom/div #js {:className "topic-internal group"
                     :onClick (partial fullscreen-topic owner nil false)
@@ -103,7 +94,7 @@
                                              :card-image (not is-growth-finances?)})}
             (cond
               (= section "finances")
-              (om/build topic-finances {:section-data topic-data
+              (om/build topic-finances {:section-data (utils/fix-finances topic-data)
                                         :section section
                                         :currency currency
                                         :topic-click (partial fullscreen-topic owner nil false)} {:opts chart-opts})
@@ -122,7 +113,10 @@
                    (not (:foce-active data)))
             (dom/button {:class (str "topic-pencil-button btn-reset")
                          :on-click #(pencil-click owner %)}
-              (dom/i {:class "fa fa-pencil"}))))
+              (dom/i {:class "fa fa-pencil"
+                      :title "Edit"
+                      :data-toggle "tooltip"
+                      :data-placement "top"}))))
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
@@ -152,7 +146,7 @@
                     #js [(js/parseFloat (.-width topic-size)) (js/parseFloat (.-height cur-size))]
                     #js [(js/parseFloat (.-width topic-size)) (js/parseFloat (.-height tr-size))]
                     anim-duration))
-    ; disappear current topic
+    ; make the current topic disappear
     (.play (Fade. cur-topic 1 0 anim-duration))
     ; appear the new topic
     (doto appear-animation
@@ -162,6 +156,7 @@
                                     {:as-of (:transition-as-of current-state)
                                      :transition-as-of nil})))
       (.play))))
+
 
 (defn get-all-sections [slug]
   (let [categories-data (:categories (slug @caches/new-sections))

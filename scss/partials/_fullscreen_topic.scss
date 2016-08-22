@@ -15,10 +15,10 @@ div.fullscreen-topic {
     cursor: pointer;
     z-index: 1040;
     float: right;
-    opacity: 0.2;
+    color: rgba(78,90,107,0.5);
 
     &:hover {
-      opacity: 0.5;
+      color: rgba(78,90,107,1);
     }
   }
 
@@ -63,8 +63,7 @@ div.fullscreen-topic {
     }
 
     div.fullscreen-topic-internal {
-      max-width: 650px;
-      min-width: 302px;
+      width: 684px;
       margin: 30px auto;
       position: relative;
       min-height: calc(100vh - #{$navbar_height}px - 60px - 4px);
@@ -129,16 +128,9 @@ div.fullscreen-topic {
         }
 
         div.topic-growth-finances{
-          margin-top: 10px;
+          margin-top: 20px;
           padding: 0px 26px;
         }
-      }
-
-      div.separator {
-        margin-top: 20px;
-        width: 30px;
-        height: 2px;
-        background-color: rgba(77, 89, 106, 0.2);
       }
 
       div.topic-body{

@@ -7,13 +7,15 @@
   :blue "#007A9D" ;"#004E64" ;"#109DB7"
   :gray "#D8D8D8" ;"#ADADAD"
   :black "#000000"
-  :oc-new-chart-blue "#4EE4D6"
-  :oc-new-chart-green "#4de148"
-  ;; greens
+  ;; Charts
+  :oc-chart-blue "#4EE4D6"
+  :oc-chart-green "#4de148"
+  :oc-chart-red "#D72A46"
+  ;; Greens
   :oc-green-dark "#008C54"
   :oc-green-regular "#26C485"
   :oc-green-light "#74E0B4"
-  ;; blues
+  ;; Blues
   :oc-blue-dark "#003848"
   :oc-blue-regular "#004E64"
   :oc-blue-light "#007A9D"
@@ -25,7 +27,9 @@
   :oc-gray-3 "#8A8A8A"
   :oc-gray-4 "#5B5B5B"
   :oc-gray-5 "#4E5A6B" ;rgb(78,90,107)
-
+  :oc-gray-5-half "rgba(78,90,107,0.5)"
+  :oc-gray-5-3-quarter "rgba(78,90,107,0.75)"
+  ;; Reds
   :oc-red-dark "#9E001A"
   :oc-red-regular "#D72A46"
   :oc-red-light "#EC7A8D"})

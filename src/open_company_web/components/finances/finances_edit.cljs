@@ -24,27 +24,27 @@
           next-period (:next-period data)
           tab-cb (fn [_ k]
                    (cond
-                     (= k :cash)
-                     (signal-tab (:period finances-data) :revenue)
                      (= k :revenue)
                      (signal-tab (:period finances-data) :costs)
                      (= k :costs)
+                     (signal-tab (:period finances-data) :cash)
+                     (= k :cash)
                      (when next-period
-                       (signal-tab next-period :cash))))
+                        (signal-tab next-period :revenue))))
           burn (- (:revenue finances-data) (:costs finances-data))
           burn-prefix (if (or (zero? burn) (pos? burn)) prefix (str "-" prefix))
           burn-rate (if (js/isNaN burn)
-                      "calculated"
+                      "-"
                       (if (zero? burn)
-                        (str burn-prefix "0")
+                        (str burn-prefix "-")
                         (str burn-prefix (utils/thousands-separator (utils/abs burn) currency 0))))
           runway-days (:runway finances-data)
           runway (cond
-                   (nil? runway-days) "calculated"
+                   (nil? runway-days) "-"
                    (or (not (:cash finances-data))
                        (not (:costs finances-data))) ""
-                   (zero? runway-days) "break-even"
-                   (pos? runway-days) "profitable"
+                   (zero? runway-days) "-"
+                   (pos? runway-days) "-"
                    :else (finances-utils/get-rounded-runway runway-days)) 
           ref-prefix (str (:period finances-data) "-")
           period-month (utils/get-month period)
@@ -52,23 +52,13 @@
                          (= period-month "DEC")
                          (:needs-year data))]
       (dom/tr {}
-        (dom/td {:class "no-cell"}
+        (dom/th {:class "no-cell"}
           (utils/get-period-string (:period finances-data) "monthly" [:short (when needs-year :force-year)]))
-        ;; cash
-        (dom/td {}
-          (om/build cell {:value (:cash finances-data)
-                          :decimals 0
-                          :placeholder (if is-new "at month end" "")
-                          :currency currency
-                          :cell-state cell-state
-                          :draft-cb #(change-cb :cash %)
-                          :period period
-                          :key :cash
-                          :tab-cb tab-cb}))
         ;; revenue
         (dom/td {}
           (om/build cell {:value (:revenue finances-data)
                           :decimals 0
+                          :positive-only true
                           :placeholder (if is-new "entire month" "")
                           :currency currency
                           :cell-state cell-state
@@ -80,6 +70,7 @@
         (dom/td {}
           (om/build cell {:value (:costs finances-data)
                           :decimals 0
+                          :positive-only true
                           :placeholder (if is-new "entire month" "")
                           :currency currency
                           :cell-state cell-state
@@ -87,12 +78,21 @@
                           :period period
                           :key :costs
                           :tab-cb tab-cb}))
-        ;; Burn
-        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new :dark true})}
-          burn-rate)
+        ;; cash
+        (dom/td {}
+          (om/build cell {:value (:cash finances-data)
+                          :decimals 0
+                          :positive-only false
+                          :placeholder (if is-new "at month end" "")
+                          :currency currency
+                          :cell-state cell-state
+                          :draft-cb #(change-cb :cash %)
+                          :period period
+                          :key :cash
+                          :tab-cb tab-cb}))
         ;; Runway
         (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new :dark true})}
-                runway)))))
+          runway)))))
 
 (defn replace-row-in-data [data row k v]
   "Find and replace the edited row"
@@ -124,10 +124,9 @@
               (dom/thead {}
                 (dom/tr {}
                   (dom/th {} "")
-                  (dom/th {} "Cash")
                   (dom/th {} "Revenue")
-                  (dom/th {} "Costs")
-                  (dom/th {:class "dark"} "Cash flow")
+                  (dom/th {} "Expenses")
+                  (dom/th {} "Cash")
                   (dom/th {:class "dark"} "Runway")))
               (dom/tbody {}
                 (let [current-period (utils/current-period)]
@@ -147,8 +146,7 @@
                                                    :change-cb #(replace-row-in-data data row-data %1 %2)}))))
                 (dom/tr {}
                   (dom/td {}
-                    (dom/a {:class "more" :on-click #(more-months owner)} "More..."))
-                  (dom/td {})
+                    (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner)} "Earlier..."))
                   (dom/td {})
                   (dom/td {})
                   (dom/td {})

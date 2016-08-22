@@ -3,7 +3,7 @@
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.ui.d3-dot-chart :refer (d3-dot-chart)]
+            [open-company-web.components.ui.d3-chart :refer (d3-chart)]
             [open-company-web.components.ui.utility-components :refer (editable-pen)]
             [open-company-web.components.growth.utils :as growth-utils]
             [open-company-web.router :as router]
@@ -12,7 +12,7 @@
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
 
-(defn label-from-set [data-set interval metric-unit currency-symbol]
+(defn- label-from-set [data-set interval metric-unit currency-symbol]
   (let [actual-val (:value data-set)
         actual (when actual-val (utils/thousands-separator actual-val))
         period (utils/get-period-string (:period data-set) interval)
@@ -21,13 +21,15 @@
     (when actual-val
       (str fixed-cur-unit actual unit))))
 
-(defn sub-label [period metric-info]
+(defn- sub-label [period metric-info]
   (let [mname (:name metric-info)
         interval (:interval metric-info)
         label (str mname " - ")]
     (cond
       (= interval "weekly")
       (str label (utils/get-weekly-period-day period) " " (utils/get-month period "weekly") " " (utils/get-year period "weekly"))
+      (= interval "quarterly")
+      (str label (utils/get-quarter-from-period period [:short]) " " (utils/get-year period))
       :else
       (str label (utils/get-month period) " " (utils/get-year period)))))
 
@@ -47,17 +49,26 @@
           actual-with-label (label-from-set actual-set interval metric-unit currency-symbol)
           fixed-sorted-metric (vec (map #(merge % {:label (label-from-set % interval metric-unit currency-symbol)
                                                    :sub-label (sub-label (:period %) metric-info)}) sorted-metric))
-          chart-opts {:opts {:chart-height (:height (:chart-size options))
+          chart-opts {:opts {:chart-type "unbordered-chart"
+                             :chart-height 100
                              :chart-width (:width (:chart-size options))
                              :chart-keys [:value]
                              :interval interval
-                             :label-color (occ/get-color-by-kw :oc-gray-5)
-                             :label-key :label
-                             :sub-label-key :sub-label
+                             :x-axis-labels false
                              :svg-click #(when (:topic-click options) ((:topic-click options) nil))
-                             :chart-colors {:value (occ/get-color-by-kw :oc-new-chart-blue)}
-                             :chart-selected-colors {:value (occ/get-color-by-kw :oc-new-chart-blue)}
+                             :chart-colors {:value (occ/get-color-by-kw :oc-chart-blue)}
+                             :chart-selected-colors {:value (occ/get-color-by-kw :oc-chart-blue)}
+                             :chart-fill-polygons true
+                             :label-color (occ/get-color-by-kw :oc-gray-5)
+                             :sub-label-color (occ/get-color-by-kw :oc-gray-5)
+                             :labels {:value {:position :bottom
+                                              :order 1
+                                              :value-presenter #(:label %2)
+                                              :value (occ/get-color-by-kw :oc-gray-5) 
+                                              :label-presenter #(:sub-label %2)
+                                              :label-color (occ/get-color-by-kw :oc-gray-5)}}
                              :hide-nav (:hide-nav options)}}]
+
       (dom/div {:class (utils/class-set {:section true
                                          slug true
                                          :read-only (:read-only data)})
@@ -65,11 +76,4 @@
                 :on-click (:start-editing-cb data)}
         (when (pos? (count metric-data))
           (dom/div {}
-            (when (:show-label options)
-              (dom/div {:class "chart-header-container"}
-                (dom/div {:class "target-actual-container"}
-                  (dom/div {:class "actual-container"}
-                    (dom/h3 {:class "actual blue"} actual-with-label
-                      (om/build editable-pen {:click-callback (:start-data-editing-cb data)}))
-                    (dom/h3 {:class "actual-label gray"} (str "as of " period))))))
-            (om/build d3-dot-chart {:chart-data fixed-sorted-metric} chart-opts)))))))
+            (om/build d3-chart {:chart-data fixed-sorted-metric} chart-opts)))))))

@@ -19,7 +19,13 @@
             [cljsjs.emojione]) ; pulled in for cljsjs externs
   (:import  [goog.i18n NumberFormat]))
 
-(defn abs [n] (if n (max n (- n)) 0))
+(defn abs
+  "(abs n) is the absolute value of n"
+  [n]
+  (cond
+   (not (number? n)) n ; non-sensical, so leave it alone
+   (neg? n) (- n)
+   :else n))
 
 (def oc-animation-duration 300)
 
@@ -184,13 +190,6 @@
 (defn calc-burn-rate [revenue costs]
   (- revenue costs))
 
-(defn calc-avg-burn-rate [periods]
-  (when (pos? (count periods))
-    (let [burn-rates (map #(calc-burn-rate (:revenue %) (:costs %)) periods)
-          tot (count burn-rates)]
-      (apply (fn [& items]
-               (/ (apply + items) tot)) burn-rates))))
-
 (defn calc-runway [cash burn-rate]
   (int (* (/ cash burn-rate) 30)))
 
@@ -206,11 +205,9 @@
                 (let [idx (inc (.indexOf (to-array sorted-data) data))
                       start (max 0 (- idx 3))
                       sub-data (subvec sorted-data start idx)
-                      avg-burn-rate (calc-avg-burn-rate sub-data)
                       burn-rate (calc-burn-rate (:revenue data) (:costs data))
                       runway (calc-runway (:cash data) burn-rate)]
                   (merge data {:runway runway
-                               :avg-burn-rate avg-burn-rate
                                :burn-rate burn-rate})))
               sorted-data)))))
 
@@ -302,8 +299,6 @@
   "Get the section names, as a vector of keywords, in category order and order in the category."
   (vec (map keyword (flatten (remove nil? (map #(get-in company-data [:sections (keyword %)]) (:categories company-data)))))))
 
-(def finances-empty-notes {:notes {:body ""}})
-
 (defn link-for
   ([links rel] (some #(when (= (:rel %) rel) %) links))
   ([links rel method] (some #(when (and (= (:method %) method) (= (:rel %) rel)) %) links)))
@@ -323,9 +318,8 @@
         fixed-finances (calc-burnrate-runway finances-data)
         sort-pred (sort-by-key-pred :period true)
         sorted-finances (sort sort-pred fixed-finances)
-        fixed-section (assoc section-body :data sorted-finances)
-        section-with-notes (merge finances-empty-notes fixed-section)]
-    section-with-notes))
+        fixed-section (assoc section-body :data sorted-finances)]
+    fixed-section))
 
 (defn fix-section 
   "Add `:section` name and `:as-of` keys to the section map"
@@ -390,6 +384,26 @@
         section-data
         (((keyword section) (slug @caches/revisions)) as-of)))))
 
+(def quarterly-input-format (cljs-time-format/formatter "yyyy-MM"))
+(def monthly-input-format (cljs-time-format/formatter "yyyy-MM"))
+(def weekly-input-format (cljs-time-format/formatter "yyyy-MM-dd"))
+
+(defn get-formatter [interval]
+  "Get the date formatter from the interval type."
+  (case interval
+    "quarterly"
+    quarterly-input-format
+    "weekly"
+    weekly-input-format
+    ; else
+    monthly-input-format))
+
+(defn date-from-period [period & [interval]]
+  (cljs-time-format/parse (get-formatter interval) period))
+
+(defn period-from-date [date & [interval]]
+  (cljs-time-format/unparse (get-formatter interval) date))
+
 (defn get-quarter-from-month [month & [flags]]
   (let [short-str (in? flags :short)]
     (cond
@@ -410,26 +424,10 @@
         "Q4"
         "October - December"))))
 
-
-(def quarterly-input-format (cljs-time-format/formatter "yyyy-MM"))
-(def monthly-input-format (cljs-time-format/formatter "yyyy-MM"))
-(def weekly-input-format (cljs-time-format/formatter "yyyy-MM-dd"))
-
-(defn get-formatter [interval]
-  "Get the date formatter from the interval type."
-  (case interval
-    "quarterly"
-    quarterly-input-format
-    "weekly"
-    weekly-input-format
-    ; else
-    monthly-input-format))
-
-(defn date-from-period [period & [interval]]
-  (cljs-time-format/parse (get-formatter interval) period))
-
-(defn period-from-date [date & [interval]]
-  (cljs-time-format/unparse (get-formatter interval) date))
+(defn get-quarter-from-period [period & [flags]]
+  (let [date (date-from-period period "quarterly")
+        month (cljs-time/month date)]
+    (get-quarter-from-month month flags)))
 
 (def default-growth-interval "monthly")
 
@@ -595,12 +593,6 @@
 
 (defn scroll-to-section [section-name]
   (scroll-to-id (str "section-" (name section-name))))
-
-(defn get-topic-body [section-data section]
-  (let [section-kw (keyword section)]
-    (if (#{:finances :growth} section-kw)
-      (get-in section-data [:notes :body])
-      (:body section-data))))
 
 (defn round-2-dec [value decimals]
   ; cut to 2 dec maximum then parse to float to use toString to remove trailing zeros
@@ -775,3 +767,6 @@
   (if (is-test-env?)
     body
     (.truncate js/$ body (clj->js {:length 500 :words true}))))
+
+(defn filter-placeholder-sections [topics company-data]
+  (vec (filter #(not (:placeholder (->> % keyword (get company-data)))) topics)))

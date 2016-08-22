@@ -81,19 +81,19 @@
           :let [topic-kw (keyword topic)
                 topic-data (get topics-data topic-kw)
                 is-data-topic (#{:finances :growth} topic-kw)
-                topic-body (utils/get-topic-body topic-data topic-kw)]]
+                topic-body (:body topic-data)]]
       (cond
         (= topic "add-topic")
         add-topic-height
         (#{:finances :growth} topic-kw)
         (let [headline-height (headline-body-height (:headline topic-data) (utils/truncated-body topic-body) card-width)
               start-height (data-topic-height owner topic topic-data)
-              read-more    (if (clojure.string/blank? (utils/strip-HTML-tags (utils/get-topic-body topic-data topic))) 0 read-more-height)]
+              read-more    (if (clojure.string/blank? (utils/strip-HTML-tags (:body topic-data))) 0 read-more-height)]
           (+ start-height headline-height read-more))
         :else
         (let [topic-image-height      (if (:image-url topic-data) (utils/aspect-ration-image-height (:image-width topic-data) (:image-height topic-data) card-width) 0)
               headline-body-height (headline-body-height (:headline topic-data) (utils/truncated-body topic-body) card-width)
-              read-more               (if (clojure.string/blank? (utils/strip-HTML-tags (utils/get-topic-body topic-data topic))) 0 read-more-height)]
+              read-more               (if (clojure.string/blank? (utils/strip-HTML-tags (:body topic-data))) 0 read-more-height)]
           (+ topic-default-height headline-body-height topic-image-height read-more))))))
 
 (defn get-shortest-column [owner data current-layout]

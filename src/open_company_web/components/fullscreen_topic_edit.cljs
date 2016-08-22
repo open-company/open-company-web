@@ -21,7 +21,7 @@
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.components.growth.utils :as growth-utils]
-            [open-company-web.components.tooltip :refer (tooltip)]
+            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
@@ -76,12 +76,9 @@
         fixed-runway (assoc fixed-burnrate :runway (utils/calc-runway (:cash fixed-burnrate) (:burn-rate fixed-burnrate)))]
     fixed-runway))
 
-(defn finances-data-map [finances-data]
-  (apply merge (map #(hash-map (:period %) %) finances-data)))
-
 (defn finances-init-state [topic data]
   (when (= topic "finances")
-    {:finances-data (finances-data-map data)}))
+    {:finances-data (finances-utils/finances-data-map data)}))
 
 (defn finances-row-has-data [row]
   (or (data-check-value (:cash row))
@@ -94,7 +91,7 @@
           period (:period fixed-row)
           finances-data (om/get-state owner :finances-data)
           fixed-data (assoc finances-data period fixed-row)]
-      (om/set-state! owner :has-changes (not= finances-data fixed-data))
+      (om/set-state! owner :has-changes (or (om/get-state owner :has-changes) (not= finances-data fixed-data)))
       (om/set-state! owner :finances-data fixed-data))))
 
 (defn finances-clean-row [data]
@@ -103,7 +100,7 @@
              (or (not (nil? (:cash data)))
                  (not (nil? (:costs data)))
                  (not (nil? (:revenue data)))))
-    (dissoc data :burn-rate :runway :avg-burn-rate :new :value)))
+    (dissoc data :burn-rate :runway :new :value)))
 
 (defn finances-clean-data [finances-data]
   (remove nil? (vec (map (fn [[_ v]] (finances-clean-row v)) finances-data))))
@@ -143,43 +140,27 @@
           focus-metric (or growth-metric-focus (:slug (first all-metrics)))]
       {:growth-focus (or (:growth-focus current-state) focus-metric growth-utils/new-metric-slug-placeholder)
        :growth-metadata-editing (:growth-metadata-editing current-state)
-       :growth-new-metric (empty? all-metrics)
        :growth-data (growth-utils/growth-data-map (:data topic-data))
        :growth-metrics (growth-metrics-map all-metrics)
        :growth-metric-slugs (growth-metrics-order all-metrics)})))
-
-(defn filter-growth-data [focus growth-data]
-  (into {} (filter (fn [[k v]] (= (:slug v) focus)) growth-data)))
-
-(defn growth-reset-metrics-cb [topic owner data]
-  (let [state (growth-init-state topic data (om/get-state owner))]
-    (om/set-state! owner :growth-metrics (:growth-metrics state))
-    (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))))
-
-(defn growth-delete-metric-cb [owner data metric-slug]
-  (let [all-metrics (vals (om/get-state owner :growth-metrics))
-        new-metrics (vec (filter #(not= (:slug %) metric-slug) all-metrics))
-        new-metrics-map (growth-utils/growth-data-map new-metrics)
-        all-data (vals (om/get-state owner :growth-data))
-        filtered-data (vec (filter #(not= (:slug %) metric-slug) all-data))
-        new-data (growth-utils/growth-data-map filtered-data)
-        metrics-order (growth-metrics-order new-metrics)
-        next-focus (if metrics-order
-                      (first metrics-order)
-                      growth-utils/new-metric-slug-placeholder)]
-    (om/set-state! owner :growth-focus next-focus)
-    (om/set-state! owner :growth-metrics new-metrics-map)
-    (om/set-state! owner :growth-data new-data)
-    (om/set-state! owner :growth-metric-slugs metrics-order)
-    (om/set-state! owner :growth-metadata-editing false)
-    (om/set-state! owner :has-changes true)))
 
 (defn growth-save-metrics-metadata-cb [owner data metric-slug]
   (let [metrics (om/get-state owner :growth-metrics)
        metrics-order (om/get-state owner :growth-metric-slugs)
        new-metrics (vec (map #(metrics %) metrics-order))]
-    (api/partial-update-section "growth" {:metrics new-metrics})
-    (om/set-state! owner :growth-new-metric false)))
+    (api/partial-update-section "growth" {:metrics new-metrics})))
+
+(defn growth-delete-metric-cb [owner data metric-slug]
+  (let [all-metrics (vals (om/get-state owner :growth-metrics))
+        new-metrics (vec (filter #(not= (:slug %) metric-slug) all-metrics))
+        new-metrics-order (growth-metrics-order new-metrics)
+        next-focus (if new-metrics-order
+                      (first new-metrics-order)
+                      growth-utils/new-metric-slug-placeholder)]
+    (om/set-state! owner :growth-focus next-focus)
+    (om/set-state! owner :growth-metric-slugs new-metrics-order)
+    (om/set-state! owner :growth-metadata-editing false)
+    (api/partial-update-section "growth" {:metrics new-metrics})))
 
 (defn growth-metadata-edit-cb [owner editing]
   (om/set-state! owner :growth-metadata-editing editing))
@@ -188,7 +169,13 @@
   (or (data-check-value (:value row))
       (data-check-value (:target row))))
 
-(defn growth-change-data-cb [owner row]
+(defn growth-change-data-cb
+  "
+  Callback for when data is changed in a growth table row.
+  
+  Updates the data, and enables the save button.
+  "
+  [owner row]
   (when (growth-row-has-data row)
     (let [{:keys [period slug] :as fixed-row} (growth-fix-row row)
           growth-data (om/get-state owner :growth-data)
@@ -227,14 +214,7 @@
     ; reset the finances fields to the initial values
     (om/set-state! owner :growth-data (:growth-data state))
     (om/set-state! owner :growth-metrics (:growth-metrics state))
-    (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))
-    (when (om/get-state owner :growth-new-metric)
-      (let [topic        (:topic data)
-            topic-data   (if (= (dis/foce-section-key) (keyword topic)) (dis/foce-section-data) (:topic-data data))
-            first-metric (:slug (first (:metrics topic-data)))]
-        (om/set-state! owner :growth-focus first-metric)))
-    ; and the editing state flags
-    (om/set-state! owner :growth-new-metric false)))
+    (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))))
 
 (defn growth-clean-row [data]
   ; a data entry is good if we have the period and one other value: cash, costs or revenue
@@ -260,9 +240,11 @@
          with-title {:title (om/get-state owner :title)}
          headline (utils/emoji-images-to-unicode (.-innerHTML headline-node))
          with-headline (merge with-title {:headline headline})
-         with-header-image (merge with-headline {:image-url (om/get-state owner :image-url) :image-width (om/get-state owner :image-width) :image-height (om/get-state owner :image-height)})
+         with-header-image (merge with-headline {:image-url (om/get-state owner :image-url)
+                                                 :image-width (or (om/get-state owner :image-width) 0)
+                                                 :image-height (or (om/get-state owner :image-height) 0)})
          body (utils/emoji-images-to-unicode (.-innerHTML body-node))
-         with-body (merge with-header-image (if is-data-topic {:notes {:body body}} {:body body}))
+         with-body (merge with-header-image {:body body})
          with-finances-data (if (= topic-kw :finances)
                               (merge with-body {:data (finances-clean-data (om/get-state owner :finances-data))})
                               with-body)
@@ -276,7 +258,7 @@
 
 (defn headline-on-change [owner]
   (let [headline-innerHTML (.-innerHTML (sel1 [:div.topic-edit-headline]))]
-    (when (not= (om/get-state owner :headline) headline-innerHTML)
+    (when (not= (gobj/get (om/get-state owner :headline) "__html") headline-innerHTML)
       (om/set-state! owner :has-changes true))))
 
 (defn check-headline-count [owner headline-max-length e]
@@ -369,15 +351,13 @@
       {:has-changes (or (not= (:image-url current-topic-data) (:image-url topic-data))
                         (not= (:title current-topic-data) (:title topic-data))
                         (not= (:headline current-topic-data) (:headline topic-data))
-                        (not= (:body current-topic-data) (:body topic-data))
-                        (not= (:body (:notes current-topic-data)) (:body (:notes topic-data))))
+                        (not= (:body current-topic-data) (:body topic-data)))
        :title (:title topic-data)
        :headline (utils/emojify (:headline topic-data))
        :image-url (:image-url topic-data)
        :image-width (:image-width topic-data)
        :image-height (:image-height topic-data)
-       :body (utils/emojify (utils/get-topic-body topic-data topic))
-       :notes (:notes topic-data)
+       :body (utils/emojify (:body topic-data))
        :show-title-counter (:show-title-counter current-state)
        :medium-editor (:medium-editor current-state)
        :history-listener-id (:history-listener-id current-state)
@@ -472,11 +452,9 @@
       (let [new-state (get-state owner next-props (om/get-state owner))
             headline-el (sel1 (str "div#topic-edit-headline-" (name (:topic next-props))))
             body-el (sel1 (str "div#topic-edit-body-" (name (:topic next-props))))
-            body (if (#{:finances :growth} (keyword topic)) (:body (:notes new-state)) (:body new-state))]
+            body (:body new-state)]
         (set! (.-innerHTML headline-el) (gobj/get (:headline new-state) "__html"))
-        (if (#{:finances :growth} (keyword topic))
-          (set! (.-innerHTML body-el) (gobj/get (:body (:notes new-state)) "__html"))
-          (set! (.-innerHTML body-el) (gobj/get (:body new-state) "__html")))
+        (set! (.-innerHTML body-el) (gobj/get (:body new-state) "__html"))
         (om/set-state! owner new-state))
       (utils/after 200 #(focus-headline owner)))
     ; goes hidden
@@ -542,23 +520,21 @@
                            finances-data
                            ; growth states
                            growth-focus
-                           growth-new-metric
                            growth-data
                            growth-metrics
                            show-title-counter
                            growth-metric-slugs
+                           growth-metadata-editing
                            ; tooltip
                            tooltip-dismissed]}]
     (let [topic-kw (keyword topic)
           is-data-topic (#{:finances :growth} topic-kw)
           title-length-limit 20
-          topic-body (utils/emojify (if-not (:placeholder topic-data) (utils/get-topic-body topic-data topic-kw) ""))
+          topic-body (utils/emojify (if-not (:placeholder topic-data) (:body topic-data) ""))
+          topic-body-placeholder (if (:placeholder topic-data) (:body topic-data) "")
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height utils/overlay-max-win-height)
           max-height (min (- 650 126) (- win-height 126))
-          ; growth
-          focus-metric-data (filter-growth-data growth-focus growth-data)
-          growth-data (when (= topic "growth") (growth-utils/growth-data-map (:data topic-data)))
           headline-length-limit (if (or (= topic-kw :finances)
                                         (= topic-kw :growth))
                                   80
@@ -568,25 +544,33 @@
       ; set the onbeforeunload handler only if there are changes
       (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
+      
+      ;; Save and cancel buttons
       (dom/div #js {:className "fullscreen-topic-edit group"
                     :ref "fullscreen-topic-edit"
                     :style #js {:width (str (- fullscreen-width 20) "px")}
                     :key (:updated-at topic-data)}
         (dom/div {:style {:opacity "1"
-                          :margin "27px 0px"}
+                          :margin "27px 0px"
+                          :height "30px" ; so it keeps its height even if the buttons aren't there
+                         }
                   :class "group"}
-          (dom/button {:class "btn-reset btn-outline left mr1 cancel-button"
-                       :onClick #(do
-                                  (reset-and-dismiss owner options)
-                                  (utils/event-stop %))} "CANCEL")
-          (dom/button {:class "btn-reset btn-solid left mr1 save-button"
-                       :disabled (or (not has-changes) negative-headline-char-count)
-                       :onClick #(do
-                                  (save-data owner options)
-                                  (utils/event-stop %))} "SAVE"))
+          (when-not growth-metadata-editing
+            (dom/button {:class "btn-reset btn-outline left mr1 secondary-button"
+                         :onClick #(do
+                                    (reset-and-dismiss owner options)
+                                    (utils/event-stop %))} "CANCEL"))
+          (when-not growth-metadata-editing
+            (dom/button {:class "btn-reset btn-solid left mr1 primary-button"
+                         :disabled (or (not has-changes) negative-headline-char-count)
+                         :onClick #(do
+                                    (save-data owner options)
+                                    (utils/event-stop %))} "SAVE")))
         (dom/div {:class "fullscreen-topic-internal group"
                   :on-click #(.stopPropagation %)}
           (dom/div {:class "fullscreen-topic-edit-top-box"}
+            
+            ;; Image
             (when image-url
               (dom/div {:class "topic-header-image"}
                 (dom/img {:src image-url})
@@ -596,6 +580,31 @@
                                           :stroke 4
                                           :color "white"
                                           :accent-color "white"}))))
+            
+            ;; Data table
+            (when is-data-topic
+              (dom/div {:class "topic-overlay-edit-data"}
+              (when (= topic "finances")
+                (om/build finances-edit {:finances-data finances-data
+                                         :change-finances-cb (partial change-finances-data-cb owner)
+                                         :currency currency}
+                                        {:key (:updated-at topic-data)}))
+              (when (= topic "growth")
+                (dom/div {}
+                  (om/build growth-edit {:growth-data growth-data
+                                         :initial-focus growth-focus
+                                         :metadata-edit-cb (partial growth-metadata-edit-cb owner)
+                                         :metrics growth-metrics
+                                         :growth-metric-slugs growth-metric-slugs
+                                         :change-growth-cb (partial growth-change-data-cb owner)
+                                         :delete-metric-cb (partial growth-delete-metric-cb owner data)
+                                         :save-metadata-cb (partial growth-save-metrics-metadata-cb owner data)
+                                         :cancel-cb #(growth-cancel-cb owner data)
+                                         :change-growth-metric-cb (partial growth-change-metric-cb owner data)
+                                         :new-growth-section (om/get-state owner :oc-editing)}
+                                        {:opts {:currency currency} :key growth-data})))))
+            
+            ;; Title
             (dom/input {:class "topic-edit-title"
                         :id (str "topic-edit-title-" (name topic))
                         :type "text"
@@ -607,6 +616,8 @@
                                       (om/set-state! owner :char-count (- title-length-limit (count title)))
                                       (om/set-state! owner :char-count-alert (< (- title-length-limit (count title)) title-alert-limit))
                                       (change-value owner :title e))})
+            
+            ;; Headline
             (dom/div #js {:className "topic-edit-headline emoji-autocomplete emojiable"
                           :ref "topic-edit-headline"
                           :contentEditable true
@@ -617,58 +628,19 @@
                           :onKeyUp   #(check-headline-count owner headline-length-limit %)
                           :onKeyDown #(check-headline-count owner headline-length-limit %)
                           :dangerouslySetInnerHTML headline})
-            (when is-data-topic
-              (dom/div {:class "separator"}))
-            (dom/div {:class "topic-overlay-edit-data"}
-              (when (= topic "finances")
-                (om/build finances-edit {:finances-data finances-data
-                                         :change-finances-cb (partial change-finances-data-cb owner)
-                                         :currency currency}
-                                        {:key (:updated-at topic-data)}))
-              (when (= topic "growth")
-                (dom/div {}
-                  (om/build growth-edit {:growth-data focus-metric-data
-                                         :metric-slug growth-focus
-                                         :metadata-edit-cb (partial growth-metadata-edit-cb owner)
-                                         :new-metric growth-new-metric
-                                         :metrics growth-metrics
-                                         :metric-count (count focus-metric-data)
-                                         :change-growth-cb (partial growth-change-data-cb owner)
-                                         :delete-metric-cb (partial growth-delete-metric-cb owner data)
-                                         :save-metadata-cb (partial growth-save-metrics-metadata-cb owner data)
-                                         :reset-metrics-cb #(growth-reset-metrics-cb topic owner data)
-                                         :cancel-cb #(growth-cancel-cb owner data)
-                                         :change-growth-metric-cb (partial growth-change-metric-cb owner data)
-                                         :new-growth-section (om/get-state owner :oc-editing)}
-                                        {:key focus-metric-data})
-                  (dom/div {:class "pillbox-container growth"}
-                    (for [metric-slug growth-metric-slugs]
-                      (let [metric (get growth-metrics metric-slug)
-                            mname (:name metric)
-                            metric-classes (utils/class-set {:pillbox true
-                                                             metric-slug true
-                                                             :active (= growth-focus metric-slug)})]
-                        (dom/label {:class metric-classes
-                                    :title (:description metric)
-                                    :data-tab metric-slug
-                                    :on-click (fn [e]
-                                                (.stopPropagation e)
-                                                (om/set-state! owner :growth-new-metric false)
-                                                (om/set-state! owner :growth-focus metric-slug))} mname)))
-                    (dom/label {:class (utils/class-set {:pillbox true
-                                                         growth-utils/new-metric-slug-placeholder true
-                                                         :active (= growth-focus growth-utils/new-metric-slug-placeholder)})
-                                :title "Add a new metric"
-                                :data-tab growth-utils/new-metric-slug-placeholder
-                                :on-click (fn [e]
-                                            (.stopPropagation e)
-                                            (om/set-state! owner :growth-new-metric true)
-                                            (om/set-state! owner :growth-focus growth-utils/new-metric-slug-placeholder))} "+ New metric")))))
+            
+            ;; Body
             (dom/div #js {:className (str "topic-edit-body emoji-autocomplete emojiable" (when hide-placeholder " hide-placeholder"))
                           :id (str "topic-edit-body-" (name topic))
                           :contentEditable true
+                          :placeholder topic-body-placeholder
+                          :data-placeholder topic-body-placeholder
                           :dangerouslySetInnerHTML topic-body})
+            
+            ;; Icons
             (dom/div {:class "topc-edit-top-box-footer"}
+
+              ;; Emoji
               (dom/div {:class "fullscreen-topic-emoji-picker left mr2"
                         :style {:display (if (nil? (sel1 [:div#file-upload-ui])) "block" "none")}}
                 (emoji-picker {:add-emoji-cb (fn [editor emoji]
@@ -678,22 +650,27 @@
                                                body     (sel1 (str "topic-edit-body-" (name topic)))]
                                                  (not (or (= (.-activeElement js/document) headline)
                                                           (= (.-activeElement js/document) body))))}))
-              (dom/button {:class "btn-reset add-image"
-                           :title (if (not image-url) "Add an image" "Replace image")
-                           :type "button"
-                           :data-toggle "tooltip"
-                           :data-placement "top"
-                           :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
-                           :on-click #(.click (sel1 [:input#topic-edit-upload-ui--select-trigger]))}
-                (dom/i {:class "fa fa-camera"}))
-              (dom/button {:class "btn-reset image-url"
-                           :title "Provide an image link"
-                           :type "button"
-                           :data-toggle "tooltip"
-                           :data-placement "top"
-                           :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
-                           :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
-                (dom/i {:class "fa fa-code"}))
+              ;; Add image
+              (when-not is-data-topic
+                (dom/button {:class "btn-reset add-image"
+                             :title (if (not image-url) "Add an image" "Replace image")
+                             :type "button"
+                             :data-toggle "tooltip"
+                             :data-placement "top"
+                             :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
+                             :on-click #(.click (sel1 [:input#topic-edit-upload-ui--select-trigger]))}
+                  (dom/i {:class "fa fa-camera"})))
+              ;; Embed image
+              (when-not is-data-topic
+                (dom/button {:class "btn-reset image-url"
+                             :title "Provide an image link"
+                             :type "button"
+                             :data-toggle "tooltip"
+                             :data-placement "top"
+                             :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
+                             :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
+                  (dom/i {:class "fa fa-code"})))
+              ;; Archive
               (dom/button #js {:className "btn-reset archive-button right"
                                :title "Archive this topic"
                                :type "button"
@@ -702,7 +679,10 @@
                                :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
                                :onClick #(remove-topic-click owner options %)}
                 (dom/i {:class "fa fa-archive"}))
+              
+              ;; Char counter
               (dom/div {:class (str "char-count" (when char-count-alert " red"))} char-count)
+              ;; Image U/L form
               (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
                 (dom/input {:type "text"
                             :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
@@ -724,9 +704,11 @@
                           :style {:display "none"}
                           :type "file"
                           :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))}))))
+      
+      ;; Onboarding toolip
       (when (and show-first-edit-tooltip
                  (not tooltip-dismissed))
-        (om/build tooltip
+        (om/build onboard-tip
           {:cta "WHAT WOULD YOU LIKE TO SAY? YOU CAN ADD TEXT, EMOJI AND IMAGES."}
           {:opts {:dismiss-tooltip #(doto owner
                                       (om/set-state! :tooltip-dismissed true)

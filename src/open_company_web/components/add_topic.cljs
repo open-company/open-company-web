@@ -61,8 +61,10 @@
   (if @(::expanded? s)
     (let [all-sections (into {} (for [s (get-all-sections)]
                                   [(keyword (:section s)) s]))
+          slug (keyword (router/current-company-slug))
+          topic-order (map keyword (:new-section-order (get @caches/new-sections slug)))
           inactive-not-archived (filterv (complement (cs/union (set active-topics) (set archived-topics)))
-                                         (keys all-sections))
+                                         topic-order)
           chunked (chunk-topics inactive-not-archived archived-topics)]
       [:div.card.p--card
        [:div.open-sans.small-caps.bold.mb2.gray5

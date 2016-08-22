@@ -4,13 +4,13 @@
   :name "Buffer"
   :currency "USD"
   :slug "buffer"
+  :uuid "1234"
 
   :categories ["progress", "company"]
   :sections {:progress ["finances" "challenges" "growth"] :company ["values"]}
 
   :challenges {
     :title "Key Challenges"
-    :icon "tactic"
     :body "<h3>Recruiting</h3><p>We're continuing our fast pace of growing the team, and we'd love your help to spread the word about all our <a>current open positions</a>, <a href=\"http://twitter.com\">Twitter</a> or <a href=\"http://buffer.com\">Buffer</a>.</p>
 <h3>Spead & Reliability</h3><p>We've made some key speed and reliability <a href=\"/improvements\">improvements</a> to <a href=\"http://buffer.com/b2b\">Buffer for business</a>, but there is still a ways to go. Everyone please drop everything and support the devops team in anyway you can when we have an outage situation.</p>
 <h3>Onbarding</h3><p>We're in the <a href=\"/early-stages\">early stages</a> of experimenting with a progress indicator in the onboarding improvement ideas to <a href=\"/gretchen\">Gretchen</a>."
@@ -25,7 +25,6 @@
   :values {
     :updated-at "2015-11-30T18:17:55.073Z"
     :title "Values"
-    :icon "scale"
     :author {
       :image "https://secure.gravatar.com/avatar/98b5456ea1c562024f41501ffd7bc3c6.jpg?s=192&d=https%3A%2F%2Fslack.global.ssl.fastly.net%2F7fa9%2Fimg%2Favatars%2Fava_0022-192.png"
       :name "Iacopo Carraro"
@@ -73,22 +72,13 @@
   :growth {
     :updated-at "2015-10-23T11:21:39.000Z"
     :title "Key metrics"
-    :icon "chart-growth"
+    :body "<p>We usually find that September is one of the months of lowest growth. We are seeing this here with 3.2%, which
+        is lower than our recent months, however it's a number we're happy about for generally our lowest growth month of the year.</p>
+        <p>Our current YoY MRR growth stands at around 80%, a number we'd like to grow.</p>"
     :author {
       :image "https://secure.gravatar.com/avatar/46c1c756f36549c2dea0253e1e025053?s=96&d=mm&r=g"
       :name "Joel Gascoigne"
       :user-id "123456"
-    },
-    :notes {
-      :author {
-        :image "https://secure.gravatar.com/avatar/46c1c756f36549c2dea0253e1e025053?s=96&d=mm&r=g"
-        :name "Joel Gascoigne"
-        :user-id "123456"
-      }
-      :body "<p>We usually find that September is one of the months of lowest growth. We are seeing this here with 3.2%, which
-          is lower than our recent months, however it's a number we're happy about for generally our lowest growth month of the year.</p>
-          <p>Our current YoY MRR growth stands at around 80%, a number we'd like to grow.</p>"
-      :updated-at "2015-10-23T11:21:39.000Z"
     }
     :revisions [
       {
@@ -258,7 +248,7 @@
   :finances {
     :updated-at "2015-10-23T11:21:40.000Z"
     :title "Finances"
-    :icon "money-bag"
+    :body ""
     :author {
       :image "https://secure.gravatar.com/avatar/46c1c756f36549c2dea0253e1e025053?s=96&d=mm&r=g"
       :name "Joel Gascoigne"
@@ -519,22 +509,14 @@
       "2015-09-18T18:33:41.000Z" {
         :updated-at "2015-09-18T18:33:41.000Z"
         :title "Finances"
+        :body "<p>We're delighted to hit almost $7.5M in annual recurring revenue and be fast moving
+          towards the big $10M ARR milestone.</p>
+          <p>As a company, we're starting to feel that some of our recent team growth and structure adjustments
+          in the last few months are starting to take effect.</p>"
         :author {
           :image "https://secure.gravatar.com/avatar/46c1c756f36549c2dea0253e1e025053?s=96&d=mm&r=g"
           :name "Joel Gascoigne"
           :user-id "123456"
-        }
-        :notes {
-          :author {
-            :image "https://secure.gravatar.com/avatar/46c1c756f36549c2dea0253e1e025053?s=96&d=mm&r=g"
-            :name "Joel Gascoigne"
-            :user-id "123456"
-          }
-          :body "<p>We're delighted to hit almost $7.5M in annual recurring revenue and be fast moving
-            towards the big $10M ARR milestone.</p>
-            <p>As a company, we're starting to feel that some of our recent team growth and structure adjustments
-            in the last few months are starting to take effect.</p>"
-          :updated-at "2015-09-18T18:33:41.000Z"
         }
         :revisions [
           {
@@ -613,20 +595,12 @@
       "2015-09-18T18:33:42.000Z" {
         :updated-at "2015-09-18T18:33:42.000Z"
         :title "Key metrics"
+        :body "<p>As a company, we're starting to feel that some of our recent team growth
+          and structure adjustments in the last few months are starting to take effect.</p>"
         :author {
           :image "https://secure.gravatar.com/avatar/46c1c756f36549c2dea0253e1e025053?s=96&d=mm&r=g"
           :name "Joel Gascoigne"
           :user-id "123456"
-        }
-        :notes {
-          :author {
-            :image "https://secure.gravatar.com/avatar/46c1c756f36549c2dea0253e1e025053?s=96&d=mm&r=g"
-            :name "Joel Gascoigne"
-            :user-id "123456"
-          }
-          :body "<p>As a company, we're starting to feel that some of our recent team growth
-            and structure adjustments in the last few months are starting to take effect.</p>"
-          :updated-at "2015-09-18T18:33:42.000Z"
         }
         :revisions [
           {

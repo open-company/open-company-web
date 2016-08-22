@@ -1,7 +1,11 @@
 (ns open-company-web.components.fullscreen-topic
-  (:require [cljs.core.async :refer (chan put!)]
-            [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros (defcomponent)]
+  "
+  Display a topic in full screen in either display, editing or transitioning (history nav.) modes.
+
+  Handle back button, edit button, and history nav transitions.
+  "
+  (:require [om.core :as om :include-macros true]
+            [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.api :as api]
             [open-company-web.caches :as cache]
@@ -14,19 +18,14 @@
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.fullscreen-topic-edit :refer (fullscreen-topic-edit)]
             [open-company-web.components.topic-attribution :refer (topic-attribution)]
-            [open-company-web.components.ui.icon :refer (icon)]
-            [open-company-web.components.ui.small-loading :refer (small-loading)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
-            [open-company-web.components.ui.small-loading :as loading]
-            [dommy.core :as dommy :refer-macros (sel1 sel)]
-            [goog.style :refer (setStyle)]
+            [dommy.core :refer-macros (sel1)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
-            [goog.fx.dom :refer (Fade Resize Scroll)]
-            [open-company-web.lib.oc-colors :as oc-colors]))
+            [goog.fx.dom :refer (Fade Resize Scroll)]))
 
-(defn show-fullscreen-topic [owner]
+(defn- show-fullscreen-topic [owner]
   (utils/disable-scroll)
   (.play
     (new Fade (om/get-ref owner "fullscreen-topic") 0 1 utils/oc-animation-duration)))
@@ -43,12 +42,13 @@
                                                  is-actual] :as data} owner options]
   (render [_]
     (let [fullscreen-width (responsive/fullscreen-topic-width card-width)
+          chart-reduction (if (responsive/is-mobile) 100 250)
+          chart-width (- fullscreen-width chart-reduction)
           chart-opts {:show-title false
                       :show-revisions-navigation false
                       :switch-metric-cb (:switch-metric-cb options)
-                      :chart-size {:width  (- fullscreen-width 100)
-                                   :height (if (responsive/is-mobile) 174 295)}}
-          chart-data {:section-data topic-data
+                      :chart-size {:width chart-width}}
+          chart-data {:section-data (if (= topic "finances") (utils/fix-finances topic-data) topic-data)
                       :section (keyword topic)
                       :currency currency
                       :actual-as-of (:updated-at topic-data)
@@ -57,18 +57,13 @@
       (dom/div {:class "fullscreen-topic-internal group"
                 :style #js {:width (str (- fullscreen-width 20) "px")}}
         (dom/div {:class "fullscreen-topic-top-box"}
+
+          ;; Image
           (when (:image-url topic-data)
             (dom/div {:class "topic-header-image"}
               (dom/img {:src (:image-url topic-data)})))
-          (dom/div {:class "topic-title-container group"}
-            (dom/div {:class "topic-title left"} (:title topic-data))
-            (when (and can-edit
-                       is-actual)
-              (dom/div {:class "edit-button"
-                        :on-click #((:start-editing options))}
-                (dom/i {:class "fa fa-pencil"}))))
-          (dom/div {:class "topic-headline"
-                    :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
+          
+          ;; Chart
           (when (or (= topic "growth") (= topic "finances"))
             (dom/div {:class "topic-growth-finances"}
               (cond
@@ -76,12 +71,31 @@
                 (om/build topic-growth chart-data {:opts chart-opts})
                 (= topic "finances")
                 (om/build topic-finances chart-data {:opts chart-opts}))))
+          
+          ;; Title
+          (dom/div {:class "topic-title-container group"}
+            (dom/div {:class "topic-title left"} (:title topic-data))
+            (when (and can-edit
+                       is-actual)
+              (dom/div {:class "edit-button"
+                        :on-click #((:start-editing options))}
+                (dom/i {:class "fa fa-pencil"
+                        :title "Edit"
+                        :data-toggle "tooltip"
+                        :data-placement "top"}))))
+          
+          ;; Headline
+          (dom/div {:class "topic-headline"
+                    :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
+          ;; Body
           (dom/div {:class "topic-body"
-                  :dangerouslySetInnerHTML (utils/emojify (utils/get-topic-body topic-data topic))})
+                  :dangerouslySetInnerHTML (utils/emojify (:body topic-data))})
+          
+          ;; Attribution
           (when-not hide-history-navigation
             (om/build topic-attribution data {:opts options})))))))
 
-(defn start-editing [owner options]
+(defn- start-editing [owner options]
   (let [editing (om/get-state owner :editing)
         section (om/get-props owner :section)]
     (.pushState js/history nil (str "Edit " (name section)) (oc-urls/company-section-edit (router/current-company-slug) (name section)))
@@ -89,7 +103,7 @@
       ((:topic-navigation options) false)
       (om/set-state! owner :editing true))))
 
-(defn exit-editing [owner options]
+(defn- exit-editing [owner options]
   (let [editing (om/get-state owner :editing)
         section (om/get-props owner :section)]
     (.pushState js/history nil (name section) (oc-urls/company-section (router/current-company-slug) (name section)))
@@ -97,7 +111,7 @@
       ((:topic-navigation options) true)
       (om/set-state! owner :editing false))))
 
-(defn hide-fullscreen-topic [owner options & [force-fullscreen-dismiss]]
+(defn- hide-fullscreen-topic [owner options & [force-fullscreen-dismiss]]
   ; if it's in editing mode
   (let [editing (om/get-state owner :editing)]
     (exit-editing owner options)
@@ -111,25 +125,18 @@
             #((:close-overlay-cb options)))
           (.play))))))
 
-(defn esc-listener [owner options e]
+(defn- esc-listener [owner options e]
   (when (= (.-keyCode e) 27)
     (hide-fullscreen-topic owner options)))
 
-(defn remove-topic-click [owner options e]
-  (.stopPropagation e)
-  (when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
-    (let [section (om/get-props owner :section)]
-      (dis/dispatch! [:topic-archive section]))
-    (hide-fullscreen-topic owner options true)))
-
-(defn revision-navigation [owner as-of]
+(defn- revision-navigation [owner as-of]
   (let [actual-as-of (om/get-state owner :actual-as-of)
         section (name (om/get-props owner :section))]
     (if (= as-of actual-as-of)
       (.pushState js/history nil section (oc-urls/company-section (router/current-company-slug) (om/get-props owner :section)))
       (.pushState js/history nil (str section " revision " as-of) (oc-urls/company-section-revision (router/current-company-slug) (om/get-props owner :section) as-of)))))
 
-(defn animate-transition [owner]
+(defn- animate-transition [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
         tr-topic (om/get-ref owner "tr-topic")
         current-state (om/get-state owner)
@@ -165,7 +172,7 @@
                                      :transition-as-of nil}))))
       (.play))))
 
-(defn rev-click [owner e revision]
+(defn- rev-click [owner e revision]
   (when e
     (utils/event-stop e))
   (om/set-state! owner :transition-as-of (:updated-at revision)))
@@ -194,6 +201,7 @@
        :show-save-button false
        :last-selected-metric selected-metric
        :actual-as-of actual-as-of
+       :source (:src (router/query-params))
        :edit-rand (rand 4)}))
 
   (did-mount [_]
@@ -218,7 +226,7 @@
     (when (om/get-state owner :transition-as-of)
       (animate-transition owner)))
 
-  (render-state [_ {:keys [as-of transition-as-of actual-as-of editing show-save-button data-posted last-selected-metric edit-rand] :as state}]
+  (render-state [_ {:keys [as-of transition-as-of actual-as-of source editing show-save-button data-posted last-selected-metric edit-rand] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -246,8 +254,9 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (str "fullscreen-topic" (when (:animate data) " initial"))
                     :ref "fullscreen-topic"}
-        (when-not editing
-          (dom/div {:class "btd-container"}
+        (when-not (or editing (= "email" source)) ; don't show back when we're editing or came here from an email
+          (dom/div {:class "btd-container"
+                    :style {:width (str (+ fullscreen-width 20) "px")}}
             (back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)
                                     :button-cta (if (utils/in? (:route @router/path) "updates") "BACK TO UPDATE" "BACK TO DASHBOARD")})))
         (dom/div {:style #js {:display (when-not editing "none")}
