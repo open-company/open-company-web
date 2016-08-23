@@ -143,7 +143,7 @@
     "Add an image"
     "Replace image"))
 
-(defcomponent topic-edit [{:keys [show-first-edit-tooltip
+(defcomponent topic-edit [{:keys [show-first-edit-tip
                                   currency
                                   prev-rev
                                   next-rev]} owner options]
@@ -358,8 +358,9 @@
                                         (if (:placeholder topic-data)
                                           (dis/dispatch! [:topic-archive (name section)])
                                           (dis/dispatch! [:start-foce nil])))} "CANCEL")))
+
         ;; Onboarding toolip
-        (when show-first-edit-tooltip
+        (when show-first-edit-tip
           (onboard-tip
             {:id (str "content-topic-add-" company-slug)
              :once-only true

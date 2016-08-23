@@ -255,7 +255,7 @@
                                       :foce-data (:foce-data data)
                                       :prev-rev prev-rev
                                       :next-rev next-rev
-                                      :show-first-edit-tooltip (:show-first-edit-tooltip data)}
+                                      :show-first-edit-tip (:show-first-edit-tip data)}
                                      {:opts (merge options {:rev-click rev-cb})
                                       :key (str "topic-foce-" section)})
                 (om/build topic-internal {:section section

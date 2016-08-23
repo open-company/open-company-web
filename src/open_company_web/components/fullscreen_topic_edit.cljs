@@ -434,7 +434,7 @@
       file
       (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
 
-(defcomponent fullscreen-topic-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
+(defcomponent fullscreen-topic-edit [{:keys [card-width topic topic-data currency focus show-first-edit-tip] :as data} owner options]
 
   (init-state [_]
     (get-state owner data nil))
@@ -581,7 +581,9 @@
               (when (= topic "finances")
                 (om/build finances-edit {:finances-data finances-data
                                          :change-finances-cb (partial change-finances-data-cb owner)
-                                         :currency currency}
+                                         :currency currency
+                                         :show-first-edit-tip show-first-edit-tip
+                                         :first-edit-tip-cb #(focus-headline owner)}
                                         {:key (:updated-at topic-data)}))
               (when (= topic "growth")
                 (dom/div {}
@@ -595,7 +597,9 @@
                                          :save-metadata-cb (partial growth-save-metrics-metadata-cb owner data)
                                          :cancel-cb #(growth-cancel-cb owner data)
                                          :change-growth-metric-cb (partial growth-change-metric-cb owner data)
-                                         :new-growth-section (om/get-state owner :oc-editing)}
+                                         :new-growth-section (om/get-state owner :oc-editing)
+                                         :show-first-edit-tip show-first-edit-tip
+                                         :first-edit-tip-cb #(focus-headline owner)}
                                         {:opts {:currency currency} :key growth-data})))))
             
             ;; Title

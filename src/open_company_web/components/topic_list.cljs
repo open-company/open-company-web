@@ -30,6 +30,8 @@
 
 (def scrolled-to-top (atom false))
 
+;; ===== Utility functions =====
+
 (defn- get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
     (let [slug (keyword (router/current-company-slug))
@@ -41,6 +43,12 @@
 
 (defn- get-active-topics [company-data category]
   (get-in company-data [:sections (keyword category)]))
+
+(defn- get-category-topics [company-data active-topics]
+  (let [topics-list   (flatten (vals active-topics))]
+    (map keyword topics-list)))
+
+;; ===== Events =====
 
 (defn- update-active-topics [owner category-name new-topic & [section-data]]
   (let [company-data (om/get-props owner :company-data)
@@ -57,37 +65,6 @@
     (if section-data
       (api/patch-sections new-categories section-data new-topic)
       (api/patch-sections new-categories))))
-
-(defn- get-category-topics [company-data active-topics]
-  (let [topics-list   (flatten (vals active-topics))]
-    (map keyword topics-list)))
-
-(defn- should-show-add-topic-tooltip? [company-data active-topics]
-  (let [category-topics (get-category-topics company-data active-topics)]
-    (and (jwt/jwt)
-         (not (:read-only company-data))
-         (empty? category-topics))))
-
-(defn get-state [owner data current-state]
-  (let [company-data (:company-data data)
-        categories (:categories company-data)
-        active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))
-        show-add-topic-tooltip (should-show-add-topic-tooltip? company-data active-topics)
-        selected-topic (if (nil? current-state) (router/current-section) (:selected-topic current-state))]
-    {:initial-active-topics active-topics
-     :active-topics active-topics
-     :card-width (:card-width data)
-     :new-sections-requested (or (:new-sections-requested current-state) false)
-     :selected-topic selected-topic
-     :tr-selected-topic nil
-     :topic-navigation (or (:topic-navigation current-state) true)
-     :share-selected-topics (:sections (:stakeholder-update company-data))
-     :transitioning false
-     :redirect-to-preview (or (:redirect-to-preview current-state) false)
-     :fullscreen-force-edit (if (nil? current-state) (router/section-editing?) (:fullscreen-force-edit current-state))
-     :show-add-topic-tooltip show-add-topic-tooltip
-     :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
-     :show-share-tooltip (or (:show-share-tooltip current-state) false)}))
 
 (defn- topic-click [owner topic selected-metric & [force-edit]]
   (let [company-slug (router/current-company-slug)]
@@ -134,6 +111,8 @@
     (when (= key-code 37)
       (switch-topic owner true))))
 
+;; ===== Animation =====
+
 (defn- animation-finished [owner]
   (let [cur-state (om/get-state owner)]
     (.pushState js/history nil (name (:tr-selected-topic cur-state)) (oc-urls/company-section (router/current-company-slug) (:tr-selected-topic cur-state)))
@@ -154,11 +133,53 @@
     (.play (new Slide tr-selected-topic #js [(if left? (* width -1) width) 0] #js [0 0] utils/oc-animation-duration))
     (.play (new Fade tr-selected-topic 0 1 utils/oc-animation-duration))))
 
-(defn- should-show-first-edit-tooltip? [company-data category-topics]
-  ; show first edit tooltip if there is only one content section (not data) and it is a placeholder section
-  (let [filtered-topics (filter #(and (not= % :growth) (not= % :finances)) category-topics)]
-    (and (= (count filtered-topics) 1)
-         (->> filtered-topics first keyword (get company-data) :placeholder))))
+;; ===== Onboarding Tips =====
+
+(defn- show-add-topic-tip?
+  "Show initial welcome tooltip to a r/w user with no topics."
+  [company-data active-topics]
+  (when (and (jwt/jwt) (not (:read-only company-data)))
+    (let [category-topics (get-category-topics company-data active-topics)]
+      (empty? category-topics))))
+
+(defn- show-first-edit-tip?
+  "Show first edit tooltip to a r/w user if there is only one content section (not data),
+  and it is a placeholder section."
+  [company-data category-topics]
+  (when (and (jwt/jwt) (not (:read-only company-data)))
+    (let [filtered-topics (filter #(and (not= % :growth) (not= % :finances)) category-topics)]
+      (and (= (count filtered-topics) 1)
+           (->> filtered-topics first keyword (get company-data) :placeholder)))))
+
+(defn- show-data-first-edit-tip? [company-data selected-topic category-topics]
+  "Show data first edit tooltip to a r/w user if the selected topic is a data topic,
+  and it is a placeholder section."
+  (when (and (jwt/jwt) (not (:read-only company-data)))
+    (when (or (= selected-topic "growth") (= selected-topic "finances"))
+      (:placeholder (company-data (keyword selected-topic))))))
+
+;; ===== Topic List Component =====
+
+(defn- get-state [owner data current-state]
+  (let [company-data (:company-data data)
+        categories (:categories company-data)
+        active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))
+        show-add-topic-tip (show-add-topic-tip? company-data active-topics)
+        selected-topic (if (nil? current-state) (router/current-section) (:selected-topic current-state))]
+    {:initial-active-topics active-topics
+     :active-topics active-topics
+     :card-width (:card-width data)
+     :new-sections-requested (or (:new-sections-requested current-state) false)
+     :selected-topic selected-topic
+     :tr-selected-topic nil
+     :topic-navigation (or (:topic-navigation current-state) true)
+     :share-selected-topics (:sections (:stakeholder-update company-data))
+     :transitioning false
+     :redirect-to-preview (or (:redirect-to-preview current-state) false)
+     :fullscreen-force-edit (if (nil? current-state) (router/section-editing?) (:fullscreen-force-edit current-state))
+     :show-add-topic-tip show-add-topic-tip
+     :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
+     :show-share-tooltip (or (:show-share-tooltip current-state) false)}))
 
 (defcomponent topic-list [data owner options]
 
@@ -221,7 +242,7 @@
                            share-selected-topics
                            redirect-to-preview
                            fullscreen-force-edit
-                           show-add-topic-tooltip
+                           show-add-topic-tip
                            show-second-add-topic-tooltip
                            show-share-tooltip]}]
     (let [company-slug    (router/current-company-slug)
@@ -262,7 +283,8 @@
                                             :read-only (:read-only company-data)
                                             :card-width card-width
                                             :currency (:currency company-data)
-                                            :animate (not transitioning)}
+                                            :animate (not transitioning)
+                                            :show-first-edit-tip (show-data-first-edit-tip? company-data selected-topic category-topics)}
                                            {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                    :topic-navigation #(om/set-state! owner :topic-navigation %)}}))
             ;; Fullscreen topic for transition
@@ -293,14 +315,14 @@
                                   :foce-key (:foce-key data)
                                   :foce-data (:foce-data data)
                                   :share-selected-topics share-selected-topics
-                                  :show-first-edit-tooltip (should-show-first-edit-tooltip? company-data category-topics)}
+                                  :show-first-edit-tip (show-first-edit-tip? company-data category-topics)}
                                  {:opts {:topic-click (partial topic-click owner)
                                          :update-active-topics (partial update-active-topics owner)}})
         
         ;; Onboarding tooltips
         
         ;; Desktop only welcom
-        (when (and show-add-topic-tooltip (not selected-topic)) 
+        (when (and show-add-topic-tip (not selected-topic)) 
 
           (onboard-tip
             {:id (str "welcome-" company-slug "-desktop")
@@ -309,7 +331,7 @@
              :desktop (str "Hi " (jwt/get-key :name) ", welcome to OpenCompany! To get started, add a topic.")}))
 
         ;; Mobile only welcome
-        (when show-add-topic-tooltip
+        (when show-add-topic-tip
           (onboard-tip
             {:id (str "welcome-" company-slug "-mobile")
              :once-only false

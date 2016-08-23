@@ -3,7 +3,9 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.router :as router]
             [open-company-web.components.ui.cell :refer (cell)]
+            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.components.finances.utils :as finances-utils]
             [cljs.core.async :refer (put!)]))
 
@@ -115,8 +117,9 @@
       (om/set-state! owner :finances-data (:finances-data next-props))))
 
   (render-state [_ {:keys [finances-data stop]}]
-    (let [currency (:currency data)]
-      ; real component
+    (let [company-slug (router/current-company-slug)
+          currency (:currency data)]
+
       (dom/div {:class "finances"}
         (dom/div {:class "composed-section-edit finances-body edit"}
           (dom/div {:class "table-container group"}
@@ -150,4 +153,13 @@
                   (dom/td {})
                   (dom/td {})
                   (dom/td {})
-                  (dom/td {}))))))))))
+                  (dom/td {}))))))
+
+        ;; Onboarding toolip
+        (when (:show-first-edit-tip data)
+          (onboard-tip
+            {:id (str "finance-topic-add-" company-slug)
+             :once-only true
+             :mobile false
+             :desktop "Enter revenue, expenses and cash to create a simple chart."
+             :dismiss-tip-fn (:first-edit-tip-cb data)}))))))

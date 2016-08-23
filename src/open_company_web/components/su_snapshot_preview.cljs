@@ -147,14 +147,14 @@
         (when (and (seq company-data)
                    (empty? (:sections su-data))
                    (not su-tooltip-dismissed))
-          (om/build onboard-tip {
+          (onboard-tip {
             :id :update-preview
             :once-only true
             :mobile false
-            :desktop "This is a preview of your update. Drag topics to reorder, or click the X to remove a topic."}
-            {:opts {:dismiss-tooltip #(do
-                                       (om/set-state! owner :su-tooltip-dismissed true)
-                                       (.focus (sel1 [:input#su-snapshot-preview-title])))}}))
+            :desktop "This is a preview of your update. Drag topics to reorder, or click the X to remove a topic."
+            :dismiss-tip-fn #(do
+                               (om/set-state! owner :su-tooltip-dismissed true)
+                               (.focus (sel1 [:input#su-snapshot-preview-title])))}))
         (om/build menu data)
         (dom/div {:class "page snapshot-page"}
           (dom/div {:class "su-snapshot-header"}
