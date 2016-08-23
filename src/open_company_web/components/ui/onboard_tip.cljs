@@ -3,14 +3,18 @@
             [dommy.core :refer-macros (sel1)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [open-company-web.lib.cookies :as cookie]
             [open-company-web.lib.responsive :as responsive]))
+
+(def ten-years (* 60 60 24 365 10))
 
 ;; ===== Events =====
 
 (defn- stop-listening
   "Unbind the click listener."
   [s]
-  (events/unlistenByKey (::click-listener s)))
+  (if-let [listener (::click-listener s)]
+    (events/unlistenByKey @listener)))
 
 (defn- on-click-out 
   "
@@ -28,10 +32,10 @@
         once-only (:once-only args)
         callback (:dismiss-tip-fn args)]
     (when once-only
-      ;; TODO set the cookie
-      )
+      ;; create a cookie to mark the tip as seen
+      (cookie/set-cookie! id true ten-years))
     (when callback
-      ((callback)))))
+      (callback))))
 
 ;; ===== Utility functions =====
 
@@ -45,7 +49,9 @@
 (defn- already-shown? 
   "If this is a once-only tip and there is a cookie saying we've already shown it, return true."
   [id once-only]
-  false)
+  (if once-only
+    (cookie/get-cookie id)
+    false))
 
 (defn- shown?
   "Return true if the tip should be shown, based on local dismissal state, device and already shown cookie."
@@ -80,16 +86,16 @@
   "
 
   < (rum/local false ::dismissed)
+    (rum/local false ::click-listener)
 
-  {
-   ;; Listen for a click to dismiss the onboard tip
-   :did-mount (fn [s] (when (shown? s)
+  ;; Listen for a click to dismiss the onboard tip
+  {:did-mount (fn [s] (when (shown? s)
                         (let [click-listener (events/listen (sel1 [:body]) EventType/CLICK (partial on-click-out s))]
-                          (merge s {::click-listener click-listener}))))
+                          (reset! (::click-listener s) click-listener)))
+                      s)
   
    ;; Stop listening for clicks to dismiss the onboard tip
-   :will-unmount (fn [s] (stop-listening s)
-                         (dissoc s ::click-listener))}
+   :will-unmount (fn [s] (stop-listening s) s)}
 
   [s {:keys [id once-only mobile desktop css-class]}]
 
@@ -100,7 +106,7 @@
   (assert (or (not css-class) (string? css-class)) "onboard-tip css-class not a string")
 
   (when (shown? s)
-    [:div {:class (str "tooltip-container " css-class)}
-      [:div {:class (str "tooltip-box")}
-        [:div {:class "triangle"}]
-        [:div {:class "tooltip-cta"} (if (responsive/is-mobile?) mobile desktop)]]]))
+    [:div {:class (str "onboard-tip-container " css-class)}
+      [:div.onboard-tip-box
+        [:div.triangle]
+        [:div.onboard-tip-cta (if (responsive/is-mobile?) mobile desktop)]]]))

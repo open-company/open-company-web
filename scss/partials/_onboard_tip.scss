@@ -1,15 +1,19 @@
-div.tooltip-container {
+div.onboard-tip-container {
   position: fixed;
   width: 226px;
   height: 113px;
   left: 50%;
   top: 50%;
   margin-left: -110px;
-  margin-top: -56px;
+  margin-top: -116px;
   z-index: 10000;
   padding: 0px;
 
-  div.tooltip-box {
+  &.large {
+    height: 163px;
+  }
+  
+  div.onboard-tip-box {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -28,7 +32,7 @@ div.tooltip-container {
       margin-top: 29px;
     }
 
-    div.tooltip-cta {
+    div.onboard-tip-cta {
       font-weight: 700;
       font-family: $oc_headers_font;
       font-size: 12px;
@@ -43,8 +47,4 @@ div.tooltip-container {
       text-transform: uppercase;
     }
   }
-}
-
-div.tooltip-container.large {
-  height: 163px;
 }

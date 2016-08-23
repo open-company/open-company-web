@@ -177,7 +177,7 @@
     (utils/event-stop e))
   (om/set-state! owner :transition-as-of (:updated-at revision)))
 
-(defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width hide-history-navigation show-first-edit-tooltip] :as data} owner options]
+(defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width hide-history-navigation] :as data} owner options]
 
   (init-state [_]
     (when (:fullscreen-force-edit data)
@@ -269,8 +269,7 @@
                                            :card-width card-width
                                            :is-actual is-actual?
                                            :prev-rev prev-rev
-                                           :next-rev next-rev
-                                           :show-first-edit-tooltip show-first-edit-tooltip}
+                                           :next-rev next-rev}
                                           {:opts edit-topic-opts}))
         (dom/div #js {:className "fullscreen-topic-transition group"
                       :ref "fullscreen-topic-transition"

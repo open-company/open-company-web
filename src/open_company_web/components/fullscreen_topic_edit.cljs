@@ -21,7 +21,6 @@
             [open-company-web.components.finances.utils :as finances-utils]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.components.growth.utils :as growth-utils]
-            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
@@ -264,8 +263,6 @@
 (defn check-headline-count [owner headline-max-length e]
   (when-let [headline (sel1 [:div.topic-edit-headline])]
     (let [headline-value (.-innerText headline)]
-      (when (pos? (count headline-value))
-        (om/set-state! owner :tooltip-dismissed true))
       (when (and (not= (.-keyCode e) 8)
                  (not= (.-keyCode e) 16)
                  (not= (.-keyCode e) 17)
@@ -361,7 +358,6 @@
        :show-title-counter (:show-title-counter current-state)
        :medium-editor (:medium-editor current-state)
        :history-listener-id (:history-listener-id current-state)
-       :tooltip-dismissed false
        :body-click body-click
        :char-count (:char-count current-state)
        :hide-placeholder false}
@@ -438,7 +434,7 @@
       file
       (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
 
-(defcomponent fullscreen-topic-edit [{:keys [card-width topic topic-data currency focus show-first-edit-tooltip] :as data} owner options]
+(defcomponent fullscreen-topic-edit [{:keys [card-width topic topic-data currency focus] :as data} owner options]
 
   (init-state [_]
     (get-state owner data nil))
@@ -524,11 +520,8 @@
                            growth-metrics
                            show-title-counter
                            growth-metric-slugs
-                           growth-metadata-editing
-                           ; tooltip
-                           tooltip-dismissed]}]
-    (let [company-slug (router/current-company-slug)
-          topic-kw (keyword topic)
+                           growth-metadata-editing]}]
+    (let [topic-kw (keyword topic)
           is-data-topic (#{:finances :growth} topic-kw)
           title-length-limit 20
           topic-body (utils/emojify (if-not (:placeholder topic-data) (:body topic-data) ""))
@@ -702,16 +695,4 @@
               (dom/input {:id "topic-edit-upload-ui--select-trigger"
                           :style {:display "none"}
                           :type "file"
-                          :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))}))))
-      
-      ;; Onboarding toolip
-      (when (and show-first-edit-tooltip
-                 (not tooltip-dismissed))
-        (om/build onboard-tip
-          {:id (str "content-topic-add-" company-slug)
-           :once-only true
-           :mobile false
-           :desktop "What would you like to say? You can add text, emoji and images."
-           :dismiss-tip-fn #(doto owner
-                              (om/set-state! :tooltip-dismissed true)
-                              (focus-headline))}))))))
+                          :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))}))))))))

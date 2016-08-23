@@ -66,8 +66,7 @@
   (let [category-topics (get-category-topics company-data active-topics)]
     (and (jwt/jwt)
          (not (:read-only company-data))
-         (or (empty? category-topics)
-             (zero? (count (filter #(not (->> % keyword (get company-data) :placeholder)) category-topics)))))))
+         (empty? category-topics))))
 
 (defn get-state [owner data current-state]
   (let [company-data (:company-data data)
@@ -262,8 +261,7 @@
                                             :read-only (:read-only company-data)
                                             :card-width card-width
                                             :currency (:currency company-data)
-                                            :animate (not transitioning)
-                                            :show-first-edit-tooltip (should-show-first-edit-tooltip? company-data category-topics)}
+                                            :animate (not transitioning)}
                                            {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                    :topic-navigation #(om/set-state! owner :topic-navigation %)}}))
             ;; Fullscreen topic for transition
@@ -293,28 +291,40 @@
                                   :topics-data company-data
                                   :foce-key (:foce-key data)
                                   :foce-data (:foce-data data)
-                                  :share-selected-topics share-selected-topics}
+                                  :share-selected-topics share-selected-topics
+                                  :show-first-edit-tooltip (should-show-first-edit-tooltip? company-data category-topics)}
                                  {:opts {:topic-click (partial topic-click owner)
                                          :update-active-topics (partial update-active-topics owner)}})
         
         ;; Onboarding tooltips
+        
+        ;; Desktop only welcom
+        (when (and show-add-topic-tooltip (not selected-topic)) 
+
+          (onboard-tip
+            {:id (str "welcome-" company-slug "-desktop")
+             :once-only true
+             :mobile false
+             :desktop (str "Hi " (jwt/get-key :name) ", welcome to OpenCompany! To get started, add a topic.")}))
+
+        ;; Mobile only welcome
         (when show-add-topic-tooltip
           (onboard-tip
-            {:id (str "welcome-" company-slug)
+            {:id (str "welcome-" company-slug "-mobile")
              :once-only false
              :mobile (str "Hi " (jwt/get-key :name) ", your dashboard can be viewed after it's been created on a desktop browser.")
-             :desktop (str "Hi " (jwt/get-key :name) ", welcome to OpenCompany! To get started, add a topic.")}))
+             :desktop false}))
         
-        (when (and show-second-add-topic-tooltip
-                   (not selected-topic))                   
+        ;; After 1st topic
+        (when (and show-second-add-topic-tooltip (not selected-topic))                   
           (onboard-tip
             {:id (str "first-topic-" company-slug)
              :once-only true
              :mobile false
              :desktop "Add another topic and you'll see how quickly the big picture comes together."}))
         
-        (when (and show-share-tooltip
-                   (not selected-topic))
+        ;; After 2nd topic
+        (when (and show-share-tooltip (not selected-topic))
           (onboard-tip
             {:id (str "second-topic-" company-slug)
              :once-only true

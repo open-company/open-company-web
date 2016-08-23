@@ -19,6 +19,7 @@
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
+            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [goog.dom :as gdom]
             [goog.object :as googobj]
@@ -142,7 +143,8 @@
     "Add an image"
     "Replace image"))
 
-(defcomponent topic-edit [{:keys [currency
+(defcomponent topic-edit [{:keys [show-first-edit-tooltip
+                                  currency
                                   prev-rev
                                   next-rev]} owner options]
 
@@ -208,8 +210,12 @@
         (.attr "data-original-title" add-image-tooltip)
         (.tooltip "fixTitle"))))
 
-  (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert file-upload-state file-upload-progress upload-remote-url negative-headline-char-count has-changes]}]
-    (let [section             (dis/foce-section-key)
+  (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
+                           file-upload-state file-upload-progress upload-remote-url negative-headline-char-count
+                           has-changes]}]
+
+    (let [company-slug        (router/current-company-slug)
+          section             (dis/foce-section-key)
           topic-data          (dis/foce-section-data)
           section-kw          (keyword section)
           chart-opts          {:chart-size {:width 230}
@@ -279,7 +285,7 @@
                         :placeholder body-placeholder
                         :data-placeholder body-placeholder
                         :contentEditable true
-                        :style #js {:minHeight (if (:placeholder topic-data) "100px" "0px")}
+                        :style #js {:minHeight (if (:placeholder topic-data) "110px" "0px")}
                         :onBlur #(om/set-state! owner :char-count nil)
                         :dangerouslySetInnerHTML initial-body})
           (dom/div {:class "topic-foce-buttons group"}
@@ -351,4 +357,12 @@
                                         (utils/event-stop %)
                                         (if (:placeholder topic-data)
                                           (dis/dispatch! [:topic-archive (name section)])
-                                          (dis/dispatch! [:start-foce nil])))} "CANCEL"))))))))
+                                          (dis/dispatch! [:start-foce nil])))} "CANCEL")))
+        ;; Onboarding toolip
+        (when show-first-edit-tooltip
+          (onboard-tip
+            {:id (str "content-topic-add-" company-slug)
+             :once-only true
+             :mobile false
+             :desktop "What would you like to say? You can add text, emoji and images."
+             :dismiss-tip-fn focus-headline})))))))

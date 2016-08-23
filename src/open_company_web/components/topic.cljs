@@ -198,6 +198,7 @@
       (animate-revision-navigation owner)))
 
   (render-state [_ {:keys [editing as-of actual-as-of transition-as-of] :as state}]
+
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -253,7 +254,8 @@
                                       :foce-key (:foce-key data)
                                       :foce-data (:foce-data data)
                                       :prev-rev prev-rev
-                                      :next-rev next-rev}
+                                      :next-rev next-rev
+                                      :show-first-edit-tooltip (:show-first-edit-tooltip data)}
                                      {:opts (merge options {:rev-click rev-cb})
                                       :key (str "topic-foce-" section)})
                 (om/build topic-internal {:section section
