@@ -134,7 +134,8 @@
                            link-posted
                            su-topics
                            su-tooltip-dismissed]}]
-    (let [company-data (dis/company-data data)
+    (let [company-slug (router/current-company-slug)
+          company-data (dis/company-data data)
           su-data      (stakeholder-update-data data)
           card-width   (responsive/calc-card-width 1)
           ww           (.-clientWidth (sel1 js/document :body))
@@ -148,10 +149,11 @@
                    (empty? (:sections su-data))
                    (not su-tooltip-dismissed))
           (onboard-tip {
-            :id :update-preview
+            :id (str "update-preview-" company-slug)
             :once-only true
             :mobile false
-            :desktop "This is a preview of your update. Drag topics to reorder, or click the X to remove a topic."
+            :desktop "This is a preview of your update. You can drag topics to reorder, and you can remove them by clicking the \"X\"."
+            :css-class "large"
             :dismiss-tip-fn #(do
                                (om/set-state! owner :su-tooltip-dismissed true)
                                (.focus (sel1 [:input#su-snapshot-preview-title])))}))
