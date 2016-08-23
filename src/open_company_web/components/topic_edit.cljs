@@ -20,6 +20,7 @@
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
             [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
+            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [goog.dom :as gdom]
             [goog.object :as googobj]
@@ -130,13 +131,19 @@
     (.focus headline)
     (utils/to-end-of-content-editable headline)))
 
-(defn remove-topic-click [e]
+(defn remove-topic-click [owner e]
   (when e
     (utils/event-stop e))
-  (when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
-    (let [section (dis/foce-section-key)]
-      (dis/dispatch! [:topic-archive section]))
-    (dis/dispatch! [:start-foce nil])))
+  (add-popover {:container-id "archive-topic-confirm"
+                :title nil
+                :message (str "Archiving removes the topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
+                :cancel-title "CANCEL"
+                :cancel-cb #(hide-popover nil "archive-topic-confirm")
+                :success-title "ARCHIVE"
+                :success-cb #(do
+                                (let [section (dis/foce-section-key)]
+                                  (dis/dispatch! [:topic-archive section]))
+                                (dis/dispatch! [:start-foce nil]))}))
 
 (defn- add-image-tooltip [image-header]
   (if (or (not image-header) (string/blank? image-header))
@@ -325,7 +332,7 @@
                            :data-toggle "tooltip"
                            :data-placement "top"
                            :style {:display (if (nil? file-upload-state) "block" "none")}
-                           :on-click (partial remove-topic-click)}
+                           :on-click (partial remove-topic-click owner)}
                   (dom/i {:class "fa fa-archive"})))
             (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
                 (dom/input {:type "text"

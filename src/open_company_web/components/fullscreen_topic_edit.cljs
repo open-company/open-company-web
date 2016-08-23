@@ -23,6 +23,7 @@
             [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
+            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -413,10 +414,16 @@
 (defn remove-topic-click [owner options e]
   (when e
     (utils/event-stop e))
-  (when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
-    (let [section (om/get-props owner :topic)]
-      (dis/dispatch! [:topic-archive section]))
-    ((:dismiss-editing options) true)))
+  (add-popover {:container-id "archive-topic-confirm"
+                :title nil
+                :message (str "Archiving removes the topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
+                :cancel-title "CANCEL"
+                :cancel-cb #(hide-popover nil "archive-topic-confirm")
+                :success-title "ARCHIVE"
+                :success-cb #(do
+                                (let [section (om/get-props owner :topic)]
+                                  (dis/dispatch! [:topic-archive section]))
+                                ((:dismiss-editing options) true))}))
 
 (defn img-on-load [owner img]
   (om/set-state! owner (merge (om/get-state owner) {:image-width (.-clientWidth img)

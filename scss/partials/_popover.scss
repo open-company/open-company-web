@@ -22,5 +22,13 @@ div.oc-popover-container {
     border-radius: 4px;
     overflow: auto;
     padding: 20px 0px 10px 10px;
+
+    h3.title {
+      margin-top: 0px;
+    }
+
+    div.buttons-container {
+      margin-top: 30px;
+    }
   }
 }
