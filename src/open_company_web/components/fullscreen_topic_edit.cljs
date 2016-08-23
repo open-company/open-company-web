@@ -157,16 +157,21 @@
                                           :body (:body other-data)})))
 
 (defn growth-delete-metric-cb [owner data metric-slug]
-  (let [all-metrics (vals (om/get-state owner :growth-metrics))
+  (let [topic (om/get-props owner :topic)
+        all-metrics (vals (om/get-state owner :growth-metrics))
         new-metrics (vec (filter #(not= (:slug %) metric-slug) all-metrics))
         new-metrics-order (growth-metrics-order new-metrics)
         next-focus (if new-metrics-order
                       (first new-metrics-order)
-                      growth-utils/new-metric-slug-placeholder)]
+                      growth-utils/new-metric-slug-placeholder)
+        other-data (data-to-save owner topic)]
     (om/set-state! owner :growth-focus next-focus)
     (om/set-state! owner :growth-metric-slugs new-metrics-order)
     (om/set-state! owner :growth-metadata-editing false)
-    (api/partial-update-section "growth" {:metrics new-metrics})))
+    (api/partial-update-section "growth" {:metrics new-metrics}
+                                         {:title (:title other-data)
+                                          :headline (:headline other-data)
+                                          :body (:body other-data)})))
 
 (defn growth-metadata-edit-cb [owner editing]
   (om/set-state! owner :growth-metadata-editing editing))
