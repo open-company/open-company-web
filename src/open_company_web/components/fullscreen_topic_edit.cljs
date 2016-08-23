@@ -168,6 +168,7 @@
     (om/set-state! owner :growth-focus next-focus)
     (om/set-state! owner :growth-metric-slugs new-metrics-order)
     (om/set-state! owner :growth-metadata-editing false)
+    ;; PATCH metrics, preserving title, headline and body w/ local state we have, not what the response has
     (api/partial-update-section "growth" {:metrics new-metrics}
                                          {:title (:title other-data)
                                           :headline (:headline other-data)
@@ -564,14 +565,19 @@
           (when-not growth-metadata-editing
             (dom/button {:class "btn-reset btn-outline left mr1 secondary-button"
                          :onClick #(do
+                                    ;; reset growth section data from API since we may have preserved some local
+                                    ;; state in the atom DB during metric add/archive operations
+                                    (when (= topic "growth") (api/get-section (router/current-company-slug) "growth"))
                                     (reset-and-dismiss owner options)
-                                    (utils/event-stop %))} "CANCEL"))
+                                    (utils/event-stop %))}
+              "CANCEL"))
           (when-not growth-metadata-editing
             (dom/button {:class "btn-reset btn-solid left mr1 primary-button"
                          :disabled (or (not has-changes) negative-headline-char-count)
                          :onClick #(do
                                     (save-data owner options)
-                                    (utils/event-stop %))} "SAVE")))
+                                    (utils/event-stop %))}
+              "SAVE")))
         (dom/div {:class "fullscreen-topic-internal group"
                   :on-click #(.stopPropagation %)}
           (dom/div {:class "fullscreen-topic-edit-top-box"}

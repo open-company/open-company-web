@@ -155,6 +155,20 @@
           (let [body (if (:success response) (json->cljs (:body response)) {})]
             (dispatcher/dispatch! [:section {:body body :section section :slug (keyword slug)}])))))))
 
+(defn get-section [slug section-name]
+  (when slug
+    (api-get (str "/companies/" slug "/" (name section-name))
+      nil
+      (fn [{:keys [response success status]}]
+        (let [section-kw (keyword section-name)
+              body (if success (json->cljs (:body response)) {})
+              dispatch-body {:slug slug
+                             :section section-kw
+                             :body body
+                             :status status
+                             :success success}]
+            (dispatcher/dispatch! [:section dispatch-body]))))))
+
 (defn partial-update-section
   "PATCH a section, dispatching the results with a `:section` action, merging the response first with
   the optional preserve map argument."
