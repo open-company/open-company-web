@@ -92,8 +92,7 @@
        :link-loading false
        :slack-loading false
        :link-posting false
-       :link-posted false
-       :su-tooltip-dismissed false}))
+       :link-posted false}))
 
   (did-mount [_]
     (om/set-state! owner :did-mount true)
@@ -132,8 +131,7 @@
                            slack-loading
                            link-posting
                            link-posted
-                           su-topics
-                           su-tooltip-dismissed]}]
+                           su-topics]}]
     (let [company-slug (router/current-company-slug)
           company-data (dis/company-data data)
           su-data      (stakeholder-update-data data)
@@ -146,17 +144,14 @@
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
                                          :main-scroll true})}
         (when (and (seq company-data)
-                   (empty? (:sections su-data))
-                   (not su-tooltip-dismissed))
+                   (empty? (:sections su-data)))
           (onboard-tip {
             :id (str "update-preview-" company-slug)
             :once-only true
             :mobile false
             :desktop "This is a preview of your update. You can drag topics to reorder, and you can remove them by clicking the \"X\"."
             :css-class "large"
-            :dismiss-tip-fn #(do
-                               (om/set-state! owner :su-tooltip-dismissed true)
-                               (.focus (sel1 [:input#su-snapshot-preview-title])))}))
+            :dismiss-tip-fn #(.focus (sel1 [:input#su-snapshot-preview-title]))}))
         (om/build menu data)
         (dom/div {:class "page snapshot-page"}
           (dom/div {:class "su-snapshot-header"}
