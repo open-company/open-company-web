@@ -143,11 +143,18 @@
        :growth-metrics (growth-metrics-map all-metrics)
        :growth-metric-slugs (growth-metrics-order all-metrics)})))
 
+(declare data-to-save)
 (defn growth-save-metrics-metadata-cb [owner data metric-slug]
-  (let [metrics (om/get-state owner :growth-metrics)
-       metrics-order (om/get-state owner :growth-metric-slugs)
-       new-metrics (vec (map #(metrics %) metrics-order))]
-    (api/partial-update-section "growth" {:metrics new-metrics})))
+  (let [topic (om/get-props owner :topic)
+        metrics (om/get-state owner :growth-metrics)
+        metrics-order (om/get-state owner :growth-metric-slugs)
+        new-metrics (vec (map #(metrics %) metrics-order))
+        other-data (data-to-save owner topic)]
+    ;; PATCH metrics, preserving title, headline and body w/ local state we have, not what the response has
+    (api/partial-update-section "growth" {:metrics new-metrics} 
+                                         {:title (:title other-data)
+                                          :headline (:headline other-data)
+                                          :body (:body other-data)})))
 
 (defn growth-delete-metric-cb [owner data metric-slug]
   (let [all-metrics (vals (om/get-state owner :growth-metrics))
