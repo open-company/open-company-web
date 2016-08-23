@@ -82,7 +82,7 @@
     (let [company-data (dis/company-data data)
           su-data (stakeholder-update-data data)
           su-sections (if (empty? (:sections su-data))
-                        (flatten (vals (:sections company-data)))
+                        (utils/filter-placeholder-sections (flatten (vals (:sections company-data))) company-data)
                         (utils/filter-placeholder-sections (:sections su-data) company-data))]
       {:columns-num (responsive/columns-num)
        :su-topics su-sections
