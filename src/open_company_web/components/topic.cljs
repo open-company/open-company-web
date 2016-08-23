@@ -11,7 +11,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.oc-colors :as oc-colors]
             [open-company-web.lib.responsive :as responsive]
-            [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.topic-edit :refer (topic-edit)]

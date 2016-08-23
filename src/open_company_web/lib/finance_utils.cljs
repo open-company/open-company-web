@@ -1,4 +1,4 @@
-(ns open-company-web.components.finances.utils
+(ns open-company-web.lib.finance-utils
   (:require [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]

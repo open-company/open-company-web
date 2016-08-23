@@ -5,7 +5,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.oc-colors :as occ]
-            [open-company-web.components.finances.utils :as finances-utils]
+            [open-company-web.lib.finance-utils :as finance-utils]
             [open-company-web.components.ui.d3-chart :refer (d3-chart)]
             [open-company-web.lib.utils :as utils]))
 
@@ -24,12 +24,12 @@
     (cond
       (or (s/blank? value) (= value 0)) "-"
       (<= value ten-years) ">9yrs"
-      (neg? value) (finances-utils/get-rounded-runway value [:round :short])
+      (neg? value) (finance-utils/get-rounded-runway value [:round :short])
       :else "-")))
 
 (defn- get-state [owner data & [initial]]
   (let [section-data (:section-data data)]
-    {:finances-data (finances-utils/map-placeholder-data (:data section-data))}))
+    {:finances-data (finance-utils/map-placeholder-data (:data section-data))}))
 
 (defcomponent topic-finances [{:keys [section section-data currency] :as data} owner options]
 
@@ -46,7 +46,7 @@
           no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))]
 
       (when-not no-data
-        (let [fixed-finances-data (finances-utils/fill-gap-months finances-row-data)
+        (let [fixed-finances-data (finance-utils/fill-gap-months finances-row-data)
               sort-pred (utils/sort-by-key-pred :period)
               sorted-finances (sort sort-pred (vals fixed-finances-data))          
               sum-revenues (apply + (map utils/abs (map :revenue finances-row-data)))

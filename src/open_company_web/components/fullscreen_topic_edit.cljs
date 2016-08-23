@@ -18,9 +18,9 @@
             [open-company-web.lib.medium-editor-exts :as editor]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
-            [open-company-web.components.finances.utils :as finances-utils]
+            [open-company-web.lib.finance-utils :as finance-utils]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
-            [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
@@ -77,7 +77,7 @@
 
 (defn finances-init-state [topic data]
   (when (= topic "finances")
-    {:finances-data (finances-utils/finances-data-map data)}))
+    {:finances-data (finance-utils/finances-data-map data)}))
 
 (defn finances-row-has-data [row]
   (or (data-check-value (:cash row))

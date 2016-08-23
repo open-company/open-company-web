@@ -13,7 +13,7 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.medium-editor-exts :as editor]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
-            [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.ui.icon :as i]

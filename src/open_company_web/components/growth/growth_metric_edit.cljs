@@ -8,7 +8,7 @@
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.iso4217 :refer (sorted-iso4217)]
-            [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.lib.growth-utils :as growth-utils]
             [cuerdas.core :as s]
             [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
 

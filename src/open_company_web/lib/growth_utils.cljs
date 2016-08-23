@@ -1,4 +1,4 @@
-(ns open-company-web.components.growth.utils
+(ns open-company-web.lib.growth-utils
   (:require [open-company-web.lib.utils :as utils]
             [open-company-web.lib.oc-colors :as occ]
             [cljs-time.core :as t]
