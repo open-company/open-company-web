@@ -153,7 +153,7 @@
           topic-data (dis/foce-section-data)
           body       (:body topic-data)]
       {:initial-headline (utils/emojify (:headline topic-data))
-       :body-placeholder (if (:placeholder topic-data) body "")
+       :body-placeholder (or (:body-placeholder topic-data) "")
        :initial-body  (utils/emojify (if (:placeholder topic-data) "" body))
        :char-count nil
        :char-count-alert false
@@ -167,7 +167,7 @@
           company-data (dis/company-data)
           topic-data   (get company-data (keyword topic))
           body         (:body topic-data)]
-      (om/set-state! owner :body-placeholder (if (:placeholder topic-data) body ""))))
+      (om/set-state! owner :body-placeholder (or (:body-placeholder topic-data) ""))))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)

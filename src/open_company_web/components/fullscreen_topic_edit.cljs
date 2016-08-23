@@ -525,7 +525,7 @@
           is-data-topic (#{:finances :growth} topic-kw)
           title-length-limit 20
           topic-body (utils/emojify (if-not (:placeholder topic-data) (:body topic-data) ""))
-          topic-body-placeholder (if (:placeholder topic-data) (:body topic-data) "")
+          topic-body-placeholder (or (:body-placeholder topic-data) "")
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height utils/overlay-max-win-height)
           max-height (min (- 650 126) (- win-height 126))

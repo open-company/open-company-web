@@ -53,7 +53,8 @@
                       :currency currency
                       :actual-as-of (:updated-at topic-data)
                       :selected-metric selected-metric
-                      :read-only true}]
+                      :read-only true}
+          topic-body (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))]
       (dom/div {:class "fullscreen-topic-internal group"
                 :style #js {:width (str (- fullscreen-width 20) "px")}}
         (dom/div {:class "fullscreen-topic-top-box"}
@@ -88,8 +89,8 @@
           (dom/div {:class "topic-headline"
                     :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
           ;; Body
-          (dom/div {:class "topic-body"
-                  :dangerouslySetInnerHTML (utils/emojify (:body topic-data))})
+          (dom/div {:class (str "topic-body" (when (:placeholder topic-data) " italic"))
+                  :dangerouslySetInnerHTML (utils/emojify topic-body)})
           
           ;; Attribution
           (when-not hide-history-navigation
