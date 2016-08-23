@@ -155,9 +155,10 @@
     (.play (new Fade tr-selected-topic 0 1 utils/oc-animation-duration))))
 
 (defn- should-show-first-edit-tooltip? [company-data category-topics]
-  ; show first edit tooltip if there is only one section and is a placeholder section
-  (and (= (count category-topics) 1)
-       (->> category-topics first keyword (get company-data) :placeholder)))
+  ; show first edit tooltip if there is only one content section (not data) and it is a placeholder section
+  (let [filtered-topics (filter #(and (not= % :growth) (not= % :finances)) category-topics)]
+    (and (= (count filtered-topics) 1)
+         (->> filtered-topics first keyword (get company-data) :placeholder))))
 
 (defcomponent topic-list [data owner options]
 
