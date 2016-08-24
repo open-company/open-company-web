@@ -35,6 +35,7 @@
 (def headline-alert-limit 10)
 
 (def before-unload-message "You have unsaved edits. Are you sure you want to leave this topic?")
+(def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
 
 (defn- scroll-to-topic-top [topic]
   (let [body-scroll (.-scrollTop (.-body js/document))
@@ -139,8 +140,7 @@
         
         ;; confirmation dialog
         (add-popover {:container-id "leave-topic-confirm"
-                      :title nil
-                      :height "170px"
+                      :height "150px"
                       :message before-unload-message
                       :cancel-title "STAY"
                       :cancel-cb #(do
@@ -150,6 +150,8 @@
                       :success-title "LEAVE"
                       :success-cb #(do
                                     (hide-popover nil "leave-topic-confirm")
+                                    ;; cancel any FoCE
+                                    (dis/dispatch! [:start-foce nil])
                                     ;; Dispatch the current url
                                     (@router/route-dispatcher (router/get-token)))})
         
@@ -160,8 +162,8 @@
   (when e
     (utils/event-stop e))
   (add-popover {:container-id "archive-topic-confirm"
-                :title nil
-                :message (str "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
+                :message before-archive-message
+                :height "170px"
                 :cancel-title "KEEP"
                 :cancel-cb #(hide-popover nil "archive-topic-confirm")
                 :success-title "ARCHIVE"

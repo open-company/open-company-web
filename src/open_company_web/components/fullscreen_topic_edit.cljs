@@ -414,8 +414,8 @@
   (when e
     (utils/event-stop e))
   (add-popover {:container-id "archive-topic-confirm"
-                :title nil
-                :message (str "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
+                :message topic-edit/before-archive-message
+                :height "170px"
                 :cancel-title "KEEP"
                 :cancel-cb #(hide-popover nil "archive-topic-confirm")
                 :success-title "ARCHIVE"
