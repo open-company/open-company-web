@@ -7,19 +7,23 @@
             [open-company-web.lib.utils :as utils]))
 
 (defcomponent popover [data owner]
+
   (render [_]
-    (dom/div {:class "oc-popover"
-              :width (:width data)
-              :height (:height data)}
-      (dom/div {:class "title-container"}
-        (dom/h3 {:class "title"} (:title data)))
-      (dom/div {:class "message-container"}
-        (dom/p {:class "message"} (:message data)))
-      (dom/div {:class "buttons-container"}
-        (dom/button {:class "btn-reset btn-solid mr1 primary-button"
-                     :on-click (:success-cb data)} (:success-title data))
-        (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
-                     :on-click (:cancel-cb data)} (:cancel-title data))))))
+    (let [width (:width data)
+          height (:height data)
+          style {}
+          w-style (if width (assoc style :width width) style)
+          h-style (if height (assoc style :height height) style)]
+      (dom/div {:class "oc-popover" :style h-style}
+        (dom/div {:class "title-container"}
+          (dom/h3 {:class "title"} (:title data)))
+        (dom/div {:class "message-container"}
+          (dom/p {:class "message"} (:message data)))
+        (dom/div {:class "buttons-container"}
+          (dom/button {:class "btn-reset btn-solid mr1 primary-button"
+                       :on-click (:success-cb data)} (:success-title data))
+          (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
+                       :on-click (:cancel-cb data)} (:cancel-title data)))))))
 
 (defn hide-popover [e container-id]
   (when (.-$ js/window)

@@ -34,7 +34,7 @@
 (def title-alert-limit 3)
 (def headline-alert-limit 10)
 
-(def before-unload-message "You have unsaved edits.")
+(def before-unload-message "You have unsaved edits. Are you sure you want to leave this topic?")
 
 (defn scroll-to-topic-top [topic]
   (let [body-scroll (.-scrollTop (.-body js/document))
@@ -131,13 +131,38 @@
     (.focus headline)
     (utils/to-end-of-content-editable headline)))
 
+(defn handle-navigate-event [current-token owner e]
+    ;; only when the URL is changing
+    (when-not (= (.-token e) current-token)
+      ;; check if there are unsaved changes
+      (if (om/get-state owner :has-changes)
+        
+        ;; confirmation dialog
+        (add-popover {:container-id "leave-topic-confirm"
+                      :title nil
+                      :height "170px"
+                      :message before-unload-message
+                      :cancel-title "STAY"
+                      :cancel-cb #(do
+                                    ;; Go back to the previous token
+                                    (.setToken @router/history current-token)
+                                    (hide-popover nil "leave-topic-confirm"))
+                      :success-title "LEAVE"
+                      :success-cb #(do
+                                    (hide-popover nil "leave-topic-confirm")
+                                    ;; Dispatch the current url
+                                    (@router/route-dispatcher (router/get-token)))})
+        
+        ; no changes, so dispatch the current url
+        (@router/route-dispatcher (router/get-token)))))
+
 (defn remove-topic-click [owner e]
   (when e
     (utils/event-stop e))
   (add-popover {:container-id "archive-topic-confirm"
                 :title nil
-                :message (str "Archiving removes the topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
-                :cancel-title "CANCEL"
+                :message (str "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
+                :cancel-title "KEEP"
                 :cancel-cb #(hide-popover nil "archive-topic-confirm")
                 :success-title "ARCHIVE"
                 :success-cb #(do
@@ -195,15 +220,7 @@
       (let [win-location (.-location js/window)
             current-token (oc-urls/company (router/current-company-slug))
             listener (events/listen @router/history HistoryEventType/NAVIGATE
-                       #(when-not (= (.-token %) current-token)
-                          (if (om/get-state owner :has-changes)
-                            (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
-                              ; dispatch the current url
-                              (@router/route-dispatcher (router/get-token))
-                              ; go back to the previous token
-                              (.setToken @router/history current-token))
-                            ; dispatch the current url
-                            (@router/route-dispatcher (router/get-token)))))]
+                      (partial handle-navigate-event current-token owner))]
         (om/set-state! owner :history-listener-id listener))))
 
   (did-update [_ _ _]

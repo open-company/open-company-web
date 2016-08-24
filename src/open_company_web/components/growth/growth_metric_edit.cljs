@@ -15,8 +15,8 @@
 (defn show-archive-confirm-popover [owner data]
   (add-popover {:container-id "archive-metric-confirm"
                 :title nil
-                :message "Archiving removes this metric, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this metric?"
-                :cancel-title "CANCEL"
+                :message "Archiving removes this metric, but you won’t lose prior updates if you add it again later. Are you sure you want to archive?"
+                :cancel-title "KEEP"
                 :cancel-cb #(hide-popover nil "delete-metric-confirm")
                 :success-title "ARCHIVE"
                 :success-cb #((:delete-metric-cb data) (om/get-state owner :metric-slug))}))
