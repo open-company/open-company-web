@@ -18,6 +18,7 @@
             [open-company-web.lib.medium-editor-exts :as editor]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
+            [open-company-web.components.topic-edit :as topic-edit]
             [open-company-web.lib.finance-utils :as finance-utils]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.lib.growth-utils :as growth-utils]
@@ -34,7 +35,8 @@
             [clojure.string :as string]
             [cljsjs.react.dom]))
 
-(def before-unload-message "You have unsaved edits. Are you sure you want to leave this topic?")
+(def title-alert-limit 3)
+(def headline-alert-limit 10)
 
 (defn change-value [owner k e]
   (let [target (.-target e)
@@ -266,15 +268,12 @@
                             with-finances-data)]
       with-growth-data)))
 
-(def title-alert-limit 3)
-(def headline-alert-limit 10)
-
-(defn headline-on-change [owner]
+(defn- headline-on-change [owner]
   (let [headline-innerHTML (.-innerHTML (sel1 [:div.topic-edit-headline]))]
     (when (not= (gobj/get (om/get-state owner :headline) "__html") headline-innerHTML)
       (om/set-state! owner :has-changes true))))
 
-(defn check-headline-count [owner headline-max-length e]
+(defn- check-headline-count [owner headline-max-length e]
   (when-let [headline (sel1 [:div.topic-edit-headline])]
     (let [headline-value (.-innerText headline)]
       (when (and (not= (.-keyCode e) 8)
@@ -294,7 +293,7 @@
         (om/set-state! owner :negative-headline-char-count (neg? remaining-chars)))
       (headline-on-change owner))))
 
-(defn count-chars
+(defn- count-chars
   "A special variant of `count` that will count emoji strings (:smile:)
    and html spaces (&nbsp;) as single characters."
   [s]
@@ -302,11 +301,11 @@
       (string/replace #"&nbsp;" " ")
       count))
 
-(defn headline-count-chars []
+(defn- headline-count-chars []
   (when-let [headline-node (sel1 [:div.topic-edit-headline])]
     (count-chars (.-innerHTML headline-node))))
 
-(defn top-position [el]
+(defn- top-position [el]
   (loop [yPos 0
          element el]
     (if (and element
@@ -320,7 +319,7 @@
              (gobj/get element "offsetParent"))
       yPos)))
 
-(defn body-clicked [owner e]
+(defn- body-clicked [owner e]
   (when (om/get-props owner :visible)
     (when-let* [topic-body (sel1 [:div.topic-body])
                 fullscreen-topic (sel1 [:div.fullscreen-topic])
@@ -346,11 +345,11 @@
           (utils/to-end-of-content-editable topic-body)
           (scroll-to-bottom))))))
 
-(defn setup-body-listener [owner]
+(defn- setup-body-listener [owner]
   (when-let [fullscreen-topic (sel1 [:div.fullscreen-topic])]
     (events/listen fullscreen-topic EventType/CLICK (partial body-clicked owner))))
 
-(defn get-state [owner data current-state]
+(defn- get-state [owner data current-state]
   (let [topic         (:topic data)
         current-topic-data (:topic-data data)
         topic-data    (if (= (dis/foce-section-key) (keyword topic)) (dis/foce-section-data) (:topic-data data))
@@ -378,7 +377,7 @@
       (finances-init-state topic (:data topic-data))
       (growth-init-state topic data current-state))))
 
-(defn reset-and-dismiss [owner options]
+(defn- reset-and-dismiss [owner options]
   (let [props (om/get-props owner)
         placeholder-section (:placeholder (:topic-data props))]
     (when placeholder-section
@@ -386,12 +385,12 @@
     ((:dismiss-editing options) placeholder-section)
     (om/set-state! owner (get-state owner props (om/get-state owner)))))
 
-(defn force-hide-placeholder [owner]
+(defn- force-hide-placeholder [owner]
   (let [editor       (om/get-state owner :body-medium-editor)
         body-el   (sel1 (str "div#topic-edit-body-" (name (om/get-props owner :topic))))]
     (utils/medium-editor-hide-placeholder editor body-el)))
 
-(defn setup-medium-editor [owner {:keys [topic-data topic] :as data}]
+(defn- setup-medium-editor [owner {:keys [topic-data topic] :as data}]
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
   (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
         med-ed (new js/MediumEditor body-el (clj->js
@@ -404,14 +403,14 @@
   (js/emojiAutocomplete)
   (utils/after 200 #(focus-headline owner)))
 
-(defn save-data [owner options]
+(defn- save-data [owner options]
   (let [topic (om/get-props owner :topic)]
     (when-let [section-data (data-to-save owner topic)]
       (om/set-state! owner :has-changes false)
       (dis/dispatch! [:save-topic topic section-data])
       ((:dismiss-editing options)))))
 
-(defn remove-topic-click [owner options e]
+(defn- remove-topic-click [owner options e]
   (when e
     (utils/event-stop e))
   (add-popover {:container-id "archive-topic-confirm"
@@ -425,12 +424,12 @@
                                   (dis/dispatch! [:topic-archive section]))
                                 ((:dismiss-editing options) true))}))
 
-(defn img-on-load [owner img]
+(defn- img-on-load [owner img]
   (om/set-state! owner (merge (om/get-state owner) {:image-width (.-clientWidth img)
                                                     :image-height (.-clientHeight img)}))
   (gdom/removeNode img))
 
-(defn upload-file! [owner file]
+(defn- upload-file! [owner file]
   (let [success-cb  (fn [success]
                       (let [url    (.-url success)
                             node   (gdom/createDom "img")]
@@ -503,15 +502,7 @@
       (let [win-location (.-location js/window)
             current-token (oc-urls/company-section-edit (router/current-company-slug) (name topic))
             listener (events/listen @router/history HistoryEventType/NAVIGATE
-                       #(when-not (= (.-token %) current-token)
-                          (if (om/get-state owner :has-changes)
-                            (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
-                              ; dispatch the current url
-                              (@router/route-dispatcher (router/get-token))
-                              ; go back to the previous token
-                              (.setToken @router/history current-token))
-                            ; dispatch the current url
-                            (@router/route-dispatcher (router/get-token)))))]
+                        (partial topic-edit/handle-navigate-event current-token owner))]
         (om/set-state! owner :history-listener-id listener))))
 
   (did-update [_ _ prev-state]
@@ -556,7 +547,7 @@
           ww (.-clientWidth (sel1 js/document :body))
           fullscreen-width (responsive/fullscreen-topic-width card-width)]
       ; set the onbeforeunload handler only if there are changes
-      (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
+      (let [onbeforeunload-cb (when has-changes topic-edit/before-unload-message)]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
       
       ;; Save and cancel buttons

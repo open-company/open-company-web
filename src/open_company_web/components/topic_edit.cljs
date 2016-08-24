@@ -36,24 +36,24 @@
 
 (def before-unload-message "You have unsaved edits. Are you sure you want to leave this topic?")
 
-(defn scroll-to-topic-top [topic]
+(defn- scroll-to-topic-top [topic]
   (let [body-scroll (.-scrollTop (.-body js/document))
         topic-scroll-top (utils/offset-top topic)]
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
-(defn start-fullscreen-editing-click [owner options e]
+(defn- start-fullscreen-editing-click [owner options e]
   (utils/event-stop e)
   (let [section (om/get-props owner :section)
         topic-click-cb (:topic-click options)]
     (topic-click-cb nil true)))
 
-(defn force-hide-placeholder [owner]
+(defn- force-hide-placeholder [owner]
   (let [editor       (om/get-state owner :body-editor)
         section-name (name (om/get-props owner :section))
         body-el      (sel1 [(str "div#foce-body-" section-name)])]
     (utils/medium-editor-hide-placeholder editor body-el)))
 
-(defn setup-edit [owner]
+(defn- setup-edit [owner]
   (when-let* [section-kw   (keyword (om/get-props owner :section))
               section-name (name section-kw)
               body-el      (sel1 [(str "div#foce-body-" section-name)])]
@@ -69,7 +69,7 @@
       (om/set-state! owner :body-editor body-editor))
     (js/emojiAutocomplete)))
 
-(defn headline-on-change [owner]
+(defn- headline-on-change [owner]
   (om/set-state! owner :has-changes true)
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
     (let [headline-innerHTML (.-innerHTML headline)
@@ -81,7 +81,7 @@
         (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))
         (om/set-state! owner :negative-headline-char-count (neg? remaining-chars))))))
 
-(defn check-headline-count [owner e has-changes]
+(defn- check-headline-count [owner e has-changes]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
     (let [headline-value (.-innerText headline)]
       (when (and (not= (.-keyCode e) 8)
@@ -98,13 +98,13 @@
   (when has-changes
     (headline-on-change owner)))
 
-(defn img-on-load [owner img]
+(defn- img-on-load [owner img]
   (om/set-state! owner :has-changes true)
   (dis/dispatch! [:foce-input {:image-width (.-clientWidth img)
                                :image-height (.-clientHeight img)}])
   (gdom/removeNode img))
 
-(defn upload-file! [owner file]
+(defn- upload-file! [owner file]
   (let [success-cb  (fn [success]
                       (let [url    (.-url success)
                             node   (gdom/createDom "img")]
@@ -156,7 +156,7 @@
         ; no changes, so dispatch the current url
         (@router/route-dispatcher (router/get-token)))))
 
-(defn remove-topic-click [owner e]
+(defn- remove-topic-click [owner e]
   (when e
     (utils/event-stop e))
   (add-popover {:container-id "archive-topic-confirm"
