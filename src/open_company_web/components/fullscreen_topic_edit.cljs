@@ -547,7 +547,7 @@
           ww (.-clientWidth (sel1 js/document :body))
           fullscreen-width (responsive/fullscreen-topic-width card-width)]
       ; set the onbeforeunload handler only if there are changes
-      (let [onbeforeunload-cb (when has-changes topic-edit/before-unload-message)]
+      (let [onbeforeunload-cb (when has-changes #(str topic-edit/before-unload-message))]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
       
       ;; Save and cancel buttons
