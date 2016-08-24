@@ -1,29 +1,28 @@
 (ns open-company-web.components.ui.popover
-  (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros (defcomponent)]
-            [om-tools.dom :as dom :include-macros true]
+  (:require [rum.core :as rum]
             [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
 
-(defcomponent popover [data owner]
+(rum/defc popover [data]
 
-  (render [_]
-    (let [width (:width data)
-          height (:height data)
-          style {}
-          w-style (if width (assoc style :width width) style)
-          h-style (if height (assoc style :height height) style)]
-      (dom/div {:class "oc-popover" :style h-style}
-        (dom/div {:class "title-container"}
-          (dom/h3 {:class "title"} (:title data)))
-        (dom/div {:class "message-container"}
-          (dom/p {:class "message"} (:message data)))
-        (dom/div {:class "buttons-container"}
-          (dom/button {:class "btn-reset btn-solid mr1 primary-button"
-                       :on-click (:success-cb data)} (:success-title data))
-          (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
-                       :on-click (:cancel-cb data)} (:cancel-title data)))))))
+  (let [title (:title data)
+        width (:width data)
+        height (:height data)
+        style {}
+        w-style (if width (assoc style :width width) style)
+        h-style (if height (assoc style :height height) style)]
+    [:div.oc-popover {:style h-style}
+      (when title
+        [:div.title-container
+          [:h3.title title]])
+      [:div.message-container
+        [:p.message (:message data)]]
+      [:div.buttons-container
+        [:button.btn-reset.btn-outline.mr1.secondary-button {:on-click (:cancel-cb data)} 
+          (:cancel-title data)]
+        [:button.btn-reset.btn-solid.mr1.primary-button {:on-click (:success-cb data)} 
+          (:success-title data)]]]))
 
 (defn hide-popover [e container-id]
   (when (.-$ js/window)
@@ -34,7 +33,7 @@
       (.setTimeout js/window #(try
                                 (let [container (sel1 (str "#" container-id))
                                       $container (js/$ container)] 
-                                  (om/detach-root container)
+                                  (rum/unmount container)
                                   (.remove $container))
                                 (catch :default e)) 1500)
       (catch :default e))))
@@ -50,9 +49,9 @@
         (.setTimeout js/window
                      (fn []
                        ; render the popover component
-                       (om/root popover data {:target (sel1 (str "#" container-id))})
+                       (rum/mount (popover data) (sel1 (str "#" container-id)))
                        ; add the close action
                        (.click popover-ct #(hide-popover % container-id))
                        ; show the popover
-                       (.setTimeout js/window #(.fadeIn popover-ct 400) 0))
+                       (.setTimeout js/window #(.fadeIn popover-ct 300) 0))
                      1)))))
