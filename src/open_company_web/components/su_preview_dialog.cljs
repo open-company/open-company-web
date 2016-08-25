@@ -239,10 +239,11 @@
   [:div
    (modal-title "Share Update" nil)
    [:div.p3
-    [:div.group
-     [:button.btn-reset {:on-click #(prompt-cb :slack)}
-      [:div.circle50.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
-      [:span.left.ml1.gray5.h6 {} "SHARE TO SLACK"]]]
+    ; Temporarily comment out until Slack bot is fixed.
+    ; [:div.group
+    ;  [:button.btn-reset {:on-click #(prompt-cb :slack)}
+    ;   [:div.circle50.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
+    ;   [:span.left.ml1.gray5.h6 {} "SHARE TO SLACK"]]]
     [:div.group
      [:button.btn-reset {:on-click #(prompt-cb :email)}
       [:div.circle50.left (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
