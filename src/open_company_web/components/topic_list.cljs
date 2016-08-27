@@ -326,7 +326,7 @@
 
           (onboard-tip
             {:id (str "welcome-" company-slug "-desktop")
-             :once-only true
+             :once-only false
              :mobile false
              :desktop (str "Hi " (jwt/get-key :name) ", welcome to OpenCompany! To get started, add a topic.")}))
 
