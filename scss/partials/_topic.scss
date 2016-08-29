@@ -38,9 +38,11 @@ div.topic {
   div.pinned-topic i.fa.fa-thumb-tack{
     opacity: 0;
     position: absolute;
-    top: 10px;
+    font-size: 16px;
+    top: 12px;
     right: 10px;
     transform: rotate(25deg);
+    z-index: 100;
   }
 
   &:hover {
