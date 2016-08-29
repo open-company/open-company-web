@@ -9,3 +9,9 @@ div.login {
     padding: 0 30px;
   }
 }
+
+body.small-footer {
+  div.login-internal {
+    min-height: calc(100vh - #{$footer_small_height}px - 35px - 8px);
+  }
+}
