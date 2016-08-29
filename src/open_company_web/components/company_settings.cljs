@@ -18,7 +18,10 @@
             [open-company-web.local-settings :as ls]
             [open-company-web.dispatcher :as dis]
             [org.martinklepsch.derivatives :as drv]
-            [open-company-web.lib.iso4217 :as iso4217]))
+            [open-company-web.lib.iso4217 :as iso4217]
+            [goog.events :as events]
+            [goog.fx.dom :refer (Fade)]
+            [goog.fx.Animation.EventType :as AnimationEventType]))
 
 (rum/defcs thanks-for-subscribing
   < {:will-unmount (fn [s] (cook/remove-cookie! :subscription-callback-slug) s)}
@@ -118,7 +121,8 @@
      :logo (or (:logo current-state) (:logo company-data))
      :company-name (or (:company-name current-state) (:name company-data))
      :currency (or (:currency current-state) (:currency company-data))
-     :loading false}))
+     :loading false
+     :show-save-successful (or (:show-save-successful current-state) false)}))
 
 (defn- upload-file! [owner file]
   (let [success-cb  (fn [success]
@@ -143,7 +147,13 @@
     (get-state data nil))
 
   (will-receive-props [_ next-props]
-    (om/set-state! owner (get-state next-props nil)))
+    (when (om/get-state owner :loading)
+      (utils/after 1500 (fn []
+                          (let [fade-animation (new Fade (sel1 [:div#company-settings-save-successful]) 1 0 utils/oc-animation-duration)]
+                            (doto fade-animation
+                              (.listen AnimationEventType/FINISH #(om/set-state! owner :show-save-successful false))
+                              (.play))))))
+    (om/set-state! owner (get-state next-props {:show-save-successful (om/get-state owner :loading)})))
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -153,7 +163,8 @@
   (render-state [_ {company-uuid :uuid company-name :company-name logo :logo
                     currency :currency loading :loading
                     file-upload-state :file-upload-state upload-remote-url :upload-remote-url
-                    file-upload-progress :file-upload-progress}]
+                    file-upload-progress :file-upload-progress
+                    show-save-successful :show-save-successful}]
     (let [slug (keyword (router/current-company-slug))]
 
       (utils/update-page-title (str "OpenCompany - " company-name))
@@ -248,12 +259,19 @@
                           {:react-key (:code currency)}))))
 
           ;; Save button
-          (dom/div {:class "mt2 right-align"}
-            (dom/button {:class "btn-reset btn-solid"
+          (dom/div {:class "mt2 right-align group"}
+            (dom/button {:class "btn-reset btn-solid right"
                          :on-click #(save-company-clicked owner)}
               (if loading
                 (loading/small-loading)
-                "SAVE"))))
+                "SAVE"))
+            (dom/div {:style {:float "right"
+                              :margin-right "20px"
+                              :color "rgba(78, 90, 107, 0.5)"
+                              :margin-top "5px"
+                              :opacity (if show-save-successful "1" "0")}
+                      :id "company-settings-save-successful"}
+              "Save successful")))
 
         (when false ; hide until Stripe/Recurly accounts are live
 
