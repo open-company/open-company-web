@@ -177,6 +177,14 @@
     "Add an image"
     "Replace image"))
 
+(defn body-clicked [e]
+  (when-let [medium-editor-toolbar-save (sel1 [:a.medium-editor-toolbar-save])]
+    (when (utils/event-inside? e medium-editor-toolbar-save)
+      (let [medium-editor-toolbar-input (sel1 [:input.medium-editor-toolbar-input])
+            url-val (.-value medium-editor-toolbar-input)]
+        (when-not (string/starts-with? url-val "http")
+          (set! (.-value medium-editor-toolbar-input) (str "http://" url-val)))))))
+
 (defcomponent topic-edit [{:keys [show-first-edit-tip
                                   currency
                                   card-width
@@ -211,7 +219,12 @@
       ; remove the onbeforeunload handler
       (set! (.-onbeforeunload js/window) nil)
       ; remove history change listener
-      (events/unlistenByKey (om/get-state owner :history-listener-id))))
+      (when (om/get-state owner :history-listener-id)
+        (events/unlistenByKey (om/get-state owner :history-listener-id))
+        (om/set-state! owner :history-listener-id nil))
+      (when (om/get-state owner :body-click-listener)
+        (events/unlistenByKey (om/get-state owner :body-click-listener))
+        (om/set-state! owner :body-click-listener nil))))
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -224,7 +237,11 @@
             current-token (oc-urls/company (router/current-company-slug))
             listener (events/listen @router/history HistoryEventType/NAVIGATE
                       (partial handle-navigate-event current-token owner))]
-        (om/set-state! owner :history-listener-id listener))))
+        (om/set-state! owner :history-listener-id listener))
+      (let [body-click-listener (events/listen (.-body js/document)
+                                               EventType/MOUSEDOWN
+                                               body-clicked)]
+        (om/set-state! owner :body-click-listener body-click-listener))))
 
   (did-update [_ _ prev-state]
     (let [section           (dis/foce-section-key)
