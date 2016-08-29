@@ -18,12 +18,13 @@
             [open-company-web.lib.medium-editor-exts :as editor]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
-            [open-company-web.components.finances.utils :as finances-utils]
+            [open-company-web.components.topic-edit :as topic-edit]
+            [open-company-web.lib.finance-utils :as finance-utils]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
-            [open-company-web.components.growth.utils :as growth-utils]
-            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
+            [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.components.ui.icon :refer (icon)]
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
+            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -34,7 +35,8 @@
             [clojure.string :as string]
             [cljsjs.react.dom]))
 
-(def before-unload-message "You have unsaved edits.")
+(def title-alert-limit 3)
+(def headline-alert-limit 10)
 
 (defn change-value [owner k e]
   (let [target (.-target e)
@@ -78,7 +80,7 @@
 
 (defn finances-init-state [topic data]
   (when (= topic "finances")
-    {:finances-data (finances-utils/finances-data-map data)}))
+    {:finances-data (finance-utils/finances-data-map data)}))
 
 (defn finances-row-has-data [row]
   (or (data-check-value (:cash row))
@@ -144,23 +146,36 @@
        :growth-metrics (growth-metrics-map all-metrics)
        :growth-metric-slugs (growth-metrics-order all-metrics)})))
 
+(declare data-to-save)
 (defn growth-save-metrics-metadata-cb [owner data metric-slug]
-  (let [metrics (om/get-state owner :growth-metrics)
-       metrics-order (om/get-state owner :growth-metric-slugs)
-       new-metrics (vec (map #(metrics %) metrics-order))]
-    (api/partial-update-section "growth" {:metrics new-metrics})))
+  (let [topic (om/get-props owner :topic)
+        metrics (om/get-state owner :growth-metrics)
+        metrics-order (om/get-state owner :growth-metric-slugs)
+        new-metrics (vec (map #(metrics %) metrics-order))
+        other-data (data-to-save owner topic)]
+    ;; PATCH metrics, preserving title, headline and body w/ local state we have, not what the response has
+    (api/partial-update-section "growth" {:metrics new-metrics} 
+                                         {:title (:title other-data)
+                                          :headline (:headline other-data)
+                                          :body (:body other-data)})))
 
 (defn growth-delete-metric-cb [owner data metric-slug]
-  (let [all-metrics (vals (om/get-state owner :growth-metrics))
+  (let [topic (om/get-props owner :topic)
+        all-metrics (vals (om/get-state owner :growth-metrics))
         new-metrics (vec (filter #(not= (:slug %) metric-slug) all-metrics))
         new-metrics-order (growth-metrics-order new-metrics)
         next-focus (if new-metrics-order
                       (first new-metrics-order)
-                      growth-utils/new-metric-slug-placeholder)]
+                      growth-utils/new-metric-slug-placeholder)
+        other-data (data-to-save owner topic)]
     (om/set-state! owner :growth-focus next-focus)
     (om/set-state! owner :growth-metric-slugs new-metrics-order)
     (om/set-state! owner :growth-metadata-editing false)
-    (api/partial-update-section "growth" {:metrics new-metrics})))
+    ;; PATCH metrics, preserving title, headline and body w/ local state we have, not what the response has
+    (api/partial-update-section "growth" {:metrics new-metrics}
+                                         {:title (:title other-data)
+                                          :headline (:headline other-data)
+                                          :body (:body other-data)})))
 
 (defn growth-metadata-edit-cb [owner editing]
   (om/set-state! owner :growth-metadata-editing editing))
@@ -253,19 +268,14 @@
                             with-finances-data)]
       with-growth-data)))
 
-(def title-alert-limit 3)
-(def headline-alert-limit 10)
-
-(defn headline-on-change [owner]
+(defn- headline-on-change [owner]
   (let [headline-innerHTML (.-innerHTML (sel1 [:div.topic-edit-headline]))]
     (when (not= (gobj/get (om/get-state owner :headline) "__html") headline-innerHTML)
       (om/set-state! owner :has-changes true))))
 
-(defn check-headline-count [owner headline-max-length e]
+(defn- check-headline-count [owner headline-max-length e]
   (when-let [headline (sel1 [:div.topic-edit-headline])]
     (let [headline-value (.-innerText headline)]
-      (when (pos? (count headline-value))
-        (om/set-state! owner :tooltip-dismissed true))
       (when (and (not= (.-keyCode e) 8)
                  (not= (.-keyCode e) 16)
                  (not= (.-keyCode e) 17)
@@ -283,7 +293,7 @@
         (om/set-state! owner :negative-headline-char-count (neg? remaining-chars)))
       (headline-on-change owner))))
 
-(defn count-chars
+(defn- count-chars
   "A special variant of `count` that will count emoji strings (:smile:)
    and html spaces (&nbsp;) as single characters."
   [s]
@@ -291,11 +301,11 @@
       (string/replace #"&nbsp;" " ")
       count))
 
-(defn headline-count-chars []
+(defn- headline-count-chars []
   (when-let [headline-node (sel1 [:div.topic-edit-headline])]
     (count-chars (.-innerHTML headline-node))))
 
-(defn top-position [el]
+(defn- top-position [el]
   (loop [yPos 0
          element el]
     (if (and element
@@ -309,7 +319,7 @@
              (gobj/get element "offsetParent"))
       yPos)))
 
-(defn body-clicked [owner e]
+(defn- body-clicked [owner e]
   (when (om/get-props owner :visible)
     (when-let* [topic-body (sel1 [:div.topic-body])
                 fullscreen-topic (sel1 [:div.fullscreen-topic])
@@ -335,11 +345,11 @@
           (utils/to-end-of-content-editable topic-body)
           (scroll-to-bottom))))))
 
-(defn setup-body-listener [owner]
+(defn- setup-body-listener [owner]
   (when-let [fullscreen-topic (sel1 [:div.fullscreen-topic])]
     (events/listen fullscreen-topic EventType/CLICK (partial body-clicked owner))))
 
-(defn get-state [owner data current-state]
+(defn- get-state [owner data current-state]
   (let [topic         (:topic data)
         current-topic-data (:topic-data data)
         topic-data    (if (= (dis/foce-section-key) (keyword topic)) (dis/foce-section-data) (:topic-data data))
@@ -361,14 +371,13 @@
        :show-title-counter (:show-title-counter current-state)
        :medium-editor (:medium-editor current-state)
        :history-listener-id (:history-listener-id current-state)
-       :tooltip-dismissed false
        :body-click body-click
        :char-count (:char-count current-state)
        :hide-placeholder false}
       (finances-init-state topic (:data topic-data))
       (growth-init-state topic data current-state))))
 
-(defn reset-and-dismiss [owner options]
+(defn- reset-and-dismiss [owner options]
   (let [props (om/get-props owner)
         placeholder-section (:placeholder (:topic-data props))]
     (when placeholder-section
@@ -376,12 +385,12 @@
     ((:dismiss-editing options) placeholder-section)
     (om/set-state! owner (get-state owner props (om/get-state owner)))))
 
-(defn force-hide-placeholder [owner]
+(defn- force-hide-placeholder [owner]
   (let [editor       (om/get-state owner :body-medium-editor)
         body-el   (sel1 (str "div#topic-edit-body-" (name (om/get-props owner :topic))))]
     (utils/medium-editor-hide-placeholder editor body-el)))
 
-(defn setup-medium-editor [owner {:keys [topic-data topic] :as data}]
+(defn- setup-medium-editor [owner {:keys [topic-data topic] :as data}]
   ; save initial innerHTML and setup MediumEditor and Emoji autocomplete
   (let [body-el (sel1 (str "div#topic-edit-body-" (name topic)))
         med-ed (new js/MediumEditor body-el (clj->js
@@ -394,27 +403,33 @@
   (js/emojiAutocomplete)
   (utils/after 200 #(focus-headline owner)))
 
-(defn save-data [owner options]
+(defn- save-data [owner options]
   (let [topic (om/get-props owner :topic)]
     (when-let [section-data (data-to-save owner topic)]
       (om/set-state! owner :has-changes false)
       (dis/dispatch! [:save-topic topic section-data])
       ((:dismiss-editing options)))))
 
-(defn remove-topic-click [owner options e]
+(defn- remove-topic-click [owner options e]
   (when e
     (utils/event-stop e))
-  (when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
-    (let [section (om/get-props owner :topic)]
-      (dis/dispatch! [:topic-archive section]))
-    ((:dismiss-editing options) true)))
+  (add-popover {:container-id "archive-topic-confirm"
+                :message topic-edit/before-archive-message
+                :height "170px"
+                :cancel-title "KEEP"
+                :cancel-cb #(hide-popover nil "archive-topic-confirm")
+                :success-title "ARCHIVE"
+                :success-cb #(do
+                                (let [section (om/get-props owner :topic)]
+                                  (dis/dispatch! [:topic-archive section]))
+                                ((:dismiss-editing options) true))}))
 
-(defn img-on-load [owner img]
+(defn- img-on-load [owner img]
   (om/set-state! owner (merge (om/get-state owner) {:image-width (.-clientWidth img)
                                                     :image-height (.-clientHeight img)}))
   (gdom/removeNode img))
 
-(defn upload-file! [owner file]
+(defn- upload-file! [owner file]
   (let [success-cb  (fn [success]
                       (let [url    (.-url success)
                             node   (gdom/createDom "img")]
@@ -438,7 +453,7 @@
       file
       (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
 
-(defcomponent fullscreen-topic-edit [{:keys [card-width topic topic-data currency focus show-first-edit-tooltip] :as data} owner options]
+(defcomponent fullscreen-topic-edit [{:keys [card-width topic topic-data currency focus show-first-edit-tip] :as data} owner options]
 
   (init-state [_]
     (get-state owner data nil))
@@ -487,15 +502,7 @@
       (let [win-location (.-location js/window)
             current-token (oc-urls/company-section-edit (router/current-company-slug) (name topic))
             listener (events/listen @router/history HistoryEventType/NAVIGATE
-                       #(when-not (= (.-token %) current-token)
-                          (if (om/get-state owner :has-changes)
-                            (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
-                              ; dispatch the current url
-                              (@router/route-dispatcher (router/get-token))
-                              ; go back to the previous token
-                              (.setToken @router/history current-token))
-                            ; dispatch the current url
-                            (@router/route-dispatcher (router/get-token)))))]
+                        (partial topic-edit/handle-navigate-event current-token owner))]
         (om/set-state! owner :history-listener-id listener))))
 
   (did-update [_ _ prev-state]
@@ -524,14 +531,12 @@
                            growth-metrics
                            show-title-counter
                            growth-metric-slugs
-                           growth-metadata-editing
-                           ; tooltip
-                           tooltip-dismissed]}]
+                           growth-metadata-editing]}]
     (let [topic-kw (keyword topic)
           is-data-topic (#{:finances :growth} topic-kw)
           title-length-limit 20
           topic-body (utils/emojify (if-not (:placeholder topic-data) (:body topic-data) ""))
-          topic-body-placeholder (if (:placeholder topic-data) (:body topic-data) "")
+          topic-body-placeholder (or (:body-placeholder topic-data) "")
           win-height (.-clientHeight (.-body js/document))
           needs-fix? (< win-height utils/overlay-max-win-height)
           max-height (min (- 650 126) (- win-height 126))
@@ -542,7 +547,7 @@
           ww (.-clientWidth (sel1 js/document :body))
           fullscreen-width (responsive/fullscreen-topic-width card-width)]
       ; set the onbeforeunload handler only if there are changes
-      (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
+      (let [onbeforeunload-cb (when has-changes #(str topic-edit/before-unload-message))]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
       
       ;; Save and cancel buttons
@@ -558,14 +563,19 @@
           (when-not growth-metadata-editing
             (dom/button {:class "btn-reset btn-outline left mr1 secondary-button"
                          :onClick #(do
+                                    ;; reset growth section data from API since we may have preserved some local
+                                    ;; state in the atom DB during metric add/archive operations
+                                    (when (= topic "growth") (api/get-section (router/current-company-slug) "growth"))
                                     (reset-and-dismiss owner options)
-                                    (utils/event-stop %))} "CANCEL"))
+                                    (utils/event-stop %))}
+              "CANCEL"))
           (when-not growth-metadata-editing
             (dom/button {:class "btn-reset btn-solid left mr1 primary-button"
                          :disabled (or (not has-changes) negative-headline-char-count)
                          :onClick #(do
                                     (save-data owner options)
-                                    (utils/event-stop %))} "SAVE")))
+                                    (utils/event-stop %))}
+              "SAVE")))
         (dom/div {:class "fullscreen-topic-internal group"
                   :on-click #(.stopPropagation %)}
           (dom/div {:class "fullscreen-topic-edit-top-box"}
@@ -587,7 +597,9 @@
               (when (= topic "finances")
                 (om/build finances-edit {:finances-data finances-data
                                          :change-finances-cb (partial change-finances-data-cb owner)
-                                         :currency currency}
+                                         :currency currency
+                                         :show-first-edit-tip show-first-edit-tip
+                                         :first-edit-tip-cb #(focus-headline owner)}
                                         {:key (:updated-at topic-data)}))
               (when (= topic "growth")
                 (dom/div {}
@@ -601,7 +613,9 @@
                                          :save-metadata-cb (partial growth-save-metrics-metadata-cb owner data)
                                          :cancel-cb #(growth-cancel-cb owner data)
                                          :change-growth-metric-cb (partial growth-change-metric-cb owner data)
-                                         :new-growth-section (om/get-state owner :oc-editing)}
+                                         :new-growth-section (om/get-state owner :oc-editing)
+                                         :show-first-edit-tip show-first-edit-tip
+                                         :first-edit-tip-cb #(focus-headline owner)}
                                         {:opts {:currency currency} :key growth-data})))))
             
             ;; Title
@@ -703,13 +717,4 @@
               (dom/input {:id "topic-edit-upload-ui--select-trigger"
                           :style {:display "none"}
                           :type "file"
-                          :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))}))))
-      
-      ;; Onboarding toolip
-      (when (and show-first-edit-tooltip
-                 (not tooltip-dismissed))
-        (om/build onboard-tip
-          {:cta "WHAT WOULD YOU LIKE TO SAY? YOU CAN ADD TEXT, EMOJI AND IMAGES."}
-          {:opts {:dismiss-tooltip #(doto owner
-                                      (om/set-state! :tooltip-dismissed true)
-                                      (focus-headline))}}))))))
+                          :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))}))))))))

@@ -166,7 +166,8 @@
                                :sharing-mode sharing-mode
                                :foce-key (:foce-key props)
                                :foce-data (:foce-data props)
-                               :share-selected share-selected?}
+                               :share-selected share-selected?
+                               :show-first-edit-tip (:show-first-edit-tip props)}
                                {:opts {:section-name section-name
                                        :share-remove-click (:share-remove-click options)
                                        :topic-click (partial topic-click section-name)}}))))))))

@@ -82,7 +82,7 @@
     (let [company-data (dis/company-data data)
           su-data (stakeholder-update-data data)
           su-sections (if (empty? (:sections su-data))
-                        (flatten (vals (:sections company-data)))
+                        (utils/filter-placeholder-sections (flatten (vals (:sections company-data))) company-data)
                         (utils/filter-placeholder-sections (:sections su-data) company-data))]
       {:columns-num (responsive/columns-num)
        :su-topics su-sections
@@ -92,8 +92,7 @@
        :link-loading false
        :slack-loading false
        :link-posting false
-       :link-posted false
-       :su-tooltip-dismissed false}))
+       :link-posted false}))
 
   (did-mount [_]
     (om/set-state! owner :did-mount true)
@@ -132,9 +131,9 @@
                            slack-loading
                            link-posting
                            link-posted
-                           su-topics
-                           su-tooltip-dismissed]}]
-    (let [company-data (dis/company-data data)
+                           su-topics]}]
+    (let [company-slug (router/current-company-slug)
+          company-data (dis/company-data data)
           su-data      (stakeholder-update-data data)
           card-width   (responsive/calc-card-width 1)
           ww           (.-clientWidth (sel1 js/document :body))
@@ -145,12 +144,14 @@
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
                                          :main-scroll true})}
         (when (and (seq company-data)
-                   (empty? (:sections su-data))
-                   (not su-tooltip-dismissed))
-          (om/build onboard-tip {:cta "THIS IS A PREVIEW OF YOUR UPDATE. DRAG TOPICS TO REORDER, OR CLICK THE X TO REMOVE A TOPIC."}
-                                {:opts {:dismiss-tooltip #(do
-                                                           (om/set-state! owner :su-tooltip-dismissed true)
-                                                           (.focus (sel1 [:input#su-snapshot-preview-title])))}}))
+                   (empty? (:sections su-data)))
+          (onboard-tip {
+            :id (str "update-preview-" company-slug)
+            :once-only true
+            :mobile false
+            :desktop "This is a preview of your update. You can drag topics to reorder, and you can remove them by clicking the \"X\"."
+            :css-class "large"
+            :dismiss-tip-fn #(.focus (sel1 [:input#su-snapshot-preview-title]))}))
         (om/build menu data)
         (dom/div {:class "page snapshot-page"}
           (dom/div {:class "su-snapshot-header"}

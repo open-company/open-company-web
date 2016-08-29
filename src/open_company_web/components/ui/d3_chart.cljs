@@ -146,9 +146,9 @@
           (-> chart-node
             (.append "rect")
             (.attr "class" "hover-rect")
-            (.attr "width" (/ chart-width show-data-points))
+            (.attr "width" (/ chart-width (count chart-data)))
             (.attr "height" chart-height)
-            (.attr "x" (* i (/ chart-width show-data-points)))
+            (.attr "x" (* i (/ chart-width (count chart-data))))
             (.attr "y" 0)
             (.on "mouseover" #(data-select owner options i))
             (.on "mouseout" #(data-select owner options (om/get-state owner :selected)))

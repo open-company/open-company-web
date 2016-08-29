@@ -13,12 +13,14 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.medium-editor-exts :as editor]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
-            [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
+            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
+            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [goog.dom :as gdom]
             [goog.object :as googobj]
@@ -32,26 +34,27 @@
 (def title-alert-limit 3)
 (def headline-alert-limit 10)
 
-(def before-unload-message "You have unsaved edits.")
+(def before-unload-message "You have unsaved edits. Are you sure you want to leave this topic?")
+(def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
 
-(defn scroll-to-topic-top [topic]
+(defn- scroll-to-topic-top [topic]
   (let [body-scroll (.-scrollTop (.-body js/document))
         topic-scroll-top (utils/offset-top topic)]
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
-(defn start-fullscreen-editing-click [owner options e]
+(defn- start-fullscreen-editing-click [owner options e]
   (utils/event-stop e)
   (let [section (om/get-props owner :section)
         topic-click-cb (:topic-click options)]
     (topic-click-cb nil true)))
 
-(defn force-hide-placeholder [owner]
+(defn- force-hide-placeholder [owner]
   (let [editor       (om/get-state owner :body-editor)
         section-name (name (om/get-props owner :section))
         body-el      (sel1 [(str "div#foce-body-" section-name)])]
     (utils/medium-editor-hide-placeholder editor body-el)))
 
-(defn setup-edit [owner]
+(defn- setup-edit [owner]
   (when-let* [section-kw   (keyword (om/get-props owner :section))
               section-name (name section-kw)
               body-el      (sel1 [(str "div#foce-body-" section-name)])]
@@ -67,7 +70,7 @@
       (om/set-state! owner :body-editor body-editor))
     (js/emojiAutocomplete)))
 
-(defn headline-on-change [owner]
+(defn- headline-on-change [owner]
   (om/set-state! owner :has-changes true)
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
     (let [headline-innerHTML (.-innerHTML headline)
@@ -79,7 +82,7 @@
         (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))
         (om/set-state! owner :negative-headline-char-count (neg? remaining-chars))))))
 
-(defn check-headline-count [owner e has-changes]
+(defn- check-headline-count [owner e has-changes]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
     (let [headline-value (.-innerText headline)]
       (when (and (not= (.-keyCode e) 8)
@@ -96,13 +99,13 @@
   (when has-changes
     (headline-on-change owner)))
 
-(defn img-on-load [owner img]
+(defn- img-on-load [owner img]
   (om/set-state! owner :has-changes true)
   (dis/dispatch! [:foce-input {:image-width (.-clientWidth img)
                                :image-height (.-clientHeight img)}])
   (gdom/removeNode img))
 
-(defn upload-file! [owner file]
+(defn- upload-file! [owner file]
   (let [success-cb  (fn [success]
                       (let [url    (.-url success)
                             node   (gdom/createDom "img")]
@@ -129,20 +132,53 @@
     (.focus headline)
     (utils/to-end-of-content-editable headline)))
 
-(defn remove-topic-click [e]
+(defn handle-navigate-event [current-token owner e]
+    ;; only when the URL is changing
+    (when-not (= (.-token e) current-token)
+      ;; check if there are unsaved changes
+      (if (om/get-state owner :has-changes)
+        
+        ;; confirmation dialog
+        (add-popover {:container-id "leave-topic-confirm"
+                      :height "150px"
+                      :message before-unload-message
+                      :cancel-title "STAY"
+                      :cancel-cb #(do
+                                    ;; Go back to the previous token
+                                    (.setToken @router/history current-token)
+                                    (hide-popover nil "leave-topic-confirm"))
+                      :success-title "LEAVE"
+                      :success-cb #(do
+                                    (hide-popover nil "leave-topic-confirm")
+                                    ;; cancel any FoCE
+                                    (dis/dispatch! [:start-foce nil])
+                                    ;; Dispatch the current url
+                                    (@router/route-dispatcher (router/get-token)))})
+        
+        ; no changes, so dispatch the current url
+        (@router/route-dispatcher (router/get-token)))))
+
+(defn- remove-topic-click [owner e]
   (when e
     (utils/event-stop e))
-  (when (js/confirm "Archiving removes the topic from the dashboard, but you won’t lose prior updates if you add it again later. Are you sure you want to archive this topic?")
-    (let [section (dis/foce-section-key)]
-      (dis/dispatch! [:topic-archive section]))
-    (dis/dispatch! [:start-foce nil])))
+  (add-popover {:container-id "archive-topic-confirm"
+                :message before-archive-message
+                :height "170px"
+                :cancel-title "KEEP"
+                :cancel-cb #(hide-popover nil "archive-topic-confirm")
+                :success-title "ARCHIVE"
+                :success-cb #(do
+                                (let [section (dis/foce-section-key)]
+                                  (dis/dispatch! [:topic-archive section]))
+                                (dis/dispatch! [:start-foce nil]))}))
 
 (defn- add-image-tooltip [image-header]
   (if (or (not image-header) (string/blank? image-header))
     "Add an image"
     "Replace image"))
 
-(defcomponent topic-edit [{:keys [currency
+(defcomponent topic-edit [{:keys [show-first-edit-tip
+                                  currency
                                   prev-rev
                                   next-rev]} owner options]
 
@@ -151,7 +187,7 @@
           topic-data (dis/foce-section-data)
           body       (:body topic-data)]
       {:initial-headline (utils/emojify (:headline topic-data))
-       :body-placeholder (if (:placeholder topic-data) body "")
+       :body-placeholder (or (:body-placeholder topic-data) "")
        :initial-body  (utils/emojify (if (:placeholder topic-data) "" body))
        :char-count nil
        :char-count-alert false
@@ -165,7 +201,7 @@
           company-data (dis/company-data)
           topic-data   (get company-data (keyword topic))
           body         (:body topic-data)]
-      (om/set-state! owner :body-placeholder (if (:placeholder topic-data) body ""))))
+      (om/set-state! owner :body-placeholder (or (:body-placeholder topic-data) ""))))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
@@ -186,15 +222,7 @@
       (let [win-location (.-location js/window)
             current-token (oc-urls/company (router/current-company-slug))
             listener (events/listen @router/history HistoryEventType/NAVIGATE
-                       #(when-not (= (.-token %) current-token)
-                          (if (om/get-state owner :has-changes)
-                            (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
-                              ; dispatch the current url
-                              (@router/route-dispatcher (router/get-token))
-                              ; go back to the previous token
-                              (.setToken @router/history current-token))
-                            ; dispatch the current url
-                            (@router/route-dispatcher (router/get-token)))))]
+                      (partial handle-navigate-event current-token owner))]
         (om/set-state! owner :history-listener-id listener))))
 
   (did-update [_ _ _]
@@ -208,8 +236,12 @@
         (.attr "data-original-title" add-image-tooltip)
         (.tooltip "fixTitle"))))
 
-  (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert file-upload-state file-upload-progress upload-remote-url negative-headline-char-count has-changes]}]
-    (let [section             (dis/foce-section-key)
+  (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
+                           file-upload-state file-upload-progress upload-remote-url negative-headline-char-count
+                           has-changes]}]
+
+    (let [company-slug        (router/current-company-slug)
+          section             (dis/foce-section-key)
           topic-data          (dis/foce-section-data)
           section-kw          (keyword section)
           chart-opts          {:chart-size {:width 230}
@@ -279,7 +311,7 @@
                         :placeholder body-placeholder
                         :data-placeholder body-placeholder
                         :contentEditable true
-                        :style #js {:minHeight (if (:placeholder topic-data) "100px" "0px")}
+                        :style #js {:minHeight (if (:placeholder topic-data) "110px" "0px")}
                         :onBlur #(om/set-state! owner :char-count nil)
                         :dangerouslySetInnerHTML initial-body})
           (dom/div {:class "topic-foce-buttons group"}
@@ -319,7 +351,7 @@
                            :data-toggle "tooltip"
                            :data-placement "top"
                            :style {:display (if (nil? file-upload-state) "block" "none")}
-                           :on-click (partial remove-topic-click)}
+                           :on-click (partial remove-topic-click owner)}
                   (dom/i {:class "fa fa-archive"})))
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
               (str file-upload-progress "%")))
@@ -354,4 +386,13 @@
                                         (utils/event-stop %)
                                         (if (:placeholder topic-data)
                                           (dis/dispatch! [:topic-archive (name section)])
-                                          (dis/dispatch! [:start-foce nil])))} "CANCEL"))))))))
+                                          (dis/dispatch! [:start-foce nil])))} "CANCEL")))
+
+        ;; Onboarding toolip
+        (when show-first-edit-tip
+          (onboard-tip
+            {:id (str "content-topic-add-" company-slug)
+             :once-only true
+             :mobile false
+             :desktop "What would you like to say? You can add text, emoji and images."
+             :dismiss-tip-fn focus-headline})))))))

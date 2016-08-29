@@ -86,8 +86,6 @@
         (str month " " year " Update"))
       title)))
 
-(def before-unload-message "You have unsaved changes.")
-
 (defn save-click [owner]
   (let [title (om/get-state owner :title)
         intro-body (or (om/get-state owner :out-intro) (om/get-state owner :intro) "")
@@ -98,7 +96,6 @@
                                    :outro {:body outro-body}})))
 
 (defn cancel-click [owner]
-  (om/set-state! owner :has-changes false)
   (let [current-state (om/get-state owner)]
     (om/set-state! owner :title (:initial-title current-state))
     (om/set-state! owner :intro (:initial-intro current-state))
@@ -117,8 +114,6 @@
         fixed-title (get-title su-data)]
     {:title (get-title su-data)
      :initial-title title
-     :history-listener-id (or (:history-listener-id current-state) nil)
-     :has-changes (not= fixed-title title)
      :sections sections
      :initial-intro intro
      :intro intro
@@ -128,7 +123,6 @@
      :fixed-buttons-position (or (:fixed-buttons-position current-state) false)}))
 
 (defn change-cb [owner k v]
-  (om/set-state! owner :has-changes true)
   (cond
     (= k :outro)
     (om/set-state! owner :out-outro v)
@@ -147,33 +141,8 @@
   (init-state [_]
     (get-state data nil))
 
-  (will-unmount [_]
-    (when-not (utils/is-test-env?)
-      ; re enable the route dispatcher
-      (reset! prevent-route-dispatch false)
-      ; remove the onbeforeunload handler
-      (set! (.-onbeforeunload js/window) nil)
-      ; remove history change listener
-      (events/unlistenByKey (om/get-state owner :history-listener-id))))
-
   (did-mount [_]
-    (fix-buttons-position owner)
-    (when-not (utils/is-test-env?)
-      (utils/after 100 (fn []
-        (reset! prevent-route-dispatch true)
-        (let [win-location (.-location js/window)
-              current-token (str (.-pathname win-location) (.-search win-location) (.-hash win-location))
-              listener (events/listen @router/history EventType/NAVIGATE
-                         #(when-not (= (.-token %) current-token)
-                            (if (om/get-state owner :has-changes)
-                              (if (js/confirm (str before-unload-message " Are you sure you want to leave this page?"))
-                                ; dispatch the current url
-                                (@router/route-dispatcher (router/get-token))
-                                ; go back to the previous token
-                                (.setToken @router/history current-token))
-                              ; dispatch the current url
-                              (@router/route-dispatcher (router/get-token)))))]
-          (om/set-state! owner :history-listener-id listener))))))
+    (fix-buttons-position owner))
 
   (did-update [_ _ _]
     (fix-buttons-position owner))
@@ -183,10 +152,8 @@
     (when (:su-edit next-props)
       (router/nav! (oc-urls/stakeholder-update-list))))
 
-  (render-state [_ {:keys [has-changes title intro sections outro force-content-update]}]
-    ; set the onbeforeunload handler only if there are changes
-    (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
-      (set! (.-onbeforeunload js/window) onbeforeunload-cb))
+  (render-state [_ {:keys [title intro sections outro force-content-update]}]
+
     (let [company-data (dispatcher/company-data data)
           su-data (:stakeholder-update company-data)]
 
@@ -202,23 +169,15 @@
         ;; Stakeholder update
         (and (not (contains? data :loading)) company-data)
         (dom/div {:class (utils/class-set {:su-edit true
-                                           :navbar-offset (not (responsive/is-mobile))})}
+                                           :navbar-offset (not (responsive/is-mobile-size?))})}
           ;; Company / user header
-          (when-not (responsive/is-mobile)
+          (when-not (responsive/is-mobile-size?)
             (om/build navbar data))
           
           (dom/div #js {:className "update-internal"
                         :ref "update-internal"}
           
             (dom/div {:class "sections group"}; col-md-9 col-sm-12"}
-              (dom/div #js {:className "floating-buttons group"
-                            :ref "floating-buttons"}
-                (when has-changes
-                  (dom/button {:class "cancel"
-                               :on-click #(cancel-click owner)} "Cancel"))
-                (when has-changes
-                  (dom/button {:class "save"
-                               :on-click #(save-click owner)} "Save")))
               ;; share button
               (dom/div {:class "share-su"}
                 (dom/button {:class "share"
@@ -240,7 +199,7 @@
                                                    :update-content force-content-update}
                                                   {:opts {:change-cb (partial change-cb owner)}})
               ;; Dashboard link
-              (when (responsive/is-mobile)
+              (when (responsive/is-mobile-size?)
                 (dom/div {:class "dashboard-link"}
                   (om/build link {:href (oc-urls/company) :name "View Dashboard"}))))))
 

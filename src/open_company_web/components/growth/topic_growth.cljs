@@ -4,7 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.growth.growth-metric :refer (growth-metric)]
-            [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.caches :refer (company-cache)]
             [cuerdas.core :as s]))
 

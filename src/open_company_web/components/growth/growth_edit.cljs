@@ -4,9 +4,10 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.cell :refer (cell)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.components.growth.growth-metric-edit :refer (growth-metric-edit)]
             [open-company-web.components.ui.utility-components :refer (editable-pen)]
+            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [cljs.core.async :refer (put!)]))
@@ -87,7 +88,8 @@
       (om/set-state! owner :growth-data (:growth-data next-props))))
 
   (render-state [_ {:keys [metric-slug growth-data metrics growth-metric-slugs metadata-edit new-metric stop]}]
-    (let [{:keys [interval slug] :as metric-info} (get-current-metric-info metric-slug data)
+    (let [company-slug (router/current-company-slug)
+          {:keys [interval slug] :as metric-info} (get-current-metric-info metric-slug data)
           prefix (if (= (:unit metric-info) "currency")
                    (utils/get-symbol-for-currency-code (:currency options))
                    "")
@@ -110,7 +112,7 @@
                                         :change-growth-metric-cb (:change-growth-metric-cb data)}
                                         {:opts {:currency (:currency options)}})
           
-          (dom/div  
+          (dom/div
             ;; metric label and meta-data edit icon
             (when interval
               (dom/div {:class "chart-header-container"}
@@ -190,4 +192,13 @@
                                         (.stopPropagation e)
                                         (set-metadata-edit owner data true)
                                         (om/set-state! owner :new-metric true)
-                                        (om/set-state! owner :metric-slug growth-utils/new-metric-slug-placeholder))} "+ New metric")))))))))
+                                        (om/set-state! owner :metric-slug growth-utils/new-metric-slug-placeholder))} "+ New metric")))
+          
+          ;; Onboarding toolip
+          (when (:show-first-edit-tip data)
+            (onboard-tip
+              {:id (str "growth-topic-add-" company-slug)
+               :once-only true
+               :mobile false
+               :desktop "Add metrics you'd like to share and we'll build simple charts for you."
+               :dismiss-tip-fn (:first-edit-tip-cb data)}))))))))

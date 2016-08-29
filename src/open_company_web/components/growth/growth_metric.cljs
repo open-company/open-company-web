@@ -5,7 +5,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.d3-chart :refer (d3-chart)]
             [open-company-web.components.ui.utility-components :refer (editable-pen)]
-            [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.router :as router]
             [open-company-web.lib.oc-colors :as occ]
             [open-company-web.dispatcher :as dispatcher]

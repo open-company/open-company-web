@@ -102,19 +102,24 @@
                              false))]
   (reset! _mobile fixed-browser-type)))
 
-(defn is-mobile []
+(defn is-mobile-size? []
  "Check if it's mobile based only on screen size"
- ; fake the browser type for the moment
+ ;; fake the browser type for the moment
  (when (neg? @_mobile)
-  (set-browser-type!))
+ (set-browser-type!))
  @_mobile)
-
-(defn can-edit? []
-  "Check if it's mobile based only on the UserAgent"
-  (not userAgent/MOBILE))
 
 (defn user-agent-mobile? []
   userAgent/MOBILE)
+
+(defn is-mobile?
+  "Check if it's mobile based on UserAgent or screen size."
+  []
+  (or (is-mobile-size?) (user-agent-mobile?)))
+
+(defn can-edit? []
+  "Check if it's mobile based only on the UserAgent"
+  (not (user-agent-mobile?)))
 
 (defn fullscreen-topic-width [card-width]
   (let [ww (.-clientWidth (sel1 js/document :body))]

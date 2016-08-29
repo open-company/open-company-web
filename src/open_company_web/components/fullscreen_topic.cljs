@@ -42,7 +42,7 @@
                                                  is-actual] :as data} owner options]
   (render [_]
     (let [fullscreen-width (responsive/fullscreen-topic-width card-width)
-          chart-reduction (if (responsive/is-mobile) 100 250)
+          chart-reduction (if (responsive/is-mobile-size?) 100 250)
           chart-width (- fullscreen-width chart-reduction)
           chart-opts {:show-title false
                       :show-revisions-navigation false
@@ -53,7 +53,8 @@
                       :currency currency
                       :actual-as-of (:updated-at topic-data)
                       :selected-metric selected-metric
-                      :read-only true}]
+                      :read-only true}
+          topic-body (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))]
       (dom/div {:class "fullscreen-topic-internal group"
                 :style #js {:width (str (- fullscreen-width 20) "px")}}
         (dom/div {:class "fullscreen-topic-top-box"}
@@ -88,8 +89,8 @@
           (dom/div {:class "topic-headline"
                     :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
           ;; Body
-          (dom/div {:class "topic-body"
-                  :dangerouslySetInnerHTML (utils/emojify (:body topic-data))})
+          (dom/div {:class (str "topic-body" (when (:placeholder topic-data) " italic"))
+                  :dangerouslySetInnerHTML (utils/emojify topic-body)})
           
           ;; Attribution
           (when-not hide-history-navigation
@@ -177,7 +178,8 @@
     (utils/event-stop e))
   (om/set-state! owner :transition-as-of (:updated-at revision)))
 
-(defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width hide-history-navigation show-first-edit-tooltip] :as data} owner options]
+(defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width
+                                        hide-history-navigation show-first-edit-tip] :as data} owner options]
 
   (init-state [_]
     (when (:fullscreen-force-edit data)
@@ -270,7 +272,7 @@
                                            :is-actual is-actual?
                                            :prev-rev prev-rev
                                            :next-rev next-rev
-                                           :show-first-edit-tooltip show-first-edit-tooltip}
+                                           :show-first-edit-tip show-first-edit-tip}
                                           {:opts edit-topic-opts}))
         (dom/div #js {:className "fullscreen-topic-transition group"
                       :ref "fullscreen-topic-transition"

@@ -35,7 +35,7 @@
           (when-not (:hide-right-menu data)
             (dom/ul {:class "nav navbar-nav navbar-right"}
               (dom/li {}
-                (if (responsive/is-mobile)
+                (if (responsive/is-mobile-size?)
                   (dom/div {:on-click (partial menu-click owner)}
                     (i/icon :menu-34 {}))
                   (if (jwt/jwt)

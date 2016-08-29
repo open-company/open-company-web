@@ -1,15 +1,19 @@
-div.tooltip-container {
+div.onboard-tip-container {
   position: fixed;
   width: 226px;
   height: 113px;
   left: 50%;
   top: 50%;
   margin-left: -110px;
-  margin-top: -56px;
+  margin-top: -116px;
   z-index: 10000;
   padding: 0px;
 
-  div.tooltip-box {
+  &.large {
+    height: 163px;
+  }
+  
+  div.onboard-tip-box {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -17,12 +21,8 @@ div.tooltip-container {
     height: 100%;
     background-color: rgba(77, 89, 106, 1);
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-    opacity: 0;
+    opacity: 1;
     transition: 230ms;
-
-    &.shown {
-      opacity: 1;
-    }
 
     div.triangle {
       @include triangle(right, $oc_yellow, 6px);
@@ -32,7 +32,7 @@ div.tooltip-container {
       margin-top: 29px;
     }
 
-    div.tooltip-cta {
+    div.onboard-tip-cta {
       font-weight: 700;
       font-family: $oc_headers_font;
       font-size: 12px;
@@ -47,8 +47,4 @@ div.tooltip-container {
       text-transform: uppercase;
     }
   }
-}
-
-div.tooltip-container.large {
-  height: 163px;
 }

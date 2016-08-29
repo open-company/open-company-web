@@ -3,8 +3,10 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.router :as router]
             [open-company-web.components.ui.cell :refer (cell)]
-            [open-company-web.components.finances.utils :as finances-utils]
+            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
+            [open-company-web.lib.finance-utils :as finance-utils]
             [cljs.core.async :refer (put!)]))
 
 (defn signal-tab [period k]
@@ -45,7 +47,7 @@
                        (not (:costs finances-data))) ""
                    (zero? runway-days) "-"
                    (pos? runway-days) "-"
-                   :else (finances-utils/get-rounded-runway runway-days)) 
+                   :else (finance-utils/get-rounded-runway runway-days)) 
           ref-prefix (str (:period finances-data) "-")
           period-month (utils/get-month period)
           needs-year (or (= period-month "JAN")
@@ -115,8 +117,9 @@
       (om/set-state! owner :finances-data (:finances-data next-props))))
 
   (render-state [_ {:keys [finances-data stop]}]
-    (let [currency (:currency data)]
-      ; real component
+    (let [company-slug (router/current-company-slug)
+          currency (:currency data)]
+
       (dom/div {:class "finances"}
         (dom/div {:class "composed-section-edit finances-body edit"}
           (dom/div {:class "table-container group"}
@@ -131,12 +134,12 @@
               (dom/tbody {}
                 (let [current-period (utils/current-period)]
                   (for [idx (range stop)]
-                    (let [period (finances-utils/get-past-period current-period idx)
+                    (let [period (finance-utils/get-past-period current-period idx)
                           has-value (contains? finances-data period)
                           row-data (if has-value
                                       (get finances-data period)
-                                      (finances-utils/placeholder-data period {:new true}))
-                          next-period (finances-utils/get-past-period current-period (inc idx))]
+                                      (finance-utils/placeholder-data period {:new true}))
+                          next-period (finance-utils/get-past-period current-period (inc idx))]
                       (om/build finances-edit-row {:cursor row-data
                                                    :next-period next-period
                                                    :is-last (= idx 0)
@@ -150,4 +153,13 @@
                   (dom/td {})
                   (dom/td {})
                   (dom/td {})
-                  (dom/td {}))))))))))
+                  (dom/td {}))))))
+
+        ;; Onboarding toolip
+        (when (:show-first-edit-tip data)
+          (onboard-tip
+            {:id (str "finance-topic-add-" company-slug)
+             :once-only true
+             :mobile false
+             :desktop "Enter revenue, expenses and cash to create a simple chart."
+             :dismiss-tip-fn (:first-edit-tip-cb data)}))))))

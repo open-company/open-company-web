@@ -11,7 +11,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.oc-colors :as oc-colors]
             [open-company-web.lib.responsive :as responsive]
-            [open-company-web.components.growth.utils :as growth-utils]
+            [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.topic-edit :refer (topic-edit)]
@@ -83,7 +83,7 @@
           image-header        (:image-url topic-data)
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
-          topic-body          (:body topic-data)
+          topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
           truncated-body      (if (utils/is-test-env?) topic-body (.truncate js/$ topic-body (clj->js {:length 500 :words true})))]
       (dom/div #js {:className "topic-internal group"
                     :onClick (partial fullscreen-topic owner nil false)
@@ -107,7 +107,7 @@
           (dom/div {:class "topic-title"} (:title topic-data))
           (when (and show-fast-editing
                    (responsive/can-edit?)
-                   (not (responsive/is-mobile))
+                   (not (responsive/is-mobile-size?))
                    (not (:read-only topic-data))
                    (not sharing-mode)
                    (not (:foce-active data)))
@@ -198,6 +198,7 @@
       (animate-revision-navigation owner)))
 
   (render-state [_ {:keys [editing as-of actual-as-of transition-as-of] :as state}]
+
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -253,7 +254,8 @@
                                       :foce-key (:foce-key data)
                                       :foce-data (:foce-data data)
                                       :prev-rev prev-rev
-                                      :next-rev next-rev}
+                                      :next-rev next-rev
+                                      :show-first-edit-tip (:show-first-edit-tip data)}
                                      {:opts (merge options {:rev-click rev-cb})
                                       :key (str "topic-foce-" section)})
                 (om/build topic-internal {:section section

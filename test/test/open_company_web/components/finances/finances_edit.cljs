@@ -5,7 +5,7 @@
               [om.core :as om :include-macros true]
               [dommy.core :as dommy :refer-macros (sel1 sel)]
               [open-company-web.components.finances.finances-edit :refer (finances-edit)]
-              [open-company-web.components.finances.utils :as finances-utils]
+              [open-company-web.lib.finance-utils :as finance-utils]
               [om.dom :as dom :include-macros true]
               [open-company-web.data.company :refer (company)]
               [open-company-web.router :as router]
@@ -18,7 +18,7 @@
 
 (def fixed-company-data (utils/fix-sections company))
 
-(def map-finances-data (finances-utils/map-placeholder-data (:data (:finances fixed-company-data))))
+(def map-finances-data (finance-utils/map-placeholder-data (:data (:finances fixed-company-data))))
 
 (def test-atom {
   :finances-data map-finances-data

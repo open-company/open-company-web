@@ -17,7 +17,7 @@
           (dom/div {:class "left-column"}
             (dom/div {:class "user-profile-name-title data-title"} "NAME")
             (dom/div {:class "user-profile-name"} (jwt/get-key :real-name))
-            (dom/div {:class "user-profile-org-title data-title"} "ORGANIZATION")
+            (dom/div {:class "user-profile-org-title data-title"} "SLACK ORGANIZATION")
             (dom/div {:class "user-profile-org"} (jwt/get-key :org-name))
             (dom/div {:class "user-profile-email-title data-title"} "EMAIL")
             (dom/div {:class "user-profile-email"} (jwt/get-key :email)))
@@ -26,5 +26,5 @@
             (when (jwt/get-key :avatar)
               (dom/img {:class "user-profile-avatar" :src (jwt/get-key :avatar)}))))
         (dom/div {:class "user-profile-disclaimer"}
-          "This information is from your Slack account – use Slack to update your profile."))
+          "User information is from your Slack account."))
       (om/build footer data))))
