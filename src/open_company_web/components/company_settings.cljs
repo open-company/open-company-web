@@ -3,6 +3,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel1)]
             [rum.core :as rum]
             [clojure.string :as string]
             [open-company-web.local-settings :as ls]
@@ -119,6 +120,23 @@
      :currency (or (:currency current-state) (:currency company-data))
      :loading false}))
 
+(defn- upload-file! [owner file]
+  (let [success-cb  (fn [success]
+                      (let [url    (.-url success)]
+                        (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil
+                                                                          :file-upload-progress nil
+                                                                          :logo url}))))
+        error-cb    (fn [error] (js/console.log "error" error))
+        progress-cb (fn [progress]
+                      (let [state (om/get-state owner)]
+                        (om/set-state! owner (merge state {:file-upload-state :show-progress
+                                                           :file-upload-progress progress}))))]
+    (cond
+      (and (string? file) (not (string/blank? file)))
+      (js/filepicker.storeUrl file success-cb error-cb progress-cb)
+      file
+      (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
+
 (defcomponent company-settings-form [data owner]
 
   (init-state [_]
@@ -127,8 +145,15 @@
   (will-receive-props [_ next-props]
     (om/set-state! owner (get-state next-props nil)))
 
+  (did-mount [_]
+    (when-not (utils/is-test-env?)
+      (js/filepicker.setKey ls/filestack-key)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+
   (render-state [_ {company-uuid :uuid company-name :company-name logo :logo
-                    currency :currency loading :loading}]
+                    currency :currency loading :loading
+                    file-upload-state :file-upload-state upload-remote-url :upload-remote-url
+                    file-upload-progress :file-upload-progress}]
     (let [slug (keyword (router/current-company-slug))]
 
       (utils/update-page-title (str "OpenCompany - " company-name))
@@ -155,13 +180,58 @@
 
           ;; Company logo
           (dom/div {:class "small-caps bold mb1"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
-          (dom/input {:type "text"
-                      :value logo
-                      :id "logo"
-                      :class "npt col-10 p1 mb3"
-                      :maxLength 255
-                      :on-change #(om/set-state! owner :logo (.. % -target -value))
-                      :placeholder "http://example.com/logo.png"})
+          (dom/div {}
+            (if (not= file-upload-state :show-url-field)
+              (dom/input {:type "text"
+                          :value logo
+                          :id "logo"
+                          :class "npt col-10 p1 mb3"
+                          :maxLength 255
+                          :disabled true
+                          :style {:margin-bottom "2px"}
+                          :on-change #(om/set-state! owner :logo (.. % -target -value))
+                          :placeholder "http://example.com/logo.png"})
+              (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
+                  (dom/input {:type "text"
+                              :class "npt col-7 p1 mb3"
+                              :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
+                              :placeholder "http://site.com/img.png"
+                              :value upload-remote-url})
+                  (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                               :class "btn-reset btn-solid"
+                               :disabled (string/blank? upload-remote-url)
+                               :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
+                    "add")
+                  (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                               :class "btn-reset btn-outline"
+                               :on-click #(om/set-state! owner :file-upload-state nil)}
+                    "cancel"))))
+          (dom/div {:class "group"
+                    :style {:margin-bottom "10px"}}
+            (dom/input {:id "foce-file-upload-ui--select-trigger"
+                        :style {:display "none"}
+                        :type "file"
+                        :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
+            (dom/button {:class "btn-reset camera left"
+                         :title "Upload a logo"
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :style {:display (if (nil? file-upload-state) "block" "none")}
+                         :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
+              (dom/i {:class "fa fa-camera"}))
+            (dom/button {:class "btn-reset image-url left"
+                         :title "Provide an image link"
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :style {:display (if (nil? file-upload-state) "block" "none")}
+                         :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
+              (dom/i {:class "fa fa-code"}))
+            (dom/div {:class "left"
+                      :style {:display (if (= file-upload-state :show-progress) "block" "none")
+                              :color "rgba(78, 90, 107, 0.5)"}}
+              (str file-upload-progress "%")))
 
           ;; Currency
           (dom/div {:class "small-caps bold mb1"} "DISPLAY FINANCE & GROWTH CHART CURRENCY AS")
