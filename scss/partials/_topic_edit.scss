@@ -117,7 +117,7 @@ div.topic {
 
       &:hover {
         button.topic-pencil-button {
-          opacity: 0.8;
+          opacity: 0.5;
         }
       }
 
@@ -127,6 +127,10 @@ div.topic {
         right: 10px;
         opacity: 0;
         transition: 230ms;
+
+        &:hover {
+          color: rgba(78,90,107,1);
+        }
       }
 
       div.topic-headline-inner {
@@ -281,6 +285,10 @@ div.topic {
           margin-bottom: 5px;
           color: rgba(78, 90, 107, 0.5);
           font-size: 15px;
+
+          &:hover {
+            color: rgba(78,90,107,1);
+          }
         }
 
         button.left {

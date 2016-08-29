@@ -12,9 +12,9 @@
             [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.ui.icon :as i]
+            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
-            [open-company-web.components.tooltip :refer (tooltip)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -76,9 +76,6 @@
   (let [company-data (dis/company-data (om/get-props owner))]
     (->> section keyword (get company-data) :title)))
 
-(defn filter-placeholder-sections [sections company-data]
-  (filter #(not (->> % keyword (get company-data) :placeholder)) sections))
-
 (defcomponent su-snapshot-preview [data owner options]
 
   (init-state [_]
@@ -86,7 +83,7 @@
           su-data (stakeholder-update-data data)
           su-sections (if (empty? (:sections su-data))
                         (flatten (vals (:sections company-data)))
-                        (filter-placeholder-sections (:sections su-data) company-data))]
+                        (utils/filter-placeholder-sections (:sections su-data) company-data))]
       {:columns-num (responsive/columns-num)
        :su-topics su-sections
        :title-focused false
@@ -110,7 +107,7 @@
             su-data      (stakeholder-update-data next-props)
             su-sections  (if (empty? (:sections su-data))
                            (flatten (vals (:sections company-data)))
-                           (filter-placeholder-sections (:sections su-data) company-data))]
+                           (utils/filter-placeholder-sections (:sections su-data) company-data))]
         (om/set-state! owner :su-topics su-sections)))
     ; share via link
     (when (om/get-state owner :link-loading)
@@ -143,17 +140,17 @@
           ww           (.-clientWidth (sel1 js/document :body))
           total-width  (if (> ww 413) (str (min ww (+ card-width 100)) "px") "auto")
           su-subtitle  (str "— " (utils/date-string (js/Date.) [:year]))
-          possible-sections (filter-placeholder-sections (flatten (vals (:sections company-data))) company-data)
+          possible-sections (utils/filter-placeholder-sections (flatten (vals (:sections company-data))) company-data)
           topics-to-add (sort #(compare (title-from-section-name owner %1) (title-from-section-name owner %2)) (reduce utils/vec-dissoc possible-sections su-topics))]
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
                                          :main-scroll true})}
         (when (and (seq company-data)
                    (empty? (:sections su-data))
                    (not su-tooltip-dismissed))
-          (om/build tooltip {:cta "THIS IS A PREVIEW OF YOUR UPDATE. DRAG TOPICS TO REORDER, OR CLICK THE X TO REMOVE A TOPIC."}
-                            {:opts {:dismiss-tooltip #(do
-                                                       (om/set-state! owner :su-tooltip-dismissed true)
-                                                       (.focus (sel1 [:input#su-snapshot-preview-title])))}}))
+          (om/build onboard-tip {:cta "THIS IS A PREVIEW OF YOUR UPDATE. DRAG TOPICS TO REORDER, OR CLICK THE X TO REMOVE A TOPIC."}
+                                {:opts {:dismiss-tooltip #(do
+                                                           (om/set-state! owner :su-tooltip-dismissed true)
+                                                           (.focus (sel1 [:input#su-snapshot-preview-title])))}}))
         (om/build menu data)
         (dom/div {:class "page snapshot-page"}
           (dom/div {:class "su-snapshot-header"}

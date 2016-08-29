@@ -43,12 +43,9 @@
 (defn win-width [columns]
   (let [ww (.-clientWidth (sel1 js/document :body))]
     (case columns
-      3
-      (max (min ww c3-max-win-width) c3-min-win-width)
-      2
-      (max (min ww c2-max-win-width) c2-min-win-width)
-      1
-      (max (min ww c1-max-win-width) c1-min-win-width))))
+      3 (max (min ww c3-max-win-width) c3-min-win-width)
+      2 (max (min ww c2-max-win-width) c2-min-win-width)
+      1 (max (min ww c1-max-win-width) c1-min-win-width))))
 
 (defn get-min-win-width [columns]
   (case columns
@@ -121,6 +118,6 @@
 
 (defn fullscreen-topic-width [card-width]
   (let [ww (.-clientWidth (sel1 js/document :body))]
-    (if (> ww 575)
-      575
+    (if (> ww big-web-min-width)
+      big-web-min-width
       (min card-width ww))))

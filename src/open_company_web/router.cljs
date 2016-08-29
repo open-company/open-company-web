@@ -82,6 +82,9 @@
 (defn current-section []
   (:section @path))
 
+(defn query-params []
+  (:query-params @path))
+
 (defn section-editing? []
   (some #(= "edit" %) (:route @path)))
 

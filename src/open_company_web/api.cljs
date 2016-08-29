@@ -100,7 +100,7 @@
 
 (defn patch-company [slug data]
   (when data
-    (let [company-data (dissoc data :links :read-only :revisions :su-list :su-list-loaded)
+    (let [company-data (dissoc data :links :read-only :revisions :su-list :su-list-loaded :revisions :section)
           json-data (cljs->json company-data)
           links (:links (dispatcher/company-data))
           company-link (utils/link-for links "partial-update" "PATCH")]
@@ -201,7 +201,7 @@
   (when finances-data
     (let [links (:links finances-data)
           slug (router/current-company-slug)
-          data {:data (map #(dissoc % :burn-rate :runway :avg-burn-rate :value :new :read-only) (:data finances-data))}
+          data {:data (map #(dissoc % :burn-rate :runway :value :new :read-only) (:data finances-data))}
           json-data (cljs->json data)
           finances-link (utils/link-for links "partial-update" "PATCH")]
       (api-patch (:href finances-link)
@@ -215,26 +215,6 @@
           (let [body (if (:success response) (json->cljs (:body response)) {})
                 dispatch-body {:body (merge {:section :finances} body)
                                :section :finances
-                               :slug (keyword slug)}]
-            (dispatcher/dispatch! [:section dispatch-body])))))))
-
-(defn patch-section-notes [notes-data links section]
-  (when notes-data
-    (let [slug (router/current-company-slug)
-          clean-notes-data (dissoc notes-data :author :updated-at)
-          json-data (cljs->json {:notes notes-data})
-          section-link (utils/link-for links "partial-update" "PATCH")]
-      (api-patch (:href section-link)
-        { :json-params json-data
-          :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (:type section-link)}}
-        (fn [response]
-          (let [body (if (:success response) (json->cljs (:body response)) {})
-                dispatch-body {:body (merge {:section section} body)
-                               :section section
                                :slug (keyword slug)}]
             (dispatcher/dispatch! [:section dispatch-body])))))))
 

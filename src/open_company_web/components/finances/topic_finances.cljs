@@ -1,61 +1,35 @@
 (ns open-company-web.components.finances.topic-finances
-  (:require [om.core :as om :include-macros true]
+  (:require [clojure.string :as s]
+            [om.core :as om :include-macros true]
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.dispatcher :as dispatcher]
+            [open-company-web.lib.oc-colors :as occ]
             [open-company-web.components.finances.utils :as finances-utils]
-            [open-company-web.components.finances.cash :refer (cash)]
-            [open-company-web.components.finances.cash-flow :refer (cash-flow)]
-            [open-company-web.components.finances.costs :refer (costs)]
-            [open-company-web.components.finances.runway :refer (runway)]
+            [open-company-web.components.ui.d3-chart :refer (d3-chart)]
             [open-company-web.lib.utils :as utils]))
 
-(defn get-state [owner data & [initial]]
-  (let [section-data (:section-data data)]
-    {:focus (if initial
-              (or (:selected-metric data) "cash")
-              (om/get-state owner :focus))
-     :finances-data (finances-utils/map-placeholder-data (:data section-data))}))
-
-(defn pillbox-click [owner options e]
-  (.preventDefault e)
-  (let [tab  (.. e -target -dataset -tab)]
-    (when (fn? (:switch-metric-cb options))
-      ((:switch-metric-cb options) tab))
-    (om/update-state! owner :focus (fn [] tab)))
-  (.stopPropagation e))
-
-(defn has-revenues-or-costs [finances-data]
+(defn- has-revenues-or-costs [finances-data]
   (some #(or (not (zero? (:revenue %))) (not (zero? (:costs %)))) finances-data))
 
-(defn render-pillboxes [owner options]
-  (let [data (om/get-props owner)
-        section-data (:section-data data)
-        focus (om/get-state owner :focus)
-        classes "pillbox"
-        cash-classes (str classes (when (= focus "cash") " active"))
-        cash-flow-classes (str classes (when (= focus "cash-flow") " active"))
-        runway-classes (str classes (when (= focus "runway") " active"))
-        finances-row-data (:data section-data)
-        sum-revenues (apply + (map :revenue finances-row-data))
-        needs-runway (some #(neg? (:runway %)) finances-row-data)
-        first-title (if (pos? sum-revenues) "Cash flow" "Burn rate")
-        needs-cash-flow (has-revenues-or-costs finances-row-data)]
-    (dom/div {:class "pillbox-container finances"}
-      (dom/label {:class cash-classes
-                  :title "Cash"
-                  :data-tab "cash"
-                  :on-click (partial pillbox-click owner options)} "Cash")
-      (when needs-cash-flow
-        (dom/label {:class cash-flow-classes
-                    :title first-title
-                    :data-tab "cash-flow"
-                    :on-click (partial pillbox-click owner options)} first-title))
-      (when needs-runway
-        (dom/label {:class runway-classes
-                    :title "Runway"
-                    :data-tab "runway"
-                    :on-click (partial pillbox-click owner options)} "Runway")))))
+(defn- get-currency-label [cur-symbol selected-key data]
+  (let [value (get data selected-key)
+        abs-value (utils/abs (or value 0))
+        short-value (utils/with-metric-prefix abs-value)]
+    (str cur-symbol short-value)))
+
+(defn- get-runway-label [selected-key data]
+  (let [value (get data selected-key)
+        ten-years (* -1 10 365)]
+    (cond
+      (or (s/blank? value) (= value 0)) "-"
+      (<= value ten-years) ">9yrs"
+      (neg? value) (finances-utils/get-rounded-runway value [:round :short])
+      :else "-")))
+
+(defn- get-state [owner data & [initial]]
+  (let [section-data (:section-data data)]
+    {:finances-data (finances-utils/map-placeholder-data (:data section-data))}))
 
 (defcomponent topic-finances [{:keys [section section-data currency] :as data} owner options]
 
@@ -63,35 +37,77 @@
     (get-state owner data true))
 
   (will-update [_ next-props _]
-    ; this means the section datas have changed from the API or at a upper lever of this component
+    ; this means the section datas have changed from the API or at a parent of this component
     (when-not (= next-props data)
       (om/set-state! owner (get-state owner next-props))))
 
-  (render-state [_ {:keys [focus] :as state}]
+  (render-state [_ state]
     (let [finances-row-data (:data section-data)
-          no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))
-          sum-revenues (apply + (map :revenue finances-row-data))
-          subsection-data {:section-data section-data
-                           :read-only true
-                           :currency currency}
-          subsection-options {:opts options}]
+          no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))]
+
       (when-not no-data
-        (dom/div {:class "section-container" :id "section-finances"}
-          (dom/div {:class "composed-section finances group"}
-            (when (:pillboxes-first options)
-              (render-pillboxes owner options))
-            (dom/div {:class (utils/class-set {:composed-section-body true})}
-              (case focus
+        (let [fixed-finances-data (finances-utils/fill-gap-months finances-row-data)
+              sort-pred (utils/sort-by-key-pred :period)
+              sorted-finances (sort sort-pred (vals fixed-finances-data))          
+              sum-revenues (apply + (map utils/abs (map :revenue finances-row-data)))
+              cur-symbol (utils/get-symbol-for-currency-code currency)
+              chart-opts {:chart-type "bordered-chart"
+                          :chart-height 112
+                          :chart-width (:width (:chart-size options))
+                          :chart-keys [:costs]
+                          :interval "monthly"
+                          :x-axis-labels true
+                          :svg-click #(when (:topic-click options) ((:topic-click options) nil))
+                          :chart-colors {:costs (occ/get-color-by-kw :oc-red-regular)
+                                         :revenue (occ/get-color-by-kw :oc-green-regular)}
+                          :chart-selected-colors {:costs (occ/get-color-by-kw :oc-red-regular)
+                                                  :revenue (occ/get-color-by-kw :oc-green-regular)}
+                          :chart-fill-polygons false
+                          :hide-nav (:hide-nav options)}
+              labels {:costs {:value-presenter (partial get-currency-label cur-symbol)
+                              :value-color (occ/get-color-by-kw :oc-red-regular)
+                              :label-presenter (if (pos? sum-revenues) #(str "EXPENSES") #(str "BURN"))
+                              :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)} 
+                      :cash {:value-presenter (partial get-currency-label cur-symbol)
+                             :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
+                             :label-presenter #(str "CASH")
+                             :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)} 
+                      :runway {:value-presenter (partial get-runway-label)
+                               :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
+                               :label-presenter #(str "RUNWAY")
+                               :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}}]
 
-                "cash"
-                (om/build cash subsection-data subsection-options)
+          (dom/div {:class "section-container" :id "section-finances"}          
 
-                "cash-flow"
-                (if (pos? sum-revenues)
-                  (om/build cash-flow subsection-data subsection-options)
-                  (om/build costs subsection-data subsection-options))
+            (dom/div {:class "composed-section finances group"}
 
-                "runway"
-                (om/build runway subsection-data subsection-options)))
-            (when-not (:pillboxes-first options)
-              (render-pillboxes owner options))))))))
+              ;; has the company ever had revenue?
+              (if (pos? sum-revenues)
+                ;; post-revenue gets an additional revenue label, 4 total labels in 2 rows
+                (let [revenue-labels (merge labels {:revenue {:position :top
+                                                              :order 1
+                                                              :value-presenter (partial get-currency-label cur-symbol)
+                                                              :value-color (occ/get-color-by-kw :oc-green-regular)
+                                                              :label-presenter #(str "REVENUE")
+                                                              :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}})
+                      ordered-labels (-> revenue-labels
+                                      (assoc-in [:costs :position] :top)
+                                      (assoc-in [:costs :order] 2)
+                                      (assoc-in [:cash :position] :bottom)
+                                      (assoc-in [:cash :order] 1)
+                                      (assoc-in [:runway :position] :bottom)
+                                      (assoc-in [:runway :order] 2))]
+                  (om/build d3-chart {:chart-data sorted-finances}
+                                     {:opts (merge chart-opts {:labels ordered-labels
+                                                               :chart-keys [:costs :revenue]})}))
+
+                ;; pre-revenue gets just 3 labels in 1 row
+                (let [ordered-labels (-> labels
+                                      (assoc-in [:cash :position] :bottom)
+                                      (assoc-in [:cash :order] 1)
+                                      (assoc-in [:costs :position] :bottom)
+                                      (assoc-in [:costs :order] 2)
+                                      (assoc-in [:runway :position] :bottom)
+                                      (assoc-in [:runway :order] 3))]
+                  (om/build d3-chart {:chart-data sorted-finances}
+                                     {:opts (merge chart-opts {:labels ordered-labels})}))))))))))

@@ -15,9 +15,9 @@
         value (keyw obj)
         label (if has-value
                 (if (and (= keyw :runway) (zero? value))
-                  "Break-even"
+                  "-"
                   (str (utils/get-period-string (:period obj)) " " column-name ": " prefix (utils/thousands-separator (keyw obj)) suffix))
-                "N/A")
+                "-")
         period (utils/get-period-string (:period obj) "monthly" [:short])]
     [period
      value
@@ -35,8 +35,7 @@
     :costs nil
     :revenue nil
     :burn-rate nil
-    :runway nil
-    :avg-burn-rate nil}))
+    :runway nil}))
 
 (defn chart-placeholder-data [initial-data]
   (when (seq initial-data)
@@ -66,8 +65,9 @@
                            (placeholder-data prev-period {:new true}))))]
       (vec fixed-data))))
 
-(defn- get-chart-data [data prefix keyw column-name & [style fill-color pattern tooltip-suffix]]
+(defn- get-chart-data
   "Vector of max *(count fixed-data) elements of [:Label value]"
+  [data prefix keyw column-name & [style fill-color pattern tooltip-suffix]]
   (let [fixed-data (chart-placeholder-data data)
         chart-data (partial chart-data-at-index fixed-data keyw column-name prefix tooltip-suffix)
         placeholder-vect (vec (range (count fixed-data)))
@@ -100,9 +100,10 @@
     (utils/abs runway)
     0))
 
-(defn remove-trailing-zero [string]
+(defn remove-trailing-zero
   "Remove the last zero(s) in a numeric string only after the dot.
    Remote the dot too if it is the last char after removing the zeros"
+  [string]
   (cond
 
     (and (not= (.indexOf string ".") -1) (= (last string) "0"))
@@ -115,7 +116,7 @@
     string))
 
 (defn day-label [& [flags]]
- "day")
+  "day")
 
 (defn week-label [flags]
   (if (utils/in? flags :short)
@@ -124,7 +125,7 @@
 
 (defn month-label [flags]
  (if (utils/in? flags :short)
-    "mnth"
+    "mo"
     "month"))
 
 (defn year-label [flags]
@@ -138,16 +139,17 @@
     ""))
 
 (defn get-rounded-runway [runway-days & [flags]]
-  (let [abs-runway-days (utils/abs runway-days)]
+  (let [spacer (if (utils/in? flags :short) "" " ")
+        abs-runway-days (utils/abs runway-days)]
     (cond
       ; days
       (< abs-runway-days 7)
       (let [days (int abs-runway-days)]
-        (str days " " (day-label flags) (pluralize days)))
+        (str days spacer (day-label flags) (pluralize days)))
       ; weeks
       (< abs-runway-days (* 30 3))
       (let [weeks (int (/ abs-runway-days 7))]
-        (str weeks " " (week-label flags) (pluralize weeks)))
+        (str weeks spacer (week-label flags) (pluralize weeks)))
       ; months
       (< abs-runway-days (* 30 12))
       (if (utils/in? flags :round)
@@ -155,9 +157,9 @@
               fixed-months (if (utils/in? flags :remove-trailing-zero)
                              (remove-trailing-zero (str months))
                              (str months))]
-          (str fixed-months " " (month-label flags) (pluralize months)))
+          (str fixed-months spacer (month-label flags) (pluralize months)))
         (let [months (quot abs-runway-days 30)]
-          (str months " " (month-label flags) (pluralize months))))
+          (str months spacer (month-label flags) (pluralize months))))
       ; years
       :else
       (if (utils/in? flags :round)
@@ -165,12 +167,12 @@
               fixed-years (if (utils/in? flags :remove-trailing-zero)
                             (remove-trailing-zero (str years))
                             (str years))]
-          (str fixed-years " " (year-label flags) (pluralize years)))
+          (str fixed-years spacer (year-label flags) (pluralize years)))
         (let [years (quot abs-runway-days (* 30 12))]
-          (str years " " (year-label flags) (pluralize years)))))))
+          (str years spacer (year-label flags) (pluralize years)))))))
 
-(defn finances-data-map [finances-data-coll]
-  (apply merge (map #(hash-map (:period %) %) finances-data-coll)))
+(defn finances-data-map [finances-data]
+  (apply merge (map #(hash-map (:period %) %) finances-data)))
 
 (defn fill-gap-months [finances-data]
   (let [data-map (finances-data-map finances-data)
