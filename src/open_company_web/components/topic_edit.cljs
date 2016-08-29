@@ -177,13 +177,22 @@
     "Add an image"
     "Replace image"))
 
+(defn add-protocol-if-needed []
+  (let [medium-editor-toolbar-input (sel1 [:input.medium-editor-toolbar-input])
+        url-val (.-value medium-editor-toolbar-input)]
+    (when-not (string/starts-with? url-val "http")
+      (set! (.-value medium-editor-toolbar-input) (str "http://" url-val)))))
+
 (defn body-clicked [e]
   (when-let [medium-editor-toolbar-save (sel1 [:a.medium-editor-toolbar-save])]
     (when (utils/event-inside? e medium-editor-toolbar-save)
-      (let [medium-editor-toolbar-input (sel1 [:input.medium-editor-toolbar-input])
-            url-val (.-value medium-editor-toolbar-input)]
-        (when-not (string/starts-with? url-val "http")
-          (set! (.-value medium-editor-toolbar-input) (str "http://" url-val)))))))
+      (add-protocol-if-needed))))
+
+(defn body-keypress [e]
+  (when-let [medium-editor-toolbar-input (sel1 [:input.medium-editor-toolbar-input])]
+    (when (and (= (.-keyCode e) 13)
+               (utils/event-inside? e medium-editor-toolbar-input))
+      (add-protocol-if-needed))))
 
 (defcomponent topic-edit [{:keys [show-first-edit-tip
                                   currency
@@ -224,7 +233,10 @@
         (om/set-state! owner :history-listener-id nil))
       (when (om/get-state owner :body-click-listener)
         (events/unlistenByKey (om/get-state owner :body-click-listener))
-        (om/set-state! owner :body-click-listener nil))))
+        (om/set-state! owner :body-click-listener nil))
+      (when (om/get-state owner :body-keypress-listener)
+        (events/unlistenByKey (om/get-state owner :body-keypress-listener))
+        (om/set-state! owner :body-keypress-listener nil))))
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -241,7 +253,11 @@
       (let [body-click-listener (events/listen (.-body js/document)
                                                EventType/MOUSEDOWN
                                                body-clicked)]
-        (om/set-state! owner :body-click-listener body-click-listener))))
+        (om/set-state! owner :body-click-listener body-click-listener))
+      (let [body-keypress-listener (events/listen (.-body js/document)
+                                                  EventType/KEYDOWN
+                                                  body-keypress)]
+        (om/set-state! owner :body-keypress-listener body-keypress-listener))))
 
   (did-update [_ _ prev-state]
     (let [section           (dis/foce-section-key)
