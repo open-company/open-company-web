@@ -222,6 +222,7 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
+                                                 :draggable-topic (:pin topic-data)
                                                  :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
                     :ref "topic"
@@ -234,6 +235,9 @@
             (dom/button {:class "btn-reset share-remove"
                          :on-click #(when (contains? options :share-remove-click) ((:share-remove-click options) (name section)))}
               (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.5)" :size 12 :stroke 4 :accent-color "rgba(78, 90, 107, 0.5)"}))))
+        (when (:pin topic-data)
+          (dom/div {:class "pinned-topic"}
+            (dom/i {:class "fa fa-thumb-tack"})))
         (dom/div #js {:className "topic-anim group"
                       :key (str "topic-anim-" as-of "-" transition-as-of)
                       :ref "topic-anim"}

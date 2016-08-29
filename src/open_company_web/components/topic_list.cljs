@@ -187,7 +187,7 @@
                               :forcePlaceholderSize true
                               :placeholder "topic-list-sortable-placeholder"
                               :items ".topic-row"
-                              :handle ".topic"
+                              :handle ".draggable-topic"
                               :stop #()
                               :opacity 1})))
 
