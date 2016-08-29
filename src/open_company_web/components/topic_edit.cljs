@@ -177,6 +177,11 @@
     "Add an image"
     "Replace image"))
 
+(defn- pin-tooltip [pinned]
+  (if pinned
+    "Unpin this topic"
+    "Pin this topic"))
+
 (defcomponent topic-edit [{:keys [show-first-edit-tip
                                   currency
                                   prev-rev
@@ -230,10 +235,15 @@
           topic-data        (dis/foce-section-data)
           image-header      (:image-url topic-data)
           add-image-tooltip (add-image-tooltip image-header)
-          add-image-el      (js/$ (gdom/getElementByClass "camera"))]
+          add-image-el      (js/$ (gdom/getElementByClass "camera"))
+          pin-image         (js/$ (gdom/getElementByClass "pin-button"))]
       (doto add-image-el
         (.tooltip "hide")
         (.attr "data-original-title" add-image-tooltip)
+        (.tooltip "fixTitle"))
+      (doto pin-image
+        (.tooltip "hide")
+        (.attr "data-original-title" (pin-tooltip (:pin topic-data)))
         (.tooltip "fixTitle"))))
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
@@ -344,6 +354,14 @@
                          :style {:display (if (nil? file-upload-state) "block" "none")}
                          :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
                 (dom/i {:class "fa fa-code"}))
+            (dom/button {:class "btn-reset pin-button right"
+                         :title (pin-tooltip (:pin topic-data))
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :style {:display (if (nil? file-upload-state) "block" "none")}
+                         :on-click #(dis/dispatch! [:foce-input {:pin (not (:pin topic-data))}])}
+                (dom/i {:class (str "fa fa-thumb-tack" (if (:pin topic-data) " pinned" ""))}))
             (when-not (:placeholder topic-data)
               (dom/button {:class "btn-reset archive-button right"
                            :title "Archive this topic"

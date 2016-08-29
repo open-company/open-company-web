@@ -268,6 +268,14 @@ div.topic {
           }
         }
 
+        button.pin-button i:not(.pinned) {
+          transform: rotate(0deg);
+        }
+
+        button.pin-button i.pinned {
+          transform: rotate(25deg);
+        }
+
         span.file-upload-progress {
           margin-top: 7px;
           padding-bottom: 0px;
