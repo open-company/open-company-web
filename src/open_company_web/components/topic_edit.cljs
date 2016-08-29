@@ -226,7 +226,7 @@
                       (partial handle-navigate-event current-token owner))]
         (om/set-state! owner :history-listener-id listener))))
 
-  (did-update [_ _ _]
+  (did-update [_ _ prev-state]
     (let [section           (dis/foce-section-key)
           topic-data        (dis/foce-section-data)
           image-header      (:image-url topic-data)
@@ -235,7 +235,12 @@
       (doto add-image-el
         (.tooltip "hide")
         (.attr "data-original-title" add-image-tooltip)
-        (.tooltip "fixTitle"))))
+        (.tooltip "fixTitle")))
+    (let [file-upload-state (om/get-state owner :file-upload-state)
+          old-file-upload-state (:file-upload-state prev-state)]
+      (when (and (= file-upload-state :show-url-field)
+                 (not= old-file-upload-state :show-url-field))
+        (.focus (sel1 [:input.upload-remote-url-field])))))
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
                            file-upload-state file-upload-progress upload-remote-url negative-headline-char-count
