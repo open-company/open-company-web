@@ -181,6 +181,16 @@
      :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
      :show-share-tooltip (or (:show-share-tooltip current-state) false)}))
 
+(defn setup-sortable [owner]
+  (when-let [list-node (js/jQuery (sel1 [:div.topics-column-container]))]
+    (.sortable list-node #js {:scroll true
+                              :forcePlaceholderSize true
+                              :placeholder "topic-list-sortable-placeholder"
+                              :items ".topic-row"
+                              :handle ".topic"
+                              :stop #()
+                              :opacity 1})))
+
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
@@ -200,7 +210,8 @@
     (when (and (not (utils/is-test-env?))
                (not (responsive/user-agent-mobile?)))
       (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))]
-        (om/set-state! owner :kb-listener kb-listener))))
+        (om/set-state! owner :kb-listener kb-listener))
+      (setup-sortable owner)))
 
   (will-unmount [_]
     (when (and (not (utils/is-test-env?))
