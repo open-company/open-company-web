@@ -226,6 +226,17 @@ div.topic {
       div.topic-foce-footer {
         width: 100%;
 
+        div.upload-remote-url-container{
+          width: 100%;
+
+          input.upload-remote-url-field {
+            height: 32px;
+            margin-top: 1px;
+            outline: none;
+            border: 1px solid rgba(78, 90, 107, 0.5);
+          }
+        }
+
         div.topic-foce-footer-left {
           float: left;
           height: 41px;

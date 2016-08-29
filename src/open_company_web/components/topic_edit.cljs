@@ -179,6 +179,7 @@
 
 (defcomponent topic-edit [{:keys [show-first-edit-tip
                                   currency
+                                  card-width
                                   prev-rev
                                   next-rev]} owner options]
 
@@ -360,7 +361,8 @@
             (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))
                       :style {:display (if file-upload-state "block" "none")}}
               (dom/input {:type "text"
-                          :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
+                          :class "upload-remote-url-field"
+                          :style {:width (str (- card-width 122 50) "px")}
                           :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
                           :placeholder "http://site.com/img.png"
                           :value upload-remote-url})
