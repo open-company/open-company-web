@@ -140,7 +140,7 @@
   (let [columns-num (:columns-num data)
         company-data (dis/company-data)
         show-add-topic (add-topic? owner)
-        {:keys [pinned other]} (utils/get-pinned-other-keys company-data)
+        {:keys [pinned other]} (utils/get-pinned-other-keys (utils/get-section-keys company-data) company-data)
         final-layout (loop [idx 0
                             layout (get-pinned-layout pinned columns-num)]
                         (let [shortest-column (get-shortest-column owner data layout)
@@ -225,36 +225,50 @@
           (dom/div {:class "topics-column-container group"
                     :style #js {:width total-width}}
             (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
-              (let [column (get best-layout kw)]
+              (let [column (get best-layout kw)
+                    {:keys [pinned other]} (utils/get-pinned-other-keys column (dis/company-data))]
                 (dom/div {:class (str "topics-column col-" (name kw))
                           :style #js {:width (str card-width "px")}}
-                  (when (pos? (count column))
-                    (for [idx (range (count column))
-                      :let [section-kw (get column idx)
-                            section-name (name section-kw)]]
-                      (partial-render-topic section-name
-                                            (when (= section-name "add-topic") (int (name kw))))))
-                  (when (and show-add-topic
-                             (= kw :1)
-                             (= (count topics) 0))
-                    (partial-render-topic "add-topic" 1))
-                  (when (and show-add-topic
-                             (= kw :2)
-                             (or (and (= (count topics) 1)
-                                      (= columns-num 3))
-                                 (and (>= (count topics) 1)
-                                      (= columns-num 2))))
-                    (partial-render-topic "add-topic" 2))
-                  (when (and show-add-topic
-                             (= kw :3)
-                             (>= (count topics) 2))
-                    (partial-render-topic "add-topic" 3))))))
+                  (dom/div #js {:className "topics-column-pinned"}
+                    (when (pos? (count pinned))
+                      (for [idx (range (count pinned))
+                            :let [section-kw (get pinned idx)
+                                  section-name (name section-kw)]]
+                        (partial-render-topic section-name
+                                              (when (= section-name "add-topic") (int (name kw)))))))
+                  (dom/div #js {:className "topics-column-other"}
+                    (when (pos? (count other))
+                      (for [idx (range (count other))
+                            :let [section-kw (get other idx)
+                                  section-name (name section-kw)]]
+                        (partial-render-topic section-name
+                                              (when (= section-name "add-topic") (int (name kw))))))
+                    (when (and show-add-topic
+                               (= kw :1)
+                               (= (count topics) 0))
+                      (partial-render-topic "add-topic" 1))
+                    (when (and show-add-topic
+                               (= kw :2)
+                               (or (and (= (count topics) 1)
+                                        (= columns-num 3))
+                                   (and (>= (count topics) 1)
+                                        (= columns-num 2))))
+                      (partial-render-topic "add-topic" 2))
+                    (when (and show-add-topic
+                               (= kw :3)
+                               (>= (count topics) 2))
+                      (partial-render-topic "add-topic" 3)))))))
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
                     :style #js {:width total-width}}
             (dom/div {:class "topics-column"}
-              (for [section (vec topics)]
-                (partial-render-topic (name section)))
-              (when show-add-topic
-                (partial-render-topic "add-topic" 1)))))))))
+              (let [{:keys [pinned other]} (utils/get-pinned-other-keys topics (dis/company-data))]
+                (dom/div #js {:className "topics-column-pinned"}
+                  (for [section pinned]
+                    (partial-render-topic (name section))))
+                (dom/div #js {:className "topics-column-other"}
+                  (for [section other]
+                    (partial-render-topic (name section)))
+                  (when show-add-topic
+                    (partial-render-topic "add-topic" 1)))))))))))
