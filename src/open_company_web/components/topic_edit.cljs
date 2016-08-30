@@ -182,6 +182,31 @@
     "Unpin this topic"
     "Pin this topic"))
 
+(defn- save-topic [owner]
+  (let [topic      (name (dis/foce-section-key))
+        topic-data (dis/foce-section-data)]
+    (when (and (not (om/get-state owner :initially-pinned))
+               (:pin topic-data))
+      ; needs to PATCH :sections to move the topic at the top of the unpinned topics
+      (let [company-data (dis/company-data)
+            sections     (vec (flatten (vals (:sections company-data))))
+            without-topic (utils/vec-dissoc sections topic)
+            last-pinned-idx (loop [last-pinned nil
+                                   idx 0]
+                              (println "   loop:" idx (get without-topic idx))
+                              (let [sec (get without-topic idx)
+                                    sec-data (->> sec keyword (get company-data))]
+                                (if (or (<= idx (count sections))
+                                        (:pin sec-data))
+                                  (recur sec (inc idx))
+                                  idx)))
+            with-pinned-topic (let [[before after] (split-at last-pinned-idx without-topic)]
+                                (vec (concat before topic after)))]
+        ;; TODO: save sections with the newly pinned section in the right spot
+        (println "sections:" sections "last-pinned-idx:" last-pinned-idx)
+        (println "insert" with-pinned-topic))))
+  (dis/dispatch! [:foce-save]))
+
 (defcomponent topic-edit [{:keys [show-first-edit-tip
                                   currency
                                   prev-rev
@@ -194,6 +219,7 @@
       {:initial-headline (utils/emojify (:headline topic-data))
        :body-placeholder (or (:body-placeholder topic-data) "")
        :initial-body  (utils/emojify (if (:placeholder topic-data) "" body))
+       :initially-pinned (:pin topic-data)
        :char-count nil
        :char-count-alert false
        :has-changes false
@@ -395,7 +421,7 @@
             (dom/div {:class "topic-foce-footer-right"}
               (dom/button {:class "btn-reset btn-solid"
                            :disabled (or (= file-upload-state :show-progress) negative-headline-char-count)
-                           :on-click #(dis/dispatch! [:foce-save])} "SAVE")
+                           :on-click #(save-topic owner)} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
                            :on-click #(do
                                         (utils/event-stop %)
