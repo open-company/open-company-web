@@ -206,7 +206,7 @@
                     :style #js {:width total-width}}
             (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
               (let [column (get best-layout kw)]
-                (dom/div {:class "topics-column"
+                (dom/div {:class (str "topics-column col-" (name kw))
                           :style #js {:width (str card-width "px")}}
                   (when (pos? (count column))
                     (for [idx (range (count column))
