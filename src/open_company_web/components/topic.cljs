@@ -184,6 +184,9 @@
      :actual-as-of (:updated-at section-data)
      :transition-as-of nil})
 
+  (did-mount [_]
+    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+
   (will-update [_ next-props _]
     (let [new-as-of (:updated-at (:section-data next-props))
           current-as-of (om/get-state owner :as-of)
@@ -237,7 +240,10 @@
               (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.5)" :size 12 :stroke 4 :accent-color "rgba(78, 90, 107, 0.5)"}))))
         (when (:pin topic-data)
           (dom/div {:class "pinned-topic"}
-            (dom/i {:class "fa fa-thumb-tack"})))
+            (dom/i {:class "fa fa-thumb-tack"
+                    :data-toggle "tooltip"
+                    :data-placement "top"
+                    :title "Drag and drop to reorder"})))
         (dom/div #js {:className "topic-anim group"
                       :key (str "topic-anim-" as-of "-" transition-as-of)
                       :ref "topic-anim"}
