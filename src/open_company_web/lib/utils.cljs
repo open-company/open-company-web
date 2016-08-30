@@ -299,6 +299,21 @@
   "Get the section names, as a vector of keywords, in category order and order in the category."
   (vec (map keyword (flatten (remove nil? (map #(get-in company-data [:sections (keyword %)]) (:categories company-data)))))))
 
+(defn get-pinned-other-keys [company-data]
+  (let [sections (get-section-keys company-data)]
+    (loop [pinned []
+           unpinned sections
+           idx 0]
+      (if (<= idx (count sections))
+        (let [sec (get sections idx)
+              sec-data (->> sec keyword (get company-data))
+              is-pinned (:pin sec-data)
+              next-pinned (if is-pinned (vec (conj pinned sec)) pinned)
+              next-unpinned (if is-pinned (vec (vec-dissoc unpinned sec)) unpinned)]
+          (recur next-pinned next-unpinned (inc idx)))
+        {:pinned pinned
+         :other unpinned}))))
+
 (defn link-for
   ([links rel] (some #(when (= (:rel %) rel) %) links))
   ([links rel method] (some #(when (and (= (:method %) method) (= (:rel %) rel)) %) links)))
