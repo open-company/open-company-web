@@ -200,13 +200,13 @@
     (api/patch-sections (vec (concat pinned-topics-list other-topics-list)))))
 
 (defn setup-sortable [owner]
-  (when-let [list-node (js/jQuery (sel [:div.topics-column]))]
+  (when-let [list-node (js/jQuery (sel [:div.topics-column-pinned]))]
     (.sortable list-node #js {:scroll true
                               :forcePlaceholderSize true
                               :placeholder "topic-list-sortable-placeholder"
-                              :items ".topic-row.draggable-topic"
+                              :items "div.topic-row.draggable-topic"
                               :handle ".draggable-topic"
-                              :connectWith ".topics-column"
+                              :connectWith ".topics-column-pinned"
                               :start #(om/set-state! owner :dragging true)
                               :stop #(do (om/set-state! owner :dragging false) (save-sections-order owner))
                               :opacity 1})))
