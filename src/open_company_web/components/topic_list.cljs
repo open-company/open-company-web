@@ -191,7 +191,6 @@
         max-count (max (count col1-pinned-topics-list) (count col2-pinned-topics-list) (count col3-pinned-topics-list))
         pinned-topics-list (loop [topics []
                                   idx 0]
-                             (println "   new topics:" (remove nil? (conj topics (get col1-pinned-topics-list idx) (get col2-pinned-topics-list idx) (get col3-pinned-topics-list idx))))
                              (if (<= (inc idx) max-count)
                                (recur (vec (remove nil? (conj topics (get col1-pinned-topics-list idx) (get col2-pinned-topics-list idx) (get col3-pinned-topics-list idx))))
                                       (inc idx))
@@ -205,7 +204,7 @@
     (.sortable list-node #js {:scroll true
                               :forcePlaceholderSize true
                               :placeholder "topic-list-sortable-placeholder"
-                              :items ".topic-row"
+                              :items ".topic-row.draggable-topic"
                               :handle ".draggable-topic"
                               :connectWith ".topics-column"
                               :start #(om/set-state! owner :dragging true)
