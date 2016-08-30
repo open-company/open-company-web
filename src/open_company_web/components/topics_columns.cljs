@@ -112,21 +112,41 @@
       (= min-height thrd-clmn)
       :3)))
 
+(defn get-pinned-layout [pinned-topics columns-num]
+  (if (= columns-num 3)
+    (loop [idx 3
+           cl1 [(first pinned-topics)]
+           cl2 (vec (remove nil? [(second pinned-topics)]))
+           cl3 (vec (remove nil? [(get pinned-topics 2)]))]
+      (if (<= idx (count pinned-topics))
+        (recur (+ idx 3)
+               (vec (remove nil? (conj cl1 (get pinned-topics idx))))
+               (vec (remove nil? (conj cl2 (get pinned-topics (+ idx 1)))))
+               (vec (remove nil? (conj cl3 (get pinned-topics (+ idx 1))))))
+        {:1 cl1
+         :2 cl2
+         :3 cl3}))
+    (loop [idx 2
+           cl1 (vec (remove nil? [(first pinned-topics)]))
+           cl2 (vec (remove nil? [(second pinned-topics)]))]
+      (if (<= idx (count pinned-topics))
+        (recur (+ idx 2)
+               (vec (remove nil? (conj cl1 (get pinned-topics idx))))
+               (vec (remove nil? (conj cl2 (get pinned-topics (+ idx 1))))))
+        {:1 cl1
+         :2 cl2}))))
+
 (defn calc-layout [owner data]
   (let [columns-num (:columns-num data)
+        company-data (dis/company-data)
         show-add-topic (add-topic? owner)
-        topics (to-array (:topics data))
-        final-layout (loop [idx (if (= columns-num 3) 3 2)
-                            layout (if (= columns-num 3)
-                                      {:1 [(first topics)]
-                                       :2 [(second topics)]
-                                       :3 [(get topics 2)]}
-                                      {:1 [(first topics)]
-                                       :2 [(second topics)]})]
+        {:keys [pinned other]} (utils/get-pinned-other-keys company-data)
+        final-layout (loop [idx 0
+                            layout (get-pinned-layout pinned columns-num)]
                         (let [shortest-column (get-shortest-column owner data layout)
-                              new-column (conj (get layout shortest-column) (get topics idx))
+                              new-column (conj (get layout shortest-column) (get other idx))
                               new-layout (assoc layout shortest-column new-column)]
-                          (if (< (inc idx) (count topics))
+                          (if (<= (inc idx) (count other))
                             (recur (inc idx)
                                    new-layout)
                             new-layout)))
@@ -151,7 +171,7 @@
                        :update-active-topics update-active-topics})
         (let [sd (->> section-name keyword (get topics-data))]
           (when-not (and (:read-only company-data) (:placeholder sd))
-            (dom/div #js {:className "topic-row"
+            (dom/div #js {:className (str "topic-row" (when (:pin sd) " draggable-topic"))
                           :data-topic (name section-name)
                           :ref section-name
                           :key (str "topic-row-" (name section-name))}
