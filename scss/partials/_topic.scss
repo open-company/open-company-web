@@ -25,11 +25,19 @@ div.dragging{
   }
 }
 
-div.topics-column-container:hover{
-  div.topic{
-    div.pinned-topic i.fa.fa-thumb-tack{
-      opacity: 0.5;
+div.dragging{
+  div.topics-column-container:hover{
+    div.topic{
+      div.pinned-topic i.fa.fa-thumb-tack{
+        opacity: 0.5;
+      }
     }
+  }
+}
+
+div.topic:hover{
+  div.pinned-topic i.fa.fa-thumb-tack{
+    opacity: 0.5;
   }
 }
 
