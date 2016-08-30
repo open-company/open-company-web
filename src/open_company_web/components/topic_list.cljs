@@ -181,6 +181,25 @@
      :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
      :show-share-tooltip (or (:show-share-tooltip current-state) false)}))
 
+(defn save-sections-order [owner]
+  (let [col1-pinned-topics (sel [:div.col-1 :div.topic.draggable-topic])
+        col1-pinned-topics-list (vec (for [topic col1-pinned-topics] (.data (js/jQuery topic) "section")))
+        col2-pinned-topics (sel [:div.col-2 :div.topic.draggable-topic])
+        col2-pinned-topics-list (vec (for [topic col2-pinned-topics] (.data (js/jQuery topic) "section")))
+        col3-pinned-topics (sel [:div.col-3 :div.topic.draggable-topic])
+        col3-pinned-topics-list (vec (for [topic col3-pinned-topics] (.data (js/jQuery topic) "section")))
+        max-count (max (count col1-pinned-topics-list) (count col2-pinned-topics-list) (count col3-pinned-topics-list))
+        pinned-topics-list (loop [topics []
+                                  idx 0]
+                             (println "   new topics:" (remove nil? (conj topics (get col1-pinned-topics-list idx) (get col2-pinned-topics-list idx) (get col3-pinned-topics-list idx))))
+                             (if (<= (inc idx) max-count)
+                               (recur (vec (remove nil? (conj topics (get col1-pinned-topics-list idx) (get col2-pinned-topics-list idx) (get col3-pinned-topics-list idx))))
+                                      (inc idx))
+                               topics))
+        other-topics (sel [:div.topic.not-draggable-topic])
+        other-topics-list (vec (for [topic other-topics] (.data (js/jQuery topic) "section")))]
+    (api/patch-sections (vec (concat pinned-topics-list other-topics-list)))))
+
 (defn setup-sortable [owner]
   (when-let [list-node (js/jQuery (sel [:div.topics-column]))]
     (.sortable list-node #js {:scroll true
@@ -190,7 +209,7 @@
                               :handle ".draggable-topic"
                               :connectWith ".topics-column"
                               :start #(om/set-state! owner :dragging true)
-                              :stop #(om/set-state! owner :dragging false)
+                              :stop #(do (om/set-state! owner :dragging false) (save-sections-order owner))
                               :opacity 1})))
 
 (defcomponent topic-list [data owner options]
