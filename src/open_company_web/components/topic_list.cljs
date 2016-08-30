@@ -8,7 +8,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [dommy.core :refer-macros (sel1)]
+            [dommy.core :refer-macros (sel sel1)]
             [open-company-web.api :as api]
             [open-company-web.urls :as oc-urls]
             [open-company-web.caches :as caches]
@@ -182,13 +182,15 @@
      :show-share-tooltip (or (:show-share-tooltip current-state) false)}))
 
 (defn setup-sortable [owner]
-  (when-let [list-node (js/jQuery (sel1 [:div.topics-column-container]))]
+  (when-let [list-node (js/jQuery (sel [:div.topics-column]))]
     (.sortable list-node #js {:scroll true
                               :forcePlaceholderSize true
                               :placeholder "topic-list-sortable-placeholder"
                               :items ".topic-row"
                               :handle ".draggable-topic"
-                              :stop #()
+                              :connectWith ".topics-column"
+                              :start #(om/set-state! owner :dragging true)
+                              :stop #(om/set-state! owner :dragging false)
                               :opacity 1})))
 
 (defcomponent topic-list [data owner options]
@@ -255,7 +257,8 @@
                            fullscreen-force-edit
                            show-add-topic-tip
                            show-second-add-topic-tooltip
-                           show-share-tooltip]}]
+                           show-share-tooltip
+                           dragging]}]
     (let [company-slug    (router/current-company-slug)
           company-data    (:company-data data)
           category-topics (get-category-topics company-data active-topics)
@@ -266,7 +269,7 @@
                             3 (str (+ (* card-width 3) 40 60) "px")
                             2 (str (+ (* card-width 2) 20 60) "px")
                             1 (if (> ww 413) (str card-width "px") "auto"))]
-      (dom/div {:class "topic-list group"
+      (dom/div {:class (str "topic-list group" (when dragging " dragging"))
                 :style {:margin-top (if selected-topic "0px" "84px")}
                 :key "topic-list"}
         ;; Activate sharing mode button
