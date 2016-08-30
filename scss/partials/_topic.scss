@@ -19,6 +19,20 @@ div.topics-columns.sharing-mode {
   }
 }
 
+div.dragging{
+  div.topic:not(.draggable-topic) {
+    opacity: 0.2;
+  }
+}
+
+div.topics-column-container:hover{
+  div.topic{
+    div.pinned-topic i.fa.fa-thumb-tack{
+      opacity: 0.5;
+    }
+  }
+}
+
 div.topic {
   margin: 0px;
   padding: 0px;
@@ -43,12 +57,6 @@ div.topic {
     right: 10px;
     transform: rotate(25deg);
     z-index: 100;
-  }
-
-  &:hover {
-    div.pinned-topic i.fa.fa-thumb-tack{
-      opacity: 0.5;
-    }
   }
 
   div.share-remove-container{
