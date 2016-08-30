@@ -226,9 +226,11 @@
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
                                                  :draggable-topic (:pin topic-data)
+                                                 :not-draggable-topic (not (:pin topic-data))
                                                  :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
                     :ref "topic"
+                    :data-section (name section)
                     :id (str "topic-" (name section))
                     :onClick #(when (and (:topic-click options) (not foce-active))
                                 ((:topic-click options) nil false))}
