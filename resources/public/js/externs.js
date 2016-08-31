@@ -27,6 +27,11 @@ $.truncate = function(){};
 $.attr = function(){};
 $.on = function(){};
 $.click = function(){};
+// WURFL
+var WURFL = {};
+WURFL.complete_device_name = {};
+WURFL.is_mobile = {};
+WURFL.form_factor = {};
 // Location
 var location = {};
 location.reload = function(){};
