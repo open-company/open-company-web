@@ -11,6 +11,8 @@ body.animating div.page {
   transition: transform $oc_animation_duration ease-in-out;
   -webkit-transition: -webkit-transform $oc_animation_duration ease-in-out;
   min-height: calc(100vh + #{$navbar_height}px);
+  top: 0px;
+  position: absolute;
 }
 
 body.animating.left div.page {
@@ -28,13 +30,8 @@ body.menu-visible div.page {
   top: 0px;
 }
 
-body.animating.small-footer div.footer {
-  bottom: #{$footer_small_height - 10}px;
-}
-
 body.animating div.footer {
   position: absolute;
-  bottom: #{$footer_height - 4}px;
   left: 0px;
   width: 100%;
 }
@@ -44,6 +41,6 @@ body.menu-visible:not(.animating) div.page nav{
   top: default;
 }
 
-body.animating div#app {
-  min-height: 100vh;
-}
+// body.animating div#app {
+//   min-height: 100vh;
+// }
