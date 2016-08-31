@@ -296,8 +296,8 @@
     cur-period))
 
 (defn get-section-keys [company-data]
-  "Get the section names, as a vector of keywords, in category order and order in the category."
-  (vec (map keyword (flatten (remove nil? (map #(get-in company-data [:sections (keyword %)]) (:categories company-data)))))))
+  "Get the section names, as a vector of keywords."
+  (vec (map keyword (:sections company-data))))
 
 (defn get-pinned-other-keys [sections company-data]
   (loop [pinned []

@@ -18,26 +18,18 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defonce default-category "progress")
-
 (defcomponent company-dashboard [{:keys [menu-open] :as data} owner]
 
   (init-state [_]
-    (let [url-hash (.. js/window -location -hash)
-          url-tab (subs url-hash 1 (count url-hash))
-          active-tab (if (pos? (count url-tab))
-                       url-tab
-                       default-category)]
-      {:active-category active-tab
-       :navbar-editing false
-       :editing-topic false
-       :save-bt-active false
-       :columns-num (responsive/columns-num)}))
+    {:navbar-editing false
+     :editing-topic false
+     :save-bt-active false
+     :columns-num (responsive/columns-num)})
 
   (did-mount [_]
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
 
-  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active active-category columns-num] :as state}]
+  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num] :as state}]
     (let [company-data (dis/company-data data)
           card-width (responsive/calc-card-width)]
       (dom/div {:class (utils/class-set {:company-dashboard true
@@ -65,8 +57,7 @@
                            :card-width card-width
                            :columns-num columns-num
                            :foce-key (:foce-key data)
-                           :foce-data (:foce-data data)
-                           :active-category (:active-category state)}))
+                           :foce-data (:foce-data data)}))
             ;;Footer
             (when company-data
               (om/build footer {:columns-num columns-num

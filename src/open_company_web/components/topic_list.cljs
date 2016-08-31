@@ -41,21 +41,18 @@
         (om/update-state! owner :new-sections-requested not)
         (api/get-new-sections)))))
 
-(defn- get-active-topics [company-data category]
-  (get-in company-data [:sections (keyword category)]))
+(defn- get-active-topics [company-data]
+  (:sections company-data))
 
-(defn- get-category-topics [company-data active-topics]
-  (let [topics-list   (flatten (vals active-topics))]
-    (map keyword topics-list)))
+(defn- get-topics [company-data active-topics]
+  (map keyword active-topics))
 
 ;; ===== Events =====
 
-(defn- update-active-topics [owner category-name new-topic & [section-data]]
+(defn- update-active-topics [owner new-topic & [section-data]]
   (let [company-data (om/get-props owner :company-data)
-        old-categories (:sections company-data)
-        old-topics (get-active-topics company-data category-name)
+        old-topics (get-active-topics company-data)
         new-topics (concat old-topics [new-topic])
-        new-categories (assoc old-categories (keyword category-name) new-topics)
         new-topic-kw (keyword new-topic)]
     (if (#{:finances :growth} new-topic-kw)
       (dispatcher/dispatch! [:force-fullscreen-edit new-topic])
@@ -63,8 +60,8 @@
         (dispatcher/dispatch! [:start-foce new-topic-kw (or section-data {:section new-topic :placeholder true})])
         (om/set-state! owner :new-topic-foce new-topic-kw)))
     (if section-data
-      (api/patch-sections new-categories section-data new-topic)
-      (api/patch-sections new-categories))))
+      (api/patch-sections new-topics section-data new-topic)
+      (api/patch-sections new-topics))))
 
 (defn- topic-click [owner topic selected-metric & [force-edit]]
   (let [company-slug (router/current-company-slug)]
@@ -139,19 +136,19 @@
   "Show initial welcome tooltip to a r/w user with no topics."
   [company-data active-topics]
   (when (and (jwt/jwt) (not (:read-only company-data)))
-    (let [category-topics (get-category-topics company-data active-topics)]
-      (empty? category-topics))))
+    (let [all-topics (get-topics company-data active-topics)]
+      (empty? all-topics))))
 
 (defn- show-first-edit-tip?
   "Show first edit tooltip to a r/w user if there is only one content section (not data),
   and it is a placeholder section."
-  [company-data category-topics]
+  [company-data company-topics]
   (when (and (jwt/jwt) (not (:read-only company-data)))
-    (let [filtered-topics (filter #(and (not= % :growth) (not= % :finances)) category-topics)]
+    (let [filtered-topics (filter #(and (not= % :growth) (not= % :finances)) company-topics)]
       (and (= (count filtered-topics) 1)
            (->> filtered-topics first keyword (get company-data) :placeholder)))))
 
-(defn- show-data-first-edit-tip? [company-data selected-topic category-topics]
+(defn- show-data-first-edit-tip? [company-data selected-topic]
   "Show data first edit tooltip to a r/w user if the selected topic is a data topic,
   and it is a placeholder section."
   (when (and (jwt/jwt) (not (:read-only company-data)))
@@ -162,8 +159,7 @@
 
 (defn- get-state [owner data current-state]
   (let [company-data (:company-data data)
-        categories (:categories company-data)
-        active-topics (apply merge (map #(hash-map (keyword %) (get-active-topics company-data %)) categories))
+        active-topics (apply merge (map #(hash-map (keyword %) (->> % keyword (get company-data))) (get-active-topics company-data)))
         show-add-topic-tip (show-add-topic-tip? company-data active-topics)
         selected-topic (if (nil? current-state) (router/current-section) (:selected-topic current-state))]
     {:initial-active-topics active-topics
@@ -249,7 +245,7 @@
     (when-not (:read-only (:company-data next-props))
       (get-new-sections-if-needed owner))
     (let [company-data (:company-data next-props)
-          topics (flatten (vals (:sections company-data)))
+          topics (vec (:sections company-data))
           no-placeholder-sections (utils/filter-placeholder-sections topics company-data)]
       (when (and (:force-edit-topic next-props) (contains? company-data (keyword (:force-edit-topic next-props))))
         (om/set-state! owner :fullscreen-force-edit true)
@@ -279,7 +275,7 @@
                            dragging]}]
     (let [company-slug    (router/current-company-slug)
           company-data    (:company-data data)
-          category-topics (get-category-topics company-data active-topics)
+          company-topics (get-topics company-data active-topics)
           card-width      (:card-width data)
           columns-num     (:columns-num data)
           ww              (.-clientWidth (sel1 js/document :body))
@@ -294,7 +290,7 @@
         (when (and (not (responsive/is-mobile-size?))
                    (responsive/can-edit?)
                    (not (:read-only company-data))
-                   (>= (count (utils/filter-placeholder-sections category-topics company-data)) min-no-placeholder-section-enable-share))
+                   (>= (count (utils/filter-placeholder-sections company-topics company-data)) min-no-placeholder-section-enable-share))
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
             (dom/button {:class "sharing-button"
@@ -316,7 +312,7 @@
                                             :card-width card-width
                                             :currency (:currency company-data)
                                             :animate (not transitioning)
-                                            :show-first-edit-tip (show-data-first-edit-tip? company-data selected-topic category-topics)}
+                                            :show-first-edit-tip (show-data-first-edit-tip? company-data selected-topic)}
                                            {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                    :topic-navigation #(om/set-state! owner :topic-navigation %)}}))
             ;; Fullscreen topic for transition
@@ -341,13 +337,13 @@
                                   :show-fast-editing true
                                   :total-width total-width
                                   :content-loaded (not (:loading data))
-                                  :topics category-topics
+                                  :topics company-topics
                                   :company-data company-data
                                   :topics-data company-data
                                   :foce-key (:foce-key data)
                                   :foce-data (:foce-data data)
                                   :share-selected-topics share-selected-topics
-                                  :show-first-edit-tip (show-first-edit-tip? company-data category-topics)}
+                                  :show-first-edit-tip (show-first-edit-tip? company-data company-topics)}
                                  {:opts {:topic-click (partial topic-click owner)
                                          :update-active-topics (partial update-active-topics owner)}})
         

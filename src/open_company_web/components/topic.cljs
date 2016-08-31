@@ -157,17 +157,6 @@
                                      :transition-as-of nil})))
       (.play))))
 
-
-(defn get-all-sections [slug]
-  (let [categories-data (:categories (slug @caches/new-sections))
-        all-category-sections (apply concat
-                                     (for [category categories-data]
-                                       (let [cat-name (:name category)
-                                             sections (:sections category)]
-                                         (map #(assoc % :category cat-name) sections))))]
-    (apply merge
-           (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
-
 (defcomponent topic [{:keys [active-topics
                              section-data
                              section

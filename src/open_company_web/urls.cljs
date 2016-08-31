@@ -55,12 +55,6 @@
   ([slug]
     (str "/" (name slug) "/settings")))
 
-(defn company-category
-  ([category]
-    (company-category (router/current-company-slug) category))
-  ([slug category]
-    (str "/" (name slug) "#" (name category))))
-
 (defn company-section
   "Section url"
   ([] (company-section (router/current-company-slug) (router/current-section)))

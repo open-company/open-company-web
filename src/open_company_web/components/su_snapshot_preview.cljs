@@ -82,7 +82,7 @@
     (let [company-data (dis/company-data data)
           su-data (stakeholder-update-data data)
           su-sections (if (empty? (:sections su-data))
-                        (utils/filter-placeholder-sections (flatten (vals (:sections company-data))) company-data)
+                        (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
                         (utils/filter-placeholder-sections (:sections su-data) company-data))]
       {:columns-num (responsive/columns-num)
        :su-topics su-sections
@@ -105,7 +105,7 @@
       (let [company-data (dis/company-data next-props)
             su-data      (stakeholder-update-data next-props)
             su-sections  (if (empty? (:sections su-data))
-                           (flatten (vals (:sections company-data)))
+                           (vec (:sections company-data))
                            (utils/filter-placeholder-sections (:sections su-data) company-data))]
         (om/set-state! owner :su-topics su-sections)))
     ; share via link
@@ -139,7 +139,7 @@
           ww           (.-clientWidth (sel1 js/document :body))
           total-width  (if (> ww 413) (str (min ww (+ card-width 100)) "px") "auto")
           su-subtitle  (str "— " (utils/date-string (js/Date.) [:year]))
-          possible-sections (utils/filter-placeholder-sections (flatten (vals (:sections company-data))) company-data)
+          possible-sections (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
           topics-to-add (sort #(compare (title-from-section-name owner %1) (title-from-section-name owner %2)) (reduce utils/vec-dissoc possible-sections su-topics))]
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
                                          :main-scroll true})}

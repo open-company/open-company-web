@@ -16,8 +16,7 @@
 
 (def test-atom {
   :section "values"
-  :section-data (:values company)
-  :active-category "company"})
+  :section-data (:values company)})
 
 (deftest test-topic-body-component
   (testing "Topic body component"

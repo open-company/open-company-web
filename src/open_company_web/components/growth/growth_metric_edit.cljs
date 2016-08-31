@@ -114,8 +114,7 @@
 (defn get-presets [data]
   (let [slugs (:slugs data)
         slug (keyword (router/current-company-slug))
-        sections-map (:categories (slug @new-sections))
-        all-sections (mapcat :sections sections-map)
+        all-sections (:templates (slug @new-sections))
         growth-defaults (first (filter #(= (:section-name %) "growth") all-sections))
         all-metrics (:metrics growth-defaults)
         available-metrics (vec (filter #(not (utils/in? slugs (:slug %))) all-metrics))]

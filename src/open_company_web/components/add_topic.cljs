@@ -12,19 +12,16 @@
 ;; topic adding component
 (defn get-all-sections
   "Return all sections for the current company no matter it's state (archived, active, inactive)
-   e.g {:section a-string :title a-string :category a-string*}"
+   e.g {:section a-string :title a-string}"
   []
   (let [company-data (dis/company-data)
-        slug         (keyword (router/current-company-slug))
-        categories   (:categories company-data)]
+        slug         (keyword (router/current-company-slug))]
     (into
-     (:archived company-data)
-     (for [cat (:categories (get @caches/new-sections slug))
-           sec (:sections cat)]
-       (-> sec
-           (assoc :section (:section-name sec))
-           (select-keys [:title :section])
-           (assoc :category (:name cat)))))))
+      (:archived company-data)
+      (for [sec (:new-sections (get @caches/new-sections slug))]
+        (-> sec
+            (assoc :section (:section-name sec))
+            (select-keys [:title :section]))))))
 
 (rum/defcs custom-topic-input
   < (rum/local "" ::topic-title)
@@ -82,7 +79,7 @@
                (let [topic-full (get all-sections topic)]
                  [:div.mb1.btn-reset.yellow-line-hover-child
                   {:key topic
-                   :on-click #(do (update-active-topics (or (:category topic-full) :progress) (:section topic-full))
+                   :on-click #(do (update-active-topics (:section topic-full))
                                   (reset! (::expanded? s) false))}
                   [:span.child
                    (:title topic-full)

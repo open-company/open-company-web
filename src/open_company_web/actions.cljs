@@ -58,7 +58,7 @@
   (when body
     (let [slug (:slug body)
           response (:response body)]
-      (swap! cache/new-sections assoc-in [(keyword slug) :categories] (:categories response))
+      (swap! cache/new-sections assoc-in [(keyword slug) :new-sections] (:templates response))
       (swap! cache/new-sections assoc-in [(keyword slug) :new-section-order] (:sections response))
       ;; signal to the app-state that the new-sections have been loaded
       (assoc-in db [(keyword slug) :new-sections] (rand 4)))))
@@ -158,13 +158,13 @@
 (defmethod dispatcher/action :topic-archive [db [_ topic]]
   (let [slug (keyword (router/current-company-slug))
         company-data (dispatcher/company-data)
-        old-categories (:sections company-data)
-        new-categories (apply merge (map #(hash-map (first %) (utils/vec-dissoc (second %) (name topic))) old-categories))]
-    (api/patch-sections new-categories)
+        old-sections (:sections company-data)
+        new-sections (utils/vec-dissoc old-sections topic)]
+    (api/patch-sections new-sections)
     (-> db
       (dissoc :foce-key)
       (dissoc :foce-data)
-      (assoc-in (conj (dispatcher/company-data-key slug) :sections) new-categories))))
+      (assoc-in (conj (dispatcher/company-data-key slug) :sections) new-sections))))
 
 (defmethod dispatcher/action :foce-save [db [_]]
   (let [slug (keyword (router/current-company-slug))

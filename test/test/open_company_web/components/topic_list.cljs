@@ -19,8 +19,7 @@
   :company-data company
   :columns-num 1
   :card-width "100px"
-  :topics ["update" "finances"]
-  :active-category "progress"})
+  :topics ["update" "finances"]})
 
 (deftest test-topic-list-component
   (testing "Topic list component"

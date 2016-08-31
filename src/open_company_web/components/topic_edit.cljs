@@ -189,7 +189,7 @@
                (:pin topic-data))
       ; needs to PATCH :sections to move the topic at the top of the unpinned topics
       (let [company-data (dis/company-data)
-            sections     (vec (flatten (vals (:sections company-data))))
+            sections     (vec (:sections company-data))
             without-topic (utils/vec-dissoc sections topic)
             last-pinned-idx (loop [last-pinned nil
                                    idx 0]

@@ -6,7 +6,6 @@
   :slug "buffer"
   :uuid "1234"
 
-  :categories ["progress", "company"]
   :sections {:progress ["finances" "challenges" "growth"] :company ["values"]}
 
   :challenges {
