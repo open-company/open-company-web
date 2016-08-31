@@ -648,7 +648,7 @@
              (.-offsetParent el)))))
 
 (defn medium-editor-options [placeholder hide-on-click]
-  {:toolbar #js {:buttons #js ["bold" "italic" "strikethrough" "orderedlist" "unorderedlist" "anchor"]}
+  {:toolbar #js {:buttons #js ["bold" "italic" "unorderedlist" "anchor"]}
    :buttonLabels "fontawesome"
    :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
    :anchor #js {:customClassOption nil
