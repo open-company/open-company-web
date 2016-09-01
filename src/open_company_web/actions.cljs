@@ -171,7 +171,7 @@
       (dissoc :foce-data)
       (assoc-in (conj (dispatcher/company-data-key slug) :sections) new-sections))))
 
-(defmethod dispatcher/action :foce-save [db [_]]
+(defmethod dispatcher/action :foce-save [db [_ & [new-sections]]]
   (let [slug (keyword (router/current-company-slug))
         topic (:foce-key db)
         topic-data (:foce-data db)
@@ -181,11 +181,14 @@
         with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))
         old-section-data (get (dispatcher/company-data db slug) (keyword topic))
         new-data (dissoc (merge old-section-data with-fixed-body) :placeholder)]
-    (api/partial-update-section (:section (:foce-data db)) new-data)
+    (if new-sections
+      (api/patch-sections new-sections new-data (:section (:foce-data db)))
+      (api/partial-update-section (:section (:foce-data db)) new-data))
     (-> db
         (dissoc :foce-key)
         (dissoc :foce-data)
-        (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) new-data))))
+        (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) new-data)
+        (assoc-in (conj (dispatcher/company-data-key slug) :sections) new-sections))))
 
 (defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
   (if topic

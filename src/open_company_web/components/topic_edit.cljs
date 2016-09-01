@@ -185,8 +185,9 @@
 (defn- save-topic [owner]
   (let [topic      (name (dis/foce-section-key))
         topic-data (dis/foce-section-data)]
-    (when (and (not (om/get-state owner :initially-pinned))
-               (:pin topic-data))
+    (cond
+      (and (not (om/get-state owner :initially-pinned))
+           (:pin topic-data))
       ; needs to PATCH :sections to move the topic at the top of the unpinned topics
       (let [company-data (dis/company-data)
             sections     (vec (:sections company-data))
@@ -194,9 +195,19 @@
             {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
             with-pinned-topic (let [[before after] (split-at (count pinned) without-topic)]
                                 (vec (concat before [topic] after)))]
-        (utils/after 100
-          #(dis/dispatch! [:new-sections with-pinned-topic])))))
-  (dis/dispatch! [:foce-save]))
+        (dis/dispatch! [:foce-save with-pinned-topic]))
+      (and (om/get-state owner :initially-pinned)
+           (not (:pin topic-data)))
+      ; needs to PATCH :sections to move the topic at the top of the unpinned topics
+      (let [company-data (dis/company-data)
+            sections     (vec (:sections company-data))
+            without-topic (utils/vec-dissoc sections topic)
+            {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
+            with-unpinned-topic (let [[before after] (split-at (inc (count pinned)) without-topic)]
+                                (vec (concat before [topic] after)))]
+        (dis/dispatch! [:foce-save with-unpinned-topic]))
+      :else
+      (dis/dispatch! [:foce-save]))))
 
 (defcomponent topic-edit [{:keys [show-first-edit-tip
                                   currency
