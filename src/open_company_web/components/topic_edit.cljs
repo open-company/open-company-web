@@ -191,20 +191,11 @@
       (let [company-data (dis/company-data)
             sections     (vec (:sections company-data))
             without-topic (utils/vec-dissoc sections topic)
-            last-pinned-idx (loop [last-pinned nil
-                                   idx 0]
-                              (println "   loop:" idx (get without-topic idx))
-                              (let [sec (get without-topic idx)
-                                    sec-data (->> sec keyword (get company-data))]
-                                (if (or (<= idx (count sections))
-                                        (:pin sec-data))
-                                  (recur sec (inc idx))
-                                  idx)))
-            with-pinned-topic (let [[before after] (split-at last-pinned-idx without-topic)]
-                                (vec (concat before topic after)))]
-        ;; TODO: save sections with the newly pinned section in the right spot
-        (println "sections:" sections "last-pinned-idx:" last-pinned-idx)
-        (println "insert" with-pinned-topic))))
+            {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
+            with-pinned-topic (let [[before after] (split-at (count pinned) without-topic)]
+                                (vec (concat before [topic] after)))]
+        (utils/after 100
+          #(dis/dispatch! [:new-sections with-pinned-topic])))))
   (dis/dispatch! [:foce-save]))
 
 (defcomponent topic-edit [{:keys [show-first-edit-tip
