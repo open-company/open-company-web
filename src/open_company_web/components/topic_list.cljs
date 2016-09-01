@@ -275,7 +275,7 @@
                            dragging]}]
     (let [company-slug    (router/current-company-slug)
           company-data    (:company-data data)
-          company-topics (get-topics company-data active-topics)
+          company-topics  (vec (map keyword (:sections company-data)))
           card-width      (:card-width data)
           columns-num     (:columns-num data)
           ww              (.-clientWidth (sel1 js/document :body))
