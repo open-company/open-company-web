@@ -1,6 +1,5 @@
 (ns open-company-web.lib.responsive
   (:require [dommy.core :refer-macros (sel1)]
-            [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]
             [goog.object :as gobj]
             [goog.userAgent :as userAgent]))
@@ -130,7 +129,8 @@
       (min card-width ww))))
 
 (defn is-tablet-or-mobile? []
-  (if (utils/is-test-env?)
+  ;; check if it's test env, can't import utils to avoid circular dependencies
+  (if (not (not (.-_phantom js/window)))
     false
     (or (= (gobj/get js/WURFL "form_factor") "Tablet")
         (= (gobj/get js/WURFL "form_factor") "Smartphone")
