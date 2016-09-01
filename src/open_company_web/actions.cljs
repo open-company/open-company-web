@@ -155,6 +155,11 @@
 (defmethod dispatcher/action :input [db [_ path value]]
   (assoc-in db path value))
 
+(defmethod dispatcher/action :new-sections [db [_ new-sections]]
+  (let [slug (keyword (router/current-company-slug))]
+    (api/patch-sections new-sections)
+    (assoc-in db (conj (dispatcher/company-data-key slug) :sections) new-sections)))
+
 (defmethod dispatcher/action :topic-archive [db [_ topic]]
   (let [slug (keyword (router/current-company-slug))
         company-data (dispatcher/company-data)
