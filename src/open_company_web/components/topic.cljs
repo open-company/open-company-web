@@ -183,7 +183,8 @@
      :transition-as-of nil})
 
   (did-mount [_]
-    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+    (when-not (utils/is-test-env?)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (will-update [_ next-props _]
     (let [new-as-of (:updated-at (:section-data next-props))
