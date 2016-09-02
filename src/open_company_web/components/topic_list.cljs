@@ -175,7 +175,8 @@
      :fullscreen-force-edit (if (nil? current-state) (router/section-editing?) (:fullscreen-force-edit current-state))
      :show-add-topic-tip show-add-topic-tip
      :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
-     :show-share-tooltip (or (:show-share-tooltip current-state) false)}))
+     :show-share-tooltip (or (:show-share-tooltip current-state) false)
+     :show-second-pin-tip (or (:show-second-pin-tip current-state) false)}))
 
 (defn save-sections-order [owner]
   (let [col1-pinned-topics (sel [:div.col-1 :div.topic.draggable-topic])
@@ -193,19 +194,37 @@
                                topics))
         other-topics (sel [:div.topic.not-draggable-topic])
         other-topics-list (vec (for [topic other-topics] (.data (js/jQuery topic) "section")))]
-    (api/patch-sections (vec (concat pinned-topics-list other-topics-list)))))
+    (dispatcher/dispatch! [:new-sections (vec (concat pinned-topics-list other-topics-list))])))
+
+(defn pinned-count [data]
+  (let [company-data   (:company-data data)
+        company-topics (vec (map keyword (:sections company-data)))]
+    (count (filter :pin (map #(->> % keyword (get company-data)) company-topics)))))
 
 (defn setup-sortable [owner]
+  (when-not (om/get-state owner :sortable)
+    (when-let [list-node (js/jQuery (sel [:div.topics-column-pinned]))]
+      (when-not (.sortable list-node "instance")
+        (.sortable list-node #js {:scroll true
+                                  :forcePlaceholderSize true
+                                  :placeholder "topic-list-sortable-placeholder"
+                                  :items "div.topic-row.draggable-topic"
+                                  :handle ".draggable-topic"
+                                  :connectWith ".topics-column-pinned"
+                                  :start #(om/set-state! owner :dragging true)
+                                  :stop #(do (om/set-state! owner :dragging false)
+                                             (save-sections-order owner))
+                                  :opacity 1})))))
+
+(defn destroy-sortable []
   (when-let [list-node (js/jQuery (sel [:div.topics-column-pinned]))]
-    (.sortable list-node #js {:scroll true
-                              :forcePlaceholderSize true
-                              :placeholder "topic-list-sortable-placeholder"
-                              :items "div.topic-row.draggable-topic"
-                              :handle ".draggable-topic"
-                              :connectWith ".topics-column-pinned"
-                              :start #(om/set-state! owner :dragging true)
-                              :stop #(do (om/set-state! owner :dragging false) (save-sections-order owner))
-                              :opacity 1})))
+    (when (.sortable list-node "instance")
+      (.sortable list-node "destroy"))))
+
+(defn manage-sortable [owner]
+  (if (> (pinned-count (om/get-props owner)) 1)
+    (setup-sortable owner)
+    (destroy-sortable)))
 
 (defcomponent topic-list [data owner options]
 
@@ -227,7 +246,7 @@
                (not (responsive/user-agent-mobile?)))
       (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))]
         (om/set-state! owner :kb-listener kb-listener))
-      (setup-sortable owner)))
+      (manage-sortable owner)))
 
   (will-unmount [_]
     (when (and (not (utils/is-test-env?))
@@ -255,11 +274,14 @@
         (om/set-state! owner :show-second-add-topic-tooltip true))
       ; show share tooltip if needed
       (when (= (count no-placeholder-sections) 2)
-        (om/set-state! owner :show-share-tooltip true))))
+        (om/set-state! owner :show-share-tooltip true))
+      (when (= (count (filter #(->> % keyword (get company-data) :pin) no-placeholder-sections)) 2)
+        (om/set-state! owner :show-second-pin-tip true))))
 
   (did-update [_ _ _]
     (when (om/get-state owner :tr-selected-topic)
-      (animate-selected-topic-transition owner (om/get-state owner :animation-direction))))
+      (animate-selected-topic-transition owner (om/get-state owner :animation-direction)))
+    (manage-sortable owner))
 
   (render-state [_ {:keys [active-topics
                            selected-topic
@@ -272,6 +294,7 @@
                            show-add-topic-tip
                            show-second-add-topic-tooltip
                            show-share-tooltip
+                           show-second-pin-tip
                            dragging]}]
     (let [company-slug    (router/current-company-slug)
           company-data    (:company-data data)
@@ -373,7 +396,7 @@
              :once-only true
              :mobile false
              :desktop "Add another topic and you'll see how quickly the big picture comes together."}))
-        
+
         ;; After 2nd topic
         (when (and show-share-tooltip (not selected-topic))
           (onboard-tip
@@ -381,4 +404,12 @@
              :once-only true
              :mobile false
              :desktop "It's easy to share information with your employees, investors and customers. Click on \"SHARE AN UPDATE\" above to try it."
-             :css-class "large"}))))))
+             :css-class "large"}))
+
+        ;; After 2nd topic is pinned show tooltip
+        (when (and show-second-pin-tip (not selected-topic))
+          (onboard-tip
+            {:id (str "second-pin-" company-slug)
+             :once-only true
+             :mobile false
+             :desktop "YOU CAN DRAG AND DROP PINNED ITEMS TO REORDER THEM"}))))))
