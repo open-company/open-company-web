@@ -268,7 +268,8 @@
       (doto add-image-el
         (.tooltip "hide")
         (.attr "data-original-title" add-image-tooltip)
-        (.tooltip "fixTitle"))
+        (.tooltip "fixTitle")
+        (.tooltip "hide"))
       (doto pin-image
         (.tooltip "hide")
         (.attr "data-original-title" (pin-tooltip (:pin topic-data)))

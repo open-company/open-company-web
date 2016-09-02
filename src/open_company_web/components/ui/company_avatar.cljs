@@ -30,6 +30,7 @@
                               (router/nav! company-home))}
             (dom/div {:class "company-avatar-container"}
               (dom/div {:class "company-avatar-border"}
+                (dom/span {:class "helper"})
                 (if-not (clojure.string/blank? company-logo)
                   (dom/img {:src company-logo
                             :class "company-avatar-img"
