@@ -91,7 +91,9 @@
               read-more    (if (clojure.string/blank? (utils/strip-HTML-tags (:body topic-data))) 0 read-more-height)]
           (+ start-height headline-height read-more))
         :else
-        (let [topic-image-height      (if (:image-url topic-data) (utils/aspect-ration-image-height (:image-width topic-data) (:image-height topic-data) card-width) 0)
+        (let [topic-image-height      (if (:image-url topic-data)
+                                        (utils/aspect-ration-image-height (:image-width topic-data) (:image-height topic-data) card-width)
+                                        0)
               headline-body-height (headline-body-height (:headline topic-data) (utils/truncated-body topic-body) card-width)
               read-more               (if (clojure.string/blank? (utils/strip-HTML-tags (:body topic-data))) 0 read-more-height)]
           (+ topic-default-height headline-body-height topic-image-height read-more))))))
@@ -115,7 +117,7 @@
 (defn get-pinned-layout [pinned-topics columns-num]
   (if (= columns-num 3)
     (loop [idx 3
-           cl1 [(first pinned-topics)]
+           cl1 (vec (remove nil? [(first pinned-topics)]))
            cl2 (vec (remove nil? [(second pinned-topics)]))
            cl3 (vec (remove nil? [(get pinned-topics 2)]))]
       (if (<= idx (count pinned-topics))
