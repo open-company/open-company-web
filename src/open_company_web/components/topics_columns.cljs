@@ -213,8 +213,10 @@
       (om/set-state! owner :best-layout (calc-layout owner next-props))))
 
   (render-state [_ {:keys [best-layout]}]
-    (let [show-add-topic     (add-topic? owner)
-          partial-render-topic (partial render-topic owner options)]
+    (let [show-add-topic         (add-topic? owner)
+          partial-render-topic   (partial render-topic owner options)
+          {:keys [pinned other]} (utils/get-pinned-other-keys topics (dis/company-data))
+          columns-container-key   (str (apply str pinned) (apply str other))]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true
@@ -225,7 +227,8 @@
           ;; render 2 or 3 column layout
           (> columns-num 1)
           (dom/div {:class "topics-column-container group"
-                    :style #js {:width total-width}}
+                    :style #js {:width total-width}
+                    :key columns-container-key}
             (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
               (let [column (get best-layout kw)
                     {:keys [pinned other]} (utils/get-pinned-other-keys column (dis/company-data))]
@@ -263,7 +266,8 @@
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
-                    :style #js {:width total-width}}
+                    :style #js {:width total-width}
+                    :key columns-container-key}
             (dom/div {:class "topics-column"}
               (let [{:keys [pinned other]} (utils/get-pinned-other-keys topics (dis/company-data))]
                 (dom/div #js {:className "topics-column-pinned"}
