@@ -20,7 +20,7 @@
 (deftest test-popover-component
   (testing "Popover component"
     (let [c (tu/new-container!)
-          app-state (atom test-atom)
+          app-state (atom test-data)
           _ (rum/mount (popover test-data) c)
           popover-node (sel1 c [:div.oc-popover])]
       (is (not (nil? popover-node)))

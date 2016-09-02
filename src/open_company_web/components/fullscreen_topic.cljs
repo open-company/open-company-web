@@ -93,7 +93,8 @@
                   :dangerouslySetInnerHTML (utils/emojify topic-body)})
           
           ;; Attribution
-          (when-not hide-history-navigation
+          (when (and (not hide-history-navigation)
+                     (not (:placeholder topic-data)))
             (om/build topic-attribution data {:opts options})))))))
 
 (defn- start-editing [owner options]

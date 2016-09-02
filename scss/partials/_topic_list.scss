@@ -10,8 +10,8 @@ div.topic-list-edit-container {
   }
 }
 
-.animating div.topic-list{
-  margin-top: 0px;
+body.animating div.topic-list{
+  margin-top: 0px !important;
   padding-top: #{$navbar_height}px;
   min-height: calc(100vh - #{$footer_height}px);
 }
