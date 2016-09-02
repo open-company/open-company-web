@@ -222,9 +222,10 @@
       (.sortable list-node "destroy"))))
 
 (defn manage-sortable [owner]
-  (if (> (pinned-count (om/get-props owner)) 1)
-    (setup-sortable owner)
-    (destroy-sortable)))
+  (when-not (utils/is-test-env?)
+    (if (> (pinned-count (om/get-props owner)) 1)
+      (setup-sortable owner)
+      (destroy-sortable))))
 
 (defcomponent topic-list [data owner options]
 
