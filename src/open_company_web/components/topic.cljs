@@ -87,6 +87,7 @@
           truncated-body      (if (utils/is-test-env?) topic-body (.truncate js/$ topic-body (clj->js {:length 500 :words true})))]
       (dom/div #js {:className "topic-internal group"
                     :onClick (partial fullscreen-topic owner nil false)
+                    :key (str "topic-internal-" (name section))
                     :ref "topic-internal"}
         (when (or is-growth-finances?
                   image-header)
@@ -106,8 +107,8 @@
         (dom/div {:class "group"}
           (dom/div {:class "topic-title"} (:title topic-data))
           (when (and show-fast-editing
-                   (responsive/can-edit?)
                    (not (responsive/is-mobile-size?))
+                   (responsive/can-edit?)
                    (not (:read-only topic-data))
                    (not sharing-mode)
                    (not (:foce-active data)))
@@ -116,7 +117,15 @@
               (dom/i {:class "fa fa-pencil"
                       :title "Edit"
                       :data-toggle "tooltip"
-                      :data-placement "top"}))))
+                      :data-placement "top"})))
+          (when (and (:pin topic-data)
+                     (not (responsive/is-mobile-size?))
+                     (> (count (:pinned (utils/get-pinned-other-keys (:sections (dis/company-data)) (dis/company-data)))) 1))
+            (dom/div {:class "pinned-topic"}
+              (dom/i {:class "fa fa-thumb-tack"
+                      :data-toggle "tooltip"
+                      :data-placement "top"
+                      :title "Drag and drop to reorder"}))))
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
@@ -220,6 +229,7 @@
                                                  :sharing-selected (and sharing-mode share-selected)})
                     :ref "topic"
                     :data-section (name section)
+                    :key (str "topic-" (name section))
                     :id (str "topic-" (name section))
                     :onClick #(when (and (:topic-click options) (not foce-active))
                                 ((:topic-click options) nil false))}
@@ -229,12 +239,6 @@
             (dom/button {:class "btn-reset share-remove"
                          :on-click #(when (contains? options :share-remove-click) ((:share-remove-click options) (name section)))}
               (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.5)" :size 12 :stroke 4 :accent-color "rgba(78, 90, 107, 0.5)"}))))
-        (when (:pin topic-data)
-          (dom/div {:class "pinned-topic"}
-            (dom/i {:class "fa fa-thumb-tack"
-                    :data-toggle "tooltip"
-                    :data-placement "top"
-                    :title "Drag and drop to reorder"})))
         (dom/div #js {:className "topic-anim group"
                       :key (str "topic-anim-" as-of "-" transition-as-of)
                       :ref "topic-anim"}
