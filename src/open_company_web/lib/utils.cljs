@@ -355,9 +355,7 @@
         read-only (readonly? links)
         without-sections (apply dissoc company-data section-keys)
         with-read-only (assoc without-sections :read-only read-only)
-        sections (into {} (map
-                           (fn [sn] [sn (fix-section (sn company-data) sn)])
-                           section-keys))
+        sections (apply merge (map (fn [sn] (hash-map sn (fix-section (get company-data sn) sn))) section-keys))
         with-fixed-sections (merge with-read-only sections)]
     with-fixed-sections))
 
