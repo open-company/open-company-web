@@ -16,6 +16,7 @@ $.height = function(){};
 $.find = function(){};
 $.data = function(){};
 $.sortable = function(){};
+$.destroy = function(){};
 $.tooltip = function(){};
 $.offset = function(){};
 $.offset.top = {};
