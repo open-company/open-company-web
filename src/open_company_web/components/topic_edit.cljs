@@ -382,14 +382,6 @@
                          :style {:display (if (nil? file-upload-state) "block" "none")}
                          :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
                 (dom/i {:class "fa fa-code"}))
-            (dom/button {:class "btn-reset pin-button right"
-                         :title (pin-tooltip (:pin topic-data))
-                         :type "button"
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :style {:display (if (nil? file-upload-state) "block" "none")}
-                         :on-click #(dis/dispatch! [:foce-input {:pin (not (:pin topic-data))}])}
-                (dom/i {:class (str "fa fa-thumb-tack" (if (:pin topic-data) " pinned" ""))}))
             (when-not (:placeholder topic-data)
               (dom/button {:class "btn-reset archive-button right"
                            :title "Archive this topic"
@@ -399,6 +391,15 @@
                            :style {:display (if (nil? file-upload-state) "block" "none")}
                            :on-click (partial remove-topic-click owner)}
                   (dom/i {:class "fa fa-archive"})))
+            (when-not (:placeholder topic-data)
+              (dom/button {:class "btn-reset pin-button right"
+                           :title (pin-tooltip (:pin topic-data))
+                           :type "button"
+                           :data-toggle "tooltip"
+                           :data-placement "top"
+                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :on-click #(dis/dispatch! [:foce-input {:pin (not (:pin topic-data))}])}
+                  (dom/i {:class (str "fa fa-thumb-tack" (if (:pin topic-data) " pinned" ""))})))
             (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
                 (dom/input {:type "text"
                             :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
