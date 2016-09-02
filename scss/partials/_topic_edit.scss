@@ -268,12 +268,30 @@ div.topic {
           }
         }
 
-        button.pin-button i:not(.pinned) {
-          transform: rotate(0deg);
-        }
+        button.pin-button {
+          opacity: 1;
+          color: rgba(78, 90, 107, 1);
 
-        button.pin-button i.pinned {
-          transform: rotate(25deg);
+          &:hover {
+            opacity: 1 !important;
+          }
+
+          i {
+            opacity: 0.5;
+
+            &:hover {
+              opacity: 0.8;
+            }
+
+            &:not(.pinned) {
+              transform: rotate(0deg);
+            }
+
+            &.pinned {
+              transform: rotate(25deg);
+              opacity: 0.8;
+            }
+          }
         }
 
         span.file-upload-progress {
