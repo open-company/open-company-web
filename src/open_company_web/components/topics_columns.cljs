@@ -139,21 +139,23 @@
          :2 cl2}))))
 
 (defn calc-layout [owner data]
-  (let [columns-num (:columns-num data)
-        company-data (dis/company-data)
-        show-add-topic (add-topic? owner)
-        {:keys [pinned other]} (utils/get-pinned-other-keys (utils/get-section-keys company-data) company-data)
-        final-layout (loop [idx 0
-                            layout (get-pinned-layout pinned columns-num)]
-                        (let [shortest-column (get-shortest-column owner data layout)
-                              new-column (conj (get layout shortest-column) (get other idx))
-                              new-layout (assoc layout shortest-column new-column)]
-                          (if (<= (inc idx) (count other))
-                            (recur (inc idx)
-                                   new-layout)
-                            new-layout)))
-        clean-layout (apply merge (for [[k v] final-layout] {k (vec (remove nil? v))}))]
-    clean-layout))
+  (if (utils/is-test-env?)
+    (om/get-props owner :topics)
+    (let [columns-num (:columns-num data)
+          company-data (dis/company-data)
+          show-add-topic (add-topic? owner)
+          {:keys [pinned other]} (utils/get-pinned-other-keys (utils/get-section-keys company-data) company-data)
+          final-layout (loop [idx 0
+                              layout (get-pinned-layout pinned columns-num)]
+                          (let [shortest-column (get-shortest-column owner data layout)
+                                new-column (conj (get layout shortest-column) (get other idx))
+                                new-layout (assoc layout shortest-column new-column)]
+                            (if (<= (inc idx) (count other))
+                              (recur (inc idx)
+                                     new-layout)
+                              new-layout)))
+          clean-layout (apply merge (for [[k v] final-layout] {k (vec (remove nil? v))}))]
+      clean-layout)))
 
 (defn render-topic [owner options section-name & [column]]
   (when section-name
