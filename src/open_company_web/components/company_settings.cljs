@@ -218,7 +218,7 @@
                                :on-click #(om/set-state! owner :file-upload-state nil)}
                     "cancel"))))
           (dom/div {:class "group"
-                    :style {:margin-bottom "10px"}}
+                    :style {:margin-bottom "2rem"}}
             (dom/input {:id "foce-file-upload-ui--select-trigger"
                         :style {:display "none"}
                         :type "file"
