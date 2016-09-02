@@ -4,7 +4,8 @@
             [goog.history.Html5History :as history5]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
-            [goog.history.EventType :as HistoryEventType]))
+            [goog.history.EventType :as HistoryEventType]
+            [open-company-web.lib.raven :as raven]))
 
 (def path (atom {}))
 
@@ -14,6 +15,12 @@
   (doseq [[k v] parts] (swap! path assoc k v)))
 
 (defn get-token []
+  (when (or (not js/window.location.pathname)
+            (not js/window.location.search))
+    (raven/capture-message (str "Window.location problem:"
+                                " windown.location.pathname:" js/window.location.pathname
+                                " window.location.search:" js/window.location.search
+                                " return:" (str js/window.location.pathname js/window.location.search))))
   (str js/window.location.pathname js/window.location.search))
 
 ; this is needed as of this
