@@ -238,7 +238,7 @@
                          :data-placement "top"
                          :style {:display (if (nil? file-upload-state) "block" "none")}
                          :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
-              (dom/i {:class "fa fa-code"}))
+              (dom/i {:class "fa fa-link"}))
             (dom/div {:class "left"
                       :style {:display (if (= file-upload-state :show-progress) "block" "none")
                               :color "rgba(78, 90, 107, 0.5)"}}
