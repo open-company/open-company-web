@@ -6,9 +6,9 @@
               [open-company-web.router :as router]
               [open-company-web.lib.utils :as utils]
               [open-company-web.lib.responsive :as responsive]
-              [open-company-web.components.menu :refer (menu)]
-              [open-company-web.components.navbar :refer (navbar)]
-              [open-company-web.components.footer :refer (footer)]))
+              [open-company-web.components.ui.menu :refer (menu)]
+              [open-company-web.components.ui.navbar :refer (navbar)]
+              [open-company-web.components.ui.footer :refer (footer)]))
 
 (defcomponent list-page-item [data owner]
   (render [_]

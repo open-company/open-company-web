@@ -4,7 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.responsive :as responsive]
-            [open-company-web.components.footer :refer (footer)]
+            [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.login-required :refer (login-required)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
