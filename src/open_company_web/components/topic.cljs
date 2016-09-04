@@ -50,10 +50,7 @@
 
 (defn pencil-click [owner e]
   (utils/event-stop e)
-  (let [section (om/get-props owner :section)]
-    (if (#{:growth :finances} (keyword section))
-      (fullscreen-topic owner nil true)
-      (start-foce-click owner))))
+  (start-foce-click owner))
 
 (defn block-a-expand []
   (when-not (utils/is-test-env?)
