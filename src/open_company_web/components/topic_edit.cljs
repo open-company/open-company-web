@@ -265,20 +265,35 @@
       (when section
         (dom/div #js {:className "topic-foce group"
                       :ref "topic-internal"}
-          (when image-header
-            (dom/div {:class "card-header card-image"}
-              (when image-header
-                (dom/img {:src image-header
-                          :class "topic-header-img"}))
-              (when image-header
-                (dom/button {:class "btn-reset remove-header"
-                             :on-click #(do
+          (when (or is-growth-finances?
+                    image-header)
+            (dom/div {:class (utils/class-set {:card-header true
+                                               :card-image (not is-growth-finances?)})}
+              (cond
+                (= section-kw :finances)
+                (om/build topic-finances {:section-data topic-data
+                                          :section section-kw
+                                          :currency currency
+                                          :editable true}
+                                          {:opts chart-opts})
+                (= section-kw :growth)
+                (om/build topic-growth {:section-data topic-data
+                                        :section section-kw
+                                        :currency currency
+                                        :editable true} 
+                                        {:opts chart-opts})
+      
+                :else
+                [(dom/img {:src image-header
+                            :class "topic-header-img"})
+                 (dom/button {:class "btn-reset remove-header"
+                              :on-click #(do
                                           (om/set-state! owner :has-changes true)
                                           (dis/dispatch! [:foce-input {:image-url nil :image-height 0 :image-width 0}]))}
                   (i/icon :simple-remove {:size 15
                                           :stroke 4
                                           :color "white"
-                                          :accent-color "white"})))))
+                                          :accent-color "white"}))])))
           ;; Topic title
           (dom/input {:class "topic-title"
                       :value (:title topic-data)
