@@ -39,10 +39,10 @@
                                   "<div>"
                                     "<div class=\"topic-internal\">"
                                       (when-not (clojure.string/blank? headline)
-                                        (str "<div class=\"topic-headline-inner\" style=\"width: " card-width "px;\">"
+                                        (str "<div class=\"topic-headline-inner\" style=\"width: " (+ card-width 20 -8) "px;\">"
                                                (utils/emojify headline true)
                                              "</div>"))
-                                      "<div class=\"topic-body\" style=\"width: " card-width "px;\">"
+                                      "<div class=\"topic-body\" style=\"width: " (+ card-width 20 -8) "px;\">"
                                         (utils/emojify body true)
                                       "</div>"
                                     "</div>"
@@ -219,6 +219,7 @@
           partial-render-topic   (partial render-topic owner options)
           {:keys [pinned other]} (utils/get-pinned-other-keys topics (dis/company-data))
           columns-container-key   (str (apply str pinned) (apply str other))]
+      (println "topics-columns render card-width" card-width)
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true
@@ -235,7 +236,7 @@
               (let [column (get best-layout kw)
                     {:keys [pinned other]} (utils/get-pinned-other-keys column (dis/company-data))]
                 (dom/div {:class (str "topics-column col-" (name kw))
-                          :style #js {:width (str card-width "px")}}
+                          :style #js {:width (str (+ card-width 20 -8) "px")}}
                   (dom/div #js {:className "topics-column-pinned"}
                     (when (pos? (count pinned))
                       (for [idx (range (count pinned))
