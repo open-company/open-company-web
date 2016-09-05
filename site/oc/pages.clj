@@ -10,6 +10,7 @@
 
 (defn index [options]
   [:div
+    [:div#showit]
    [:div.container.outer.section
     [:div.container.inner
      [:div.section-box
