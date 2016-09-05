@@ -15,7 +15,7 @@ div.topics-columns {
     div.topics-column {
       min-width: 302px;
       max-width: 500px;
-      margin-right: 20px;
+      margin-right: 0px;
       float: left;
 
       &:last-child {
@@ -24,12 +24,27 @@ div.topics-columns {
 
       div.topic-row{
         height: auto;
-        padding-bottom: 22px;
+        padding: 0px 10px 22px 10px;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+
+        &.left-highlight {
+          border-left: 4px solid $oc-yellow;
+        }
+
+        &.right-highlight {
+          border-right: 4px solid $oc-yellow;
+        }
+
+        &.draggable-topic.ui-draggable-dragging {
+          z-index: 1000;
+          opacity: 0.5;
+        }
       }
     }
 
     &.columns-1 {
-      padding: 20px 0px 20px 0px;
+      // padding: 20px 0px 20px 0px;
       div.topics-column{
         margin: 0 auto;
         float: none;
@@ -55,4 +70,11 @@ div.dragging {
   div.topics-column-pinned {
     min-height: 10px;
   }
+}
+
+div#showit {
+  position: absolute;
+  border: 1px solid black;
+  opacity: 0.5;
+  z-index: 10000;
 }
