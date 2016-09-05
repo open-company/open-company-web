@@ -28,6 +28,10 @@ $.truncate = function(){};
 $.attr = function(){};
 $.on = function(){};
 $.click = function(){};
+$.addClass = function(){};
+$.removeClass = function(){};
+$.width = function(){};
+$.height = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
