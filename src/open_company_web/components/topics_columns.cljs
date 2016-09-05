@@ -123,8 +123,8 @@
       (if (<= idx (count pinned-topics))
         (recur (+ idx 3)
                (vec (remove nil? (conj cl1 (get pinned-topics idx))))
-               (vec (remove nil? (conj cl2 (get pinned-topics (+ idx 1)))))
-               (vec (remove nil? (conj cl3 (get pinned-topics (+ idx 1))))))
+               (vec (remove nil? (conj cl2 (get pinned-topics (inc idx)))))
+               (vec (remove nil? (conj cl3 (get pinned-topics (+ idx 2))))))
         {:1 cl1
          :2 cl2
          :3 cl3}))
