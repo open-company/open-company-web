@@ -369,7 +369,7 @@
                          :data-toggle "tooltip"
                          :data-placement "top"
                          :style {:display (if no-data? "block" "none")}
-                         :on-click #(.alert "chart click")}
+                         :on-click #(.log js/console "chart click")}
                 (dom/i {:class "fa fa-line-chart"})))
             (when-not (:placeholder topic-data)
               (dom/button {:class "btn-reset archive-button right"

@@ -133,6 +133,24 @@ div.topic {
         }
       }
 
+      &:hover {
+        button.chart-pencil-button {
+          color: rgba(78,90,107,0.5);
+        }
+      }
+
+      button.chart-pencil-button{
+        position: absolute;
+        top: 25px;
+        right: 25px;
+        transition: 230ms;
+        color: rgba(78,90,107,0);
+
+        &:hover {
+          color: rgba(78,90,107,1);
+        }
+      }
+
       div.topic-headline-inner {
         padding-top: 14px;
         font-size: 20px;

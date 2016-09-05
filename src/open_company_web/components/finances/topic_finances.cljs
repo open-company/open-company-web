@@ -31,7 +31,7 @@
   (let [section-data (:section-data data)]
     {:finances-data (finance-utils/map-placeholder-data (:data section-data))}))
 
-(defcomponent topic-finances [{:keys [section section-data currency] :as data} owner options]
+(defcomponent topic-finances [{:keys [section section-data currency editable] :as data} owner options]
 
   (init-state [_]
     (get-state owner data true))
@@ -110,4 +110,13 @@
                                       (assoc-in [:runway :position] :bottom)
                                       (assoc-in [:runway :order] 3))]
                   (om/build d3-chart {:chart-data sorted-finances}
-                                     {:opts (merge chart-opts {:labels ordered-labels})}))))))))))
+                                     {:opts (merge chart-opts {:labels ordered-labels})})))
+
+              (when editable
+                (dom/button {:class "btn-reset chart-pencil-button"
+                             :title "Edit chart data"
+                             :type "button"
+                             :data-toggle "tooltip"
+                             :data-placement "left"
+                             :on-click #(.log js/console "chart edit click")}
+                  (dom/i {:class "fa fa-pencil editable-pen"}))))))))))
