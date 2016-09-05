@@ -156,6 +156,7 @@ div.selected-topic-container{
 }
 
 div.topic-list-sortable-placeholder {
-  background-color: rgba(78, 90, 107, 0.2);
   margin-bottom: 23px;
+  height: 2px;
+  background-color: $oc_yellow;
 }
