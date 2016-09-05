@@ -21,6 +21,7 @@
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [goog.events :as events]
+            [goog.object :as gobj]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
             [goog.fx.dom :refer (Fade Slide)]
@@ -201,20 +202,70 @@
         company-topics (vec (map keyword (:sections company-data)))]
     (count (filter :pin (map #(->> % keyword (get company-data)) company-topics)))))
 
+(defn get-topic-at-position [owner left top]
+  (let [company-data    (:company-data (om/get-props owner))
+        company-topics  (vec (map keyword (:sections company-data)))
+        dragging-topic (.data (js/$ ".ui-draggable-dragging") "topic")]
+    (.removeClass (js/$ ".topic-row") "left-highlight")
+    (.removeClass (js/$ ".topic-row") "right-highlight")
+    (doseq [topic company-topics]
+      (let [topic-el (js/$ (str ".topic-row[data-topic=" (name topic) "]"))
+            topic-pos (.position topic-el)
+            topic-position (utils/absolute-offset topic-el)
+                           ; {:left (- (gobj/get topic-pos "left") 20)
+                           ;  :top (- (gobj/get topic-pos "top") 30)}
+            topic-size {:width (.width topic-el) :height (.height topic-el)}
+            target-css {:width (+ (:width topic-size) 20)
+                        :height (+ (:height topic-size) 22)
+                        :left (- (:left topic-position) 10)
+                        :top (:top topic-position)}]
+        ; (println "topic" topic topic-position topic-size left top)
+        (.css (js/$ "div#showit") (clj->js target-css))
+        (when (= topic :customer-service)
+          (println "checking: " topic " (" left "," top ") with: " target-css))
+        (when (and (not= (name topic) dragging-topic)
+                   (<= (:left target-css) left)
+                   (<= (:top target-css) top)
+                   (>= (+ (:left target-css) (:width target-css)) left)
+                   (>= (+ (:top target-css) (:height target-css)) top))
+          (println "inside!!!" topic topic-position topic-size)
+          (if (< (- left (:left topic-position)) (/ (:width topic-size) 2))
+            ; set left border
+            (.addClass topic-el "left-highlight")
+            ; set right border
+            (.addClass topic-el "right-highlight")
+            ))))))
+
+(defn dragging [owner e]
+  (let [tcc-offset (.offset (js/$ ".topics-column-container"))
+        inside-pos {:left (- (int (gobj/get e "pageX")) (int (gobj/get tcc-offset "left")))
+                    :top (- (int (gobj/get e "pageY")) (int (gobj/get tcc-offset "top")))}]
+    ; (println "absolute pos: -" (int (gobj/get e "pageX")) (int (gobj/get tcc-offset "left")) "= " (:left inside-pos) "and -"  (int (gobj/get e "pageY")) (int (gobj/get tcc-offset "top")) "=" (:top inside-pos))
+    ; (println "topics-column-container" (.offset (js/$ ".topics-column-container")))
+    ; (println "pos inside:" inside-pos)
+    (get-topic-at-position owner (:left inside-pos) (:top inside-pos))))
+
 (defn setup-sortable [owner]
   (when-not (om/get-state owner :sortable)
-    (when-let [list-node (js/jQuery (sel [:div.topics-column-pinned]))]
-      (when-not (.sortable list-node "instance")
-        (.sortable list-node #js {:scroll true
-                                  :forcePlaceholderSize true
-                                  :placeholder "topic-list-sortable-placeholder"
-                                  :items "div.topic-row.draggable-topic"
-                                  :handle ".draggable-topic"
-                                  :connectWith ".topics-column-pinned"
-                                  :start #(om/set-state! owner :dragging true)
-                                  :stop #(do (om/set-state! owner :dragging false)
-                                             (save-sections-order owner))
-                                  :opacity 1})))))
+    (when-let [list-node (js/jQuery (sel [:div.topic-row.draggable-topic]))]
+      (when-not (.draggable list-node "instance")
+        (.draggable list-node #js {:addClasses "dragging"
+                                   :drag #(dragging owner %)
+                                   :start (fn [] (.addClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic"))
+                                   :stop (fn [] (.removeClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic"))})))
+    ; (when-let [list-node (js/jQuery (sel [:div.topics-column-pinned]))]
+    ;   (when-not (.sortable list-node "instance")
+    ;     (.sortable list-node #js {:scroll true
+    ;                               :forcePlaceholderSize true
+    ;                               :placeholder "topic-list-sortable-placeholder"
+    ;                               :items "div.topic-row.draggable-topic"
+    ;                               :handle ".draggable-topic"
+    ;                               :connectWith ".topics-column-pinned"
+    ;                               :start #(om/set-state! owner :dragging true)
+    ;                               :stop #(do (om/set-state! owner :dragging false)
+    ;                                          (save-sections-order owner))
+    ;                               :opacity 1})))
+    ))
 
 (defn destroy-sortable []
   (when-let [list-node (js/jQuery (sel [:div.topics-column-pinned]))]
