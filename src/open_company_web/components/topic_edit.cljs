@@ -243,32 +243,32 @@
 
     (let [company-slug        (router/current-company-slug)
           section             (dis/foce-section-key)
-          topic-data          (dis/foce-section-data)
           section-kw          (keyword section)
-          chart-opts          {:chart-size {:width 230}
-                               :hide-nav true
-                               :topic-click (:topic-click options)}
-          is-growth-finances? (#{:growth :finances} section-kw)
+          topic-data          (dis/foce-section-data)
+          topic-body          (:body topic-data)
           gray-color          (oc-colors/get-color-by-kw :oc-gray-5)
-          finances-row-data   (:data topic-data)
+          image-header        (:image-url topic-data)
+          is-data?            (#{:growth :finances} section-kw)
+          finances-data       (:data topic-data)
           growth-data         (growth-utils/growth-data-map (:data topic-data))
-          no-data             (or (and (= section-kw :finances)
-                                       (or (empty? finances-row-data)
-                                        (utils/no-finances-data? finances-row-data)))
+          no-data?            (or (and (= section-kw :finances)
+                                       (or (empty? finances-data)
+                                        (utils/no-finances-data? finances-data)))
                                   (and (= section-kw :growth)
                                        (utils/no-growth-data? growth-data)))
-          image-header        (:image-url topic-data)
-          topic-body          (:body topic-data)]
+          chart-opts          {:chart-size {:width 230}
+                               :hide-nav true
+                               :topic-click (:topic-click options)}]
       ; set the onbeforeunload handler only if there are changes
       (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
       (when section
         (dom/div #js {:className "topic-foce group"
                       :ref "topic-internal"}
-          (when (or is-growth-finances?
+          (when (or is-data?
                     image-header)
             (dom/div {:class (utils/class-set {:card-header true
-                                               :card-image (not is-growth-finances?)})}
+                                               :card-image (not is-data?)})}
               (cond
                 (= section-kw :finances)
                 (om/build topic-finances {:section-data topic-data
@@ -344,22 +344,33 @@
                                              body     (sel1 (str "#foce-body-" (name section)))]
                                          (not (or (= (.-activeElement js/document) headline)
                                                   (= (.-activeElement js/document) body))))}))
-            (dom/button {:class "btn-reset camera left"
+            (when-not is-data?
+              (dom/button {:class "btn-reset camera left"
                          :title (add-image-tooltip image-header)
                          :type "button"
                          :data-toggle "tooltip"
                          :data-placement "top"
                          :style {:display (if (nil? file-upload-state) "block" "none")}
                          :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
-                (dom/i {:class "fa fa-camera"}))
-            (dom/button {:class "btn-reset image-url left"
-                         :title "Provide an image link"
+                (dom/i {:class "fa fa-camera"})))
+            (when-not is-data?
+              (dom/button {:class "btn-reset image-url left"
+                           :title "Provide an image link"
+                           :type "button"
+                           :data-toggle "tooltip"
+                           :data-placement "top"
+                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
+                  (dom/i {:class "fa fa-code"})))
+            (when is-data?
+              (dom/button {:class "btn-reset chart-button left"
+                         :title "Add a chart"
                          :type "button"
                          :data-toggle "tooltip"
                          :data-placement "top"
-                         :style {:display (if (nil? file-upload-state) "block" "none")}
-                         :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
-                (dom/i {:class "fa fa-code"}))
+                         :style {:display (if no-data? "block" "none")}
+                         :on-click #(.alert "chart click")}
+                (dom/i {:class "fa fa-line-chart"})))
             (when-not (:placeholder topic-data)
               (dom/button {:class "btn-reset archive-button right"
                            :title "Archive this topic"
