@@ -177,7 +177,8 @@
      :show-add-topic-tip show-add-topic-tip
      :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
      :show-share-tooltip (or (:show-share-tooltip current-state) false)
-     :show-second-pin-tip (or (:show-second-pin-tip current-state) false)}))
+     :show-second-pin-tip (or (:show-second-pin-tip current-state) false)
+     :rerender (rand 4)}))
 
 (defn save-sections-order [owner]
   (let [col1-pinned-topics (sel [:div.col-1 :div.topic.draggable-topic])
@@ -247,17 +248,26 @@
             (= (:side in?) "right")
             (.addClass (:topic-el in?) "right-highlight"))
           ; reorder topics
-          (when (:inside? in?)
+          (if (:inside? in?)
             (let [dragged-topic (keyword (.data (js/$ ".ui-draggable-dragging") "topic"))
                   {:keys [pinned other]} (utils/get-pinned-other-keys (:sections company-data) company-data)
                   pinned-kw (map keyword pinned)
                   other-kw (map keyword other)
                   all-but-dragged (concat (utils/vec-dissoc pinned-kw dragged-topic) other-kw)
-                  idx (.indexOf all-but-dragged (:topic in?))
+                  idx (.indexOf pinned-kw (:topic in?))
                   fixed-idx (if (= (:side in?) "left") idx (inc idx))
                   new-sections (let [[before after] (split-at fixed-idx all-but-dragged)]
                                  (vec (concat before [dragged-topic] after)))]
-              (dispatcher/dispatch! [:new-sections new-sections]))))))))
+              (if (>= idx 0)
+                ; dropped in a good spot
+                (dispatcher/dispatch! [:new-sections new-sections])
+                ;dropped in a not good spot, reset the order to the original
+                (do
+                  (dispatcher/dispatch! [:new-sections (:sections company-data)])
+                  (om/set-state! owner :rerender (rand 4)))))
+            ; dropped out of any topic, reset the order to original to move the dragged topic
+            ; in it's place
+            (om/set-state! owner :rerender (rand 4))))))))
 
 (defn inside-position-from-event [e]
   (let [tcc-offset (.offset (js/$ ".topics-column-container"))]
@@ -271,25 +281,24 @@
     (.removeClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic")))
 
 (defn setup-sortable [owner]
-  (when-not (om/get-state owner :sortable)
-    (when-let [list-node (js/jQuery (sel [:div.topic-row.draggable-topic]))]
-      (when-not (.draggable list-node "instance")
-        (.draggable list-node #js {:addClasses "dragging"
-                                   :drag #(dragging owner % false)
-                                   :scroll true
-                                   :start (fn [] (.addClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic"))
-                                   :stop #(dragging owner % true)})))))
+  (when-let [list-node (js/jQuery (sel [:div.topic-row.draggable-topic]))]
+    (when-not (.draggable list-node "instance")
+      (.draggable list-node #js {:addClasses "dragging"
+                                 :drag #(dragging owner % false)
+                                 :scroll true
+                                 :start (fn [] (.addClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic"))
+                                 :stop #(dragging owner % true)}))))
 
-(defn destroy-sortable []
-  (when-let [list-node (js/jQuery (sel [:div.topics-column-pinned]))]
-    (when (.sortable list-node "instance")
-      (.sortable list-node "destroy"))))
+(defn destroy-sortable [owner]
+  (when-let [list-node (js/jQuery (sel [:div.topic-row.draggable-topic]))]
+    (when (.draggable list-node "instance")
+      (.draggable list-node "destroy"))))
 
 (defn manage-sortable [owner]
   (when-not (utils/is-test-env?)
     (if (> (pinned-count (om/get-props owner)) 1)
-      (setup-sortable owner)
-      (destroy-sortable))))
+      (do (destroy-sortable owner) (setup-sortable owner))
+      (destroy-sortable owner))))
 
 (defcomponent topic-list [data owner options]
 
@@ -360,7 +369,8 @@
                            show-second-add-topic-tooltip
                            show-share-tooltip
                            show-second-pin-tip
-                           dragging]}]
+                           dragging
+                           rerender]}]
     (let [company-slug    (router/current-company-slug)
           company-data    (:company-data data)
           company-topics  (vec (map keyword (:sections company-data)))
@@ -373,7 +383,8 @@
                             1 (if (> ww 413) (str card-width "px") "auto"))]
       (dom/div {:class (str "topic-list group" (when dragging " dragging"))
                 :style {:margin-top (if selected-topic "0px" "84px")}
-                :key "topic-list"}
+                :data-rerender rerender
+                :key (str "topic-list" rerender)}
         ;; Activate sharing mode button
         (when (and (not (responsive/is-mobile-size?))
                    (responsive/can-edit?)
