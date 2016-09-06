@@ -106,6 +106,14 @@
         ;; Topic title
         (dom/div {:class "group"}
           (dom/div {:class "topic-title"} (:title topic-data))
+          (when (and (:pin topic-data)
+                     (not (responsive/is-mobile-size?))
+                     (> (count (:pinned (utils/get-pinned-other-keys (:sections (dis/company-data)) (dis/company-data)))) 1))
+            (dom/div {:class "pinned-topic"}
+              (dom/i {:class "fa fa-thumb-tack"
+                      :data-toggle "tooltip"
+                      :data-placement "top"
+                      :title "Drag and drop to reorder"})))
           (when (and show-fast-editing
                    (not (responsive/is-mobile-size?))
                    (responsive/can-edit?)
@@ -117,15 +125,7 @@
               (dom/i {:class "fa fa-pencil"
                       :title "Edit"
                       :data-toggle "tooltip"
-                      :data-placement "top"})))
-          (when (and (:pin topic-data)
-                     (not (responsive/is-mobile-size?))
-                     (> (count (:pinned (utils/get-pinned-other-keys (:sections (dis/company-data)) (dis/company-data)))) 1))
-            (dom/div {:class "pinned-topic"}
-              (dom/i {:class "fa fa-thumb-tack"
-                      :data-toggle "tooltip"
-                      :data-placement "top"
-                      :title "Drag and drop to reorder"}))))
+                      :data-placement "top"}))))
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
