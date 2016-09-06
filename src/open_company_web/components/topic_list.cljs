@@ -13,6 +13,7 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.caches :as caches]
             [open-company-web.router :as router]
+            [open-company-web.lib.raven :as sentry]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
@@ -204,33 +205,35 @@
     (count pinned)))
 
 (defn coord-inside [left top topic]
-  (let [dragging-topic (.data (js/$ ".ui-draggable-dragging") "topic")
-        topic-el (js/$ (str ".topic-row[data-topic=" (name topic) "]"))
-        topic-pos (.position topic-el)
-        topic-position (utils/absolute-offset (.get topic-el 0))
-        topic-posalter {:left (- (gobj/get topic-pos "left") 20)
-                        :top (- (gobj/get topic-pos "top") 30)}
-        topic-size {:width (.width topic-el) :height (.height topic-el)}
-        target-css {:width (int (+ (:width topic-size) 26))
-                    :height (int (+ (:height topic-size) 22))
-                    :left (int (:left topic-position))
-                    :top (int (- (:top topic-position) 84))}]
-    (if (and (not= (name topic) dragging-topic)
-               (>= left (:left target-css) )
-               (>= top (:top target-css))
-               (< left (+ (:left target-css) (:width target-css)))
-               (< top (+ (:top target-css) (:height target-css))))
-      (if (< (- left (:left topic-position)) (/ (:width topic-size) 2))
-        {:side "left"
-         :topic-el topic-el
-         :inside? true
-         :topic topic}
-        {:side "right"
-         :topic-el topic-el
-         :inside? true
-         :topic topic})
-      {:topic-el topic-el
-       :inside? false})))
+  (if topic
+    (let [dragging-topic (.data (js/$ ".ui-draggable-dragging") "topic")
+          topic-el (js/$ (str ".topic-row[data-topic=" (name topic) "]"))
+          topic-pos (.position topic-el)
+          topic-position (utils/absolute-offset (.get topic-el 0))
+          topic-posalter {:left (- (gobj/get topic-pos "left") 20)
+                          :top (- (gobj/get topic-pos "top") 30)}
+          topic-size {:width (.width topic-el) :height (.height topic-el)}
+          target-css {:width (int (+ (:width topic-size) 26))
+                      :height (int (+ (:height topic-size) 22))
+                      :left (int (:left topic-position))
+                      :top (int (- (:top topic-position) 84))}]
+      (if (and (not= (name topic) dragging-topic)
+                 (>= left (:left target-css) )
+                 (>= top (:top target-css))
+                 (< left (+ (:left target-css) (:width target-css)))
+                 (< top (+ (:top target-css) (:height target-css))))
+        (if (< (- left (:left topic-position)) (/ (:width topic-size) 2))
+          {:side "left"
+           :topic-el topic-el
+           :inside? true
+           :topic topic}
+          {:side "right"
+           :topic-el topic-el
+           :inside? true
+           :topic topic})
+        {:topic-el topic-el
+         :inside? false}))
+    (sentry/capture-message (str "open-company-web.components.topic-list/coord-inside params, left:" left ", top:" top ", topic:" topic))))
 
 (defn get-topic-at-position [owner left top stop?]
   (let [left (+ left 45)
@@ -283,7 +286,7 @@
       (.draggable list-node #js {:addClasses "dragging"
                                  :drag #(dragging owner % false)
                                  :scroll true
-                                 :start (fn [] (.addClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic"))
+                                 :start #(.addClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic")
                                  :stop #(dragging owner % true)}))))
 
 (defn destroy-draggable [owner]
@@ -296,6 +299,13 @@
     (if (> (pinned-count (om/get-props owner)) 1)
       (do (destroy-draggable owner) (utils/after 1 #(setup-draggable owner)))
       (destroy-draggable owner))))
+
+(defn can-edit-sections? [company-data]
+  (let [company-topics (vec (map keyword (:sections company-data)))]
+    (and (not (responsive/is-mobile-size?))
+         (responsive/can-edit?)
+         (not (:read-only company-data))
+         (>= (count (utils/filter-placeholder-sections company-topics company-data)) min-no-placeholder-section-enable-share))))
 
 (defcomponent topic-list [data owner options]
 
@@ -334,8 +344,8 @@
       (om/set-state! owner (get-state owner next-props (om/get-state owner))))
     (when-not (:read-only (:company-data next-props))
       (get-new-sections-if-needed owner))
-    (let [company-data (:company-data next-props)
-          topics (vec (:sections company-data))
+    (let [company-data            (:company-data next-props)
+          topics                  (vec (:sections company-data))
           no-placeholder-sections (utils/filter-placeholder-sections topics company-data)]
       (when (and (:force-edit-topic next-props) (contains? company-data (keyword (:force-edit-topic next-props))))
         (om/set-state! owner :fullscreen-force-edit true)
@@ -350,9 +360,11 @@
         (om/set-state! owner :show-second-pin-tip true))))
 
   (did-update [_ _ _]
-    (when (om/get-state owner :tr-selected-topic)
-      (animate-selected-topic-transition owner (om/get-state owner :animation-direction)))
-    (manage-draggable owner))
+    (when-not (utils/is-test-env?)
+      (when (om/get-state owner :tr-selected-topic)
+        (animate-selected-topic-transition owner (om/get-state owner :animation-direction)))
+      (when (can-edit-sections? (:company-data data))
+        (manage-draggable owner))))
 
   (render-state [_ {:keys [active-topics
                            selected-topic
@@ -377,16 +389,17 @@
           total-width     (case columns-num
                             3 (str (+ (* card-width 3) 40 60) "px")
                             2 (str (+ (* card-width 2) 20 60) "px")
-                            1 (if (> ww 413) (str card-width "px") "auto"))]
-      (dom/div {:class (str "topic-list group" (when dragging " dragging"))
+                            1 (if (> ww 413) (str card-width "px") "auto"))
+          can-edit-secs   (can-edit-sections? company-data)]
+      (dom/div {:class (utils/class-set {:topic-list true
+                                         :group true
+                                         :dragging dragging
+                                         :editable can-edit-secs})
                 :style {:margin-top (if selected-topic "0px" "84px")}
                 :data-rerender rerender
                 :key (str "topic-list" rerender)}
         ;; Activate sharing mode button
-        (when (and (not (responsive/is-mobile-size?))
-                   (responsive/can-edit?)
-                   (not (:read-only company-data))
-                   (>= (count (utils/filter-placeholder-sections company-topics company-data)) min-no-placeholder-section-enable-share))
+        (when can-edit-secs
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
             (dom/button {:class "sharing-button"
