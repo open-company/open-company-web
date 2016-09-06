@@ -6,6 +6,9 @@ div.topics-columns {
     div.topic.not-draggable-topic {
       opacity: 0.5 !important;
     }
+    div.topic-row div.topic button.topic-pencil-button {
+      opacity: 0;
+    }
   }
 
   div.topics-column-container {
