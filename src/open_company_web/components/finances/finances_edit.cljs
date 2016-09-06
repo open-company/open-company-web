@@ -43,57 +43,54 @@
           ref-prefix (str (:period finances-data) "-")
           period-month (utils/get-month period)
           needs-year (or (= period-month "JAN")
-                         (= period-month "DEC")
                          (:needs-year data))]
-      [(dom/tr {}
-        (dom/th {:class "no-cell"}
-          (utils/get-period-string (:period finances-data) "monthly" [:short]))
-        ;; revenue
-        (dom/td {}
-          (om/build cell {:value (:revenue finances-data)
-                          :decimals 0
-                          :positive-only true
-                          :placeholder (if is-new "entire month" "")
-                          :currency currency
-                          :cell-state cell-state
-                          :draft-cb #(change-cb :revenue %)
-                          :period period
-                          :key :revenue
-                          :tab-cb tab-cb}))
-        ;; costs
-        (dom/td {}
-          (om/build cell {:value (:costs finances-data)
-                          :decimals 0
-                          :positive-only true
-                          :placeholder (if is-new "entire month" "")
-                          :currency currency
-                          :cell-state cell-state
-                          :draft-cb #(change-cb :costs %)
-                          :period period
-                          :key :costs
-                          :tab-cb tab-cb}))
-        ;; cash
-        (dom/td {}
-          (om/build cell {:value (:cash finances-data)
-                          :decimals 0
-                          :positive-only false
-                          :placeholder (if is-new "month end" "")
-                          :currency currency
-                          :cell-state cell-state
-                          :draft-cb #(change-cb :cash %)
-                          :period period
-                          :key :cash
-                          :tab-cb tab-cb})))
-      (when needs-year
+      (dom/tbody {}
         (dom/tr {}
-          (dom/th {:class "no-cell year"}
-            "2016")
-          (dom/td {:class "no-cell"})
-          (dom/td {:class "no-cell"})
-          (dom/td {:class "no-cell"})
-          )
-        )]
-      )))
+          (dom/th {:class "no-cell"}
+            (utils/get-period-string (:period finances-data) "monthly" [:short :skip-year]))
+          ;; revenue
+          (dom/td {}
+            (om/build cell {:value (:revenue finances-data)
+                            :decimals 0
+                            :positive-only true
+                            :placeholder (if is-new "entire month" "")
+                            :currency currency
+                            :cell-state cell-state
+                            :draft-cb #(change-cb :revenue %)
+                            :period period
+                            :key :revenue
+                            :tab-cb tab-cb}))
+          ;; costs
+          (dom/td {}
+            (om/build cell {:value (:costs finances-data)
+                            :decimals 0
+                            :positive-only true
+                            :placeholder (if is-new "entire month" "")
+                            :currency currency
+                            :cell-state cell-state
+                            :draft-cb #(change-cb :costs %)
+                            :period period
+                            :key :costs
+                            :tab-cb tab-cb}))
+          ;; cash
+          (dom/td {}
+            (om/build cell {:value (:cash finances-data)
+                            :decimals 0
+                            :positive-only false
+                            :placeholder (if is-new "month end" "")
+                            :currency currency
+                            :cell-state cell-state
+                            :draft-cb #(change-cb :cash %)
+                            :period period
+                            :key :cash
+                            :tab-cb tab-cb})))
+        (when needs-year
+          (dom/tr {}
+            (dom/th {:class "no-cell year"}
+              (utils/get-year (:period finances-data)))
+            (dom/td {:class "no-cell"})
+            (dom/td {:class "no-cell"})
+            (dom/td {:class "no-cell"})))))))
 
 (defn replace-row-in-data [data row k v]
   "Find and replace the edited row"
@@ -117,7 +114,8 @@
 
   (render-state [_ {:keys [finances-data stop]}]
     (let [company-slug (router/current-company-slug)
-          currency (:currency data)]
+          currency (:currency data)
+          editing-cb (:editing-cb data)]
 
       (dom/div {:class "finances"}
         (dom/div {:class "composed-section-edit finances-body edit"}
@@ -129,23 +127,23 @@
                   (dom/th {} "Revenue")
                   (dom/th {} "Expenses")
                   (dom/th {} "Cash")))
-              (dom/tbody {}
-                (let [current-period (utils/current-period)]
-                  (for [idx (range stop)]
-                    (let [period (finance-utils/get-past-period current-period idx)
-                          has-value (contains? finances-data period)
-                          row-data (if has-value
-                                      (get finances-data period)
-                                      (finance-utils/placeholder-data period {:new true}))
-                          next-period (finance-utils/get-past-period current-period (inc idx))]
-                      (om/build finances-edit-row {:cursor row-data
-                                                   :next-period next-period
-                                                   :is-last (= idx 0)
-                                                   :needs-year (= idx (dec stop))
-                                                   :currency currency
-                                                   :change-cb #(replace-row-in-data data row-data %1 %2)}))))
+              (let [current-period (utils/current-period)]
+                (for [idx (range stop)]
+                  (let [period (finance-utils/get-past-period current-period idx)
+                        has-value (contains? finances-data period)
+                        row-data (if has-value
+                                    (get finances-data period)
+                                    (finance-utils/placeholder-data period {:new true}))
+                        next-period (finance-utils/get-past-period current-period (inc idx))]
+                    (om/build finances-edit-row {:cursor row-data
+                                                 :next-period next-period
+                                                 :is-last (= idx 0)
+                                                 :needs-year (= idx (dec stop))
+                                                 :currency currency
+                                                 :change-cb #(replace-row-in-data data row-data %1 %2)}))))
+              (dom/tfoot {}
                 (dom/tr {}
-                  (dom/th {:col-span 2}
+                  (dom/th {:class "earlier" :col-span 2}
                     (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner)} "Earlier..."))
                   (dom/td {})
                   (dom/td {})))))
@@ -155,11 +153,11 @@
               (dom/button {:class "btn-reset btn-solid"
                            :on-click  #(do
                                         (utils/event-stop %)
-                                        (.log js/console "save"))} "SAVE")
+                                        (editing-cb false))} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
                            :on-click #(do
                                         (utils/event-stop %)
-                                        (.log js/console "cancel"))} "CANCEL"))))
+                                        (editing-cb false))} "CANCEL"))))
 
         ;; Onboarding toolip
         (when (:show-first-edit-tip data)

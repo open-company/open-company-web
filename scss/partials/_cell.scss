@@ -1,11 +1,14 @@
 .comp-cell {
   border: 2px solid transparent;
-  width: 80px;
+  width: 70px;
   height: 30px;
-
+  overflow-x: hidden;
+  
   .comp-cell-int {
     width: 100%;
     min-height: 24px;
+    text-align: right;
+    padding: 2px 4px 0 0;
 
     span, input {
       width: 100%;

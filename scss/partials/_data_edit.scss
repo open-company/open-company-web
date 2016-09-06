@@ -26,9 +26,8 @@ div.finances, div.growth {
 
     tr {
 
-
       th {
-        padding: 4px 0 4px 8px;
+        padding: 4px 0 4px 0px;
         font-weight: 700;
         font-family: $oc_headers_font;
         font-size: 12px;
@@ -38,6 +37,7 @@ div.finances, div.growth {
         text-transform: uppercase;
         height: 36px;
         vertical-align: middle;
+        text-align: center;
 
         a.more {
           font-weight: 700;
@@ -46,15 +46,11 @@ div.finances, div.growth {
           letter-spacing: 1px;
           color: rgba(78, 90, 107, 0.5);
         }
-
-        &.year {
-          padding: 0 0 0 8px;
-          height: 12px;
-        }
       }
 
       td {
         padding: 3px;
+        text-align: center;
       }
 
       td.no-cell, th.no-cell {
@@ -70,7 +66,13 @@ div.finances, div.growth {
       }
 
       th.no-cell {
+        padding: 4px 0 4px 8px;
         font-family: $oc_headers_font;
+      }
+
+      th.earlier {
+        text-align: left;
+        padding-left: 8px;
       }
 
       td div.comp-cell {

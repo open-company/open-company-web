@@ -15,6 +15,7 @@
 ;; - :prefix a prefix to show before the formatted value
 ;; - :suffix a suffix to show after the formatted value
 ;; - :cell-state (optional) an initial state for the component
+;; - :positive-only (optional) if true, don't allow negative values (just drops the -)
 
 
 (defn- to-state [owner data state]

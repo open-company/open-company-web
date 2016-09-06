@@ -28,17 +28,21 @@
       (neg? value) (finance-utils/get-rounded-runway value [:round :short])
       :else "-")))
 
+(defn- data-editing-toggle [owner editing-cb editing]
+  (om/set-state! owner :data-editing? editing)
+  (editing-cb editing))
+
 (defcomponent topic-finances [{:keys [section section-data currency editable editing-cb] :as data} owner options]
 
   (init-state [_]
-    {:is-data-editing? false})
+    {:data-editing? false})
 
   (render-state [_ state]
     (let [finances-row-data (:data section-data)
           no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))]
 
       (when-not no-data
-        (let [is-data-editing? (om/get-state owner :is-data-editing?)
+        (let [data-editing? (om/get-state owner :data-editing?)
               fixed-finances-data (finance-utils/fill-gap-months finances-row-data)
               sort-pred (utils/sort-by-key-pred :period)
               sorted-finances (sort sort-pred (vals fixed-finances-data))          
@@ -71,12 +75,13 @@
                                :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}}]
 
           (dom/div {:id "section-finances" :class (utils/class-set {:section-container true
-                                                                    :editing is-data-editing?})}
+                                                                    :editing data-editing?})}
 
-            (if is-data-editing?
+            (if data-editing?
               (om/build finances-edit {:finances-data (finance-utils/finances-data-map finances-row-data)
                                        :change-finances-cb #(.log js/console "change finances cb") ; (partial change-finances-data-cb owner)
                                        :currency currency
+                                       :editing-cb (partial data-editing-toggle owner editing-cb)
                                        :show-first-edit-tip false ; show-first-edit-tip
                                        ;:first-edit-tip-cb #(focus-headline owner)
                                       }
@@ -121,6 +126,6 @@
                                :type "button"
                                :data-toggle "tooltip"
                                :data-placement "left"
-                               :on-click #(do (om/set-state! owner :is-data-editing? true)
+                               :on-click #(do (om/set-state! owner :data-editing? true)
                                               (editing-cb true))}
                     (dom/i {:class "fa fa-pencil editable-pen"})))))))))))
