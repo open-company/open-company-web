@@ -254,7 +254,7 @@
                   pinned-kw (map keyword pinned)
                   other-kw (map keyword other)
                   all-but-dragged (concat (utils/vec-dissoc pinned-kw dragged-topic) other-kw)
-                  idx (.indexOf pinned-kw (:topic in?))
+                  idx (.indexOf (utils/vec-dissoc pinned-kw dragged-topic) (:topic in?))
                   fixed-idx (if (= (:side in?) "left") idx (inc idx))
                   new-sections (let [[before after] (split-at fixed-idx all-but-dragged)]
                                  (vec (concat before [dragged-topic] after)))]
