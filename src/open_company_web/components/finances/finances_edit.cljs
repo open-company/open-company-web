@@ -150,7 +150,7 @@
 
           (dom/div {:class "topic-foce-footer group"}
             (dom/div {:class "topic-foce-footer-right"}
-              (dom/button {:class "btn-reset btn-solid"
+              (dom/button {:class "btn-reset btn-outline btn-data-save"
                            :on-click  #(do
                                         (utils/event-stop %)
                                         (editing-cb false))} "SAVE")

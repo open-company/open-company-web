@@ -98,6 +98,10 @@ div.finances, div.growth {
     button.btn-outline {
       background-color: white;
     }
+
+    button.btn-outline.btn-data-save {
+      color: $oc_green;
+    }
   }
 }
 
