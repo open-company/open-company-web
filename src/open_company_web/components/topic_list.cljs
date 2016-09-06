@@ -248,23 +248,23 @@
             (= (:side in?) "right")
             (.addClass (:topic-el in?) "right-highlight"))
           ; reorder topics
-          (do
-            (when (:inside? in?)
-              (let [dragged-topic (keyword (.data (js/$ ".ui-draggable-dragging") "topic"))
-                    {:keys [pinned other]} (utils/get-pinned-other-keys (:sections company-data) company-data)
-                    pinned-kw (map keyword pinned)
-                    other-kw (map keyword other)
-                    all-but-dragged (concat (utils/vec-dissoc pinned-kw dragged-topic) other-kw)
-                    idx (.indexOf (utils/vec-dissoc pinned-kw dragged-topic) (:topic in?))
-                    fixed-idx (if (= (:side in?) "left") idx (inc idx))
-                    new-sections (let [[before after] (split-at fixed-idx all-but-dragged)]
-                                   (vec (concat before [dragged-topic] after)))]
-                (if (>= idx 0)
-                  ; dropped in a good spot
-                  (dispatcher/dispatch! [:new-sections new-sections])
-                  ;dropped in a not good spot, reset the order to the original
-                  (dispatcher/dispatch! [:new-sections (:sections company-data)]))))
-            (om/set-state! owner :rerender (rand 4))))))))
+          (when (:inside? in?)
+            (let [dragged-topic (keyword (.data (js/$ ".ui-draggable-dragging") "topic"))
+                  {:keys [pinned other]} (utils/get-pinned-other-keys (:sections company-data) company-data)
+                  pinned-kw (map keyword pinned)
+                  other-kw (map keyword other)
+                  all-but-dragged (concat (utils/vec-dissoc pinned-kw dragged-topic) other-kw)
+                  idx (.indexOf (utils/vec-dissoc pinned-kw dragged-topic) (:topic in?))
+                  fixed-idx (if (= (:side in?) "left") idx (inc idx))
+                  new-sections (let [[before after] (split-at fixed-idx all-but-dragged)]
+                                 (vec (concat before [dragged-topic] after)))]
+              (if (>= idx 0)
+                ; dropped in a good spot
+                (dispatcher/dispatch! [:new-sections new-sections])
+                ;dropped in a not good spot, reset the order to the original
+                (dispatcher/dispatch! [:new-sections (:sections company-data)])))))))
+    (when stop?
+      (om/set-state! owner :rerender (rand 4)))))
 
 (defn inside-position-from-event [e]
   (let [tcc-offset (.offset (js/$ ".topics-column-container"))]
@@ -277,7 +277,7 @@
   (when stop?
     (.removeClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic")))
 
-(defn setup-sortable [owner]
+(defn setup-draggable [owner]
   (when-let [list-node (js/jQuery (sel [:div.topic-row.draggable-topic]))]
     (when-not (.draggable list-node "instance")
       (.draggable list-node #js {:addClasses "dragging"
@@ -286,16 +286,16 @@
                                  :start (fn [] (.addClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic"))
                                  :stop #(dragging owner % true)}))))
 
-(defn destroy-sortable [owner]
+(defn destroy-draggable [owner]
   (when-let [list-node (js/jQuery (sel [:div.topic-row.draggable-topic]))]
     (when (.draggable list-node "instance")
       (.draggable list-node "destroy"))))
 
-(defn manage-sortable [owner]
+(defn manage-draggable [owner]
   (when-not (utils/is-test-env?)
     (if (> (pinned-count (om/get-props owner)) 1)
-      (do (destroy-sortable owner) (setup-sortable owner))
-      (destroy-sortable owner))))
+      (do (destroy-draggable owner) (utils/after 1 #(setup-draggable owner)))
+      (destroy-draggable owner))))
 
 (defcomponent topic-list [data owner options]
 
@@ -317,7 +317,7 @@
                (not (responsive/user-agent-mobile?)))
       (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))]
         (om/set-state! owner :kb-listener kb-listener))
-      (manage-sortable owner)))
+      (manage-draggable owner)))
 
   (will-unmount [_]
     (when (and (not (utils/is-test-env?))
@@ -352,7 +352,7 @@
   (did-update [_ _ _]
     (when (om/get-state owner :tr-selected-topic)
       (animate-selected-topic-transition owner (om/get-state owner :animation-direction)))
-    (manage-sortable owner))
+    (manage-draggable owner))
 
   (render-state [_ {:keys [active-topics
                            selected-topic
