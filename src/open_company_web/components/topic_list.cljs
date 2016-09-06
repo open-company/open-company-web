@@ -292,7 +292,7 @@
 (defn destroy-draggable [owner]
   (when-let [list-node (js/jQuery (sel [:div.topic-row.draggable-topic]))]
     (when (.draggable list-node "instance")
-      (.draggable list-node "destroy"))))
+      (try (.draggable list-node "destroy") (catch :default e (sentry/capture-error e))))))
 
 (defn manage-draggable [owner]
   (when-not (utils/is-test-env?)
@@ -388,7 +388,7 @@
           ww              (.-clientWidth (sel1 js/document :body))
           total-width     (case columns-num
                             3 (str (+ (* card-width 3) 40 60) "px")
-                            2 (str (+ (* card-width 2) 20 60) "px")
+                            2 (str (+ (* card-width 2) 20 64) "px")
                             1 (if (> ww 413) (str card-width "px") "auto"))
           can-edit-secs   (can-edit-sections? company-data)]
       (dom/div {:class (utils/class-set {:topic-list true
