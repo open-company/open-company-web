@@ -248,25 +248,22 @@
             (= (:side in?) "right")
             (.addClass (:topic-el in?) "right-highlight"))
           ; reorder topics
-          (if (:inside? in?)
-            (let [dragged-topic (keyword (.data (js/$ ".ui-draggable-dragging") "topic"))
-                  {:keys [pinned other]} (utils/get-pinned-other-keys (:sections company-data) company-data)
-                  pinned-kw (map keyword pinned)
-                  other-kw (map keyword other)
-                  all-but-dragged (concat (utils/vec-dissoc pinned-kw dragged-topic) other-kw)
-                  idx (.indexOf (utils/vec-dissoc pinned-kw dragged-topic) (:topic in?))
-                  fixed-idx (if (= (:side in?) "left") idx (inc idx))
-                  new-sections (let [[before after] (split-at fixed-idx all-but-dragged)]
-                                 (vec (concat before [dragged-topic] after)))]
-              (if (>= idx 0)
-                ; dropped in a good spot
-                (dispatcher/dispatch! [:new-sections new-sections])
-                ;dropped in a not good spot, reset the order to the original
-                (do
-                  (dispatcher/dispatch! [:new-sections (:sections company-data)])
-                  (om/set-state! owner :rerender (rand 4)))))
-            ; dropped out of any topic, reset the order to original to move the dragged topic
-            ; in it's place
+          (do
+            (when (:inside? in?)
+              (let [dragged-topic (keyword (.data (js/$ ".ui-draggable-dragging") "topic"))
+                    {:keys [pinned other]} (utils/get-pinned-other-keys (:sections company-data) company-data)
+                    pinned-kw (map keyword pinned)
+                    other-kw (map keyword other)
+                    all-but-dragged (concat (utils/vec-dissoc pinned-kw dragged-topic) other-kw)
+                    idx (.indexOf (utils/vec-dissoc pinned-kw dragged-topic) (:topic in?))
+                    fixed-idx (if (= (:side in?) "left") idx (inc idx))
+                    new-sections (let [[before after] (split-at fixed-idx all-but-dragged)]
+                                   (vec (concat before [dragged-topic] after)))]
+                (if (>= idx 0)
+                  ; dropped in a good spot
+                  (dispatcher/dispatch! [:new-sections new-sections])
+                  ;dropped in a not good spot, reset the order to the original
+                  (dispatcher/dispatch! [:new-sections (:sections company-data)]))))
             (om/set-state! owner :rerender (rand 4))))))))
 
 (defn inside-position-from-event [e]
