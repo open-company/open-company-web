@@ -199,9 +199,9 @@
     (dispatcher/dispatch! [:new-sections (vec (concat pinned-topics-list other-topics-list))])))
 
 (defn pinned-count [data]
-  (let [company-data   (:company-data data)
-        company-topics (vec (map keyword (:sections company-data)))]
-    (count (filter :pin (map #(->> % keyword (get company-data)) company-topics)))))
+  (let [company-data (:company-data data)
+        {:keys [pinned]} (utils/get-pinned-other-keys (:sections company-data) company-data)]
+    (count pinned)))
 
 (defn coord-inside [left top topic]
   (let [dragging-topic (.data (js/$ ".ui-draggable-dragging") "topic")
