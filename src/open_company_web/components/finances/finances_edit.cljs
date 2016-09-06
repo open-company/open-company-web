@@ -40,14 +40,6 @@
                       (if (zero? burn)
                         (str burn-prefix "-")
                         (str burn-prefix (utils/thousands-separator (utils/abs burn) currency 0))))
-          runway-days (:runway finances-data)
-          runway (cond
-                   (nil? runway-days) "-"
-                   (or (not (:cash finances-data))
-                       (not (:costs finances-data))) ""
-                   (zero? runway-days) "-"
-                   (pos? runway-days) "-"
-                   :else (finance-utils/get-rounded-runway runway-days)) 
           ref-prefix (str (:period finances-data) "-")
           period-month (utils/get-month period)
           needs-year (or (= period-month "JAN")
@@ -85,16 +77,13 @@
           (om/build cell {:value (:cash finances-data)
                           :decimals 0
                           :positive-only false
-                          :placeholder (if is-new "at month end" "")
+                          :placeholder (if is-new "month end" "")
                           :currency currency
                           :cell-state cell-state
                           :draft-cb #(change-cb :cash %)
                           :period period
                           :key :cash
-                          :tab-cb tab-cb}))
-        ;; Runway
-        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new :dark true})}
-          runway)))))
+                          :tab-cb tab-cb}))))))
 
 (defn replace-row-in-data [data row k v]
   "Find and replace the edited row"
@@ -129,8 +118,7 @@
                   (dom/th {} "")
                   (dom/th {} "Revenue")
                   (dom/th {} "Expenses")
-                  (dom/th {} "Cash")
-                  (dom/th {:class "dark"} "Runway")))
+                  (dom/th {} "Cash")))
               (dom/tbody {}
                 (let [current-period (utils/current-period)]
                   (for [idx (range stop)]
@@ -148,10 +136,8 @@
                                                    :currency currency
                                                    :change-cb #(replace-row-in-data data row-data %1 %2)}))))
                 (dom/tr {}
-                  (dom/td {}
+                  (dom/th {:col-span 2}
                     (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner)} "Earlier..."))
-                  (dom/td {})
-                  (dom/td {})
                   (dom/td {})
                   (dom/td {}))))))
 

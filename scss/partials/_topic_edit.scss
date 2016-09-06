@@ -23,6 +23,10 @@ div.topic {
     div.topic-foce{
       position: relative;
 
+      & > div.section-container {
+        padding: 20px 10px 0 10px;
+      }
+
       & > div, & > input{
         padding: 0px 20px;
       }
@@ -76,10 +80,6 @@ div.topic {
 
         img {
           width:100%;
-        }
-
-        div.section-container {
-          margin: 10px;
         }
 
         div.gradient {

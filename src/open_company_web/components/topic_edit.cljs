@@ -267,24 +267,24 @@
                       :ref "topic-internal"}
           (when (or is-data?
                     image-header)
-            (dom/div {:class (utils/class-set {:card-header true
-                                               :card-image (not is-data?)})}
-              (cond
-                (= section-kw :finances)
-                (om/build topic-finances {:section-data topic-data
-                                          :section section-kw
-                                          :currency currency
-                                          :editable true}
-                                          {:opts chart-opts})
-                (= section-kw :growth)
-                (om/build topic-growth {:section-data topic-data
+            (cond
+              (= section-kw :finances)
+              (om/build topic-finances {:section-data topic-data
                                         :section section-kw
                                         :currency currency
-                                        :editable true} 
+                                        :editable true}
                                         {:opts chart-opts})
-      
-                :else
-                [(dom/img {:src image-header
+              (= section-kw :growth)
+              (om/build topic-growth {:section-data topic-data
+                                      :section section-kw
+                                      :currency currency
+                                      :editable true} 
+                                      {:opts chart-opts})
+    
+              :else
+              (dom/div {:class (utils/class-set {:card-header true
+                                                 :card-image true})}
+                (dom/img {:src image-header
                             :class "topic-header-img"})
                  (dom/button {:class "btn-reset remove-header"
                               :on-click #(do
@@ -293,7 +293,7 @@
                   (i/icon :simple-remove {:size 15
                                           :stroke 4
                                           :color "white"
-                                          :accent-color "white"}))])))
+                                          :accent-color "white"})))))
           ;; Topic title
           (dom/input {:class "topic-title"
                       :value (:title topic-data)
