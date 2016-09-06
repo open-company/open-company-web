@@ -2,6 +2,12 @@ div.topics-columns {
   padding: 0;
   width: 100vw;
 
+  &.dragging-topic {
+    div.topic.not-draggable-topic {
+      opacity: 0.5 !important;
+    }
+  }
+
   div.topics-column-container {
     padding: 20px 30px 20px 30px;
     margin: 0 auto;
@@ -28,11 +34,11 @@ div.topics-columns {
         border-left: 4px solid transparent;
         border-right: 4px solid transparent;
 
-        &.left-highlight {
+        &.draggable-topic.left-highlight {
           border-left: 4px solid $oc-yellow;
         }
 
-        &.right-highlight {
+        &.draggable-topic.right-highlight {
           border-right: 4px solid $oc-yellow;
         }
 
