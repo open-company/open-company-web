@@ -82,10 +82,6 @@ div.topic {
     }
   }
 
-  @include big_web(){
-    cursor: pointer;
-  }
-
   div.topic-anim{
     position: relative;
     height: auto;
@@ -237,7 +233,6 @@ div.topic {
         font-weight: 400;
         color: $oc_gray_7;
         overflow: hidden;
-        cursor: pointer;
         font-size: 15px;
         line-height: 22px;
 
@@ -249,7 +244,6 @@ div.topic {
           font-size: 15px;
           line-height: 22px;
           font-weight: 400;
-          cursor: pointer;
         }
 
         b{
