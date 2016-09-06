@@ -202,33 +202,49 @@
         company-topics (vec (map keyword (:sections company-data)))]
     (count (filter :pin (map #(->> % keyword (get company-data)) company-topics)))))
 
+(defn coord-inside [left top topic]
+  (let [dragging-topic (.data (js/$ ".ui-draggable-dragging") "topic")
+        topic-el (js/$ (str ".topic-row[data-topic=" (name topic) "]"))
+        topic-pos (.position topic-el)
+        topic-position (utils/absolute-offset (.get topic-el 0))
+        topic-posalter {:left (- (gobj/get topic-pos "left") 20)
+                        :top (- (gobj/get topic-pos "top") 30)}
+        topic-size {:width (.width topic-el) :height (.height topic-el)}
+        target-css {:width (int (+ (:width topic-size) 26))
+                    :height (int (+ (:height topic-size) 22))
+                    :left (int (:left topic-position))
+                    :top (int (- (:top topic-position) 84))}]
+    (if (and (not= (name topic) dragging-topic)
+               (>= left (:left target-css) )
+               (>= top (:top target-css))
+               (< left (+ (:left target-css) (:width target-css)))
+               (< top (+ (:top target-css) (:height target-css))))
+      (if (< (- left (:left topic-position)) (/ (:width topic-size) 2))
+        {:side "left"
+         :topic-el topic-el
+         :inside? true
+         :topic topic}
+        {:side "right"
+         :topic-el topic-el
+         :inside? true
+         :topic topic})
+      {:topic-el topic-el
+       :inside? false})))
+
 (defn get-topic-at-position [owner left top]
   (let [left (+ left 45)
         top (+ top 60)
         company-data    (:company-data (om/get-props owner))
-        company-topics  (vec (map keyword (:sections company-data)))
-        dragging-topic (.data (js/$ ".ui-draggable-dragging") "topic")]
-    (.removeClass (js/$ ".topic-row") "left-highlight")
-    (.removeClass (js/$ ".topic-row") "right-highlight")
+        company-topics  (vec (map keyword (:sections company-data)))]
     (doseq [topic company-topics]
-      (let [topic-el (js/$ (str ".topic-row[data-topic=" (name topic) "]"))
-            topic-pos (.position topic-el)
-            topic-position (utils/absolute-offset (.get topic-el 0))
-            topic-posalter {:left (- (gobj/get topic-pos "left") 20)
-                            :top (- (gobj/get topic-pos "top") 30)}
-            topic-size {:width (.width topic-el) :height (.height topic-el)}
-            target-css {:width (+ (:width topic-size) 28)
-                        :height (+ (:height topic-size) 22)
-                        :left (:left topic-position)
-                        :top (- (:top topic-position) 84)}]
-        (when (and (not= (name topic) dragging-topic)
-                   (<= (:left target-css) left)
-                   (<= (:top target-css) top)
-                   (>= (+ (:left target-css) (:width target-css)) left)
-                   (>= (+ (:top target-css) (:height target-css)) top))
-          (if (< (- left (:left topic-position)) (/ (:width topic-size) 2))
-            (.addClass topic-el "left-highlight")
-            (.addClass topic-el "right-highlight")))))))
+      (let [in? (coord-inside left top topic)]
+        (.removeClass (:topic-el in?) "left-highlight")
+        (.removeClass (:topic-el in?) "right-highlight")
+        (cond
+          (= (:side in?) "left")
+          (.addClass (:topic-el in?) "left-highlight")
+          (= (:side in?) "right")
+          (.addClass (:topic-el in?) "right-highlight"))))))
 
 (defn dragging [owner e]
   (let [tcc-offset (.offset (js/$ ".topics-column-container"))
@@ -242,6 +258,7 @@
       (when-not (.draggable list-node "instance")
         (.draggable list-node #js {:addClasses "dragging"
                                    :drag #(dragging owner %)
+                                   :scroll true
                                    :start (fn [] (.addClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic"))
                                    :stop (fn [] (.removeClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic"))})))))
 
