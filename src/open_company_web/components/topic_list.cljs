@@ -231,7 +231,7 @@
       {:topic-el topic-el
        :inside? false})))
 
-(defn get-topic-at-position [owner left top]
+(defn get-topic-at-position [owner left top stop?]
   (let [left (+ left 45)
         top (+ top 60)
         company-data    (:company-data (om/get-props owner))
@@ -240,27 +240,45 @@
       (let [in? (coord-inside left top topic)]
         (.removeClass (:topic-el in?) "left-highlight")
         (.removeClass (:topic-el in?) "right-highlight")
-        (cond
-          (= (:side in?) "left")
-          (.addClass (:topic-el in?) "left-highlight")
-          (= (:side in?) "right")
-          (.addClass (:topic-el in?) "right-highlight"))))))
+        (if-not stop?
+          (cond
+            (= (:side in?) "left")
+            (.addClass (:topic-el in?) "left-highlight")
+            (= (:side in?) "right")
+            (.addClass (:topic-el in?) "right-highlight"))
+          ; reorder topics
+          (when (:inside? in?)
+            (let [dragged-topic (keyword (.data (js/$ ".ui-draggable-dragging") "topic"))
+                  {:keys [pinned other]} (utils/get-pinned-other-keys (:sections company-data) company-data)
+                  pinned-kw (map keyword pinned)
+                  other-kw (map keyword other)
+                  all-but-dragged (concat (utils/vec-dissoc pinned-kw dragged-topic) other-kw)
+                  idx (.indexOf all-but-dragged (:topic in?))
+                  fixed-idx (if (= (:side in?) "left") idx (inc idx))
+                  new-sections (let [[before after] (split-at fixed-idx all-but-dragged)]
+                                 (vec (concat before [dragged-topic] after)))]
+              (dispatcher/dispatch! [:new-sections new-sections]))))))))
 
-(defn dragging [owner e]
-  (let [tcc-offset (.offset (js/$ ".topics-column-container"))
-        inside-pos {:left (- (int (gobj/get e "pageX")) (int (gobj/get tcc-offset "left")))
-                    :top (- (int (gobj/get e "pageY")) (int (gobj/get tcc-offset "top")))}]
-    (get-topic-at-position owner (:left inside-pos) (:top inside-pos))))
+(defn inside-position-from-event [e]
+  (let [tcc-offset (.offset (js/$ ".topics-column-container"))]
+    {:left (- (int (gobj/get e "pageX")) (int (gobj/get tcc-offset "left")))
+     :top (- (int (gobj/get e "pageY")) (int (gobj/get tcc-offset "top")))}))
+
+(defn dragging [owner e stop?]
+  (let [inside-pos (inside-position-from-event e)]
+    (get-topic-at-position owner (:left inside-pos) (:top inside-pos) stop?))
+  (when stop?
+    (.removeClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic")))
 
 (defn setup-sortable [owner]
   (when-not (om/get-state owner :sortable)
     (when-let [list-node (js/jQuery (sel [:div.topic-row.draggable-topic]))]
       (when-not (.draggable list-node "instance")
         (.draggable list-node #js {:addClasses "dragging"
-                                   :drag #(dragging owner %)
+                                   :drag #(dragging owner % false)
                                    :scroll true
                                    :start (fn [] (.addClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic"))
-                                   :stop (fn [] (.removeClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic"))})))))
+                                   :stop #(dragging owner % true)})))))
 
 (defn destroy-sortable []
   (when-let [list-node (js/jQuery (sel [:div.topics-column-pinned]))]
