@@ -44,63 +44,6 @@ div.topic-list{
     background-color: $oc_gray_6;
   }
 
-  div.sharing-header{
-    border-top: 4px solid $oc_yellow;
-    background-color: rgba(78, 90, 107, 0.5);
-
-    div.sharing-header-inner{
-      margin: 0px auto;
-      padding: 15px 30px;
-
-      div.sharing-header-left{
-        float: left;
-        width: 33%;
-        height: 30px;
-
-        label.selected-topics{
-          font-weight: 700;
-          font-family: $oc_headers_font;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: #ffffff;
-          margin: 0px;
-          padding: 0px;
-          margin-top: 8px;
-          display: inline-block;
-        }
-      }
-
-      div.sharing-header-center{
-        float: left;
-        width: 33%;
-        text-align: center;
-      }
-
-      div.sharing-header-right{
-        float: right;
-        text-align: right;
-        width: 33%;
-        height: 30px;
-
-        button.close-share {
-          background-color: transparent;
-          width: 30px;
-          height: 30px;
-          outline: none;
-          border: 0px solid black;
-
-          div.svg-icon{
-            float: right;
-            svg{
-              stroke: white !important;
-            }
-          }
-        }
-      }
-    }
-  }
-
   div.sharing-button-container {
     height: 30px;
     margin: 0 auto;
