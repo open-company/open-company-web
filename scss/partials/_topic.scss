@@ -103,16 +103,12 @@ div.topic {
       }
 
       div.pinned-topic{
-        font-size: 13px;
+        font-size: 12px;
         float: left;
         z-index: 100;
-        margin-top: 14px;
+        margin-top: 15px;
         color: rgba(78, 90, 107, 0.5);
         margin-left: 5px;
-
-        i.fa.fa-thumb-tack {
-          transform: rotate(25deg);
-        }
       }
 
       & > div{
