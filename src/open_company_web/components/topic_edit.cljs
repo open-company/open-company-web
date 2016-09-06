@@ -177,6 +177,9 @@
     "Add an image"
     "Replace image"))
 
+(defn- data-editing-toggle [owner editing]
+  (om/set-state! owner :data-editing? editing))
+
 (defcomponent topic-edit [{:keys [show-first-edit-tip
                                   currency
                                   prev-rev
@@ -193,7 +196,8 @@
        :char-count-alert false
        :has-changes false
        :file-upload-state nil
-       :file-upload-progress 0}))
+       :file-upload-progress 0
+       :data-editing? false}))
 
   (will-receive-props [_ next-props]
     ;; update body placeholder when receiving data from API
@@ -239,7 +243,7 @@
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
                            file-upload-state file-upload-progress upload-remote-url negative-headline-char-count
-                           has-changes]}]
+                           has-changes data-editing?]}]
 
     (let [company-slug        (router/current-company-slug)
           section             (dis/foce-section-key)
@@ -272,7 +276,8 @@
               (om/build topic-finances {:section-data topic-data
                                         :section section-kw
                                         :currency currency
-                                        :editable true}
+                                        :editable true
+                                        :editing-cb (partial data-editing-toggle owner)}
                                         {:opts chart-opts})
               (= section-kw :growth)
               (om/build topic-growth {:section-data topic-data
@@ -401,11 +406,13 @@
             (dom/div {:class "divider"})
             (dom/div {:class "topic-foce-footer-left"}
               (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
+            
             (dom/div {:class "topic-foce-footer-right"}
               (dom/button {:class "btn-reset btn-solid"
-                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count)
+                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count data-editing?)
                            :on-click #(dis/dispatch! [:foce-save])} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
+                           :disabled data-editing?
                            :on-click #(do
                                         (utils/event-stop %)
                                         (if (:placeholder topic-data)

@@ -28,7 +28,7 @@
       (neg? value) (finance-utils/get-rounded-runway value [:round :short])
       :else "-")))
 
-(defcomponent topic-finances [{:keys [section section-data currency editable] :as data} owner options]
+(defcomponent topic-finances [{:keys [section section-data currency editable editing-cb] :as data} owner options]
 
   (init-state [_]
     {:is-data-editing? false})
@@ -121,5 +121,6 @@
                                :type "button"
                                :data-toggle "tooltip"
                                :data-placement "left"
-                               :on-click #(om/set-state! owner :is-data-editing? true)}
+                               :on-click #(do (om/set-state! owner :is-data-editing? true)
+                                              (editing-cb true))}
                     (dom/i {:class "fa fa-pencil editable-pen"})))))))))))

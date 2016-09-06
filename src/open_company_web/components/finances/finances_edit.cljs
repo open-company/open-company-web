@@ -45,9 +45,9 @@
           needs-year (or (= period-month "JAN")
                          (= period-month "DEC")
                          (:needs-year data))]
-      (dom/tr {}
+      [(dom/tr {}
         (dom/th {:class "no-cell"}
-          (utils/get-period-string (:period finances-data) "monthly" [:short (when needs-year :force-year)]))
+          (utils/get-period-string (:period finances-data) "monthly" [:short]))
         ;; revenue
         (dom/td {}
           (om/build cell {:value (:revenue finances-data)
@@ -83,7 +83,17 @@
                           :draft-cb #(change-cb :cash %)
                           :period period
                           :key :cash
-                          :tab-cb tab-cb}))))))
+                          :tab-cb tab-cb})))
+      (when needs-year
+        (dom/tr {}
+          (dom/th {:class "no-cell year"}
+            "2016")
+          (dom/td {:class "no-cell"})
+          (dom/td {:class "no-cell"})
+          (dom/td {:class "no-cell"})
+          )
+        )]
+      )))
 
 (defn replace-row-in-data [data row k v]
   "Find and replace the edited row"
@@ -131,15 +141,25 @@
                       (om/build finances-edit-row {:cursor row-data
                                                    :next-period next-period
                                                    :is-last (= idx 0)
-                                                   :needs-year (or (= idx 0)
-                                                                   (= idx (dec stop)))
+                                                   :needs-year (= idx (dec stop))
                                                    :currency currency
                                                    :change-cb #(replace-row-in-data data row-data %1 %2)}))))
                 (dom/tr {}
                   (dom/th {:col-span 2}
                     (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner)} "Earlier..."))
                   (dom/td {})
-                  (dom/td {}))))))
+                  (dom/td {})))))
+
+          (dom/div {:class "topic-foce-footer group"}
+            (dom/div {:class "topic-foce-footer-right"}
+              (dom/button {:class "btn-reset btn-solid"
+                           :on-click  #(do
+                                        (utils/event-stop %)
+                                        (.log js/console "save"))} "SAVE")
+              (dom/button {:class "btn-reset btn-outline"
+                           :on-click #(do
+                                        (utils/event-stop %)
+                                        (.log js/console "cancel"))} "CANCEL"))))
 
         ;; Onboarding toolip
         (when (:show-first-edit-tip data)
