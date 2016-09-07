@@ -84,7 +84,9 @@
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
-          truncated-body      (if (utils/is-test-env?) topic-body (.truncate js/$ topic-body (clj->js {:length 500 :words true})))]
+          truncated-body      (if (utils/is-test-env?) topic-body (.truncate js/$ topic-body (clj->js {:length 500 :words true})))
+          company-data        (dis/company-data)
+          {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
       (dom/div #js {:className "topic-internal group"
                     :onClick (partial fullscreen-topic owner nil false)
                     :key (str "topic-internal-" (name section))
@@ -107,13 +109,12 @@
         (dom/div {:class "group"}
           (dom/div {:class "topic-title"} (:title topic-data))
           (when (and (:pin topic-data)
-                     (not (responsive/is-mobile-size?))
-                     (> (count (:pinned (utils/get-pinned-other-keys (:sections (dis/company-data)) (dis/company-data)))) 1))
+                     (not (responsive/is-mobile-size?)))
             (dom/div {:class "pinned-topic"}
               (dom/i {:class "fa fa-thumb-tack"
                       :data-toggle "tooltip"
                       :data-placement "top"
-                      :title "Drag and drop to reorder"})))
+                      :title (if (> (count pinned) 1) "Drag and drop to reorder" "Pinned to the top")})))
           (when (and show-fast-editing
                    (not (responsive/is-mobile-size?))
                    (responsive/can-edit?)
