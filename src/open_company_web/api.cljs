@@ -38,7 +38,6 @@
     params))
 
 (defn refresh-jwt []
-  (js/console.info "Refreshing JWToken")
   (http/get (str auth-endpoint "/refresh-token") (complete-params {})))
 
 (defn update-jwt-cookie! [jwt]
