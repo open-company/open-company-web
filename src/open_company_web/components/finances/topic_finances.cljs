@@ -38,6 +38,7 @@
     {:data-editing? false})
 
   (render-state [_ state]
+    (.log js/console "Render Finance!")
     (let [finances-row-data (:data section-data)
           no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))
           data-editing? (or initial-editing? (om/get-state owner :data-editing?))]
@@ -73,7 +74,7 @@
                                :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
                                :label-presenter #(str "RUNWAY")
                                :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}}]
-
+          (.log js/console (str "sorted finances row data: " sorted-finances))
           (dom/div {:id "section-finances" :class (utils/class-set {:section-container true
                                                                     :editing data-editing?})}
 

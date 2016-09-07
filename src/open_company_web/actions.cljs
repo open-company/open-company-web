@@ -188,10 +188,13 @@
     (dissoc db :force-edit-topic)))
 
 (defmethod dispatcher/action :save-topic [db [_ topic topic-data]]
+  (.log js/console "dispatched action!")
   (let [slug (keyword (router/current-company-slug))
         old-section-data (get (dispatcher/company-data db slug) (keyword topic))
         new-data (dissoc (merge old-section-data topic-data) :placeholder)]
+    (.log js/console (str "saving: " topic-data))
     (api/partial-update-section topic new-data)
+    (.log js/console (str "updating DB with: " (merge old-section-data topic-data)))
     (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic)) (merge old-section-data topic-data))))
 
 (defmethod dispatcher/action :su-share/reset [db _]
