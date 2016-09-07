@@ -276,7 +276,7 @@
                     image-header)
             (cond
               (= section-kw :finances)
-              (om/build topic-finances {:section-data topic-data
+              (om/build topic-finances {:section-data (utils/fix-finances topic-data)
                                         :section section-kw
                                         :currency currency
                                         :editable? true
