@@ -53,6 +53,7 @@
             (om/build cell {:value (:revenue finances-data)
                             :decimals 0
                             :positive-only true
+                            :short true
                             :placeholder (if is-new "entire month" "")
                             :currency currency
                             :cell-state cell-state
@@ -65,6 +66,7 @@
             (om/build cell {:value (:costs finances-data)
                             :decimals 0
                             :positive-only true
+                            :short true
                             :placeholder (if is-new "entire month" "")
                             :currency currency
                             :cell-state cell-state
@@ -77,6 +79,7 @@
             (om/build cell {:value (:cash finances-data)
                             :decimals 0
                             :positive-only false
+                            :short true
                             :placeholder (if is-new "month end" "")
                             :currency currency
                             :cell-state cell-state
