@@ -39,11 +39,11 @@
 
   (render-state [_ state]
     (let [finances-row-data (:data section-data)
-          no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))]
+          no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))
+          data-editing? (or (:initial-editing data) (om/get-state owner :data-editing?))]
 
-      (when-not no-data
-        (let [data-editing? (om/get-state owner :data-editing?)
-              fixed-finances-data (finance-utils/fill-gap-months finances-row-data)
+      (when (or data-editing? (not no-data))
+        (let [fixed-finances-data (finance-utils/fill-gap-months finances-row-data)
               sort-pred (utils/sort-by-key-pred :period)
               sorted-finances (sort sort-pred (vals fixed-finances-data))          
               sum-revenues (apply + (map utils/abs (map :revenue finances-row-data)))

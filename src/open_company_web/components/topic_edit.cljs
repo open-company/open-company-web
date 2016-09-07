@@ -234,11 +234,14 @@
           topic-data        (dis/foce-section-data)
           image-header      (:image-url topic-data)
           add-image-tooltip (add-image-tooltip image-header)
-          add-image-el      (js/$ (gdom/getElementByClass "camera"))]
+          add-image-el      (js/$ (gdom/getElementByClass "camera"))
+          add-chart-el      (js/$ (gdom/getElementByClass "chart-button"))]
       (doto add-image-el
         (.tooltip "hide")
         (.attr "data-original-title" add-image-tooltip)
         (.tooltip "fixTitle")
+        (.tooltip "hide"))
+      (doto add-chart-el
         (.tooltip "hide"))))
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
@@ -277,7 +280,8 @@
                                         :section section-kw
                                         :currency currency
                                         :editable true
-                                        :editing-cb (partial data-editing-toggle owner)}
+                                        :editing-cb (partial data-editing-toggle owner)
+                                        :initial-editing data-editing?}
                                         {:opts chart-opts})
               (= section-kw :growth)
               (om/build topic-growth {:section-data topic-data
@@ -367,14 +371,14 @@
                            :style {:display (if (nil? file-upload-state) "block" "none")}
                            :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
                   (dom/i {:class "fa fa-code"})))
-            (when is-data?
+            (when (and is-data? (not data-editing?))
               (dom/button {:class "btn-reset chart-button left"
                          :title "Add a chart"
                          :type "button"
                          :data-toggle "tooltip"
                          :data-placement "top"
                          :style {:display (if no-data? "block" "none")}
-                         :on-click #(.log js/console "chart click")}
+                         :on-click #(om/set-state! owner :data-editing? true)}
                 (dom/i {:class "fa fa-line-chart"})))
             (when-not (:placeholder topic-data)
               (dom/button {:class "btn-reset archive-button right"
