@@ -141,9 +141,8 @@
   (remove nil? (vec (map (fn [[_ v]] (finances-clean-row v)) finances-data))))
 
 (defn- save-data [owner]
-  (.log js/console "saving!")
   ; (om/set-state! owner :has-changes false)
-  (dis/dispatch! [:save-topic "finances" {:data (finances-clean-data (om/get-state owner :finances-data))}]))
+  (dis/dispatch! [:save-topic-data "finances" {:data (finances-clean-data (om/get-state owner :finances-data))}]))
 
 (defn replace-row-in-data [owner row-data k v]
   "Find and replace the edited row"

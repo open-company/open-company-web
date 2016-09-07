@@ -83,9 +83,6 @@
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
           truncated-body      (if (utils/is-test-env?) topic-body (.truncate js/$ topic-body (clj->js {:length 500 :words true})))]
 
-      (.log js/console (str "headline: " (:headline topic-data)))
-      (.log js/console (str "data: " (:data topic-data)))
-
       (dom/div #js {:className "topic-internal group"
                     :onClick (partial fullscreen-topic owner nil false)
                     :ref "topic-internal"}

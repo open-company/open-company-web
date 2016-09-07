@@ -187,15 +187,21 @@
     (assoc-in db [:force-edit-topic] topic)
     (dissoc db :force-edit-topic)))
 
-(defmethod dispatcher/action :save-topic [db [_ topic topic-data]]
-  (.log js/console "dispatched action!")
+(defn- save-topic [db topic topic-data]
   (let [slug (keyword (router/current-company-slug))
         old-section-data (get (dispatcher/company-data db slug) (keyword topic))
         new-data (dissoc (merge old-section-data topic-data) :placeholder)]
-    (.log js/console (str "saving: " topic-data))
     (api/partial-update-section topic new-data)
-    (.log js/console (str "updating DB with: " (merge old-section-data topic-data)))
     (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic)) (merge old-section-data topic-data))))
+
+(defmethod dispatcher/action :save-topic [db [_ topic topic-data]]
+  (save-topic db topic topic-data))
+
+(defmethod dispatcher/action :save-topic-data [db [_ topic topic-data]]
+  ;; save topic data for the company
+  (save-topic db topic topic-data)
+  ;; update topic data for the still in-progress FoCE
+  (assoc db :foce-data (merge (:foce-data db) topic-data)))
 
 (defmethod dispatcher/action :su-share/reset [db _]
   (dissoc db :su-share))
