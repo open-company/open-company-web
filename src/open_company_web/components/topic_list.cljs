@@ -183,11 +183,11 @@
 
 (defn save-sections-order [owner]
   (let [col1-pinned-topics (sel [:div.col-1 :div.topic.draggable-topic])
-        col1-pinned-topics-list (vec (for [topic col1-pinned-topics] (.data (js/jQuery topic) "section")))
+        col1-pinned-topics-list (vec (for [topic col1-pinned-topics] (.data (js/$ topic) "section")))
         col2-pinned-topics (sel [:div.col-2 :div.topic.draggable-topic])
-        col2-pinned-topics-list (vec (for [topic col2-pinned-topics] (.data (js/jQuery topic) "section")))
+        col2-pinned-topics-list (vec (for [topic col2-pinned-topics] (.data (js/$ topic) "section")))
         col3-pinned-topics (sel [:div.col-3 :div.topic.draggable-topic])
-        col3-pinned-topics-list (vec (for [topic col3-pinned-topics] (.data (js/jQuery topic) "section")))
+        col3-pinned-topics-list (vec (for [topic col3-pinned-topics] (.data (js/$ topic) "section")))
         max-count (max (count col1-pinned-topics-list) (count col2-pinned-topics-list) (count col3-pinned-topics-list))
         pinned-topics-list (loop [topics []
                                   idx 0]
@@ -196,7 +196,7 @@
                                       (inc idx))
                                topics))
         other-topics (sel [:div.topic.not-draggable-topic])
-        other-topics-list (vec (for [topic other-topics] (.data (js/jQuery topic) "section")))]
+        other-topics-list (vec (for [topic other-topics] (.data (js/$ topic) "section")))]
     (dispatcher/dispatch! [:new-sections (vec (concat pinned-topics-list other-topics-list))])))
 
 (defn pinned-count [data]
@@ -265,9 +265,7 @@
                 ; dropped in a good spot
                 (dispatcher/dispatch! [:new-sections new-sections])
                 ;dropped in a not good spot, reset the order to the original
-                (dispatcher/dispatch! [:new-sections (:sections company-data)])))))))
-    (when stop?
-      (om/set-state! owner :rerender (rand 4)))))
+                (dispatcher/dispatch! [:new-sections (:sections company-data)])))))))))
 
 (defn inside-position-from-event [e]
   (let [tcc-offset (.offset (js/$ ".topics-column-container"))]
@@ -278,19 +276,19 @@
   (let [inside-pos (inside-position-from-event e)]
     (get-topic-at-position owner (:left inside-pos) (:top inside-pos) stop?))
   (when stop?
-    (.removeClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic")))
+    (om/set-state! owner :rerender (rand 4))))
 
 (defn setup-draggable [owner]
-  (when-let [list-node (js/jQuery (sel [:div.topic-row.draggable-topic]))]
+  (when-let [list-node (js/$ "div.topic-row.draggable-topic")]
     (when-not (.draggable list-node "instance")
       (.draggable list-node #js {:addClasses "dragging"
                                  :drag #(dragging owner % false)
                                  :scroll true
-                                 :start #(.addClass (js/jQuery (sel1 [:div.topics-columns])) "dragging-topic")
+                                 :start #(.addClass (js/$ (sel1 [:div.topics-columns])) "dragging-topic")
                                  :stop #(dragging owner % true)}))))
 
 (defn destroy-draggable [owner]
-  (when-let [list-node (js/jQuery (sel [:div.topic-row.draggable-topic]))]
+  (when-let [list-node (js/$ "div.topic-row.draggable-topic")]
     (when (.draggable list-node "instance")
       (try (.draggable list-node "destroy") (catch :default e (sentry/capture-error e))))))
 
@@ -397,7 +395,7 @@
                                          :editable can-edit-secs})
                 :style {:margin-top (if selected-topic "0px" "84px")}
                 :data-rerender rerender
-                :key (str "topic-list" rerender)}
+                :key (str "topic-list-" rerender)}
         ;; Activate sharing mode button
         (when can-edit-secs
           (dom/div {:class "sharing-button-container"
