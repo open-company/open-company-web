@@ -133,21 +133,20 @@ div.topic {
         }
       }
 
-      &:hover {
-        button.chart-pencil-button {
-          color: rgba(78,90,107,0.5);
-        }
-      }
-
       button.chart-pencil-button{
         position: absolute;
-        top: 25px;
-        right: 25px;
+        top: 30px;
+        right: 30px;
         transition: 230ms;
-        color: rgba(78,90,107,0);
+
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 15px;
+        background-color: rgba(78,90,107,0.5);
 
         &:hover {
-          color: rgba(78,90,107,1);
+          background-color: rgba(78,90,107,1.0);
         }
       }
 

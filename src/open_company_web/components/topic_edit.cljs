@@ -279,9 +279,9 @@
               (om/build topic-finances {:section-data topic-data
                                         :section section-kw
                                         :currency currency
-                                        :editable true
+                                        :editable? true
                                         :editing-cb (partial data-editing-toggle owner)
-                                        :initial-editing data-editing?}
+                                        :initial-editing? data-editing?}
                                         {:opts chart-opts})
               (= section-kw :growth)
               (om/build topic-growth {:section-data topic-data

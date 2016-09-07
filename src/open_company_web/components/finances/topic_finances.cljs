@@ -32,7 +32,7 @@
   (om/set-state! owner :data-editing? editing)
   (editing-cb editing))
 
-(defcomponent topic-finances [{:keys [section section-data currency editable editing-cb] :as data} owner options]
+(defcomponent topic-finances [{:keys [section section-data currency editable? initial-editing? editing-cb] :as data} owner options]
 
   (init-state [_]
     {:data-editing? false})
@@ -40,7 +40,7 @@
   (render-state [_ state]
     (let [finances-row-data (:data section-data)
           no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))
-          data-editing? (or (:initial-editing data) (om/get-state owner :data-editing?))]
+          data-editing? (or initial-editing? (om/get-state owner :data-editing?))]
 
       (when (or data-editing? (not no-data))
         (let [fixed-finances-data (finance-utils/fill-gap-months finances-row-data)
@@ -79,7 +79,6 @@
 
             (if data-editing?
               (om/build finances-edit {:finances-data (finance-utils/finances-data-map finances-row-data)
-                                       :change-finances-cb #(.log js/console "change finances cb") ; (partial change-finances-data-cb owner)
                                        :currency currency
                                        :editing-cb (partial data-editing-toggle owner editing-cb)
                                        :show-first-edit-tip false ; show-first-edit-tip
@@ -120,7 +119,7 @@
                     (om/build d3-chart {:chart-data sorted-finances}
                                        {:opts (merge chart-opts {:labels ordered-labels})})))
 
-                (when editable
+                (when editable?
                   (dom/button {:class "btn-reset chart-pencil-button"
                                :title "Edit chart data"
                                :type "button"

@@ -2,12 +2,15 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.components.ui.cell :refer (cell)]
             [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.lib.finance-utils :as finance-utils]
             [cljs.core.async :refer (put!)]))
+
+(def batch-size 6)
 
 (defn signal-tab [period k]
   (let [ch (utils/get-channel (str period k))]
@@ -95,12 +98,57 @@
             (dom/td {:class "no-cell"})
             (dom/td {:class "no-cell"})))))))
 
-(defn replace-row-in-data [data row k v]
-  "Find and replace the edited row"
-  (let [new-row (update row k (fn[_]v))]
-    ((:change-finances-cb data) new-row)))
+(defn finances-get-value [v]
+  (if (js/isNaN v)
+    0
+    v))
 
-(def batch-size 6)
+(defn finances-check-value [v]
+  (and (not (= v ""))
+       (not (nil? v))))
+
+(defn finances-fix-row [row]
+  (let [fixed-cash (update-in row [:cash] finances-get-value)
+        fixed-revenue (assoc fixed-cash :revenue (finances-get-value (:revenue row)))
+        fixed-costs (assoc fixed-revenue :costs (finances-get-value (:costs row)))
+        fixed-burnrate (assoc fixed-costs :burn-rate (utils/calc-burn-rate (:revenue fixed-costs) (:costs fixed-costs)))
+        fixed-runway (assoc fixed-burnrate :runway (utils/calc-runway (:cash fixed-burnrate) (:burn-rate fixed-burnrate)))]
+    fixed-runway))
+
+(defn finances-row-has-data [row]
+  (or (finances-check-value (:cash row))
+      (finances-check-value (:costs row))
+      (finances-check-value (:revenue row))))
+
+(defn change-finances-data [owner row]
+  (when (finances-row-has-data row)
+    (let [fixed-row (finances-fix-row row)
+          period (:period fixed-row)
+          finances-data (om/get-state owner :finances-data)
+          fixed-data (assoc finances-data period fixed-row)]
+      ;(om/set-state! owner :has-changes (or (om/get-state owner :has-changes) (not= finances-data fixed-data)))
+      (om/set-state! owner :finances-data fixed-data))))
+
+(defn finances-clean-row [data]
+  ; a data entry is good if we have the period and one other value: cash, costs or revenue
+  (when (and (not (nil? (:period data)))
+             (or (not (nil? (:cash data)))
+                 (not (nil? (:costs data)))
+                 (not (nil? (:revenue data)))))
+    (dissoc data :burn-rate :runway :new :value)))
+
+(defn finances-clean-data [finances-data]
+  (remove nil? (vec (map (fn [[_ v]] (finances-clean-row v)) finances-data))))
+
+(defn- save-data [owner]
+  (.log js/console "saving!")
+  ; (om/set-state! owner :has-changes false)
+  (dis/dispatch! [:save-topic "finances" {:data (finances-clean-data (om/get-state owner :finances-data))}]))
+
+(defn replace-row-in-data [owner row-data k v]
+  "Find and replace the edited row"
+  (let [new-row (update row-data k (fn[_]v))]
+    (change-finances-data owner new-row)))
 
 (defn more-months [owner]
   (om/update-state! owner :stop #(+ % batch-size)))
@@ -143,7 +191,7 @@
                                                  :is-last (= idx 0)
                                                  :needs-year (= idx (dec stop))
                                                  :currency currency
-                                                 :change-cb #(replace-row-in-data data row-data %1 %2)}))))
+                                                 :change-cb #(replace-row-in-data owner row-data %1 %2)}))))
               (dom/tfoot {}
                 (dom/tr {}
                   (dom/th {:class "earlier" :col-span 2}
@@ -156,6 +204,7 @@
               (dom/button {:class "btn-reset btn-outline btn-data-save"
                            :on-click  #(do
                                         (utils/event-stop %)
+                                        (save-data owner)
                                         (editing-cb false))} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
                            :on-click #(do
