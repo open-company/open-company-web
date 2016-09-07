@@ -56,11 +56,9 @@
         old-topics (get-active-topics company-data)
         new-topics (concat old-topics [new-topic])
         new-topic-kw (keyword new-topic)]
-    (if (#{:finances :growth} new-topic-kw)
-      (dispatcher/dispatch! [:force-fullscreen-edit new-topic])
-      (if section-data
-        (dispatcher/dispatch! [:start-foce new-topic-kw (or section-data {:section new-topic :placeholder true})])
-        (om/set-state! owner :new-topic-foce new-topic-kw)))
+    (if section-data
+      (dispatcher/dispatch! [:start-foce new-topic-kw (or section-data {:section new-topic :placeholder true})])
+      (om/set-state! owner :new-topic-foce new-topic-kw))
     (if section-data
       (api/patch-sections new-topics section-data new-topic)
       (api/patch-sections new-topics))))

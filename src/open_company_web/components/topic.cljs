@@ -50,10 +50,7 @@
 
 (defn pencil-click [owner e]
   (utils/event-stop e)
-  (let [section (om/get-props owner :section)]
-    (if (#{:growth :finances} (keyword section))
-      (fullscreen-topic owner nil true)
-      (start-foce-click owner))))
+  (start-foce-click owner))
 
 (defn block-a-expand []
   (when-not (utils/is-test-env?)
@@ -87,6 +84,7 @@
           truncated-body      (if (utils/is-test-env?) topic-body (.truncate js/$ topic-body (clj->js {:length 500 :words true})))
           company-data        (dis/company-data)
           {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
+
       (dom/div #js {:className "topic-internal group"
                     :onClick (partial fullscreen-topic owner nil false)
                     :key (str "topic-internal-" (name section))
@@ -215,6 +213,7 @@
                   (utils/event-stop e))
           foce-active (not (nil? (dis/foce-section-key)))
           is-foce (= (dis/foce-section-key) section-kw)]
+
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))

@@ -15,7 +15,8 @@
 ;; - :prefix a prefix to show before the formatted value
 ;; - :suffix a suffix to show after the formatted value
 ;; - :cell-state (optional) an initial state for the component
-
+;; - :positive-only (optional) if true, don't allow negative values (just drops the -)
+;; - :short (optional) if true, display values as max 3 digits (e.g. 2.34M)
 
 (defn- to-state [owner data state]
   (om/set-state! owner :cell-state state)
@@ -103,13 +104,23 @@
 
   (render-state [_ {:keys [value cell-state]}]
     (let [safe-value (safe-parse-float value)
-          positive-only (:positive-only data)
-          abs-value (if positive-only (utils/abs safe-value) safe-value)
+          positive-only? (:positive-only data)
+          short? (:short data)
+          abs-value (if positive-only? (utils/abs safe-value) safe-value)
           prefix (:prefix data)
           currency (:currency data)
           decimals (or (:decimals data) 2)
-          formatted-value (if currency
+          formatted-value (cond
+                            (and short? currency)
+                            (str (utils/get-symbol-for-currency-code currency) (utils/with-metric-prefix abs-value))
+                            
+                            short?
+                            (utils/with-metric-prefix abs-value)
+
+                            currency
                             (utils/thousands-separator abs-value currency decimals)
+                            
+                            :else
                             (utils/thousands-separator abs-value))
           prefix-value (if (and (not (s/blank? formatted-value)) (:prefix data))
                          (str (:prefix data) formatted-value)

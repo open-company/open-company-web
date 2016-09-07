@@ -1,0 +1,126 @@
+// div.growth {
+//   padding-left: 26px;
+
+//   div.table-container{
+//     padding-top: 11px;
+//   }
+// }
+
+div#section-finances.editing {
+  padding: 0;
+}
+
+div.finances, div.growth {
+
+  table.table {
+    border-spacing: 10px;
+    max-width: 100%;
+    width: 100%;
+    float: left;
+    background-color: rgba(78, 90, 107, 0.05);
+    margin-bottom: 0;
+
+    * {
+      border: 0px solid transparent;
+    }
+
+    tr {
+
+      th {
+        padding: 4px 0 4px 0px;
+        font-weight: 700;
+        font-family: $oc_headers_font;
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: rgba(78,90,107, 0.75);
+        text-transform: uppercase;
+        height: 36px;
+        vertical-align: middle;
+        text-align: center;
+
+        a.more {
+          font-weight: 700;
+          font-family: $oc_headers_font;
+          font-size: 12px;
+          letter-spacing: 1px;
+          color: rgba(78, 90, 107, 0.5);
+        }
+      }
+
+      td {
+        padding: 3px;
+        text-align: center;
+      }
+
+      td.no-cell, th.no-cell {
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 1px;
+        color: rgba(78,90,107, 0.75);
+        text-transform: uppercase;
+      }
+
+      td.no-cell {
+        font-family: $oc_main_font;
+      }
+
+      th.no-cell {
+        padding: 4px 0 4px 8px;
+        font-family: $oc_headers_font;
+      }
+
+      th.earlier {
+        text-align: left;
+        padding-left: 8px;
+      }
+
+      td div.comp-cell {
+        opacity: 0.5;
+        background-color: #ffffff;
+        padding-top: 4px;
+      }
+
+      td div.comp-cell div.comp-cell-int {
+        font-weight: normal;
+        font-size: 12px;
+        letter-spacing: 1px;
+        color: $oc_gray_7;
+      }
+    }
+  }
+
+  div.topic-foce-footer {
+    padding: 10px 20px 20px 20px;
+    background-color: rgba(78, 90, 107, 0.05);
+    margin: 0 !important;
+
+    button.btn-outline {
+      background-color: white;
+    }
+
+    button.btn-outline.btn-data-save {
+      color: $oc_green;
+    }
+  }
+}
+
+div.growth-body {
+  table.table {
+    margin-left: 40px;
+    width: 400px;
+    td.no-cell:first-child, tr:first-child{
+      width: 150px;
+    }
+  }
+}
+
+div.pillbox-container.growth{
+  background-color: transparent;
+  padding: 12px 26px 12px 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  width: 100%;
+
+  @include pillbox();
+}

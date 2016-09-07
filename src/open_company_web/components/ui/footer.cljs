@@ -1,4 +1,4 @@
-(ns open-company-web.components.footer
+(ns open-company-web.components.ui.footer
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]

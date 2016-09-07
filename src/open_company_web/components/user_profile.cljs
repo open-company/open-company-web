@@ -4,7 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.router :as router]
             [open-company-web.lib.jwt :as jwt]
-            [open-company-web.components.footer :refer (footer)]
+            [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]))
 
 (defcomponent user-profile [data owner]

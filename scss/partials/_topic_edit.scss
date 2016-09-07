@@ -23,6 +23,10 @@ div.topic {
     div.topic-foce{
       position: relative;
 
+      & > div.section-container {
+        padding: 20px 10px 0 10px;
+      }
+
       & > div, & > input{
         padding: 0px 20px;
       }
@@ -78,10 +82,6 @@ div.topic {
           width:100%;
         }
 
-        div.section-container {
-          margin: 10px;
-        }
-
         div.gradient {
           position:absolute;
           z-index:2;
@@ -130,6 +130,23 @@ div.topic {
 
         &:hover {
           color: rgba(78,90,107,1);
+        }
+      }
+
+      button.chart-pencil-button{
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        transition: 230ms;
+
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 15px;
+        background-color: rgba(78,90,107,0.5);
+
+        &:hover {
+          background-color: rgba(78,90,107,1.0);
         }
       }
 

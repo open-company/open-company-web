@@ -454,14 +454,15 @@
           fixed-year (if (in? flags :short-year) (str "'" (subs (str year) 2 4)) (str year))
           plus-one-week-year (cljs-time/year (cljs-time/plus parsed-date (cljs-time/days 7)))
           minus-one-week-year (cljs-time/year (cljs-time/minus parsed-date (cljs-time/days 7)))
-          needs-year (or (in? flags :force-year)
-                         (case fixed-interval
-                           "weekly"
-                           (or (not= plus-one-week-year year) (not= minus-one-week-year year))
-                           "quarterly"
-                           (or (= month 1) (= month 10))
-                           ;else
-                           (or (= month 1) (= month 12))))]
+          needs-year (and (not (in? flags :skip-year))
+                          (or (in? flags :force-year)
+                            (case fixed-interval
+                              "weekly"
+                              (or (not= plus-one-week-year year) (not= minus-one-week-year year))
+                              "quarterly"
+                              (or (= month 1) (= month 10))
+                              ;else
+                              (or (= month 1) (= month 12)))))]
       (case fixed-interval
         "quarterly"
         (str (get-quarter-from-month (cljs-time/month parsed-date) flags)

@@ -68,7 +68,7 @@
                         :data-tab metric-slug
                         :on-click (partial pillbox-click owner options)} mname)))))))
 
-(defcomponent topic-growth [{:keys [section section-data currency] :as data} owner options]
+(defcomponent topic-growth [{:keys [section section-data currency editable] :as data} owner options]
 
   (init-state [_]
     (get-state owner data true))
@@ -99,4 +99,14 @@
               (when (and focus (seq (:metric-data subsection-data)))
                 (om/build growth-metric subsection-data {:opts options}))
               (when (> (count growth-metric-slugs) 1)
-                (render-pillboxes owner options)))))))))
+                (render-pillboxes owner options))
+              (when editable
+                (dom/button {:class "btn-reset chart-pencil-button"
+                             :title "Edit chart data"
+                             :type "button"
+                             :data-toggle "tooltip"
+                             :data-placement "left"
+                             :on-click #(.log js/console "chart edit click")}
+                  (dom/i {:class "fa fa-pencil editable-pen"})))
+
+              )))))))

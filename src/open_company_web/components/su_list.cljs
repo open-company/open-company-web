@@ -11,8 +11,8 @@
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
-            [open-company-web.components.navbar :refer (navbar)]
             [open-company-web.components.topic-body :refer (topic-body)]
+            [open-company-web.components.ui.navbar :refer (navbar)]
             [open-company-web.components.ui.link :refer (link)]
             [clojure.string :as str]
             [goog.style :refer (setStyle)]))

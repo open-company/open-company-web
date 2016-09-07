@@ -209,6 +209,9 @@
       :else
       (dis/dispatch! [:foce-save]))))
 
+(defn- data-editing-toggle [owner editing]
+  (om/set-state! owner :data-editing? editing))
+
 (defcomponent topic-edit [{:keys [show-first-edit-tip
                                   currency
                                   prev-rev
@@ -226,7 +229,8 @@
        :char-count-alert false
        :has-changes false
        :file-upload-state nil
-       :file-upload-progress 0}))
+       :file-upload-progress 0
+       :data-editing? false}))
 
   (will-receive-props [_ next-props]
     ;; update body placeholder when receiving data from API
@@ -264,7 +268,8 @@
           image-header      (:image-url topic-data)
           add-image-tooltip (add-image-tooltip image-header)
           add-image-el      (js/$ (gdom/getElementByClass "camera"))
-          pin-image         (js/$ (gdom/getElementByClass "pin-button"))]
+          pin-image         (js/$ (gdom/getElementByClass "pin-button"))
+          add-chart-el      (js/$ (gdom/getElementByClass "chart-button"))]
       (doto add-image-el
         (.tooltip "hide")
         (.attr "data-original-title" add-image-tooltip)
@@ -273,44 +278,63 @@
       (doto pin-image
         (.tooltip "hide")
         (.attr "data-original-title" (pin-tooltip (:pin topic-data)))
-        (.tooltip "fixTitle"))))
+        (.tooltip "fixTitle"))
+      (doto add-chart-el
+        (.tooltip "hide"))))
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
                            file-upload-state file-upload-progress upload-remote-url negative-headline-char-count
-                           has-changes]}]
+                           has-changes data-editing?]}]
 
     (let [company-slug        (router/current-company-slug)
           section             (dis/foce-section-key)
-          topic-data          (dis/foce-section-data)
           section-kw          (keyword section)
-          chart-opts          {:chart-size {:width 230}
-                               :hide-nav true
-                               :topic-click (:topic-click options)}
-          is-growth-finances? (#{:growth :finances} section-kw)
+          topic-data          (dis/foce-section-data)
+          topic-body          (:body topic-data)
           gray-color          (oc-colors/get-color-by-kw :oc-gray-5)
-          finances-row-data   (:data topic-data)
+          image-header        (:image-url topic-data)
+          is-data?            (#{:growth :finances} section-kw)
+          finances-data       (:data topic-data)
           growth-data         (growth-utils/growth-data-map (:data topic-data))
-          no-data             (or (and (= section-kw :finances)
-                                       (or (empty? finances-row-data)
-                                        (utils/no-finances-data? finances-row-data)))
+          no-data?            (or (and (= section-kw :finances)
+                                       (or (empty? finances-data)
+                                        (utils/no-finances-data? finances-data)))
                                   (and (= section-kw :growth)
                                        (utils/no-growth-data? growth-data)))
-          image-header        (:image-url topic-data)
-          topic-body          (:body topic-data)]
+          chart-opts          {:chart-size {:width 230}
+                               :hide-nav true
+                               :topic-click (:topic-click options)}]
       ; set the onbeforeunload handler only if there are changes
       (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
       (when section
         (dom/div #js {:className "topic-foce group"
                       :ref "topic-internal"}
-          (when image-header
-            (dom/div {:class "card-header card-image"}
-              (when image-header
+          (when (or is-data?
+                    image-header)
+            (cond
+              (= section-kw :finances)
+              (om/build topic-finances {:section-data (utils/fix-finances topic-data)
+                                        :section section-kw
+                                        :currency currency
+                                        :editable? true
+                                        :editing-cb (partial data-editing-toggle owner)
+                                        :initial-editing? data-editing?}
+                                        {:opts chart-opts})
+              (= section-kw :growth)
+              (om/build topic-growth {:section-data topic-data
+                                      :section section-kw
+                                      :currency currency
+                                      :editable true} 
+                                      {:opts chart-opts})
+    
+              :else
+              (dom/div {:class (utils/class-set {:card-header true
+                                                 :card-image true})}
                 (dom/img {:src image-header
-                          :class "topic-header-img"}))
-              (when image-header
-                (dom/button {:class "btn-reset remove-header"
-                             :on-click #(do
+                            :class "topic-header-img"})
+                 (dom/button {:class "btn-reset remove-header"
+                              :on-click #(do
                                           (om/set-state! owner :has-changes true)
                                           (dis/dispatch! [:foce-input {:image-url nil :image-height 0 :image-width 0}]))}
                   (i/icon :simple-remove {:size 15
@@ -367,22 +391,33 @@
                                              body     (sel1 (str "#foce-body-" (name section)))]
                                          (not (or (= (.-activeElement js/document) headline)
                                                   (= (.-activeElement js/document) body))))}))
-            (dom/button {:class "btn-reset camera left"
+            (when-not is-data?
+              (dom/button {:class "btn-reset camera left"
                          :title (add-image-tooltip image-header)
                          :type "button"
                          :data-toggle "tooltip"
                          :data-placement "top"
                          :style {:display (if (nil? file-upload-state) "block" "none")}
                          :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
-                (dom/i {:class "fa fa-camera"}))
-            (dom/button {:class "btn-reset image-url left"
-                         :title "Provide an image link"
+                (dom/i {:class "fa fa-camera"})))
+            (when-not is-data?
+              (dom/button {:class "btn-reset image-url left"
+                           :title "Provide an image link"
+                           :type "button"
+                           :data-toggle "tooltip"
+                           :data-placement "top"
+                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
+                  (dom/i {:class "fa fa-code"})))
+            (when (and is-data? (not data-editing?))
+              (dom/button {:class "btn-reset chart-button left"
+                         :title "Add a chart"
                          :type "button"
                          :data-toggle "tooltip"
                          :data-placement "top"
-                         :style {:display (if (nil? file-upload-state) "block" "none")}
-                         :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
-                (dom/i {:class "fa fa-code"}))
+                         :style {:display (if no-data? "block" "none")}
+                         :on-click #(om/set-state! owner :data-editing? true)}
+                (dom/i {:class "fa fa-line-chart"})))
             (when-not (:placeholder topic-data)
               (dom/button {:class "btn-reset archive-button right"
                            :title "Archive this topic"
@@ -422,11 +457,13 @@
             (dom/div {:class "divider"})
             (dom/div {:class "topic-foce-footer-left"}
               (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
+            
             (dom/div {:class "topic-foce-footer-right"}
               (dom/button {:class "btn-reset btn-solid"
-                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count)
+                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count data-editing?)
                            :on-click #(save-topic owner)} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
+                           :disabled data-editing?
                            :on-click #(do
                                         (utils/event-stop %)
                                         (if (:placeholder topic-data)

@@ -1,4 +1,4 @@
-(ns open-company-web.components.menu
+(ns open-company-web.components.ui.menu
   (:require [cljs.core.async :refer (put!)]
             [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
