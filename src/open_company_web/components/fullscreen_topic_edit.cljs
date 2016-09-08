@@ -492,18 +492,18 @@
       (when-not (:placeholder topic-data)
         (utils/after 100 #(dis/dispatch! [:start-foce nil])))))
 
-  (did-mount [_]
-    (when-not (utils/is-test-env?)
-      (reset! prevent-route-dispatch true)
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-      (setup-medium-editor owner data)
-      (when-not (om/get-state owner :body-click)
-        (om/set-state! owner :body-click (setup-body-listener owner)))
-      (let [win-location (.-location js/window)
-            current-token (oc-urls/company-section-edit (router/current-company-slug) (name topic))
-            listener (events/listen @router/history HistoryEventType/NAVIGATE
-                        (partial topic-edit/handle-navigate-event current-token owner))]
-        (om/set-state! owner :history-listener-id listener))))
+  ; (did-mount [_]
+  ;   (when-not (utils/is-test-env?)
+  ;     (reset! prevent-route-dispatch true)
+  ;     (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+  ;     (setup-medium-editor owner data)
+  ;     (when-not (om/get-state owner :body-click)
+  ;       (om/set-state! owner :body-click (setup-body-listener owner)))
+  ;     (let [win-location (.-location js/window)
+  ;           current-token (oc-urls/company-section-edit (router/current-company-slug) (name topic))
+  ;           listener (events/listen @router/history HistoryEventType/NAVIGATE
+  ;                       (partial topic-edit/handle-navigate-event current-token owner))]
+  ;       (om/set-state! owner :history-listener-id listener))))
 
   (did-update [_ _ prev-state]
     (when-not (om/get-state owner :body-medium-editor)
