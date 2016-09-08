@@ -60,11 +60,6 @@
   ([] (company-section (router/current-company-slug) (router/current-section)))
   ([company-slug section-name] (str "/" (name company-slug) "/" (name section-name))))
 
-(defn company-section-edit
-  "section url edit mode"
-  ([] (company-section-edit (router/current-company-slug) (router/current-section)))
-  ([company-slug section-name] (str "/" (name company-slug) "/" (name section-name) "/edit")))
-
 (defn company-section-revision
   ([] (company-section (router/current-company-slug) (router/current-section)))
   ([revision] (str (company-section (router/current-company-slug) (router/current-section)) "?as-of=" revision))

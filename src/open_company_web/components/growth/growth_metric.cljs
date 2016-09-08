@@ -55,7 +55,6 @@
                              :chart-keys [:value]
                              :interval interval
                              :x-axis-labels false
-                             :svg-click #(when (:topic-click options) ((:topic-click options) nil))
                              :chart-colors {:value (occ/get-color-by-kw :oc-chart-blue)}
                              :chart-selected-colors {:value (occ/get-color-by-kw :oc-chart-blue)}
                              :chart-fill-polygons true

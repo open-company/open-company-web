@@ -41,7 +41,6 @@
       (utils/event-stop e))
     ((om/get-props owner :topic-click) selected-metric force-editing)))
 
-
 (defn start-foce-click [owner]
   (let [section-kw (keyword (om/get-props owner :section))
         company-data (dis/company-data)
@@ -52,10 +51,6 @@
   (utils/event-stop e)
   (start-foce-click owner))
 
-(defn block-a-expand []
-  (when-not (utils/is-test-env?)
-    (.on (js/$ "div.topic-body a") "click" #(.stopPropagation %))))
-
 (defcomponent topic-internal [{:keys [topic-data
                                       section
                                       currency
@@ -64,12 +59,6 @@
                                       next-rev
                                       sharing-mode
                                       show-fast-editing] :as data} owner options]
-
-  (did-mount [_]
-    (block-a-expand))
-
-  (did-update [_ _ _]
-    (block-a-expand))
 
   (render [_]
     (let [section-kw          (keyword section)
@@ -86,7 +75,6 @@
           {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
 
       (dom/div #js {:className "topic-internal group"
-                    :onClick (partial fullscreen-topic owner nil false)
                     :key (str "topic-internal-" (name section))
                     :ref "topic-internal"}
         (when (or is-growth-finances?
@@ -97,8 +85,7 @@
               (= section "finances")
               (om/build topic-finances {:section-data (utils/fix-finances topic-data)
                                         :section section
-                                        :currency currency
-                                        :topic-click (partial fullscreen-topic owner nil false)} {:opts chart-opts})
+                                        :currency currency} {:opts chart-opts})
               (= section "growth")
               (om/build topic-growth {:section-data topic-data :section section :currency currency} {:opts chart-opts})
               :else
@@ -231,9 +218,7 @@
                     :ref "topic"
                     :data-section (name section)
                     :key (str "topic-" (name section))
-                    :id (str "topic-" (name section))
-                    :onClick #(when (and (:topic-click options) (not foce-active))
-                                ((:topic-click options) nil false))}
+                    :id (str "topic-" (name section))}
         (when show-share-remove
           (dom/div {:class "share-remove-container"
                     :id (str "share-remove-" (name section))}

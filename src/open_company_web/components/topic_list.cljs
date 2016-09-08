@@ -65,21 +65,15 @@
 
 (defn- topic-click [owner topic selected-metric & [force-edit]]
   (let [company-slug (router/current-company-slug)]
-    (if force-edit
-          (.pushState js/history nil (str "Edit " (name topic)) (oc-urls/company-section-edit company-slug (name topic)))
-          (.pushState js/history nil (name topic) (oc-urls/company-section company-slug (name topic)))))
-  (when force-edit
-    (om/set-state! owner :fullscreen-force-edit true))
+    (.pushState js/history nil (name topic) (oc-urls/company-section company-slug (name topic))))
   (om/set-state! owner :selected-topic topic)
-  (om/set-state! owner :selected-metric selected-metric)
-  (utils/after 100 #(om/set-state! owner :fullscreen-force-edit false)))
+  (om/set-state! owner :selected-metric selected-metric))
 
 (defn- close-overlay-cb [owner]
   (.pushState js/history nil "Dashboard" (oc-urls/company (router/current-company-slug)))
   (om/set-state! owner (merge (om/get-state owner) {:transitioning false
                                                     :selected-topic nil
-                                                    :selected-metric nil
-                                                    :fullscreen-force-edit false})))
+                                                    :selected-metric nil})))
 
 (defn- switch-topic [owner is-left?]
   (when (and (om/get-state owner :topic-navigation)
@@ -172,7 +166,6 @@
      :share-selected-topics (:sections (:stakeholder-update company-data))
      :transitioning false
      :redirect-to-preview (or (:redirect-to-preview current-state) false)
-     :fullscreen-force-edit (if (nil? current-state) (router/section-editing?) (:fullscreen-force-edit current-state))
      :show-add-topic-tip show-add-topic-tip
      :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
      :show-share-tooltip (or (:show-share-tooltip current-state) false)
@@ -344,7 +337,6 @@
           topics                  (vec (:sections company-data))
           no-placeholder-sections (utils/filter-placeholder-sections topics company-data)]
       (when (and (:force-edit-topic next-props) (contains? company-data (keyword (:force-edit-topic next-props))))
-        (om/set-state! owner :fullscreen-force-edit true)
         (om/set-state! owner :selected-topic (dispatcher/force-edit-topic)))
       ; show second tooltip if needed
       (when (= (count no-placeholder-sections) 1)
@@ -369,7 +361,6 @@
                            transitioning
                            share-selected-topics
                            redirect-to-preview
-                           fullscreen-force-edit
                            show-add-topic-tip
                            show-second-add-topic-tooltip
                            show-share-tooltip
@@ -410,14 +401,12 @@
                             :style #js {:opacity 1 :backgroundColor "rgba(255, 255, 255, 0.98)"}}
                 (om/build fullscreen-topic {:section selected-topic
                                             :section-data (->> selected-topic keyword (get company-data))
-                                            :fullscreen-force-edit fullscreen-force-edit
                                             :revision-updates (dispatcher/section-revisions company-slug (router/current-section))
                                             :selected-metric selected-metric
                                             :read-only (:read-only company-data)
                                             :card-width card-width
                                             :currency (:currency company-data)
-                                            :animate (not transitioning)
-                                            :show-first-edit-tip (show-data-first-edit-tip? company-data selected-topic)}
+                                            :animate (not transitioning)}
                                            {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                    :topic-navigation #(om/set-state! owner :topic-navigation %)}}))
             ;; Fullscreen topic for transition

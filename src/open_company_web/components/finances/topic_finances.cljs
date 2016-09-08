@@ -54,7 +54,6 @@
                           :chart-keys [:costs]
                           :interval "monthly"
                           :x-axis-labels true
-                          :svg-click #(when (:topic-click options) ((:topic-click options) nil))
                           :chart-colors {:costs (occ/get-color-by-kw :oc-red-regular)
                                          :revenue (occ/get-color-by-kw :oc-green-regular)}
                           :chart-selected-colors {:costs (occ/get-color-by-kw :oc-red-regular)

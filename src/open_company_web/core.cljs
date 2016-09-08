@@ -193,11 +193,6 @@
     (defroute company-section-route (urls/company-section ":slug" ":section") {:as params}
       (company-handler "section" target company-dashboard params))
 
-    (defroute company-section-edit-route (urls/company-section-edit ":slug" ":section") {:as params}
-      (if (jwt/jwt)
-        (company-handler "section-edit" target company-dashboard params)
-        (router/redirect! (urls/company-section (:slug (:params params)) (:section (:params params))))))
-
     (defroute company-route (urls/company ":slug") {:as params}
       (company-handler "dashboard" target company-dashboard params))
 
@@ -235,7 +230,6 @@
                                  company-route
                                  company-route-slash
                                  company-section-route
-                                 company-section-edit-route
                                  su-snapshot-preview-route
                                  su-edit-route
                                  su-list-route
