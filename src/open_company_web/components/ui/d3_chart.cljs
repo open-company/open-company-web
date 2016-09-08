@@ -77,10 +77,7 @@
                          ; Make SVG 10px wider to give 5px on each side for month label overrun
                          (.attr "width" (+ chart-width 10))
                          (.attr "height" chart-height)
-                         (.on "click" (fn []
-                                        (when (:svg-click options)
-                                          ((:svg-click options) nil))
-                                        (.stopPropagation (.-event js/d3)))))
+                         (.on "click" (fn [] (.stopPropagation (.-event js/d3)))))
           scale-fn (scale owner options)
           data-max (max-y (om/get-props owner :chart-data) chart-keys)
           max-y (scale-fn data-max)

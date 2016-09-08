@@ -1,8 +1,8 @@
 (ns open-company-web.components.fullscreen-topic
   "
-  Display a topic in full screen in either display, editing or transitioning (history nav.) modes.
+  Display a topic in full screen in either display, or transitioning (history nav.) modes.
 
-  Handle back button, edit button, and history nav transitions.
+  Handle back button, and history nav transitions.
   "
   (:require [om.core :as om :include-macros true]
             [om-tools.core :refer-macros (defcomponent)]
@@ -16,7 +16,6 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
-            [open-company-web.components.fullscreen-topic-edit :refer (fullscreen-topic-edit)]
             [open-company-web.components.topic-attribution :refer (topic-attribution)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [dommy.core :refer-macros (sel1)]
@@ -36,7 +35,6 @@
                                                  selected-metric
                                                  card-width
                                                  hide-history-navigation
-                                                 can-edit
                                                  prev-rev
                                                  next-rev
                                                  is-actual] :as data} owner options]
@@ -75,15 +73,7 @@
           
           ;; Title
           (dom/div {:class "topic-title-container group"}
-            (dom/div {:class "topic-title left"} (:title topic-data))
-            (when (and can-edit
-                       is-actual)
-              (dom/div {:class "edit-button"
-                        :on-click #((:start-editing options))}
-                (dom/i {:class "fa fa-pencil"
-                        :title "Edit"
-                        :data-toggle "tooltip"
-                        :data-placement "top"}))))
+            (dom/div {:class "topic-title left"} (:title topic-data)))
           
           ;; Headline
           (dom/div {:class "topic-headline"
@@ -97,35 +87,13 @@
                      (not (:placeholder topic-data)))
             (om/build topic-attribution data {:opts options})))))))
 
-(defn- start-editing [owner options]
-  (let [editing (om/get-state owner :editing)
-        section (om/get-props owner :section)]
-    (.pushState js/history nil (str "Edit " (name section)) (oc-urls/company-section-edit (router/current-company-slug) (name section)))
-    (when-not editing
-      ((:topic-navigation options) false)
-      (om/set-state! owner :editing true))))
-
-(defn- exit-editing [owner options]
-  (let [editing (om/get-state owner :editing)
-        section (om/get-props owner :section)]
-    (.pushState js/history nil (name section) (oc-urls/company-section (router/current-company-slug) (name section)))
-    (when editing
-      ((:topic-navigation options) true)
-      (om/set-state! owner :editing false))))
-
 (defn- hide-fullscreen-topic [owner options & [force-fullscreen-dismiss]]
-  ; if it's in editing mode
-  (let [editing (om/get-state owner :editing)]
-    (exit-editing owner options)
-    (when (or (not editing)
-              force-fullscreen-dismiss
-              (om/get-props owner :fullscreen-force-edit))
-      (utils/enable-scroll)
-      (let [fade-out (new Fade (sel1 :div.fullscreen-topic) 1 0 utils/oc-animation-duration)]
-        (doto fade-out
-          (.listen AnimationEventType/FINISH
-            #((:close-overlay-cb options)))
-          (.play))))))
+  (utils/enable-scroll)
+  (let [fade-out (new Fade (sel1 :div.fullscreen-topic) 1 0 utils/oc-animation-duration)]
+    (doto fade-out
+      (.listen AnimationEventType/FINISH
+        #((:close-overlay-cb options)))
+      (.play))))
 
 (defn- esc-listener [owner options e]
   (when (= (.-keyCode e) 27)
@@ -180,15 +148,9 @@
   (om/set-state! owner :transition-as-of (:updated-at revision)))
 
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width
-                                        hide-history-navigation show-first-edit-tip] :as data} owner options]
+                                        hide-history-navigation] :as data} owner options]
 
   (init-state [_]
-    (when (:fullscreen-force-edit data)
-      (dis/dispatch! [:force-fullscreen-edit nil])
-      ((:topic-navigation options) false))
-    (when (and (router/section-editing?)
-               (:read-only section-data))
-      (utils/after 100 #(router/nav! (oc-urls/company-section))))
     (let [company-data (dis/company-data)
           su-data      (dis/stakeholder-update-data)]
       (when (and company-data
@@ -199,13 +161,11 @@
           current-as-of (or (router/current-as-of) actual-as-of)]
       {:as-of current-as-of
        :transition-as-of nil
-       :editing (and (:fullscreen-force-edit data) (not (:read-only section-data)))
        :data-posted false
        :show-save-button false
        :last-selected-metric selected-metric
        :actual-as-of actual-as-of
-       :source (:src (router/query-params))
-       :edit-rand (rand 4)}))
+       :source (:src (router/query-params))}))
 
   (did-mount [_]
     (om/set-state! owner :esc-listener-key
@@ -229,7 +189,7 @@
     (when (om/get-state owner :transition-as-of)
       (animate-transition owner)))
 
-  (render-state [_ {:keys [as-of transition-as-of actual-as-of source editing show-save-button data-posted last-selected-metric edit-rand] :as state}]
+  (render-state [_ {:keys [as-of transition-as-of actual-as-of source show-save-button data-posted last-selected-metric] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -239,12 +199,7 @@
           topic-data (utils/select-section-data section-data section-kw as-of)
           is-actual? (= as-of actual-as-of)
           fullscreen-topic-opts (merge options {:rev-click (partial rev-click owner)
-                                                :switch-metric-cb #(om/set-state! owner :last-selected-metric %)
-                                                :start-editing #(start-editing owner options)})
-          edit-topic-opts (merge options {:show-save-button #(om/set-state! owner :show-save-button %)
-                                          :dismiss-editing (partial hide-fullscreen-topic owner options)})
-          can-edit? (and (responsive/can-edit?)
-                         (not (:read-only data)))
+                                                :switch-metric-cb #(om/set-state! owner :last-selected-metric %)})
           fullscreen-width (responsive/fullscreen-topic-width card-width)]
       ; preload previous revision
       (when (and prev-rev
@@ -257,28 +212,14 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (str "fullscreen-topic" (when (:animate data) " initial"))
                     :ref "fullscreen-topic"}
-        (when-not (or editing (= "email" source)) ; don't show back when we're editing or came here from an email
+        (when-not (= "email" source) ; don't show back when we came here from an email
           (dom/div {:class "btd-container"
                     :style {:width (str (+ fullscreen-width 20) "px")}}
             (back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)
                                     :button-cta (if (utils/in? (:route @router/path) "updates") "BACK TO UPDATE" "BACK TO DASHBOARD")})))
-        (dom/div {:style #js {:display (when-not editing "none")}
-                  :key (str as-of edit-rand)}
-          (om/build fullscreen-topic-edit {:topic section
-                                           :topic-data topic-data
-                                           :visible editing
-                                           :selected-metric selected-metric
-                                           :currency currency
-                                           :card-width card-width
-                                           :is-actual is-actual?
-                                           :prev-rev prev-rev
-                                           :next-rev next-rev
-                                           :show-first-edit-tip show-first-edit-tip}
-                                          {:opts edit-topic-opts}))
         (dom/div #js {:className "fullscreen-topic-transition group"
                       :ref "fullscreen-topic-transition"
-                      :style #js {:height (when-not transition-as-of "auto")
-                                  :display (when editing "none")}}
+                      :style #js {:height (when-not transition-as-of "auto")}}
           (dom/div #js {:className "fullscreen-topic-as-of group"
                         :ref "cur-topic"
                         :key (str "cur-" as-of)
@@ -289,7 +230,6 @@
                                                  :currency currency
                                                  :card-width card-width
                                                  :is-actual is-actual?
-                                                 :can-edit can-edit?
                                                  :hide-history-navigation hide-history-navigation
                                                  :prev-rev prev-rev
                                                  :next-rev next-rev}
