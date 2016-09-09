@@ -2,10 +2,11 @@
   (:require [clojure.string :as string]
             [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
-            [open-company-web.lib.utils :as utils]
-            [open-company-web.components.ui.cell :refer (cell)]
             [om-tools.dom :as dom :include-macros true]
+            [open-company-web.dispatcher :as dis]
+            [open-company-web.lib.utils :as utils]
             [open-company-web.lib.growth-utils :as growth-utils]
+            [open-company-web.components.ui.cell :refer (cell)]
             [open-company-web.components.growth.growth-metric-edit :refer (growth-metric-edit)]
             [open-company-web.components.ui.utility-components :refer (editable-pen)]
             [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
@@ -107,6 +108,21 @@
 
 (defn filter-growth-data [metric-slug growth-data]
   (into {} (filter (fn [[k v]] (= (:slug v) metric-slug)) growth-data)))
+
+(defn growth-clean-row [data]
+  ; a data entry is good if we have the period value
+  (when (and (not (nil? (:period data)))
+             (not (nil? (:slug data)))
+             (or (not (nil? (:target data)))
+                 (not (nil? (:value data)))))
+    (dissoc data :new)))
+
+(defn growth-clean-data [growth-data]
+  (remove nil? (vec (map (fn [[_ v]] (growth-clean-row v)) growth-data))))
+
+(defn- save-data [owner]
+  ; (om/set-state! owner :has-changes false)
+  (dis/dispatch! [:save-topic-data "growth" {:data (growth-clean-data (om/get-state owner :growth-data))}]))
 
 (defn replace-row-in-data [owner row k v]
   (let [new-row (update row k (fn[_]v))]
@@ -210,7 +226,7 @@
                   (dom/button {:class "btn-reset btn-outline btn-data-save"
                                :on-click  #(do
                                             (utils/event-stop %)
-                                            ;(save-data owner)
+                                            (save-data owner)
                                             (editing-cb false))} "SAVE")
                   (dom/button {:class "btn-reset btn-outline"
                                :on-click #(do
