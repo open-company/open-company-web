@@ -152,14 +152,14 @@
 (defn more-months [owner]
   (om/update-state! owner :stop #(+ % batch-size)))
 
-(defcomponent finances-edit [{:keys [currency editing-cb show-first-edit-tip first-edit-tip-cb]} owner]
+(defcomponent finances-edit [{:keys [finances-data currency editing-cb show-first-edit-tip first-edit-tip-cb]} owner]
 
   (init-state [_]
-    {:finances-data (:finances-data data)
+    {:finances-data finances-data
      :stop batch-size})
 
   (will-receive-props [_ next-props]
-    (when-not (= (:finances-data data) (:finances-data next-props))
+    (when-not (= finances-data (:finances-data next-props))
       (om/set-state! owner :finances-data (:finances-data next-props))))
 
   (render-state [_ {:keys [finances-data stop]}]
