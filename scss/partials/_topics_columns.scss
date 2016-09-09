@@ -12,7 +12,7 @@ div.topics-columns {
   }
 
   div.topics-column-container {
-    padding: 20px 25px 20px 25px;
+    padding: 20px;
     margin: 0 auto;
 
     @media screen and (max-width: 413px){
@@ -54,11 +54,15 @@ div.topics-columns {
     }
 
     &.columns-1 {
+      padding: 20px 0px;
+
       div.topics-column{
         margin: 0 auto;
         float: none;
 
         div.topic-row{
+          padding: 0px;
+          border: none;
           padding-bottom: 12px;
         }
       }

@@ -270,7 +270,7 @@
           (dom/div {:class "topics-column-container columns-1 group"
                     :style #js {:width total-width}
                     :key columns-container-key}
-            (dom/div {:class "topics-column col-1"}
+            (dom/div {:class "topics-column"}
               (dom/div #js {:className "topics-column-pinned"}
                 (for [section pinned]
                   (partial-render-topic (name section))))
