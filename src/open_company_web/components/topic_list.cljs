@@ -265,7 +265,7 @@
                    (>= (count (utils/filter-placeholder-sections category-topics company-data)) min-no-placeholder-section-enable-share))
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
-            (dom/button {:class "sharing-button"
+            (dom/button {:class "btn-reset btn-solid sharing-button right"
                          :on-click #(router/nav! (oc-urls/stakeholder-update-preview company-slug))} "SHARE AN UPDATE " (dom/i {:class "fa fa-share"}))))
         ;; Fullscreen topic
         (when selected-topic
