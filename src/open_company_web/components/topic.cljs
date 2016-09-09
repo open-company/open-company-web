@@ -84,7 +84,9 @@
                                         :section section
                                         :currency currency} {:opts chart-opts})
               (= section "growth")
-              (om/build topic-growth {:section-data topic-data :section section :currency currency} {:opts chart-opts})
+              (om/build topic-growth {:section-data topic-data
+                                      :section section
+                                      :currency currency} {:opts chart-opts})
               :else
               (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options}))))
         ;; Topic title

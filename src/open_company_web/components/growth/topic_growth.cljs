@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.growth.growth-metric :refer (growth-metric)]
+            [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.caches :refer (company-cache)]
             [cuerdas.core :as s]))
@@ -36,7 +37,8 @@
     {:focus focus
      :growth-data growth-data
      :growth-metrics metrics
-     :growth-metric-slugs metric-slugs}))
+     :growth-metric-slugs metric-slugs
+     :data-editing? false}))
 
 (defn pillbox-click [owner options e]
   (.preventDefault e)
@@ -68,7 +70,23 @@
                         :data-tab metric-slug
                         :on-click (partial pillbox-click owner options)} mname)))))))
 
-(defcomponent topic-growth [{:keys [section section-data currency editable] :as data} owner options]
+                ; ;; new metric
+                ; (dom/label {:class (utils/class-set {:pillbox true
+                ;                                      growth-utils/new-metric-slug-placeholder true
+                ;                                      :active (= slug growth-utils/new-metric-slug-placeholder)})
+                ;             :title "Add a new metric"
+                ;             :data-tab growth-utils/new-metric-slug-placeholder
+                ;             :on-click (fn [e]
+                ;                         (.stopPropagation e)
+                ;                         (set-metadata-edit owner data true)
+                ;                         (om/set-state! owner :new-metric true)
+                ;                         (om/set-state! owner :metric-slug growth-utils/new-metric-slug-placeholder))} "+ New metric")))
+
+(defn- data-editing-toggle [owner editing-cb editing]
+  (om/set-state! owner :data-editing? editing)
+  (editing-cb editing))
+
+(defcomponent topic-growth [{:keys [section section-data currency editable? initial-editing? editing-cb] :as data} owner options]
 
   (init-state [_]
     (get-state owner data true))
@@ -78,9 +96,10 @@
     (when-not (= next-props data)
       (om/set-state! owner (get-state owner next-props true))))
 
-  (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs]}]
+  (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs data-editing?]}]
     (let [section-name (utils/camel-case-str (name section))
           no-data (utils/no-growth-data? growth-data)
+          data-editing? (or initial-editing? data-editing?)
           focus-metric-data (filter-growth-data focus growth-data)
           focus-metric-info (get growth-metrics focus)
           subsection-data {:metric-data focus-metric-data
@@ -88,25 +107,47 @@
                            :currency currency
                            :read-only true
                            :total-metrics (count growth-metrics)}]
-      (when-not no-data
-        (dom/div {:class "section-container"
-                  :id "section-growth"
-                  :key (name section)}
-          (dom/div {:class "composed-section growth group"}
-            ; growth data chart
-            (dom/div {:class (utils/class-set {:composed-section-body true})}
-              ;; growth metric currently shown
-              (when (and focus (seq (:metric-data subsection-data)))
-                (om/build growth-metric subsection-data {:opts options}))
-              (when (> (count growth-metric-slugs) 1)
-                (render-pillboxes owner options))
-              (when editable
-                (dom/button {:class "btn-reset chart-pencil-button"
-                             :title "Edit chart data"
-                             :type "button"
-                             :data-toggle "tooltip"
-                             :data-placement "left"
-                             :on-click #(.log js/console "chart edit click")}
-                  (dom/i {:class "fa fa-pencil editable-pen"})))
 
-              )))))))
+      (dom/div {:id "section-growth"
+                :class (utils/class-set {:section-container true
+                                         :editing data-editing?})
+                :key (name section)}
+
+        (if data-editing?
+
+          (om/build growth-edit {
+                         :initial-focus focus
+                         :growth-data growth-data
+                         :metrics growth-metrics
+                         :editing-cb (partial data-editing-toggle owner editing-cb)
+                         ;:growth-metric-slugs growth-metric-slugs
+                         ;:metadata-edit-cb (partial growth-metadata-edit-cb owner)
+                         ;:change-growth-cb (partial growth-change-data-cb owner)
+                         ;:delete-metric-cb (partial growth-delete-metric-cb owner data)
+                         ;:save-metadata-cb (partial growth-save-metrics-metadata-cb owner data)
+                         ;:cancel-cb #(growth-cancel-cb owner data)
+                         ;:change-growth-metric-cb (partial growth-change-metric-cb owner data)
+                         ;:new-growth-section (om/get-state owner :oc-editing)
+                         :show-first-edit-tip false ;show-first-edit-tip
+                         ;:first-edit-tip-cb #(focus-headline owner)
+                        }
+                        {:opts {:currency currency} :key growth-data})
+
+          (when-not no-data
+            (dom/div {:class "composed-section growth group"}
+              ; growth data chart
+              (dom/div {:class (utils/class-set {:composed-section-body true})}
+                ;; growth metric currently shown
+                (when (and focus (seq (:metric-data subsection-data)))
+                  (om/build growth-metric subsection-data {:opts options}))
+                (when (> (count growth-metric-slugs) 1)
+                  (render-pillboxes owner options))
+                (when editable?
+                  (dom/button {:class "btn-reset chart-pencil-button"
+                               :title "Edit chart data"
+                               :type "button"
+                               :data-toggle "tooltip"
+                               :data-placement "left"
+                               :on-click #(do (om/set-state! owner :data-editing? true)
+                                              (editing-cb true))}
+                    (dom/i {:class "fa fa-pencil editable-pen"})))))))))))

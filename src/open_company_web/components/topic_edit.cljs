@@ -287,7 +287,9 @@
               (om/build topic-growth {:section-data topic-data
                                       :section section-kw
                                       :currency currency
-                                      :editable true} 
+                                      :editable? true
+                                      :editing-cb (partial data-editing-toggle owner)
+                                      :initial-editing? data-editing?}
                                       {:opts chart-opts})
     
               :else
