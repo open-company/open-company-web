@@ -217,12 +217,17 @@
         other-topics-list (vec (for [topic other-topics] (.data (js/$ topic) "section")))]
     (dispatcher/dispatch! [:new-sections (vec (concat pinned-topics-list other-topics-list))])))
 
-(defn pinned-count [data]
+(defn pinned-count
+  "Return the count of pinned topics in the current company"
+  [data]
   (let [company-data (:company-data data)
         {:keys [pinned]} (utils/get-pinned-other-keys (:sections company-data) company-data)]
     (count pinned)))
 
-(defn coord-inside [left top topic]
+(defn coord-inside
+  "Given the current left and top drag coordinate and a topic return a map saying if the coords
+  are over it and if it's on the left or right side"
+  [left top topic]
   (if topic
     (let [dragging-topic (.data (js/$ ".ui-draggable-dragging") "topic")
           topic-el (js/$ (str ".topic-row[data-topic=" (name topic) "]"))
@@ -253,7 +258,9 @@
          :inside? false}))
     (sentry/capture-message (str "open-company-web.components.topic-list/coord-inside params, left:" left ", top:" top ", topic:" topic))))
 
-(defn get-topic-at-position [owner left top stop?]
+(defn get-topic-at-position
+  "Give left and top coordinates of the current drag position, show the yellow bar on left or right of the current hovering topic"
+  [owner left top stop?]
   (let [left (+ left 45)
         top (+ top 60)
         company-data    (:company-data (om/get-props owner))

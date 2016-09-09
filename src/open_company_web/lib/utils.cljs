@@ -299,7 +299,9 @@
   "Get the section names, as a vector of keywords."
   (vec (map keyword (:sections company-data))))
 
-(defn get-pinned-other-keys [sections company-data]
+(defn get-pinned-other-keys
+  "Get a map that split the given list of topics in pinned and non pinned topics"
+  [sections company-data]
   (loop [pinned []
          unpinned sections
          idx 0]
