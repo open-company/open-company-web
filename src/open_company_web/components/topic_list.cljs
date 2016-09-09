@@ -305,6 +305,9 @@
          (not (:read-only company-data))
          (>= (count (utils/filter-placeholder-sections company-topics company-data)) min-no-placeholder-section-enable-share))))
 
+(def card-x-margins 20)
+(def columns-layout-padding 25)
+
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
@@ -385,9 +388,9 @@
           columns-num     (:columns-num data)
           ww              (.-clientWidth (sel1 js/document :body))
           total-width     (case columns-num
-                            3 (str (+ (* card-width 3) 40 60) "px")
-                            2 (str (+ (* card-width 2) 20 64) "px")
-                            1 (if (> ww 413) (str card-width "px") "auto"))
+                            3 (str (+ (* card-width 3) (* card-x-margins 3) (+ columns-layout-padding 2)) "px")
+                            2 (str (+ (* card-width 2) (* card-x-margins 2) (+ columns-layout-padding 2)) "px")
+                            1 (if (>= ww responsive/c1-min-win-width) (str card-width "px") "auto"))
           can-edit-secs   (can-edit-sections? company-data)]
       (dom/div {:class (utils/class-set {:topic-list true
                                          :group true
