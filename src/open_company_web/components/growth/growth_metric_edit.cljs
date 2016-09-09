@@ -172,19 +172,33 @@
       (dom/div {:class "growth-metric-edit p3"}
 
         ;; name
-        (dom/div {:class "small-caps bold mb1"} "Metric name")
-        (dom/input {:class "npt col-5 p1 mb3"
+        (dom/div {:class "small-caps bold mb1"} "Chart label")
+        (dom/input {:class "npt col-8 p1 mb2"
           :type "text"
           :value (om/get-state owner :metric-name)
           :on-change (fn [e]
                        (om/set-state! owner :metric-name (.. e -target -value))
                        (change-name owner data))
           :id "mtr-name"
-          :placeholder "DAU"})
+          :placeholder "A short name, e.g. DAU"})
+
+        ;; description
+        (dom/div {:class "small-caps bold mb1"} "Description (Shown in tooltip)")
+        (dom/input {:class "npt col-12 p1 mb2"
+                    :type "text"
+                    :value (om/get-state owner :description)
+                    :placeholder "e.g. Daily Active Users"
+                    :on-change (fn [e]
+                                  (let [value (.. e -target -value)
+                                        slug (om/get-state owner :metric-slug)
+                                        change-cb (:change-growth-metric-cb data)]
+                                    (om/set-state! owner :description value)
+                                    (when slug
+                                      (change-cb slug {:description value}))))})
 
         ;; interval
         (dom/div {:class "small-caps bold mb1"} "Interval")
-        (dom/select {:class "npt col-3 p1 mb3"
+        (dom/select {:class "npt col-5 p1 mb2"
                      :default-value (om/get-state owner :interval)
                      :id "mtr-interval"
                      ; if there are data the interval can't be changed
@@ -195,39 +209,27 @@
 
         ;; unit
         (dom/div {:class "small-caps bold mb1"} "Measured As")
-        (dom/select {:class "npt col-3 p1 mb3"
+        (dom/select {:class "npt col-5 p1 mb2"
                      :default-value (or (om/get-state owner :unit) "A number")
                      :id "mtr-unit"}
           (for [unit units]
             (dom/option {:value (:unit unit)} (:name unit))))
 
-        ;; description
-        (dom/div {:class "small-caps bold mb1"} "Description for tooltip")
-        (dom/input {:class "npt col-10 p1 mb3"
-                    :type "text"
-                    :value (om/get-state owner :description)
-                    :on-change (fn [e]
-                                  (let [value (.. e -target -value)
-                                        slug (om/get-state owner :metric-slug)
-                                        change-cb (:change-growth-metric-cb data)]
-                                    (om/set-state! owner :description value)
-                                    (when slug
-                                      (change-cb slug {:description value}))))})
-
-        (dom/div
-          ;; add or save button
-          (dom/button {:class "btn-reset btn-solid mr1 primary-button"
-                       :disabled (or (s/blank? (om/get-state owner :metric-slug))
-                                     (s/blank? (om/get-state owner :metric-name))
-                                     (s/blank? (om/get-state owner :unit))
-                                     (s/blank? (om/get-state owner :interval)))
-                       :on-click #((:save-cb data))}
-            "SAVE")
-          ;; archive button
-          (when-not (:new-metric data)
-            (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
-                         :title "Archive this metric"
-                         :on-click #(show-archive-confirm-popover owner data)} "ARCHIVE"))
-          ;; cancel button
-          (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
-                       :on-click (:cancel-cb data)} "CANCEL"))))))
+        (dom/div {:class "topic-foce-footer group"}
+          (dom/div {:class "topic-foce-footer-right"}
+            ;; add or save button
+            (dom/button {:class "btn-reset btn-outline btn-data-save"
+                         :disabled (or (s/blank? (om/get-state owner :metric-slug))
+                                       (s/blank? (om/get-state owner :metric-name))
+                                       (s/blank? (om/get-state owner :unit))
+                                       (s/blank? (om/get-state owner :interval)))
+                         :on-click #((:save-cb data))}
+              "SAVE")
+            ;; archive button
+            ; (when-not (:new-metric data)
+            ;   (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
+            ;                :title "Archive this metric"
+            ;                :on-click #(show-archive-confirm-popover owner data)} "ARCHIVE"))
+            ;; cancel button
+            (dom/button {:class "btn-reset btn-outline"
+                         :on-click (:cancel-cb data)} "CANCEL")))))))

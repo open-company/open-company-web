@@ -232,7 +232,7 @@
     (om/set-state! owner :growth-metric-slugs (:growth-metric-slugs state))))
 
 (defn growth-clean-row [data]
-  ; a data entry is good if we have the period and one other value: cash, costs or revenue
+  ; a data entry is good if we have the period value
   (when (and (not (nil? (:period data)))
              (not (nil? (:slug data)))
              (or (not (nil? (:target data)))

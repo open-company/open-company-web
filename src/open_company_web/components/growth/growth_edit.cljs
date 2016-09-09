@@ -99,7 +99,6 @@
   (om/update-state! owner :stop #(+ % batch-size)))
 
 (defn set-metadata-edit [owner data editing]
-  ((:metadata-edit-cb data) editing)
   (om/set-state! owner :metadata-edit editing))
 
 (defn save-metadata-cb [owner data]
@@ -164,7 +163,6 @@
                                                              (om/set-state! owner :metadata-edit false)
                                                              ((:delete-metric-cb data) metric-slug))
                                           :cancel-cb (fn []
-                                                       ((:cancel-cb data))
                                                        (om/set-state! owner :new-metric false)
                                                        (set-metadata-edit owner data false))
                                           :change-growth-metric-cb (:change-growth-metric-cb data)}
@@ -222,16 +220,16 @@
 
               (when interval
                 (dom/div {:class "topic-foce-footer group"}
-                (dom/div {:class "topic-foce-footer-right"}
-                  (dom/button {:class "btn-reset btn-outline btn-data-save"
-                               :on-click  #(do
-                                            (utils/event-stop %)
-                                            (save-data owner)
-                                            (editing-cb false))} "SAVE")
-                  (dom/button {:class "btn-reset btn-outline"
-                               :on-click #(do
-                                            (utils/event-stop %)
-                                            (editing-cb false))} "CANCEL"))))
+                  (dom/div {:class "topic-foce-footer-right"}
+                    (dom/button {:class "btn-reset btn-outline btn-data-save"
+                                 :on-click  #(do
+                                              (utils/event-stop %)
+                                              (save-data owner)
+                                              (editing-cb false))} "SAVE")
+                    (dom/button {:class "btn-reset btn-outline"
+                                 :on-click #(do
+                                              (utils/event-stop %)
+                                              (editing-cb false))} "CANCEL"))))
 
             ;; Onboarding toolip
             (when (:show-first-edit-tip data)

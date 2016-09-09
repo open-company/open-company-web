@@ -120,7 +120,6 @@
                          :growth-data growth-data
                          :metrics growth-metrics
                          :editing-cb (partial data-editing-toggle owner editing-cb)
-                         ;:growth-metric-slugs growth-metric-slugs
                          ;:metadata-edit-cb (partial growth-metadata-edit-cb owner)
                          ;:change-growth-cb (partial growth-change-data-cb owner)
                          ;:delete-metric-cb (partial growth-delete-metric-cb owner data)
