@@ -160,25 +160,43 @@
 ;; ===== Topic List Component =====
 
 (defn- get-state [owner data current-state]
+  ; get internal component state
   (let [company-data (:company-data data)
         active-topics (apply merge (map #(hash-map (keyword %) (->> % keyword (get company-data))) (get-active-topics company-data)))
         show-add-topic-tip (show-add-topic-tip? company-data active-topics)
         selected-topic (if (nil? current-state) (router/current-section) (:selected-topic current-state))]
-    {:initial-active-topics active-topics
+    {; initial active topics to check with the updated active topics
+     :initial-active-topics active-topics
+     ; actual active topics possibly changed by the user
      :active-topics active-topics
+     ; card with
      :card-width (:card-width data)
+     ; remember if the /slug/new call was already started
      :new-sections-requested (or (:new-sections-requested current-state) false)
+     ; selected topic for fullscreen
      :selected-topic selected-topic
+     ; transitioning btw fullscreen topics, navigated with kb arrows or swipe on mobile
      :tr-selected-topic nil
+     ; enamble/disable fullscreen topic navigation
      :topic-navigation (or (:topic-navigation current-state) true)
+     ; share selected topics
      :share-selected-topics (:sections (:stakeholder-update company-data))
+     ; transitioning btw fullscreen topics
      :transitioning false
+     ; redirect the user to the updates preview page
      :redirect-to-preview (or (:redirect-to-preview current-state) false)
+     ; force fullscreen edit open, user clicked on expand in FoCE
      :fullscreen-force-edit (if (nil? current-state) (router/section-editing?) (:fullscreen-force-edit current-state))
+     ; remember if add topic tooltip was shown
      :show-add-topic-tip show-add-topic-tip
+     ; remember if second add topic tooltip was shown
      :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
+     ; showremember if share tooltip was shown
      :show-share-tooltip (or (:show-share-tooltip current-state) false)
+     ; remember if second pin tip was shown
      :show-second-pin-tip (or (:show-second-pin-tip current-state) false)
+     ; this is used to foce the rerender of the component when the user drag a topic
+     ; but it's dropped in a no action spot
      :rerender (rand 4)}))
 
 (defn save-sections-order [owner]
