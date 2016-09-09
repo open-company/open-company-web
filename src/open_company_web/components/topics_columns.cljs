@@ -39,10 +39,10 @@
                                   "<div>"
                                     "<div class=\"topic-internal\">"
                                       (when-not (clojure.string/blank? headline)
-                                        (str "<div class=\"topic-headline-inner\" style=\"width: " (+ card-width 20 -8) "px;\">"
+                                        (str "<div class=\"topic-headline-inner\" style=\"width: " (+ card-width 20) "px;\">"
                                                (utils/emojify headline true)
                                              "</div>"))
-                                      "<div class=\"topic-body\" style=\"width: " (+ card-width 20 -8) "px;\">"
+                                      "<div class=\"topic-body\" style=\"width: " (+ card-width 20) "px;\">"
                                         (utils/emojify body true)
                                       "</div>"
                                     "</div>"
@@ -235,7 +235,7 @@
               (let [column (get best-layout kw)
                     {:keys [pinned other]} (utils/get-pinned-other-keys column (dis/company-data))]
                 (dom/div {:class (str "topics-column col-" (name kw))
-                          :style #js {:width (str (+ card-width 20 -8) "px")}}
+                          :style #js {:width (str (+ card-width 20) "px")}}
                   (dom/div #js {:className "topics-column-pinned"}
                     (when (pos? (count pinned))
                       (for [idx (range (count pinned))
