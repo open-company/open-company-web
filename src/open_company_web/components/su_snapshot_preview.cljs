@@ -77,6 +77,8 @@
   (let [company-data (dis/company-data (om/get-props owner))]
     (->> section keyword (get company-data) :title)))
 
+(def topic-row-x-padding 40)
+
 (defcomponent su-snapshot-preview [data owner options]
 
   (init-state [_]
@@ -138,7 +140,7 @@
           su-data      (stakeholder-update-data data)
           card-width   (responsive/calc-card-width 1)
           ww           (.-clientWidth (sel1 js/document :body))
-          total-width  (if (> ww 413) (str (min ww (+ card-width 140)) "px") "auto")
+          total-width  (if (>= ww responsive/c1-min-win-width) (str (min ww (+ card-width (* topic-row-x-padding 2))) "px") "auto")
           su-subtitle  (str "— " (utils/date-string (js/Date.) [:year]))
           possible-sections (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
           topics-to-add (sort #(compare (title-from-section-name owner %1) (title-from-section-name owner %2)) (reduce utils/vec-dissoc possible-sections su-topics))]

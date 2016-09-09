@@ -152,24 +152,41 @@
 ;; ===== Topic List Component =====
 
 (defn- get-state [owner data current-state]
+  ; get internal component state
   (let [company-data (:company-data data)
         active-topics (apply merge (map #(hash-map (keyword %) (->> % keyword (get company-data))) (get-active-topics company-data)))
         show-add-topic-tip (show-add-topic-tip? company-data active-topics)
         selected-topic (if (nil? current-state) (router/current-section) (:selected-topic current-state))]
-    {:initial-active-topics active-topics
+    {; initial active topics to check with the updated active topics
+     :initial-active-topics active-topics
+     ; actual active topics possibly changed by the user
      :active-topics active-topics
+     ; card with
      :card-width (:card-width data)
+     ; remember if the /slug/new call was already started
      :new-sections-requested (or (:new-sections-requested current-state) false)
+     ; selected topic for fullscreen
      :selected-topic selected-topic
+     ; transitioning btw fullscreen topics, navigated with kb arrows or swipe on mobile
      :tr-selected-topic nil
+     ; enamble/disable fullscreen topic navigation
      :topic-navigation (or (:topic-navigation current-state) true)
+     ; share selected topics
      :share-selected-topics (:sections (:stakeholder-update company-data))
+     ; transitioning btw fullscreen topics
      :transitioning false
+     ; redirect the user to the updates preview page
      :redirect-to-preview (or (:redirect-to-preview current-state) false)
+     ; remember if add topic tooltip was shown
      :show-add-topic-tip show-add-topic-tip
+     ; remember if second add topic tooltip was shown
      :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
+     ; showremember if share tooltip was shown
      :show-share-tooltip (or (:show-share-tooltip current-state) false)
+     ; remember if second pin tip was shown
      :show-second-pin-tip (or (:show-second-pin-tip current-state) false)
+     ; this is used to foce the rerender of the component when the user drag a topic
+     ; but it's dropped in a no action spot
      :rerender (rand 4)}))
 
 (defn save-sections-order [owner]
@@ -190,12 +207,17 @@
         other-topics-list (vec (for [topic other-topics] (.data (js/$ topic) "section")))]
     (dispatcher/dispatch! [:new-sections (vec (concat pinned-topics-list other-topics-list))])))
 
-(defn pinned-count [data]
+(defn pinned-count
+  "Return the count of pinned topics in the current company"
+  [data]
   (let [company-data (:company-data data)
         {:keys [pinned]} (utils/get-pinned-other-keys (:sections company-data) company-data)]
     (count pinned)))
 
-(defn coord-inside [left top topic]
+(defn coord-inside
+  "Given the current left and top drag coordinate and a topic return a map saying if the coords
+  are over it and if it's on the left or right side"
+  [left top topic]
   (if topic
     (let [dragging-topic (.data (js/$ ".ui-draggable-dragging") "topic")
           topic-el (js/$ (str ".topic-row[data-topic=" (name topic) "]"))
@@ -226,7 +248,9 @@
          :inside? false}))
     (sentry/capture-message (str "open-company-web.components.topic-list/coord-inside params, left:" left ", top:" top ", topic:" topic))))
 
-(defn get-topic-at-position [owner left top stop?]
+(defn get-topic-at-position
+  "Give left and top coordinates of the current drag position, show the yellow bar on left or right of the current hovering topic"
+  [owner left top stop?]
   (let [left (+ left 45)
         top (+ top 60)
         company-data    (:company-data (om/get-props owner))
@@ -278,7 +302,7 @@
                                  :start #(.addClass (js/$ (sel1 [:div.topics-columns])) "dragging-topic")
                                  :stop #(dragging owner % true)}))))
 
-(defn destroy-draggable [owner]
+(defn destroy-draggable []
   (when-let [list-node (js/$ "div.topic-row.draggable-topic")]
     (when (.draggable list-node "instance")
       (try (.draggable list-node "destroy") (catch :default e (sentry/capture-error e))))))
@@ -286,8 +310,8 @@
 (defn manage-draggable [owner]
   (when-not (utils/is-test-env?)
     (if (> (pinned-count (om/get-props owner)) 1)
-      (do (destroy-draggable owner) (utils/after 1 #(setup-draggable owner)))
-      (destroy-draggable owner))))
+      (do (destroy-draggable) (utils/after 1 #(setup-draggable owner)))
+      (destroy-draggable))))
 
 (defn can-edit-sections? [company-data]
   (let [company-topics (vec (map keyword (:sections company-data)))]
@@ -295,6 +319,9 @@
          (responsive/can-edit?)
          (not (:read-only company-data))
          (>= (count (utils/filter-placeholder-sections company-topics company-data)) min-no-placeholder-section-enable-share))))
+
+(def card-x-margins 20)
+(def columns-layout-padding 20)
 
 (defcomponent topic-list [data owner options]
 
@@ -347,12 +374,17 @@
       (when (= (count (filter #(->> % keyword (get company-data) :pin) no-placeholder-sections)) 2)
         (om/set-state! owner :show-second-pin-tip true))))
 
-  (did-update [_ _ _]
+  (did-update [_ prev-props _]
     (when-not (utils/is-test-env?)
       (when (om/get-state owner :tr-selected-topic)
         (animate-selected-topic-transition owner (om/get-state owner :animation-direction)))
-      (when (can-edit-sections? (:company-data data))
-        (manage-draggable owner))))
+      (if (not (nil? (:foce-key data)))
+        ;; if FoCE is starting we need to destroy the draggable or the medium editor
+        ;; will conflict with it
+        (destroy-draggable)
+        ;; else setup draggable as usuale
+        (when (can-edit-sections? (:company-data data))
+          (manage-draggable owner)))))
 
   (render-state [_ {:keys [active-topics
                            selected-topic
@@ -374,9 +406,9 @@
           columns-num     (:columns-num data)
           ww              (.-clientWidth (sel1 js/document :body))
           total-width     (case columns-num
-                            3 (str (+ (* card-width 3) 40 60) "px")
-                            2 (str (+ (* card-width 2) 20 64) "px")
-                            1 (if (> ww 413) (str card-width "px") "auto"))
+                            3 (str (+ (* card-width 3) (* card-x-margins 3) (* columns-layout-padding 2) 1) "px")
+                            2 (str (+ (* card-width 2) (* card-x-margins 2) (* columns-layout-padding 2) 1) "px")
+                            1 (if (>= ww responsive/c1-min-win-width) (str card-width "px") "auto"))
           can-edit-secs   (can-edit-sections? company-data)]
       (dom/div {:class (utils/class-set {:topic-list true
                                          :group true

@@ -33,16 +33,18 @@
 (def add-topic-height 94)
 (def read-more-height 15)
 
+(def topic-margins 20)
+
 (defn headline-body-height [headline body card-width]
   (let [$headline (js/$ (str "<div class=\"topic\">"
                                 "<div class=\"topic-anim\">"
                                   "<div>"
                                     "<div class=\"topic-internal\">"
                                       (when-not (clojure.string/blank? headline)
-                                        (str "<div class=\"topic-headline-inner\" style=\"width: " (+ card-width 20 -8) "px;\">"
+                                        (str "<div class=\"topic-headline-inner\" style=\"width: " (+ card-width topic-margins) "px;\">"
                                                (utils/emojify headline true)
                                              "</div>"))
-                                      "<div class=\"topic-body\" style=\"width: " (+ card-width 20 -8) "px;\">"
+                                      "<div class=\"topic-body\" style=\"width: " (+ card-width topic-margins) "px;\">"
                                         (utils/emojify body true)
                                       "</div>"
                                     "</div>"
@@ -114,7 +116,10 @@
       (= min-height thrd-clmn)
       :3)))
 
-(defn get-pinned-layout [pinned-topics columns-num]
+(defn get-pinned-layout
+  "Return the layout of the pinned topics only on 3 or 2 columns depending on the
+  current screen width."
+  [pinned-topics columns-num]
   (if (= columns-num 3)
     (loop [idx 3
            cl1 (vec (remove nil? [(first pinned-topics)]))
@@ -138,7 +143,9 @@
         {:1 cl1
          :2 cl2}))))
 
-(defn calc-layout [owner data]
+(defn calc-layout 
+  "Calculate the best layout given the list of topics and the number of columns to layout to"
+  [owner data]
   (if (utils/is-test-env?)
     (om/get-props owner :topics)
     (let [columns-num (:columns-num data)
@@ -231,11 +238,14 @@
           (dom/div {:class "topics-column-container group"
                     :style #js {:width total-width}
                     :key columns-container-key}
+            ; for each column key contained in best layout
             (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
+              ; get the pinned and the other topics of the current column
               (let [column (get best-layout kw)
                     {:keys [pinned other]} (utils/get-pinned-other-keys column (dis/company-data))]
                 (dom/div {:class (str "topics-column col-" (name kw))
-                          :style #js {:width (str (+ card-width 20 -8) "px")}}
+                          :style #js {:width (str (+ card-width topic-margins) "px")}}
+                  ; render the pinned topics
                   (dom/div #js {:className "topics-column-pinned"}
                     (when (pos? (count pinned))
                       (for [idx (range (count pinned))
@@ -243,6 +253,7 @@
                                   section-name (name section-kw)]]
                         (partial-render-topic section-name
                                               (when (= section-name "add-topic") (int (name kw)))))))
+                  ; render the other topics
                   (dom/div #js {:className "topics-column-other"}
                     (when (pos? (count other))
                       (for [idx (range (count other))
@@ -250,6 +261,7 @@
                                   section-name (name section-kw)]]
                         (partial-render-topic section-name
                                               (when (= section-name "add-topic") (int (name kw))))))
+                    ; render the add topic in the correct column
                     (when (and show-add-topic
                                (= kw :1)
                                (= (count topics) 0))
@@ -270,7 +282,7 @@
           (dom/div {:class "topics-column-container columns-1 group"
                     :style #js {:width total-width}
                     :key columns-container-key}
-            (dom/div {:class "topics-column col-1"}
+            (dom/div {:class "topics-column"}
               (dom/div #js {:className "topics-column-pinned"}
                 (for [section pinned]
                   (partial-render-topic (name section))))

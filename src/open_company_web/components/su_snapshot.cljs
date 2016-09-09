@@ -102,7 +102,7 @@
           su-data      (dis/stakeholder-update-data)
           card-width   (responsive/calc-card-width 1)
           ww           (.-clientWidth (sel1 js/document :body))
-          total-width  (if (> ww 413) (str (min ww (+ card-width 100)) "px") "auto")
+          total-width  (if (>= ww responsive/c1-min-win-width) (str (min ww (+ card-width 100)) "px") "auto")
           su-subtitle  (str "- " (utils/date-string (js/Date.) [:year]))]
       (dom/div {:class "su-snapshot main-scroll"}
         (dom/div {:class "page"}

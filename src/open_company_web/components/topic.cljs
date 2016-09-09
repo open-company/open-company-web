@@ -170,6 +170,7 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
+      ; initialize bootstrap tooltips
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (will-update [_ next-props _]
