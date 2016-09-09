@@ -287,7 +287,7 @@
                                  :start #(.addClass (js/$ (sel1 [:div.topics-columns])) "dragging-topic")
                                  :stop #(dragging owner % true)}))))
 
-(defn destroy-draggable [owner]
+(defn destroy-draggable []
   (when-let [list-node (js/$ "div.topic-row.draggable-topic")]
     (when (.draggable list-node "instance")
       (try (.draggable list-node "destroy") (catch :default e (sentry/capture-error e))))))
@@ -295,8 +295,8 @@
 (defn manage-draggable [owner]
   (when-not (utils/is-test-env?)
     (if (> (pinned-count (om/get-props owner)) 1)
-      (do (destroy-draggable owner) (utils/after 1 #(setup-draggable owner)))
-      (destroy-draggable owner))))
+      (do (destroy-draggable) (utils/after 1 #(setup-draggable owner)))
+      (destroy-draggable))))
 
 (defn can-edit-sections? [company-data]
   (let [company-topics (vec (map keyword (:sections company-data)))]
@@ -360,12 +360,17 @@
       (when (= (count (filter #(->> % keyword (get company-data) :pin) no-placeholder-sections)) 2)
         (om/set-state! owner :show-second-pin-tip true))))
 
-  (did-update [_ _ _]
+  (did-update [_ prev-props _]
     (when-not (utils/is-test-env?)
       (when (om/get-state owner :tr-selected-topic)
         (animate-selected-topic-transition owner (om/get-state owner :animation-direction)))
-      (when (can-edit-sections? (:company-data data))
-        (manage-draggable owner))))
+      (if (not (nil? (:foce-key data)))
+        ;; if FoCE is starting we need to destroy the draggable or the medium editor
+        ;; will conflict with it
+        (destroy-draggable)
+        ;; else setup draggable as usuale
+        (when (can-edit-sections? (:company-data data))
+          (manage-draggable owner)))))
 
   (render-state [_ {:keys [active-topics
                            selected-topic
