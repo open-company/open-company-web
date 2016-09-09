@@ -55,33 +55,6 @@ div.topic-list{
     height: 30px;
     margin: 0 auto;
     padding: 29px;
-
-    button.sharing-button {
-      float: right;
-      height: 30px;
-      padding: 5px 20px;
-      background-color: transparent;
-      font-weight: 700;
-      font-family: $oc_headers_font;
-      font-size: 12px;
-      line-height: 1.5;
-      letter-spacing: 1px;
-      color: $oc_gray_5;
-      opacity: 0.6;
-      outline: none;
-      border: 0px solid transparent;
-
-      &:hover {
-        outline: none;
-        border: 0px solid transparent;
-        opacity: 1;
-      }
-
-      &:active, &:focus{
-        outline: none;
-        border: 0px solid transparent;
-      }
-    }
   }
 }
 

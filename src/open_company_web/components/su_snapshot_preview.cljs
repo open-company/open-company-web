@@ -8,8 +8,8 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
-            [open-company-web.components.menu :refer (menu)]
-            [open-company-web.components.navbar :refer (navbar)]
+            [open-company-web.components.ui.menu :refer (menu)]
+            [open-company-web.components.ui.navbar :refer (navbar)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
@@ -182,7 +182,6 @@
                                   :ref "preview-title"
                                   :onChange #(om/set-state! owner :title (.. % -target -value))
                                   :style #js {:width total-width}})))
-              (dom/div {:class "preview-subtitle"} su-subtitle)
               (when show-su-dialog
                 (om/build su-preview-dialog {:selected-topics (:sections su-data)
                                              :company-data company-data

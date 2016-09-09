@@ -2,7 +2,7 @@
   (:require [doo.runner :refer-macros [doo-tests]]
             [test.open-company-web.components.page-not-found]
             [test.open-company-web.components.list-companies]
-            [test.open-company-web.components.navbar]))
+            [test.open-company-web.components.ui.navbar]))
 
 (enable-console-print!)
 
@@ -12,4 +12,4 @@
 (doo-tests 
   'test.open-company-web.components.page-not-found
   'test.open-company-web.components.list-companies
-  'test.open-company-web.components.navbar)
+  'test.open-company-web.components.ui.navbar)

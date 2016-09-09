@@ -8,8 +8,8 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
-            [open-company-web.components.navbar :refer (navbar)]
-            [open-company-web.components.footer :refer (footer)]
+            [open-company-web.components.ui.navbar :refer (navbar)]
+            [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
             [goog.events :as events]
@@ -22,12 +22,12 @@
   (om/set-state! owner :transitioning false)
   (om/set-state! owner :selected-topic nil)
   (om/set-state! owner :selected-metric nil)
-  (.pushState js/history nil "Stakeholder update" (oc-urls/stakeholder-update (router/current-company-slug) (router/current-stakeholder-update-slug))))
+  (.pushState js/history nil "Stakeholder update" (oc-urls/stakeholder-update (router/current-company-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug))))
 
 (defn topic-click [owner topic selected-metric]
   (om/set-state! owner :selected-topic topic)
   (om/set-state! owner :selected-metric selected-metric)
-  (.pushState js/history nil (name topic) (oc-urls/stakeholder-update-section  (router/current-company-slug) (router/current-stakeholder-update-slug) topic)))
+  (.pushState js/history nil (name topic) (oc-urls/stakeholder-update-section  (router/current-company-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug) topic)))
 
 (defn switch-topic [owner is-left?]
   (when (and (om/get-state owner :topic-navigation)
@@ -57,7 +57,7 @@
 (defn animation-finished [owner]
   (let [cur-state (om/get-state owner)
         new-topic (:tr-selected-topic cur-state)]
-    (.pushState js/history nil (name new-topic) (oc-urls/stakeholder-update-section (router/current-company-slug) (router/current-stakeholder-update-slug) new-topic))
+    (.pushState js/history nil (name new-topic) (oc-urls/stakeholder-update-section (router/current-company-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug) new-topic))
     (om/set-state! owner (merge cur-state {:selected-topic (:tr-selected-topic cur-state)
                                            :transitioning true
                                            :tr-selected-topic nil}))))
@@ -102,8 +102,7 @@
           su-data      (dis/stakeholder-update-data)
           card-width   (responsive/calc-card-width 1)
           ww           (.-clientWidth (sel1 js/document :body))
-          total-width  (if (>= ww responsive/c1-min-win-width) (str (min ww (+ card-width 100)) "px") "auto")
-          su-subtitle  (str "- " (utils/date-string (js/Date.) [:year]))]
+          total-width  (if (>= ww responsive/c1-min-win-width) (str (min ww (+ card-width 100)) "px") "auto")]
       (dom/div {:class "su-snapshot main-scroll"}
         (dom/div {:class "page"}
           ;; SU Snapshot
@@ -150,7 +149,6 @@
                   (dom/span {:class "company-name"} (:name company-data))))
               (when (:title su-data)
                 (dom/div {:class "su-snapshot-title"} (:title su-data)))
-              (dom/div {:class "su-snapshot-subtitle"} su-subtitle)
               (om/build topics-columns {:columns-num 1
                                         :card-width card-width
                                         :total-width total-width
