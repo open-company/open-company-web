@@ -1,27 +1,45 @@
-// div.growth {
-//   padding-left: 26px;
-
-//   div.table-container{
-//     padding-top: 11px;
-//   }
-// }
-
-div#section-finances.editing {
+div#section-finances.editing, div#section-growth.editing {
   padding: 0;
+  background-color: #F3F4F5;
+
+  div.metric-name {
+    padding: 32px 8px 0px 30px;
+    font-weight: 700;
+    font-family: $oc_headers_font;
+    letter-spacing: 1px;
+    line-height: 1.5;
+  }
+}
+
+div.finances {
+  table.table {
+    width: 100%;
+  }
+}
+
+div.growth {
+  table.table {
+    width: 180px;
+  }
 }
 
 div.finances, div.growth {
 
   table.table {
     border-spacing: 10px;
-    max-width: 100%;
-    width: 100%;
     float: left;
-    background-color: rgba(78, 90, 107, 0.05);
     margin-bottom: 0;
 
     * {
       border: 0px solid transparent;
+    }
+
+    thead th {
+      text-align: center;
+    }
+
+    tbody tr th {
+      text-align: right;   
     }
 
     tr {
@@ -37,7 +55,6 @@ div.finances, div.growth {
         text-transform: uppercase;
         height: 36px;
         vertical-align: middle;
-        text-align: center;
 
         a.more {
           font-weight: 700;
@@ -72,7 +89,7 @@ div.finances, div.growth {
 
       th.earlier {
         text-align: left;
-        padding-left: 8px;
+        padding-left: 20px;
       }
 
       td div.comp-cell {
@@ -92,7 +109,6 @@ div.finances, div.growth {
 
   div.topic-foce-footer {
     padding: 10px 20px 20px 20px;
-    background-color: rgba(78, 90, 107, 0.05);
     margin: 0 !important;
 
     button.btn-outline {
@@ -101,16 +117,6 @@ div.finances, div.growth {
 
     button.btn-outline.btn-data-save {
       color: $oc_green;
-    }
-  }
-}
-
-div.growth-body {
-  table.table {
-    margin-left: 40px;
-    width: 400px;
-    td.no-cell:first-child, tr:first-child{
-      width: 150px;
     }
   }
 }

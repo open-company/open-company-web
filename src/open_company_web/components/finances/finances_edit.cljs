@@ -162,10 +162,9 @@
     (when-not (= (:finances-data data) (:finances-data next-props))
       (om/set-state! owner :finances-data (:finances-data next-props))))
 
-  (render-state [_ {:keys [finances-data stop]}]
-    (let [company-slug (router/current-company-slug)
-          currency (:currency data)
-          editing-cb (:editing-cb data)]
+  (render-state [{:keys [currency editing-cb show-first-edit-tip first-edit-tip-cb]} {:keys [finances-data stop]}]
+
+    (let [company-slug (router/current-company-slug)]
 
       (dom/div {:class "finances"}
         (dom/div {:class "composed-section-edit finances-body edit"}
@@ -211,10 +210,10 @@
                                         (editing-cb false))} "CANCEL"))))
 
         ;; Onboarding toolip
-        (when (:show-first-edit-tip data)
+        (when show-first-edit-tip
           (onboard-tip
             {:id (str "finance-topic-add-" company-slug)
              :once-only true
              :mobile false
              :desktop "Enter revenue, expenses and cash to create a simple chart."
-             :dismiss-tip-fn (:first-edit-tip-cb data)}))))))
+             :dismiss-tip-fn first-edit-tip-cb}))))))

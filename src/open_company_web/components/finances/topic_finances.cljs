@@ -37,10 +37,10 @@
   (init-state [_]
     {:data-editing? false})
 
-  (render-state [_ state]
+  (render-state [_ {:keys [data-editing?]}]
     (let [finances-row-data (:data section-data)
           no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))
-          data-editing? (or initial-editing? (om/get-state owner :data-editing?))]
+          data-editing? (or initial-editing? data-editing?)]
 
       (when (or data-editing? (not no-data))
         (let [fixed-finances-data (finance-utils/fill-gap-months finances-row-data)
@@ -72,6 +72,7 @@
                                :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
                                :label-presenter #(str "RUNWAY")
                                :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}}]
+
           (dom/div {:id "section-finances" :class (utils/class-set {:section-container true
                                                                     :editing data-editing?})}
 
