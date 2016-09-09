@@ -270,26 +270,19 @@ div.topic {
 
         button.pin-button {
           opacity: 1;
-          color: rgba(78, 90, 107, 1);
+          color: rgba(78, 90, 107, 0.5);
 
           &:hover {
-            opacity: 1 !important;
+            color: rgba(78, 90, 107, 1);
           }
 
           i {
-            opacity: 0.5;
-
-            &:hover {
-              opacity: 0.8;
-            }
-
             &:not(.pinned) {
               transform: rotate(0deg);
             }
 
             &.pinned {
               transform: rotate(25deg);
-              opacity: 0.8;
             }
           }
         }
