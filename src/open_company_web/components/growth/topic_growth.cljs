@@ -52,7 +52,6 @@
                         :title (:description metric)
                         :data-tab metric-slug
                         :on-click (partial pillbox-click owner options)} mname)))))))
-
                 ; ;; new metric
                 ; (dom/label {:class (utils/class-set {:pillbox true
                 ;                                      growth-utils/new-metric-slug-placeholder true
@@ -84,7 +83,7 @@
      :growth-data growth-data
      :growth-metrics metrics
      :growth-metric-slugs metric-slugs
-     :data-editing? false}))
+     :data-editing? (:initial-editing? data)}))
 
 (defcomponent topic-growth [{:keys [section section-data currency editable? initial-editing? editing-cb] :as data} owner options]
 
@@ -99,7 +98,6 @@
   (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs data-editing?]}]
     (let [section-name (utils/camel-case-str (name section))
           no-data (utils/no-growth-data? growth-data)
-          data-editing? (or initial-editing? data-editing?)
           focus-metric-data (filter-growth-data focus growth-data)
           focus-metric-info (get growth-metrics focus)
           subsection-data {:metric-data focus-metric-data
@@ -121,13 +119,6 @@
                          :metrics growth-metrics
                          :metric-slugs growth-metric-slugs
                          :editing-cb (partial data-editing-toggle owner editing-cb)
-                         ;:metadata-edit-cb (partial growth-metadata-edit-cb owner)
-                         ;:change-growth-cb (partial growth-change-data-cb owner)
-                         ;:delete-metric-cb (partial growth-delete-metric-cb owner data)
-                         ;:save-metadata-cb (partial growth-save-metrics-metadata-cb owner data)
-                         ;:cancel-cb #(growth-cancel-cb owner data)
-                         ;:change-growth-metric-cb (partial growth-change-metric-cb owner data)
-                         ;:new-growth-section (om/get-state owner :oc-editing)
                          :show-first-edit-tip false ;show-first-edit-tip
                          ;:first-edit-tip-cb #(focus-headline owner)
                         }

@@ -138,11 +138,13 @@
 (defmethod dispatcher/action :start-foce [db [_ section-key section-data]]
   (if section-key
     (-> db
-        (assoc :foce-key section-key)
-        (assoc :foce-data section-data))
+        (assoc :foce-key section-key) ; which topic is being FoCE
+        (assoc :foce-data section-data) ; map of the in progress edits of the topic data
+        (assoc :foce-data-editing? false)) ; is the data portion of the topic (e.g. finance, growth) being edited
     (-> db
         (dissoc :foce-key)
-        (dissoc :foce-data))))
+        (dissoc :foce-data)
+        (dissoc :foce-data-editing?))))
 
 (defmethod dispatcher/action :foce-input [db [_ topic-data-map]]
   (let [old-data (:foce-data db)]
@@ -164,6 +166,7 @@
     (-> db
       (dissoc :foce-key)
       (dissoc :foce-data)
+      (dissoc :foce-data-editing?)
       (assoc-in (conj (dispatcher/company-data-key slug) :sections) new-categories))))
 
 (defmethod dispatcher/action :foce-save [db [_]]
@@ -180,6 +183,7 @@
     (-> db
         (dissoc :foce-key)
         (dissoc :foce-data)
+        (dissoc :foce-data-editing?)
         (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) new-data))))
 
 (defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]

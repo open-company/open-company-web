@@ -89,27 +89,6 @@
      :units (:units growth-defaults)
      :metrics available-metrics}))
 
-; (defn change-name [owner data]
-;   (let [change-cb (:change-growth-metric-cb data)
-;         name-value (.val (js/$ "input#mtr-name"))
-;         slug (om/get-state owner :metric-slug)]
-;     (om/set-state! owner :metric-name name-value)
-;     ; if it's a newly created metric
-;     (if (:new-metric data)
-;       ; change the slug and update all the other fields
-;       (let [presets (om/get-state owner :presets)
-;             metrics (:metrics data)
-;             slugs (vec (map :slug (vals metrics)))
-;             new-slug (growth-utils/get-slug slugs presets (s/trim name-value))]
-;         (om/set-state! owner :metric-slug new-slug)
-;         (change-cb slug {:slug new-slug
-;                          :description (om/get-state owner :description)
-;                          :unit (om/get-state owner :unit)
-;                          :interval (om/get-state owner :interval)
-;                          :name name-value}))
-;       ; change only the name
-;       (change-cb slug {:name name-value}))))
-
 (defn- save-metric-info [owner save-cb]
   (let [slug (om/get-state owner :metric-slug)]
     (save-cb slug {
@@ -179,12 +158,6 @@
                     :value (om/get-state owner :description)
                     :placeholder "e.g. Daily Active Users"
                     :on-change (fn [e] (om/set-state! owner :description (.. e -target -value)))})
-                                  ; (let [value 
-                                  ;       slug (om/get-state owner :metric-slug)
-                                  ;       change-cb (:change-growth-metric-cb data)]
-                                  ;   (om/set-state! owner :description value)
-                                  ;   (when slug
-                                  ;     (change-cb slug {:description value}))))})
 
         ;; interval
         (dom/div {:class "small-caps bold mb1"} "Interval")
