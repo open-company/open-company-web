@@ -23,23 +23,6 @@
 (defn metrics-order [metrics-coll]
   (map :slug metrics-coll))
 
-(defn get-state [owner data & [initial]]
-  (let [section-data (:section-data data)
-        all-metrics (:metrics section-data)
-        metrics (metrics-map all-metrics)
-        first-metric (:slug (first (:metrics section-data)))
-        last-focus (utils/company-cache-key focus-cache-key)
-        focus (if initial
-                (or (:selected-metric data) last-focus first-metric)
-                (om/get-state owner :focus))
-        growth-data (growth-utils/growth-data-map (:data section-data))
-        metric-slugs (metrics-order all-metrics)]
-    {:focus focus
-     :growth-data growth-data
-     :growth-metrics metrics
-     :growth-metric-slugs metric-slugs
-     :data-editing? false}))
-
 (defn pillbox-click [owner options e]
   (.preventDefault e)
   (let [data (om/get-props owner)
@@ -86,13 +69,30 @@
   (om/set-state! owner :data-editing? editing)
   (editing-cb editing))
 
+(defn get-state [owner data & [initial]]
+  (let [section-data (:section-data data)
+        all-metrics (:metrics section-data)
+        metrics (metrics-map all-metrics)
+        first-metric (:slug (first (:metrics section-data)))
+        last-focus (utils/company-cache-key focus-cache-key)
+        focus (if initial
+                (or (:selected-metric data) last-focus first-metric)
+                (om/get-state owner :focus))
+        growth-data (growth-utils/growth-data-map (:data section-data))
+        metric-slugs (metrics-order all-metrics)]
+    {:focus focus
+     :growth-data growth-data
+     :growth-metrics metrics
+     :growth-metric-slugs metric-slugs
+     :data-editing? false}))
+
 (defcomponent topic-growth [{:keys [section section-data currency editable? initial-editing? editing-cb] :as data} owner options]
 
   (init-state [_]
     (get-state owner data true))
 
   (will-update [_ next-props _]
-    ; this means the section datas have changed from the API or at a upper lever of this component
+    ;; this means the section data has changed from the API or at a upper lever of this component
     (when-not (= next-props data)
       (om/set-state! owner (get-state owner next-props true))))
 
@@ -119,6 +119,7 @@
                          :initial-focus focus
                          :growth-data growth-data
                          :metrics growth-metrics
+                         :metric-slugs growth-metric-slugs
                          :editing-cb (partial data-editing-toggle owner editing-cb)
                          ;:metadata-edit-cb (partial growth-metadata-edit-cb owner)
                          ;:change-growth-cb (partial growth-change-data-cb owner)

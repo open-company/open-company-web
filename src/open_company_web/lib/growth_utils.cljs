@@ -88,46 +88,27 @@
        (if value (utils/thousands-separator value) "")
        (if suffix (str " " suffix) "")))
 
-(defn chart-data-at-index [data column-name prefix suffix has-target interval idx]
+(defn chart-data-at-index [data column-name prefix suffix interval idx]
   (let [data (to-array data)
         obj (get (vec (reverse data)) idx)
         value (or (:value obj) 0)
-        target (or (:target obj) 0)
         label (get-graph-tooltip column-name prefix value suffix)
-        target-label (get-graph-tooltip (str column-name " target") prefix (utils/thousands-separator target) suffix)
         period (utils/get-period-string (:period obj) interval [:short])
-        values (if has-target
-                 [period
-                  target
-                  (occ/fill-color :oc-gray-2)
-                  target-label
-                  value
-                  (occ/fill-color :oc-blue-light)
-                  label]
-                 [period
-                  value
-                  (occ/fill-color :oc-blue-light)
-                  label])]
+        values [period
+                value
+                (occ/fill-color :oc-blue-light)
+                label]]
     values))
 
 (defn- get-chart-data
   "Vector of max *columns elements of [:Label value]"
   [data prefix slug column-name tooltip-suffix interval]
   (let [fixed-data (chart-placeholder-data data slug interval)
-        has-target (some :target data)
-        chart-data (partial chart-data-at-index fixed-data column-name prefix tooltip-suffix has-target interval)
-        columns (if has-target
-                  [["string" column-name]
-                   ["number" "target"]
-                   #js {"type" "string" "role" "style"}
-                   #js {"type" "string" "role" "tooltip"}
-                   ["number" column-name]
-                   #js {"type" "string" "role" "style"}
-                   #js {"type" "string" "role" "tooltip"}]
-                  [["string" column-name]
-                   ["number" column-name]
-                   #js {"type" "string" "role" "style"}
-                   #js {"type" "string" "role" "tooltip"}])
+        chart-data (partial chart-data-at-index fixed-data column-name prefix tooltip-suffix interval)
+        columns [["string" column-name]
+                 ["number" column-name]
+                 #js {"type" "string" "role" "style"}
+                 #js {"type" "string" "role" "tooltip"}]
         mapper (vec (range (count fixed-data)))
         values (vec (map chart-data mapper))]
     { :prefix (if prefix prefix "")
@@ -135,7 +116,7 @@
       :max-show columns-num
       :values values
       :pattern "###,###.##"
-      :column-thickness (if has-target "28" "14")}))
+      :column-thickness "14"}))
 
 (defn get-actual [metrics]
   (some #(when (:value (metrics %)) %) (vec (range (count metrics)))))

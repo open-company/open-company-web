@@ -224,4 +224,4 @@
             ;; cancel button
             (dom/button {:class "btn-reset btn-outline"
                          :on-click #(do (utils/event-stop %)
-                                        (:cancel-cb data))} "CANCEL")))))))
+                                        ((:cancel-cb data)))} "CANCEL")))))))

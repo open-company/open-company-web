@@ -116,28 +116,24 @@
         :interval "monthly"
         :name "Total registered users"
         :slug "total-registered-users"
-        :target "high"
         :unit "users"
       }
       {
         :interval "monthly"
         :name "Monthly active users"
         :slug "mau"
-        :target "high"
         :unit "users"
       }
       {
         :interval "monthly"
         :name "Average daily active users"
         :slug "dau"
-        :target "high"
         :unit "users"
       }
       {
         :interval "monthly"
         :name "Annual recurring revenue"
         :slug "arr"
-        :target "high"
         :unit "USD"
       }
     ]
@@ -638,28 +634,24 @@
             :interval "monthly"
             :name "Total registered users"
             :slug "total-registered-users"
-            :target "high"
             :unit "users"
           }
           {
             :interval "monthly"
             :name "Monthly active users"
             :slug "mau"
-            :target "high"
             :unit "users"
           }
           {
             :interval "monthly"
             :name "Average daily active users"
             :slug "dau"
-            :target "high"
             :unit "users"
           }
           {
             :interval "monthly"
             :name "Annual recurring revenue"
             :slug "arr"
-            :target "high"
             :unit "USD"
           }
         ]
