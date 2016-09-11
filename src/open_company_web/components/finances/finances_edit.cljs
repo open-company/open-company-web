@@ -57,7 +57,6 @@
                             :decimals 0
                             :positive-only true
                             :short true
-                            :placeholder (if is-new "entire month" "")
                             :currency currency
                             :cell-state cell-state
                             :draft-cb #(change-cb :revenue %)
@@ -70,7 +69,6 @@
                             :decimals 0
                             :positive-only true
                             :short true
-                            :placeholder (if is-new "entire month" "")
                             :currency currency
                             :cell-state cell-state
                             :draft-cb #(change-cb :costs %)
@@ -83,7 +81,7 @@
                             :decimals 0
                             :positive-only false
                             :short true
-                            :placeholder (if is-new "month end" "")
+                            :placeholder "" ; (if is-new "on SEP 30" "")
                             :currency currency
                             :cell-state cell-state
                             :draft-cb #(change-cb :cash %)
