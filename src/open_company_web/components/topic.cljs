@@ -110,7 +110,7 @@
           (dom/div {:class "topic-title"} (:title topic-data))
           (when (and (:pin topic-data)
                      (not (responsive/is-mobile-size?))
-                     (not (responsive/can-edit?))
+                     (responsive/can-edit?)
                      (not (:read-only topic-data)))
             (dom/div {:class "pinned-topic"}
               (dom/i {:class "fa fa-thumb-tack"
