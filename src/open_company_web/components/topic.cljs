@@ -108,7 +108,8 @@
         ;; Topic title
         (dom/div {:class "group"}
           (dom/div {:class "topic-title"} (:title topic-data))
-          (when (and (:pin topic-data)
+          (when (and show-fast-editing
+                     (:pin topic-data)
                      (not (responsive/is-mobile-size?))
                      (responsive/can-edit?)
                      (not (:read-only topic-data)))
