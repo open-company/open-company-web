@@ -21,11 +21,11 @@
 
 (defn- show-archive-confirm-popover [owner data]
   (add-popover {:container-id "archive-metric-confirm"
-                :message "Archiving removes this metric, but you won’t lose prior updates if you add it again later. Are you sure you want to archive?"
+                :message "Prior updates to this chart will only be available in topic history. Are you sure you want to archive?"
                 :cancel-title "KEEP"
                 :cancel-cb #(hide-popover nil "delete-metric-confirm")
                 :success-title "ARCHIVE"
-                :success-cb #((:delete-metric-cb data) (om/get-state owner :metric-slug))}))
+                :success-cb #((:archive-metric-cb data) (om/get-state owner :metric-slug))}))
 
 (defn- option-template [state]
   (if-not (.-id state) (.-text state))
@@ -136,7 +136,9 @@
 
   (did-mount [_]
     (om/set-state! owner :did-mount true)
-    (init-select2 owner data))
+    (init-select2 owner data)
+    (when-not (utils/is-test-env?)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (render [_]
     (let [all-metrics (:metrics data)
@@ -185,7 +187,8 @@
 
         (dom/div {:class "topic-foce-footer group"}
           (dom/div {:class "topic-foce-footer-right"}
-            ;; add or save button
+
+            ;; next or save button
             (dom/button {:class "btn-reset btn-outline btn-data-save"
                          :disabled (or (s/blank? (om/get-state owner :metric-slug))
                                        (s/blank? (om/get-state owner :metric-name))
@@ -195,13 +198,19 @@
                                         (save-metric-info owner (:save-cb data) new-metric?))}
               (if new-metric? "NEXT" "SAVE"))
 
-            ;; archive button
-            ; (when-not (:new-metric? data)
-            ;   (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
-            ;                :title "Archive this metric"
-            ;                :on-click #(show-archive-confirm-popover owner data)} "ARCHIVE"))
-
             ;; cancel button
             (dom/button {:class "btn-reset btn-outline"
                          :on-click #(do (utils/event-stop %)
-                                        ((:cancel-cb data)))} "CANCEL")))))))
+                                        ((:cancel-cb data)))} "CANCEL")
+
+            (when-not new-metric?
+              (dom/button {:class "btn-reset archive-button"
+                           :title "Archive this chart"
+                           :type "button"
+                           :data-toggle "tooltip"
+                           :data-placement "top"
+                           :on-click #(show-archive-confirm-popover owner data)}
+                  (dom/i {:class "fa fa-archive"})))
+
+
+            ))))))

@@ -41,6 +41,15 @@
     (om/set-state! owner :new-metric? false))
   (editing-cb editing?))
 
+(defn- archive-metric-cb [owner editing-cb metric-slug]
+  (let [metric-slugs (remove #{metric-slug} (om/get-state owner :growth-metric-slugs)) ; remove the slug
+       focus (first metric-slugs)]
+    (.log js/console (str metric-slugs))
+    (.log js/console focus)
+    (om/set-state! owner :focus focus) ; new focus on the first remaining metric
+    (om/set-state! owner :growth-metric-slugs metric-slugs)) ; update valid slugs state
+  (data-editing-toggle owner editing-cb false)) ; no longer data editing
+
 (defn- render-pillboxes [owner editable? editing-cb options]
 
   (let [data (om/get-props owner)
@@ -133,6 +142,7 @@
                          :metric-slugs growth-metric-slugs
                          :editing-cb (partial data-editing-toggle owner editing-cb)
                          :switch-focus-cb (partial switch-focus owner)
+                         :archive-metric-cb (partial archive-metric-cb owner editing-cb)
                          :show-first-edit-tip false ;show-first-edit-tip
                          ;:first-edit-tip-cb #(focus-headline owner)
                         }

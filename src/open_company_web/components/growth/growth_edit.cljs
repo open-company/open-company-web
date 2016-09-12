@@ -110,11 +110,18 @@
     ;; dispatch the metric matadata change (for API update)
     (dis/dispatch! [:save-topic-data "growth" {:metrics (metrics-as-sequence owner (:metric-slugs data))}])))
 
-(defn- cancel-metada-cb [owner data editing-cb]
+(defn- cancel-metadata-cb [owner data editing-cb]
   (set-metadata-edit owner false) ; cancel the metadata editing
   (when (:new-metric? data)
     (editing-cb false))) ; cancel the whole data editing
-    
+
+(defn- archive-metadata-cb [owner data metric-slug]
+  (set-metadata-edit owner false) ; cancel the metadata editing
+  (let [metric-slugs (remove #{metric-slug} (:metric-slugs data)) ; remove the slug
+        fewer-metrics (metrics-as-sequence owner metric-slugs)] ; full metrics w/o the slug
+    (dis/dispatch! [:save-topic-data "growth" {:metrics fewer-metrics}])) ; dispatch the fewer metrics
+  ((:archive-metric-cb data) metric-slug))
+
 ;; ===== Growth Metric Data Functions =====
 
 (defn- growth-get-value [v]
@@ -217,10 +224,8 @@
                                           :new-metric? new-metric?
                                           :metric-count (count (filter-growth-data metric-slug growth-data))
                                           :save-cb (partial save-metadata-cb owner data)
-                                          :cancel-cb #(cancel-metada-cb owner data editing-cb)}
-                                          ; :archive-metric-cb (fn [metric-slug]
-                                          ;                      (set-metadata-edit owner false)
-                                          ;                      ((:delete-metric-cb data) metric-slug))
+                                          :cancel-cb #(cancel-metadata-cb owner data editing-cb)
+                                          :archive-metric-cb (partial archive-metadata-cb owner data)}
                                           {:opts {:currency (:currency options)}})
             
             (dom/div
@@ -229,7 +234,7 @@
                 (dom/div {:class "metric-name"}
                   (:name metric-info)
                   (dom/button {:class "btn-reset metadata-edit-button"
-                               :title "Edit this metric"
+                               :title "Chart settings"
                                :type "button"
                                :data-toggle "tooltip"
                                :data-placement "right"
