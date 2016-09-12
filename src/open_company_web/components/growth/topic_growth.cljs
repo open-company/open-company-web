@@ -35,13 +35,20 @@
 (defn- filter-growth-data [focus growth-data]
   (vec (filter #(= (:slug %) focus) (vals growth-data))))
 
-(defn- data-editing-toggle [owner editing-cb editing]
-  (om/set-state! owner :data-editing? editing)
-  (editing-cb editing))
+(defn- data-editing-toggle [owner editing-cb editing?]
+  (om/set-state! owner :data-editing? editing?)
+  (when-not editing?
+    (om/set-state! owner :new-metric? false))
+  (editing-cb editing?))
 
-(defn- new-metric [owner editing-cb]
-  (om/set-state! owner :new-metric? true)
-  (data-editing-toggle owner editing-cb true))
+(defn- archive-metric-cb [owner editing-cb metric-slug]
+  (let [metric-slugs (remove #{metric-slug} (om/get-state owner :growth-metric-slugs)) ; remove the slug
+       focus (first metric-slugs)]
+    (.log js/console (str metric-slugs))
+    (.log js/console focus)
+    (om/set-state! owner :focus focus) ; new focus on the first remaining metric
+    (om/set-state! owner :growth-metric-slugs metric-slugs)) ; update valid slugs state
+  (data-editing-toggle owner editing-cb false)) ; no longer data editing
 
 (defn- render-pillboxes [owner editable? editing-cb options]
 
@@ -62,6 +69,8 @@
                                                  :active (= focus metric-slug)})]
             (dom/label {:class metric-classes
                         :title (:description metric)
+                        :data-toggle "tooltip"
+                        :data-placement "bottom"
                         :data-tab metric-slug
                         :on-click (partial pillbox-click owner options)} mname))))
       
@@ -69,11 +78,14 @@
         ;; new metric
         (dom/label {:class (utils/class-set {:pillbox true
                                              :new true})
-                    :title "Add a new metric"
+                    :title "Add a new chart"
+                    :data-toggle "tooltip"
+                    :data-placement "bottom"
                     :data-tab growth-utils/new-metric-slug-placeholder
                     :on-click (fn [e]
                                 (.stopPropagation e)
-                                (new-metric owner editing-cb))} "+ New")))))
+                                (om/set-state! owner :new-metric? true)
+                                (data-editing-toggle owner editing-cb true))} "+ New")))))
 
 (defn- get-state [owner data initial]
   (let [section-data (:section-data data)
@@ -104,7 +116,7 @@
     (when-not (= next-props data)
       (om/set-state! owner (get-state owner next-props false))))
 
-  (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug data-editing?]}]
+  (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug data-editing? new-metric?]}]
     (let [section-name (utils/camel-case-str (name section))
           no-data (utils/no-growth-data? growth-data)
           focus-metric-data (filter-growth-data focus growth-data)
@@ -124,11 +136,13 @@
 
           (om/build growth-edit {
                          :initial-focus focus
-                         :new-metric? (om/get-state owner :new-metric?)
+                         :new-metric? new-metric?
                          :growth-data growth-data
                          :metrics growth-metrics
                          :metric-slugs growth-metric-slugs
                          :editing-cb (partial data-editing-toggle owner editing-cb)
+                         :switch-focus-cb (partial switch-focus owner)
+                         :archive-metric-cb (partial archive-metric-cb owner editing-cb)
                          :show-first-edit-tip false ;show-first-edit-tip
                          ;:first-edit-tip-cb #(focus-headline owner)
                         }

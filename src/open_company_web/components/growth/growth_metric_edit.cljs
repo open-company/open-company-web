@@ -21,11 +21,11 @@
 
 (defn- show-archive-confirm-popover [owner data]
   (add-popover {:container-id "archive-metric-confirm"
-                :message "Archiving removes this metric, but you won’t lose prior updates if you add it again later. Are you sure you want to archive?"
+                :message "Prior updates to this chart will only be available in topic history. Are you sure you want to archive?"
                 :cancel-title "KEEP"
                 :cancel-cb #(hide-popover nil "delete-metric-confirm")
                 :success-title "ARCHIVE"
-                :success-cb #((:delete-metric-cb data) (om/get-state owner :metric-slug))}))
+                :success-cb #((:archive-metric-cb data) (om/get-state owner :metric-slug))}))
 
 (defn- option-template [state]
   (if-not (.-id state) (.-text state))
@@ -91,14 +91,15 @@
      :units (:units growth-defaults)
      :metrics available-metrics}))
 
-(defn- save-metric-info [owner save-cb]
+(defn- save-metric-info [owner save-cb new?]
   (let [slug (om/get-state owner :metric-slug)]
     (save-cb slug {
       :slug slug
       :name (om/get-state owner :metric-name)
       :description (om/get-state owner :description)
       :unit (om/get-state owner :unit)
-      :interval (om/get-state owner :interval)})))
+      :interval (om/get-state owner :interval)}
+      new?)))
 
 (defcomponent growth-metric-edit [data owner options]
 
@@ -134,12 +135,15 @@
 
   (did-mount [_]
     (om/set-state! owner :did-mount true)
-    (init-select2 owner data))
+    (init-select2 owner data)
+    (when-not (utils/is-test-env?)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (render [_]
     (let [all-metrics (:metrics data)
           {:keys [metrics intervals prompt] :as presets} (om/get-state owner :presets)
-          units (om/get-state owner :units)]
+          units (om/get-state owner :units)
+          new-metric? (:new-metric? data)]
 
       (dom/div {:class "growth-metric-edit p3"}
 
@@ -182,23 +186,30 @@
 
         (dom/div {:class "topic-foce-footer group"}
           (dom/div {:class "topic-foce-footer-right"}
-            ;; add or save button
+
+            ;; next or save button
             (dom/button {:class "btn-reset btn-outline btn-data-save"
                          :disabled (or (s/blank? (om/get-state owner :metric-slug))
                                        (s/blank? (om/get-state owner :metric-name))
                                        (s/blank? (om/get-state owner :unit))
                                        (s/blank? (om/get-state owner :interval)))
                          :on-click #(do (utils/event-stop %)
-                                        (save-metric-info owner (:save-cb data)))}
-              (if (:new-metric? data) "NEXT" "SAVE"))
-
-            ;; archive button
-            ; (when-not (:new-metric? data)
-            ;   (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
-            ;                :title "Archive this metric"
-            ;                :on-click #(show-archive-confirm-popover owner data)} "ARCHIVE"))
+                                        (save-metric-info owner (:save-cb data) new-metric?))}
+              (if new-metric? "NEXT" "SAVE"))
 
             ;; cancel button
             (dom/button {:class "btn-reset btn-outline"
                          :on-click #(do (utils/event-stop %)
-                                        ((:cancel-cb data)))} "CANCEL")))))))
+                                        ((:cancel-cb data)))} "CANCEL")
+
+            (when-not new-metric?
+              (dom/button {:class "btn-reset archive-button"
+                           :title "Archive this chart"
+                           :type "button"
+                           :data-toggle "tooltip"
+                           :data-placement "top"
+                           :on-click #(show-archive-confirm-popover owner data)}
+                  (dom/i {:class "fa fa-archive"})))
+
+
+            ))))))

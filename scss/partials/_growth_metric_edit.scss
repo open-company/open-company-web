@@ -6,7 +6,7 @@ div.growth-metric-edit {
     margin-bottom: 15px;    
   }
 
-  div.growth-metric-edit-row{
+  div.growth-metric-edit-row {
     width: 100%;
 
     button {
@@ -36,6 +36,16 @@ div.growth-metric-edit {
         background-color: transparent;
         color: $oc_gray_5;
       }
+    }
+  }
+
+  button.archive-button {
+    margin-top: 3px;
+    color: rgba(78, 90, 107, 0.5);
+    font-size: 15px;
+
+    &:hover {
+      color: rgba(78,90,107,1);
     }
   }
 }

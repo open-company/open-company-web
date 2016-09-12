@@ -201,8 +201,8 @@
   (let [slug (keyword (router/current-company-slug))
         old-section-data (get (dispatcher/company-data db slug) (keyword topic))
         new-data (dissoc (merge old-section-data topic-data) :placeholder)]
-    (api/partial-update-section topic new-data)
-    (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic)) (merge old-section-data topic-data))))
+    (api/partial-update-section topic (dissoc topic-data :placeholder))
+    (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic)) new-data)))
 
 (defmethod dispatcher/action :save-topic [db [_ topic topic-data]]
   (save-topic db topic topic-data))

@@ -91,7 +91,7 @@
         (when needs-year
           (dom/tr {}
             (dom/th {:class "no-cell year"}
-              (utils/get-year (:period finances-data)))
+              (utils/get-year period))
             (dom/td {:class "no-cell"})
             (dom/td {:class "no-cell"})
             (dom/td {:class "no-cell"})))))))
