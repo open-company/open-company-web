@@ -181,9 +181,7 @@
         with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))
         old-section-data (get (dispatcher/company-data db slug) (keyword topic))
         new-data (dissoc (merge old-section-data with-fixed-body) :placeholder)]
-    (if new-sections
-      (api/patch-sections new-sections new-data (:section (:foce-data db)))
-      (api/partial-update-section (:section (:foce-data db)) new-data))
+    (api/patch-sections new-sections new-data (:section (:foce-data db)))
     (-> db
         (dissoc :foce-key)
         (dissoc :foce-data)
