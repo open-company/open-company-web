@@ -33,6 +33,18 @@ div.su-snapshot-preview {
       }
     }
 
+    div.snapshot-cta {
+      color: $oc_gray_2;
+      color: #D8D8D8;
+      text-align: center;
+      width: 690px;
+      margin-left: -345px;
+      left: 50%;
+      position: absolute;
+      margin-top: 17px;
+      font-size: 16px;
+    }
+
     div.share-su {
       float: right;
       padding: 9px 20px 11px 0;
