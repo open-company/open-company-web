@@ -782,3 +782,7 @@
 
 (defn filter-placeholder-sections [topics company-data]
   (vec (filter #(not (:placeholder (->> % keyword (get company-data)))) topics)))
+
+(defn su-date-from-created-at [created-at]
+  (let [from-js-date (cljs-time/date-time (js-date created-at))]
+    (cljs-time-format/unparse (cljs-time-format/formatter "yyyy-MM-dd") from-js-date)))

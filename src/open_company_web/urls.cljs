@@ -76,7 +76,7 @@
   ([]
     (stakeholder-update-list (router/current-company-slug)))
   ([slug]
-    (str "/" (name slug) "/updates")))
+    (str "/" (name slug) "/updates/list")))
 
 (defn stakeholder-update-preview
   ([]
@@ -104,4 +104,4 @@
   ([update-date update-slug section]
     (stakeholder-update-section (router/current-company-slug) update-date update-slug section))
   ([slug update-date update-slug section]
-    (str "/" (name slug) "/updates/" (name update-date) "/" (name update-slug) "/" (name section))))
+    (str (stakeholder-update slug update-date update-slug) "/" (name section))))

@@ -19,17 +19,18 @@
 
 (defcomponent su-update [data owner]
   (render [_]
-    (let [update (:update data)
+    (let [slug (router/current-company-slug)
+          update (:update data)
           js-date-upat (utils/js-date (:created-at update))
           month-string (utils/month-string-int (inc (.getMonth js-date-upat)))
           topic-updated-at (str month-string " " (.getDate js-date-upat) ", " (.getFullYear js-date-upat))
           intro (:intro update)
           update-slug (:slug update)
-          update-date (:date update)
+          update-date (utils/su-date-from-created-at (:created-at update))
           links (:links update)
           update-get-link (utils/link-for links "self" "GET")]
       (dom/div {:class "su-update"
-                :on-click #(router/nav! (oc-urls/stakeholder-update update-date update-slug))}
+                :on-click #(router/nav! (oc-urls/stakeholder-update slug update-date update-slug))}
         (dom/div {:class "su-title"} (:title update))
         (dom/div {:class "su-date"} topic-updated-at)
         (dom/div {:class "su-body"
