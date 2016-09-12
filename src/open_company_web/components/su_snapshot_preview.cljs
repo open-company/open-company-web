@@ -90,7 +90,7 @@
       {:columns-num (responsive/columns-num)
        :su-topics su-sections
        :title-focused false
-       :title (if (clojure.string/blank? (:title su-data))  (utils/su-default-title) (:title su-data))
+       :title (:title su-data)
        :show-su-dialog false
        :link-loading false
        :slack-loading false
@@ -180,6 +180,7 @@
                                   :type "text"
                                   :value title
                                   :ref "preview-title"
+                                  :placeholder "Update Title"
                                   :onChange #(om/set-state! owner :title (.. % -target -value))
                                   :style #js {:width total-width}})))
               (when show-su-dialog
