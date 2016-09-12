@@ -478,6 +478,7 @@
                                   :total-width total-width
                                   :content-loaded (not (:loading data))
                                   :topics company-topics
+                                  :new-sections (:new-sections data)
                                   :company-data company-data
                                   :topics-data company-data
                                   :foce-key (:foce-key data)
