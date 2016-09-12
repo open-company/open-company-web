@@ -73,6 +73,7 @@
 }
 
 @mixin pillbox(){
+
   label.pillbox {
     margin: 4px 3px;
     padding: 6px 12px;
@@ -89,6 +90,10 @@
       background-color: #ffffff;
       color: $oc_gray_5;
       border: 1px solid $oc_gray_5;
+    }
+
+    &.new {
+      color: $oc_green;
     }
   }
 }

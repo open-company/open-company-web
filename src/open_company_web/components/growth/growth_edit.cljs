@@ -143,24 +143,30 @@
   ;; dispatch the metric matadata change (for API update)
   (dis/dispatch! [:save-topic-data "growth" {:metrics (metrics-as-sequence owner data)}]))
 
+(defn- cancel-metada-cb [owner data editing-cb]
+  (if (om/get-state owner :new-metric?)
+    (editing-cb false) ; cancel the whole data editing
+    (set-metadata-edit owner data false))) ; cancel the metadata editing
+
 ;; ===== Growth Data Editing Component =====
 
-(defcomponent growth-edit [{:keys [editing-cb show-first-edit-tip first-edit-tip-cb] :as data} owner options]
+(defcomponent growth-edit [{:keys [editing-cb show-first-edit-tip first-edit-tip-cb new-metric?] :as data} owner options]
 
   (init-state [_]
     {:metadata-edit? false ; not editing metric metadata
      :growth-data (:growth-data data) ; all the growth data for all metrics
      :metric-slug (:initial-focus data) ; the slug of the current metric
-     :new-metric false ; this metric hasn't been saved before
+     :new-metric? new-metric? ; this metric hasn't been saved before
      :stop batch-size}) ; how many periods (reverse chronological) to show
 
   (will-receive-props [_ next-props]
     (when (not= (:growth-data data) (:growth-data next-props))
       (om/set-state! owner :growth-data (:growth-data next-props))))
 
-  (render-state [_ {:keys [metadata-edit? growth-data metric-slug new-metric stop] :as state}]
+  (render-state [_ {:keys [growth-data metric-slug new-metric? stop] :as state}]
 
     (let [company-slug (router/current-company-slug)
+          metadata-edit? (or new-metric? (om/get-state owner :metadata-edit?))
           metric-info (current-metric-info metric-slug data)
           slug (:slug metric-info)
           interval (:interval metric-info)
@@ -176,12 +182,10 @@
 
             ;; Meta-data editing form
             (om/build growth-metric-edit {:metric-info metric-info
-                                          :new-metric new-metric
+                                          :new-metric? new-metric?
                                           :metric-count (count (filter-growth-data metric-slug growth-data))
                                           :save-cb (partial save-metadata-cb owner data)
-                                          :cancel-cb (fn []
-                                                       (om/set-state! owner :new-metric false)
-                                                       (set-metadata-edit owner data false))}
+                                          :cancel-cb #(cancel-metada-cb owner data editing-cb)}
                                           ; :archive-metric-cb (fn [metric-slug]
                                           ;                      (set-metadata-edit owner data false)
                                           ;                      ((:delete-metric-cb data) metric-slug))
