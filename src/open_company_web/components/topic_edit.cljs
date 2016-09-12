@@ -207,6 +207,10 @@
       :else
       (dis/dispatch! [:foce-save sections]))))
 
+(defn- data-editing-cb [owner value]
+  (om/set-state! owner :data-editing? value) ; local state
+  (dis/set-foce-section-data-editing value)) ; global atom state
+
 (defcomponent topic-edit [{:keys [show-first-edit-tip
                                   currency
                                   prev-rev
@@ -224,7 +228,8 @@
        :char-count-alert false
        :has-changes false
        :file-upload-state nil
-       :file-upload-progress 0}))
+       :file-upload-progress 0
+       :data-editing? (dis/foce-section-data-editing?)}))
 
   (will-receive-props [_ next-props]
     ;; update body placeholder when receiving data from API
@@ -278,7 +283,7 @@
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
                            file-upload-state file-upload-progress upload-remote-url negative-headline-char-count
-                           has-changes]}]
+                           has-changes data-editing?]}]
 
     (let [company-slug        (router/current-company-slug)
           section             (dis/foce-section-key)
@@ -295,7 +300,6 @@
                                         (utils/no-finances-data? finances-data)))
                                   (and (= section-kw :growth)
                                        (utils/no-growth-data? growth-data)))
-          data-editing?       (dis/foce-section-data-editing?)
           chart-opts          {:chart-size {:width 230}
                                :hide-nav true
                                :topic-click (:topic-click options)}]
@@ -313,7 +317,7 @@
                                         :section section-kw
                                         :currency currency
                                         :editable? true
-                                        :editing-cb (partial dis/set-foce-section-data-editing)
+                                        :editing-cb (partial data-editing-cb owner)
                                         :initial-editing? data-editing?}
                                         {:opts chart-opts})
               (= section-kw :growth)
@@ -321,7 +325,7 @@
                                       :section section-kw
                                       :currency currency
                                       :editable? true
-                                      :editing-cb (partial dis/set-foce-section-data-editing)
+                                      :editing-cb (partial data-editing-cb owner)
                                       :initial-editing? data-editing?}
                                       {:opts chart-opts})
     
@@ -413,7 +417,9 @@
                            :data-toggle "tooltip"
                            :data-placement "top"
                            :style {:display (if no-data? "block" "none")}
-                           :on-click #(dis/set-foce-section-data-editing true)}
+                           :on-click #(do
+                                        (dis/set-foce-section-data-editing true)
+                                        (om/set-state! owner :data-editing? true))}
                 (dom/i {:class "fa fa-line-chart"})))
             (when-not (:placeholder topic-data)
               (dom/button {:class "btn-reset archive-button right"

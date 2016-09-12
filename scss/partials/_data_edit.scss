@@ -115,7 +115,12 @@ div.finances, div.growth {
     }
 
     button.btn-outline.btn-data-save {
+      opacity: 1;
       color: $oc_green;
+
+      &:disabled {
+        opacity: 0.2;
+      }
     }
   }
 }
