@@ -109,7 +109,9 @@
         (dom/div {:class "group"}
           (dom/div {:class "topic-title"} (:title topic-data))
           (when (and (:pin topic-data)
-                     (not (responsive/is-mobile-size?)))
+                     (not (responsive/is-mobile-size?))
+                     (not (responsive/can-edit?))
+                     (not (:read-only topic-data)))
             (dom/div {:class "pinned-topic"}
               (dom/i {:class "fa fa-thumb-tack"
                       :data-toggle "tooltip"
