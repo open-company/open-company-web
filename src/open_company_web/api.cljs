@@ -181,7 +181,7 @@
           section-kw (keyword section)
           company-data (dispatcher/company-data)
           section-data (get company-data section-kw)
-          clean-partial-section-data (dissoc partial-section-data :as-of :icon)
+          clean-partial-section-data (dissoc partial-section-data :as-of :icon :section)
           json-data (cljs->json clean-partial-section-data)
           partial-update-link (utils/link-for (:links section-data) "partial-update" "PATCH")]
       (api-patch (:href partial-update-link)
