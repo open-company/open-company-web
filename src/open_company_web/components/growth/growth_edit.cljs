@@ -1,5 +1,6 @@
 (ns open-company-web.components.growth.growth-edit
   (:require [clojure.string :as string]
+            [cuerdas.core :as s]
             [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -66,6 +67,54 @@
               (utils/get-year period))
             (dom/td {:class "no-cell"})))))))
 
+;; ===== Growth Metric Metadata Functions =====
+
+(defn- current-metric-info [metric-slug owner]
+  (or (get (om/get-state owner :metrics) metric-slug) {}))
+
+(defn- growth-change-metric
+  ""
+  [owner slug properties-map]
+  (let [metrics (or (om/get-state owner :metrics) {})
+        metric (or (get metrics slug) {})
+        new-metric (merge metric properties-map)
+        new-metrics (assoc metrics slug new-metric)]
+    (om/set-state! owner :metrics new-metrics)))
+
+(defn- set-metadata-edit [owner editing]
+  (om/set-state! owner :metadata-edit? editing))
+
+(defn- metrics-as-sequence
+  "We have metrics here as a map, but they need to be dispatched as a sequence."
+  [owner metric-slugs]
+  (let [metric-map (om/get-state owner :metrics)]
+    (map metric-map metric-slugs)))
+
+(defn- new-metric-slug [metric-name]
+  (s/slugify (str metric-name " " (utils/my-uuid))))
+
+(defn- save-metadata-cb [owner data slug properties-map new-metric?]
+  ;; we are no longer editing
+  (set-metadata-edit owner false)
+  
+  ;; reflect edits in metric metadata in local state
+  (if new-metric?
+    (let [new-slug (new-metric-slug (:name properties-map))] ; new slug for a new metric
+      (growth-change-metric owner new-slug (assoc properties-map :slug new-slug))
+      (om/set-state! owner :metric-slug new-slug)) ; now data editing the new metric
+    (growth-change-metric owner slug properties-map))
+  
+  (if new-metric?
+    ;; edit new metric's data, not its meta-data       
+    (om/set-state! owner :metadata-edit? false) 
+    ;; dispatch the metric matadata change (for API update)
+    (dis/dispatch! [:save-topic-data "growth" {:metrics (metrics-as-sequence owner (:metric-slugs data))}])))
+
+(defn- cancel-metada-cb [owner data editing-cb]
+  (if (:new-metric? data)
+    (editing-cb false) ; cancel the whole data editing
+    (set-metadata-edit owner false))) ; cancel the metadata editing
+
 ;; ===== Growth Metric Data Functions =====
 
 (defn- growth-get-value [v]
@@ -113,54 +162,18 @@
 (defn- growth-clean-data [growth-data]
   (remove nil? (vec (map (fn [[_ v]] (growth-clean-row v)) growth-data))))
 
-(defn- save-data [owner]
+(defn- save-data [owner data new-metric?]
   ; (om/set-state! owner :has-changes false)
-  (dis/dispatch! [:save-topic-data "growth" {:data (growth-clean-data (om/get-state owner :growth-data))}]))
+  (let [data-map {:data (growth-clean-data (om/get-state owner :growth-data))}
+        existing-metrics (vec (metrics-as-sequence owner (:metric-slugs data)))
+        metric-slug (om/get-state owner :metric-slug)
+        new-metrics (if new-metric? (conj existing-metrics (current-metric-info metric-slug owner)) existing-metrics)
+        final-map (if new-metric? (assoc data-map :metrics new-metrics) data-map)] ; add the metadata if this is a new metric
+    (dis/dispatch! [:save-topic-data "growth" final-map])))
 
 (defn- replace-row-in-data [owner row k v]
   (let [new-row (update row k (fn[_]v))]
     (growth-change-data owner new-row)))
-
-;; ===== Growth Metric Metadata Functions =====
-
-(defn- current-metric-info [metric-slug owner]
-  (or (get (om/get-state owner :metrics) metric-slug) {}))
-
-(defn- growth-change-metric
-  ""
-  [owner slug properties-map]
-  (let [metrics (or (om/get-state owner :metrics) {})
-        metric (or (get metrics slug) {})
-        new-metric (merge metric properties-map)
-        new-metrics (assoc metrics slug new-metric)]
-    (om/set-state! owner :metrics new-metrics)))
-
-(defn- set-metadata-edit [owner editing]
-  (om/set-state! owner :metadata-edit? editing))
-
-(defn- metrics-as-sequence
-  "We have metrics here as a map, but they need to be dispatched as a sequence."
-  [owner data]
-  (let [metric-map (om/get-state owner :growth-data)
-        metric-slugs (:metric-slugs data)]
-    (map metric-map metric-slugs)))
-
-(defn- save-metadata-cb [owner data slug properties-map new-metric?]
-  ;; no longer editing
-  (set-metadata-edit owner false)
-  ;; reflect edits in metric metadata in local state
-  (growth-change-metric owner slug properties-map)
-  (if new-metric?
-    (do
-      (om/set-state! owner :metric-slug slug) ; now editing the new metric
-      (om/set-state! owner :metadata-edit? false)) ; edit new metric's data, not its meta-data
-    ;; dispatch the metric matadata change (for API update)
-    (dis/dispatch! [:save-topic-data "growth" {:metrics (metrics-as-sequence owner data)}])))
-
-(defn- cancel-metada-cb [owner data editing-cb]
-  (if (:new-metric? data)
-    (editing-cb false) ; cancel the whole data editing
-    (set-metadata-edit owner false))) ; cancel the metadata editing
 
 ;; ===== Growth Data Editing Component =====
 
@@ -190,10 +203,6 @@
           unit (:unit metric-info)
           prefix (if (= unit "currency") (utils/get-symbol-for-currency-code (:currency options)) "")
           suffix (when (= unit "%") "%")]
-
-      (.log js/console (str metric-slug))
-      (.log js/console (str metrics))
-      (.log js/console (str metric-info))
 
       (dom/div {:class "growth"}
         (dom/div {:class "composed-section-edit growth-body edit"}
@@ -277,8 +286,8 @@
                     (dom/button {:class "btn-reset btn-outline btn-data-save"
                                  :on-click  #(do
                                               (utils/event-stop %)
-                                              (save-data owner)
-                                              (editing-cb false))} "SAVE")
+                                              (save-data owner data new-metric?)
+                                              (editing-cb false))} (if new-metric? "ADD" "SAVE"))
                     (dom/button {:class "btn-reset btn-outline"
                                  :on-click #(do
                                               (utils/event-stop %)
