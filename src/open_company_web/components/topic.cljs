@@ -245,7 +245,7 @@
             (dom/button {:class "btn-reset share-remove"
                          :data-toggle "tooltip"
                          :data-placement "right"
-                         :title "Remove from update"
+                         :title "Remove topic from this update."
                          :on-click #(when (contains? options :share-remove-click) ((:share-remove-click options) (name section)))}
               (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.5)" :size 12 :stroke 4 :accent-color "rgba(78, 90, 107, 0.5)"}))))
         (when show-share-remove
@@ -254,7 +254,7 @@
             (dom/button {:class "btn-reset share-dnd"
                          :data-toggle "tooltip"
                          :data-placement "right"
-                         :title "Drag and drop topic to reorder"}
+                         :title "Drag and drop topic to reorder."}
               (dom/i {:class "fa fa-arrows-v"}))))
         (dom/div #js {:className "topic-anim group"
                       :key (str "topic-anim-" as-of "-" transition-as-of)
