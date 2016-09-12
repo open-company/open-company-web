@@ -118,10 +118,10 @@
     (assoc-in (dispatcher/su-list-key slug) response)
     (dissoc :loading)))
 
-(defmethod dispatcher/action :su-edit [db [_ {:keys [slug su-slug]}]]
+(defmethod dispatcher/action :su-edit [db [_ {:keys [slug su-date su-slug]}]]
   (let [protocol (.. js/document -location -protocol)
         host     (.. js/document -location -host)
-        su-url   (str protocol "//" host "/" (name slug) "/updates/" su-slug)]
+        su-url   (str protocol "//" host (oc-urls/stakeholder-update slug (utils/su-date-from-created-at su-date) su-slug))]
     (-> db
       (assoc-in (dispatcher/latest-stakeholder-update-key slug) su-url)
       (dissoc :loading))))
