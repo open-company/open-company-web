@@ -208,4 +208,5 @@
           [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js?oc_deploy_key"}]
           [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js?oc_deploy_key"}]
           ;; Filestack
-          [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]]})
+          [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]
+          [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]]})

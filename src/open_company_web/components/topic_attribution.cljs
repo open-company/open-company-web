@@ -65,7 +65,7 @@
   (render-state [_ {:keys [force-update]}]
     (dom/div {:class "topic-attribution-container group"}
       (dom/div {:class "topic-navigation"}
-        (when (and (not (responsive/is-mobile-size?)) prev-rev)
+        (when (and (not (responsive/is-tablet-or-mobile?)) prev-rev)
           (dom/button {:class "topic-navigation-button earlier-update"
                        :title "View prior update"
                        :type "button"
@@ -78,7 +78,7 @@
                 :data-placement "top"
                 :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
         (time-ago (:updated-at topic-data)))
-        (when (and (not (responsive/is-mobile-size?)) next-rev)
+        (when (and (not (responsive/is-tablet-or-mobile?)) next-rev)
           (dom/button {:class "topic-navigation-button later-update"
                        :title "View next update"
                        :type "button"

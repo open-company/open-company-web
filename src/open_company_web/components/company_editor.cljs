@@ -4,7 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.oc-colors :as occ]
-            [open-company-web.components.navbar :refer (navbar)]
+            [open-company-web.components.ui.navbar :refer (navbar)]
             [open-company-web.components.ui.small-loading :as loading]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]))

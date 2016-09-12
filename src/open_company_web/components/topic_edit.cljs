@@ -271,7 +271,8 @@
       (doto add-image-el
         (.tooltip "hide")
         (.attr "data-original-title" add-image-tooltip)
-        (.tooltip "fixTitle")))
+        (.tooltip "fixTitle")
+        (.tooltip "hide")))
     (let [file-upload-state (om/get-state owner :file-upload-state)
           old-file-upload-state (:file-upload-state prev-state)]
       (when (and (= file-upload-state :show-url-field)
