@@ -92,14 +92,15 @@
      :units (:units growth-defaults)
      :metrics available-metrics}))
 
-(defn- save-metric-info [owner save-cb]
+(defn- save-metric-info [owner save-cb new?]
   (let [slug (om/get-state owner :metric-slug)]
     (save-cb slug {
       :slug slug
       :name (om/get-state owner :metric-name)
       :description (om/get-state owner :description)
       :unit (om/get-state owner :unit)
-      :interval (om/get-state owner :interval)})))
+      :interval (om/get-state owner :interval)}
+      new?)))
 
 (defcomponent growth-metric-edit [data owner options]
 
@@ -140,7 +141,8 @@
   (render [_]
     (let [all-metrics (:metrics data)
           {:keys [metrics intervals prompt] :as presets} (om/get-state owner :presets)
-          units (om/get-state owner :units)]
+          units (om/get-state owner :units)
+          new-metric? (:new-metric? data)]
 
       (dom/div {:class "growth-metric-edit p3"}
 
@@ -190,8 +192,8 @@
                                        (s/blank? (om/get-state owner :unit))
                                        (s/blank? (om/get-state owner :interval)))
                          :on-click #(do (utils/event-stop %)
-                                        (save-metric-info owner (:save-cb data)))}
-              (if (:new-metric? data) "NEXT" "SAVE"))
+                                        (save-metric-info owner (:save-cb data) new-metric?))}
+              (if new-metric? "NEXT" "SAVE"))
 
             ;; archive button
             ; (when-not (:new-metric? data)
