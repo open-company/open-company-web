@@ -673,15 +673,15 @@
                              :on-click #(.click (sel1 [:input#topic-edit-upload-ui--select-trigger]))}
                   (dom/i {:class "fa fa-camera"})))
               ;; Embed image
-              (when-not is-data-topic
-                (dom/button {:class "btn-reset image-url"
-                             :title "Upload an image from a URL"
-                             :type "button"
-                             :data-toggle "tooltip"
-                             :data-placement "top"
-                             :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
-                             :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
-                  (dom/i {:class "fa fa-code"})))
+              ; (when-not is-data-topic
+              ;   (dom/button {:class "btn-reset image-url"
+              ;                :title "Upload an image from a URL"
+              ;                :type "button"
+              ;                :data-toggle "tooltip"
+              ;                :data-placement "top"
+              ;                :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
+              ;                :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
+              ;     (dom/i {:class "fa fa-code"})))
               ;; Archive
               (dom/button #js {:className "btn-reset archive-button right"
                                :title "Archive this topic"

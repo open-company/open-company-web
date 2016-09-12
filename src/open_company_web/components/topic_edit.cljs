@@ -373,14 +373,14 @@
                          :style {:display (if (nil? file-upload-state) "block" "none")}
                          :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
                 (dom/i {:class "fa fa-camera"}))
-            (dom/button {:class "btn-reset image-url left"
-                         :title "Upload an image from a URL"
-                         :type "button"
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :style {:display (if (nil? file-upload-state) "block" "none")}
-                         :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
-                (dom/i {:class "fa fa-code"}))
+            ; (dom/button {:class "btn-reset image-url left"
+            ;              :title "Upload an image from a URL"
+            ;              :type "button"
+            ;              :data-toggle "tooltip"
+            ;              :data-placement "top"
+            ;              :style {:display (if (nil? file-upload-state) "block" "none")}
+            ;              :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
+            ;     (dom/i {:class "fa fa-code"}))
             (when-not (:placeholder topic-data)
               (dom/button {:class "btn-reset archive-button right"
                            :title "Archive this topic"
