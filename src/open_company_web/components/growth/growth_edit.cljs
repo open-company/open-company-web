@@ -169,7 +169,9 @@
         metric-slug (om/get-state owner :metric-slug)
         new-metrics (if new-metric? (conj existing-metrics (current-metric-info metric-slug owner)) existing-metrics)
         final-map (if new-metric? (assoc data-map :metrics new-metrics) data-map)] ; add the metadata if this is a new metric
-    (dis/dispatch! [:save-topic-data "growth" final-map])))
+    (dis/dispatch! [:save-topic-data "growth" final-map])
+    (when new-metric?
+      ((:switch-focus-cb data) metric-slug {})))) ; show the new metric
 
 (defn- replace-row-in-data [owner row k v]
   (let [new-row (update row k (fn[_]v))]

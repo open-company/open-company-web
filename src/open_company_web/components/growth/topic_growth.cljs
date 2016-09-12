@@ -133,6 +133,7 @@
                          :metrics growth-metrics
                          :metric-slugs growth-metric-slugs
                          :editing-cb (partial data-editing-toggle owner editing-cb)
+                         :switch-focus-cb (partial switch-focus owner)
                          :show-first-edit-tip false ;show-first-edit-tip
                          ;:first-edit-tip-cb #(focus-headline owner)
                         }
