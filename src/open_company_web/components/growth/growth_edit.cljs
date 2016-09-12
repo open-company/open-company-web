@@ -153,7 +153,6 @@
 (defcomponent growth-edit [{:keys [editing-cb show-first-edit-tip first-edit-tip-cb new-metric?] :as data} owner options]
 
   (init-state [_]
-    (.log js/console (str "Init with: " new-metric?))
     {:metadata-edit? false ; not editing metric metadata
      :growth-data (:growth-data data) ; all the growth data for all metrics
      :metric-slug (:initial-focus data) ; the slug of the current metric

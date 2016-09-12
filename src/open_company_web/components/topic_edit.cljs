@@ -198,7 +198,7 @@
        :has-changes false
        :file-upload-state nil
        :file-upload-progress 0
-       :data-editing? false}))
+       :data-editing? (dis/foce-section-data-editing?)}))
 
   (will-receive-props [_ next-props]
     ;; update body placeholder when receiving data from API
