@@ -116,7 +116,10 @@
                       (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil
                                                                         :file-upload-progress nil
                                                                         :has-changes true})))
-        error-cb    (fn [error] (js/console.log "error" error))
+        error-cb    (fn [error] (js/alert "An error has occurred while processing the image URL. Please try again.")
+                                (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil
+                                                                                  :file-upload-progress nil
+                                                                                  :has-changes true})))
         progress-cb (fn [progress]
                       (let [state (om/get-state owner)]
                         (om/set-state! owner (merge state {:file-upload-state :show-progress
