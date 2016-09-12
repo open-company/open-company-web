@@ -62,6 +62,8 @@
                                                  :active (= focus metric-slug)})]
             (dom/label {:class metric-classes
                         :title (:description metric)
+                        :data-toggle "tooltip"
+                        :data-placement "bottom"
                         :data-tab metric-slug
                         :on-click (partial pillbox-click owner options)} mname))))
       
@@ -69,7 +71,9 @@
         ;; new metric
         (dom/label {:class (utils/class-set {:pillbox true
                                              :new true})
-                    :title "Add a new metric"
+                    :title "Add a new chart"
+                    :data-toggle "tooltip"
+                    :data-placement "bottom"
                     :data-tab growth-utils/new-metric-slug-placeholder
                     :on-click (fn [e]
                                 (.stopPropagation e)

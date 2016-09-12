@@ -37,24 +37,34 @@
                    (cond
                      (= k :value)
                      (when next-period
-                       (signal-tab next-period :value))))]
-      (dom/tr {:class "growth-edit-row"}
-        (dom/th {:class "no-cell"}
-          period-string)
-        (dom/td {}
-          (when-not is-last
-            (om/build
-              cell
-              {:value value
-               :positive-only false
-               :placeholder "Value"
-               :cell-state cell-state
-               :draft-cb #(change-cb :value %)
-               :prefix prefix
-               :suffix suffix
-               :period period
-               :key :value
-               :tab-cb tab-cb})))))))
+                       (signal-tab next-period :value))))
+          needs-year (or (= period-month "JAN")
+               (:needs-year data))]
+
+      (dom/tbody {}
+        (dom/tr {:class "growth-edit-row"}
+          (dom/th {:class "no-cell"}
+            period-string)
+          (dom/td {}
+            (when-not is-last
+              (om/build
+                cell
+                {:value value
+                 :positive-only false
+                 :placeholder "Value"
+                 :cell-state cell-state
+                 :draft-cb #(change-cb :value %)
+                 :prefix prefix
+                 :suffix suffix
+                 :period period
+                 :key :value
+                 :tab-cb tab-cb}))))
+
+        (when needs-year
+          (dom/tr {}
+            (dom/th {:class "no-cell year"}
+              (utils/get-year period))
+            (dom/td {:class "no-cell"})))))))
 
 ;; ===== Growth Metric Data Functions =====
 
@@ -206,44 +216,47 @@
 
               ;; Growth metric data editing table
               (when interval
+
                 ;; Data editing table
                 (dom/div {:class "table-container group"}
                   (dom/table {:class "table"
                               :key (str "growth-edit-" slug)}
+
                     ;; Table header
                     (dom/thead {}
                       (dom/tr {}
                         (dom/th {} "")
                         (dom/th {} "Value")))
-                    ;; Table body
-                    (dom/tbody {}
-                      ;; For each period from the current, until as far in the past as the stop value
-                      (let [current-period (utils/current-growth-period interval)]
-                        (for [idx (range 1 stop)]
-                          (let [period (growth-utils/get-past-period current-period idx interval)
-                                has-value (contains? growth-data (str period slug))
-                                row-data (if has-value
-                                            (get growth-data (str period slug))
-                                            {:period period
-                                             :slug slug
-                                             :value nil
-                                             :new true})
-                                next-period (growth-utils/get-past-period current-period (inc idx) interval)]
-                            ;; A table row for this period
-                            (om/build growth-edit-row {:cursor row-data
-                                                       :next-period next-period
-                                                       :is-last (= idx 0)
-                                                       :needs-year (= idx (dec stop))
-                                                       :prefix prefix
-                                                       :suffix suffix
-                                                       :interval interval
-                                                       :change-cb (fn [k v]
-                                                            (replace-row-in-data owner row-data k v))}))))
+
+                    ;; For each period from the current, until as far in the past as the stop value
+                    (let [current-period (utils/current-growth-period interval)]
+                      (for [idx (range 1 stop)]
+                        (let [period (growth-utils/get-past-period current-period idx interval)
+                              has-value (contains? growth-data (str period slug))
+                              row-data (if has-value
+                                          (get growth-data (str period slug))
+                                          {:period period
+                                           :slug slug
+                                           :value nil
+                                           :new true})
+                              next-period (growth-utils/get-past-period current-period (inc idx) interval)]
+                          ;; A table row for this period
+                          (om/build growth-edit-row {:cursor row-data
+                                                     :next-period next-period
+                                                     :is-last (= idx 0)
+                                                     :needs-year (= idx (dec stop))
+                                                     :prefix prefix
+                                                     :suffix suffix
+                                                     :interval interval
+                                                     :change-cb (fn [k v]
+                                                          (replace-row-in-data owner row-data k v))}))))
+                      
                       ;; Ending table row to paginate to more data in the table
-                      (dom/tr {}
-                        (dom/th {:class "earlier" :col-span 2}
-                          (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner data)} "Earlier..."))
-                        (dom/td {}))))))
+                      (dom/tfoot {}
+                        (dom/tr {}
+                          (dom/th {:class "earlier" :col-span 2}
+                            (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner data)} "Earlier..."))
+                          (dom/td {}))))))
 
               ;; Save growth data and cancel edit buttons
               (when interval
