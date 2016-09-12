@@ -121,6 +121,13 @@ Never access the app-state directly but we should always use the proper function
 This way it will be very simple to change the structure of the app-state in the future since we just need
 to change it in one place.
 
+#### Component Tree Design
+
+The OpenCompany web app is made up of trees of Om/Rum components that start from a few top level components (company-dashboard, company-settings, user-settings, company-list, login...) and include other child components in a tree, sometimes just a few, and sometimes many.
+
+One of the most important component trees is the company dashboard. This provides the main UI for viewing and editing a company's topics. Here's a diagram of the read-only aspects of the company dashboard component tree:
+
+![Company Dashboard Diagram](https://cdn.rawgit.com/open-company/open-company-web/mainline/docs/dashboard-viewing-component-tree.svg)
 
 ## Testing
 

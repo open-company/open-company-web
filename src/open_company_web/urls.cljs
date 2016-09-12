@@ -87,16 +87,16 @@
 
 (defn stakeholder-update
   ([]
-    (stakeholder-update (router/current-company-slug) (router/current-stakeholder-update-slug)))
-  ([update-slug]
-    (stakeholder-update (router/current-company-slug) update-slug))
-  ([slug update-slug]
-    (str "/" (name slug) "/updates/" (name update-slug))))
+    (stakeholder-update (router/current-company-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug)))
+  ([update-date update-slug]
+    (stakeholder-update (router/current-company-slug) update-date update-slug))
+  ([slug update-date update-slug]
+    (str "/" (name slug) "/updates/" (name update-date) "/" (name update-slug))))
 
 (defn stakeholder-update-section
   ([]
-    (stakeholder-update-section (router/current-company-slug) (router/current-stakeholder-update-slug) (router/current-section)))
-  ([update-slug section]
-    (stakeholder-update-section (router/current-company-slug) update-slug section))
-  ([slug update-slug section]
-    (str "/" (name slug) "/updates/" (name update-slug) "/" (name section))))
+    (stakeholder-update-section (router/current-company-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug) (router/current-section)))
+  ([update-date update-slug section]
+    (stakeholder-update-section (router/current-company-slug) update-date update-slug section))
+  ([slug update-date update-slug section]
+    (str "/" (name slug) "/updates/" (name update-date) "/" (name update-slug) "/" (name section))))

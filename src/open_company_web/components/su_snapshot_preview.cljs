@@ -182,7 +182,6 @@
                                   :ref "preview-title"
                                   :onChange #(om/set-state! owner :title (.. % -target -value))
                                   :style #js {:width total-width}})))
-              (dom/div {:class "preview-subtitle"} su-subtitle)
               (when show-su-dialog
                 (om/build su-preview-dialog {:selected-topics (:sections su-data)
                                              :company-data company-data

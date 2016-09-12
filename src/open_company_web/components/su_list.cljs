@@ -25,10 +25,11 @@
           topic-updated-at (str month-string " " (.getDate js-date-upat) ", " (.getFullYear js-date-upat))
           intro (:intro update)
           update-slug (:slug update)
+          update-date (:date update)
           links (:links update)
           update-get-link (utils/link-for links "self" "GET")]
       (dom/div {:class "su-update"
-                :on-click #(router/nav! (oc-urls/stakeholder-update update-slug))}
+                :on-click #(router/nav! (oc-urls/stakeholder-update update-date update-slug))}
         (dom/div {:class "su-title"} (:title update))
         (dom/div {:class "su-date"} topic-updated-at)
         (dom/div {:class "su-body"
