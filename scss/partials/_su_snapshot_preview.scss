@@ -128,12 +128,19 @@ div.su-snapshot-preview {
             div.share-remove-container {
               display: block;
             }
+            div.share-dnd-container {
+              display: block;
+            }
           }
 
           &.ui-sortable-helper {
             background-color: transparent;
 
             div.share-remove-container {
+              display: none;
+            }
+
+            div.share-dnd-container {
               display: none;
             }
 
