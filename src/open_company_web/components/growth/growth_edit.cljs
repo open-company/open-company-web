@@ -23,7 +23,7 @@
   (when-let [ch (utils/get-channel (str period k))]
     (put! ch {:period period :key k})))
 
-(defcomponent growth-edit-row [{:keys [interval needs-year is-last change-cb next-period prefix suffix] :as data} owner]
+(defcomponent growth-edit-row [{:keys [interval is-last change-cb next-period prefix suffix] :as data} owner]
 
   (render [_]
     (let [growth-data (:cursor data)
@@ -39,8 +39,8 @@
                      (= k :value)
                      (when next-period
                        (signal-tab next-period :value))))
-          needs-year (or (= period-month "JAN")
-               (:needs-year data))]
+          needs-year? (or (= period-month "JAN")
+                          (:needs-year data))]
 
       (dom/tbody {}
         (dom/tr {:class "growth-edit-row"}
@@ -61,7 +61,7 @@
                  :key :value
                  :tab-cb tab-cb}))))
 
-        (when needs-year
+        (when needs-year?
           (dom/tr {}
             (dom/th {:class "no-cell year"}
               (utils/get-year period))
