@@ -13,6 +13,9 @@
             [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
 
 (def metric-defaults {
+  :slug growth-utils/new-metric-slug-placeholder
+  :name ""
+  :description ""
   :unit "number"
   :interval "monthly"})
 
@@ -101,25 +104,25 @@
 (defcomponent growth-metric-edit [data owner options]
 
   (init-state [_]
-    (let [metric-info (:metric-info data)
+    (let [new-metric? (:new-metric? data)
+          metric-info (if new-metric? metric-defaults (:metric-info data))
           company-currency-code (:currency options)
           presets (get-presets data)
           units (:units presets)
           fixed-units (vec (map #(if (= (:unit %) "currency")
                                    {:unit "currency"
                                     :name (utils/get-symbol-for-currency-code company-currency-code)}
-                                   %) units))
-          new-metric (:new-metric data)]
+                                   %) units))]
       {:req-libs-loaded false
        :did-mount false
        :select2-initialized false
        :presets presets
-       :metric-name (:name metric-info)
        :metric-slug (:slug metric-info)
+       :metric-name (:name metric-info)
        :description (:description metric-info)
-       :unit (if new-metric (:unit metric-defaults) (:unit metric-info))
+       :unit (:unit metric-info)
        :units fixed-units
-       :interval (if new-metric (:interval metric-defaults) (:interval metric-info))
+       :interval (if new-metric? (:interval metric-defaults) (:interval metric-info))
        :currency company-currency-code}))
 
   (will-mount [_]
@@ -166,7 +169,7 @@
                      :id "mtr-interval"
                      ; if there are data the interval can't be changed
                      :disabled (and (pos? (:metric-count data))
-                                    (not (:new-metric data)))}
+                                    (not (:new-metric? data)))}
           (for [interval intervals]
             (dom/option {:value interval} (utils/camel-case-str interval))))
 
@@ -188,12 +191,14 @@
                                        (s/blank? (om/get-state owner :interval)))
                          :on-click #(do (utils/event-stop %)
                                         (save-metric-info owner (:save-cb data)))}
-              "SAVE")
+              (if (:new-metric? data) "NEXT" "SAVE"))
+
             ;; archive button
-            ; (when-not (:new-metric data)
+            ; (when-not (:new-metric? data)
             ;   (dom/button {:class "btn-reset btn-outline mr1 secondary-button"
             ;                :title "Archive this metric"
             ;                :on-click #(show-archive-confirm-popover owner data)} "ARCHIVE"))
+
             ;; cancel button
             (dom/button {:class "btn-reset btn-outline"
                          :on-click #(do (utils/event-stop %)
