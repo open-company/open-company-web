@@ -75,7 +75,7 @@
                                 (.stopPropagation e)
                                 (new-metric owner editing-cb))} "+ New")))))
 
-(defn- get-state [owner data & [initial]]
+(defn- get-state [owner data initial]
   (let [section-data (:section-data data)
         all-metrics (:metrics section-data)
         metrics (metrics-map all-metrics)
@@ -83,7 +83,7 @@
         last-focus (utils/company-cache-key focus-cache-key)
         focus (if initial
                 (or (:selected-metric data) last-focus first-metric)
-                (om/get-state owner :focus))
+                (om/get-state owner :focus)) ; preserve focus if this is for will-update
         growth-data (growth-utils/growth-data-map (:data section-data))
         metric-slugs (metrics-order all-metrics)
         new-metric? (not focus)]
@@ -91,7 +91,7 @@
      :growth-metrics metrics
      :growth-metric-slugs metric-slugs
      :focus focus
-     :new-metric? new-metric?
+     :new-metric? (if initial new-metric? (om/get-state owner :new-metric?)) ; preserve new metric if this is for will-update
      :data-editing? (:initial-editing? data)}))
 
 (defcomponent topic-growth [{:keys [section section-data currency editable? initial-editing? editing-cb] :as data} owner options]
@@ -102,9 +102,9 @@
   (will-update [_ next-props _]
     ;; this means the section data has changed from the API or at a upper lever of this component
     (when-not (= next-props data)
-      (om/set-state! owner (get-state owner next-props true))))
+      (om/set-state! owner (get-state owner next-props false))))
 
-  (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug new-metric? data-editing?]}]
+  (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug data-editing?]}]
     (let [section-name (utils/camel-case-str (name section))
           no-data (utils/no-growth-data? growth-data)
           focus-metric-data (filter-growth-data focus growth-data)
@@ -124,7 +124,7 @@
 
           (om/build growth-edit {
                          :initial-focus focus
-                         :new-metric? new-metric? 
+                         :new-metric? (om/get-state owner :new-metric?)
                          :growth-data growth-data
                          :metrics growth-metrics
                          :metric-slugs growth-metric-slugs
