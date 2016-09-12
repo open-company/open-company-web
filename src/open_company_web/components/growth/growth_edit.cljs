@@ -111,10 +111,10 @@
     (dis/dispatch! [:save-topic-data "growth" {:metrics (metrics-as-sequence owner (:metric-slugs data))}])))
 
 (defn- cancel-metada-cb [owner data editing-cb]
-  (if (:new-metric? data)
-    (editing-cb false) ; cancel the whole data editing
-    (set-metadata-edit owner false))) ; cancel the metadata editing
-
+  (set-metadata-edit owner false) ; cancel the metadata editing
+  (when (:new-metric? data)
+    (editing-cb false))) ; cancel the whole data editing
+    
 ;; ===== Growth Metric Data Functions =====
 
 (defn- growth-get-value [v]

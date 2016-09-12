@@ -35,13 +35,11 @@
 (defn- filter-growth-data [focus growth-data]
   (vec (filter #(= (:slug %) focus) (vals growth-data))))
 
-(defn- data-editing-toggle [owner editing-cb editing]
-  (om/set-state! owner :data-editing? editing)
-  (editing-cb editing))
-
-(defn- new-metric [owner editing-cb]
-  (om/set-state! owner :new-metric? true)
-  (data-editing-toggle owner editing-cb true))
+(defn- data-editing-toggle [owner editing-cb editing?]
+  (om/set-state! owner :data-editing? editing?)
+  (when-not editing?
+    (om/set-state! owner :new-metric? false))
+  (editing-cb editing?))
 
 (defn- render-pillboxes [owner editable? editing-cb options]
 
@@ -77,7 +75,8 @@
                     :data-tab growth-utils/new-metric-slug-placeholder
                     :on-click (fn [e]
                                 (.stopPropagation e)
-                                (new-metric owner editing-cb))} "+ New")))))
+                                (om/set-state! owner :new-metric? true)
+                                (data-editing-toggle owner editing-cb true))} "+ New")))))
 
 (defn- get-state [owner data initial]
   (let [section-data (:section-data data)
@@ -108,7 +107,7 @@
     (when-not (= next-props data)
       (om/set-state! owner (get-state owner next-props false))))
 
-  (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug data-editing?]}]
+  (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug data-editing? new-metric?]}]
     (let [section-name (utils/camel-case-str (name section))
           no-data (utils/no-growth-data? growth-data)
           focus-metric-data (filter-growth-data focus growth-data)
@@ -128,7 +127,7 @@
 
           (om/build growth-edit {
                          :initial-focus focus
-                         :new-metric? (om/get-state owner :new-metric?)
+                         :new-metric? new-metric?
                          :growth-data growth-data
                          :metrics growth-metrics
                          :metric-slugs growth-metric-slugs
