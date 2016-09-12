@@ -144,7 +144,7 @@
   (dis/dispatch! [:save-topic-data "growth" {:metrics (metrics-as-sequence owner data)}]))
 
 (defn- cancel-metada-cb [owner data editing-cb]
-  (if (om/get-state owner :new-metric?)
+  (if (:new-metric? data)
     (editing-cb false) ; cancel the whole data editing
     (set-metadata-edit owner data false))) ; cancel the metadata editing
 
@@ -156,14 +156,13 @@
     {:metadata-edit? false ; not editing metric metadata
      :growth-data (:growth-data data) ; all the growth data for all metrics
      :metric-slug (:initial-focus data) ; the slug of the current metric
-     :new-metric? new-metric? ; this metric hasn't been saved before
      :stop batch-size}) ; how many periods (reverse chronological) to show
 
   (will-receive-props [_ next-props]
     (when (not= (:growth-data data) (:growth-data next-props))
       (om/set-state! owner :growth-data (:growth-data next-props))))
 
-  (render-state [_ {:keys [growth-data metric-slug new-metric? stop] :as state}]
+  (render-state [_ {:keys [growth-data metric-slug stop] :as state}]
 
     (let [company-slug (router/current-company-slug)
           metadata-edit? (or new-metric? (om/get-state owner :metadata-edit?))
