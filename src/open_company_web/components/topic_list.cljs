@@ -497,7 +497,7 @@
             {:id (str "welcome-" company-slug "-desktop")
              :once-only false
              :mobile false
-             :desktop (str "Hi " (jwt/get-key :name) ", welcome to OpenCompany! To get started, add a topic.")}))
+             :desktop (str "Hi " (jwt/get-key :name) ", welcome to OpenCompany! Choose a topic to get started.")}))
 
         ;; Mobile only welcome
         (when show-add-topic-tip
