@@ -62,6 +62,27 @@ div.topic {
     }
   }
 
+  div.share-dnd-container{
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 35px;
+    right: -35px;
+    display: none;
+
+    button.share-dnd {
+      width: 30px;
+      height: 30px;
+      border-radius: 15px;
+      background-color: white;
+
+      i.fa {
+        font-size: 12px;
+        color: rgba(78, 90, 107, 0.5);
+      }
+    }
+  }
+
   div.topic-anim{
     position: relative;
     height: auto;

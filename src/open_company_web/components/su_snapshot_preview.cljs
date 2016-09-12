@@ -90,7 +90,7 @@
       {:columns-num (responsive/columns-num)
        :su-topics su-sections
        :title-focused false
-       :title (if (clojure.string/blank? (:title su-data))  (utils/su-default-title) (:title su-data))
+       :title (:title su-data)
        :show-su-dialog false
        :link-loading false
        :slack-loading false
@@ -159,6 +159,7 @@
         (dom/div {:class "page snapshot-page"}
           (dom/div {:class "su-snapshot-header"}
             (back-to-dashboard-btn {})
+            (dom/div {:class "snapshot-cta"} "Choose the topics to share and arrange them in any order.")
             (dom/div {:class "share-su"}
               (dom/button {:class "btn-reset btn-solid share-su-button"
                            :on-click #(share-clicked owner)
@@ -180,6 +181,7 @@
                                   :type "text"
                                   :value title
                                   :ref "preview-title"
+                                  :placeholder "Update Title"
                                   :onChange #(om/set-state! owner :title (.. % -target -value))
                                   :style #js {:width total-width}})))
               (when show-su-dialog

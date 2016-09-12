@@ -327,7 +327,7 @@
       (fn [{:keys [success body]}]
         (when success
           (let [fixed-body (json->cljs body)]
-            (dispatcher/dispatch! [:su-edit {:slug slug :su-slug (:slug fixed-body)}])))))))
+            (dispatcher/dispatch! [:su-edit {:slug slug :su-slug (:slug fixed-body) :su-date (:created-at fixed-body)}])))))))
 
 (defn get-su-list []
   (let [slug (keyword (router/current-company-slug))
