@@ -374,7 +374,7 @@
                          :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
                 (dom/i {:class "fa fa-camera"}))
             (dom/button {:class "btn-reset image-url left"
-                         :title "Provide an image link"
+                         :title "Upload an image from a URL"
                          :type "button"
                          :data-toggle "tooltip"
                          :data-placement "top"

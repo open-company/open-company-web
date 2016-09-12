@@ -675,7 +675,7 @@
               ;; Embed image
               (when-not is-data-topic
                 (dom/button {:class "btn-reset image-url"
-                             :title "Provide an image link"
+                             :title "Upload an image from a URL"
                              :type "button"
                              :data-toggle "tooltip"
                              :data-placement "top"
