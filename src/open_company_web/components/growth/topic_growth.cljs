@@ -85,11 +85,13 @@
                 (or (:selected-metric data) last-focus first-metric)
                 (om/get-state owner :focus))
         growth-data (growth-utils/growth-data-map (:data section-data))
-        metric-slugs (metrics-order all-metrics)]
-    {:focus focus
-     :growth-data growth-data
+        metric-slugs (metrics-order all-metrics)
+        new-metric? (not focus)]
+    {:growth-data growth-data
      :growth-metrics metrics
      :growth-metric-slugs metric-slugs
+     :focus focus
+     :new-metric? new-metric?
      :data-editing? (:initial-editing? data)}))
 
 (defcomponent topic-growth [{:keys [section section-data currency editable? initial-editing? editing-cb] :as data} owner options]

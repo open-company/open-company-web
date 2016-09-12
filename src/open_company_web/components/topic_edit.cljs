@@ -381,7 +381,9 @@
                            :data-toggle "tooltip"
                            :data-placement "top"
                            :style {:display (if no-data? "block" "none")}
-                           :on-click #(dis/set-foce-section-data-editing true)}
+                           :on-click #(do
+                                        (dis/set-foce-section-data-editing true)
+                                        (om/set-state! owner :data-editing? true))}
                 (dom/i {:class "fa fa-line-chart"})))
             (when-not (:placeholder topic-data)
               (dom/button {:class "btn-reset archive-button right"
