@@ -116,7 +116,10 @@
                       (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil
                                                                         :file-upload-progress nil
                                                                         :has-changes true})))
-        error-cb    (fn [error] (js/console.log "error" error))
+        error-cb    (fn [error] (js/alert "An error has occurred while processing the image URL. Please try again.")
+                                (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil
+                                                                                  :file-upload-progress nil
+                                                                                  :has-changes true})))
         progress-cb (fn [progress]
                       (let [state (om/get-state owner)]
                         (om/set-state! owner (merge state {:file-upload-state :show-progress
@@ -177,8 +180,26 @@
     "Add an image"
     "Replace image"))
 
+(defn add-protocol-if-needed []
+  (let [medium-editor-toolbar-input (sel1 [:input.medium-editor-toolbar-input])
+        url-val (.-value medium-editor-toolbar-input)]
+    (when-not (string/starts-with? url-val "http")
+      (set! (.-value medium-editor-toolbar-input) (str "http://" url-val)))))
+
+(defn body-clicked [e]
+  (when-let [medium-editor-toolbar-save (sel1 [:a.medium-editor-toolbar-save])]
+    (when (utils/event-inside? e medium-editor-toolbar-save)
+      (add-protocol-if-needed))))
+
+(defn body-keypress [e]
+  (when-let [medium-editor-toolbar-input (sel1 [:input.medium-editor-toolbar-input])]
+    (when (and (= (.-keyCode e) 13)
+               (utils/event-inside? e medium-editor-toolbar-input))
+      (add-protocol-if-needed))))
+
 (defcomponent topic-edit [{:keys [show-first-edit-tip
                                   currency
+                                  card-width
                                   prev-rev
                                   next-rev]} owner options]
 
@@ -210,7 +231,15 @@
       ; remove the onbeforeunload handler
       (set! (.-onbeforeunload js/window) nil)
       ; remove history change listener
-      (events/unlistenByKey (om/get-state owner :history-listener-id))))
+      (when (om/get-state owner :history-listener-id)
+        (events/unlistenByKey (om/get-state owner :history-listener-id))
+        (om/set-state! owner :history-listener-id nil))
+      (when (om/get-state owner :body-click-listener)
+        (events/unlistenByKey (om/get-state owner :body-click-listener))
+        (om/set-state! owner :body-click-listener nil))
+      (when (om/get-state owner :body-keypress-listener)
+        (events/unlistenByKey (om/get-state owner :body-keypress-listener))
+        (om/set-state! owner :body-keypress-listener nil))))
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -223,9 +252,17 @@
             current-token (oc-urls/company (router/current-company-slug))
             listener (events/listen @router/history HistoryEventType/NAVIGATE
                       (partial handle-navigate-event current-token owner))]
-        (om/set-state! owner :history-listener-id listener))))
+        (om/set-state! owner :history-listener-id listener))
+      (let [body-click-listener (events/listen (.-body js/document)
+                                               EventType/MOUSEDOWN
+                                               body-clicked)]
+        (om/set-state! owner :body-click-listener body-click-listener))
+      (let [body-keypress-listener (events/listen (.-body js/document)
+                                                  EventType/KEYDOWN
+                                                  body-keypress)]
+        (om/set-state! owner :body-keypress-listener body-keypress-listener))))
 
-  (did-update [_ _ _]
+  (did-update [_ _ prev-state]
     (let [section           (dis/foce-section-key)
           topic-data        (dis/foce-section-data)
           image-header      (:image-url topic-data)
@@ -235,7 +272,12 @@
         (.tooltip "hide")
         (.attr "data-original-title" add-image-tooltip)
         (.tooltip "fixTitle")
-        (.tooltip "hide"))))
+        (.tooltip "hide")))
+    (let [file-upload-state (om/get-state owner :file-upload-state)
+          old-file-upload-state (:file-upload-state prev-state)]
+      (when (and (= file-upload-state :show-url-field)
+                 (not= old-file-upload-state :show-url-field))
+        (.focus (sel1 [:input.upload-remote-url-field])))))
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
                            file-upload-state file-upload-progress upload-remote-url negative-headline-char-count
@@ -354,28 +396,32 @@
                            :style {:display (if (nil? file-upload-state) "block" "none")}
                            :on-click (partial remove-topic-click owner)}
                   (dom/i {:class "fa fa-archive"})))
-            (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
-                (dom/input {:type "text"
-                            :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
-                            :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
-                            :placeholder "http://site.com/img.png"
-                            :value upload-remote-url})
-                (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
-                             :class "btn-reset btn-solid"
-                             :disabled (string/blank? upload-remote-url)
-                             :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
-                  "add")
-                (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
-                             :class "btn-reset btn-outline"
-                             :on-click #(om/set-state! owner :file-upload-state nil)}
-                  "cancel"))
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
               (str file-upload-progress "%")))
           (dom/div {:class "topic-foce-footer group"}
             (dom/div {:class "divider"})
-            (dom/div {:class "topic-foce-footer-left"}
+            (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))
+                      :style {:display (if file-upload-state "block" "none")}}
+              (dom/input {:type "text"
+                          :class "upload-remote-url-field"
+                          :style {:width (str (- card-width 122 50) "px")}
+                          :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
+                          :placeholder "http://site.com/img.png"
+                          :value upload-remote-url})
+              (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                           :class "btn-reset btn-solid"
+                           :disabled (string/blank? upload-remote-url)
+                           :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
+                "add")
+              (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                           :class "btn-reset btn-outline"
+                           :on-click #(om/set-state! owner :file-upload-state nil)}
+                "cancel"))
+            (dom/div {:class "topic-foce-footer-left"
+                      :style {:display (if (nil? file-upload-state) "block" "none")}}
               (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
-            (dom/div {:class "topic-foce-footer-right"}
+            (dom/div {:class "topic-foce-footer-right"
+                      :style {:display (if (nil? file-upload-state) "block" "none")}}
               (dom/button {:class "btn-reset btn-solid"
                            :disabled (or (= file-upload-state :show-progress) negative-headline-char-count)
                            :on-click #(dis/dispatch! [:foce-save])} "SAVE")

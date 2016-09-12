@@ -440,9 +440,10 @@
                                                                         :file-upload-state nil
                                                                         :file-upload-progress nil
                                                                         :has-changes true}))))
-        error-cb    (fn [error]
-                      (om/set-state! owner :file-upload-progress nil)
-                      (js/console.log "error" error))
+        error-cb    (fn [error] (js/alert "An error has occurred while processing the image URL. Please try again.")
+                                (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil
+                                                                                  :file-upload-progress nil
+                                                                                  :has-changes true})))
         progress-cb (fn [progress]
                       (let [state (om/get-state owner)]
                         (om/set-state! owner (merge state {:file-upload-state :show-progress
@@ -653,8 +654,10 @@
             
             ;; Icons
             (dom/div {:class "topc-edit-top-box-footer"}
+
               ;; Emoji
-              (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
+              (dom/div {:class "fullscreen-topic-emoji-picker left mr2"
+                        :style {:display (if (nil? (sel1 [:div#file-upload-ui])) "block" "none")}}
                 (emoji-picker {:add-emoji-cb (fn [editor emoji]
                                                (when (= editor (sel1 (str "div#topic-edit-body-" (name topic))))
                                                  (force-hide-placeholder owner)))
