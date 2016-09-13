@@ -44,8 +44,6 @@
 (defn- archive-metric-cb [owner editing-cb metric-slug]
   (let [metric-slugs (remove #{metric-slug} (om/get-state owner :growth-metric-slugs)) ; remove the slug
        focus (first metric-slugs)]
-    (.log js/console (str metric-slugs))
-    (.log js/console focus)
     (om/set-state! owner :focus focus) ; new focus on the first remaining metric
     (om/set-state! owner :growth-metric-slugs metric-slugs)) ; update valid slugs state
   (data-editing-toggle owner editing-cb false)) ; no longer data editing

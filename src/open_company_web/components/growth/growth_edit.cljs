@@ -25,12 +25,13 @@
 
 (defcomponent growth-edit-row [{:keys [interval is-last change-cb next-period prefix suffix] :as data} owner]
 
+
   (render [_]
+
     (let [growth-data (:cursor data)
           is-new (and (not (:value growth-data)) (:new growth-data))
           value (:value growth-data)
           period (:period growth-data)
-          period-month (utils/get-month period interval)
           flags [:short :skip-year]
           period-string (utils/get-period-string period interval flags)
           cell-state (if is-new :new :display)
@@ -39,8 +40,9 @@
                      (= k :value)
                      (when next-period
                        (signal-tab next-period :value))))
-          needs-year? (or (= period-month "JAN")
-                          (:needs-year data))]
+          needs-year? (or (:needs-year data)
+                          (and (not= interval "weekly")
+                               (= (utils/get-month period interval) "JAN")))]
 
       (dom/tbody {}
         (dom/tr {:class "growth-edit-row"}
@@ -64,7 +66,7 @@
         (when needs-year?
           (dom/tr {}
             (dom/th {:class "no-cell year"}
-              (utils/get-year period))
+              (utils/get-year period interval))
             (dom/td {:class "no-cell"})))))))
 
 ;; ===== Growth Metric Metadata Functions =====
