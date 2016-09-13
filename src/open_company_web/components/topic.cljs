@@ -111,8 +111,7 @@
           (when (and show-fast-editing
                      (:pin topic-data)
                      (not (responsive/is-mobile-size?))
-                     (responsive/can-edit?)
-                     (not (:read-only topic-data)))
+                     (responsive/can-edit?))
             (dom/div {:class "pinned-topic"}
               (dom/i {:class "fa fa-thumb-tack"
                       :data-toggle "tooltip"
