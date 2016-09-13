@@ -430,7 +430,6 @@
                 :style {:margin-top (if selected-topic "0px" "84px")}
                 :data-rerender rerender
                 :key (str "topic-list-" rerender)}
-        (dom/div {:id "showme"})
         ;; Activate sharing mode button
         (when can-edit-secs
           (dom/div {:class "sharing-button-container"
