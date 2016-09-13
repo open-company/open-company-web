@@ -66,6 +66,7 @@
                                       prev-rev
                                       next-rev
                                       sharing-mode
+                                      read-only-company
                                       show-fast-editing] :as data} owner options]
 
   (did-mount [_]
@@ -111,7 +112,8 @@
           (when (and show-fast-editing
                      (:pin topic-data)
                      (not (responsive/is-mobile-size?))
-                     (responsive/can-edit?))
+                     (responsive/can-edit?)
+                     (not read-only-company))
             (dom/div {:class "pinned-topic"}
               (dom/i {:class "fa fa-thumb-tack"
                       :data-toggle "tooltip"
