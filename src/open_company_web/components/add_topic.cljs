@@ -54,8 +54,8 @@
 
 (rum/defcs add-topic
   < (rum/local false ::expanded?)
-  [s {:keys [active-topics archived-topics column update-active-topics]}]
-  (if @(::expanded? s)
+  [s {:keys [active-topics archived-topics column update-active-topics initially-expanded]}]
+  (if (or @(::expanded? s) initially-expanded)
     (let [all-sections (into {} (for [s (get-all-sections)]
                                   [(keyword (:section s)) s]))
           slug (keyword (router/current-company-slug))

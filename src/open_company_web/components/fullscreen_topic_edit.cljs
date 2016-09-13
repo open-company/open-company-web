@@ -28,6 +28,7 @@
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [goog.object :as googobj]
             [goog.history.EventType :as HistoryEventType]
             [goog.dom :as gdom]
             [goog.object :as gobj]
@@ -431,18 +432,23 @@
 
 (defn- upload-file! [owner file]
   (let [success-cb  (fn [success]
-                      (let [url    (.-url success)
+                      (let [url    (googobj/get success "url")
                             node   (gdom/createDom "img")]
-                        (gdom/append (.-body js/document) node)
-                        (set! (.-onload node) #(img-on-load owner node))
-                        (set! (.-src node) url)
-                      (om/set-state! owner (merge (om/get-state owner) {:image-url url
-                                                                        :file-upload-state nil
-                                                                        :file-upload-progress nil
-                                                                        :has-changes true}))))
-        error-cb    (fn [error]
-                      (om/set-state! owner :file-upload-progress nil)
-                      (js/console.log "error" error))
+                        (if-not url
+                          (js/alert "An error has occurred while processing the image URL. Please try again.")
+                          (do
+                            (gdom/append (.-body js/document) node)
+                            (set! (.-onload node) #(img-on-load owner node))
+                            (set! (.-src node) url)))
+                        (dis/dispatch! [:foce-input {:image-url url}])
+                        (om/set-state! owner (merge (om/get-state owner) {:image-url url
+                                                                          :file-upload-state nil
+                                                                          :file-upload-progress nil
+                                                                          :has-changes true}))))
+        error-cb    (fn [error] (js/alert "An error has occurred while processing the image URL. Please try again.")
+                                (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil
+                                                                                  :file-upload-progress nil
+                                                                                  :has-changes true})))
         progress-cb (fn [progress]
                       (let [state (om/get-state owner)]
                         (om/set-state! owner (merge state {:file-upload-state :show-progress
@@ -653,8 +659,10 @@
             
             ;; Icons
             (dom/div {:class "topc-edit-top-box-footer"}
+
               ;; Emoji
-              (dom/div {:class "fullscreen-topic-emoji-picker left mr2"}
+              (dom/div {:class "fullscreen-topic-emoji-picker left mr2"
+                        :style {:display (if (nil? (sel1 [:div#file-upload-ui])) "block" "none")}}
                 (emoji-picker {:add-emoji-cb (fn [editor emoji]
                                                (when (= editor (sel1 (str "div#topic-edit-body-" (name topic))))
                                                  (force-hide-placeholder owner)))
@@ -673,15 +681,15 @@
                              :on-click #(.click (sel1 [:input#topic-edit-upload-ui--select-trigger]))}
                   (dom/i {:class "fa fa-camera"})))
               ;; Embed image
-              (when-not is-data-topic
-                (dom/button {:class "btn-reset image-url"
-                             :title "Provide an image link"
-                             :type "button"
-                             :data-toggle "tooltip"
-                             :data-placement "top"
-                             :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
-                             :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
-                  (dom/i {:class "fa fa-code"})))
+              ; (when-not is-data-topic
+              ;   (dom/button {:class "btn-reset image-url"
+              ;                :title "Upload an image from a URL"
+              ;                :type "button"
+              ;                :data-toggle "tooltip"
+              ;                :data-placement "top"
+              ;                :style {:font-size "15px" :display (if (nil? file-upload-state) "block" "none")}
+              ;                :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
+              ;     (dom/i {:class "fa fa-code"})))
               ;; Archive
               (dom/button #js {:className "btn-reset archive-button right"
                                :title "Archive this topic"

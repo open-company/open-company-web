@@ -30,7 +30,8 @@
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
 
   (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num] :as state}]
-    (let [company-data (dis/company-data data)
+    (let [slug (keyword (router/current-company-slug))
+          company-data (dis/company-data data)
           card-width (responsive/calc-card-width)]
       (dom/div {:class (utils/class-set {:company-dashboard true
                                          :main-scroll true})}
@@ -51,6 +52,7 @@
               (om/build topic-list
                           {:loading (or (:loading company-data) (:loading data))
                            :company-data company-data
+                           :new-sections (:new-sections (slug data))
                            :latest-su (dis/latest-stakeholder-update)
                            :force-edit-topic (:force-edit-topic data)
                            :revision-updates (dis/revisions (router/current-company-slug))

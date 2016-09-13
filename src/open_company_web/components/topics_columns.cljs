@@ -3,6 +3,7 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1 sel)]
+            [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.utils :as utils]
@@ -174,11 +175,15 @@
           topics                (:topics props)
           topic-click           (or (:topic-click options) identity)
           update-active-topics  (or (:update-active-topics options) identity)
-          share-selected?       (utils/in? share-selected-topics section-name)]
+          share-selected?       (utils/in? share-selected-topics section-name)
+          slug                  (keyword (router/current-company-slug))]
       (if (= section-name "add-topic")
         (at/add-topic {:column column
                        :archived-topics (mapv (comp keyword :section) (:archived company-data))
                        :active-topics (vec topics)
+                       :initially-expanded (and (not (om/get-props owner :loading))
+                                                (om/get-props owner :new-sections)
+                                                (zero? (count topics)))
                        :update-active-topics update-active-topics})
         (let [sd (->> section-name keyword (get topics-data))]
           (when-not (and (:read-only company-data) (:placeholder sd))

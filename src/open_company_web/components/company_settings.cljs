@@ -193,15 +193,9 @@
           (dom/div {:class "small-caps bold mb1"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
           (dom/div {}
             (if (not= file-upload-state :show-url-field)
-              (dom/input {:type "text"
-                          :value logo
-                          :id "logo"
-                          :class "npt col-10 p1 mb3"
-                          :maxLength 255
-                          :disabled true
-                          :style {:margin-bottom "2px"}
-                          :on-change #(om/set-state! owner :logo (.. % -target -value))
-                          :placeholder "http://example.com/logo.png"})
+              (dom/div {:class "company-logo-container"}
+                (when-not (string/blank? logo)
+                  (dom/img {:src logo :class "company-logo" :data-test "aaa"})))
               (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
                   (dom/input {:type "text"
                               :class "npt col-7 p1 mb3"

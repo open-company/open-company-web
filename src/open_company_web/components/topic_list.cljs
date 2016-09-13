@@ -464,6 +464,7 @@
                                   :total-width total-width
                                   :content-loaded (not (:loading data))
                                   :topics company-topics
+                                  :new-sections (:new-sections data)
                                   :company-data company-data
                                   :topics-data company-data
                                   :foce-key (:foce-key data)
@@ -482,7 +483,7 @@
             {:id (str "welcome-" company-slug "-desktop")
              :once-only false
              :mobile false
-             :desktop (str "Hi " (jwt/get-key :name) ", welcome to OpenCompany! To get started, add a topic.")}))
+             :desktop (str "Hi " (jwt/get-key :name) ", welcome to OpenCompany! Choose a topic to get started.")}))
 
         ;; Mobile only welcome
         (when show-add-topic-tip
