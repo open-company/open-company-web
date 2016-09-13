@@ -36,6 +36,13 @@
   }
 }
 
+@mixin placeholder {
+  &::-webkit-input-placeholder {@content}
+  &:-moz-placeholder           {@content}
+  &::-moz-placeholder          {@content}
+  &:-ms-input-placeholder      {@contentd}
+}
+
 @mixin topic_navigation($x_padding: 0px){
   div.topic-navigation{
     width: 100%;

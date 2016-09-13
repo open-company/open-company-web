@@ -100,7 +100,7 @@ div.su-snapshot-preview {
     div.preview-title-container {
       width: 100%;
       text-align: center;
-      margin-top: 50px;
+      margin: 50px auto;
 
       input.preview-title {
         font-weight: 400;
@@ -112,6 +112,10 @@ div.su-snapshot-preview {
         border: 1px solid transparent;
         background-color: transparent;
         border-radius: 2px;
+
+        @include placeholder {
+          font-style: italic;
+        }
       }
     }
 
