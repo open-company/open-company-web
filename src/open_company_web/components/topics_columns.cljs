@@ -193,7 +193,7 @@
                           :key (str "topic-row-" (name section-name))}
               (om/build topic {:loading (:loading company-data)
                                :section section-name
-                               :show-fast-editing (om/get-props owner :show-fast-editing)
+                               :is-stakeholder-update (om/get-props owner :is-stakeholder-update)
                                :section-data sd
                                :card-width (:card-width props)
                                :show-share-remove (:show-share-remove props)
