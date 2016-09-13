@@ -10,7 +10,6 @@
             [open-company-web.components.ui.cell :refer (cell)]
             [open-company-web.components.growth.growth-metric-edit :refer (growth-metric-edit)]
             [open-company-web.components.ui.utility-components :refer (editable-pen)]
-            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [cljs.core.async :refer (put!)]))
@@ -188,7 +187,7 @@
 
 ;; ===== Growth Data Editing Component =====
 
-(defcomponent growth-edit [{:keys [editing-cb show-first-edit-tip first-edit-tip-cb new-metric?] :as data} owner options]
+(defcomponent growth-edit [{:keys [editing-cb first-edit-tip-cb new-metric?] :as data} owner options]
 
   (init-state [_]
     {:metadata-edit? new-metric? ; not editing metric metadata
@@ -300,13 +299,4 @@
                     (dom/button {:class "btn-reset btn-outline"
                                  :on-click #(do
                                               (utils/event-stop %)
-                                              (editing-cb false))} "CANCEL"))))
-
-            ;; Onboarding toolip
-            (when (:show-first-edit-tip data)
-              (onboard-tip
-                {:id (str "growth-topic-add-" company-slug)
-                 :once-only true
-                 :mobile false
-                 :desktop "Add metrics you'd like to share and we'll build simple charts for you."
-                 :dismiss-tip-fn (:first-edit-tip-cb data)})))))))))
+                                              (editing-cb false))} "CANCEL")))))))))))

@@ -140,10 +140,7 @@
                          :metric-slugs growth-metric-slugs
                          :editing-cb (partial data-editing-toggle owner editing-cb)
                          :switch-focus-cb (partial switch-focus owner)
-                         :archive-metric-cb (partial archive-metric-cb owner editing-cb)
-                         :show-first-edit-tip false ;show-first-edit-tip
-                         ;:first-edit-tip-cb #(focus-headline owner)
-                        }
+                         :archive-metric-cb (partial archive-metric-cb owner editing-cb)}
                         {:opts {:currency currency} :key growth-data})
 
           (when-not no-data

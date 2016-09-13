@@ -79,10 +79,7 @@
             (if data-editing?
               (om/build finances-edit {:finances-data (finance-utils/finances-data-map finances-row-data)
                                        :currency currency
-                                       :editing-cb (partial data-editing-toggle owner editing-cb)
-                                       :show-first-edit-tip false ; show-first-edit-tip
-                                       ;:first-edit-tip-cb #(focus-headline owner)
-                                      }
+                                       :editing-cb (partial data-editing-toggle owner editing-cb)}
                                       {:key (:updated-at section-data)})
 
               (dom/div {:class "composed-section finances group"}
