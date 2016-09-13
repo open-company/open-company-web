@@ -243,7 +243,7 @@
                          :data-toggle "tooltip"
                          :data-placement "right"
                          :title "Drag and drop topic to reorder."}
-              (dom/i {:class "fa fa-arrows-v"}))))
+              (dom/i {:class "fa fa-arrows"}))))
         (dom/div #js {:className "topic-anim group"
                       :key (str "topic-anim-" as-of "-" transition-as-of)
                       :ref "topic-anim"}

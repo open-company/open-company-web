@@ -222,20 +222,20 @@
     (let [dragging-topic (.data (js/$ ".ui-draggable-dragging") "topic")
           topic-el (js/$ (str ".topic-row[data-topic=" (name topic) "]"))
           topic-pos (.position topic-el)
-          topic-position (utils/absolute-offset (.get topic-el 0))
-          topic-posalter {:left (- (gobj/get topic-pos "left") 20)
-                          :top (- (gobj/get topic-pos "top") 30)}
+          topic-posalter (utils/absolute-offset (.get topic-el 0))
+          topic-position {:left (gobj/get topic-pos "left")
+                          :top (gobj/get topic-pos "top")}
           topic-size {:width (.width topic-el) :height (.height topic-el)}
-          target-css {:width (int (+ (:width topic-size) 26))
-                      :height (int (+ (:height topic-size) 22))
+          target-css {:width (int (+ (:width topic-size) 26)) ; add the padding and the border of the topic
+                      :height (int (:height topic-size))
                       :left (int (:left topic-position))
-                      :top (int (- (:top topic-position) 84))}]
+                      :top (int (:top topic-position))}]
       (if (and (not= (name topic) dragging-topic)
-                 (>= left (:left target-css) )
+                 (>= left (:left target-css))
                  (>= top (:top target-css))
                  (< left (+ (:left target-css) (:width target-css)))
                  (< top (+ (:top target-css) (:height target-css))))
-        (if (< (- left (:left topic-position)) (/ (:width topic-size) 2))
+        (if (< left (+ (:left target-css) (/ (:width target-css) 2)))
           {:side "left"
            :topic-el topic-el
            :inside? true
@@ -251,8 +251,9 @@
 (defn get-topic-at-position
   "Give left and top coordinates of the current drag position, show the yellow bar on left or right of the current hovering topic"
   [owner left top stop?]
-  (let [left (+ left 45)
-        top (+ top 60)
+  (let [
+        ; left (+ left 45)
+        ; top (+ top 60)
         company-data    (:company-data (om/get-props owner))
         company-topics  (vec (map keyword (:sections company-data)))]
     (doseq [topic company-topics]
@@ -284,8 +285,8 @@
 
 (defn inside-position-from-event [e]
   (let [tcc-offset (.offset (js/$ ".topics-column-container"))]
-    {:left (- (int (gobj/get e "pageX")) (int (gobj/get tcc-offset "left")))
-     :top (- (int (gobj/get e "pageY")) (int (gobj/get tcc-offset "top")))}))
+    {:left (gobj/get e "screenX")
+     :top (gobj/get e "pageY")}))
 
 (defn dragging [owner e stop?]
   (let [inside-pos (inside-position-from-event e)]
