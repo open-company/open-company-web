@@ -323,7 +323,7 @@
   (let [update (link-for links "update" "PUT")
         partial-update (link-for links "partial-update" "PATCH")
         delete (link-for links "delete" "DELETE")]
-    (or (nil? update) (nil? partial-update))))
+    (and (nil? update) (nil? partial-update) (nil? delete))))
 
 (defn as-of-now []
   (let [date (js-date)]
@@ -345,7 +345,8 @@
                           (assoc section-body :updated-at (as-of-now)))
         with-keys       (-> with-updated-at
                           (assoc :section (name section-name))
-                          (assoc :as-of (:updated-at section-body)))]
+                          (assoc :as-of (:updated-at section-body))
+                          (assoc :read-only (readonly? (:links section-body))))]
     (if (= section-name :finances)
       (fix-finances with-keys)
       with-keys)))
