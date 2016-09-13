@@ -460,7 +460,6 @@
         (om/build topics-columns {:columns-num columns-num
                                   :card-width card-width
                                   :selected-metric selected-metric
-                                  :show-fast-editing true
                                   :total-width total-width
                                   :content-loaded (not (:loading data))
                                   :topics company-topics
