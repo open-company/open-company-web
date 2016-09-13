@@ -67,7 +67,7 @@
                                       next-rev
                                       sharing-mode
                                       read-only-company
-                                      show-fast-editing] :as data} owner options]
+                                      is-stakeholder-update] :as data} owner options]
 
   (did-mount [_]
     (block-a-expand))
@@ -109,7 +109,7 @@
         ;; Topic title
         (dom/div {:class "group"}
           (dom/div {:class "topic-title"} (:title topic-data))
-          (when (and show-fast-editing
+          (when (and (not is-stakeholder-update)
                      (:pin topic-data)
                      (not (responsive/is-mobile-size?))
                      (responsive/can-edit?)
@@ -119,10 +119,11 @@
                       :data-toggle "tooltip"
                       :data-placement "top"
                       :title (if (> (count pinned) 1) "Drag and drop to reorder" "Pinned to the top")})))
-          (when (and show-fast-editing
+          (when (and (not is-stakeholder-update)
                    (not (responsive/is-mobile-size?))
                    (responsive/can-edit?)
                    (not (:read-only topic-data))
+                   (not read-only-company)
                    (not sharing-mode)
                    (not (:foce-active data)))
             (dom/button {:class (str "topic-pencil-button btn-reset")
@@ -270,7 +271,7 @@
                 (om/build topic-edit {:section section
                                       :topic-data topic-data
                                       :sharing-mode sharing-mode
-                                      :show-fast-editing (:show-fast-editing data)
+                                      :is-stakeholder-update (:is-stakeholder-update data)
                                       :currency currency
                                       :card-width card-width
                                       :read-only-company (:read-only-company data)
@@ -284,7 +285,7 @@
                 (om/build topic-internal {:section section
                                           :topic-data topic-data
                                           :sharing-mode sharing-mode
-                                          :show-fast-editing (:show-fast-editing data)
+                                          :is-stakeholder-update (:is-stakeholder-update data)
                                           :currency currency
                                           :card-width card-width
                                           :read-only-company (:read-only-company data)
