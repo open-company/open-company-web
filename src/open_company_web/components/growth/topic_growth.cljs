@@ -60,7 +60,7 @@
 
     (dom/div {:class "pillbox-container growth"}
 
-      (when focus
+      (when (and focus (> (count growth-metric-slugs) 1))
         (for [metric-slug growth-metric-slugs]
           (let [metric (get growth-metrics metric-slug)
                 mname (:name metric)
@@ -155,7 +155,7 @@
                 ;; growth metric currently shown
                 (when (and focus (seq (:metric-data subsection-data)))
                   (om/build growth-metric subsection-data {:opts options}))
-                (when (> (count growth-metric-slugs) 1)
+                (when (pos? (count growth-metric-slugs))
                   (render-pillboxes owner editable? editing-cb options))
                 (when editable?
                   (dom/button {:class "btn-reset chart-pencil-button"
