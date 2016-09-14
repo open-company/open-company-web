@@ -32,15 +32,6 @@
 
 ;; ===== Utility functions =====
 
-(defn- get-new-sections-if-needed [owner]
-  (when-not (om/get-state owner :new-sections-requested)
-    (let [slug (keyword (router/current-company-slug))
-          company-data (dispatcher/company-data)]
-      (when (and (empty? (slug @caches/new-sections))
-                 (seq company-data))
-        (om/update-state! owner :new-sections-requested not)
-        (api/get-new-sections)))))
-
 (defn- get-active-topics [company-data]
   (:sections company-data))
 
@@ -335,8 +326,6 @@
     (get-state owner data nil))
 
   (did-mount [_]
-    (when-not (:read-only (:company-data data))
-      (get-new-sections-if-needed owner))
     ; scroll to top when the component is initially mounted to
     ; make sure the calculation for the fixed navbar are correct
     (when-not @scrolled-to-top
@@ -361,8 +350,6 @@
       (utils/after 100 #(router/nav! (oc-urls/stakeholder-update-preview))))
     (when-not (= (:company-data next-props) (:company-data data))
       (om/set-state! owner (get-state owner next-props (om/get-state owner))))
-    (when-not (:read-only (:company-data next-props))
-      (get-new-sections-if-needed owner))
     (let [company-data            (:company-data next-props)
           topics                  (vec (:sections company-data))
           no-placeholder-sections (utils/filter-placeholder-sections topics company-data)]
@@ -462,7 +449,8 @@
                                   :card-width card-width
                                   :selected-metric selected-metric
                                   :total-width total-width
-                                  :content-loaded (not (:loading data))
+                                  :content-loaded (:content-loaded data)
+                                  :loading (:loading data)
                                   :topics company-topics
                                   :new-sections (:new-sections data)
                                   :company-data company-data

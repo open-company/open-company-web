@@ -53,9 +53,9 @@
     (partition-all chunk-size items)))
 
 (rum/defcs add-topic
-  < (rum/local true ::expanded?)
-  [s {:keys [active-topics archived-topics column update-active-topics]}]
-  (if @(::expanded? s)
+  < (rum/local false ::expanded?)
+  [s {:keys [active-topics archived-topics column update-active-topics initially-expanded]}]
+  (if (or @(::expanded? s) initially-expanded)
     (let [all-sections (into {} (for [s (get-all-sections)]
                                   [(keyword (:section s)) s]))
           slug (keyword (router/current-company-slug))
@@ -63,7 +63,7 @@
           inactive-not-archived (filterv (complement (cs/union (set active-topics) (set archived-topics)))
                                          topic-order)
           chunked (chunk-topics inactive-not-archived archived-topics)]
-      [:div.card.p--card
+      [:div.card.p--card.m--card
        [:div.open-sans.small-caps.bold.mb2.gray5
         [:span.mr1 "Suggested Topics"]
         [:span.dimmed-gray.btn-reset.right
