@@ -150,7 +150,7 @@
                 ;; growth metric currently shown
                 (when (and focus (seq (:metric-data subsection-data)))
                   (om/build growth-metric subsection-data {:opts options}))
-                (when (pos? (count growth-metric-slugs))
+                (when (or (> (count growth-metric-slugs) 1) editable?)
                   (render-pillboxes owner editable? editing-cb options))
                 (when editable?
                   (dom/button {:class "btn-reset chart-pencil-button"

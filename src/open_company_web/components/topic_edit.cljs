@@ -226,10 +226,11 @@
   (init-state [_]
     (let [topic      (dis/foce-section-key)
           topic-data (dis/foce-section-data)
-          body       (:body topic-data)]
+          body       (:body topic-data)
+          has-data?  (not-empty (:data topic-data))]
       {:initial-headline (utils/emojify (:headline topic-data))
        :body-placeholder (or (:body-placeholder topic-data) "")
-       :initial-body  (utils/emojify (if (:placeholder topic-data) "" body))
+       :initial-body  (utils/emojify (if (and (:placeholder topic-data) (not has-data?)) "" body))
        :initially-pinned (:pin topic-data)
        :char-count nil
        :char-count-alert false
@@ -242,8 +243,7 @@
     ;; update body placeholder when receiving data from API
     (let [topic        (dis/foce-section-key)
           company-data (dis/company-data)
-          topic-data   (get company-data (keyword topic))
-          body         (:body topic-data)]
+          topic-data   (get company-data (keyword topic))]
       (om/set-state! owner :body-placeholder (or (:body-placeholder topic-data) ""))))
 
   (will-unmount [_]
