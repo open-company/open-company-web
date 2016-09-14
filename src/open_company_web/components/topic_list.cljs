@@ -28,8 +28,6 @@
             [goog.fx.dom :refer (Fade Slide)]
             [cljsjs.hammer]))
 
-(def min-no-placeholder-section-enable-share 1)
-
 (def scrolled-to-top (atom false))
 
 ;; ===== Utility functions =====
@@ -314,13 +312,6 @@
       (do (destroy-draggable) (utils/after 1 #(setup-draggable owner)))
       (destroy-draggable))))
 
-(defn can-edit-sections? [company-data]
-  (let [company-topics (vec (map keyword (:sections company-data)))]
-    (and (not (responsive/is-mobile-size?))
-         (responsive/can-edit?)
-         (not (:read-only company-data))
-         (>= (count (utils/filter-placeholder-sections company-topics company-data)) min-no-placeholder-section-enable-share))))
-
 (def card-x-margins 20)
 (def columns-layout-padding 20)
 
@@ -384,7 +375,7 @@
         ;; will conflict with it
         (destroy-draggable)
         ;; else setup draggable as usuale
-        (when (can-edit-sections? (:company-data data))
+        (when (utils/can-edit-sections? (:company-data data))
           (manage-draggable owner)))))
 
   (render-state [_ {:keys [active-topics
@@ -410,7 +401,7 @@
                             3 (str (+ (* card-width 3) (* card-x-margins 3) (* columns-layout-padding 2) 1) "px")
                             2 (str (+ (* card-width 2) (* card-x-margins 2) (* columns-layout-padding 2) 1) "px")
                             1 (if (>= ww responsive/c1-min-win-width) (str card-width "px") "auto"))
-          can-edit-secs   (can-edit-sections? company-data)]
+          can-edit-secs   (utils/can-edit-sections? company-data)]
       (dom/div {:class (utils/class-set {:topic-list true
                                          :group true
                                          :dragging dragging
@@ -418,12 +409,6 @@
                 :style {:margin-top (if selected-topic "0px" "84px")}
                 :data-rerender rerender
                 :key (str "topic-list-" rerender)}
-        ;; Activate sharing mode button
-        (when can-edit-secs
-          (dom/div {:class "sharing-button-container"
-                    :style #js {:width total-width}}
-            (dom/button {:class "btn-reset btn-solid sharing-button right"
-                         :on-click #(router/nav! (oc-urls/stakeholder-update-preview company-slug))} "SHARE AN UPDATE " (dom/i {:class "fa fa-share"}))))
         ;; Fullscreen topic
         (when selected-topic
           (dom/div {:class "selected-topic-container"

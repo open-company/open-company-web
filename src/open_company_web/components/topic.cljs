@@ -71,7 +71,9 @@
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
-          truncated-body      (if (utils/is-test-env?) topic-body (.truncate js/$ topic-body (clj->js {:length 500 :words true})))
+          truncated-body      (if (utils/is-test-env?)
+                                topic-body
+                                (.truncate js/$ topic-body (clj->js {:length utils/topic-body-limit :words true})))
           company-data        (dis/company-data)
           {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
 
@@ -126,11 +128,11 @@
                       :ref "topic-body"
                       :dangerouslySetInnerHTML (utils/emojify truncated-body)})
         ; if it's SU preview or SU show only read-more
-        (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
-                (utils/in? (:route @router/path) "su-snapshot"))
-          (dom/div {:class "left"
-                    :style {:margin-bottom "28px"}}
-            (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic owner nil false))))
+        (if is-stakeholder-update
+          (when (utils/exceeds-topic-body-limit topic-body)
+            (dom/div {:class "left"
+                    :style {:margin-bottom "20px"}}
+              (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic owner nil false)))))
           (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic owner nil false)) {:opts options}))))))
 
 (defn animate-revision-navigation [owner]
@@ -223,6 +225,7 @@
                                                  :not-draggable-topic (not (:pin topic-data))
                                                  :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
+                    :style #js {:width (str card-width "px")}
                     :ref "topic"
                     :data-section (name section)
                     :key (str "topic-" (name section))
@@ -239,10 +242,10 @@
         (when show-share-remove
           (dom/div {:class "share-dnd-container"
                     :id (str "share-dnd-" (name section))}
-            (dom/button {:class "btn-reset share-dnd"
-                         :data-toggle "tooltip"
-                         :data-placement "bottom"
-                         :title "Drag and drop topic to reorder."}
+            (dom/div {:class "btn-reset share-dnd"
+                      :data-toggle "tooltip"
+                      :data-placement "bottom"
+                      :title "Drag and drop topic to reorder."}
               (dom/i {:class "fa fa-arrows"}))))
         (dom/div #js {:className "topic-anim group"
                       :key (str "topic-anim-" as-of "-" transition-as-of)

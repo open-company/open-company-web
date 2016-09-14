@@ -37,12 +37,16 @@ div.su-snapshot-preview {
       color: $oc_gray_2;
       color: #D8D8D8;
       text-align: center;
-      width: 690px;
-      margin-left: -345px;
+      max-width: 460px;
+      margin-left: -230px;
       left: 50%;
       position: absolute;
-      margin-top: 17px;
+      margin-top: 20px;
       font-size: 16px;
+
+      @media screen and (max-width: 950px) {
+        display: none;
+      }
     }
 
     div.share-su {
@@ -113,15 +117,16 @@ div.su-snapshot-preview {
     div.topics-columns div.topics-column-container.columns-1 {  
 
       div.topics-column {
-        max-width: 640px !important;
+        max-width: 100%;
 
         div.topic-row {
-          padding-bottom: 0px;
-          padding-right: 40px;
-          padding-left: 40px;
           border: 0px solid transparent;
+          position: relative;
+          left: 50%;
+          margin-bottom: 0px;
+          padding: 0px 0px 22px 0px;
 
-          &:hover {
+          &.hover, &:hover {
             div.share-remove-container {
               display: block;
             }
@@ -213,8 +218,5 @@ div.su-snapshot-preview {
 }
 
 div.sortable-placeholder {
-  background-color: rgba(78, 90, 107, 0.2);
-  margin-bottom: 33px;
-  margin-left: 40px;
-  margin-right: 40px;
+  margin: 0px auto 22px;
 }

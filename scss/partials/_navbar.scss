@@ -79,6 +79,16 @@ nav.oc-navbar {
     ul.navbar-right {
       float: right;
       margin-right: 0px;
+
+      div.sharing-button-container{
+        float: left;
+        margin-right: 10px;
+        margin-top: 10px;
+      }
+
+      div.user-avatar {
+        float: right;
+      }
     }
   }
 }

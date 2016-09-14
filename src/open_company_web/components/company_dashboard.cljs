@@ -46,6 +46,7 @@
                                 :company-data company-data
                                 :card-width card-width
                                 :columns-num columns-num
+                                :show-share-su-button (utils/can-edit-sections? company-data)
                                 :menu-open menu-open
                                 :auth-settings (:auth-settings data)}))
             (when company-data
