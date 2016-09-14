@@ -37,12 +37,16 @@ div.su-snapshot-preview {
       color: $oc_gray_2;
       color: #D8D8D8;
       text-align: center;
-      width: 690px;
-      margin-left: -345px;
+      max-width: 460px;
+      margin-left: -230px;
       left: 50%;
       position: absolute;
       margin-top: 17px;
       font-size: 16px;
+
+      @media screen and (max-width: 950px) {
+        display: none;
+      }
     }
 
     div.share-su {
