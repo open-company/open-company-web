@@ -435,6 +435,7 @@
           (dom/div {:class "sharing-button-container"
                     :style #js {:width total-width}}
             (dom/button {:class "btn-reset btn-solid sharing-button right"
+                         :disabled (not (nil? (dispatcher/foce-section-key)))
                          :on-click #(router/nav! (oc-urls/stakeholder-update-preview company-slug))} "SHARE AN UPDATE " (dom/i {:class "fa fa-share"}))))
         ;; Fullscreen topic
         (when selected-topic
