@@ -9,6 +9,7 @@ resources/public/js/compiled/
 .lein-*
 .repl
 .nrepl-port
+.nrepl-history
 .DS_Store
 *.sublime-*
 .idea*
