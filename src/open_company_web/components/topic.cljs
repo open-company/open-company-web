@@ -183,7 +183,8 @@
                              sharing-mode
                              share-selected
                              archived-topics
-                             show-share-remove] :as data} owner options]
+                             show-share-remove
+                             is-stakeholder-update] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
@@ -222,7 +223,8 @@
                   (om/set-state! owner :transition-as-of (:updated-at rev))
                   (utils/event-stop e))
           foce-active (not (nil? (dis/foce-section-key)))
-          is-foce (= (dis/foce-section-key) section-kw)]
+          is-foce (= (dis/foce-section-key) section-kw)
+          window-width (.width (js/$ js/window))]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -237,7 +239,8 @@
                                                  :not-draggable-topic (not (:pin topic-data))
                                                  :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
-                    :style #js {:width (str card-width "px")}
+                    :style #js {:width (str card-width "px")
+                                :marginLeft (when (utils/in? (:route @router/path) "su-snapshot-preview") (str (/ (- window-width card-width) 2) "px"))}
                     :ref "topic"
                     :data-section (name section)
                     :key (str "topic-" (name section))

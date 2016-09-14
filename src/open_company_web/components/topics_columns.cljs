@@ -206,7 +206,6 @@
                           :ref section-name
                           :onMouseOver #(om/set-state! owner :hovering section-name)
                           :onMouseOut #(om/set-state! owner :hovering nil)
-                          :style #js {:marginLeft (if (:is-stakeholder-update props) (str "-" (/ (:card-width props) 2) "px") "auto")}
                           :key (str "topic-row-" (name section-name))}
               (om/build topic {:loading (:loading company-data)
                                :section section-name
