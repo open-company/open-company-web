@@ -17,7 +17,9 @@
   (let [value (get data selected-key)
         abs-value (utils/abs (or value 0))
         short-value (utils/with-metric-prefix abs-value)]
-    (str cur-symbol short-value)))
+    (if (s/blank? value)
+      "-"
+      (str cur-symbol short-value))))
 
 (defn- get-runway-label [selected-key data]
   (let [value (get data selected-key)
