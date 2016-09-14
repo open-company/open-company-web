@@ -81,15 +81,11 @@
       (om/update-state! owner :select2-initialized (fn [_]true)))))
 
 (defn- get-presets [data]
-  (let [slugs (:slugs data)
-        slug (keyword (router/current-company-slug))
-        all-sections (:templates (slug @new-sections))
-        growth-defaults (first (filter #(= (:section-name %) "growth") all-sections))
-        all-metrics (:metrics growth-defaults)
-        available-metrics (vec (filter #(not (utils/in? slugs (:slug %))) all-metrics))]
+  (let [slug (keyword (router/current-company-slug))
+        all-sections (:new-sections (slug @new-sections)) ; get new sections templates from cache
+        growth-defaults (first (filter #(= (:section-name %) "growth") all-sections))]
     {:intervals (:intervals growth-defaults)
-     :units (:units growth-defaults)
-     :metrics available-metrics}))
+     :units (:units growth-defaults)}))
 
 (defn- save-metric-info [owner save-cb new?]
   (let [slug (om/get-state owner :metric-slug)]
