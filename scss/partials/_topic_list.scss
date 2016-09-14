@@ -34,6 +34,7 @@ div.topic-list{
   position: relative;
   content: "";
   padding-bottom: 20px;
+  padding-top: 10px;
   min-height: calc(100vh - #{$footer_height}px);
 
   &.editable {
