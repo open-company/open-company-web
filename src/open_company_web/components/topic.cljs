@@ -237,6 +237,7 @@
                                                  :not-draggable-topic (not (:pin topic-data))
                                                  :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
+                    :style #js {:width (str card-width "px")}
                     :ref "topic"
                     :data-section (name section)
                     :key (str "topic-" (name section))
@@ -255,10 +256,10 @@
         (when show-share-remove
           (dom/div {:class "share-dnd-container"
                     :id (str "share-dnd-" (name section))}
-            (dom/button {:class "btn-reset share-dnd"
-                         :data-toggle "tooltip"
-                         :data-placement "bottom"
-                         :title "Drag and drop topic to reorder."}
+            (dom/div {:class "btn-reset share-dnd"
+                      :data-toggle "tooltip"
+                      :data-placement "bottom"
+                      :title "Drag and drop topic to reorder."}
               (dom/i {:class "fa fa-arrows"}))))
         (dom/div #js {:className "topic-anim group"
                       :key (str "topic-anim-" as-of "-" transition-as-of)
