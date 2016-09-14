@@ -307,6 +307,7 @@
     (when-not (.draggable list-node "instance")
       (.draggable list-node #js {:addClasses "dragging"
                                  :drag #(dragging owner % false)
+                                 :handle ".topic-dnd-handle"
                                  :scroll true
                                  :start #(.addClass (js/$ (sel1 [:div.topics-columns])) "dragging-topic")
                                  :stop #(dragging owner % true)}))))

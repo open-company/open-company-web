@@ -41,6 +41,10 @@ div.topic {
     opacity: 0.5;
   }
 
+  div.topic-dnd-handle {
+    cursor: move;
+  }
+
   div.share-remove-container{
     width: 30px;
     height: 30px;
