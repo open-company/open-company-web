@@ -200,7 +200,7 @@
         (let [sd (->> section-name keyword (get topics-data))]
           (when-not (and (:read-only company-data) (:placeholder sd))
             (dom/div #js {:className (utils/class-set {:topic-row true
-                                                       :draggable (:pin sd)
+                                                       :draggable-topic (:pin sd)
                                                        :hover hovering?})
                           :data-topic (name section-name)
                           :ref section-name
