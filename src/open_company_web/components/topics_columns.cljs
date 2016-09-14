@@ -185,7 +185,8 @@
           hovering-topic        (om/get-state owner :hovering)
           hovering?             (or (and (not (nil? hovering-topic))
                                          (= section-name hovering-topic))
-                                    (and (= section-name (name first-topic))
+                                    (and first-topic
+                                         (= section-name (name first-topic))
                                          (nil? hovering-topic)
                                          (<= window-scroll 188)))]
       (if (= section-name "add-topic")

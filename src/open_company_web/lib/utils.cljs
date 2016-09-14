@@ -16,6 +16,7 @@
             [open-company-web.lib.iso4217 :refer (iso4217)]
             [open-company-web.caches :refer (company-cache)]
             [open-company-web.local-settings :as ls]
+            [open-company-web.lib.responsive :as responsive]
             [cljsjs.emojione]) ; pulled in for cljsjs externs
   (:import  [goog.i18n NumberFormat]))
 
@@ -792,3 +793,12 @@
 
 (defn exceeds-topic-body-limit [body]
   (> (count (strip-HTML-tags body)) topic-body-limit))
+
+(def min-no-placeholder-section-enable-share 1)
+
+(defn can-edit-sections? [company-data]
+  (let [company-topics (vec (map keyword (:sections company-data)))]
+    (and (not (responsive/is-mobile-size?))
+         (responsive/can-edit?)
+         (not (:read-only company-data))
+         (>= (count (filter-placeholder-sections company-topics company-data)) min-no-placeholder-section-enable-share))))

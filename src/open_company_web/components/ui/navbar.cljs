@@ -19,7 +19,7 @@
     (.preventDefault e))
   (dis/toggle-menu))
 
-(defcomponent navbar [{:keys [company-data columns-num card-width latest-su link-loading email-loading slack-loading menu-open] :as data} owner options]
+(defcomponent navbar [{:keys [company-data columns-num card-width latest-su link-loading email-loading slack-loading menu-open show-share-su-button] :as data} owner options]
 
   (render [_]
     (let [header-width (+ (* card-width columns-num)    ; cards width
@@ -39,5 +39,11 @@
                   (dom/div {:on-click (partial menu-click owner)}
                     (i/icon :menu-34 {}))
                   (if (jwt/jwt)
-                    (user-avatar (partial menu-click owner))
+                    (dom/div {}
+                      (when show-share-su-button
+                        (dom/div {:class "sharing-button-container"}
+                          (dom/button {:class "btn-reset btn-outline sharing-button right"
+                                       :disabled (not (nil? (dis/foce-section-key)))
+                                       :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} (dom/i {:class "fa fa-share"}) " SHARE AN UPDATE")))
+                      (user-avatar (partial menu-click owner)))
                     (login-button (:auth-settings data))))))))))))
