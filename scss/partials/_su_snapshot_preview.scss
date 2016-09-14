@@ -117,15 +117,16 @@ div.su-snapshot-preview {
     div.topics-columns div.topics-column-container.columns-1 {  
 
       div.topics-column {
-        max-width: 640px !important;
+        max-width: 100%;
 
         div.topic-row {
-          padding-bottom: 0px;
-          padding-right: 40px;
-          padding-left: 40px;
           border: 0px solid transparent;
+          position: relative;
+          left: 50%;
+          margin-bottom: 0px;
+          padding: 0px 0px 22px 0px;
 
-          &:hover {
+          &.hover, &:hover {
             div.share-remove-container {
               display: block;
             }
@@ -217,8 +218,5 @@ div.su-snapshot-preview {
 }
 
 div.sortable-placeholder {
-  background-color: rgba(78, 90, 107, 0.2);
-  margin-bottom: 33px;
-  margin-left: 40px;
-  margin-right: 40px;
+  margin: 0px auto 22px;
 }

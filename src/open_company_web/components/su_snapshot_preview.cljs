@@ -59,7 +59,6 @@
                               :placeholder "sortable-placeholder"
                               :items ".topic-row"
                               :axis "y"
-                              :handle ".topic"
                               :stop #(om/set-state! owner :su-topics (ordered-topics-list))
                               :opacity 1})))
 
