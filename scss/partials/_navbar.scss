@@ -83,12 +83,19 @@ nav.oc-navbar {
       div.sharing-button-container{
         float: left;
         margin-right: 10px;
-        margin-top: 13px;
+        margin-top: 16px;
         color: #1E81C4;
         border: 0px solid transparent;
 
         button.sharing-button {
-          font-weight: 700;
+          font-weight: 400;
+          font-size: 12px;
+          font-family: $oc_headers_font;
+
+          i.fa.fa-share {
+            color: rgba(78, 90, 107, 0.8);
+            margin-right: 7px;
+          }
         }
       }
 
