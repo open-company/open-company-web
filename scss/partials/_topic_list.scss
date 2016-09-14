@@ -37,13 +37,6 @@ div.topic-list{
   padding-top: 15px;
   min-height: calc(100vh - #{$footer_height}px);
 
-  &.editable {
-    div.topic-row div.topic div.topic-body a{
-      pointer-events: none;
-      cursor: default;
-    }
-  }
-
   @include mobile(){
     background-color: #d9d9d9;
   }

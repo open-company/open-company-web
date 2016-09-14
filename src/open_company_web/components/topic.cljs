@@ -96,7 +96,7 @@
               :else
               (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options}))))
         ;; Topic title
-        (dom/div {:class "group"}
+        (dom/div {:class "topic-dnd-handle group"}
           (dom/div {:class "topic-title"} (:title topic-data))
           (when (and (not is-stakeholder-update)
                      (:pin topic-data)
