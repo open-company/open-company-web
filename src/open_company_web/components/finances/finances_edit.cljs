@@ -100,9 +100,13 @@
     0
     v))
 
-(defn finances-check-value [v]
+(defn- finances-check-value
+  "Return true if the value is a number."
+  [v]
   (and (not (= v ""))
-       (not (nil? v))))
+       (not (nil? v))
+       (not (js/isNaN v))))
+
 
 (defn finances-fix-row [row]
   (let [fixed-cash (update-in row [:cash] finances-get-value)
@@ -117,14 +121,21 @@
       (finances-check-value (:costs row))
       (finances-check-value (:revenue row))))
 
-(defn change-finances-data [owner row]
-  (when (finances-row-has-data row)
-    (let [fixed-row (finances-fix-row row)
-          period (:period fixed-row)
-          finances-data (om/get-state owner :finances-data)
-          fixed-data (assoc finances-data period fixed-row)]
-      ;(om/set-state! owner :has-changes (or (om/get-state owner :has-changes) (not= finances-data fixed-data)))
-      (om/set-state! owner :finances-data fixed-data))))
+(defn change-finances-data
+  "Update the local state of growth data with change from the user."
+  [owner row]
+  (.log js/console (str row))
+  (let [has-data? (finances-row-has-data row)
+        fixed-row (when has-data? (finances-fix-row row))
+        period (:period row)
+        finances-data (om/get-state owner :finances-data)
+        fixed-data (if has-data? 
+                      (assoc finances-data period fixed-row)
+                      (dissoc finances-data period))]
+    (.log js/console has-data?)
+    (.log js/console (str fixed-data))
+    ;(om/set-state! owner :has-changes (or (om/get-state owner :has-changes) (not= finances-data fixed-data)))
+    (om/set-state! owner :finances-data fixed-data)))
 
 (defn finances-clean-row [data]
   ; a data entry is good if we have the period and one other value: cash, costs or revenue
