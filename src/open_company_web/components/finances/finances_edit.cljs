@@ -124,7 +124,6 @@
 (defn change-finances-data
   "Update the local state of growth data with change from the user."
   [owner row]
-  (.log js/console (str row))
   (let [has-data? (finances-row-has-data row)
         fixed-row (when has-data? (finances-fix-row row))
         period (:period row)
@@ -132,8 +131,6 @@
         fixed-data (if has-data? 
                       (assoc finances-data period fixed-row)
                       (dissoc finances-data period))]
-    (.log js/console has-data?)
-    (.log js/console (str fixed-data))
     ;(om/set-state! owner :has-changes (or (om/get-state owner :has-changes) (not= finances-data fixed-data)))
     (om/set-state! owner :finances-data fixed-data)))
 
