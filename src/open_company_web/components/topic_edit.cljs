@@ -37,6 +37,11 @@
 (def before-unload-message "You have unsaved edits. Are you sure you want to leave this topic?")
 (def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
 
+(defn focus-headline []
+  (when-let [headline (sel1 [(str "div#foce-headline-" (name (dis/foce-section-key)))])]
+    (.focus headline)
+    (utils/to-end-of-content-editable headline)))
+
 (defn- scroll-to-topic-top [topic]
   (let [body-scroll (.-scrollTop (.-body js/document))
         topic-scroll-top (utils/offset-top topic)]
@@ -132,11 +137,6 @@
       (js/filepicker.storeUrl file success-cb error-cb progress-cb)
       file
       (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
-
-(defn focus-headline []
-  (when-let [headline (sel1 [(str "div#foce-headline-" (name (dis/foce-section-key)))])]
-    (.focus headline)
-    (utils/to-end-of-content-editable headline)))
 
 (defn handle-navigate-event [current-token owner e]
     ;; only when the URL is changing
@@ -491,11 +491,27 @@
                                           (dis/dispatch! [:topic-archive (name section)])
                                           (dis/dispatch! [:start-foce nil])))} "CANCEL")))
 
-        ;; Onboarding toolip
-        (when show-first-edit-tip
+        ;; Onboarding toolips
+        (when (and show-first-edit-tip (not is-data?))
           (onboard-tip
             {:id (str "content-topic-add-" company-slug)
              :once-only true
              :mobile false
              :desktop "What would you like to say? You can add text, emoji and images."
+             :dismiss-tip-fn focus-headline}))
+
+        (when (and (= section-kw :growth) no-data?)
+          (onboard-tip
+            {:id (str "growth-topic-add-" company-slug)
+             :once-only true
+             :mobile false
+             :desktop "Add simple charts to share company performance."
+             :dismiss-tip-fn focus-headline}))
+
+        (when (and (= section-kw :finances) no-data?)
+          (onboard-tip
+            {:id (str "finance-topic-add-" company-slug)
+             :once-only true
+             :mobile false
+             :desktop "Add a chart to share revenue, expenses and cash."
              :dismiss-tip-fn focus-headline})))))))

@@ -8,8 +8,7 @@ pom.xml
 resources/public/js/compiled/
 .lein-*
 .repl
-.nrepl-port
-.nrepl-history
+.nrepl-*
 .DS_Store
 *.sublime-*
 .idea*

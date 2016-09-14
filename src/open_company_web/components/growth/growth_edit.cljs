@@ -10,7 +10,6 @@
             [open-company-web.components.ui.cell :refer (cell)]
             [open-company-web.components.growth.growth-metric-edit :refer (growth-metric-edit)]
             [open-company-web.components.ui.utility-components :refer (editable-pen)]
-            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [cljs.core.async :refer (put!)]))
@@ -25,12 +24,13 @@
 
 (defcomponent growth-edit-row [{:keys [interval is-last change-cb next-period prefix suffix] :as data} owner]
 
+
   (render [_]
+
     (let [growth-data (:cursor data)
           is-new (and (not (:value growth-data)) (:new growth-data))
           value (:value growth-data)
           period (:period growth-data)
-          period-month (utils/get-month period interval)
           flags [:short :skip-year]
           period-string (utils/get-period-string period interval flags)
           cell-state (if is-new :new :display)
@@ -39,8 +39,9 @@
                      (= k :value)
                      (when next-period
                        (signal-tab next-period :value))))
-          needs-year? (or (= period-month "JAN")
-                          (:needs-year data))]
+          needs-year? (or (:needs-year data)
+                          (and (not= interval "weekly")
+                               (= (utils/get-month period interval) "JAN")))]
 
       (dom/tbody {}
         (dom/tr {:class "growth-edit-row"}
@@ -64,7 +65,7 @@
         (when needs-year?
           (dom/tr {}
             (dom/th {:class "no-cell year"}
-              (utils/get-year period))
+              (utils/get-year period interval))
             (dom/td {:class "no-cell"})))))))
 
 ;; ===== Growth Metric Metadata Functions =====
@@ -186,7 +187,7 @@
 
 ;; ===== Growth Data Editing Component =====
 
-(defcomponent growth-edit [{:keys [editing-cb show-first-edit-tip first-edit-tip-cb new-metric?] :as data} owner options]
+(defcomponent growth-edit [{:keys [editing-cb first-edit-tip-cb new-metric?] :as data} owner options]
 
   (init-state [_]
     {:metadata-edit? new-metric? ; not editing metric metadata
@@ -298,13 +299,4 @@
                     (dom/button {:class "btn-reset btn-outline"
                                  :on-click #(do
                                               (utils/event-stop %)
-                                              (editing-cb false))} "CANCEL"))))
-
-            ;; Onboarding toolip
-            (when (:show-first-edit-tip data)
-              (onboard-tip
-                {:id (str "growth-topic-add-" company-slug)
-                 :once-only true
-                 :mobile false
-                 :desktop "Add metrics you'd like to share and we'll build simple charts for you."
-                 :dismiss-tip-fn (:first-edit-tip-cb data)})))))))))
+                                              (editing-cb false))} "CANCEL")))))))))))

@@ -6,7 +6,6 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.components.ui.cell :refer (cell)]
-            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.lib.finance-utils :as finance-utils]
             [cljs.core.async :refer (put!)]))
 
@@ -204,13 +203,4 @@
               (dom/button {:class "btn-reset btn-outline"
                            :on-click #(do
                                         (utils/event-stop %)
-                                        (editing-cb false))} "CANCEL"))))
-
-        ;; Onboarding toolip
-        (when show-first-edit-tip
-          (onboard-tip
-            {:id (str "finance-topic-add-" company-slug)
-             :once-only true
-             :mobile false
-             :desktop "Enter revenue, expenses and cash to create a simple chart."
-             :dismiss-tip-fn first-edit-tip-cb}))))))
+                                        (editing-cb false))} "CANCEL"))))))))
