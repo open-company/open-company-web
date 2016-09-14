@@ -62,7 +62,7 @@
                              :sub-label-color (occ/get-color-by-kw :oc-gray-5)
                              :labels {:value {:position :bottom
                                               :order 1
-                                              :value-presenter #(:label %2)
+                                              :value-presenter #(or (:label %2) "-")
                                               :value (occ/get-color-by-kw :oc-gray-5) 
                                               :label-presenter #(:sub-label %2)
                                               :label-color (occ/get-color-by-kw :oc-gray-5)}}
