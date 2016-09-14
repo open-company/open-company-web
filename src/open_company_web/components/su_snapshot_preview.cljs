@@ -40,13 +40,6 @@
     (api/patch-stakeholder-update {:title (or title "")
                                    :sections topics})))
 
-(defn focus-title [owner]
-  (when-not (om/get-state owner :title-focused)
-    (when-let [preview-title (.findDOMNode js/ReactDOM (om/get-ref owner "preview-title"))]
-      (.focus preview-title)
-      (set! (.-value preview-title) (.-value preview-title))
-      (om/set-state! owner :title-focused true))))
-
 (defn share-clicked [owner]
  (patch-stakeholder-update owner)
  (om/set-state! owner :show-su-dialog :prompt))
@@ -100,8 +93,7 @@
   (did-mount [_]
     (om/set-state! owner :did-mount true)
     (setup-sortable owner options)
-    (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))
-    (focus-title owner))
+    (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
 
   (will-receive-props [_ next-props]
     (when-not (= (dis/company-data data) (dis/company-data next-props))
@@ -122,7 +114,6 @@
           (om/set-state! owner :show-su-dialog true)))))
 
   (did-update [_ _ _]
-    (focus-title owner)
     (setup-sortable owner options))
 
   (render-state [_ {:keys [columns-num
@@ -140,7 +131,12 @@
           su-data      (stakeholder-update-data data)
           card-width   (responsive/calc-card-width 1)
           ww           (.-clientWidth (sel1 js/document :body))
-          total-width  (if (>= ww responsive/c1-min-win-width) (str (min ww (+ card-width (* topic-row-x-padding 2))) "px") "auto")
+          title-width  (if (>= ww responsive/c1-min-win-width)
+                          (str (min ww card-width) "px")
+                          "auto")
+          total-width  (if (>= ww responsive/c1-min-win-width)
+                          (str (min ww (+ card-width (* topic-row-x-padding 2))) "px")
+                          "auto")
           su-subtitle  (str "— " (utils/date-string (js/Date.) [:year]))
           possible-sections (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
           topics-to-add (sort #(compare (title-from-section-name owner %1) (title-from-section-name owner %2)) (reduce utils/vec-dissoc possible-sections su-topics))]
@@ -169,11 +165,6 @@
           (when company-data
             (dom/div {:class "su-sp-content"
                       :key (apply str su-topics)}
-              (dom/div {:class "su-sp-company-header"}
-                (dom/div {}
-                  (dom/img {:class "company-logo" :src (:logo company-data)}))
-                (dom/div {}
-                  (dom/span {:class "company-name"} (:name company-data))))
               (when (:title su-data)
                 (dom/div {:class "preview-title-container"}
                   (dom/input #js {:className "preview-title"
@@ -181,9 +172,9 @@
                                   :type "text"
                                   :value title
                                   :ref "preview-title"
-                                  :placeholder "Optional Title, e.g., Monthly Update"
+                                  :placeholder (str "Optional Title, e.g. " (:name company-data) " Monthly Update")
                                   :onChange #(om/set-state! owner :title (.. % -target -value))
-                                  :style #js {:width total-width}})))
+                                  :style #js {:width title-width}})))
               (when show-su-dialog
                 (om/build su-preview-dialog {:selected-topics (:sections su-data)
                                              :company-data company-data

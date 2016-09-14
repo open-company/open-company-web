@@ -74,33 +74,10 @@ div.su-snapshot-preview {
   div.su-sp-content {
     padding-bottom: 20px;
 
-    div.su-sp-company-header {
-      height: 50px;
-      text-align: center;
-
-      div {
-        margin-top: 10px;
-      }
-
-      img.company-logo {
-        max-height: 50px;
-        max-width: 150px;
-        margin-top: -5px;
-      }
-
-      span.company-name {
-        margin-top: 0px;
-        font-weight: 700;
-        font-size: 24px;
-        line-height: 1.2;
-        color: $oc_gray_5;
-      }
-    }
-
     div.preview-title-container {
       width: 100%;
       text-align: center;
-      margin: 50px auto;
+      margin: 50px auto 30px;
 
       input.preview-title {
         font-weight: 400;
@@ -109,9 +86,13 @@ div.su-snapshot-preview {
         color: $oc_gray_5;
         text-align: center;
         outline: none;
-        border: 1px solid transparent;
         background-color: transparent;
         border-radius: 2px;
+        border: 1px solid rgba(78, 90, 107, 0.2);
+
+        &:focus {
+          border: 1px solid transparent;
+        }
 
         @include placeholder {
           font-style: italic;
@@ -135,7 +116,7 @@ div.su-snapshot-preview {
         max-width: 640px !important;
 
         div.topic-row {
-          padding-bottom: 33px;
+          padding-bottom: 0px;
           padding-right: 40px;
           padding-left: 40px;
           border: 0px solid transparent;
