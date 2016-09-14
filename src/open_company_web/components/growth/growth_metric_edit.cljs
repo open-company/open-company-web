@@ -45,8 +45,7 @@
   ; get needed states
   (let [req-libs-loaded (om/get-state owner :req-libs-loaded)
         did-mount (om/get-state owner :did-mount)
-        select2-initialized (om/get-state owner :select2-initialized)
-        change-cb (:change-growth-metric-cb data)]
+        select2-initialized (om/get-state owner :select2-initialized)]
     ; check if we are ready to initialize the widget and if we haven't aready done that
     (when (and req-libs-loaded did-mount (not select2-initialized))
       ; init unit dropdown
@@ -58,9 +57,8 @@
         (.on "change" (fn [e]
                         (let [unit-value (.. e -target -value)
                               slug (om/get-state owner :metric-slug)]
-                          (om/set-state! owner :unit unit-value)
-                          (when slug
-                            (change-cb slug {:unit unit-value}))))))
+                          (om/set-state! owner :unit unit-value)))))
+
       ; init interval dropdown
       (doto (js/$ "select#mtr-interval")
         (.select2 (clj->js {"placeholder" "Metric interval"
@@ -70,9 +68,7 @@
         (.on "change" (fn [e]
                         (let [interval-value (.. e -target -value)
                               slug (om/get-state owner :metric-slug)]
-                          (om/set-state! owner :interval interval-value)
-                          (when slug
-                            (change-cb slug {:interval interval-value}))))))
+                          (om/set-state! owner :interval interval-value)))))
 
       ; focus name
       (.focus (js/$ "input#mtr-name"))
