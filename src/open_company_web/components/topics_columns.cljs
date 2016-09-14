@@ -176,7 +176,18 @@
           topic-click           (or (:topic-click options) identity)
           update-active-topics  (or (:update-active-topics options) identity)
           share-selected?       (utils/in? share-selected-topics section-name)
-          slug                  (keyword (router/current-company-slug))]
+          slug                  (keyword (router/current-company-slug))
+          window-scroll         (.-scrollTop (.-body js/document))
+          {:keys [pinned other]} (utils/get-pinned-other-keys topics (dis/company-data))
+          first-topic           (if (pos? (count pinned))
+                                  (first pinned)
+                                  (first other))
+          hovering-topic        (om/get-state owner :hovering)
+          hovering?             (or (and (not (nil? hovering-topic))
+                                         (= section-name hovering-topic))
+                                    (and (= section-name (name first-topic))
+                                         (nil? hovering-topic)
+                                         (<= window-scroll 188)))]
       (if (= section-name "add-topic")
         (at/add-topic {:column column
                        :archived-topics (mapv (comp keyword :section) (:archived company-data))
@@ -187,9 +198,14 @@
                        :update-active-topics update-active-topics})
         (let [sd (->> section-name keyword (get topics-data))]
           (when-not (and (:read-only company-data) (:placeholder sd))
-            (dom/div #js {:className (str "topic-row" (when (:pin sd) " draggable-topic"))
+            (dom/div #js {:className (utils/class-set {:topic-row true
+                                                       :draggable (:pin sd)
+                                                       :hover hovering?})
                           :data-topic (name section-name)
                           :ref section-name
+                          :onMouseOver #(om/set-state! owner :hovering section-name)
+                          :onMouseOut #(om/set-state! owner :hovering nil)
+                          :style #js {:marginLeft (if (:is-stakeholder-update props) (str "-" (/ (:card-width props) 2) "px") "auto")}
                           :key (str "topic-row-" (name section-name))}
               (om/build topic {:loading (:loading company-data)
                                :section section-name
@@ -215,7 +231,8 @@
                                       card-width
                                       topics
                                       company-data
-                                      topics-data] :as data} owner options]
+                                      topics-data
+                                      is-stakeholder-update] :as data} owner options]
 
   (did-mount [_]
     (when (> columns-num 1)
@@ -226,7 +243,7 @@
               (not= (:columns-num next-props) (:columns-num data)))
       (om/set-state! owner :best-layout (calc-layout owner next-props))))
 
-  (render-state [_ {:keys [best-layout]}]
+  (render-state [_ {:keys [best-layout hovering]}]
     (let [show-add-topic         (add-topic? owner)
           partial-render-topic   (partial render-topic owner options)
           {:keys [pinned other]} (utils/get-pinned-other-keys topics (dis/company-data))
@@ -285,7 +302,7 @@
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
-                    :style #js {:width total-width}
+                    :style #js {:width (if is-stakeholder-update "100%" total-width)}
                     :key columns-container-key}
             (dom/div {:class "topics-column"}
               (dom/div #js {:className "topics-column-pinned"}
