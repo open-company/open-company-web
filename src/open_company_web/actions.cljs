@@ -61,13 +61,13 @@
       (swap! cache/new-sections assoc-in [(keyword slug) :new-sections] (:templates response))
       (swap! cache/new-sections assoc-in [(keyword slug) :new-section-order] (:sections response))
       ;; signal to the app-state that the new-sections have been loaded
-      (assoc-in db [(keyword slug) :new-sections] (rand 4)))))
+      (-> db
+        (assoc-in [(keyword slug) :new-sections] (:templates response))
+        (dissoc :loading)))))
 
 (defmethod dispatcher/action :auth-settings [db [_ body]]
   (when body
-    (-> db
-        (assoc :auth-settings body)
-        (dissoc :loading))))
+    (assoc db :auth-settings body)))
 
 (defmethod dispatcher/action :revision [db [_ body]]
   (if body
@@ -76,25 +76,25 @@
           assoc-in-coll-2 (dispatcher/revision-key (:slug body) (:section body) (:as-of body))
           next-db (assoc-in db assoc-in-coll-2 true)]
       (swap! cache/revisions assoc-in assoc-in-coll fixed-section)
-      (dissoc next-db :loading))
+      next-db)
     db))
 
 (defmethod dispatcher/action :section [db [_ body]]
   (if body
     (let [fixed-section (utils/fix-section (:body body) (:section body))]
-      (-> db
-          (assoc-in (dispatcher/company-section-key (:slug body) (:section body)) fixed-section)
-          (dissoc :loading)))
+      (assoc-in db (dispatcher/company-section-key (:slug body) (:section body)) fixed-section))
     db))
 
 (defmethod dispatcher/action :company [db [_ {:keys [slug success status body]}]]
   (cond
     success
     ;; add section name inside each section
-    (let [updated-body (utils/fix-sections body)]
-      (-> db
-          (assoc-in (dispatcher/company-data-key (:slug updated-body)) updated-body)
-          (dissoc :loading)))
+    (let [updated-body (utils/fix-sections body)
+          with-company-data (assoc-in db (dispatcher/company-data-key (:slug updated-body)) updated-body)]
+      (if (or (:read-only updated-body)
+               (pos? (count (:sections updated-body))))
+          (dissoc with-company-data :loading)
+          with-company-data))
     (= 403 status)
     (-> db
         (assoc-in [(keyword slug) :error] :forbidden)

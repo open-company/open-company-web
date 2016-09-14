@@ -193,6 +193,9 @@
         (at/add-topic {:column column
                        :archived-topics (mapv (comp keyword :section) (:archived company-data))
                        :active-topics (vec topics)
+                       :initially-expanded (and (not (om/get-props owner :loading))
+                                                (om/get-props owner :new-sections)
+                                                (zero? (count topics)))
                        :update-active-topics update-active-topics})
         (let [sd (->> section-name keyword (get topics-data))]
           (when-not (and (:read-only company-data) (:placeholder sd))
