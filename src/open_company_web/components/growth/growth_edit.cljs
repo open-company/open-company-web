@@ -125,35 +125,42 @@
 
 ;; ===== Growth Metric Data Functions =====
 
-(defn- growth-get-value [v]
+(defn- growth-get-value
+  "Return a blank string, 0 or the value."
+  [v]
   (if (string/blank? v)
     ""
     (if (js/isNaN v)
       0
       v)))
 
-(defn- growth-fix-row [row]
+(defn- growth-fix-row
+  "Fix the value in the row to be missing, numeric, or 0"
+  [row]
   (let [fixed-value (growth-get-value (:value row))
         with-fixed-value (if (string/blank? fixed-value)
                            (dissoc row :value)
                            (assoc row :value fixed-value))]
     with-fixed-value))
 
-(defn- growth-check-value [v]
+(defn- growth-check-value
+  "Return true if the value is a number."
+  [v]
   (and (not (= v ""))
-       (not (nil? v))))
+       (not (nil? v))
+       (not (js/isNaN v))))
 
 (defn- growth-change-data
-  ""
+  "Update the local state of growth data with change from the user."
   [owner row]
-  (when (growth-check-value (:value row))
-    (let [{:keys [period slug] :as fixed-row} (growth-fix-row row)
-          growth-data (om/get-state owner :growth-data)
-          fixed-data (if (not (:value fixed-row))
-                       (dissoc growth-data (str period slug))
-                       (assoc growth-data (str period slug) fixed-row))]
-      ;(om/set-state! owner :has-changes true)
-      (om/set-state! owner :growth-data fixed-data))))
+  (let [{:keys [period slug value] :as fixed-row} (growth-fix-row row) ; fix up this period's value if it needs it
+        growth-data (om/get-state owner :growth-data) ; current state of the data
+        ;; update the data
+        fixed-data (if value
+                     (assoc growth-data (str period slug) fixed-row)
+                     (dissoc growth-data (str period slug)))]
+    ;(om/set-state! owner :has-changes true)
+    (om/set-state! owner :growth-data fixed-data)))
 
 (defn- more-months [owner data]
   (om/update-state! owner :stop #(+ % batch-size)))
