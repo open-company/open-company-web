@@ -83,7 +83,13 @@ nav.oc-navbar {
       div.sharing-button-container{
         float: left;
         margin-right: 10px;
-        margin-top: 10px;
+        margin-top: 13px;
+        color: #1E81C4;
+        border: 0px solid transparent;
+
+        button.sharing-button {
+          font-weight: 700;
+        }
       }
 
       div.user-avatar {

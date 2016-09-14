@@ -164,16 +164,19 @@
           (when company-data
             (dom/div {:class "su-sp-content"
                       :key (apply str su-topics)}
-              (when (:title su-data)
-                (dom/div {:class "preview-title-container"}
-                  (dom/input #js {:className "preview-title"
-                                  :id "su-snapshot-preview-title"
-                                  :type "text"
-                                  :value title
-                                  :ref "preview-title"
-                                  :placeholder (str "Optional Title, e.g. " (:name company-data) " Monthly Update")
-                                  :onChange #(om/set-state! owner :title (.. % -target -value))
-                                  :style #js {:width title-width}})))
+              (dom/div {:class "su-sp-company-header"}
+                (dom/div {:class "company-logo-container"}
+                  (dom/img {:class "company-logo" :src (:logo company-data)}))
+                (when (:title su-data)
+                  (dom/div {:class "preview-title-container"}
+                    (dom/input #js {:className "preview-title"
+                                    :id "su-snapshot-preview-title"
+                                    :type "text"
+                                    :value title
+                                    :ref "preview-title"
+                                    :placeholder (str "Optional Title, e.g. " (:name company-data) " Monthly Update")
+                                    :onChange #(om/set-state! owner :title (.. % -target -value))
+                                    :style #js {:width title-width}}))))
               (when show-su-dialog
                 (om/build su-preview-dialog {:selected-topics (:sections su-data)
                                              :company-data company-data

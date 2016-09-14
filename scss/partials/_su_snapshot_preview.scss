@@ -78,28 +78,45 @@ div.su-snapshot-preview {
   div.su-sp-content {
     padding-bottom: 20px;
 
-    div.preview-title-container {
-      width: 100%;
+    div.su-sp-company-header {
       text-align: center;
-      margin: 50px auto 30px;
 
-      input.preview-title {
-        font-weight: 400;
-        font-size: 20px;
-        line-height: 1.2;
-        color: $oc_gray_5;
-        text-align: center;
-        outline: none;
-        background-color: transparent;
-        border-radius: 2px;
-        border: 1px solid rgba(78, 90, 107, 0.2);
+      div.company-logo-container {
+        margin-top: 40px;
 
-        &:focus {
-          border: 1px solid transparent;
+        img.company-logo {
+          max-height: 50px;
+          max-width: 150px;
+          margin-top: -5px;
         }
+      }
 
-        @include placeholder {
-          font-style: italic;
+      div.preview-title-container {
+        text-align: center;
+        margin: 10px auto 0px;
+
+        input.preview-title {
+          height: 28px;
+          width: 100%;
+          margin-top: 0px;
+          padding-top: 0px;
+          text-align: center;
+          font-weight: 700;
+          font-size: 24px;
+          line-height: 1.2;
+          color: $oc_gray_5;
+          outline: none;
+          background-color: transparent;
+          border-radius: 2px;
+          border: 1px solid rgba(78, 90, 107, 0.2);
+
+          &:focus {
+            border: 1px solid transparent;
+          }
+
+          @include placeholder {
+            font-style: italic;
+          }
         }
       }
     }
@@ -120,9 +137,8 @@ div.su-snapshot-preview {
         max-width: 100%;
 
         div.topic-row {
+          width: 100%;
           border: 0px solid transparent;
-          position: relative;
-          left: 50%;
           margin-bottom: 0px;
           padding: 0px 0px 22px 0px;
 
