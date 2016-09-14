@@ -776,14 +776,19 @@
           (let [hidePlaceholder (gobj/get this "hidePlaceholder")]
             (hidePlaceholder editor-el)))))))
 
-(defn truncated-body [body]
-  (if (is-test-env?)
-    body
-    (.truncate js/$ body (clj->js {:length 500 :words true}))))
-
 (defn filter-placeholder-sections [topics company-data]
   (vec (filter #(not (:placeholder (->> % keyword (get company-data)))) topics)))
 
 (defn su-date-from-created-at [created-at]
   (let [from-js-date (cljs-time/date-time (js-date created-at))]
     (cljs-time-format/unparse (cljs-time-format/formatter "yyyy-MM-dd") from-js-date)))
+
+(def topic-body-limit 500)
+
+(defn truncated-body [body]
+  (if (is-test-env?)
+    body
+    (.truncate js/$ body (clj->js {:length topic-body-limit :words true}))))
+
+(defn exceeds-topic-body-limit [body]
+  (> (count (strip-HTML-tags body)) topic-body-limit))

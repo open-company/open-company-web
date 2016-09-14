@@ -9,6 +9,6 @@
                                        read-more-cb] :as data} owner]
   (render [_]
     (let [topic-body (:body topic-data)]
-      (when (> (count (utils/strip-HTML-tags topic-body)) 500)
+      (when (utils/exceeds-topic-body-limit topic-body)
         (dom/button {:class "btn-reset topic-read-more"
                      :onClick read-more-cb} "READ MORE")))))
