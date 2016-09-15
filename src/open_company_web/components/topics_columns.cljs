@@ -183,12 +183,13 @@
                                   (first pinned)
                                   (first other))
           hovering-topic        (om/get-state owner :hovering)
-          hovering?             (or (and (not (nil? hovering-topic))
-                                         (= section-name hovering-topic))
-                                    (and first-topic
-                                         (= section-name (name first-topic))
-                                         (nil? hovering-topic)
-                                         (<= window-scroll 188)))]
+          hovering?             (and (:is-stakeholder-update props)
+                                     (or (and (not (nil? hovering-topic))
+                                              (= section-name hovering-topic))
+                                         (and first-topic
+                                              (= section-name (name first-topic))
+                                              (nil? hovering-topic)
+                                              (<= window-scroll 188))))]
       (if (= section-name "add-topic")
         (at/add-topic {:column column
                        :archived-topics (mapv (comp keyword :section) (:archived company-data))
@@ -204,12 +205,14 @@
                                                        :hover hovering?})
                           :data-topic (name section-name)
                           :ref section-name
-                          :onMouseOver #(om/set-state! owner :hovering section-name)
-                          :onMouseOut #(om/set-state! owner :hovering nil)
+                          :onMouseOver #(when (:is-stakeholder-update props)
+                                         (om/set-state! owner :hovering section-name))
+                          :onMouseOut #(when (:is-stakeholder-update props)
+                                         (om/set-state! owner :hovering nil))
                           :key (str "topic-row-" (name section-name))}
               (om/build topic {:loading (:loading company-data)
                                :section section-name
-                               :is-stakeholder-update (om/get-props owner :is-stakeholder-update)
+                               :is-stakeholder-update (:is-stakeholder-update props)
                                :section-data sd
                                :card-width (:card-width props)
                                :show-share-remove (:show-share-remove props)
