@@ -120,6 +120,7 @@
   (set-metadata-edit owner false) ; cancel the metadata editing
   (let [metric-slugs (remove #{metric-slug} (:metric-slugs data)) ; remove the slug
         fewer-metrics (metrics-as-sequence owner metric-slugs)] ; full metrics w/o the slug
+    (om/set-state! owner :metric-slug (first fewer-metrics))
     (dis/dispatch! [:save-topic-data "growth" {:metrics fewer-metrics}])) ; dispatch the fewer metrics
   ((:archive-metric-cb data) metric-slug))
 
