@@ -4,8 +4,13 @@ div.growth-metric-edit {
 
   span.select2 {
     margin-bottom: 15px;    
+    font-size: 14px;
   }
 
+  span.select2-selection.select2-selection--single {
+    outline: none;
+  }
+  
   div.growth-metric-edit-row {
     width: 100%;
 

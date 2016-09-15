@@ -187,7 +187,7 @@
                       :on-change #(om/set-state! owner :company-name (.. % -target -value))})
           ; Slug
           (dom/div {:class "small-caps bold mb1"} "DASHBOARD URL")
-          (dom/div {:class "npt npt-disabled col-8 p1 mb3"} (str ls/web-server "/" (name slug)))
+          (dom/div {:class "npt npt-disabled col-11 p1 mb3"} (str ls/web-server "/" (name slug)))
 
           ;; Company logo
           (dom/div {:class "small-caps bold mb1"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")

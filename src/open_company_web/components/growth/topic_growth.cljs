@@ -83,7 +83,7 @@
                     :on-click (fn [e]
                                 (.stopPropagation e)
                                 (om/set-state! owner :new-metric? true)
-                                (data-editing-toggle owner editing-cb true))} "+ New")))))
+                                (data-editing-toggle owner editing-cb true))} "+ New Chart")))))
 
 (defn- get-state [owner data initial]
   (let [section-data (:section-data data)

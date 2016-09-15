@@ -13,8 +13,7 @@
             [test.open-company-web.components.company-dashboard]
             [test.open-company-web.components.topic-list]
             [test.open-company-web.components.topic]
-            [test.open-company-web.components.topic-body]
-            [test.open-company-web.components.fullscreen-topic-edit]))
+            [test.open-company-web.components.topic-body]))
 
 (enable-console-print!)
 
@@ -35,5 +34,4 @@
   'test.open-company-web.components.company-dashboard
   'test.open-company-web.components.topic-list
   'test.open-company-web.components.topic
-  'test.open-company-web.components.topic-body
-  'test.open-company-web.components.fullscreen-topic-edit)
+  'test.open-company-web.components.topic-body)
