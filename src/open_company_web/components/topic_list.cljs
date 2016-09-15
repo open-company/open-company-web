@@ -218,42 +218,39 @@
   are over it and if it's on the left or right side"
   [left top topic]
   (if topic
-    (let [dragging-topic (.data (js/$ ".ui-draggable-dragging") "topic")
-          topic-el (js/$ (str ".topic-row[data-topic=" (name topic) "]"))
-          topic-pos (.position topic-el)
-          topic-posalter (utils/absolute-offset (.get topic-el 0))
-          topic-position {:left (gobj/get topic-pos "left")
-                          :top (gobj/get topic-pos "top")}
-          topic-size {:width (.width topic-el) :height (.height topic-el)}
-          target-css {:width (int (+ (:width topic-size) 26)) ; add the padding and the border of the topic
-                      :height (int (:height topic-size))
-                      :left (int (:left topic-position))
-                      :top (int (:top topic-position))}]
-      (if (and (not= (name topic) dragging-topic)
-                 (>= left (:left target-css))
-                 (>= top (:top target-css))
-                 (< left (+ (:left target-css) (:width target-css)))
-                 (< top (+ (:top target-css) (:height target-css))))
-        (if (< left (+ (:left target-css) (/ (:width target-css) 2)))
-          {:side "left"
-           :topic-el topic-el
-           :inside? true
-           :topic topic}
-          {:side "right"
-           :topic-el topic-el
-           :inside? true
-           :topic topic})
-        {:topic-el topic-el
-         :inside? false}))
+    (when-let [dragging-topic (.data (js/$ ".ui-draggable-dragging") "topic")]
+      (let [topic-el (js/$ (str ".topic-row[data-topic=" (name topic) "]"))
+            topic-pos (.position topic-el)
+            topic-posalter (utils/absolute-offset (.get topic-el 0))
+            topic-position {:left (gobj/get topic-pos "left")
+                            :top (gobj/get topic-pos "top")}
+            topic-size {:width (.width topic-el) :height (.height topic-el)}
+            target-css {:width (int (+ (:width topic-size) 26)) ; add the padding and the border of the topic
+                        :height (int (:height topic-size))
+                        :left (int (:left topic-position))
+                        :top (int (+ (:top topic-position) 84))}]
+        (if (and (not= (name topic) dragging-topic)
+                   (>= left (:left target-css))
+                   (>= top (:top target-css))
+                   (< left (+ (:left target-css) (:width target-css)))
+                   (< top (+ (:top target-css) (:height target-css))))
+          (if (< left (+ (:left target-css) (/ (:width target-css) 2)))
+            {:side "left"
+             :topic-el topic-el
+             :inside? true
+             :topic topic}
+            {:side "right"
+             :topic-el topic-el
+             :inside? true
+             :topic topic})
+          {:topic-el topic-el
+           :inside? false})))
     (sentry/capture-message (str "open-company-web.components.topic-list/coord-inside params, left:" left ", top:" top ", topic:" topic))))
 
 (defn get-topic-at-position
   "Give left and top coordinates of the current drag position, show the yellow bar on left or right of the current hovering topic"
   [owner left top stop?]
-  (let [
-        ; left (+ left 45)
-        ; top (+ top 60)
-        company-data    (:company-data (om/get-props owner))
+  (let [company-data    (:company-data (om/get-props owner))
         company-topics  (vec (map keyword (:sections company-data)))]
     (doseq [topic company-topics]
       (let [in? (coord-inside left top topic)]
