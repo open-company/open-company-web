@@ -194,29 +194,35 @@
     "Pin this topic"))
 
 (defn- save-topic [owner]
-  (let [topic      (name (dis/foce-section-key))
-        topic-data (dis/foce-section-data)
-        company-data (dis/company-data)
-        sections     (vec (:sections company-data))]
-    (cond
-      (and (not (om/get-state owner :initially-pinned))
-           (:pin topic-data))
-      ; needs to PATCH :sections to move the topic at the top of the unpinned topics
-      (let [without-topic (utils/vec-dissoc sections topic)
-            {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
-            with-pinned-topic (let [[before after] (split-at (count pinned) without-topic)]
-                                (vec (concat before [topic] after)))]
-        (dis/dispatch! [:foce-save with-pinned-topic]))
-      (and (om/get-state owner :initially-pinned)
-           (not (:pin topic-data)))
-      ; needs to PATCH :sections to move the topic at the top of the unpinned topics
-      (let [without-topic (utils/vec-dissoc sections topic)
-            {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
-            with-unpinned-topic (let [[before after] (split-at (inc (count pinned)) without-topic)]
-                                (vec (concat before [topic] after)))]
-        (dis/dispatch! [:foce-save with-unpinned-topic]))
-      :else
-      (dis/dispatch! [:foce-save sections]))))
+  (let [topic           (name (dis/foce-section-key))
+        body-el         (js/$ (str "#foce-body-" (name topic)))]
+    (utils/remove-ending-empty-paragraph body-el)
+    (let [fixed-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.html body-el)) "__html"))]
+      (dis/dispatch! [:foce-input {:body fixed-body}]))
+    ; delay dispatching the save action to avoid conflicts in the db
+    (utils/after 10
+     #(let [topic-data      (dis/foce-section-data)
+            company-data    (dis/company-data)
+            sections        (vec (:sections company-data))]
+        (cond
+          (and (not (om/get-state owner :initially-pinned))
+               (:pin topic-data))
+          ; needs to PATCH :sections to move the topic at the top of the unpinned topics
+          (let [without-topic (utils/vec-dissoc sections topic)
+                {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
+                with-pinned-topic (let [[before after] (split-at (count pinned) without-topic)]
+                                    (vec (concat before [topic] after)))]
+            (dis/dispatch! [:foce-save with-pinned-topic]))
+          (and (om/get-state owner :initially-pinned)
+               (not (:pin topic-data)))
+          ; needs to PATCH :sections to move the topic at the top of the unpinned topics
+          (let [without-topic (utils/vec-dissoc sections topic)
+                {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
+                with-unpinned-topic (let [[before after] (split-at (inc (count pinned)) without-topic)]
+                                    (vec (concat before [topic] after)))]
+            (dis/dispatch! [:foce-save with-unpinned-topic]))
+          :else
+          (dis/dispatch! [:foce-save sections]))))))
 
 (defcomponent topic-edit [{:keys [show-first-edit-tip
                                   currency

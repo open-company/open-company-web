@@ -32,6 +32,9 @@ $.addClass = function(){};
 $.removeClass = function(){};
 $.width = function(){};
 $.height = function(){};
+$.last = function(){};
+$.text = function(){};
+$.remove = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
