@@ -42,7 +42,7 @@
                         new-topic-data {:title @(::topic-title s)
                                         :section topic-name
                                         :placeholder true}]
-                    (submit-fn :progress topic-name new-topic-data))} "Add"]]))
+                    (submit-fn topic-name new-topic-data))} "Add"]]))
 
 (defn chunk-topics
   "Partition the provided sequences as if they were one with `::archived` inbetween"
