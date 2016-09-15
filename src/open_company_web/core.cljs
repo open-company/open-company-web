@@ -71,7 +71,6 @@
   ;; save route
   (router/set-route! [] {})
   ;; load data from api
-  (swap! dis/app-state assoc :loading true)
   (api/get-entry-point)
   ;; render component
   (drv-root home target))
