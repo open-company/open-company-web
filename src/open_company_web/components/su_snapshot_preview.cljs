@@ -129,12 +129,12 @@
           company-data (dis/company-data data)
           su-data      (stakeholder-update-data data)
           card-width   (responsive/calc-card-width 1)
-          ww           (.-clientWidth (sel1 js/document :body))
+          ww           (.-clientWidth (.-body js/document))
           title-width  (if (>= ww responsive/c1-min-win-width)
-                          (str (min ww card-width) "px")
+                          (str (if (< ww card-width) ww (+ card-width 60)) "px")
                           "auto")
           total-width  (if (>= ww responsive/c1-min-win-width)
-                          (str (min ww (+ card-width (* topic-row-x-padding 2))) "px")
+                          (str (if (< ww card-width) ww (+ card-width (* topic-row-x-padding 2))) "px")
                           "auto")
           su-subtitle  (str "— " (utils/date-string (js/Date.) [:year]))
           possible-sections (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
@@ -174,7 +174,7 @@
                                     :type "text"
                                     :value title
                                     :ref "preview-title"
-                                    :placeholder (str "Title, e.g. " (:name company-data) " Monthly Update")
+                                    :placeholder (str "Title, e.g., " (:name company-data) " Monthly Update")
                                     :onChange #(om/set-state! owner :title (.. % -target -value))
                                     :style #js {:width title-width}}))))
               (when show-su-dialog
