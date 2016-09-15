@@ -803,3 +803,10 @@
          (responsive/can-edit?)
          (not (:read-only company-data))
          (>= (count (filter-placeholder-sections company-topics company-data)) min-no-placeholder-section-enable-share))))
+
+(defn remove-ending-empty-paragraph
+  "Remove the last p tag if it's empty."
+  [body-el]
+  (when-not (is-test-env?)
+    (while (= (count (clojure.string/trim (.text (.last (.find (js/$ body-el) ">p"))))) 0)
+      (.remove (js/$ ">p:last-child" (js/$ body-el))))))
