@@ -20,7 +20,8 @@
             [open-company-web.components.ui.topic-read-more :refer (topic-read-more)]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
-            [goog.fx.Animation.EventType :as EventType]
+            [goog.fx.Animation.EventType :as AnimationEventType]
+            [goog.events.EventType :as EventType]
             [goog.events :as events]
             [goog.style :as gstyle]
             [cljsjs.react.dom]))
@@ -168,7 +169,7 @@
     ; appear the new topic
     (doto appear-animation
       (events/listen
-        EventType/FINISH
+        AnimationEventType/FINISH
         #(om/set-state! owner (merge current-state
                                     {:as-of (:transition-as-of current-state)
                                      :transition-as-of nil})))
@@ -189,12 +190,14 @@
   (init-state [_]
     {:as-of (:updated-at section-data)
      :actual-as-of (:updated-at section-data)
+     :window-width (.width (js/$ js/window))
      :transition-as-of nil})
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
       ; initialize bootstrap tooltips
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+      (events/listen js/window EventType/RESIZE #(om/set-state! owner :window-width (.width (js/$ js/window))))))
 
   (will-update [_ next-props _]
     (let [new-as-of (:updated-at (:section-data next-props))
@@ -209,8 +212,7 @@
     (when (om/get-state owner :transition-as-of)
       (animate-revision-navigation owner)))
 
-  (render-state [_ {:keys [editing as-of actual-as-of transition-as-of] :as state}]
-
+  (render-state [_ {:keys [editing as-of actual-as-of transition-as-of window-width] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -223,8 +225,7 @@
                   (om/set-state! owner :transition-as-of (:updated-at rev))
                   (utils/event-stop e))
           foce-active (not (nil? (dis/foce-section-key)))
-          is-foce (= (dis/foce-section-key) section-kw)
-          window-width (.width (js/$ js/window))]
+          is-foce (= (dis/foce-section-key) section-kw)]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
