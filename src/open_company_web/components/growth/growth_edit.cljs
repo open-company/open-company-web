@@ -258,12 +258,6 @@
                   (dom/table {:class "table"
                               :key (str "growth-edit-" slug)}
 
-                    ;; Table header
-                    (dom/thead {}
-                      (dom/tr {}
-                        (dom/th {} "")
-                        (dom/th {} "Value")))
-
                     ;; For each period from the current, until as far in the past as the stop value
                     (let [current-period (utils/current-growth-period interval)]
                       (for [idx (range 1 stop)]
