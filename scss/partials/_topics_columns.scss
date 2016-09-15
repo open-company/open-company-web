@@ -46,7 +46,7 @@ div.topics-columns {
           border-right: 4px solid $oc-yellow;
         }
 
-        &.draggable-topic.ui-draggable-dragging {
+        &.draggable-topic.dragging-topic {
           z-index: 1000;
           opacity: 0.5;
         }

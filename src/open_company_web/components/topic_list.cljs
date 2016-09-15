@@ -218,7 +218,7 @@
   are over it and if it's on the left or right side"
   [left top topic]
   (if topic
-    (when-let [dragging-topic (.data (js/$ ".ui-draggable-dragging") "topic")]
+    (when-let [dragging-topic (.data (js/$ ".dragging-topic") "topic")]
       (let [topic-el (js/$ (str ".topic-row[data-topic=" (name topic) "]"))
             topic-pos (.position topic-el)
             topic-posalter (utils/absolute-offset (.get topic-el 0))
@@ -265,7 +265,7 @@
             (.addClass (:topic-el in?) "right-highlight"))
           ; reorder topics
           (when (:inside? in?)
-            (let [dragged-topic (keyword (.data (js/$ ".ui-draggable-dragging") "topic"))
+            (let [dragged-topic (keyword (.data (js/$ ".dragging-topic") "topic"))
                   {:keys [pinned other]} (utils/get-pinned-other-keys (:sections company-data) company-data)
                   pinned-kw (map keyword pinned)
                   other-kw (map keyword other)
@@ -294,12 +294,17 @@
 (defn setup-draggable [owner]
   (when-let [list-node (js/$ "div.topic-row.draggable-topic")]
     (when-not (.draggable list-node "instance")
-      (.draggable list-node #js {:addClasses "dragging"
+      (.draggable list-node #js {:addClasses true
                                  :drag #(dragging owner % false)
                                  :handle ".topic-dnd-handle"
                                  :scroll true
-                                 :start #(.addClass (js/$ (sel1 [:div.topics-columns])) "dragging-topic")
-                                 :stop #(dragging owner % true)}))))
+                                 :start #(do
+                                           (.addClass (js/$ (gobj/get % "target")) "dragging-topic")
+                                           (.addClass (js/$ (sel1 [:div.topics-columns])) "dnd-active"))
+                                 :stop #(do
+                                          (dragging owner % true)
+                                          (.removeClass (js/$ (sel1 [:div.topics-columns])) "dnd-active")
+                                          (.removeClass (js/$ (gobj/get % "target")) "dragging-topic"))}))))
 
 (defn destroy-draggable []
   (when-let [list-node (js/$ "div.topic-row.draggable-topic")]

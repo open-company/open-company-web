@@ -19,7 +19,7 @@ div.topics-columns.sharing-mode {
   }
 }
 
-div.dragging{
+div.dnd-active {
   div.topic:not(.draggable-topic) {
     opacity: 0.2;
   }
