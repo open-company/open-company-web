@@ -164,7 +164,7 @@
   (let [slug (keyword (router/current-company-slug))
         company-data (dispatcher/company-data)
         old-sections (:sections company-data)
-        new-sections (utils/vec-dissoc old-sections topic)]
+        new-sections (utils/vec-dissoc old-sections (name topic))]
     (api/patch-sections new-sections)
     (-> db
       (dissoc :foce-key)
