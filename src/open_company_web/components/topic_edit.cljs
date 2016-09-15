@@ -59,6 +59,16 @@
         body-el      (sel1 [(str "div#foce-body-" section-name)])]
     (utils/medium-editor-hide-placeholder editor body-el)))
 
+(defn body-on-change [owner]
+  (when-let* [section-kw   (keyword (om/get-props owner :section))
+              section-name (name section-kw)
+              body-el      (sel1 [(str "div#foce-body-" section-name)])]
+    (om/set-state! owner :has-changes true)
+    (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
+      (dis/dispatch! [:foce-input {:body emojied-body}]))
+    (let [inner-text (.-innerText body-el)]
+      (om/set-state! owner :char-count (if (> (count inner-text) utils/topic-body-limit) "Extended\nlength" nil)))))
+
 (defn- setup-edit [owner]
   (when-let* [section-kw   (keyword (om/get-props owner :section))
               section-name (name section-kw)
@@ -67,11 +77,7 @@
       (.subscribe body-editor
                   "editableInput"
                   (fn [event editable]
-                    (om/set-state! owner :has-changes true)
-                    (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
-                      (dis/dispatch! [:foce-input {:body emojied-body}]))
-                    (let [inner-text (.-innerText body-el)]
-                      (om/set-state! owner :char-count (if (> (count inner-text) utils/topic-body-limit) "Extended\nlength" nil)))))
+                    (body-on-change owner)))
       (om/set-state! owner :body-editor body-editor))
     (js/emojiAutocomplete)))
 
@@ -90,7 +96,8 @@
 (defn- check-headline-count [owner e has-changes]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
     (let [headline-value (.-innerText headline)]
-      (when (and (not= (.-keyCode e) 8)
+      (when (and e
+                 (not= (.-keyCode e) 8)
                  (not= (.-keyCode e) 16)
                  (not= (.-keyCode e) 17)
                  (not= (.-keyCode e) 40)
@@ -402,7 +409,13 @@
                       :style {:display (if (nil? file-upload-state) "block" "none")}}
               (emoji-picker {:add-emoji-cb (fn [editor emoji]
                                              (when (= editor (sel1 (str "div#foce-body-" (name section-kw))))
-                                               (force-hide-placeholder owner)))
+                                               (force-hide-placeholder owner))
+                                             (let [headline (sel1 (str "#foce-headline-" (name section)))
+                                                   body     (sel1 (str "#foce-body-" (name section)))]
+                                               (when (= (.-activeElement js/document) headline)
+                                                  (check-headline-count owner nil true))
+                                               (when (= (.-activeElement js/document) body)
+                                                  (body-on-change owner))))
                              :disabled (let [headline (sel1 (str "#foce-headline-" (name section)))
                                              body     (sel1 (str "#foce-body-" (name section)))]
                                          (not (or (= (.-activeElement js/document) headline)
