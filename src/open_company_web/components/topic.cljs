@@ -125,9 +125,10 @@
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
-        (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
-                      :ref "topic-body"
-                      :dangerouslySetInnerHTML (utils/emojify truncated-body)})
+        (when-not (responsive/is-mobile?)
+          (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
+                        :ref "topic-body"
+                        :dangerouslySetInnerHTML (utils/emojify truncated-body)}))
         ; if it's SU preview or SU show only read-more
         (if is-stakeholder-update
           (when (utils/exceeds-topic-body-limit topic-body)
@@ -212,7 +213,8 @@
                   (om/set-state! owner :transition-as-of (:updated-at rev))
                   (utils/event-stop e))
           foce-active (not (nil? (dis/foce-section-key)))
-          is-foce (= (dis/foce-section-key) section-kw)]
+          is-foce (= (dis/foce-section-key) section-kw)
+          ww      (.-width (js/$ (.-body js/document)))]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -227,7 +229,7 @@
                                                  :not-draggable-topic (not (:pin topic-data))
                                                  :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
-                    :style #js {:width (str card-width "px")
+                    :style #js {:width (if (responsive/is-mobile?) "auto" (str card-width "px"))
                                 :marginLeft (when (utils/in? (:route @router/path) "su-snapshot-preview") (str (/ (- window-width card-width) 2) "px"))}
                     :ref "topic"
                     :data-section (name section)
