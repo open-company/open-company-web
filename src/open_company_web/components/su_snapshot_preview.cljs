@@ -131,7 +131,7 @@
           card-width   (responsive/calc-card-width 1)
           ww           (.-clientWidth (.-body js/document))
           title-width  (if (>= ww responsive/c1-min-win-width)
-                          (str (if (< ww card-width) ww (+ card-width 60)) "px")
+                          (str (if (< ww card-width) ww card-width) "px")
                           "auto")
           total-width  (if (>= ww responsive/c1-min-win-width)
                           (str (if (< ww card-width) ww (+ card-width (* topic-row-x-padding 2))) "px")
