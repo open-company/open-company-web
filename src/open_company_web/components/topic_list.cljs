@@ -254,8 +254,9 @@
         company-topics  (vec (map keyword (:sections company-data)))]
     (doseq [topic company-topics]
       (let [in? (coord-inside left top topic)]
-        (.removeClass (:topic-el in?) "left-highlight")
-        (.removeClass (:topic-el in?) "right-highlight")
+        (when (:topic-el in?)
+          (.removeClass (:topic-el in?) "left-highlight")
+          (.removeClass (:topic-el in?) "right-highlight"))
         (if-not stop?
           (cond
             (= (:side in?) "left")
