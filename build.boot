@@ -42,7 +42,14 @@
     [cljsjs/clipboard "1.5.9-0"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
     [cljsjs/emojione-picker "0.3.6-2"] ; EmojionePicker cljsjs package https://github.com/tommoor/emojione-picker
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"]
-    [lockedon/if-let "0.1.0"]]) ; More than one binding for if/when macros https://github.com/LockedOn/if-let
+    [lockedon/if-let "0.1.0"] ; More than one binding for if/when macros https://github.com/LockedOn/if-let
+    ;; ------- Deps for project repl ------------------
+    [adzerk/boot-cljs-repl   "0.3.2"] ;; latest release
+    [com.cemerick/piggieback "0.2.1"  :scope "test"]
+    [weasel                  "0.7.0"  :scope "test"]
+    [org.clojure/tools.nrepl "0.2.12" :scope "test"]
+    ;; ------------------------------------------------
+])
 
 (def static-site-deps
   '[[hiccup "1.0.5" :scope "test"]
@@ -65,7 +72,8 @@
          '[deraen.boot-sass :refer [sass]]
          '[medley.core :as med]
          '[io.perun :as p]
-         '[boot.util :as util])
+         '[boot.util :as util]
+         '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]])
 
 (deftask from-jars
   "Import files from jars (e.g. CLJSJS) and move them to the desired location in the fileset."
@@ -152,3 +160,13 @@
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {:externs ["public/js/externs.js"]})))
+
+(deftask project-repl []
+  (comp (serve :handler 'oc.server/handler
+               :port 3559)
+        (from-jars)
+        (watch)
+        (sass)
+        (build-site)
+        (cljs-repl) ; order is important!!
+        (cljs)))
