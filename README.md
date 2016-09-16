@@ -131,15 +131,13 @@ One of the most important component trees is the company dashboard. This provide
 
 #### Project repl
 
-To have repl connected to the browser where you can import and tests all the ns starts the dev task:
+To have a repl connected to the browser starts the dev task:
 
 ```console
 $ boot dev
 ```
 
-now open a browser window: [http://localhost:3559/](http://localhost:3559/).
-
-then in another terminal window start simple repl
+and open a browser window: [http://localhost:3559/](http://localhost:3559/), then in another terminal window start a repl with boot:
 
 ```console
 $ boot repl -c
@@ -153,7 +151,7 @@ cljs.user=> (start-repl)
 
 If the repl doesn't connect to the browser window, refresh the page.
 
-At this point you should be able to import all our ns:
+At this point you should be able to use the project's namespaces:
 
 ```console
 cljs.user=> (require '[open-company-web.lib.utils :as utils])
