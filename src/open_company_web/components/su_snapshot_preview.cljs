@@ -174,7 +174,7 @@
                                     :type "text"
                                     :value title
                                     :ref "preview-title"
-                                    :placeholder (str "Title, e.g., " (:name company-data) " Monthly Update")
+                                    :placeholder "Title of this Update"
                                     :onChange #(om/set-state! owner :title (.. % -target -value))
                                     :style #js {:width title-width}}))))
               (when show-su-dialog

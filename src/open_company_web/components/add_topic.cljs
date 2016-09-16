@@ -82,7 +82,9 @@
                    :on-click #(do (update-active-topics (:section topic-full))
                                   (reset! (::expanded? s) false))}
                   [:span.child
-                   (:title topic-full)
+                   (str (:title topic-full) (when (#{:finances :growth} topic) " "))
+                   (when (#{:finances :growth} topic)
+                      [:i.fa.fa-line-chart])
                    (:section-name topic-full)]])))])]
        (custom-topic-input #(do (update-active-topics %1 %2 %3)
                                 (reset! (::expanded? s) false)))])
