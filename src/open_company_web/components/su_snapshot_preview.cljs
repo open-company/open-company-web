@@ -154,7 +154,7 @@
         (dom/div {:class "page snapshot-page"}
           (dom/div {:class "su-snapshot-header"}
             (back-to-dashboard-btn {})
-            (dom/div {:class "snapshot-cta"} "Choose the topics to share and arrange them in any order")
+            (dom/div {:class "snapshot-cta"} "Choose the topics to share and arrange them in any order.")
             (dom/div {:class "share-su"}
               (dom/button {:class "btn-reset btn-solid share-su-button"
                            :on-click #(share-clicked owner)
