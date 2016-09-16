@@ -129,15 +129,15 @@ One of the most important component trees is the company dashboard. This provide
 
 ![Company Dashboard Diagram](https://cdn.rawgit.com/open-company/open-company-web/mainline/docs/dashboard-viewing-component-tree.svg)
 
-#### Project repl
+#### Project REPL
 
-To have a repl connected to the browser starts the dev task:
+To have a REPL connected to the browser starts the dev task:
 
 ```console
 $ boot dev
 ```
 
-and open a browser window: [http://localhost:3559/](http://localhost:3559/), then in another terminal window start a repl with boot:
+and open a browser window: [http://localhost:3559/](http://localhost:3559/), then in another terminal window start a REPL with boot:
 
 ```console
 $ boot repl -c
@@ -149,7 +149,7 @@ at this point you can start a weasel server to connect to the browser window:
 cljs.user=> (start-repl)
 ```
 
-If the repl doesn't connect to the browser window, refresh the page.
+If the REPL doesn't connect to the browser window, refresh the page.
 
 At this point you should be able to use the project's namespaces:
 
