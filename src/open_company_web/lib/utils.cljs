@@ -808,5 +808,6 @@
   "Remove the last p tag if it's empty."
   [body-el]
   (when-not (is-test-env?)
-    (while (= (count (clojure.string/trim (.text (.last (.find (js/$ body-el) ">p"))))) 0)
-      (.remove (js/$ ">p:last-child" (js/$ body-el))))))
+    (when (pos? (count (clojure.string/trim (.text (js/$ body-el)))))
+      (while (= (count (clojure.string/trim (.text (.last (.find (js/$ body-el) ">p"))))) 0)
+        (.remove (js/$ ">p:last-child" (js/$ body-el)))))))
