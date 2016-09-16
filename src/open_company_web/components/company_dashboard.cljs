@@ -68,6 +68,7 @@
                                 :company-data company-data
                                 :card-width card-width
                                 :columns-num columns-num
+                                :foce-key (:foce-key data)
                                 :show-share-su-button (utils/can-edit-sections? company-data)
                                 :menu-open menu-open
                                 :auth-settings (:auth-settings data)})
