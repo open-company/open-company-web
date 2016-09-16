@@ -12,7 +12,8 @@
             [open-company-web.components.ui.utility-components :refer (editable-pen)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
-            [cljs.core.async :refer (put!)]))
+            [cljs.core.async :refer (put!)]
+            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
 
 (def batch-size 6)
 
@@ -194,6 +195,14 @@
   (let [new-row (update row k (fn[_]v))]
     (growth-change-data owner new-row)))
 
+(defn- show-archive-confirm-popover [owner data]
+  (add-popover {:container-id "archive-metric-confirm"
+                :message "Prior updates to this chart will only be available in topic history. Are you sure you want to archive?"
+                :cancel-title "KEEP"
+                :cancel-cb #(hide-popover nil "delete-metric-confirm")
+                :success-title "ARCHIVE"
+                :success-cb #(archive-metadata-cb owner data (om/get-state owner :metric-slug))}))
+
 ;; ===== Growth Data Editing Component =====
 
 (defcomponent growth-edit [{:keys [editing-cb first-edit-tip-cb new-metric?] :as data} owner options]
@@ -302,4 +311,12 @@
                     (dom/button {:class "btn-reset btn-outline"
                                  :on-click #(do
                                               (utils/event-stop %)
-                                              (editing-cb false))} "CANCEL")))))))))))
+                                              (editing-cb false))} "CANCEL")
+                    (when-not new-metric?
+                      (dom/button {:class "btn-reset archive-button"
+                                   :title "Archive this chart"
+                                   :type "button"
+                                   :data-toggle "tooltip"
+                                   :data-placement "top"
+                                   :on-click #(show-archive-confirm-popover owner data)}
+                          (dom/i {:class "fa fa-archive"})))))))))))))
