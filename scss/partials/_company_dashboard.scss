@@ -22,6 +22,10 @@ body.small-footer {
 body.animating {
   div.company-dashboard {
     min-height: calc(100vh);
+
+    div.page {
+      width: 100%;
+    }
   }
 }
 

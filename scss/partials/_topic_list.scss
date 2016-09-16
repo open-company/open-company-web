@@ -12,7 +12,7 @@ div.topic-list-edit-container {
 
 body.animating div.topic-list{
   margin-top: 0px !important;
-  padding-top: #{$navbar_height}px;
+  padding-top: #{$navbar_height + 15}px; // adding 15px like in the topic list padding-top
   min-height: calc(100vh - #{$footer_height}px);
 }
 
