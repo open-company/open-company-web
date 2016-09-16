@@ -109,7 +109,8 @@
     ;; edit new metric's data, not its meta-data       
     (om/set-state! owner :metadata-edit? false) 
     ;; dispatch the metric matadata change (for API update)
-    (dis/dispatch! [:save-topic-data "growth" {:metrics (metrics-as-sequence owner (:metric-slugs data))}])))
+    (dis/dispatch! [:save-topic-data "growth" {:metrics (metrics-as-sequence owner (:metric-slugs data))
+                                               :placeholder false}])))
 
 (defn- cancel-metadata-cb [owner data editing-cb]
   (set-metadata-edit owner false) ; cancel the metadata editing
@@ -185,7 +186,7 @@
         metric-slug (om/get-state owner :metric-slug)
         new-metrics (if new-metric? (conj existing-metrics (current-metric-info metric-slug owner)) existing-metrics)
         final-map (if new-metric? (assoc data-map :metrics new-metrics) data-map)] ; add the metadata if this is a new metric
-    (dis/dispatch! [:save-topic-data "growth" final-map])
+    (dis/dispatch! [:save-topic-data "growth" (assoc final-map :placeholder false)])
     (when new-metric?
       ((:switch-focus-cb data) metric-slug {})))) ; show the new metric
 
