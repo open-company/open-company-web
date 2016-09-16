@@ -134,6 +134,7 @@
         (watch)
         (sass)
         (build-site)
+        (cljs-repl)
         (reload :asset-path "/public"
                 :on-jsload 'open-company-web.core/on-js-reload)
         (cljs :optimizations :none
