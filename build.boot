@@ -160,13 +160,3 @@
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {:externs ["public/js/externs.js"]})))
-
-(deftask project-repl []
-  (comp (serve :handler 'oc.server/handler
-               :port 3559)
-        (from-jars)
-        (watch)
-        (sass)
-        (build-site)
-        (cljs-repl) ; order is important!!
-        (cljs)))
