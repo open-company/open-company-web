@@ -811,3 +811,16 @@
     (when (pos? (count (clojure.string/trim (.text (js/$ body-el)))))
       (while (= (count (clojure.string/trim (.text (.last (.find (js/$ body-el) ">p"))))) 0)
         (.remove (js/$ ">p:last-child" (js/$ body-el)))))))
+
+(defn data-topic-has-data [section section-data]
+  (cond
+    ;; growth check count of metrics and count of data
+    (= (keyword section) :growth)
+    (and (pos? (count (:metrics section-data)))
+         (pos? (count (:data section-data))))
+    ;; finances check count of data
+    (= (keyword section) :growth)
+    (pos? (count (:data section-data)))
+    ;; else false
+    :else
+    false))
