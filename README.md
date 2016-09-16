@@ -144,7 +144,7 @@ clojure.lang.Compiler$CompilerException: java.lang.RuntimeException: No such var
              java.lang.RuntimeException: No such var: string/index-of
 ```
 
-make sure you have the same clojure version in build.boot (this is the version you should see in the other places), in the project [boot.properties](boot.properties) and in your local setup: `~/.boot/boot.properties`.
+make sure you have [clojure 1.7+](https://github.com/adzerk-oss/boot-cljs-repl#boot-cljs-repl) in build.boot, in the project boot settings [boot.properties](boot.properties) and in your local setup: `~/.boot/boot.properties`.
 
 and open a browser window: [http://localhost:3559/](http://localhost:3559/), then in another terminal window start a REPL with boot:
 
