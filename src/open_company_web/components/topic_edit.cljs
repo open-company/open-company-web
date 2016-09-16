@@ -399,7 +399,7 @@
                         :placeholder body-placeholder
                         :data-placeholder body-placeholder
                         :contentEditable true
-                        :style #js {:minHeight (if (:placeholder topic-data) "110px" "0px")}
+                        :style #js {:minHeight (if (or (:placeholder topic-data) (clojure.string/blank? topic-body)) "110px" "0px")}
                         :onBlur #(om/set-state! owner :char-count nil)
                         :dangerouslySetInnerHTML initial-body})
           (dom/div {:class "topic-foce-buttons group"}
