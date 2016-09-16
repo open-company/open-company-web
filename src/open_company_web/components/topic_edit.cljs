@@ -67,7 +67,7 @@
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
       (dis/dispatch! [:foce-input {:body emojied-body}]))
     (let [inner-text (.-innerText body-el)]
-      (om/set-state! owner :char-count (if (> (count inner-text) utils/topic-body-limit) "Extended\nlength" nil)))))
+      (om/set-state! owner :char-count nil))))
 
 (defn- setup-edit [owner]
   (when-let* [section-kw   (keyword (om/get-props owner :section))
