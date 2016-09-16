@@ -571,6 +571,11 @@
       (swap! company-cache assoc-in [slug k] v))
     (get cc k nil)))
 
+(defn remove-company-cache-key [k]
+  (let [slug (keyword (router/current-company-slug))
+        cc (slug @company-cache)]
+    (swap! company-cache update-in [slug] dissoc k)))
+
 (defn clean-company-caches []
   (reset! company-cache {}))
 
