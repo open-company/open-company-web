@@ -81,8 +81,9 @@
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
                     :ref "topic-internal"}
-        (when (or is-growth-finances?
-                  image-header)
+        (when (or (and is-growth-finances?
+                       (utils/data-topic-has-data section topic-data))
+                   image-header)
           (dom/div {:class (utils/class-set {:card-header true
                                              :card-image (not is-growth-finances?)})}
             (cond
