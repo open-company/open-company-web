@@ -152,7 +152,7 @@ div.topic {
 
       div.topic-headline-inner {
         padding-top: 14px;
-        font-size: 20px;
+        font-size: 18px;
         line-height: 25px;
         color: $oc_gray_7;
         outline: none;
@@ -162,7 +162,7 @@ div.topic {
         &:empty:after {
           content: attr(placeholder);
           display: block;
-          font-size: 20px;
+          font-size: 18px;
           line-height: 1.2;
           color: $oc_gray_7;
           font-style: italic;
@@ -175,7 +175,7 @@ div.topic {
         }
 
         .emojione {
-          @include emoji-size(20px);
+          @include emoji-size(18px);
         }
       }
 
@@ -194,11 +194,11 @@ div.topic {
         font-weight: 400;
         cursor: text;
         min-height: 20px;
-        font-size: 15px;
+        font-size: 14px;
         line-height: 22px;
 
         &:after {
-          font-size: 15px;
+          font-size: 14px;
           line-height: 22px;
           color: $oc_gray_7;
           font-style: italic;
@@ -210,12 +210,12 @@ div.topic {
         }
 
         .emojione {
-          @include emoji-size(15px);
+          @include emoji-size(14px);
         }
 
         *{
           font-weight: 400;
-          font-size: 15px;
+          font-size: 14px;
           line-height: 22px;
         }
 
