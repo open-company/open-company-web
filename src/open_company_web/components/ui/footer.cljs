@@ -17,7 +17,6 @@
       (dom/div {:class "footer"}
         (when-not (jwt/jwt)
           (dom/div {:class "footer-cta"}
-            "Powered by OpenCompany"
             (when (:su-preview data)
               (dom/div {}
                 (dom/a {:class "com-link"
