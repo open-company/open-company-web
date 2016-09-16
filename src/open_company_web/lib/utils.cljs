@@ -819,7 +819,7 @@
     (and (pos? (count (:metrics section-data)))
          (pos? (count (:data section-data))))
     ;; finances check count of data
-    (= (keyword section) :growth)
+    (= (keyword section) :finances)
     (pos? (count (:data section-data)))
     ;; else false
     :else
