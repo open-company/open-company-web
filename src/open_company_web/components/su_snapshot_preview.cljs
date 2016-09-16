@@ -207,7 +207,7 @@
             (dom/div {:class "su-preview-add-section-container"}
               (dom/div {:class "su-preview-add-section"
                         :style #js {:width total-width}}
-                (dom/div {:class "add-header"} "ADD TOPICS")
+                (dom/div {:class "add-header"} "Topics You Can Add to this Update")
                 (for [topic topics-to-add
                       :let [title (->> topic keyword (get company-data) :title)]]
                   (dom/div {:class "add-section"
