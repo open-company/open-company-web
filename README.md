@@ -129,6 +129,40 @@ One of the most important component trees is the company dashboard. This provide
 
 ![Company Dashboard Diagram](https://cdn.rawgit.com/open-company/open-company-web/mainline/docs/dashboard-viewing-component-tree.svg)
 
+#### Project repl
+
+To have repl connected to the browser where you can import and tests all the ns starts the dev task:
+
+```console
+$ boot dev
+```
+
+now open a browser window: [http://localhost:3559/](http://localhost:3559/).
+
+then in another terminal window start simple repl
+
+```console
+$ boot repl -c
+```
+
+at this point you can start a weasel server to connect to the browser window:
+
+```console
+cljs.user=> (start-repl)
+```
+
+If the repl doesn't connect to the browser window, refresh the page.
+
+At this point you should be able to import all our ns:
+
+```console
+cljs.user=> (require '[open-company-web.lib.utils :as utils])
+nil
+cljs.user=> (utils/vec-dissoc [:a :b :c] :a)
+[:b :c]
+```
+
+
 ## Testing
 
 Install [PhantomJS](https://http://phantomjs.org/) downloading the latest 2.x binary from [here](https://github.com/eugene1g/phantomjs/releases), the one from their site is currently broken.
