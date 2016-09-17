@@ -7,7 +7,7 @@
 (defn columns-num []
   (let [win-width (.-clientWidth (.-body js/document))]
     (cond
-      (>= win-width 1006)
+      (>= win-width 1012)
       3
       (>= win-width 684)
       2
@@ -15,7 +15,7 @@
       1)))
 
 ;; 3 Columns
-(def c3-min-win-width 1006)
+(def c3-min-win-width 1012)
 (def c3-max-win-width 1800)
 (def c3-min-card-width 302)
 (def c3-max-card-width 500)
@@ -25,7 +25,7 @@
 
 ;; 2 Columns
 (def c2-min-win-width 684)
-(def c2-max-win-width 1005)
+(def c2-max-win-width 1011)
 (def c2-min-card-width 302)
 (def c2-max-card-width 462)
 (def c2-win-card-diff (- (/ c2-max-win-width c2-max-card-width) (/ c2-min-win-width c2-min-card-width)))

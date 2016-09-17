@@ -3,7 +3,7 @@ nav.oc-navbar {
   z-index: 1030;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   background-color: white;
   border-top: 4px solid $oc_yellow;
   margin: 0px;
@@ -79,6 +79,29 @@ nav.oc-navbar {
     ul.navbar-right {
       float: right;
       margin-right: 0px;
+
+      div.sharing-button-container{
+        float: left;
+        margin-right: 10px;
+        margin-top: 16px;
+        color: #1E81C4;
+        border: 0px solid transparent;
+
+        button.sharing-button {
+          font-weight: 700;
+          font-size: 0.75rem;
+          font-family: $oc_headers_font;
+
+          i.fa.fa-share {
+            color: rgba(78, 90, 107, 0.8);
+            margin-right: 2px;
+          }
+        }
+      }
+
+      div.user-avatar {
+        float: right;
+      }
     }
   }
 }

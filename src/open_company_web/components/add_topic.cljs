@@ -12,19 +12,16 @@
 ;; topic adding component
 (defn get-all-sections
   "Return all sections for the current company no matter it's state (archived, active, inactive)
-   e.g {:section a-string :title a-string :category a-string*}"
+   e.g {:section a-string :title a-string}"
   []
   (let [company-data (dis/company-data)
-        slug         (keyword (router/current-company-slug))
-        categories   (:categories company-data)]
+        slug         (keyword (router/current-company-slug))]
     (into
-     (:archived company-data)
-     (for [cat (:categories (get @caches/new-sections slug))
-           sec (:sections cat)]
-       (-> sec
-           (assoc :section (:section-name sec))
-           (select-keys [:title :section])
-           (assoc :category (:name cat)))))))
+      (:archived company-data)
+      (for [sec (:new-sections (get @caches/new-sections slug))]
+        (-> sec
+            (assoc :section (:section-name sec))
+            (select-keys [:title :section]))))))
 
 (rum/defcs custom-topic-input
   < (rum/local "" ::topic-title)
@@ -45,7 +42,7 @@
                         new-topic-data {:title @(::topic-title s)
                                         :section topic-name
                                         :placeholder true}]
-                    (submit-fn :progress topic-name new-topic-data))} "Add"]]))
+                    (submit-fn topic-name new-topic-data))} "Add"]]))
 
 (defn chunk-topics
   "Partition the provided sequences as if they were one with `::archived` inbetween"
@@ -57,8 +54,8 @@
 
 (rum/defcs add-topic
   < (rum/local false ::expanded?)
-  [s {:keys [active-topics archived-topics column update-active-topics]}]
-  (if @(::expanded? s)
+  [s {:keys [active-topics archived-topics column update-active-topics initially-expanded]}]
+  (if (or @(::expanded? s) initially-expanded)
     (let [all-sections (into {} (for [s (get-all-sections)]
                                   [(keyword (:section s)) s]))
           slug (keyword (router/current-company-slug))
@@ -66,7 +63,7 @@
           inactive-not-archived (filterv (complement (cs/union (set active-topics) (set archived-topics)))
                                          topic-order)
           chunked (chunk-topics inactive-not-archived archived-topics)]
-      [:div.card.p--card
+      [:div.card.p--card.m--card
        [:div.open-sans.small-caps.bold.mb2.gray5
         [:span.mr1 "Suggested Topics"]
         [:span.dimmed-gray.btn-reset.right
@@ -82,10 +79,12 @@
                (let [topic-full (get all-sections topic)]
                  [:div.mb1.btn-reset.yellow-line-hover-child
                   {:key topic
-                   :on-click #(do (update-active-topics (or (:category topic-full) :progress) (:section topic-full))
+                   :on-click #(do (update-active-topics (:section topic-full))
                                   (reset! (::expanded? s) false))}
                   [:span.child
-                   (:title topic-full)
+                   (str (:title topic-full) (when (#{:finances :growth} topic) " "))
+                   (when (#{:finances :growth} topic)
+                      [:i.fa.fa-line-chart])
                    (:section-name topic-full)]])))])]
        (custom-topic-input #(do (update-active-topics %1 %2 %3)
                                 (reset! (::expanded? s) false)))])

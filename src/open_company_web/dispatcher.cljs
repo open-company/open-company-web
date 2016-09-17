@@ -117,3 +117,9 @@
 
 (defn foce-section-data []
   (:foce-data @app-state))
+
+(defn foce-section-data-editing? []
+  (:foce-data-editing? @app-state))
+
+(defn set-foce-section-data-editing [value]
+  (swap! app-state assoc :foce-data-editing? value))

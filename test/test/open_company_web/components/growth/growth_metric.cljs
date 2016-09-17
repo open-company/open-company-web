@@ -19,17 +19,14 @@
   :metric-info {
     :slug metric-slug
     :name "Test metric"
-    :target "high"
     :interval "monthly"
     :unit "test"}
   :metric-data [{
     :period "2015-10"
     :slug metric-slug
-    :target 123456
     :value 123456}
    {:period "2015-11"
     :slug metric-slug
-    :target 654321
     :value 654321}]})
 
 (deftest test-growth-metric-component

@@ -20,8 +20,12 @@ div.topic {
       left: 0;
     }
 
-    div.topic-foce{
+    div.topic-foce {
       position: relative;
+
+      & > div.section-container {
+        padding: 20px 10px 0 10px;
+      }
 
       & > div, & > input{
         padding: 0px 20px;
@@ -78,10 +82,6 @@ div.topic {
           width:100%;
         }
 
-        div.section-container {
-          margin: 10px;
-        }
-
         div.gradient {
           position:absolute;
           z-index:2;
@@ -133,9 +133,26 @@ div.topic {
         }
       }
 
+      button.chart-pencil-button{
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        transition: 230ms;
+
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 15px;
+        background-color: rgba(78,90,107,0.5);
+
+        &:hover {
+          background-color: rgba(78,90,107,1.0);
+        }
+      }
+
       div.topic-headline-inner {
         padding-top: 14px;
-        font-size: 20px;
+        font-size: 18px;
         line-height: 25px;
         color: $oc_gray_7;
         outline: none;
@@ -145,7 +162,7 @@ div.topic {
         &:empty:after {
           content: attr(placeholder);
           display: block;
-          font-size: 20px;
+          font-size: 18px;
           line-height: 1.2;
           color: $oc_gray_7;
           font-style: italic;
@@ -158,7 +175,7 @@ div.topic {
         }
 
         .emojione {
-          @include emoji-size(20px);
+          @include emoji-size(18px);
         }
       }
 
@@ -177,11 +194,11 @@ div.topic {
         font-weight: 400;
         cursor: text;
         min-height: 20px;
-        font-size: 15px;
+        font-size: 14px;
         line-height: 22px;
 
         &:after {
-          font-size: 15px;
+          font-size: 14px;
           line-height: 22px;
           color: $oc_gray_7;
           font-style: italic;
@@ -193,12 +210,12 @@ div.topic {
         }
 
         .emojione {
-          @include emoji-size(15px);
+          @include emoji-size(14px);
         }
 
         *{
           font-weight: 400;
-          font-size: 15px;
+          font-size: 14px;
           line-height: 22px;
         }
 
@@ -225,6 +242,18 @@ div.topic {
 
       div.topic-foce-footer {
         width: 100%;
+
+        div.upload-remote-url-container{
+          width: 100%;
+
+          input.upload-remote-url-field {
+            height: 32px;
+            margin-top: 1px;
+            padding-left: 3px;
+            outline: none;
+            border: 1px solid rgba(78, 90, 107, 0.5);
+          }
+        }
 
         div.topic-foce-footer-left {
           float: left;
@@ -257,6 +286,7 @@ div.topic {
 
       div.topic-foce-buttons {
         margin-top: 25px;
+        height: 31px;
 
         div.type-picker{
           font-size: 12px;
@@ -265,6 +295,25 @@ div.topic {
           a {
             color: black;
             text-decoration: underline;
+          }
+        }
+
+        button.pin-button {
+          opacity: 1;
+          color: rgba(78, 90, 107, 0.5);
+
+          &:hover {
+            color: rgba(78, 90, 107, 1);
+          }
+
+          i {
+            &:not(.pinned) {
+              transform: rotate(0deg);
+            }
+
+            &.pinned {
+              transform: rotate(25deg);
+            }
           }
         }
 
@@ -302,6 +351,7 @@ div.topic {
       div.topic-foce-footer {
         margin-top: 10px;
         margin-bottom: 20px;
+        height: 63px;
 
         div.divider {
           width: calc(100% + 40px);

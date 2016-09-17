@@ -58,16 +58,16 @@
   (when body
     (let [slug (:slug body)
           response (:response body)]
-      (swap! cache/new-sections assoc-in [(keyword slug) :categories] (:categories response))
+      (swap! cache/new-sections assoc-in [(keyword slug) :new-sections] (:templates response))
       (swap! cache/new-sections assoc-in [(keyword slug) :new-section-order] (:sections response))
       ;; signal to the app-state that the new-sections have been loaded
-      (assoc-in db [(keyword slug) :new-sections] (rand 4)))))
+      (-> db
+        (assoc-in [(keyword slug) :new-sections] (:templates response))
+        (dissoc :loading)))))
 
 (defmethod dispatcher/action :auth-settings [db [_ body]]
   (when body
-    (-> db
-        (assoc :auth-settings body)
-        (dissoc :loading))))
+    (assoc db :auth-settings body)))
 
 (defmethod dispatcher/action :revision [db [_ body]]
   (if body
@@ -76,25 +76,25 @@
           assoc-in-coll-2 (dispatcher/revision-key (:slug body) (:section body) (:as-of body))
           next-db (assoc-in db assoc-in-coll-2 true)]
       (swap! cache/revisions assoc-in assoc-in-coll fixed-section)
-      (dissoc next-db :loading))
+      next-db)
     db))
 
 (defmethod dispatcher/action :section [db [_ body]]
   (if body
     (let [fixed-section (utils/fix-section (:body body) (:section body))]
-      (-> db
-          (assoc-in (dispatcher/company-section-key (:slug body) (:section body)) fixed-section)
-          (dissoc :loading)))
+      (assoc-in db (dispatcher/company-section-key (:slug body) (:section body)) fixed-section))
     db))
 
 (defmethod dispatcher/action :company [db [_ {:keys [slug success status body]}]]
   (cond
     success
     ;; add section name inside each section
-    (let [updated-body (utils/fix-sections body)]
-      (-> db
-          (assoc-in (dispatcher/company-data-key (:slug updated-body)) updated-body)
-          (dissoc :loading)))
+    (let [updated-body (utils/fix-sections body)
+          with-company-data (assoc-in db (dispatcher/company-data-key (:slug updated-body)) updated-body)]
+      (if (or (:read-only updated-body)
+               (pos? (count (:sections updated-body))))
+          (dissoc with-company-data :loading)
+          with-company-data))
     (= 403 status)
     (-> db
         (assoc-in [(keyword slug) :error] :forbidden)
@@ -118,10 +118,10 @@
     (assoc-in (dispatcher/su-list-key slug) response)
     (dissoc :loading)))
 
-(defmethod dispatcher/action :su-edit [db [_ {:keys [slug su-slug]}]]
+(defmethod dispatcher/action :su-edit [db [_ {:keys [slug su-date su-slug]}]]
   (let [protocol (.. js/document -location -protocol)
         host     (.. js/document -location -host)
-        su-url   (str protocol "//" host "/" (name slug) "/updates/" su-slug)]
+        su-url   (str protocol "//" host (oc-urls/stakeholder-update slug (utils/su-date-from-created-at su-date) su-slug))]
     (-> db
       (assoc-in (dispatcher/latest-stakeholder-update-key slug) su-url)
       (dissoc :loading))))
@@ -138,11 +138,13 @@
 (defmethod dispatcher/action :start-foce [db [_ section-key section-data]]
   (if section-key
     (-> db
-        (assoc :foce-key section-key)
-        (assoc :foce-data section-data))
+        (assoc :foce-key section-key) ; which topic is being FoCE
+        (assoc :foce-data section-data) ; map of the in progress edits of the topic data
+        (assoc :foce-data-editing? false)) ; is the data portion of the topic (e.g. finance, growth) being edited
     (-> db
         (dissoc :foce-key)
-        (dissoc :foce-data))))
+        (dissoc :foce-data)
+        (dissoc :foce-data-editing?))))
 
 (defmethod dispatcher/action :foce-input [db [_ topic-data-map]]
   (let [old-data (:foce-data db)]
@@ -155,44 +157,61 @@
 (defmethod dispatcher/action :input [db [_ path value]]
   (assoc-in db path value))
 
+(defmethod dispatcher/action :new-sections [db [_ new-sections]]
+  (let [slug (keyword (router/current-company-slug))]
+    (api/patch-sections new-sections)
+    (assoc-in db (conj (dispatcher/company-data-key slug) :sections) new-sections)))
+
 (defmethod dispatcher/action :topic-archive [db [_ topic]]
   (let [slug (keyword (router/current-company-slug))
         company-data (dispatcher/company-data)
-        old-categories (:sections company-data)
-        new-categories (apply merge (map #(hash-map (first %) (utils/vec-dissoc (second %) (name topic))) old-categories))]
-    (api/patch-sections new-categories)
+        old-sections (:sections company-data)
+        new-sections (utils/vec-dissoc old-sections (name topic))]
+    (api/patch-sections new-sections)
     (-> db
       (dissoc :foce-key)
       (dissoc :foce-data)
-      (assoc-in (conj (dispatcher/company-data-key slug) :sections) new-categories))))
+      (dissoc :foce-data-editing?)
+      (assoc-in (conj (dispatcher/company-data-key slug) :sections) new-sections))))
 
-(defmethod dispatcher/action :foce-save [db [_]]
+(defmethod dispatcher/action :foce-save [db [_ & [new-sections topic-data]]]
   (let [slug (keyword (router/current-company-slug))
         topic (:foce-key db)
-        topic-data (:foce-data db)
+        topic-data (merge (:foce-data db) (if (map? topic-data) topic-data {}))
         is-data-topic (#{:finances :growth} (keyword topic))
         body (:body topic-data)
         with-fixed-headline (assoc topic-data :headline (utils/emoji-images-to-unicode (:headline topic-data)))
         with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))
         old-section-data (get (dispatcher/company-data db slug) (keyword topic))
         new-data (dissoc (merge old-section-data with-fixed-body) :placeholder)]
-    (api/partial-update-section (:section (:foce-data db)) new-data)
+    (api/patch-sections new-sections new-data (:section (:foce-data db)))
     (-> db
         (dissoc :foce-key)
         (dissoc :foce-data)
-        (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) new-data))))
+        (dissoc :foce-data-editing?)
+        (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) new-data)
+        (assoc-in (conj (dispatcher/company-data-key slug) :sections) new-sections))))
 
 (defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
   (if topic
     (assoc-in db [:force-edit-topic] topic)
     (dissoc db :force-edit-topic)))
 
-(defmethod dispatcher/action :save-topic [db [_ topic topic-data]]
+(defn- save-topic [db topic topic-data]
   (let [slug (keyword (router/current-company-slug))
         old-section-data (get (dispatcher/company-data db slug) (keyword topic))
         new-data (dissoc (merge old-section-data topic-data) :placeholder)]
-    (api/partial-update-section topic new-data)
-    (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic)) (merge old-section-data topic-data))))
+    (api/partial-update-section topic (dissoc topic-data :placeholder))
+    (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic)) new-data)))
+
+(defmethod dispatcher/action :save-topic [db [_ topic topic-data]]
+  (save-topic db topic topic-data))
+
+(defmethod dispatcher/action :save-topic-data [db [_ topic topic-data]]
+  ;; save topic data for the company
+  (save-topic db topic topic-data)
+  ;; update topic data for the still in-progress FoCE
+  (assoc db :foce-data (merge (:foce-data db) topic-data)))
 
 (defmethod dispatcher/action :su-share/reset [db _]
   (dissoc db :su-share))

@@ -83,6 +83,9 @@
 (defn current-company-slug []
   (:slug @path))
 
+(defn current-stakeholder-update-date []
+  (:update-date @path))
+
 (defn current-stakeholder-update-slug []
   (:update-slug @path))
 

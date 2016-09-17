@@ -1,9 +1,18 @@
 div.topics-columns {
   padding: 0;
-  width: 100vw;
+  width: 100%;
+
+  &.dragging-topic {
+    div.topic.not-draggable-topic {
+      opacity: 0.5 !important;
+    }
+    div.topic-row div.topic button.topic-pencil-button {
+      opacity: 0;
+    }
+  }
 
   div.topics-column-container {
-    padding: 20px 30px 20px 30px;
+    padding: 20px;
     margin: 0 auto;
 
     @media screen and (max-width: 413px){
@@ -14,8 +23,8 @@ div.topics-columns {
 
     div.topics-column {
       min-width: 302px;
-      max-width: 500px;
-      margin-right: 20px;
+      max-width: 520px;
+      margin-right: 0px;
       float: left;
 
       &:last-child {
@@ -24,18 +33,38 @@ div.topics-columns {
 
       div.topic-row{
         height: auto;
-        padding-bottom: 22px;
+        padding: 0px 6px 0px 6px;
+        margin-bottom: 22px;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+
+        &.draggable-topic.left-highlight {
+          border-left: 4px solid $oc-yellow;
+        }
+
+        &.draggable-topic.right-highlight {
+          border-right: 4px solid $oc-yellow;
+        }
+
+        &.draggable-topic.dragging-topic {
+          z-index: 1000;
+          opacity: 0.5;
+        }
       }
     }
 
     &.columns-1 {
-      padding: 20px 0px 20px 0px;
+      padding: 20px 0px;
+
       div.topics-column{
         margin: 0 auto;
         float: none;
 
         div.topic-row{
+          padding: 0px;
+          border: none;
           padding-bottom: 12px;
+          margin-bottom: 0px;
         }
       }
     }

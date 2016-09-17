@@ -6,10 +6,19 @@ div.su-snapshot {
     content: "";
     min-height: calc(100vh - #{$navbar_height}px);
     background-color: $oc_gray_6;
-    padding-top: 60px;
+    padding-top: 40px;
+
+    div.topics-columns div.topics-column-container.columns-1 {
+      div.topics-column {
+        div.topic-row {
+          width: 100%;
+          margin-bottom: 0px;
+          padding: 0px 0px 22px 0px;
+        }
+      }
+    }
 
     div.su-sp-company-header {
-      height: 50px;
       text-align: center;
 
       div {
@@ -22,24 +31,16 @@ div.su-snapshot {
         margin-top: -5px;
       }
 
-      span.company-name {
-        margin-top: 0px;
+      div.su-snapshot-title {
+        width: 100%;
+        margin-top: 50px;
+        text-align: center;
+        margin-top: 10px;
         font-weight: 700;
-        font-size: 24px;
+        font-size: 22px;
         line-height: 1.2;
         color: $oc_gray_5;
       }
-    }
-
-    div.su-snapshot-title {
-      width: 100%;
-      text-align: center;
-      font-size: 20px;
-      line-height: 1.2;
-      text-align: center;
-      color: $oc_gray_5;
-      margin-top: 50px;
-      text-align: center;
     }
 
     div.su-snapshot-subtitle {

@@ -17,15 +17,13 @@
 (def test-atom {:metric-info {:slug "test"
                               :name "Test"
                               :interval "monthly"
-                              :unit "users"
-                              :target "increase"}
+                              :unit "users"}
                 :metric-count 1
                 :metrics {"test" {
                                   :slug "test"
                                   :name "Test"
                                   :interval "monthly"
-                                  :unit "users"
-                                  :target "increase"}}
+                                  :unit "users"}}
                 :new-metric false
                 :next-cb #()
                 :delete-metric-cb #()

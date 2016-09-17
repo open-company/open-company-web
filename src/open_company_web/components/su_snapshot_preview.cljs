@@ -40,13 +40,6 @@
     (api/patch-stakeholder-update {:title (or title "")
                                    :sections topics})))
 
-(defn focus-title [owner]
-  (when-not (om/get-state owner :title-focused)
-    (when-let [preview-title (.findDOMNode js/ReactDOM (om/get-ref owner "preview-title"))]
-      (.focus preview-title)
-      (set! (.-value preview-title) (.-value preview-title))
-      (om/set-state! owner :title-focused true))))
-
 (defn share-clicked [owner]
  (patch-stakeholder-update owner)
  (om/set-state! owner :show-su-dialog :prompt))
@@ -64,8 +57,8 @@
     (.sortable list-node #js {:scroll true
                               :forcePlaceholderSize true
                               :placeholder "sortable-placeholder"
+                              :items ".topic-row"
                               :axis "y"
-                              :handle ".topic"
                               :stop #(om/set-state! owner :su-topics (ordered-topics-list))
                               :opacity 1})))
 
@@ -76,18 +69,20 @@
   (let [company-data (dis/company-data (om/get-props owner))]
     (->> section keyword (get company-data) :title)))
 
+(def topic-row-x-padding 40)
+
 (defcomponent su-snapshot-preview [data owner options]
 
   (init-state [_]
     (let [company-data (dis/company-data data)
           su-data (stakeholder-update-data data)
           su-sections (if (empty? (:sections su-data))
-                        (utils/filter-placeholder-sections (flatten (vals (:sections company-data))) company-data)
+                        (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
                         (utils/filter-placeholder-sections (:sections su-data) company-data))]
       {:columns-num (responsive/columns-num)
        :su-topics su-sections
        :title-focused false
-       :title (if (clojure.string/blank? (:title su-data))  (utils/su-default-title) (:title su-data))
+       :title (:title su-data)
        :show-su-dialog false
        :link-loading false
        :slack-loading false
@@ -97,15 +92,14 @@
   (did-mount [_]
     (om/set-state! owner :did-mount true)
     (setup-sortable owner options)
-    (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))
-    (focus-title owner))
+    (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
 
   (will-receive-props [_ next-props]
     (when-not (= (dis/company-data data) (dis/company-data next-props))
       (let [company-data (dis/company-data next-props)
             su-data      (stakeholder-update-data next-props)
             su-sections  (if (empty? (:sections su-data))
-                           (flatten (vals (:sections company-data)))
+                           (vec (:sections company-data))
                            (utils/filter-placeholder-sections (:sections su-data) company-data))]
         (om/set-state! owner :su-topics su-sections)))
     ; share via link
@@ -119,7 +113,6 @@
           (om/set-state! owner :show-su-dialog true)))))
 
   (did-update [_ _ _]
-    (focus-title owner)
     (setup-sortable owner options))
 
   (render-state [_ {:keys [columns-num
@@ -136,10 +129,15 @@
           company-data (dis/company-data data)
           su-data      (stakeholder-update-data data)
           card-width   (responsive/calc-card-width 1)
-          ww           (.-clientWidth (sel1 js/document :body))
-          total-width  (if (> ww 413) (str (min ww (+ card-width 100)) "px") "auto")
+          ww           (.-clientWidth (.-body js/document))
+          title-width  (if (>= ww responsive/c1-min-win-width)
+                          (str (if (< ww card-width) ww card-width) "px")
+                          "auto")
+          total-width  (if (>= ww responsive/c1-min-win-width)
+                          (str (if (< ww card-width) ww (+ card-width (* topic-row-x-padding 2))) "px")
+                          "auto")
           su-subtitle  (str "— " (utils/date-string (js/Date.) [:year]))
-          possible-sections (utils/filter-placeholder-sections (flatten (vals (:sections company-data))) company-data)
+          possible-sections (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
           topics-to-add (sort #(compare (title-from-section-name owner %1) (title-from-section-name owner %2)) (reduce utils/vec-dissoc possible-sections su-topics))]
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
                                          :main-scroll true})}
@@ -156,6 +154,7 @@
         (dom/div {:class "page snapshot-page"}
           (dom/div {:class "su-snapshot-header"}
             (back-to-dashboard-btn {})
+            (dom/div {:class "snapshot-cta"} "Choose the topics to share and arrange them in any order.")
             (dom/div {:class "share-su"}
               (dom/button {:class "btn-reset btn-solid share-su-button"
                            :on-click #(share-clicked owner)
@@ -166,20 +165,18 @@
             (dom/div {:class "su-sp-content"
                       :key (apply str su-topics)}
               (dom/div {:class "su-sp-company-header"}
-                (dom/div {}
+                (dom/div {:class "company-logo-container"}
                   (dom/img {:class "company-logo" :src (:logo company-data)}))
-                (dom/div {}
-                  (dom/span {:class "company-name"} (:name company-data))))
-              (when (:title su-data)
-                (dom/div {:class "preview-title-container"}
-                  (dom/input #js {:className "preview-title"
-                                  :id "su-snapshot-preview-title"
-                                  :type "text"
-                                  :value title
-                                  :ref "preview-title"
-                                  :onChange #(om/set-state! owner :title (.. % -target -value))
-                                  :style #js {:width total-width}})))
-              (dom/div {:class "preview-subtitle"} su-subtitle)
+                (when (:title su-data)
+                  (dom/div {:class "preview-title-container"}
+                    (dom/input #js {:className "preview-title"
+                                    :id "su-snapshot-preview-title"
+                                    :type "text"
+                                    :value title
+                                    :ref "preview-title"
+                                    :placeholder "Title of this Update"
+                                    :onChange #(om/set-state! owner :title (.. % -target -value))
+                                    :style #js {:width title-width}}))))
               (when show-su-dialog
                 (om/build su-preview-dialog {:selected-topics (:sections su-data)
                                              :company-data company-data
@@ -192,7 +189,7 @@
               (om/build topics-columns {:columns-num 1
                                         :card-width card-width
                                         :total-width total-width
-                                        :show-fast-editing false
+                                        :is-stakeholder-update true
                                         :content-loaded (not (:loading data))
                                         :topics su-topics
                                         :company-data company-data
@@ -210,7 +207,7 @@
             (dom/div {:class "su-preview-add-section-container"}
               (dom/div {:class "su-preview-add-section"
                         :style #js {:width total-width}}
-                (dom/div {:class "add-header"} "ADD TOPICS")
+                (dom/div {:class "add-header"} "Topics You Can Add to this Update")
                 (for [topic topics-to-add
                       :let [title (->> topic keyword (get company-data) :title)]]
                   (dom/div {:class "add-section"

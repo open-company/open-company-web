@@ -187,21 +187,15 @@
                       :on-change #(om/set-state! owner :company-name (.. % -target -value))})
           ; Slug
           (dom/div {:class "small-caps bold mb1"} "DASHBOARD URL")
-          (dom/div {:class "npt npt-disabled col-8 p1 mb3"} (str ls/web-server "/" (name slug)))
+          (dom/div {:class "npt npt-disabled col-11 p1 mb3"} (str ls/web-server "/" (name slug)))
 
           ;; Company logo
           (dom/div {:class "small-caps bold mb1"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
           (dom/div {}
             (if (not= file-upload-state :show-url-field)
-              (dom/input {:type "text"
-                          :value logo
-                          :id "logo"
-                          :class "npt col-10 p1 mb3"
-                          :maxLength 255
-                          :disabled true
-                          :style {:margin-bottom "2px"}
-                          :on-change #(om/set-state! owner :logo (.. % -target -value))
-                          :placeholder "http://example.com/logo.png"})
+              (dom/div {:class "company-logo-container"}
+                (when-not (string/blank? logo)
+                  (dom/img {:src logo :class "company-logo" :data-test "aaa"})))
               (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
                   (dom/input {:type "text"
                               :class "npt col-7 p1 mb3"
@@ -218,7 +212,7 @@
                                :on-click #(om/set-state! owner :file-upload-state nil)}
                     "cancel"))))
           (dom/div {:class "group"
-                    :style {:margin-bottom "10px"}}
+                    :style {:margin-bottom "2rem"}}
             (dom/input {:id "foce-file-upload-ui--select-trigger"
                         :style {:display "none"}
                         :type "file"
@@ -232,13 +226,13 @@
                          :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
               (dom/i {:class "fa fa-camera"}))
             (dom/button {:class "btn-reset image-url left"
-                         :title "Provide an image link"
+                         :title "Provide a link to your logo"
                          :type "button"
                          :data-toggle "tooltip"
                          :data-placement "top"
                          :style {:display (if (nil? file-upload-state) "block" "none")}
                          :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
-              (dom/i {:class "fa fa-code"}))
+              (dom/i {:class "fa fa-link"}))
             (dom/div {:class "left"
                       :style {:display (if (= file-upload-state :show-progress) "block" "none")
                               :color "rgba(78, 90, 107, 0.5)"}}

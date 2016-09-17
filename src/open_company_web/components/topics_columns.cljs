@@ -3,6 +3,7 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1 sel)]
+            [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.utils :as utils]
@@ -33,16 +34,18 @@
 (def add-topic-height 94)
 (def read-more-height 15)
 
+(def topic-margins 20)
+
 (defn headline-body-height [headline body card-width]
   (let [$headline (js/$ (str "<div class=\"topic\">"
                                 "<div class=\"topic-anim\">"
                                   "<div>"
                                     "<div class=\"topic-internal\">"
                                       (when-not (clojure.string/blank? headline)
-                                        (str "<div class=\"topic-headline-inner\" style=\"width: " card-width "px;\">"
+                                        (str "<div class=\"topic-headline-inner\" style=\"width: " (+ card-width topic-margins) "px;\">"
                                                (utils/emojify headline true)
                                              "</div>"))
-                                      "<div class=\"topic-body\" style=\"width: " card-width "px;\">"
+                                      "<div class=\"topic-body\" style=\"width: " (+ card-width topic-margins) "px;\">"
                                         (utils/emojify body true)
                                       "</div>"
                                     "</div>"
@@ -91,7 +94,9 @@
               read-more    (if (clojure.string/blank? (utils/strip-HTML-tags (:body topic-data))) 0 read-more-height)]
           (+ start-height headline-height read-more))
         :else
-        (let [topic-image-height      (if (:image-url topic-data) (utils/aspect-ration-image-height (:image-width topic-data) (:image-height topic-data) card-width) 0)
+        (let [topic-image-height      (if (:image-url topic-data)
+                                        (utils/aspect-ration-image-height (:image-width topic-data) (:image-height topic-data) card-width)
+                                        0)
               headline-body-height (headline-body-height (:headline topic-data) (utils/truncated-body topic-body) card-width)
               read-more               (if (clojure.string/blank? (utils/strip-HTML-tags (:body topic-data))) 0 read-more-height)]
           (+ topic-default-height headline-body-height topic-image-height read-more))))))
@@ -112,26 +117,53 @@
       (= min-height thrd-clmn)
       :3)))
 
-(defn calc-layout [owner data]
-  (let [columns-num (:columns-num data)
-        show-add-topic (add-topic? owner)
-        topics (to-array (:topics data))
-        final-layout (loop [idx (if (= columns-num 3) 3 2)
-                            layout (if (= columns-num 3)
-                                      {:1 [(first topics)]
-                                       :2 [(second topics)]
-                                       :3 [(get topics 2)]}
-                                      {:1 [(first topics)]
-                                       :2 [(second topics)]})]
-                        (let [shortest-column (get-shortest-column owner data layout)
-                              new-column (conj (get layout shortest-column) (get topics idx))
-                              new-layout (assoc layout shortest-column new-column)]
-                          (if (< (inc idx) (count topics))
-                            (recur (inc idx)
-                                   new-layout)
-                            new-layout)))
-        clean-layout (apply merge (for [[k v] final-layout] {k (vec (remove nil? v))}))]
-    clean-layout))
+(defn get-pinned-layout
+  "Return the layout of the pinned topics only on 3 or 2 columns depending on the
+  current screen width."
+  [pinned-topics columns-num]
+  (if (= columns-num 3)
+    (loop [idx 3
+           cl1 (vec (remove nil? [(first pinned-topics)]))
+           cl2 (vec (remove nil? [(second pinned-topics)]))
+           cl3 (vec (remove nil? [(get pinned-topics 2)]))]
+      (if (<= idx (count pinned-topics))
+        (recur (+ idx 3)
+               (vec (remove nil? (conj cl1 (get pinned-topics idx))))
+               (vec (remove nil? (conj cl2 (get pinned-topics (inc idx)))))
+               (vec (remove nil? (conj cl3 (get pinned-topics (+ idx 2))))))
+        {:1 cl1
+         :2 cl2
+         :3 cl3}))
+    (loop [idx 2
+           cl1 (vec (remove nil? [(first pinned-topics)]))
+           cl2 (vec (remove nil? [(second pinned-topics)]))]
+      (if (<= idx (count pinned-topics))
+        (recur (+ idx 2)
+               (vec (remove nil? (conj cl1 (get pinned-topics idx))))
+               (vec (remove nil? (conj cl2 (get pinned-topics (inc idx))))))
+        {:1 cl1
+         :2 cl2}))))
+
+(defn calc-layout 
+  "Calculate the best layout given the list of topics and the number of columns to layout to"
+  [owner data]
+  (if (utils/is-test-env?)
+    (om/get-props owner :topics)
+    (let [columns-num (:columns-num data)
+          company-data (dis/company-data)
+          show-add-topic (add-topic? owner)
+          {:keys [pinned other]} (utils/get-pinned-other-keys (utils/get-section-keys company-data) company-data)
+          final-layout (loop [idx 0
+                              layout (get-pinned-layout pinned columns-num)]
+                          (let [shortest-column (get-shortest-column owner data layout)
+                                new-column (conj (get layout shortest-column) (get other idx))
+                                new-layout (assoc layout shortest-column new-column)]
+                            (if (<= (inc idx) (count other))
+                              (recur (inc idx)
+                                     new-layout)
+                              new-layout)))
+          clean-layout (apply merge (for [[k v] final-layout] {k (vec (remove nil? v))}))]
+      clean-layout)))
 
 (defn render-topic [owner options section-name & [column]]
   (when section-name
@@ -143,21 +175,44 @@
           topics                (:topics props)
           topic-click           (or (:topic-click options) identity)
           update-active-topics  (or (:update-active-topics options) identity)
-          share-selected?       (utils/in? share-selected-topics section-name)]
+          share-selected?       (utils/in? share-selected-topics section-name)
+          slug                  (keyword (router/current-company-slug))
+          window-scroll         (.-scrollTop (.-body js/document))
+          {:keys [pinned other]} (utils/get-pinned-other-keys topics (dis/company-data))
+          first-topic           (if (pos? (count pinned))
+                                  (first pinned)
+                                  (first other))
+          hovering-topic        (om/get-state owner :hovering)
+          hovering?             (and (:is-stakeholder-update props)
+                                     (or (and (not (nil? hovering-topic))
+                                              (= section-name hovering-topic))
+                                         (and first-topic
+                                              (= section-name (name first-topic))
+                                              (nil? hovering-topic)
+                                              (<= window-scroll 188))))]
       (if (= section-name "add-topic")
         (at/add-topic {:column column
                        :archived-topics (mapv (comp keyword :section) (:archived company-data))
                        :active-topics (vec topics)
+                       :initially-expanded (and (not (om/get-props owner :loading))
+                                                (om/get-props owner :new-sections)
+                                                (zero? (count topics)))
                        :update-active-topics update-active-topics})
         (let [sd (->> section-name keyword (get topics-data))]
           (when-not (and (:read-only company-data) (:placeholder sd))
-            (dom/div #js {:className "topic-row"
+            (dom/div #js {:className (utils/class-set {:topic-row true
+                                                       :draggable-topic (:pin sd)
+                                                       :hover hovering?})
                           :data-topic (name section-name)
                           :ref section-name
+                          :onMouseOver #(when (:is-stakeholder-update props)
+                                         (om/set-state! owner :hovering section-name))
+                          :onMouseOut #(when (:is-stakeholder-update props)
+                                         (om/set-state! owner :hovering nil))
                           :key (str "topic-row-" (name section-name))}
               (om/build topic {:loading (:loading company-data)
                                :section section-name
-                               :show-fast-editing (om/get-props owner :show-fast-editing)
+                               :is-stakeholder-update (:is-stakeholder-update props)
                                :section-data sd
                                :card-width (:card-width props)
                                :show-share-remove (:show-share-remove props)
@@ -179,7 +234,8 @@
                                       card-width
                                       topics
                                       company-data
-                                      topics-data] :as data} owner options]
+                                      topics-data
+                                      is-stakeholder-update] :as data} owner options]
 
   (did-mount [_]
     (when (> columns-num 1)
@@ -190,9 +246,11 @@
               (not= (:columns-num next-props) (:columns-num data)))
       (om/set-state! owner :best-layout (calc-layout owner next-props))))
 
-  (render-state [_ {:keys [best-layout]}]
-    (let [show-add-topic     (add-topic? owner)
-          partial-render-topic (partial render-topic owner options)]
+  (render-state [_ {:keys [best-layout hovering]}]
+    (let [show-add-topic         (add-topic? owner)
+          partial-render-topic   (partial render-topic owner options)
+          {:keys [pinned other]} (utils/get-pinned-other-keys topics (dis/company-data))
+          columns-container-key   (str (apply str pinned) (apply str other))]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true
@@ -203,38 +261,58 @@
           ;; render 2 or 3 column layout
           (> columns-num 1)
           (dom/div {:class "topics-column-container group"
-                    :style #js {:width total-width}}
+                    :style #js {:width total-width}
+                    :key columns-container-key}
+            ; for each column key contained in best layout
             (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
-              (let [column (get best-layout kw)]
-                (dom/div {:class "topics-column"
-                          :style #js {:width (str card-width "px")}}
-                  (when (pos? (count column))
-                    (for [idx (range (count column))
-                      :let [section-kw (get column idx)
-                            section-name (name section-kw)]]
-                      (partial-render-topic section-name
-                                            (when (= section-name "add-topic") (int (name kw))))))
-                  (when (and show-add-topic
-                             (= kw :1)
-                             (= (count topics) 0))
-                    (partial-render-topic "add-topic" 1))
-                  (when (and show-add-topic
-                             (= kw :2)
-                             (or (and (= (count topics) 1)
-                                      (= columns-num 3))
-                                 (and (>= (count topics) 1)
-                                      (= columns-num 2))))
-                    (partial-render-topic "add-topic" 2))
-                  (when (and show-add-topic
-                             (= kw :3)
-                             (>= (count topics) 2))
-                    (partial-render-topic "add-topic" 3))))))
+              ; get the pinned and the other topics of the current column
+              (let [column (get best-layout kw)
+                    {:keys [pinned other]} (utils/get-pinned-other-keys column (dis/company-data))]
+                (dom/div {:class (str "topics-column col-" (name kw))
+                          :style #js {:width (str (+ card-width topic-margins) "px")}}
+                  ; render the pinned topics
+                  (dom/div #js {:className "topics-column-pinned"}
+                    (when (pos? (count pinned))
+                      (for [idx (range (count pinned))
+                            :let [section-kw (get pinned idx)
+                                  section-name (name section-kw)]]
+                        (partial-render-topic section-name
+                                              (when (= section-name "add-topic") (int (name kw)))))))
+                  ; render the other topics
+                  (dom/div #js {:className "topics-column-other"}
+                    (when (pos? (count other))
+                      (for [idx (range (count other))
+                            :let [section-kw (get other idx)
+                                  section-name (name section-kw)]]
+                        (partial-render-topic section-name
+                                              (when (= section-name "add-topic") (int (name kw))))))
+                    ; render the add topic in the correct column
+                    (when (and show-add-topic
+                               (= kw :1)
+                               (= (count topics) 0))
+                      (partial-render-topic "add-topic" 1))
+                    (when (and show-add-topic
+                               (= kw :2)
+                               (or (and (= (count topics) 1)
+                                        (= columns-num 3))
+                                   (and (>= (count topics) 1)
+                                        (= columns-num 2))))
+                      (partial-render-topic "add-topic" 2))
+                    (when (and show-add-topic
+                               (= kw :3)
+                               (>= (count topics) 2))
+                      (partial-render-topic "add-topic" 3)))))))
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
-                    :style #js {:width total-width}}
+                    :style #js {:width (if is-stakeholder-update "100%" total-width)}
+                    :key columns-container-key}
             (dom/div {:class "topics-column"}
-              (for [section (vec topics)]
-                (partial-render-topic (name section)))
-              (when show-add-topic
-                (partial-render-topic "add-topic" 1)))))))))
+              (dom/div #js {:className "topics-column-pinned"}
+                (for [section pinned]
+                  (partial-render-topic (name section))))
+              (dom/div #js {:className "topics-column-other"}
+                (for [section other]
+                  (partial-render-topic (name section)))
+                (when show-add-topic
+                  (partial-render-topic "add-topic" 1))))))))))

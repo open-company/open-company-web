@@ -71,7 +71,6 @@
   ;; save route
   (router/set-route! [] {})
   ;; load data from api
-  (swap! dis/app-state assoc :loading true)
   (api/get-entry-point)
   ;; render component
   (drv-root home target))
@@ -103,7 +102,6 @@
         (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
       ;; save route
       (router/set-route! ["login"] {})
-      (swap! dis/app-state assoc :loading true)
       (when (contains? (:query-params params) :access)
         ;login went bad, add the error message to the app-state
         (swap! dis/app-state assoc :access (:access (:query-params params))))
@@ -139,13 +137,14 @@
 (defn stakeholder-update-handler [target component params]
   (let [slug (:slug (:params params))
         update-slug (:update-slug (:params params))
+        update-date (:update-date (:params params))
         update-section (:section (:params params))
         query-params (:query-params params)
         su-key (dis/stakeholder-update-key slug update-slug)]
     (pre-routing query-params)
     (utils/clean-company-caches)
     ;; save the route
-    (router/set-route! [slug "su-snapshot" "updates" update-slug update-section] {:slug slug :update-slug update-slug :query-params query-params :section update-section})
+    (router/set-route! [slug "su-snapshot" "updates" update-date update-slug update-section] {:slug slug :update-slug update-slug :update-date update-date :query-params query-params :section update-section})
     ;; do we have the company data already?
     (when (not (get-in @dis/app-state su-key))
       ;; load the Stakeholder Update data from the API
@@ -193,11 +192,6 @@
     (defroute company-section-route (urls/company-section ":slug" ":section") {:as params}
       (company-handler "section" target company-dashboard params))
 
-    (defroute company-section-edit-route (urls/company-section-edit ":slug" ":section") {:as params}
-      (if (jwt/jwt)
-        (company-handler "section-edit" target company-dashboard params)
-        (router/redirect! (urls/company-section (:slug (:params params)) (:section (:params params))))))
-
     (defroute company-route (urls/company ":slug") {:as params}
       (company-handler "dashboard" target company-dashboard params))
 
@@ -213,10 +207,10 @@
     (defroute su-edit-route (urls/stakeholder-update-edit ":slug") {:as params}
       (company-handler "su-edit" target su-edit params))
 
-    (defroute stakeholder-update-route (urls/stakeholder-update ":slug" ":update-slug") {:as params}
+    (defroute stakeholder-update-route (urls/stakeholder-update ":slug" ":update-date" ":update-slug") {:as params}
       (stakeholder-update-handler target su-snapshot params))
 
-    (defroute stakeholder-update-section-route (urls/stakeholder-update-section ":slug" ":update-slug" ":section") {:as params}
+    (defroute stakeholder-update-section-route (urls/stakeholder-update-section ":slug" ":update-date" ":update-slug" ":section") {:as params}
       (stakeholder-update-handler target su-snapshot params))
 
     (defroute not-found-route "*" []
@@ -235,7 +229,6 @@
                                  company-route
                                  company-route-slash
                                  company-section-route
-                                 company-section-edit-route
                                  su-snapshot-preview-route
                                  su-edit-route
                                  su-list-route

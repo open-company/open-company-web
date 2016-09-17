@@ -37,7 +37,6 @@
     params))
 
 (defn refresh-jwt []
-  (js/console.info "Refreshing JWToken")
   (http/get (str auth-endpoint "/refresh-token") (complete-params {})))
 
 (defn update-jwt-cookie! [jwt]
@@ -180,7 +179,7 @@
           section-kw (keyword section)
           company-data (dispatcher/company-data)
           section-data (get company-data section-kw)
-          clean-partial-section-data (dissoc partial-section-data :as-of :icon)
+          clean-partial-section-data (dissoc partial-section-data :as-of :icon :section)
           json-data (cljs->json clean-partial-section-data)
           partial-update-link (utils/link-for (:links section-data) "partial-update" "PATCH")]
       (api-patch (:href partial-update-link)
@@ -327,7 +326,7 @@
       (fn [{:keys [success body]}]
         (when success
           (let [fixed-body (json->cljs body)]
-            (dispatcher/dispatch! [:su-edit {:slug slug :su-slug (:slug fixed-body)}])))))))
+            (dispatcher/dispatch! [:su-edit {:slug slug :su-slug (:slug fixed-body) :su-date (:created-at fixed-body)}])))))))
 
 (defn get-su-list []
   (let [slug (keyword (router/current-company-slug))

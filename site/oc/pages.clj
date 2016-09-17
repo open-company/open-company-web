@@ -186,8 +186,10 @@
           [:div#oc-loading]
           ;; jQuery needed by Bootstrap JavaScript
           [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
-          ;; jQuery needed by Emoji One autocomplete
+          ;; jQuery textcomplete needed by Emoji One autocomplete
           [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.3.4/jquery.textcomplete.min.js" :type "text/javascript"}]
+          ;; WURFL used for mobile/tablet detection
+          [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
           ;; Truncate html string
           [:script {:type "text/javascript" :src "/lib/truncate/jquery.truncate.js"}]
           ;; jQuery scrollTo plugin
@@ -208,5 +210,5 @@
           [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js?oc_deploy_key"}]
           [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js?oc_deploy_key"}]
           ;; Filestack
-          [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]
-          [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]]})
+          [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]]})
+

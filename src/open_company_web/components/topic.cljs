@@ -20,7 +20,8 @@
             [open-company-web.components.ui.topic-read-more :refer (topic-read-more)]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.dom :refer (Resize)]
-            [goog.fx.Animation.EventType :as EventType]
+            [goog.fx.Animation.EventType :as AnimationEventType]
+            [goog.events.EventType :as EventType]
             [goog.events :as events]
             [goog.style :as gstyle]
             [cljsjs.react.dom]))
@@ -41,7 +42,6 @@
       (utils/event-stop e))
     ((om/get-props owner :topic-click) selected-metric force-editing)))
 
-
 (defn start-foce-click [owner]
   (let [section-kw (keyword (om/get-props owner :section))
         company-data (dis/company-data)
@@ -50,14 +50,7 @@
 
 (defn pencil-click [owner e]
   (utils/event-stop e)
-  (let [section (om/get-props owner :section)]
-    (if (#{:growth :finances} (keyword section))
-      (fullscreen-topic owner nil true)
-      (start-foce-click owner))))
-
-(defn block-a-expand []
-  (when-not (utils/is-test-env?)
-    (.on (js/$ "div.topic-body a") "click" #(.stopPropagation %))))
+  (start-foce-click owner))
 
 (defcomponent topic-internal [{:keys [topic-data
                                       section
@@ -66,13 +59,8 @@
                                       prev-rev
                                       next-rev
                                       sharing-mode
-                                      show-fast-editing] :as data} owner options]
-
-  (did-mount [_]
-    (block-a-expand))
-
-  (did-update [_ _ _]
-    (block-a-expand))
+                                      read-only-company
+                                      is-stakeholder-update] :as data} owner options]
 
   (render [_]
     (let [section-kw          (keyword section)
@@ -84,31 +72,49 @@
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
-          truncated-body      (if (utils/is-test-env?) topic-body (.truncate js/$ topic-body (clj->js {:length 500 :words true})))]
+          truncated-body      (if (utils/is-test-env?)
+                                topic-body
+                                (.truncate js/$ topic-body (clj->js {:length utils/topic-body-limit :words true})))
+          company-data        (dis/company-data)
+          {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
+
       (dom/div #js {:className "topic-internal group"
-                    :onClick (partial fullscreen-topic owner nil false)
+                    :key (str "topic-internal-" (name section))
                     :ref "topic-internal"}
-        (when (or is-growth-finances?
-                  image-header)
+        (when (or (and is-growth-finances?
+                       (utils/data-topic-has-data section topic-data))
+                   image-header)
           (dom/div {:class (utils/class-set {:card-header true
                                              :card-image (not is-growth-finances?)})}
             (cond
               (= section "finances")
               (om/build topic-finances {:section-data (utils/fix-finances topic-data)
                                         :section section
-                                        :currency currency
-                                        :topic-click (partial fullscreen-topic owner nil false)} {:opts chart-opts})
+                                        :currency currency} {:opts chart-opts})
               (= section "growth")
-              (om/build topic-growth {:section-data topic-data :section section :currency currency} {:opts chart-opts})
+              (om/build topic-growth {:section-data topic-data
+                                      :section section
+                                      :currency currency} {:opts chart-opts})
               :else
               (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options}))))
         ;; Topic title
-        (dom/div {:class "group"}
+        (dom/div {:class "topic-dnd-handle group"}
           (dom/div {:class "topic-title"} (:title topic-data))
-          (when (and show-fast-editing
-                   (responsive/can-edit?)
+          (when (and (not is-stakeholder-update)
+                     (:pin topic-data)
+                     (not (responsive/is-mobile-size?))
+                     (responsive/can-edit?)
+                     (not read-only-company))
+            (dom/div {:class "pinned-topic"}
+              (dom/i {:class "fa fa-thumb-tack"
+                      :data-toggle "tooltip"
+                      :data-placement "top"
+                      :title (if (> (count pinned) 1) "Drag and drop to reorder" "Pinned to the top")})))
+          (when (and (not is-stakeholder-update)
                    (not (responsive/is-mobile-size?))
+                   (responsive/can-edit?)
                    (not (:read-only topic-data))
+                   (not read-only-company)
                    (not sharing-mode)
                    (not (:foce-active data)))
             (dom/button {:class (str "topic-pencil-button btn-reset")
@@ -120,15 +126,16 @@
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
-        (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
-                      :ref "topic-body"
-                      :dangerouslySetInnerHTML (utils/emojify truncated-body)})
+        (when-not (responsive/is-mobile?)
+          (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
+                        :ref "topic-body"
+                        :dangerouslySetInnerHTML (utils/emojify truncated-body)}))
         ; if it's SU preview or SU show only read-more
-        (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
-                (utils/in? (:route @router/path) "su-snapshot"))
-          (dom/div {:class "left"
-                    :style {:margin-bottom "28px"}}
-            (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic owner nil false))))
+        (if is-stakeholder-update
+          (when (utils/exceeds-topic-body-limit topic-body)
+            (dom/div {:class "left"
+                    :style {:margin-bottom "20px"}}
+              (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic owner nil false)))))
           (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic owner nil false)) {:opts options}))))))
 
 (defn animate-revision-navigation [owner]
@@ -151,22 +158,11 @@
     ; appear the new topic
     (doto appear-animation
       (events/listen
-        EventType/FINISH
+        AnimationEventType/FINISH
         #(om/set-state! owner (merge current-state
                                     {:as-of (:transition-as-of current-state)
                                      :transition-as-of nil})))
       (.play))))
-
-
-(defn get-all-sections [slug]
-  (let [categories-data (:categories (slug @caches/new-sections))
-        all-category-sections (apply concat
-                                     (for [category categories-data]
-                                       (let [cat-name (:name category)
-                                             sections (:sections category)]
-                                         (map #(assoc % :category cat-name) sections))))]
-    (apply merge
-           (map #(hash-map (keyword (:section-name %)) %) all-category-sections))))
 
 (defcomponent topic [{:keys [active-topics
                              section-data
@@ -177,12 +173,20 @@
                              sharing-mode
                              share-selected
                              archived-topics
-                             show-share-remove] :as data} owner options]
+                             show-share-remove
+                             is-stakeholder-update] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
      :actual-as-of (:updated-at section-data)
+     :window-width (.width (js/$ js/window))
      :transition-as-of nil})
+
+  (did-mount [_]
+    (when-not (utils/is-test-env?)
+      ; initialize bootstrap tooltips
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+      (events/listen js/window EventType/RESIZE #(om/set-state! owner :window-width (.width (js/$ js/window))))))
 
   (will-update [_ next-props _]
     (let [new-as-of (:updated-at (:section-data next-props))
@@ -197,8 +201,7 @@
     (when (om/get-state owner :transition-as-of)
       (animate-revision-navigation owner)))
 
-  (render-state [_ {:keys [editing as-of actual-as-of transition-as-of] :as state}]
-
+  (render-state [_ {:keys [editing as-of actual-as-of transition-as-of window-width] :as state}]
     (let [section-kw (keyword section)
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
@@ -211,7 +214,8 @@
                   (om/set-state! owner :transition-as-of (:updated-at rev))
                   (utils/event-stop e))
           foce-active (not (nil? (dis/foce-section-key)))
-          is-foce (= (dis/foce-section-key) section-kw)]
+          is-foce (= (dis/foce-section-key) section-kw)
+          ww      (.-width (js/$ (.-body js/document)))]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -222,18 +226,33 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
+                                                 :draggable-topic (:pin topic-data)
+                                                 :not-draggable-topic (not (:pin topic-data))
                                                  :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
+                    :style #js {:width (if (responsive/is-mobile?) "auto" (str card-width "px"))
+                                :marginLeft (when (utils/in? (:route @router/path) "su-snapshot-preview") (str (/ (- window-width card-width) 2) "px"))}
                     :ref "topic"
-                    :id (str "topic-" (name section))
-                    :onClick #(when (and (:topic-click options) (not foce-active))
-                                ((:topic-click options) nil false))}
+                    :data-section (name section)
+                    :key (str "topic-" (name section))
+                    :id (str "topic-" (name section))}
         (when show-share-remove
           (dom/div {:class "share-remove-container"
                     :id (str "share-remove-" (name section))}
             (dom/button {:class "btn-reset share-remove"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :title "Remove topic from this update."
                          :on-click #(when (contains? options :share-remove-click) ((:share-remove-click options) (name section)))}
               (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.5)" :size 12 :stroke 4 :accent-color "rgba(78, 90, 107, 0.5)"}))))
+        (when show-share-remove
+          (dom/div {:class "share-dnd-container"
+                    :id (str "share-dnd-" (name section))}
+            (dom/div {:class "btn-reset share-dnd"
+                      :data-toggle "tooltip"
+                      :data-placement "bottom"
+                      :title "Drag and drop topic to reorder."}
+              (dom/i {:class "fa fa-arrows"}))))
         (dom/div #js {:className "topic-anim group"
                       :key (str "topic-anim-" as-of "-" transition-as-of)
                       :ref "topic-anim"}
@@ -247,7 +266,7 @@
                 (om/build topic-edit {:section section
                                       :topic-data topic-data
                                       :sharing-mode sharing-mode
-                                      :show-fast-editing (:show-fast-editing data)
+                                      :is-stakeholder-update (:is-stakeholder-update data)
                                       :currency currency
                                       :card-width card-width
                                       :read-only-company (:read-only-company data)
@@ -261,7 +280,7 @@
                 (om/build topic-internal {:section section
                                           :topic-data topic-data
                                           :sharing-mode sharing-mode
-                                          :show-fast-editing (:show-fast-editing data)
+                                          :is-stakeholder-update (:is-stakeholder-update data)
                                           :currency currency
                                           :card-width card-width
                                           :read-only-company (:read-only-company data)

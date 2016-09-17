@@ -287,6 +287,11 @@
       {:on-click cancel-fn}
       "DONE"]]]])
 
+(defn reset-scroll-height []
+  (let [main-scroll (gdom/getElementByClass "main-scroll")]
+    (gstyle/setStyle (.-body js/document) #js {:overflow "auto"})
+    (gstyle/setStyle main-scroll #js {:height "auti"})))
+
 (defn setup-scroll-height []
   (let [main-scroll       (gdom/getElementByClass "main-scroll")
         su-preview-window (js/$ ".su-preview-window")
@@ -307,8 +312,7 @@
      :sent false})
 
   (did-mount [_]
-    (dis/dispatch! [:input [:su-share :email :subject]
-                    (str (:name (:company-data data)) " " (:su-title data))])
+    (dis/dispatch! [:input [:su-share :email :subject] (:su-title data)])
     (setup-scroll-height))
 
   (did-update [_ _ _]
@@ -316,8 +320,7 @@
 
   (will-unmount [_]
     (dis/dispatch! [:su-share/reset])
-    (.css (js/$ js/document.-body) #js {:overflow "auto"})
-    (.css (js/$ ".main-scroll") #js {:height "auto"}))
+    (reset-scroll-height))
 
   (will-receive-props [_ next-props]
     ; slack SU posted

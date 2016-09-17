@@ -6,8 +6,7 @@
   :slug "buffer"
   :uuid "1234"
 
-  :categories ["progress", "company"]
-  :sections {:progress ["finances" "challenges" "growth"] :company ["values"]}
+  :sections ["finances" "challenges" "growth" "values"]
 
   :challenges {
     :title "Key Challenges"
@@ -116,28 +115,24 @@
         :interval "monthly"
         :name "Total registered users"
         :slug "total-registered-users"
-        :target "high"
         :unit "users"
       }
       {
         :interval "monthly"
         :name "Monthly active users"
         :slug "mau"
-        :target "high"
         :unit "users"
       }
       {
         :interval "monthly"
         :name "Average daily active users"
         :slug "dau"
-        :target "high"
         :unit "users"
       }
       {
         :interval "monthly"
         :name "Annual recurring revenue"
         :slug "arr"
-        :target "high"
         :unit "USD"
       }
     ]
@@ -638,28 +633,24 @@
             :interval "monthly"
             :name "Total registered users"
             :slug "total-registered-users"
-            :target "high"
             :unit "users"
           }
           {
             :interval "monthly"
             :name "Monthly active users"
             :slug "mau"
-            :target "high"
             :unit "users"
           }
           {
             :interval "monthly"
             :name "Average daily active users"
             :slug "dau"
-            :target "high"
             :unit "users"
           }
           {
             :interval "monthly"
             :name "Annual recurring revenue"
             :slug "arr"
-            :target "high"
             :unit "USD"
           }
         ]

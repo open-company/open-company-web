@@ -16,6 +16,7 @@
             [open-company-web.lib.iso4217 :refer (iso4217)]
             [open-company-web.caches :refer (company-cache)]
             [open-company-web.local-settings :as ls]
+            [open-company-web.lib.responsive :as responsive]
             [cljsjs.emojione]) ; pulled in for cljsjs externs
   (:import  [goog.i18n NumberFormat]))
 
@@ -296,8 +297,24 @@
     cur-period))
 
 (defn get-section-keys [company-data]
-  "Get the section names, as a vector of keywords, in category order and order in the category."
-  (vec (map keyword (flatten (remove nil? (map #(get-in company-data [:sections (keyword %)]) (:categories company-data)))))))
+  "Get the section names, as a vector of keywords."
+  (vec (map keyword (:sections company-data))))
+
+(defn get-pinned-other-keys
+  "Get a map that split the given list of topics in pinned and non pinned topics"
+  [sections company-data]
+  (loop [pinned []
+         unpinned sections
+         idx 0]
+    (if (<= idx (count sections))
+      (let [sec (get sections idx)
+            sec-data (->> sec keyword (get company-data))
+            is-pinned (:pin sec-data)
+            next-pinned (if is-pinned (vec (conj pinned sec)) pinned)
+            next-unpinned (if is-pinned (vec (vec-dissoc unpinned sec)) unpinned)]
+        (recur next-pinned next-unpinned (inc idx)))
+      {:pinned pinned
+       :other unpinned})))
 
 (defn link-for
   ([links rel] (some #(when (= (:rel %) rel) %) links))
@@ -307,7 +324,7 @@
   (let [update (link-for links "update" "PUT")
         partial-update (link-for links "partial-update" "PATCH")
         delete (link-for links "delete" "DELETE")]
-    (or (nil? update) (nil? partial-update))))
+    (and (nil? update) (nil? partial-update) (nil? delete))))
 
 (defn as-of-now []
   (let [date (js-date)]
@@ -329,7 +346,8 @@
                           (assoc section-body :updated-at (as-of-now)))
         with-keys       (-> with-updated-at
                           (assoc :section (name section-name))
-                          (assoc :as-of (:updated-at section-body)))]
+                          (assoc :as-of (:updated-at section-body))
+                          (assoc :read-only (readonly? (:links section-body))))]
     (if (= section-name :finances)
       (fix-finances with-keys)
       with-keys)))
@@ -341,9 +359,7 @@
         read-only (readonly? links)
         without-sections (apply dissoc company-data section-keys)
         with-read-only (assoc without-sections :read-only read-only)
-        sections (into {} (map
-                           (fn [sn] [sn (fix-section (sn company-data) sn)])
-                           section-keys))
+        sections (apply merge (map (fn [sn] (hash-map sn (fix-section (get company-data sn) sn))) section-keys))
         with-fixed-sections (merge with-read-only sections)]
     with-fixed-sections))
 
@@ -442,14 +458,15 @@
           fixed-year (if (in? flags :short-year) (str "'" (subs (str year) 2 4)) (str year))
           plus-one-week-year (cljs-time/year (cljs-time/plus parsed-date (cljs-time/days 7)))
           minus-one-week-year (cljs-time/year (cljs-time/minus parsed-date (cljs-time/days 7)))
-          needs-year (or (in? flags :force-year)
-                         (case fixed-interval
-                           "weekly"
-                           (or (not= plus-one-week-year year) (not= minus-one-week-year year))
-                           "quarterly"
-                           (or (= month 1) (= month 10))
-                           ;else
-                           (or (= month 1) (= month 12))))]
+          needs-year (and (not (in? flags :skip-year))
+                          (or (in? flags :force-year)
+                            (case fixed-interval
+                              "weekly"
+                              (or (not= plus-one-week-year year) (not= minus-one-week-year year))
+                              "quarterly"
+                              (or (= month 1) (= month 10))
+                              ;else
+                              (or (= month 1) (= month 12)))))]
       (case fixed-interval
         "quarterly"
         (str (get-quarter-from-month (cljs-time/month parsed-date) flags)
@@ -553,6 +570,11 @@
     (when v
       (swap! company-cache assoc-in [slug k] v))
     (get cc k nil)))
+
+(defn remove-company-cache-key [k]
+  (let [slug (keyword (router/current-company-slug))
+        cc (slug @company-cache)]
+    (swap! company-cache update-in [slug] dissoc k)))
 
 (defn clean-company-caches []
   (reset! company-cache {}))
@@ -761,10 +783,49 @@
           (let [hidePlaceholder (gobj/get this "hidePlaceholder")]
             (hidePlaceholder editor-el)))))))
 
+(defn filter-placeholder-sections [topics company-data]
+  (vec (filter #(not (:placeholder (->> % keyword (get company-data)))) topics)))
+
+(defn su-date-from-created-at [created-at]
+  (let [from-js-date (cljs-time/date-time (js-date created-at))]
+    (cljs-time-format/unparse (cljs-time-format/formatter "yyyy-MM-dd") from-js-date)))
+
+(def topic-body-limit 500)
+
 (defn truncated-body [body]
   (if (is-test-env?)
     body
-    (.truncate js/$ body (clj->js {:length 500 :words true}))))
+    (.truncate js/$ body (clj->js {:length topic-body-limit :words true}))))
 
-(defn filter-placeholder-sections [topics company-data]
-  (vec (filter #(not (:placeholder (->> % keyword (get company-data)))) topics)))
+(defn exceeds-topic-body-limit [body]
+  (> (count (strip-HTML-tags body)) topic-body-limit))
+
+(def min-no-placeholder-section-enable-share 1)
+
+(defn can-edit-sections? [company-data]
+  (let [company-topics (vec (map keyword (:sections company-data)))]
+    (and (not (responsive/is-mobile-size?))
+         (responsive/can-edit?)
+         (not (:read-only company-data))
+         (>= (count (filter-placeholder-sections company-topics company-data)) min-no-placeholder-section-enable-share))))
+
+(defn remove-ending-empty-paragraph
+  "Remove the last p tag if it's empty."
+  [body-el]
+  (when-not (is-test-env?)
+    (when (pos? (count (clojure.string/trim (.text (js/$ body-el)))))
+      (while (= (count (clojure.string/trim (.text (.last (.find (js/$ body-el) ">p"))))) 0)
+        (.remove (js/$ ">p:last-child" (js/$ body-el)))))))
+
+(defn data-topic-has-data [section section-data]
+  (cond
+    ;; growth check count of metrics and count of data
+    (= (keyword section) :growth)
+    (and (pos? (count (:metrics section-data)))
+         (pos? (count (:data section-data))))
+    ;; finances check count of data
+    (= (keyword section) :finances)
+    (pos? (count (:data section-data)))
+    ;; else false
+    :else
+    false))

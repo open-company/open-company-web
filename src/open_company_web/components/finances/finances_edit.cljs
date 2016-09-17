@@ -2,12 +2,14 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.components.ui.cell :refer (cell)]
-            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.lib.finance-utils :as finance-utils]
             [cljs.core.async :refer (put!)]))
+
+(def batch-size 6)
 
 (defn signal-tab [period k]
   (let [ch (utils/get-channel (str period k))]
@@ -40,85 +42,134 @@
                       (if (zero? burn)
                         (str burn-prefix "-")
                         (str burn-prefix (utils/thousands-separator (utils/abs burn) currency 0))))
-          runway-days (:runway finances-data)
-          runway (cond
-                   (nil? runway-days) "-"
-                   (or (not (:cash finances-data))
-                       (not (:costs finances-data))) ""
-                   (zero? runway-days) "-"
-                   (pos? runway-days) "-"
-                   :else (finance-utils/get-rounded-runway runway-days)) 
           ref-prefix (str (:period finances-data) "-")
           period-month (utils/get-month period)
           needs-year (or (= period-month "JAN")
-                         (= period-month "DEC")
                          (:needs-year data))]
-      (dom/tr {}
-        (dom/th {:class "no-cell"}
-          (utils/get-period-string (:period finances-data) "monthly" [:short (when needs-year :force-year)]))
-        ;; revenue
-        (dom/td {}
-          (om/build cell {:value (:revenue finances-data)
-                          :decimals 0
-                          :positive-only true
-                          :placeholder (if is-new "entire month" "")
-                          :currency currency
-                          :cell-state cell-state
-                          :draft-cb #(change-cb :revenue %)
-                          :period period
-                          :key :revenue
-                          :tab-cb tab-cb}))
-        ;; costs
-        (dom/td {}
-          (om/build cell {:value (:costs finances-data)
-                          :decimals 0
-                          :positive-only true
-                          :placeholder (if is-new "entire month" "")
-                          :currency currency
-                          :cell-state cell-state
-                          :draft-cb #(change-cb :costs %)
-                          :period period
-                          :key :costs
-                          :tab-cb tab-cb}))
-        ;; cash
-        (dom/td {}
-          (om/build cell {:value (:cash finances-data)
-                          :decimals 0
-                          :positive-only false
-                          :placeholder (if is-new "at month end" "")
-                          :currency currency
-                          :cell-state cell-state
-                          :draft-cb #(change-cb :cash %)
-                          :period period
-                          :key :cash
-                          :tab-cb tab-cb}))
-        ;; Runway
-        (dom/td {:class (utils/class-set {:no-cell true :new-row-placeholder is-new :dark true})}
-          runway)))))
+      (dom/tbody {}
+        (dom/tr {}
+          (dom/th {:class "no-cell"}
+            (utils/get-period-string (:period finances-data) "monthly" [:short :skip-year]))
+          ;; revenue
+          (dom/td {}
+            (om/build cell {:value (:revenue finances-data)
+                            :decimals 0
+                            :positive-only true
+                            :short true
+                            :currency currency
+                            :cell-state cell-state
+                            :draft-cb #(change-cb :revenue %)
+                            :period period
+                            :key :revenue
+                            :tab-cb tab-cb}))
+          ;; costs
+          (dom/td {}
+            (om/build cell {:value (:costs finances-data)
+                            :decimals 0
+                            :positive-only true
+                            :short true
+                            :currency currency
+                            :cell-state cell-state
+                            :draft-cb #(change-cb :costs %)
+                            :period period
+                            :key :costs
+                            :tab-cb tab-cb}))
+          ;; cash
+          (dom/td {}
+            (om/build cell {:value (:cash finances-data)
+                            :decimals 0
+                            :positive-only false
+                            :short true
+                            :placeholder "" ; (if is-new "on SEP 30" "")
+                            :currency currency
+                            :cell-state cell-state
+                            :draft-cb #(change-cb :cash %)
+                            :period period
+                            :key :cash
+                            :tab-cb tab-cb})))
+        (when needs-year
+          (dom/tr {}
+            (dom/th {:class "no-cell year"}
+              (utils/get-year period))
+            (dom/td {:class "no-cell"})
+            (dom/td {:class "no-cell"})
+            (dom/td {:class "no-cell"})))))))
 
-(defn replace-row-in-data [data row k v]
+(defn finances-get-value [v]
+  (if (js/isNaN v)
+    0
+    v))
+
+(defn- finances-check-value
+  "Return true if the value is a number."
+  [v]
+  (and (not (= v ""))
+       (not (nil? v))
+       (not (js/isNaN v))))
+
+
+(defn finances-fix-row [row]
+  (let [fixed-cash (update-in row [:cash] finances-get-value)
+        fixed-revenue (assoc fixed-cash :revenue (finances-get-value (:revenue row)))
+        fixed-costs (assoc fixed-revenue :costs (finances-get-value (:costs row)))
+        fixed-burnrate (assoc fixed-costs :burn-rate (utils/calc-burn-rate (:revenue fixed-costs) (:costs fixed-costs)))
+        fixed-runway (assoc fixed-burnrate :runway (utils/calc-runway (:cash fixed-burnrate) (:burn-rate fixed-burnrate)))]
+    fixed-runway))
+
+(defn finances-row-has-data [row]
+  (or (finances-check-value (:cash row))
+      (finances-check-value (:costs row))
+      (finances-check-value (:revenue row))))
+
+(defn change-finances-data
+  "Update the local state of growth data with change from the user."
+  [owner row]
+  (let [has-data? (finances-row-has-data row)
+        fixed-row (when has-data? (finances-fix-row row))
+        period (:period row)
+        finances-data (om/get-state owner :finances-data)
+        fixed-data (if has-data? 
+                      (assoc finances-data period fixed-row)
+                      (dissoc finances-data period))]
+    ;(om/set-state! owner :has-changes (or (om/get-state owner :has-changes) (not= finances-data fixed-data)))
+    (om/set-state! owner :finances-data fixed-data)))
+
+(defn finances-clean-row [data]
+  ; a data entry is good if we have the period and one other value: cash, costs or revenue
+  (when (and (not (nil? (:period data)))
+             (or (not (nil? (:cash data)))
+                 (not (nil? (:costs data)))
+                 (not (nil? (:revenue data)))))
+    (dissoc data :burn-rate :runway :new :value)))
+
+(defn finances-clean-data [finances-data]
+  (remove nil? (vec (map (fn [[_ v]] (finances-clean-row v)) finances-data))))
+
+(defn- save-data [owner]
+  ; (om/set-state! owner :has-changes false)
+  (dis/dispatch! [:save-topic-data "finances" {:data (finances-clean-data (om/get-state owner :finances-data))
+                                               :placeholder false}]))
+
+(defn replace-row-in-data [owner row-data k v]
   "Find and replace the edited row"
-  (let [new-row (update row k (fn[_]v))]
-    ((:change-finances-cb data) new-row)))
-
-(def batch-size 6)
+  (let [new-row (update row-data k (fn[_]v))]
+    (change-finances-data owner new-row)))
 
 (defn more-months [owner]
   (om/update-state! owner :stop #(+ % batch-size)))
 
-(defcomponent finances-edit [data owner]
+(defcomponent finances-edit [{:keys [currency editing-cb show-first-edit-tip first-edit-tip-cb] :as data} owner]
 
   (init-state [_]
     {:finances-data (:finances-data data)
      :stop batch-size})
 
   (will-receive-props [_ next-props]
-    (when-not (= (:finances-data data) (:finances-data next-props))
-      (om/set-state! owner :finances-data (:finances-data next-props))))
+    (om/set-state! owner :finances-data (:finances-data next-props)))
 
   (render-state [_ {:keys [finances-data stop]}]
-    (let [company-slug (router/current-company-slug)
-          currency (:currency data)]
+
+    (let [company-slug (router/current-company-slug)]
 
       (dom/div {:class "finances"}
         (dom/div {:class "composed-section-edit finances-body edit"}
@@ -129,37 +180,36 @@
                   (dom/th {} "")
                   (dom/th {} "Revenue")
                   (dom/th {} "Expenses")
-                  (dom/th {} "Cash")
-                  (dom/th {:class "dark"} "Runway")))
-              (dom/tbody {}
-                (let [current-period (utils/current-period)]
-                  (for [idx (range stop)]
-                    (let [period (finance-utils/get-past-period current-period idx)
-                          has-value (contains? finances-data period)
-                          row-data (if has-value
-                                      (get finances-data period)
-                                      (finance-utils/placeholder-data period {:new true}))
-                          next-period (finance-utils/get-past-period current-period (inc idx))]
-                      (om/build finances-edit-row {:cursor row-data
-                                                   :next-period next-period
-                                                   :is-last (= idx 0)
-                                                   :needs-year (or (= idx 0)
-                                                                   (= idx (dec stop)))
-                                                   :currency currency
-                                                   :change-cb #(replace-row-in-data data row-data %1 %2)}))))
+                  (dom/th {} "Cash")))
+              (let [current-period (utils/current-period)]
+                (for [idx (range stop)]
+                  (let [period (finance-utils/get-past-period current-period idx)
+                        has-value (contains? finances-data period)
+                        row-data (if has-value
+                                    (get finances-data period)
+                                    (finance-utils/placeholder-data period {:new true}))
+                        next-period (finance-utils/get-past-period current-period (inc idx))]
+                    (om/build finances-edit-row {:cursor row-data
+                                                 :next-period next-period
+                                                 :is-last (= idx 0)
+                                                 :needs-year (= idx (dec stop))
+                                                 :currency currency
+                                                 :change-cb #(replace-row-in-data owner row-data %1 %2)}))))
+              (dom/tfoot {}
                 (dom/tr {}
-                  (dom/td {}
+                  (dom/th {:class "earlier" :col-span 2}
                     (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner)} "Earlier..."))
                   (dom/td {})
-                  (dom/td {})
-                  (dom/td {})
-                  (dom/td {}))))))
+                  (dom/td {})))))
 
-        ;; Onboarding toolip
-        (when (:show-first-edit-tip data)
-          (onboard-tip
-            {:id (str "finance-topic-add-" company-slug)
-             :once-only true
-             :mobile false
-             :desktop "Enter revenue, expenses and cash to create a simple chart."
-             :dismiss-tip-fn (:first-edit-tip-cb data)}))))))
+          (dom/div {:class "topic-foce-footer group"}
+            (dom/div {:class "topic-foce-footer-right"}
+              (dom/button {:class "btn-reset btn-outline btn-data-save"
+                           :on-click  #(do
+                                        (utils/event-stop %)
+                                        (save-data owner)
+                                        (editing-cb false))} "SAVE")
+              (dom/button {:class "btn-reset btn-outline"
+                           :on-click #(do
+                                        (utils/event-stop %)
+                                        (editing-cb false))} "CANCEL"))))))))
