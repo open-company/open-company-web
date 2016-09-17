@@ -67,7 +67,7 @@
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
       (dis/dispatch! [:foce-input {:body emojied-body}]))
     (let [inner-text (.-innerText body-el)]
-      (om/set-state! owner :char-count (if (> (count inner-text) utils/topic-body-limit) "Extended\nlength" nil)))))
+      (om/set-state! owner :char-count nil))))
 
 (defn- setup-edit [owner]
   (when-let* [section-kw   (keyword (om/get-props owner :section))
@@ -197,32 +197,30 @@
   (let [topic           (name (dis/foce-section-key))
         body-el         (js/$ (str "#foce-body-" (name topic)))]
     (utils/remove-ending-empty-paragraph body-el)
-    (let [fixed-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.html body-el)) "__html"))]
-      (dis/dispatch! [:foce-input {:body fixed-body}]))
-    ; delay dispatching the save action to avoid conflicts in the db
-    (utils/after 10
-     #(let [topic-data      (dis/foce-section-data)
-            company-data    (dis/company-data)
-            sections        (vec (:sections company-data))]
-        (cond
-          (and (not (om/get-state owner :initially-pinned))
-               (:pin topic-data))
-          ; needs to PATCH :sections to move the topic at the top of the unpinned topics
-          (let [without-topic (utils/vec-dissoc sections topic)
-                {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
-                with-pinned-topic (let [[before after] (split-at (count pinned) without-topic)]
-                                    (vec (concat before [topic] after)))]
-            (dis/dispatch! [:foce-save with-pinned-topic]))
-          (and (om/get-state owner :initially-pinned)
-               (not (:pin topic-data)))
-          ; needs to PATCH :sections to move the topic at the top of the unpinned topics
-          (let [without-topic (utils/vec-dissoc sections topic)
-                {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
-                with-unpinned-topic (let [[before after] (split-at (inc (count pinned)) without-topic)]
-                                    (vec (concat before [topic] after)))]
-            (dis/dispatch! [:foce-save with-unpinned-topic]))
-          :else
-          (dis/dispatch! [:foce-save sections]))))))
+    (let [topic-data   (dis/foce-section-data)
+          company-data (dis/company-data)
+          sections     (vec (:sections company-data))
+          fixed-body   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.html body-el)) "__html"))
+          data-to-save {:body fixed-body}]
+      (cond
+        (and (not (om/get-state owner :initially-pinned))
+             (:pin topic-data))
+        ; needs to PATCH :sections to move the topic at the top of the unpinned topics
+        (let [without-topic (utils/vec-dissoc sections topic)
+              {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
+              with-pinned-topic (let [[before after] (split-at (count pinned) without-topic)]
+                                  (vec (concat before [topic] after)))]
+          (dis/dispatch! [:foce-save with-pinned-topic data-to-save]))
+        (and (om/get-state owner :initially-pinned)
+             (not (:pin topic-data)))
+        ; needs to PATCH :sections to move the topic at the top of the unpinned topics
+        (let [without-topic (utils/vec-dissoc sections topic)
+              {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
+              with-unpinned-topic (let [[before after] (split-at (inc (count pinned)) without-topic)]
+                                  (vec (concat before [topic] after)))]
+          (dis/dispatch! [:foce-save with-unpinned-topic data-to-save]))
+        :else
+        (dis/dispatch! [:foce-save sections data-to-save])))))
 
 (defn- data-editing-cb [owner value]
   (om/set-state! owner :data-editing? value) ; local state
@@ -401,7 +399,7 @@
                         :placeholder body-placeholder
                         :data-placeholder body-placeholder
                         :contentEditable true
-                        :style #js {:minHeight (if (:placeholder topic-data) "110px" "0px")}
+                        :style #js {:minHeight (if (or (:placeholder topic-data) (clojure.string/blank? topic-body)) "110px" "0px")}
                         :onBlur #(om/set-state! owner :char-count nil)
                         :dangerouslySetInnerHTML initial-body})
           (dom/div {:class "topic-foce-buttons group"}

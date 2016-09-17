@@ -12,7 +12,8 @@
             [open-company-web.components.ui.utility-components :refer (editable-pen)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
-            [cljs.core.async :refer (put!)]))
+            [cljs.core.async :refer (put!)]
+            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
 
 (def batch-size 6)
 
@@ -109,7 +110,8 @@
     ;; edit new metric's data, not its meta-data       
     (om/set-state! owner :metadata-edit? false) 
     ;; dispatch the metric matadata change (for API update)
-    (dis/dispatch! [:save-topic-data "growth" {:metrics (metrics-as-sequence owner (:metric-slugs data))}])))
+    (dis/dispatch! [:save-topic-data "growth" {:metrics (metrics-as-sequence owner (:metric-slugs data))
+                                               :placeholder false}])))
 
 (defn- cancel-metadata-cb [owner data editing-cb]
   (set-metadata-edit owner false) ; cancel the metadata editing
@@ -185,13 +187,21 @@
         metric-slug (om/get-state owner :metric-slug)
         new-metrics (if new-metric? (conj existing-metrics (current-metric-info metric-slug owner)) existing-metrics)
         final-map (if new-metric? (assoc data-map :metrics new-metrics) data-map)] ; add the metadata if this is a new metric
-    (dis/dispatch! [:save-topic-data "growth" final-map])
+    (dis/dispatch! [:save-topic-data "growth" (assoc final-map :placeholder false)])
     (when new-metric?
       ((:switch-focus-cb data) metric-slug {})))) ; show the new metric
 
 (defn- replace-row-in-data [owner row k v]
   (let [new-row (update row k (fn[_]v))]
     (growth-change-data owner new-row)))
+
+(defn- show-archive-confirm-popover [owner data]
+  (add-popover {:container-id "archive-metric-confirm"
+                :message "Prior updates to this chart will only be available in topic history. Are you sure you want to archive?"
+                :cancel-title "KEEP"
+                :cancel-cb #(hide-popover nil "delete-metric-confirm")
+                :success-title "ARCHIVE"
+                :success-cb #(archive-metadata-cb owner data (om/get-state owner :metric-slug))}))
 
 ;; ===== Growth Data Editing Component =====
 
@@ -301,4 +311,12 @@
                     (dom/button {:class "btn-reset btn-outline"
                                  :on-click #(do
                                               (utils/event-stop %)
-                                              (editing-cb false))} "CANCEL")))))))))))
+                                              (editing-cb false))} "CANCEL")
+                    (when-not new-metric?
+                      (dom/button {:class "btn-reset archive-button"
+                                   :title "Archive this chart"
+                                   :type "button"
+                                   :data-toggle "tooltip"
+                                   :data-placement "top"
+                                   :on-click #(show-archive-confirm-popover owner data)}
+                          (dom/i {:class "fa fa-archive"})))))))))))))

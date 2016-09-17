@@ -43,7 +43,7 @@
                       (when show-share-su-button
                         (dom/div {:class "sharing-button-container"}
                           (dom/button {:class "btn-reset sharing-button right"
-                                       :disabled (not (nil? (dis/foce-section-key)))
+                                       :disabled (not (nil? (:foce-key data)))
                                        :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} (dom/i {:class "fa fa-share"}) " SHARE AN UPDATE")))
                       (user-avatar (partial menu-click owner)))
                     (login-button (:auth-settings data))))))))))))

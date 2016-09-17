@@ -154,7 +154,7 @@
         (dom/div {:class "page snapshot-page"}
           (dom/div {:class "su-snapshot-header"}
             (back-to-dashboard-btn {})
-            (dom/div {:class "snapshot-cta"} "Choose the topics to share and arrange them in any order")
+            (dom/div {:class "snapshot-cta"} "Choose the topics to share and arrange them in any order.")
             (dom/div {:class "share-su"}
               (dom/button {:class "btn-reset btn-solid share-su-button"
                            :on-click #(share-clicked owner)
@@ -174,7 +174,7 @@
                                     :type "text"
                                     :value title
                                     :ref "preview-title"
-                                    :placeholder (str "Title, e.g., " (:name company-data) " Monthly Update")
+                                    :placeholder "Title of this Update"
                                     :onChange #(om/set-state! owner :title (.. % -target -value))
                                     :style #js {:width title-width}}))))
               (when show-su-dialog
@@ -207,7 +207,7 @@
             (dom/div {:class "su-preview-add-section-container"}
               (dom/div {:class "su-preview-add-section"
                         :style #js {:width total-width}}
-                (dom/div {:class "add-header"} "ADD TOPICS")
+                (dom/div {:class "add-header"} "Topics You Can Add to this Update")
                 (for [topic topics-to-add
                       :let [title (->> topic keyword (get company-data) :title)]]
                   (dom/div {:class "add-section"

@@ -61,13 +61,17 @@
           (om/build menu data)
           (if (get-in data [(keyword (router/current-company-slug)) :error])
             (dom/div {:class (str "fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
-              (login-required data))
+              (login-required data)
+              ;;Footer
+              (om/build footer {:columns-num columns-num
+                                :card-width card-width}))
             (dom/div {:class "page"}
               ;; Navbar
               (om/build navbar {:save-bt-active save-bt-active
                                 :company-data company-data
                                 :card-width card-width
                                 :columns-num columns-num
+                                :foce-key (:foce-key data)
                                 :show-share-su-button (utils/can-edit-sections? company-data)
                                 :menu-open menu-open
                                 :auth-settings (:auth-settings data)})

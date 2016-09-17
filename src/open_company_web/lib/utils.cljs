@@ -571,6 +571,11 @@
       (swap! company-cache assoc-in [slug k] v))
     (get cc k nil)))
 
+(defn remove-company-cache-key [k]
+  (let [slug (keyword (router/current-company-slug))
+        cc (slug @company-cache)]
+    (swap! company-cache update-in [slug] dissoc k)))
+
 (defn clean-company-caches []
   (reset! company-cache {}))
 
@@ -808,5 +813,19 @@
   "Remove the last p tag if it's empty."
   [body-el]
   (when-not (is-test-env?)
-    (while (= (count (clojure.string/trim (.text (.last (.find (js/$ body-el) ">p"))))) 0)
-      (.remove (js/$ ">p:last-child" (js/$ body-el))))))
+    (when (pos? (count (clojure.string/trim (.text (js/$ body-el)))))
+      (while (= (count (clojure.string/trim (.text (.last (.find (js/$ body-el) ">p"))))) 0)
+        (.remove (js/$ ">p:last-child" (js/$ body-el)))))))
+
+(defn data-topic-has-data [section section-data]
+  (cond
+    ;; growth check count of metrics and count of data
+    (= (keyword section) :growth)
+    (and (pos? (count (:metrics section-data)))
+         (pos? (count (:data section-data))))
+    ;; finances check count of data
+    (= (keyword section) :finances)
+    (pos? (count (:data section-data)))
+    ;; else false
+    :else
+    false))

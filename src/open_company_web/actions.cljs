@@ -174,10 +174,10 @@
       (dissoc :foce-data-editing?)
       (assoc-in (conj (dispatcher/company-data-key slug) :sections) new-sections))))
 
-(defmethod dispatcher/action :foce-save [db [_ & [new-sections]]]
+(defmethod dispatcher/action :foce-save [db [_ & [new-sections topic-data]]]
   (let [slug (keyword (router/current-company-slug))
         topic (:foce-key db)
-        topic-data (:foce-data db)
+        topic-data (merge (:foce-data db) (if (map? topic-data) topic-data {}))
         is-data-topic (#{:finances :growth} (keyword topic))
         body (:body topic-data)
         with-fixed-headline (assoc topic-data :headline (utils/emoji-images-to-unicode (:headline topic-data)))

@@ -215,12 +215,12 @@ div.topic {
 
       div.topic-headline-inner {
         padding-top: 15px;
-        font-size: 20px;
+        font-size: 18px;
         line-height: 25px;
         color: $oc_gray_7;
 
         .emojione {
-          @include emoji-size(20px);
+          @include emoji-size(18px);
         }
       }
 
@@ -237,15 +237,15 @@ div.topic {
         font-weight: 400;
         color: $oc_gray_7;
         overflow: hidden;
-        font-size: 15px;
+        font-size: 14px;
         line-height: 22px;
 
         .emojione {
-          @include emoji-size(15px);
+          @include emoji-size(14px);
         }
 
         *{
-          font-size: 15px;
+          font-size: 14px;
           line-height: 22px;
           font-weight: 400;
         }

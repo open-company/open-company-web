@@ -1,6 +1,10 @@
 div.company-dashboard {
   background-color: #fff;
 
+  div.login-required {
+    min-height: calc(100vh - #{$footer_height}px - 41px);
+  }
+
   div.page{
     position: relative; /* Set the position property so z-index will apply */
     z-index: 20; /* Make sure this is higher than #menu */
@@ -22,6 +26,10 @@ body.small-footer {
 body.animating {
   div.company-dashboard {
     min-height: calc(100vh);
+
+    div.page {
+      width: 100%;
+    }
   }
 }
 

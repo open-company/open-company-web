@@ -102,7 +102,6 @@
         (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
       ;; save route
       (router/set-route! ["login"] {})
-      (swap! dis/app-state assoc :loading true)
       (when (contains? (:query-params params) :access)
         ;login went bad, add the error message to the app-state
         (swap! dis/app-state assoc :access (:access (:query-params params))))

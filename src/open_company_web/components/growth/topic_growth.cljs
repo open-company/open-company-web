@@ -45,8 +45,11 @@
   (let [metric-slugs (remove #{metric-slug} (om/get-state owner :growth-metric-slugs)) ; remove the slug
        focus (first metric-slugs)]
     (om/set-state! owner :focus focus) ; new focus on the first remaining metric
-    (om/set-state! owner :growth-metric-slugs metric-slugs)) ; update valid slugs state
-  (data-editing-toggle owner editing-cb false)) ; no longer data editing
+    (om/set-state! owner :growth-metric-slugs metric-slugs) ; update valid slugs state
+    ;; if last focus is the removing metric, remove the last focus cache
+    (when (= (utils/company-cache-key focus-cache-key) metric-slug)
+      (utils/remove-company-cache-key focus-cache-key)))
+    (data-editing-toggle owner editing-cb false)) ; no longer data editing
 
 (defn- render-pillboxes [owner editable? editing-cb options]
 
