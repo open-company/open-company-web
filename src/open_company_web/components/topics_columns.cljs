@@ -251,6 +251,7 @@
           partial-render-topic   (partial render-topic owner options)
           {:keys [pinned other]} (utils/get-pinned-other-keys topics (dis/company-data))
           columns-container-key   (str (apply str pinned) (apply str other))]
+      (println "topics-columns render")
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true

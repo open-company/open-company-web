@@ -217,6 +217,7 @@
           foce-active (not (nil? (dis/foce-section-key)))
           is-foce (= (dis/foce-section-key) section-kw)
           ww      (.-width (js/$ (.-body js/document)))]
+      (println "topic render" section)
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -227,8 +228,8 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
-                                                 :draggable-topic (:pin topic-data)
-                                                 :not-draggable-topic (not (:pin topic-data))
+                                                 :draggable-topic (and (not (:read-only-company data)) (:pin topic-data))
+                                                 :not-draggable-topic (or (:read-only-company data) (not (:pin topic-data)))
                                                  :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
                     :style #js {:width (if (responsive/is-mobile?) "auto" (str card-width "px"))
