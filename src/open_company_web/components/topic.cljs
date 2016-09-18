@@ -216,6 +216,7 @@
           foce-active (not (nil? (dis/foce-section-key)))
           is-foce (= (dis/foce-section-key) section-kw)
           ww      (.-width (js/$ (.-body js/document)))]
+      (println "topic render" section)
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
