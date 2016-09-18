@@ -227,23 +227,19 @@
                    (>= top (:top target-css))
                    (< left (+ (:left target-css) (:width target-css)))
                    (< top (+ (:top target-css) (:height target-css))))
-          (do (println "      found:" topic "dragging-topic" dragging-topic)
           (if (< left (+ (:left target-css) (/ (:width target-css) 2)))
-            (do (println "      left!")
             {:side "left"
              :topic-el topic-el
              :inside? true
-             :topic topic})
-            (do (println "      right!")
+             :topic topic}
             {:side "right"
              :topic-el topic-el
              :inside? true
-             :topic topic})))
+             :topic topic})
           {:topic-el topic-el
            :topic topic
            :inside? false})))
-    (do (println "      no .dragging-topic found!!!!")
-    (sentry/capture-message (str "open-company-web.components.topic-list/coord-inside params, left:" left ", top:" top ", topic:" topic)))))
+    (sentry/capture-message (str "open-company-web.components.topic-list/coord-inside params, left:" left ", top:" top ", topic:" topic))))
 
 (defn get-topic-at-position
   "Give left and top coordinates of the current drag position, show the yellow bar on left or right of the current hovering topic"
@@ -257,7 +253,6 @@
           (.removeClass (:topic-el in?) "right-highlight"))
         (if-not stop?
           (when (:inside? in?)
-            (println "   draging:" in?)
             (cond
               (= (:side in?) "left")
               (.addClass (:topic-el in?) "left-highlight")
@@ -274,7 +269,6 @@
                   fixed-idx (if (= (:side in?) "left") idx (inc idx))
                   new-sections (let [[before after] (split-at fixed-idx all-but-dragged)]
                                  (vec (concat before [dragged-topic] after)))]
-              (println "   stop! inside:" in? "dragged-topic" dragged-topic "pinned" pinned-kw "other" other-kw "all-but-dragged" all-but-dragged "idx" idx "fixed-idx" fixed-idx "new-sections" new-sections)
               (if (>= idx 0)
                 ; dropped in a good spot
                 (dispatcher/dispatch! [:new-sections new-sections])
@@ -288,7 +282,6 @@
 
 (defn dragging [owner e stop?]
   (let [inside-pos (inside-position-from-event e)]
-    (println "   drag:" inside-pos)
     (get-topic-at-position owner (:left inside-pos) (:top inside-pos) stop?))
   (when stop?
     (om/set-state! owner :rerender (rand 4))))
@@ -297,18 +290,16 @@
   (when-let [list-node (js/$ "div.topic-row.draggable-topic")]
     (when-not (.draggable list-node "instance")
       (.draggable list-node #js {:addClasses true
-                                 :drag #(do (println "DnD drag") (dragging owner % false))
+                                 :drag #(dragging owner % false)
                                  :handle ".topic-dnd-handle"
                                  :scroll true
                                  :start #(do
-                                           (println "DnD start")
                                            (.addClass (js/$ (gobj/get % "target")) "dragging-topic")
                                            (.addClass (js/$ (sel1 [:div.topics-columns])) "dnd-active"))
                                  :stop #(do
                                           (dragging owner % true)
                                           (.removeClass (js/$ (sel1 [:div.topics-columns])) "dnd-active")
-                                          (.removeClass (js/$ (gobj/get % "target")) "dragging-topic")
-                                          (println "DnD end"))}))))
+                                          (.removeClass (js/$ (gobj/get % "target")) "dragging-topic")(dragging owner % false))}))))
 
 (defn destroy-draggable []
   (when-let [list-node (js/$ "div.topic-row.draggable-topic")]
@@ -398,7 +389,6 @@
                            show-second-pin-tip
                            dragging
                            rerender]}]
-    (println "topic-list render")
     (let [company-slug    (router/current-company-slug)
           company-data    (:company-data data)
           company-topics  (vec (map keyword (:sections company-data)))
