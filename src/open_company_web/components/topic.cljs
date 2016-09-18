@@ -126,10 +126,11 @@
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
-        (when-not (responsive/is-mobile?)
-          (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
-                        :ref "topic-body"
-                        :dangerouslySetInnerHTML (utils/emojify truncated-body)}))
+
+        (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
+                      :ref "topic-body"
+                      :dangerouslySetInnerHTML (utils/emojify truncated-body)})
+
         ; if it's SU preview or SU show only read-more
         (if is-stakeholder-update
           (when (utils/exceeds-topic-body-limit topic-body)
