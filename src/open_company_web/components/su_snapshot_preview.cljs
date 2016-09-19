@@ -61,16 +61,18 @@
                               :items ".topic-row"
                               :axis "y"
                               :start (fn [event ui]
-                                        (let [dragged-item (gobj/get ui "item")]
-                                          (om/set-state! owner :su-dragging-topic (.data dragged-item "topic"))
-                                          (.addClass (js/$ dragged-item) "su-dragging-topic")
-                                          (.addClass (js/$ (sel1 [:div.topics-columns])) "sortable-active")))
+                                        (if-let [dragged-item (gobj/get ui "item")]
+                                          (do 
+                                            (om/set-state! owner :su-dragging-topic (.data dragged-item "topic"))
+                                            (.addClass (js/$ dragged-item) "su-dragging-topic")
+                                            (.addClass (js/$ (sel1 [:div.topics-columns])) "sortable-active"))))
                               :stop (fn [event ui]
-                                      (let [dragged-item (gobj/get ui "item")]
-                                        (om/set-state! owner :su-dragging-topic nil)
-                                        (.removeClass (js/$ dragged-item) "su-dragging-topic")
-                                        (.removeClass (js/$ (sel1 [:div.topics-columns])) "sortable-active")
-                                        (om/set-state! owner :su-topics (ordered-topics-list))))
+                                      (if-let [dragged-item (gobj/get ui "item")]
+                                        (do
+                                          (.removeClass (js/$ dragged-item) "su-dragging-topic")
+                                          (.removeClass (js/$ (sel1 [:div.topics-columns])) "sortable-active")
+                                          (om/set-state! owner :su-topics (ordered-topics-list))))
+                                      (om/set-state! owner :su-dragging-topic nil))
                               :opacity 1})))
 
 (defn add-su-section [owner topic]
