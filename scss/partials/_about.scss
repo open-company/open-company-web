@@ -1,0 +1,34 @@
+/***** About ******/
+
+
+div.container.about {
+  margin-top: 50px;
+  margin-bottom: 150px;
+}
+
+@media (min-width: 768px) { 
+  div.container.about {
+    max-width: 700px;
+  }
+}
+
+h1.about {
+  font-family: OpenSans;
+  font-size: 24px;
+  line-height: 1.1;
+  color: #4e5a6b;
+  text-align: center;
+  margin-top: 50px;
+  margin-bottom: 20px;
+}
+
+div.container p {
+  font-family: Domine;
+  font-size: 18px;
+  line-height: 1.4;
+  color: #4e5a6b;
+}
+
+div.container p.person {
+  margin-top: 20px;
+}
