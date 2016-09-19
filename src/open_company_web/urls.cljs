@@ -17,6 +17,7 @@
 (def contact-mail-to (str "mailto:" contact-email))
 
 (def login "/login")
+(def sign-up "/sign-up")
 
 (def logout "/logout")
 
