@@ -75,22 +75,6 @@ a:hover, a:hover *{
     border-bottom: 1px solid #eee;
 }
 
-/*
- * Main content
- */
- .main {
-    padding: 0px !important;
-}
-@include mobile(){
-    .main {
-        padding-right: 40px;
-        padding-left: 40px;
-    }
-}
-.main .page-header {
-    margin-top: 0;
-}
-
 .hidden {
   display: none;
 }
