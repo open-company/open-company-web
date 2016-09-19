@@ -29,7 +29,9 @@
             [open-company-web.components.user-profile :refer (user-profile)]
             [open-company-web.components.login :refer (login)]
             [open-company-web.components.ui.loading :refer (loading)]
-            [open-company-web.components.sign-up :refer (sign-up)]))
+            [open-company-web.components.sign-up :refer (sign-up)]
+            [open-company-web.components.about :refer (about)]
+            [open-company-web.components.pricing :refer (pricing)]))
 
 (enable-console-print!)
 
@@ -109,13 +111,13 @@
       ;; render component
       (drv-root login target))))
 
-(defn signup-handle [target params]
+(defn simple-handle [component route-name target params]
   (pre-routing (:query-params params))
   (utils/clean-company-caches)
   ;; save route
-  (router/set-route! ["sign-up"] {})
+  (router/set-route! [route-name] {})
   ;; render component
-  (rum/mount (sign-up) target))
+  (rum/mount (component) target))
 
 ;; Component specific to a company
 (defn company-handler [route target component params]
@@ -171,7 +173,13 @@
       (login-handler target params))
 
     (defroute signup-route urls/sign-up {:as params}
-      (signup-handle target params))
+      (simple-handle sign-up "sign-up" target params))
+
+    (defroute about-route urls/about {:as params}
+      (simple-handle about "about" target params))
+
+    (defroute pricing-route urls/pricing {:as params}
+      (simple-handle pricing "pricing" target params))
 
     (defroute subscription-callback-route urls/subscription-callback {}
       (when-let [s (cook/get-cookie :subscription-callback-slug)]
@@ -232,6 +240,8 @@
     (def route-dispatch!
       (secretary/uri-dispatcher [login-route
                                  signup-route
+                                 about-route
+                                 pricing-route
                                  subscription-callback-route
                                  home-page-route
                                  list-page-route-slash

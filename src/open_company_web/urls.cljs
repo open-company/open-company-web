@@ -21,6 +21,8 @@
 
 (def logout "/logout")
 
+(def pricing "/pricing")
+
 (defn not-found [& [params]]
   (str "/404" (when params (str "?" (params->query-string params)))))
 
