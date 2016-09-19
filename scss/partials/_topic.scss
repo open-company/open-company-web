@@ -41,7 +41,7 @@ div.topic {
     opacity: 0.5;
   }
 
-  div.topic-dnd-handle {
+  &.draggable-topic div.topic-dnd-handle {
     cursor: move;
   }
 

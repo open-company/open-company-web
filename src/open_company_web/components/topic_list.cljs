@@ -204,6 +204,8 @@
         {:keys [pinned]} (utils/get-pinned-other-keys (:sections company-data) company-data)]
     (count pinned)))
 
+;; ----- DnD ---------------------------------------
+
 (defn coord-inside
   "Given the current left and top drag coordinate and a topic return a map saying if the coords
   are over it and if it's on the left or right side"
@@ -235,6 +237,7 @@
              :inside? true
              :topic topic})
           {:topic-el topic-el
+           :topic topic
            :inside? false})))
     (sentry/capture-message (str "open-company-web.components.topic-list/coord-inside params, left:" left ", top:" top ", topic:" topic))))
 
@@ -249,11 +252,12 @@
           (.removeClass (:topic-el in?) "left-highlight")
           (.removeClass (:topic-el in?) "right-highlight"))
         (if-not stop?
-          (cond
-            (= (:side in?) "left")
-            (.addClass (:topic-el in?) "left-highlight")
-            (= (:side in?) "right")
-            (.addClass (:topic-el in?) "right-highlight"))
+          (when (:inside? in?)
+            (cond
+              (= (:side in?) "left")
+              (.addClass (:topic-el in?) "left-highlight")
+              (= (:side in?) "right")
+              (.addClass (:topic-el in?) "right-highlight")))
           ; reorder topics
           (when (:inside? in?)
             (let [dragged-topic (keyword (.data (js/$ ".dragging-topic") "topic"))
@@ -273,8 +277,8 @@
 
 (defn inside-position-from-event [e]
   (let [tcc-offset (.offset (js/$ ".topics-column-container"))]
-    {:left (gobj/get e "screenX")
-     :top (gobj/get e "pageY")}))
+    {:left (gobj/get e "clientX")
+     :top (gobj/get e "clientY")}))
 
 (defn dragging [owner e stop?]
   (let [inside-pos (inside-position-from-event e)]
@@ -295,7 +299,7 @@
                                  :stop #(do
                                           (dragging owner % true)
                                           (.removeClass (js/$ (sel1 [:div.topics-columns])) "dnd-active")
-                                          (.removeClass (js/$ (gobj/get % "target")) "dragging-topic"))}))))
+                                          (.removeClass (js/$ (gobj/get % "target")) "dragging-topic")(dragging owner % false))}))))
 
 (defn destroy-draggable []
   (when-let [list-node (js/$ "div.topic-row.draggable-topic")]
@@ -307,6 +311,8 @@
     (if (> (pinned-count (om/get-props owner)) 1)
       (do (destroy-draggable) (utils/after 1 #(setup-draggable owner)))
       (destroy-draggable))))
+
+;; -------------------------------------------------
 
 (def card-x-margins 20)
 (def columns-layout-padding 20)
