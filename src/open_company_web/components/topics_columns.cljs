@@ -202,6 +202,7 @@
           (when-not (and (:read-only company-data) (:placeholder sd))
             (dom/div #js {:className (utils/class-set {:topic-row true
                                                        :draggable-topic (:pin sd)
+                                                       :su-dragging-topic (= (:su-dragging-topic props) section-name)
                                                        :hover hovering?})
                           :data-topic (name section-name)
                           :ref section-name

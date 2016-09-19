@@ -460,7 +460,7 @@
                            :style {:display (if (nil? file-upload-state) "block" "none")}
                            :on-click (partial remove-topic-click owner)}
                   (dom/i {:class "fa fa-archive"})))
-            (when-not (:placeholder topic-data)
+            (when (> (count (utils/get-section-keys (dis/company-data))) 1)
               (dom/button {:class "btn-reset pin-button right"
                            :title (pin-tooltip (:pin topic-data))
                            :type "button"

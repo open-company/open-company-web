@@ -180,14 +180,14 @@
   (init-state [_]
     {:as-of (:updated-at section-data)
      :actual-as-of (:updated-at section-data)
-     :window-width (.width (js/$ js/window))
+     :window-width (.-clientWidth (.-body js/document))
      :transition-as-of nil})
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
       ; initialize bootstrap tooltips
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-      (events/listen js/window EventType/RESIZE #(om/set-state! owner :window-width (.width (js/$ js/window))))))
+      (events/listen js/window EventType/RESIZE #(om/set-state! owner :window-width (.-clientWidth (.-body js/document))))))
 
   (will-update [_ next-props _]
     (let [new-as-of (:updated-at (:section-data next-props))
@@ -215,8 +215,7 @@
                   (om/set-state! owner :transition-as-of (:updated-at rev))
                   (utils/event-stop e))
           foce-active (not (nil? (dis/foce-section-key)))
-          is-foce (= (dis/foce-section-key) section-kw)
-          ww      (.-width (js/$ (.-body js/document)))]
+          is-foce (= (dis/foce-section-key) section-kw)]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))

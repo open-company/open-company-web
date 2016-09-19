@@ -19,6 +19,7 @@
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
             [goog.fx.dom :refer (Fade)]
+            [goog.object :as gobj]
             [cljsjs.hammer]
             [cljsjs.react.dom]))
 
@@ -59,7 +60,19 @@
                               :placeholder "sortable-placeholder"
                               :items ".topic-row"
                               :axis "y"
-                              :stop #(om/set-state! owner :su-topics (ordered-topics-list))
+                              :start (fn [event ui]
+                                        (if-let [dragged-item (gobj/get ui "item")]
+                                          (do 
+                                            (om/set-state! owner :su-dragging-topic (.data dragged-item "topic"))
+                                            (.addClass (js/$ dragged-item) "su-dragging-topic")
+                                            (.addClass (js/$ (sel1 [:div.topics-columns])) "sortable-active"))))
+                              :stop (fn [event ui]
+                                      (if-let [dragged-item (gobj/get ui "item")]
+                                        (do
+                                          (.removeClass (js/$ dragged-item) "su-dragging-topic")
+                                          (.removeClass (js/$ (sel1 [:div.topics-columns])) "sortable-active")
+                                          (om/set-state! owner :su-topics (ordered-topics-list))))
+                                      (om/set-state! owner :su-dragging-topic nil))
                               :opacity 1})))
 
 (defn add-su-section [owner topic]
@@ -192,6 +205,7 @@
                                         :is-stakeholder-update true
                                         :content-loaded (not (:loading data))
                                         :topics su-topics
+                                        :su-dragging-topic (om/get-state owner :su-dragging-topic)
                                         :company-data company-data
                                         :show-share-remove true
                                         :topics-data company-data
