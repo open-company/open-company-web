@@ -99,7 +99,7 @@ Open `target/public/app-shell.html` in your browser. Using production rather tha
 To have a ClojureScript REPL connected to the browser, first start the dev task:
 
 ```console
-$ boot dev
+boot dev
 ```
 
 If you get an error like this:
@@ -116,7 +116,7 @@ Next open a browser window: [http://localhost:3559/](http://localhost:3559/)
 Then in another terminal window start a REPL with boot:
 
 ```console
-$ boot repl -c
+boot repl -c
 ```
 
 At this point, you can start a weasel server to connect to the browser window:
