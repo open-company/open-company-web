@@ -34,7 +34,7 @@ The OpenCompany Web Application provides a Web UI for creating and consuming ope
 
 ### Browser Support
 
-Latest Chrome, Firefox, Safari and Edge.
+Latest Chrome, Firefox, Safari and IE Edge.
 
 
 ## Local Setup
