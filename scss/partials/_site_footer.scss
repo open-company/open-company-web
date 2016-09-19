@@ -1,0 +1,94 @@
+.navbar-bottom {
+  background-color: #F6F7F8 !important;
+  margin-bottom: 0px !important;
+}
+
+.navbar-logo img {
+  height: 20px;
+}
+
+a.navbar-logo {
+  padding-top: 14px;  
+}
+
+@media (min-width: 768px) { /* not mobile */
+
+  /* These push footer to the bottom on a short page with a long view port */
+
+  #wrap {
+    min-height: 100%;
+  }
+
+  div.main {
+    overflow: auto;
+    padding-bottom: 90px; /* footer offset */
+  }
+
+  nav.navbar-bottom {
+    position: relative;
+    clear: both;
+    height: 90px;
+    margin-top: -90px;
+  }
+
+  nav.navbar-bottom.pricing {
+    margin-top: -130px;
+  }
+
+}
+
+@media (max-width: 767px) { /* mobile */
+
+  nav.navbar-bottom {
+    height: 50px;
+  }
+
+  nav.navbar-bottom ul.navbar-bottom-left a.navbar-logo img {
+    margin-left: 15px;
+  }
+  
+  nav.navbar-bottom ul.navbar-nav>li, .navbar-bottom .navbar-nav>li>a {
+    display: inline;
+  }
+
+  nav.navbar-bottom ul.navbar-right {
+    display: none;
+  }
+
+  nav.navbar-bottom ul.navbar-bottom-left {
+    margin-top: 15px !important;
+    margin-bottom: 0px !important;
+  }
+
+  nav.navbar-bottom ul.navbar-left li a {
+    padding-bottom: 0px;
+  }
+}
+
+ul.navbar-left li {
+  opacity: 0.6;
+  color: #4e5a6b;
+}
+
+@media (min-width: 768px) { /* not mobile */
+  ul.navbar-left li {
+    margin-top: 19px;
+  }
+}
+
+ul.navbar-left li a:hover {
+  opacity: 1;
+}
+
+ul.navbar-right {
+  margin-right: 30px;
+}
+
+ul.navbar-right li a i {
+  margin-top: 16px;
+  color: rgba(77, 89, 106, 0.5);
+}
+
+ul.navbar-right li a:hover i {
+  color: rgba(77, 89, 106, 0.8);
+}
