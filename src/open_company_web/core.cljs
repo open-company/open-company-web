@@ -170,7 +170,7 @@
 (if-let [target (sel1 :div#app)]
   (do
     (defroute login-route urls/login {:as params}
-      (login-handler target params))
+      (simple-handle sign-up "login" target params))
 
     (defroute signup-route urls/sign-up {:as params}
       (simple-handle sign-up "sign-up" target params))
