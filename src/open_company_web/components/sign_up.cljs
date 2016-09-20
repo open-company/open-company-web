@@ -1,13 +1,20 @@
 (ns open-company-web.components.sign-up
   (:require [rum.core :as rum]
+            [open-company-web.dispatcher :as dis]
+            [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.site-header :refer (site-header)]
-            [open-company-web.components.ui.site-footer :refer (site-footer)]))
+            [open-company-web.components.ui.site-footer :refer (site-footer)]
+            [open-company-web.components.ui.login-overlay :refer (login-overlay)]))
 
-(rum/defc sign-up []
+(rum/defcs sign-up < rum/reactive [s]
+
   [:div
     [:div {:id "wrap"} ; <!-- used to push footer to the bottom --> 
         
       (site-header)
+
+      (when (:show-login-overlay (rum/react dis/app-state))
+        (login-overlay))
 
       [:div.main.sign-up
         [:div.cta
@@ -19,7 +26,7 @@
                   [:input {:id "referrer" :type "hidden" :name "refrerrer" :value ""}]
                   [:div.row
                     [:div.col-xs-12.center
-                      [:button.submit {:id "submit" :name "subscribe" :type "submit"} "Get Started →"]]]]]]]]
+                      [:button.submit {:id "submit" :name "subscribe" :type "submit" :on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay true]))} "Get Started →"]]]]]]]]
 
         [:div.sub-tag
           [:div.container.sub-tag
