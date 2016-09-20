@@ -229,3 +229,7 @@
   (if uuid
     (assoc-in db [:subscription uuid] data)
     (assoc db :subscription nil)))
+
+(defmethod dispatcher/action :show-login-overlay
+ [db [_ show-login-overlay]]
+ (assoc db :show-login-overlay show-login-overlay))
