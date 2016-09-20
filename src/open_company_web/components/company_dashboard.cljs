@@ -10,7 +10,7 @@
             [open-company-web.router :as router]
             [open-company-web.components.topic-list :refer (topic-list)]
             [open-company-web.caches :as caches]
-            [open-company-web.components.ui.login-required :refer (login-required)]
+            [open-company-web.components.sign-up :refer (sign-up)]
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.menu :refer (menu)]
             [open-company-web.components.ui.navbar :refer (navbar)]
@@ -61,10 +61,7 @@
           (om/build menu data)
           (if (get-in data [(keyword (router/current-company-slug)) :error])
             (dom/div {:class (str "fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
-              (login-required data)
-              ;;Footer
-              (om/build footer {:columns-num columns-num
-                                :card-width card-width}))
+              (sign-up))
             (dom/div {:class "page"}
               ;; Navbar
               (om/build navbar {:save-bt-active save-bt-active
