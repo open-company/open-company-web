@@ -13,7 +13,7 @@ div.login-overlay-container {
   div.login-overlay {
     position: absolute;
     width: 500px;
-    min-height: 200px;
+    // min-height: 200px;
     left: 50%;
     top: 0px;
     margin-left: -250px;
@@ -24,6 +24,14 @@ div.login-overlay-container {
     padding-top: 20px 0px 0px;
 
     &.login-with-slack {
+      div.sign-in-cta {
+        font-weight: 400;
+        font-family: $oc_headers_font;
+        font-size: 20px;
+        line-height: 1.2;
+        color: $oc_gray_5;
+      }
+
       div.login-with-email {
         margin-top: 13px;
         margin-bottom: 103px;
@@ -39,6 +47,8 @@ div.login-overlay-container {
 
     &.login-with-email {
       div.sign-in-cta {
+        font-weight: 400;
+        font-family: $oc_headers_font;
         font-size: 20px;
         line-height: 1.2;
         color: $oc_gray_5;
@@ -53,6 +63,7 @@ div.login-overlay-container {
           line-height: 1.5;
           letter-spacing: 1px;
           color: $oc_gray_5;
+          font-family: $oc_headers_font;
           margin: 0px;
           padding: 0px;
         }
@@ -63,6 +74,7 @@ div.login-overlay-container {
 
         input {
           width: 100%;
+          height: 40px;
           margin: 0px;
           padding: 0px;
         }
@@ -76,6 +88,43 @@ div.login-overlay-container {
           letter-spacing: 1px;
           font-weight: 400;
           color: $oc_gray_5;
+          font-family: $oc_headers_font;
+        }
+      }
+    }
+
+    &.password-reset {
+      div.password-reset-cta {
+        font-size: 20px;
+        line-height: 1.2;
+        color: $oc_gray_5;
+        font-family: $oc_headers_font;
+        font-weight: 400;
+      }
+
+      div.password-reset-label-container {
+        margin-top: 20px;
+
+        label.password-reset-label {
+          font-size: 12px;
+          font-weight: 400;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+          font-family: $oc_headers_font;
+          margin: 0px;
+          padding: 0px;
+        }
+      }
+
+      div.password-reset-field-container {
+        margin-top: 7px;
+
+        input {
+          width: 100%;
+          height: 40px;
+          margin: 0px;
+          padding: 0px;
         }
       }
     }
@@ -114,9 +163,10 @@ div.login-overlay-container {
 
       a {
         color: $oc_gray_5;
+        font-family: $oc_headers_font;
+        font-weight: 400;
         opacity: 0.5;
         font-size: 12px;
-        font-weight: 800;
       }
     }
   }
