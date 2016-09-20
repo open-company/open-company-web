@@ -23,6 +23,49 @@ div.login-overlay-container {
     border-radius: 2px;
     padding-top: 20px 0px 0px;
 
+    &.login-with-email {
+      div.sign-in-cta {
+        font-size: 20px;
+        line-height: 1.2;
+        color: $oc_gray_5;
+      }
+
+      div.sign-in-label-container {
+        margin-top: 20px;
+
+        label.sign-in-label {
+          font-size: 12px;
+          font-weight: 400;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+          margin: 0px;
+          padding: 0px;
+        }
+      }
+
+      div.sign-in-field-container {
+        margin-top: 7px;
+
+        input {
+          width: 100%;
+          margin: 0px;
+          padding: 0px;
+        }
+      }
+
+      div.forgot-password {
+        a {
+          opacity: 0.5;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          font-weight: 400;
+          color: $oc_gray_5;
+        }
+      }
+    }
+
     button.close {
       position: absolute;
       right: 10px;
