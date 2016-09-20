@@ -16,11 +16,14 @@
       (when (:show-login-overlay (rum/react dis/app-state))
         (cond
           ; login via email
-          (= (:show-login-overlay (rum/react dis/app-state)) :email)
+          (= (:show-login-overlay (rum/react dis/app-state)) :login-with-email)
           (login-overlays/login-with-email)
+          ; password reset
+          (= (:show-login-overlay (rum/react dis/app-state)) :password-reset)
+          (login-overlays/password-reset)
           ; login via slack as default
           :else
-          (login-overlays/login-with-slack)))
+          (login-overlays/login-signup-with-slack)))
 
       [:div.main.sign-up
         [:div.cta
@@ -32,7 +35,13 @@
                   [:input {:id "referrer" :type "hidden" :name "refrerrer" :value ""}]
                   [:div.row
                     [:div.col-xs-12.center
-                      [:button.submit {:id "submit" :name "subscribe" :type "submit" :on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay true]))} "Get Started →"]]]]]]]]
+                      [:button.submit {:id "submit"
+                                       :name "subscribe"
+                                       :type "submit"
+                                       :on-click #(do
+                                                   (utils/event-stop %)
+                                                   (dis/dispatch! [:show-login-overlay :signup-with-slack]))}
+                        "Get Started →"]]]]]]]]
 
         [:div.sub-tag
           [:div.container.sub-tag
