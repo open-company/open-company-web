@@ -4,7 +4,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.site-header :refer (site-header)]
             [open-company-web.components.ui.site-footer :refer (site-footer)]
-            [open-company-web.components.ui.login-overlay :refer (login-overlay)]))
+            [open-company-web.components.ui.login-overlay :as login-overlays]))
 
 (rum/defcs sign-up < rum/reactive [s]
 
@@ -14,7 +14,13 @@
       (site-header)
 
       (when (:show-login-overlay (rum/react dis/app-state))
-        (login-overlay))
+        (cond
+          ; login via email
+          (= (:show-login-overlay (rum/react dis/app-state)) :email)
+          (login-overlays/login-with-email)
+          ; login via slack as default
+          :else
+          (login-overlays/login-with-slack)))
 
       [:div.main.sign-up
         [:div.cta
