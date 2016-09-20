@@ -114,10 +114,20 @@
 (defn simple-handle [component route-name target params]
   (pre-routing (:query-params params))
   (utils/clean-company-caches)
-  ;; save route
-  (router/set-route! [route-name] {})
-  ;; render component
-  (rum/mount (component) target))
+  (if (contains? (:query-params params) :jwt)
+    (do ; contains :jwt so auth went well
+      (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (api/get-entry-point))
+    (do
+      (when (contains? (:query-params params) :login-redirect)
+        (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+      ;; save route
+      (router/set-route! [route-name] {})
+      (when (contains? (:query-params params) :access)
+        ;login went bad, add the error message to the app-state
+        (swap! dis/app-state assoc :access (:access (:query-params params))))
+      ;; render component
+      (rum/mount (component) target))))
 
 ;; Component specific to a company
 (defn company-handler [route target component params]
