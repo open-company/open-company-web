@@ -814,7 +814,8 @@
   [body-el]
   (when-not (is-test-env?)
     (when (pos? (count (clojure.string/trim (.text (js/$ body-el)))))
-      (while (= (count (clojure.string/trim (.text (.last (.find (js/$ body-el) ">p"))))) 0)
+      (while (and (= (count (clojure.string/trim (.text (.last (.find (js/$ body-el) ">p"))))) 0)
+                  (pos? (.-length (.find (js/$ body-el) ">p"))))
         (.remove (js/$ ">p:last-child" (js/$ body-el)))))))
 
 (defn data-topic-has-data [section section-data]

@@ -32,6 +32,10 @@ The OpenCompany Web Application provides a Web UI for creating and consuming ope
 
 ![OpenCompany Screenshot](https://open-company-assets.s3.amazonaws.com/oc-screenshot.png)
 
+### Browser Support
+
+Latest Chrome, Firefox, Safari and IE Edge.
+
 
 ## Local Setup
 
@@ -90,11 +94,51 @@ boot prod-build
 
 Open `target/public/app-shell.html` in your browser. Using production rather than dev, you will not get the live reloading nor a REPL.
 
-#### Browser Support
+### Project REPL
 
-Latest Chrome, Firefox, Safari and Edge.
+To have a ClojureScript REPL connected to the browser, first start the dev task:
 
-#### App State Design
+```console
+boot dev
+```
+
+If you get an error like this:
+
+```console
+clojure.lang.Compiler$CompilerException: java.lang.RuntimeException: No such var: string/index-of, compiling:(cljs/source_map.clj:260:52)
+             java.lang.RuntimeException: No such var: string/index-of
+```
+
+Make sure you have [clojure 1.7+](https://github.com/adzerk-oss/boot-cljs-repl#boot-cljs-repl) in build.boot, in the project boot settings [boot.properties](boot.properties) and in your local setup: `~/.boot/boot.properties`.
+
+Next open a browser window: [http://localhost:3559/](http://localhost:3559/)
+
+Then in another terminal window start a REPL with boot:
+
+```console
+boot repl -c
+```
+
+At this point, you can start a weasel server to connect to the browser window:
+
+```console
+cljs.user=> (start-repl)
+```
+
+If the REPL doesn't connect to the browser window, refresh the page in the browser.
+
+At this point, you should be able to use the project's namespaces:
+
+```console
+cljs.user=> (require '[open-company-web.lib.utils :as utils])
+nil
+cljs.user=> (utils/vec-dissoc [:a :b :c] :a)
+[:b :c]
+```
+
+## Techincal Design
+
+### App State Design
 
 The app-state has the following structure:
 
@@ -121,13 +165,14 @@ Never access the app-state directly but we should always use the proper function
 This way it will be very simple to change the structure of the app-state in the future since we just need
 to change it in one place.
 
-#### Component Tree Design
+### Component Tree Design
 
 The OpenCompany web app is made up of trees of Om/Rum components that start from a few top level components (company-dashboard, company-settings, user-settings, company-list, login...) and include other child components in a tree, sometimes just a few, and sometimes many.
 
 One of the most important component trees is the company dashboard. This provides the main UI for viewing and editing a company's topics. Here's a diagram of the read-only aspects of the company dashboard component tree:
 
 ![Company Dashboard Diagram](https://cdn.rawgit.com/open-company/open-company-web/mainline/docs/dashboard-viewing-component-tree.svg)
+
 
 ## Testing
 
