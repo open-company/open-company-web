@@ -18,14 +18,16 @@
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
-    [:div.login-overlay.center
+    [:div.login-overlay.login-with-slack.center
       {:on-click #(utils/event-stop %)}
       [:button.close {:on-click (partial close-overlay)} [:i.fa.fa-times]]
       [:button.btn-reset.mt2.login-button
         {:on-click #(login/login! (:extended-scopes-url (:auth-settings @dis/app-state)) %)}
         [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]]
+      [:div.login-with-email
+        [:a {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :email]))} "OR SIGN IN VIA EMAIL"]]
       [:div.login-overlay-footer.p2.mt1.group
-        [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :email])} "DON’T HAVE AN ACCOUNT? SIGN UP NOW"]]]])
+        [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :sign-up])} "DON’T HAVE AN ACCOUNT? SIGN UP NOW"]]]])
 
 (rum/defcs login-with-email < rum/reactive
                               dont-scroll

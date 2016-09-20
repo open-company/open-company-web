@@ -23,6 +23,20 @@ div.login-overlay-container {
     border-radius: 2px;
     padding-top: 20px 0px 0px;
 
+    &.login-with-slack {
+      div.login-with-email {
+        margin-top: 13px;
+        margin-bottom: 103px;
+        a {
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
+          opacity: 0.5;
+        }
+      }
+    }
+
     &.login-with-email {
       div.sign-in-cta {
         font-size: 20px;
