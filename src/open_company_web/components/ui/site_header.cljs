@@ -33,4 +33,4 @@
             [:li
               (if (jwt/jwt)
                 [:a {:href "" :on-click #(do (utils/event-stop %) (dis/dispatch! [:logout]))} "Log Out"]
-                [:a {:href "" :on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay true]))} "Sign In / Sign Up"])])]]]])
+                [:a {:href "" :on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :slack]))} "Sign In / Sign Up"])])]]]])
