@@ -2,7 +2,6 @@
   (:require-macros [cljs.core.async.macros :refer (go)])
   (:require [cljs.core.async :as async :refer (<!)]
             [cljs-http.client :as http]
-            [clojure.string :refer (join)]
             [open-company-web.dispatcher :as dispatcher]
             [cognitect.transit :as t]
             [clojure.walk :refer (keywordize-keys stringify-keys)]
