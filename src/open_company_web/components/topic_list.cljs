@@ -278,7 +278,7 @@
 (defn inside-position-from-event [e]
   (let [tcc-offset (.offset (js/$ ".topics-column-container"))]
     {:left (gobj/get e "clientX")
-     :top (gobj/get e "clientY")}))
+     :top (+ (gobj/get e "clientY") (gobj/get (gobj/get js/document "body") "scrollTop"))}))
 
 (defn dragging [owner e stop?]
   (let [inside-pos (inside-position-from-event e)]
