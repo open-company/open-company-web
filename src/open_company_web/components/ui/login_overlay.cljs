@@ -31,7 +31,12 @@
         {:on-click #(login/login! (:extended-scopes-url (:auth-settings @dis/app-state)) %)}
         [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]]
       [:div.login-with-email
-        [:a {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :login-with-email]))} "OR SIGN IN VIA EMAIL"]]
+        [:a {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :login-with-email]))}
+          (cond
+            (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
+            "OR SIGN UP VIA EMAIL"
+            :else
+            "OR SIGN IN VIA EMAIL")]]
       [:div.login-overlay-footer.p2.mt1.group
         [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :signup-with-slack])} "DON’T HAVE AN ACCOUNT? SIGN UP NOW"]]]])
 
