@@ -32,6 +32,8 @@
 
 (def subscription-callback "/subscription-completed")
 
+(def email-confirmation "/email-confirmation")
+
 ;; User
 
 (def user-profile "/profile")
@@ -57,6 +59,12 @@
     (company-settings (router/current-company-slug)))
   ([slug]
     (str "/" (name slug) "/settings")))
+
+(defn company-logo-setup
+  ([]
+    (company-logo-setup (router/current-company-slug)))
+  ([slug]
+    (str (company-settings slug) "/logo")))
 
 (defn company-section
   "Section url"
