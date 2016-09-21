@@ -52,7 +52,7 @@
     (utils/update-page-title "OpenCompany - Setup Your Company Logo"))
 
   (render-state [_ {:keys [loading logo]}]
-    (dom/div {:class "company-editor"}
+    (dom/div {:class "company-editor company-logo-setup"}
       (dom/div {:class (str "group fullscreen-page "  (if (jwt/jwt) "with-small-footer" "with-footer"))}
         (dom/div {:class "col-md-7 col-md-offset-2 p0"}
           (dom/h2 {:class "domine mb3"} "Company Setup"))
