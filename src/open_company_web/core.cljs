@@ -17,6 +17,7 @@
             [open-company-web.lib.raven :as sentry]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.company-editor :refer (company-editor)]
+            [open-company-web.components.company-logo-setup :refer (company-logo-setup)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.company-settings :refer (company-settings)]
             [open-company-web.components.su-edit :refer (su-edit)]
@@ -31,7 +32,8 @@
             [open-company-web.components.ui.loading :refer (loading)]
             [open-company-web.components.sign-up :refer (sign-up)]
             [open-company-web.components.about :refer (about)]
-            [open-company-web.components.pricing :refer (pricing)]))
+            [open-company-web.components.pricing :refer (pricing)]
+            [open-company-web.components.email-confirmation :refer (email-confirmation)]))
 
 (enable-console-print!)
 
@@ -191,6 +193,11 @@
     (defroute pricing-route urls/pricing {:as params}
       (simple-handle pricing "pricing" target params))
 
+    (defroute email-confirmation-route urls/email-confirmation {:as params}
+      (utils/clean-company-caches)
+      (pre-routing (:query-params params))
+      (drv-root email-confirmation target))
+
     (defroute subscription-callback-route urls/subscription-callback {}
       (when-let [s (cook/get-cookie :subscription-callback-slug)]
         (router/redirect! (urls/company-settings s))))
@@ -204,6 +211,20 @@
           (pre-routing (:query-params params))
           (drv-root company-editor target))
         (login-handler target params)))
+
+    (defroute company-logo-setup-route (urls/company-logo-setup ":slug") {:as params}
+      (let [slug (:slug (:params params))
+            query-params (:query-params params)]
+        (pre-routing query-params)
+        (utils/clean-company-caches)
+        ;; save the route
+        (router/set-route! [slug "settings" "logo"] {:slug slug :query-params query-params})
+        ;; do we have the company data already?
+        (when-not (dis/company-data)
+          ;; load the company data from the API
+          (api/get-company slug)
+          (swap! dis/app-state assoc :loading true))
+      (drv-root company-logo-setup target)))
 
     (defroute list-page-route urls/companies {:as params}
       (list-companies-handler target params))
@@ -252,11 +273,13 @@
                                  signup-route
                                  about-route
                                  pricing-route
+                                 email-confirmation-route
                                  subscription-callback-route
                                  home-page-route
                                  list-page-route-slash
                                  list-page-route
                                  company-create-route
+                                 company-logo-setup-route
                                  user-profile-route
                                  company-settings-route
                                  company-route
