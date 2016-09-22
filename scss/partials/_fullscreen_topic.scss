@@ -31,8 +31,10 @@ div.fullscreen-topic {
       width: 500px;
       margin: 30px auto;
       position: relative;
-      min-height: calc(100vh - #{$navbar_height}px - 60px - 4px);
       padding-top: 2px;
+      border-radius: 2px;
+      background-color: #fcfcfc;
+      box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
 
       @include mobile(){
         margin-bottom: 40px;
@@ -40,10 +42,10 @@ div.fullscreen-topic {
 
       button.close-fullscreen-topic-btn {
         position: absolute;
-        top: 15px;
-        right: 10px;
-        width: 25px;
-        height: 25px;
+        top: 0px;
+        right: -30px;
+        width: 30px;
+        height: 30px;
         font-weight: 400;
         font-family: $oc_headers_font;
         font-size: 25px;
@@ -59,8 +61,6 @@ div.fullscreen-topic {
 
       div.fullscreen-topic-top-box{
         border-radius: 4px;
-        background-color: #ffffff;
-        border: solid 2px rgba(78, 90, 107, 0.2);
         padding: 0px;
         position: relative;
         overflow: scroll;

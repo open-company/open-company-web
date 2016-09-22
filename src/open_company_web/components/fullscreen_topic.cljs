@@ -7,18 +7,19 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel1)]
             [open-company-web.api :as api]
             [open-company-web.caches :as cache]
-            [open-company-web.router :as router]
             [open-company-web.urls :as oc-urls]
+            [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
-            [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.topic-attribution :refer (topic-attribution)]
+            [open-company-web.components.finances.topic-finances :refer (topic-finances)]
+            [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
-            [dommy.core :refer-macros (sel1)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -79,7 +80,7 @@
         ;; Close button
         (dom/button {:class "btn-reset close-fullscreen-topic-btn"
                      :on-click #(hide-fullscreen-topic-cb)}
-          (dom/i {:class "fa fa-times"}))
+          (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
         (dom/div {:class "fullscreen-topic-top-box"
                   :style #js {:height (str (* (/ wh 100) 85) "px")}}
           ;; Image
