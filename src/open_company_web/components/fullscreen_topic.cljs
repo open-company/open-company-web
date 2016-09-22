@@ -19,6 +19,7 @@
             [open-company-web.components.topic-attribution :refer (topic-attribution)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [dommy.core :refer-macros (sel1)]
+            [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -29,16 +30,36 @@
   (.play
     (new Fade (om/get-ref owner "fullscreen-topic") 0 1 utils/oc-animation-duration)))
 
+(defn- window-height []
+  (gobj/get (gobj/get js/document "documentElement") "clientHeight"))
+
 (defcomponent fullscreen-topic-internal [{:keys [topic
                                                  topic-data
                                                  currency
                                                  selected-metric
                                                  card-width
                                                  hide-history-navigation
+                                                 hide-fullscreen-topic-cb
                                                  prev-rev
                                                  next-rev
                                                  is-actual] :as data} owner options]
-  (render [_]
+
+  (init-state [_]
+    {:wh (window-height)
+     :resize-listener nil})
+
+  (did-mount [_]
+    (when-not (utils/is-test-env?)
+      (let [win-height (window-height)
+            resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :wh (window-height)))]
+        (om/set-state! owner {:wh win-height
+                              :resize-listener resize-listener}))))
+
+  (will-unmount [_]
+    (when-let [resize-listener (om/get-state owner :resize-listener)]
+      (events/unlistenByKey resize-listener)))
+
+  (render-state [_ {:keys [wh] :as state}]
     (let [fullscreen-width (responsive/fullscreen-topic-width card-width)
           chart-reduction (if (responsive/is-mobile-size?) 100 250)
           chart-width (- fullscreen-width chart-reduction)
@@ -54,9 +75,13 @@
                       :read-only true}
           topic-body (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))]
       (dom/div {:class "fullscreen-topic-internal group"
-                :style #js {:width (str (- fullscreen-width 20) "px")}}
-        (dom/div {:class "fullscreen-topic-top-box"}
-
+                :on-click #(utils/event-stop %)}
+        ;; Close button
+        (dom/button {:class "btn-reset close-fullscreen-topic-btn"
+                     :on-click #(hide-fullscreen-topic-cb)}
+          (dom/i {:class "fa fa-times"}))
+        (dom/div {:class "fullscreen-topic-top-box"
+                  :style #js {:height (str (* (/ wh 100) 85) "px")}}
           ;; Image
           (when (:image-url topic-data)
             (dom/div {:class "topic-header-image"}
@@ -171,7 +196,10 @@
     (om/set-state! owner :esc-listener-key
       (events/listen js/document EventType/KEYUP (partial esc-listener owner options)))
     (when (:animate data)
-      (show-fullscreen-topic owner)))
+      (show-fullscreen-topic owner))
+    (om/set-state! owner :selected-topic-click
+      (events/listen (sel1 [:div.selected-topic]) EventType/CLICK #(when-not (utils/event-inside? % (sel1 [:div.fullscreen-topic-internal]))
+                                                                      (hide-fullscreen-topic owner options)))))
 
   (will-receive-props [_ next-props]
     (when-not (= next-props data)
@@ -183,7 +211,8 @@
         (om/set-state! owner :actual-as-of (:updated-at (:section-data next-props))))))
 
   (will-unmount [_]
-    (events/unlistenByKey (om/get-state owner :esc-listener-key)))
+    (events/unlistenByKey (om/get-state owner :esc-listener-key))
+    (events/unlistenByKey (om/get-state owner :selected-topic-click)))
 
   (did-update [_ _ _]
     (when (om/get-state owner :transition-as-of)
@@ -212,11 +241,6 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (str "fullscreen-topic" (when (:animate data) " initial"))
                     :ref "fullscreen-topic"}
-        (when-not (= "email" source) ; don't show back when we came here from an email
-          (dom/div {:class "btd-container"
-                    :style {:width (str (+ fullscreen-width 20) "px")}}
-            (back-to-dashboard-btn {:click-cb #(hide-fullscreen-topic owner options true)
-                                    :button-cta (if (utils/in? (:route @router/path) "updates") "BACK TO UPDATE" "BACK TO DASHBOARD")})))
         (dom/div #js {:className "fullscreen-topic-transition group"
                       :ref "fullscreen-topic-transition"
                       :style #js {:height (when-not transition-as-of "auto")}}
@@ -231,6 +255,7 @@
                                                  :card-width card-width
                                                  :is-actual is-actual?
                                                  :hide-history-navigation hide-history-navigation
+                                                 :hide-fullscreen-topic-cb (partial hide-fullscreen-topic owner options)
                                                  :prev-rev prev-rev
                                                  :next-rev next-rev}
                                                 {:opts fullscreen-topic-opts}))
@@ -248,6 +273,7 @@
                                                      :currency currency
                                                      :card-width card-width
                                                      :hide-history-navigation hide-history-navigation
+                                                     :hide-fullscreen-topic-cb (partial hide-fullscreen-topic owner options)
                                                      :prev-rev tr-prev-rev
                                                      :next-rev tr-next-rev}
                                                     {:opts fullscreen-topic-opts})))))))))
