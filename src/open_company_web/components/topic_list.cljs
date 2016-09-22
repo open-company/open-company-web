@@ -218,7 +218,7 @@
             topic-position {:left (gobj/get topic-pos "left")
                             :top (gobj/get topic-pos "top")}
             topic-size {:width (.width topic-el) :height (.height topic-el)}
-            target-css {:width (int (+ (:width topic-size) 26)) ; add the padding and the border of the topic
+            target-css {:width (int (+ (:width topic-size) 20)) ; add the margin 6 * 2 and the border 4 * 2 of the topic
                         :height (int (:height topic-size))
                         :left (int (:left topic-position))
                         :top (int (+ (:top topic-position) 84))}]

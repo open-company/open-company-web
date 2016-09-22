@@ -33,27 +33,16 @@ div.topics-columns {
 
       div.topic-row{
         height: auto;
-        padding: 0px 6px 0px 6px;
-        margin-bottom: 22px;
+        margin: 0px 6px 22px 6px;
+        padding: 0px;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
 
-        div.topic {
-          margin-left: 4px;
-          margin-right: 4px;
-          border-left: 0px solid $oc_yellow;
-          border-right: 0px solid $oc_yellow;
-        }
-
-        &.draggable-topic.left-highlight div.topic {
-          margin-left: 0px;
-          margin-right: 4px;
+        &.draggable-topic.left-highlight {
           border-left: 4px solid $oc-yellow;
-          border-right: 0px solid $oc-yellow;
         }
 
-        &.draggable-topic.right-highlight div.topic {
-          margin-left: 4px;
-          margin-right: 0px;
-          border-left: 0px solid $oc-yellow;
+        &.draggable-topic.right-highlight {
           border-right: 4px solid $oc-yellow;
         }
 
