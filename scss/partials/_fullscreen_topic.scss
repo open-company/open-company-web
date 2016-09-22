@@ -1,48 +1,13 @@
 div.fullscreen-topic {
   width: 100%;
   height: 100%;
-  background-color: white;
+  background-color: transparent;
   overflow-x: hidden;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
 
   &.initial {
     opacity: 0;
-  }
-
-  div.edit-button {
-    position: relative;
-    cursor: pointer;
-    z-index: 1040;
-    float: right;
-    color: rgba(78,90,107,0.5);
-
-    &:hover {
-      color: rgba(78,90,107,1);
-    }
-  }
-
-  div.btd-container{
-    height: 50px;
-    margin: 0 auto;
-    width: 100vw;
-
-    div.back-to-dashboard-row {
-      z-index: 1040;
-
-      button.back-to-dashboard {
-        margin-top: 0px;
-        opacity: 1;
-        background-color: white;
-        color: rgba(78,90,107,0.8);
-        border: 1px solid rgba(78,90,107,0.8);
-
-        &:hover {
-          color: rgba(78,90,107,1);
-          border: 1px solid rgba(78,90,107,1);
-        }
-      }
-    }
   }
 
   div.fullscreen-topic-transition{
@@ -63,7 +28,7 @@ div.fullscreen-topic {
     }
 
     div.fullscreen-topic-internal {
-      width: 684px;
+      width: 500px;
       margin: 30px auto;
       position: relative;
       min-height: calc(100vh - #{$navbar_height}px - 60px - 4px);
@@ -73,11 +38,32 @@ div.fullscreen-topic {
         margin-bottom: 40px;
       }
 
+      button.close-fullscreen-topic-btn {
+        position: absolute;
+        top: 10px;
+        right: 5px;
+        width: 25px;
+        height: 25px;
+        font-weight: 400;
+        font-family: $oc_headers_font;
+        font-size: 25px;
+        color: rgba(78, 90, 107, 0.4);
+        z-index: 1000;
+
+        i {
+          display: block;
+          margin-top: -10px;
+          margin-left: -2px;
+        }
+      }
+
       div.fullscreen-topic-top-box{
         border-radius: 4px;
         background-color: #ffffff;
         border: solid 2px rgba(78, 90, 107, 0.2);
         padding: 0px;
+        position: relative;
+        overflow: scroll;
 
         div.topic-header-image {
           text-align: center;
