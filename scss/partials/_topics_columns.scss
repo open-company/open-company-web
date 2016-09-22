@@ -35,14 +35,23 @@ div.topics-columns {
         height: auto;
         padding: 0px 6px 0px 6px;
         margin-bottom: 22px;
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
 
-        &.draggable-topic.left-highlight {
+        div.topic {
+          margin-left: 4px;
+          margin-right: 4px;
+          border-left: 0px solid $oc_yellow;
+          border-right: 0px solid $oc_yellow;
+        }
+
+        &.draggable-topic.left-highlight div.topic {
+          margin-left: 0px;
+          margin-right: 4px;
           border-left: 4px solid $oc-yellow;
         }
 
-        &.draggable-topic.right-highlight {
+        &.draggable-topic.right-highlight div.topic {
+          margin-left: 4px;
+          margin-right: 0px;
           border-right: 4px solid $oc-yellow;
         }
 

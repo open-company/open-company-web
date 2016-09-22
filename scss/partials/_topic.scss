@@ -26,7 +26,6 @@ div.dnd-active {
 }
 
 div.topic {
-  margin: 0px;
   padding: 0px;
   height: 100%;
   background-color: $oc_white;
@@ -36,6 +35,8 @@ div.topic {
   box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
   position: relative;
   transition: opacity 0.5s;
+  margin-left: 4px;
+  margin-right: 4px;
 
   &.no-foce {
     opacity: 0.5;
