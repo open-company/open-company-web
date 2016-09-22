@@ -8,7 +8,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [dommy.core :refer-macros (sel sel1)]
+            [dommy.core :as dommy :refer-macros (sel sel1)]
             [open-company-web.api :as api]
             [open-company-web.urls :as oc-urls]
             [open-company-web.caches :as caches]
@@ -71,7 +71,7 @@
              (nil? (om/get-state owner :tr-selected-topic)))
     (let [selected-topic (om/get-state owner :selected-topic)
           active-topics (om/get-state owner :active-topics)
-          topics-list (flatten (vals active-topics))
+          topics-list (keys active-topics)
           current-idx (.indexOf (vec topics-list) selected-topic)]
       (om/set-state! owner :animation-direction is-left?)
       (if is-left?
@@ -414,7 +414,7 @@
               (dom/div #js {:className "selected-topic"
                             :key (str "transition-" selected-topic)
                             :ref "selected-topic"
-                            :style #js {:opacity 1 :backgroundColor "rgba(255, 255, 255, 0.98)"}}
+                            :style #js {:opacity 1}}
                 (om/build fullscreen-topic {:section selected-topic
                                             :section-data (->> selected-topic keyword (get company-data))
                                             :revision-updates (dispatcher/section-revisions company-slug (router/current-section))
