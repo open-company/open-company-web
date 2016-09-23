@@ -34,7 +34,7 @@
         [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]]
       [:div.login-with-email.domine.underline.bold
         [:a {:on-click #(do (utils/event-stop %)
-                            (dis/dispatch! [:show-login-overlay (if (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack) :signup-with-email :login-with-email)]))}
+                            (dis/dispatch! [:show-login-overlay (if (= (:show-login-overlay @dis/app-state) :signup-with-slack) :signup-with-email :login-with-email)]))}
           (cond
             (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
             "OR SIGN UP VIA EMAIL"
@@ -92,7 +92,7 @@
       {:on-click #(utils/event-stop %)}
       [:button.close {:on-click (partial close-overlay)} [:i.fa.fa-times]]
       [:div.p2.group
-        [:div.sing-in-cta.mb3 "Sign In"]
+        [:div.sing-in-cta.mb3 "Sign Un"]
         [:form.sign-in-form
           [:div.sign-in-label-container
             [:label.sign-in-label "YOUR NAME"]]
@@ -117,7 +117,8 @@
           [:span.underline "SIGN IN NOW"]]]]])
 
 (rum/defcs password-reset < rum/reactive
-                            dont-scroll
+                            (merge dont-scroll
+                              {:did-mount (fn [s] (.focus [:div.password-reset-field-container.email]) s)})
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
@@ -129,7 +130,7 @@
         [:form.password-reset-form
           [:div.password-reset-label-container
             [:label.password-reset-label "PLEASE ENTER YOUR EMAIL ADDRESS"]]
-          [:div.password-reset-field-container
+          [:div.password-reset-field-container.email
             [:input.password-reset-field {:value "" :type "text" :name "email"}]]
           [:div.group.pb2.mt3
             [:div.right.ml1
