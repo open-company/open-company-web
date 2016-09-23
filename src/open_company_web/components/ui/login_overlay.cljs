@@ -3,7 +3,8 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.ui.login-button :as login]))
+            [open-company-web.components.ui.login-button :as login]
+            [open-company-web.components.ui.icon :as i]))
 
 (defn close-overlay [e]
   (utils/event-stop e)
@@ -26,22 +27,34 @@
           [:div.sign-in-cta.m2.left "Sign Up"]
           :else
           [:div])]
-      [:button.close {:on-click (partial close-overlay)} [:i.fa.fa-times]]
+      [:button.close {:on-click (partial close-overlay)}
+        (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"})]
       [:button.btn-reset.mt2.login-button
         {:on-click #(login/login! (:extended-scopes-url (:auth-settings @dis/app-state)) %)}
         [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]]
-      [:div.login-with-email
-        [:a {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :login-with-email]))}
+      [:div.login-with-email.domine.underline.bold
+        [:a {:on-click #(do (utils/event-stop %)
+                            (dis/dispatch! [:show-login-overlay (if (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack) :signup-with-email :login-with-email)]))}
           (cond
             (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
             "OR SIGN UP VIA EMAIL"
             :else
             "OR SIGN IN VIA EMAIL")]]
       [:div.login-overlay-footer.p2.mt1.group
-        [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :signup-with-slack])} "DON’T HAVE AN ACCOUNT? SIGN UP NOW"]]]])
+        (cond
+            (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
+            [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :signin-with-slack])}
+              "ALREADY HAVE AN ACCOUNT? "
+               [:span.underline "SIGN IN NOW"]]
+            :else
+            [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :signup-with-slack])}
+              "DON’T HAVE AN ACCOUNT? "
+               [:span.underline "SIGN UP NOW"]])
+        ]]])
 
 (rum/defcs login-with-email < rum/reactive
-                              dont-scroll
+                              (merge dont-scroll
+                                {:did-mount (fn [s] (.focus (sel1 [:input.email])) s)})
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
@@ -49,23 +62,59 @@
       {:on-click #(utils/event-stop %)}
       [:button.close {:on-click (partial close-overlay)} [:i.fa.fa-times]]
       [:div.p2.group
-        [:div.sing-in-cta.mb3 "Sign in"]
+        [:div.sing-in-cta.mb3 "Sign In"]
         [:form.sign-in-form
           [:div.sign-in-label-container
             [:label.sign-in-label "EMAIL"]]
           [:div.sign-in-field-container
-            [:input.sign-in-field {:value "" :type "text" :name "email"}]]
+            [:input.sign-in-field.email {:value "" :type "text" :name "email"}]]
           [:div.sign-in-label-container
             [:label.sign-in-label "PASSWORD"]]
           [:div.sign-in-field-container
-            [:input.sign-in-field {:value "" :type "password" :name "pswd"}]]
+            [:input.sign-in-field.pswd {:value "" :type "password" :name "pswd"}]]
           [:div.group.pb2.my3
             [:div.left.forgot-password
               [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
               [:button.btn-reset.btn-solid "SIGN IN"]]]]]
       [:div.login-overlay-footer.p2.mt1.group
-        [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :signup-with-email]))} "DON’T HAVE AN ACCOUNT? SIGN UP NOW"]]]])
+        [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :signup-with-email]))}
+          "DON’T HAVE AN ACCOUNT? "
+          [:span.underline "SIGN UP NOW"]]]]])
+
+(rum/defcs signup-with-email < rum/reactive
+                               (merge dont-scroll
+                                 {:did-mount (fn [s] (.focus (sel1 [:input.name])) s)})
+  [state]
+  [:div.login-overlay-container.group
+    {:on-click (partial close-overlay)}
+    [:div.login-overlay.signup-with-email.group
+      {:on-click #(utils/event-stop %)}
+      [:button.close {:on-click (partial close-overlay)} [:i.fa.fa-times]]
+      [:div.p2.group
+        [:div.sing-in-cta.mb3 "Sign In"]
+        [:form.sign-in-form
+          [:div.sign-in-label-container
+            [:label.sign-in-label "YOUR NAME"]]
+          [:div.sign-in-field-container
+            [:input.sign-in-field.name {:value "" :type "text" :name "name"}]]
+          [:div.sign-in-label-container
+            [:label.sign-in-label "EMAIL"]]
+          [:div.sign-in-field-container
+            [:input.sign-in-field.email {:value "" :type "text" :name "email"}]]
+          [:div.sign-in-label-container
+            [:label.sign-in-label "PASSWORD"]]
+          [:div.sign-in-field-container
+            [:input.sign-in-field.pswd {:value "" :type "password" :name "pswd"}]]
+          [:div.group.pb2.my3
+            [:div.left.forgot-password
+              [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
+            [:div.right
+              [:button.btn-reset.btn-solid "SIGN IN"]]]]]
+      [:div.login-overlay-footer.p2.mt1.group
+        [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :signin-with-email]))}
+          "ALREADY HAVE AN ACCOUNT? "
+          [:span.underline "SIGN IN NOW"]]]]])
 
 (rum/defcs password-reset < rum/reactive
                             dont-scroll
