@@ -131,8 +131,8 @@ div.fullscreen-topic {
         div.topic-headline {
           margin-top: 18px;
           font-family: $oc_headers_font;
-          font-size: 26px;
-          line-height: 1.4;
+          font-size: 18px;
+          line-height: 25px;
           color: $oc_gray_7;
           padding: 0px 26px;
 
@@ -156,11 +156,11 @@ div.fullscreen-topic {
       }
 
       div.topic-body{
-        @include rich-editor-body($oc_gray_7);
+        @include rich-editor-body($oc_gray_7, 14px);
         margin-top: 21px !important;
         margin-bottom: 20px !important;
         line-height: 1.8;
-        font-size: 18px;
+        font-size: 14px;
         padding: 0px 30px !important;
         overflow-wrap: break-word;
       }
