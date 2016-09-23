@@ -18,6 +18,9 @@
           ; login via email
           (= (:show-login-overlay (rum/react dis/app-state)) :login-with-email)
           (login-overlays/login-with-email)
+          ; signup via email
+          (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-email)
+          (login-overlays/signup-with-email)
           ; password reset
           (= (:show-login-overlay (rum/react dis/app-state)) :password-reset)
           (login-overlays/password-reset)
@@ -35,12 +38,12 @@
                   [:input {:id "referrer" :type "hidden" :name "refrerrer" :value ""}]
                   [:div.row
                     [:div.col-xs-12.center
-                      [:button.submit {:id "submit"
-                                       :name "subscribe"
-                                       :type "submit"
-                                       :on-click #(do
-                                                   (utils/event-stop %)
-                                                   (dis/dispatch! [:show-login-overlay :signup-with-slack]))}
+                      [:button.submit.domine {:id "submit"
+                                              :name "subscribe"
+                                              :type "submit"
+                                              :on-click #(do
+                                                          (utils/event-stop %)
+                                                          (dis/dispatch! [:show-login-overlay :signup-with-slack]))}
                         "Get Started →"]]]]]]]]
 
         [:div.sub-tag
