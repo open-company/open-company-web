@@ -6,6 +6,10 @@ div.fullscreen-topic {
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
 
+  @include mobile(){
+    background-color: white;
+  }
+
   &.initial {
     opacity: 0;
   }
@@ -15,8 +19,18 @@ div.fullscreen-topic {
     height: auto;
     overflow: hidden;
 
+    @include mobile(){
+      height: 100% !important;
+      overflow-y: scroll;
+    }
+
     div.fullscreen-topic-as-of {
       height: auto;
+
+      @include mobile(){
+        height: 100% !important;
+        overflow-y: scroll;
+      }
     }
 
     div.fullscreen-topic-tr-as-of {
@@ -25,18 +39,32 @@ div.fullscreen-topic {
       left: 0;
       height: auto;
       width: 100vw;
+      @include mobile(){
+        height: 100% !important;
+        overflow-y: scroll;
+      }
     }
 
     div.fullscreen-topic-internal {
-      width: 500px;
+      -webkit-overflow-scrolling: touch;
+      max-width: 500px;
       margin: 30px auto;
       position: relative;
       border-radius: 2px;
       background-color: #fcfcfc;
-      box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
+      @include big_web(){
+        box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
+      }
 
       @include mobile(){
-        margin-bottom: 40px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        height: 100%;
+        width: 100%;
+        margin-top: 0px;
+        padding-top: 30px;
+        margin-bottom: 0px;
+        padding-bottom: 0px;
       }
 
       button.close-fullscreen-topic-btn {
@@ -51,10 +79,14 @@ div.fullscreen-topic {
         color: rgba(78, 90, 107, 0.4);
         z-index: 1000;
 
-        i {
-          display: block;
-          margin-top: -10px;
-          margin-left: -2px;
+        @include mobile(){
+          right: 10px;
+          top: 0px;
+
+          div.svg-icon svg {
+            // color: rgba(78, 90, 107, 0.5);
+            stroke: rgba(78, 90, 107, 0.4) !important;
+          }
         }
       }
 
@@ -72,6 +104,11 @@ div.fullscreen-topic {
             border-top-left-radius: 2px;
             border-top-right-radius: 2px;
           }
+        }
+
+        button.mobile-close {
+          margin-top: -35px;
+          float: right;
         }
 
         div.topic-title-container{

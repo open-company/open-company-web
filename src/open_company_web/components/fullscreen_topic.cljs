@@ -82,7 +82,7 @@
                      :on-click #(hide-fullscreen-topic-cb)}
           (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
         (dom/div {:class "fullscreen-topic-top-box"
-                  :style #js {:maxHeight (str (* (/ wh 100) 85) "px")}}
+                  :style #js {:maxHeight (when-not (responsive/is-mobile?) (str (* (/ wh 100) 85) "px"))}}
           ;; Image
           (when (:image-url topic-data)
             (dom/div {:class "topic-header-image"}
@@ -111,7 +111,10 @@
           ;; Attribution
           (when (and (not hide-history-navigation)
                      (not (:placeholder topic-data)))
-            (om/build topic-attribution data {:opts options})))))))
+            (om/build topic-attribution data {:opts options}))
+          (when (responsive/is-mobile?)
+            (dom/button {:class "btn-reset btn-link mobile-close"
+                         :on-click #(hide-fullscreen-topic-cb)} "CLOSE")))))))
 
 (defn- hide-fullscreen-topic [owner options & [force-fullscreen-dismiss]]
   (utils/enable-scroll)
