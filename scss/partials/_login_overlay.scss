@@ -45,7 +45,7 @@ div.login-overlay-container {
       }
     }
 
-    &.login-with-email {
+    &.login-with-email, &.signup-with-email {
       div.sign-in-cta {
         font-weight: 400;
         font-family: $oc_headers_font;
