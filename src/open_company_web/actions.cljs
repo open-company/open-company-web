@@ -7,7 +7,8 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
-            [open-company-web.api :as api]))
+            [open-company-web.api :as api]
+            [open-company-web.local-settings :as ls]))
 
 ;; ---- Generic Actions Dispatch
 ;; This is a small generic abstraction to handle "actions".
@@ -233,3 +234,19 @@
 (defmethod dispatcher/action :show-login-overlay
  [db [_ show-login-overlay]]
  (assoc db :show-login-overlay show-login-overlay))
+
+(defmethod dispatcher/action :login-with-slack
+  [db [_ auth-url]]
+  (let [current (router/get-token)]
+    (when-not (.startsWith current oc-urls/login)
+        (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)))
+  (router/redirect! auth-url))
+
+(defmethod dispatcher/action :login-with-email-change
+  [db [_ k v]]
+  (assoc-in db [:login-with-email k] v))
+
+(defmethod dispatcher/action :login-with-email
+  [db [_ auth-url]]
+  (api/auth-with-email auth-url (:email (:login-with-email db)) (:pswd (:login-with-email db)))
+  db)
