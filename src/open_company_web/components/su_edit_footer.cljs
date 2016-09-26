@@ -25,7 +25,7 @@
 
   (will-receive-props [_ next-props]
     ; update outro when the content changes from the parent component
-    ; or when it force the conetnt refresh
+    ; or when it force the content refresh
     (let [next-outro (:outro next-props)]
       (when (or (:update-content next-props)
                 (not= next-outro (:outro data)))

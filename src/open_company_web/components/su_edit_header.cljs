@@ -29,7 +29,7 @@
 
   (will-receive-props [_ next-props]
     ; update intro when the content changes from the parent component
-    ; or when it force the conetnt refresh
+    ; or when it force the content refresh
     (let [next-intro (:intro next-props)]
       (when (or (:update-content next-props)
                 (not= next-intro (:intro data)))
