@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.components.ui.login-button :as login]
             [open-company-web.components.ui.back-to-dashboard-btn :as btd]))
@@ -23,7 +24,9 @@
              "OpenCompany requires verification with your Slack team. Please allow access."
              [:p.my2.h5 "If Slack did not allow you to authorize OpenCompany, try "
               [:button.p0.btn-reset.underline
-               {:on-click #(login/login! (:basic-scopes-url (:auth-settings data)) %)}
+               {:on-click #(do
+                             (.preventDefault %)
+                             (dis/dispatch! [:login-with-slack (:basic-scopes-url (:slack (:auth-settings data)))]))}
                 "this link instead."]]]
             (:access data)
             [:span.block.red
@@ -31,7 +34,9 @@
             :else
             "Please sign in to access this company dashboard.")]
      [:button.btn-reset.mt2
-      {:on-click #(login/login! (:extended-scopes-url (:auth-settings data)) %)}
+      {:on-click #(do
+                    (.preventDefault %)
+                    (dis/dispatch! [:login-with-slack (:extended-scopes-url (:slack (:auth-settings data)))]))}
       [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]]]
     [:div.logo-container
      [:img.logo-gold {:src "/img/oc-logo-gold.svg"}]

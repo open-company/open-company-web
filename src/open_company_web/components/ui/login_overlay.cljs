@@ -30,7 +30,9 @@
       [:button.close {:on-click (partial close-overlay)}
         (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"})]
       [:button.btn-reset.mt2.login-button
-        {:on-click #(login/login! (:extended-scopes-url (:auth-settings @dis/app-state)) %)}
+        {:on-click #(do
+                      (.preventDefault %)
+                      (dis/dispatch! [:login-with-slack (:extended-scopes-url (:auth-settings @dis/app-state))]))}
         [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]]
       [:div.login-with-email.domine.underline.bold
         [:a {:on-click #(do (utils/event-stop %)
@@ -43,7 +45,7 @@
       [:div.login-overlay-footer.p2.mt1.group
         (cond
             (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
-            [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :signin-with-slack])}
+            [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :login-with-slack])}
               "ALREADY HAVE AN ACCOUNT? "
                [:span.underline "SIGN IN NOW"]]
             :else
@@ -67,16 +69,28 @@
           [:div.sign-in-label-container
             [:label.sign-in-label "EMAIL"]]
           [:div.sign-in-field-container
-            [:input.sign-in-field.email {:value "" :type "text" :name "email"}]]
+            [:input.sign-in-field.email
+              {:value (:email (:login-with-email (rum/react dis/app-state)))
+               :on-change #(dis/dispatch! [:login-with-email-change :email (.-value (sel1 [:input.email]))])
+               :type "text"
+               :name "email"}]]
           [:div.sign-in-label-container
             [:label.sign-in-label "PASSWORD"]]
           [:div.sign-in-field-container
-            [:input.sign-in-field.pswd {:value "" :type "password" :name "pswd"}]]
+            [:input.sign-in-field.pswd
+              {:value (:pswd (:login-with-email (rum/react dis/app-state)))
+               :on-change #(dis/dispatch! [:login-with-email-change :pswd (.-value (sel1 [:input.pswd]))])
+               :type "password"
+               :name "pswd"}]]
           [:div.group.pb2.my3
             [:div.left.forgot-password
               [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
-              [:button.btn-reset.btn-solid "SIGN IN"]]]]]
+              [:button.btn-reset.btn-solid
+                {:on-click #(do
+                              (.preventDefault %)
+                              (dis/dispatch! [:login-with-email (:auth-url (:email (:auth-settings @dis/app-state)))]))}
+                "SIGN IN"]]]]]
       [:div.login-overlay-footer.p2.mt1.group
         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :signup-with-email]))}
           "DON’T HAVE AN ACCOUNT? "
@@ -110,9 +124,13 @@
             [:div.left.forgot-password
               [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
-              [:button.btn-reset.btn-solid "SIGN IN"]]]]]
+              [:button.btn-reset.btn-solid
+                {:on-click #(do
+                              (.preventDefault %)
+                              (dis/dispatch! [:signup-with-email (:auth-url (:email (:auth-settings @dis/app-state))) (.-value (sel1 [:input.name])) (.-value (sel1 [:input.email])) (.-value (sel1 [:input.pswd]))]))}
+                "SIGN UP"]]]]]
       [:div.login-overlay-footer.p2.mt1.group
-        [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :signin-with-email]))}
+        [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :login-with-email]))}
           "ALREADY HAVE AN ACCOUNT? "
           [:span.underline "SIGN IN NOW"]]]]])
 
