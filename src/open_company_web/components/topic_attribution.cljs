@@ -53,7 +53,8 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+      (when (responsive/is-tablet-or-mobile?)
+        (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
       ; force a rerender every minute
       (om/set-state! owner :self-update (js/setInterval #(om/update-state! owner :force-update inc) (* 60 1000)))))
 

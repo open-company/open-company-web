@@ -269,7 +269,8 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (js/filepicker.setKey ls/filestack-key)
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+      (when (responsive/is-tablet-or-mobile?)
+        (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
       (setup-edit owner)
       (utils/after 100 #(focus-headline))
       (reset! prevent-route-dispatch true)
@@ -280,25 +281,26 @@
         (om/set-state! owner :history-listener-id listener))))
 
   (did-update [_ _ prev-state]
-    (let [section           (dis/foce-section-key)
-          topic-data        (dis/foce-section-data)
-          image-header      (:image-url topic-data)
-          add-image-tooltip (add-image-tooltip image-header)
-          add-image-el      (js/$ (gdom/getElementByClass "camera"))
-          pin-image         (js/$ (gdom/getElementByClass "pin-button"))
-          add-chart-el      (js/$ (gdom/getElementByClass "chart-button"))]
-      (doto add-image-el
-        (.tooltip "hide")
-        (.attr "data-original-title" add-image-tooltip)
-        (.tooltip "fixTitle")
-        (.tooltip "hide"))
-      (doto pin-image
-        (.tooltip "hide")
-        (.attr "data-original-title" (pin-tooltip (:pin topic-data)))
-        (.tooltip "fixTitle"))
-      (doto add-chart-el
-        (.tooltip "fixTitle")
-        (.tooltip "hide")))
+    (when (responsive/is-tablet-or-mobile?)
+      (let [section           (dis/foce-section-key)
+            topic-data        (dis/foce-section-data)
+            image-header      (:image-url topic-data)
+            add-image-tooltip (add-image-tooltip image-header)
+            add-image-el      (js/$ (gdom/getElementByClass "camera"))
+            pin-image         (js/$ (gdom/getElementByClass "pin-button"))
+            add-chart-el      (js/$ (gdom/getElementByClass "chart-button"))]
+        (doto add-image-el
+          (.tooltip "hide")
+          (.attr "data-original-title" add-image-tooltip)
+          (.tooltip "fixTitle")
+          (.tooltip "hide"))
+        (doto pin-image
+          (.tooltip "hide")
+          (.attr "data-original-title" (pin-tooltip (:pin topic-data)))
+          (.tooltip "fixTitle"))
+        (doto add-chart-el
+          (.tooltip "fixTitle")
+          (.tooltip "hide"))))
     (let [file-upload-state (om/get-state owner :file-upload-state)
           old-file-upload-state (:file-upload-state prev-state)]
       (when (and (= file-upload-state :show-url-field)

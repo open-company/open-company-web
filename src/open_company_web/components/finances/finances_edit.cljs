@@ -9,7 +9,7 @@
             [open-company-web.lib.finance-utils :as finance-utils]
             [cljs.core.async :refer (put!)]))
 
-(def batch-size 6)
+(def batch-size 5)
 
 (defn signal-tab [period k]
   (let [ch (utils/get-channel (str period k))]

@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.icon :as i]
             [goog.style :as gstyle]
             [goog.dom :as gdom]
@@ -54,7 +55,8 @@
       ; hide placeholder callback when needed
       ((:hide-placeholder options) (not (nil? (om/get-state owner :state))))
       (when (= (om/get-state owner :state) :show-options)
-        (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
+        (when (responsive/is-tablet-or-mobile?)
+          (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))))
 
   (render-state [this {:keys [state url]}]
     (dom/div {:id "file-upload-ui"

@@ -6,6 +6,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.components.ui.cell :refer (cell)]
             [open-company-web.components.growth.growth-metric-edit :refer (growth-metric-edit)]
@@ -15,7 +16,7 @@
             [cljs.core.async :refer (put!)]
             [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
 
-(def batch-size 6)
+(def batch-size 5)
 
 ;; ===== Growth Data Row Editing Component (Single Row in the Data Table) =====
 
@@ -220,7 +221,8 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+      (when (responsive/is-tablet-or-mobile?)
+        (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
   (render-state [_ {:keys [metadata-edit? metrics growth-data metric-slug stop] :as state}]
 

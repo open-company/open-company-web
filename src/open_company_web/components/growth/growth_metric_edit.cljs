@@ -9,6 +9,7 @@
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.iso4217 :refer (sorted-iso4217)]
             [open-company-web.lib.growth-utils :as growth-utils]
+            [open-company-web.lib.responsive :as responsive]
             [cuerdas.core :as s]
             [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
 
@@ -129,7 +130,8 @@
     (om/set-state! owner :did-mount true)
     (init-select2 owner data)
     (when-not (utils/is-test-env?)
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+      (when (responsive/is-tablet-or-mobile?)
+        (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
   (render [_]
     (let [all-metrics (:metrics data)
