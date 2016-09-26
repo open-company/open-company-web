@@ -60,6 +60,7 @@
 (def ^:private api-patch (partial req api-endpoint http/patch))
 
 (def ^:private auth-get (partial req auth-endpoint http/get))
+(def ^:private auth-post (partial req auth-endpoint http/post))
 
 (def ^:private pay-get (partial req pay-endpoint http/get))
 (def ^:private pay-post (partial req pay-endpoint http/post))
@@ -362,3 +363,17 @@
                             :update-slug (keyword update-slug)
                             :response fixed-body}]
               (dispatcher/dispatch! [:stakeholder-update response]))))))))
+
+(defn auth-with-email [auth-url email pswd]
+  (when (and auth-url email pswd)
+    (let [auth-endpoint (str "/" (clojure.string/join "/" (subvec (clojure.string/split auth-url "/") 3)))]
+      (println "authenticating with" auth-endpoint "user:" email "pswd:" pswd)
+      (auth-post auth-endpoint
+        {:headers {
+          ; required by Chrome
+              "Access-Control-Allow-Headers" "Content-Type"
+              ; custom content type
+              "content-type" "application/json"}}
+        (fn [{:keys [success body]}]
+          (println "auth-with-email done:" success)
+          (println "   body:" body))))))
