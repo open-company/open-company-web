@@ -259,11 +259,11 @@
 (defmethod dispatcher/action :login-with-email
   [db [_ auth-url]]
   (api/auth-with-email auth-url (:email (:login-with-email db)) (:pswd (:login-with-email db)))
-  db)
+  (dissoc db :login-with-email-error))
 
 (defmethod dispatcher/action :login-with-email/failed
-  [db [_]]
-  (assoc db :login-with-email :failed))
+  [db [_ error]]
+  (assoc db :login-with-email-error error))
 
 (defmethod dispatcher/action :login-with-email/success
   [db [_ jwt]]
