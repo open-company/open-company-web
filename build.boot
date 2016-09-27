@@ -5,8 +5,8 @@
     [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
     [tolitius/boot-check "0.1.3" :scope "test"]
 
-    [org.clojure/clojure "1.9.0-alpha11"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
-    [org.clojure/clojurescript "1.9.225"] ; ClojureScript compiler https://github.com/clojure/clojurescript]
+    [org.clojure/clojure "1.9.0-alpha13"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojurescript "1.9.225"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
     [org.omcljs/om "1.0.0-alpha41" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
 
