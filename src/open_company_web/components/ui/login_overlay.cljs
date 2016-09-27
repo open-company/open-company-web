@@ -1,6 +1,7 @@
 (ns open-company-web.components.ui.login-overlay
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [open-company-web.urls :as oc-url]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.login-button :as login]
@@ -32,7 +33,7 @@
       [:button.btn-reset.mt2.login-button
         {:on-click #(do
                       (.preventDefault %)
-                      (dis/dispatch! [:login-with-slack (:extended-scopes-url (:auth-settings @dis/app-state))]))}
+                      (dis/dispatch! [:login-with-slack (:extended-scopes-url (:slack (:auth-settings @dis/app-state)))]))}
         [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]]
       [:div.login-with-email.domine.underline.bold
         [:a {:on-click #(do (utils/event-stop %)
@@ -51,8 +52,7 @@
             :else
             [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :signup-with-slack])}
               "DON’T HAVE AN ACCOUNT? "
-               [:span.underline "SIGN UP NOW"]])
-        ]]])
+               [:span.underline "SIGN UP NOW"]])]]])
 
 (rum/defcs login-with-email < rum/reactive
                               (merge dont-scroll
@@ -65,6 +65,22 @@
       [:button.close {:on-click (partial close-overlay)} [:i.fa.fa-times]]
       [:div.p2.group
         [:div.sing-in-cta.mb3 "Sign In"]
+        (when-not (nil? (:login-with-email-error (rum/react dis/app-state)))
+          (cond
+            (= (:login-with-email-error (rum/react dis/app-state)) 401)
+            [:span.error-message.red
+              "The email or password you entered is incorrect."
+              [:br]
+              "Please try again, or "
+              [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]
+              "."]
+            :else
+            [:span.error-message.red
+              "System troubles logging in."
+              [:br]
+              "Please try again, then "
+              [:a.underline.red {:href oc-url/contact-mail-to} "contact support"]
+              "."]))
         [:form.sign-in-form
           [:div.sign-in-label-container
             [:label.sign-in-label "EMAIL"]]

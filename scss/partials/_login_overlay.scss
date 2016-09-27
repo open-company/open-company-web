@@ -35,6 +35,7 @@ div.login-overlay-container {
       div.login-with-email {
         margin-top: 13px;
         margin-bottom: 103px;
+
         a {
           font-size: 12px;
           line-height: 1.5;
@@ -52,6 +53,14 @@ div.login-overlay-container {
         font-size: 20px;
         line-height: 1.2;
         color: $oc_gray_5;
+      }
+
+      span.error-message {
+        font-size: 14px;
+        margin: 0px;
+        a:hover {
+          color: $oc_red;
+        }
       }
 
       div.sign-in-label-container {
