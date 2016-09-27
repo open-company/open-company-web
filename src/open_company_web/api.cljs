@@ -5,6 +5,7 @@
             [open-company-web.dispatcher :as dispatcher]
             [cognitect.transit :as t]
             [clojure.walk :refer (keywordize-keys stringify-keys)]
+            [clojure.string :as s]
             [open-company-web.lib.cookies :as cook]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.jwt :as j]
@@ -36,8 +37,8 @@
                                 "Authorization" (str "Bearer " jwt)}))
     params))
 
-(defn refresh-jwt []
-  (http/get (str auth-endpoint "/refresh-token") (complete-params {})))
+(defn refresh-jwt [refresh-url]
+  (http/get refresh-url (complete-params {})))
 
 (defn update-jwt-cookie! [jwt]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
@@ -46,9 +47,9 @@
   (let [jwt (j/jwt)]
     (go
       (when (and jwt (j/expired?))
-        (let [res (<! (refresh-jwt))]
+        (let [res (<! (refresh-jwt (:refresh-url (:auth-settings @dispatcher/app-state))))]
           (if (:success res)
-            (update-jwt-cookie! (-> res :body :jwt))
+            (update-jwt-cookie! (:body res))
             (dispatcher/dispatch! [:logout]))))
 
       (let [response (<! (method (str endpoint path) (complete-params params)))]
@@ -60,7 +61,6 @@
 (def ^:private api-patch (partial req api-endpoint http/patch))
 
 (def ^:private auth-get (partial req auth-endpoint http/get))
-(def ^:private auth-post (partial req auth-endpoint http/post))
 
 (def ^:private pay-get (partial req pay-endpoint http/get))
 (def ^:private pay-post (partial req pay-endpoint http/post))
@@ -366,14 +366,16 @@
 
 (defn auth-with-email [auth-url email pswd]
   (when (and auth-url email pswd)
-    (let [auth-endpoint (str "/" (clojure.string/join "/" (subvec (clojure.string/split auth-url "/") 3)))]
-      (println "authenticating with" auth-endpoint "user:" email "pswd:" pswd)
-      (auth-post auth-endpoint
-        {:headers {
-          ; required by Chrome
-              "Access-Control-Allow-Headers" "Content-Type"
-              ; custom content type
-              "content-type" "application/json"}}
-        (fn [{:keys [success body]}]
-          (println "auth-with-email done:" success)
-          (println "   body:" body))))))
+    (let [auth-endpoint (str "/" (s/join "/" (subvec (s/split auth-url "/") 3)))]
+      (auth-get auth-endpoint
+        {:basic-auth {
+          :username email
+          :password pswd}}
+        (fn [{:keys [success body status]}]
+         (if success
+            (dispatcher/dispatch! [:login-with-email/success body])
+            (cond
+              (= status 401)
+              (dispatcher/dispatch! [:login-with-email/failed 401])
+              :else
+              (dispatcher/dispatch! [:login-with-email/failed 500]))))))))
