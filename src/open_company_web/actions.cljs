@@ -250,3 +250,12 @@
   [db [_ auth-url]]
   (api/auth-with-email auth-url (:email (:login-with-email db)) (:pswd (:login-with-email db)))
   db)
+
+(defmethod dispatcher/action :login-with-email/failed
+  [db [_]]
+  (assoc db :login-with-email :failed))
+
+(defmethod dispatcher/action :login-with-email/success
+  [db [_ jwt]]
+  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+  (router/redirect! oc-urls/home))
