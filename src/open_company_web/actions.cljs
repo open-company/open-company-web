@@ -233,7 +233,17 @@
 
 (defmethod dispatcher/action :show-login-overlay
  [db [_ show-login-overlay]]
- (assoc db :show-login-overlay show-login-overlay))
+ (cond
+    (= show-login-overlay :login-with-email)
+    (-> db
+      (assoc :show-login-overlay show-login-overlay)
+      (assoc :login-with-email {:email "" :pswd ""}))
+    (= show-login-overlay :signup-with-email)
+    (-> db
+      (assoc :show-login-overlay show-login-overlay)
+      (assoc :signup-with-email {:name "" :email "" :pswd ""}))
+    :else
+    (assoc db :show-login-overlay show-login-overlay)))
 
 (defmethod dispatcher/action :login-with-slack
   [db [_ auth-url]]
