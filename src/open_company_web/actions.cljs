@@ -221,6 +221,8 @@
 
 (defmethod dispatcher/action :jwt
   [db [_ jwt-data]]
+  (when jwt-data
+    (api/get-auth-settings))
   (assoc db :jwt jwt-data))
 
 ;; Stripe Payment related actions
@@ -271,3 +273,8 @@
   [db [_ jwt]]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
   (router/redirect! oc-urls/home))
+
+(defmethod dispatcher/action :get-auth-settings
+  [db [_]]
+  (api/get-auth-settings)
+  db)
