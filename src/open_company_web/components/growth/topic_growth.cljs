@@ -71,6 +71,7 @@
             (dom/label {:class metric-classes
                         :title (:description metric)
                         :data-toggle "tooltip"
+                        :data-container "body"
                         :data-placement "bottom"
                         :data-tab metric-slug
                         :on-click (partial pillbox-click owner options)} mname))))
@@ -81,6 +82,7 @@
                                              :new true})
                     :title "Add a new chart"
                     :data-toggle "tooltip"
+                    :data-container "body"
                     :data-placement "bottom"
                     :data-tab growth-utils/new-metric-slug-placeholder
                     :on-click (fn [e]
@@ -160,6 +162,7 @@
                                :title "Edit chart data"
                                :type "button"
                                :data-toggle "tooltip"
+                               :data-container "body"
                                :data-placement "left"
                                :on-click #(do (om/set-state! owner :data-editing? true)
                                               (editing-cb true))}

@@ -199,6 +199,7 @@
                            :title "Archive this chart"
                            :type "button"
                            :data-toggle "tooltip"
+                           :data-container "body"
                            :data-placement "top"
                            :on-click #(show-archive-confirm-popover owner data)}
                   (dom/i {:class "fa fa-archive"})))
