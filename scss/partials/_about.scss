@@ -1,5 +1,10 @@
 /***** About ******/
 
+@media (min-width: 768px) { 
+  div#wrap.about-wrap {
+    min-height: calc(100vh - 40px);
+  }
+}
 
 div.container.about {
   margin-top: 50px;

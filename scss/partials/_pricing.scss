@@ -1,4 +1,10 @@
 @media (min-width: 768px) { /* not mobile */
+  div#wrap.wrap-pricing {
+    min-height: calc(100vh - 40px);
+  }
+}
+
+@media (min-width: 768px) { /* not mobile */
   div.container.pricing {
     margin-bottom: 40px;
   }

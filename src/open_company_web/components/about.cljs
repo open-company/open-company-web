@@ -6,7 +6,7 @@
 
 (rum/defc about []
   [:div
-    [:div {:id "wrap"} ; <!-- used to push footer to the bottom --> 
+    [:div.about-wrap {:id "wrap"} ; <!-- used to push footer to the bottom --> 
 
       (site-header)
 

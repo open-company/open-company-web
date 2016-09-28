@@ -6,7 +6,7 @@
 
 (rum/defc pricing []
   [:div
-    [:div {:id "wrap"} ; <!-- used to push footer to the bottom --> 
+    [:div.pricing-wrap {:id "wrap"} ; <!-- used to push footer to the bottom --> 
 
       (site-header)
 
