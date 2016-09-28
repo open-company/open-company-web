@@ -140,3 +140,19 @@
               [:button.btn-reset.btn-outline
                 {:on-click #(dis/dispatch! [:show-login-overlay nil])}
                 "CANCEL"]]]]]]])
+
+(defn login-overlays-handler [s]
+  (when (:show-login-overlay s)
+    (cond
+      ; login via email
+      (= (:show-login-overlay s) :login-with-email)
+      (login-with-email)
+      ; signup via email
+      (= (:show-login-overlay s) :signup-with-email)
+      (signup-with-email)
+      ; password reset
+      (= (:show-login-overlay s) :password-reset)
+      (password-reset)
+      ; login via slack as default
+      :else
+      (login-signup-with-slack))))

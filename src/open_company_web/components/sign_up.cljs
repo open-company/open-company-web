@@ -13,20 +13,8 @@
         
       (site-header)
 
-      (when (:show-login-overlay (rum/react dis/app-state))
-        (cond
-          ; login via email
-          (= (:show-login-overlay (rum/react dis/app-state)) :login-with-email)
-          (login-overlays/login-with-email)
-          ; signup via email
-          (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-email)
-          (login-overlays/signup-with-email)
-          ; password reset
-          (= (:show-login-overlay (rum/react dis/app-state)) :password-reset)
-          (login-overlays/password-reset)
-          ; login via slack as default
-          :else
-          (login-overlays/login-signup-with-slack)))
+      ; show login overlays when needed
+      (login-overlays/login-overlays-handler (rum/react dis/app-state))
 
       [:div.main.sign-up
         [:div.cta
