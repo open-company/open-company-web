@@ -269,7 +269,7 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (js/filepicker.setKey ls/filestack-key)
-      (when (responsive/is-tablet-or-mobile?)
+      (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
       (setup-edit owner)
       (utils/after 100 #(focus-headline))
@@ -281,7 +281,7 @@
         (om/set-state! owner :history-listener-id listener))))
 
   (did-update [_ _ prev-state]
-    (when (responsive/is-tablet-or-mobile?)
+    (when-not (responsive/is-tablet-or-mobile?)
       (let [section           (dis/foce-section-key)
             topic-data        (dis/foce-section-data)
             image-header      (:image-url topic-data)

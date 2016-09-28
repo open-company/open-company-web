@@ -186,7 +186,7 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       ; initialize bootstrap tooltips
-      (when (responsive/is-tablet-or-mobile?)
+      (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
       (events/listen js/window EventType/RESIZE #(om/set-state! owner :window-width (.-clientWidth (.-body js/document))))))
 

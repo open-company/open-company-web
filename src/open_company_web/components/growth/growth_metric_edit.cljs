@@ -130,7 +130,7 @@
     (om/set-state! owner :did-mount true)
     (init-select2 owner data)
     (when-not (utils/is-test-env?)
-      (when (responsive/is-tablet-or-mobile?)
+      (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
   (render [_]

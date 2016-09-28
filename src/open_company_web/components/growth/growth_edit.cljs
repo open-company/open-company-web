@@ -221,7 +221,7 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (when (responsive/is-tablet-or-mobile?)
+      (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
   (render-state [_ {:keys [metadata-edit? metrics growth-data metric-slug stop] :as state}]

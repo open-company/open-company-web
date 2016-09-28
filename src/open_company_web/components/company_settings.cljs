@@ -159,7 +159,7 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (js/filepicker.setKey ls/filestack-key)
-      (when (responsive/is-tablet-or-mobile?)
+      (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
   (render-state [_ {company-uuid :uuid company-name :company-name logo :logo

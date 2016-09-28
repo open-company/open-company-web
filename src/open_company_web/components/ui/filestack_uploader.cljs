@@ -55,7 +55,7 @@
       ; hide placeholder callback when needed
       ((:hide-placeholder options) (not (nil? (om/get-state owner :state))))
       (when (= (om/get-state owner :state) :show-options)
-        (when (responsive/is-tablet-or-mobile?)
+        (when-not (responsive/is-tablet-or-mobile?)
           (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))))
 
   (render-state [this {:keys [state url]}]
