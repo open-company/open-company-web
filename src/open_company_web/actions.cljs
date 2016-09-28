@@ -237,11 +237,13 @@
     (= show-login-overlay :login-with-email)
     (-> db
       (assoc :show-login-overlay show-login-overlay)
-      (assoc :login-with-email {:email "" :pswd ""}))
+      (assoc :login-with-email {:email "" :pswd ""})
+      (dissoc :login-with-email-error))
     (= show-login-overlay :signup-with-email)
     (-> db
       (assoc :show-login-overlay show-login-overlay)
-      (assoc :signup-with-email {:name "" :email "" :pswd ""}))
+      (assoc :signup-with-email {:name "" :email "" :pswd ""})
+      (dissoc :signup-with-email-error))
     :else
     (assoc db :show-login-overlay show-login-overlay)))
 
