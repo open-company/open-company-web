@@ -5,14 +5,17 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.login-button :as login]
-            [open-company-web.components.ui.icon :as i]))
+            [open-company-web.components.ui.icon :as i]
+            [open-company-web.components.ui.small-loading :refer (small-loading)]))
 
 (defn close-overlay [e]
   (utils/event-stop e)
   (dis/dispatch! [:show-login-overlay false]))
 
 (def dont-scroll
-  {:will-mount (fn [s] (dommy/add-class! (sel1 [:body]) :no-scroll) s)
+  {:will-mount (fn [s] (dommy/add-class! (sel1 [:body]) :no-scroll)
+                       (when-not (:auth-settings @dis/app-state)
+                          (dis/dispatch! [:get-auth-settings])) s)
    :will-unmount (fn [s] (dommy/remove-class! (sel1 [:body]) :no-scroll) s)})
 
 (rum/defcs login-signup-with-slack < rum/reactive
@@ -34,7 +37,9 @@
         {:on-click #(do
                       (.preventDefault %)
                       (dis/dispatch! [:login-with-slack (:extended-scopes-url (:slack (:auth-settings @dis/app-state)))]))}
-        [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]]
+        (if (:auth-settings (rum/react dis/app-state))
+          [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
+          (small-loading))]
       [:div.login-with-email.domine.underline.bold
         [:a {:on-click #(do (utils/event-stop %)
                             (dis/dispatch! [:show-login-overlay (if (= (:show-login-overlay @dis/app-state) :signup-with-slack) :signup-with-email :login-with-email)]))}
@@ -64,7 +69,9 @@
       {:on-click #(utils/event-stop %)}
       [:button.close {:on-click (partial close-overlay)} [:i.fa.fa-times]]
       [:div.p2.group
-        [:div.sing-in-cta.mb3 "Sign In"]
+        [:div.sing-in-cta.mb3 "Sign In"
+          (when-not (:auth-settings (rum/react dis/app-state))
+            (small-loading))]
         (when-not (nil? (:login-with-email-error (rum/react dis/app-state)))
           (cond
             (= (:login-with-email-error (rum/react dis/app-state)) 401)
@@ -103,7 +110,8 @@
               [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
               [:button.btn-reset.btn-solid
-                {:on-click #(do
+                {:disabled (nil? (:email (:auth-settings (rum/react dis/app-state))))
+                 :on-click #(do
                               (.preventDefault %)
                               (dis/dispatch! [:login-with-email (:auth-url (:email (:auth-settings @dis/app-state)))]))}
                 "SIGN IN"]]]]]
@@ -122,7 +130,9 @@
       {:on-click #(utils/event-stop %)}
       [:button.close {:on-click (partial close-overlay)} [:i.fa.fa-times]]
       [:div.p2.group
-        [:div.sing-in-cta.mb3 "Sign Un"]
+        [:div.sing-in-cta.mb3 "Sign Up"
+          (when-not (:auth-settings (rum/react dis/app-state))
+            (small-loading))]
         [:form.sign-in-form
           [:div.sign-in-label-container
             [:label.sign-in-label "YOUR NAME"]]
@@ -141,7 +151,8 @@
               [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
               [:button.btn-reset.btn-solid
-                {:on-click #(do
+                {:disabled (nil? (:email (:auth-settings (rum/react dis/app-state))))
+                 :on-click #(do
                               (.preventDefault %)
                               (dis/dispatch! [:signup-with-email (:auth-url (:email (:auth-settings @dis/app-state))) (.-value (sel1 [:input.name])) (.-value (sel1 [:input.email])) (.-value (sel1 [:input.pswd]))]))}
                 "SIGN UP"]]]]]
