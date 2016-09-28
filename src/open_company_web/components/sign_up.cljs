@@ -12,7 +12,8 @@
     [:div {:id "wrap"} ; <!-- used to push footer to the bottom --> 
         
       (site-header)
-
+      ;; preload slack button as hidden
+      [:img.hidden {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
       (when (:show-login-overlay (rum/react dis/app-state))
         (cond
           ; login via email
