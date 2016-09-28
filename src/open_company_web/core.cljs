@@ -292,12 +292,6 @@
                                  stakeholder-update-section-route
                                  not-found-route]))
 
-    (defn login-wall []
-      ;; load the login settings from auth server
-      ;; if the user is not logged in yet
-      (when-not (:auth-settings @dis/app-state)
-        (api/get-auth-settings)))
-
     (defn handle-url-change [e]
       (when-not @prevent-route-dispatch
         ;; we are checking if this event is due to user action,
@@ -307,8 +301,6 @@
           ;; in this case, we're setting it so
           ;; let's scroll to the top to simulate a navigation
           (js/window.scrollTo 0 0))
-        ; check if the user is logged in
-        (login-wall)
         ;; dispatch on the token
         (route-dispatch! (router/get-token)))))
   (sentry/capture-message "Error: div#app is not defined!"))
