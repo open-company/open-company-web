@@ -46,7 +46,7 @@
 (defn- req [endpoint method path params on-complete]
   (let [jwt (j/jwt)]
     (go
-      (when (and jwt (j/expired?))
+      (when (and jwt (j/expired?) (:refresh-url (:auth-settings @dispatcher/app-state)))
         (let [res (<! (refresh-jwt (:refresh-url (:auth-settings @dispatcher/app-state))))]
           (if (:success res)
             (update-jwt-cookie! (:body res))
