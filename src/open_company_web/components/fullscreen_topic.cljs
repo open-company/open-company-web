@@ -67,7 +67,7 @@
           chart-opts {:show-title false
                       :show-revisions-navigation false
                       :switch-metric-cb (:switch-metric-cb options)
-                      :chart-size {:width chart-width}}
+                      :chart-size {:width (- chart-width 20)}}
           chart-data {:section-data (if (= topic "finances") (utils/fix-finances topic-data) topic-data)
                       :section (keyword topic)
                       :currency currency
@@ -111,7 +111,7 @@
           ;; Attribution
           (when (and (not hide-history-navigation)
                      (not (:placeholder topic-data)))
-            (om/build topic-attribution data {:opts options}))
+            (om/build topic-attribution (assoc data :close-cb #(hide-fullscreen-topic-cb)) {:opts options}))
           (when (responsive/is-mobile?)
             (dom/button {:class "btn-reset btn-link mobile-close"
                          :on-click #(hide-fullscreen-topic-cb)} "CLOSE")))))))

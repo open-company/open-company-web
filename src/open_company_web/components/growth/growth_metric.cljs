@@ -51,7 +51,7 @@
                                                    :sub-label (sub-label (:period %) metric-info)}) sorted-metric))
           chart-opts {:opts {:chart-type "unbordered-chart"
                              :chart-height 100
-                             :chart-width (- (:width (:chart-size options)) 10)
+                             :chart-width (:width (:chart-size options))
                              :chart-keys [:value]
                              :interval interval
                              :x-axis-labels false
