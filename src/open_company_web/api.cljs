@@ -396,8 +396,4 @@
       (fn [{:keys [success body status]}]
        (if success
           (dispatcher/dispatch! [:signup-with-email/success body])
-          (cond
-            (= status 401)
-            (dispatcher/dispatch! [:signup-with-email/failed 401])
-            :else
-            (dispatcher/dispatch! [:signup-with-email/failed 500])))))))
+          (dispatcher/dispatch! [:signup-with-email/failed status]))))))
