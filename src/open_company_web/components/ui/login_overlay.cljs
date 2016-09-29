@@ -227,7 +227,7 @@
                                (<= (count (:pswd (:signup-with-email (rum/react dis/app-state)))) 5))
                  :on-click #(do
                               (utils/event-stop %)
-                              (dis/dispatch! [:signup-with-email "https://auth.opencompany.com/email/users"]))}
+                              (dis/dispatch! [:signup-with-email "/email/users"]))}
                 "SIGN UP"]]]]]
       [:div.login-overlay-footer.p2.mt1.group
         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :login-with-email]))}

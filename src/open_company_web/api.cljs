@@ -383,22 +383,21 @@
 
 (defn signup-with-email [auth-url first-name last-name email pswd]
   (when (and auth-url email pswd)
-    (let [auth-endpoint (str "/" (s/join "/" (subvec (s/split auth-url "/") 3)))]
-      (auth-post auth-endpoint
-        {:json-params {:first-name first-name
-                       :last-name last-name
-                       :email email
-                       :password pswd}
-         :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (content-type "user")}}
-        (fn [{:keys [success body status]}]
-         (if success
-            (dispatcher/dispatch! [:signup-with-email/success body])
-            (cond
-              (= status 401)
-              (dispatcher/dispatch! [:signup-with-email/failed 401])
-              :else
-              (dispatcher/dispatch! [:signup-with-email/failed 500]))))))))
+    (auth-post auth-url
+      {:json-params {:first-name first-name
+                     :last-name last-name
+                     :email email
+                     :password pswd}
+       :headers {
+          ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type"
+          ; custom content type
+          "content-type" (content-type "user")}}
+      (fn [{:keys [success body status]}]
+       (if success
+          (dispatcher/dispatch! [:signup-with-email/success body])
+          (cond
+            (= status 401)
+            (dispatcher/dispatch! [:signup-with-email/failed 401])
+            :else
+            (dispatcher/dispatch! [:signup-with-email/failed 500])))))))
