@@ -4,7 +4,6 @@
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.jwt :as jwt]
-            [open-company-web.components.ui.login-button :as login]
             [open-company-web.components.ui.back-to-dashboard-btn :as btd]))
 
 (rum/defc login-required < rum/static
