@@ -105,29 +105,30 @@
       [:button.close {:on-click (partial close-overlay)} [:i.fa.fa-times]]
       [:div.login-overlay-cta.pl2.pr2.group
         [:div.sign-in-cta "Sign In"]]
-      [:div.pt2.pl2.pr2.group
+      [:div.pt2.pl2.pr2.pb2.group
         [:form.sign-in-form
           [:div.sign-in-label-container
             [:label.sign-in-label "YOUR NAME"]]
-          [:div.sign-in-field-container
-            [:input.sign-in-field.name {:value "" :type "text" :name "name"}]]
+          [:div.sign-in-field-container.group
+            [:input.sign-in-field.surname.half.left {:value "" :placeholder "First name" :type "text" :name "name"}]
+            [:input.sign-in-field.name.half.right {:value "" :placeholder "Last name" :type "text" :name "surname"}]]
           [:div.sign-in-label-container
             [:label.sign-in-label "EMAIL"]]
           [:div.sign-in-field-container
-            [:input.sign-in-field.email {:value "" :type "text" :name "email"}]]
+            [:input.sign-in-field.email {:value "" :placeholder "email@example.com" :type "text" :name "email"}]]
           [:div.sign-in-label-container
             [:label.sign-in-label "PASSWORD"]]
           [:div.sign-in-field-container
-            [:input.sign-in-field.pswd {:value "" :type "password" :name "pswd"}]]
+            [:input.sign-in-field.pswd {:value "" :placeholder "your secret" :type "password" :name "pswd"}]]
           [:div.group.pb2.my3
             [:div.left.forgot-password
               [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
-              [:button.btn-reset.btn-solid "SIGN IN"]]]]]]
+              [:button.btn-reset.btn-solid "SIGN IN"]]]]]
       [:div.login-overlay-footer.p2.mt1.group
         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :signin-with-email]))}
           "ALREADY HAVE AN ACCOUNT? "
-          [:span.underline "SIGN IN NOW"]]]])
+          [:span.underline "SIGN IN NOW"]]]]])
 
 (rum/defcs password-reset < rum/reactive
                             (merge dont-scroll
