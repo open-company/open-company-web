@@ -273,7 +273,7 @@
 (defmethod dispatcher/action :login-with-email/success
   [db [_ jwt]]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-  (router/redirect! oc-urls/home)
+  (.reload js/location)
   db)
 
 (defmethod dispatcher/action :get-auth-settings
