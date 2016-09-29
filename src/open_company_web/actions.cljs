@@ -254,7 +254,8 @@
   (let [current (router/get-token)]
     (when-not (.startsWith current oc-urls/login)
         (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)))
-  (router/redirect! auth-url))
+  (router/redirect! auth-url)
+  db)
 
 (defmethod dispatcher/action :login-with-email-change
   [db [_ k v]]
@@ -272,7 +273,8 @@
 (defmethod dispatcher/action :login-with-email/success
   [db [_ jwt]]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-  (router/redirect! oc-urls/home))
+  (router/redirect! oc-urls/home)
+  db)
 
 (defmethod dispatcher/action :get-auth-settings
   [db [_]]
