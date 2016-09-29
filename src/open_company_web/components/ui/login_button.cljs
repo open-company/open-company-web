@@ -3,6 +3,7 @@
             [open-company-web.api :as api]
             [open-company-web.urls :as oc-urls]
             [open-company-web.lib.cookies :as cook]
+            [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.local-settings :as ls]))
@@ -12,9 +13,12 @@
   (dis/dispatch! [:login-with-slack auth-url]))
 
 (rum/defcs login-button < rum/reactive
-                          {:will-mount (fn [s] (dis/dispatch! [:get-auth-settings]) s)}
+                          {:will-mount (fn [s]
+                                        (when-not (utils/is-test-env?)
+                                          (dis/dispatch! [:get-auth-settings]))
+                                        s)}
   [s auth-settings]
   [:button.btn-reset
-   {:on-click #(login! (:extended-scopes-url (:slack auth-settings)) %)}
-   (when (:auth-settings (rum/react dis/app-state))
-    [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}])])
+    {:on-click #(login! (:extended-scopes-url (:slack auth-settings)) %)}
+    (when (:auth-settings (rum/react dis/app-state))
+      [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}])])
