@@ -4,7 +4,6 @@
             [open-company-web.urls :as oc-url]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.ui.login-button :as login]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.small-loading :refer (small-loading)]))
 
@@ -168,7 +167,7 @@
 
 (rum/defcs password-reset < rum/reactive
                             (merge dont-scroll
-                              {:did-mount (fn [s] (.focus [:div.password-reset-field-container.email]) s)})
+                              {:did-mount (fn [s] (.focus [:div.sign-in-field-container.email]) s)})
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
