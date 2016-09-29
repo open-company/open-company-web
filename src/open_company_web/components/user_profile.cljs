@@ -17,8 +17,10 @@
           (dom/div {:class "left-column"}
             (dom/div {:class "user-profile-name-title data-title"} "NAME")
             (dom/div {:class "user-profile-name"} (jwt/get-key :real-name))
-            (dom/div {:class "user-profile-org-title data-title"} "SLACK ORGANIZATION")
-            (dom/div {:class "user-profile-org"} (jwt/get-key :org-name))
+            (when (= (jwt/get-key :auth-source) "slack")
+              (dom/div {:class "user-profile-org-title data-title"} "SLACK ORGANIZATION"))
+            (when (= (jwt/get-key :auth-source) "slack")
+              (dom/div {:class "user-profile-org"} (jwt/get-key :org-name)))
             (dom/div {:class "user-profile-email-title data-title"} "EMAIL")
             (dom/div {:class "user-profile-email"} (jwt/get-key :email)))
           (dom/div {:class "right-column"}
