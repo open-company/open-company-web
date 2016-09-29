@@ -96,7 +96,7 @@
 
 (rum/defcs signup-with-email < rum/reactive
                                (merge dont-scroll
-                                 {:did-mount (fn [s] (.focus (sel1 [:input.name])) s)})
+                                 {:did-mount (fn [s] (.focus (sel1 [:input.firstname])) s)})
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
@@ -110,8 +110,8 @@
           [:div.sign-in-label-container
             [:label.sign-in-label "YOUR NAME"]]
           [:div.sign-in-field-container.group
-            [:input.sign-in-field.surname.half.left {:value "" :placeholder "First name" :type "text" :name "name"}]
-            [:input.sign-in-field.name.half.right {:value "" :placeholder "Last name" :type "text" :name "surname"}]]
+            [:input.sign-in-field.firstname.half.left {:value "" :placeholder "First name" :type "text" :name "firstname"}]
+            [:input.sign-in-field.lastname.half.right {:value "" :placeholder "Last name" :type "text" :name "lastname"}]]
           [:div.sign-in-label-container
             [:label.sign-in-label "EMAIL"]]
           [:div.sign-in-field-container
