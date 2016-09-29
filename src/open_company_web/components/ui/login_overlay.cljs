@@ -30,6 +30,17 @@
       [:div.pt2.pl2.pr2.group
         [:button.close {:on-click (partial close-overlay)}
           (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"})]
+        (cond
+          (= (:slack-access (rum/react dis/app-state)) "denied")
+          [:div.block.red
+            "OpenCompany requires verification with your Slack team. Please allow access."
+            [:p.my2.h5 "If Slack did not allow you to authorize OpenCompany, try "
+              [:button.p0.btn-reset.underline
+                {:on-click #(login/login! (:basic-scopes-url (:auth-settings @dis/app-state)) %)}
+                "this link instead."]]]
+          (:slack-access (rum/react dis/app-state))
+          [:span.block.red
+            "There is a temporary error validating with Slack. Please try again later."])
         [:button.btn-reset.mt2.login-button
           {:on-click #(login/login! (:extended-scopes-url (:auth-settings @dis/app-state)) %)}
           [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]]
