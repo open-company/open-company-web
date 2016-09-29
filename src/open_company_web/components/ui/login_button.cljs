@@ -11,8 +11,10 @@
   (.preventDefault e)
   (dis/dispatch! [:login-with-slack auth-url]))
 
-(rum/defc login-button < rum/static
-  [auth-settings]
+(rum/defcs login-button < rum/reactive
+                          {:will-mount (fn [s] (dis/dispatch! [:get-auth-settings]) s)}
+  [s auth-settings]
   [:button.btn-reset
    {:on-click #(login! (:extended-scopes-url (:slack auth-settings)) %)}
-   [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]])
+   (when (:auth-settings (rum/react dis/app-state))
+    [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}])])
