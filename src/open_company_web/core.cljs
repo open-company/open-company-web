@@ -109,7 +109,7 @@
       (router/set-route! ["login"] {})
       (when (contains? (:query-params params) :access)
         ;login went bad, add the error message to the app-state
-        (swap! dis/app-state assoc :access (:access (:query-params params))))
+        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
       ;; render component
       (drv-root login target))))
 
@@ -127,7 +127,7 @@
       (router/set-route! [route-name] {})
       (when (contains? (:query-params params) :access)
         ;login went bad, add the error message to the app-state
-        (swap! dis/app-state assoc :access (:access (:query-params params))))
+        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
       ;; render component
       (rum/mount (component) target))))
 
