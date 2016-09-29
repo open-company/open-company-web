@@ -61,6 +61,7 @@
 (def ^:private api-patch (partial req api-endpoint http/patch))
 
 (def ^:private auth-get (partial req auth-endpoint http/get))
+(def ^:private auth-post (partial req auth-endpoint http/post))
 
 (def ^:private pay-get (partial req pay-endpoint http/get))
 (def ^:private pay-post (partial req pay-endpoint http/post))
@@ -379,3 +380,25 @@
               (dispatcher/dispatch! [:login-with-email/failed 401])
               :else
               (dispatcher/dispatch! [:login-with-email/failed 500]))))))))
+
+(defn signup-with-email [auth-url first-name last-name email pswd]
+  (when (and auth-url email pswd)
+    (let [auth-endpoint (str "/" (s/join "/" (subvec (s/split auth-url "/") 3)))]
+      (auth-post auth-endpoint
+        {:json-params {:first-name first-name
+                       :last-name last-name
+                       :email email
+                       :password pswd}
+         :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (content-type "user")}}
+        (fn [{:keys [success body status]}]
+         (if success
+            (dispatcher/dispatch! [:signup-with-email/success body])
+            (cond
+              (= status 401)
+              (dispatcher/dispatch! [:signup-with-email/failed 401])
+              :else
+              (dispatcher/dispatch! [:signup-with-email/failed 500]))))))))
