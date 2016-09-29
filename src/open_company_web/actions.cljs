@@ -244,7 +244,7 @@
     (= show-login-overlay :signup-with-email)
     (-> db
       (assoc :show-login-overlay show-login-overlay)
-      (assoc :signup-with-email {:name "" :email "" :pswd ""})
+      (assoc :signup-with-email {:firstname "" :lastname "" :email "" :pswd ""})
       (dissoc :signup-with-email-error))
     :else
     (assoc db :show-login-overlay show-login-overlay)))
@@ -271,6 +271,25 @@
   (assoc db :login-with-email-error error))
 
 (defmethod dispatcher/action :login-with-email/success
+  [db [_ jwt]]
+  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+  (.reload js/location)
+  db)
+
+(defmethod dispatcher/action :signup-with-email-change
+  [db [_ k v]]
+  (assoc-in db [:signup-with-email k] v))
+
+(defmethod dispatcher/action :signup-with-email
+  [db [_ auth-url]]
+  (api/signup-with-email auth-url (:firstname (:signup-with-email db)) (:lastname (:signup-with-email db)) (:email (:signup-with-email db)) (:pswd (:signup-with-email db)))
+  (dissoc db :signup-with-email-error))
+
+(defmethod dispatcher/action :signup-with-email/failed
+  [db [_ error]]
+  (assoc db :signup-with-email-error error))
+
+(defmethod dispatcher/action :signup-with-email/success
   [db [_ jwt]]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
   (.reload js/location)
