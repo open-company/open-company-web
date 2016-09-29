@@ -137,7 +137,7 @@
 
 (rum/defcs signup-with-email < rum/reactive
                                (merge dont-scroll
-                                 {:did-mount (fn [s] (.focus (sel1 [:input.name])) s)})
+                                 {:did-mount (fn [s] (.focus (sel1 [:input.firstname])) s)})
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
@@ -153,16 +153,17 @@
         [:form.sign-in-form
           [:div.sign-in-label-container
             [:label.sign-in-label "YOUR NAME"]]
-          [:div.sign-in-field-container
-            [:input.sign-in-field.name {:value "" :type "text" :name "name"}]]
+          [:div.sign-in-field-container.group
+            [:input.sign-in-field.firstname.half.left {:value "" :placeholder "First name" :type "text" :name "firstname"}]
+            [:input.sign-in-field.lastname.half.right {:value "" :placeholder "Last name" :type "text" :name "lastname"}]]
           [:div.sign-in-label-container
             [:label.sign-in-label "EMAIL"]]
           [:div.sign-in-field-container
-            [:input.sign-in-field.email {:value "" :type "text" :name "email"}]]
+            [:input.sign-in-field.email {:value "" :placeholder "email@example.com" :type "text" :name "email"}]]
           [:div.sign-in-label-container
             [:label.sign-in-label "PASSWORD"]]
           [:div.sign-in-field-container
-            [:input.sign-in-field.pswd {:value "" :type "password" :name "pswd"}]]
+            [:input.sign-in-field.pswd {:value "" :placeholder "your secret" :type "password" :name "pswd"}]]
           [:div.group.pb2.my3
             [:div.left.forgot-password
               [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]

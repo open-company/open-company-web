@@ -100,6 +100,10 @@ div.login-overlay-container {
           font-family: $oc_main_font;
           font-weight: 400;
 
+          &.half{
+            width: 49%;
+          }
+
           &:active, &:focus {
             outline: none;
           }
