@@ -1,14 +1,19 @@
 (ns open-company-web.components.about
   (:require [rum.core :as rum]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.components.ui.site-header :refer (site-header)]
             [open-company-web.components.ui.site-footer :refer (site-footer)]
+            [open-company-web.components.ui.login-overlay :as login-overlays]
             [open-company-web.urls :as oc-urls]))
 
-(rum/defc about []
+(rum/defcs about < rum/reactive [s]
   [:div
-    [:div {:id "wrap"} ; <!-- used to push footer to the bottom --> 
+    [:div.about-wrap {:id "wrap"} ; <!-- used to push footer to the bottom --> 
 
       (site-header)
+
+      ; show login overlays when needed
+      (login-overlays/login-overlays-handler (rum/react dis/app-state))
 
       [:div.container.main.about
 
