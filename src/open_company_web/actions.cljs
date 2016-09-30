@@ -262,8 +262,8 @@
   (assoc-in db [:login-with-email k] v))
 
 (defmethod dispatcher/action :login-with-email
-  [db [_ auth-url]]
-  (api/auth-with-email auth-url (:email (:login-with-email db)) (:pswd (:login-with-email db)))
+  [db [_]]
+  (api/auth-with-email (:email (:login-with-email db)) (:pswd (:login-with-email db)))
   (dissoc db :login-with-email-error))
 
 (defmethod dispatcher/action :login-with-email/failed
@@ -281,8 +281,8 @@
   (assoc-in db [:signup-with-email k] v))
 
 (defmethod dispatcher/action :signup-with-email
-  [db [_ auth-url]]
-  (api/signup-with-email auth-url (:firstname (:signup-with-email db)) (:lastname (:signup-with-email db)) (:email (:signup-with-email db)) (:pswd (:signup-with-email db)))
+  [db [_]]
+  (api/signup-with-email (:firstname (:signup-with-email db)) (:lastname (:signup-with-email db)) (:email (:signup-with-email db)) (:pswd (:signup-with-email db)))
   (dissoc db :signup-with-email-error))
 
 (defmethod dispatcher/action :signup-with-email/failed
