@@ -1,0 +1,120 @@
+div.user-management {
+  div.um-cta {
+    font-weight: 500;
+    font-family: $oc_main_font;
+    font-size: 24px;
+    line-height: 1.2;
+    color: $oc_gray_5;
+  }
+
+  div.um-description {
+    p.um-p {
+      font-family: $oc_headers_font;
+      font-weight: 400;
+      font-size: 14px;
+      color: $oc_gray_5;
+      opacity: 0.5;
+    }
+  }
+
+  div.um-invite {
+    div.um-invite-label {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      color: $oc_gray_5;
+      font-family: $oc_headers_font;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    input.um-invite-field {
+      width: 340px;
+      height: 34px;
+      margin: 0px;
+      padding: .5rem;
+      background-color: white;
+      border: 1px solid rgba(78, 90, 107, 0.1);
+      border-radius: 2px;
+      font-size: 14px;
+      line-height: 1.2;
+      color: #4E5A6B;
+      font-family: $oc_main_font;
+      font-weight: 400;
+
+      &:invalid {
+        border: 1px solid rgba(215,42,70,0.3);
+      }
+
+      &:active, &:focus {
+        outline: none;
+      }
+    }
+
+    button.um-invite-send {
+      margin-top: 3px;
+    }
+  }
+
+  div.um-byemail-container {
+    padding: 30px;
+    background-color: rgba(78, 90, 107, 0.05);
+    border-radius: 2px;
+
+    input.um-byemail-anyone {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(78, 90, 107, 1);
+    }
+
+    span.um-byemail-anyone-span {
+      font-family: $oc_headers_font;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      color: $oc_gray_5;
+      margin-top: 3px;
+    }
+
+    div.um-byemail {
+      span.um-byemail-at {
+        font-family: $oc_main_font;
+        font-weight: 700;
+        font-size: 18px;
+        line-height: 1.8;
+        color: $oc_gray_5;
+      }
+
+      input.um-byemail-email {
+        width: 304px;
+        height: 34px;
+        margin: 0px;
+        padding: .5rem;
+        background-color: white;
+        border: 1px solid rgba(78, 90, 107, 0.1);
+        border-radius: 2px;
+        font-size: 14px;
+        line-height: 1.2;
+        color: #4E5A6B;
+        font-family: $oc_main_font;
+        font-weight: 400;
+        margin-left: 5px;
+
+        &:invalid {
+          border: 1px solid rgba(215,42,70,0.3);
+        }
+
+        &:active, &:focus {
+          outline: none;
+        }
+      }
+
+      button.um-byemail-save {
+        margin-left: 5px;
+        margin-top: 3px;
+      }
+    }
+  }
+}
