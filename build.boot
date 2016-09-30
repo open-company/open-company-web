@@ -158,6 +158,15 @@
               :source-map true
               :compiler-options {:externs ["public/js/externs.js"]})))
 
+(deftask staging-build []
+  (comp (from-jars)
+        (sass :output-style :compressed)
+        (build-site)
+        (cljs :optimizations :advanced
+              :source-map true
+              :compiler-options {:externs ["public/js/externs.js"]
+                                 :preloads '[devtools.preload]})))
+
 (deftask prod-build []
   (comp (from-jars)
         (sass :output-style :compressed)
