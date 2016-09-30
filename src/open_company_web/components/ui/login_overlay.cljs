@@ -221,8 +221,8 @@
               [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
               [:button.btn-reset.btn-solid
-                {:disabled (or (s/blank? (:firstname (:signup-with-email (rum/react dis/app-state))))
-                               (s/blank? (:lastname (:signup-with-email (rum/react dis/app-state))))
+                {:disabled (or (and (s/blank? (:firstname (:signup-with-email (rum/react dis/app-state))))
+                                    (s/blank? (:lastname (:signup-with-email (rum/react dis/app-state)))))
                                (gobj/get (gobj/get (sel1 [:input.email]) "validity") "patternMismatch")
                                (<= (count (:pswd (:signup-with-email (rum/react dis/app-state)))) 5))
                  :on-click #(do
