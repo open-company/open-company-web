@@ -10,6 +10,7 @@
             [open-company-web.components.ui.small-loading :as loading]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.ui.footer :as footer]
+            [open-company-web.components.user-management :refer (user-management)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]
@@ -330,6 +331,7 @@
 
           ;; Company profile
           (dom/div {:class "company-settings-container"}
-            (om/build company-settings-form data)))
+            (om/build company-settings-form data)
+            (user-management)))
 
         (om/build footer/footer data)))))
