@@ -212,7 +212,7 @@
                :id "signup-pswd"
                :on-change #(dis/dispatch! [:signup-with-email-change :pswd (.-value (sel1 [:input.pswd]))])
                :pattern ".{5,}"
-               :placeholder "your secret"
+               :placeholder "your secret - at least 5 characters"
                :type "password"
                :tabIndex 4
                :name "pswd"}]]
