@@ -6,17 +6,45 @@ div.user-avatar {
     padding: 0;
     border: 0px solid transparent;
     background-color: transparent;
-    width: 40px;
+    width: auto;
     height: 40px;
+    color: rgba(78, 90, 107, 0.5);
+
+    &.no-image {
+      i.fa.fa-ellipsis-v {
+        margin-top: 12px;
+      }
+    }
 
     &:active, &:focus {
       outline: none;
       border: 0px solid tranparent;
     }
 
+    div.user-avatar-name {
+      font-size: 14px;
+      margin-top: 7px;
+      margin-right: 5px;
+      color: rgba(78, 90, 107, 0.8);
+    }
+
     img.user-avatar-img {
       max-width: 40px;
       max-height: 40px;
+      margin-right: 5px;
+    }
+
+    i.fa.fa-ellipsis-v {
+      font-size: 22px;
+      margin-top: 8px;
+      padding-right: 10px;
+      transition: 230ms;
+    }
+
+    &:hover {
+      i.fa.fa-ellipsis-v {
+        color: rgba(78, 90, 107, 0.8);
+      }
     }
   }
 }
