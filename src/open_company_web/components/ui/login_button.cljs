@@ -9,7 +9,7 @@
                                         (when-not (utils/is-test-env?)
                                           (dis/dispatch! [:get-auth-settings]))
                                         s)}
-  [s auth-settings]
+  [s]
   [:div.login-button
     (login-overlays-handler (rum/react dis/app-state))
     [:button.btn-reset.signup-signin

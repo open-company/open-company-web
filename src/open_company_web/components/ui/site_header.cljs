@@ -5,7 +5,8 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.lib.responsive :as responsive]))
+            [open-company-web.lib.responsive :as responsive]
+            [open-company-web.components.ui.login-button :refer (login-button)]))
 
 (rum/defc site-header []
   ; <!-- Nav Bar -->
@@ -33,4 +34,4 @@
             [:li
               (if (jwt/jwt)
                 [:a {:href "" :on-click #(do (utils/event-stop %) (dis/dispatch! [:logout]))} "Log Out"]
-                [:a {:href "" :on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :slack]))} "Sign In / Sign Up"])])]]]])
+                (login-button))])]]]])

@@ -17,7 +17,7 @@
     (router/set-route! ["companies" :test]
                        {:slug :test})
     (let [c (tu/new-container!)
-          _ (rum/mount (login-button {}) c)
+          _ (rum/mount (login-button) c)
           login-button-node (sel1 c [:button])]
       (is (not (nil? login-button-node)))
       (tu/unmount! c))))

@@ -40,6 +40,13 @@ ul.navbar-nav li {
 
 ul.navbar-top li {
   margin-top: 19px;
-  opacity: 0.6;
-  color: #4e5a6b;
+}
+
+ul.navbar-top li a, ul.navbar-top li button {
+  opacity: 0.4;
+  color: #4e5a6b !important; //override bootstrap
+
+  &:hover {
+    opacity: 0.6;
+  }
 }

@@ -46,4 +46,4 @@
                                        :disabled (not (nil? (:foce-key data)))
                                        :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} (dom/i {:class "fa fa-share"}) " SHARE AN UPDATE")))
                       (user-avatar (partial menu-click owner)))
-                    (login-button (:auth-settings data))))))))))))
+                    (login-button)))))))))))
