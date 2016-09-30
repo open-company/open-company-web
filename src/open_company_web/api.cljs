@@ -38,7 +38,7 @@
     params))
 
 (defn refresh-jwt [refresh-url]
-  (http/get refresh-url (complete-params {})))
+  (http/get (str ls/auth-server-domain refresh-url) (complete-params {})))
 
 (defn update-jwt-cookie! [jwt]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
@@ -46,11 +46,12 @@
 (defn- req [endpoint method path params on-complete]
   (let [jwt (j/jwt)]
     (go
-      (when (and jwt (j/expired?) (:refresh-url (:auth-settings @dispatcher/app-state)))
-        (let [res (<! (refresh-jwt (:refresh-url (:auth-settings @dispatcher/app-state))))]
-          (if (:success res)
-            (update-jwt-cookie! (:body res))
-            (dispatcher/dispatch! [:logout]))))
+      (let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh-url")]
+        (when (and jwt (j/expired?) refresh-url)
+          (let [res (<! (refresh-jwt refresh-url))]
+            (if (:success res)
+              (update-jwt-cookie! (:body res))
+              (dispatcher/dispatch! [:logout])))))
 
       (let [response (<! (method (str endpoint path) (complete-params params)))]
         (on-complete response)))))
@@ -118,11 +119,11 @@
                                            :body (when success (json->cljs body))}]))))))
 
 (defn get-auth-settings []
-  (auth-get "/auth-settings"
-            {:headers {"content-type" "application/json"}}
-            (fn [response]
-              (let [body (if (:success response) (:body response) {})]
-                (dispatcher/dispatch! [:auth-settings body])))))
+  (auth-get "/"
+    {:headers {"content-type" "application/json"}}
+    (fn [response]
+      (let [body (if (:success response) (:body response) {})]
+        (dispatcher/dispatch! [:auth-settings body])))))
 
 (defn save-or-create-section [section-data]
   (when section-data
@@ -365,10 +366,11 @@
                             :response fixed-body}]
               (dispatcher/dispatch! [:stakeholder-update response]))))))))
 
-(defn auth-with-email [auth-url email pswd]
-  (when (and auth-url email pswd)
-    (let [auth-endpoint (str "/" (s/join "/" (subvec (s/split auth-url "/") 3)))]
-      (auth-get auth-endpoint
+(defn auth-with-email [email pswd]
+  (when (and email pswd)
+    (let [email-links (:links (:email (:auth-settings @dispatcher/app-state)))
+          auth-url (utils/link-for email-links "authenticate" "GET")]
+      (auth-get (:href auth-url)
         {:basic-auth {
           :username email
           :password pswd}}
@@ -381,19 +383,21 @@
               :else
               (dispatcher/dispatch! [:login-with-email/failed 500]))))))))
 
-(defn signup-with-email [auth-url first-name last-name email pswd]
-  (when (and auth-url email pswd)
-    (auth-post auth-url
-      {:json-params {:first-name first-name
-                     :last-name last-name
-                     :email email
-                     :password pswd}
-       :headers {
-          ; required by Chrome
-          "Access-Control-Allow-Headers" "Content-Type"
-          ; custom content type
-          "content-type" (content-type "user")}}
-      (fn [{:keys [success body status]}]
-       (if success
-          (dispatcher/dispatch! [:signup-with-email/success body])
-          (dispatcher/dispatch! [:signup-with-email/failed status]))))))
+(defn signup-with-email [first-name last-name email pswd]
+  (when (and first-name last-name email pswd)
+    (let [email-links (:links (:email (:auth-settings @dispatcher/app-state)))
+          auth-url (utils/link-for email-links "create" "POST")]
+      (auth-post (:href auth-url)
+        {:json-params {:first-name first-name
+                       :last-name last-name
+                       :email email
+                       :password pswd}
+         :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (content-type "user")}}
+        (fn [{:keys [success body status]}]
+         (if success
+            (dispatcher/dispatch! [:signup-with-email/success body])
+            (dispatcher/dispatch! [:signup-with-email/failed status])))))))
