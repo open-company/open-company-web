@@ -131,7 +131,7 @@
                 {:disabled (nil? (:email (:auth-settings (rum/react dis/app-state))))
                  :on-click #(do
                               (.preventDefault %)
-                              (dis/dispatch! [:login-with-email (:auth-url (:email (:auth-settings @dis/app-state)))]))}
+                              (dis/dispatch! [:login-with-email]))}
                 "SIGN IN"]]]]]
       [:div.login-overlay-footer.p2.mt1.group
         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :signup-with-email]))}
@@ -227,7 +227,7 @@
                                (<= (count (:pswd (:signup-with-email (rum/react dis/app-state)))) 5))
                  :on-click #(do
                               (utils/event-stop %)
-                              (dis/dispatch! [:signup-with-email "/email/users"]))}
+                              (dis/dispatch! [:signup-with-email]))}
                 "SIGN UP"]]]]]
       [:div.login-overlay-footer.p2.mt1.group
         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :login-with-email]))}
