@@ -23,15 +23,15 @@
       [:div.collapse.navbar-collapse {:id "oc-navbar-collapse"}
         [:ul.nav.navbar-nav.navbar-right.navbar-top
           [:li
-              [:a {:href oc-urls/home :on-click #(do (utils/event-stop %) (router/nav! oc-urls/home))} "Home"]]
+              [:a.navbar-item {:href oc-urls/home :on-click #(do (utils/event-stop %) (router/nav! oc-urls/home))} "Home"]]
           [:li
-              [:a {:href oc-urls/pricing :on-click #(do (utils/event-stop %) (router/nav! oc-urls/pricing))} "Pricing"]]
+              [:a.navbar-item {:href oc-urls/pricing :on-click #(do (utils/event-stop %) (router/nav! oc-urls/pricing))} "Pricing"]]
           [:li
-              [:a {:href oc-urls/about :on-click #(do (utils/event-stop %) (router/nav! oc-urls/about))} "About"]]
+              [:a.navbar-item {:href oc-urls/about :on-click #(do (utils/event-stop %) (router/nav! oc-urls/about))} "About"]]
           [:li.mobile-only
-            [:a.contact {:href (str "mailto:" oc-urls/contact-email)} "Contact"]]
+            [:a.navbar-item.contact {:href (str "mailto:" oc-urls/contact-email)} "Contact"]]
           (when-not (responsive/is-mobile?)
             [:li
               (if (jwt/jwt)
                 [:a {:href "" :on-click #(do (utils/event-stop %) (dis/dispatch! [:logout]))} "Log Out"]
-                (login-button))])]]]])
+                (login-button {:button-classes "navbar-item"}))])]]]])

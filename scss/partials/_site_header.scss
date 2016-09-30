@@ -42,7 +42,7 @@ ul.navbar-top li {
   margin-top: 19px;
 }
 
-ul.navbar-top li a, ul.navbar-top li button {
+ul.navbar-top li .navbar-item {
   opacity: 0.4;
   color: #4e5a6b !important; //override bootstrap
 

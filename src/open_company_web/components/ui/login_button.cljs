@@ -9,9 +9,10 @@
                                         (when-not (utils/is-test-env?)
                                           (dis/dispatch! [:get-auth-settings]))
                                         s)}
-  [s]
+  [s {:keys [button-classes]}]
   [:div.login-button
     (login-overlays-handler (rum/react dis/app-state))
-    [:button.btn-reset.signup-signin
-      {:on-click #(dis/dispatch! [:show-login-overlay :login-with-slack])}
+    [:button
+      {:class (str "btn-reset signup-signin " (when button-classes button-classes))
+       :on-click #(dis/dispatch! [:show-login-overlay :login-with-slack])}
       "Sign In / Sign Up"]])
