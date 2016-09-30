@@ -373,7 +373,12 @@
       (auth-get (:href auth-url)
         {:basic-auth {
           :username email
-          :password pswd}}
+          :password pswd}
+         :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (:type auth-url)}}
         (fn [{:keys [success body status]}]
          (if success
             (dispatcher/dispatch! [:login-with-email/success body])
@@ -396,7 +401,7 @@
             ; required by Chrome
             "Access-Control-Allow-Headers" "Content-Type"
             ; custom content type
-            "content-type" (content-type "user")}}
+            "content-type" (:type auth-url)}}
         (fn [{:keys [success body status]}]
          (if success
             (dispatcher/dispatch! [:signup-with-email/success body])
