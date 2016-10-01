@@ -252,7 +252,7 @@
 (defmethod dispatcher/action :login-with-slack
   [db [_ auth-url]]
   (let [current (router/get-token)]
-    (when-not (.startsWith current oc-urls/login)
+    (when-not (or (.startsWith current oc-urls/login) (.startsWith current oc-urls/sign-up))
         (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)))
   (router/redirect! auth-url)
   db)
