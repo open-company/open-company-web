@@ -91,14 +91,14 @@
         (when-not (nil? (:login-with-email-error (rum/react dis/app-state)))
           (cond
             (= (:login-with-email-error (rum/react dis/app-state)) 401)
-            [:span.error-message.red
+            [:span.small-caps.red
               "The email or password you entered is incorrect."
               [:br]
               "Please try again, or "
               [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]
               "."]
             :else
-            [:span.error-message.red
+            [:span.small-caps.red
               "System troubles logging in."
               [:br]
               "Please try again, then "
@@ -156,17 +156,17 @@
         (when-not (nil? (:signup-with-email-error (rum/react dis/app-state)))
           (cond
             (= (:signup-with-email-error (rum/react dis/app-state)) 409)
-            [:span.error-message.red
+            [:span.small-caps.red
               "The email or password you entered is incorrect."
               [:br]
               "Please try again, or "
               [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]
               "."]
             (= (:signup-with-email-error (rum/react dis/app-state)) 400)
-            [:span.error-message.red
+            [:span.small-caps.red
               "An error occurred while processing your data, please check the fields and try again."]
             :else
-            [:span.error-message.red
+            [:span.small-caps.red
               "System troubles logging in."
               [:br]
               "Please try again, then "
