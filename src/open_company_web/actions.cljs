@@ -41,8 +41,8 @@
         login-redirect                (do (cook/remove-cookie! :login-redirect)
                                           (router/redirect! login-redirect))
         (and first (not second))      (router/nav! (oc-urls/company (slug first)))
-        (and first second)            (router/nav! oc-urls/companies)
-        )) db))
+        (and first second)            (router/nav! oc-urls/companies)))
+    db))
 
 (defmethod dispatcher/action :company-submit [db _]
   (api/post-company (:company-editor db))
@@ -56,7 +56,7 @@
     db))
 
 (defmethod dispatcher/action :new-section [db [_ body]]
-  (when body
+  (if body
     (let [slug (:slug body)
           response (:response body)]
       (swap! cache/new-sections assoc-in [(keyword slug) :new-sections] (:templates response))
@@ -64,11 +64,16 @@
       ;; signal to the app-state that the new-sections have been loaded
       (-> db
         (assoc-in [(keyword slug) :new-sections] (:templates response))
-        (dissoc :loading)))))
+        (dissoc :loading)))
+    db))
 
 (defmethod dispatcher/action :auth-settings [db [_ body]]
-  (when body
-    (assoc db :auth-settings body)))
+  (if body
+    (do
+      (when (utils/link-for (:links body) "users")
+        (utils/after 100 #(api/enumerate-users)))
+      (assoc db :auth-settings body))
+    db))
 
 (defmethod dispatcher/action :revision [db [_ body]]
   (if body
