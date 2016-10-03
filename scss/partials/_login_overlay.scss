@@ -58,14 +58,6 @@ div.login-overlay-container {
 
     &.login-with-email, &.signup-with-email, &.password-reset {
 
-      span.error-message {
-        font-size: 14px;
-        margin: 0px;
-        a:hover {
-          color: $oc_red;
-        }
-      }
-
       div.sign-in-label-container {
         margin-top: 20px;
 
