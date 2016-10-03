@@ -256,11 +256,13 @@
     (assoc db :show-login-overlay show-login-overlay)))
 
 (defmethod dispatcher/action :login-with-slack
-  [db [_ auth-url]]
-  (let [current (router/get-token)]
+  [db [_ simple-scope?]]
+  (let [current (router/get-token)
+        slack-ref (if simple-scope? "authenticate-retry" "authenticate")
+        auth-url (utils/link-for (:links (:slack (:auth-settings @dispatcher/app-state))) slack-ref)]
     (when-not (or (.startsWith current oc-urls/login) (.startsWith current oc-urls/sign-up))
-        (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)))
-  (router/redirect! auth-url)
+        (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+    (router/redirect! (:href auth-url)))
   db)
 
 (defmethod dispatcher/action :login-with-email-change

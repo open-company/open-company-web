@@ -49,7 +49,7 @@
             [:p.my2.h5 "If Slack did not allow you to authorize OpenCompany, try "
               [:button.p0.btn-reset.underline
                 {:on-click #(do (utils/event-stop %)
-                                (dis/dispatch! [:login-with-slack (:basic-scopes-url (:auth-settings @dis/app-state))]))}
+                                (dis/dispatch! [:login-with-slack false]))}
                 "this link instead."]]]
           (:slack-access (rum/react dis/app-state))
           [:span.block.red
@@ -57,7 +57,7 @@
         [:button.btn-reset.mt2.login-button
           {:on-click #(do
                         (.preventDefault %)
-                        (dis/dispatch! [:login-with-slack (:extended-scopes-url (:slack (:auth-settings @dis/app-state)))]))}
+                        (dis/dispatch! [:login-with-slack true]))}
           (if (:auth-settings (rum/react dis/app-state))
             [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
             (small-loading))]
