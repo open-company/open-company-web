@@ -1,5 +1,9 @@
 (ns open-company-web.components.user-management
-  (:require [rum.core :as rum]))
+  (:require [rum.core :as rum]
+            [dommy.core :as dommy :refer-macros (sel1)]
+            [open-company-web.dispatcher :as dis]
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.components.user-invitation :refer (user-invitation)]))
 
 (rum/defcs user-management < rum/reactive
   [s]
@@ -12,17 +16,22 @@
         "ORGANIZATIONS THAT SIGN UP WITH SLACK ENABLE MEMBERS OF THE SLACK ORGANIZATION TO BE A USER. "
         "ORGANIZATIONS THAT SIGN UP WITH EMAIL CAN INVITE USERS TO JOIN  BY EMAIL, "
         "OR THEY CAN MAKE IT AVAILABLE TO ANYONE WITH A COMPANY EMAIL DOMAIN (e.g., @acme.com)."]]
+    (when (pos? (count (:enumerate-users (rum/react dis/app-state))))
+      (user-invitation (:enumerate-users (rum/react dis/app-state))))
     [:div.my3.um-invite.group
       [:div.um-invite-label
         "INVITE USERS BY EMAIL ADDRESS"]
       [:div
-        [:input.left.um-invite-field
-          {:value ""
-           :name "um-invite"
+        [:input.left.um-invite-field.email
+          {:name "um-invite"
            :type "text"
+           :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
            :placeholder "user emails separated by comma"}]
         [:button.right.btn-reset.btn-solid.um-invite-send
-          {:on-click #()}
+          {:on-click #(let [email (.-value (sel1 [:input.um-invite-field.email]))]
+                        (if (utils/valid-email? email)
+                          (dis/dispatch! [:invite-by-email email])
+                          (js/alert "The email address you entered is not valid.")))}
           "SEND INVITE(S)"]]]
     [:div.my2.um-byemail-container.group
       [:div.group
