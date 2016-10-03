@@ -241,6 +241,9 @@
       (drv-root user-profile target))
 
     (defroute company-settings-route (urls/company-settings ":slug") {:as params}
+      ; add force-remove-loading to avoid inifinte spinner if the company
+      ; has no sections and the user is looking at company profile
+      (swap! dis/app-state assoc :force-remove-loading true)
       (company-handler "profile" target company-settings params))
 
     (defroute company-section-route (urls/company-section ":slug" ":section") {:as params}
