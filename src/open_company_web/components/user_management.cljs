@@ -22,8 +22,6 @@
       [:div.um-invite-label
         "INVITE USERS BY EMAIL ADDRESS"]
       [:div
-        (when (:invite-by-email-error (rum/react dis/app-state))
-          [:span.error-message.red "An error occurred, please try again."])
         [:input.left.um-invite-field.email
           {:name "um-invite"
            :type "text"
@@ -34,7 +32,9 @@
                         (if (utils/valid-email? email)
                           (dis/dispatch! [:invite-by-email email])
                           (js/alert "The email address you entered is not valid.")))}
-          "SEND INVITE(S)"]]]
+          "SEND INVITE(S)"]
+        (when (:invite-by-email-error (rum/react dis/app-state))
+          [:span.small-caps.red.mt1.left "An error occurred, please try again."])]]
     [:div.my2.um-byemail-container.group
       [:div.group
         [:input.left.um-byemail-anyone
