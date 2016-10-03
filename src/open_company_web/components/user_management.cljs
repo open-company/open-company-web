@@ -22,6 +22,8 @@
       [:div.um-invite-label
         "INVITE USERS BY EMAIL ADDRESS"]
       [:div
+        (when (:invite-by-email-error (rum/react dis/app-state))
+          [:span.error-message.red "An error occurred, please try again."])
         [:input.left.um-invite-field.email
           {:name "um-invite"
            :type "text"
