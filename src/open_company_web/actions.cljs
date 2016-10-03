@@ -93,8 +93,9 @@
     (let [updated-body (utils/fix-sections body)
           with-company-data (assoc-in db (dispatcher/company-data-key (:slug updated-body)) updated-body)]
       (if (or (:read-only updated-body)
-               (pos? (count (:sections updated-body))))
-          (dissoc with-company-data :loading)
+              (pos? (count (:sections updated-body)))
+              (:force-remove-loading with-company-data))
+          (dissoc with-company-data :loading :force-remove-loading)
           with-company-data))
     (= 403 status)
     (-> db
@@ -298,4 +299,37 @@
 (defmethod dispatcher/action :get-auth-settings
   [db [_]]
   (api/get-auth-settings)
+  db)
+
+(defmethod dispatcher/action :enumerate-users
+  [db [_]]
+  (api/enumerate-users)
+  db)
+
+(defmethod dispatcher/action :enumerate-users/success
+  [db [_ users]]
+  (if users
+    (assoc db :enumerate-users users)
+    (dissoc db :enumerate-users)))
+
+(defmethod dispatcher/action :invite-by-email
+  [db [_ email]]
+  (api/send-invitation email)
+  db)
+
+(defmethod dispatcher/action :invite-by-email/success
+  [db [_ email]]
+  ; refresh the users list once the invitation succeded
+  (api/enumerate-users)
+  db)
+
+(defmethod dispatcher/action :user-invitation-action
+  [db [_ user-id action]]
+  (api/user-invitation-action user-id action)
+  db)
+
+(defmethod dispatcher/action :user-invitation-action/complete
+  [db [_]]
+  ; refresh the list of users once the invitation action complete
+  (api/enumerate-users)
   db)
