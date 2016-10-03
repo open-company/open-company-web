@@ -30,8 +30,7 @@
               [:a.navbar-item {:href oc-urls/about :on-click #(do (utils/event-stop %) (router/nav! oc-urls/about))} "About"]]
           [:li.mobile-only
             [:a.navbar-item.contact {:href (str "mailto:" oc-urls/contact-email)} "Contact"]]
-          (when-not (responsive/is-mobile?)
-            [:li
-              (if (jwt/jwt)
-                [:a {:href "" :on-click #(do (utils/event-stop %) (dis/dispatch! [:logout]))} "Log Out"]
-                (login-button {:button-classes "navbar-item"}))])]]]])
+          [:li
+            (if (jwt/jwt)
+              [:a {:href "" :on-click #(do (utils/event-stop %) (dis/dispatch! [:logout]))} "Log Out"]
+              (login-button {:button-classes "navbar-item"}))]]]]])

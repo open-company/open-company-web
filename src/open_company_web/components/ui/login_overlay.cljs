@@ -6,6 +6,8 @@
             [open-company-web.urls :as oc-url]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.oc-colors :as occ]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.small-loading :refer (small-loading)]))
 
@@ -18,6 +20,12 @@
                        (when-not (:auth-settings @dis/app-state)
                           (dis/dispatch! [:get-auth-settings])) s)
    :will-unmount (fn [s] (dommy/remove-class! (sel1 [:body]) :no-scroll) s)})
+
+(rum/defc close-button
+  []
+  [:button.close {:on-click (partial close-overlay)}
+    (let [close-color (if (responsive/is-mobile?) (occ/get-color-by-kw :oc-gray-5) "white")]
+      (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color close-color :accent-color close-color}))])
 
 (rum/defcs login-signup-with-slack < rum/reactive
                                      dont-scroll
@@ -33,8 +41,7 @@
           :else
           [:div.sign-in-cta.left "Sign In"])]
       [:div.pt2.pl2.pr2.group
-        [:button.close {:on-click (partial close-overlay)}
-          (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"})]
+        (close-button)
         (cond
           (= (:slack-access (rum/react dis/app-state)) "denied")
           [:div.block.red
@@ -81,8 +88,7 @@
     {:on-click (partial close-overlay)}
     [:div.login-overlay.login-with-email.group
       {:on-click #(utils/event-stop %)}
-      [:button.close {:on-click (partial close-overlay)}
-          (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"})]
+      (close-button)
       [:div.login-overlay-cta.pl2.pr2.group
         [:div.sign-in-cta "Sign In"
           (when-not (:auth-settings (rum/react dis/app-state))
@@ -146,8 +152,7 @@
     {:on-click (partial close-overlay)}
     [:div.login-overlay.signup-with-email.group
       {:on-click #(utils/event-stop %)}
-      [:button.close {:on-click (partial close-overlay)}
-          (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"})]
+      (close-button)
       [:div.login-overlay-cta.pl2.pr2.group
         [:div.sign-in-cta "Sign Up"
           (when-not (:auth-settings (rum/react dis/app-state))
@@ -242,8 +247,7 @@
     {:on-click (partial close-overlay)}
     [:div.login-overlay.password-reset
       {:on-click #(utils/event-stop %)}
-      [:button.close {:on-click (partial close-overlay)}
-          (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"})]
+      (close-button)
       [:div.login-overlay-cta.pl2.pr2.group
         [:div.sign-in-cta "Password reset"
           (when-not (:auth-settings (rum/react dis/app-state))
