@@ -29,3 +29,6 @@
 
 ;; Filestack key
 (def filestack-key "Aoay0qXUSOyVIcDvls4Egz")
+
+;; Cookie prefix
+(def cookie-name-prefix "localhost-")
