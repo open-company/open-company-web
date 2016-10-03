@@ -323,6 +323,12 @@
   (api/enumerate-users)
   db)
 
+(defmethod dispatcher/action :invite-by-email/failed
+  [db [_ email]]
+  ; refresh the users list once the invitation succeded
+  (api/enumerate-users)
+  (assoc db :invite-by-email-error true))
+
 (defmethod dispatcher/action :user-invitation-action
   [db [_ user-id action]]
   (api/user-invitation-action user-id action)
