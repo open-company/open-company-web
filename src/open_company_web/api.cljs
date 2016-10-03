@@ -1,5 +1,6 @@
 (ns open-company-web.api
-  (:require-macros [cljs.core.async.macros :refer (go)])
+  (:require-macros [cljs.core.async.macros :refer (go)]
+                   [if-let.core :refer (when-let*)])
   (:require [cljs.core.async :as async :refer (<!)]
             [cljs-http.client :as http]
             [open-company-web.dispatcher :as dispatcher]
@@ -63,6 +64,9 @@
 
 (def ^:private auth-get (partial req auth-endpoint http/get))
 (def ^:private auth-post (partial req auth-endpoint http/post))
+(def ^:private auth-put (partial req auth-endpoint http/put))
+(def ^:private auth-patch (partial req auth-endpoint http/patch))
+(def ^:private auth-delete (partial req auth-endpoint http/delete))
 
 (def ^:private pay-get (partial req pay-endpoint http/get))
 (def ^:private pay-post (partial req pay-endpoint http/post))
@@ -406,3 +410,51 @@
          (if success
             (dispatcher/dispatch! [:signup-with-email/success body])
             (dispatcher/dispatch! [:signup-with-email/failed status])))))))
+
+(defn enumerate-users []
+  (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "users" "GET")]
+    (auth-get (:href enumerate-link)
+      {:headers {
+        ; required by Chrome
+        "Access-Control-Allow-Headers" "Content-Type"
+        ; custom content type
+        "content-type" (:type enumerate-link)}}
+      (fn [{:keys [success body status]}]
+        (if success
+          (dispatcher/dispatch! [:enumerate-users/success (:users (:collection body))]))))))
+
+(defn send-invitation [email]
+  (when email
+    (let [invitation-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "invite")]
+      (auth-post (:href invitation-link)
+        {:json-params {:email email}
+         :headers {
+          ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type"
+          ; custom content type
+          "content-type" (:type invitation-link)
+          "accept" (:type invitation-link)}}
+        (fn [{:keys [success body status]}]
+          (if success
+            (dispatcher/dispatch! [:invite-by-email/success (:users (:collection body))])
+            (dispatcher/dispatch! [:invite-by-email/failed])))))))
+
+(defn user-invitation-action [user-id action]
+  (when (and user-id action)
+    (when-let* [user-data (first (filter #(= (:user-id %) user-id) (:enumerate-user @dispatcher/app-state)))
+                user-link (utils/link-for (:links user-data) action)]
+      (let [auth-req (case (:method user-link)
+                        "POST" auth-post
+                        "PUT" auth-put
+                        "PATCH" auth-patch
+                        "DELETE" auth-delete
+                        auth-get)]
+        (auth-req (:href user-link)
+          {:headers {
+          ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type"
+          ; custom content type
+          "content-type" (:type user-link)
+          "accept" (:type user-link)}}
+          (fn [{:keys [status success body]}]
+            (dispatcher/dispatch! [:user-invitation-action/complete])))))))
