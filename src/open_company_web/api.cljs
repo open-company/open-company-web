@@ -420,8 +420,9 @@
         ; custom content type
         "content-type" (:type enumerate-link)}}
       (fn [{:keys [success body status]}]
-        (if success
-          (dispatcher/dispatch! [:enumerate-users/success (:users (:collection body))]))))))
+        (let [fixed-body (if success (json->cljs body) {})]
+          (if success
+            (dispatcher/dispatch! [:enumerate-users/success (:users (:collection fixed-body))])))))))
 
 (defn send-invitation [email]
   (when email
@@ -441,7 +442,7 @@
 
 (defn user-invitation-action [user-id action]
   (when (and user-id action)
-    (when-let* [user-data (first (filter #(= (:user-id %) user-id) (:enumerate-user @dispatcher/app-state)))
+    (when-let* [user-data (first (filter #(= (:user-id %) user-id) (:enumerate-users @dispatcher/app-state)))
                 user-link (utils/link-for (:links user-data) action)]
       (let [auth-req (case (:method user-link)
                         "POST" auth-post
