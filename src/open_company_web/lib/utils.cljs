@@ -815,6 +815,7 @@
   (when-not (is-test-env?)
     (when (pos? (count (clojure.string/trim (.text (js/$ body-el)))))
       (while (and (= (count (clojure.string/trim (.text (.last (.find (js/$ body-el) ">p"))))) 0)
+                  (= (.-length (.find (js/$ body-el) ">p img")) 0)
                   (pos? (.-length (.find (js/$ body-el) ">p"))))
         (.remove (js/$ ">p:last-child" (js/$ body-el)))))))
 
