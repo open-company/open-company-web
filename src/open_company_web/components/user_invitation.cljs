@@ -3,6 +3,10 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]))
 
+(defn user-invitation-action [user-id action]
+  (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
+  (dis/dispatch! [:user-invitation-action user-id action]))
+
 (rum/defc invite-row
   [invitation]
   [:tr
@@ -18,23 +22,23 @@
              :data-toggle "tooltip"
              :data-container "body"
              :title "RESEND INVITE"
-             :on-click #(dis/dispatch! [:user-invitation-action (:user-id invitation) "invite"])}
+             :on-click #(user-invitation-action (:user-id invitation) "invite")}
             [:i.fa.fa-share]]
           [:button.btn-reset
             {:data-placement "top"
              :data-toggle "tooltip"
              :data-container "body"
              :title "CANCEL INVITE"
-             :on-click #(dis/dispatch! [:user-invitation-action (:user-id invitation) "delete"])}
+             :on-click #(user-invitation-action (:user-id invitation) "delete")}
             [:i.fa.fa-times]]]
-        (= (clojure.string/lower-case (:status invitation)) "joined")
+        (= (clojure.string/lower-case (:status invitation)) "active")
         [:div
           [:button.btn-reset
             {:data-placement "top"
              :data-toggle "tooltip"
              :data-container "body"
              :title "REMOVE USER"
-             :on-click #(dis/dispatch! [:user-invitation-action (:user-id invitation) "delete"])}
+             :on-click #(user-invitation-action (:user-id invitation) "delete")}
             [:i.fa.fa-trash-o]]]
         :else
         [:div])]])
