@@ -5,7 +5,6 @@
             [dommy.core :refer-macros (sel1)]
             [rum.core :as rum]
             [clojure.string :as string]
-            [goog.format.EmailAddress :as email]
             [goog.dom :as gdom]
             [goog.style :as gstyle]
             [open-company-web.api :as api]
@@ -19,8 +18,6 @@
             [org.martinklepsch.derivatives :as drv]
             [cljsjs.react.dom]
             [cljsjs.clipboard]))
-
-(defn valid-email? [addr] (email/isValidAddress addr))
 
 (defn send-clicked [type]
   (let [post-data (get-in @dis/app-state [:su-share type])
@@ -159,14 +156,14 @@
         (cond
           (not (seq to-field))
           [:span.red.py1 " — Required"]
-          (not (every? valid-email? to-field))
+          (not (every? utils/valid-email? to-field))
           [:span.red.py1 " — Not a valid email address"]))]
      (item-input {:item-render email-item
                   :match-ptn #"(\S+)[,|\s]+"
                   :split-ptn #"[,|\s]+"
                   :container-node :div.npt.pt1.pr1.pl1.mb3.mh4.overflow-auto
                   :input-node :input.border-none.outline-none.mr.mb1
-                  :valid-item? valid-email?
+                  :valid-item? utils/valid-email?
                   :on-change (fn [val] (dis/dispatch! [:input [:su-share :email :to] val]))})]
     [:label.block.small-caps.bold.mb2 "Subject"]
     [:input.domine.npt.p1.col-12.mb3
@@ -265,7 +262,7 @@
       {:on-click send-fn
        :disabled (when (= :email type)
                    (let [to (->> (drv/react s :su-share) :email :to)]
-                     (not (and (seq to) (every? valid-email? to)))))}
+                     (not (and (seq to) (every? utils/valid-email? to)))))}
       (case type
         :sent "SENT ✓"
         :sending (loading/small-loading {})
