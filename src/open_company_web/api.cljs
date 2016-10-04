@@ -314,7 +314,7 @@
           (fn [{:keys [success body]}]
             (when (not success)
               (reset! new-sections-requested false))
-            (let [fixed-body (if success (json->cljs body) {})]
+            (let [fixed-body (if body (json->cljs body) {})]
               (dispatcher/dispatch! [:new-section {:response fixed-body :slug slug}]))))))))
 
 (defn share-stakeholder-update [{:keys [email slack]}]
@@ -425,20 +425,23 @@
             (dispatcher/dispatch! [:enumerate-users/success (:users (:collection fixed-body))])))))))
 
 (defn send-invitation [email]
-  (when email
-    (let [invitation-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "invite")]
-      (auth-post (:href invitation-link)
-        {:json-params {:email email}
-         :headers {
-          ; required by Chrome
-          "Access-Control-Allow-Headers" "Content-Type"
-          ; custom content type
-          "content-type" (:type invitation-link)
-          "accept" (:type invitation-link)}}
-        (fn [{:keys [success body status]}]
-          (if success
-            (dispatcher/dispatch! [:invite-by-email/success (:users (:collection body))])
-            (dispatcher/dispatch! [:invite-by-email/failed])))))))
+  (let [company-data (dispatcher/company-data)]
+    (when (and email company-data)
+      (let [invitation-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "invite")]
+        (auth-post (:href invitation-link)
+          {:json-params {:email email
+                         :company-name (:name company-data)
+                         :logo (:logo company-data)}
+           :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (:type invitation-link)
+            "accept" (:type invitation-link)}}
+          (fn [{:keys [success body status]}]
+            (if success
+              (dispatcher/dispatch! [:invite-by-email/success (:users (:collection body))])
+              (dispatcher/dispatch! [:invite-by-email/failed]))))))))
 
 (defn user-invitation-action [user-id action]
   (when (and user-id action)
