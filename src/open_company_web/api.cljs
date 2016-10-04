@@ -431,7 +431,7 @@
         (auth-post (:href invitation-link)
           {:json-params {:email email
                          :company-name (:name company-data)
-                         :logo (:logo company-data)}
+                         :logo (or (:logo company-data) "")}
            :headers {
             ; required by Chrome
             "Access-Control-Allow-Headers" "Content-Type"
