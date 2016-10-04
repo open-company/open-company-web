@@ -6,6 +6,11 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.topic-read-more :refer (topic-read-more)]))
 
+(defcomponent topic-close [{:keys [close-cb]} owner]
+  (render [_]
+    (dom/button {:class "btn-reset topic-close"
+                 :onClick close-cb} "CLOSE")))
+
 (defn time-ago
   [past-date]
   (let [past-js-date (utils/js-date past-date)
@@ -40,10 +45,10 @@
       :else
       "just now")))
 
-
 (defcomponent topic-attribution [{:keys [topic-data
                                          section
                                          read-more-cb
+                                         close-cb
                                          prev-rev
                                          next-rev] :as data} owner options]
 
@@ -71,11 +76,13 @@
                        :title "View prior update"
                        :type "button"
                        :data-toggle "tooltip"
+                       :data-container "body"
                        :data-placement "top"
                        :on-click #(when prev-rev ((:rev-click options) % prev-rev))}
             (dom/i {:class "fa fa-caret-left"})))
         (dom/div {:class "topic-attribution"
                 :data-toggle (when-not (responsive/is-mobile-size?) "tooltip")
+                :data-container "body"
                 :data-placement "top"
                 :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
         (time-ago (:updated-at topic-data)))
@@ -84,9 +91,13 @@
                        :title "View next update"
                        :type "button"
                        :data-toggle "tooltip"
+                       :data-container "body"
                        :data-placement "top"
                        :on-click #(when next-rev ((:rev-click options) % next-rev))}
             (dom/i {:class "fa fa-caret-right"}))))
       (when read-more-cb
         (dom/div {:class "right"}
-          (om/build topic-read-more data))))))
+          (om/build topic-read-more data)))
+      (when close-cb
+        (dom/div {:class "right"}
+          (om/build topic-close {:close-cb close-cb}))))))

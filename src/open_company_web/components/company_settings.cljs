@@ -198,6 +198,7 @@
                      :title "Upload a logo"
                      :type "button"
                      :data-toggle "tooltip"
+                     :data-container "body"
                      :data-placement "top"
                      :style {:display (if (nil? file-upload-state) "block" "none")}
                      :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
@@ -206,6 +207,7 @@
                      :title "Provide a link to your logo"
                      :type "button"
                      :data-toggle "tooltip"
+                     :data-container "body"
                      :data-placement "top"
                      :style {:display (if (nil? file-upload-state) "block" "none")}
                      :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
@@ -276,6 +278,7 @@
 
           ;; Company logo
           (dom/div {:class "small-caps bold mb1"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
+          ;; Logo update
           (om/build company-logo-setup {:logo logo
                                         :logo-did-change-cb #(om/set-state! owner :logo %)})
 

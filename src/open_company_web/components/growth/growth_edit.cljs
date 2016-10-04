@@ -258,6 +258,7 @@
                                :title "Chart settings"
                                :type "button"
                                :data-toggle "tooltip"
+                               :data-container "body"
                                :data-placement "right"
                                :style {:font-size "15px"}
                                :on-click #(set-metadata-edit owner  true)}
@@ -319,6 +320,7 @@
                                    :title "Archive this chart"
                                    :type "button"
                                    :data-toggle "tooltip"
+                                   :data-container "body"
                                    :data-placement "top"
                                    :on-click #(show-archive-confirm-popover owner data)}
                           (dom/i {:class "fa fa-archive"})))))))))))))

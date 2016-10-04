@@ -122,6 +122,7 @@
                                :title "Edit chart data"
                                :type "button"
                                :data-toggle "tooltip"
+                               :data-container "body"
                                :data-placement "left"
                                :on-click #(do (om/set-state! owner :data-editing? true)
                                               (editing-cb true))}

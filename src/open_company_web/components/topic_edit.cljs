@@ -429,6 +429,7 @@
                          :title (add-image-tooltip image-header)
                          :type "button"
                          :data-toggle "tooltip"
+                         :data-container "body"
                          :data-placement "top"
                          :style {:display (if (nil? file-upload-state) "block" "none")}
                          :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
@@ -438,6 +439,7 @@
             ;                :title "Provide an image link"
             ;                :type "button"
             ;                :data-toggle "tooltip"
+            ;                :data-container "body"
             ;                :data-placement "top"
             ;                :style {:display (if (nil? file-upload-state) "block" "none")}
             ;                :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
@@ -447,6 +449,7 @@
                            :title "Add a chart"
                            :type "button"
                            :data-toggle "tooltip"
+                           :data-container "body"
                            :data-placement "top"
                            :style {:display (if no-data? "block" "none")}
                            :on-click #(do
@@ -458,6 +461,7 @@
                            :title "Archive this topic"
                            :type "button"
                            :data-toggle "tooltip"
+                           :data-container "body"
                            :data-placement "top"
                            :style {:display (if (nil? file-upload-state) "block" "none")}
                            :on-click (partial remove-topic-click owner)}
@@ -467,6 +471,7 @@
                            :title (pin-tooltip (:pin topic-data))
                            :type "button"
                            :data-toggle "tooltip"
+                           :data-container "body"
                            :data-placement "top"
                            :style {:display (if (nil? file-upload-state) "block" "none")}
                            :on-click #(dis/dispatch! [:foce-input {:pin (not (:pin topic-data))}])}
