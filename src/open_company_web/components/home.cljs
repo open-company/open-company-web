@@ -23,7 +23,8 @@
       (if-not (jwt/jwt)
         (sign-up)
         (dom/div {:class "home fullscreen-page"}
-          (dom/div {:class "home-internal"})
-          (om/build footer {:su-preview false
-                            :card-width card-width
-                            :columns-num columns-num}))))))
+          (when-not (:loading data)
+            (dom/div {:class "home-internal"})
+            (om/build footer {:su-preview false
+                              :card-width card-width
+                              :columns-num columns-num})))))))
