@@ -273,7 +273,7 @@
        :disabled (when (= :email type)
                    (let [to (->> (drv/react s :su-share) :email :to)
                          subject (->> (drv/react s :su-share) :email :subject)]
-                     (or (not (and (seq to) (every? valid-email? to)))
+                     (or (not (and (seq to) (every? utils/valid-email? to)))
                          (string/blank? subject))))}
       (case type
         :sent "SENT ✓"
