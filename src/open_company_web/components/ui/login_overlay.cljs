@@ -119,7 +119,7 @@
                :on-change #(dis/dispatch! [:login-with-email-change :email (.-value (sel1 [:input.email]))])
                :type "email"
                :tabIndex 1
-               :autocapitalize "none"
+               :autoCapitalize "none"
                :name "email"}]]
           [:div.sign-in-label-container
             [:label.sign-in-label "PASSWORD"]]
@@ -209,7 +209,7 @@
                :placeholder "email@example.com"
                :type "email"
                :tabIndex 3
-               :autocapitalize "none"
+               :autoCapitalize "none"
                :name "email"}]]
           [:div.sign-in-label-container
             [:label.sign-in-label {:for "signup-pswd"} "PASSWORD"]]
@@ -218,7 +218,7 @@
               {:value (:pswd (:signup-with-email (rum/react dis/app-state)))
                :id "signup-pswd"
                :on-change #(dis/dispatch! [:signup-with-email-change :pswd (.-value (sel1 [:input.pswd]))])
-               :pattern ".{5,}"
+               :pattern ".{4,}"
                :placeholder "your secret - at least 5 characters"
                :type "password"
                :tabIndex 4
@@ -259,7 +259,7 @@
           [:div.sign-in-label-container
             [:label.sign-in-label "PLEASE ENTER YOUR EMAIL ADDRESS"]]
           [:div.sign-in-field-container.email
-            [:input.sign-in-field {:value "" :tabIndex 1 :type "email" :autocapitalize "none" :name "email"}]]
+            [:input.sign-in-field {:value "" :tabIndex 1 :type "email" :autoCapitalize "none" :name "email"}]]
           [:div.group.pb2.mt3
             [:div.right.ml1
               [:button.btn-reset.btn-solid

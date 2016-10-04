@@ -75,6 +75,8 @@
   (utils/clean-company-caches)
   ;; save route
   (router/set-route! [] {})
+  (when (jwt/jwt)
+    (swap! dis/app-state assoc :loading true))
   ;; load data from api
   (api/get-entry-point)
   ;; render component
