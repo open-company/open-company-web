@@ -7,6 +7,7 @@
             [rum.core :as rum]
             [clojure.string :as string]
             [open-company-web.local-settings :as ls]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.small-loading :as loading]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.ui.footer :as footer]
@@ -158,7 +159,8 @@
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (js/filepicker.setKey ls/filestack-key)
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+      (when-not (responsive/is-tablet-or-mobile?)
+        (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
   (render-state [_ {company-uuid :uuid company-name :company-name logo :logo
                     currency :currency loading :loading
