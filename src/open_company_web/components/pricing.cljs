@@ -3,13 +3,15 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.components.ui.site-header :refer (site-header)]
             [open-company-web.components.ui.site-footer :refer (site-footer)]
-            [open-company-web.urls :as oc-urls]))
+            [open-company-web.urls :as oc-urls]
+            [open-company-web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
 (rum/defcs pricing < rum/reactive [s]
   [:div
     [:div.pricing-wrap {:id "wrap"} ; <!-- used to push footer to the bottom --> 
 
       (site-header)
+      (login-overlays-handler (rum/react dis/app-state))
 
       [:div.container.main.pricing
 
