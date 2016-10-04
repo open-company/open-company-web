@@ -8,7 +8,7 @@
             [open-company-web.components.ui.back-to-dashboard-btn :as btd]
             [open-company-web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
-(rum/defc login-required < rum/static
+(rum/defc login-required < rum/reactive
   [{:keys [welcome] :as data}]
   [:div.login-required
    (login-overlays-handler (rum/react dis/app-state))
