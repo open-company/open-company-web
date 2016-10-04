@@ -115,7 +115,7 @@
       ;; render component
       (drv-root login target))))
 
-(defn simple-handle [component route-name target params]
+(defn simple-handler [component route-name target params]
   (pre-routing (:query-params params))
   (utils/clean-company-caches)
   (if (contains? (:query-params params) :jwt)
@@ -130,6 +130,8 @@
       (when (contains? (:query-params params) :access)
         ;login went bad, add the error message to the app-state
         (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
+      ; remove om component if mounted to the same node
+      (om/detach-root target)
       ;; render component
       (rum/mount (component) target))))
 
@@ -187,16 +189,16 @@
 (if-let [target (sel1 :div#app)]
   (do
     (defroute login-route urls/login {:as params}
-      (simple-handle sign-up "login" target params))
+      (simple-handler sign-up "login" target params))
 
     (defroute signup-route urls/sign-up {:as params}
-      (simple-handle sign-up "sign-up" target params))
+      (simple-handler sign-up "sign-up" target params))
 
     (defroute about-route urls/about {:as params}
-      (simple-handle about "about" target params))
+      (simple-handler about "about" target params))
 
     (defroute pricing-route urls/pricing {:as params}
-      (simple-handle pricing "pricing" target params))
+      (simple-handler pricing "pricing" target params))
 
     (defroute email-confirmation-route urls/email-confirmation {:as params}
       (utils/clean-company-caches)
