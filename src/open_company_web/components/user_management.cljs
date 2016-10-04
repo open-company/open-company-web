@@ -35,12 +35,8 @@
           "SEND INVITE(S)"]
         (when (:invite-by-email-error (rum/react dis/app-state))
           [:span.small-caps.red.mt1.left "An error occurred, please try again."])]]
-    [:div.my2.um-byemail-container.group
+    [:div.my2.um-byemail-container.group.hidden
       [:div.group
-        [:input.left.um-byemail-anyone
-          {:type "checkbox"
-           :name "um-anyone"
-           :checked false}]
         [:span.left.ml1.um-byemail-anyone-span
           "ANYONE WITH THIS EMAIL DOMAIN HAS USER ACCESS"]]
       [:div.mt2.um-byemail.group
