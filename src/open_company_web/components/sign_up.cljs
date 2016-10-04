@@ -3,7 +3,8 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.site-header :refer (site-header)]
-            [open-company-web.components.ui.site-footer :refer (site-footer)]))
+            [open-company-web.components.ui.site-footer :refer (site-footer)]
+            [open-company-web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
 (rum/defcs sign-up < rum/reactive [s]
 
@@ -13,6 +14,7 @@
       (site-header)
       ;; preload slack button as hidden
       [:img.hidden {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
+      (login-overlays-handler (rum/react dis/app-state))
 
       [:div.main.sign-up
         [:div.cta
@@ -27,7 +29,7 @@
                       [:button.submit.domine {:id "submit"
                                               :name "subscribe"
                                               :type "submit"
-                                              :on-click #(do
+                                              :onClick #(do
                                                           (utils/event-stop %)
                                                           (dis/dispatch! [:show-login-overlay :signup-with-slack]))}
                         "Get Started →"]]]]]]]]

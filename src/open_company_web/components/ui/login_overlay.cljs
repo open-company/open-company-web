@@ -218,7 +218,7 @@
               {:value (:pswd (:signup-with-email (rum/react dis/app-state)))
                :id "signup-pswd"
                :on-change #(dis/dispatch! [:signup-with-email-change :pswd (.-value (sel1 [:input.pswd]))])
-               :pattern ".{5,}"
+               :pattern ".{4,}"
                :placeholder "your secret - at least 5 characters"
                :type "password"
                :tabIndex 4

@@ -5,11 +5,13 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.components.ui.login-button :refer (login-button)]
-            [open-company-web.components.ui.back-to-dashboard-btn :as btd]))
+            [open-company-web.components.ui.back-to-dashboard-btn :as btd]
+            [open-company-web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
 (rum/defc login-required < rum/static
   [{:keys [welcome] :as data}]
   [:div.login-required
+   (login-overlays-handler (rum/react dis/app-state))
    (when-not welcome
      (btd/back-to-dashboard-btn {:button-cta "OPENCOMPANY.COM" :click-cb #(router/redirect! oc-urls/home)}))
    [:div.welcome.center.mx-auto.max-width-3
