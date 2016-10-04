@@ -144,8 +144,12 @@
                     [:su-share :email :note]
                     email-notes])))
 
-(rum/defcs email-dialog < rum/static rum/reactive (drv/drv :su-share) emoji-autocomplete
-  [s {:keys [share-link]}]
+(rum/defcs email-dialog < rum/static
+                          rum/reactive
+                          (drv/drv :su-share)
+                          emoji-autocomplete
+                          (rum/local false ::subject-focused)
+  [{:keys [::subject-focused] :as s} {:keys [share-link]}]
   [:div
    (modal-title "Share by Email" :email-84)
    [:div.p3
@@ -165,10 +169,16 @@
                   :input-node :input.border-none.outline-none.mr.mb1
                   :valid-item? utils/valid-email?
                   :on-change (fn [val] (dis/dispatch! [:input [:su-share :email :to] val]))})]
-    [:label.block.small-caps.bold.mb2 "Subject"]
+    [:label.block.small-caps.bold.mb2
+      "Subject"
+      (when-let [subject-field (->> (drv/react s :su-share) :email :subject)]
+        (cond
+          (and @subject-focused (string/blank? subject-field))
+          [:span.red.py1 " — Required"]))]
     [:input.domine.npt.p1.col-12.mb3
      {:type "text"
       :on-change #(dis/dispatch! [:input [:su-share :email :subject] (.. % -target -value)])
+      :on-blur #(reset! subject-focused true)
       :value (-> (drv/react s :su-share) :email :subject)}]
     [:label.block.small-caps.bold.mb2 "Your Note"]
     [:div.npt.group
@@ -261,8 +271,10 @@
      [:button.btn-reset.btn-solid
       {:on-click send-fn
        :disabled (when (= :email type)
-                   (let [to (->> (drv/react s :su-share) :email :to)]
-                     (not (and (seq to) (every? utils/valid-email? to)))))}
+                   (let [to (->> (drv/react s :su-share) :email :to)
+                         subject (->> (drv/react s :su-share) :email :subject)]
+                     (or (not (and (seq to) (every? valid-email? to)))
+                         (string/blank? subject))))}
       (case type
         :sent "SENT ✓"
         :sending (loading/small-loading {})
