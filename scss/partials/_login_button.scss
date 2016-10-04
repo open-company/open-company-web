@@ -1,11 +1,17 @@
-button.signup-signin {
-  opacity: 0.6;
-  color: $oc_gray_5;
-  font-family: $oc_headers_font;
-  font-size: 14px;
-  font-weight: bold;
-  line-height: 1.5;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-top: 12px;
+div.login-button{
+  button.signup-signin, span.signup-signin {
+    opacity: 0.4;
+    color: $oc_gray_5;
+    font-family: $oc_main_font;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1.5;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 12px;
+
+    &:hover {
+      opacity: 0.6;
+    }
+  }
 }

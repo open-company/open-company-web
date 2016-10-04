@@ -15,4 +15,9 @@
     [:button
       {:class (str "btn-reset signup-signin " (when button-classes button-classes))
        :on-click #(dis/dispatch! [:show-login-overlay :login-with-slack])}
-      "Sign In / Sign Up"]])
+      "Sign In"]
+    [:span.signup-signin " / "]
+    [:button
+      {:class (str "btn-reset signup-signin " (when button-classes button-classes))
+       :on-click #(dis/dispatch! [:show-login-overlay :signup-with-email])}
+      "Sign Up"]])
