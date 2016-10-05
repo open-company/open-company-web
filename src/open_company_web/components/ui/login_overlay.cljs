@@ -72,11 +72,11 @@
         [:div.login-overlay-footer.p2.mt1.group
           (cond
               (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
-              [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :signin-with-slack])}
+              [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :login-with-email])}
                 "ALREADY HAVE AN ACCOUNT? "
                  [:span.underline "SIGN IN NOW"]]
               :else
-              [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :signup-with-slack])}
+              [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :signup-with-email])}
                 "DON’T HAVE AN ACCOUNT? "
                  [:span.underline "SIGN UP NOW"]])]]])
 
