@@ -462,3 +462,18 @@
           "accept" (:type user-link)}}
           (fn [{:keys [status success body]}]
             (dispatcher/dispatch! [:user-invitation-action/complete])))))))
+
+(defn confirm-invitation [token]
+  (let [auth-link (utils/link-for (:links (:email (:auth-settings @dispatcher/app-state))) "authenticate")]
+    (when (and token auth-link)
+      (auth-get (:href auth-link)
+        {:headers {
+          ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type, Authorization"
+          ; custom content type
+          "content-type" (:type auth-link)
+          "accept" (:type auth-link)
+          ; pass the token as Authorization
+          "Authorization" (str "Bearer " token)}}
+        (fn [{:keys [status]}]
+          (dispatcher/dispatch! [:invitation-confirmed status]))))))
