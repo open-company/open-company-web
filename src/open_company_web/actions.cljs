@@ -42,7 +42,9 @@
                                           (router/redirect! login-redirect))
         (and first (not second))      (router/nav! (oc-urls/company (slug first)))
         (and first second)            (router/nav! oc-urls/companies)))
-    db))
+    (if (utils/in? (:route @router/path) "create-company")
+      (dissoc db :loading)
+      db)))
 
 (defmethod dispatcher/action :company-submit [db _]
   (api/post-company (:company-editor db))
