@@ -72,7 +72,8 @@
 (defmethod dispatcher/action :auth-settings [db [_ body]]
   (if body
     (do
-      (when (utils/link-for (:links body) "users")
+      (when (and (utils/in? (:route @router/path) "profile")
+                 (utils/link-for (:links body) "users"))
         (utils/after 100 #(api/enumerate-users)))
       (assoc db :auth-settings body))
     db))

@@ -144,7 +144,7 @@
     (pre-routing query-params)
     (utils/clean-company-caches)
     ;; save the route
-    (router/set-route! [slug section route (when edit? "edit")] {:slug slug :section section :edit edit? :query-params query-params})
+    (router/set-route! (vec (remove nil? [slug (when section section) route (when edit? "edit")])) {:slug slug :section section :edit edit? :query-params query-params})
     ;; load revision if needed
     (when (:as-of query-params)
       (api/load-revision {:updated-at (:as-of query-params)
