@@ -33,7 +33,8 @@
             [open-company-web.components.sign-up :refer (sign-up)]
             [open-company-web.components.about :refer (about)]
             [open-company-web.components.pricing :refer (pricing)]
-            [open-company-web.components.email-confirmation :refer (email-confirmation)]))
+            [open-company-web.components.email-confirmation :refer (email-confirmation)]
+            [open-company-web.components.confirm-invitation :refer (confirm-invitation)]))
 
 (enable-console-print!)
 
@@ -205,6 +206,12 @@
       (pre-routing (:query-params params))
       (drv-root email-confirmation target))
 
+    (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
+      (utils/clean-company-caches)
+      (pre-routing query-params)
+      (router/set-route! ["confirm-invitation"] {:query-params query-params})
+      (drv-root confirm-invitation target))
+
     (defroute subscription-callback-route urls/subscription-callback {}
       (when-let [s (cook/get-cookie :subscription-callback-slug)]
         (router/redirect! (urls/company-settings s))))
@@ -285,6 +292,7 @@
                                  about-route
                                  pricing-route
                                  email-confirmation-route
+                                 confirm-invitation-route
                                  subscription-callback-route
                                  home-page-route
                                  list-page-route-slash
