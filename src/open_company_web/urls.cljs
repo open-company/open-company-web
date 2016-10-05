@@ -34,6 +34,8 @@
 
 (def email-confirmation "/email-confirmation")
 
+(def confirm-invitation "/invite")
+
 ;; User
 
 (def user-profile "/profile")
