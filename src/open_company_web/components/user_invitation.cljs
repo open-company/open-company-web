@@ -3,7 +3,7 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]))
 
-(defn user-invitation-action [user-id action & payload]
+(defn user-invitation-action [user-id action & [payload]]
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
   (dis/dispatch! [:user-invitation-action user-id action payload]))
 
