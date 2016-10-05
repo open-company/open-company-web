@@ -349,8 +349,8 @@
   (assoc db :invite-by-email-error true))
 
 (defmethod dispatcher/action :user-invitation-action
-  [db [_ user-id action]]
-  (api/user-invitation-action user-id action)
+  [db [_ user-id action payload]]
+  (api/user-invitation-action user-id action payload)
   db)
 
 (defmethod dispatcher/action :user-invitation-action/complete

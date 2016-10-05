@@ -443,7 +443,7 @@
               (dispatcher/dispatch! [:invite-by-email/success (:users (:collection body))])
               (dispatcher/dispatch! [:invite-by-email/failed]))))))))
 
-(defn user-invitation-action [user-id action]
+(defn user-invitation-action [user-id action payload]
   (when (and user-id action)
     (when-let* [user-data (first (filter #(= (:user-id %) user-id) (:enumerate-users @dispatcher/app-state)))
                 user-link (utils/link-for (:links user-data) action)]
@@ -452,14 +452,18 @@
                         "PUT" auth-put
                         "PATCH" auth-patch
                         "DELETE" auth-delete
-                        auth-get)]
+                        auth-get)
+            headers {:headers {
+                      ; required by Chrome
+                      "Access-Control-Allow-Headers" "Content-Type"
+                      ; custom content type
+                      "content-type" (:type user-link)
+                      "accept" (:type user-link)}}
+            with-payload (if payload
+                            (assoc headers :json-params payload)
+                            headers)]
         (auth-req (:href user-link)
-          {:headers {
-          ; required by Chrome
-          "Access-Control-Allow-Headers" "Content-Type"
-          ; custom content type
-          "content-type" (:type user-link)
-          "accept" (:type user-link)}}
+          with-payload
           (fn [{:keys [status success body]}]
             (dispatcher/dispatch! [:user-invitation-action/complete])))))))
 
