@@ -72,9 +72,15 @@
 (defmethod dispatcher/action :auth-settings [db [_ body]]
   (if body
     (do
+      ; load users if on profile page
       (when (and (utils/in? (:route @router/path) "profile")
                  (utils/link-for (:links body) "users"))
         (utils/after 100 #(api/enumerate-users)))
+      ; start token exchange if on confirm invitation page and token is present
+      (when (and (utils/in? (:route @router/path) "confirm-invitation")
+                 (contains? (:query-params @router/path) :token))
+        (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path)))))
+
       (assoc db :auth-settings body))
     db))
 
@@ -349,3 +355,11 @@
   ; refresh the list of users once the invitation action complete
   (api/enumerate-users)
   db)
+
+(defmethod dispatcher/action :invitation-confirmed
+  [db [_ status]]
+  (if (= status 200)
+    (do
+      ; @TODO: save the jwt
+      (assoc db :email-confirmed true))
+    (assoc db :email-confirmed false)))
