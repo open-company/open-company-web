@@ -207,6 +207,8 @@
       (drv-root email-confirmation target))
 
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
+      (when (jwt/jwt)
+        (router/redirect! urls/home))
       (utils/clean-company-caches)
       (pre-routing query-params)
       (router/set-route! ["confirm-invitation"] {:query-params query-params})
