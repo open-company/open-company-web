@@ -475,5 +475,7 @@
           "accept" (:type auth-link)
           ; pass the token as Authorization
           "Authorization" (str "Bearer " token)}}
-        (fn [{:keys [status]}]
+        (fn [{:keys [status body success]}]
+          (when success
+            (update-jwt-cookie! body))
           (dispatcher/dispatch! [:invitation-confirmed status]))))))

@@ -334,7 +334,7 @@
 (defmethod dispatcher/action :invite-by-email
   [db [_ email]]
   (api/send-invitation email)
-  db)
+  (dissoc db :invite-by-email-error))
 
 (defmethod dispatcher/action :invite-by-email/success
   [db [_ email]]
@@ -361,8 +361,4 @@
 
 (defmethod dispatcher/action :invitation-confirmed
   [db [_ status]]
-  (if (= status 200)
-    (do
-      ; @TODO: save the jwt
-      (assoc db :email-confirmed true))
-    (assoc db :email-confirmed false)))
+  (assoc db :email-confirmed (= status 200)))
