@@ -6,6 +6,11 @@
             [open-company-web.components.user-invitation :refer (user-invitation)]))
 
 (rum/defcs user-management < rum/reactive
+                             {:before-render (fn [s]
+                                               (when (and (:auth-settings @dis/app-state)
+                                                          (not (:enumerate-users-requested @dis/app-state)))
+                                                 (dis/dispatch! [:enumerate-users]))
+                                               s)}
   [s]
   [:div.user-management.lg-col-5.md-col-7.col-11.mx-auto.mt4.mb4.group
     [:div.um-cta.pb2 "User Management"]
