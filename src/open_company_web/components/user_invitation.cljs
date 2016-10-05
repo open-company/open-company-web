@@ -3,9 +3,9 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]))
 
-(defn user-invitation-action [user-id action]
+(defn user-invitation-action [user-id action & payload]
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
-  (dis/dispatch! [:user-invitation-action user-id action]))
+  (dis/dispatch! [:user-invitation-action user-id action payload]))
 
 (rum/defc invite-row
   [invitation]
@@ -22,7 +22,13 @@
              :data-toggle "tooltip"
              :data-container "body"
              :title "RESEND INVITE"
-             :on-click #(user-invitation-action (:user-id invitation) "invite")}
+             :on-click #(let [company-data (dis/company-data)]
+                          (user-invitation-action
+                            (:user-id invitation)
+                            "invite"
+                            {:email (:email invitation)
+                             :company-name (:name company-data)
+                             :logo (or (:logo company-data) "")}))}
             [:i.fa.fa-share]]
           [:button.btn-reset
             {:data-placement "top"

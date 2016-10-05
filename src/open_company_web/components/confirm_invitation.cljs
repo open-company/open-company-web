@@ -26,10 +26,10 @@
       (om/update-state! owner #(merge % {:loading false
                                          :confirmed false}))))
 
-  (will-receive-props [_ _]
-    (when (contains? data :email-confirmed)
+  (will-receive-props [_ next-props]
+    (when (contains? next-props :email-confirmed)
       (om/update-state! owner #(merge % {:loading false
-                                         :confirmed (:email-confirmed data)}))))
+                                         :confirmed (:email-confirmed next-props)}))))
 
   (render-state [_ {:keys [loading confirmed]}]
     (dom/div {:class (utils/class-set {:confirm-invitation true

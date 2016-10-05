@@ -334,7 +334,7 @@
 (defmethod dispatcher/action :invite-by-email
   [db [_ email]]
   (api/send-invitation email)
-  db)
+  (dissoc db :invite-by-email-error))
 
 (defmethod dispatcher/action :invite-by-email/success
   [db [_ email]]
@@ -349,8 +349,8 @@
   (assoc db :invite-by-email-error true))
 
 (defmethod dispatcher/action :user-invitation-action
-  [db [_ user-id action]]
-  (api/user-invitation-action user-id action)
+  [db [_ user-id action payload]]
+  (api/user-invitation-action user-id action payload)
   db)
 
 (defmethod dispatcher/action :user-invitation-action/complete
@@ -361,8 +361,4 @@
 
 (defmethod dispatcher/action :invitation-confirmed
   [db [_ status]]
-  (if (= status 200)
-    (do
-      ; @TODO: save the jwt
-      (assoc db :email-confirmed true))
-    (assoc db :email-confirmed false)))
+  (assoc db :email-confirmed (= status 200)))
