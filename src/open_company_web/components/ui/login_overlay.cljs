@@ -141,7 +141,7 @@
                               (dis/dispatch! [:login-with-email]))}
                 "SIGN IN"]]]]]
       [:div.login-overlay-footer.p2.mt1.group
-        [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :signup-with-email]))}
+        [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :signup-with-slack]))}
           "DON’T HAVE AN ACCOUNT? "
           [:span.underline "SIGN UP NOW"]]]]])
 
@@ -237,7 +237,7 @@
                               (dis/dispatch! [:signup-with-email]))}
                 "SIGN UP"]]]]]
       [:div.login-overlay-footer.p2.mt1.group
-        [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :login-with-email]))}
+        [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :login-with-slack]))}
           "ALREADY HAVE AN ACCOUNT? "
           [:span.underline "SIGN IN NOW"]]]]])
 
