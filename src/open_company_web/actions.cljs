@@ -4,6 +4,7 @@
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]
+            [open-company-web.lib.jwt :as jwt]
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
@@ -37,14 +38,20 @@
         [first second] (filter #(= (:rel %) "company") links)]
     (let [login-redirect (cook/get-cookie :login-redirect)]
       (cond
-        (and create-link (not first)) (router/nav! oc-urls/create-company)
-        login-redirect                (do (cook/remove-cookie! :login-redirect)
+        (and create-link (not first))   (router/nav! oc-urls/create-company)
+        (and (jwt/jwt) login-redirect)  (do
+                                          (cook/remove-cookie! :login-redirect)
                                           (router/redirect! login-redirect))
-        (and first (not second))      (router/nav! (oc-urls/company (slug first)))
-        (and first second)            (router/nav! oc-urls/companies)))
-    (if (utils/in? (:route @router/path) "create-company")
-      (dissoc db :loading)
-      db)))
+        (and first (not second))        (router/nav! (oc-urls/company (slug first)))
+        (and first second)              (router/nav! oc-urls/companies)))
+    (let [next-db (if (cook/get-cookie :show-login-overlay)
+                    (assoc db :show-login-overlay (cook/get-cookie :show-login-overlay))
+                    db)]
+      (when (cook/get-cookie :show-login-overlay)
+        (cook/remove-cookie! :show-login-overlay))
+      (if (utils/in? (:route @router/path) "create-company")
+        (dissoc next-db :loading)
+        next-db))))
 
 (defmethod dispatcher/action :company-submit [db _]
   (api/post-company (:company-editor db))
@@ -269,7 +276,9 @@
   (let [current (router/get-token)
         slack-ref (if simple-scope? "authenticate-retry" "authenticate")
         auth-url (utils/link-for (:links (:slack (:auth-settings @dispatcher/app-state))) slack-ref)]
-    (when-not (or (.startsWith current oc-urls/login) (.startsWith current oc-urls/sign-up))
+    (when (and (not (.startsWith current oc-urls/login))
+               (not (.startsWith current oc-urls/sign-up))
+               (not (cook/get-cookie :login-redirect)))
         (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
     (router/redirect! (:href auth-url)))
   db)
