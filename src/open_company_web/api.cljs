@@ -58,9 +58,14 @@
                   (and (>= status 500) (<= status 599))
                   (= status 400)
                   (= status 422))
-          (sentry/set-user-context! response)
-          (sentry/capture-message (str "xhr response error:" status))
-          (sentry/set-user-context! nil))
+          (let [report {:response response
+                        :path path
+                        :method method
+                        :jwt (j/jwt)
+                        :params params}]
+            (sentry/set-user-context! report)
+            (sentry/capture-message (str "xhr response error:" status))
+            (sentry/set-user-context! nil)))
         (on-complete response)))))
 
 (def ^:private api-get (partial req api-endpoint http/get))
