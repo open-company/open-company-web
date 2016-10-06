@@ -29,3 +29,6 @@
 
 (defn capture-error-with-message [msg]
   (capture-error (js/Error. msg)))
+
+(defn set-user-context! [ctx]
+  (.setUserContext js/Raven (when ctx (clj->js ctx))))
