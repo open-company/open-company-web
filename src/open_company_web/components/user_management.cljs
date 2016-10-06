@@ -4,9 +4,21 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.jwt :as jwt]
-            [open-company-web.components.user-invitation :refer (user-invitation)]))
+            [org.martinklepsch.derivatives :as drv]
+            [open-company-web.components.user-invitation :refer (user-invitation)]
+            [open-company-web.components.su-preview-dialog :refer (item-input)]))
+
+(rum/defc email-item [v delete! submitted?]
+  [:div.item-input-item
+   {:class (when-not submitted? "border b--red")
+    :style (when submitted? {:backgroundColor "rgba(78, 90, 107, 0.1)"})}
+   [:span.inline-block.p1 v
+    [:button.btn-reset.p0.ml1
+     {:on-click #(delete!)}
+     "x"]]])
 
 (rum/defcs user-management < rum/reactive
+                             (drv/drv :um-invite)
                              {:before-render (fn [s]
                                                (when (and (:auth-settings @dis/app-state)
                                                           (not (:enumerate-users-requested @dis/app-state)))
@@ -25,18 +37,23 @@
       (user-invitation (:enumerate-users (rum/react dis/app-state))))
     [:div.my3.um-invite.group
       [:div.um-invite-label
-        "INVITE USERS BY EMAIL ADDRESS"]
-      [:div
-        [:input.left.um-invite-field.email
-          {:name "um-invite"
-           :type "text"
-           :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
-           :placeholder "user emails separated by comma"}]
+        "INVITE USERS BY EMAIL ADDRESS"
+        (when-let [to-field (:email (drv/react s :um-invite))]
+          (cond
+            (not (every? utils/valid-email? to-field))
+            [:span.red.py1 " — Not a valid email address"]))]
+      [:div.item-input-container
+        (item-input {:item-render email-item
+                     :match-ptn #"(\S+)[,|\s]+"
+                     :split-ptn #"[,|\s]+"
+                     :container-node :div.item-input
+                     :input-node :input.border-none.outline-none.mr.mb1
+                     :valid-item? utils/valid-email?
+                     :on-change (fn [v] (dis/dispatch! [:input [:um-invite :email] v]))})
         [:button.right.btn-reset.btn-solid.um-invite-send
-          {:on-click #(let [email (.-value (sel1 [:input.um-invite-field.email]))]
-                        (if (utils/valid-email? email)
-                          (dis/dispatch! [:invite-by-email email])
-                          (js/alert "The email address you entered is not valid.")))}
+          {:disabled (let [to (:email (drv/react s :um-invite))]
+                       (not (and (seq to) (every? utils/valid-email? to))))
+           :on-click #(dis/dispatch! [:invite-by-email (:email (drv/react s :um-invite))])}
           "SEND INVITES"]
         (when (:invite-by-email-error (rum/react dis/app-state))
           [:span.small-caps.red.mt1.left "An error occurred, please try again."])]]
