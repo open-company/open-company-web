@@ -246,7 +246,7 @@
                 {:disabled (or (and (s/blank? (:firstname (:signup-with-email (rum/react dis/app-state))))
                                     (s/blank? (:lastname (:signup-with-email (rum/react dis/app-state)))))
                                (gobj/get (gobj/get (sel1 [:input.email]) "validity") "patternMismatch")
-                               (<= (count (:pswd (:signup-with-email (rum/react dis/app-state)))) 5))
+                               (< (count (:pswd (:signup-with-email (rum/react dis/app-state)))) 5))
                  :on-click #(do
                               (utils/event-stop %)
                               (dis/dispatch! [:signup-with-email]))}
