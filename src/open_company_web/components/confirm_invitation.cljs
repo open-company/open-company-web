@@ -43,7 +43,12 @@
                 "Email confirmed!"
                 "Email confirmation error, plase try again.")))
           (dom/button {:class "btn-reset btn-solid confirm-invitation-get-started"
-                       :on-click #(router/nav! oc-urls/home)}
+                       :disabled loading
+                       :on-click #(if-not confirmed
+                                    (do
+                                      (om/set-state! owner :loading true)
+                                      (dis/dispatch! [:confirm-invitation ]))
+                                    (router/nav! oc-urls/home))}
             (if loading
               (small-loading)
               (if confirmed
