@@ -362,7 +362,7 @@
 (defmethod dispatcher/action :confirm-invitation
   [db [_]]
   (api/confirm-invitation (:token (:query-params @router/path)))
-  db)
+  (dissoc db :email-confirmed))
 
 (defmethod dispatcher/action :invitation-confirmed
   [db [_ status]]
