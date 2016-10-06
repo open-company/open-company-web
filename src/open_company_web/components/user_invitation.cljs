@@ -64,4 +64,4 @@
           [:th "ACTIONS"]]]
       [:tbody
         (for [invitation invitations]
-          (rum/with-key (invite-row invitation) (str "invitation-tr-" (:user-id invitation))))]]])
+          (rum/with-key (invite-row invitation) (str "invitation-tr-" (:href (utils/link-for (:links invitation) "self")))))]]])
