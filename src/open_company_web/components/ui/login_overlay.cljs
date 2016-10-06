@@ -3,6 +3,7 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [clojure.string :as s]
             [goog.object :as gobj]
+            [goog.style :as gstyle]
             [open-company-web.urls :as oc-url]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
@@ -16,10 +17,24 @@
   (dis/dispatch! [:show-login-overlay false]))
 
 (def dont-scroll
-  {:will-mount (fn [s] (dommy/add-class! (sel1 [:body]) :no-scroll)
-                       (when-not (:auth-settings @dis/app-state)
-                          (dis/dispatch! [:get-auth-settings])) s)
-   :will-unmount (fn [s] (dommy/remove-class! (sel1 [:body]) :no-scroll) s)})
+  {:before-render (fn [s]
+                    (if (responsive/is-mobile?)
+                      (let [display-none #js {:display "none"}]
+                        (gstyle/setStyle (sel1 [:div.main]) display-none)
+                        (gstyle/setStyle (sel1 [:nav.navbar-bottom]) display-none)
+                        (gstyle/setStyle (sel1 [:nav.navbar-static-top]) display-none))
+                      (dommy/add-class! (sel1 [:body]) :no-scroll))
+                    (when-not (:auth-settings @dis/app-state)
+                      (dis/dispatch! [:get-auth-settings]))
+                    s)
+   :will-unmount (fn [s]
+                   (if (responsive/is-mobile?)
+                    (let [display-block #js {:display "block"}]
+                      (gstyle/setStyle (sel1 [:div.main]) display-block)
+                      (gstyle/setStyle (sel1 [:nav.navbar-bottom]) display-block)
+                      (gstyle/setStyle (sel1 [:nav.navbar-static-top]) display-block))
+                    (dommy/remove-class! (sel1 [:body]) :no-scroll))
+                   s)})
 
 (rum/defc close-button
   []
