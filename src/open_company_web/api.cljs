@@ -45,6 +45,27 @@
 (defn update-jwt-cookie! [jwt]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
 
+(defn- method-name [method]
+  (cond
+    (= method http/delete)
+    "DELETE"
+    (= method http/get)
+    "GET"
+    (= method http/head)
+    "HEAD"
+    (= method http/jsonp)
+    "JSONP"
+    (= method http/move)
+    "MOVE"
+    (= method http/options)
+    "OPTIONS"
+    (= method http/patch)
+    "PATCH"
+    (= method http/post)
+    "POST"
+    (= method http/put)
+    "PUT"))
+
 (defn- req [endpoint method path params on-complete]
   (let [jwt (j/jwt)]
     (go
@@ -63,7 +84,7 @@
                   (= status 422))
           (let [report {:response response
                         :path path
-                        :method method
+                        :method (method-name method)
                         :jwt (j/jwt)
                         :params params}]
             (sentry/set-user-context! report)
