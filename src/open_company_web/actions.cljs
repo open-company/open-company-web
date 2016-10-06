@@ -332,8 +332,8 @@
     (dissoc db :enumerate-users)))
 
 (defmethod dispatcher/action :invite-by-email
-  [db [_ email]]
-  (api/send-invitation email)
+  [db [_ emails]]
+  (api/send-invitation emails)
   (dissoc db :invite-by-email-error))
 
 (defmethod dispatcher/action :invite-by-email/success
