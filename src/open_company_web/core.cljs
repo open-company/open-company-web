@@ -243,6 +243,11 @@
           (swap! dis/app-state assoc :loading true))
       (drv-root company-logo-setup target)))
 
+    (defroute logout-route urls/logout {:as params}
+      (cook/remove-cookie! :jwt)
+      (cook/remove-cookie! :login-redirect)
+      (router/redirect! urls/home))
+
     (defroute list-page-route urls/companies {:as params}
       (list-companies-handler target params))
 
@@ -301,6 +306,7 @@
                                  list-page-route
                                  company-create-route
                                  company-logo-setup-route
+                                 logout-route
                                  user-profile-route
                                  company-settings-route
                                  company-route

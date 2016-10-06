@@ -57,9 +57,12 @@
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         ; report all 5xx to sentry
-        (when (or (= status 0) (and (>= status 500) (<= status 599)))
+        (when (or (= status 0)
+                  (and (>= status 500) (<= status 599))
+                  (= status 400)
+                  (= status 422))
           (sentry/set-user-context! response)
-          (sentry/capture-message "500")
+          (sentry/capture-message (str "xhr response error:" status))
           (sentry/set-user-context! nil))
         (on-complete response)))))
 
