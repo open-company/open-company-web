@@ -63,5 +63,5 @@
           [:th "STATUS"]
           [:th "ACTIONS"]]]
       [:tbody
-        (for [invitation invitations]
+        (for [invitation (filter #(contains? % :status) invitations)]
           (rum/with-key (invite-row invitation) (str "invitation-tr-" (:href (utils/link-for (:links invitation) "self")))))]]])

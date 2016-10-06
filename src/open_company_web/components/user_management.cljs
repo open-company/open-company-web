@@ -17,7 +17,8 @@
      {:on-click #(delete!)}
      "x"]]])
 
-(rum/defcs user-management < rum/reactive
+(rum/defcs user-management < rum/static
+                             rum/reactive
                              (drv/drv :um-invite)
                              {:before-render (fn [s]
                                                (when (and (:auth-settings @dis/app-state)

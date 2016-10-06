@@ -81,19 +81,19 @@
                               (dis/dispatch! [:show-login-overlay (if (= (:show-login-overlay @dis/app-state) :signup-with-slack) :signup-with-email :login-with-email)]))}
             (cond
               (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
-              "OR SIGN UP VIA EMAIL"
+              "or sign up via email"
               :else
-              "OR SIGN IN VIA EMAIL")]]]
+              "or sign in via email")]]]
         [:div.login-overlay-footer.py2.px3.mt1.group
           (cond
               (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
               [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :login-with-email])}
-                "ALREADY HAVE AN ACCOUNT? "
-                 [:span.underline "SIGN IN NOW"]]
+                "Already have an account? "
+                 [:span.underline "Sign in now"]]
               :else
               [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :signup-with-email])}
-                "DON’T HAVE AN ACCOUNT? "
-                 [:span.underline "SIGN UP NOW"]])]]])
+                "Don't have an account? "
+                 [:span.underline "Sign up now."]])]]])
 
 (rum/defcs login-with-email < rum/reactive
                               (merge dont-scroll
@@ -145,20 +145,20 @@
                :type "password"
                :tabIndex 2
                :name "pswd"}]]
-          [:div.group.pb2.my3
+          [:div.group.pb3.my3
             [:div.left.forgot-password
-              [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
+              [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "Forgot password?"]]
             [:div.right
               [:button.btn-reset.btn-solid
                 {:disabled (nil? (:email (:auth-settings (rum/react dis/app-state))))
                  :on-click #(do
                               (.preventDefault %)
                               (dis/dispatch! [:login-with-email]))}
-                "SIGN IN"]]]]]
+                "Sign in"]]]]]
       [:div.login-overlay-footer.py2.px3.mt1.group
         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :signup-with-slack]))}
-          "DON’T HAVE AN ACCOUNT? "
-          [:span.underline "SIGN UP NOW"]]]]])
+          "Don't have an account? "
+          [:span.underline "Sign up now."]]]]])
 
 (rum/defcs signup-with-email < rum/reactive
                                (merge dont-scroll
@@ -238,9 +238,9 @@
                :type "password"
                :tabIndex 4
                :name "pswd"}]]
-          [:div.group.pb2.my3
+          [:div.group.pb3.my3
             [:div.left.forgot-password
-              [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
+              [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "Forgot password?"]]
             [:div.right
               [:button.btn-reset.btn-solid
                 {:disabled (or (and (s/blank? (:firstname (:signup-with-email (rum/react dis/app-state))))
@@ -253,8 +253,8 @@
                 "SIGN UP"]]]]]
       [:div.login-overlay-footer.py2.px3.mt1.group
         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :login-with-slack]))}
-          "ALREADY HAVE AN ACCOUNT? "
-          [:span.underline "SIGN IN NOW"]]]]])
+          "Already have an account? "
+          [:span.underline "Sign in now."]]]]])
 
 (rum/defcs password-reset < rum/reactive
                             (merge dont-scroll
@@ -275,7 +275,7 @@
             [:label.sign-in-label "PLEASE ENTER YOUR EMAIL ADDRESS"]]
           [:div.sign-in-field-container.email
             [:input.sign-in-field {:value "" :tabIndex 1 :type "email" :autoCapitalize "none" :name "email"}]]
-          [:div.group.pb2.mt3
+          [:div.group.pb3.mt3
             [:div.right.ml1
               [:button.btn-reset.btn-solid
                 "RESET PASSWORD"]]

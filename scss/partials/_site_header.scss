@@ -45,7 +45,7 @@ ul.navbar-top li {
 ul.navbar-top li .navbar-item {
   opacity: 0.4;
   color: $oc_gray_5 !important; //override bootstrap
-  font-family: $oc_main_font;
+  font-family: $oc_headers_font;
 
   &:hover {
     opacity: 0.6;
