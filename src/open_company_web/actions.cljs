@@ -359,6 +359,11 @@
   (api/enumerate-users)
   db)
 
+(defmethod dispatcher/action :confirm-invitation
+  [db [_]]
+  (api/confirm-invitation (:token (:query-params @router/path)))
+  db)
+
 (defmethod dispatcher/action :invitation-confirmed
   [db [_ status]]
   (assoc db :email-confirmed (= status 200)))
