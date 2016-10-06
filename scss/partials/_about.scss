@@ -18,7 +18,7 @@ div.container.about {
 }
 
 h1.about {
-  font-family: OpenSans;
+  font-family: $oc_headers_font;
   font-size: 24px;
   line-height: 1.1;
   color: #4e5a6b;
@@ -28,7 +28,7 @@ h1.about {
 }
 
 div.container p {
-  font-family: Domine;
+  font-family: $oc_main_font;
   font-size: 18px;
   line-height: 1.4;
   color: #4e5a6b;

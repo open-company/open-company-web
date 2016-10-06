@@ -29,7 +29,7 @@ div.vertical-center-row {
 }
 
 h1.tagline {
-  font-family: Domine;
+  font-family: $oc_main_font;
   font-size: 36px;
   line-height: 1.4;
   color: #ffffff;
@@ -125,7 +125,7 @@ div.sub-tag {
 }
 
 h2.sub-tagline {
-  font-family: Domine;
+  font-family: $oc_main_font;
   font-size: 24px;
   line-height: 1.1;
   color: #4e5a6b;
@@ -154,7 +154,7 @@ div.no-bottom {
 }
 
 div.left-to-right p, div.right-to-left p {
-  font-family: Domine;
+  font-family: $oc_main_font;
   font-size: 18px;
   line-height: 1.4;
   color: #4e5a6b;
@@ -174,7 +174,7 @@ div.right-to-left {
 }
 
 h3.info-headline {
-  font-family: Domine;
+  font-family: $oc_main_font;
   font-size: 18px;
   font-weight: bold;
   line-height: 1.4;
