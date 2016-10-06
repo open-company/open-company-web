@@ -30,7 +30,7 @@ button.navbar-toggle {
 }
 
 ul.navbar-nav li {
-  font-family: OpenSans;
+  font-family: $oc_headers_font;
   font-size: 14px;
   font-weight: bold;
   line-height: 1.5;
@@ -44,7 +44,8 @@ ul.navbar-top li {
 
 ul.navbar-top li .navbar-item {
   opacity: 0.4;
-  color: #4e5a6b !important; //override bootstrap
+  color: $oc_gray_5 !important; //override bootstrap
+  font-family: $oc_main_font;
 
   &:hover {
     opacity: 0.6;
