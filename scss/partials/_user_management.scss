@@ -29,6 +29,41 @@ div.user-management {
       padding: 0px;
     }
 
+    div.item-input-container {
+      div.item-input {
+        min-height: 44px;
+        margin: 0px 0px 1rem 0px;
+        padding: 5px;
+        background-color: white;
+        border: 1px solid rgba(78, 90, 107, 0.1);
+        border-radius: 2px;
+        font-size: 14px;
+        line-height: 1.2;
+        color: #4E5A6B;
+        font-family: $oc_main_font;
+        font-weight: 400;
+
+        input {
+          outline: none;
+          margin: 0px 0px 5px 5px;
+          // padding: 0px;
+          height: 32px;
+          width: 100%;
+
+          &:active, &:focus {
+            outline: none;
+          }
+        }
+
+        div.item-input-item {
+          display: inline-block;
+          height: 32px;
+          margin: 0px 0px 5px 5px;
+          padding: 0px;
+        }
+      }
+    }
+
     input.um-invite-field {
       width: 340px;
       height: 34px;
