@@ -47,7 +47,7 @@
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
-    [:div.login-overlay.login-with-slack.center
+    [:div.login-overlay.login-with-slack
       {:on-click #(utils/event-stop %)}
       [:div.login-overlay-cta.pl2.pr2.group
         (cond
@@ -55,7 +55,7 @@
           [:div.sign-in-cta.left "Sign Up"]
           :else
           [:div.sign-in-cta.left "Sign In"])]
-      [:div.pt2.pl2.pr2.group
+      [:div.pt2.pl3.pr3.group.center
         (close-button)
         (cond
           (= (:slack-access (rum/react dis/app-state)) "denied")
@@ -84,7 +84,7 @@
               "OR SIGN UP VIA EMAIL"
               :else
               "OR SIGN IN VIA EMAIL")]]]
-        [:div.login-overlay-footer.p2.mt1.group
+        [:div.login-overlay-footer.py2.px3.mt1.group
           (cond
               (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
               [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :login-with-email])}
@@ -108,7 +108,7 @@
         [:div.sign-in-cta "Sign In"
           (when-not (:auth-settings (rum/react dis/app-state))
             (small-loading))]]
-      [:div.pt2.pl2.pr2.pb2.group
+      [:div.pt2.pl3.pr3.pb2.group
         (when-not (nil? (:login-with-email-error (rum/react dis/app-state)))
           (cond
             (= (:login-with-email-error (rum/react dis/app-state)) 401)
@@ -155,7 +155,7 @@
                               (.preventDefault %)
                               (dis/dispatch! [:login-with-email]))}
                 "SIGN IN"]]]]]
-      [:div.login-overlay-footer.p2.mt1.group
+      [:div.login-overlay-footer.py2.px3.mt1.group
         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :signup-with-slack]))}
           "DON’T HAVE AN ACCOUNT? "
           [:span.underline "SIGN UP NOW"]]]]])
@@ -173,7 +173,7 @@
         [:div.sign-in-cta "Sign Up"
           (when-not (:auth-settings (rum/react dis/app-state))
             (small-loading))]]
-      [:div.pt2.pl2.pr2.pb2.group
+      [:div.pt2.pl3.pr3.pb2.group
         (when-not (nil? (:signup-with-email-error (rum/react dis/app-state)))
           (cond
             (= (:signup-with-email-error (rum/react dis/app-state)) 409)
@@ -251,7 +251,7 @@
                               (utils/event-stop %)
                               (dis/dispatch! [:signup-with-email]))}
                 "SIGN UP"]]]]]
-      [:div.login-overlay-footer.p2.mt1.group
+      [:div.login-overlay-footer.py2.px3.mt1.group
         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:show-login-overlay :login-with-slack]))}
           "ALREADY HAVE AN ACCOUNT? "
           [:span.underline "SIGN IN NOW"]]]]])
@@ -269,7 +269,7 @@
         [:div.sign-in-cta "Password reset"
           (when-not (:auth-settings (rum/react dis/app-state))
             (small-loading))]]
-      [:div.pt2.pl2.pr2.pb2.group
+      [:div.pt2.pl3.pr3.pb2.group
         [:form.sign-in-form
           [:div.sign-in-label-container
             [:label.sign-in-label "PLEASE ENTER YOUR EMAIL ADDRESS"]]

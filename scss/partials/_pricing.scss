@@ -45,7 +45,7 @@ div.price-box {
 }
 
 div.container.pricing h1 {
-  font-family: OpenSans;
+  font-family: $oc_headers_font;
   font-size: 24px;
   line-height: 1.1;
   color: #4e5a6b;
@@ -53,7 +53,7 @@ div.container.pricing h1 {
 }
 
 div.container.pricing span.cost {
-  font-family: OpenSans;
+  font-family: $oc_headers_font;
   font-size: 24px;
   line-height: 1.1;
   color: #4e5a6b;

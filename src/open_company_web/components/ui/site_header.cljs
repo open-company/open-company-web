@@ -22,8 +22,9 @@
             [:span.icon-bar]]]
       [:div.collapse.navbar-collapse {:id "oc-navbar-collapse"}
         [:ul.nav.navbar-nav.navbar-right.navbar-top
-          [:li
-              [:a.navbar-item {:href oc-urls/home :on-click #(do (utils/event-stop %) (router/nav! oc-urls/home))} "Home"]]
+          (when-not (utils/in? (:route @router/path) "home")
+            [:li
+                [:a.navbar-item {:href oc-urls/home :on-click #(do (utils/event-stop %) (router/nav! oc-urls/home))} "Home"]])
           [:li
               [:a.navbar-item {:href oc-urls/pricing :on-click #(do (utils/event-stop %) (router/nav! oc-urls/pricing))} "Pricing"]]
           [:li

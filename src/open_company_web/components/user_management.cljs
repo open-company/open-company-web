@@ -3,6 +3,7 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.jwt :as jwt]
             [open-company-web.components.user-invitation :refer (user-invitation)]))
 
 (rum/defcs user-management < rum/reactive
@@ -16,11 +17,10 @@
     [:div.um-cta.pb2 "User Management"]
     [:div.um-description
       [:p.um-p
-        "USERS CAN ADD AND EDIT TOPICS, AND THEY CAN SHARE UPDATES WITH OTHERS."]
-      [:p.um-p
-        "ORGANIZATIONS THAT SIGN UP WITH SLACK ENABLE MEMBERS OF THE SLACK ORGANIZATION TO BE A USER. "
-        "ORGANIZATIONS THAT SIGN UP WITH EMAIL CAN INVITE USERS TO JOIN  BY EMAIL, "
-        "OR THEY CAN MAKE IT AVAILABLE TO ANYONE WITH A COMPANY EMAIL DOMAIN (e.g., @acme.com)."]]
+        "Users can add and edit topics, and they can share updates with others."]
+      (when (= (jwt/get-key :auth-source) "slack")
+        [:p.um-p
+          "All members of your Slack organization (not guests) can authenticate as users. You can also invite users to join by email."])]
     (when (pos? (count (:enumerate-users (rum/react dis/app-state))))
       (user-invitation (:enumerate-users (rum/react dis/app-state))))
     [:div.my3.um-invite.group
@@ -37,7 +37,7 @@
                         (if (utils/valid-email? email)
                           (dis/dispatch! [:invite-by-email email])
                           (js/alert "The email address you entered is not valid.")))}
-          "SEND INVITE(S)"]
+          "SEND INVITES"]
         (when (:invite-by-email-error (rum/react dis/app-state))
           [:span.small-caps.red.mt1.left "An error occurred, please try again."])]]
     [:div.my2.um-byemail-container.group.hidden

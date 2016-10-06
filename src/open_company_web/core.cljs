@@ -75,7 +75,7 @@
   ;; clean the caches
   (utils/clean-company-caches)
   ;; save route
-  (router/set-route! [] {})
+  (router/set-route! ["home"] {})
   (when (jwt/jwt)
     (swap! dis/app-state assoc :loading true))
   ;; load data from api

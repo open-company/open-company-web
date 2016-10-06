@@ -199,7 +199,7 @@
                      :type "button"
                      :data-toggle "tooltip"
                      :data-container "body"
-                     :data-placement "top"
+                     :data-placement "bottom"
                      :style {:display (if (nil? file-upload-state) "block" "none")}
                      :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
           (dom/i {:class "fa fa-camera"}))
@@ -208,7 +208,7 @@
                      :type "button"
                      :data-toggle "tooltip"
                      :data-container "body"
-                     :data-placement "top"
+                     :data-placement "bottom"
                      :style {:display (if (nil? file-upload-state) "block" "none")}
                      :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
           (dom/i {:class "fa fa-link"}))
@@ -266,24 +266,23 @@
         (dom/div {:class "settings-form p3"}
 
           ;; Company name
-          (dom/div {:class "small-caps bold mb1"} "COMPANY NAME")
+          (dom/div {:class "settings-form-input-label"} "COMPANY NAME")
           (dom/input {:class "npt col-8 p1 mb3"
                       :type "text"
                       :id "name"
                       :value company-name
                       :on-change #(om/set-state! owner :company-name (.. % -target -value))})
           ; Slug
-          (dom/div {:class "small-caps bold mb1"} "DASHBOARD URL")
+          (dom/div {:class "settings-form-input-label"} "DASHBOARD URL")
           (dom/div {:class "npt npt-disabled col-11 p1 mb3"} (str ls/web-server "/" (name slug)))
 
           ;; Company logo
-          (dom/div {:class "small-caps bold mb1"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
-          ;; Logo update
+          (dom/div {:class "settings-form-input-label"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
           (om/build company-logo-setup {:logo logo
                                         :logo-did-change-cb #(om/set-state! owner :logo %)})
 
           ;; Currency
-          (dom/div {:class "small-caps bold mb1"} "DISPLAY FINANCE & GROWTH CHART CURRENCY AS")
+          (dom/div {:class "settings-form-input-label"} "DISPLAY FINANCE & GROWTH CHART CURRENCY AS")
           (dom/select {:id "currency"
                        :value currency
                        :on-change #(om/set-state! owner :currency (.. % -target -value))
