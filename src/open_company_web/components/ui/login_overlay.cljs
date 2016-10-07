@@ -78,9 +78,10 @@
         [:button.btn-reset.mt2.login-button
           {:on-click #(do
                         (.preventDefault %)
-                        (dis/dispatch! [:login-with-slack true]))}
-          (if (:auth-settings (rum/react dis/app-state))
-            [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
+                        (when (:auth-settings (rum/react dis/app-state))
+                          (dis/dispatch! [:login-with-slack true])))}
+          [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
+          (when-not (:auth-settings (rum/react dis/app-state))
             (small-loading))]
         [:div.login-with-email.domine.underline.bold
           [:a {:on-click #(do (utils/event-stop %)
