@@ -39,7 +39,7 @@
     (dom/div {:class "company-editor"}
       (dom/div {:class (str "group fullscreen-page "  (if (jwt/jwt) "with-small-footer" "with-footer"))}
         (dom/div {:class "col-md-7 col-md-offset-2 p0"}
-          (dom/h2 {:class "domine mb3"} "Company Setup"))
+          (dom/h2 {:class "domine mb3 ml3"} "Company Setup"))
         (dom/div {:class "col-md-7 col-md-offset-2 bg-gray p3 group"}
           (dom/form {:on-submit (partial create-company-clicked owner)}
             (dom/div {:class "form-group"}

@@ -536,3 +536,23 @@
           (when success
             (update-jwt-cookie! body))
           (dispatcher/dispatch! [:invitation-confirmed status]))))))
+
+(defn collect-name-password [firstname lastname pswd]
+  (let [update-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "update" "PATCH")]
+    (when (and firstname lastname pswd update`-link)
+      (auth-get (:href update-link)
+        {:json-params {
+          :firstname firstname
+          :lastname lastname
+          :password pswd
+         }
+         :headers {
+          ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type, Authorization"
+          ; custom content type
+          "content-type" (:type update-link)
+          "accept" (:type update-link)
+          ; pass the token as Authorization
+          "Authorization" (str "Bearer " token)}}
+        (fn [{:keys [status body success]}]
+          (dispatcher/dispatch! [:collect-name-pswd/finish status]))))))
