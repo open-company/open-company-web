@@ -833,4 +833,4 @@
     :else
     false))
 
-(defn valid-email? [addr] (email/isValidAddress addr))
+(defn valid-email? [addr] (when addr (email/isValidAddress addr)))
