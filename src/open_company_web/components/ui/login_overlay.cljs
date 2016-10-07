@@ -151,7 +151,7 @@
                :type "password"
                :tabIndex 2
                :name "pswd"}]]
-          [:div.group.pb3.my3
+          [:div.group.pb3.mt3
             [:div.left.forgot-password
               [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
@@ -244,7 +244,7 @@
                :type "password"
                :tabIndex 4
                :name "pswd"}]]
-          [:div.group.pb3.my3
+          [:div.group.pb3.mt3
             [:div.left.forgot-password
               [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
