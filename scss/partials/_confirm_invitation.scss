@@ -14,17 +14,21 @@ div.confirm-invitation {
   button.confirm-invitation-get-started {
     margin-top: 65px;
     min-height: 50px;
-    width: 395px;
+    @include big_web(){
+      width: 395px;
+    }
   }
 
   div.confirm-invitation-p {
-    width: 400px;
     text-align: center;
-    margin-left: -200px;
-    left: 50%;
     position: relative;
     margin-top: 32px;
     margin-bottom: 50px;
+    @include big_web(){
+      width: 400px;
+      margin-left: -200px;
+      left: 50%;
+    }
 
     p{
       font-size: 18px;
