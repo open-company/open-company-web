@@ -25,7 +25,9 @@
                         (when (sel1 [:nav.navbar-bottom])
                           (gstyle/setStyle (sel1 [:nav.navbar-bottom]) display-none))
                         (when (sel1 [:nav.navbar-static-top])
-                          (gstyle/setStyle (sel1 [:nav.navbar-static-top]) display-none)))
+                          (gstyle/setStyle (sel1 [:nav.navbar-static-top]) display-none))
+                        (when (sel1 [:div.fullscreen-page])
+                          (gstyle/setStyle (sel1 [:div.fullscreen-page]) display-none)))
                       (dommy/add-class! (sel1 [:body]) :no-scroll))
                     (when-not (:auth-settings @dis/app-state)
                       (dis/dispatch! [:get-auth-settings]))
@@ -38,7 +40,9 @@
                       (when (sel1 [:nav.navbar-bottom])
                         (gstyle/setStyle (sel1 [:nav.navbar-bottom]) display-block))
                       (when (sel1 [:nav.navbar-static-top])
-                        (gstyle/setStyle (sel1 [:nav.navbar-static-top]) display-block)))
+                        (gstyle/setStyle (sel1 [:nav.navbar-static-top]) display-block))
+                      (when (sel1 [:div.fullscreen-page])
+                          (gstyle/setStyle (sel1 [:div.fullscreen-page]) display-block)))
                     (dommy/remove-class! (sel1 [:body]) :no-scroll))
                    s)})
 
@@ -78,7 +82,7 @@
         [:button.btn-reset.mt2.login-button
           {:on-click #(do
                         (.preventDefault %)
-                        (when (:auth-settings (rum/react dis/app-state))
+                        (when (:auth-settings @dis/app-state)
                           (dis/dispatch! [:login-with-slack true])))}
           [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
           (when-not (:auth-settings (rum/react dis/app-state))
