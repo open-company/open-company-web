@@ -12,7 +12,6 @@
 (rum/defc login-required < rum/reactive
   [{:keys [welcome] :as data}]
   [:div.login-required
-    (login-overlays-handler (rum/react dis/app-state))
     (when-not welcome
       (btd/back-to-dashboard-btn {:button-cta "OPENCOMPANY.COM" :click-cb #(router/redirect! oc-urls/home)}))
     [:div.welcome.center.mx-auto.max-width-3
