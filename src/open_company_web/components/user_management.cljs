@@ -15,7 +15,8 @@
                                                  (dis/dispatch! [:enumerate-users]))
                                                s)
                              :did-mount (fn [s]
-                                          (dis/dispatch! [:input [:um-invite :email] ""])
+                                          (when-not (utils/is-test-env?)
+                                            (dis/dispatch! [:input [:um-invite :email] ""]))
                                           s)}
   [s]
   [:div.user-management.lg-col-5.md-col-7.col-11.mx-auto.mt4.mb4.group
@@ -44,7 +45,7 @@
             :on-click #(let [email (:email (:um-invite @dis/app-state))]
                          (if (utils/valid-email? email)
                            (dis/dispatch! [:invite-by-email email])
-                           (dis/dispatch! [:input [:invite-by-email-error true]])))}
+                           (dis/dispatch! [:input [:invite-by-email-error] true])))}
           "SEND INVITE"]
         (when (:invite-by-email-error (rum/react dis/app-state))
           [:span.small-caps.red.mt1.left "An error occurred, please try again."])]]
