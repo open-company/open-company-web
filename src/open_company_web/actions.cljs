@@ -341,7 +341,7 @@
   [db [_ email]]
   ; refresh the users list once the invitation succeded
   (api/enumerate-users)
-  db)
+  (assoc-in db [:um-invite :email] ""))
 
 (defmethod dispatcher/action :invite-by-email/failed
   [db [_ email]]
