@@ -175,6 +175,11 @@
           (drv-root company-editor target))
         (login-handler target params)))
 
+    (defroute logout-route urls/logout {:as params}
+      (cook/remove-cookie! :jwt)
+      (cook/remove-cookie! :login-redirect)
+      (router/redirect! urls/home))
+
     (defroute list-page-route urls/companies {:as params}
       (list-companies-handler target params))
 
@@ -224,6 +229,7 @@
                                  list-page-route-slash
                                  list-page-route
                                  company-create-route
+                                 logout-route
                                  user-profile-route
                                  company-settings-route
                                  company-route
