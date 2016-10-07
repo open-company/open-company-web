@@ -50,6 +50,7 @@
 
 (defn pencil-click [owner e]
   (utils/event-stop e)
+  (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
   (start-foce-click owner))
 
 (defcomponent topic-internal [{:keys [topic-data
