@@ -44,14 +44,9 @@
                                           (router/redirect! login-redirect))
         (and first (not second))        (router/nav! (oc-urls/company (slug first)))
         (and first second)              (router/nav! oc-urls/companies)))
-    (let [next-db (if (cook/get-cookie :show-login-overlay)
-                    (assoc db :show-login-overlay (cook/get-cookie :show-login-overlay))
-                    db)]
-      (when (cook/get-cookie :show-login-overlay)
-        (cook/remove-cookie! :show-login-overlay))
-      (if (utils/in? (:route @router/path) "create-company")
-        (dissoc next-db :loading)
-        next-db))))
+    (if (utils/in? (:route @router/path) "create-company")
+      (dissoc db :loading)
+      db)))
 
 (defmethod dispatcher/action :company-submit [db _]
   (api/post-company (:company-editor db))
@@ -239,7 +234,13 @@
   [db [_ jwt-data]]
   (when jwt-data
     (api/get-auth-settings))
-  (assoc db :jwt jwt-data))
+  (let [next-db (if (cook/get-cookie :show-login-overlay)
+                    (assoc db :show-login-overlay (keyword (cook/get-cookie :show-login-overlay)))
+                    db)]
+    (when (and (cook/get-cookie :show-login-overlay)
+               (not= (keyword (cook/get-cookie :show-login-overlay)) :collect-name-password))
+      (cook/remove-cookie! :show-login-overlay))
+    next-db))
 
 ;; Stripe Payment related actions
 
@@ -332,8 +333,8 @@
     (dissoc db :enumerate-users)))
 
 (defmethod dispatcher/action :invite-by-email
-  [db [_ emails]]
-  (api/send-invitation emails)
+  [db [_]]
+  (api/send-invitation (:email (:um-invite db)))
   (dissoc db :invite-by-email-error))
 
 (defmethod dispatcher/action :invite-by-email/success
@@ -366,4 +367,20 @@
 
 (defmethod dispatcher/action :invitation-confirmed
   [db [_ status]]
+  (when (= status 200)
+    (cook/set-cookie! :show-login-overlay :collect-name-password))
   (assoc db :email-confirmed (= status 200)))
+
+(defmethod dispatcher/action :collect-name-pswd
+  [db [_]]
+  (let [form-data (:collect-name-pswd db)]
+    (api/collect-name-password (:firstname form-data) (:lastname form-data) (:pswd form-data)))
+  db)
+
+(defmethod dispatcher/action :collect-name-pswd/finish
+  [db [_ status]]
+  (if (= status 200)
+    (do
+      (cook/remove-cookie! :show-login-overlay)
+      (dissoc db :show-login-overlay))
+    (assoc db :collect-name-password-error status)))
