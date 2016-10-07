@@ -54,7 +54,7 @@
         [:button.right.btn-reset.btn-solid.um-invite-send
           {:disabled (let [to (:email (drv/react s :um-invite))]
                        (not (and (seq to) (every? utils/valid-email? to))))
-           :on-click #(dis/dispatch! [:invite-by-email (:email (drv/react s :um-invite))])}
+           :on-click #(dis/dispatch! [:invite-by-email])}
           "SEND INVITES"]
         (when (:invite-by-email-error (rum/react dis/app-state))
           [:span.small-caps.red.mt1.left "An error occurred, please try again."])]]
