@@ -352,7 +352,7 @@
             (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
           (if sent
             (confirmation share-via cancel-fn)
-            (dom/div
+            (dom/div {:class "su-preview-box"}
               (case share-via
                 :prompt (prompt-dialog #(do
                                           (when (= % :link)
