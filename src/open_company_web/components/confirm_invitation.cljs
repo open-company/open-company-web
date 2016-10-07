@@ -48,7 +48,7 @@
                                     (do
                                       (om/set-state! owner :loading true)
                                       (dis/dispatch! [:confirm-invitation]))
-                                    (router/nav! oc-urls/home))}
+                                    (router/redirect! oc-urls/home))}
             (if loading
               (small-loading)
               (if confirmed

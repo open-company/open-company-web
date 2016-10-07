@@ -538,12 +538,12 @@
           (dispatcher/dispatch! [:invitation-confirmed status]))))))
 
 (defn collect-name-password [firstname lastname pswd]
-  (let [update-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "update" "PATCH")]
-    (when (and firstname lastname pswd update`-link)
-      (auth-get (:href update-link)
+  (let [update-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "partial-update" "PATCH")]
+    (when (and firstname lastname pswd update-link)
+      (auth-patch (:href update-link)
         {:json-params {
-          :firstname firstname
-          :lastname lastname
+          :first-name firstname
+          :last-name lastname
           :password pswd
          }
          :headers {
@@ -553,4 +553,4 @@
           "content-type" (:type update-link)
           "accept" (:type update-link)}}
         (fn [{:keys [status body success]}]
-          (dispatcher/dispatch! [:collect-name-pswd/finish status]))))))
+          (dispatcher/dispatch! [:collect-name-pswd-finish status]))))))

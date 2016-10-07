@@ -235,10 +235,10 @@
   (when jwt-data
     (api/get-auth-settings))
   (let [next-db (if (cook/get-cookie :show-login-overlay)
-                    (assoc db :show-login-overlay (keyword (cook/get-cookie :show-login-overlay)))
-                    db)]
+                  (assoc db :show-login-overlay (keyword (cook/get-cookie :show-login-overlay)))
+                  db)]
     (when (and (cook/get-cookie :show-login-overlay)
-               (not= (keyword (cook/get-cookie :show-login-overlay)) :collect-name-password))
+               (not= (cook/get-cookie :show-login-overlay) "collect-name-password"))
       (cook/remove-cookie! :show-login-overlay))
     next-db))
 
@@ -368,7 +368,7 @@
 (defmethod dispatcher/action :invitation-confirmed
   [db [_ status]]
   (when (= status 200)
-    (cook/set-cookie! :show-login-overlay :collect-name-password))
+    (cook/set-cookie! :show-login-overlay "collect-name-password"))
   (assoc db :email-confirmed (= status 200)))
 
 (defmethod dispatcher/action :collect-name-pswd
@@ -377,7 +377,7 @@
     (api/collect-name-password (:firstname form-data) (:lastname form-data) (:pswd form-data)))
   db)
 
-(defmethod dispatcher/action :collect-name-pswd/finish
+(defmethod dispatcher/action :collect-name-pswd-finish
   [db [_ status]]
   (if (= status 200)
     (do

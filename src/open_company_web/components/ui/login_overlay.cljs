@@ -20,9 +20,12 @@
   {:before-render (fn [s]
                     (if (responsive/is-mobile?)
                       (let [display-none #js {:display "none"}]
-                        (gstyle/setStyle (sel1 [:div.main]) display-none)
-                        (gstyle/setStyle (sel1 [:nav.navbar-bottom]) display-none)
-                        (gstyle/setStyle (sel1 [:nav.navbar-static-top]) display-none))
+                        (when (sel1 [:div.main])
+                          (gstyle/setStyle (sel1 [:div.main]) display-none))
+                        (when (sel1 [:nav.navbar-bottom])
+                          (gstyle/setStyle (sel1 [:nav.navbar-bottom]) display-none))
+                        (when (sel1 [:nav.navbar-static-top])
+                          (gstyle/setStyle (sel1 [:nav.navbar-static-top]) display-none)))
                       (dommy/add-class! (sel1 [:body]) :no-scroll))
                     (when-not (:auth-settings @dis/app-state)
                       (dis/dispatch! [:get-auth-settings]))
@@ -30,9 +33,12 @@
    :will-unmount (fn [s]
                    (if (responsive/is-mobile?)
                     (let [display-block #js {:display "block"}]
-                      (gstyle/setStyle (sel1 [:div.main]) display-block)
-                      (gstyle/setStyle (sel1 [:nav.navbar-bottom]) display-block)
-                      (gstyle/setStyle (sel1 [:nav.navbar-static-top]) display-block))
+                      (when (sel1 [:div.main])
+                        (gstyle/setStyle (sel1 [:div.main]) display-block))
+                      (when (sel1 [:nav.navbar-bottom])
+                        (gstyle/setStyle (sel1 [:nav.navbar-bottom]) display-block))
+                      (when (sel1 [:nav.navbar-static-top])
+                        (gstyle/setStyle (sel1 [:nav.navbar-static-top]) display-block)))
                     (dommy/remove-class! (sel1 [:body]) :no-scroll))
                    s)})
 
