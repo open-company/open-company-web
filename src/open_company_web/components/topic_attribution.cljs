@@ -98,6 +98,6 @@
       (when read-more-cb
         (dom/div {:class "right"}
           (om/build topic-read-more data)))
-      (when close-cb
+      (when (and close-cb (responsive/is-mobile?))
         (dom/div {:class "right"}
           (om/build topic-close {:close-cb close-cb}))))))

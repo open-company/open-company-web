@@ -111,10 +111,7 @@
           ;; Attribution
           (when (and (not hide-history-navigation)
                      (not (:placeholder topic-data)))
-            (om/build topic-attribution (assoc data :close-cb #(hide-fullscreen-topic-cb)) {:opts options}))
-          (when (responsive/is-mobile?)
-            (dom/button {:class "btn-reset btn-link mobile-close"
-                         :on-click #(hide-fullscreen-topic-cb)} "CLOSE")))))))
+            (om/build topic-attribution (assoc data :close-cb #(hide-fullscreen-topic-cb)) {:opts options})))))))
 
 (defn- hide-fullscreen-topic [owner options & [force-fullscreen-dismiss]]
   (utils/enable-scroll)

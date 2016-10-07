@@ -23,7 +23,7 @@ div.fullscreen-topic {
 
     @include mobile(){
       height: 100% !important;
-      overflow-y: scroll;
+      overflow-y: visible;
     }
 
     div.fullscreen-topic-as-of {
@@ -31,7 +31,7 @@ div.fullscreen-topic {
 
       @include mobile(){
         height: 100% !important;
-        overflow-y: scroll;
+        overflow-y: visible;
       }
     }
 
@@ -43,7 +43,7 @@ div.fullscreen-topic {
       width: 100vw;
       @include mobile(){
         height: 100% !important;
-        overflow-y: scroll;
+        overflow-y: visible;
       }
     }
 
@@ -59,7 +59,7 @@ div.fullscreen-topic {
       }
 
       @include mobile(){
-        overflow-y: scroll;
+        overflow-y: visible;
         overflow-x: hidden;
         height: 100%;
         width: 100%;
@@ -96,7 +96,7 @@ div.fullscreen-topic {
         border-radius: 2px;
         padding: 0px;
         position: relative;
-        overflow-y: scroll;
+        overflow-y: visible;
 
         div.topic-header-image {
           text-align: center;
