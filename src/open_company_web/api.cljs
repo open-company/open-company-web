@@ -551,8 +551,6 @@
           "Access-Control-Allow-Headers" "Content-Type, Authorization"
           ; custom content type
           "content-type" (:type update-link)
-          "accept" (:type update-link)
-          ; pass the token as Authorization
-          "Authorization" (str "Bearer " token)}}
+          "accept" (:type update-link)}}
         (fn [{:keys [status body success]}]
           (dispatcher/dispatch! [:collect-name-pswd/finish status]))))))
