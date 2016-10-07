@@ -82,7 +82,7 @@
         [:button.btn-reset.mt2.login-button
           {:on-click #(do
                         (.preventDefault %)
-                        (when (:auth-settings (rum/react dis/app-state))
+                        (when (:auth-settings @dis/app-state)
                           (dis/dispatch! [:login-with-slack true])))}
           [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
           (when-not (:auth-settings (rum/react dis/app-state))
