@@ -109,6 +109,7 @@
             (dom/div {:class "pinned-topic"}
               (dom/i {:class "fa fa-thumb-tack"
                       :data-toggle "tooltip"
+                      :data-container "body"
                       :data-placement "top"
                       :title (if (> (count pinned) 1) "Drag and drop to reorder" "Pinned to the top")})))
           (when (and (not is-stakeholder-update)
@@ -123,6 +124,7 @@
               (dom/i {:class "fa fa-pencil"
                       :title "Edit"
                       :data-toggle "tooltip"
+                      :data-container "body"
                       :data-placement "top"}))))
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
@@ -243,6 +245,7 @@
                     :id (str "share-remove-" (name section))}
             (dom/button {:class "btn-reset share-remove"
                          :data-toggle "tooltip"
+                         :data-container "body"
                          :data-placement "top"
                          :title "Remove topic from this update."
                          :on-click #(when (contains? options :share-remove-click) ((:share-remove-click options) (name section)))}
@@ -252,6 +255,7 @@
                     :id (str "share-dnd-" (name section))}
             (dom/div {:class "btn-reset share-dnd"
                       :data-toggle "tooltip"
+                      :data-container "body"
                       :data-placement "bottom"
                       :title "Drag and drop topic to reorder."}
               (dom/i {:class "fa fa-arrows"}))))
