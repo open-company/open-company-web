@@ -115,22 +115,14 @@
                  :disabled (and (contains? :value data) (= (count (:value data)) 0))}
       (:text data))))
 
-(defn get-state [data current-state]
-  (let [company-data (dis/company-data data)]
-    {:uuid (:uuid company-data)
-     :initial-logo (:logo data)
-     :logo (or (:logo current-state) (:logo company-data))
-     :company-name (or (:company-name current-state) (:name company-data))
-     :currency (or (:currency current-state) (:currency company-data))
-     :loading false
-     :show-save-successful (or (:show-save-successful current-state) false)}))
-
 (defn- upload-file! [owner file]
+  (js/filepicker.setKey ls/filestack-key)
   (let [success-cb  (fn [success]
                       (let [url    (.-url success)]
                         (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil
                                                                           :file-upload-progress nil
-                                                                          :logo url}))))
+                                                                          :logo-did-change true
+                                                                          :state-logo url}))))
         error-cb    (fn [error] (js/console.log "error" error))
         progress-cb (fn [progress]
                       (let [state (om/get-state owner)]
@@ -141,6 +133,98 @@
       (js/filepicker.storeUrl file success-cb error-cb progress-cb)
       file
       (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
+
+(defcomponent company-logo-setup [{:keys [logo logo-did-change-cb logo-did-load-cb] :as data} owner]
+  (init-state [_]
+    {:file-upload-state nil
+     :file-upload-progress nil
+     :logo-did-change false
+     :state-logo logo
+     :upload-remote-url nil})
+
+  (did-mount [_]
+    (when-not (utils/is-test-env?)
+      (js/filepicker.setKey ls/filestack-key)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+
+  (will-receive-props [_ next-props]
+    (when (and (not= (:logo next-props) (:logo data))
+               (nil? (om/get-state owner :file-upload-state))
+               (nil? (om/get-state owner :upload-remote-url)))
+      (om/set-state! owner :state-logo (:logo next-props))))
+
+  (did-update [_ _ prev-state]
+    (when (and (not= (:state-logo prev-state) (om/get-state owner :state-logo))
+               (not= (om/get-state owner :state-logo) (:logo data)))
+      (when (fn? logo-did-change-cb)
+        (logo-did-change-cb (om/get-state owner :state-logo)))))
+
+  (render-state [_ {:keys [file-upload-state file-upload-progress upload-remote-url state-logo logo-did-change]}]
+    (dom/div {}
+      (dom/div {}
+        (if (not= file-upload-state :show-url-field)
+          (dom/div {:class "company-logo-container"}
+            (when-not (string/blank? state-logo)
+              (dom/img {:src state-logo
+                        :class "company-logo"
+                        :data-test "aaa"
+                        :on-load #(when (and logo-did-change (fn? logo-did-load-cb))
+                                    (logo-did-load-cb state-logo (.width (js/$ "img.company-logo")) (.height (js/$ "img.company-logo"))))
+                        :on-error #(when (and logo-did-change (fn? logo-did-load-cb))
+                                    (logo-did-load-cb state-logo nil nil))})))
+          (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
+              (dom/input {:type "text"
+                          :class "npt col-7 p1 mb3"
+                          :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
+                          :placeholder "http://site.com/img.png"
+                          :value upload-remote-url})
+              (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                           :class "btn-reset btn-solid"
+                           :disabled (string/blank? upload-remote-url)
+                           :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
+                "add")
+              (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                           :class "btn-reset btn-outline"
+                           :on-click #(om/set-state! owner :file-upload-state nil)}
+                "cancel"))))
+      (dom/div {:class "group"
+                :style {:margin-bottom "2rem"}}
+        (dom/input {:id "foce-file-upload-ui--select-trigger"
+                    :style {:display "none"}
+                    :type "file"
+                    :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
+        (dom/button {:class "btn-reset camera left"
+                     :title "Upload a logo"
+                     :type "button"
+                     :data-toggle "tooltip"
+                     :data-container "body"
+                     :data-placement "top"
+                     :style {:display (if (nil? file-upload-state) "block" "none")}
+                     :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
+          (dom/i {:class "fa fa-camera"}))
+        (dom/button {:class "btn-reset image-url left"
+                     :title "Provide a link to your logo"
+                     :type "button"
+                     :data-toggle "tooltip"
+                     :data-container "body"
+                     :data-placement "top"
+                     :style {:display (if (nil? file-upload-state) "block" "none")}
+                     :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
+          (dom/i {:class "fa fa-link"}))
+        (dom/div {:class "left"
+                  :style {:display (if (= file-upload-state :show-progress) "block" "none")
+                          :color "rgba(78, 90, 107, 0.5)"}}
+          (str file-upload-progress "%"))))))
+
+(defn get-state [data current-state]
+  (let [company-data (dis/company-data data)]
+    {:uuid (:uuid company-data)
+     :initial-logo (:logo data)
+     :logo (or (:logo current-state) (:logo company-data))
+     :company-name (or (:company-name current-state) (:name company-data))
+     :currency (or (:currency current-state) (:currency company-data))
+     :loading false
+     :show-save-successful (or (:show-save-successful current-state) false)}))
 
 (defcomponent company-settings-form [data owner]
 
@@ -193,54 +277,8 @@
 
           ;; Company logo
           (dom/div {:class "small-caps bold mb1"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
-          (dom/div {}
-            (if (not= file-upload-state :show-url-field)
-              (dom/div {:class "company-logo-container"}
-                (when-not (string/blank? logo)
-                  (dom/img {:src logo :class "company-logo" :data-test "aaa"})))
-              (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
-                  (dom/input {:type "text"
-                              :class "npt col-7 p1 mb3"
-                              :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
-                              :placeholder "http://site.com/img.png"
-                              :value upload-remote-url})
-                  (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
-                               :class "btn-reset btn-solid"
-                               :disabled (string/blank? upload-remote-url)
-                               :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
-                    "add")
-                  (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
-                               :class "btn-reset btn-outline"
-                               :on-click #(om/set-state! owner :file-upload-state nil)}
-                    "cancel"))))
-          (dom/div {:class "group"
-                    :style {:margin-bottom "2rem"}}
-            (dom/input {:id "foce-file-upload-ui--select-trigger"
-                        :style {:display "none"}
-                        :type "file"
-                        :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
-            (dom/button {:class "btn-reset camera left"
-                         :title "Upload a logo"
-                         :type "button"
-                         :data-toggle "tooltip"
-                         :data-container "body"
-                         :data-placement "top"
-                         :style {:display (if (nil? file-upload-state) "block" "none")}
-                         :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
-              (dom/i {:class "fa fa-camera"}))
-            (dom/button {:class "btn-reset image-url left"
-                         :title "Provide a link to your logo"
-                         :type "button"
-                         :data-toggle "tooltip"
-                         :data-container "body"
-                         :data-placement "top"
-                         :style {:display (if (nil? file-upload-state) "block" "none")}
-                         :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
-              (dom/i {:class "fa fa-link"}))
-            (dom/div {:class "left"
-                      :style {:display (if (= file-upload-state :show-progress) "block" "none")
-                              :color "rgba(78, 90, 107, 0.5)"}}
-              (str file-upload-progress "%")))
+          (om/build company-logo-setup {:logo logo
+                                        :logo-did-change-cb #(om/set-state! owner :logo %)})
 
           ;; Currency
           (dom/div {:class "small-caps bold mb1"} "DISPLAY FINANCE & GROWTH CHART CURRENCY AS")

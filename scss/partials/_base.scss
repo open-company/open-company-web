@@ -34,16 +34,16 @@ html, body {
 div.fullscreen-page {
   position: relative;
   background-color: white;
-  min-height: 100vh;
   border-top: 4px solid $oc_yellow;
   width: 100%;
+  min-height: 100vh;
 
   &.with-small-footer {
-    min-height: calc(100vh - #{$footer_small_height}px - 52px);
+    min-height: calc(100vh - #{$footer_small_height}px);
   }
 
   &.with-footer {
-    min-height: calc(100vh - #{$footer_height}px - 52px);
+    min-height: calc(100vh - #{$footer_height}px);
   }
 }
 
@@ -75,22 +75,6 @@ a:hover, a:hover *{
  .sub-header {
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
-}
-
-/*
- * Main content
- */
- .main {
-    padding: 0px !important;
-}
-@include mobile(){
-    .main {
-        padding-right: 40px;
-        padding-left: 40px;
-    }
-}
-.main .page-header {
-    margin-top: 0;
 }
 
 .hidden {
@@ -143,4 +127,8 @@ span.num.red {
 
 .animating .navbar-offset {
   margin-top: 0px;
+}
+
+div#wrap {
+  min-height: 100vh;
 }

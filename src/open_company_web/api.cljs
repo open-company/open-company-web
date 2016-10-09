@@ -5,6 +5,7 @@
             [open-company-web.dispatcher :as dispatcher]
             [cognitect.transit :as t]
             [clojure.walk :refer (keywordize-keys stringify-keys)]
+            [clojure.string :as s]
             [open-company-web.lib.cookies :as cook]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.jwt :as j]
@@ -37,8 +38,8 @@
                                 "Authorization" (str "Bearer " jwt)}))
     params))
 
-(defn refresh-jwt []
-  (http/get (str auth-endpoint "/refresh-token") (complete-params {})))
+(defn refresh-jwt [refresh-url]
+  (http/get (str ls/auth-server-domain refresh-url) (complete-params {})))
 
 (defn update-jwt-cookie! [jwt]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
@@ -67,11 +68,12 @@
 (defn- req [endpoint method path params on-complete]
   (let [jwt (j/jwt)]
     (go
-      (when (and jwt (j/expired?))
-        (let [res (<! (refresh-jwt))]
-          (if (:success res)
-            (update-jwt-cookie! (-> res :body :jwt))
-            (dispatcher/dispatch! [:logout]))))
+      (let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh-url")]
+        (when (and jwt (j/expired?) refresh-url)
+          (let [res (<! (refresh-jwt refresh-url))]
+            (if (:success res)
+              (update-jwt-cookie! (:body res))
+              (dispatcher/dispatch! [:logout])))))
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         ; report all 5xx to sentry
@@ -95,6 +97,7 @@
 (def ^:private api-patch (partial req api-endpoint http/patch))
 
 (def ^:private auth-get (partial req auth-endpoint http/get))
+(def ^:private auth-post (partial req auth-endpoint http/post))
 
 (def ^:private pay-get (partial req pay-endpoint http/get))
 (def ^:private pay-post (partial req pay-endpoint http/post))
@@ -169,11 +172,11 @@
                                            :body (when success (json->cljs body))}]))))))
 
 (defn get-auth-settings []
-  (auth-get "/auth-settings"
-            {:headers {"content-type" "application/json"}}
-            (fn [response]
-              (let [body (if (:success response) (:body response) {})]
-                (dispatcher/dispatch! [:auth-settings body])))))
+  (auth-get "/"
+    {:headers {"content-type" "application/json"}}
+    (fn [response]
+      (let [body (if (:success response) (:body response) {})]
+        (dispatcher/dispatch! [:auth-settings body])))))
 
 (defn save-or-create-section [section-data]
   (when section-data
@@ -415,3 +418,44 @@
                             :update-slug (keyword update-slug)
                             :response fixed-body}]
               (dispatcher/dispatch! [:stakeholder-update response]))))))))
+
+(defn auth-with-email [email pswd]
+  (when (and email pswd)
+    (let [email-links (:links (:email (:auth-settings @dispatcher/app-state)))
+          auth-url (utils/link-for email-links "authenticate" "GET")]
+      (auth-get (:href auth-url)
+        {:basic-auth {
+          :username email
+          :password pswd}
+         :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (:type auth-url)}}
+        (fn [{:keys [success body status]}]
+         (if success
+            (dispatcher/dispatch! [:login-with-email/success body])
+            (cond
+              (= status 401)
+              (dispatcher/dispatch! [:login-with-email/failed 401])
+              :else
+              (dispatcher/dispatch! [:login-with-email/failed 500]))))))))
+
+(defn signup-with-email [first-name last-name email pswd]
+  (when (and first-name last-name email pswd)
+    (let [email-links (:links (:email (:auth-settings @dispatcher/app-state)))
+          auth-url (utils/link-for email-links "create" "POST")]
+      (auth-post (:href auth-url)
+        {:json-params {:first-name first-name
+                       :last-name last-name
+                       :email email
+                       :password pswd}
+         :headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (:type auth-url)}}
+        (fn [{:keys [success body status]}]
+         (if success
+            (dispatcher/dispatch! [:signup-with-email/success body])
+            (dispatcher/dispatch! [:signup-with-email/failed status])))))))

@@ -7,7 +7,8 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
-            [open-company-web.api :as api]))
+            [open-company-web.api :as api]
+            [open-company-web.local-settings :as ls]))
 
 ;; ---- Generic Actions Dispatch
 ;; This is a small generic abstraction to handle "actions".
@@ -220,6 +221,8 @@
 
 (defmethod dispatcher/action :jwt
   [db [_ jwt-data]]
+  (when jwt-data
+    (api/get-auth-settings))
   (assoc db :jwt jwt-data))
 
 ;; Stripe Payment related actions
@@ -229,3 +232,70 @@
   (if uuid
     (assoc-in db [:subscription uuid] data)
     (assoc db :subscription nil)))
+
+(defmethod dispatcher/action :show-login-overlay
+ [db [_ show-login-overlay]]
+ (cond
+    (= show-login-overlay :login-with-email)
+    (-> db
+      (assoc :show-login-overlay show-login-overlay)
+      (assoc :login-with-email {:email "" :pswd ""})
+      (dissoc :login-with-email-error))
+    (= show-login-overlay :signup-with-email)
+    (-> db
+      (assoc :show-login-overlay show-login-overlay)
+      (assoc :signup-with-email {:firstname "" :lastname "" :email "" :pswd ""})
+      (dissoc :signup-with-email-error))
+    :else
+    (assoc db :show-login-overlay show-login-overlay)))
+
+(defmethod dispatcher/action :login-with-slack
+  [db [_ auth-url]]
+  (let [current (router/get-token)]
+    (when-not (or (.startsWith current oc-urls/login) (.startsWith current oc-urls/sign-up))
+        (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)))
+  (router/redirect! auth-url)
+  db)
+
+(defmethod dispatcher/action :login-with-email-change
+  [db [_ k v]]
+  (assoc-in db [:login-with-email k] v))
+
+(defmethod dispatcher/action :login-with-email
+  [db [_]]
+  (api/auth-with-email (:email (:login-with-email db)) (:pswd (:login-with-email db)))
+  (dissoc db :login-with-email-error))
+
+(defmethod dispatcher/action :login-with-email/failed
+  [db [_ error]]
+  (assoc db :login-with-email-error error))
+
+(defmethod dispatcher/action :login-with-email/success
+  [db [_ jwt]]
+  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+  (.reload js/location)
+  db)
+
+(defmethod dispatcher/action :signup-with-email-change
+  [db [_ k v]]
+  (assoc-in db [:signup-with-email k] v))
+
+(defmethod dispatcher/action :signup-with-email
+  [db [_]]
+  (api/signup-with-email (:firstname (:signup-with-email db)) (:lastname (:signup-with-email db)) (:email (:signup-with-email db)) (:pswd (:signup-with-email db)))
+  (dissoc db :signup-with-email-error))
+
+(defmethod dispatcher/action :signup-with-email/failed
+  [db [_ error]]
+  (assoc db :signup-with-email-error error))
+
+(defmethod dispatcher/action :signup-with-email/success
+  [db [_ jwt]]
+  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+  (.reload js/location)
+  db)
+
+(defmethod dispatcher/action :get-auth-settings
+  [db [_]]
+  (api/get-auth-settings)
+  db)

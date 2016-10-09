@@ -63,8 +63,8 @@
             (dom/div {:class (str "fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
               (login-required data)
               ;;Footer
-              (om/build footer {:columns-num columns-num
-                                :card-width card-width}))
+               (om/build footer {:columns-num columns-num
+                                 :card-width card-width}))
             (dom/div {:class "page"}
               ;; Navbar
               (om/build navbar {:save-bt-active save-bt-active

@@ -16,6 +16,9 @@
          om/specify-state-methods!)))
 
 (defn drv-root [{:keys [state drv-spec target component]}]
+  ; unmount rum component if mounted to the same node
+  (rum/unmount target)
+  ; mount component
   (om/root component
            state
            {:target target
