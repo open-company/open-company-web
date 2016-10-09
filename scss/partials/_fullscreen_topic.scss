@@ -1,48 +1,19 @@
+$lightbox_side_padding: 30;
+
 div.fullscreen-topic {
   width: 100%;
   height: 100%;
-  background-color: white;
+  background-color: transparent;
   overflow-x: hidden;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
 
+  @include mobile(){
+    background-color: white;
+  }
+
   &.initial {
     opacity: 0;
-  }
-
-  div.edit-button {
-    position: relative;
-    cursor: pointer;
-    z-index: 1040;
-    float: right;
-    color: rgba(78,90,107,0.5);
-
-    &:hover {
-      color: rgba(78,90,107,1);
-    }
-  }
-
-  div.btd-container{
-    height: 50px;
-    margin: 0 auto;
-    width: 100vw;
-
-    div.back-to-dashboard-row {
-      z-index: 1040;
-
-      button.back-to-dashboard {
-        margin-top: 0px;
-        opacity: 1;
-        background-color: white;
-        color: rgba(78,90,107,0.8);
-        border: 1px solid rgba(78,90,107,0.8);
-
-        &:hover {
-          color: rgba(78,90,107,1);
-          border: 1px solid rgba(78,90,107,1);
-        }
-      }
-    }
   }
 
   div.fullscreen-topic-transition{
@@ -50,8 +21,18 @@ div.fullscreen-topic {
     height: auto;
     overflow: hidden;
 
+    @include mobile(){
+      height: 100% !important;
+      overflow-y: visible;
+    }
+
     div.fullscreen-topic-as-of {
       height: auto;
+
+      @include mobile(){
+        height: 100% !important;
+        overflow-y: visible;
+      }
     }
 
     div.fullscreen-topic-tr-as-of {
@@ -60,24 +41,62 @@ div.fullscreen-topic {
       left: 0;
       height: auto;
       width: 100vw;
+      @include mobile(){
+        height: 100% !important;
+        overflow-y: visible;
+      }
     }
 
     div.fullscreen-topic-internal {
-      width: 684px;
+      -webkit-overflow-scrolling: touch;
+      max-width: 500px;
       margin: 30px auto;
       position: relative;
-      min-height: calc(100vh - #{$navbar_height}px - 60px - 4px);
-      padding-top: 2px;
+      border-radius: 2px;
+      background-color: #fcfcfc;
+      @include big_web(){
+        box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
+      }
 
       @include mobile(){
-        margin-bottom: 40px;
+        overflow-y: visible;
+        overflow-x: hidden;
+        height: 100%;
+        width: 100%;
+        margin-top: 0px;
+        padding-top: 30px;
+        margin-bottom: 0px;
+        padding-bottom: 0px;
+      }
+
+      button.close-fullscreen-topic-btn {
+        position: absolute;
+        top: 0px;
+        right: -30px;
+        width: 30px;
+        height: 30px;
+        font-weight: 400;
+        font-family: $oc_headers_font;
+        font-size: 25px;
+        color: rgba(78, 90, 107, 0.4);
+        z-index: 1000;
+
+        @include mobile(){
+          right: 10px;
+          top: 0px;
+
+          div.svg-icon svg {
+            // color: rgba(78, 90, 107, 0.5);
+            stroke: rgba(78, 90, 107, 0.4) !important;
+          }
+        }
       }
 
       div.fullscreen-topic-top-box{
-        border-radius: 4px;
-        background-color: #ffffff;
-        border: solid 2px rgba(78, 90, 107, 0.2);
+        border-radius: 2px;
         padding: 0px;
+        position: relative;
+        overflow-y: visible;
 
         div.topic-header-image {
           text-align: center;
@@ -89,9 +108,14 @@ div.fullscreen-topic {
           }
         }
 
+        button.mobile-close {
+          margin-top: -35px;
+          float: right;
+        }
+
         div.topic-title-container{
           margin-top: 17px;
-          padding: 0px 26px;
+          padding: 0px #{$lightbox_side_padding}px;
 
           div.topic-title {
             opacity: 0.5;
@@ -109,13 +133,13 @@ div.fullscreen-topic {
         div.topic-headline {
           margin-top: 18px;
           font-family: $oc_headers_font;
-          font-size: 26px;
-          line-height: 1.4;
+          font-size: 18px;
+          line-height: 25px;
           color: $oc_gray_7;
-          padding: 0px 26px;
+          padding: 0px #{$lightbox_side_padding}px;
 
           .emojione {
-            @include emoji-size(26px);
+            @include emoji-size(#{$lightbox_side_padding}px);
           }
         }
 
@@ -124,27 +148,27 @@ div.fullscreen-topic {
           line-height: 1.8;
           font-size: 18px;
           margin-top: 12px !important;
-          padding: 0px 26px !important;
+          padding: 0px #{$lightbox_side_padding}px !important;
         }
 
         div.topic-growth-finances{
           margin-top: 20px;
-          padding: 0px 26px;
+          padding: 0px #{$lightbox_side_padding}px;
         }
       }
 
       div.topic-body{
-        @include rich-editor-body($oc_gray_7);
+        @include rich-editor-body($oc_gray_7, 14px);
         margin-top: 21px !important;
         margin-bottom: 20px !important;
         line-height: 1.8;
-        font-size: 18px;
-        padding: 0px 30px !important;
+        font-size: 14px;
+        padding: 0px #{$lightbox_side_padding}px !important;
         overflow-wrap: break-word;
       }
 
       div.topic-attribution-container {
-        padding: 0px 30px;
+        padding: 0px #{$lightbox_side_padding}px;
       }
     }
   }

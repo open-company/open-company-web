@@ -111,7 +111,7 @@
   font-size: $size;
 }
 
-@mixin rich-editor-body($text_color: #444444){
+@mixin rich-editor-body($text_color: #444444, $font_size: 18px){
   border: 0px solid transparent;
 
   &:focus,
@@ -138,7 +138,7 @@
   &, & *{
     margin: 0;
     padding: 0;
-    font-size: 18px;
+    font-size: $font_size;
     line-height: 1.8;
     color: $text_color;
     font-family: $oc_main_font;
@@ -156,7 +156,7 @@
   }
 
   .emojione {
-    @include emoji-size(18px);
+    @include emoji-size($font_size);
   }
 
   h1, h2, h3, h4, h5 {

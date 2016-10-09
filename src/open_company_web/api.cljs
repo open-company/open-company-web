@@ -11,6 +11,7 @@
             [open-company-web.lib.jwt :as j]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.raven :as sentry]
             [open-company-web.caches :refer (revisions)]))
 
 (def ^:private api-endpoint ls/api-server-domain)
@@ -43,6 +44,27 @@
 (defn update-jwt-cookie! [jwt]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
 
+(defn- method-name [method]
+  (cond
+    (= method http/delete)
+    "DELETE"
+    (= method http/get)
+    "GET"
+    (= method http/head)
+    "HEAD"
+    (= method http/jsonp)
+    "JSONP"
+    (= method http/move)
+    "MOVE"
+    (= method http/options)
+    "OPTIONS"
+    (= method http/patch)
+    "PATCH"
+    (= method http/post)
+    "POST"
+    (= method http/put)
+    "PUT"))
+
 (defn- req [endpoint method path params on-complete]
   (let [jwt (j/jwt)]
     (go
@@ -53,7 +75,20 @@
               (update-jwt-cookie! (:body res))
               (dispatcher/dispatch! [:logout])))))
 
-      (let [response (<! (method (str endpoint path) (complete-params params)))]
+      (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
+        ; report all 5xx to sentry
+        (when (or (= status 0)
+                  (and (>= status 500) (<= status 599))
+                  (= status 400)
+                  (= status 422))
+          (let [report {:response response
+                        :path path
+                        :method (method-name method)
+                        :jwt (j/jwt)
+                        :params params}]
+            (sentry/set-user-context! report)
+            (sentry/capture-message (str "xhr response error:" status))
+            (sentry/set-user-context! nil)))
         (on-complete response)))))
 
 (def ^:private api-get (partial req api-endpoint http/get))
@@ -70,6 +105,24 @@
 (defn dispatch-body [action response]
   (let [body (if (:success response) (json->cljs (:body response)) {})]
     (dispatcher/dispatch! [action body])))
+
+(defn api-500-test [with-response]
+  (api-get (if with-response "/---error-test---" "/---500-test---")
+    {:headers {
+      ; required by Chrome
+      "Access-Control-Allow-Headers" "Content-Type"
+      ; custom content type
+      "content-type" "text/plain"}}
+    (fn [_])))
+
+(defn auth-500-test [with-response]
+  (auth-get (if with-response "/---error-test---" "/---500-test---")
+    {:headers {
+      ; required by Chrome
+      "Access-Control-Allow-Headers" "Content-Type"
+      ; custom content type
+      "content-type" "text/plain"}}
+    (fn [_])))
 
 (defn get-entry-point []
   (api-get "/" nil (fn [response]
