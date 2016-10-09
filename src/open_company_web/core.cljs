@@ -17,6 +17,7 @@
             [open-company-web.lib.raven :as sentry]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.company-editor :refer (company-editor)]
+            [open-company-web.components.company-logo-setup :refer (company-logo-setup)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.company-settings :refer (company-settings)]
             [open-company-web.components.su-edit :refer (su-edit)]
@@ -28,7 +29,11 @@
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
             [open-company-web.components.login :refer (login)]
-            [open-company-web.components.ui.loading :refer (loading)]))
+            [open-company-web.components.ui.loading :refer (loading)]
+            [open-company-web.components.sign-up :refer (sign-up)]
+            [open-company-web.components.about :refer (about)]
+            [open-company-web.components.pricing :refer (pricing)]
+            [open-company-web.components.email-confirmation :refer (email-confirmation)]))
 
 (enable-console-print!)
 
@@ -104,9 +109,27 @@
       (router/set-route! ["login"] {})
       (when (contains? (:query-params params) :access)
         ;login went bad, add the error message to the app-state
-        (swap! dis/app-state assoc :access (:access (:query-params params))))
+        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
       ;; render component
       (drv-root login target))))
+
+(defn simple-handle [component route-name target params]
+  (pre-routing (:query-params params))
+  (utils/clean-company-caches)
+  (if (contains? (:query-params params) :jwt)
+    (do ; contains :jwt so auth went well
+      (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (api/get-entry-point))
+    (do
+      (when (contains? (:query-params params) :login-redirect)
+        (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+      ;; save route
+      (router/set-route! [route-name] {})
+      (when (contains? (:query-params params) :access)
+        ;login went bad, add the error message to the app-state
+        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
+      ;; render component
+      (rum/mount (component) target))))
 
 ;; Component specific to a company
 (defn company-handler [route target component params]
@@ -159,7 +182,21 @@
 (if-let [target (sel1 :div#app)]
   (do
     (defroute login-route urls/login {:as params}
-      (login-handler target params))
+      (simple-handle sign-up "login" target params))
+
+    (defroute signup-route urls/sign-up {:as params}
+      (simple-handle sign-up "sign-up" target params))
+
+    (defroute about-route urls/about {:as params}
+      (simple-handle about "about" target params))
+
+    (defroute pricing-route urls/pricing {:as params}
+      (simple-handle pricing "pricing" target params))
+
+    (defroute email-confirmation-route urls/email-confirmation {:as params}
+      (utils/clean-company-caches)
+      (pre-routing (:query-params params))
+      (drv-root email-confirmation target))
 
     (defroute subscription-callback-route urls/subscription-callback {}
       (when-let [s (cook/get-cookie :subscription-callback-slug)]
@@ -174,6 +211,20 @@
           (pre-routing (:query-params params))
           (drv-root company-editor target))
         (login-handler target params)))
+
+    (defroute company-logo-setup-route (urls/company-logo-setup ":slug") {:as params}
+      (let [slug (:slug (:params params))
+            query-params (:query-params params)]
+        (pre-routing query-params)
+        (utils/clean-company-caches)
+        ;; save the route
+        (router/set-route! [slug "settings" "logo"] {:slug slug :query-params query-params})
+        ;; do we have the company data already?
+        (when-not (dis/company-data)
+          ;; load the company data from the API
+          (api/get-company slug)
+          (swap! dis/app-state assoc :loading true))
+      (drv-root company-logo-setup target)))
 
     (defroute logout-route urls/logout {:as params}
       (cook/remove-cookie! :jwt)
@@ -224,11 +275,16 @@
 
     (def route-dispatch!
       (secretary/uri-dispatcher [login-route
+                                 signup-route
+                                 about-route
+                                 pricing-route
+                                 email-confirmation-route
                                  subscription-callback-route
                                  home-page-route
                                  list-page-route-slash
                                  list-page-route
                                  company-create-route
+                                 company-logo-setup-route
                                  logout-route
                                  user-profile-route
                                  company-settings-route

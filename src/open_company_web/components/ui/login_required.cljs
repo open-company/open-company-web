@@ -15,24 +15,15 @@
     [:div
      [:div.login-required-cta
       (cond (jwt/jwt)
-            "Sorry, you don't have access to this company dashboard. Please sign in with a different Slack account."
+            [:div
+              "Sorry, you don't have access to this company dashboard."
+              [:br]
+              "Please sign in with a different account."]
             welcome
             "OpenCompany, See the Big Picture"
-            (= (:access data) "denied")
-            [:div.block.red
-             "OpenCompany requires verification with your Slack team. Please allow access."
-             [:p.my2.h5 "If Slack did not allow you to authorize OpenCompany, try "
-              [:button.p0.btn-reset.underline
-               {:on-click #(login/login! (:basic-scopes-url (:auth-settings data)) %)}
-                "this link instead."]]]
-            (:access data)
-            [:span.block.red
-             "There is a temporary error validating with Slack. Please try again later."]
             :else
             "Please sign in to access this company dashboard.")]
-     [:button.btn-reset.mt2
-      {:on-click #(login/login! (:extended-scopes-url (:auth-settings data)) %)}
-      [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]]]
+     (login/login-button)]
     [:div.logo-container
      [:img.logo-gold {:src "/img/oc-logo-gold.svg"}]
      [:div.logo-cta "OpenCompany makes it easy to see the big picture. Companies are strongest when everyone knows what matters most."]]]])
