@@ -84,6 +84,7 @@
                          :title "Add an image"
                          :type "button"
                          :data-toggle "tooltip"
+                         :data-container "body"
                          :data-placement "top"
                          :on-click (fn [_]
                                      (insert-marker!)
@@ -94,6 +95,7 @@
                          :title "Provide an image link"
                          :type "button"
                          :data-toggle "tooltip"
+                         :data-container "body"
                          :data-placement "top"
                          :on-click (fn [_]
                                      (insert-marker!)

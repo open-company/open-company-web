@@ -40,6 +40,24 @@
   }
 }
 
+.btn-link {
+  padding: .3rem 2rem;
+  font-weight: 700;
+  font-family: $oc_headers_font;
+  font-size: 0.75rem;
+  letter-spacing: .1em;
+  color: $oc_gray_5;
+  text-transform: uppercase;
+  text-decoration: underline;
+  transition: 230ms;
+  background-color: transparent;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
 .btn-solid {
   background-color: $oc_yellow;
   border: solid 1px $oc_yellow;
