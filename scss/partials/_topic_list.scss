@@ -14,6 +14,10 @@ body.animating div.topic-list{
   margin-top: 0px !important;
   padding-top: #{$navbar_height + 15}px; // adding 15px like in the topic list padding-top
   min-height: calc(100vh - #{$footer_height}px);
+
+  @include mobile(){
+    padding-top: #{$navbar_height}px;
+  }
 }
 
 .small-footer.animating div.topic-list {
@@ -39,6 +43,7 @@ div.topic-list{
 
   @include mobile(){
     background-color: #d9d9d9;
+    padding-top: 0px;
   }
 
   @include big_web(){
@@ -53,7 +58,7 @@ div.topic-list{
 }
 
 div.selected-topic-container{
-  background-color: rgba(255, 255, 255, 0.98);
+  background-color: rgba(78, 90, 107, 0.5);
   width: 100%;
   height: 100vh;
   overflow-y: hidden;
