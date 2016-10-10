@@ -4,10 +4,12 @@
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]
+            [open-company-web.lib.jwt :as jwt]
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
-            [open-company-web.api :as api]))
+            [open-company-web.api :as api]
+            [open-company-web.local-settings :as ls]))
 
 ;; ---- Generic Actions Dispatch
 ;; This is a small generic abstraction to handle "actions".
@@ -36,12 +38,15 @@
         [first second] (filter #(= (:rel %) "company") links)]
     (let [login-redirect (cook/get-cookie :login-redirect)]
       (cond
-        (and create-link (not first)) (router/nav! oc-urls/create-company)
-        login-redirect                (do (cook/remove-cookie! :login-redirect)
+        (and create-link (not first))   (router/nav! oc-urls/create-company)
+        (and (jwt/jwt) login-redirect)  (do
+                                          (cook/remove-cookie! :login-redirect)
                                           (router/redirect! login-redirect))
-        (and first (not second))      (router/nav! (oc-urls/company (slug first)))
-        (and first second)            (router/nav! oc-urls/companies)
-        )) db))
+        (and first (not second))        (router/nav! (oc-urls/company (slug first)))
+        (and first second)              (router/nav! oc-urls/companies)))
+    (if (utils/in? (:route @router/path) "create-company")
+      (dissoc db :loading)
+      db)))
 
 (defmethod dispatcher/action :company-submit [db _]
   (api/post-company (:company-editor db))
@@ -55,7 +60,7 @@
     db))
 
 (defmethod dispatcher/action :new-section [db [_ body]]
-  (when body
+  (if body
     (let [slug (:slug body)
           response (:response body)]
       (swap! cache/new-sections assoc-in [(keyword slug) :new-sections] (:templates response))
@@ -63,11 +68,17 @@
       ;; signal to the app-state that the new-sections have been loaded
       (-> db
         (assoc-in [(keyword slug) :new-sections] (:templates response))
-        (dissoc :loading)))))
+        (dissoc :loading)))
+    db))
 
 (defmethod dispatcher/action :auth-settings [db [_ body]]
-  (when body
-    (assoc db :auth-settings body)))
+  (if body
+    (do
+      (when (and (utils/in? (:route @router/path) "confirm-invitation")
+                 (contains? (:query-params @router/path) :token))
+        (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path)))))
+      (assoc db :auth-settings body))
+    db))
 
 (defmethod dispatcher/action :revision [db [_ body]]
   (if body
@@ -92,8 +103,9 @@
     (let [updated-body (utils/fix-sections body)
           with-company-data (assoc-in db (dispatcher/company-data-key (:slug updated-body)) updated-body)]
       (if (or (:read-only updated-body)
-               (pos? (count (:sections updated-body))))
-          (dissoc with-company-data :loading)
+              (pos? (count (:sections updated-body)))
+              (:force-remove-loading with-company-data))
+          (dissoc with-company-data :loading :force-remove-loading)
           with-company-data))
     (= 403 status)
     (-> db
@@ -220,7 +232,15 @@
 
 (defmethod dispatcher/action :jwt
   [db [_ jwt-data]]
-  (assoc db :jwt jwt-data))
+  (when jwt-data
+    (api/get-auth-settings))
+  (let [next-db (if (cook/get-cookie :show-login-overlay)
+                  (assoc db :show-login-overlay (keyword (cook/get-cookie :show-login-overlay)))
+                  db)]
+    (when (and (cook/get-cookie :show-login-overlay)
+               (not= (cook/get-cookie :show-login-overlay) "collect-name-password"))
+      (cook/remove-cookie! :show-login-overlay))
+    next-db))
 
 ;; Stripe Payment related actions
 
@@ -229,3 +249,138 @@
   (if uuid
     (assoc-in db [:subscription uuid] data)
     (assoc db :subscription nil)))
+
+(defmethod dispatcher/action :show-login-overlay
+ [db [_ show-login-overlay]]
+ (cond
+    (= show-login-overlay :login-with-email)
+    (-> db
+      (assoc :show-login-overlay show-login-overlay)
+      (assoc :login-with-email {:email "" :pswd ""})
+      (dissoc :login-with-email-error))
+    (= show-login-overlay :signup-with-email)
+    (-> db
+      (assoc :show-login-overlay show-login-overlay)
+      (assoc :signup-with-email {:firstname "" :lastname "" :email "" :pswd ""})
+      (dissoc :signup-with-email-error))
+    :else
+    (assoc db :show-login-overlay show-login-overlay)))
+
+(defmethod dispatcher/action :login-with-slack
+  [db [_ simple-scope?]]
+  (let [current (router/get-token)
+        slack-ref (if simple-scope? "authenticate-retry" "authenticate")
+        auth-url (utils/link-for (:links (:slack (:auth-settings @dispatcher/app-state))) slack-ref)]
+    (when (and (not (.startsWith current oc-urls/login))
+               (not (.startsWith current oc-urls/sign-up))
+               (not (cook/get-cookie :login-redirect)))
+        (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+    (router/redirect! (:href auth-url)))
+  db)
+
+(defmethod dispatcher/action :login-with-email-change
+  [db [_ k v]]
+  (assoc-in db [:login-with-email k] v))
+
+(defmethod dispatcher/action :login-with-email
+  [db [_]]
+  (api/auth-with-email (:email (:login-with-email db)) (:pswd (:login-with-email db)))
+  (dissoc db :login-with-email-error))
+
+(defmethod dispatcher/action :login-with-email/failed
+  [db [_ error]]
+  (assoc db :login-with-email-error error))
+
+(defmethod dispatcher/action :login-with-email/success
+  [db [_ jwt]]
+  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+  (.reload js/location)
+  db)
+
+(defmethod dispatcher/action :signup-with-email-change
+  [db [_ k v]]
+  (assoc-in db [:signup-with-email k] v))
+
+(defmethod dispatcher/action :signup-with-email
+  [db [_]]
+  (api/signup-with-email (:firstname (:signup-with-email db)) (:lastname (:signup-with-email db)) (:email (:signup-with-email db)) (:pswd (:signup-with-email db)))
+  (dissoc db :signup-with-email-error))
+
+(defmethod dispatcher/action :signup-with-email/failed
+  [db [_ error]]
+  (assoc db :signup-with-email-error error))
+
+(defmethod dispatcher/action :signup-with-email/success
+  [db [_ jwt]]
+  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+  (.reload js/location)
+  db)
+
+(defmethod dispatcher/action :get-auth-settings
+  [db [_]]
+  (api/get-auth-settings)
+  db)
+
+(defmethod dispatcher/action :enumerate-users
+  [db [_]]
+  (api/enumerate-users)
+  (assoc db :enumerate-users-requested true))
+
+(defmethod dispatcher/action :enumerate-users/success
+  [db [_ users]]
+  (if users
+    (assoc db :enumerate-users users)
+    (dissoc db :enumerate-users)))
+
+(defmethod dispatcher/action :invite-by-email
+  [db [_]]
+  (api/send-invitation (:email (:um-invite db)))
+  (dissoc db :invite-by-email-error))
+
+(defmethod dispatcher/action :invite-by-email/success
+  [db [_ email]]
+  ; refresh the users list once the invitation succeded
+  (api/enumerate-users)
+  (assoc-in db [:um-invite :email] ""))
+
+(defmethod dispatcher/action :invite-by-email/failed
+  [db [_ email]]
+  ; refresh the users list once the invitation succeded
+  (api/enumerate-users)
+  (assoc db :invite-by-email-error true))
+
+(defmethod dispatcher/action :user-invitation-action
+  [db [_ user-id action payload]]
+  (api/user-invitation-action user-id action payload)
+  db)
+
+(defmethod dispatcher/action :user-invitation-action/complete
+  [db [_]]
+  ; refresh the list of users once the invitation action complete
+  (api/enumerate-users)
+  db)
+
+(defmethod dispatcher/action :confirm-invitation
+  [db [_]]
+  (api/confirm-invitation (:token (:query-params @router/path)))
+  (dissoc db :email-confirmed))
+
+(defmethod dispatcher/action :invitation-confirmed
+  [db [_ status]]
+  (when (= status 200)
+    (cook/set-cookie! :show-login-overlay "collect-name-password"))
+  (assoc db :email-confirmed (= status 200)))
+
+(defmethod dispatcher/action :collect-name-pswd
+  [db [_]]
+  (let [form-data (:collect-name-pswd db)]
+    (api/collect-name-password (:firstname form-data) (:lastname form-data) (:pswd form-data)))
+  db)
+
+(defmethod dispatcher/action :collect-name-pswd-finish
+  [db [_ status]]
+  (if (= status 200)
+    (do
+      (cook/remove-cookie! :show-login-overlay)
+      (dissoc db :show-login-overlay))
+    (assoc db :collect-name-password-error status)))

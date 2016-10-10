@@ -205,6 +205,7 @@
                                                        :su-dragging-topic (= (:su-dragging-topic props) section-name)
                                                        :hover hovering?})
                           :data-topic (name section-name)
+                          :style #js {:width (if (responsive/is-mobile?) "auto" (str (:card-width props) "px"))}
                           :ref section-name
                           :onMouseOver #(when (:is-stakeholder-update props)
                                          (om/set-state! owner :hovering section-name))

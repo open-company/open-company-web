@@ -6,6 +6,7 @@
             [cljs-time.format :as cljs-time-format]
             [cljs-time.core :as cljs-time]
             [goog.style :refer (setStyle)]
+            [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
             [goog.string :as gstring]
             [goog.i18n.NumberFormat :as nf]
@@ -831,3 +832,5 @@
     ;; else false
     :else
     false))
+
+(defn valid-email? [addr] (when addr (email/isValidAddress addr)))

@@ -1,0 +1,53 @@
+/* Header */
+
+nav.navbar-static-top {
+  border-top: 4px solid #f9d748; /* gold */
+  background-color: white !important;
+  margin-bottom: 0px !important;
+}
+
+@media (min-width: 768px) { /* not mobile */
+  nav.navbar-static-top {
+    height: 105px;
+  }
+
+  a.navbar-brand img {
+    margin-top: 21px;
+  }
+}
+
+a.navbar-brand img {
+  width: 150px;
+  color: rgba(78, 90, 107, 0.5);
+}
+
+button.navbar-toggle {
+  border: 0;
+}
+
+.navbar-collapse {
+  background-color: white;
+}
+
+ul.navbar-nav li {
+  font-family: $oc_headers_font;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.5;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+ul.navbar-top li {
+  margin-top: 19px;
+}
+
+ul.navbar-top li .navbar-item {
+  opacity: 0.4;
+  color: $oc_gray_5 !important; //override bootstrap
+  font-family: $oc_headers_font;
+
+  &:hover {
+    opacity: 0.6;
+  }
+}
