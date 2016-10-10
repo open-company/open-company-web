@@ -1,11 +1,13 @@
 (ns open-company-web.components.ui.user-avatar
   (:require [rum.core :as rum]
             [open-company-web.lib.jwt :as jwt]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.components.ui.icon :as i]))
 
 (rum/defc user-avatar < rum/static
+                        rum/reactive
   [on-click]
-  (let [has-avatar (not (clojure.string/blank? (jwt/get-key :avatar)))]
+  (let [has-avatar (not (clojure.string/blank? (get-in (rum/react dis/app-state) [:jwt :avatar])))]
     [:div.user-avatar
       [:button
         {:type "button"
@@ -13,8 +15,8 @@
          :id "user-profile-dropdown"
          :on-click #(on-click %)}
         (if-not has-avatar
-          [:div.user-avatar-name.left (or (jwt/get-key :first-name) (jwt/get-key :last-name))]
+          [:div.user-avatar-name.left (or (get-in (rum/react dis/app-state) [:jwt :first-name]) (get-in (rum/react dis/app-state) [:jwt :last-name]))]
           [:img.user-avatar-img
             {:src (jwt/get-key :avatar)
-             :title (jwt/get-key :real-name)}])
+             :title (get-in (rum/react dis/app-state) [:jwt :real-name])}])
         [:i.fa.fa-ellipsis-v.right]]]))
