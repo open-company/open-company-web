@@ -125,10 +125,11 @@
             (= (:login-with-email-error (rum/react dis/app-state)) 401)
             [:span.small-caps.red
               "The email or password you entered is incorrect."
-              [:br]
-              "Please try again, or "
-              [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]
-              "."]
+              ; [:br]
+              ; "Please try again, or "
+              ; [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]
+              ; "."
+              ]
             :else
             [:span.small-caps.red
               "System troubles logging in."
@@ -157,8 +158,8 @@
                :tabIndex 2
                :name "pswd"}]]
           [:div.group.pb3.mt3
-            [:div.left.forgot-password
-              [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
+            ;;[:div.left.forgot-password
+            ;;  [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
               [:button.btn-reset.btn-solid
                 {:disabled (nil? (:email (:auth-settings (rum/react dis/app-state))))
@@ -190,10 +191,11 @@
             (= (:signup-with-email-error (rum/react dis/app-state)) 409)
             [:span.small-caps.red
               "The email or password you entered is incorrect."
-              [:br]
-              "Please try again, or "
-              [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]
-              "."]
+              ; [:br]
+              ; "Please try again, or "
+              ; [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]
+              ; "."
+              ]
             (= (:signup-with-email-error (rum/react dis/app-state)) 400)
             [:span.small-caps.red
               "An error occurred while processing your data, please check the fields and try again."]
@@ -250,8 +252,8 @@
                :tabIndex 4
                :name "pswd"}]]
           [:div.group.pb3.mt3
-            [:div.left.forgot-password
-              [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
+            ;;[:div.left.forgot-password
+            ;;  [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
               [:button.btn-reset.btn-solid
                 {:disabled (or (and (s/blank? (:firstname (:signup-with-email (rum/react dis/app-state))))
@@ -319,10 +321,11 @@
             (= (:collect-name-password-error (rum/react dis/app-state)) 409)
             [:span.small-caps.red
               "The email or password you entered is incorrect."
-              [:br]
-              "Please try again, or "
-              [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]
-              "."]
+              ; [:br]
+              ; "Please try again, or "
+              ; [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]
+              ; "."
+              ]
             :else
             [:span.small-caps.red
               "System troubles logging in."
