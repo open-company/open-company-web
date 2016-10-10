@@ -145,6 +145,7 @@
               {:value (:email (:login-with-email (rum/react dis/app-state)))
                :on-change #(dis/dispatch! [:login-with-email-change :email (.-value (sel1 [:input.email]))])
                :type "email"
+               :autofocus true
                :tabIndex 1
                :autoCapitalize "none"
                :name "email"}]]
@@ -213,6 +214,7 @@
             [:input.sign-in-field.firstname.half.left
               {:value (:firstname (:signup-with-email (rum/react dis/app-state)))
                :id "signup-firstname"
+               :autofocus true
                :on-change #(dis/dispatch! [:signup-with-email-change :firstname (.-value (sel1 [:input.firstname]))])
                :placeholder "First name"
                :type "text"
@@ -287,7 +289,13 @@
           [:div.sign-in-label-container
             [:label.sign-in-label "PLEASE ENTER YOUR EMAIL ADDRESS"]]
           [:div.sign-in-field-container.email
-            [:input.sign-in-field {:value "" :tabIndex 1 :type "email" :autoCapitalize "none" :name "email"}]]
+            [:input.sign-in-field
+              {:value ""
+               :tabIndex 1
+               :type "email"
+               :autoCapitalize "none"
+               :autofocus true
+               :name "email"}]]
           [:div.group.pb3.mt3
             [:div.right.ml1
               [:button.btn-reset.btn-solid
