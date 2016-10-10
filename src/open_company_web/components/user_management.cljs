@@ -35,7 +35,8 @@
        [:div
          [:input.left.um-invite-field.email
            {:name "um-invite"
-            :type "text"
+            :type "email"
+            :autoCapitalize "none"
             :value (:email (:um-invite (rum/react dis/app-state)))
             :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
             :on-change #(dis/dispatch! [:input [:um-invite :email] (.. % -target -value)])
