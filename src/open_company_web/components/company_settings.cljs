@@ -12,6 +12,7 @@
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.ui.footer :as footer]
             [open-company-web.components.user-management :refer (user-management)]
+            [open-company-web.components.ui.login-required :refer (login-required)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]
@@ -341,16 +342,20 @@
 
       (dom/div {:class "main-company-settings fullscreen-page"}
 
-        (back-to-dashboard-btn {})
-
-        (if (:loading data)
-
-          ;; The data is still loading
+        (cond
+          ;; the data is still loading
+          (:loading data)
           (dom/div (dom/h4 "Loading data..."))
 
+          (get-in data [(keyword (router/current-company-slug)) :error])
+          (login-required)
+
           ;; Company profile
-          (dom/div {:class "company-settings-container"}
-            (om/build company-settings-form data)
-            (user-management)))
+          :else
+          (dom/div {}
+            (back-to-dashboard-btn {})
+            (dom/div {:class "company-settings-container"}
+              (om/build company-settings-form data)
+              (user-management))))
 
         (om/build footer/footer data)))))
