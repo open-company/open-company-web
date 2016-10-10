@@ -2,8 +2,6 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.router :as router]
-            [open-company-web.lib.jwt :as jwt]
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]))
 
@@ -16,18 +14,22 @@
         (dom/div {:class "user-profile-content group"}
           (dom/div {:class "left-column"}
             (dom/div {:class "user-profile-name-title data-title"} "NAME")
-            (dom/div {:class "user-profile-name"} (jwt/get-key :real-name))
-            (when (= (jwt/get-key :auth-source) "slack")
+            (let [real-name (get-in data [:jwt :real-name])
+                  first-name (get-in data [:jwt :first-name])
+                  last-name (get-in data [:jwt :last-name])]
+              (dom/div {:class "user-profile-name"} (or real-name (str first-name " " last-name))))
+            (when (= (get-in data [:jwt :auth-source]) "slack")
               (dom/div {:class "user-profile-org-title data-title"} "SLACK ORGANIZATION"))
-            (when (= (jwt/get-key :auth-source) "slack")
-              (dom/div {:class "user-profile-org"} (jwt/get-key :org-name)))
+            (when (= (get-in data [:jwt :auth-source]) "slack")
+              (dom/div {:class "user-profile-org"} (get-in data [:jwt :org-name])))
             (dom/div {:class "user-profile-email-title data-title"} "EMAIL")
-            (dom/div {:class "user-profile-email"} (jwt/get-key :email)))
+            (dom/div {:class "user-profile-email"} (get-in data [:jwt :email])))
           (dom/div {:class "right-column"}
-            (dom/div {:class "user-profile-avatar-title data-title"} "AVATAR")
-            (when (jwt/get-key :avatar)
-              (dom/img {:class "user-profile-avatar" :src (jwt/get-key :avatar)}))))
-        (when (= (jwt/get-key :auth-source) "slack")
+            (when (get-in data [:jwt :avatar])
+              (dom/div {:class "user-profile-avatar-title data-title"} "AVATAR")
+              (when (get-in data [:jwt :avatar])
+                (dom/img {:class "user-profile-avatar" :src (get-in data [:jwt :avatar])})))))
+        (when (= (get-in data [:jwt :auth-source]) "slack")
           (dom/div {:class "user-profile-disclaimer"}
             "User information is from your Slack account.")))
       (om/build footer data))))
