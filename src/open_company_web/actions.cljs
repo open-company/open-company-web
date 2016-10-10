@@ -332,10 +332,30 @@
     (assoc db :enumerate-users users)
     (dissoc db :enumerate-users)))
 
+(defmethod dispatcher/action :invite-by-email-change
+  [db [_ email]]
+  (-> db
+    (assoc-in [:um-invite :email] email)
+    (dissoc :invite-by-email-error)))
+
 (defmethod dispatcher/action :invite-by-email
   [db [_]]
-  (api/send-invitation (:email (:um-invite db)))
-  (dissoc db :invite-by-email-error))
+  (let [email (:email (:um-invite db))
+        user  (first (filter #(= (:email %) email) (:enumerate-users db)))]
+    (if user
+      (if (= (:status user) "pending")
+        ;resend invitation since user was invited and didn't accept
+        (let [company-data (dispatcher/company-data)
+              idx (.indexOf (:enumerate-users db) user)]
+          (api/user-invitation-action (utils/link-for (:links user) "invite") {:email (:email user)
+                                                                               :company-name (:name company-data)
+                                                                               :logo (:logo company-data)})
+          (assoc-in db [:enumerate-users idx :loading] true))
+        ; user is already in, send error message
+        (assoc db :invite-by-email-error :user-exists))
+      (do ; looks like a new user, sending invitation
+        (api/send-invitation (:email (:um-invite db)))
+        (dissoc db :invite-by-email-error)))))
 
 (defmethod dispatcher/action :invite-by-email/success
   [db [_ email]]
