@@ -230,6 +230,9 @@
      :has-changes (or (:has-changes current-state) false)
      :show-save-successful (or (:show-save-successful current-state) false)}))
 
+(defn cancel-clicked [owner]
+  (om/set-state! owner (get-state (om/get-props owner) nil)))
+
 (defcomponent company-settings-form [data owner]
 
   (init-state [_]
@@ -313,11 +316,12 @@
               (if loading
                 (loading/small-loading)
                 "SAVE"))
-            (dom/div {:style {:float "right"
-                              :margin-right "20px"
-                              :color "rgba(78, 90, 107, 0.5)"
-                              :margin-top "5px"
+            (dom/button {:class "btn-reset btn-outline right mr2"
+                         :on-click #(cancel-clicked owner)}
+              "CANCEL")
+            (dom/div {:style {:margin-top "5px"
                               :opacity (if show-save-successful "1" "0")}
+                      :class "mr2 right"
                       :id "company-settings-save-successful"}
               "Save successful")))
 
