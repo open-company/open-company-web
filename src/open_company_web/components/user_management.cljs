@@ -31,7 +31,7 @@
       (user-invitation (:enumerate-users (rum/react dis/app-state))))
     [:div.my3.um-invite.group
       [:div.um-invite-label
-        "INVITE USERS BY EMAIL ADDRESS"]
+        "INVITE USER BY EMAIL ADDRESS"]
        [:div
          [:input.left.um-invite-field.email
            {:name "um-invite"
