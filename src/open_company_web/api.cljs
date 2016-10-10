@@ -43,7 +43,8 @@
   (http/get (str ls/auth-server-domain refresh-url) (complete-params {})))
 
 (defn update-jwt-cookie! [jwt]
-  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+  (utils/after 1 #(dispatcher/dispatch! [:jwt jwt])))
 
 (defn- method-name [method]
   (cond
@@ -532,12 +533,13 @@
           "Authorization" (str "Bearer " token)}}
         (fn [{:keys [status body success]}]
           (when success
-            (update-jwt-cookie! body))
-          (dispatcher/dispatch! [:invitation-confirmed status]))))))
+            (update-jwt-cookie! body)
+            (dispatcher/dispatch! [:jwt (j/get-contents)]))
+          (utils/after 100 #(dispatcher/dispatch! [:invitation-confirmed status])))))))
 
 (defn collect-name-password [firstname lastname pswd]
   (let [update-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "partial-update" "PATCH")]
-    (when (and firstname lastname pswd update-link)
+    (when (and (or firstname lastname) pswd update-link)
       (auth-patch (:href update-link)
         {:json-params {
           :first-name firstname
@@ -551,4 +553,7 @@
           "content-type" (:type update-link)
           "accept" (:type update-link)}}
         (fn [{:keys [status body success]}]
-          (dispatcher/dispatch! [:collect-name-pswd-finish status]))))))
+          (when success
+            (update-jwt-cookie! body)
+            (dispatcher/dispatch! [:jwt (j/get-contents)]))
+          (utils/after 100 #(dispatcher/dispatch! [:collect-name-pswd-finish status])))))))
