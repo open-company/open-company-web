@@ -193,6 +193,7 @@
         (dom/input {:id "foce-file-upload-ui--select-trigger"
                     :style {:display "none"}
                     :type "file"
+                    :accept "image/x-png, image/gif, image/jpeg"
                     :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
         (dom/button {:class "btn-reset camera left"
                      :title "Upload a logo"
