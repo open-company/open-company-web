@@ -200,6 +200,7 @@
                      :data-toggle "tooltip"
                      :data-container "body"
                      :data-placement "bottom"
+                     :data-container "body"
                      :style {:display (if (nil? file-upload-state) "block" "none")}
                      :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
           (dom/i {:class "fa fa-camera"}))
@@ -209,6 +210,7 @@
                      :data-toggle "tooltip"
                      :data-container "body"
                      :data-placement "bottom"
+                     :data-container "body"
                      :style {:display (if (nil? file-upload-state) "block" "none")}
                      :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
           (dom/i {:class "fa fa-link"}))
