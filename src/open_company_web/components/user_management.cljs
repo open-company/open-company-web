@@ -29,7 +29,7 @@
           "All members of your Slack organization (not guests) can authenticate as users. You can also invite users to join by email."])]
     (when (pos? (count (:enumerate-users (rum/react dis/app-state))))
       (user-invitation (:enumerate-users (rum/react dis/app-state))))
-    [:div.my3.um-invite.group
+    [:div.my4.um-invite.group
       [:div.um-invite-label
         "INVITE USER BY EMAIL ADDRESS"]
        [:div
