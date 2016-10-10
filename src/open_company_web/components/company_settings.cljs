@@ -94,7 +94,7 @@
     (set! (.-src img) url)))
 
 (defn save-company-clicked [owner]
-  (let [logo         (om/get-state owner :logo)
+  (let [logo             (om/get-state owner :logo)
         old-company-data (dis/company-data (om/get-props owner))
         new-company-data {:name (om/get-state owner :company-name)
                           :currency (om/get-state owner :currency)}]
@@ -225,6 +225,7 @@
      :company-name (or (:company-name current-state) (:name company-data))
      :currency (or (:currency current-state) (:currency company-data))
      :loading false
+     :has-changes (or (:has-changes current-state) false)
      :show-save-successful (or (:show-save-successful current-state) false)}))
 
 (defcomponent company-settings-form [data owner]
@@ -251,7 +252,8 @@
                     currency :currency loading :loading
                     file-upload-state :file-upload-state upload-remote-url :upload-remote-url
                     file-upload-progress :file-upload-progress
-                    show-save-successful :show-save-successful}]
+                    show-save-successful :show-save-successful
+                    has-changes :has-changes}]
     (let [slug (keyword (router/current-company-slug))]
 
       (utils/update-page-title (str "OpenCompany - " company-name))
@@ -271,7 +273,9 @@
                       :type "text"
                       :id "name"
                       :value company-name
-                      :on-change #(om/set-state! owner :company-name (.. % -target -value))})
+                      :on-change #(do
+                                   (om/set-state! owner :has-changes true)
+                                   (om/set-state! owner :company-name (.. % -target -value)))})
           ; Slug
           (dom/div {:class "settings-form-input-label"} "DASHBOARD URL")
           (dom/div {:class "npt npt-disabled col-11 p1 mb3"} (str ls/web-server "/" (name slug)))
@@ -279,13 +283,17 @@
           ;; Company logo
           (dom/div {:class "settings-form-input-label"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
           (om/build company-logo-setup {:logo logo
-                                        :logo-did-change-cb #(om/set-state! owner :logo %)})
+                                        :logo-did-change-cb #(do
+                                                              (om/set-state! owner :has-changes true)
+                                                              (om/set-state! owner :logo %))})
 
           ;; Currency
           (dom/div {:class "settings-form-input-label"} "DISPLAY FINANCE & GROWTH CHART CURRENCY AS")
           (dom/select {:id "currency"
                        :value currency
-                       :on-change #(om/set-state! owner :currency (.. % -target -value))
+                       :on-change #(do
+                                    (om/set-state! owner :has-changes true)
+                                    (om/set-state! owner :currency (.. % -target -value)))
                        :class "npt col-8 p1 mb3 company-currency"}
             (for [currency (iso4217/sorted-iso4217)]
               (let [symbol (:symbol currency)
@@ -298,7 +306,8 @@
           ;; Save button
           (dom/div {:class "mt2 right-align group"}
             (dom/button {:class "btn-reset btn-solid right"
-                         :on-click #(save-company-clicked owner)}
+                         :on-click #(save-company-clicked owner)
+                         :disabled (not has-changes)}
               (if loading
                 (loading/small-loading)
                 "SAVE"))
