@@ -496,29 +496,27 @@
               (dispatcher/dispatch! [:invite-by-email/success (:users (:collection body))])
               (dispatcher/dispatch! [:invite-by-email/failed]))))))))
 
-(defn user-invitation-action [user-id action payload]
-  (when (and user-id action)
-    (when-let* [user-data (first (filter #(= (:user-id %) user-id) (:enumerate-users @dispatcher/app-state)))
-                user-link (utils/link-for (:links user-data) action)]
-      (let [auth-req (case (:method user-link)
-                        "POST" auth-post
-                        "PUT" auth-put
-                        "PATCH" auth-patch
-                        "DELETE" auth-delete
-                        auth-get)
-            headers {:headers {
-                      ; required by Chrome
-                      "Access-Control-Allow-Headers" "Content-Type"
-                      ; custom content type
-                      "content-type" (:type user-link)
-                      "accept" (:type user-link)}}
-            with-payload (if payload
-                            (assoc headers :json-params payload)
-                            headers)]
-        (auth-req (:href user-link)
-          with-payload
-          (fn [{:keys [status success body]}]
-            (dispatcher/dispatch! [:user-invitation-action/complete])))))))
+(defn user-invitation-action [action-link payload]
+  (when (and action-link)
+    (let [auth-req (case (:method action-link)
+                      "POST" auth-post
+                      "PUT" auth-put
+                      "PATCH" auth-patch
+                      "DELETE" auth-delete
+                      auth-get) ; default to GET
+          headers {:headers {
+                    ; required by Chrome
+                    "Access-Control-Allow-Headers" "Content-Type"
+                    ; custom content type
+                    "content-type" (:type action-link)
+                    "accept" (:type action-link)}}
+          with-payload (if payload
+                          (assoc headers :json-params payload)
+                          headers)]
+      (auth-req (:href action-link)
+        with-payload
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:user-invitation-action/complete]))))))
 
 (defn confirm-invitation [token]
   (let [auth-link (utils/link-for (:links (:email (:auth-settings @dispatcher/app-state))) "authenticate")]

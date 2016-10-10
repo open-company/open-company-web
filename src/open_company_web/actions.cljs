@@ -350,9 +350,10 @@
   (assoc db :invite-by-email-error true))
 
 (defmethod dispatcher/action :user-invitation-action
-  [db [_ user-id action payload]]
-  (api/user-invitation-action user-id action payload)
-  db)
+  [db [_ invitation action payload]]
+  (let [idx (.indexOf (:enumerate-users db) invitation)]
+    (api/user-invitation-action (utils/link-for (:links invitation) action) payload)
+    (assoc-in db [:enumerate-users idx :loading] true)))
 
 (defmethod dispatcher/action :user-invitation-action/complete
   [db [_]]

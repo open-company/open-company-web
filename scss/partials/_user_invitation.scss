@@ -33,6 +33,14 @@ div.um-invitations-box {
           &.value {
             background-color: white;
           }
+
+          button.invite-row-action {
+            opacity: 0.6;
+
+            &:hover {
+              opacity: 1;
+            }
+          }
         }
       }
     }
