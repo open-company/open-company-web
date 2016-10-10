@@ -240,7 +240,7 @@
     (when (and (cook/get-cookie :show-login-overlay)
                (not= (cook/get-cookie :show-login-overlay) "collect-name-password"))
       (cook/remove-cookie! :show-login-overlay))
-    next-db))
+    (assoc next-db :jwt (jwt/get-contents))))
 
 ;; Stripe Payment related actions
 
@@ -400,7 +400,8 @@
 
 (defmethod dispatcher/action :collect-name-pswd-finish
   [db [_ status]]
-  (if (= status 200)
+  (if (and (>= status 200)
+           (<= status 299))
     (do
       (cook/remove-cookie! :show-login-overlay)
       (dissoc db :show-login-overlay))
