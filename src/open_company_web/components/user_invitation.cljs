@@ -9,11 +9,12 @@
   (dis/dispatch! [:user-invitation-action invitation action payload]))
 
 (rum/defc invite-row
-  [invitation]
+  [invitation show-email?]
   (let [user-links (:links invitation)]
     [:tr
-      [:td [:div.value (:real-name invitation)]]
       [:td [:div.value (:email invitation)]]
+      (when show-email?
+        [:td (when-not (clojure.string/blank? (:real-name invitation)) [:div.value (:real-name invitation)])])
       [:td [:div (clojure.string/upper-case (:status invitation))]]
       [:td
         (cond
@@ -59,14 +60,16 @@
                                           (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
                                         s)}
   [invitations]
-  [:div.my3.um-invitations-box.container.col-12.group
-    [:table.table
-      [:thead
-        [:tr
-          [:th "NAME"]
-          [:th "EMAIL"]
-          [:th "STATUS"]
-          [:th "ACTIONS"]]]
-      [:tbody
-        (for [invitation (filter #(contains? % :status) invitations)]
-          (rum/with-key (invite-row invitation) (str "invitation-tr-" (:href (utils/link-for (:links invitation) "self")))))]]])
+  (let [show-name? (some #(not (clojure.string/blank? (:real-name %))) invitations)]
+    [:div.my3.um-invitations-box.container.col-12.group
+      [:table.table
+        [:thead
+          [:tr
+            [:th "EMAIL"]
+            (when show-name?
+              [:th "NAME"])
+            [:th "STATUS"]
+            [:th "ACTIONS"]]]
+        [:tbody
+          (for [invitation (filter #(contains? % :status) invitations)]
+            (rum/with-key (invite-row invitation show-name?) (str "invitation-tr-" (:href (utils/link-for (:links invitation) "self")))))]]]))
