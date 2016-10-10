@@ -18,6 +18,31 @@ div.login-overlay-container {
     position: relative;
   }
 
+  button.close {
+    position: absolute;
+    left: 50%;
+    margin-left: 250px;
+    top: 65px;
+    width: 30px;
+    height: 30px;
+    outline: none;
+    font-size: 25px;
+    color: white;
+    opacity: 1;
+    font-family: $oc_headers_font;
+    font-weight: 400;
+
+    @include mobile(){
+      top: 21px;
+      right: 20px;
+      color: $oc_gray_5;
+    }
+
+    &:active, &:hover {
+      outline: none;
+    }
+  }
+
   div.login-overlay {
     position: absolute;
     width: 500px;
@@ -76,30 +101,6 @@ div.login-overlay-container {
           color: $oc_gray_5;
           opacity: 0.5;
         }
-      }
-    }
-
-    button.close {
-      position: absolute;
-      right: -30px;
-      top: 0px;
-      width: 30px;
-      height: 30px;
-      outline: none;
-      font-size: 25px;
-      color: white;
-      opacity: 1;
-      font-family: $oc_headers_font;
-      font-weight: 400;
-
-      @include mobile(){
-        top: 21px;
-        right: 20px;
-        color: $oc_gray_5;
-      }
-
-      &:active, &:hover {
-        outline: none;
       }
     }
 

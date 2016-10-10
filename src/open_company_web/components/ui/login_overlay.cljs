@@ -57,6 +57,7 @@
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
+    (close-button)
     [:div.login-overlay.login-with-slack
       {:on-click #(utils/event-stop %)}
       [:div.login-overlay-cta.pl2.pr2.group
@@ -66,7 +67,6 @@
           :else
           [:div.sign-in-cta.left "Sign In"])]
       [:div.pt2.pl3.pr3.group.center
-        (close-button)
         (cond
           (= (:slack-access (rum/react dis/app-state)) "denied")
           [:div.block.red
@@ -112,9 +112,9 @@
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
+    (close-button)
     [:div.login-overlay.login-with-email.group
       {:on-click #(utils/event-stop %)}
-      (close-button)
       [:div.login-overlay-cta.pl2.pr2.group
         [:div.sign-in-cta "Sign In"
           (when-not (:auth-settings (rum/react dis/app-state))
@@ -177,9 +177,9 @@
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
+    (close-button)
     [:div.login-overlay.signup-with-email.group
       {:on-click #(utils/event-stop %)}
-      (close-button)
       [:div.login-overlay-cta.pl2.pr2.group
         [:div.sign-in-cta "Sign Up"
           (when-not (:auth-settings (rum/react dis/app-state))
@@ -273,9 +273,9 @@
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
+    (close-button)
     [:div.login-overlay.password-reset
       {:on-click #(utils/event-stop %)}
-      (close-button)
       [:div.login-overlay-cta.pl2.pr2.group
         [:div.sign-in-cta "Password Reset"
           (when-not (:auth-settings (rum/react dis/app-state))
