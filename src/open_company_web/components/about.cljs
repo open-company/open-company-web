@@ -11,7 +11,7 @@
     [:div.about-wrap {:id "wrap"} ; <!-- used to push footer to the bottom --> 
 
       (site-header)
-      (login-overlays-handler (rum/react dis/app-state))
+      (login-overlays-handler)
 
       [:div.container.main.about
 

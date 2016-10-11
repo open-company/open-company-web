@@ -8,11 +8,12 @@
 ;; Derived Data ================================================================
 
 (defn drv-spec [db]
-  {:base         [[] db]
-   :su-share     [[:base] (fn [base] (:su-share base))]
-   :um-invite    [[:base] (fn [base] (:um-invite base))]
-   :jwt          [[:base] (fn [base] (:jwt base))]
-   :subscription [[:base] (fn [base] (:subscription base))]})
+  {:base               [[] db]
+   :su-share           [[:base] (fn [base] (:su-share base))]
+   :um-invite          [[:base] (fn [base] (:um-invite base))]
+   :jwt                [[:base] (fn [base] (:jwt base))]
+   :subscription       [[:base] (fn [base] (:subscription base))]
+   :show-login-overlay [[:base] (fn [base] (:show-login-overlay base))]})
 
 ;; Action Loop =================================================================
 

@@ -4,6 +4,7 @@
             [clojure.string :as s]
             [goog.object :as gobj]
             [goog.style :as gstyle]
+            [org.martinklepsch.derivatives :as drv]
             [open-company-web.urls :as oc-url]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
@@ -138,6 +139,7 @@
               [:a.underline.red {:href oc-url/contact-mail-to} "contact support"]
               "."]))
         [:form.sign-in-form
+          {:id "sign-in-form"}
           [:div.sign-in-label-container
             [:label.sign-in-label "EMAIL"]]
           [:div.sign-in-field-container
@@ -145,8 +147,9 @@
               {:value (:email (:login-with-email (rum/react dis/app-state)))
                :on-change #(dis/dispatch! [:login-with-email-change :email (.-value (sel1 [:input.email]))])
                :type "email"
+               :id "sign-in-email"
                :autofocus true
-               :tabIndex 1
+               ; :tabindex 1
                :autoCapitalize "none"
                :name "email"}]]
           [:div.sign-in-label-container
@@ -156,7 +159,8 @@
               {:value (:pswd (:login-with-email (rum/react dis/app-state)))
                :on-change #(dis/dispatch! [:login-with-email-change :pswd (.-value (sel1 [:input.pswd]))])
                :type "password"
-               :tabIndex 2
+               :id "sign-in-pswd"
+               ; :tabindex 2
                :name "pswd"}]]
           [:div.group.pb3.mt3
             ;;[:div.left.forgot-password
@@ -209,50 +213,53 @@
               [:a.underline.red {:href oc-url/contact-mail-to} "contact support"]
               "."]))
         [:form.sign-in-form
+          {:id "sign-up-form"
+           :action ""
+           :method "GET"}
           [:div.sign-in-label-container
-            [:label.sign-in-label {:for "signup-firstname"} "YOUR NAME"]]
+            [:label.sign-in-label {:for "sign-up-firstname"} "YOUR NAME"]]
           [:div.sign-in-field-container.group
             [:input.sign-in-field.firstname.half.left
               {:value (:firstname (:signup-with-email (rum/react dis/app-state)))
-               :id "signup-firstname"
+               :id "sign-up-firstname"
                :autofocus true
                :on-change #(dis/dispatch! [:signup-with-email-change :firstname (.-value (sel1 [:input.firstname]))])
                :placeholder "First name"
                :type "text"
-               :tabIndex 1
+               ; :tabindex 1
                :name "firstname"}]
             [:input.sign-in-field.lastname.half.right
               {:value (:lastname (:signup-with-email (rum/react dis/app-state)))
-               :id "signup-lastname"
+               :id "sign-up-lastname"
                :on-change #(dis/dispatch! [:signup-with-email-change :lastname (.-value (sel1 [:input.lastname]))])
                :placeholder "Last name"
                :type "text"
-               :tabIndex 2
+               ; :tabindex 2
                :name "lastname"}]]
           [:div.sign-in-label-container
-            [:label.sign-in-label {:for "signup-email"} "EMAIL"]]
+            [:label.sign-in-label {:for "sign-up-email"} "EMAIL"]]
           [:div.sign-in-field-container
             [:input.sign-in-field.email
               {:value (:email (:signup-with-email (rum/react dis/app-state)))
-               :id "signup-email"
+               :id "sign-up-email"
                :on-change #(dis/dispatch! [:signup-with-email-change :email (.-value (sel1 [:input.email]))])
                :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
                :placeholder "email@example.com"
                :type "email"
-               :tabIndex 3
+               ; :tabindex 3
                :autoCapitalize "none"
                :name "email"}]]
           [:div.sign-in-label-container
-            [:label.sign-in-label {:for "signup-pswd"} "PASSWORD"]]
+            [:label.sign-in-label {:for "sign-up-pswd"} "PASSWORD"]]
           [:div.sign-in-field-container
             [:input.sign-in-field.pswd
               {:value (:pswd (:signup-with-email (rum/react dis/app-state)))
-               :id "signup-pswd"
+               :id "sign-up-pswd"
                :on-change #(dis/dispatch! [:signup-with-email-change :pswd (.-value (sel1 [:input.pswd]))])
                :pattern ".{4,}"
                :placeholder "at least 5 characters"
                :type "password"
-               :tabIndex 4
+               ; :tabindex 4
                :name "pswd"}]]
           [:div.group.pb3.mt3
             ;;[:div.left.forgot-password
@@ -292,7 +299,7 @@
           [:div.sign-in-field-container.email
             [:input.sign-in-field
               {:value ""
-               :tabIndex 1
+               ; :tabindex 1
                :type "email"
                :autoCapitalize "none"
                :autofocus true
@@ -352,7 +359,7 @@
                :on-change #(dis/dispatch! [:input [:collect-name-pswd :firstname] (.-value (sel1 [:input.firstname]))])
                :placeholder "First name"
                :type "text"
-               :tabIndex 1
+               ; :tabindex 1
                :name "firstname"}]
             [:input.sign-in-field.lastname.half.right
               {:value (:lastname (:collect-name-pswd (rum/react dis/app-state)))
@@ -360,7 +367,7 @@
                :on-change #(dis/dispatch! [:input [:collect-name-pswd :lastname] (.-value (sel1 [:input.lastname]))])
                :placeholder "Last name"
                :type "text"
-               :tabIndex 2
+               ; :tabindex 2
                :name "lastname"}]]
           [:div.sign-in-label-container
             [:label.sign-in-label {:for "signup-pswd"} "PASSWORD"]]
@@ -372,7 +379,7 @@
                :pattern ".{4,}"
                :placeholder "at least 5 characters"
                :type "password"
-               :tabIndex 4
+               ; :tabindex 4
                :name "pswd"}]]
           [:div.group.my3
             [:div.right
@@ -385,21 +392,27 @@
                               (dis/dispatch! [:collect-name-pswd]))}
                 "LET ME IN"]]]]]]])
 
-(defn login-overlays-handler [s]
-  (when (:show-login-overlay s)
-    (cond
-      ; login via email
-      (= (:show-login-overlay s) :login-with-email)
-      (login-with-email)
-      ; signup via email
-      (= (:show-login-overlay s) :signup-with-email)
-      (signup-with-email)
-      ; password reset
-      (= (:show-login-overlay s) :password-reset)
-      (password-reset)
-      ; form to collect name and password
-      (= (:show-login-overlay s) :collect-name-password)
-      (collect-name-password)
-      ; login via slack as default
-      :else
-      (login-signup-with-slack))))
+(rum/defcs login-overlays-handler < rum/static
+                                    rum/reactive
+                                    (drv/drv :show-login-overlay)
+  [s]
+  (cond
+    ; login via email
+    (= (drv/react s :show-login-overlay) :login-with-email)
+    (login-with-email)
+    ; signup via email
+    (= (drv/react s :show-login-overlay) :signup-with-email)
+    (signup-with-email)
+    ; password reset
+    (= (drv/react s :show-login-overlay) :password-reset)
+    (password-reset)
+    ; form to collect name and password
+    (= (drv/react s :show-login-overlay) :collect-name-password)
+    (collect-name-password)
+    ; login via slack as default
+    (or (= (drv/react s :show-login-overlay) :login-with-slack)
+        (= (drv/react s :show-login-overlay) :signup-with-slack))
+    (login-signup-with-slack)
+    ; show nothing
+    :else
+    [:div.hidden]))

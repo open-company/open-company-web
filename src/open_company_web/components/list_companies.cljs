@@ -34,7 +34,7 @@
             card-width (responsive/calc-card-width)]
         (dom/div {:class "list-companies"}
           ;show login overlays if needed
-          (login-overlays-handler data)
+          (login-overlays-handler)
           (om/build menu data)
           (dom/div {:class "page"}
             (om/build navbar {:card-width card-width

@@ -29,7 +29,7 @@
                           (when (> columns-num 1) 60))] ; x margins if needed
       (dom/nav {:class "oc-navbar group"}
         (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
-          (login-overlays-handler (rum/react dis/app-state)))
+          (login-overlays-handler))
         (dom/div {:class "oc-navbar-header"
                   :style #js {:width (str header-width "px")}}
           (if (utils/in? (:route @router/path) "companies")

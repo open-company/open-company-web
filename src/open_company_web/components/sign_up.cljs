@@ -14,7 +14,7 @@
       (site-header)
       ;; preload slack button as hidden
       [:img.hidden {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
-      (login-overlays-handler (rum/react dis/app-state))
+      (login-overlays-handler)
 
       [:div.main.sign-up
         [:div.cta

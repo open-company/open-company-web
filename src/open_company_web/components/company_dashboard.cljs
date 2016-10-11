@@ -61,7 +61,7 @@
         (dom/div {:class (utils/class-set {:company-dashboard true
                                            :main-scroll true})}
           ;show login overlays if needed
-          (login-overlays-handler data)
+          (login-overlays-handler)
           (om/build menu data)
           (if (get-in data [(keyword (router/current-company-slug)) :error])
             (dom/div {:class (str "fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
