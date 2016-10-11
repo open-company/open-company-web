@@ -89,6 +89,7 @@
                            :revision-updates (dis/revisions (router/current-company-slug))
                            :card-width card-width
                            :columns-num columns-num
+                           :show-login-overlay (:show-login-overlay data)
                            :foce-key (:foce-key data)
                            :foce-data (:foce-data data)})
               ;;Footer
