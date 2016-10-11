@@ -41,19 +41,18 @@
               "Confirming invitation..."
               (if confirmed
                 "Email confirmed!"
-                "Email confirmation error, plase try again.")))
-          (dom/button {:class "btn-reset btn-solid confirm-invitation-get-started"
-                       :disabled loading
-                       :on-click #(if-not confirmed
-                                    (do
-                                      (om/set-state! owner :loading true)
-                                      (dis/dispatch! [:confirm-invitation]))
-                                    (router/redirect! oc-urls/home))}
-            (if loading
-              (small-loading)
-              (if confirmed
-                "OK! LET’S GET STARTED"
-                "TRY AGAIN"))))
+                "Invite confirmation error. Please ask to be re-invited.")))
+          (when confirmed
+            (dom/button {:class "btn-reset btn-solid confirm-invitation-get-started"
+                         :disabled loading
+                         :on-click #(if-not confirmed
+                                      (do
+                                        (om/set-state! owner :loading true)
+                                        (dis/dispatch! [:confirm-invitation]))
+                                      (router/redirect! oc-urls/home))}
+              (if loading
+                (small-loading)
+                "OK! LET’S GET STARTED"))))
         (dom/div {:class "mt5 center group"}
           (dom/img {:src "/img/oc-logo-gold.png"})
           (dom/div {:class "confirm-invitation-p group"}
