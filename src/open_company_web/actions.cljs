@@ -115,6 +115,11 @@
     (do
       (router/redirect-404!)
       db)
+    (and (>= 500 status)
+         (<= 599 status))
+    (do
+      (router/redirect-500!)
+      db)
     ;; probably some default failure handling should be added here
     :else db))
 

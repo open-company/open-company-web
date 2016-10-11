@@ -148,6 +148,22 @@
        [:a.btn {:href "/"} "Return To Home"]
        [:script {:src "/js/set-path.js"}]]]]]])
 
+(defn server-error [{contact-mail-to :contact-mail-to contact-email :contact-email}]
+  [:div.container.outer.section.content.about
+   [:div.container.inner
+    [:div.row
+     [:div.col-md-12
+      [:div.not-found
+       [:h1 "500"]
+       [:h2 "Hmm, this does not look right."]
+       [:p
+        "You seem to have come accross an error."
+        [:br]
+        "Please try again or contact support: "
+        [:a {:href contact-mail-to} contact-email]]
+       [:a.btn {:href "/"} "Return To Home"]
+       [:script {:src "/js/set-path.js"}]]]]]])
+
 (def app-shell
   {:head [:head
           [:meta {:charset "utf-8"}]
