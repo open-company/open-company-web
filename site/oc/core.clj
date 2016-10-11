@@ -22,6 +22,7 @@
            :integrity "sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7",
            :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css",
            :rel "stylesheet"}]
+   [:link {:href "/css/app.main.css", :rel "stylesheet"}]
    [:link {:href "/css/site.main.css", :rel "stylesheet"}]
    ;; HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries
    ;; WARNING: Respond.js doesn't work if you view the page via file://
@@ -38,11 +39,28 @@
    [:link {:href "https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css",
            :rel "stylesheet"}]])
 
-(defn nav []
-  [:nav.navbar.navbar-default
-   {:role "navigation"}
-   [:div.navbar-header
-    [:a.navbar-brand {:href "/"} [:strong "open"] "company"]]])
+(defn nav [index?]
+  [:nav.navbar.navbar-default.navbar-static-top
+    [:div.container-fluid
+      [:div.navbar-header
+        [:a.navbar-brand {:href "/"}
+          [:img {:alt "OpenCompany" :src "img/oc-wordmark.svg"}]]
+        [:button.navbar-toggle.collapsed {:type "button" :data-toggle "collapse" :data-target "#oc-navbar-collapse"}
+            [:span.sr-only "Toggle navigation"]
+            [:span.icon-bar]
+            [:span.icon-bar]
+            [:span.icon-bar]]]
+      [:div.collapse.navbar-collapse {:id "oc-navbar-collapse"}
+        [:ul.nav.navbar-nav.navbar-right.navbar-top
+          (when-not index?
+            [:li
+              [:a.navbar-item {:href "/"} "Home"]])
+          [:li
+              [:a.navbar-item {:href "/pricing"} "Pricing"]]
+          [:li
+              [:a.navbar-item {:href "/about"} "About"]]
+          [:li.mobile-only
+            [:a.navbar-item.contact {:href "mailto:hello@opencompany.com"} "Contact"]]]]]])
 
 (defn tagline []
   [:div.tagline.text-center
@@ -68,16 +86,26 @@
          [:button "Get early access"]]]]]]]])
 
 (defn footer []
-  [:div.container.outer.footer
-   [:nav.navbar.navbar-default
-    [:p.navbar-text "OpenCompany"]
-    [:ul.nav.navbar.navbar-nav
-     [:li
-      [:a {:href "http://twitter.com/opencompanyhq"}
-       [:i.fa.fa-twitter]]]
-     [:li
-      [:a {:href "https://github.com/open-company"}
-       [:i.fa.fa-github-alt]]]]]])
+  [:nav.navbar.navbar-default.navbar-bottom
+    [:ul.nav.navbar-nav.navbar-left.navbar-bottom-left
+      [:li [:a.navbar-logo {:href "/"}
+        [:img {:alt "OpenCompany" :src "img/oc-logo-grey.svg"}]]]
+      [:li.web-only
+        [:a {:href "/pricing"} "Pricing"]]
+      [:li.web-only
+        [:a {:href "/about"} "About"]]
+      [:li
+        [:a.contact {:href "mailto:hello@opencompany.com"} "Contact"]]
+      [:li.mobile-only {:style {:float "right" :marginRight "15px"}}
+        [:a {:href "https://twitter.com/opencompanyhq"}
+          [:i.fa.fa-2x.fa-twitter {:aria-hidden "true"}]]]]
+    [:ul.nav.navbar-nav.navbar-right
+      [:li
+        [:a {:href "https://twitter.com/opencompanyhq"}
+          [:i.fa.fa-2x.fa-twitter {:aria-hidden "true"}]]]
+      [:li
+        [:a {:href "https://github.com/open-company"}
+          [:i.fa.fa-2x.fa-github {:aria-hidden "true"}]]]]])
 
 
 (defn read-edn [entry]
@@ -95,14 +123,15 @@
                 [:div
                  {:class (if (is? :index) "hero gradient" "gradient")}
                  [:div
-                  {:class (if (is? :index) "container outer header hero" "container outer header")}
-                  (nav)
+                  {:class (if (is? :index) "container outer header hero" "outer header")}
+                  (nav (is? :index))
                   (when (is? :index) (tagline))]]
                 (case page
                   :index   (pages/index options)
                   :about   (pages/about options)
                   :pricing (pages/pricing options)
                   :404     (pages/not-found options)
+                  :500     (pages/server-error options)
                   :privacy (pages/privacy options)
                   :terms   (pages/terms options))
                 (if (is? :index :about)
