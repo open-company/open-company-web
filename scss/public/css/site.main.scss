@@ -2,6 +2,7 @@
 Colors:
 #4183D7 OC blue
 #65C6BB OC grean
+#f9d748 OC yellow
 
 Sizes:
 <768 xs
@@ -52,7 +53,7 @@ h3 {
 /*--- Nav / Header ---*/
 
 div.gradient {
-  background-image: linear-gradient(138deg, #4183D7 0%, #51A0CB 44%, #54A6C9 51%, #56ABC6 59%, #65C6BB 100%);
+  background-image: linear-gradient(138deg, #f9d748 0%, #51A0CB 44%, #54A6C9 51%, #56ABC6 59%, #65C6BB 100%);
   color: white;
   width: 100%;
 }
@@ -133,7 +134,7 @@ div.early-access input {
 }
 
 div.early-access button {
-  background-color: #4183D7;
+  background-color: #f9d748;
   color: white;
   border-width: 0px;
   border-radius: 3px;
@@ -280,7 +281,7 @@ div.row.features h2 {
 }
 
 .pricing-name {
-  border: 3px solid #4183D7;
+  border: 3px solid #f9d748;
 }
 
 .pricing-name h3,
@@ -302,7 +303,7 @@ div.row.features h2 {
   color: #fafafa;
   padding: 12px 0;
   font-size: 27px;
-  background: #4183D7;
+  background: #f9d748;
 }
 
 .pricing-price h4 {
@@ -419,7 +420,7 @@ div.container.outer.footer nav.navbar i.fa {
 }
 
 div.container.outer.footer nav.navbar a > i.fa {
-  color: #4183D7;
+  color: #f9d748;
   transition: all 0.3s ease 0s;
 }
 
@@ -444,7 +445,7 @@ div.container.outer.footer nav.navbar {
 .not-found h1 {
     font-family: "Lora", serif;
     font-size: 6rem;
-    color: #4183D7;
+    color: #f9d748;
 }
 
 .not-found h2 {
@@ -455,10 +456,14 @@ div.container.outer.footer nav.navbar {
   font-family: 'Open Sans', sans-serif;
 }
 
+.not-found p a {
+  color: #f9d748;
+}
+
 .not-found .btn {
     margin-top: 2rem;
     font-family: 'Open Sans', sans-serif;
-    background-color: #4183D7;
+    background-color: #f9d748;
     padding: .7rem 2rem;
     color: white;
     font-weight: 700
