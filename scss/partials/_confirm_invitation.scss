@@ -14,9 +14,6 @@ div.confirm-invitation {
   button.confirm-invitation-get-started {
     margin-top: 65px;
     min-height: 50px;
-    @include big_web(){
-      width: 395px;
-    }
   }
 
   div.confirm-invitation-p {

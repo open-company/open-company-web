@@ -1,10 +1,10 @@
 div.um-invitations-box {
   color: rgba(78, 90, 107, 0.5);
-  background-color: rgba(78, 90, 107, 0.05);
   table.table {
     tr {
       th, td {
         border: none;
+        background-color: rgba(78, 90, 107, 0.05);
       }
 
       th {
@@ -28,7 +28,7 @@ div.um-invitations-box {
         div {
           margin: 5px;
           height: 30px;
-          padding: 5px;
+          padding: 0px;
           white-space: pre;
 
           button.invite-row-action {
