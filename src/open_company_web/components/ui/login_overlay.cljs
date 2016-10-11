@@ -149,7 +149,7 @@
                :type "email"
                :id "sign-in-email"
                :autofocus true
-               ; :tabindex 1
+               :tabindex 1
                :autoCapitalize "none"
                :name "email"}]]
           [:div.sign-in-label-container
@@ -160,7 +160,7 @@
                :on-change #(dis/dispatch! [:login-with-email-change :pswd (.-value (sel1 [:input.pswd]))])
                :type "password"
                :id "sign-in-pswd"
-               ; :tabindex 2
+               :tabindex 2
                :name "pswd"}]]
           [:div.group.pb3.mt3
             ;;[:div.left.forgot-password
@@ -226,7 +226,7 @@
                :on-change #(dis/dispatch! [:signup-with-email-change :firstname (.-value (sel1 [:input.firstname]))])
                :placeholder "First name"
                :type "text"
-               ; :tabindex 1
+               :tabindex 1
                :name "firstname"}]
             [:input.sign-in-field.lastname.half.right
               {:value (:lastname (:signup-with-email (rum/react dis/app-state)))
@@ -234,7 +234,7 @@
                :on-change #(dis/dispatch! [:signup-with-email-change :lastname (.-value (sel1 [:input.lastname]))])
                :placeholder "Last name"
                :type "text"
-               ; :tabindex 2
+               :tabindex 2
                :name "lastname"}]]
           [:div.sign-in-label-container
             [:label.sign-in-label {:for "sign-up-email"} "EMAIL"]]
@@ -246,7 +246,7 @@
                :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
                :placeholder "email@example.com"
                :type "email"
-               ; :tabindex 3
+               :tabindex 3
                :autoCapitalize "none"
                :name "email"}]]
           [:div.sign-in-label-container
@@ -259,7 +259,7 @@
                :pattern ".{4,}"
                :placeholder "at least 5 characters"
                :type "password"
-               ; :tabindex 4
+               :tabindex 4
                :name "pswd"}]]
           [:div.group.pb3.mt3
             ;;[:div.left.forgot-password
@@ -299,7 +299,7 @@
           [:div.sign-in-field-container.email
             [:input.sign-in-field
               {:value ""
-               ; :tabindex 1
+               :tabindex 1
                :type "email"
                :autoCapitalize "none"
                :autofocus true
@@ -359,7 +359,7 @@
                :on-change #(dis/dispatch! [:input [:collect-name-pswd :firstname] (.-value (sel1 [:input.firstname]))])
                :placeholder "First name"
                :type "text"
-               ; :tabindex 1
+               :tabindex 1
                :name "firstname"}]
             [:input.sign-in-field.lastname.half.right
               {:value (:lastname (:collect-name-pswd (rum/react dis/app-state)))
@@ -367,7 +367,7 @@
                :on-change #(dis/dispatch! [:input [:collect-name-pswd :lastname] (.-value (sel1 [:input.lastname]))])
                :placeholder "Last name"
                :type "text"
-               ; :tabindex 2
+               :tabindex 2
                :name "lastname"}]]
           [:div.sign-in-label-container
             [:label.sign-in-label {:for "signup-pswd"} "PASSWORD"]]
@@ -379,7 +379,7 @@
                :pattern ".{4,}"
                :placeholder "at least 5 characters"
                :type "password"
-               ; :tabindex 4
+               :tabindex 4
                :name "pswd"}]]
           [:div.group.my3
             [:div.right
