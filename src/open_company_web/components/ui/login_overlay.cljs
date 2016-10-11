@@ -191,7 +191,8 @@
           (cond
             (= (:signup-with-email-error (rum/react dis/app-state)) 409)
             [:span.small-caps.red
-              "The email or password you entered is incorrect."
+              "This email address already has an account. "
+              [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :login-with-email])} "Would you like to sign in with that account?"]
               ; [:br]
               ; "Please try again, or "
               ; [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]

@@ -71,6 +71,12 @@ div.login-overlay-container {
       overflow: auto;
     }
 
+    a.red {
+      &:hover {
+        color: $oc_red;
+      }
+    }
+
     div.login-overlay-cta {
       padding: 1.5rem 2rem;
       border-bottom: solid 1px rgba(78, 90, 107, 0.1);
