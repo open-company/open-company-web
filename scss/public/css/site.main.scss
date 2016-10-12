@@ -12,14 +12,14 @@ Sizes:
 */
 
 html, body {
- font-family: "Lora", serif;
+ font-family: $oc_main_font;
  font-size: 14px;
  height: 100%;
  color: #777;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Open Sans', sans-serif;
+  font-family: $oc_headers_font;
   color: #444;
 }
 
@@ -77,7 +77,7 @@ div.gradient {
 }
 
 nav.navbar {
-  font-family: 'Open Sans', sans-serif;
+  font-family: $oc_headers_font;
   font-weight: 300;
 }
 
@@ -144,7 +144,7 @@ div.early-access button {
   padding-right: 15px;
   margin-left: 5px;
   transition: all 0.3s ease 0s;
-  font-family: 'Open Sans', sans-serif;
+  font-family: $oc_headers_font;
 }
 
 div.early-access button:hover {
@@ -426,7 +426,7 @@ div.container.outer.footer nav.navbar i.fa {
 }
 
 div.container.outer.footer nav.navbar a > i.fa {
-  color: #f9d748;
+  color: $oc_yellow;
   transition: all 0.3s ease 0s;
 }
 
@@ -449,9 +449,9 @@ div.container.outer.footer nav.navbar {
 }
 
 .error-page h1 {
-    font-family: "Lora", serif;
+    font-family: $oc_main_font;
     font-size: 6rem;
-    color: #f9d748;
+    color: $oc_yellow;
 }
 
 .error-page h2 {
@@ -459,17 +459,17 @@ div.container.outer.footer nav.navbar {
 }
 
 .error-page p {
-  font-family: 'Open Sans', sans-serif;
+  font-family: $oc_headers_font;
 }
 
 .error-page p a {
-  color: #f9d748;
+  color: $oc_yellow;
 }
 
 .error-page .btn {
     margin-top: 2rem;
-    font-family: 'Open Sans', sans-serif;
-    background-color: #f9d748;
+    font-family: $oc_headers_font;
+    background-color: $oc_yellow;
     padding: .7rem 2rem;
     color: white;
     font-weight: 700
