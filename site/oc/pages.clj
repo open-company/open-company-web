@@ -133,15 +133,15 @@
       [:p "We’re also looking for awesome people that are interested in startup transparency. We are a fully distributed team working from our home offices around the world. Join us."]]]]])
 
 (defn not-found [{contact-mail-to :contact-mail-to contact-email :contact-email}]
-  [:div.container.outer.section.content.about
+  [:div.container.outer.section.not-found
    [:div.container.inner
     [:div.row
      [:div.col-md-12
-      [:div.not-found
+      [:div.error-page
        [:h1 "404"]
        [:h2 "Hmm, this does not look right."]
        [:p
-        "You seem to have come accross a page that does not yet exist."
+        "You seem to have come across a page that does not yet exist."
         [:br]
         "Please try again or contact support: "
         [:a {:href contact-mail-to} contact-email]]
@@ -149,15 +149,15 @@
        [:script {:src "/js/set-path.js"}]]]]]])
 
 (defn server-error [{contact-mail-to :contact-mail-to contact-email :contact-email}]
-  [:div.container.outer.section.content.about
+  [:div.container.outer.section.server-error
    [:div.container.inner
     [:div.row
      [:div.col-md-12
-      [:div.not-found
+      [:div.error-page
        [:h1 "500"]
        [:h2 "Hmm, this does not look right."]
        [:p
-        "You seem to have come accross an error."
+        "You seem to have come across an error."
         [:br]
         "Please try again or contact support: "
         [:a {:href contact-mail-to} contact-email]]

@@ -398,6 +398,12 @@ div.bottom-block div.early-access {
   }
 }
 
+/* Not found and Server error */
+
+div.not-found, div.server-error {
+  min-height: calc(100vh - 106px);
+}
+
 /*--- Footer ---*/
 
 /* Don't show the footer at xs size */
@@ -437,30 +443,30 @@ div.container.outer.footer nav.navbar {
   border-width: 0px;
 }
 
-.not-found {
+.error-page {
   margin: 10rem auto;
   text-align: center;
 }
 
-.not-found h1 {
+.error-page h1 {
     font-family: "Lora", serif;
     font-size: 6rem;
     color: #f9d748;
 }
 
-.not-found h2 {
+.error-page h2 {
     font-size: 2rem;
 }
 
-.not-found p {
+.error-page p {
   font-family: 'Open Sans', sans-serif;
 }
 
-.not-found p a {
+.error-page p a {
   color: #f9d748;
 }
 
-.not-found .btn {
+.error-page .btn {
     margin-top: 2rem;
     font-family: 'Open Sans', sans-serif;
     background-color: #f9d748;
