@@ -38,11 +38,15 @@
         [first second] (filter #(= (:rel %) "company") links)]
     (let [login-redirect (cook/get-cookie :login-redirect)]
       (cond
+        ; redirect to create-company if the user has no companies
         (and create-link (not first))   (router/nav! oc-urls/create-company)
+        ; if there is a login-redirect use it
         (and (jwt/jwt) login-redirect)  (do
                                           (cook/remove-cookie! :login-redirect)
                                           (router/redirect! login-redirect))
+        ; if the user has only one company, send him to the company dashboard
         (and first (not second))        (router/nav! (oc-urls/company (slug first)))
+        ; if the user has more than one company send him to the companies page
         (and first second)              (router/nav! oc-urls/companies)))
     (if (utils/in? (:route @router/path) "create-company")
       (dissoc db :loading)
