@@ -54,6 +54,8 @@ div.fullscreen-topic {
       position: relative;
       border-radius: 2px;
       background-color: #fcfcfc;
+      padding-bottom: 12px;
+
       @include big_web(){
         box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
       }
