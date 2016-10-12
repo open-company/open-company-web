@@ -19,7 +19,7 @@
 
 (def dont-scroll
   {:before-render (fn [s]
-                    (if (responsive/is-mobile?)
+                    (if (responsive/is-mobile-size?)
                       (let [display-none #js {:display "none"}]
                         (when (sel1 [:div.main])
                           (gstyle/setStyle (sel1 [:div.main]) display-none))
@@ -34,7 +34,7 @@
                       (dis/dispatch! [:get-auth-settings]))
                     s)
    :will-unmount (fn [s]
-                   (if (responsive/is-mobile?)
+                   (if (responsive/is-mobile-size?)
                     (let [display-block #js {:display "block"}]
                       (when (sel1 [:div.main])
                         (gstyle/setStyle (sel1 [:div.main]) display-block))
@@ -50,7 +50,7 @@
 (rum/defc close-button
   []
   [:button.close {:on-click (partial close-overlay)}
-    (let [close-color (if (responsive/is-mobile?) (occ/get-color-by-kw :oc-gray-5) "white")]
+    (let [close-color (if (responsive/is-mobile-size?) (occ/get-color-by-kw :oc-gray-5) "white")]
       (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color close-color :accent-color close-color}))])
 
 (rum/defcs login-signup-with-slack < rum/reactive
