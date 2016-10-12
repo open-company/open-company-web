@@ -50,11 +50,19 @@ div.fullscreen-topic {
     div.fullscreen-topic-internal {
       -webkit-overflow-scrolling: touch;
       max-width: 500px;
-      margin: 30px auto;
+      margin: 230px auto 30px;
       position: relative;
       border-radius: 2px;
       background-color: #fcfcfc;
       padding-bottom: 12px;
+
+      @media screen and (max-height: 768px){
+        margin-top: 30px;
+      }
+
+      @media screen and (max-height: 1300px) and (min-height: 769px){
+        margin-top: 130px;
+      }
 
       @include big_web(){
         box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
