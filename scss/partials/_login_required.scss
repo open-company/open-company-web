@@ -27,5 +27,21 @@ div.login-required {
         margin: 32px auto;
       }
     }
+
+    button.logout {
+      opacity: 0.4;
+      color: $oc_gray_5;
+      font-family: $oc_main_font;
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 12px;
+
+      &:hover {
+        opacity: 0.6;
+      }
+    }
   }
 }

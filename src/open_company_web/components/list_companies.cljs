@@ -2,13 +2,15 @@
     (:require [om.core :as om :include-macros true]
               [om-tools.core :as om-core :refer-macros (defcomponent)]
               [om-tools.dom :as dom :include-macros true]
+              [rum.core :as rum]
               [open-company-web.urls :as oc-urls]
               [open-company-web.router :as router]
               [open-company-web.lib.utils :as utils]
               [open-company-web.lib.responsive :as responsive]
               [open-company-web.components.ui.menu :refer (menu)]
               [open-company-web.components.ui.navbar :refer (navbar)]
-              [open-company-web.components.ui.footer :refer (footer)]))
+              [open-company-web.components.ui.footer :refer (footer)]
+              [open-company-web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
 (defcomponent list-page-item [data owner]
   (render [_]
@@ -31,6 +33,9 @@
       (let [company-list (:companies data)
             card-width (responsive/calc-card-width)]
         (dom/div {:class "list-companies"}
+          ;show login overlays if needed
+          (when-not (utils/is-test-env?)
+            (login-overlays-handler))
           (om/build menu data)
           (dom/div {:class "page"}
             (om/build navbar {:card-width card-width

@@ -6,6 +6,7 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.login-required :refer (login-required)]
+            [open-company-web.components.sign-up :refer (sign-up)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -19,10 +20,11 @@
 
   (render-state [_ {:keys [columns-num]}]
     (let [card-width  (responsive/calc-card-width)]
-      (dom/div {:class "home fullscreen-page"}
-        (dom/div {:class "home-internal"}
-          (when-not (jwt/jwt)
-            (login-required (assoc data :welcome true))))
-        (om/build footer {:su-preview false
-                          :card-width card-width
-                          :columns-num columns-num})))))
+      (if-not (jwt/jwt)
+        (sign-up)
+        (dom/div {:class "home fullscreen-page"}
+          (when-not (:loading data)
+            (dom/div {:class "home-internal"})
+            (om/build footer {:su-preview false
+                              :card-width card-width
+                              :columns-num columns-num})))))))

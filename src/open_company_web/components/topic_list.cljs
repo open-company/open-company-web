@@ -46,7 +46,7 @@
         new-topics (concat old-topics [new-topic])
         new-topic-kw (keyword new-topic)]
     (if section-data
-      (dispatcher/dispatch! [:start-foce new-topic-kw (or section-data {:section new-topic :placeholder true})])
+      (dispatcher/dispatch! [:start-foce new-topic-kw (or section-data {:section new-topic :placeholder true :body-placeholder "What would you like to say about this?"})])
       (when-not (some #(= (:section %) (name new-topic)) (:archived (dispatcher/company-data)))
         (om/set-state! owner :new-topic-foce new-topic-kw)))
     (if section-data
@@ -461,7 +461,7 @@
         ;; Onboarding tooltips
         
         ;; Desktop only welcom
-        (when (and show-add-topic-tip (not selected-topic)) 
+        (when (and show-add-topic-tip (not selected-topic) (nil? (:show-login-overlay data)))
 
           (onboard-tip
             {:id (str "welcome-" company-slug "-desktop")
@@ -470,7 +470,7 @@
              :desktop (str "Hi " (jwt/get-key :name) ", welcome to OpenCompany! Choose a topic to get started.")}))
 
         ;; Mobile only welcome
-        (when show-add-topic-tip
+        (when (and show-add-topic-tip (nil? (:show-login-overlay data)))
           (onboard-tip
             {:id (str "welcome-" company-slug "-mobile")
              :once-only false

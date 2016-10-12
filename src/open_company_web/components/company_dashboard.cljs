@@ -3,6 +3,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [rum.core :as rum]
             [cljs.core.async :refer (chan <!)]
             [open-company-web.api :as api]
             [open-company-web.router :as router]
@@ -15,6 +16,7 @@
             [open-company-web.components.ui.menu :refer (menu)]
             [open-company-web.components.ui.navbar :refer (navbar)]
             [open-company-web.components.ui.loading :refer (loading)]
+            [open-company-web.components.ui.login-overlay :refer (login-overlays-handler)]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
@@ -58,13 +60,16 @@
           (om/build loading {:loading true}))
         (dom/div {:class (utils/class-set {:company-dashboard true
                                            :main-scroll true})}
+          ;show login overlays if needed
+          (when-not (utils/is-test-env?)
+            (login-overlays-handler))
           (om/build menu data)
           (if (get-in data [(keyword (router/current-company-slug)) :error])
             (dom/div {:class (str "fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
               (login-required data)
               ;;Footer
-              (om/build footer {:columns-num columns-num
-                                :card-width card-width}))
+               (om/build footer {:columns-num columns-num
+                                 :card-width card-width}))
             (dom/div {:class "page"}
               ;; Navbar
               (om/build navbar {:save-bt-active save-bt-active
@@ -85,6 +90,7 @@
                            :revision-updates (dis/revisions (router/current-company-slug))
                            :card-width card-width
                            :columns-num columns-num
+                           :show-login-overlay (:show-login-overlay data)
                            :foce-key (:foce-key data)
                            :foce-data (:foce-data data)})
               ;;Footer

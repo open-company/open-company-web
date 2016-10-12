@@ -133,15 +133,31 @@
       [:p "We’re also looking for awesome people that are interested in startup transparency. We are a fully distributed team working from our home offices around the world. Join us."]]]]])
 
 (defn not-found [{contact-mail-to :contact-mail-to contact-email :contact-email}]
-  [:div.container.outer.section.content.about
+  [:div.container.outer.section.not-found
    [:div.container.inner
     [:div.row
      [:div.col-md-12
-      [:div.not-found
+      [:div.error-page
        [:h1 "404"]
        [:h2 "Hmm, this does not look right."]
        [:p
-        "You seem to have come accross a page that does not yet exist."
+        "You seem to have come across a page that does not yet exist."
+        [:br]
+        "Please try again or contact support: "
+        [:a {:href contact-mail-to} contact-email]]
+       [:a.btn {:href "/"} "Return To Home"]
+       [:script {:src "/js/set-path.js"}]]]]]])
+
+(defn server-error [{contact-mail-to :contact-mail-to contact-email :contact-email}]
+  [:div.container.outer.section.server-error
+   [:div.container.inner
+    [:div.row
+     [:div.col-md-12
+      [:div.error-page
+       [:h1 "500"]
+       [:h2 "Hmm, this does not look right."]
+       [:p
+        "You seem to have come across an error."
         [:br]
         "Please try again or contact support: "
         [:a {:href contact-mail-to} contact-email]]
@@ -160,7 +176,7 @@
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
-          [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" :integrity "sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" :crossorigin "anonymous"}]
+          [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" :crossorigin "anonymous"}]
           ;; Normalize.css //necolas.github.io/normalize.css/
           ;; TODO inline this into app.main.css
           [:link {:rel "stylesheet" :href "/css/normalize.css?oc_deploy_key"}]
@@ -173,21 +189,21 @@
           ;; Emoji One Autocomplete CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css?oc_deploy_key"}]
           ;; Google fonts Domine and OpenSans
-          [:link {:type "text/css", :rel "stylesheet", :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
           ;;  Medium Editor css
-          [:link {:type "text/css", :rel "stylesheet", :href "/css/medium-editor/medium-editor.css?oc_deploy_key"}]
-          [:link {:type "text/css", :rel "stylesheet", :href "/css/medium-editor/default.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/medium-editor.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/default.css?oc_deploy_key"}]
           ;; Emojione Sprites CSS
-          [:link {:type "text/css", :rel "stylesheet", :href "/css/emojione.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.css?oc_deploy_key"}]
           ;; EmojionePicker css from cljsjs
-          [:link {:type "text/css", :rel "stylesheet", :href "/css/emojione-picker.css?oc_deploy_key"}]]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione-picker.css?oc_deploy_key"}]]
    :body [:body
           [:div#app [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
           [:div#oc-loading]
           ;; jQuery needed by Bootstrap JavaScript
           [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
           ;; jQuery textcomplete needed by Emoji One autocomplete
-          [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.3.4/jquery.textcomplete.min.js" :type "text/javascript"}]
+          [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js" :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
           ;; Truncate html string
@@ -199,7 +215,7 @@
           ;; Resolve jQuery UI and Bootstrap tooltip conflict
           [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
           ;; Bootstrap JavaScript //getf.com/
-          [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"  :type "text/javascript" :integrity "sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" :crossorigin "anonymous"}]
+          [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
           ;; Emoji One Autocomplete
           [:script {:src "/js/emojione/autocomplete.js?oc_deploy_key" :type "text/javascript"}]
           ;; JWT Decode lib

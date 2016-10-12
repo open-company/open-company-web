@@ -16,8 +16,12 @@
 (defn not-found []
   (assoc (res/resource-response "/404.html" {:root "public"}) :status 404))
 
+(defn server-error []
+  (assoc (res/resource-response "/500.html" {:root "public"}) :status 500))
+
 (defroutes resources
   (GET "/404" [] (not-found))
+  (GET "/500" [] (server-error))
   (GET "/" [] (app-shell))
   (GET ["/:path" :path #"[^\.]+"] [path] (app-shell)))
 

@@ -67,6 +67,15 @@
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
     (redirect! (str "/404?path=" encoded-url))))
 
+(defn redirect-500! []
+  (let [win-location (.-location js/window)
+        pathname (.-pathname win-location)
+        search (.-search win-location)
+        hash-string (.-hash win-location)
+        encoded-url (js/encodeURIComponent (str pathname search hash-string))]
+    ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
+    (redirect! (str "/500?path=" encoded-url))))
+
 (defn history-back! []
   (.go (.-history js/window) -1))
 

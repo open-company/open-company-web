@@ -17,8 +17,11 @@
 (def contact-mail-to (str "mailto:" contact-email))
 
 (def login "/login")
+(def sign-up "/sign-up")
 
 (def logout "/logout")
+
+(def pricing "/pricing")
 
 (defn not-found [& [params]]
   (str "/404" (when params (str "?" (params->query-string params)))))
@@ -28,6 +31,10 @@
 (def oc-github "https://github.com/open-company")
 
 (def subscription-callback "/subscription-completed")
+
+(def email-confirmation "/email-confirmation")
+
+(def confirm-invitation "/invite")
 
 ;; User
 
@@ -54,6 +61,12 @@
     (company-settings (router/current-company-slug)))
   ([slug]
     (str "/" (name slug) "/settings")))
+
+(defn company-logo-setup
+  ([]
+    (company-logo-setup (router/current-company-slug)))
+  ([slug]
+    (str (company-settings slug) "/logo")))
 
 (defn company-section
   "Section url"

@@ -91,9 +91,14 @@ nav.oc-navbar {
           font-weight: 700;
           font-size: 0.75rem;
           font-family: $oc_headers_font;
+          color: $oc_gray_5;
+          opacity: 0.6;
+
+          &:hover {
+            opacity: 0.8;
+          }
 
           i.fa.fa-share {
-            color: rgba(78, 90, 107, 0.8);
             margin-right: 2px;
           }
         }

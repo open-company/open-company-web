@@ -3,15 +3,17 @@
             [org.martinklepsch.derivatives :as drv]
             [open-company-web.router :as router]))
 
-(defonce app-state (atom {:loading false :menu-open false}))
+(defonce app-state (atom {:loading false :menu-open false :show-login-overlay false}))
 
 ;; Derived Data ================================================================
 
 (defn drv-spec [db]
-  {:base         [[] db]
-   :su-share     [[:base] (fn [base] (:su-share base))]
-   :jwt          [[:base] (fn [base] (:jwt base))]
-   :subscription [[:base] (fn [base] (:subscription base))]})
+  {:base               [[] db]
+   :su-share           [[:base] (fn [base] (:su-share base))]
+   :um-invite          [[:base] (fn [base] (:um-invite base))]
+   :jwt                [[:base] (fn [base] (:jwt base))]
+   :subscription       [[:base] (fn [base] (:subscription base))]
+   :show-login-overlay [[:base] (fn [base] (:show-login-overlay base))]})
 
 ;; Action Loop =================================================================
 

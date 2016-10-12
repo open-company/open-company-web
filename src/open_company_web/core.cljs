@@ -17,6 +17,7 @@
             [open-company-web.lib.raven :as sentry]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.company-editor :refer (company-editor)]
+            [open-company-web.components.company-logo-setup :refer (company-logo-setup)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.company-settings :refer (company-settings)]
             [open-company-web.components.su-edit :refer (su-edit)]
@@ -28,7 +29,12 @@
             [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
             [open-company-web.components.login :refer (login)]
-            [open-company-web.components.ui.loading :refer (loading)]))
+            [open-company-web.components.ui.loading :refer (loading)]
+            [open-company-web.components.sign-up :refer (sign-up)]
+            [open-company-web.components.about :refer (about)]
+            [open-company-web.components.pricing :refer (pricing)]
+            [open-company-web.components.email-confirmation :refer (email-confirmation)]
+            [open-company-web.components.confirm-invitation :refer (confirm-invitation)]))
 
 (enable-console-print!)
 
@@ -69,7 +75,9 @@
   ;; clean the caches
   (utils/clean-company-caches)
   ;; save route
-  (router/set-route! [] {})
+  (router/set-route! ["home"] {})
+  (when (jwt/jwt)
+    (swap! dis/app-state assoc :loading true))
   ;; load data from api
   (api/get-entry-point)
   ;; render component
@@ -104,9 +112,29 @@
       (router/set-route! ["login"] {})
       (when (contains? (:query-params params) :access)
         ;login went bad, add the error message to the app-state
-        (swap! dis/app-state assoc :access (:access (:query-params params))))
+        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
       ;; render component
       (drv-root login target))))
+
+(defn simple-handler [component route-name target params]
+  (pre-routing (:query-params params))
+  (utils/clean-company-caches)
+  (if (contains? (:query-params params) :jwt)
+    (do ; contains :jwt so auth went well
+      (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (api/get-entry-point))
+    (do
+      (when (contains? (:query-params params) :login-redirect)
+        (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+      ;; save route
+      (router/set-route! [route-name] {})
+      (when (contains? (:query-params params) :access)
+        ;login went bad, add the error message to the app-state
+        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
+      ; remove om component if mounted to the same node
+      (om/detach-root target)
+      ;; render component
+      (rum/mount (component) target))))
 
 ;; Component specific to a company
 (defn company-handler [route target component params]
@@ -117,7 +145,7 @@
     (pre-routing query-params)
     (utils/clean-company-caches)
     ;; save the route
-    (router/set-route! [slug section route (when edit? "edit")] {:slug slug :section section :edit edit? :query-params query-params})
+    (router/set-route! (vec (remove nil? [slug (when section section) route (when edit? "edit")])) {:slug slug :section section :edit edit? :query-params query-params})
     ;; load revision if needed
     (when (:as-of query-params)
       (api/load-revision {:updated-at (:as-of query-params)
@@ -125,6 +153,9 @@
                           :type (api/content-type "section")}
                          slug
                          section))
+    (when (contains? (:query-params params) :access)
+        ;login went bad, add the error message to the app-state
+        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
     ;; do we have the company data already?
     (when-not (dis/company-data)
       ;; load the company data from the API
@@ -159,7 +190,29 @@
 (if-let [target (sel1 :div#app)]
   (do
     (defroute login-route urls/login {:as params}
-      (login-handler target params))
+      (simple-handler sign-up "login" target params))
+
+    (defroute signup-route urls/sign-up {:as params}
+      (simple-handler sign-up "sign-up" target params))
+
+    (defroute about-route urls/about {:as params}
+      (simple-handler about "about" target params))
+
+    (defroute pricing-route urls/pricing {:as params}
+      (simple-handler pricing "pricing" target params))
+
+    (defroute email-confirmation-route urls/email-confirmation {:as params}
+      (utils/clean-company-caches)
+      (pre-routing (:query-params params))
+      (drv-root email-confirmation target))
+
+    (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
+      (when (jwt/jwt)
+        (router/redirect! urls/home))
+      (utils/clean-company-caches)
+      (pre-routing query-params)
+      (router/set-route! ["confirm-invitation"] {:query-params query-params})
+      (drv-root confirm-invitation target))
 
     (defroute subscription-callback-route urls/subscription-callback {}
       (when-let [s (cook/get-cookie :subscription-callback-slug)]
@@ -172,8 +225,23 @@
       (if (jwt/jwt)
         (do
           (pre-routing (:query-params params))
+          (router/set-route! ["create-company"] {:query-params (:query-params params)})
           (drv-root company-editor target))
         (login-handler target params)))
+
+    (defroute company-logo-setup-route (urls/company-logo-setup ":slug") {:as params}
+      (let [slug (:slug (:params params))
+            query-params (:query-params params)]
+        (pre-routing query-params)
+        (utils/clean-company-caches)
+        ;; save the route
+        (router/set-route! [slug "settings" "logo"] {:slug slug :query-params query-params})
+        ;; do we have the company data already?
+        (when-not (dis/company-data)
+          ;; load the company data from the API
+          (api/get-company slug)
+          (swap! dis/app-state assoc :loading true))
+      (drv-root company-logo-setup target)))
 
     (defroute logout-route urls/logout {:as params}
       (cook/remove-cookie! :jwt)
@@ -192,6 +260,9 @@
       (drv-root user-profile target))
 
     (defroute company-settings-route (urls/company-settings ":slug") {:as params}
+      ; add force-remove-loading to avoid inifinte spinner if the company
+      ; has no sections and the user is looking at company profile
+      (swap! dis/app-state assoc :force-remove-loading true)
       (company-handler "profile" target company-settings params))
 
     (defroute company-section-route (urls/company-section ":slug" ":section") {:as params}
@@ -224,11 +295,17 @@
 
     (def route-dispatch!
       (secretary/uri-dispatcher [login-route
+                                 signup-route
+                                 about-route
+                                 pricing-route
+                                 email-confirmation-route
+                                 confirm-invitation-route
                                  subscription-callback-route
                                  home-page-route
                                  list-page-route-slash
                                  list-page-route
                                  company-create-route
+                                 company-logo-setup-route
                                  logout-route
                                  user-profile-route
                                  company-settings-route
@@ -242,12 +319,6 @@
                                  stakeholder-update-section-route
                                  not-found-route]))
 
-    (defn login-wall []
-      ;; load the login settings from auth server
-      ;; if the user is not logged in yet
-      (when-not (:auth-settings @dis/app-state)
-        (api/get-auth-settings)))
-
     (defn handle-url-change [e]
       (when-not @prevent-route-dispatch
         ;; we are checking if this event is due to user action,
@@ -257,8 +328,6 @@
           ;; in this case, we're setting it so
           ;; let's scroll to the top to simulate a navigation
           (js/window.scrollTo 0 0))
-        ; check if the user is logged in
-        (login-wall)
         ;; dispatch on the token
         (route-dispatch! (router/get-token)))))
   (sentry/capture-message "Error: div#app is not defined!"))

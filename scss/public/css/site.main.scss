@@ -1,7 +1,11 @@
+@import "modules/_colors";
+@import "modules/_fonts";
+
 /*
 Colors:
 #4183D7 OC blue
 #65C6BB OC grean
+#f9d748 OC yellow
 
 Sizes:
 <768 xs
@@ -11,14 +15,14 @@ Sizes:
 */
 
 html, body {
- font-family: "Lora", serif;
+ font-family: $oc_main_font;
  font-size: 14px;
  height: 100%;
  color: #777;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Open Sans', sans-serif;
+  font-family: $oc_headers_font;
   color: #444;
 }
 
@@ -52,7 +56,7 @@ h3 {
 /*--- Nav / Header ---*/
 
 div.gradient {
-  background-image: linear-gradient(138deg, #4183D7 0%, #51A0CB 44%, #54A6C9 51%, #56ABC6 59%, #65C6BB 100%);
+  background-image: linear-gradient(138deg, #f9d748 0%, #51A0CB 44%, #54A6C9 51%, #56ABC6 59%, #65C6BB 100%);
   color: white;
   width: 100%;
 }
@@ -76,7 +80,7 @@ div.gradient {
 }
 
 nav.navbar {
-  font-family: 'Open Sans', sans-serif;
+  font-family: $oc_headers_font;
   font-weight: 300;
 }
 
@@ -133,7 +137,7 @@ div.early-access input {
 }
 
 div.early-access button {
-  background-color: #4183D7;
+  background-color: #f9d748;
   color: white;
   border-width: 0px;
   border-radius: 3px;
@@ -143,7 +147,7 @@ div.early-access button {
   padding-right: 15px;
   margin-left: 5px;
   transition: all 0.3s ease 0s;
-  font-family: 'Open Sans', sans-serif;
+  font-family: $oc_headers_font;
 }
 
 div.early-access button:hover {
@@ -280,7 +284,7 @@ div.row.features h2 {
 }
 
 .pricing-name {
-  border: 3px solid #4183D7;
+  border: 3px solid #f9d748;
 }
 
 .pricing-name h3,
@@ -302,7 +306,7 @@ div.row.features h2 {
   color: #fafafa;
   padding: 12px 0;
   font-size: 27px;
-  background: #4183D7;
+  background: #f9d748;
 }
 
 .pricing-price h4 {
@@ -397,6 +401,12 @@ div.bottom-block div.early-access {
   }
 }
 
+/* Not found and Server error */
+
+div.not-found, div.server-error {
+  min-height: calc(100vh - 106px);
+}
+
 /*--- Footer ---*/
 
 /* Don't show the footer at xs size */
@@ -419,7 +429,7 @@ div.container.outer.footer nav.navbar i.fa {
 }
 
 div.container.outer.footer nav.navbar a > i.fa {
-  color: #4183D7;
+  color: $oc_yellow;
   transition: all 0.3s ease 0s;
 }
 
@@ -436,29 +446,33 @@ div.container.outer.footer nav.navbar {
   border-width: 0px;
 }
 
-.not-found {
+.error-page {
   margin: 10rem auto;
   text-align: center;
 }
 
-.not-found h1 {
-    font-family: "Lora", serif;
+.error-page h1 {
+    font-family: $oc_main_font;
     font-size: 6rem;
-    color: #4183D7;
+    color: $oc_yellow;
 }
 
-.not-found h2 {
+.error-page h2 {
     font-size: 2rem;
 }
 
-.not-found p {
-  font-family: 'Open Sans', sans-serif;
+.error-page p {
+  font-family: $oc_headers_font;
 }
 
-.not-found .btn {
+.error-page p a {
+  color: $oc_yellow;
+}
+
+.error-page .btn {
     margin-top: 2rem;
-    font-family: 'Open Sans', sans-serif;
-    background-color: #4183D7;
+    font-family: $oc_headers_font;
+    background-color: $oc_yellow;
     padding: .7rem 2rem;
     color: white;
     font-weight: 700
