@@ -40,7 +40,7 @@
             (if loading
               "Confirming invitation..."
               (if confirmed
-                "Email confirmed!"
+                "Invitation confirmed!"
                 "Invite confirmation error. Please ask to be re-invited.")))
           (when confirmed
             (dom/button {:class "btn-reset btn-solid confirm-invitation-get-started"
@@ -52,7 +52,7 @@
                                       (router/redirect! oc-urls/home))}
               (if loading
                 (small-loading)
-                "OK! LET’S GET STARTED"))))
+                "OK! LET’S GET STARTED →"))))
         (dom/div {:class "mt5 center group"}
           (dom/img {:src "/img/oc-logo-gold.png"})
           (dom/div {:class "confirm-invitation-p group"}
