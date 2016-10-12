@@ -114,8 +114,7 @@ div.fullscreen-topic {
         }
 
         div.topic-title-container{
-          margin-top: 17px;
-          padding: 0px #{$lightbox_side_padding}px;
+          padding: 17px #{$lightbox_side_padding}px 0px;
 
           div.topic-title {
             opacity: 0.5;
