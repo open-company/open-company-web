@@ -169,10 +169,12 @@ div.topic {
         width: 100%;
         position: relative;
         padding-top: 10px;
+        border-bottom: 1px solid rgba(78, 90, 107, 0.2);
 
         &.card-image {
           overflow: hidden;
           padding-top: 0px;
+          border-bottom: none;
         }
 
         img {
@@ -180,7 +182,7 @@ div.topic {
         }
 
         div.section-container {
-          margin: 10px;
+          margin: 10px 10px 0px 10px;
         }
 
         div.gradient {
