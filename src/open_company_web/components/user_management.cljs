@@ -27,8 +27,6 @@
       (when (= (jwt/get-key :auth-source) "slack")
         [:p.um-p
           "All members of your Slack organization (not guests) can authenticate as users. You can also invite users to join by email."])]
-    (when (pos? (count (:enumerate-users (rum/react dis/app-state))))
-      (user-invitation (:enumerate-users (rum/react dis/app-state))))
     [:div.my4.um-invite.group
       [:div.um-invite-label
         "INVITE USER BY EMAIL ADDRESS"]
@@ -57,14 +55,17 @@
               [:span.small-caps.red.mt1.left (str (:email (:um-invite @dis/app-state)) " is already a user.")]
               :else
               [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]]
-    [:div.my2.um-byemail-container.group.hidden
-      [:div.group
-        [:span.left.ml1.um-byemail-anyone-span
-          "ANYONE WITH THIS EMAIL DOMAIN HAS USER ACCESS"]]
-      [:div.mt2.um-byemail.group
-        [:span.left.um-byemail-at "@"]
-        [:input.left.um-byemail-email
-          {:type "text"
-           :name "um-byemail-email"
-           :placeholder "your email domain without @"}]
-        [:button.left.um-byemail-save.btn-reset.btn-outline "SAVE"]]]])
+    (when (pos? (count (:enumerate-users (rum/react dis/app-state))))
+      (user-invitation (:enumerate-users (rum/react dis/app-state))))
+    (comment
+      [:div.my2.um-byemail-container.group
+        [:div.group
+          [:span.left.ml1.um-byemail-anyone-span
+            "ANYONE WITH THIS EMAIL DOMAIN HAS USER ACCESS"]]
+        [:div.mt2.um-byemail.group
+          [:span.left.um-byemail-at "@"]
+          [:input.left.um-byemail-email
+            {:type "text"
+             :name "um-byemail-email"
+             :placeholder "your email domain without @"}]
+          [:button.left.um-byemail-save.btn-reset.btn-outline "SAVE"]]])])
