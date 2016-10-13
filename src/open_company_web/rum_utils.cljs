@@ -1,7 +1,9 @@
 (ns open-company-web.rum-utils
   (:require [org.martinklepsch.derivatives :as drv]
             [rum.core :as rum]
-            [om.core :as om]))
+            [om.core :as om :include-macros true]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
+            [om-tools.dom :as dom :include-macros true]))
 
 (let [get-k ":derivatives/get"
       release-k ":derivatives/release"]
@@ -23,3 +25,7 @@
            state
            {:target target
             :descriptor (om-derivatives (drv/derivatives-manager drv-spec))}))
+
+(defcomponent rum-wrapper [data owner]
+  (render [_]
+    ((:rum-component data))))
