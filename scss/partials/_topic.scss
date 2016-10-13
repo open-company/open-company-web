@@ -164,12 +164,11 @@ div.topic {
       }
 
       div.card-header{
-        margin: 0px;
+        margin: 0px 0px 5px 0px;
         padding: 0px;
         width: 100%;
         position: relative;
         padding-top: 10px;
-        border-bottom: 1px solid rgba(78, 90, 107, 0.2);
 
         &.card-image {
           overflow: hidden;
