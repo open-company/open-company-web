@@ -134,11 +134,7 @@
       ; remove om component if mounted to the same node
       (om/detach-root target)
       ;; render component
-      (swap! dis/app-state assoc :rum-component component)
-      (ru/drv-root {:state dis/app-state
-                    :drv-spec (dis/drv-spec dis/app-state)
-                    :component ru/rum-wrapper
-                    :target target}))))
+      (drv-root #(om/component (component)) target))))
 
 ;; Component specific to a company
 (defn company-handler [route target component params]

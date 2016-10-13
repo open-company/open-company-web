@@ -25,7 +25,3 @@
            state
            {:target target
             :descriptor (om-derivatives (drv/derivatives-manager drv-spec))}))
-
-(defcomponent rum-wrapper [data owner]
-  (render [_]
-    ((:rum-component data))))
