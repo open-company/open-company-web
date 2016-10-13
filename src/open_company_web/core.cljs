@@ -335,6 +335,7 @@
 (defn init []
   ;; Persist JWT in App State
   (dis/dispatch! [:jwt (jwt/get-contents)])
+  (.click (js/$ js/window) #(.tooltip (js/$ "[data-toggle=tooltip]") "hide"))
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when (and handle-url-change route-dispatch!)
