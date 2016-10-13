@@ -163,7 +163,7 @@
         fixed-data (if value
                      (assoc growth-data (str period slug) fixed-row)
                      (dissoc growth-data (str period slug)))]
-    ;(om/set-state! owner :has-changes true)
+    (om/set-state! owner :has-changes? true)
     (om/set-state! owner :growth-data fixed-data)))
 
 (defn- more-months [owner data]
@@ -182,7 +182,7 @@
   (remove nil? (vec (map (fn [[_ v]] (growth-clean-row v)) growth-data))))
 
 (defn- save-data [owner data new-metric?]
-  ; (om/set-state! owner :has-changes false)
+  (om/set-state! owner :has-changes? false)
   (let [data-map {:data (growth-clean-data (om/get-state owner :growth-data))}
         existing-metrics (vec (metrics-as-sequence owner (:metric-slugs data)))
         metric-slug (om/get-state owner :metric-slug)
@@ -213,6 +213,7 @@
      :metrics (:metrics data)
      :growth-data (:growth-data data) ; all the growth data for all metrics
      :metric-slug (:initial-focus data) ; the slug of the current metric
+     :has-changes? false
      :stop batch-size}) ; how many periods (reverse chronological) to show
 
   (will-receive-props [_ next-props]
@@ -224,7 +225,7 @@
       (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
-  (render-state [_ {:keys [metadata-edit? metrics growth-data metric-slug stop] :as state}]
+  (render-state [_ {:keys [metadata-edit? metrics growth-data metric-slug stop has-changes?] :as state}]
 
     (let [company-slug (router/current-company-slug)
           metric-info (current-metric-info metric-slug owner)
@@ -307,6 +308,7 @@
                 (dom/div {:class "topic-foce-footer group"}
                   (dom/div {:class "topic-foce-footer-right"}
                     (dom/button {:class "btn-reset btn-outline btn-data-save"
+                                 :disabled (not has-changes?)
                                  :on-click  #(do
                                               (utils/event-stop %)
                                               (save-data owner data new-metric?)

@@ -147,11 +147,13 @@
 
 (defn- save-data [owner]
   ; (om/set-state! owner :has-changes false)
+  (om/set-state! owner :has-changes? false)
   (dis/dispatch! [:save-topic-data "finances" {:data (finances-clean-data (om/get-state owner :finances-data))
                                                :placeholder false}]))
 
 (defn replace-row-in-data [owner row-data k v]
   "Find and replace the edited row"
+  (om/set-state! owner :has-changes? true)
   (let [new-row (update row-data k (fn[_]v))]
     (change-finances-data owner new-row)))
 
@@ -162,12 +164,13 @@
 
   (init-state [_]
     {:finances-data (:finances-data data)
+     :has-changes? false
      :stop batch-size})
 
   (will-receive-props [_ next-props]
     (om/set-state! owner :finances-data (:finances-data next-props)))
 
-  (render-state [_ {:keys [finances-data stop]}]
+  (render-state [_ {:keys [finances-data stop has-changes?]}]
 
     (let [company-slug (router/current-company-slug)]
 
@@ -205,6 +208,7 @@
           (dom/div {:class "topic-foce-footer group"}
             (dom/div {:class "topic-foce-footer-right"}
               (dom/button {:class "btn-reset btn-outline btn-data-save"
+                           :disabled (not has-changes?)
                            :on-click  #(do
                                         (utils/event-stop %)
                                         (save-data owner)
