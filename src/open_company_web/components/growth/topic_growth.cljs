@@ -109,6 +109,17 @@
      :new-metric? (if initial new-metric? (om/get-state owner :new-metric?)) ; preserve new metric if this is for will-update
      :data-editing? (:initial-editing? data)}))
 
+(defn- data-editing-on-change [owner new-data]
+  (om/update-state! owner #(merge % {:growth-data new-data})))
+
+(defn- metadata-editing-on-change [owner focus k v]
+  (let [focus (om/get-state owner :focus)
+        metrics (om/get-state owner :growth-metrics)
+        metric (get metrics focus)
+        new-metric (assoc metric k v)
+        new-metrics (assoc metrics focus new-metric)]
+    (om/set-state! owner :growth-metrics new-metrics)))
+
 (defcomponent topic-growth [{:keys [section section-data currency editable? initial-editing? editing-cb] :as data} owner options]
 
   (init-state [_]
@@ -126,6 +137,8 @@
           focus-metric-info (get growth-metrics focus)
           subsection-data {:metric-data focus-metric-data
                            :metric-info focus-metric-info
+                           :editing data-editing?
+                           :focus focus
                            :currency currency
                            :read-only true
                            :total-metrics (count growth-metrics)}]
@@ -145,7 +158,7 @@
                 (om/build growth-metric subsection-data {:opts options}))
               (when (or (> (count growth-metric-slugs) 1) editable?)
                 (render-pillboxes owner editable? editing-cb options))
-              (when editable?
+              (when (and editable? (not data-editing?))
                 (dom/button {:class "btn-reset chart-pencil-button"
                              :title "Edit chart data"
                              :type "button"
@@ -164,6 +177,8 @@
              :growth-data growth-data
              :metrics growth-metrics
              :metric-slugs growth-metric-slugs
+             :data-on-change-cb (partial data-editing-on-change owner)
+             :metadata-on-change-cb (partial metadata-editing-on-change owner focus)
              :editing-cb (partial data-editing-toggle owner editing-cb)
              :switch-focus-cb (partial switch-focus owner)
              :archive-metric-cb (partial archive-metric-cb owner editing-cb)}
