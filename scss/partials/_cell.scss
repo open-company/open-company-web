@@ -14,10 +14,12 @@
     span, input {
       width: 100%;
       text-align: right;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 400;
-      font-family: $oc_headers_font;
-      letter-spacing: 1px;
+      font-family: $oc_main_font;
+      letter-spacing: normal;
+      line-height: 1.2;
+      color: $oc_gray_5;
       padding: 0;
       margin: 0;
     }
@@ -28,47 +30,26 @@
     border-bottom: 2px solid rgba(0, 0, 0, 0.4);
 
     span.placeholder {
-      color: rgba(0, 0, 0, 0.4);
-      font-size: 12px;
-      font-weight: 400;
-      font-family: $oc_headers_font;
+      opacity: 0.4;
     }
   }
 
   .state-display {
     border: 2px solid transparent;
-
-    span {
-      color: black;
-      font-size: 12px;
-      font-weight: 400;
-      font-family: $oc_headers_font;
-    }
   }
 
   .state-draft {
     border: 2px solid transparent;
     border-bottom: 2px solid rgba(0, 0, 0, 0.8);
-
-    span {
-      color: black;
-      font-size: 12px;
-      font-weight: 400;
-      font-family: $oc_headers_font;
-    }
   }
 
   .state-edit {
     border: 2px solid blue;
 
     input {
-      color: black;
-      border: 0px solid black;
+      border: none;
       outline: none;
       text-align: left;
-      font-size: 12px;
-      font-weight: 400;
-      font-family: $oc_headers_font;
     }
   }
 
