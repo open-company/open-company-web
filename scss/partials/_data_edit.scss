@@ -93,16 +93,9 @@ div.finances, div.growth {
       }
 
       td div.comp-cell {
-        opacity: 0.5;
         background-color: #ffffff;
-        padding-top: 4px;
-      }
-
-      td div.comp-cell div.comp-cell-int {
-        font-weight: normal;
-        font-size: 12px;
-        letter-spacing: 1px;
-        color: $oc_gray_7;
+        padding-top: 2px;
+        padding-left: 2px;
       }
     }
   }
