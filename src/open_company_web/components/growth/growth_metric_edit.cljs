@@ -188,33 +188,4 @@
                        :default-value (or unit "Number")
                        :id "mtr-unit"}
             (for [unit units]
-              (dom/option {:value (:unit unit)} (:name unit)))))
-
-        ; (dom/div {:class "topic-foce-footer group"}
-        ;   (dom/div {:class "topic-foce-footer-right"}
-
-        ;     ;; next or save button
-        ;     (dom/button {:class "btn-reset btn-outline btn-data-save"
-        ;                  :disabled (or (s/blank? (om/get-state owner :metric-slug))
-        ;                                (s/blank? (om/get-state owner :metric-name))
-        ;                                (s/blank? (om/get-state owner :unit))
-        ;                                (s/blank? (om/get-state owner :interval)))
-        ;                  :on-click #(do (utils/event-stop %)
-        ;                                 (save-metric-info owner (:save-cb data) new-metric?))}
-        ;       (if new-metric? "NEXT" "SAVE"))
-
-        ;     ;; cancel button
-        ;     (dom/button {:class "btn-reset btn-outline"
-        ;                  :on-click #(do (utils/event-stop %)
-        ;                                 ((:cancel-cb data)))} "CANCEL")
-
-        ;     (when-not new-metric?
-        ;       (dom/button {:class "btn-reset archive-button"
-        ;                    :title "Archive this chart"
-        ;                    :type "button"
-        ;                    :data-toggle "tooltip"
-        ;                    :data-container "body"
-        ;                    :data-placement "top"
-        ;                    :on-click #(show-archive-confirm-popover owner data)}
-        ;           (dom/i {:class "fa fa-archive"})))))
-        ))))
+              (dom/option {:value (:unit unit)} (:name unit)))))))))
