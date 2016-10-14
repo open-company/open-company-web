@@ -57,8 +57,10 @@
                             "templateSelection" unit-option-template}))
         (.on "change" (fn [e]
                         (let [unit-value (.. e -target -value)
-                              slug (om/get-state owner :metric-slug)]
-                          (om/set-state! owner :unit unit-value)))))
+                              slug (om/get-state owner :metric-slug)
+                              on-change-cb (om/get-props owner :metadata-on-change-cb)]
+                          (om/set-state! owner :unit unit-value)
+                          (on-change-cb :unit unit-value)))))
 
       ; init interval dropdown
       (doto (js/$ "select#mtr-interval.interval")
@@ -68,8 +70,10 @@
                             "templateSelection" option-template}))
         (.on "change" (fn [e]
                         (let [interval-value (.. e -target -value)
-                              slug (om/get-state owner :metric-slug)]
-                          (om/set-state! owner :interval interval-value)))))
+                              slug (om/get-state owner :metric-slug)
+                              on-change-cb (om/get-props owner :metadata-on-change-cb)]
+                          (om/set-state! owner :interval interval-value)
+                          (on-change-cb :interval interval-value)))))
 
       ; focus name
       (.focus (js/$ "input#mtr-name"))
@@ -101,11 +105,7 @@
           metric-info (if new-metric? metric-defaults (:metric-info data))
           company-currency-code (:currency options)
           presets (get-presets data)
-          units (:units presets)
-          fixed-units (vec (map #(if (= (:unit %) "currency")
-                                   {:unit "currency"
-                                    :name (utils/get-symbol-for-currency-code company-currency-code)}
-                                   %) units))]
+          units (:units presets)]
       {:req-libs-loaded false
        :did-mount false
        :select2-initialized false
@@ -114,7 +114,7 @@
        :metric-name (:name metric-info)
        :description (:description metric-info)
        :unit (:unit metric-info)
-       :units fixed-units
+       :units units
        :interval (if new-metric? (:interval metric-defaults) (:interval metric-info))
        :currency company-currency-code}))
 
@@ -133,10 +133,16 @@
       (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
-  (render [_]
+  (render-state [_ {:keys [metric-slug
+                           metric-name
+                           description
+                           interval
+                           unit
+                           presets
+                           units
+                           currency]}]
     (let [all-metrics (:metrics data)
-          {:keys [metrics intervals prompt] :as presets} (om/get-state owner :presets)
-          units (om/get-state owner :units)
+          {:keys [metrics intervals prompt] :as presets} presets
           new-metric? (:new-metric? data)]
 
       (dom/div {:class "growth-metric-edit p3"}
@@ -144,23 +150,31 @@
         ;; name
         (dom/input {:class "npt col-12 p1 mb2"
           :type "text"
-          :value (om/get-state owner :metric-name)
-          :on-change (fn [e] (om/set-state! owner :metric-name (.. e -target -value)))
+          :value metric-name
+          :on-change (fn [e]
+                      (let [v (.. e -target -value)
+                            on-change-cb (om/get-props owner :metadata-on-change-cb)]
+                        (om/set-state! owner :metric-name v)
+                        (on-change-cb :name v)))
                        ;(change-name owner data))
           :id "mtr-name"
-          :placeholder "A short name, e.g. DAU"})
+          :placeholder "Chart label - a short name, e.g. DAU"})
 
         ;; description
         (dom/input {:class "npt col-12 p1 mb2"
                     :type "text"
-                    :value (om/get-state owner :description)
-                    :placeholder "e.g. Daily Active Users"
-                    :on-change (fn [e] (om/set-state! owner :description (.. e -target -value)))})
+                    :value description
+                    :placeholder "Description - e.g. Daily Active Users"
+                    :on-change (fn [e]
+                                  (let [v (.. e -target -value)
+                                        on-change-cb (om/get-props owner :metadata-on-change-cb)]
+                                    (om/set-state! owner :description v)
+                                    (on-change-cb :description v)))})
 
         ;; interval
         (dom/div {:class "col-5 left"}
           (dom/select {:class "npt col-12 p1 mb2 interval"
-                       :default-value (om/get-state owner :interval)
+                       :default-value interval
                        :id "mtr-interval"
                        ; if there are data the interval can't be changed
                        :disabled (and (pos? (:metric-count data))
@@ -171,7 +185,7 @@
         ;; unit
         (dom/div {:class "col-5 right"}
           (dom/select {:class "npt col-12 p1 mb2 unit"
-                       :default-value (or (om/get-state owner :unit) "A number")
+                       :default-value (or unit "Number")
                        :id "mtr-unit"}
             (for [unit units]
               (dom/option {:value (:unit unit)} (:name unit)))))
