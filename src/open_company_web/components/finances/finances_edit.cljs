@@ -7,7 +7,8 @@
             [open-company-web.router :as router]
             [open-company-web.components.ui.cell :refer (cell)]
             [open-company-web.lib.finance-utils :as finance-utils]
-            [cljs.core.async :refer (put!)]))
+            [cljs.core.async :refer (put!)]
+            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
 
 (def batch-size 5)
 
@@ -160,24 +161,36 @@
 (defn more-months [owner]
   (om/update-state! owner :stop #(+ % batch-size)))
 
+(defn- show-archive-confirm-popover [owner data]
+  (add-popover {:container-id "archive-metric-confirm"
+                :message "Prior updates to this chart will only be available in topic history. Are you sure you want to archive?"
+                :cancel-title "KEEP"
+                :cancel-cb #(hide-popover nil "delete-metric-confirm")
+                :success-title "ARCHIVE"
+                :success-cb (fn []
+                              (om/update-state! owner #(merge % {:finances-data {}
+                                                                 :table-key (str (rand 4))
+                                                                 :has-changes? true})))}))
+
 (defcomponent finances-edit [{:keys [currency editing-cb show-first-edit-tip first-edit-tip-cb] :as data} owner]
 
   (init-state [_]
     {:finances-data (:finances-data data)
      :has-changes? false
+     :table-key (str (rand 4))
      :stop batch-size})
 
   (will-receive-props [_ next-props]
     (om/set-state! owner :finances-data (:finances-data next-props)))
 
-  (render-state [_ {:keys [finances-data stop has-changes?]}]
-
+  (render-state [_ {:keys [finances-data stop has-changes? table-key]}]
     (let [company-slug (router/current-company-slug)]
 
       (dom/div {:class "finances"}
         (dom/div {:class "composed-section-edit finances-body edit"}
           (dom/div {:class "table-container group"}
-            (dom/table {:class "table"}
+            (dom/table {:class "table"
+                        :key table-key}
               (dom/thead {}
                 (dom/tr {}
                   (dom/th {} "")
@@ -216,4 +229,13 @@
               (dom/button {:class "btn-reset btn-outline"
                            :on-click #(do
                                         (utils/event-stop %)
-                                        (editing-cb false))} "CANCEL"))))))))
+                                        (editing-cb false))} "CANCEL")
+              (dom/button {:class "btn-reset archive-button"
+                                   :title "Archive this chart"
+                                   :type "button"
+                                   :style #js {:marginTop "3px"}
+                                   :data-toggle "tooltip"
+                                   :data-container "body"
+                                   :data-placement "top"
+                                   :on-click #(show-archive-confirm-popover owner data)}
+                          (dom/i {:class "fa fa-archive"})))))))))
