@@ -50,7 +50,7 @@
     ; check if we are ready to initialize the widget and if we haven't aready done that
     (when (and req-libs-loaded did-mount (not select2-initialized))
       ; init unit dropdown
-      (doto (js/$ "select#mtr-unit")
+      (doto (js/$ "select#mtr-unit.unit")
         (.select2 (clj->js {"placeholder" "Metric unit"
                             "minimumResultsForSearch" -1
                             "templateResult" unit-option-template
@@ -61,7 +61,7 @@
                           (om/set-state! owner :unit unit-value)))))
 
       ; init interval dropdown
-      (doto (js/$ "select#mtr-interval")
+      (doto (js/$ "select#mtr-interval.interval")
         (.select2 (clj->js {"placeholder" "Metric interval"
                             "minimumResultsForSearch" -1
                             "templateResult" option-template
@@ -142,8 +142,7 @@
       (dom/div {:class "growth-metric-edit p3"}
 
         ;; name
-        (dom/div {:class "small-caps bold mb1"} "Chart label")
-        (dom/input {:class "npt col-8 p1 mb2"
+        (dom/input {:class "npt col-12 p1 mb2"
           :type "text"
           :value (om/get-state owner :metric-name)
           :on-change (fn [e] (om/set-state! owner :metric-name (.. e -target -value)))
@@ -152,7 +151,6 @@
           :placeholder "A short name, e.g. DAU"})
 
         ;; description
-        (dom/div {:class "small-caps bold mb1"} "Description (Shown in tooltip)")
         (dom/input {:class "npt col-12 p1 mb2"
                     :type "text"
                     :value (om/get-state owner :description)
@@ -160,51 +158,49 @@
                     :on-change (fn [e] (om/set-state! owner :description (.. e -target -value)))})
 
         ;; interval
-        (dom/div {:class "small-caps bold mb1"} "Interval")
-        (dom/select {:class "npt col-5 p1 mb2"
-                     :default-value (om/get-state owner :interval)
-                     :id "mtr-interval"
-                     ; if there are data the interval can't be changed
-                     :disabled (and (pos? (:metric-count data))
-                                    (not (:new-metric? data)))}
-          (for [interval intervals]
-            (dom/option {:value interval} (utils/camel-case-str interval))))
+        (dom/div {:class "col-5 left"}
+          (dom/select {:class "npt col-12 p1 mb2 interval"
+                       :default-value (om/get-state owner :interval)
+                       :id "mtr-interval"
+                       ; if there are data the interval can't be changed
+                       :disabled (and (pos? (:metric-count data))
+                                      (not (:new-metric? data)))}
+            (for [interval intervals]
+              (dom/option {:value interval} (utils/camel-case-str interval)))))
 
         ;; unit
-        (dom/div {:class "small-caps bold mb1"} "Measured As")
-        (dom/select {:class "npt col-5 p1 mb2"
-                     :default-value (or (om/get-state owner :unit) "A number")
-                     :id "mtr-unit"}
-          (for [unit units]
-            (dom/option {:value (:unit unit)} (:name unit))))
+        (dom/div {:class "col-5 right"}
+          (dom/select {:class "npt col-12 p1 mb2 unit"
+                       :default-value (or (om/get-state owner :unit) "A number")
+                       :id "mtr-unit"}
+            (for [unit units]
+              (dom/option {:value (:unit unit)} (:name unit)))))
 
-        (dom/div {:class "topic-foce-footer group"}
-          (dom/div {:class "topic-foce-footer-right"}
+        ; (dom/div {:class "topic-foce-footer group"}
+        ;   (dom/div {:class "topic-foce-footer-right"}
 
-            ;; next or save button
-            (dom/button {:class "btn-reset btn-outline btn-data-save"
-                         :disabled (or (s/blank? (om/get-state owner :metric-slug))
-                                       (s/blank? (om/get-state owner :metric-name))
-                                       (s/blank? (om/get-state owner :unit))
-                                       (s/blank? (om/get-state owner :interval)))
-                         :on-click #(do (utils/event-stop %)
-                                        (save-metric-info owner (:save-cb data) new-metric?))}
-              (if new-metric? "NEXT" "SAVE"))
+        ;     ;; next or save button
+        ;     (dom/button {:class "btn-reset btn-outline btn-data-save"
+        ;                  :disabled (or (s/blank? (om/get-state owner :metric-slug))
+        ;                                (s/blank? (om/get-state owner :metric-name))
+        ;                                (s/blank? (om/get-state owner :unit))
+        ;                                (s/blank? (om/get-state owner :interval)))
+        ;                  :on-click #(do (utils/event-stop %)
+        ;                                 (save-metric-info owner (:save-cb data) new-metric?))}
+        ;       (if new-metric? "NEXT" "SAVE"))
 
-            ;; cancel button
-            (dom/button {:class "btn-reset btn-outline"
-                         :on-click #(do (utils/event-stop %)
-                                        ((:cancel-cb data)))} "CANCEL")
+        ;     ;; cancel button
+        ;     (dom/button {:class "btn-reset btn-outline"
+        ;                  :on-click #(do (utils/event-stop %)
+        ;                                 ((:cancel-cb data)))} "CANCEL")
 
-            (when-not new-metric?
-              (dom/button {:class "btn-reset archive-button"
-                           :title "Archive this chart"
-                           :type "button"
-                           :data-toggle "tooltip"
-                           :data-container "body"
-                           :data-placement "top"
-                           :on-click #(show-archive-confirm-popover owner data)}
-                  (dom/i {:class "fa fa-archive"})))
-
-
-            ))))))
+        ;     (when-not new-metric?
+        ;       (dom/button {:class "btn-reset archive-button"
+        ;                    :title "Archive this chart"
+        ;                    :type "button"
+        ;                    :data-toggle "tooltip"
+        ;                    :data-container "body"
+        ;                    :data-placement "top"
+        ;                    :on-click #(show-archive-confirm-popover owner data)}
+        ;           (dom/i {:class "fa fa-archive"})))))
+        ))))

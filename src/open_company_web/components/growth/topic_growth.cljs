@@ -135,35 +135,36 @@
                                          :editing data-editing?})
                 :key (name section)}
 
-        (if data-editing?
+        ; Chart
+        (when-not no-data
+          (dom/div {:class "composed-section growth group"}
+            ; growth data chart
+            (dom/div {:class (utils/class-set {:composed-section-body true})}
+              ;; growth metric currently shown
+              (when (and focus (seq (:metric-data subsection-data)))
+                (om/build growth-metric subsection-data {:opts options}))
+              (when (or (> (count growth-metric-slugs) 1) editable?)
+                (render-pillboxes owner editable? editing-cb options))
+              (when editable?
+                (dom/button {:class "btn-reset chart-pencil-button"
+                             :title "Edit chart data"
+                             :type "button"
+                             :data-toggle "tooltip"
+                             :data-container "body"
+                             :data-placement "left"
+                             :on-click #(do (om/set-state! owner :data-editing? true)
+                                            (editing-cb true))}
+                  (dom/i {:class "fa fa-pencil editable-pen"}))))))
 
+        ; Data/metadata edit
+        (when data-editing?
           (om/build growth-edit {
-                         :initial-focus focus
-                         :new-metric? new-metric?
-                         :growth-data growth-data
-                         :metrics growth-metrics
-                         :metric-slugs growth-metric-slugs
-                         :editing-cb (partial data-editing-toggle owner editing-cb)
-                         :switch-focus-cb (partial switch-focus owner)
-                         :archive-metric-cb (partial archive-metric-cb owner editing-cb)}
-                        {:opts {:currency currency} :key growth-data})
-
-          (when-not no-data
-            (dom/div {:class "composed-section growth group"}
-              ; growth data chart
-              (dom/div {:class (utils/class-set {:composed-section-body true})}
-                ;; growth metric currently shown
-                (when (and focus (seq (:metric-data subsection-data)))
-                  (om/build growth-metric subsection-data {:opts options}))
-                (when (or (> (count growth-metric-slugs) 1) editable?)
-                  (render-pillboxes owner editable? editing-cb options))
-                (when editable?
-                  (dom/button {:class "btn-reset chart-pencil-button"
-                               :title "Edit chart data"
-                               :type "button"
-                               :data-toggle "tooltip"
-                               :data-container "body"
-                               :data-placement "left"
-                               :on-click #(do (om/set-state! owner :data-editing? true)
-                                              (editing-cb true))}
-                    (dom/i {:class "fa fa-pencil editable-pen"})))))))))))
+             :initial-focus focus
+             :new-metric? new-metric?
+             :growth-data growth-data
+             :metrics growth-metrics
+             :metric-slugs growth-metric-slugs
+             :editing-cb (partial data-editing-toggle owner editing-cb)
+             :switch-focus-cb (partial switch-focus owner)
+             :archive-metric-cb (partial archive-metric-cb owner editing-cb)}
+            {:opts {:currency currency} :key growth-data}))))))

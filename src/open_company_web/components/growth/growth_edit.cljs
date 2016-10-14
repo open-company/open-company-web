@@ -238,91 +238,75 @@
       (dom/div {:class "growth"}
         (dom/div {:class "composed-section-edit growth-body edit"}
 
-          ;; Show either meta-data editing form or growth metric data editing table
-          (if metadata-edit?
+          ;; Meta-data editing form
+          (om/build growth-metric-edit {:metric-info metric-info
+                                        :new-metric? new-metric?
+                                        :metric-count (count (filter-growth-data metric-slug growth-data))
+                                        :save-cb (partial save-metadata-cb owner data)
+                                        :cancel-cb #(cancel-metadata-cb owner data editing-cb)
+                                        :archive-metric-cb (partial archive-metadata-cb owner data)}
+                                        {:opts {:currency (:currency options)}})
 
-            ;; Meta-data editing form
-            (om/build growth-metric-edit {:metric-info metric-info
-                                          :new-metric? new-metric?
-                                          :metric-count (count (filter-growth-data metric-slug growth-data))
-                                          :save-cb (partial save-metadata-cb owner data)
-                                          :cancel-cb #(cancel-metadata-cb owner data editing-cb)
-                                          :archive-metric-cb (partial archive-metadata-cb owner data)}
-                                          {:opts {:currency (:currency options)}})
-            
-            (dom/div
-              ;; Metric label and meta-data edit icon
-              (when interval
-                (dom/div {:class "metric-name"}
-                  (:name metric-info)
-                  (dom/button {:class "btn-reset metadata-edit-button"
-                               :title "Chart settings"
-                               :type "button"
-                               :data-toggle "tooltip"
-                               :data-container "body"
-                               :data-placement "right"
-                               :style {:font-size "15px"}
-                               :on-click #(set-metadata-edit owner  true)}
-                    (dom/i {:class "fa fa-cog"}))))
+          (dom/div
 
-              ;; Growth metric data editing table
-              (when interval
+            ;; Growth metric data editing table
+            (when interval
 
-                ;; Data editing table
-                (dom/div {:class "table-container group"}
-                  (dom/table {:class "table"
-                              :key (str "growth-edit-" slug)}
+              ;; Data editing table
+              (dom/div {:class "table-container group"}
+                (dom/table {:class "table"
+                            :key (str "growth-edit-" slug)}
 
-                    ;; For each period from the current, until as far in the past as the stop value
-                    (let [current-period (utils/current-growth-period interval)]
-                      (for [idx (range 1 stop)]
-                        (let [period (growth-utils/get-past-period current-period idx interval)
-                              has-value (contains? growth-data (str period slug))
-                              row-data (if has-value
-                                          (get growth-data (str period slug))
-                                          {:period period
-                                           :slug slug
-                                           :value nil
-                                           :new true})
-                              next-period (growth-utils/get-past-period current-period (inc idx) interval)]
-                          ;; A table row for this period
-                          (om/build growth-edit-row {:cursor row-data
-                                                     :next-period next-period
-                                                     :is-last (= idx 0)
-                                                     :needs-year (= idx (dec stop))
-                                                     :prefix prefix
-                                                     :suffix suffix
-                                                     :interval interval
-                                                     :change-cb (fn [k v]
-                                                          (replace-row-in-data owner row-data k v))}))))
-                      
-                      ;; Ending table row to paginate to more data in the table
-                      (dom/tfoot {}
-                        (dom/tr {}
-                          (dom/th {:class "earlier" :col-span 2}
-                            (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner data)} "Earlier..."))
-                          (dom/td {}))))))
+                  ;; For each period from the current, until as far in the past as the stop value
+                  (let [current-period (utils/current-growth-period interval)]
+                    (for [idx (range 1 stop)]
+                      (let [period (growth-utils/get-past-period current-period idx interval)
+                            has-value (contains? growth-data (str period slug))
+                            row-data (if has-value
+                                        (get growth-data (str period slug))
+                                        {:period period
+                                         :slug slug
+                                         :value nil
+                                         :new true})
+                            next-period (growth-utils/get-past-period current-period (inc idx) interval)]
+                        ;; A table row for this period
+                        (om/build growth-edit-row {:cursor row-data
+                                                   :next-period next-period
+                                                   :is-last (= idx 0)
+                                                   :needs-year (= idx (dec stop))
+                                                   :prefix prefix
+                                                   :suffix suffix
+                                                   :interval interval
+                                                   :change-cb (fn [k v]
+                                                        (replace-row-in-data owner row-data k v))}))))
 
-              ;; Save growth data and cancel edit buttons
-              (when interval
-                (dom/div {:class "topic-foce-footer group"}
-                  (dom/div {:class "topic-foce-footer-right"}
-                    (dom/button {:class "btn-reset btn-outline btn-data-save"
-                                 :disabled (not has-changes?)
-                                 :on-click  #(do
-                                              (utils/event-stop %)
-                                              (save-data owner data new-metric?)
-                                              (editing-cb false))} (if new-metric? "ADD" "SAVE"))
-                    (dom/button {:class "btn-reset btn-outline"
-                                 :on-click #(do
-                                              (utils/event-stop %)
-                                              (editing-cb false))} "CANCEL")
-                    (when-not new-metric?
-                      (dom/button {:class "btn-reset archive-button"
-                                   :title "Archive this chart"
-                                   :type "button"
-                                   :data-toggle "tooltip"
-                                   :data-container "body"
-                                   :data-placement "top"
-                                   :on-click #(show-archive-confirm-popover owner data)}
-                          (dom/i {:class "fa fa-archive"})))))))))))))
+                    ;; Ending table row to paginate to more data in the table
+                    (dom/tfoot {}
+                      (dom/tr {}
+                        (dom/th {:class "earlier" :col-span 2}
+                          (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner data)} "Earlier..."))
+                        (dom/td {}))))))
+
+            ;; Save growth data and cancel edit buttons
+            (when interval
+              (dom/div {:class "topic-foce-footer group"}
+                (dom/div {:class "topic-foce-footer-right"}
+                  (dom/button {:class "btn-reset btn-outline btn-data-save"
+                               :disabled (not has-changes?)
+                               :on-click  #(do
+                                            (utils/event-stop %)
+                                            (save-data owner data new-metric?)
+                                            (editing-cb false))} (if new-metric? "ADD" "SAVE"))
+                  (dom/button {:class "btn-reset btn-outline"
+                               :on-click #(do
+                                            (utils/event-stop %)
+                                            (editing-cb false))} "CANCEL")
+                  (when-not new-metric?
+                    (dom/button {:class "btn-reset archive-button"
+                                 :title "Archive this chart"
+                                 :type "button"
+                                 :data-toggle "tooltip"
+                                 :data-container "body"
+                                 :data-placement "top"
+                                 :on-click #(show-archive-confirm-popover owner data)}
+                        (dom/i {:class "fa fa-archive"}))))))))))))
