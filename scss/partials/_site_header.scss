@@ -51,3 +51,9 @@ ul.navbar-top li .navbar-item {
     opacity: 0.6;
   }
 }
+
+@media (min-width: 768px)  { /* not mobile */
+  .navbar-nav>li>a {
+    padding-top: 16px;
+  }
+}
