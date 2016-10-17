@@ -72,8 +72,8 @@
 
 ;; ===== Growth Metric Metadata Functions =====
 
-(defn- current-metric-info [metric-slug owner]
-  (or (get (om/get-state owner :metrics) metric-slug) {}))
+(defn- current-metric-info [owner metric-slug]
+  (get (om/get-state owner :metrics) metric-slug))
 
 (defn- growth-change-metric
   ""
@@ -84,9 +84,6 @@
         new-metrics (assoc metrics slug new-metric)]
     (om/set-state! owner :metrics new-metrics)))
 
-(defn- set-metadata-edit [owner editing]
-  (om/set-state! owner :metadata-edit? editing))
-
 (defn- metrics-as-sequence
   "We have metrics here as a map, but they need to be dispatched as a sequence."
   [owner metric-slugs]
@@ -96,35 +93,14 @@
 (defn- new-metric-slug [metric-name]
   (s/slugify (str metric-name " " (utils/my-uuid))))
 
-(defn- save-metadata-cb [owner data slug properties-map new-metric?]
-  ;; reflect edits in metric metadata in local state
-  (if new-metric?
-    (let [new-slug (new-metric-slug (:name properties-map))] ; new slug for a new metric
-      (growth-change-metric owner new-slug (assoc properties-map :slug new-slug))
-      (om/set-state! owner :metric-slug new-slug)) ; now data editing the new metric
-    (growth-change-metric owner slug properties-map))
-  
-  (if new-metric?
-    ;; edit new metric's data, not its meta-data       
-    (om/set-state! owner :metadata-edit? false) 
-    ;; dispatch the metric matadata change (for API update)
-    (dis/dispatch! [:save-topic-data "growth" {:metrics (metrics-as-sequence owner (:metric-slugs data))
-                                               :placeholder false}])))
+;; ===== Growth Metric Data Functions =====
 
-(defn- cancel-metadata-cb [owner data editing-cb]
-  (set-metadata-edit owner false) ; cancel the metadata editing
-  (when (:new-metric? data)
-    (editing-cb false))) ; cancel the whole data editing
-
-(defn- archive-metadata-cb [owner data metric-slug]
-  (set-metadata-edit owner false) ; cancel the metadata editing
+(defn- archive-metric-cb [owner data metric-slug]
   (let [metric-slugs (remove #{metric-slug} (:metric-slugs data)) ; remove the slug
         fewer-metrics (metrics-as-sequence owner metric-slugs)] ; full metrics w/o the slug
     (om/set-state! owner :metric-slug (first fewer-metrics))
     (dis/dispatch! [:save-topic-data "growth" {:metrics fewer-metrics}])) ; dispatch the fewer metrics
   ((:archive-metric-cb data) metric-slug))
-
-;; ===== Growth Metric Data Functions =====
 
 (defn- growth-get-value
   "Return a blank string, 0 or the value."
@@ -177,23 +153,43 @@
              (not (nil? (:slug data))))
     (dissoc data :new)))
 
-(defn- growth-clean-data [growth-data]
-  (vec (remove nil? (map (fn [[_ v]] (growth-clean-row v)) growth-data))))
+(defn- growth-clean-data [growth-data new-slug]
+  (let [fixed-growth-data (apply merge (map (fn [[k v]]
+                                              (hash-map
+                                                (if (= (:slug v) growth-utils/new-metric-slug-placeholder)
+                                                  (str (:period v) new-slug)
+                                                  k)
+                                                (if (= (:slug v) growth-utils/new-metric-slug-placeholder)
+                                                  (assoc v :slug new-slug)
+                                                  v))) growth-data))]
+    (vec (remove nil? (map (fn [[_ v]] (growth-clean-row v)) fixed-growth-data)))))
 
 (defn- save-data [owner data new-metric?]
-  (om/set-state! owner :has-changes? false)
-  (let [data-map {:data (growth-clean-data (om/get-state owner :growth-data))}
-        existing-metrics (vec (metrics-as-sequence owner (:metric-slugs data)))
-        metric-slug (om/get-state owner :metric-slug)
-        new-metrics (if new-metric?
-                      (conj existing-metrics (current-metric-info metric-slug owner))
-                      existing-metrics)
-        final-map (if new-metric?
-                    (assoc data-map :metrics (vals new-metrics))
-                    (assoc data-map :metrics (vals (:metrics data))))] ; add the metadata if this is a new metric
-    (dis/dispatch! [:save-topic-data "growth" (assoc final-map :placeholder false)])
-    (when new-metric?
-      ((:switch-focus-cb data) metric-slug {})))) ; show the new metric
+  (let [metric-slug (om/get-state owner :metric-slug)
+        metadata-map (current-metric-info owner metric-slug)]
+    ; if it's a new metric
+    (if new-metric?
+      ; create a unique slug and update the metadata and the current focus
+      (let [new-slug (new-metric-slug (:name metadata-map))
+            metadata-on-change-cb (om/get-props owner :metadata-on-change-cb)] ; new slug for a new metric
+        (growth-change-metric owner new-slug (assoc metadata-map :slug new-slug))
+        (om/set-state! owner :metric-slug new-slug)
+        (metadata-on-change-cb :slug new-slug)) ; now data editing the new metric
+      (growth-change-metric owner metric-slug metadata-map))
+    ; reset the has-changes? flag
+    (om/set-state! owner :has-changes? false)
+    ; save all the metric data
+    (let [new-slug (om/get-state owner :metric-slug)
+          data-map {:data (growth-clean-data (om/get-state owner :growth-data) new-slug)}
+          existing-metrics (vec (metrics-as-sequence owner (:metric-slugs data)))
+          updated-metadata (assoc metadata-map :slug new-slug)
+          new-metrics (if new-metric?
+                        (conj existing-metrics updated-metadata)
+                        existing-metrics)
+          final-map (assoc data-map :metrics new-metrics)] ; add the metadata if this is a new metric
+      (dis/dispatch! [:save-topic-data "growth" (assoc final-map :placeholder false)])
+      (when new-metric?
+        ((:switch-focus-cb data) new-slug {}))))) ; show the new metric
 
 (defn- replace-row-in-data [owner row k v]
   (let [new-row (update row k (fn[_]v))]
@@ -205,7 +201,7 @@
                 :cancel-title "KEEP"
                 :cancel-cb #(hide-popover nil "delete-metric-confirm")
                 :success-title "ARCHIVE"
-                :success-cb #(archive-metadata-cb owner data (om/get-state owner :metric-slug))}))
+                :success-cb #(archive-metric-cb owner data (om/get-state owner :metric-slug))}))
 
 ;; ===== Growth Data Editing Component =====
 
@@ -216,8 +212,7 @@
                                    metadata-on-change-cb] :as data} owner options]
 
   (init-state [_]
-    {:metadata-edit? new-metric? ; not editing metric metadata
-     :metrics (:metrics data)
+    {:metrics (:metrics data)
      :growth-data (:growth-data data) ; all the growth data for all metrics
      :metric-slug (:initial-focus data) ; the slug of the current metric
      :has-changes? false
@@ -234,15 +229,11 @@
       (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
-  (render-state [_ {:keys [metadata-edit? metrics growth-data metric-slug stop has-changes?] :as state}]
+  (render-state [_ {:keys [metrics growth-data metric-slug stop has-changes?] :as state}]
     (let [company-slug (router/current-company-slug)
-          metric-info (current-metric-info metric-slug owner)
-          slug (:slug metric-info)
-          interval (:interval metric-info)
-          unit (:unit metric-info)
+          {slug :slug interval :interval metric-name :name unit :unit description :description :as metric-info} (current-metric-info owner metric-slug)
           prefix (if (= unit "currency") (utils/get-symbol-for-currency-code (:currency options)) "")
           suffix (when (= unit "%") "%")]
-
       (dom/div {:class "growth"}
         (dom/div {:class "composed-section-edit growth-body edit"}
 
@@ -252,10 +243,7 @@
                                         :metric-count (count (filter-growth-data metric-slug growth-data))
                                         :metadata-on-change-cb (fn [k v]
                                                                 (om/set-state! owner :has-changes? true)
-                                                                (metadata-on-change-cb k v))
-                                        :save-cb (partial save-metadata-cb owner data)
-                                        :cancel-cb #(cancel-metadata-cb owner data editing-cb)
-                                        :archive-metric-cb (partial archive-metadata-cb owner data)}
+                                                                (metadata-on-change-cb k v))}
                                         {:opts {:currency (:currency options)}})
 
           (dom/div
@@ -303,7 +291,8 @@
               (dom/div {:class "topic-foce-footer group"}
                 (dom/div {:class "topic-foce-footer-right"}
                   (dom/button {:class "btn-reset btn-outline btn-data-save"
-                               :disabled (not has-changes?)
+                               :disabled (or (not has-changes?)
+                                              (string/blank? metric-name))
                                :on-click  #(do
                                             (utils/event-stop %)
                                             (save-data owner data new-metric?)
