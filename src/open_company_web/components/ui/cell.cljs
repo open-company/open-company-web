@@ -21,11 +21,10 @@
 (defn- to-state [owner data state]
   (om/set-state! owner :cell-state state)
   (when (= state :edit)
-    (utils/after 10 #(let [input (.findDOMNode js/ReactDOM (om/get-ref owner "edit-field"))
-                           value (.-value input)]
+    (utils/after 10 #(when-let [input (.findDOMNode js/ReactDOM (om/get-ref owner "edit-field"))]
                        (when input
                          (.focus (.findDOMNode js/ReactDOM input))
-                         (set! (.-value input) value))))))
+                         (set! (.-value input) (.-value input)))))))
 
 (defn- initial-cell-state
   "Get the initial state for the cell.
