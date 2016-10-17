@@ -4,7 +4,6 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.d3-chart :refer (d3-chart)]
-            [open-company-web.components.ui.utility-components :refer (editable-pen)]
             [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.router :as router]
             [open-company-web.lib.oc-colors :as occ]
@@ -24,7 +23,7 @@
 (defn- sub-label [period metric-info]
   (let [mname (:name metric-info)
         interval (:interval metric-info)
-        label (str mname " - ")]
+        label (if-not (clojure.string/blank? mname) (str mname " - ") "")]
     (cond
       (= interval "weekly")
       (str label (utils/get-weekly-period-day period) " " (utils/get-month period "weekly") " " (utils/get-year period "weekly"))
@@ -67,9 +66,9 @@
                                               :label-presenter #(:sub-label %2)
                                               :label-color (occ/get-color-by-kw :oc-gray-5)}}
                              :hide-nav (:hide-nav options)}}]
-
       (dom/div {:class (utils/class-set {:section true
                                          slug true
+                                         :fake-chart (:fake-chart data)
                                          :read-only (:read-only data)})
                 :key slug
                 :on-click (:start-editing-cb data)}
