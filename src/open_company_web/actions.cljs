@@ -167,6 +167,9 @@
         (dissoc :foce-data)
         (dissoc :foce-data-editing?))))
 
+(defmethod dispatcher/action :start-foce-data-editing [db [_ value]]
+  (assoc db :foce-data-editing? value))
+
 (defmethod dispatcher/action :foce-input [db [_ topic-data-map]]
   (let [old-data (:foce-data db)]
     (assoc db :foce-data (merge old-data topic-data-map))))
