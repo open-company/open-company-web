@@ -9,9 +9,7 @@
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.iso4217 :refer (sorted-iso4217)]
             [open-company-web.lib.growth-utils :as growth-utils]
-            [open-company-web.lib.responsive :as responsive]
-            [cuerdas.core :as s]
-            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
+            [open-company-web.lib.responsive :as responsive]))
 
 (def metric-defaults {
   :slug growth-utils/new-metric-slug-placeholder
@@ -19,14 +17,6 @@
   :description ""
   :unit "number"
   :interval "monthly"})
-
-(defn- show-archive-confirm-popover [owner data]
-  (add-popover {:container-id "archive-metric-confirm"
-                :message "This chart will no longer be available for new data, but prior entries will still be visible in topic history. Are you sure you want to archive?"
-                :cancel-title "KEEP"
-                :cancel-cb #(hide-popover nil "delete-metric-confirm")
-                :success-title "ARCHIVE"
-                :success-cb #((:archive-metric-cb data) (om/get-state owner :metric-slug))}))
 
 (defn- option-template [state]
   (if-not (.-id state) (.-text state))
@@ -88,16 +78,6 @@
     {:intervals (:intervals growth-defaults)
      :units (:units growth-defaults)}))
 
-(defn- save-metric-info [owner save-cb new?]
-  (let [slug (om/get-state owner :metric-slug)]
-    (save-cb slug {
-      :slug slug
-      :name (om/get-state owner :metric-name)
-      :description (om/get-state owner :description)
-      :unit (om/get-state owner :unit)
-      :interval (om/get-state owner :interval)}
-      new?)))
-
 (defcomponent growth-metric-edit [data owner options]
 
   (init-state [_]
@@ -156,7 +136,6 @@
                             on-change-cb (om/get-props owner :metadata-on-change-cb)]
                         (om/set-state! owner :metric-name v)
                         (on-change-cb :name v)))
-                       ;(change-name owner data))
           :id "mtr-name"
           :placeholder "Chart label - a short name, e.g. DAU"})
 
