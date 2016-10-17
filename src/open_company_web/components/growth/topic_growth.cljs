@@ -11,6 +11,13 @@
 
 (def focus-cache-key :last-selected-metric)
 
+(def new-metric-preset
+  {:name ""
+   :description ""
+   :slug growth-utils/new-metric-slug-placeholder
+   :interval "monthly"
+   :unit "number"})
+
 (defn- switch-focus [owner focus options]
   (utils/company-cache-key focus-cache-key focus)
   (om/set-state! owner :focus focus)
@@ -35,10 +42,21 @@
 (defn- filter-growth-data [focus growth-data]
   (vec (filter #(= (:slug %) focus) (vals growth-data))))
 
-(defn- data-editing-toggle [owner editing-cb editing?]
-  (om/set-state! owner :data-editing? editing?)
-  (when-not editing?
+(defn- data-editing-toggle [owner editing-cb editing? & [new-metric?]]
+  (if editing?
+    (when new-metric?
+      ; if entering editing mode for a new metric
+      ; set the focus to the new metric slug
+      (om/set-state! owner :focus growth-utils/new-metric-slug-placeholder)
+      (om/set-state! owner :new-metric? true)
+      ; and add a placeholder metadata to the metrics map
+      (let [growth-metrics (om/get-state owner :growth-metrics)
+            new-metrics (assoc growth-metrics growth-utils/new-metric-slug-placeholder new-metric-preset)]
+        (om/set-state! owner :growth-metrics new-metrics)))
+    ; disable new-metric? if exiting the editing
     (om/set-state! owner :new-metric? false))
+  ; set editing
+  (om/set-state! owner :data-editing? editing?)
   (editing-cb editing?))
 
 (defn- archive-metric-cb [owner editing-cb metric-slug]
@@ -74,26 +92,12 @@
                         :data-container "body"
                         :data-placement "bottom"
                         :data-tab metric-slug
-                        :on-click (partial pillbox-click owner options)} mname))))
-      
-      (when editable?
-        ;; new metric
-        (dom/label {:class (utils/class-set {:pillbox true
-                                             :new true})
-                    :title "Add a new chart"
-                    :data-toggle "tooltip"
-                    :data-container "body"
-                    :data-placement "bottom"
-                    :data-tab growth-utils/new-metric-slug-placeholder
-                    :on-click (fn [e]
-                                (.stopPropagation e)
-                                (om/set-state! owner :new-metric? true)
-                                (data-editing-toggle owner editing-cb true))} "+ New Chart")))))
+                        :on-click (partial pillbox-click owner options)} mname)))))))
 
 (defn- get-state [owner data initial]
   (let [section-data (:section-data data)
         all-metrics (:metrics section-data)
-        metrics (metrics-map all-metrics)
+        metrics (if initial (metrics-map all-metrics) (om/get-state owner :growth-metrics))
         first-metric (:slug (first (:metrics section-data)))
         last-focus (utils/company-cache-key focus-cache-key)
         focus (if initial
@@ -101,7 +105,7 @@
                 (om/get-state owner :focus)) ; preserve focus if this is for will-update
         growth-data (growth-utils/growth-data-map (:data section-data))
         metric-slugs (metrics-order all-metrics)
-        new-metric? (not focus)]
+        new-metric? (if initial (not focus) (om/get-state owner :new-metric?))]
     {:growth-data growth-data
      :growth-metrics metrics
      :growth-metric-slugs metric-slugs
@@ -113,11 +117,10 @@
   (om/update-state! owner #(merge % {:growth-data new-data})))
 
 (defn- metadata-editing-on-change [owner focus k v]
-  (let [focus (om/get-state owner :focus)
-        metrics (om/get-state owner :growth-metrics)
+  (let [metrics (om/get-state owner :growth-metrics)
         metric (get metrics focus)
         new-metric (assoc metric k v)
-        new-metrics (assoc metrics focus new-metric)]
+        new-metrics (assoc metrics (if (= k :slug) v focus) new-metric)]
     (om/set-state! owner :growth-metrics new-metrics)))
 
 (defcomponent topic-growth [{:keys [section section-data currency editable? initial-editing? editing-cb] :as data} owner options]
@@ -135,14 +138,18 @@
           no-data (utils/no-growth-data? growth-data)
           focus-metric-data (filter-growth-data focus growth-data)
           focus-metric-info (get growth-metrics focus)
-          subsection-data {:metric-data focus-metric-data
+          show-placeholder-chart? (and data-editing?
+                                       (< (count focus-metric-data) 2))
+          subsection-data {:metric-data (if show-placeholder-chart?
+                                          (growth-utils/fake-chart-placeholder-data focus-metric-info)
+                                          focus-metric-data)
                            :metric-info focus-metric-info
+                           :fake-chart show-placeholder-chart?
                            :editing data-editing?
                            :focus focus
                            :currency currency
                            :read-only true
                            :total-metrics (count growth-metrics)}]
-
       (dom/div {:id "section-growth"
                 :class (utils/class-set {:section-container true
                                          :editing data-editing?})
@@ -156,7 +163,9 @@
               ;; growth metric currently shown
               (when (and focus (seq (:metric-data subsection-data)))
                 (om/build growth-metric subsection-data {:opts options}))
-              (when (or (> (count growth-metric-slugs) 1) editable?)
+              (when (or (> (count growth-metric-slugs) 1)
+                        editable?
+                        (not data-editing?))
                 (render-pillboxes owner editable? editing-cb options))
               (when (and editable? (not data-editing?))
                 (dom/button {:class "btn-reset chart-pencil-button"
@@ -164,10 +173,32 @@
                              :type "button"
                              :data-toggle "tooltip"
                              :data-container "body"
-                             :data-placement "left"
+                             :data-placement "right"
                              :on-click #(do (om/set-state! owner :data-editing? true)
                                             (editing-cb true))}
-                  (dom/i {:class "fa fa-pencil editable-pen"}))))))
+                  (dom/i {:class "fa fa-pencil editable-pen"})))
+              (when (and editable? (not data-editing?))
+                (dom/button {:class "btn-reset chart-plus-button"
+                             :title "Add a chart"
+                             :type "button"
+                             :data-toggle "tooltip"
+                             :data-container "body"
+                             :data-placement "right"
+                             :on-click (fn [e]
+                                         (data-editing-toggle owner editing-cb true true))}
+                  (dom/i {:class "fa fa-plus"})))
+              (when (and editable?
+                         (not data-editing?)
+                         (not= focus growth-utils/new-metric-slug-placeholder))
+                (dom/button {:class "btn-reset chart-archive-button"
+                             :title "Archive chart"
+                             :type "button"
+                             :data-toggle "tooltip"
+                             :data-container "body"
+                             :data-placement "right"
+                             :on-click (fn [e]
+                                         (archive-metric-cb owner editing-cb focus))}
+                  (dom/i {:class "fa fa-archive"}))))))
 
         ; Data/metadata edit
         (when data-editing?
