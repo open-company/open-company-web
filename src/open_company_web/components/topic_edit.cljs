@@ -224,7 +224,7 @@
 
 (defn- data-editing-cb [owner value]
   (om/set-state! owner :data-editing? value) ; local state
-  (dis/set-foce-section-data-editing value)) ; global atom state
+  (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
 
 (defcomponent topic-edit [{:keys [show-first-edit-tip
                                   currency
@@ -456,7 +456,7 @@
                              :data-placement "top"
                              :style {:display (if no-data? "block" "none")}
                              :on-click #(do
-                                          (dis/set-foce-section-data-editing true)
+                                          (dis/dispatch! [:start-foce-data-editing true])
                                           (om/set-state! owner :data-editing? true))}
                   (dom/i {:class "fa fa-line-chart"})))
               (when-not (:placeholder topic-data)
