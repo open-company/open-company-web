@@ -100,6 +100,28 @@ div.finances, div.growth {
     }
   }
 
+  div.section.new-metric-slug-placeholder.fake-chart {
+    position: relative;
+
+    &:after {
+      display: block;
+      position: absolute;
+      content: "Your Chart Will Show Up Here \00000a (minimum two periods)";
+      white-space: pre;
+      width: 100%;
+      height: 100%;
+      top: 0px;
+      left: 0px;
+      background-color: rgba(243,244,245,0.8);
+      color: rgba(78,90,107,0.5);
+      font-size: 12px;
+      font-style: italic;
+      letter-spacing: 1px;
+      text-align: center;
+      padding-top: 120px;
+    }
+  }
+
   div.topic-foce-footer {
     margin: 0 !important;
 
