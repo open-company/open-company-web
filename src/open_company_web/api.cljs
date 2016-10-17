@@ -180,7 +180,7 @@
   (auth-get "/"
     {:headers {"content-type" "application/json"}}
     (fn [response]
-      (let [body (if (:success response) (:body response) {})]
+      (let [body (if (:success response) (:body response) false)]
         (dispatcher/dispatch! [:auth-settings body])))))
 
 (defn save-or-create-section [section-data]

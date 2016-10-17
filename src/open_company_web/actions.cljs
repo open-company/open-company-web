@@ -77,12 +77,11 @@
 
 (defmethod dispatcher/action :auth-settings [db [_ body]]
   (if body
-    (do
-      (when (and (utils/in? (:route @router/path) "confirm-invitation")
+    (when (and (utils/in? (:route @router/path) "confirm-invitation")
                  (contains? (:query-params @router/path) :token))
         (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path)))))
-      (assoc db :auth-settings body))
-    db))
+    (utils/after 2000 #(api/get-auth-settings)))
+  (assoc db :auth-settings body))
 
 (defmethod dispatcher/action :revision [db [_ body]]
   (if body

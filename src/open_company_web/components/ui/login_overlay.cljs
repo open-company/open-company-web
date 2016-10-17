@@ -18,7 +18,11 @@
   (dis/dispatch! [:show-login-overlay false]))
 
 (def dont-scroll
-  {:before-render (fn [s]
+  {:will-mount (fn [s]
+                (when-not (contains? @dis/app-state :auth-settings)
+                  (dis/dispatch! [:get-auth-settings]))
+                s)
+   :before-render (fn [s]
                     (if (responsive/is-mobile-size?)
                       (let [display-none #js {:display "none"}]
                         (when (sel1 [:div.main])
@@ -30,8 +34,6 @@
                         (when (sel1 [:div.fullscreen-page])
                           (gstyle/setStyle (sel1 [:div.fullscreen-page]) display-none)))
                       (dommy/add-class! (sel1 [:body]) :no-scroll))
-                    (when-not (:auth-settings @dis/app-state)
-                      (dis/dispatch! [:get-auth-settings]))
                     s)
    :will-unmount (fn [s]
                    (if (responsive/is-mobile-size?)
@@ -84,7 +86,8 @@
           {:on-click #(do
                         (.preventDefault %)
                         (when (:auth-settings @dis/app-state)
-                          (dis/dispatch! [:login-with-slack true])))}
+                          (dis/dispatch! [:login-with-slack true])))
+           :disabled (not (:auth-settings (rum/react dis/app-state)))}
           [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
           (when-not (:auth-settings (rum/react dis/app-state))
             (small-loading))]
@@ -167,7 +170,8 @@
             ;;  [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
               [:button.btn-reset.btn-solid
-                {:disabled (nil? (:email (:auth-settings (rum/react dis/app-state))))
+                {:disabled (or (not (:auth-settings (rum/react dis/app-state)))
+                               (nil? (-> dis/app-state rum/react :auth-settings :email)))
                  :on-click #(do
                               (.preventDefault %)
                               (dis/dispatch! [:login-with-email]))}
@@ -266,7 +270,8 @@
             ;;  [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
               [:button.btn-reset.btn-solid
-                {:disabled (or (and (s/blank? (:firstname (:signup-with-email (rum/react dis/app-state))))
+                {:disabled (or (not (:auth-settings (rum/react dis/app-state)))
+                               (and (s/blank? (:firstname (:signup-with-email (rum/react dis/app-state))))
                                     (s/blank? (:lastname (:signup-with-email (rum/react dis/app-state)))))
                                (gobj/get (gobj/get (sel1 [:input.email]) "validity") "patternMismatch")
                                (< (count (:pswd (:signup-with-email (rum/react dis/app-state)))) 5))
@@ -310,7 +315,8 @@
                 "RESET PASSWORD"]]
             [:div.right
               [:button.btn-reset.btn-outline
-                {:on-click #(dis/dispatch! [:show-login-overlay nil])}
+                {:on-click #(dis/dispatch! [:show-login-overlay nil])
+                 :disabled (not (:auth-settings (rum/react dis/app-state)))}
                 "CANCEL"]]]]]]])
 
 (rum/defcs collect-name-password < rum/reactive
