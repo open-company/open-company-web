@@ -193,3 +193,18 @@
                  next-data
                  (inc idx))
           next-data)))))
+
+(defn fake-chart-placeholder-data []
+  (let [current-period   (utils/current-period)]
+    (loop [idx 0
+           period current-period
+           d   []]
+      (if (< idx (- columns-num 2))
+        (let [row {:period period
+                   :cash (- (* 1000 6) (* (inc idx) 1000))
+                   :costs (- (* 100 6) (* (inc idx) 100))
+                   :revenue (* (inc idx) 200)}]
+          (recur (inc idx)
+                 (get-past-period period 1)
+                 (assoc d idx row)))
+        d))))
