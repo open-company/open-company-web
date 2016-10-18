@@ -67,19 +67,20 @@
         fewer-metrics (growth-utils/metrics-as-sequence (om/get-state owner :growth-metrics) metric-slugs)]
     (om/set-state! owner :focus focus) ; new focus on the first remaining metric
     (om/set-state! owner :growth-metric-slugs metric-slugs) ; update valid slugs state
+    (om/set-state! owner :growth-metrics (metrics-map fewer-metrics))
     ;; if last focus is the removing metric, remove the last focus cache
     (when (= (utils/company-cache-key focus-cache-key) metric-slug)
       (utils/remove-company-cache-key focus-cache-key))
     (dis/dispatch! [:save-topic-data "growth" {:metrics fewer-metrics}])
     (data-editing-toggle owner editing-cb false))) ; no longer data editing
 
-(defn- show-archive-confirm-popover [owner editing-cb]
+(defn- show-archive-confirm-popover [owner editing-cb metric-slug]
   (add-popover {:container-id "archive-metric-confirm"
                 :message "Prior updates to this chart will only be available in topic history. Are you sure you want to archive?"
                 :cancel-title "KEEP"
                 :cancel-cb #(hide-popover nil "delete-metric-confirm")
                 :success-title "ARCHIVE"
-                :success-cb #(archive-metric-cb owner editing-cb (om/get-state owner :metric-slug))}))
+                :success-cb #(archive-metric-cb owner editing-cb metric-slug)}))
 
 (defn- render-pillboxes [owner editable? editing-cb options]
 
@@ -208,7 +209,7 @@
                              :data-toggle "tooltip"
                              :data-container "body"
                              :data-placement "right"
-                             :on-click #(show-archive-confirm-popover owner editing-cb)}
+                             :on-click #(show-archive-confirm-popover owner editing-cb focus)}
                   (dom/i {:class "fa fa-archive"}))))))
 
         ; Data/metadata edit
@@ -223,5 +224,5 @@
              :metadata-on-change-cb (partial metadata-editing-on-change owner focus)
              :editing-cb (partial data-editing-toggle owner editing-cb)
              :switch-focus-cb (partial switch-focus owner)
-             :archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)}
+             :archive-metric-cb (partial show-archive-confirm-popover owner editing-cb focus)}
             {:opts {:currency currency} :key growth-data}))))))
