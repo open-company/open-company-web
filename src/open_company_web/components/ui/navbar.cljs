@@ -45,9 +45,28 @@
                   (if (jwt/jwt)
                     (dom/div {}
                       (when show-share-su-button
-                        (dom/div {:class "sharing-button-container"}
+                        (dom/div {:class "sharing-button-container dropdown"}
                           (dom/button {:class "btn-reset sharing-button right"
+                                       :aria-haspopup true
+                                       :aria-expanded false
+                                       :id "share-an-update"
+                                       :data-toggle "dropdown"
                                        :disabled (not (nil? (:foce-key data)))
-                                       :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} (dom/i {:class "fa fa-share"}) " SHARE AN UPDATE")))
+                                       ; :on-click #(router/nav! (oc-urls/stakeholder-update-preview))
+                                     }
+                            (dom/i {:class "fa fa-share"}) " SHARE AN UPDATE")
+                          (dom/ul {:class "dropdown-menu" :aria-labelledby "share-an-update"}
+                            (dom/li {} (dom/a {:href (oc-urls/stakeholder-update-preview "email")
+                                               :on-click #(do
+                                                           (.preventDefault %)
+                                                           (router/nav! (oc-urls/stakeholder-update-preview "email")))} "SHARE BY EMAIL"))
+                            (dom/li {} (dom/a {:href (oc-urls/stakeholder-update-preview "slack")
+                                               :on-click #(do
+                                                           (.preventDefault %)
+                                                           (router/nav! (oc-urls/stakeholder-update-preview "slack")))} "SHARE TO SLACK"))
+                            (dom/li {} (dom/a {:href (oc-urls/stakeholder-update-preview "url")
+                                               :on-click #(do
+                                                           (.preventDefault %)
+                                                           (router/nav! (oc-urls/stakeholder-update-preview "url")))} "SHARE A URL")))))
                       (user-avatar (partial menu-click owner)))
                     (login-button)))))))))))

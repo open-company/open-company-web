@@ -102,6 +102,21 @@ nav.oc-navbar {
             margin-right: 2px;
           }
         }
+
+        ul.dropdown-menu {
+          li{
+            &:hover {
+              background-color: white;
+            }
+            a{
+              color: $oc_gray_5;
+              &:hover {
+                opacity: 0.6;
+                background-color: white;
+              }
+            }
+          }
+        }
       }
 
       div.user-avatar {
