@@ -100,7 +100,7 @@ div.finances, div.growth {
     }
   }
 
-  div.section.new-metric-slug-placeholder.fake-chart {
+  div.section.new-metric-slug-placeholder.fake-chart, div.bordered-chart.fake-chart {
     position: relative;
 
     &:after {
