@@ -131,9 +131,11 @@
         finances-data (om/get-state owner :finances-data)
         fixed-data (if has-data? 
                       (assoc finances-data period fixed-row)
-                      (dissoc finances-data period))]
+                      (dissoc finances-data period))
+        data-on-change-cb (om/get-props owner :data-on-change-cb)]
     ;(om/set-state! owner :has-changes (or (om/get-state owner :has-changes) (not= finances-data fixed-data)))
-    (om/set-state! owner :finances-data fixed-data)))
+    (om/set-state! owner :finances-data fixed-data)
+    (data-on-change-cb fixed-data)))
 
 (defn finances-clean-row [data]
   ; a data entry is good if we have the period and one other value: cash, costs or revenue
