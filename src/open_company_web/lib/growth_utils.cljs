@@ -132,6 +132,9 @@
       :pattern "###,###.##"
       :column-thickness "14"}))
 
+(defn metrics-as-sequence [metric-map metric-slugs]
+  (map metric-map metric-slugs))
+
 (defn get-actual [metrics]
   (some #(when (:value (metrics %)) %) (vec (range (count metrics)))))
 
