@@ -73,7 +73,7 @@
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
-          truncated-body      (if (utils/is-test-env?)
+          truncated-body      (if (or (utils/is-test-env?) (= (:su-medium data) :email))
                                 topic-body
                                 (.truncate js/$ topic-body (clj->js {:length utils/topic-body-limit :words true})))
           company-data        (dis/company-data)
@@ -136,7 +136,7 @@
 
         ; if it's SU preview or SU show only read-more
         (if is-stakeholder-update
-          (when (utils/exceeds-topic-body-limit topic-body)
+          (when (and (utils/exceeds-topic-body-limit topic-body) (not= (:su-medium data) :email))
             (dom/div {:class "left"
                     :style {:margin-bottom "20px"}}
               (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic owner nil false)))))
