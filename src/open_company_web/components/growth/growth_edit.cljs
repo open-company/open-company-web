@@ -13,8 +13,7 @@
             [open-company-web.components.ui.utility-components :refer (editable-pen)]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
-            [cljs.core.async :refer (put!)]
-            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
+            [cljs.core.async :refer (put!)]))
 
 (def batch-size 5)
 
@@ -84,23 +83,13 @@
         new-metrics (assoc metrics slug new-metric)]
     (om/set-state! owner :metrics new-metrics)))
 
-(defn- metrics-as-sequence
-  "We have metrics here as a map, but they need to be dispatched as a sequence."
-  [owner metric-slugs]
-  (let [metric-map (om/get-state owner :metrics)]
-    (map metric-map metric-slugs)))
-
 (defn- new-metric-slug [metric-name]
   (s/slugify (str metric-name " " (utils/my-uuid))))
 
 ;; ===== Growth Metric Data Functions =====
 
-(defn- archive-metric-cb [owner data metric-slug]
-  (let [metric-slugs (remove #{metric-slug} (:metric-slugs data)) ; remove the slug
-        fewer-metrics (metrics-as-sequence owner metric-slugs)] ; full metrics w/o the slug
-    (om/set-state! owner :metric-slug (first fewer-metrics))
-    (dis/dispatch! [:save-topic-data "growth" {:metrics fewer-metrics}])) ; dispatch the fewer metrics
-  ((:archive-metric-cb data) metric-slug))
+(defn- archive-metric-cb [owner]
+  ((om/get-props owner :archive-metric-cb)))
 
 (defn- growth-get-value
   "Return a blank string, 0 or the value."
@@ -181,7 +170,7 @@
     ; save all the metric data
     (let [new-slug (om/get-state owner :metric-slug)
           data-map {:data (growth-clean-data (om/get-state owner :growth-data) new-slug)}
-          existing-metrics (vec (metrics-as-sequence owner (:metric-slugs data)))
+          existing-metrics (vec (growth-utils/metrics-as-sequence (om/get-state owner :metrics) (:metric-slugs data)))
           updated-metadata (assoc metadata-map :slug new-slug)
           new-metrics (if new-metric?
                         (conj existing-metrics updated-metadata)
@@ -194,14 +183,6 @@
 (defn- replace-row-in-data [owner row k v]
   (let [new-row (update row k (fn[_]v))]
     (growth-change-data owner new-row)))
-
-(defn- show-archive-confirm-popover [owner data]
-  (add-popover {:container-id "archive-metric-confirm"
-                :message "Prior updates to this chart will only be available in topic history. Are you sure you want to archive?"
-                :cancel-title "KEEP"
-                :cancel-cb #(hide-popover nil "delete-metric-confirm")
-                :success-title "ARCHIVE"
-                :success-cb #(archive-metric-cb owner data (om/get-state owner :metric-slug))}))
 
 ;; ===== Growth Data Editing Component =====
 
@@ -308,5 +289,5 @@
                                  :data-toggle "tooltip"
                                  :data-container "body"
                                  :data-placement "top"
-                                 :on-click #(show-archive-confirm-popover owner data)}
+                                 :on-click #(archive-metric-cb owner)}
                         (dom/i {:class "fa fa-archive"}))))))))))))
