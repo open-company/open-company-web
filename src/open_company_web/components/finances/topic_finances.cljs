@@ -40,7 +40,7 @@
 (defcomponent topic-finances [{:keys [section section-data currency editable? initial-editing? editing-cb] :as data} owner options]
 
   (init-state [_]
-    {:data-editing? false
+    {:data-editing? initial-editing?
      :finances-row-data (:data section-data)})
 
   (will-receive-props [_ next-props]
@@ -53,14 +53,16 @@
           data-editing? (or initial-editing? data-editing?)]
 
       (when (or data-editing? (not no-data))
-        (let [fixed-finances-data (finance-utils/fill-gap-months finances-row-data)
+        (let [show-placeholder-chart? (and data-editing?
+                                           (< (count finances-row-data) 2))
+              fixed-finances-data (if show-placeholder-chart?
+                                    (finance-utils/finances-data-map (:data (utils/fix-finances {:data (finance-utils/fake-chart-placeholder-data)})))
+                                    (finance-utils/fill-gap-months finances-row-data))
               sort-pred (utils/sort-by-key-pred :period)
               sorted-finances (sort sort-pred (vals fixed-finances-data))          
               sum-revenues (apply + (map utils/abs (map :revenue finances-row-data)))
               cur-symbol (utils/get-symbol-for-currency-code currency)
-              show-placeholder-chart? (and data-editing?
-                                           (< (count finances-row-data) 2))
-              chart-opts {:chart-type "bordered-chart"
+              chart-opts {:chart-type (str "bordered-chart" (when show-placeholder-chart? " fake-chart"))
                           :chart-height 112
                           :chart-width (:width (:chart-size options))
                           :chart-keys [:costs]
