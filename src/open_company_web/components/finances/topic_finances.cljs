@@ -34,14 +34,22 @@
   (om/set-state! owner :data-editing? editing)
   (editing-cb editing))
 
+(defn finances-data-on-change [owner fixed-data]
+  (om/set-state! owner :finances-row-data (vals fixed-data)))
+
 (defcomponent topic-finances [{:keys [section section-data currency editable? initial-editing? editing-cb] :as data} owner options]
 
   (init-state [_]
-    {:data-editing? false})
+    {:data-editing? false
+     :finances-row-data (:data section-data)})
 
-  (render-state [_ {:keys [data-editing?]}]
-    (let [finances-row-data (:data section-data)
-          no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))
+  (will-receive-props [_ next-props]
+    (when-not (= next-props data)
+      (om/set-state! owner {:data-editing? (om/get-state owner :data-editing?)
+                            :finances-row-data (-> next-props :section-data :data)})))
+
+  (render-state [_ {:keys [data-editing? finances-row-data]}]
+    (let [no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))
           data-editing? (or initial-editing? data-editing?)]
 
       (when (or data-editing? (not no-data))
@@ -50,6 +58,8 @@
               sorted-finances (sort sort-pred (vals fixed-finances-data))          
               sum-revenues (apply + (map utils/abs (map :revenue finances-row-data)))
               cur-symbol (utils/get-symbol-for-currency-code currency)
+              show-placeholder-chart? (and data-editing?
+                                           (< (count finances-row-data) 2))
               chart-opts {:chart-type "bordered-chart"
                           :chart-height 112
                           :chart-width (:width (:chart-size options))
@@ -78,52 +88,53 @@
           (dom/div {:id "section-finances" :class (utils/class-set {:section-container true
                                                                     :editing data-editing?})}
 
-            (if data-editing?
-              (om/build finances-edit {:finances-data (finance-utils/finances-data-map finances-row-data)
-                                       :currency currency
-                                       :editing-cb (partial data-editing-toggle owner editing-cb)}
-                                      {:key (:updated-at section-data)})
+            (dom/div {:class "composed-section finances group"}
 
-              (dom/div {:class "composed-section finances group"}
+              ;; has the company ever had revenue?
+              (if (pos? sum-revenues)
+                ;; post-revenue gets an additional revenue label, 4 total labels in 2 rows
+                (let [revenue-labels (merge labels {:revenue {:position :top
+                                                              :order 1
+                                                              :value-presenter (partial get-currency-label cur-symbol)
+                                                              :value-color (occ/get-color-by-kw :oc-green-regular)
+                                                              :label-presenter #(str "REVENUE")
+                                                              :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}})
+                      ordered-labels (-> revenue-labels
+                                      (assoc-in [:costs :position] :top)
+                                      (assoc-in [:costs :order] 2)
+                                      (assoc-in [:cash :position] :bottom)
+                                      (assoc-in [:cash :order] 1)
+                                      (assoc-in [:runway :position] :bottom)
+                                      (assoc-in [:runway :order] 2))]
+                  (om/build d3-chart {:chart-data sorted-finances}
+                                     {:opts (merge chart-opts {:labels ordered-labels
+                                                               :chart-keys [:costs :revenue]})}))
 
-                ;; has the company ever had revenue?
-                (if (pos? sum-revenues)
-                  ;; post-revenue gets an additional revenue label, 4 total labels in 2 rows
-                  (let [revenue-labels (merge labels {:revenue {:position :top
-                                                                :order 1
-                                                                :value-presenter (partial get-currency-label cur-symbol)
-                                                                :value-color (occ/get-color-by-kw :oc-green-regular)
-                                                                :label-presenter #(str "REVENUE")
-                                                                :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}})
-                        ordered-labels (-> revenue-labels
-                                        (assoc-in [:costs :position] :top)
-                                        (assoc-in [:costs :order] 2)
-                                        (assoc-in [:cash :position] :bottom)
-                                        (assoc-in [:cash :order] 1)
-                                        (assoc-in [:runway :position] :bottom)
-                                        (assoc-in [:runway :order] 2))]
-                    (om/build d3-chart {:chart-data sorted-finances}
-                                       {:opts (merge chart-opts {:labels ordered-labels
-                                                                 :chart-keys [:costs :revenue]})}))
+                ;; pre-revenue gets just 3 labels in 1 row
+                (let [ordered-labels (-> labels
+                                      (assoc-in [:cash :position] :bottom)
+                                      (assoc-in [:cash :order] 1)
+                                      (assoc-in [:costs :position] :bottom)
+                                      (assoc-in [:costs :order] 2)
+                                      (assoc-in [:runway :position] :bottom)
+                                      (assoc-in [:runway :order] 3))]
+                  (om/build d3-chart {:chart-data sorted-finances}
+                                     {:opts (merge chart-opts {:labels ordered-labels})})))
 
-                  ;; pre-revenue gets just 3 labels in 1 row
-                  (let [ordered-labels (-> labels
-                                        (assoc-in [:cash :position] :bottom)
-                                        (assoc-in [:cash :order] 1)
-                                        (assoc-in [:costs :position] :bottom)
-                                        (assoc-in [:costs :order] 2)
-                                        (assoc-in [:runway :position] :bottom)
-                                        (assoc-in [:runway :order] 3))]
-                    (om/build d3-chart {:chart-data sorted-finances}
-                                       {:opts (merge chart-opts {:labels ordered-labels})})))
+              (when data-editing?
+                (om/build finances-edit {:finances-data (finance-utils/finances-data-map finances-row-data)
+                                         :currency currency
+                                         :data-on-change-cb (partial finances-data-on-change owner)
+                                         :editing-cb (partial data-editing-toggle owner editing-cb)}
+                                        {:key (:updated-at section-data)}))
 
-                (when editable?
-                  (dom/button {:class "btn-reset chart-pencil-button"
-                               :title "Edit chart data"
-                               :type "button"
-                               :data-toggle "tooltip"
-                               :data-container "body"
-                               :data-placement "left"
-                               :on-click #(do (om/set-state! owner :data-editing? true)
-                                              (editing-cb true))}
-                    (dom/i {:class "fa fa-pencil editable-pen"})))))))))))
+              (when (and editable? (not data-editing?))
+                (dom/button {:class "btn-reset chart-pencil-button"
+                             :title "Edit chart data"
+                             :type "button"
+                             :data-toggle "tooltip"
+                             :data-container "body"
+                             :data-placement "left"
+                             :on-click #(do (om/set-state! owner :data-editing? true)
+                                            (editing-cb true))}
+                  (dom/i {:class "fa fa-pencil editable-pen"}))))))))))
