@@ -7,6 +7,8 @@
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.caches :refer (company-cache)]
+            [open-company-web.dispatcher :as dis]
+            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]
             [cuerdas.core :as s]))
 
 (def focus-cache-key :last-selected-metric)
@@ -61,13 +63,23 @@
 
 (defn- archive-metric-cb [owner editing-cb metric-slug]
   (let [metric-slugs (remove #{metric-slug} (om/get-state owner :growth-metric-slugs)) ; remove the slug
-       focus (first metric-slugs)]
+        focus (first metric-slugs)
+        fewer-metrics (growth-utils/metrics-as-sequence (om/get-state owner :growth-metrics) metric-slugs)]
     (om/set-state! owner :focus focus) ; new focus on the first remaining metric
     (om/set-state! owner :growth-metric-slugs metric-slugs) ; update valid slugs state
     ;; if last focus is the removing metric, remove the last focus cache
     (when (= (utils/company-cache-key focus-cache-key) metric-slug)
-      (utils/remove-company-cache-key focus-cache-key)))
-    (data-editing-toggle owner editing-cb false)) ; no longer data editing
+      (utils/remove-company-cache-key focus-cache-key))
+    (dis/dispatch! [:save-topic-data "growth" {:metrics fewer-metrics}])
+    (data-editing-toggle owner editing-cb false))) ; no longer data editing
+
+(defn- show-archive-confirm-popover [owner editing-cb]
+  (add-popover {:container-id "archive-metric-confirm"
+                :message "Prior updates to this chart will only be available in topic history. Are you sure you want to archive?"
+                :cancel-title "KEEP"
+                :cancel-cb #(hide-popover nil "delete-metric-confirm")
+                :success-title "ARCHIVE"
+                :success-cb #(archive-metric-cb owner editing-cb (om/get-state owner :metric-slug))}))
 
 (defn- render-pillboxes [owner editable? editing-cb options]
 
@@ -196,8 +208,7 @@
                              :data-toggle "tooltip"
                              :data-container "body"
                              :data-placement "right"
-                             :on-click (fn [e]
-                                         (archive-metric-cb owner editing-cb focus))}
+                             :on-click #(show-archive-confirm-popover owner editing-cb)}
                   (dom/i {:class "fa fa-archive"}))))))
 
         ; Data/metadata edit
@@ -212,5 +223,5 @@
              :metadata-on-change-cb (partial metadata-editing-on-change owner focus)
              :editing-cb (partial data-editing-toggle owner editing-cb)
              :switch-focus-cb (partial switch-focus owner)
-             :archive-metric-cb (partial archive-metric-cb owner editing-cb)}
+             :archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)}
             {:opts {:currency currency} :key growth-data}))))))
