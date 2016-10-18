@@ -14,7 +14,7 @@
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
-            [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
+            [open-company-web.components.su-preview-dialog :refer (su-preview-dialog item-input email-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -138,7 +138,8 @@
                            link-posting
                            link-posted
                            su-topics]}]
-    (let [company-slug (router/current-company-slug)
+    (let [share-medium (keyword (:medium @router/path))
+          company-slug (router/current-company-slug)
           company-data (dis/company-data data)
           su-data      (stakeholder-update-data data)
           card-width   (responsive/calc-card-width 1)
@@ -146,6 +147,9 @@
           title-width  (if (>= ww responsive/c1-min-win-width)
                           (str (if (< ww card-width) ww card-width) "px")
                           "auto")
+          fields-width  (if (>= ww responsive/c1-min-win-width)
+                           (str (if (< ww card-width) ww (- card-width 5)) "px")
+                           "auto")
           total-width  (if (>= ww responsive/c1-min-win-width)
                           (str (if (< ww card-width) ww (+ card-width (* topic-row-x-padding 2))) "px")
                           "auto")
@@ -175,21 +179,58 @@
                 "SHARE " (dom/i {:class "fa fa-share"}))))
           ;; SU Snapshot Preview
           (when company-data
-            (dom/div {:class "su-sp-content"
+            (dom/div {:class "su-sp-content group"
                       :key (apply str su-topics)}
-              (dom/div {:class "su-sp-company-header"}
-                (dom/div {:class "company-logo-container"}
-                  (dom/img {:class "company-logo" :src (:logo company-data)}))
-                (when (:title su-data)
-                  (dom/div {:class "preview-title-container"}
+              (dom/div {:class "su-sp-company-header group"}
+                (when (not= share-medium :email)
+                  (dom/div {:class "company-logo-container group"}
+                    (dom/img {:class "company-logo" :src (:logo company-data)})))
+                (when (and (:title su-data) (not= share-medium :email))
+                  (dom/div {:class "preview-field-container group"
+                            :style #js {:width fields-width}}
                     (dom/input #js {:className "preview-title"
                                     :id "su-snapshot-preview-title"
                                     :type "text"
                                     :value title
                                     :ref "preview-title"
                                     :placeholder "Title of this Update"
-                                    :onChange #(om/set-state! owner :title (.. % -target -value))
-                                    :style #js {:width title-width}}))))
+                                    :onChange #(om/set-state! owner :title (.. % -target -value))})))
+                (when (= share-medium :email)
+                  (dom/div {:class "preview-field-container group"
+                            :style #js {:width fields-width}}
+                    (dom/label {} "To")
+                    (dom/div {:class "preview-to"}
+                      (item-input {:item-render email-item
+                                   :match-ptn #"(\S+)[,|\s]+"
+                                   :split-ptn #"[,|\s]+"
+                                   :container-node :div.npt.pt1.pr1.pl1.mh4.overflow-auto.preview-to-field
+                                   :input-node :input.border-none.outline-none.mr.mb1
+                                   :valid-item? utils/valid-email?
+                                   :on-change (fn [val] (dis/dispatch! [:input [:su-share :email :to] val]))}))
+                    (when-let [to-field (->> data :su-share :email :to)]
+                      (cond
+                        (not (seq to-field))
+                        (dom/span {:class "left red pt1 ml1"} "Required")
+                        (not (every? utils/valid-email? to-field))
+                        (dom/span {:class "left red pt1 ml1"} "Not a valid email address")))))
+                (when (= share-medium :email)
+                  (dom/div {:class "preview-field-container group"
+                            :style #js {:width fields-width}}
+                    (dom/label {} "Subject")
+                    (dom/div {:class "preview-subject"}
+                      (dom/input #js {:className "preview-subject-field"
+                                      :type "text"
+                                      :value (-> data :su-share :email :subject)
+                                      :on-change #(dis/dispatch! [:input [:su-share :email :subject] (.val (js/$ ".preview-subject-field"))])}))))
+                (when (= share-medium :email)
+                  (dom/div {:class "preview-field-container"
+                            :style #js {:width fields-width}}
+                    (dom/label {} "Note")
+                    (dom/div {:class "preview-note"}
+                      (dom/input #js {:className "preview-note-field"
+                                      :type "text"
+                                      :value (-> data :su-share :email :note)
+                                      :on-change #(dis/dispatch! [:input [:su-share :email :note] (.val (js/$ ".preview-note-field"))])})))))
               (when show-su-dialog
                 (om/build su-preview-dialog {:selected-topics (:sections su-data)
                                              :company-data company-data
@@ -206,6 +247,7 @@
                                         :content-loaded (not (:loading data))
                                         :topics su-topics
                                         :su-dragging-topic (om/get-state owner :su-dragging-topic)
+                                        :su-medium share-medium
                                         :company-data company-data
                                         :show-share-remove true
                                         :topics-data company-data

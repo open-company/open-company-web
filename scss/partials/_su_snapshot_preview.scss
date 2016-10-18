@@ -91,9 +91,11 @@ div.su-snapshot-preview {
         }
       }
 
-      div.preview-title-container {
+      div.preview-field-container {
         text-align: center;
         margin: 25px auto 10px;
+        width: 100%;
+        display: table;
 
         input.preview-title {
           height: 28px;
@@ -116,6 +118,40 @@ div.su-snapshot-preview {
 
           @include placeholder {
             font-style: italic;
+          }
+        }
+
+        label {
+          display: table-cell;
+          width: 1px;
+          color: $oc_gray_5;
+          font-size: 12px;
+          letter-spacing: 1px;
+          font-weight: 400;
+          font-family: $oc_headers_font;
+          text-transform: uppercase;
+        }
+
+        .preview-to div.preview-to-field{
+          text-align: left;
+        }
+
+        .preview-subject, .preview-note {
+          margin-top: 0px;
+        }
+
+        .preview-to, .preview-subject, .preview-note {
+          display: block;
+          width: 100%;
+          margin-left: 0.5rem;
+          min-height: 36px;
+          input {
+            width: 100%;
+            min-height: 36px;
+
+            &:focus {
+              outline: none;
+            }
           }
         }
       }
