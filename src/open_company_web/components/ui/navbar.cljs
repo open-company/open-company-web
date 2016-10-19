@@ -52,7 +52,6 @@
                                        :id "share-an-update"
                                        :data-toggle "dropdown"
                                        :disabled (not (nil? (:foce-key data)))
-                                       ; :on-click #(router/nav! (oc-urls/stakeholder-update-preview))
                                      }
                             (dom/i {:class "fa fa-share"}) " SHARE AN UPDATE")
                           (dom/ul {:class "dropdown-menu" :aria-labelledby "share-an-update"}
