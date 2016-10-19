@@ -7,6 +7,10 @@ div.su-preview-dialog {
   background-color: rgba(78, 90, 107, 0.5);
   z-index: 1038;
 
+  .email-item.submitted{
+    background-color: rgba(78, 90, 107, 0.1);
+  }
+
   div.su-preview-window {
     width: 460px;
     position: absolute;

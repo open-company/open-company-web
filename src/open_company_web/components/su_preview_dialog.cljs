@@ -130,9 +130,8 @@
          :on-change #(maybe-submit (.. % -target -value))}])]))
 
 (rum/defc email-item [v delete! submitted?]
-  [:div.inline-block.mr1.mb1.rounded
-   {:class (when-not submitted? "border b--red")
-    :style (when submitted? {:backgroundColor "rgba(78, 90, 107, 0.1)"})}
+  [:div.inline-block.mr1.mb1.rounded.email-item
+   {:class (if submitted? "submitted" "border b--red")}
    [:span.inline-block.p1 v
     [:button.btn-reset.p0.ml1
      {:on-click #(delete!)}
