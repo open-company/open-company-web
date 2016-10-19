@@ -371,12 +371,10 @@
             (let [fixed-body (if body (json->cljs body) {})]
               (dispatcher/dispatch! [:new-section {:response fixed-body :slug slug}]))))))))
 
-(defn share-stakeholder-update [{:keys [email slack]}]
+(defn share-stakeholder-update [{:keys [post-data]}]
   (let [slug         (keyword (router/current-company-slug))
         company-data (dispatcher/company-data)
         links        (:links company-data)
-        post-data    (cond email (assoc email :email true)
-                           slack (assoc slack :slack true))
         share-link   (utils/link-for links "share" "POST")]
     (api-post (:href share-link)
               {:json-params post-data
