@@ -187,14 +187,12 @@
                                        (s/blank? (om/get-state owner :metric-name))
                                        (s/blank? (om/get-state owner :unit))
                                        (s/blank? (om/get-state owner :interval)))
-                         :on-click #(do (utils/event-stop %)
-                                        (save-metric-info owner (:save-cb data) new-metric?))}
+                         :on-click #(save-metric-info owner (:save-cb data) new-metric?)}
               (if new-metric? "NEXT" "SAVE"))
 
             ;; cancel button
             (dom/button {:class "btn-reset btn-outline"
-                         :on-click #(do (utils/event-stop %)
-                                        ((:cancel-cb data)))} "CANCEL")
+                         :on-click #((:cancel-cb data))} "CANCEL")
 
             (when-not new-metric?
               (dom/button {:class "btn-reset archive-button"

@@ -20,5 +20,5 @@
   (let [button-cta (or button-cta "BACK TO DASHBOARD")]
     [:div.back-to-dashboard-row
      [:button.back-to-dashboard.btn-reset.btn-outline
-      {:on-click #(do (utils/event-stop %) (click-cb))}
+      {:on-click #(do (.preventDefault %) (click-cb))}
       (str "← " button-cta)]]))

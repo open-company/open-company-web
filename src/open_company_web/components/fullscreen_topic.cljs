@@ -75,8 +75,7 @@
                       :selected-metric selected-metric
                       :read-only true}
           topic-body (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))]
-      (dom/div {:class "fullscreen-topic-internal group"
-                :on-click #(utils/event-stop %)}
+      (dom/div {:class "fullscreen-topic-internal group"}
         ;; Close button
         (dom/button {:class "btn-reset close-fullscreen-topic-btn"
                      :on-click #(hide-fullscreen-topic-cb)}
@@ -169,8 +168,6 @@
       (.play))))
 
 (defn- rev-click [owner e revision]
-  (when e
-    (utils/event-stop e))
   (om/set-state! owner :transition-as-of (:updated-at revision)))
 
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width

@@ -79,7 +79,7 @@
          :type "button"
          :on-mouse-down #(save-caret-position s)
          :on-click #(do
-                      (utils/event-stop %)
+                      (.preventDefault %)
                       (if (and @caret-pos (not @visible))
                         (reset! visible true)
                         (reset! visible false)))}

@@ -9,7 +9,7 @@
   [:nav.navbar.navbar-default.navbar-bottom
 
       [:ul.nav.navbar-nav.navbar-left.navbar-bottom-left
-        [:li [:a.navbar-logo {:href oc-urls/home :on-click #(do (utils/event-stop %) (router/nav! oc-urls/home))}
+        [:li [:a.navbar-logo {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))}
           [:img {:alt "OpenCompany" :src "img/oc-logo-grey.svg"}]]]
         [:li.web-only
             [:a {:href oc-urls/pricing} "Pricing"]]

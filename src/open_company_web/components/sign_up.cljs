@@ -30,7 +30,7 @@
                                               :name "subscribe"
                                               :type "submit"
                                               :onClick #(do
-                                                          (utils/event-stop %)
+                                                          (.preventDefault %)
                                                           (dis/dispatch! [:show-login-overlay :signup-with-slack]))}
                         "Get Started →"]]]]]]]]
 

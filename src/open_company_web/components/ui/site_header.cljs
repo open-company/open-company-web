@@ -13,7 +13,7 @@
   [:nav.navbar.navbar-default.navbar-static-top
     [:div.container-fluid
       [:div.navbar-header
-        [:a.navbar-brand {:href oc-urls/home :on-click #(do (utils/event-stop %) (router/nav! oc-urls/home))}
+        [:a.navbar-brand {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))}
           [:img {:alt "OpenCompany" :src "img/oc-wordmark.svg"}]]
         [:button.navbar-toggle.collapsed {:type "button" :data-toggle "collapse" :data-target "#oc-navbar-collapse"}
             [:span.sr-only "Toggle navigation"]
@@ -24,11 +24,11 @@
         [:ul.nav.navbar-nav.navbar-right.navbar-top
           (when-not (utils/in? (:route @router/path) "home")
             [:li
-                [:a.navbar-item {:href oc-urls/home :on-click #(do (utils/event-stop %) (router/nav! oc-urls/home))} "Home"]])
+                [:a.navbar-item {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))} "Home"]])
           [:li
-              [:a.navbar-item {:href oc-urls/pricing :on-click #(do (utils/event-stop %) (router/nav! oc-urls/pricing))} "Pricing"]]
+              [:a.navbar-item {:href oc-urls/pricing :on-click #(do (.preventDefault %) (router/nav! oc-urls/pricing))} "Pricing"]]
           [:li
-              [:a.navbar-item {:href oc-urls/about :on-click #(do (utils/event-stop %) (router/nav! oc-urls/about))} "About"]]
+              [:a.navbar-item {:href oc-urls/about :on-click #(do (.preventDefault %) (router/nav! oc-urls/about))} "About"]]
           [:li.mobile-only
             [:a.navbar-item.contact {:href (str "mailto:" oc-urls/contact-email)} "Contact"]]
           [:li

@@ -74,7 +74,7 @@
                              :transition ".2s"
                              :transform (when state "rotate(135deg)")}
                      :on-click (fn [e]
-                                  (utils/event-stop e)
+                                  (.preventDefault e)
                                   (om/update-state! owner :state #(if % nil :show-options)))}
           (i/icon :circle-add {:size 24 :color "rgba(78, 90, 107, 0.5)" :accent-color "rgba(78, 90, 107, 0.5)"}))
           (dom/div {:style #js {:margin "1px 0 0 30px"
