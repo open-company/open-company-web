@@ -39,7 +39,7 @@
 (defn fullscreen-topic [owner selected-metric force-editing & [e]]
   (when (not (om/get-props owner :foce-active))
     (when (and e (not= (.-tagName (.-target e)) "A"))
-      (utils/event-stop e))
+      (.preventDefault e))
     ((om/get-props owner :topic-click) selected-metric force-editing)))
 
 (defn start-foce-click [owner]
@@ -49,8 +49,6 @@
     (dis/dispatch! [:start-foce section-kw section-data])))
 
 (defn pencil-click [owner e]
-  (utils/event-stop e)
-  (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
   (start-foce-click owner))
 
 (defcomponent topic-internal [{:keys [topic-data
@@ -163,9 +161,11 @@
     (doto appear-animation
       (events/listen
         AnimationEventType/FINISH
-        #(om/set-state! owner (merge current-state
-                                    {:as-of (:transition-as-of current-state)
-                                     :transition-as-of nil})))
+        (fn []
+          (om/set-state! owner (merge current-state
+                                      {:as-of (:transition-as-of current-state)
+                                       :transition-as-of nil}))
+          (utils/after 100 #(utils/remove-tooltips))))
       (.play))))
 
 (defcomponent topic [{:keys [active-topics
@@ -215,9 +215,7 @@
           all-revisions (slug @caches/revisions)
           revisions-list (section-kw all-revisions)
           topic-data (utils/select-section-data section-data section-kw as-of)
-          rev-cb (fn [e rev]
-                  (om/set-state! owner :transition-as-of (:updated-at rev))
-                  (utils/event-stop e))
+          rev-cb (fn [_ rev] (om/set-state! owner :transition-as-of (:updated-at rev)))
           foce-active (not (nil? (dis/foce-section-key)))
           is-foce (= (dis/foce-section-key) section-kw)]
       ;; preload previous revision

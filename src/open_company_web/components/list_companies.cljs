@@ -16,7 +16,9 @@
   (render [_]
     (dom/li
       (dom/a {:href (oc-urls/company (:slug data))
-              :on-click (fn [e] (utils/event-stop e) (router/nav! (oc-urls/company (:slug data))))}
+              :on-click (fn [e]
+                          (.preventDefault e)
+                          (router/nav! (oc-urls/company (:slug data))))}
         (if-not (clojure.string/blank? (:logo data))
           (dom/img {:class "company-logo" :src (:logo data)})
           (dom/span {:class "company-logo"} (first (clojure.string/upper-case (:name data)))))

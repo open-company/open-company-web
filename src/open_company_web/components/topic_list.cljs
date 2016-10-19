@@ -331,11 +331,12 @@
     (when-not @scrolled-to-top
       (set! (.-scrollTop (.-body js/document)) 0)
       (reset! scrolled-to-top true))
-    (when (and (not (utils/is-test-env?))
-               (not (responsive/user-agent-mobile?)))
-      (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))]
-        (om/set-state! owner :kb-listener kb-listener))
-      (manage-draggable owner)))
+    (when (not (utils/is-test-env?))
+      (when-not (responsive/user-agent-mobile?)
+        (let [kb-listener (events/listen js/window EventType/KEYDOWN (partial kb-listener owner))]
+          (om/set-state! owner :kb-listener kb-listener)))
+      (when (utils/can-edit-sections? (:company-data data))
+        (manage-draggable owner))))
 
   (will-unmount [_]
     (when (and (not (utils/is-test-env?))

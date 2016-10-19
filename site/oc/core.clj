@@ -72,19 +72,6 @@
         {:size "40", :placeholder "email@work.com", :type "email"}]
        [:button "Get early access"]]]]])
 
-(defn email-capture []
-  [:div.solid
-   [:div.container.outer.section
-    [:div.container.inner
-     [:div.bottom-block.text-center
-      [:h2 "Operate in the Open"]
-      [:div.early-access
-       [:form.form-inline
-        [:div.form-group
-         [:input#email
-          {:size "40", :placeholder "email@work.com", :type "email"}]
-         [:button "Get early access"]]]]]]]])
-
 (defn footer []
   [:nav.navbar.navbar-default.navbar-bottom
     [:ul.nav.navbar-nav.navbar-left.navbar-bottom-left
@@ -134,8 +121,6 @@
                   :500     (pages/server-error options)
                   :privacy (pages/privacy options)
                   :terms   (pages/terms options))
-                (if (is? :index :about)
-                  (email-capture))
                 (footer)]))))
 
 (defn app-shell [_]

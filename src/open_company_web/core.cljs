@@ -134,7 +134,7 @@
       ; remove om component if mounted to the same node
       (om/detach-root target)
       ;; render component
-      (rum/mount (component) target))))
+      (drv-root #(om/component (component)) target))))
 
 ;; Component specific to a company
 (defn company-handler [route target component params]
@@ -335,7 +335,8 @@
 (defn init []
   ;; Persist JWT in App State
   (dis/dispatch! [:jwt (jwt/get-contents)])
-  (.click (js/$ js/window) #(.remove (js/$ "div.tooltip")))
+  ;; on any click remove all the shown tooltips to make sure they don't get stuck
+  (.click (js/$ js/window) #(utils/remove-tooltips))
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when (and handle-url-change route-dispatch!)

@@ -77,12 +77,14 @@
 
 (defmethod dispatcher/action :auth-settings [db [_ body]]
   (if body
-    (do
-      (when (and (utils/in? (:route @router/path) "confirm-invitation")
+    ; auth settings loaded
+    (when (and (utils/in? (:route @router/path) "confirm-invitation")
                  (contains? (:query-params @router/path) :token))
-        (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path)))))
-      (assoc db :auth-settings body))
-    db))
+      ; call confirm-invitation if needed
+      (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path)))))
+    ; if the auth-settings call failed retry it in 2 seconds
+    (utils/after 2000 #(api/get-auth-settings)))
+  (assoc db :auth-settings body))
 
 (defmethod dispatcher/action :revision [db [_ body]]
   (if body

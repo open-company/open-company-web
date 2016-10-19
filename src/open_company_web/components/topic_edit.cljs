@@ -47,12 +47,6 @@
         topic-scroll-top (utils/offset-top topic)]
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
-(defn- start-fullscreen-editing-click [owner options e]
-  (utils/event-stop e)
-  (let [section (om/get-props owner :section)
-        topic-click-cb (:topic-click options)]
-    (topic-click-cb nil true)))
-
 (defn- force-hide-placeholder [owner]
   (let [editor       (om/get-state owner :body-editor)
         section-name (name (om/get-props owner :section))
@@ -172,8 +166,6 @@
         (@router/route-dispatcher (router/get-token)))))
 
 (defn- remove-topic-click [owner e]
-  (when e
-    (utils/event-stop e))
   (add-popover {:container-id "archive-topic-confirm"
                 :message before-archive-message
                 :height "170px"
@@ -511,11 +503,9 @@
                              :on-click #(save-topic owner)} "SAVE")
                 (dom/button {:class "btn-reset btn-outline"
                              :disabled data-editing?
-                             :on-click #(do
-                                          (utils/event-stop %)
-                                          (if (:placeholder topic-data)
-                                            (dis/dispatch! [:topic-archive (name section)])
-                                            (dis/dispatch! [:start-foce nil])))} "CANCEL"))))
+                             :on-click #(if (:placeholder topic-data)
+                                          (dis/dispatch! [:topic-archive (name section)])
+                                          (dis/dispatch! [:start-foce nil]))} "CANCEL"))))
 
         ;; Onboarding toolips
         (when (and show-first-edit-tip (not is-data?))

@@ -225,13 +225,10 @@
               (dom/button {:class "btn-reset btn-outline btn-data-save"
                            :disabled (not has-changes?)
                            :on-click  #(do
-                                        (utils/event-stop %)
                                         (save-data owner)
                                         (editing-cb false))} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
-                           :on-click #(do
-                                        (utils/event-stop %)
-                                        (editing-cb false))} "CANCEL")
+                           :on-click #(editing-cb false)} "CANCEL")
               (dom/button {:class "btn-reset archive-button"
                                    :title "Archive this chart"
                                    :type "button"

@@ -33,13 +33,11 @@
   (map :slug metrics-coll))
 
 (defn- pillbox-click [owner options e]
-  (.preventDefault e)
   (let [data (om/get-props owner)
         focus  (.. e -target -dataset -tab)
         section-data (:section-data data)
         metrics (metrics-map (:metrics section-data))]
-    (switch-focus owner focus options))
-  (.stopPropagation e))
+    (switch-focus owner focus options)))
 
 (defn- filter-growth-data [focus growth-data]
   (vec (filter #(= (:slug %) focus) (vals growth-data))))

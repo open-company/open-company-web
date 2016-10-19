@@ -834,3 +834,6 @@
     false))
 
 (defn valid-email? [addr] (when addr (email/isValidAddress addr)))
+
+(defn remove-tooltips []
+  (.remove (js/$ "div.tooltip")))

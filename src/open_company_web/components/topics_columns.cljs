@@ -198,14 +198,17 @@
                                                 (om/get-props owner :new-sections)
                                                 (zero? (count topics)))
                        :update-active-topics update-active-topics})
-        (let [sd (->> section-name keyword (get topics-data))]
+        (let [sd (->> section-name keyword (get topics-data))
+              topic-row-style (if (utils/in? (:route @router/path) "su-snapshot-preview")
+                                #js {}
+                                #js {:width (if (responsive/is-mobile?) "auto" (str (:card-width props) "px"))})]
           (when-not (and (:read-only company-data) (:placeholder sd))
             (dom/div #js {:className (utils/class-set {:topic-row true
                                                        :draggable-topic (:pin sd)
                                                        :su-dragging-topic (= (:su-dragging-topic props) section-name)
                                                        :hover hovering?})
                           :data-topic (name section-name)
-                          :style #js {:width (if (responsive/is-mobile?) "auto" (str (:card-width props) "px"))}
+                          :style topic-row-style
                           :ref section-name
                           :onMouseOver #(when (:is-stakeholder-update props)
                                          (om/set-state! owner :hovering section-name))

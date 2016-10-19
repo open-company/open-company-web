@@ -275,13 +275,10 @@
                                :disabled (or (not has-changes?)
                                               (string/blank? metric-name))
                                :on-click  #(do
-                                            (utils/event-stop %)
                                             (save-data owner data new-metric?)
                                             (editing-cb false))} (if new-metric? "ADD" "SAVE"))
                   (dom/button {:class "btn-reset btn-outline"
-                               :on-click #(do
-                                            (utils/event-stop %)
-                                            (editing-cb false))} "CANCEL")
+                               :on-click #(editing-cb false)} "CANCEL")
                   (when-not new-metric?
                     (dom/button {:class "btn-reset archive-button"
                                  :title "Archive this chart"
