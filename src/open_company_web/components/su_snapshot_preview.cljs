@@ -14,7 +14,8 @@
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
-            [open-company-web.components.su-preview-dialog :refer (su-preview-dialog item-input email-item)]
+            [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
+            [open-company-web.components.ui.multi-items-input :refer (item-input email-item)]
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -30,21 +31,36 @@
     (vec (remove nil? topics-list))))
 
 (defn post-stakeholder-update [owner]
-  (om/set-state! owner :link-posting true)
-  (api/share-stakeholder-update {}))
+  (let [share-medium (keyword (:medium @router/path))]
+    (cond
+      ; post for email: to, subject and note
+      (= share-medium :email)
+      (let [post-data {:email true
+                       :to (-> @dis/app-state :su-share :email :to)
+                       :subject (-> @dis/app-state :su-share :email :subject)
+                       :note (-> @dis/app-state :su-share :email :note)}]
+        (api/share-stakeholder-update post-data))
+      ; post for :slack
+      (= share-medium :link)
+      (let [post-data {:slack true
+                       :note (-> @dis/app-state :su-share :slack :note)}]
+        (api/share-stakeholder-update post-data))
+      ; post for link
+      (= share-medium :link)
+      (api/share-stakeholder-update {}))
+    (om/set-state! owner :share-status :su-posting)))
 
 (defn stakeholder-update-data [data]
   (:stakeholder-update (dis/company-data data)))
 
 (defn patch-stakeholder-update [owner]
-  (let [title  (om/get-state owner :title)
-        topics (om/get-state owner :su-topics)]
-    (api/patch-stakeholder-update {:title (or title "")
-                                   :sections topics})))
+  (let [patch-data {:title (or (om/get-state owner :title) "")
+                    :sections (om/get-state owner :su-topics)}]
+    (api/patch-stakeholder-update patch-data)))
 
 (defn share-clicked [owner]
  (patch-stakeholder-update owner)
- (om/set-state! owner :show-su-dialog :prompt))
+ (om/set-state! owner :share-status :su-patching))
 
 (defn dismiss-su-preview [owner]
   (om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false
@@ -124,15 +140,24 @@
                            (vec (:sections company-data))
                            (utils/filter-placeholder-sections (:sections su-data) company-data))]
         (om/set-state! owner :su-topics su-sections)))
+    (when (= (om/get-state owner :share-status) :su-patching)
+      ; post with data
+      (post-stakeholder-update owner)
+      (om/set-state! owner :share-status :posted))
+    (when (= (om/get-state owner :share-status) :su-posting)
+      ; share post sent, let's show the final dialog
+      (om/set-state! owner :share-status :su-posted)
+      (om/set-state! owner :show-su-dialog true))
     ; share via link
-    (when (om/get-state owner :link-loading)
-      (if-not (om/get-state owner :link-posting)
-        (post-stakeholder-update owner)
-        ; show share url dialog
-        (when (not= (dis/latest-stakeholder-update data) (dis/latest-stakeholder-update next-props))
-          (om/set-state! owner :link-loading false)
-          (om/set-state! owner :link-posted true)
-          (om/set-state! owner :show-su-dialog true)))))
+    ; (when (om/get-state owner :link-loading)
+    ;   (if-not (om/get-state owner :link-posting)
+    ;     (post-stakeholder-update owner)
+    ;     ; show share url dialog
+    ;     (when (not= (dis/latest-stakeholder-update data) (dis/latest-stakeholder-update next-props))
+    ;       (om/set-state! owner :link-loading false)
+    ;       (om/set-state! owner :link-posted true)
+    ;       (om/set-state! owner :show-su-dialog true))))
+    )
 
   (did-update [_ _ _]
     (setup-sortable owner options))
@@ -260,13 +285,8 @@
                           :style #js {:color "rgba(78, 90, 107, 0.5)"}}
                           (emoji-picker {:add-emoji-cb #(note-did-change)})))))))
               (when show-su-dialog
-                (om/build su-preview-dialog {:selected-topics (:sections su-data)
-                                             :company-data company-data
-                                             :latest-su (dis/latest-stakeholder-update)
-                                             :share-via-slack slack-loading
-                                             :share-via-email email-loading
-                                             :share-via-link (or link-loading link-posted)
-                                             :su-title title}
+                (om/build su-preview-dialog {:latest-su (dis/latest-stakeholder-update)
+                                             :share-via share-medium}
                                             {:opts {:dismiss-su-preview #(dismiss-su-preview owner)}}))
               (om/build topics-columns {:columns-num 1
                                         :card-width card-width
