@@ -15,6 +15,7 @@
             [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.su-preview-dialog :refer (su-preview-dialog item-input email-item)]
+            [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -84,6 +85,13 @@
 
 (def topic-row-x-padding 40)
 
+(defn note-did-change []
+  (let [medium (keyword (:medium @router/path))
+        email-notes (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.preview-note-field])))]
+    (dis/dispatch! [:input
+                    [:su-share medium :note]
+                    email-notes])))
+
 (defcomponent su-snapshot-preview [data owner options]
 
   (init-state [_]
@@ -105,6 +113,7 @@
   (did-mount [_]
     (om/set-state! owner :did-mount true)
     (setup-sortable owner options)
+    (js/emojiAutocomplete)
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
 
   (will-receive-props [_ next-props]
@@ -148,7 +157,7 @@
                           (str (if (< ww card-width) ww card-width) "px")
                           "auto")
           fields-width  (if (>= ww responsive/c1-min-win-width)
-                           (str (if (< ww card-width) ww (- card-width 5)) "px")
+                           (str (if (< ww card-width) ww (+ card-width 10)) "px")
                            "auto")
           total-width  (if (>= ww responsive/c1-min-win-width)
                           (str (if (< ww card-width) ww (+ card-width (* topic-row-x-padding 2))) "px")
@@ -175,7 +184,11 @@
             (dom/div {:class "share-su"}
               (dom/button {:class "btn-reset btn-solid share-su-button"
                            :on-click #(share-clicked owner)
-                           :disabled (zero? (count su-topics))}
+                           :disabled (or (zero? (count su-topics))
+                                         (and (= share-medium :email)
+                                              (or (not (seq (->> data :su-share :email :to)))
+                                                  (not (every? utils/valid-email? (->> data :su-share :email :to)))
+                                                  (clojure.string/blank? (->> data :su-share :email :subject)))))}
                 "SHARE " (dom/i {:class "fa fa-share"}))))
           ;; SU Snapshot Preview
           (when company-data
@@ -198,39 +211,54 @@
                 (when (= share-medium :email)
                   (dom/div {:class "preview-field-container group"
                             :style #js {:width fields-width}}
-                    (dom/label {} "To")
-                    (dom/div {:class "preview-to"}
-                      (item-input {:item-render email-item
-                                   :match-ptn #"(\S+)[,|\s]+"
-                                   :split-ptn #"[,|\s]+"
-                                   :container-node :div.npt.pt1.pr1.pl1.mh4.overflow-auto.preview-to-field
-                                   :input-node :input.border-none.outline-none.mr.mb1
-                                   :valid-item? utils/valid-email?
-                                   :on-change (fn [val] (dis/dispatch! [:input [:su-share :email :to] val]))}))
+                    (dom/div {:class "preview-field-container-inner"}
+                      (dom/label {} "To")
+                      (dom/div {:class "preview-to"}
+                        (item-input {:item-render email-item
+                                     :match-ptn #"(\S+)[,|\s]+"
+                                     :split-ptn #"[,|\s]+"
+                                     :container-node :div.npt.pt1.pr1.pl1.mh4.overflow-auto.preview-to-field
+                                     :input-node :input.border-none.outline-none.mr.mb1
+                                     :valid-item? utils/valid-email?
+                                     :on-change (fn [val] (dis/dispatch! [:input [:su-share :email :to] val]))})))
                     (when-let [to-field (->> data :su-share :email :to)]
                       (cond
                         (not (seq to-field))
                         (dom/span {:class "left red pt1 ml1"} "Required")
                         (not (every? utils/valid-email? to-field))
-                        (dom/span {:class "left red pt1 ml1"} "Not a valid email address")))))
+                        (dom/span {:class "left red pt1 ml1"} "Not a valid email address")))
+                    (dom/hr {:class "separator"})))
                 (when (= share-medium :email)
                   (dom/div {:class "preview-field-container group"
                             :style #js {:width fields-width}}
-                    (dom/label {} "Subject")
-                    (dom/div {:class "preview-subject"}
-                      (dom/input #js {:className "preview-subject-field"
-                                      :type "text"
-                                      :value (-> data :su-share :email :subject)
-                                      :on-change #(dis/dispatch! [:input [:su-share :email :subject] (.val (js/$ ".preview-subject-field"))])}))))
-                (when (= share-medium :email)
-                  (dom/div {:class "preview-field-container"
+                    (dom/div {:class "preview-field-container-inner"}
+                      (dom/label {} "Subject")
+                      (dom/div {:class "preview-subject"}
+                        (dom/input #js {:className "preview-subject-field"
+                                        :type "text"
+                                        :value (-> data :su-share :email :subject)
+                                        :onChange #(dis/dispatch! [:input [:su-share :email :subject] (.-value (sel1 [:input.preview-subject-field]))])})))
+                    (dom/hr {:class "separator"})))
+                (when (or (= share-medium :email)
+                          (= share-medium :slack))
+                  (dom/div {:class "preview-note-container"
                             :style #js {:width fields-width}}
                     (dom/label {} "Note")
-                    (dom/div {:class "preview-note"}
-                      (dom/input #js {:className "preview-note-field"
-                                      :type "text"
-                                      :value (-> data :su-share :email :note)
-                                      :on-change #(dis/dispatch! [:input [:su-share :email :note] (.val (js/$ ".preview-note-field"))])})))))
+                    (dom/div {:class "preview-note npt group"}
+                      (dom/div
+                        {:class "domine p1 col-12 emoji-autocomplete ta-mh no-outline emojiable preview-note-field"
+                         :content-editable true
+                         :on-key-down #(note-did-change)
+                         :on-key-up #(note-did-change)
+                         :style #js {:width fields-width}
+                         :placeholder "Optional note to go with this update."})
+                      (dom/div
+                        {:class "group"
+                         :style #js {:minHeight "25px"}}
+                        (dom/div
+                         {:class "left"
+                          :style #js {:color "rgba(78, 90, 107, 0.5)"}}
+                          (emoji-picker {:add-emoji-cb #(note-did-change)})))))))
               (when show-su-dialog
                 (om/build su-preview-dialog {:selected-topics (:sections su-data)
                                              :company-data company-data

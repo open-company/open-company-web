@@ -91,66 +91,125 @@ div.su-snapshot-preview {
         }
       }
 
-      div.preview-field-container {
+      div.preview-note-container {
         text-align: center;
         margin: 25px auto 10px;
-        width: 100%;
-        display: table;
-
-        input.preview-title {
-          height: 28px;
-          width: 100%;
-          margin-top: 0px;
-          padding-top: 0px;
-          text-align: center;
-          font-weight: 700;
-          font-size: 22px;
-          line-height: 1.2;
-          color: $oc_gray_5;
-          outline: none;
-          background-color: transparent;
-          border-radius: 2px;
-          border: 1px solid rgba(78, 90, 107, 0.2);
-
-          &:focus {
-            border: 1px solid transparent;
-          }
-
-          @include placeholder {
-            font-style: italic;
-          }
-        }
+        padding-left: 10px;
 
         label {
-          display: table-cell;
-          width: 1px;
+          float: left;
           color: $oc_gray_5;
           font-size: 12px;
           letter-spacing: 1px;
           font-weight: 400;
           font-family: $oc_headers_font;
           text-transform: uppercase;
+          margin-top: -20px;
         }
 
-        .preview-to div.preview-to-field{
-          text-align: left;
-        }
-
-        .preview-subject, .preview-note {
-          margin-top: 0px;
-        }
-
-        .preview-to, .preview-subject, .preview-note {
-          display: block;
+        .preview-note {
+          margin-top: 40px;
           width: 100%;
-          margin-left: 0.5rem;
-          min-height: 36px;
-          input {
+          display: block;
+          text-align: left;
+          line-height: 1.2;
+          color: $oc_gray_5;
+          font-size: 14px;
+        }
+      }
+
+      div.preview-field-container {
+        text-align: center;
+        margin: 10px auto 0px;
+        width: 100%;
+        padding-left: 10px;
+
+        hr.separator {
+          // padding-left: 10px;
+          width: 100%;
+          height: 1px;
+          background-color: rgba(78, 90, 107, 0.4);
+          float: left;
+          margin: 0px;
+          padding: 0px;
+        }
+
+        div.preview-field-container-inner {
+          width: 100%;
+          display: table;
+
+          input.preview-title {
+            height: 28px;
+            width: 100%;
+            margin-top: 0px;
+            padding-top: 0px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 22px;
+            line-height: 1.2;
+            color: $oc_gray_5;
+            outline: none;
+            background-color: transparent;
+            border-radius: 2px;
+            border: 1px solid rgba(78, 90, 107, 0.2);
+
+            &:focus {
+              border: 1px solid transparent;
+            }
+
+            @include placeholder {
+              font-style: italic;
+            }
+          }
+
+          label {
+            display: table-cell;
+            width: 1px;
+            color: $oc_gray_5;
+            font-size: 12px;
+            letter-spacing: 1px;
+            font-weight: 400;
+            font-family: $oc_headers_font;
+            text-transform: uppercase;
+          }
+
+          .preview-to {
+            background-color: transparent;
+            border: none;
+
+            div.preview-to-field{
+              text-align: left;
+              background-color: transparent;
+              border: none;
+
+              .email-item.submitted {
+                background-color: white;
+              }
+            }
+          }
+
+          .preview-subject {
+            margin-top: 0px;
+          }
+
+          .preview-to, .preview-subject {
+            display: block;
             width: 100%;
             min-height: 36px;
 
-            &:focus {
+            input {
+              width: 100%;
+              min-height: 36px;
+              line-height: 1.2;
+              color: $oc_gray_5;
+              background-color: transparent;
               outline: none;
+              border: none;
+              font-size: 14px;
+
+              &:focus {
+                outline: none;
+              }
             }
           }
         }
