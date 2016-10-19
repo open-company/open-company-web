@@ -164,7 +164,8 @@
           (revision-navigation owner (:transition-as-of current-state))
           (om/set-state! owner (merge current-state
                                     {:as-of (:transition-as-of current-state)
-                                     :transition-as-of nil}))))
+                                     :transition-as-of nil}))
+          (utils/after 100 #(utils/remove-tooltips))))
       (.play))))
 
 (defn- rev-click [owner e revision]

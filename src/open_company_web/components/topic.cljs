@@ -161,9 +161,11 @@
     (doto appear-animation
       (events/listen
         AnimationEventType/FINISH
-        #(om/set-state! owner (merge current-state
-                                    {:as-of (:transition-as-of current-state)
-                                     :transition-as-of nil})))
+        (fn []
+          (om/set-state! owner (merge current-state
+                                      {:as-of (:transition-as-of current-state)
+                                       :transition-as-of nil}))
+          (utils/after 100 #(utils/remove-tooltips))))
       (.play))))
 
 (defcomponent topic [{:keys [active-topics
