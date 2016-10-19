@@ -119,7 +119,7 @@
                (:latest-su next-props))
       (om/set-state! owner :share-link (:latest-su next-props))))
 
-  (render-state [_ {:keys [share-via share-link sending sent] :as state}]
+  (render-state [_ {:keys [share-via share-link] :as state}]
     (let [cancel-fn    (:dismiss-su-preview options)]
       (dom/div {:class "su-preview-dialog"}
         (dom/div {:class "su-preview-window"}
@@ -132,7 +132,8 @@
               :link       (link-dialog share-link)
               (or :email
                   :slack) (confirmation share-via cancel-fn))
-            (dom/div {:class "px3 pb3 right-align"}
-              (dom/button {:class "btn-reset btn-outline"
-                           :on-click cancel-fn}
-                "DONE"))))))))
+            (when (= share-via :link)
+              (dom/div {:class "px3 pb3 right-align"}
+                (dom/button {:class "btn-reset btn-solid"
+                             :on-click cancel-fn}
+                            "DONE")))))))))
