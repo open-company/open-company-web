@@ -371,13 +371,13 @@
             (let [fixed-body (if body (json->cljs body) {})]
               (dispatcher/dispatch! [:new-section {:response fixed-body :slug slug}]))))))))
 
-(defn share-stakeholder-update [{:keys [post-data]}]
+(defn share-stakeholder-update [post-data]
   (let [slug         (keyword (router/current-company-slug))
         company-data (dispatcher/company-data)
         links        (:links company-data)
         share-link   (utils/link-for links "share" "POST")]
     (api-post (:href share-link)
-              {:json-params post-data
+              {:json-params (cljs->json post-data)
                :headers {;; required by Chrome
                          "Access-Control-Allow-Headers" "Content-Type"
                          ;; custom content type
