@@ -17,6 +17,7 @@
             [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
             [open-company-web.components.ui.multi-items-input :refer (item-input email-item)]
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
+            [open-company-web.components.ui.small-loading :refer (small-loading)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -31,7 +32,8 @@
     (vec (remove nil? topics-list))))
 
 (defn post-stakeholder-update [owner]
-  (let [share-medium (keyword (:medium @router/path))]
+  (om/set-state! owner :share-status :su-posting)
+  (let [share-medium (om/get-state owner :share-medium)]
     (cond
       ; post for email: to, subject and note
       (= share-medium :email)
@@ -41,34 +43,25 @@
                        :note (-> @dis/app-state :su-share :email :note)}]
         (api/share-stakeholder-update post-data))
       ; post for :slack
-      (= share-medium :link)
+      (= share-medium :slack)
       (let [post-data {:slack true
                        :note (-> @dis/app-state :su-share :slack :note)}]
         (api/share-stakeholder-update post-data))
       ; post for link
       (= share-medium :link)
-      (api/share-stakeholder-update {}))
-    (om/set-state! owner :share-status :su-posting)))
+      (api/share-stakeholder-update {}))))
 
 (defn stakeholder-update-data [data]
   (:stakeholder-update (dis/company-data data)))
 
-(defn patch-stakeholder-update [owner]
+(defn share-clicked [owner]
   (let [patch-data {:title (or (om/get-state owner :title) "")
                     :sections (om/get-state owner :su-topics)}]
-    (api/patch-stakeholder-update patch-data)))
-
-(defn share-clicked [owner]
- (patch-stakeholder-update owner)
- (om/set-state! owner :share-status :su-patching))
+    (api/patch-stakeholder-update patch-data))
+  (om/set-state! owner :share-status :su-patching))
 
 (defn dismiss-su-preview [owner]
-  (om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false
-                                                    :slack-loading false
-                                                    :link-loading false
-                                                    :email-loading false
-                                                    :link-posting false
-                                                    :link-posted false})))
+  (om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false})))
 
 (defn setup-sortable [owner options]
   (when-let [list-node (js/jQuery (sel1 [:div.topics-column]))]
@@ -101,11 +94,16 @@
 
 (def topic-row-x-padding 40)
 
-(defn note-did-change []
-  (let [medium (keyword (:medium @router/path))
-        email-notes (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.preview-note-field])))]
+(defn email-note-did-change []
+  (let [email-notes (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:.preview-note-field])))]
     (dis/dispatch! [:input
-                    [:su-share medium :note]
+                    [:su-share :email :note]
+                    email-notes])))
+
+(defn slack-note-did-change []
+  (let [email-notes (.-value (sel1 [:.preview-note-field]))]
+    (dis/dispatch! [:input
+                    [:su-share :slack :note]
                     email-notes])))
 
 (defcomponent su-snapshot-preview [data owner options]
@@ -120,11 +118,9 @@
        :su-topics su-sections
        :title-focused false
        :title (:title su-data)
-       :show-su-dialog false
-       :link-loading false
-       :slack-loading false
-       :link-posting false
-       :link-posted false}))
+       :share-medium (keyword (:medium @router/path))
+       :share-status nil
+       :show-su-dialog false}))
 
   (did-mount [_]
     (om/set-state! owner :did-mount true)
@@ -142,22 +138,11 @@
         (om/set-state! owner :su-topics su-sections)))
     (when (= (om/get-state owner :share-status) :su-patching)
       ; post with data
-      (post-stakeholder-update owner)
-      (om/set-state! owner :share-status :posted))
+      (post-stakeholder-update owner))
     (when (= (om/get-state owner :share-status) :su-posting)
       ; share post sent, let's show the final dialog
       (om/set-state! owner :share-status :su-posted)
-      (om/set-state! owner :show-su-dialog true))
-    ; share via link
-    ; (when (om/get-state owner :link-loading)
-    ;   (if-not (om/get-state owner :link-posting)
-    ;     (post-stakeholder-update owner)
-    ;     ; show share url dialog
-    ;     (when (not= (dis/latest-stakeholder-update data) (dis/latest-stakeholder-update next-props))
-    ;       (om/set-state! owner :link-loading false)
-    ;       (om/set-state! owner :link-posted true)
-    ;       (om/set-state! owner :show-su-dialog true))))
-    )
+      (om/set-state! owner :show-su-dialog true)))
 
   (did-update [_ _ _]
     (setup-sortable owner options))
@@ -166,14 +151,10 @@
                            title-focused
                            title
                            show-su-dialog
-                           email-loading
-                           link-loading
-                           slack-loading
-                           link-posting
-                           link-posted
-                           su-topics]}]
-    (let [share-medium (keyword (:medium @router/path))
-          company-slug (router/current-company-slug)
+                           share-status
+                           su-topics
+                           share-medium]}]
+    (let [company-slug (router/current-company-slug)
           company-data (dis/company-data data)
           su-data      (stakeholder-update-data data)
           card-width   (responsive/calc-card-width 1)
@@ -214,6 +195,9 @@
                                               (or (not (seq (->> data :su-share :email :to)))
                                                   (not (every? utils/valid-email? (->> data :su-share :email :to)))
                                                   (clojure.string/blank? (->> data :su-share :email :subject)))))}
+                (when (or (= share-status :su-patching)
+                          (= share-status :su-posting))
+                  (small-loading))
                 "SHARE " (dom/i {:class "fa fa-share"}))))
           ;; SU Snapshot Preview
           (when company-data
@@ -267,23 +251,28 @@
                 (when (or (= share-medium :email)
                           (= share-medium :slack))
                   (dom/div {:class "preview-note-container"
-                            :style #js {:width fields-width}}
+                              :style #js {:width fields-width}}
                     (dom/label {} "Note")
-                    (dom/div {:class "preview-note npt group"}
-                      (dom/div
-                        {:class "domine p1 col-12 emoji-autocomplete ta-mh no-outline emojiable preview-note-field"
-                         :content-editable true
-                         :on-key-down #(note-did-change)
-                         :on-key-up #(note-did-change)
-                         :style #js {:width fields-width}
-                         :placeholder "Optional note to go with this update."})
-                      (dom/div
-                        {:class "group"
-                         :style #js {:minHeight "25px"}}
+                    (when (= share-medium :email)
+                      (dom/div {:class "preview-note npt group"}
                         (dom/div
-                         {:class "left"
-                          :style #js {:color "rgba(78, 90, 107, 0.5)"}}
-                          (emoji-picker {:add-emoji-cb #(note-did-change)})))))))
+                          {:class "domine p1 col-12 emoji-autocomplete ta-mh no-outline emojiable preview-note-field"
+                           :content-editable true
+                           :on-key-down #(email-note-did-change)
+                           :on-key-up #(email-note-did-change)
+                           :placeholder "Optional note to go with this update."})
+                        (dom/div
+                          {:class "group"
+                           :style #js {:minHeight "25px"}}
+                          (dom/div
+                           {:class "left"
+                            :style #js {:color "rgba(78, 90, 107, 0.5)"}}
+                            (emoji-picker {:add-emoji-cb #(email-note-did-change)})))))
+                    (when (= share-medium :slack)
+                      (dom/div {:class "preview-note npt group"}
+                        (dom/textarea {:class "domine p1 col-12 ta-mh no-outline preview-note-field"
+                                       :value (-> data :su-share :slack :note)
+                                       :on-change #(slack-note-did-change)}))))))
               (when show-su-dialog
                 (om/build su-preview-dialog {:latest-su (dis/latest-stakeholder-update)
                                              :share-via share-medium}

@@ -115,6 +115,10 @@ div.su-snapshot-preview {
           line-height: 1.2;
           color: $oc_gray_5;
           font-size: 14px;
+
+          textarea.preview-note-field {
+            border: none;
+          }
         }
       }
 
@@ -134,33 +138,33 @@ div.su-snapshot-preview {
           padding: 0px;
         }
 
+        input.preview-title {
+          height: 28px;
+          width: 100%;
+          margin-top: 0px;
+          padding-top: 0px;
+          text-align: center;
+          font-weight: 700;
+          font-size: 22px;
+          line-height: 1.2;
+          color: $oc_gray_5;
+          outline: none;
+          background-color: transparent;
+          border-radius: 2px;
+          border: 1px solid rgba(78, 90, 107, 0.2);
+
+          &:focus {
+            border: 1px solid transparent;
+          }
+
+          @include placeholder {
+            font-style: italic;
+          }
+        }
+
         div.preview-field-container-inner {
           width: 100%;
           display: table;
-
-          input.preview-title {
-            height: 28px;
-            width: 100%;
-            margin-top: 0px;
-            padding-top: 0px;
-            text-align: center;
-            font-weight: 700;
-            font-size: 22px;
-            line-height: 1.2;
-            color: $oc_gray_5;
-            outline: none;
-            background-color: transparent;
-            border-radius: 2px;
-            border: 1px solid rgba(78, 90, 107, 0.2);
-
-            &:focus {
-              border: 1px solid transparent;
-            }
-
-            @include placeholder {
-              font-style: italic;
-            }
-          }
 
           label {
             display: table-cell;
