@@ -95,7 +95,7 @@
 (def topic-row-x-padding 40)
 
 (defn email-note-did-change []
-  (let [email-notes (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:.preview-note-field])))]
+  (let [email-notes (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:.email-note-field])))]
     (dis/dispatch! [:input
                     [:su-share :email :note]
                     email-notes])))
