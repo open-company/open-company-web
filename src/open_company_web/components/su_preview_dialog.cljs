@@ -2,21 +2,11 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [dommy.core :refer-macros (sel1)]
             [rum.core :as rum]
-            [clojure.string :as string]
             [goog.dom :as gdom]
             [goog.style :as gstyle]
-            [open-company-web.api :as api]
             [open-company-web.dispatcher :as dis]
-            [open-company-web.router :as router]
-            [open-company-web.urls :as oc-urls]
-            [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.icon :as i]
-            [open-company-web.components.ui.small-loading :as loading]
-            [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
-            [open-company-web.components.ui.multi-items-input :refer (item-input email-item)]
-            [org.martinklepsch.derivatives :as drv]
             [cljsjs.react.dom]
             [cljsjs.clipboard]))
 
@@ -30,27 +20,11 @@
   {:did-mount    (fn [s] (assoc s ::clipboard (js/Clipboard. btn-selector)))
    :will-unmount (fn [s] (.destroy (::clipboard s)) s)})
 
-;; Modal components
-
-(rum/defc modal-title < rum/static
-  [title icon-id]
-  [:h3.m0.px3.py25.gray5.domine
-   {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.1)"}}
-   (when icon-id
-     (if (= :slack icon-id)
-       [:i {:class "fa fa-slack mr2"}]
-       (i/icon icon-id {:class "inline mr2"
-                        :color :oc-gray-3
-                        :accent-color :oc-gray-3})))
-   title])
-
 (rum/defcs link-dialog < (rum/local false ::copied)
                          (rum/local false ::clipboard)
                          (clipboard-mixin ".js-copy-btn")
   [{:keys [::copied] :as _state} link]
-  [:div
-   (modal-title  "Share a Link" :link-72)
-   [:div.p3
+  [:div.p3
     [:label.block.small-caps.bold.mb2 "Share this private link"]
     [:div.flex
      [:input.domine.npt.p1.flex-auto
@@ -66,23 +40,21 @@
     [:div.block.mt2
      [:a.small-caps.underline.bold.dimmed-gray
       {:href link :target "_blank"}
-      "Open in New Window"]]]])
+      "Open in New Window"]]])
 
 (rum/defc confirmation < rum/static
   [type cancel-fn]
   [:div
-   (case type
-     :email (modal-title "Email Sent!" :email-84)
-     :slack (modal-title "Shared via Slack!" :slack))
-   [:div.p3
-    [:p.domine
-     (case type
-       :email "Recipients will get your update by email."
-       :slack "Members of your Slack organization will get your update.")]
-    [:div.right-align.mt3
-     [:button.btn-reset.btn-solid
-      {:on-click cancel-fn}
-      "DONE"]]]])
+    [:div.p3
+      [:p.domine
+        (case type
+          :email "Recipients will get your update by email."
+          :slack [:div "Members of your " [:i.fa.fa-slack] " Slack organization will get your update."])]]
+    (when (= type :email)
+      [:div.right-align.m3
+        [:button.btn-reset.btn-solid
+          {:on-click cancel-fn}
+          "DONE"]])])
 
 (defn reset-scroll-height []
   (let [main-scroll (gdom/getElementByClass "main-scroll")]
@@ -131,9 +103,4 @@
             (case share-via
               :link       (link-dialog share-link)
               (or :email
-                  :slack) (confirmation share-via cancel-fn))
-            (when (= share-via :link)
-              (dom/div {:class "px3 pb3 right-align"}
-                (dom/button {:class "btn-reset btn-solid"
-                             :on-click cancel-fn}
-                            "DONE")))))))))
+                  :slack) (confirmation share-via cancel-fn))))))))
