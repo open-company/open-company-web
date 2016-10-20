@@ -3,8 +3,8 @@
               [cljs-react-test.simulate :as sim]
               [cljs-react-test.utils :as tu]
               [om.core :as om :include-macros true]
-              [dommy.core :as dommy :refer-macros [sel1 sel]]
-              [open-company-web.components.ui.navbar :refer [navbar]]
+              [dommy.core :as dommy :refer-macros (sel1)]
+              [open-company-web.components.ui.navbar :refer (navbar)]
               [om.dom :as dom :include-macros true]
               [open-company-web.router :as router]))
 
@@ -16,16 +16,14 @@
 (def company-symbol "OPEN")
 
 (def test-atom {
+  :card-width 500
+  :columns-num 1
   :OPEN {
-    :symbol company-symbol
-    :links [
-      {
-        :rel "report"
-        :href "/companies/OPEN/reports/2015/Q1"
-      }
-    ]
-  }
-})
+    :company-data {
+      :slug company-symbol
+      :links [
+        {:rel "report"
+         :href (str "/companies/" company-symbol "/reports/2015/Q1")}]}}})
 
 (deftest test-navbar-component
   (testing "Navbar component"
@@ -33,6 +31,6 @@
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root navbar app-state {:target c})
-          navbar-node (sel c [:div#navbar])]
-      (is (not (nil? navbar-node)))
-      (tu/unmount! c))))
+          navbar-node (sel1 c [:nav.oc-navbar])]
+              (is (not (nil? navbar-node)))
+              (tu/unmount! c))))
