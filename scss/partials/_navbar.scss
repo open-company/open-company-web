@@ -103,17 +103,13 @@ nav.oc-navbar {
           }
         }
 
-        ul.dropdown-menu {
-          li{
+        div.dropdown-menu {
+          a {
+            color: $oc_gray_5;
+            display: inline-block;
             &:hover {
+              opacity: 0.6;
               background-color: white;
-            }
-            a{
-              color: $oc_gray_5;
-              &:hover {
-                opacity: 0.6;
-                background-color: white;
-              }
             }
           }
         }

@@ -55,27 +55,21 @@
                                        :data-toggle "dropdown"
                                        :disabled (not (nil? (:foce-key data)))}
                             (dom/i {:class "fa fa-share"}) " SHARE AN UPDATE")
-                          (dom/ul {:class "dropdown-menu" :aria-labelledby "share-an-update"}
-                            (when (not (utils/is-test-env?))
-                              (dom/li {}
-                                (dom/a {:href (oc-urls/stakeholder-update-preview :email)
-                                        :on-click #(do
-                                                     (.preventDefault %)
-                                                     (router/nav! (oc-urls/stakeholder-update-preview :email)))}
-                                  "SHARE BY EMAIL")))
-                            (when (not (utils/is-test-env?))
-                              (dom/li {}
-                                (dom/a {:href (oc-urls/stakeholder-update-preview :slack)
-                                        :on-click #(do
-                                                     (.preventDefault %)
-                                                     (router/nav! (oc-urls/stakeholder-update-preview :slack)))}
-                                  "SHARE TO SLACK")))
-                            (when (not (utils/is-test-env?))
-                              (dom/li {}
-                                (dom/a {:href (oc-urls/stakeholder-update-preview :link)
-                                        :on-click #(do
-                                                     (.preventDefault %)
-                                                     (router/nav! (oc-urls/stakeholder-update-preview :link)))}
-                                  "SHARE A LINK"))))))
+                          (dom/div {:class "dropdown-menu" :aria-labelledby "share-an-update"}
+                            (dom/a {:href (oc-urls/stakeholder-update-preview :email)
+                                    :on-click #(do
+                                                 (.preventDefault %)
+                                                 (router/nav! (oc-urls/stakeholder-update-preview :email)))}
+                              "SHARE BY EMAIL")
+                            (dom/a {:href (oc-urls/stakeholder-update-preview :slack)
+                                    :on-click #(do
+                                                 (.preventDefault %)
+                                                 (router/nav! (oc-urls/stakeholder-update-preview :slack)))}
+                              "SHARE TO SLACK")
+                            (dom/a {:href (oc-urls/stakeholder-update-preview :link)
+                                    :on-click #(do
+                                                 (.preventDefault %)
+                                                 (router/nav! (oc-urls/stakeholder-update-preview :link)))}
+                              "SHARE A LINK"))))
                       (user-avatar (partial menu-click owner)))
                     (login-button)))))))))))
