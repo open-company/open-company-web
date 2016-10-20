@@ -235,7 +235,7 @@ div.topic {
           display: none;
         }
 
-        p:last-child {
+        & > div:last-child, p:last-child {
           margin-bottom: 0px;
           padding-bottom: 0px;
         }

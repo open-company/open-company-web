@@ -121,7 +121,7 @@
     border: 0px solid transparent;
   }
 
-  p, ul, ol {
+  & > div, p, ul, ol {
     margin: 0;
     margin-bottom: 16px;
 
@@ -130,7 +130,7 @@
     }
   }
 
-  p {
+  & > div, p {
     margin: 0 0 .88888em 0;
     padding: 0;
   }
@@ -224,7 +224,7 @@
     white-space: inherit;
   }
 
-  p:last-child{
+  p:last-child, & > div:last-child{
     margin-bottom: 0px;
     padding-bottom: 0px;
   }
