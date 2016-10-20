@@ -46,10 +46,9 @@
   [type cancel-fn]
   [:div
     [:div.p3
-      [:p.domine
-        (case type
-          :email "Recipients will get your update by email."
-          :slack [:div "Members of your " [:i.fa.fa-slack] " Slack organization will get your update."])]]
+      (case type
+        :email [:div.domine "Recipients will get your update by email."]
+        :slack [:div.domine "Members of your " [:i.fa.fa-slack] " Slack organization will get your update."])]
     (when (= type :email)
       [:div.right-align.m3
         [:button.btn-reset.btn-solid
