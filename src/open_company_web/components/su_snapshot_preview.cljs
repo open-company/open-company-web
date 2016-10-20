@@ -101,7 +101,7 @@
                     email-notes])))
 
 (defn slack-note-did-change []
-  (let [email-notes (.-value (sel1 [:.preview-note-field]))]
+  (let [email-notes (.-innerText (sel1 [:.slack-note-field]))]
     (dis/dispatch! [:input
                     [:su-share :slack :note]
                     email-notes])))
@@ -209,9 +209,13 @@
                             :style #js {:width fields-width}}
                     (dom/label {} "Optional Slack Note")
                     (dom/div {:class "slack-note npt group"}
-                      (dom/textarea {:class "domine p1 col-12 ta-mh no-outline slack-note-field"
-                                     :value (-> data :su-share :slack :note)
-                                     :on-change #(slack-note-did-change)}))))
+                      (dom/div
+                          {:class "domine p1 col-12 no-outline slack-note-field"
+                           :content-editable true
+                           :on-key-down #(slack-note-did-change)
+                           :on-key-up #(slack-note-did-change)
+                           :default-value (-> data :su-share :slack :note)
+                           :placeholder "Optional note to go with this update."}))))
                 (when (not= share-medium :email)
                   (dom/div {:class "company-logo-container group"}
                     (dom/img {:class "company-logo" :src (:logo company-data)})))
@@ -263,7 +267,7 @@
                     (when (= share-medium :email)
                       (dom/div {:class "email-note group"}
                         (dom/div
-                          {:class "domine p1 col-12 emoji-autocomplete ta-mh no-outline emojiable preview-note-field"
+                          {:class "domine p1 col-12 emoji-autocomplete no-outline emojiable email-note-field"
                            :content-editable true
                            :on-key-down #(email-note-did-change)
                            :on-key-up #(email-note-did-change)

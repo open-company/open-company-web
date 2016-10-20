@@ -117,9 +117,10 @@ div.su-snapshot-preview {
           font-size: 14px;
           background-color: transparent;
 
-          textarea.slack-note-field {
+          div.slack-note-field {
             background-color: transparent;
             border: 1px solid rgba(78, 90, 107, 0.2);
+            min-height: 48px;
           }
         }
 
@@ -134,6 +135,10 @@ div.su-snapshot-preview {
           background-color: transparent;
           border: 1px solid rgba(78, 90, 107, 0.2);
           border-radius: 2px;
+
+          div.email-note-field {
+            min-height: 48px;
+          }
         }
       }
 
