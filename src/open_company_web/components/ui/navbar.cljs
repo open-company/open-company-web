@@ -21,14 +21,16 @@
     (.preventDefault e))
   (dis/toggle-menu))
 
-(defcomponent navbar [{:keys [company-data columns-num card-width latest-su link-loading email-loading slack-loading menu-open show-share-su-button] :as data} owner options]
+(defcomponent navbar [{:keys [columns-num
+                              card-width
+                              show-share-su-button] :as data} owner options]
 
   (render [_]
     (let [header-width (+ (* card-width columns-num)    ; cards width
                           (* 20 (dec columns-num))      ; cards right margin
                           (when (> columns-num 1) 60))] ; x margins if needed
       (dom/nav {:class "oc-navbar group"}
-        (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
+        (when (and (not (utils/is-test-env?)) (not (jwt/jwt)))
           (login-overlays-handler))
         (dom/div {:class "oc-navbar-header"
                   :style #js {:width (str header-width "px")}}
@@ -51,21 +53,27 @@
                                        :aria-expanded false
                                        :id "share-an-update"
                                        :data-toggle "dropdown"
-                                       :disabled (not (nil? (:foce-key data)))
-                                     }
+                                       :disabled (not (nil? (:foce-key data)))}
                             (dom/i {:class "fa fa-share"}) " SHARE AN UPDATE")
                           (dom/ul {:class "dropdown-menu" :aria-labelledby "share-an-update"}
-                            (dom/li {} (dom/a {:href (oc-urls/stakeholder-update-preview "email")
-                                               :on-click #(do
-                                                           (.preventDefault %)
-                                                           (router/nav! (oc-urls/stakeholder-update-preview "email")))} "SHARE BY EMAIL"))
-                            (dom/li {} (dom/a {:href (oc-urls/stakeholder-update-preview "slack")
-                                               :on-click #(do
-                                                           (.preventDefault %)
-                                                           (router/nav! (oc-urls/stakeholder-update-preview "slack")))} "SHARE TO SLACK"))
-                            (dom/li {} (dom/a {:href (oc-urls/stakeholder-update-preview "url")
-                                               :on-click #(do
-                                                           (.preventDefault %)
-                                                           (router/nav! (oc-urls/stakeholder-update-preview "url")))} "SHARE A URL")))))
+                            (when (not (utils/is-test-env?))
+                              (dom/li {}
+                                (dom/a {:href (oc-urls/stakeholder-update-preview :email)
+                                        :on-click #(do
+                                                     (.preventDefault %)
+                                                     (router/nav! (oc-urls/stakeholder-update-preview :email)))}
+                                  "SHARE BY EMAIL"))
+                              (dom/li {}
+                                (dom/a {:href (oc-urls/stakeholder-update-preview :slack)
+                                        :on-click #(do
+                                                     (.preventDefault %)
+                                                     (router/nav! (oc-urls/stakeholder-update-preview :slack)))}
+                                  "SHARE TO SLACK"))
+                              (dom/li {}
+                                (dom/a {:href (oc-urls/stakeholder-update-preview :link)
+                                        :on-click #(do
+                                                     (.preventDefault %)
+                                                     (router/nav! (oc-urls/stakeholder-update-preview :link)))}
+                                  "SHARE A URL"))))))
                       (user-avatar (partial menu-click owner)))
                     (login-button)))))))))))
