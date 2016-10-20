@@ -107,7 +107,7 @@ div.su-snapshot-preview {
           margin-top: -20px;
         }
 
-        .preview-note {
+        div.slack-note {
           margin-top: 40px;
           width: 100%;
           display: block;
@@ -117,10 +117,23 @@ div.su-snapshot-preview {
           font-size: 14px;
           background-color: transparent;
 
-          textarea.preview-note-field {
+          textarea.slack-note-field {
             background-color: transparent;
             border: 1px solid rgba(78, 90, 107, 0.2);
           }
+        }
+
+        div.email-note {
+          margin-top: 40px;
+          width: 100%;
+          display: block;
+          text-align: left;
+          line-height: 1.2;
+          color: $oc_gray_5;
+          font-size: 14px;
+          background-color: transparent;
+          border: 1px solid rgba(78, 90, 107, 0.2);
+          border-radius: 2px;
         }
       }
 
@@ -162,6 +175,11 @@ div.su-snapshot-preview {
           @include placeholder {
             font-style: italic;
           }
+        }
+
+        div.preview-note {
+          border: 1px solid rgba(78, 90, 107, 0.4);
+          border-radius: 2px;
         }
 
         div.preview-field-container-inner {

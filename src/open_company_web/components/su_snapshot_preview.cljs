@@ -207,9 +207,9 @@
                 (when (= share-medium :slack)
                   (dom/div {:class "preview-note-container"
                             :style #js {:width fields-width}}
-                    (dom/label {} "Optional Note")
-                    (dom/div {:class "preview-note npt group"}
-                      (dom/textarea {:class "domine p1 col-12 ta-mh no-outline preview-note-field"
+                    (dom/label {} "Optional Slack Note")
+                    (dom/div {:class "slack-note npt group"}
+                      (dom/textarea {:class "domine p1 col-12 ta-mh no-outline slack-note-field"
                                      :value (-> data :su-share :slack :note)
                                      :on-change #(slack-note-did-change)}))))
                 (when (not= share-medium :email)
@@ -261,7 +261,7 @@
                               :style #js {:width fields-width}}
                     (dom/label {} "Optional Note")
                     (when (= share-medium :email)
-                      (dom/div {:class "preview-note npt group"}
+                      (dom/div {:class "email-note group"}
                         (dom/div
                           {:class "domine p1 col-12 emoji-autocomplete ta-mh no-outline emojiable preview-note-field"
                            :content-editable true
