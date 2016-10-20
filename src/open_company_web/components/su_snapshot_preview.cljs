@@ -252,7 +252,7 @@
                           (= share-medium :slack))
                   (dom/div {:class "preview-note-container"
                               :style #js {:width fields-width}}
-                    (dom/label {} "Note")
+                    (dom/label {} "Optional Note")
                     (when (= share-medium :email)
                       (dom/div {:class "preview-note npt group"}
                         (dom/div

@@ -76,6 +76,6 @@
                                         :on-click #(do
                                                      (.preventDefault %)
                                                      (router/nav! (oc-urls/stakeholder-update-preview :link)))}
-                                  "SHARE A URL"))))))
+                                  "SHARE A LINK"))))))
                       (user-avatar (partial menu-click owner)))
                     (login-button)))))))))))
