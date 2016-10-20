@@ -104,11 +104,21 @@ nav.oc-navbar {
         }
 
         div.dropdown-menu {
-          a {
-            color: $oc_gray_5;
+          button.dropdown-item {
             display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: $oc_headers_font;
+            color: $oc_gray_5;
+            opacity: 0.6;
+            color: $oc_gray_5;
+
+            i.fa {
+              margin-right: 5px;
+            }
+
             &:hover {
-              opacity: 0.6;
+              opacity: 0.8;
               background-color: white;
             }
           }
