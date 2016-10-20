@@ -48,12 +48,7 @@
     [:div.p3
       (case type
         :email [:div.domine "Recipients will get your update by email."]
-        :slack [:div.domine "Members of your " [:i.fa.fa-slack] " Slack organization will get your update."])]
-    (when (= type :email)
-      [:div.right-align.m3
-        [:button.btn-reset.btn-solid
-          {:on-click cancel-fn}
-          "DONE"]])])
+        :slack [:div.domine "Members of your " [:i.fa.fa-slack] " Slack organization will get your update."])]])
 
 (defn reset-scroll-height []
   (let [main-scroll (gdom/getElementByClass "main-scroll")]
