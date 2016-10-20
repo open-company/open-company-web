@@ -82,7 +82,7 @@ div.su-snapshot-preview {
       text-align: center;
 
       div.company-logo-container {
-        margin-top: 40px;
+        margin-top: 20px;
 
         img.company-logo {
           max-height: 50px;
@@ -93,7 +93,7 @@ div.su-snapshot-preview {
 
       div.preview-note-container {
         text-align: center;
-        margin: 25px auto 10px;
+        margin: 25px auto 0px;
         padding-left: 10px;
 
         label {
@@ -115,9 +115,11 @@ div.su-snapshot-preview {
           line-height: 1.2;
           color: $oc_gray_5;
           font-size: 14px;
+          background-color: transparent;
 
           textarea.preview-note-field {
-            border: none;
+            background-color: transparent;
+            border: 1px solid rgba(78, 90, 107, 0.2);
           }
         }
       }
@@ -141,7 +143,7 @@ div.su-snapshot-preview {
         input.preview-title {
           height: 28px;
           width: 100%;
-          margin-top: 0px;
+          margin-top: 10px;
           padding-top: 0px;
           text-align: center;
           font-weight: 700;

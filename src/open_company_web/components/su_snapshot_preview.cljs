@@ -204,6 +204,14 @@
             (dom/div {:class "su-sp-content group"
                       :key (apply str su-topics)}
               (dom/div {:class "su-sp-company-header group"}
+                (when (= share-medium :slack)
+                  (dom/div {:class "preview-note-container"
+                            :style #js {:width fields-width}}
+                    (dom/label {} "Optional Note")
+                    (dom/div {:class "preview-note npt group"}
+                      (dom/textarea {:class "domine p1 col-12 ta-mh no-outline preview-note-field"
+                                     :value (-> data :su-share :slack :note)
+                                     :on-change #(slack-note-did-change)}))))
                 (when (not= share-medium :email)
                   (dom/div {:class "company-logo-container group"}
                     (dom/img {:class "company-logo" :src (:logo company-data)})))
@@ -248,8 +256,7 @@
                                         :value (-> data :su-share :email :subject)
                                         :onChange #(dis/dispatch! [:input [:su-share :email :subject] (.-value (sel1 [:input.preview-subject-field]))])})))
                     (dom/hr {:class "separator"})))
-                (when (or (= share-medium :email)
-                          (= share-medium :slack))
+                (when (= share-medium :email)
                   (dom/div {:class "preview-note-container"
                               :style #js {:width fields-width}}
                     (dom/label {} "Optional Note")
@@ -267,12 +274,7 @@
                           (dom/div
                            {:class "left"
                             :style #js {:color "rgba(78, 90, 107, 0.5)"}}
-                            (emoji-picker {:add-emoji-cb #(email-note-did-change)})))))
-                    (when (= share-medium :slack)
-                      (dom/div {:class "preview-note npt group"}
-                        (dom/textarea {:class "domine p1 col-12 ta-mh no-outline preview-note-field"
-                                       :value (-> data :su-share :slack :note)
-                                       :on-change #(slack-note-did-change)}))))))
+                            (emoji-picker {:add-emoji-cb #(email-note-did-change)}))))))))
               (when show-su-dialog
                 (om/build su-preview-dialog {:latest-su (dis/latest-stakeholder-update)
                                              :share-via share-medium}
