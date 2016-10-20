@@ -1,6 +1,5 @@
 (ns open-company-web.urls
-  (:require [open-company-web.router :as router]
-            [clojure.string :as clj-str]))
+  (:require [open-company-web.router :as router]))
 
 (defn params->query-string [m]
      (clojure.string/join "&" (for [[k v] m] (str (name k) "=" v))))
