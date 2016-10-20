@@ -62,13 +62,15 @@
                                         :on-click #(do
                                                      (.preventDefault %)
                                                      (router/nav! (oc-urls/stakeholder-update-preview :email)))}
-                                  "SHARE BY EMAIL"))
+                                  "SHARE BY EMAIL")))
+                            (when (not (utils/is-test-env?))
                               (dom/li {}
                                 (dom/a {:href (oc-urls/stakeholder-update-preview :slack)
                                         :on-click #(do
                                                      (.preventDefault %)
                                                      (router/nav! (oc-urls/stakeholder-update-preview :slack)))}
-                                  "SHARE TO SLACK"))
+                                  "SHARE TO SLACK")))
+                            (when (not (utils/is-test-env?))
                               (dom/li {}
                                 (dom/a {:href (oc-urls/stakeholder-update-preview :link)
                                         :on-click #(do
