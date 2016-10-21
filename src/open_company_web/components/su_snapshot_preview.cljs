@@ -58,15 +58,25 @@
   (let [share-medium (om/get-state owner :share-medium)
         su-topics (om/get-state owner :su-topics)
         data (om/get-props owner)]
-    (when (and (pos? (count su-topics))
+    (if (and (pos? (count su-topics))
                (and (= share-medium :email)
                     (seq (->> data :su-share :email :to))
                     (every? utils/valid-email? (->> data :su-share :email :to))
                     (not (clojure.string/blank? (->> data :su-share :email :subject)))))
       (let [patch-data {:title (or (om/get-state owner :title) "")
                         :sections (om/get-state owner :su-topics)}]
-        (api/patch-stakeholder-update patch-data))
-      (om/set-state! owner :share-status :su-patching))))
+        (api/patch-stakeholder-update patch-data)
+        (om/set-state! owner :share-status :su-patching))
+      (do
+        (cond
+          (= share-medium :email)
+          (do
+            (when (clojure.string/blank? (->> data :su-share :email :subject))
+              (dis/dispatch! [:input [:su-share :email :subject-error] true]))
+            (when (not (seq (->> data :su-share :email :to)))
+              (dis/dispatch! [:input [:su-share :email :to-error] true]))))
+        (when (zero? (count su-topics))
+          (dis/dispatch! [:input [:su-share :su-topics-error] true]))))))
 
 (defn dismiss-su-preview [owner]
   (om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false})))
@@ -87,6 +97,7 @@
                               :stop (fn [event ui]
                                       (if-let [dragged-item (gobj/get ui "item")]
                                         (do
+                                          (dis/dispatch! [:input [:su-share :su-topics-error] false])
                                           (.removeClass (js/$ dragged-item) "su-dragging-topic")
                                           (.removeClass (js/$ (sel1 [:div.topics-columns])) "sortable-active")
                                           (om/set-state! owner :su-topics (ordered-topics-list))))
@@ -94,6 +105,7 @@
                               :opacity 1})))
 
 (defn add-su-section [owner topic]
+  (dis/dispatch! [:input [:su-share :su-topics-error] false])
   (om/update-state! owner :su-topics #(conj % topic)))
 
 (defn title-from-section-name [owner section]
@@ -244,13 +256,17 @@
                                      :container-node :div.npt.pt1.pr1.pl1.mh4.overflow-auto.preview-to-field
                                      :input-node :input.border-none.outline-none.mr.mb1
                                      :valid-item? utils/valid-email?
-                                     :on-change (fn [val] (dis/dispatch! [:input [:su-share :email :to] val]))})))
+                                     :on-change (fn [val]
+                                                  (dis/dispatch! [:input [:su-share :email :to] val])
+                                                  (dis/dispatch! [:input [:su-share :email :to-error] false]))})))
                     (when-let [to-field (->> data :su-share :email :to)]
                       (cond
                         (not (seq to-field))
                         (dom/span {:class "left red pt1 ml1"} "Required")
                         (not (every? utils/valid-email? to-field))
                         (dom/span {:class "left red pt1 ml1"} "Not a valid email address")))
+                    (when (->> data :su-share :email :to-error)
+                      (dom/span {:class "left red pt1"} "Required"))
                     (dom/hr {:class "separator"})))
                 (when (= share-medium :email)
                   (dom/div {:class "preview-field-container group"
@@ -261,7 +277,11 @@
                         (dom/input #js {:className "preview-subject-field"
                                         :type "text"
                                         :value (-> data :su-share :email :subject)
-                                        :onChange #(dis/dispatch! [:input [:su-share :email :subject] (.-value (sel1 [:input.preview-subject-field]))])})))
+                                        :onChange #(do
+                                                     (dis/dispatch! [:input [:su-share :email :subject] (.-value (sel1 [:input.preview-subject-field]))])
+                                                     (dis/dispatch! [:input [:su-share :email :subject-error] false]))})))
+                    (when (->> data :su-share :email :subject-error)
+                        (dom/div {:class "left red pt1"} "Required"))
                     (dom/hr {:class "separator"})))
                 (when (= share-medium :email)
                   (dom/div {:class "preview-note-container"
@@ -286,6 +306,12 @@
                 (om/build su-preview-dialog {:latest-su (dis/latest-stakeholder-update)
                                              :share-via share-medium}
                                             {:opts {:dismiss-su-preview #(dismiss-su-preview owner)}}))
+              (when (->> data :su-share :su-topics-error)
+                (dom/div {:class "group"
+                          :style {:width fields-width
+                                  :text-align "center"
+                                  :margin "0 auto"}}
+                  (dom/div {:class "red center domine my2"} "Please add at least one topic to the update.")))
               (om/build topics-columns {:columns-num 1
                                         :card-width card-width
                                         :total-width total-width
