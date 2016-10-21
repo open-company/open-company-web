@@ -42,10 +42,18 @@
       {:href link :target "_blank"}
       "Open in New Window"]]])
 
+(rum/defc modal-title < rum/static
+  [title]
+  [:h3.m0.mb2.gray5.domine
+   title])
+
 (rum/defc confirmation < rum/static
   [type cancel-fn]
   [:div
     [:div.p3
+      (case type
+        :email (modal-title "Email sent!")
+        :slack (modal-title "Slack message shared!"))
       (case type
         :email [:div.domine "Recipients will get your update by email."]
         :slack [:div.domine "Members of your " [:i.fa.fa-slack] " Slack organization will get your update."])]])

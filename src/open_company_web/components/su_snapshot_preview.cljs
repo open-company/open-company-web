@@ -55,10 +55,18 @@
   (:stakeholder-update (dis/company-data data)))
 
 (defn share-clicked [owner]
-  (let [patch-data {:title (or (om/get-state owner :title) "")
-                    :sections (om/get-state owner :su-topics)}]
-    (api/patch-stakeholder-update patch-data))
-  (om/set-state! owner :share-status :su-patching))
+  (let [share-medium (om/get-state owner :share-medium)
+        su-topics (om/get-state owner :su-topics)
+        data (om/get-props owner)]
+    (when (and (pos? (count su-topics))
+               (and (= share-medium :email)
+                    (seq (->> data :su-share :email :to))
+                    (every? utils/valid-email? (->> data :su-share :email :to))
+                    (not (clojure.string/blank? (->> data :su-share :email :subject)))))
+      (let [patch-data {:title (or (om/get-state owner :title) "")
+                        :sections (om/get-state owner :su-topics)}]
+        (api/patch-stakeholder-update patch-data))
+      (om/set-state! owner :share-status :su-patching))))
 
 (defn dismiss-su-preview [owner]
   (om/set-state! owner (merge (om/get-state owner) {:show-su-dialog false})))
@@ -189,12 +197,7 @@
             (dom/div {:class "snapshot-cta"} "Choose the topics to share and arrange them in any order.")
             (dom/div {:class "share-su"}
               (dom/button {:class "btn-reset btn-solid share-su-button"
-                           :on-click #(share-clicked owner)
-                           :disabled (or (zero? (count su-topics))
-                                         (and (= share-medium :email)
-                                              (or (not (seq (->> data :su-share :email :to)))
-                                                  (not (every? utils/valid-email? (->> data :su-share :email :to)))
-                                                  (clojure.string/blank? (->> data :su-share :email :subject)))))}
+                           :on-click #(share-clicked owner)}
                 (when (or (= share-status :su-patching)
                           (= share-status :su-posting))
                   (small-loading))
