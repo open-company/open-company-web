@@ -8,7 +8,7 @@
             [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.caches :refer (company-cache)]
             [open-company-web.dispatcher :as dis]
-            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]
+            [open-company-web.components.ui.popover :refer (add-popover-with-om-component add-popover hide-popover)]
             [cuerdas.core :as s]))
 
 (def focus-cache-key :last-selected-metric)
@@ -105,6 +105,50 @@
                         :data-tab metric-slug
                         :on-click (partial pillbox-click owner options)} mname)))))))
 
+(defcomponent growth-popover [{:keys [initial-focus
+                                      new-metric?
+                                      growth-data
+                                      growth-metrics
+                                      curency
+                                      hide-popover-cb
+                                      growth-metric-slugs
+                                      growth-editing-on-change
+                                      growth-metadata-editing-on-change
+                                      growth-data-editing-toggle
+                                      growth-switch-focus
+                                      growth-show-archive-confirm-popover] :as data} owner options]
+  (render [_]
+    (dom/div {:class "oc-popover-container-internal growth composed-section"
+              :style {:width "100%" :height "100vh"}}
+      (dom/button {:class "close-button"
+                   :on-click #(hide-popover-cb)
+                   :style {:top "50%"
+                           :left "50%"
+                           :margin-top "-225px"
+                           :margin-left "195px"}}
+        (dom/i {:class "fa fa-times"}))
+      (dom/div {:class "oc-popover "
+                :on-click (fn [e] (.stopPropagation e))
+                :style {:width "390px"
+                        :height "450px"
+                        :margin-top "-225px"
+                        :text-align "center"
+                        :overflow-x "visible"
+                        :overflow-y "scroll"}}
+        (dom/h3 {} "Growth edit")
+
+        (om/build growth-edit {:initial-focus initial-focus
+                               :new-metric? new-metric?
+                               :growth-data growth-data
+                               :metrics growth-metrics
+                               :currency curency
+                               :metric-slugs growth-metric-slugs
+                               :data-on-change-cb growth-editing-on-change
+                               :metadata-on-change-cb growth-metadata-editing-on-change
+                               :editing-cb growth-data-editing-toggle
+                               :switch-focus-cb growth-switch-focus
+                               :archive-metric-cb growth-show-archive-confirm-popover})))))
+
 (defn- get-state [owner data initial]
   (let [section-data (:section-data data)
         all-metrics (:metrics section-data)
@@ -144,6 +188,27 @@
     (when-not (= next-props data)
       (om/set-state! owner (get-state owner next-props false))))
 
+  (did-update [_ _ prev-state]
+    (when (and (not (:data-editing? prev-state))
+               (om/get-state owner :data-editing?))
+      (add-popover-with-om-component growth-popover
+        {:data (merge data {:initial-focus (om/get-state owner :focus)
+                            :new-metric? (om/get-state owner :new-metric?)
+                            :hide-popover-cb #(do
+                                                (editing-cb false)
+                                                (om/set-state! owner :data-editing? false))
+                            :growth-data (om/get-state owner :growth-data)
+                            :growth-metrics (om/get-state owner :growth-metrics)
+                            :metric-slugs (om/get-state owner :growth-metric-slugs)
+                            :growth-data-on-change-cb (partial data-editing-on-change owner)
+                            :growth-metadata-on-change-cb (partial metadata-editing-on-change owner (om/get-state owner :focus))
+                            :growth-data-editing-toggle (partial data-editing-toggle owner editing-cb)
+                            :growth-switch-focus-cb (partial switch-focus owner)
+                            :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb (om/get-state owner :focus))})
+         :width 390
+         :height 450
+         :container-id "growth-edit"})))
+
   (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug data-editing? new-metric?]}]
     (let [section-name (utils/camel-case-str (name section))
           no-data (utils/no-growth-data? growth-data)
@@ -175,10 +240,9 @@
               (when (and focus (seq (:metric-data subsection-data)))
                 (om/build growth-metric subsection-data {:opts options}))
               (when (or (> (count growth-metric-slugs) 1)
-                        editable?
-                        (not data-editing?))
+                        editable?)
                 (render-pillboxes owner editable? editing-cb options))
-              (when (and editable? (not data-editing?))
+              (when editable?
                 (dom/button {:class "btn-reset chart-pencil-button"
                              :title "Edit chart data"
                              :type "button"
@@ -188,7 +252,7 @@
                              :on-click #(do (om/set-state! owner :data-editing? true)
                                             (editing-cb true))}
                   (dom/i {:class "fa fa-pencil editable-pen"})))
-              (when (and editable? (not data-editing?))
+              (when editable?
                 (dom/button {:class "btn-reset chart-plus-button"
                              :title "Add a chart"
                              :type "button"
@@ -199,7 +263,6 @@
                                          (data-editing-toggle owner editing-cb true true))}
                   (dom/i {:class "fa fa-plus"})))
               (when (and editable?
-                         (not data-editing?)
                          (not= focus growth-utils/new-metric-slug-placeholder))
                 (dom/button {:class "btn-reset chart-archive-button"
                              :title "Archive chart"
@@ -208,19 +271,4 @@
                              :data-container "body"
                              :data-placement "right"
                              :on-click #(show-archive-confirm-popover owner editing-cb focus)}
-                  (dom/i {:class "fa fa-archive"}))))))
-
-        ; Data/metadata edit
-        (when data-editing?
-          (om/build growth-edit {
-             :initial-focus focus
-             :new-metric? new-metric?
-             :growth-data growth-data
-             :metrics growth-metrics
-             :metric-slugs growth-metric-slugs
-             :data-on-change-cb (partial data-editing-on-change owner)
-             :metadata-on-change-cb (partial metadata-editing-on-change owner focus)
-             :editing-cb (partial data-editing-toggle owner editing-cb)
-             :switch-focus-cb (partial switch-focus owner)
-             :archive-metric-cb (partial show-archive-confirm-popover owner editing-cb focus)}
-            {:opts {:currency currency} :key growth-data}))))))
+                  (dom/i {:class "fa fa-archive"}))))))))))
