@@ -1,6 +1,5 @@
 div#section-finances.editing, div#section-growth.editing {
   padding: 0;
-  background-color: #F3F4F5;
 
   div.metric-name {
     padding: 32px 8px 0px 30px;
@@ -14,6 +13,9 @@ div#section-finances.editing, div#section-growth.editing {
 div.finances {
   table.table {
     width: 100%;
+  }
+  div.table-container {
+    background-color: #F3F4F5;
   }
 }
 
