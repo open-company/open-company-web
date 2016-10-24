@@ -189,10 +189,12 @@
 (defcomponent growth-edit [{:keys [editing-cb
                                    first-edit-tip-cb
                                    new-metric?
+                                   currency
                                    focus
                                    metadata-on-change-cb] :as data} owner options]
 
   (init-state [_]
+    (js/console.log "growth-edit" (:initial-focus data) (:metrics data))
     {:metrics (:metrics data)
      :growth-data (:growth-data data) ; all the growth data for all metrics
      :metric-slug (:initial-focus data) ; the slug of the current metric
@@ -213,7 +215,7 @@
   (render-state [_ {:keys [metrics growth-data metric-slug stop has-changes?] :as state}]
     (let [company-slug (router/current-company-slug)
           {slug :slug interval :interval metric-name :name unit :unit description :description :as metric-info} (current-metric-info owner metric-slug)
-          prefix (if (= unit "currency") (utils/get-symbol-for-currency-code (:currency options)) "")
+          prefix (if (= unit "currency") (utils/get-symbol-for-currency-code currency) "")
           suffix (when (= unit "%") "%")]
       (dom/div {:class "growth"}
         (dom/div {:class "composed-section-edit growth-body edit"}
@@ -222,10 +224,10 @@
           (om/build growth-metric-edit {:metric-info metric-info
                                         :new-metric? new-metric?
                                         :metric-count (count (filter-growth-data metric-slug growth-data))
+                                        :currency currency
                                         :metadata-on-change-cb (fn [k v]
                                                                 (om/set-state! owner :has-changes? true)
-                                                                (metadata-on-change-cb k v))}
-                                        {:opts {:currency (:currency options)}})
+                                                                (metadata-on-change-cb k v))})
 
           (dom/div
 
@@ -271,12 +273,12 @@
             (when interval
               (dom/div {:class "topic-foce-footer group"}
                 (dom/div {:class "topic-foce-footer-right"}
-                  (dom/button {:class "btn-reset btn-outline btn-data-save"
+                  (dom/button {:class "btn-reset btn-solid btn-data-save"
                                :disabled (or (not has-changes?)
                                               (string/blank? metric-name))
                                :on-click  #(do
                                             (save-data owner data new-metric?)
-                                            (editing-cb false))} (if new-metric? "ADD" "SAVE"))
+                                            (editing-cb false))} (if new-metric? "ADD" "UPDATE"))
                   (dom/button {:class "btn-reset btn-outline"
                                :on-click #(editing-cb false)} "CANCEL")
                   (when-not new-metric?
