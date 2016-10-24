@@ -361,151 +361,146 @@
                                           :color "white"
                                           :accent-color "white"})))))
           ;; Topic title
-          (when-not data-editing?
-            (dom/input {:class "topic-title"
-                        :value (:title topic-data)
-                        :max-length title-max-length
-                        :placeholder (:name topic-data)
-                        :type "text"
-                        :on-blur #(om/set-state! owner :char-count nil)
-                        :on-change #(let [v (.. % -target -value)
-                                          remaining-chars (- title-max-length (count v))]
-                                      (dis/dispatch! [:foce-input {:title v}])
-                                      (om/set-state! owner :has-changes true)
-                                      (om/set-state! owner :char-count remaining-chars)
-                                      (om/set-state! owner :char-count-alert (< remaining-chars title-alert-limit)))}))
+          (dom/input {:class "topic-title"
+                      :value (:title topic-data)
+                      :max-length title-max-length
+                      :placeholder (:name topic-data)
+                      :type "text"
+                      :on-blur #(om/set-state! owner :char-count nil)
+                      :on-change #(let [v (.. % -target -value)
+                                        remaining-chars (- title-max-length (count v))]
+                                    (dis/dispatch! [:foce-input {:title v}])
+                                    (om/set-state! owner :has-changes true)
+                                    (om/set-state! owner :char-count remaining-chars)
+                                    (om/set-state! owner :char-count-alert (< remaining-chars title-alert-limit)))})
           ;; Topic headline
-          (when-not data-editing?
-            (dom/div #js {:className "topic-headline-inner emoji-autocomplete emojiable"
-                          :id (str "foce-headline-" (name section))
-                          :key "foce-headline"
-                          :placeholder "Headline"
-                          :contentEditable true
-                          :onKeyUp   #(check-headline-count owner % true)
-                          :onKeyDown #(check-headline-count owner % true)
-                          :onFocus    #(check-headline-count owner % false)
-                          :onBlur #(do
-                                      (check-headline-count owner % false)
-                                      (om/set-state! owner :char-count nil))
-                          :dangerouslySetInnerHTML initial-headline}))
-          (when-not data-editing?
-            (dom/div #js {:className "topic-body emoji-autocomplete emojiable"
-                          :id (str "foce-body-" (name section))
-                          :key "foce-body"
-                          :ref "topic-body"
-                          :placeholder body-placeholder
-                          :data-placeholder body-placeholder
-                          :contentEditable true
-                          :onBlur #(om/set-state! owner :char-count nil)
-                          :dangerouslySetInnerHTML initial-body}))
-          (when-not data-editing?
-            (dom/div {:class "topic-foce-buttons group"}
-              (dom/input {:id "foce-file-upload-ui--select-trigger"
-                          :style {:display "none"}
-                          :type "file"
-                          :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
-              (dom/div {:class "left mr2"
-                        :style {:display (if (nil? file-upload-state) "block" "none")}}
-                (emoji-picker {:add-emoji-cb (fn [editor emoji]
-                                               (when (= editor (sel1 (str "div#foce-body-" (name section-kw))))
-                                                 (force-hide-placeholder owner))
-                                               (let [headline (sel1 (str "#foce-headline-" (name section)))
-                                                     body     (sel1 (str "#foce-body-" (name section)))]
-                                                 (when (= (.-activeElement js/document) headline)
-                                                    (check-headline-count owner nil true))
-                                                 (when (= (.-activeElement js/document) body)
-                                                    (body-on-change owner))))
-                               :disabled (let [headline (sel1 (str "#foce-headline-" (name section)))
-                                               body     (sel1 (str "#foce-body-" (name section)))]
-                                           (not (or (= (.-activeElement js/document) headline)
-                                                    (= (.-activeElement js/document) body))))}))
-              (when-not is-data?
-                (dom/button {:class "btn-reset camera left"
-                           :title (add-image-tooltip image-header)
+          (dom/div #js {:className "topic-headline-inner emoji-autocomplete emojiable"
+                        :id (str "foce-headline-" (name section))
+                        :key "foce-headline"
+                        :placeholder "Headline"
+                        :contentEditable true
+                        :onKeyUp   #(check-headline-count owner % true)
+                        :onKeyDown #(check-headline-count owner % true)
+                        :onFocus    #(check-headline-count owner % false)
+                        :onBlur #(do
+                                    (check-headline-count owner % false)
+                                    (om/set-state! owner :char-count nil))
+                        :dangerouslySetInnerHTML initial-headline})
+          (dom/div #js {:className "topic-body emoji-autocomplete emojiable"
+                        :id (str "foce-body-" (name section))
+                        :key "foce-body"
+                        :ref "topic-body"
+                        :placeholder body-placeholder
+                        :data-placeholder body-placeholder
+                        :contentEditable true
+                        :onBlur #(om/set-state! owner :char-count nil)
+                        :dangerouslySetInnerHTML initial-body})
+          (dom/div {:class "topic-foce-buttons group"}
+            (dom/input {:id "foce-file-upload-ui--select-trigger"
+                        :style {:display "none"}
+                        :type "file"
+                        :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
+            (dom/div {:class "left mr2"
+                      :style {:display (if (nil? file-upload-state) "block" "none")}}
+              (emoji-picker {:add-emoji-cb (fn [editor emoji]
+                                             (when (= editor (sel1 (str "div#foce-body-" (name section-kw))))
+                                               (force-hide-placeholder owner))
+                                             (let [headline (sel1 (str "#foce-headline-" (name section)))
+                                                   body     (sel1 (str "#foce-body-" (name section)))]
+                                               (when (= (.-activeElement js/document) headline)
+                                                  (check-headline-count owner nil true))
+                                               (when (= (.-activeElement js/document) body)
+                                                  (body-on-change owner))))
+                             :disabled (let [headline (sel1 (str "#foce-headline-" (name section)))
+                                             body     (sel1 (str "#foce-body-" (name section)))]
+                                         (not (or (= (.-activeElement js/document) headline)
+                                                  (= (.-activeElement js/document) body))))}))
+            (when-not is-data?
+              (dom/button {:class "btn-reset camera left"
+                         :title (add-image-tooltip image-header)
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-container "body"
+                         :data-placement "top"
+                         :style {:display (if (nil? file-upload-state) "block" "none")}
+                         :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
+                (dom/i {:class "fa fa-camera"})))
+            ; (when-not is-data?
+            ;   (dom/button {:class "btn-reset image-url left"
+            ;                :title "Provide an image link"
+            ;                :type "button"
+            ;                :data-toggle "tooltip"
+            ;                :data-container "body"
+            ;                :data-placement "top"
+            ;                :style {:display (if (nil? file-upload-state) "block" "none")}
+            ;                :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
+            ;       (dom/i {:class "fa fa-code"})))
+            (when (and is-data? (not data-editing?))
+              (dom/button {:class "btn-reset chart-button left"
+                           :title "Add a chart"
+                           :type "button"
+                           :data-toggle "tooltip"
+                           :data-container "body"
+                           :data-placement "top"
+                           :style {:display (if no-data? "block" "none")}
+                           :on-click #(do
+                                        (dis/dispatch! [:start-foce-data-editing true])
+                                        (om/set-state! owner :data-editing? true))}
+                (dom/i {:class "fa fa-line-chart"})))
+            (when-not (:placeholder topic-data)
+              (dom/button {:class "btn-reset archive-button right"
+                           :title "Archive this topic"
                            :type "button"
                            :data-toggle "tooltip"
                            :data-container "body"
                            :data-placement "top"
                            :style {:display (if (nil? file-upload-state) "block" "none")}
-                           :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
-                  (dom/i {:class "fa fa-camera"})))
-              ; (when-not is-data?
-              ;   (dom/button {:class "btn-reset image-url left"
-              ;                :title "Provide an image link"
-              ;                :type "button"
-              ;                :data-toggle "tooltip"
-              ;                :data-container "body"
-              ;                :data-placement "top"
-              ;                :style {:display (if (nil? file-upload-state) "block" "none")}
-              ;                :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
-              ;       (dom/i {:class "fa fa-code"})))
-              (when (and is-data? (not data-editing?))
-                (dom/button {:class "btn-reset chart-button left"
-                             :title "Add a chart"
-                             :type "button"
-                             :data-toggle "tooltip"
-                             :data-container "body"
-                             :data-placement "top"
-                             :style {:display (if no-data? "block" "none")}
-                             :on-click #(do
-                                          (dis/dispatch! [:start-foce-data-editing true])
-                                          (om/set-state! owner :data-editing? true))}
-                  (dom/i {:class "fa fa-line-chart"})))
-              (when-not (:placeholder topic-data)
-                (dom/button {:class "btn-reset archive-button right"
-                             :title "Archive this topic"
-                             :type "button"
-                             :data-toggle "tooltip"
-                             :data-container "body"
-                             :data-placement "top"
-                             :style {:display (if (nil? file-upload-state) "block" "none")}
-                             :on-click (partial remove-topic-click owner)}
-                    (dom/i {:class "fa fa-archive"})))
-              (when (> (count (utils/get-section-keys (dis/company-data))) 1)
-                (dom/button {:class "btn-reset pin-button right"
-                             :title (pin-tooltip (:pin topic-data))
-                             :type "button"
-                             :data-toggle "tooltip"
-                             :data-container "body"
-                             :data-placement "top"
-                             :style {:display (if (nil? file-upload-state) "block" "none")}
-                             :on-click #(dis/dispatch! [:foce-input {:pin (not (:pin topic-data))}])}
-                    (dom/i {:class (str "fa fa-thumb-tack" (if (:pin topic-data) " pinned" ""))})))
-              (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
-                (str file-upload-progress "%"))))
-          (when-not data-editing?
-            (dom/div {:class "topic-foce-footer group"}
-              (dom/div {:class "divider"})
-              (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))
-                        :style {:display (if file-upload-state "block" "none")}}
-                (dom/input {:type "text"
-                            :class "upload-remote-url-field"
-                            :style {:width (str (- card-width 122 50) "px")}
-                            :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
-                            :placeholder "http://site.com/img.png"
-                            :value upload-remote-url})
-                (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
-                             :class "btn-reset btn-solid"
-                             :disabled (string/blank? upload-remote-url)
-                             :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
-                  "add")
-                (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
-                             :class "btn-reset btn-outline"
-                             :on-click #(om/set-state! owner :file-upload-state nil)}
-                  "cancel"))
-              (dom/div {:class "topic-foce-footer-left"
-                        :style {:display (if (nil? file-upload-state) "block" "none")}}
-                (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
-              (dom/div {:class "topic-foce-footer-right"
-                        :style {:display (if (nil? file-upload-state) "block" "none")}}
-                (dom/button {:class "btn-reset btn-solid"
-                             :disabled (or (= file-upload-state :show-progress) negative-headline-char-count data-editing?)
-                             :on-click #(save-topic owner)} "SAVE")
-                (dom/button {:class "btn-reset btn-outline"
-                             :disabled data-editing?
-                             :on-click #(if (:placeholder topic-data)
-                                          (dis/dispatch! [:topic-archive (name section)])
-                                          (dis/dispatch! [:start-foce nil]))} "CANCEL"))))
+                           :on-click (partial remove-topic-click owner)}
+                  (dom/i {:class "fa fa-archive"})))
+            (when (> (count (utils/get-section-keys (dis/company-data))) 1)
+              (dom/button {:class "btn-reset pin-button right"
+                           :title (pin-tooltip (:pin topic-data))
+                           :type "button"
+                           :data-toggle "tooltip"
+                           :data-container "body"
+                           :data-placement "top"
+                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :on-click #(dis/dispatch! [:foce-input {:pin (not (:pin topic-data))}])}
+                  (dom/i {:class (str "fa fa-thumb-tack" (if (:pin topic-data) " pinned" ""))})))
+            (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
+              (str file-upload-progress "%")))
+          (dom/div {:class "topic-foce-footer group"}
+            (dom/div {:class "divider"})
+            (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))
+                      :style {:display (if file-upload-state "block" "none")}}
+              (dom/input {:type "text"
+                          :class "upload-remote-url-field"
+                          :style {:width (str (- card-width 122 50) "px")}
+                          :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
+                          :placeholder "http://site.com/img.png"
+                          :value upload-remote-url})
+              (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                           :class "btn-reset btn-solid"
+                           :disabled (string/blank? upload-remote-url)
+                           :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
+                "add")
+              (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
+                           :class "btn-reset btn-outline"
+                           :on-click #(om/set-state! owner :file-upload-state nil)}
+                "cancel"))
+            (dom/div {:class "topic-foce-footer-left"
+                      :style {:display (if (nil? file-upload-state) "block" "none")}}
+              (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
+            (dom/div {:class "topic-foce-footer-right"
+                      :style {:display (if (nil? file-upload-state) "block" "none")}}
+              (dom/button {:class "btn-reset btn-solid"
+                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count data-editing?)
+                           :on-click #(save-topic owner)} "SAVE")
+              (dom/button {:class "btn-reset btn-outline"
+                           :disabled data-editing?
+                           :on-click #(if (:placeholder topic-data)
+                                        (dis/dispatch! [:topic-archive (name section)])
+                                        (dis/dispatch! [:start-foce nil]))} "CANCEL")))
 
         ;; Onboarding toolips
         (when (and show-first-edit-tip (not is-data?))
