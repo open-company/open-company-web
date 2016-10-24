@@ -107,7 +107,7 @@
   (render [_]
     (dom/div {:class "oc-popover finances composed-section"
               :on-click (fn [e] (.stopPropagation e))
-              :style {:width "400px" :height "400px" :margin-top "-200px"}}
+              :style {:width "400px" :height "400px" :margin-top "-200px" :text-align "center"}}
 
       (finances-chart data finances-row-data true {:width 230} true)
 
