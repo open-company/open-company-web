@@ -124,6 +124,7 @@ div.finances, div.growth {
 
   div.topic-foce-footer {
     margin: 0 !important;
+    width: 100%;
 
     button.btn-outline {
       background-color: white;
@@ -135,6 +136,15 @@ div.finances, div.growth {
 
       &:disabled {
         opacity: 0.2;
+      }
+    }
+
+    div.topic-foce-footer-right {
+      float: right;
+
+      button {
+        margin-left: 7px;
+        float: right;
       }
     }
   }
