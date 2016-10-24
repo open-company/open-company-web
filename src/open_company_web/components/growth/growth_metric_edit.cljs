@@ -83,7 +83,7 @@
   (init-state [_]
     (let [new-metric? (:new-metric? data)
           metric-info (if new-metric? metric-defaults (:metric-info data))
-          company-currency-code (:currency options)
+          company-currency-code (:currency data)
           presets (get-presets data)
           units (:units presets)]
       {:req-libs-loaded false
@@ -125,7 +125,7 @@
           {:keys [metrics intervals prompt] :as presets} presets
           new-metric? (:new-metric? data)]
 
-      (dom/div {:class "growth-metric-edit p3"}
+      (dom/div {:class "growth-metric-edit p3 group"}
 
         ;; name
         (dom/input {:class "npt col-12 p1 mb2"
