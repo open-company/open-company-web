@@ -207,7 +207,10 @@
                             :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb (om/get-state owner :focus))})
          :width 390
          :height 450
-         :container-id "growth-edit"})))
+         :container-id "growth-edit"}))
+    (when (and (:data-editing? prev-state)
+               (not (om/get-state owner :data-editing?)))
+      (hide-popover nil "growth-edit")))
 
   (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug data-editing? new-metric?]}]
     (let [section-name (utils/camel-case-str (name section))
