@@ -18,9 +18,10 @@
       (.css (js/$ "body") #js {"overflow" ""})
       (let [popover-ct (js/$ (str "#" container-id))]
         (.fadeOut popover-ct 400 #(.css popover-ct #js {"display" "none"})))
+      (.removeClass (js/$ "body") "no-scroll")
       (.setTimeout js/window #(try
                                 (let [container (sel1 (str "#" container-id))
-                                      $container (js/$ container)] 
+                                      $container (js/$ container)]
                                   (rum/unmount container)
                                   (.remove $container))
                                 (catch :default e)) 1500)
@@ -39,6 +40,7 @@
 ;; :success-title required title of the primary styled success button
 ;; :success-cb function to call when the user clicks the cancel button, required if you provide a cancel title,
 ;;             be sure to call hide-popover with the container ID
+;; :hide-on-click-out true if you want to remove the popover on backgorund click
 ;;
 (defn add-popover-with-rum-component [component data]
   (let [container-id (:container-id data)]
@@ -52,8 +54,9 @@
                      (fn []
                        ; render the popover component
                        (rum/mount (component data) (sel1 (str "#" container-id)))
+                       (.addClass (js/$ "body") "no-scroll")
                        ; add the close action
-                       (when (:add-hide-listener data)
+                       (when (:hide-on-click-out data)
                          (.click popover-ct #(hide-popover % container-id)))
                        ; show the popover
                        (.setTimeout js/window #(.fadeIn popover-ct 300) 0))
@@ -71,8 +74,9 @@
                      (fn []
                        ; render the popover component
                        (om/root component (:data data) {:target (sel1 (str "#" container-id))})
+                       (.addClass (js/$ "body") "no-scroll")
                        ; add the close action
-                       (when (:add-hide-listener data)
+                       (when (:hide-on-click-out data)
                          (.click popover-ct #(hide-popover % container-id)))
                        ; show the popover
                        (.setTimeout js/window #(.fadeIn popover-ct 300) 0))
