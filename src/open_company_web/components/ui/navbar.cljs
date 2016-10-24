@@ -55,7 +55,10 @@
                                        :data-toggle "dropdown"
                                        :disabled (not (nil? (:foce-key data)))}
                             (dom/i {:class "fa fa-share"}) " SHARE AN UPDATE")
-                          (dom/div {:class "dropdown-menu" :aria-labelledby "share-an-update"}
+                          (dom/div {:class "dropdown-menu"
+                                    :aria-labelledby "share-an-update"
+                                    :style {:left "0"
+                                            :top "25px"}}
                             (dom/button {:class "btn-reset dropdown-item"
                                          :on-click #(do
                                                       (.preventDefault %)
