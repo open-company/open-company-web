@@ -222,11 +222,11 @@
 
           (dom/div {:class "topic-foce-footer group"}
             (dom/div {:class "topic-foce-footer-right"}
-              (dom/button {:class "btn-reset btn-outline btn-data-save"
+              (dom/button {:class "btn-reset btn-solid btn-data-save"
                            :disabled (not has-changes?)
                            :on-click  #(do
                                         (save-data owner)
-                                        (editing-cb false))} "SAVE")
+                                        (editing-cb false))} "UPDATE")
               (dom/button {:class "btn-reset btn-outline"
                            :on-click #(editing-cb false)} "CANCEL")
               (dom/button {:class "btn-reset archive-button"
