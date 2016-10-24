@@ -81,7 +81,9 @@
                (om/get-state owner :data-editing?))
       (add-popover-with-om-component finances-popover {:data (merge data {:finances-row-data (om/get-state owner :finances-row-data)
                                                                           :finances-data-on-change (partial finances-data-on-change owner)
-                                                                          :hide-popover-cb #(om/set-state! owner :data-editing? false)
+                                                                          :hide-popover-cb #(do
+                                                                                              (editing-cb false)
+                                                                                              (om/set-state! owner :data-editing? false))
                                                                           :editing-cb (partial data-editing-toggle owner editing-cb)})
                                                        :width 390
                                                        :height 450
