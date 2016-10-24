@@ -194,7 +194,6 @@
                                    metadata-on-change-cb] :as data} owner options]
 
   (init-state [_]
-    (js/console.log "growth-edit" (:initial-focus data) (:metrics data))
     {:metrics (:metrics data)
      :growth-data (:growth-data data) ; all the growth data for all metrics
      :metric-slug (:initial-focus data) ; the slug of the current metric
