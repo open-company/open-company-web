@@ -4,6 +4,7 @@
   this component directly.
   "
   (:require [rum.core :as rum]
+            [om.core :as om :include-macros true]
             [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
@@ -34,12 +35,12 @@
 ;; :message textual content of the dialog
 ;; :cancel-title optional title of the secondary styled cancel button, pass as false if you only want 1 button
 ;; :cancel-cb function to call when the user clicks the cancel button, required if you provide a cancel title,
-;;            be sure to call hide-popever with the container ID
+;;            be sure to call hide-popover with the container ID
 ;; :success-title required title of the primary styled success button
 ;; :success-cb function to call when the user clicks the cancel button, required if you provide a cancel title,
-;;             be sure to call hide-popever with the container ID
+;;             be sure to call hide-popover with the container ID
 ;;
-(defn add-popover [data]
+(defn add-popover-with-rum-component [component data]
   (let [container-id (:container-id data)]
     (when (.-$ js/window) ; avoid tests crash
       (let [popover-ct (js/$ (str "<div class='oc-popover-container' id='" container-id "'></div>"))
@@ -50,12 +51,35 @@
         (.setTimeout js/window
                      (fn []
                        ; render the popover component
-                       (rum/mount (popover data) (sel1 (str "#" container-id)))
+                       (rum/mount (component data) (sel1 (str "#" container-id)))
                        ; add the close action
-                       (.click popover-ct #(hide-popover % container-id))
+                       (when (:add-hide-listener data)
+                         (.click popover-ct #(hide-popover % container-id)))
                        ; show the popover
                        (.setTimeout js/window #(.fadeIn popover-ct 300) 0))
                      1)))))
+
+(defn add-popover-with-om-component [component data]
+  (let [container-id (:container-id data)]
+    (when (.-$ js/window) ; avoid tests crash
+      (let [popover-ct (js/$ (str "<div class='oc-popover-container' id='" container-id "'></div>"))
+            body (js/$ (.-body js/document))]
+        ; add the div to the body
+        (.append body popover-ct)
+        ; if the component has not been mounted, render it
+        (.setTimeout js/window
+                     (fn []
+                       ; render the popover component
+                       (om/root component (:data data) {:target (sel1 (str "#" container-id))})
+                       ; add the close action
+                       (when (:add-hide-listener data)
+                         (.click popover-ct #(hide-popover % container-id)))
+                       ; show the popover
+                       (.setTimeout js/window #(.fadeIn popover-ct 300) 0))
+                     1)))))
+
+(defn add-popover [data]
+  (add-popover-with-rum-component popover data))
 
 (rum/defc popover < rum/static [{:keys [container-id
                                         height
