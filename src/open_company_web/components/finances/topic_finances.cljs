@@ -38,19 +38,32 @@
 (defn finances-data-on-change [owner fixed-data]
   (om/set-state! owner :finances-row-data (vals fixed-data)))
 
-(defcomponent finances-popover [{:keys [currency finances-row-data section-data] :as data} owner options]
+(defcomponent finances-popover [{:keys [currency finances-row-data section-data hide-popover-cb] :as data} owner options]
   (render [_]
-    (dom/div {:class "oc-popover finances composed-section"
-              :on-click (fn [e] (.stopPropagation e))
-              :style {:width "390px" :height "400px" :margin-top "-200px" :text-align "center"}}
+    (dom/div {:class "oc-popover-container-internal finances composed-section"
+              :style {:width "100%" :height "100vh"}}
+      (dom/button {:class "close-button"
+                   :on-click #(hide-popover-cb)
+                   :style {:top "50%"
+                           :left "50%"
+                           :margin-top "-225px"
+                           :margin-left "195px"}}
+        (dom/i {:class "fa fa-times"}))
+      (dom/div {:class "oc-popover "
+                :on-click (fn [e] (.stopPropagation e))
+                :style {:width "390px"
+                        :height "450px"
+                        :margin-top "-225px"
+                        :text-align "center"
+                        :overflow-x "visible"
+                        :overflow-y "scroll"}}
+        (dom/h3 {} "Finances edit")
 
-      (dom/h3 {} "Finances edit")
-
-      (om/build finances-edit {:finances-data (finance-utils/finances-data-map finances-row-data)
-                               :currency currency
-                               :data-on-change-cb (:finances-data-on-change data)
-                               :editing-cb (:editing-cb data)}
-                              {:key (:updated-at section-data)}))))
+        (om/build finances-edit {:finances-data (finance-utils/finances-data-map finances-row-data)
+                                 :currency currency
+                                 :data-on-change-cb (:finances-data-on-change data)
+                                 :editing-cb (:editing-cb data)}
+                                {:key (:updated-at section-data)})))))
 
 (defcomponent topic-finances [{:keys [section section-data currency editable? initial-editing? editing-cb] :as data} owner options]
 
@@ -68,9 +81,10 @@
                (om/get-state owner :data-editing?))
       (add-popover-with-om-component finances-popover {:data (merge data {:finances-row-data (om/get-state owner :finances-row-data)
                                                                           :finances-data-on-change (partial finances-data-on-change owner)
+                                                                          :hide-popover-cb #(om/set-state! owner :data-editing? false)
                                                                           :editing-cb (partial data-editing-toggle owner editing-cb)})
                                                        :width 390
-                                                       :height 400
+                                                       :height 450
                                                        :container-id "finances-edit"}))
     (when (and (:data-editing? prev-state)
                (not (om/get-state owner :data-editing?)))
