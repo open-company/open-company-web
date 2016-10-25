@@ -108,7 +108,8 @@
                   sorted-finances (sort sort-pred (vals fixed-finances-data))
                   sum-revenues (apply + (map utils/abs (map :revenue finances-row-data)))
                   cur-symbol (utils/get-symbol-for-currency-code currency)
-                  chart-opts {:chart-type (str "bordered-chart" (when show-placeholder-chart? " fake-chart"))
+                  chart-opts {:chart-type "bordered-chart"
+                              :fake-chart show-placeholder-chart?
                               :chart-height 112
                               :chart-width (:width (:chart-size options))
                               :chart-keys [:costs]
