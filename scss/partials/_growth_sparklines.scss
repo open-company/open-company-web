@@ -1,0 +1,60 @@
+div.growth-sparklines{
+  div.growth-sparkline {
+    margin: 0px 0px 5px 0px;
+    border: 2px solid #979797;
+    min-height: 54px;
+    border-radius: 8px;
+    padding: 11px;
+
+    &:hover {
+      border: 2px solid $oc_yellow;
+      div.actions {
+        display: block;
+      }
+    }
+
+    div.left-box {
+      width: 45%;
+      float: left;
+
+      div.inline {
+        display: inline-block;
+        width: 100%;
+        overflow: hidden;
+        font-size: 14px;
+        white-space: pre;
+        color: black;
+        float: left;
+      }
+    }
+
+    div.center-box {
+      width: 45%;
+      float: left;
+      font-size: 32px;
+      white-space: pre;
+      overflow: hidden;
+      padding-left: 20px;
+    }
+
+    div.actions {
+      width: 14px;
+      font-size: 14px;
+      float: right;
+      display: none;
+
+      button{
+        width: 14px;
+        height: 14px;
+        margin: 0px;
+        padding: 0px 3px 0px 3px;
+        opacity: 0.4;
+
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+
+}
