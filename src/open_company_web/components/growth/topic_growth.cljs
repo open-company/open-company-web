@@ -3,12 +3,12 @@
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.components.growth.growth-metric :refer (growth-metric)]
             [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.caches :refer (company-cache)]
             [open-company-web.dispatcher :as dis]
             [open-company-web.components.ui.popover :refer (add-popover-with-om-component add-popover hide-popover)]
+            [open-company-web.components.growth.growth-sparklines :refer (growth-sparklines)]
             [cuerdas.core :as s]))
 
 (def focus-cache-key :last-selected-metric)
@@ -212,9 +212,10 @@
           (dom/div {:class "composed-section growth group"}
             ; growth data chart
             (dom/div {:class (utils/class-set {:composed-section-body true})}
-              ;; growth metric currently shown
-              (when (and focus (seq (:metric-data subsection-data)))
-                (om/build growth-metric subsection-data {:opts options}))
+              ;; growth metric sparklines
+              (growth-sparklines {:growth-data growth-data
+                                  :growth-metrics growth-metrics
+                                  :growth-metric-slugs growth-metric-slugs})
               (when editable?
                 (dom/button {:class "btn-reset chart-pencil-button"
                              :title "Edit chart data"
