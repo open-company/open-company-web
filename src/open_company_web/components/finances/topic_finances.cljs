@@ -32,7 +32,6 @@
       :else "-")))
 
 (defn- data-editing-toggle [owner editing-cb editing]
-  (om/set-state! owner :data-editing? editing)
   (editing-cb editing))
 
 (defn finances-data-on-change [owner fixed-data]
@@ -75,7 +74,7 @@
 
   (will-receive-props [_ next-props]
     (when-not (= next-props data)
-      (om/set-state! owner {:data-editing? (om/get-state owner :data-editing?)
+      (om/set-state! owner {:data-editing? (:foce-data-editing? next-props)
                             :finances-row-data (-> next-props :section-data :data)})))
 
   (did-update [_ _ prev-state]
@@ -84,8 +83,7 @@
       (add-popover-with-om-component finances-popover {:data (merge data {:finances-row-data (om/get-state owner :finances-row-data)
                                                                           :finances-data-on-change (partial finances-data-on-change owner)
                                                                           :hide-popover-cb #(do
-                                                                                              (editing-cb false)
-                                                                                              (om/set-state! owner :data-editing? false))
+                                                                                              (editing-cb false))
                                                                           :editing-cb (partial data-editing-toggle owner editing-cb)})
                                                        :width 390
                                                        :height 450
@@ -175,6 +173,5 @@
                            :data-toggle "tooltip"
                            :data-container "body"
                            :data-placement "left"
-                           :on-click #(do (om/set-state! owner :data-editing? true)
-                                          (editing-cb true))}
+                           :on-click #(editing-cb true)}
                 (dom/i {:class "fa fa-pencil editable-pen"})))))))))
