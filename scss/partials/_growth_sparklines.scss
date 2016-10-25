@@ -1,4 +1,13 @@
 div.growth-sparklines{
+
+  &.editing {
+    div.growth-sparkline:hover {
+      div.actions {
+        display: block;
+      }
+    }
+  }
+
   div.growth-sparkline {
     margin: 0px 0px 5px 0px;
     border: 2px solid #979797;
@@ -8,9 +17,6 @@ div.growth-sparklines{
 
     &:hover {
       border: 2px solid $oc_yellow;
-      div.actions {
-        display: block;
-      }
     }
 
     div.left-box {
