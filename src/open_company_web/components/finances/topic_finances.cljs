@@ -69,18 +69,15 @@
 (defcomponent topic-finances [{:keys [section section-data currency editable? foce-data-editing? editing-cb] :as data} owner options]
 
   (init-state [_]
-    {:data-editing? foce-data-editing?
-     :initial-editing? foce-data-editing?
-     :finances-row-data (:data section-data)})
+    {:finances-row-data (:data section-data)})
 
   (will-receive-props [_ next-props]
     (when-not (= next-props data)
-      (om/set-state! owner {:data-editing? (:foce-data-editing? next-props)
-                            :finances-row-data (-> next-props :section-data :data)})))
+      (om/set-state! owner {:finances-row-data (-> next-props :section-data :data)})))
 
-  (did-update [_ _ prev-state]
-    (when (and (not (:data-editing? prev-state))
-               (om/get-state owner :data-editing?))
+  (did-update [_ prev-props prev-state]
+    (when (and (not (:foce-data-editing? prev-props))
+               (:foce-data-editing? data))
       (add-popover-with-om-component finances-popover {:data (merge data {:finances-row-data (om/get-state owner :finances-row-data)
                                                                           :finances-data-on-change (partial finances-data-on-change owner)
                                                                           :hide-popover-cb #(do
@@ -90,20 +87,19 @@
                                                        :height 450
                                                        :z-index-popover 0
                                                        :container-id "finances-edit"}))
-    (when (and (:data-editing? prev-state)
-               (not (om/get-state owner :data-editing?)))
+    (when (and (:foce-data-editing? prev-props)
+               (not (:foce-data-editing? data)))
       (hide-popover nil "finances-edit")))
 
-  (render-state [_ {:keys [data-editing? finances-row-data initial-editing?]}]
-    (let [no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))
-          data-editing? (or initial-editing? data-editing?)]
+  (render-state [_ {:keys [finances-row-data]}]
+    (let [no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))]
 
       (when (not no-data)
         (dom/div {:id "section-finances" :class (utils/class-set {:section-container true
-                                                                  :editing data-editing?})}
+                                                                  :editing foce-data-editing?})}
 
           (dom/div {:class "composed-section finances group"}
-            (let [show-placeholder-chart? (and data-editing?
+            (let [show-placeholder-chart? (and foce-data-editing?
                                                (< (count finances-row-data) 2))
                   fixed-finances-data (if show-placeholder-chart?
                                         (finance-utils/finances-data-map (:data (utils/fix-finances {:data (finance-utils/fake-chart-placeholder-data)})))

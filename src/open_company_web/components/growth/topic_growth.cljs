@@ -140,7 +140,7 @@
      :growth-metric-slugs metric-slugs
      :focus focus
      :new-metric? (if initial new-metric? (om/get-state owner :new-metric?)) ; preserve new metric if this is for will-update
-     :data-editing? (:foce-data-editing? data)}))
+     }))
 
 (defn- data-editing-on-change [owner new-data]
   (om/update-state! owner #(merge % {:growth-data new-data})))
@@ -157,18 +157,14 @@
   (init-state [_]
     (get-state owner data true))
 
-  (will-receive-props [_ next-props]
-    ; update the data editing only via the global key foce-data-editing? do not use the local state
-    (om/set-state! owner :data-editing? (:foce-data-editing? next-props)))
-
   (will-update [_ next-props _]
     ;; this means the section data has changed from the API or at a upper lever of this component
     (when-not (= next-props data)
       (om/set-state! owner (get-state owner next-props false))))
 
-  (did-update [_ _ prev-state]
-    (when (and (not (:data-editing? prev-state))
-               (om/get-state owner :data-editing?))
+  (did-update [_ prev-props prev-state]
+    (when (and (not (:foce-data-editing? prev-props))
+               (:foce-data-editing? data))
       (add-popover-with-om-component growth-popover
         {:data (merge data {:initial-focus (om/get-state owner :focus)
                             :new-metric? (om/get-state owner :new-metric?)
@@ -184,31 +180,31 @@
          :width 390
          :height 450
          :container-id "growth-edit"}))
-    (when (and (:data-editing? prev-state)
-               (not (om/get-state owner :data-editing?)))
+    (when (and (:foce-data-editing? prev-props)
+               (not (:foce-data-editing? data)))
       (hide-popover nil "growth-edit")))
 
-  (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug data-editing? new-metric?]}]
+  (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug new-metric?]}]
 
     (let [section-name (utils/camel-case-str (name section))
           no-data (utils/no-growth-data? growth-data)
           focus-metric-data (filter-growth-data focus growth-data)
           focus-metric-info (get growth-metrics focus)
-          show-placeholder-chart? (and data-editing?
+          show-placeholder-chart? (and foce-data-editing?
                                        (< (count focus-metric-data) 2))
           subsection-data {:metric-data (if show-placeholder-chart?
                                           (growth-utils/fake-chart-placeholder-data focus-metric-info)
                                           focus-metric-data)
                            :metric-info focus-metric-info
                            :fake-chart show-placeholder-chart?
-                           :editing data-editing?
+                           :editing foce-data-editing?
                            :focus focus
                            :currency currency
                            :read-only true
                            :total-metrics (count growth-metrics)}]
       (dom/div {:id "section-growth"
                 :class (utils/class-set {:section-container true
-                                         :editing data-editing?})
+                                         :editing foce-data-editing?})
                 :key (name section)}
 
         ; Chart
