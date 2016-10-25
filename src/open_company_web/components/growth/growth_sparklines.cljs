@@ -1,5 +1,6 @@
 (ns open-company-web.components.growth.growth-sparklines
-  (:require [rum.core :as rum]))
+  (:require [rum.core :as rum]
+            [open-company-web.dispatcher :as dis]))
 
 (rum/defc growth-sparkline < {:did-mount (fn [s] (.tooltip (js/$ "[data-toggle=tooltip]")) s)}
   [{:keys [metric-data metric-metadata]}]
@@ -27,6 +28,9 @@
 (rum/defc growth-sparklines
   [{:keys [growth-data growth-metrics growth-metric-slugs] :as data}]
   [:div.growth-sparklines
+    {:class (when (= (dis/foce-section-key) :growth) "editing")}
     (for [slug growth-metric-slugs]
-      (growth-sparkline {:metric-data (filter #(= (:slug %) slug) growth-data)
-                         :metric-metadata (get growth-metrics slug)}))])
+      (rum/with-key
+        (growth-sparkline {:metric-data (filter #(= (:slug %) slug) growth-data)
+                           :metric-metadata (get growth-metrics slug)})
+        (name slug)))])
