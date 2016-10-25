@@ -214,7 +214,8 @@
             ; growth data chart
             (dom/div {:class (utils/class-set {:composed-section-body true})}
               ;; growth metric sparklines
-              (growth-sparklines {:growth-data growth-data
-                                  :growth-metrics growth-metrics
-                                  :growth-metric-slugs growth-metric-slugs
-                                  :archive-cb (partial show-archive-confirm-popover owner editing-cb)}))))))))
+              (om/build growth-sparklines {:growth-data growth-data
+                                           :growth-metrics growth-metrics
+                                           :growth-metric-slugs growth-metric-slugs
+                                           :currency currency
+                                           :archive-cb (partial show-archive-confirm-popover owner editing-cb)}))))))))
