@@ -449,6 +449,7 @@
                                   :content-loaded (:content-loaded data)
                                   :loading (:loading data)
                                   :topics company-topics
+                                  :foce-data-editing? (:foce-data-editing? data)
                                   :new-sections (:new-sections data)
                                   :company-data company-data
                                   :topics-data company-data

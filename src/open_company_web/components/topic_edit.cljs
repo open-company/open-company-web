@@ -222,7 +222,7 @@
                                   currency
                                   card-width
                                   prev-rev
-                                  next-rev]} owner options]
+                                  next-rev] :as data} owner options]
 
   (init-state [_]
     (let [topic      (dis/foce-section-key)
@@ -335,6 +335,7 @@
                                         :section section-kw
                                         :currency currency
                                         :editable? true
+                                        :foce-data-editing? data-editing?
                                         :editing-cb (partial data-editing-cb owner)
                                         :initial-editing? data-editing?}
                                         {:opts chart-opts})
@@ -343,6 +344,7 @@
                                       :section section-kw
                                       :currency currency
                                       :editable? true
+                                      :foce-data-editing? data-editing?
                                       :editing-cb (partial data-editing-cb owner)
                                       :initial-editing? data-editing?}
                                       {:opts chart-opts})

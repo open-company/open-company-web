@@ -273,6 +273,7 @@
                                       :is-stakeholder-update (:is-stakeholder-update data)
                                       :currency currency
                                       :card-width card-width
+                                      :foce-data-editing? (:foce-data-editing? data)
                                       :read-only-company (:read-only-company data)
                                       :foce-key (:foce-key data)
                                       :foce-data (:foce-data data)
