@@ -215,7 +215,6 @@
         (dis/dispatch! [:foce-save sections data-to-save])))))
 
 (defn- data-editing-cb [owner value]
-  (om/set-state! owner :data-editing? value) ; local state
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
 
 (defcomponent topic-edit [{:keys [show-first-edit-tip
@@ -237,8 +236,7 @@
        :char-count-alert false
        :has-changes false
        :file-upload-state nil
-       :file-upload-progress 0
-       :data-editing? (dis/foce-section-data-editing?)}))
+       :file-upload-progress 0}))
 
   (will-receive-props [_ next-props]
     ;; update body placeholder when receiving data from API
@@ -301,7 +299,7 @@
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
                            file-upload-state file-upload-progress upload-remote-url negative-headline-char-count
-                           has-changes data-editing?]}]
+                           has-changes]}]
 
     (let [company-slug        (router/current-company-slug)
           section             (dis/foce-section-key)
@@ -335,18 +333,16 @@
                                         :section section-kw
                                         :currency currency
                                         :editable? true
-                                        :foce-data-editing? data-editing?
-                                        :editing-cb (partial data-editing-cb owner)
-                                        :initial-editing? data-editing?}
+                                        :foce-data-editing? (:foce-data-editing? data)
+                                        :editing-cb (partial data-editing-cb owner)}
                                         {:opts chart-opts})
               (= section-kw :growth)
               (om/build topic-growth {:section-data topic-data
                                       :section section-kw
                                       :currency currency
                                       :editable? true
-                                      :foce-data-editing? data-editing?
-                                      :editing-cb (partial data-editing-cb owner)
-                                      :initial-editing? data-editing?}
+                                      :foce-data-editing? (:foce-data-editing? data)
+                                      :editing-cb (partial data-editing-cb owner)}
                                       {:opts chart-opts})
     
               :else
@@ -437,7 +433,7 @@
             ;                :style {:display (if (nil? file-upload-state) "block" "none")}
             ;                :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
             ;       (dom/i {:class "fa fa-code"})))
-            (when (and is-data? (not data-editing?))
+            (when (and is-data? (not (dis/foce-section-data-editing?)))
               (dom/button {:class "btn-reset chart-button left"
                            :title "Add a chart"
                            :type "button"
@@ -445,9 +441,7 @@
                            :data-container "body"
                            :data-placement "top"
                            :style {:display (if no-data? "block" "none")}
-                           :on-click #(do
-                                        (dis/dispatch! [:start-foce-data-editing true])
-                                        (om/set-state! owner :data-editing? true))}
+                           :on-click #(dis/dispatch! [:start-foce-data-editing true])}
                 (dom/i {:class "fa fa-line-chart"})))
             (when-not (:placeholder topic-data)
               (dom/button {:class "btn-reset archive-button right"
@@ -496,10 +490,10 @@
             (dom/div {:class "topic-foce-footer-right"
                       :style {:display (if (nil? file-upload-state) "block" "none")}}
               (dom/button {:class "btn-reset btn-solid"
-                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count data-editing?)
+                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count (dis/foce-section-data-editing?))
                            :on-click #(save-topic owner)} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
-                           :disabled data-editing?
+                           :disabled (dis/foce-section-data-editing?)
                            :on-click #(if (:placeholder topic-data)
                                         (dis/dispatch! [:topic-archive (name section)])
                                         (dis/dispatch! [:start-foce nil]))} "CANCEL")))
