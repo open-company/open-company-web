@@ -167,9 +167,11 @@
   (add-popover {:container-id "archive-metric-confirm"
                 :message "Prior updates to this chart will only be available in topic history. Are you sure you want to archive?"
                 :cancel-title "KEEP"
-                :cancel-cb #(hide-popover nil "delete-metric-confirm")
+                :cancel-cb #(hide-popover nil "archive-metric-confirm")
                 :success-title "ARCHIVE"
+                :z-index-offset 1
                 :success-cb (fn []
+                              (hide-popover nil "archive-metric-confirm")
                               (om/update-state! owner #(merge % {:finances-data {}
                                                                  :table-key (str (rand 4))
                                                                  :has-changes? true})))}))
