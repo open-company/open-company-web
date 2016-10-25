@@ -11,6 +11,11 @@ div.composed-section {
 
     margin: 0 auto;
 
+    &.growth-sparklines {
+      margin: 0;
+      float: right;
+    }
+
     svg {
       rect.hover-rect {
         cursor: pointer;
@@ -51,6 +56,15 @@ div.composed-section {
       padding-right: 8px;
     }
 
+    &.growth-sparklines {
+      float: left;
+
+      div.chart-labels {
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+    }
+
     div.chart-value, div.chart-label {
       font-weight: 700;
       font-family: $oc_headers_font;
@@ -85,6 +99,12 @@ div.composed-section {
     padding-top: 12px;
     padding-bottom: 12px;
     margin-bottom: 10px;
+
+    &.growth-sparklines {
+      padding-top: 0px;
+      padding-bottom: 0px;
+      margin-bottom: 0px;
+    }
 
     div.chart-value {
       font-size: 20px;
