@@ -49,16 +49,18 @@
           fixed-sorted-metric (vec (map #(merge % {:label (label-from-set % interval metric-unit currency-symbol)
                                                    :sub-label (sub-label (:period %) metric-info)}) sorted-metric))
           chart-opts {:opts {:chart-type "unbordered-chart"
-                             :chart-height 100
+                             :chart-height (or (:height (:chart-size options)) 100)
                              :chart-width (:width (:chart-size options))
                              :chart-keys [:value]
                              :interval interval
                              :x-axis-labels false
-                             :chart-colors {:value (occ/get-color-by-kw :oc-chart-blue)}
+                             :circle-radius (:circle-radius options)
+                             :chart-colors {:value (occ/get-color-by-kw (or (:main-chart-color-kw options) :oc-chart-blue))}
                              :chart-selected-colors {:value (occ/get-color-by-kw :oc-chart-blue)}
-                             :chart-fill-polygons true
+                             :chart-fill-polygons (or (:chart-fill-polygons options) false)
                              :label-color (occ/get-color-by-kw :oc-gray-5)
                              :sub-label-color (occ/get-color-by-kw :oc-gray-5)
+                             :growth-sparklines true
                              :labels {:value {:position :bottom
                                               :order 1
                                               :value-presenter #(or (:label %2) "-")
