@@ -17,32 +17,13 @@ div.growth-sparklines{
   div.growth-sparkline {
     margin: 0px 0px 5px 0px;
     border: 1px solid rgba(78,90,107,0.4);
-    min-height: 54px;
     border-radius: 8px;
     padding: 12px;
 
-    div.left-box {
-      width: 45%;
-      float: left;
-
-      div.inline {
-        display: inline-block;
-        width: 100%;
-        overflow: hidden;
-        font-size: 14px;
-        white-space: pre;
-        color: black;
-        float: left;
-      }
-    }
-
     div.center-box {
-      width: 45%;
+      width: 90%;
       float: left;
-      font-size: 32px;
-      white-space: pre;
       overflow: hidden;
-      padding-left: 20px;
     }
 
     div.actions {
@@ -53,7 +34,6 @@ div.growth-sparklines{
 
       button{
         width: 14px;
-        height: 14px;
         margin: 0px;
         padding: 0px 3px 0px 3px;
         opacity: 0.4;
