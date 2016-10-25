@@ -56,7 +56,6 @@
     ; disable new-metric? if exiting the editing
     (om/set-state! owner :new-metric? false))
   ; set editing
-  (om/set-state! owner :data-editing? editing?)
   (editing-cb editing?))
 
 (defn- archive-metric-cb [owner editing-cb metric-slug]
@@ -141,7 +140,7 @@
      :growth-metric-slugs metric-slugs
      :focus focus
      :new-metric? (if initial new-metric? (om/get-state owner :new-metric?)) ; preserve new metric if this is for will-update
-     :data-editing? (:initial-editing? data)}))
+     :data-editing? (:foce-data-editing? data)}))
 
 (defn- data-editing-on-change [owner new-data]
   (om/update-state! owner #(merge % {:growth-data new-data})))
@@ -153,10 +152,14 @@
         new-metrics (assoc metrics (if (= k :slug) v focus) new-metric)]
     (om/set-state! owner :growth-metrics new-metrics)))
 
-(defcomponent topic-growth [{:keys [section section-data currency editable? initial-editing? editing-cb] :as data} owner options]
+(defcomponent topic-growth [{:keys [section section-data currency editable? foce-data-editing? editing-cb] :as data} owner options]
 
   (init-state [_]
     (get-state owner data true))
+
+  (will-receive-props [_ next-props]
+    ; update the data editing only via the global key foce-data-editing? do not use the local state
+    (om/set-state! owner :data-editing? (:foce-data-editing? next-props)))
 
   (will-update [_ next-props _]
     ;; this means the section data has changed from the API or at a upper lever of this component
@@ -169,9 +172,7 @@
       (add-popover-with-om-component growth-popover
         {:data (merge data {:initial-focus (om/get-state owner :focus)
                             :new-metric? (om/get-state owner :new-metric?)
-                            :hide-popover-cb #(do
-                                                (editing-cb false)
-                                                (om/set-state! owner :data-editing? false))
+                            :hide-popover-cb #(editing-cb false)
                             :growth-data (om/get-state owner :growth-data)
                             :growth-metrics (om/get-state owner :growth-metrics)
                             :metric-slugs (om/get-state owner :growth-metric-slugs)
@@ -188,6 +189,7 @@
       (hide-popover nil "growth-edit")))
 
   (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug data-editing? new-metric?]}]
+
     (let [section-name (utils/camel-case-str (name section))
           no-data (utils/no-growth-data? growth-data)
           focus-metric-data (filter-growth-data focus growth-data)
@@ -224,8 +226,7 @@
                              :data-toggle "tooltip"
                              :data-container "body"
                              :data-placement "right"
-                             :on-click #(do (om/set-state! owner :data-editing? true)
-                                            (editing-cb true))}
+                             :on-click #(editing-cb true)}
                   (dom/i {:class "fa fa-pencil editable-pen"})))
               (when editable?
                 (dom/button {:class "btn-reset chart-plus-button"
