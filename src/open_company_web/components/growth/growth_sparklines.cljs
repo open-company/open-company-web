@@ -1,40 +1,54 @@
 (ns open-company-web.components.growth.growth-sparklines
-  (:require [rum.core :as rum]
-            [open-company-web.dispatcher :as dis]))
+  (:require [om.core :as om :include-macros true]
+            [om-tools.core :refer-macros (defcomponent)]
+            [om-tools.dom :as dom :include-macros true]
+            [open-company-web.dispatcher :as dis]
+            [open-company-web.components.growth.growth-metric :refer (growth-metric)]))
 
-(rum/defc growth-sparkline < {:did-mount (fn [s] (.tooltip (js/$ "[data-toggle=tooltip]")) s)}
-  [{:keys [metric-data metric-metadata archive-cb edit-cb]}]
-  [:div.growth-sparkline.group
-    {:id (str "growth-sparkline-" (:slug metric-metadata))}
-    [:div.left-box
-      [:div.inline (:name metric-metadata)]
-      [:div.inline (:description metric-metadata)]]
-    [:div.center-box
-      [:div "~~~~~"]]
-    [:div.actions.right
-      [:button.btn-reset
-        {:data-placement "right"
-         :data-container "body"
-         :data-toggle "tooltip"
-         :title "Edit chart"
-         :on-click #(edit-cb (:slug metric-metadata))}
-        [:i.fa.fa-pencil]]
-      [:button.btn-reset
-        {:data-placement "right"
-         :data-container "body"
-         :data-toggle "tooltip"
-         :title "Remove chart"
-         :on-click #(archive-cb (:slug metric-metadata))}
-        [:i.fa.fa-times]]]])
+(defcomponent growth-sparkline [{:keys [metric-data metric-metadata currency total-metrics archive-cb edit-cb] :as data} owner]
 
-(rum/defc growth-sparklines
-  [{:keys [growth-data growth-metrics growth-metric-slugs archive-cb edit-cb] :as data}]
-  [:div.growth-sparklines
-    {:class (when (= (dis/foce-section-key) :growth) "editing")}
-    (for [slug growth-metric-slugs]
-      (rum/with-key
-        (growth-sparkline {:metric-data (filter #(= (:slug %) slug) growth-data)
-                           :metric-metadata (get growth-metrics slug)
-                           :archive-cb archive-cb
-                           :edit-cb edit-cb})
-        (name slug)))])
+  (did-mount [_]
+    (.tooltip (js/$ "[data-toggle=tooltip]")))
+
+  (render [_]
+    (dom/div {:class "growth-sparkline group"
+              :id (str "growth-sparkline-" (:slug metric-metadata))}
+      (dom/div {:class "center-box"}
+        (let [subsection-data {:metric-data metric-data
+                               :metric-info metric-metadata
+                               :currency currency
+                               :read-only true
+                               :total-metrics total-metrics}]
+          (om/build growth-metric subsection-data {:opts {:chart-size {:width 100 :height 30}
+                                                          :hide-nav true
+                                                          :main-chart-color-kw :oc-gray-5
+                                                          :circle-radius 3
+                                                          :chart-fill-polygons false}})))
+      (dom/div {:class "actions right"}
+        (dom/button
+          {:class "btn-reset"
+           :data-placement "right"
+           :data-container "body"
+           :data-toggle "tooltip"
+           :title "Edit chart"
+           :on-click #(edit-cb (:slug metric-metadata))}
+          (dom/i {:class "fa fa-pencil"}))
+        (dom/button
+          {:class "btn-reset"
+           :data-placement "right"
+           :data-container "body"
+           :data-toggle "tooltip"
+           :title "Remove chart"
+           :on-click #(archive-cb (:slug metric-metadata))}
+          (dom/i "fa.fa-times"))))))
+
+(defcomponent growth-sparklines [{:keys [growth-data growth-metrics growth-metric-slugs currency archive-cb edit-cb] :as data} owner]
+  (render [_]
+    (dom/div {:class (str "growth-sparklines" (when (= (dis/foce-section-key) :growth) " editing"))}
+      (for [slug growth-metric-slugs]
+        (om/build growth-sparkline {:metric-data (filter #(= (keyword (:slug %)) (keyword slug)) (vals growth-data))
+                                    :metric-metadata (get growth-metrics slug)
+                                    :currency currency
+                                    :archive-cb archive-cb
+                                    :total-metrics (count growth-metric-slugs)
+                                    :edit-cb edit-cb})))))
