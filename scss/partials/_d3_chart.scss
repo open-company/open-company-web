@@ -56,15 +56,6 @@ div.composed-section {
       padding-right: 8px;
     }
 
-    &.growth-sparklines {
-      float: left;
-
-      div.chart-labels {
-        padding-left: 0px;
-        padding-right: 0px;
-      }
-    }
-
     div.chart-value, div.chart-label {
       font-weight: 700;
       font-family: $oc_headers_font;
@@ -74,6 +65,26 @@ div.composed-section {
 
     div.chart-label {
       font-size: 12px;
+    }
+
+    &.growth-sparklines {
+      float: left;
+
+      div.chart-labels {
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+
+      div.chart-value, div.chart-label {
+        font-weight: 400;
+        font-family: $oc_main_font;
+        letter-spacing: 1px;
+        line-height: 1;
+      }
+
+      div.chart-label {
+        font-size: 14px;
+      }
     }
   }
 
@@ -92,6 +103,13 @@ div.composed-section {
     div.chart-value {
       font-size: 22px;
     }
+
+    &.growth-sparklines {
+      div.chart-value {
+        font-size: 14px;
+        font-weight: 400;
+      }
+    }
   }
 
   div.chart-bottom-label-container {
@@ -106,8 +124,11 @@ div.composed-section {
       margin-bottom: 0px;
     }
 
-    div.chart-value {
-      font-size: 20px;
+    &.growth-sparklines {
+      div.chart-value {
+        font-size: 14px;
+        font-weight: 400;
+      }
     }
   }
 
