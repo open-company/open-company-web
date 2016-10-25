@@ -4,7 +4,7 @@
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.dispatcher :as dispatcher]
-            [open-company-web.components.ui.popover :refer (add-popover-with-om-component hide-popover)]
+            [open-company-web.components.ui.popover :as popover :refer (add-popover-with-om-component hide-popover)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.ui.d3-chart :refer (d3-chart)]
             [open-company-web.lib.finance-utils :as finance-utils]
@@ -47,15 +47,17 @@
                    :style {:top "50%"
                            :left "50%"
                            :margin-top "-225px"
+                           :z-index (+ popover/default-z-index 2)
                            :margin-left "195px"}}
         (dom/i {:class "fa fa-times"}))
-      (dom/div {:class "oc-popover "
+      (dom/div {:class "oc-popover"
                 :on-click (fn [e] (.stopPropagation e))
                 :style {:width "390px"
                         :height "450px"
                         :margin-top "-225px"
                         :text-align "center"
                         :overflow-x "visible"
+                        :z-index (+ popover/default-z-index 1)
                         :overflow-y "scroll"}}
         (dom/h3 {} "Finances edit")
 
@@ -87,6 +89,7 @@
                                                                           :editing-cb (partial data-editing-toggle owner editing-cb)})
                                                        :width 390
                                                        :height 450
+                                                       :z-index-popover 0
                                                        :container-id "finances-edit"}))
     (when (and (:data-editing? prev-state)
                (not (om/get-state owner :data-editing?)))
