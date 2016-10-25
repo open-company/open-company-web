@@ -27,6 +27,8 @@
                                 (catch :default e)) 1500)
       (catch :default e))))
 
+(def default-z-index 1031)
+
 ;; Options passed as a map to add-popover -
 ;;
 ;; :container-id unique DOM ID for the container, pass the same ID hide-popover
@@ -41,6 +43,7 @@
 ;; :success-cb function to call when the user clicks the cancel button, required if you provide a cancel title,
 ;;             be sure to call hide-popover with the container ID
 ;; :hide-on-click-out true if you want to remove the popover on backgorund click
+;; :z-index-offset an offset to add to the default z-index to make sure multiple popover stack as expeceted
 ;;
 (defn add-popover-with-rum-component [component data]
   (let [container-id (:container-id data)]
@@ -49,12 +52,14 @@
             body (js/$ (.-body js/document))]
         ; add the div to the body
         (.append body popover-ct)
+        (let [z-index (or (:z-index-offset data) 0)]
+          (.css popover-ct #js {:zIndex (+ default-z-index (* z-index 3))}))
         ; if the component has not been mounted, render it
         (.setTimeout js/window
                      (fn []
                        ; render the popover component
                        (rum/mount (component data) (sel1 (str "#" container-id)))
-                       (.addClass (js/$ "body") "no-scroll")
+                       (.addClass body "no-scroll")
                        ; add the close action
                        (when (:hide-on-click-out data)
                          (.click popover-ct #(hide-popover % container-id)))
@@ -69,12 +74,14 @@
             body (js/$ (.-body js/document))]
         ; add the div to the body
         (.append body popover-ct)
+        (let [z-index (or (:z-index-offset data) 0)]
+          (.css popover-ct #js {:zIndex (+ default-z-index (* z-index 3))}))
         ; if the component has not been mounted, render it
         (.setTimeout js/window
                      (fn []
                        ; render the popover component
                        (om/root component (:data data) {:target (sel1 (str "#" container-id))})
-                       (.addClass (js/$ "body") "no-scroll")
+                       (.addClass body "no-scroll")
                        ; add the close action
                        (when (:hide-on-click-out data)
                          (.click popover-ct #(hide-popover % container-id)))
@@ -93,7 +100,8 @@
                                         cancel-title
                                         cancel-cb
                                         success-title
-                                        success-cb]}]
+                                        success-cb
+                                        z-index-offset]}]
 
   ;; assertions of proper usage
   (assert (string? container-id) "popover container-id is not a string")
@@ -105,12 +113,20 @@
   (assert (if cancel-cb (fn? cancel-cb) true) "popover cancel-cb is not a function")
   (assert (string? success-title) "popover success-title is not a string")
   (assert (fn? success-cb) "popover success-cb is not a function")
+  (assert (number? z-index-offset) "z-index-offset must be a number")
 
   (let [style {}
-        w-style (if width (assoc style :width width) style)
-        h-style (if height (assoc style :height height) style)]
+        w-style (if width
+                  (assoc style :width width)
+                  style)
+        h-style (if height
+                  (assoc w-style :height height)
+                  w-style)
+        z-style (if z-index-offset
+                  (assoc h-style :z-index (+ default-z-index (* z-index-offset 3) 1))
+                  (assoc h-style :z-index (+ default-z-index 1)))]
 
-    [:div.oc-popover {:style h-style}
+    [:div.oc-popover {:style z-style}
       (when title
         [:div.title-container
           [:h3.title title]])
