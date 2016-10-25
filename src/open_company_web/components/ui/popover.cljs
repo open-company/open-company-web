@@ -123,8 +123,8 @@
                   (assoc w-style :height height)
                   w-style)
         z-style (if z-index-offset
-                  (assoc h-style :z-index (+ default-z-index (* z-index-offset 3) 1))
-                  (assoc h-style :z-index (+ default-z-index 1)))]
+                  (assoc h-style :zIndex (+ default-z-index (* z-index-offset 3) 1))
+                  (assoc h-style :zIndex (+ default-z-index 1)))]
 
     [:div.oc-popover {:style z-style}
       (when title
