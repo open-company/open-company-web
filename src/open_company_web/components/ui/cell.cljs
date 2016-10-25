@@ -56,7 +56,7 @@
   (let [raw-value (.. e -target -value)
         parsed-value (parse-value raw-value)
         abs-value (if (:positive-only data) (utils/abs parsed-value) parsed-value)
-        init-value (om/get-state owner :inital-value)
+        init-value (om/get-state owner :initial-value)
         ; if the value is the same as it was at the start
         ; go to the :display state, else go to :draft
         state (if (check-value abs-value init-value)
@@ -74,21 +74,21 @@
     (to-state owner data state)))
 
 (defn safe-parse-float [value]
-  (let [cleaned-value (trim-commas value)
-        float-value (js/parseFloat cleaned-value)]
-    (if (js/isNaN float-value)
-      0
-      float-value)))
+  (when-not (nil? value)
+    (let [cleaned-value (trim-commas value)
+          float-value (js/parseFloat cleaned-value)]
+      (if (js/isNaN float-value)
+        0
+        float-value))))
 
 (defcomponent cell [data owner]
 
   (init-state [_]
     (utils/add-channel (str (:period data) (:key data)) (chan))
-    (let [parsed-value (.parseFloat js/window (:value data))
-          value (if (js/isNaN parsed-value) "" parsed-value)]
+    (let [parsed-value (safe-parse-float (:value data))]
       {:cell-state (initial-cell-state data)
-       :inital-value (:value data)
-       :value value}))
+       :initial-value (:value data)
+       :value parsed-value}))
 
   (did-update [_ _ prev-state]
     (when-not (= (:value prev-state) (om/get-state owner :value))
@@ -109,18 +109,19 @@
           prefix (:prefix data)
           currency (:currency data)
           decimals (or (:decimals data) 2)
-          formatted-value (cond
-                            (and short? currency)
-                            (str (utils/get-symbol-for-currency-code currency) (utils/with-metric-prefix abs-value))
-                            
-                            short?
-                            (utils/with-metric-prefix abs-value)
+          formatted-value (when abs-value
+                            (cond
+                              (and short? currency)
+                              (str (utils/get-symbol-for-currency-code currency) (utils/with-metric-prefix abs-value))
 
-                            currency
-                            (utils/thousands-separator abs-value currency decimals)
-                            
-                            :else
-                            (utils/thousands-separator abs-value))
+                              short?
+                              (utils/with-metric-prefix abs-value)
+
+                              currency
+                              (utils/thousands-separator abs-value currency decimals)
+
+                              :else
+                              (utils/thousands-separator abs-value)))
           prefix-value (if (and (not (s/blank? formatted-value)) (:prefix data))
                          (str (:prefix data) formatted-value)
                          formatted-value)
