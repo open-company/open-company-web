@@ -80,31 +80,6 @@
                 :success-title "ARCHIVE"
                 :success-cb #(archive-metric-cb owner editing-cb metric-slug)}))
 
-(defn- render-pillboxes [owner editable? editing-cb options]
-
-  (let [data (om/get-props owner)
-        growth-metric-slugs (om/get-state owner :growth-metric-slugs)
-        growth-metrics (om/get-state owner :growth-metrics)
-        focus (om/get-state owner :focus)
-        data-editing? (om/get-state owner :data-editing?)]
-
-    (dom/div {:class "pillbox-container growth"}
-
-      (when (and focus (> (count growth-metric-slugs) 1))
-        (for [metric-slug growth-metric-slugs]
-          (let [metric (get growth-metrics metric-slug)
-                mname (:name metric)
-                metric-classes (utils/class-set {:pillbox true
-                                                 metric-slug true
-                                                 :active (= focus metric-slug)})]
-            (dom/label {:class metric-classes
-                        :title (:description metric)
-                        :data-toggle "tooltip"
-                        :data-container "body"
-                        :data-placement "bottom"
-                        :data-tab metric-slug
-                        :on-click (partial pillbox-click owner options)} mname)))))))
-
 (defcomponent growth-popover [{:keys [initial-focus
                                       new-metric?
                                       growth-data
@@ -242,9 +217,6 @@
               ;; growth metric currently shown
               (when (and focus (seq (:metric-data subsection-data)))
                 (om/build growth-metric subsection-data {:opts options}))
-              (when (or (> (count growth-metric-slugs) 1)
-                        editable?)
-                (render-pillboxes owner editable? editing-cb options))
               (when editable?
                 (dom/button {:class "btn-reset chart-pencil-button"
                              :title "Edit chart data"
