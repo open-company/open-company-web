@@ -3,6 +3,7 @@
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.dispatcher :as dis]
+            [open-company-web.lib.oc-colors :as occ]
             [open-company-web.components.growth.growth-metric :refer (growth-metric)]))
 
 (defcomponent growth-sparkline [{:keys [metric-data metric-metadata currency total-metrics archive-cb edit-cb] :as data} owner]
@@ -18,11 +19,15 @@
                                :metric-info metric-metadata
                                :currency currency
                                :read-only true
+                               :circle-radius 2
+                               :circle-stroke 3
+                               :circle-fill (occ/get-color-by-kw :oc-gray-5)
+                               :circle-selected-stroke 6
+                               :line-stroke-width 2
                                :total-metrics total-metrics}]
           (om/build growth-metric subsection-data {:opts {:chart-size {:width 100 :height 30}
                                                           :hide-nav true
                                                           :main-chart-color-kw :oc-gray-5
-                                                          :circle-radius 3
                                                           :chart-fill-polygons false}})))
       (dom/div {:class "actions right"}
         (dom/button

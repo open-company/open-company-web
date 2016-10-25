@@ -116,7 +116,7 @@
                           (.append "line")
                           (.attr "class" "chart-line")
                           (.style "stroke" (chart-key fill-colors))
-                          (.style "stroke-width" circle-stroke)
+                          (.style "stroke-width" (or (om/get-props owner :line-stroke-width) circle-stroke))
                           (.attr "x1" (+ cx 2))
                           (.attr "y1" (get-y cy max-y))
                           (.attr "x2" (- next-cx 2))
@@ -129,8 +129,10 @@
                                 0
                                 (or (om/get-props owner :circle-radius) circle-radius)))
                     (.attr "stroke" (chart-key fill-colors))
-                    (.attr "stroke-width" (if (= i selected) circle-selected-stroke circle-stroke))
-                    (.attr "fill" "white")
+                    (.attr "stroke-width" (if (= i selected)
+                                            (or (om/get-props owner :circle-selected-stroke) circle-selected-stroke)
+                                            (or (om/get-props owner :circle-stroke) circle-stroke)))
+                    (.attr "fill" (or (om/get-props owner :circle-fill) "white"))
                     (.attr "data-fill" (chart-key fill-colors))
                     (.attr "data-hasvalue" (chart-key data-set))
                     (.attr "data-selectedFill" (chart-key fill-selected-colors))
@@ -189,9 +191,9 @@
               hasvalue (.attr circle "data-hasvalue")]
           (-> circle
               (.attr "stroke" color)
-              (.attr "stroke-width" circle-stroke)
-              (.attr "fill" "white")
-              (.attr "r" (if hasvalue circle-radius 0)))))))
+              (.attr "stroke-width" (or (om/get-props owner :circle-stroke) circle-stroke))
+              (.attr "fill" (or (om/get-props owner :circle-fill) "white"))
+              (.attr "r" (if hasvalue (or (om/get-props owner :circle-radius) circle-radius) 0)))))))
     
     ;; draw the selected circles specially
     (.each selected-circles (fn [d i]
@@ -201,9 +203,9 @@
               hasvalue (.attr circle "data-hasvalue")]
           (-> circle
               (.attr "stroke" color)
-              (.attr "stroke-width" circle-selected-stroke)
-              (.attr "fill" "white")
-              (.attr "r" (if hasvalue circle-radius 0)))))))
+              (.attr "stroke-width" (or (om/get-props owner :circle-selected-stroke) circle-selected-stroke))
+              (.attr "fill" (or (om/get-props owner :circle-fill) "white"))
+              (.attr "r" (if hasvalue (or (om/get-props owner :circle-radius) circle-radius) 0)))))))
 
     ;; let the rest of the component know a (potentially) new data point is selected
     (om/set-state! owner :selected idx)))

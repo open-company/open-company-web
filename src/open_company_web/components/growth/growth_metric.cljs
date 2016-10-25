@@ -54,7 +54,6 @@
                              :chart-keys [:value]
                              :interval interval
                              :x-axis-labels false
-                             :circle-radius (:circle-radius options)
                              :chart-colors {:value (occ/get-color-by-kw (or (:main-chart-color-kw options) :oc-chart-blue))}
                              :chart-selected-colors {:value (occ/get-color-by-kw :oc-chart-blue)}
                              :chart-fill-polygons (or (:chart-fill-polygons options) false)
@@ -76,4 +75,9 @@
                 :on-click (:start-editing-cb data)}
         (when (pos? (count metric-data))
           (dom/div {}
-            (om/build d3-chart {:chart-data fixed-sorted-metric} chart-opts)))))))
+            (om/build d3-chart {:chart-data fixed-sorted-metric
+                                :circle-radius (:circle-radius data)
+                                :circle-stroke (:circle-stroke data)
+                                :circle-fill (:circle-fill data)
+                                :line-stroke-width (:line-stroke-width data)
+                                :circle-selected-stroke (:circle-selected-stroke data)} chart-opts)))))))
