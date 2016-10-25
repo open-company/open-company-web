@@ -433,15 +433,20 @@
             ;                :style {:display (if (nil? file-upload-state) "block" "none")}
             ;                :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
             ;       (dom/i {:class "fa fa-code"})))
-            (when (and is-data? (not (dis/foce-section-data-editing?)))
+            (when (or (= is-data? :growth)
+                      (and (= is-data? :finances)
+                           (not (dis/foce-section-data-editing?))))
               (dom/button {:class "btn-reset chart-button left"
-                           :title "Add a chart"
+                           :title (if (and (= is-data? :growth)
+                                           (pos? (count (:metrics topic-data))))
+                                    "Add another chart"
+                                    "Add a chart")
                            :type "button"
                            :data-toggle "tooltip"
                            :data-container "body"
                            :data-placement "top"
-                           :style {:display (if no-data? "block" "none")}
-                           :on-click #(dis/dispatch! [:start-foce-data-editing true])}
+                           :style {:display (if (or (and (= is-data? :finances) no-data?) (= is-data? :growth)) "block" "none")}
+                           :on-click #(dis/dispatch! [:start-foce-data-editing :new])}
                 (dom/i {:class "fa fa-line-chart"})))
             (when-not (:placeholder topic-data)
               (dom/button {:class "btn-reset archive-button right"
