@@ -66,10 +66,11 @@
                                  :editing-cb (:editing-cb data)}
                                 {:key (:updated-at section-data)})))))
 
-(defcomponent topic-finances [{:keys [section section-data currency editable? initial-editing? editing-cb] :as data} owner options]
+(defcomponent topic-finances [{:keys [section section-data currency editable? foce-data-editing? editing-cb] :as data} owner options]
 
   (init-state [_]
-    {:data-editing? initial-editing?
+    {:data-editing? foce-data-editing?
+     :initial-editing? foce-data-editing?
      :finances-row-data (:data section-data)})
 
   (will-receive-props [_ next-props]
@@ -93,7 +94,7 @@
                (not (om/get-state owner :data-editing?)))
       (hide-popover nil "finances-edit")))
 
-  (render-state [_ {:keys [data-editing? finances-row-data]}]
+  (render-state [_ {:keys [data-editing? finances-row-data initial-editing?]}]
     (let [no-data (or (empty? finances-row-data) (utils/no-finances-data? finances-row-data))
           data-editing? (or initial-editing? data-editing?)]
 
