@@ -77,6 +77,7 @@
                 :cancel-title "KEEP"
                 :cancel-cb #(hide-popover nil "delete-metric-confirm")
                 :success-title "ARCHIVE"
+                :z-index-offset 0
                 :success-cb #(archive-metric-cb owner editing-cb metric-slug)}))
 
 (defcomponent growth-popover [{:keys [initial-focus
@@ -215,33 +216,5 @@
               ;; growth metric sparklines
               (growth-sparklines {:growth-data growth-data
                                   :growth-metrics growth-metrics
-                                  :growth-metric-slugs growth-metric-slugs})
-              (when editable?
-                (dom/button {:class "btn-reset chart-pencil-button"
-                             :title "Edit chart data"
-                             :type "button"
-                             :data-toggle "tooltip"
-                             :data-container "body"
-                             :data-placement "right"
-                             :on-click #(editing-cb true)}
-                  (dom/i {:class "fa fa-pencil editable-pen"})))
-              (when editable?
-                (dom/button {:class "btn-reset chart-plus-button"
-                             :title "Add a chart"
-                             :type "button"
-                             :data-toggle "tooltip"
-                             :data-container "body"
-                             :data-placement "right"
-                             :on-click (fn [e]
-                                         (data-editing-toggle owner editing-cb true true))}
-                  (dom/i {:class "fa fa-plus"})))
-              (when (and editable?
-                         (not= focus growth-utils/new-metric-slug-placeholder))
-                (dom/button {:class "btn-reset chart-archive-button"
-                             :title "Archive chart"
-                             :type "button"
-                             :data-toggle "tooltip"
-                             :data-container "body"
-                             :data-placement "right"
-                             :on-click #(show-archive-confirm-popover owner editing-cb focus)}
-                  (dom/i {:class "fa fa-archive"}))))))))))
+                                  :growth-metric-slugs growth-metric-slugs
+                                  :archive-cb (partial show-archive-confirm-popover owner editing-cb)}))))))))
