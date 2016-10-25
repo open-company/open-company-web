@@ -51,7 +51,7 @@
               (placeholder-data prev-period {:new true}))))))))
 
 (defn edit-placeholder-data [initial-data]
-  (let [current-period (utils/current-period)
+  (let [current-period (utils/current-finance-period)
         last-period (if (last initial-data)
                       (:period (last initial-data))
                       (get-past-period current-period 12))
@@ -195,7 +195,7 @@
           next-data)))))
 
 (defn fake-chart-placeholder-data []
-  (let [current-period   (utils/current-period)]
+  (let [current-period   (utils/current-finance-period)]
     (loop [idx 0
            period current-period
            d   []]

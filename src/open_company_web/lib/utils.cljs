@@ -290,11 +290,12 @@
     true
     false))
 
-(defn current-period []
+(defn current-finance-period []
   (let [date (js/Date.)
-        month (inc (.getMonth date))
+        fixed-date (js/Date. (.setMonth date (- (.getMonth date) 1)))
+        month (inc (.getMonth fixed-date))
         month-str (str (when (< month 10) "0") month)
-        cur-period (str (.getFullYear date) "-" month-str)]
+        cur-period (str (.getFullYear fixed-date) "-" month-str)]
     cur-period))
 
 (defn get-section-keys [company-data]

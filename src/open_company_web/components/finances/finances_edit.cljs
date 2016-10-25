@@ -199,7 +199,7 @@
                   (dom/th {} "Revenue")
                   (dom/th {} "Expenses")
                   (dom/th {} "Cash")))
-              (let [current-period (utils/current-period)]
+              (let [current-period (utils/current-finance-period)]
                 (for [idx (range stop)]
                   (let [period (finance-utils/get-past-period current-period idx)
                         has-value (contains? finances-data period)
