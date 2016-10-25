@@ -127,7 +127,7 @@
                     (.attr "class" (str "chart-dot chart-dot-" i))
                     (.attr "r" (if (not (chart-key data-set))
                                 0
-                                circle-radius))
+                                (or (om/get-props owner :circle-radius) circle-radius)))
                     (.attr "stroke" (chart-key fill-colors))
                     (.attr "stroke-width" (if (= i selected) circle-selected-stroke circle-stroke))
                     (.attr "fill" "white")
@@ -244,7 +244,7 @@
     (dom/div {:class (str class-name (if multiple-rows? " multiple-rows"))
               :style (if center? 
                         {:text-align :center :align-items :center :justify-content :center}
-                        {:align-items :flex-start :justify-content :flex-start :padding-left "20px"})}
+                        {:align-items :flex-start :justify-content :flex-start})}
       (for [label-key label-keys]
         (dom/div {:class "chart-labels"}
           (dom/div {:class "chart-value"
@@ -275,27 +275,28 @@
         (d3-render-chart owner options))))
 
   (render-state [_ {:keys [start selected]}]
-
     (let [hide-chart-nav (:hide-nav options)
           selected-data-set (get (current-data owner) selected)
           labels (:labels options)
           top-label-keys (label-keys-for labels :top)
           bottom-label-keys (label-keys-for labels :bottom)
-          chart-type (:chart-type options)]
+          chart-class (str (:chart-type options) (when (:fake-chart options) " fake-chart"))
+          chart-top-label-class (str "chart-top-label-container" (when (:growth-sparklines options) " growth-sparklines"))
+          chart-bottom-label-class (str "chart-bottom-label-container" (when (:growth-sparklines options) " growth-sparklines"))]
 
-      (dom/div {:class chart-type}
+      (dom/div {:class chart-class}
         
         ;; Top row labels
         (when (not (empty? top-label-keys))
-          (labels-for "chart-top-label-container" top-label-keys labels selected-data-set))
+          (labels-for chart-top-label-class top-label-keys labels selected-data-set))
 
-        ;; Bottom row labels
-        (when (not (empty? bottom-label-keys))
-          (labels-for "chart-bottom-label-container" bottom-label-keys labels selected-data-set))
+          ;; Bottom row labels
+          (when (not (empty? bottom-label-keys))
+            (labels-for chart-bottom-label-class bottom-label-keys labels selected-data-set))
 
         ;; D3 Chart w/ optional nav. buttons
         (when (> (count chart-data) 1)
-          (dom/div {:class "chart-container"
+          (dom/div {:class (str "chart-container" (when (:growth-sparklines options) " growth-sparklines"))
                     :style {:width (str (+ chart-width 30) "px")
                             :height (str chart-height "px")}}
             ;; Previous button
