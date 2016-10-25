@@ -113,7 +113,7 @@
   (assert (if cancel-cb (fn? cancel-cb) true) "popover cancel-cb is not a function")
   (assert (string? success-title) "popover success-title is not a string")
   (assert (fn? success-cb) "popover success-cb is not a function")
-  (assert (number? z-index-offset) "z-index-offset must be a number")
+  (assert (if z-index-offset (number? z-index-offset) true) "z-index-offset must be a number")
 
   (let [style {}
         w-style (if width
