@@ -215,7 +215,6 @@
               ;; growth metric sparklines
               (growth-sparklines {:growth-data growth-data
                                   :growth-metrics growth-metrics
-                                  :editing editable?
                                   :growth-metric-slugs growth-metric-slugs})
               (when editable?
                 (dom/button {:class "btn-reset chart-pencil-button"
