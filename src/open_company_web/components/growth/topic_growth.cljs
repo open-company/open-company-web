@@ -8,8 +8,7 @@
             [open-company-web.caches :refer (company-cache)]
             [open-company-web.dispatcher :as dis]
             [open-company-web.components.ui.popover :refer (add-popover-with-om-component add-popover hide-popover)]
-            [open-company-web.components.growth.growth-sparklines :refer (growth-sparklines)]
-            [cuerdas.core :as s]))
+            [open-company-web.components.growth.growth-sparklines :refer (growth-sparklines)]))
 
 (def focus-cache-key :last-selected-metric)
 
