@@ -1,4 +1,4 @@
-(ns open-company-web.oc-lib
+(ns open-company-web.lib.oc-lib
   "Port of some function included in oc.lib.data.utils of https://github.com/open-company/open-company-lib"
   (:require [defun.core :refer (defun)]
             [cuerdas.core :as s]
@@ -37,7 +37,7 @@
         "October - December"))))
 
 (defn format-period [interval period]
-  (s/upper 
+  (s/upper
     (case interval
       "quarterly" (str (get-quarter-from-month (t/month period) [:short]) " " (f/unparse yearly-date period))
       "weekly" (f/unparse weekly-date period)
@@ -70,7 +70,7 @@
   ([periods :guard sequential? interval :guard intervals]
   (let [sorted-periods (reverse (sort periods))]
     (contiguous (rest sorted-periods) [(first sorted-periods)] interval))) ; start w/ the oldest period as contiguous list
-  
+
   ;; Weekly - initial state
   ([periods :guard sequential? contiguous-periods :guard vector? interval :guard #{:weekly}]
     (contiguous periods contiguous-periods interval utils/weekly-input-format (t/weeks 1)))
@@ -80,7 +80,7 @@
   ;; Quarterly- initial state
   ([periods :guard sequential? contiguous-periods :guard vector? interval :guard #{:quarterly}]
     (contiguous periods contiguous-periods interval utils/quarterly-input-format (t/months 3)))
-  
+
   ;; All intervals - progressing
   ([periods :guard sequential? contiguous-periods :guard vector? interval :guard intervals formatter one-interval]
     (let [current-period (f/parse formatter (last contiguous-periods))
@@ -147,7 +147,7 @@
 
 (defn with-currency
   "Combine the value with the currency indicator, if available."
-  
+
   ([currency value] (with-currency currency value false))
 
   ([currency value explicit-positive?]
@@ -161,7 +161,7 @@
         currency-entry (iso4217 currency-key)
         currency-symbol (if currency-entry (:symbol currency-entry) false)
         currency-text (if currency-entry (:text currency-entry) false)]
-    (if currency-symbol 
+    (if currency-symbol
       (str neg pos currency-symbol clean-value)
       (if currency-text
         (str pos value-string " " currency-text)
