@@ -42,7 +42,7 @@
            :data-placement "right"
            :data-container "body"
            :data-toggle "tooltip"
-           :title "Remove chart"
+           :title "Remove this chart"
            :on-click #(archive-cb (:slug metric-metadata))}
           (dom/i {:class "fa fa-times"}))))))
 
