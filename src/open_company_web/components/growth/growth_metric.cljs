@@ -3,7 +3,7 @@
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.oc-lib :as oc-lib]
+            [open-company-web.lib.oc-lib :as oc-lib]
             [open-company-web.components.ui.d3-chart :refer (d3-chart)]
             [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.router :as router]
