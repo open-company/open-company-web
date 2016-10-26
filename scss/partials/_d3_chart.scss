@@ -24,7 +24,7 @@ div.composed-section {
       text.x-axis-label {
         font-size: 12px;
         font-weight: 700;
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         color: $oc_gray_5;
         opacity: 0.25;
       }
@@ -77,13 +77,14 @@ div.composed-section {
 
       div.chart-value, div.chart-label {
         font-weight: 400;
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         letter-spacing: 1px;
         line-height: 1;
+        font-size: 13px;
       }
 
       div.chart-label {
-        font-size: 14px;
+        font-size: 13px;
       }
     }
   }
@@ -106,7 +107,7 @@ div.composed-section {
 
     &.growth-sparklines {
       div.chart-value {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 400;
       }
     }
@@ -126,7 +127,7 @@ div.composed-section {
 
     &.growth-sparklines {
       div.chart-value {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 400;
       }
     }
