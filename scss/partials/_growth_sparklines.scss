@@ -10,7 +10,7 @@ div.growth-sparklines{
         padding: 11px;
 
         div.actions {
-          opacity: 1;
+          display: block;
         }
       }
     }
@@ -33,8 +33,8 @@ div.growth-sparklines{
       height: 30px;
       font-size: 14px;
       float: right;
-      opacity: 0;
-      margin: 0;
+      display: none;
+      margin: -5px 0 0 0;
       padding: 0;
 
       button{
