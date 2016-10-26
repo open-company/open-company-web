@@ -1,22 +1,24 @@
 div.growth-sparklines{
 
   &.editing {
-    div.growth-sparkline:hover {
+    div.growth-sparkline {
+      border: 1px solid rgba(78,90,107,0.4);
+      padding: 12px;
 
       &:hover {
         border: 2px solid rgb(249,215,72);
         padding: 11px;
-      }
 
-      div.actions {
-        display: block;
+        div.actions {
+          opacity: 1;
+        }
       }
     }
   }
 
   div.growth-sparkline {
     margin: 0px 0px 5px 0px;
-    border: 1px solid rgba(78,90,107,0.4);
+    border: 1px solid transparent;
     border-radius: 8px;
     padding: 12px;
 
@@ -30,7 +32,7 @@ div.growth-sparklines{
       width: 14px;
       font-size: 14px;
       float: right;
-      display: none;
+      opacity: 0;
 
       button{
         width: 14px;
