@@ -84,7 +84,7 @@
     (om/set-state! owner :metrics new-metrics)))
 
 (defn- new-metric-slug [metric-name]
-  (s/slugify (str metric-name " " (utils/my-uuid))))
+  (s/slug (str metric-name " " (utils/my-uuid))))
 
 ;; ===== Growth Metric Data Functions =====
 
