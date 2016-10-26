@@ -3,13 +3,15 @@
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.dispatcher :as dis]
+            [open-company-web.lib.utils :as utils]
             [open-company-web.lib.oc-colors :as occ]
             [open-company-web.components.growth.growth-metric :refer (growth-metric)]))
 
 (defcomponent growth-sparkline [{:keys [metric-data metric-metadata currency total-metrics archive-cb edit-cb] :as data} owner]
 
   (did-mount [_]
-    (.tooltip (js/$ "[data-toggle=tooltip]")))
+    (when-not (utils/is-test-env?)
+      (.tooltip (js/$ "[data-toggle=tooltip]"))))
 
   (render [_]
     (dom/div {:class "growth-sparkline group"
