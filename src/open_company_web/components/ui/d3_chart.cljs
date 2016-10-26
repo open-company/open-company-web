@@ -40,7 +40,7 @@
   "Given the width of the chart and an index of a data point within the displayed data set
   return the horizontal (x-axis) position of the data point."
   [chart-width i data-count]
-  (let [dot-spacer (/ (- chart-width 20) (dec show-data-points))
+  (let [dot-spacer (/ (- chart-width 30) (dec show-data-points))
         natural-dot-location (+ (* i dot-spacer) 15)]
     (if (< data-count show-data-points)
       ;; we're showing less than a full set of data points, so we need an x offset to center the chart
@@ -304,7 +304,7 @@
         ;; D3 Chart w/ optional nav. buttons
         (when (> (count chart-data) 1)
           (dom/div {:class (str "chart-container" (when (:growth-sparklines options) " growth-sparklines"))
-                    :style {:width (str (+ chart-width 30) "px")
+                    :style {:width (str (+ chart-width (if hide-chart-nav 30 10)) "px")
                             :height (str chart-height "px")}}
             ;; Previous button
             (dom/div {:class (str "chart-prev" (when hide-chart-nav " hidden"))
