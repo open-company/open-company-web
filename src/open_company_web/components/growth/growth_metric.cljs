@@ -3,6 +3,7 @@
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.oc-lib :as oc-lib]
             [open-company-web.components.ui.d3-chart :refer (d3-chart)]
             [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.router :as router]
@@ -11,14 +12,48 @@
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
 
-(defn- label-from-set [data-set interval metric-unit currency-symbol]
+(defn- format-delta
+  "Create a display fragment for a delta value."
+
+  ([delta prior-date]
+  (let [pos (when (pos? delta) "+")]
+    (str "(" pos (if (zero? delta) "no change" (oc-lib/with-size-label delta)) "% since " prior-date ") ")))
+
+  ([currency delta prior-date]
+  (str "(" (if (zero? delta) "no change" (oc-lib/with-currency currency (oc-lib/with-size-label delta) true))
+    " since " prior-date ") ")))
+
+(defn- growth-metric-delta [periods {metric-name :name unit :unit interval :interval :as metadatum} currency]
+  (let [growth-metric (first periods)
+        slug (:slug growth-metric)
+        period (when interval (utils/date-from-period (:period growth-metric) interval))
+        date (when (and interval period) (oc-lib/format-period interval period))
+        value (:value growth-metric)
+        ;; Check for older periods contiguous to most recent
+        contiguous-periods (when (seq periods) (oc-lib/contiguous (map :period periods) (keyword interval)))
+        prior-contiguous? (>= (count contiguous-periods) 2)
+        ;; Info on prior period
+        prior-metric (when prior-contiguous?
+                        (first (filter #(= (:period %) (second contiguous-periods)) periods)))
+        prior-period (when (and interval prior-metric) (utils/date-from-period (:period prior-metric) interval))
+        prior-date (when (and interval prior-period) (oc-lib/format-period interval prior-period))
+        formatted-prior-date (when prior-date (clojure.string/join " " (butlast (clojure.string/split prior-date #" ")))) ; drop the year
+        prior-value (when prior-metric (:value prior-metric))
+        metric-delta (when (and value prior-value) (- value prior-value))
+        metric-delta-percent (when metric-delta (* 100 (float (/ metric-delta prior-value))))
+        formatted-metric-delta (when metric-delta-percent (format-delta metric-delta-percent formatted-prior-date))
+        ;; Format output
+        label (str formatted-metric-delta "- " date)
+        format-symbol (case unit "%" "%" "currency" currency nil)]
+    label))
+
+(defn- label-from-set [data-set metric-name interval metric-unit currency-symbol]
   (let [actual-val (:value data-set)
-        actual (when actual-val (utils/thousands-separator actual-val))
         period (utils/get-period-string (:period data-set) interval)
         fixed-cur-unit (when (= metric-unit "currency") currency-symbol)
         unit (when (= metric-unit "%") "%")]
     (when actual-val
-      (str fixed-cur-unit actual unit))))
+      (str fixed-cur-unit (oc-lib/with-size-label actual-val) unit " " metric-name))))
 
 (defn- sub-label [period metric-info]
   (let [mname (:name metric-info)
@@ -45,9 +80,11 @@
           metric-unit (:unit metric-info)
           period (utils/get-period-string (:period actual-set) interval)
           currency-symbol (utils/get-symbol-for-currency-code (:currency data))
-          actual-with-label (label-from-set actual-set interval metric-unit currency-symbol)
-          fixed-sorted-metric (vec (map #(merge % {:label (label-from-set % interval metric-unit currency-symbol)
-                                                   :sub-label (sub-label (:period %) metric-info)}) sorted-metric))
+          actual-with-label (label-from-set actual-set (:name metric-info) interval metric-unit currency-symbol)
+          fixed-sorted-metric (vec (map #(merge % {:label (label-from-set % (:name metric-info) interval metric-unit currency-symbol)
+                                                   :sub-label (let [idx (.indexOf (vec (map :period (reverse sorted-metric))) (:period %))
+                                                                    periods (subvec (vec (reverse sorted-metric)) idx)]
+                                                                (growth-metric-delta periods metric-info currency-symbol))}) sorted-metric))
           chart-opts {:opts {:chart-type "unbordered-chart"
                              :chart-height (or (:height (:chart-size options)) 100)
                              :chart-width (:width (:chart-size options))
