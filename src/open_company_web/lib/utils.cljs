@@ -403,7 +403,7 @@
         (((keyword section) (slug @caches/revisions)) as-of)))))
 
 (def quarterly-input-format (cljs-time-format/formatter "YYYY-MM"))
-(def monthly-input-format (cljs-time-format/formatter "YYYY-M"))
+(def monthly-input-format (cljs-time-format/formatter "YYYY-MM"))
 (def weekly-input-format (cljs-time-format/formatter :date))
 
 (defn get-formatter [interval]
