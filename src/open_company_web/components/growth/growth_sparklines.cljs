@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.oc-colors :as occ]
             [open-company-web.components.growth.growth-metric :refer (growth-metric)]))
 
@@ -27,10 +28,10 @@
                                :circle-selected-stroke 4
                                :line-stroke-width 2
                                :total-metrics total-metrics}]
-          (om/build growth-metric subsection-data {:opts {:chart-size {:width 100 :height 30}
+          (om/build growth-metric subsection-data {:opts {:chart-size {:width (- (responsive/calc-card-width) 50 140 40 15) :height 30}
                                                           :hide-nav true
                                                           :chart-fill-polygons false}})))
-      (dom/div {:class "actions right"}
+      (dom/div {:class "actions group right"}
         (dom/button
           {:class "btn-reset"
            :data-placement "right"
