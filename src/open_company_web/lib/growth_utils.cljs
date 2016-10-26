@@ -16,7 +16,7 @@
   (let [metrics (:metrics presets)
         metric (filter #(= (s/lower (:name %)) (s/lower metric-name)) metrics)
         slug (if (empty? metric)
-               (s/slugify metric-name)
+               (s/slug metric-name)
                (:slug (first metric)))]
     (if add-noise
       (str slug "-" (get-noise))
