@@ -20,8 +20,8 @@
     (dom/span {:class "domine"}
       "("
       pos
-      (if (zero? delta) "no change" (oc-lib/with-size-label delta))
-      "%)")))
+      (if (zero? delta) "no change" (str (oc-lib/with-size-label delta) "%"))
+      ")")))
 
   ([currency delta]
     (dom/span {:class "domine"}
