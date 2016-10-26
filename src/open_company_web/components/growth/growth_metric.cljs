@@ -54,8 +54,8 @@
                              :chart-keys [:value]
                              :interval interval
                              :x-axis-labels false
-                             :chart-colors {:value (occ/get-color-by-kw (or (:main-chart-color-kw options) :oc-chart-blue))}
-                             :chart-selected-colors {:value (occ/get-color-by-kw :oc-chart-blue)}
+                             :chart-colors {:value (occ/get-color-by-kw :oc-blue-dark)}
+                             :chart-selected-colors {:value (occ/get-color-by-kw :oc-blue-dark)}
                              :chart-fill-polygons (or (:chart-fill-polygons options) false)
                              :label-color (occ/get-color-by-kw :oc-gray-5)
                              :sub-label-color (occ/get-color-by-kw :oc-gray-5)
@@ -63,7 +63,7 @@
                              :labels {:value {:position :bottom
                                               :order 1
                                               :value-presenter #(or (:label %2) "-")
-                                              :value (occ/get-color-by-kw :oc-gray-5) 
+                                              :value (occ/get-color-by-kw :oc-blue-dark) 
                                               :label-presenter #(:sub-label %2)
                                               :label-color (occ/get-color-by-kw :oc-gray-5)}}
                              :hide-nav (:hide-nav options)}}]

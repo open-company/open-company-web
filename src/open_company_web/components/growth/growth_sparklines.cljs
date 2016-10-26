@@ -21,13 +21,12 @@
                                :read-only true
                                :circle-radius 2
                                :circle-stroke 3
-                               :circle-fill (occ/get-color-by-kw :oc-gray-5)
-                               :circle-selected-stroke 6
+                               :circle-fill (occ/get-color-by-kw :oc-dark-blue)
+                               :circle-selected-stroke 4
                                :line-stroke-width 2
                                :total-metrics total-metrics}]
           (om/build growth-metric subsection-data {:opts {:chart-size {:width 100 :height 30}
                                                           :hide-nav true
-                                                          :main-chart-color-kw :oc-gray-5
                                                           :chart-fill-polygons false}})))
       (dom/div {:class "actions right"}
         (dom/button
@@ -45,7 +44,7 @@
            :data-toggle "tooltip"
            :title "Remove chart"
            :on-click #(archive-cb (:slug metric-metadata))}
-          (dom/i "fa.fa-times"))))))
+          (dom/i {:class "fa fa-times"}))))))
 
 (defcomponent growth-sparklines [{:keys [growth-data growth-metrics growth-metric-slugs currency archive-cb edit-cb] :as data} owner]
   (render [_]
