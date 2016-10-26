@@ -73,14 +73,14 @@
           data-count (count chart-data)
           fill-colors (:chart-colors options)
           fill-selected-colors (:chart-selected-colors options)
-          chart-width (:chart-width options)
+          chart-width (+ (:chart-width options) (if (:hide-nav options) 30 10))
           chart-height (:chart-height options)
           chart-keys (:chart-keys options)
           ; main chart node
           chart-node (-> js/d3
                          (.select d3-chart)
                          ; Make SVG 10px wider to give 5px on each side for month label overrun
-                         (.attr "width" (+ chart-width 10))
+                         (.attr "width" chart-width)
                          (.attr "height" chart-height)
                          (.on "click" (fn [] (.stopPropagation (.-event js/d3)))))
           scale-fn (scale owner options)
@@ -184,7 +184,7 @@
   (.stopPropagation (.-event js/d3)) ; we got this!
   (let [svg-el (om/get-ref owner "d3-chart")
         d3-svg-el (.select js/d3 svg-el)
-        chart-width (:chart-width options)
+        chart-width (+ (:chart-width options) (if (:hide-nav options) 30 10))
         selected-circles (.selectAll d3-svg-el (str "circle.chart-dot-" idx))
         all-circles (.selectAll d3-svg-el "circle")]
     
@@ -317,8 +317,8 @@
             (dom/svg {:className "d3-chart"
                       :ref "d3-chart"
                       ;; either leave space for the nav (0 margin), or take up the space with 10 px of margin
-                      :style {:margin-left (str (if hide-chart-nav 10 0) "px")
-                              :margin-right (str (if hide-chart-nav 10 0) "px")}})
+                      :style {:margin-left (str (if hide-chart-nav 0 10) "px")
+                              :margin-right (str (if hide-chart-nav 0 10) "px")}})
             
             ;; Next button
             (dom/div {:class (str "chart-next" (when hide-chart-nav " hidden"))
