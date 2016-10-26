@@ -28,7 +28,7 @@
                                :circle-selected-stroke 6
                                :line-stroke-width 2
                                :total-metrics total-metrics}]
-          (om/build growth-metric subsection-data {:opts {:chart-size {:width (- (responsive/calc-card-width) 50 140 40 15) :height 30}
+          (om/build growth-metric subsection-data {:opts {:chart-size {:width (- (responsive/calc-card-width) 50 170 40 15) :height 30}
                                                           :hide-nav true
                                                           :chart-fill-polygons false}})))
       (dom/div {:class "actions group right"}
