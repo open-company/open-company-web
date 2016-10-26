@@ -15,13 +15,19 @@
 (defn- format-delta
   "Create a display fragment for a delta value."
 
-  ([delta prior-date]
+  ([delta]
   (let [pos (when (pos? delta) "+")]
-    (str "(" pos (if (zero? delta) "no change" (oc-lib/with-size-label delta)) "% since " prior-date ") ")))
+    (dom/span {:class "domine"}
+      "("
+      pos
+      (if (zero? delta) "no change" (oc-lib/with-size-label delta))
+      "%)")))
 
-  ([currency delta prior-date]
-  (str "(" (if (zero? delta) "no change" (oc-lib/with-currency currency (oc-lib/with-size-label delta) true))
-    " since " prior-date ") ")))
+  ([currency delta]
+    (dom/span {:class "domine"}
+      "("
+      (if (zero? delta) "no change" (oc-lib/with-currency currency (oc-lib/with-size-label delta) true))
+      ")")))
 
 (defn- growth-metric-delta [periods {metric-name :name unit :unit interval :interval :as metadatum} currency]
   (let [growth-metric (first periods)
@@ -35,17 +41,12 @@
         ;; Info on prior period
         prior-metric (when prior-contiguous?
                         (first (filter #(= (:period %) (second contiguous-periods)) periods)))
-        prior-period (when (and interval prior-metric) (utils/date-from-period (:period prior-metric) interval))
-        prior-date (when (and interval prior-period) (oc-lib/format-period interval prior-period))
-        formatted-prior-date (when prior-date (clojure.string/join " " (butlast (clojure.string/split prior-date #" ")))) ; drop the year
         prior-value (when prior-metric (:value prior-metric))
         metric-delta (when (and value prior-value) (- value prior-value))
         metric-delta-percent (when metric-delta (* 100 (float (/ metric-delta prior-value))))
-        formatted-metric-delta (when metric-delta-percent (format-delta metric-delta-percent formatted-prior-date))
-        ;; Format output
-        label (str formatted-metric-delta "- " date)
-        format-symbol (case unit "%" "%" "currency" currency nil)]
-    label))
+        formatted-metric-delta (when metric-delta-percent (format-delta metric-delta-percent))]
+    ;; Format output
+    (dom/div {} date " " formatted-metric-delta)))
 
 (defn- label-from-set [data-set metric-name interval metric-unit currency-symbol]
   (let [actual-val (:value data-set)
