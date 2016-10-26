@@ -336,14 +336,6 @@
                                         :foce-data-editing? (:foce-data-editing? data)
                                         :editing-cb (partial data-editing-cb owner)}
                                         {:opts chart-opts})
-              (= section-kw :growth)
-              (om/build topic-growth {:section-data topic-data
-                                      :section section-kw
-                                      :currency currency
-                                      :editable? true
-                                      :foce-data-editing? (:foce-data-editing? data)
-                                      :editing-cb (partial data-editing-cb owner)}
-                                      {:opts chart-opts})
     
               :else
               (dom/div {:class (utils/class-set {:card-header true
@@ -384,6 +376,14 @@
                                     (check-headline-count owner % false)
                                     (om/set-state! owner :char-count nil))
                         :dangerouslySetInnerHTML initial-headline})
+          (when (= section-kw :growth)
+            (om/build topic-growth {:section-data topic-data
+                                    :section section-kw
+                                    :currency currency
+                                    :editable? true
+                                    :foce-data-editing? (:foce-data-editing? data)
+                                    :editing-cb (partial data-editing-cb owner)}
+                                    {:opts chart-opts}))
           (dom/div #js {:className "topic-body emoji-autocomplete emojiable"
                         :id (str "foce-body-" (name section))
                         :key "foce-body"
