@@ -404,7 +404,7 @@
 
 (def quarterly-input-format (cljs-time-format/formatter "YYYY-MM"))
 (def monthly-input-format (cljs-time-format/formatter "YYYY-MM"))
-(def weekly-input-format (cljs-time-format/formatter :date))
+(def weekly-input-format (cljs-time-format/formatter "YYYY-MM-dd"))
 
 (defn get-formatter [interval]
   "Get the date formatter from the interval type."
