@@ -343,6 +343,10 @@
                 (dom/img {:src image-header
                             :class "topic-header-img"})
                  (dom/button {:class "btn-reset remove-header"
+                              :data-toggle "tooltip"
+                              :data-placement "top"
+                              :data-container "body"
+                              :title "Remove this image"
                               :on-click #(do
                                           (om/set-state! owner :has-changes true)
                                           (dis/dispatch! [:foce-input {:image-url nil :image-height 0 :image-width 0}]))}
