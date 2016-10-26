@@ -29,13 +29,17 @@ div.growth-sparklines{
     }
 
     div.actions {
-      width: 14px;
+      width: 20px;
+      height: 30px;
       font-size: 14px;
       float: right;
       opacity: 0;
+      margin: 0;
+      padding: 0;
 
       button{
-        width: 14px;
+        width: 20px;
+        height: 14px;
         margin: 0px;
         padding: 0px 3px 0px 3px;
         opacity: 0.4;
