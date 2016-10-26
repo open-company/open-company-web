@@ -19,16 +19,21 @@
   (let [filtered-data (map #(select-keys % chart-keys) data)]
     (apply max (vec (flatten (map vals filtered-data))))))
 
+(defn- min-y [data chart-keys]
+  (let [filtered-data (map #(select-keys % chart-keys) data)]
+    (apply min (vec (flatten (map vals filtered-data))))))
+
 (defn- get-y [y max-y]
   (+ 10 (- max-y y)))
 
 (defn- scale [owner options]
   (let [all-data (om/get-props owner :chart-data)
         chart-keys (:chart-keys options)
+        data-min (min-y all-data chart-keys)
         data-max (max-y all-data chart-keys)
         linear-fn (.. js/d3 -scale linear)
-        domain-fn (.domain linear-fn #js [0 data-max])
-        range-fn (.range linear-fn #js [0 (- (:chart-height options) 35)])]
+        domain-fn (.domain linear-fn #js [data-min data-max])
+        range-fn (.range linear-fn #js [0 (:chart-height options)])]
     range-fn))
 
 (defn- data-x-position
