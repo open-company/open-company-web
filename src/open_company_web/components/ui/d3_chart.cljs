@@ -32,7 +32,7 @@
         data-min (min-y all-data chart-keys)
         data-max (max-y all-data chart-keys)
         linear-fn (.. js/d3 -scale linear)
-        domain-fn (.domain linear-fn #js [data-min data-max])
+        domain-fn (.domain linear-fn #js [0 data-max])
         range-fn (.range linear-fn #js [0 (:chart-height options)])]
     range-fn))
 
