@@ -54,7 +54,7 @@
         fixed-cur-unit (when (= metric-unit "currency") currency-symbol)
         unit (when (= metric-unit "%") "%")]
     (when actual-val
-      (str fixed-cur-unit (oc-lib/with-size-label actual-val) unit " " metric-name))))
+      (dom/span {:class "bold"} (str fixed-cur-unit (oc-lib/with-size-label actual-val) unit " " metric-name)))))
 
 (defn- sub-label [period metric-info]
   (let [mname (:name metric-info)
