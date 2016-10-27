@@ -173,7 +173,7 @@
     (let [data-editing? (:foce-data-editing? data)]
       (when (and (not (:foce-data-editing? prev-props))
                  data-editing?)
-        (data-editing-toggle owner editing-cb true true))
+        (data-editing-toggle owner editing-cb true (= data-editing? growth-utils/new-metric-slug-placeholder)))
       (when (and (not (:editing prev-state))
                  (om/get-state owner :editing))
         (add-popover-with-om-component growth-popover
