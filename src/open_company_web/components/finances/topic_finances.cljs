@@ -6,7 +6,7 @@
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.components.ui.popover :as popover :refer (add-popover-with-om-component hide-popover)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
-            [open-company-web.components.ui.d3-chart :refer (d3-chart)]
+            [open-company-web.components.finances.finances-sparklines :refer (finances-sparklines)]
             [open-company-web.lib.finance-utils :as finance-utils]
             [open-company-web.lib.oc-colors :as occ]
             [open-company-web.lib.utils :as utils]))
@@ -123,53 +123,16 @@
                               :hide-nav (:hide-nav options)}
                   labels {:costs {:value-presenter (partial get-currency-label cur-symbol)
                                   :value-color (occ/get-color-by-kw :oc-red-regular)
-                                  :label-presenter (if (pos? sum-revenues) #(str "EXPENSES") #(str "BURN"))
+                                  :label-presenter (if (pos? sum-revenues) #(str "Expenses") #(str "Burn"))
                                   :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}
                           :cash {:value-presenter (partial get-currency-label cur-symbol)
                                  :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
-                                 :label-presenter #(str "CASH")
+                                 :label-presenter #(str "Cash")
                                  :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}
-                          :runway {:value-presenter (partial get-runway-label)
-                                   :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
-                                   :label-presenter #(str "RUNWAY")
-                                   :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}}]
-              ;; has the company ever had revenue?
-              (if (pos? sum-revenues)
-                ;; post-revenue gets an additional revenue label, 4 total labels in 2 rows
-                (let [revenue-labels (merge labels {:revenue {:position :top
-                                                              :order 1
-                                                              :value-presenter (partial get-currency-label cur-symbol)
-                                                              :value-color (occ/get-color-by-kw :oc-green-regular)
-                                                              :label-presenter #(str "REVENUE")
-                                                              :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}})
-                      ordered-labels (-> revenue-labels
-                                      (assoc-in [:costs :position] :top)
-                                      (assoc-in [:costs :order] 2)
-                                      (assoc-in [:cash :position] :bottom)
-                                      (assoc-in [:cash :order] 1)
-                                      (assoc-in [:runway :position] :bottom)
-                                      (assoc-in [:runway :order] 2))]
-                  (om/build d3-chart {:chart-data sorted-finances}
-                                     {:opts (merge chart-opts {:labels ordered-labels
-                                                               :chart-keys [:costs :revenue]})}))
+                          :revenue {:value-presenter (partial get-runway-label)
+                                    :value-color (occ/get-color-by-kw :oc-gray-5-3-quarter)
+                                    :label-presenter #(str "Revenue")
+                                    :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}}]
 
-                ;; pre-revenue gets just 3 labels in 1 row
-                (let [ordered-labels (-> labels
-                                      (assoc-in [:cash :position] :bottom)
-                                      (assoc-in [:cash :order] 1)
-                                      (assoc-in [:costs :position] :bottom)
-                                      (assoc-in [:costs :order] 2)
-                                      (assoc-in [:runway :position] :bottom)
-                                      (assoc-in [:runway :order] 3))]
-                  (om/build d3-chart {:chart-data sorted-finances}
-                                     {:opts (merge chart-opts {:labels ordered-labels})}))))
-
-            (when editable?
-              (dom/button {:class "btn-reset chart-pencil-button"
-                           :title "Edit chart data"
-                           :type "button"
-                           :data-toggle "tooltip"
-                           :data-container "body"
-                           :data-placement "left"
-                           :on-click #(editing-cb true)}
-                (dom/i {:class "fa fa-pencil editable-pen"})))))))))
+              (om/build finances-sparklines {:finances-data sorted-finances}
+                                            {:opts (merge chart-opts {:labels labels})}))))))))
