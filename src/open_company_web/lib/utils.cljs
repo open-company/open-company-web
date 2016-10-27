@@ -417,7 +417,9 @@
     monthly-input-format))
 
 (defn date-from-period [period & [interval]]
-  (cljs-time-format/parse (get-formatter interval) period))
+  (if period
+    (cljs-time-format/parse (get-formatter interval) period)
+    (cljs-time/now)))
 
 (defn period-from-date [date & [interval]]
   (cljs-time-format/unparse (get-formatter interval) date))
