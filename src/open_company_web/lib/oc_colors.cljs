@@ -2,8 +2,8 @@
 
 (def oc-colors {
   :yellow "#f9d748" ; rgb(249,215,72)
-  :green "#74E0B4" ;"#26C485"
-  :red "#d72a46"
+  :green "#35BC2E" ; rgb(53,188,46)
+  :red "#E04B53" ;rgb(244,75,83)
   :blue "#007A9D" ;"#004E64" ;"#109DB7"
   :gray "#D8D8D8" ;"#ADADAD"
   :black "#000000"
@@ -13,10 +13,10 @@
   :oc-chart-red "#D72A46"
   ;; Greens
   :oc-green-dark "#008C54"
-  :oc-green-regular "#26C485"
-  :oc-green-light "#74E0B4"
+  :oc-green-regular "#35BC2E" ; :green
+  :oc-green-light "#4DE249" ; rgb(77,226,73)
   ;; Blues
-  :oc-blue-dark "#003848"
+  :oc-blue-dark "#1E81C4"
   :oc-blue-regular "#004E64"
   :oc-blue-light "#007A9D"
   ;; Grays
@@ -31,7 +31,7 @@
   :oc-gray-5-3-quarter "rgba(78,90,107,0.75)"
   ;; Reds
   :oc-red-dark "#9E001A"
-  :oc-red-regular "#D72A46"
+  :oc-red-regular "#E04B53" ; :red
   :oc-red-light "#EC7A8D"})
 
 (defn get-color-by-kw [kw]
