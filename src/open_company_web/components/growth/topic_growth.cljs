@@ -31,29 +31,35 @@
 (defn- metrics-order [metrics-coll]
   (map :slug metrics-coll))
 
-(defn- pillbox-click [owner options e]
-  (let [data (om/get-props owner)
-        focus  (.. e -target -dataset -tab)
-        section-data (:section-data data)
-        metrics (metrics-map (:metrics section-data))]
-    (switch-focus owner focus options)))
-
 (defn- filter-growth-data [focus growth-data]
   (vec (filter #(= (:slug %) focus) (vals growth-data))))
 
 (defn- data-editing-toggle [owner editing-cb editing? & [new-metric?]]
   (if editing?
-    (when new-metric?
-      ; if entering editing mode for a new metric
-      ; set the focus to the new metric slug
-      (om/set-state! owner :focus growth-utils/new-metric-slug-placeholder)
-      (om/set-state! owner :new-metric? true)
-      ; and add a placeholder metadata to the metrics map
-      (let [growth-metrics (om/get-state owner :growth-metrics)
-            new-metrics (assoc growth-metrics growth-utils/new-metric-slug-placeholder new-metric-preset)]
-        (om/set-state! owner :growth-metrics new-metrics)))
+    (if new-metric?
+      (do
+        ; if entering editing mode for a new metric
+        ; set the focus to the new metric slug
+        (om/set-state! owner :focus growth-utils/new-metric-slug-placeholder)
+        (om/set-state! owner :editing true)
+        (om/set-state! owner :new-metric? true)
+        ; and add a placeholder metadata to the metrics map
+        (let [growth-metrics (om/get-state owner :growth-metrics)
+              new-metrics (assoc growth-metrics growth-utils/new-metric-slug-placeholder new-metric-preset)
+              metric-slugs (om/get-state owner :growth-metric-slugs)]
+          (om/set-state! owner :growth-metrics new-metrics)
+          (om/set-state! owner :growth-metric-slugs (vec (conj metric-slugs growth-utils/new-metric-slug-placeholder)))))
+      (do
+        ; switch focus to the edited metric
+        (om/set-state! owner :focus editing?)
+        (om/set-state! owner :editing true)
+        ; reset new-metric? flag
+        (om/set-state! owner :new-metric? false)))
     ; disable new-metric? if exiting the editing
-    (om/set-state! owner :new-metric? false))
+    (do
+      (om/set-state! owner :new-metric? false)
+      (om/set-state! owner :editing false)
+      (hide-popover nil "growth-edit")))
   ; set editing
   (editing-cb editing?))
 
@@ -76,7 +82,7 @@
                 :cancel-title "KEEP"
                 :cancel-cb #(hide-popover nil "delete-metric-confirm")
                 :success-title "ARCHIVE"
-                :z-index-offset 0
+                :z-index-offset 1
                 :success-cb #(archive-metric-cb owner editing-cb metric-slug)}))
 
 (defcomponent growth-popover [{:keys [initial-focus
@@ -86,11 +92,11 @@
                                       curency
                                       hide-popover-cb
                                       growth-metric-slugs
-                                      growth-editing-on-change
-                                      growth-metadata-editing-on-change
-                                      growth-data-editing-toggle
-                                      growth-switch-focus
-                                      growth-show-archive-confirm-popover] :as data} owner options]
+                                      growth-editing-on-change-cb
+                                      growth-metadata-editing-on-change-cb
+                                      growth-data-editing-toggle-cb
+                                      growth-switch-focus-cb
+                                      growth-archive-metric-cb] :as data} owner options]
   (render [_]
     (dom/div {:class "oc-popover-container-internal growth composed-section"
               :style {:width "100%" :height "100vh"}}
@@ -117,11 +123,11 @@
                                :metrics growth-metrics
                                :currency curency
                                :metric-slugs growth-metric-slugs
-                               :data-on-change-cb growth-editing-on-change
-                               :metadata-on-change-cb growth-metadata-editing-on-change
-                               :editing-cb growth-data-editing-toggle
-                               :switch-focus-cb growth-switch-focus
-                               :archive-metric-cb growth-show-archive-confirm-popover})))))
+                               :data-on-change-cb growth-editing-on-change-cb
+                               :metadata-on-change-cb growth-metadata-editing-on-change-cb
+                               :editing-cb growth-data-editing-toggle-cb
+                               :switch-focus-cb growth-switch-focus-cb
+                               :archive-metric-cb growth-archive-metric-cb})))))
 
 (defn- get-state [owner data initial]
   (let [section-data (:section-data data)
@@ -163,26 +169,31 @@
       (om/set-state! owner (get-state owner next-props false))))
 
   (did-update [_ prev-props prev-state]
-    (when (and (not (:foce-data-editing? prev-props))
-               (:foce-data-editing? data))
-      (add-popover-with-om-component growth-popover
-        {:data (merge data {:initial-focus (om/get-state owner :focus)
-                            :new-metric? (om/get-state owner :new-metric?)
-                            :hide-popover-cb #(editing-cb false)
-                            :growth-data (om/get-state owner :growth-data)
-                            :growth-metrics (om/get-state owner :growth-metrics)
-                            :metric-slugs (om/get-state owner :growth-metric-slugs)
-                            :growth-data-on-change-cb (partial data-editing-on-change owner)
-                            :growth-metadata-on-change-cb (partial metadata-editing-on-change owner (om/get-state owner :focus))
-                            :growth-data-editing-toggle (partial data-editing-toggle owner editing-cb)
-                            :growth-switch-focus-cb (partial switch-focus owner)
-                            :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb (om/get-state owner :focus))})
-         :width 390
-         :height 450
-         :container-id "growth-edit"}))
-    (when (and (:foce-data-editing? prev-props)
-               (not (:foce-data-editing? data)))
-      (hide-popover nil "growth-edit")))
+    (let [foce-data-editing? (:foce-data-editing? data)]
+      (when (and (not (:foce-data-editing? prev-props))
+                 foce-data-editing?)
+        (data-editing-toggle owner editing-cb true true))
+      (when (and (not (:editing prev-state))
+                 (om/get-state owner :editing))
+        (add-popover-with-om-component growth-popover
+          {:data (merge data {:initial-focus (om/get-state owner :focus)
+                              :new-metric? (om/get-state owner :new-metric?)
+                              :hide-popover-cb (fn [] (editing-cb false))
+                              :growth-data (om/get-state owner :growth-data)
+                              :growth-metrics (om/get-state owner :growth-metrics)
+                              :growth-metric-slugs (om/get-state owner :growth-metric-slugs)
+                              :growth-editing-on-change-cb (partial data-editing-on-change owner)
+                              :growth-metadata-editing-on-change-cb (partial metadata-editing-on-change owner (om/get-state owner :focus))
+                              :growth-data-editing-toggle-cb (partial data-editing-toggle owner editing-cb)
+                              :growth-switch-focus-cb (partial switch-focus owner)
+                              :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)})
+           :width 390
+           :height 450
+           :z-index-offset 0
+           :container-id "growth-edit"}))
+      (when (and (:foce-data-editing? prev-props)
+                 (not foce-data-editing?))
+        (data-editing-toggle owner editing-cb false))))
 
   (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug new-metric?]}]
 
@@ -217,4 +228,5 @@
                                            :growth-metrics growth-metrics
                                            :growth-metric-slugs growth-metric-slugs
                                            :currency currency
+                                           :edit-cb (partial data-editing-toggle owner editing-cb)
                                            :archive-cb (partial show-archive-confirm-popover owner editing-cb)}))))))))
