@@ -288,8 +288,8 @@
           top-label-keys (label-keys-for labels :top)
           bottom-label-keys (label-keys-for labels :bottom)
           chart-class (str (:chart-type options) (when (:fake-chart options) " fake-chart"))
-          chart-top-label-class (str "chart-top-label-container" (when (:growth-sparklines options) " growth-sparklines"))
-          chart-bottom-label-class (str "chart-bottom-label-container" (when (:growth-sparklines options) " growth-sparklines"))]
+          chart-top-label-class (str "chart-top-label-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))
+          chart-bottom-label-class (str "chart-bottom-label-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))]
 
       (dom/div {:class chart-class}
         
