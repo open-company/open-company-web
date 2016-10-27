@@ -27,7 +27,7 @@
                                :circle-radius 2
                                :circle-stroke 3
                                :circle-fill (occ/get-color-by-kw :oc-dark-blue)
-                               :circle-selected-stroke 6
+                               :circle-selected-stroke 5
                                :line-stroke-width 2
                                :total-metrics total-metrics}]
           (om/build growth-metric subsection-data {:opts {:chart-size {:width (- card-width 50  ;; margin left and right
