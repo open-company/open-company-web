@@ -325,35 +325,23 @@
       (when section
         (dom/div #js {:className "topic-foce group"
                       :ref "topic-internal"}
-          (when (or is-data?
-                    image-header)
-            (cond
-              (= section-kw :finances)
-              (om/build topic-finances {:section-data (utils/fix-finances topic-data)
-                                        :section section-kw
-                                        :currency currency
-                                        :editable? true
-                                        :foce-data-editing? (:foce-data-editing? data)
-                                        :editing-cb (partial data-editing-cb owner)}
-                                        {:opts chart-opts})
-    
-              :else
-              (dom/div {:class (utils/class-set {:card-header true
-                                                 :card-image true})}
-                (dom/img {:src image-header
-                            :class "topic-header-img"})
-                 (dom/button {:class "btn-reset remove-header"
-                              :data-toggle "tooltip"
-                              :data-placement "top"
-                              :data-container "body"
-                              :title "Remove this image"
-                              :on-click #(do
-                                          (om/set-state! owner :has-changes true)
-                                          (dis/dispatch! [:foce-input {:image-url nil :image-height 0 :image-width 0}]))}
-                  (i/icon :simple-remove {:size 15
-                                          :stroke 4
-                                          :color "white"
-                                          :accent-color "white"})))))
+          (when (and (not is-data?)
+                     image-header)
+            (dom/div {:class "card-header card-image"}
+              (dom/img {:src image-header
+                          :class "topic-header-img"})
+               (dom/button {:class "btn-reset remove-header"
+                            :data-toggle "tooltip"
+                            :data-placement "top"
+                            :data-container "body"
+                            :title "Remove this image"
+                            :on-click #(do
+                                        (om/set-state! owner :has-changes true)
+                                        (dis/dispatch! [:foce-input {:image-url nil :image-height 0 :image-width 0}]))}
+                (i/icon :simple-remove {:size 15
+                                        :stroke 4
+                                        :color "white"
+                                        :accent-color "white"}))))
           ;; Topic title
           (dom/input {:class "topic-title"
                       :value (:title topic-data)
@@ -380,14 +368,25 @@
                                     (check-headline-count owner % false)
                                     (om/set-state! owner :char-count nil))
                         :dangerouslySetInnerHTML initial-headline})
-          (when (= section-kw :growth)
-            (om/build topic-growth {:section-data topic-data
-                                    :section section-kw
-                                    :currency currency
-                                    :editable? true
-                                    :foce-data-editing? (:foce-data-editing? data)
-                                    :editing-cb (partial data-editing-cb owner)}
-                                    {:opts chart-opts}))
+          (when is-data?
+            (dom/div {:class ""}
+              (cond
+                (= section-kw :growth)
+                (om/build topic-growth {:section-data topic-data
+                                        :section section-kw
+                                        :currency currency
+                                        :editable? true
+                                        :foce-data-editing? (:foce-data-editing? data)
+                                        :editing-cb (partial data-editing-cb owner)}
+                                        {:opts chart-opts})
+                (= section-kw :finances)
+                (om/build topic-finances {:section-data (utils/fix-finances topic-data)
+                                          :section section-kw
+                                          :currency currency
+                                          :editable? true
+                                          :foce-data-editing? (:foce-data-editing? data)
+                                          :editing-cb (partial data-editing-cb owner)}
+                                          {:opts chart-opts}))))
           (dom/div #js {:className "topic-body emoji-autocomplete emojiable"
                         :id (str "foce-body-" (name section))
                         :key "foce-body"
@@ -450,7 +449,7 @@
                            :data-container "body"
                            :data-placement "top"
                            :style {:display (if (or (and (= is-data? :finances) no-data?) (= is-data? :growth)) "block" "none")}
-                           :on-click #(dis/dispatch! [:start-foce-data-editing :new])}
+                           :on-click #(dis/dispatch! [:start-foce-data-editing (if (= is-data? :growth) growth-utils/new-metric-slug-placeholder :new)])}
                 (dom/i {:class "fa fa-line-chart"})))
             (when-not (:placeholder topic-data)
               (dom/button {:class "btn-reset archive-button right"
