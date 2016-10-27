@@ -170,9 +170,9 @@
       (om/set-state! owner (get-state owner next-props false))))
 
   (did-update [_ prev-props prev-state]
-    (let [foce-data-editing? (:foce-data-editing? data)]
+    (let [data-editing? (:foce-data-editing? data)]
       (when (and (not (:foce-data-editing? prev-props))
-                 foce-data-editing?)
+                 data-editing?)
         (data-editing-toggle owner editing-cb true true))
       (when (and (not (:editing prev-state))
                  (om/get-state owner :editing))
@@ -193,7 +193,7 @@
            :z-index-offset 0
            :container-id "growth-edit"}))
       (when (and (:foce-data-editing? prev-props)
-                 (not foce-data-editing?))
+                 (not data-editing?))
         (data-editing-toggle owner editing-cb false))))
 
   (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug new-metric?]}]
