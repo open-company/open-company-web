@@ -2,6 +2,7 @@
   (:require [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
+            [open-company-web.lib.oc-colors :as occ]
             [goog.string :as gstring]
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
@@ -208,3 +209,13 @@
                  (get-past-period period 1)
                  (assoc d idx row)))
         d))))
+
+(defn color-for-metric [k]
+  (occ/get-color-by-kw (cond (= k :revenue) :green
+                             (= k :costs) :red
+                             :else :oc-gray-7)))
+
+(defn finances-key-colors []
+  {:revenue (color-for-metric :revenue)
+   :costs  (color-for-metric :costs)
+   :cash  (color-for-metric :cash)})
