@@ -29,11 +29,14 @@
                                :circle-fill (occ/get-color-by-kw :oc-dark-blue)
                                :circle-selected-stroke 5
                                :line-stroke-width 2
-                               :total-metrics total-metrics}]
-          (om/build growth-metric subsection-data {:opts {:chart-size {:width (- card-width 50  ;; margin left and right
-                                                                                            170 ;; max left label size of the sparkline
-                                                                                            40  ;; internal padding
-                                                                                            15) ;; internal spacing
+                               :total-metrics total-metrics}
+              fixed-card-width (if (responsive/is-mobile?)
+                                 (.-clientWidth (.-body js/document)) ; use all the possible space on mobile
+                                 card-width)]
+          (om/build growth-metric subsection-data {:opts {:chart-size {:width (- fixed-card-width 50  ;; margin left and right
+                                                                                                  170 ;; max left label size of the sparkline
+                                                                                                  40  ;; internal padding
+                                                                                                  15) ;; internal spacing
                                                                        :height 30}
                                                           :hide-nav true
                                                           :chart-fill-polygons false}})))
