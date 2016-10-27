@@ -6,9 +6,11 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.oc-colors :as occ]
-            [open-company-web.components.growth.growth-metric :refer (growth-metric)]))
+            [open-company-web.components.growth.growth-metric :refer (growth-metric)]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]))
 
-(defcomponent growth-sparkline [{:keys [metric-data metric-metadata currency total-metrics archive-cb edit-cb] :as data} owner]
+(defcomponent growth-sparkline [{:keys [metric-data metric-metadata currency total-metrics archive-cb edit-cb card-width] :as data} owner]
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -28,7 +30,11 @@
                                :circle-selected-stroke 6
                                :line-stroke-width 2
                                :total-metrics total-metrics}]
-          (om/build growth-metric subsection-data {:opts {:chart-size {:width (- (responsive/calc-card-width) 50 170 40 15) :height 30}
+          (om/build growth-metric subsection-data {:opts {:chart-size {:width (- card-width 50  ;; margin left and right
+                                                                                            170 ;; max left label size of the sparkline
+                                                                                            40  ;; internal padding
+                                                                                            15) ;; internal spacing
+                                                                       :height 30}
                                                           :hide-nav true
                                                           :chart-fill-polygons false}})))
       (dom/div {:class "actions group right"}
@@ -50,12 +56,21 @@
           (dom/i {:class "fa fa-times"}))))))
 
 (defcomponent growth-sparklines [{:keys [growth-data growth-metrics growth-metric-slugs currency archive-cb edit-cb] :as data} owner]
-  (render [_]
+
+  (init-state [_]
+    {:card-width (responsive/calc-card-width)})
+
+  (did-mount [_]
+    (when-not (utils/is-test-env?)
+      (events/listen js/window EventType/RESIZE #(om/set-state! owner :card-width (responsive/calc-card-width)))))
+
+  (render-state [_ {:keys [card-width]}]
     (dom/div {:class (str "growth-sparklines" (when (= (dis/foce-section-key) :growth) " editing"))}
       (for [slug growth-metric-slugs]
         (om/build growth-sparkline {:metric-data (filter #(= (keyword (:slug %)) (keyword slug)) (vals growth-data))
                                     :metric-metadata (get growth-metrics slug)
                                     :currency currency
+                                    :card-width card-width
                                     :archive-cb archive-cb
                                     :total-metrics (count growth-metric-slugs)
                                     :edit-cb edit-cb})))))
