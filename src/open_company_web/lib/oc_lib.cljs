@@ -9,6 +9,11 @@
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
 
+;; Porting:
+; Math/ -> js/Math. floor round abs
+; format -> goog.string.format
+; biginteger -> nothing
+
 (def intervals #{:weekly :monthly :quarterly})
 
 (def yearly-date (f/formatter "YYYY"))
