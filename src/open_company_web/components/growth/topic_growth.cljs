@@ -73,6 +73,7 @@
     ;; if last focus is the removing metric, remove the last focus cache
     (when (= (utils/company-cache-key focus-cache-key) metric-slug)
       (utils/remove-company-cache-key focus-cache-key))
+    (hide-popover nil "archive-metric-confirm")
     (dis/dispatch! [:save-topic-data "growth" {:metrics fewer-metrics}])
     (data-editing-toggle owner editing-cb false))) ; no longer data editing
 
@@ -80,7 +81,7 @@
   (add-popover {:container-id "archive-metric-confirm"
                 :message "Prior updates to this chart will only be available in topic history. Are you sure you want to archive?"
                 :cancel-title "KEEP"
-                :cancel-cb #(hide-popover nil "delete-metric-confirm")
+                :cancel-cb #(hide-popover nil "archive-metric-confirm")
                 :success-title "ARCHIVE"
                 :z-index-offset 1
                 :success-cb #(archive-metric-cb owner editing-cb metric-slug)}))
