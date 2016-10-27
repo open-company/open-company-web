@@ -88,9 +88,6 @@
 
 ;; ===== Growth Metric Data Functions =====
 
-(defn- archive-metric-cb [owner]
-  ((om/get-props owner :archive-metric-cb)))
-
 (defn- growth-get-value
   "Return a blank string, 0 or the value."
   [v]
@@ -170,11 +167,15 @@
     ; save all the metric data
     (let [new-slug (om/get-state owner :metric-slug)
           data-map {:data (growth-clean-data (om/get-state owner :growth-data) new-slug)}
-          existing-metrics (vec (growth-utils/metrics-as-sequence (om/get-state owner :metrics) (:metric-slugs data)))
-          updated-metadata (assoc metadata-map :slug new-slug)
-          new-metrics (if new-metric?
-                        (conj existing-metrics updated-metadata)
-                        existing-metrics)
+          metrics-map (om/get-state owner :metrics)
+          new-metrics-map (if new-metric?
+                            (assoc (dissoc metrics-map growth-utils/new-metric-slug-placeholder) new-slug (assoc metadata-map :slug new-slug))
+                            metrics-map)
+          old-metric-slugs (vec (:metric-slugs data))
+          metric-slugs (if new-metric?
+                          (assoc old-metric-slugs (.indexOf (to-array old-metric-slugs) growth-utils/new-metric-slug-placeholder) new-slug)
+                          old-metric-slugs)
+          new-metrics (vec (growth-utils/metrics-as-sequence new-metrics-map metric-slugs))
           final-map (assoc data-map :metrics new-metrics)] ; add the metadata if this is a new metric
       (dis/dispatch! [:save-topic-data "growth" (assoc final-map :placeholder false)])
       (when new-metric?
@@ -187,16 +188,18 @@
 ;; ===== Growth Data Editing Component =====
 
 (defcomponent growth-edit [{:keys [editing-cb
+                                   archive-metric-cb
                                    first-edit-tip-cb
+                                   initial-focus
                                    new-metric?
                                    currency
                                    focus
                                    metadata-on-change-cb] :as data} owner options]
 
   (init-state [_]
-    {:metrics (:metrics data)
-     :growth-data (:growth-data data) ; all the growth data for all metrics
-     :metric-slug (:initial-focus data) ; the slug of the current metric
+    {:growth-data (:growth-data data) ; all the growth data for all metrics
+     :metric-slug initial-focus ; the slug of the current metric
+     :metrics (:metrics data)
      :has-changes? false
      :stop batch-size}) ; how many periods (reverse chronological) to show
 
@@ -211,7 +214,7 @@
       (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
-  (render-state [_ {:keys [metrics growth-data metric-slug stop has-changes?] :as state}]
+  (render-state [_ {:keys [growth-data metrics metric-slug stop has-changes?] :as state}]
     (let [company-slug (router/current-company-slug)
           {slug :slug interval :interval metric-name :name unit :unit description :description :as metric-info} (current-metric-info owner metric-slug)
           prefix (if (= unit "currency") (utils/get-symbol-for-currency-code currency) "")
@@ -226,6 +229,7 @@
                                         :currency currency
                                         :metadata-on-change-cb (fn [k v]
                                                                 (om/set-state! owner :has-changes? true)
+                                                                (om/set-state! owner :metrics (assoc metrics metric-slug (assoc (get metrics metric-slug) k v)))
                                                                 (metadata-on-change-cb k v))})
 
           (dom/div
@@ -287,5 +291,5 @@
                                  :data-toggle "tooltip"
                                  :data-container "body"
                                  :data-placement "top"
-                                 :on-click #(archive-metric-cb owner)}
+                                 :on-click #(archive-metric-cb metric-slug)}
                         (dom/i {:class "fa fa-archive"}))))))))))))
