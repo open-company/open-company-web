@@ -163,31 +163,17 @@
 (defn more-months [owner]
   (om/update-state! owner :stop #(+ % batch-size)))
 
-(defn- show-archive-confirm-popover [owner data]
-  (add-popover {:container-id "archive-metric-confirm"
-                :message "Prior updates to this chart will only be available in topic history. Are you sure you want to archive?"
-                :cancel-title "KEEP"
-                :cancel-cb #(hide-popover nil "archive-metric-confirm")
-                :success-title "ARCHIVE"
-                :z-index-offset 1
-                :success-cb (fn []
-                              (hide-popover nil "archive-metric-confirm")
-                              (om/update-state! owner #(merge % {:finances-data {}
-                                                                 :table-key (str (rand 4))
-                                                                 :has-changes? true})))}))
-
-(defcomponent finances-edit [{:keys [currency editing-cb show-first-edit-tip first-edit-tip-cb] :as data} owner]
+(defcomponent finances-edit [{:keys [currency editing-cb show-first-edit-tip first-edit-tip-cb table-key archive-data-cb] :as data} owner]
 
   (init-state [_]
     {:finances-data (:finances-data data)
      :has-changes? false
-     :table-key (str (rand 4))
      :stop batch-size})
 
   (will-receive-props [_ next-props]
     (om/set-state! owner :finances-data (:finances-data next-props)))
 
-  (render-state [_ {:keys [finances-data stop has-changes? table-key]}]
+  (render-state [_ {:keys [finances-data stop has-changes?]}]
     (let [company-slug (router/current-company-slug)]
 
       (dom/div {:class "finances"}
@@ -238,5 +224,5 @@
                                    :data-toggle "tooltip"
                                    :data-container "body"
                                    :data-placement "top"
-                                   :on-click #(show-archive-confirm-popover owner data)}
+                                   :on-click #(archive-data-cb)}
                           (dom/i {:class "fa fa-archive"})))))))))

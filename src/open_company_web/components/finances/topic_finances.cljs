@@ -4,7 +4,7 @@
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.dispatcher :as dispatcher]
-            [open-company-web.components.ui.popover :as popover :refer (add-popover-with-om-component hide-popover)]
+            [open-company-web.components.ui.popover :as popover :refer (add-popover-with-om-component add-popover hide-popover)]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.finances.finances-sparklines :refer (finances-sparklines)]
             [open-company-web.lib.finance-utils :as finance-utils]
@@ -37,7 +37,23 @@
 (defn finances-data-on-change [owner fixed-data]
   (om/set-state! owner :finances-row-data (vals fixed-data)))
 
-(defcomponent finances-popover [{:keys [currency finances-row-data section-data hide-popover-cb] :as data} owner options]
+;; archive stuff
+
+(defn- show-archive-confirm-popover [owner data]
+  (add-popover {:container-id "archive-metric-confirm"
+                :message "Prior updates to this chart will only be available in topic history. Are you sure you want to archive?"
+                :cancel-title "KEEP"
+                :cancel-cb #(hide-popover nil "archive-metric-confirm")
+                :success-title "ARCHIVE"
+                :z-index-offset 1
+                :success-cb (fn []
+                              (hide-popover nil "archive-metric-confirm")
+                              (dispatcher/dispatch! [:save-topic "finances" {:data []}])
+                              (om/update-state! owner #(merge % {:finances-row-data {}
+                                                                 :table-key (str (rand 4))
+                                                                 :has-changes? true})))}))
+
+(defcomponent finances-popover [{:keys [currency finances-row-data section-data hide-popover-cb table-key] :as data} owner options]
   (render [_]
     (dom/div {:class "oc-popover-container-internal finances composed-section"
               :style {:width "100%" :height "100vh"}}
@@ -62,14 +78,16 @@
 
         (om/build finances-edit {:finances-data (finance-utils/finances-data-map finances-row-data)
                                  :currency currency
+                                 :table-key table-key
                                  :data-on-change-cb (:finances-data-on-change data)
                                  :editing-cb (:editing-cb data)}
                                 {:key (:updated-at section-data)})))))
 
-(defcomponent topic-finances [{:keys [section section-data currency editable? foce-data-editing? editing-cb] :as data} owner options]
+(defcomponent topic-finances [{:keys [section section-data currency editable? foce-data-editing? editing-cb table-key] :as data} owner options]
 
   (init-state [_]
-    {:finances-row-data (:data section-data)})
+    {:finances-row-data (:data section-data)
+     :table-key (str (rand 4))})
 
   (will-receive-props [_ next-props]
     (when-not (= next-props data)
@@ -80,6 +98,8 @@
                (:foce-data-editing? data))
       (add-popover-with-om-component finances-popover {:data (merge data {:finances-row-data (om/get-state owner :finances-row-data)
                                                                           :finances-data-on-change (partial finances-data-on-change owner)
+                                                                          :table-key table-key
+                                                                          :archive-data-cb #(show-archive-confirm-popover owner data)
                                                                           :hide-popover-cb #(do
                                                                                               (editing-cb false))
                                                                           :editing-cb (partial data-editing-toggle owner editing-cb)})
@@ -135,5 +155,6 @@
                                     :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}}]
 
               (om/build finances-sparklines {:finances-data sorted-finances
+                                             :archive-cb #(show-archive-confirm-popover owner data)
                                              :currency currency}
                                             {:opts (merge chart-opts {:labels labels})}))))))))

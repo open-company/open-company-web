@@ -10,7 +10,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defcomponent finances-sparkline [{:keys [finances-data chart-selected-idx chart-selected-cb data-key currency charts-count archive-cb edit-cb card-width] :as data} owner]
+(defcomponent finances-sparkline [{:keys [finances-data chart-selected-idx chart-selected-cb data-key currency charts-count archive-cb card-width] :as data} owner]
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -43,7 +43,7 @@
                                                           :hide-nav true
                                                           :chart-fill-polygons false}}))))))
 
-(defcomponent finances-sparklines [{:keys [finances-data currency archive-cb edit-cb] :as data} owner]
+(defcomponent finances-sparklines [{:keys [finances-data currency archive-cb] :as data} owner]
 
   (init-state [_]
     {:card-width (responsive/calc-card-width)
@@ -80,5 +80,5 @@
            :data-container "body"
            :data-toggle "tooltip"
            :title "Remove this chart"
-           :on-click #(archive-cb)}
+           :on-click archive-cb}
           (dom/i {:class "fa fa-times"}))))))
