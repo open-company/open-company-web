@@ -151,8 +151,10 @@
 (defn- save-data [owner]
   ; (om/set-state! owner :has-changes false)
   (om/set-state! owner :has-changes? false)
-  (dis/dispatch! [:save-topic-data "finances" {:data (finances-clean-data (om/get-state owner :finances-data))
-                                               :placeholder false}]))
+  ((om/get-props owner :data-section-on-change))
+
+  (dis/dispatch! [:foce-input {:data (finances-clean-data (om/get-state owner :finances-data))
+                               :placeholder false}]))
 
 (defn replace-row-in-data [owner row-data k v]
   "Find and replace the edited row"

@@ -49,12 +49,12 @@
                 :z-index-offset 1
                 :success-cb (fn []
                               (hide-popover nil "archive-metric-confirm")
-                              (dispatcher/dispatch! [:save-topic "finances" {:data []}])
+                              (dispatcher/dispatch! [:foce-input {:data []}])
                               (om/update-state! owner #(merge % {:finances-row-data {}
                                                                  :table-key (str (rand 4))
                                                                  :has-changes? true})))}))
 
-(defcomponent finances-popover [{:keys [currency finances-row-data section-data hide-popover-cb table-key] :as data} owner options]
+(defcomponent finances-popover [{:keys [currency finances-row-data section-data hide-popover-cb table-key data-section-on-change width height] :as data} owner options]
   (render [_]
     (dom/div {:class "oc-popover-container-internal finances composed-section"
               :style {:width "100%" :height "100vh"}}
@@ -62,15 +62,15 @@
                    :on-click #(hide-popover-cb)
                    :style {:top "50%"
                            :left "50%"
-                           :margin-top "-225px"
-                           :z-index (+ popover/default-z-index 2)
-                           :margin-left "195px"}}
+                           :margin-top (str "-" (/ height 2) "px")
+                           :margin-left (str (/ width 2) "px")}}
         (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
       (dom/div {:class "oc-popover"
                 :on-click (fn [e] (.stopPropagation e))
-                :style {:width "390px"
-                        :height "450px"
-                        :margin-top "-225px"
+                :style {:width (str width "px")
+                        :height (str height "px")
+                        :margin-top (str "-" (/ height 2) "px")
+                        :margin-left (str "-" (/ width 2) "px")
                         :text-align "center"
                         :overflow-x "visible"
                         :z-index (+ popover/default-z-index 1)
@@ -81,10 +81,11 @@
                                  :currency currency
                                  :table-key table-key
                                  :data-on-change-cb (:finances-data-on-change data)
-                                 :editing-cb (:editing-cb data)}
+                                 :editing-cb (:editing-cb data)
+                                 :data-section-on-change data-section-on-change}
                                 {:key (:updated-at section-data)})))))
 
-(defcomponent topic-finances [{:keys [section section-data currency editable? foce-data-editing? editing-cb table-key] :as data} owner options]
+(defcomponent topic-finances [{:keys [section section-data currency editable? foce-data-editing? editing-cb table-key data-section-on-change] :as data} owner options]
 
   (init-state [_]
     {:finances-row-data (:data section-data)
@@ -103,9 +104,10 @@
                                                                           :archive-data-cb #(show-archive-confirm-popover owner data)
                                                                           :hide-popover-cb #(do
                                                                                               (editing-cb false))
-                                                                          :editing-cb (partial data-editing-toggle owner editing-cb)})
-                                                       :width 390
-                                                       :height 450
+                                                                          :editing-cb (partial data-editing-toggle owner editing-cb)
+                                                                          :data-section-on-change data-section-on-change
+                                                                          :width 390
+                                                                          :height 450})
                                                        :z-index-popover 0
                                                        :container-id "finances-edit"}))
     (when (and (:foce-data-editing? prev-props)
