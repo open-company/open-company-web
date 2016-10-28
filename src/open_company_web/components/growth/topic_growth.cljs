@@ -38,28 +38,25 @@
 (defn- data-editing-toggle [owner editing-cb editing? & [new-metric?]]
   (if editing?
     (if new-metric?
-      (do
+      (let [growth-metrics (om/get-state owner :growth-metrics)
+            new-metrics (assoc growth-metrics growth-utils/new-metric-slug-placeholder new-metric-preset)
+            metric-slugs (om/get-state owner :growth-metric-slugs)]
         ; if entering editing mode for a new metric
         ; set the focus to the new metric slug
-        (om/set-state! owner :focus growth-utils/new-metric-slug-placeholder)
-        (om/set-state! owner :editing true)
-        (om/set-state! owner :new-metric? true)
         ; and add a placeholder metadata to the metrics map
-        (let [growth-metrics (om/get-state owner :growth-metrics)
-              new-metrics (assoc growth-metrics growth-utils/new-metric-slug-placeholder new-metric-preset)
-              metric-slugs (om/get-state owner :growth-metric-slugs)]
-          (om/set-state! owner :growth-metrics new-metrics)
-          (om/set-state! owner :growth-metric-slugs (vec (conj metric-slugs growth-utils/new-metric-slug-placeholder)))))
-      (do
-        ; switch focus to the edited metric
-        (om/set-state! owner :focus editing?)
-        (om/set-state! owner :editing true)
-        ; reset new-metric? flag
-        (om/set-state! owner :new-metric? false)))
+        (om/update-state! owner #(merge % {:focus growth-utils/new-metric-slug-placeholder
+                                           :editing true
+                                           :new-metric? true
+                                           :growth-metrics new-metrics
+                                           :growth-metric-slugs (vec (conj metric-slugs growth-utils/new-metric-slug-placeholder))})))
+      ; switch focus to the edited metric
+      (om/update-state! owner #(merge % {:focus editing?
+                                         :editing true
+                                         :new-metric? false})))
     ; disable new-metric? if exiting the editing
     (do
-      (om/set-state! owner :new-metric? false)
-      (om/set-state! owner :editing false)
+      (om/update-state! owner #(merge % {:new-metric? false
+                                         :editing false}))
       (hide-popover nil "growth-edit")))
   ; set editing
   (editing-cb editing?))
@@ -147,6 +144,7 @@
      :growth-metrics metrics
      :growth-metric-slugs metric-slugs
      :focus focus
+     :editing (if initial false (om/get-state owner :editing))
      :new-metric? (if initial new-metric? (om/get-state owner :new-metric?)) ; preserve new metric if this is for will-update
      }))
 
@@ -172,29 +170,30 @@
 
   (did-update [_ prev-props prev-state]
     (let [data-editing? (:foce-data-editing? data)]
-      (when (and (not (:foce-data-editing? prev-props))
-                 data-editing?)
-        (data-editing-toggle owner editing-cb true (= data-editing? growth-utils/new-metric-slug-placeholder)))
-      (when (and (not (:editing prev-state))
-                 (om/get-state owner :editing))
+      (cond
+        (and (not (:foce-data-editing? prev-props))
+             data-editing?)
+        (utils/after 1 #(data-editing-toggle owner editing-cb data-editing? (= data-editing? growth-utils/new-metric-slug-placeholder)))
+        (and (not (:editing prev-state))
+             (om/get-state owner :editing))
         (add-popover-with-om-component growth-popover
-          {:data (merge data {:initial-focus (om/get-state owner :focus)
+          {:data (merge data {:initial-focus data-editing?
                               :new-metric? (om/get-state owner :new-metric?)
                               :hide-popover-cb (fn [] (editing-cb false))
                               :growth-data (om/get-state owner :growth-data)
                               :growth-metrics (om/get-state owner :growth-metrics)
                               :growth-metric-slugs (om/get-state owner :growth-metric-slugs)
                               :growth-editing-on-change-cb (partial data-editing-on-change owner)
-                              :growth-metadata-editing-on-change-cb (partial metadata-editing-on-change owner (om/get-state owner :focus))
+                              :growth-metadata-editing-on-change-cb (partial metadata-editing-on-change owner data-editing?)
                               :growth-data-editing-toggle-cb (partial data-editing-toggle owner editing-cb)
                               :growth-switch-focus-cb (partial switch-focus owner)
                               :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)})
            :width 390
-           :height 450
+           :height (min 572 (.-clientHeight (.-body js/document)))
            :z-index-offset 0
-           :container-id "growth-edit"}))
-      (when (and (:foce-data-editing? prev-props)
-                 (not data-editing?))
+           :container-id "growth-edit"})
+        (and (:foce-data-editing? prev-props)
+             (not data-editing?))
         (data-editing-toggle owner editing-cb false))))
 
   (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug new-metric?]}]
@@ -230,5 +229,4 @@
                                            :growth-metrics growth-metrics
                                            :growth-metric-slugs growth-metric-slugs
                                            :currency currency
-                                           :edit-cb (partial data-editing-toggle owner editing-cb)
                                            :archive-cb (partial show-archive-confirm-popover owner editing-cb)}))))))))
