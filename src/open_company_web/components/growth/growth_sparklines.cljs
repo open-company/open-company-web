@@ -10,7 +10,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defcomponent growth-sparkline [{:keys [metric-data metric-metadata currency total-metrics archive-cb edit-cb card-width] :as data} owner]
+(defcomponent growth-sparkline [{:keys [metric-data metric-metadata currency archive-cb edit-cb card-width] :as data} owner]
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -28,8 +28,7 @@
                                :circle-stroke 3
                                :circle-fill (occ/get-color-by-kw :oc-dark-blue)
                                :circle-selected-stroke 5
-                               :line-stroke-width 2
-                               :total-metrics total-metrics}
+                               :line-stroke-width 2}
               fixed-card-width (if (responsive/is-mobile?)
                                  (.-clientWidth (.-body js/document)) ; use all the possible space on mobile
                                  card-width)]
@@ -75,5 +74,4 @@
                                     :currency currency
                                     :card-width card-width
                                     :archive-cb archive-cb
-                                    :total-metrics (count growth-metric-slugs)
                                     :edit-cb edit-cb})))))
