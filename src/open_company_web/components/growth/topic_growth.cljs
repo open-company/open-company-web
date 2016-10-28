@@ -72,7 +72,7 @@
     (when (= (utils/company-cache-key focus-cache-key) metric-slug)
       (utils/remove-company-cache-key focus-cache-key))
     (hide-popover nil "archive-metric-confirm")
-    (dis/dispatch! [:save-topic-data "growth" {:metrics fewer-metrics}])
+    (dis/dispatch! [:foce-input {:metrics fewer-metrics}])
     (data-editing-toggle owner editing-cb false))) ; no longer data editing
 
 (defn- show-archive-confirm-popover [owner editing-cb metric-slug]
@@ -96,6 +96,7 @@
                                       growth-data-editing-toggle-cb
                                       growth-switch-focus-cb
                                       growth-archive-metric-cb
+                                      data-section-on-change
                                       width
                                       height] :as data} owner options]
   (render [_]
@@ -129,7 +130,8 @@
                                :metadata-on-change-cb growth-metadata-editing-on-change-cb
                                :editing-cb growth-data-editing-toggle-cb
                                :switch-focus-cb growth-switch-focus-cb
-                               :archive-metric-cb growth-archive-metric-cb})))))
+                               :archive-metric-cb growth-archive-metric-cb
+                               :data-section-on-change data-section-on-change})))))
 
 (defn- get-state [owner data initial]
   (let [section-data (:section-data data)
@@ -161,7 +163,7 @@
         new-metrics (assoc metrics (if (= k :slug) v focus) new-metric)]
     (om/set-state! owner :growth-metrics new-metrics)))
 
-(defcomponent topic-growth [{:keys [section section-data currency editable? foce-data-editing? editing-cb] :as data} owner options]
+(defcomponent topic-growth [{:keys [section section-data currency editable? foce-data-editing? editing-cb data-section-on-change] :as data} owner options]
 
   (init-state [_]
     (get-state owner data true))
@@ -191,6 +193,7 @@
                               :growth-data-editing-toggle-cb (partial data-editing-toggle owner editing-cb)
                               :growth-switch-focus-cb (partial switch-focus owner)
                               :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)
+                              :data-section-on-change data-section-on-change
                               :width 390
                               :height (min 572 (.-clientHeight (.-body js/document)))})
            :z-index-offset 0

@@ -177,7 +177,8 @@
                           old-metric-slugs)
           new-metrics (vec (growth-utils/metrics-as-sequence new-metrics-map metric-slugs))
           final-map (assoc data-map :metrics new-metrics)] ; add the metadata if this is a new metric
-      (dis/dispatch! [:save-topic-data "growth" (assoc final-map :placeholder false)])
+      ((om/get-props owner :data-section-on-change))
+      (dis/dispatch! [:foce-input (assoc final-map :placeholder false)])
       (when new-metric?
         ((:switch-focus-cb data) new-slug {}))))) ; show the new metric
 
