@@ -20,28 +20,30 @@
     (dom/div {:class "finances-sparkline sparkline group"
               :id (str "finances-sparkline-" (name data-key))
               :key (name data-key)}
-      (dom/div {:class "center-box"}
-        (let [subsection-data {:finances-data finances-data
-                               :data-key data-key
-                               :currency currency
-                               :read-only true
-                               :chart-selected-idx chart-selected-idx
-                               :chart-selected-cb chart-selected-cb
-                               :circle-radius 2
-                               :circle-stroke 3
-                               :circle-fill (finance-utils/color-for-metric data-key)
-                               :circle-selected-stroke 5
-                               :line-stroke-width 2}
-              fixed-card-width (if (responsive/is-mobile?)
-                                 (.-clientWidth (.-body js/document)) ; use all the possible space on mobile
-                                 card-width)]
-          (om/build finances-metric subsection-data {:opts {:chart-size {:width (- fixed-card-width 50  ;; margin left and right
-                                                                                                  170 ;; max left label size of the sparkline
-                                                                                                  40  ;; internal padding
-                                                                                                  15) ;; internal spacing
-                                                                       :height 30}
-                                                          :hide-nav true
-                                                          :chart-fill-polygons false}}))))))
+      (let [center-box-width (if (responsive/is-mobile?) (- (.-clientWidth (.-body js/document)) 20 80) (- card-width 80))]
+        (dom/div {:class "center-box"
+                  :style {:width (str center-box-width "px")}}
+          (let [subsection-data {:finances-data finances-data
+                                 :data-key data-key
+                                 :currency currency
+                                 :read-only true
+                                 :chart-selected-idx chart-selected-idx
+                                 :chart-selected-cb chart-selected-cb
+                                 :circle-radius 2
+                                 :circle-stroke 3
+                                 :circle-fill (finance-utils/color-for-metric data-key)
+                                 :circle-selected-stroke 5
+                                 :line-stroke-width 2}
+                fixed-card-width (if (responsive/is-mobile?)
+                                   (.-clientWidth (.-body js/document)) ; use all the possible space on mobile
+                                   card-width)]
+            (om/build finances-metric subsection-data {:opts {:chart-size {:width (- fixed-card-width 50  ;; margin left and right
+                                                                                                    180 ;; max left label size of the sparkline
+                                                                                                    40  ;; internal padding
+                                                                                                    15) ;; internal spacing
+                                                                         :height 30}
+                                                            :hide-nav true
+                                                            :chart-fill-polygons false}})))))))
 
 (defcomponent finances-sparklines [{:keys [finances-data currency archive-cb] :as data} owner]
 
@@ -55,8 +57,7 @@
 
   (render-state [_ {:keys [card-width chart-selected-idx]}]
     (dom/div {:class (str "finances-sparklines group sparklines" (when (= (dis/foce-section-key) :finances) " editing"))}
-      (dom/div {:class "finances-sparklines-inner left group"
-                :style {:width "90%"}}
+      (dom/div {:class "finances-sparklines-inner left group"}
         (let [sum-revenues (apply + (map utils/abs (map :revenue finances-data)))]
           (for [slug (if (pos? sum-revenues) [:revenue :costs :cash] [:costs :cash])]
             (om/build finances-sparkline {:finances-data finances-data

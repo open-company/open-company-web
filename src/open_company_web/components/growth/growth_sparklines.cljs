@@ -19,26 +19,28 @@
   (render [_]
     (dom/div {:class "growth-sparkline sparkline group"
               :id (str "growth-sparkline-" (:slug metric-metadata))}
-      (dom/div {:class "center-box"}
-        (let [subsection-data {:metric-data metric-data
-                               :metric-info metric-metadata
-                               :currency currency
-                               :read-only true
-                               :circle-radius 2
-                               :circle-stroke 3
-                               :circle-fill (occ/get-color-by-kw :oc-dark-blue)
-                               :circle-selected-stroke 5
-                               :line-stroke-width 2}
-              fixed-card-width (if (responsive/is-mobile?)
-                                 (.-clientWidth (.-body js/document)) ; use all the possible space on mobile
-                                 card-width)]
-          (om/build growth-metric subsection-data {:opts {:chart-size {:width (- fixed-card-width 50  ;; margin left and right
-                                                                                                  170 ;; max left label size of the sparkline
-                                                                                                  40  ;; internal padding
-                                                                                                  15) ;; internal spacing
-                                                                       :height 30}
-                                                          :hide-nav true
-                                                          :chart-fill-polygons false}})))
+      (let [center-box-width (if (responsive/is-mobile?) (- (.-clientWidth (.-body js/document)) 20 80) (- card-width 80))]
+        (dom/div {:class "center-box"
+                  :style {:width (str center-box-width "px")}}
+          (let [subsection-data {:metric-data metric-data
+                                 :metric-info metric-metadata
+                                 :currency currency
+                                 :read-only true
+                                 :circle-radius 2
+                                 :circle-stroke 3
+                                 :circle-fill (occ/get-color-by-kw :oc-dark-blue)
+                                 :circle-selected-stroke 5
+                                 :line-stroke-width 2}
+                fixed-card-width (if (responsive/is-mobile?)
+                                   (.-clientWidth (.-body js/document)) ; use all the possible space on mobile
+                                   card-width)]
+            (om/build growth-metric subsection-data {:opts {:chart-size {:width (- fixed-card-width 50  ;; margin left and right
+                                                                                                    180 ;; max left label size of the sparkline
+                                                                                                    40  ;; internal padding
+                                                                                                    15) ;; internal spacing
+                                                                         :height 30}
+                                                            :hide-nav true
+                                                            :chart-fill-polygons false}}))))
       (dom/div {:class "actions group right"}
         (dom/button
           {:class "btn-reset"
