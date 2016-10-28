@@ -303,7 +303,7 @@
 
         ;; D3 Chart w/ optional nav. buttons
         (when (and (> (count chart-data) 1) (:show-chart options))
-          (dom/div {:class (str "chart-container" (when (:sparklines-class options) " sparklines"))
+          (dom/div {:class (str "chart-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))
                     :style {:width (str (+ chart-width (if hide-chart-nav 30 10)) "px")
                             :height (str chart-height "px")}}
             ;; Previous button

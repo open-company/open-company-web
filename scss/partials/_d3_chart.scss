@@ -11,7 +11,7 @@ div.composed-section {
 
     margin: 0 auto;
 
-    &.sparklines {
+    &.chart-sparklines {
       margin: 0;
       float: right;
     }
@@ -69,7 +69,7 @@ div.composed-section {
       font-size: 12px;
     }
 
-    &.sparklines {
+    &.chart-sparklines {
       float: left;
       max-width: 170px;
       overflow: hidden;
@@ -114,7 +114,7 @@ div.composed-section {
       font-size: 22px;
     }
 
-    &.sparklines {
+    &.chart-sparklines {
       div.chart-value {
         font-size: 13px;
         font-weight: 400;
@@ -128,13 +128,13 @@ div.composed-section {
     padding-bottom: 12px;
     margin-bottom: 10px;
 
-    &.sparklines {
+    &.chart-sparklines {
       padding-top: 0px;
       padding-bottom: 0px;
       margin-bottom: 0px;
     }
 
-    &.sparklines {
+    &.chart-sparklines {
       div.chart-value {
         font-size: 13px;
         font-weight: 400;
