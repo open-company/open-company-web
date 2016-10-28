@@ -10,7 +10,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defcomponent growth-sparkline [{:keys [metric-data metric-metadata currency archive-cb edit-cb card-width] :as data} owner]
+(defcomponent growth-sparkline [{:keys [metric-data metric-metadata currency archive-cb card-width] :as data} owner]
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -46,7 +46,7 @@
            :data-container "body"
            :data-toggle "tooltip"
            :title "Edit chart"
-           :on-click #(edit-cb (:slug metric-metadata))}
+           :on-click #(dis/dispatch! [:start-foce-data-editing (:slug metric-metadata)])}
           (dom/i {:class "fa fa-pencil"}))
         (dom/button
           {:class "btn-reset"
@@ -57,7 +57,7 @@
            :on-click #(archive-cb (:slug metric-metadata))}
           (dom/i {:class "fa fa-times"}))))))
 
-(defcomponent growth-sparklines [{:keys [growth-data growth-metrics growth-metric-slugs currency archive-cb edit-cb] :as data} owner]
+(defcomponent growth-sparklines [{:keys [growth-data growth-metrics growth-metric-slugs currency archive-cb] :as data} owner]
 
   (init-state [_]
     {:card-width (responsive/calc-card-width)})
@@ -73,5 +73,4 @@
                                     :metric-metadata (get growth-metrics slug)
                                     :currency currency
                                     :card-width card-width
-                                    :archive-cb archive-cb
-                                    :edit-cb edit-cb})))))
+                                    :archive-cb archive-cb})))))
