@@ -163,7 +163,7 @@
 (defn more-months [owner]
   (om/update-state! owner :stop #(+ % batch-size)))
 
-(defcomponent finances-edit [{:keys [currency editing-cb show-first-edit-tip first-edit-tip-cb table-key archive-data-cb] :as data} owner]
+(defcomponent finances-edit [{:keys [currency editing-cb show-first-edit-tip first-edit-tip-cb table-key] :as data} owner]
 
   (init-state [_]
     {:finances-data (:finances-data data)
@@ -216,13 +216,4 @@
                                         (save-data owner)
                                         (editing-cb false))} "UPDATE")
               (dom/button {:class "btn-reset btn-outline"
-                           :on-click #(editing-cb false)} "CANCEL")
-              (dom/button {:class "btn-reset archive-button"
-                                   :title "Archive this chart"
-                                   :type "button"
-                                   :style #js {:marginTop "3px"}
-                                   :data-toggle "tooltip"
-                                   :data-container "body"
-                                   :data-placement "top"
-                                   :on-click #(archive-data-cb)}
-                          (dom/i {:class "fa fa-archive"})))))))))
+                           :on-click #(editing-cb false)} "CANCEL"))))))))
