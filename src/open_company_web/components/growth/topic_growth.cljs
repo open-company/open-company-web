@@ -95,7 +95,9 @@
                                       growth-metadata-editing-on-change-cb
                                       growth-data-editing-toggle-cb
                                       growth-switch-focus-cb
-                                      growth-archive-metric-cb] :as data} owner options]
+                                      growth-archive-metric-cb
+                                      width
+                                      height] :as data} owner options]
   (render [_]
     (dom/div {:class "oc-popover-container-internal growth composed-section"
               :style {:width "100%" :height "100vh"}}
@@ -103,14 +105,15 @@
                    :on-click #(hide-popover-cb)
                    :style {:top "50%"
                            :left "50%"
-                           :margin-top "-225px"
-                           :margin-left "195px"}}
+                           :margin-top (str "-" (/ height 2) "px")
+                           :margin-left (str (/ width 2) "px")}}
         (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
       (dom/div {:class "oc-popover "
                 :on-click (fn [e] (.stopPropagation e))
-                :style {:width "390px"
-                        :height "450px"
-                        :margin-top "-225px"
+                :style {:width (str width "px")
+                        :height (str height "px")
+                        :margin-top (str "-" (/ height 2) "px")
+                        :margin-left (str "-" (/ width 2) "px")
                         :text-align "center"
                         :overflow-x "visible"
                         :overflow-y "scroll"}}
@@ -187,9 +190,9 @@
                               :growth-metadata-editing-on-change-cb (partial metadata-editing-on-change owner data-editing?)
                               :growth-data-editing-toggle-cb (partial data-editing-toggle owner editing-cb)
                               :growth-switch-focus-cb (partial switch-focus owner)
-                              :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)})
-           :width 390
-           :height (min 572 (.-clientHeight (.-body js/document)))
+                              :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)
+                              :width 390
+                              :height (min 572 (.-clientHeight (.-body js/document)))})
            :z-index-offset 0
            :container-id "growth-edit"})
         (and (:foce-data-editing? prev-props)
