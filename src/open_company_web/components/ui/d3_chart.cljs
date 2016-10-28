@@ -273,11 +273,11 @@
        :selected (dec (count current-data))}))
 
   (did-mount [_]
-    (when-not (utils/is-test-env?)
+    (when (and (not (utils/is-test-env?)) (:show-chart options))
       (d3-render-chart owner options)))
 
   (did-update [_ old-props old-state]
-    (when-not (utils/is-test-env?)
+    (when (and (not (utils/is-test-env?)) (:show-chart options))
       (when (or (not= old-props data) (not= old-state (om/get-state owner)))
         (d3-render-chart owner options))))
 
@@ -297,13 +297,13 @@
         (when (not (empty? top-label-keys))
           (labels-for chart-top-label-class top-label-keys labels selected-data-set))
 
-          ;; Bottom row labels
-          (when (not (empty? bottom-label-keys))
-            (labels-for chart-bottom-label-class bottom-label-keys labels selected-data-set))
+        ;; Bottom row labels
+        (when (not (empty? bottom-label-keys))
+          (labels-for chart-bottom-label-class bottom-label-keys labels selected-data-set))
 
         ;; D3 Chart w/ optional nav. buttons
-        (when (> (count chart-data) 1)
-          (dom/div {:class (str "chart-container" (when (:growth-sparklines options) " growth-sparklines"))
+        (when (and (> (count chart-data) 1) (:show-chart options))
+          (dom/div {:class (str "chart-container" (when (:sparklines-class options) " sparklines"))
                     :style {:width (str (+ chart-width (if hide-chart-nav 30 10)) "px")
                             :height (str chart-height "px")}}
             ;; Previous button
