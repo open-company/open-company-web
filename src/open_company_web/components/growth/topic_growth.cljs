@@ -77,7 +77,7 @@
 
 (defn- show-archive-confirm-popover [owner editing-cb metric-slug]
   (add-popover {:container-id "archive-metric-confirm"
-                :message "Prior updates to this chart will only be available in topic history. Are you sure you want to archive?"
+                :message "This chart will be removed but will still appear in prior updates. Are you sure you want to archive?"
                 :cancel-title "KEEP"
                 :cancel-cb #(hide-popover nil "archive-metric-confirm")
                 :success-title "ARCHIVE"
