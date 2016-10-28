@@ -20,7 +20,7 @@
     (dom/div {:class "finances-sparkline sparkline group"
               :id (str "finances-sparkline-" (name data-key))
               :key (name data-key)}
-      (let [center-box-width (if (responsive/is-mobile?) (- (.-clientWidth (.-body js/document)) 20 80) (- card-width 80))]
+      (let [center-box-width (if (responsive/is-mobile?) (- (.-clientWidth (.-body js/document)) 20 80) (- card-width 90))]
         (dom/div {:class "center-box"
                   :style {:width (str center-box-width "px")}}
           (let [subsection-data {:finances-data finances-data

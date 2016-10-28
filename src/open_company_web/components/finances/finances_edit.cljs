@@ -180,7 +180,7 @@
 
       (dom/div {:class "finances"}
         (dom/div {:class "composed-section-edit finances-body edit"}
-          (dom/div {:class "table-container group"}
+          (dom/div {:class "table-container my2 group"}
             (dom/table {:class "table"
                         :key table-key}
               (dom/thead {}

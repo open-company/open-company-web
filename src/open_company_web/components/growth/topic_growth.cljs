@@ -118,7 +118,8 @@
                         :text-align "center"
                         :overflow-x "visible"
                         :overflow-y "scroll"}}
-        (dom/h3 {} "Growth edit")
+        (dom/div {:class "group"}
+          (dom/h3 {:class "left px2 group"} "Edit Growth"))
 
         (om/build growth-edit {:initial-focus initial-focus
                                :new-metric? new-metric?

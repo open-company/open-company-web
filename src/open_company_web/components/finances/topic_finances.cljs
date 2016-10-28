@@ -75,7 +75,8 @@
                         :overflow-x "visible"
                         :z-index (+ popover/default-z-index 1)
                         :overflow-y "scroll"}}
-        (dom/h3 {} "Finances edit")
+        (dom/div {:class "group"}
+          (dom/h3 {:class "left group"} "Edit Finances"))
 
         (om/build finances-edit {:finances-data (finance-utils/finances-data-map finances-row-data)
                                  :currency currency
