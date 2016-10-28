@@ -264,7 +264,7 @@
 
 ;; ===== D3 Chart Component =====
 
-(defcomponent d3-chart [{:keys [chart-data] :as data} owner {:keys [chart-width chart-height] :as options}]
+(defcomponent d3-chart [{:keys [chart-data selected-metric-cb] :as data} owner {:keys [chart-width chart-height] :as options}]
 
   (init-state [_]
     (let [start (max 0 (- (count chart-data) show-data-points))
@@ -279,7 +279,14 @@
   (did-update [_ old-props old-state]
     (when (and (not (utils/is-test-env?)) (:show-chart options))
       (when (or (not= old-props data) (not= old-state (om/get-state owner)))
-        (d3-render-chart owner options))))
+        (d3-render-chart owner options)))
+    (when (and (fn? selected-metric-cb)
+               (not= (om/get-state owner :selected) (:selected old-state)))
+      (selected-metric-cb (om/get-state owner :selected))))
+
+  (will-receive-props [_ next-props]
+    (when (not= (:selected next-props) (om/get-state owner :selected))
+      (om/set-state! owner :selected (:selected next-props))))
 
   (render-state [_ {:keys [start selected]}]
     (let [hide-chart-nav (:hide-nav options)

@@ -72,9 +72,12 @@
         label (if-not (clojure.string/blank? mname) (str mname " - ") "")]
     (str label (utils/get-month period) " " (utils/get-year period))))
 
-(defcomponent finances-metric [{:keys [finances-data data-key currency charts-count] :as data} owner options]
+(defcomponent finances-metric [{:keys [finances-data data-key currency charts-count chart-selected-idx chart-selected-cb] :as data} owner options]
 
-  (render [_]
+  (init-state [_]
+    {:selected-metric-idx 0})
+
+  (render-state [_ {:keys [selected-metric-idx]}]
     (let [filled-metric-data (finance-utils/fill-gap-months finances-data)
           actual-set (first finances-data)
           period (utils/get-period-string (:period actual-set))
@@ -118,4 +121,6 @@
                                 :circle-stroke (:circle-stroke data)
                                 :circle-fill (:circle-fill data)
                                 :line-stroke-width (:line-stroke-width data)
+                                :selected chart-selected-idx
+                                :selected-metric-cb chart-selected-cb
                                 :circle-selected-stroke (:circle-selected-stroke data)} chart-opts)))))))

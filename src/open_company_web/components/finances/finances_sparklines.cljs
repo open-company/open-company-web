@@ -10,7 +10,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defcomponent finances-sparkline [{:keys [finances-data data-key currency charts-count archive-cb edit-cb card-width] :as data} owner]
+(defcomponent finances-sparkline [{:keys [finances-data chart-selected-idx chart-selected-cb data-key currency charts-count archive-cb edit-cb card-width] :as data} owner]
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -25,6 +25,8 @@
                                :data-key data-key
                                :currency currency
                                :read-only true
+                               :chart-selected-idx chart-selected-idx
+                               :chart-selected-cb chart-selected-cb
                                :circle-radius 2
                                :circle-stroke 3
                                :circle-fill (finance-utils/color-for-metric data-key)
@@ -44,13 +46,14 @@
 (defcomponent finances-sparklines [{:keys [finances-data currency archive-cb edit-cb] :as data} owner]
 
   (init-state [_]
-    {:card-width (responsive/calc-card-width)})
+    {:card-width (responsive/calc-card-width)
+     :chart-selected-idx 0})
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (events/listen js/window EventType/RESIZE #(om/set-state! owner :card-width (responsive/calc-card-width)))))
 
-  (render-state [_ {:keys [card-width]}]
+  (render-state [_ {:keys [card-width chart-selected-idx]}]
     (dom/div {:class (str "finances-sparklines group sparklines" (when (= (dis/foce-section-key) :finances) " editing"))}
       (dom/div {:class "finances-sparklines-inner left group"
                 :style {:width "90%"}}
@@ -58,6 +61,8 @@
           (for [slug (if (pos? sum-revenues) [:revenue :costs :cash] [:costs :cash])]
             (om/build finances-sparkline {:finances-data finances-data
                                           :data-key slug
+                                          :chart-selected-idx chart-selected-idx
+                                          :chart-selected-cb #(om/set-state! owner :chart-selected-idx %)
                                           :currency currency
                                           :card-width card-width}))))
       (dom/div {:class "actions group right"}
@@ -67,7 +72,7 @@
            :data-container "body"
            :data-toggle "tooltip"
            :title "Edit chart"
-           :on-click #(edit-cb)}
+           :on-click #(dis/dispatch! [:start-foce-data-editing true])}
           (dom/i {:class "fa fa-pencil"}))
         (dom/button
           {:class "btn-reset"
