@@ -72,21 +72,29 @@
         label (if-not (clojure.string/blank? mname) (str mname " - ") "")]
     (str label (utils/get-month period) " " (utils/get-year period))))
 
+(defn get-fixed-sorted-metric [finances-data currency data-key]
+  (let [currency-symbol (utils/get-symbol-for-currency-code currency)]
+    (vec (map #(merge % {:label (label-from-set % data-key currency-symbol)
+                         :sub-label (let [idx (.indexOf (vec (map :period (reverse finances-data))) (:period %))
+                                          periods (subvec (vec (reverse finances-data)) idx)]
+                                     (finance-metric-delta periods data-key currency-symbol))}) finances-data))))
+
 (defcomponent finances-metric [{:keys [finances-data data-key currency charts-count chart-selected-idx chart-selected-cb] :as data} owner options]
 
   (init-state [_]
-    {:selected-metric-idx 0})
+    {:selected-metric-idx 0
+     :fixed-sorted-metric (get-fixed-sorted-metric finances-data currency data-key)})
 
-  (render-state [_ {:keys [selected-metric-idx]}]
+  (will-receive-props [_ next-props]
+    (when (not= (:finances-data next-props) finances-data)
+      (om/set-state! owner :fixed-sorted-metric (get-fixed-sorted-metric (:finances-data next-props) currency data-key))))
+
+  (render-state [_ {:keys [selected-metric-idx fixed-sorted-metric]}]
     (let [filled-metric-data (finance-utils/fill-gap-months finances-data)
           actual-set (first finances-data)
           period (utils/get-period-string (:period actual-set))
           currency-symbol (utils/get-symbol-for-currency-code (:currency data))
           actual-with-label (label-from-set actual-set data-key currency-symbol)
-          fixed-sorted-metric (vec (map #(merge % {:label (label-from-set % data-key currency-symbol)
-                                                   :sub-label (let [idx (.indexOf (vec (map :period (reverse finances-data))) (:period %))
-                                                                    periods (subvec (vec (reverse finances-data)) idx)]
-                                                               (finance-metric-delta periods data-key currency-symbol))}) finances-data))
           chart-opts {:opts {:chart-type "unbordered-chart"
                              :chart-height (or (:height (:chart-size options)) 100)
                              :chart-width (:width (:chart-size options))
