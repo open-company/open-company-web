@@ -376,6 +376,7 @@
                                         :section section-kw
                                         :currency currency
                                         :editable? true
+                                        :data-section-on-change #(om/set-state! owner :has-changes true)
                                         :foce-data-editing? (:foce-data-editing? data)
                                         :editing-cb (partial data-editing-cb owner)}
                                         {:opts chart-opts})
@@ -384,6 +385,7 @@
                                           :section section-kw
                                           :currency currency
                                           :editable? true
+                                          :data-section-on-change #(om/set-state! owner :has-changes true)
                                           :foce-data-editing? (:foce-data-editing? data)
                                           :editing-cb (partial data-editing-cb owner)}
                                           {:opts chart-opts}))))
