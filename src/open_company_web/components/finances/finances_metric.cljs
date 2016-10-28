@@ -20,14 +20,18 @@
   (let [pos (when (pos? delta) "+")]
     (dom/span {:class "domine"}
       "("
-      pos
-      (if (zero? delta) "no change" (str (oc-lib/with-size-label delta) "%"))
+      (dom/span {:class "open-sans"}
+        pos
+        (if (zero? delta) "no change" (str (oc-lib/with-size-label delta) "%")))
       ")")))
 
   ([currency delta]
     (dom/span {:class "domine"}
       "("
-      (if (zero? delta) "no change" (oc-lib/with-currency currency (oc-lib/with-size-label delta) true))
+      (dom/span {:class "open-sans"}
+        (if (zero? delta)
+          "no change"
+          (oc-lib/with-currency currency (oc-lib/with-size-label delta) true)))
       ")")))
 
 (defn- finance-metric-delta [periods data-key currency]
@@ -54,7 +58,10 @@
         period (utils/get-period-string (:period data-set))
         fixed-cur-unit currency-symbol]
     (when actual-val
-      (dom/span {:class "bold"} (str fixed-cur-unit (oc-lib/with-size-label actual-val) " " metric-name)))))
+      (dom/span {:class "bold domine"}
+        (dom/span {:class "open-sans"} fixed-cur-unit (oc-lib/with-size-label actual-val))
+        " "
+        metric-name))))
 
 (defn- sub-label [period metric-info]
   (let [mname (:name metric-info)
