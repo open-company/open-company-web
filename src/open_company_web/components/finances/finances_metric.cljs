@@ -19,20 +19,16 @@
   ([delta]
   (let [pos (when (pos? delta) "+")]
     (dom/span {:class "domine"}
-      "("
       (dom/span {:class "open-sans"}
         pos
-        (if (zero? delta) "no change" (str (oc-lib/with-size-label delta) "%")))
-      ")")))
+        (if (zero? delta) "no change" (str (oc-lib/with-size-label delta) "%"))))))
 
   ([currency delta]
     (dom/span {:class "domine"}
-      "("
       (dom/span {:class "open-sans"}
         (if (zero? delta)
           "no change"
-          (oc-lib/with-currency currency (oc-lib/with-size-label delta) true)))
-      ")")))
+          (oc-lib/with-currency currency (oc-lib/with-size-label delta) true))))))
 
 (defn- finance-metric-delta [periods data-key currency]
   (let [finance-metric (first periods)
@@ -50,7 +46,9 @@
         metric-delta-percent (when metric-delta (* 100 (float (/ metric-delta prior-value))))
         formatted-metric-delta (when metric-delta-percent (format-delta metric-delta-percent))]
     ;; Format output
-    (dom/div {} date " " formatted-metric-delta)))
+    (dom/div {} 
+      (when (= data-key :cash) date)
+      (when (not= data-key :cash) formatted-metric-delta))))
 
 (defn- label-from-set [data-set data-key currency-symbol]
   (let [actual-val (data-key data-set)
@@ -95,6 +93,7 @@
           period (utils/get-period-string (:period actual-set))
           currency-symbol (utils/get-symbol-for-currency-code (:currency data))
           actual-with-label (label-from-set actual-set data-key currency-symbol)
+          cash? (= data-key :cash)
           chart-opts {:opts {:chart-type "unbordered-chart"
                              :chart-height (or (:height (:chart-size options)) 100)
                              :chart-width (:width (:chart-size options))
@@ -110,9 +109,9 @@
                              :show-chart (not= data-key :cash)
                              :labels {:value {:position :bottom
                                               :order 1
-                                              :value-presenter #(or (:label %2) "-")
+                                              :value-presenter (if cash? #(:sub-label %2) #(or (:label %2) "-"))
                                               :value (occ/get-color-by-kw :oc-blue-dark)
-                                              :label-presenter #(:sub-label %2)
+                                              :label-presenter (if cash? #(or (:label %2) "-") #(:sub-label %2))
                                               :label-color (occ/get-color-by-kw :oc-gray-5)}}
                              :hide-nav (:hide-nav options)}}]
       (dom/div {:class (utils/class-set {:section true

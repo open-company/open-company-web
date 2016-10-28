@@ -20,7 +20,9 @@
     (dom/div {:class "finances-sparkline sparkline group"
               :id (str "finances-sparkline-" (name data-key))
               :key (name data-key)}
-      (let [center-box-width (if (responsive/is-mobile?) (- (.-clientWidth (.-body js/document)) 20 80) (- card-width 90))]
+      (let [center-box-width (if (responsive/is-mobile?)
+                              (- (.-clientWidth (.-body js/document)) 20 80)
+                              (- card-width 90))]
         (dom/div {:class "center-box"
                   :style {:width (str center-box-width "px")}}
           (let [subsection-data {:finances-data finances-data
@@ -37,13 +39,13 @@
                 fixed-card-width (if (responsive/is-mobile?)
                                    (.-clientWidth (.-body js/document)) ; use all the possible space on mobile
                                    card-width)]
-            (om/build finances-metric subsection-data {:opts {:chart-size {:width (- fixed-card-width 50  ;; margin left and right
-                                                                                                    180 ;; max left label size of the sparkline
-                                                                                                    40  ;; internal padding
-                                                                                                    15) ;; internal spacing
-                                                                         :height 30}
-                                                            :hide-nav true
-                                                            :chart-fill-polygons false}})))))))
+            (om/build finances-metric subsection-data {:opts {:chart-size {:height 30
+                                                                           :width (- fixed-card-width 50  ;; margin left and right
+                                                                                                     180 ;; max left label size of the sparkline
+                                                                                                      40  ;; internal padding
+                                                                                                      15)} ;; internal spacing
+                                                              :hide-nav true
+                                                              :chart-fill-polygons false}})))))))
 
 (defcomponent finances-sparklines [{:keys [finances-data currency archive-cb] :as data} owner]
 
