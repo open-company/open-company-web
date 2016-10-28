@@ -50,7 +50,7 @@
 
 (defn- label-from-set [data-set data-key currency-symbol]
   (let [actual-val (data-key data-set)
-        metric-name (s/capital (s/human data-key))
+        metric-name (s/capital (s/human (if (= data-key :costs) :expenses data-key)))
         period (utils/get-period-string (:period data-set))
         fixed-cur-unit currency-symbol]
     (when actual-val
@@ -85,7 +85,8 @@
                              :chart-fill-polygons (or (:chart-fill-polygons options) false)
                              :label-color (occ/get-color-by-kw :oc-gray-5)
                              :sub-label-color (occ/get-color-by-kw :oc-gray-5)
-                             :sparklines-class "sparklines"
+                             :sparklines-class "chart-sparklines"
+                             :show-chart (not= data-key :cash)
                              :labels {:value {:position :bottom
                                               :order 1
                                               :value-presenter #(or (:label %2) "-")
@@ -100,8 +101,7 @@
                 :key data-key
                 :on-click (:start-editing-cb data)}
 
-        (when (and (pos? (count finances-data))
-                   (not= data-key :cash))
+        (when (pos? (count finances-data))
           (dom/div {}
             (om/build d3-chart {:chart-data fixed-sorted-metric
                                 :circle-radius (:circle-radius data)
