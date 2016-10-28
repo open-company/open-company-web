@@ -97,7 +97,8 @@
                              :chart-fill-polygons (or (:chart-fill-polygons options) false)
                              :label-color (occ/get-color-by-kw :oc-gray-5)
                              :sub-label-color (occ/get-color-by-kw :oc-gray-5)
-                             :sparklines-class "sparklines"
+                             :sparklines-class "chart-sparklines"
+                             :show-chart true
                              :labels {:value {:position :bottom
                                               :order 1
                                               :value-presenter #(or (:label %2) "-")
