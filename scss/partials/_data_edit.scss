@@ -19,11 +19,15 @@ div.finances {
 }
 
 div.growth {
-  table.table {
-    width: 180px;
-  }
+
   div.table-container {
     background-color: #F3F4F5;
+    margin: 0 auto 10px;
+    width: 180px;
+
+    table.table {
+      margin-top: 10px;
+    }
   }
 }
 
