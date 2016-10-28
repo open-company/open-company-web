@@ -61,7 +61,10 @@
       (dom/span {:class "bold domine"}
         (dom/span {:class "open-sans"} fixed-cur-unit (oc-lib/with-size-label actual-val))
         " "
-        metric-name))))
+        metric-name
+        (when (and (= data-key :cash)
+                   (neg? (:runway data-set)))
+          (str ", " (finance-utils/get-rounded-runway (:runway data-set)) " runway"))))))
 
 (defn- sub-label [period metric-info]
   (let [mname (:name metric-info)

@@ -10,6 +10,12 @@ div.sparklines{
 
       div.sparkline {
 
+        &#finances-sparkline-cash {
+          div.chart-bottom-label-container.chart-sparklines {
+            max-width: none;
+          }
+        }
+
         div.center-box {
           width: 100%;
           overflow: hidden;
