@@ -211,7 +211,7 @@
         d))))
 
 (defn color-for-metric [k]
-  (occ/get-color-by-kw (cond (= k :revenue) :green
+  (occ/get-color-by-kw (cond (= k :revenue) :oc-green-dark
                              (= k :costs) :red
                              :else :oc-gray-7)))
 

@@ -3,7 +3,7 @@
 (def oc-colors {
   :yellow "#f9d748" ; rgb(249,215,72)
   :green "#26C485" ; rgb(53,188,46)
-  :red "#d72a46" ;rgb(244,75,83)
+  :red "#E04B53"
   :blue "#007A9D" ;"#004E64" ;"#109DB7"
   :gray "#D8D8D8" ;"#ADADAD"
   :black "#000000"
@@ -13,7 +13,7 @@
   :oc-chart-green "#4de148"
   :oc-chart-red "#D72A46"
   ;; Greens
-  :oc-green-dark "#008C54"
+  :oc-green-dark "#35bc2e"
   :oc-green-regular "#26C485" ; :green
   :oc-green-light "#4DE249" ; rgb(77,226,73)
   ;; Blues
