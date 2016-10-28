@@ -2,13 +2,14 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [open-company-web.lib.utils :as utils]
-            [open-company-web.components.growth.growth-edit :refer (growth-edit)]
-            [open-company-web.lib.growth-utils :as growth-utils]
-            [open-company-web.caches :refer (company-cache)]
             [open-company-web.dispatcher :as dis]
-            [open-company-web.components.ui.popover :refer (add-popover-with-om-component add-popover hide-popover)]
-            [open-company-web.components.growth.growth-sparklines :refer (growth-sparklines)]))
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.components.ui.icon :as i]
+            [open-company-web.caches :refer (company-cache)]
+            [open-company-web.lib.growth-utils :as growth-utils]
+            [open-company-web.components.growth.growth-edit :refer (growth-edit)]
+            [open-company-web.components.growth.growth-sparklines :refer (growth-sparklines)]
+            [open-company-web.components.ui.popover :refer (add-popover-with-om-component add-popover hide-popover)]))
 
 (def focus-cache-key :last-selected-metric)
 
@@ -107,7 +108,7 @@
                            :left "50%"
                            :margin-top "-225px"
                            :margin-left "195px"}}
-        (dom/i {:class "fa fa-times"}))
+        (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
       (dom/div {:class "oc-popover "
                 :on-click (fn [e] (.stopPropagation e))
                 :style {:width "390px"

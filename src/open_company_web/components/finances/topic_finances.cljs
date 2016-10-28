@@ -3,13 +3,14 @@
             [om.core :as om :include-macros true]
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.oc-colors :as occ]
+            [open-company-web.components.ui.icon :as i]
             [open-company-web.dispatcher :as dispatcher]
-            [open-company-web.components.ui.popover :as popover :refer (add-popover-with-om-component add-popover hide-popover)]
+            [open-company-web.lib.finance-utils :as finance-utils]
             [open-company-web.components.finances.finances-edit :refer (finances-edit)]
             [open-company-web.components.finances.finances-sparklines :refer (finances-sparklines)]
-            [open-company-web.lib.finance-utils :as finance-utils]
-            [open-company-web.lib.oc-colors :as occ]
-            [open-company-web.lib.utils :as utils]))
+            [open-company-web.components.ui.popover :as popover :refer (add-popover-with-om-component add-popover hide-popover)]))
 
 (defn- has-revenues-or-costs [finances-data]
   (some #(or (not (zero? (:revenue %))) (not (zero? (:costs %)))) finances-data))
@@ -64,7 +65,7 @@
                            :margin-top "-225px"
                            :z-index (+ popover/default-z-index 2)
                            :margin-left "195px"}}
-        (dom/i {:class "fa fa-times"}))
+        (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
       (dom/div {:class "oc-popover"
                 :on-click (fn [e] (.stopPropagation e))
                 :style {:width "390px"
