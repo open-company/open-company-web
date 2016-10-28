@@ -4,8 +4,11 @@
   this component directly.
   "
   (:require [rum.core :as rum]
+            [om.core :as om]
             [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dis]
+            [open-company-web.rum-utils :as ru]
             [open-company-web.lib.utils :as utils]))
 
 
@@ -25,6 +28,8 @@
                                 (catch :default e)) 1500)
       (catch :default e))))
 
+(def default-z-index 1031)
+
 ;; Options passed as a map to add-popover -
 ;;
 ;; :container-id unique DOM ID for the container, pass the same ID hide-popover
@@ -39,6 +44,31 @@
 ;; :success-cb function to call when the user clicks the cancel button, required if you provide a cancel title,
 ;;             be sure to call hide-popever with the container ID
 ;;
+(defn add-popover-with-derivative-rum-component [component data]
+  (let [container-id (:container-id data)]
+    (when (.-$ js/window) ; avoid tests crash
+      (let [popover-ct (js/$ (str "<div class='oc-popover-container' id='" container-id "'></div>"))
+            body (js/$ (.-body js/document))]
+        ; add the div to the body
+        (.append body popover-ct)
+        (let [z-index (or (:z-index-offset data) 0)]
+          (.css popover-ct #js {:zIndex (+ default-z-index (* z-index 3))}))
+        ; if the component has not been mounted, render it
+        (.setTimeout js/window
+                     (fn []
+                       ; render the popover component
+                       (ru/drv-root {:state dis/app-state
+                                     :component #(om/component (component))
+                                     :drv-spec (dis/drv-spec dis/app-state)
+                                     :target (sel1 (str "#" container-id))})
+                       (.addClass body "no-scroll")
+                       ; add the close action
+                       (when (:hide-on-click-out data)
+                         (.click popover-ct #(hide-popover % container-id)))
+                       ; show the popover
+                       (.setTimeout js/window #(.fadeIn popover-ct 300) 0))
+                     1)))))
+
 (defn add-popover [data]
   (let [container-id (:container-id data)]
     (when (.-$ js/window) ; avoid tests crash

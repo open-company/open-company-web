@@ -10,6 +10,8 @@
 (defn drv-spec [db]
   {:base               [[] db]
    :su-share           [[:base] (fn [base] (:su-share base))]
+   :su-list            [[:base] (fn [base] (-> ((keyword (router/current-company-slug)) base)
+                                              :su-list :collection :stakeholder-updates))]
    :um-invite          [[:base] (fn [base] (:um-invite base))]
    :jwt                [[:base] (fn [base] (:jwt base))]
    :subscription       [[:base] (fn [base] (:subscription base))]
