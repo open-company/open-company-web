@@ -17,7 +17,7 @@
       (.tooltip (js/$ "[data-toggle=tooltip]"))))
 
   (render [_]
-    (dom/div {:class "sparkline group"
+    (dom/div {:class "growth-sparkline sparkline group"
               :id (str "growth-sparkline-" (:slug metric-metadata))}
       (dom/div {:class "center-box"}
         (let [subsection-data {:metric-data metric-data
@@ -67,7 +67,7 @@
       (events/listen js/window EventType/RESIZE #(om/set-state! owner :card-width (responsive/calc-card-width)))))
 
   (render-state [_ {:keys [card-width]}]
-    (dom/div {:class (str "sparklines" (when (= (dis/foce-section-key) :growth) " editing"))}
+    (dom/div {:class (str "growth-sparklines sparklines" (when (= (dis/foce-section-key) :growth) " editing"))}
       (for [slug growth-metric-slugs]
         (om/build growth-sparkline {:metric-data (filter #(= (keyword (:slug %)) (keyword slug)) (vals growth-data))
                                     :metric-metadata (get growth-metrics slug)

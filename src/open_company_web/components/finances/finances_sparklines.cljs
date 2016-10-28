@@ -17,7 +17,7 @@
       (.tooltip (js/$ "[data-toggle=tooltip]"))))
 
   (render [_]
-    (dom/div {:class "sparkline group"
+    (dom/div {:class "finances-sparkline sparkline group"
               :id (str "finances-sparkline-" (name data-key))
               :key (name data-key)}
       (dom/div {:class "center-box"}
@@ -39,7 +39,27 @@
                                                                                                   15) ;; internal spacing
                                                                        :height 30}
                                                           :hide-nav true
-                                                          :chart-fill-polygons false}})))
+                                                          :chart-fill-polygons false}}))))))
+
+(defcomponent finances-sparklines [{:keys [finances-data currency archive-cb edit-cb] :as data} owner]
+
+  (init-state [_]
+    {:card-width (responsive/calc-card-width)})
+
+  (did-mount [_]
+    (when-not (utils/is-test-env?)
+      (events/listen js/window EventType/RESIZE #(om/set-state! owner :card-width (responsive/calc-card-width)))))
+
+  (render-state [_ {:keys [card-width]}]
+    (dom/div {:class (str "finances-sparklines group sparklines" (when (= (dis/foce-section-key) :finances) " editing"))}
+      (dom/div {:class "finances-sparklines-inner left group"
+                :style {:width "90%"}}
+        (let [sum-revenues (apply + (map utils/abs (map :revenue finances-data)))]
+          (for [slug (if (pos? sum-revenues) [:revenue :costs :cash] [:costs :cash])]
+            (om/build finances-sparkline {:finances-data finances-data
+                                          :data-key slug
+                                          :currency currency
+                                          :card-width card-width}))))
       (dom/div {:class "actions group right"}
         (dom/button
           {:class "btn-reset"
@@ -57,23 +77,3 @@
            :title "Remove this chart"
            :on-click #(archive-cb)}
           (dom/i {:class "fa fa-times"}))))))
-
-(defcomponent finances-sparklines [{:keys [finances-data currency archive-cb edit-cb] :as data} owner]
-
-  (init-state [_]
-    {:card-width (responsive/calc-card-width)})
-
-  (did-mount [_]
-    (when-not (utils/is-test-env?)
-      (events/listen js/window EventType/RESIZE #(om/set-state! owner :card-width (responsive/calc-card-width)))))
-
-  (render-state [_ {:keys [card-width]}]
-    (dom/div {:class (str "sparklines" (when (= (dis/foce-section-key) :finances) " editing"))}
-      (let [sum-revenues (apply + (map utils/abs (map :revenue finances-data)))]
-        (for [slug (if (pos? sum-revenues) [:revenue :costs :cash] [:costs :cash])]
-          (om/build finances-sparkline {:finances-data finances-data
-                                        :data-key slug
-                                        :currency currency
-                                        :card-width card-width
-                                        :archive-cb archive-cb
-                                        :edit-cb edit-cb}))))))

@@ -1,8 +1,43 @@
 div.sparklines{
   margin-top: 10px;
 
+  &.finances-sparklines {
+    border: 1px solid transparent;
+    border-radius: 8px;
+
+    div.finances-sparklines-inner {
+      width: 90%;
+
+      div.sparkline {
+
+        div.center-box {
+          width: 100%;
+          overflow: hidden;
+        }
+      }
+    }
+
+    div.actions {
+      margin: 10px 10px 0 0;
+    }
+  }
+
   &.editing {
-    div.sparkline {
+    &.finances-sparklines{
+      border: 1px solid rgba(78,90,107,0.4);
+      padding: 1px;
+
+      &:hover {
+        border: 2px solid rgb(249,215,72);
+        padding: 0px;
+
+        div.actions {
+          display: block;
+        }
+      }
+    }
+
+    div.growth-sparkline.sparkline {
       border: 1px solid rgba(78,90,107,0.4);
       padding: 8px 12px;
 
@@ -19,35 +54,41 @@ div.sparklines{
 
   div.sparkline {
     margin: 0px 0px 5px 0px;
-    border: 1px solid transparent;
-    border-radius: 8px;
     padding: 8px 12px;
 
-    div.center-box {
-      width: 90%;
-      float: left;
-      overflow: hidden;
+    &.growth-sparkline {
+      border: 1px solid transparent;
+      border-radius: 8px;
+
+      div.center-box {
+        width: 90%;
+        float: left;
+        overflow: hidden;
+      }
+
+      div.actions {
+        margin: -5px 0 0 0;
+      }
     }
+  }
 
-    div.actions {
+  div.actions {
+    width: 20px;
+    height: 30px;
+    font-size: 14px;
+    float: right;
+    display: none;
+    padding: 0;
+
+    button{
       width: 20px;
-      height: 30px;
-      font-size: 14px;
-      float: right;
-      display: none;
-      margin: -5px 0 0 0;
-      padding: 0;
+      height: 14px;
+      margin: 0px;
+      padding: 0px 3px 0px 3px;
+      opacity: 0.4;
 
-      button{
-        width: 20px;
-        height: 14px;
-        margin: 0px;
-        padding: 0px 3px 0px 3px;
-        opacity: 0.4;
-
-        &:hover {
-          opacity: 0.8;
-        }
+      &:hover {
+        opacity: 0.8;
       }
     }
   }
