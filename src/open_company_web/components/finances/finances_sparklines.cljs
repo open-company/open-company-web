@@ -18,7 +18,8 @@
 
   (render [_]
     (dom/div {:class "sparkline group"
-              :id (str "finances-sparkline-" (name data-key))}
+              :id (str "finances-sparkline-" (name data-key))
+              :key (name data-key)}
       (dom/div {:class "center-box"}
         (let [subsection-data {:finances-data finances-data
                                :data-key data-key
@@ -28,8 +29,7 @@
                                :circle-stroke 3
                                :circle-fill (finance-utils/color-for-metric data-key)
                                :circle-selected-stroke 5
-                               :line-stroke-width 2
-                               :charts-count charts-count}
+                               :line-stroke-width 2}
               fixed-card-width (if (responsive/is-mobile?)
                                  (.-clientWidth (.-body js/document)) ; use all the possible space on mobile
                                  card-width)]
@@ -70,11 +70,10 @@
   (render-state [_ {:keys [card-width]}]
     (dom/div {:class (str "sparklines" (when (= (dis/foce-section-key) :finances) " editing"))}
       (let [sum-revenues (apply + (map utils/abs (map :revenue finances-data)))]
-        (for [slug [:revenue :costs :cash]]
+        (for [slug (if (pos? sum-revenues) [:revenue :costs :cash] [:costs :cash])]
           (om/build finances-sparkline {:finances-data finances-data
                                         :data-key slug
                                         :currency currency
                                         :card-width card-width
-                                        :charts-count (if (pos? sum-revenues) 3 2)
                                         :archive-cb archive-cb
                                         :edit-cb edit-cb}))))))
