@@ -134,5 +134,6 @@
                                     :label-presenter #(str "Revenue")
                                     :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}}]
 
-              (om/build finances-sparklines {:finances-data sorted-finances}
+              (om/build finances-sparklines {:finances-data sorted-finances
+                                             :currency currency}
                                             {:opts (merge chart-opts {:labels labels})}))))))))
