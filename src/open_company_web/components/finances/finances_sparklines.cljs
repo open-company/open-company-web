@@ -25,7 +25,10 @@
                               (- card-width 90))]
         (dom/div {:class "center-box"
                   :style {:width (str center-box-width "px")}}
-          (let [subsection-data {:finances-data finances-data
+          (let [fixed-card-width (if (responsive/is-mobile?)
+                                   (.-clientWidth (.-body js/document)) ; use all the possible space on mobile
+                                   card-width)
+                subsection-data {:finances-data finances-data
                                  :data-key data-key
                                  :currency currency
                                  :read-only true
@@ -35,16 +38,13 @@
                                  :circle-stroke 3
                                  :circle-fill (finance-utils/color-for-metric data-key)
                                  :circle-selected-stroke 5
-                                 :line-stroke-width 2}
-                fixed-card-width (if (responsive/is-mobile?)
-                                   (.-clientWidth (.-body js/document)) ; use all the possible space on mobile
-                                   card-width)]
-            (om/build finances-metric subsection-data {:opts {:chart-size {:height 30
-                                                                           :width (- fixed-card-width 50  ;; margin left and right
-                                                                                                     180 ;; max left label size of the sparkline
-                                                                                                      40  ;; internal padding
-                                                                                                      15)} ;; internal spacing
-                                                              :hide-nav true
+                                 :line-stroke-width 2
+                                 :chart-size {:height 40
+                                              :width (- fixed-card-width 50     ;; margin left and right
+                                                                        180     ;; max left label size of the sparkline
+                                                                         40     ;; internal padding
+                                                                         15)}}] ;; internal spacing
+            (om/build finances-metric subsection-data {:opts {:hide-nav true
                                                               :chart-fill-polygons false}})))))))
 
 (defcomponent finances-sparklines [{:keys [finances-data currency archive-cb] :as data} owner]

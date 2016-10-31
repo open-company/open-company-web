@@ -22,24 +22,25 @@
       (let [center-box-width (if (responsive/is-mobile?) (- (.-clientWidth (.-body js/document)) 20 80) (- card-width 90))]
         (dom/div {:class "center-box"
                   :style {:width (str center-box-width "px")}}
-          (let [subsection-data {:metric-data metric-data
+          (let [fixed-card-width (if (responsive/is-mobile?)
+                                   (.-clientWidth (.-body js/document)) ; use all the possible space on mobile
+                                   card-width)
+                subsection-data {:metric-data metric-data
                                  :metric-info metric-metadata
                                  :currency currency
+                                 :card-width card-width
                                  :read-only true
                                  :circle-radius 2
                                  :circle-stroke 3
                                  :circle-fill (occ/get-color-by-kw :oc-dark-blue)
                                  :circle-selected-stroke 5
-                                 :line-stroke-width 2}
-                fixed-card-width (if (responsive/is-mobile?)
-                                   (.-clientWidth (.-body js/document)) ; use all the possible space on mobile
-                                   card-width)]
-            (om/build growth-metric subsection-data {:opts {:chart-size {:width (- fixed-card-width 50  ;; margin left and right
-                                                                                                    180 ;; max left label size of the sparkline
-                                                                                                    40  ;; internal padding
-                                                                                                    15) ;; internal spacing
-                                                                         :height 30}
-                                                            :hide-nav true
+                                 :line-stroke-width 2
+                                 :chart-size {:width (- fixed-card-width 50  ;; margin left and right
+                                                                        180 ;; max left label size of the sparkline
+                                                                         40  ;; internal padding
+                                                                         15) ;; internal spacing
+                                              :height 40}}]
+            (om/build growth-metric subsection-data {:opts {:hide-nav true
                                                             :chart-fill-polygons false}}))))
       (dom/div {:class "actions group right"}
         (dom/button
