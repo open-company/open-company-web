@@ -205,22 +205,7 @@
 
   (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug new-metric?]}]
 
-    (let [section-name (utils/camel-case-str (name section))
-          no-data (utils/no-growth-data? growth-data)
-          focus-metric-data (filter-growth-data focus growth-data)
-          focus-metric-info (get growth-metrics focus)
-          show-placeholder-chart? (and foce-data-editing?
-                                       (< (count focus-metric-data) 2))
-          subsection-data {:metric-data (if show-placeholder-chart?
-                                          (growth-utils/fake-chart-placeholder-data focus-metric-info)
-                                          focus-metric-data)
-                           :metric-info focus-metric-info
-                           :fake-chart show-placeholder-chart?
-                           :editing foce-data-editing?
-                           :focus focus
-                           :currency currency
-                           :read-only true
-                           :total-metrics (count growth-metrics)}]
+    (let [no-data (utils/no-growth-data? growth-data)]
       (dom/div {:id "section-growth"
                 :class (utils/class-set {:section-container true
                                          :editing foce-data-editing?})
@@ -235,5 +220,6 @@
               (om/build growth-sparklines {:growth-data growth-data
                                            :growth-metrics growth-metrics
                                            :growth-metric-slugs growth-metric-slugs
+                                           :editing? editable?
                                            :currency currency
                                            :archive-cb (partial show-archive-confirm-popover owner editing-cb)}))))))))

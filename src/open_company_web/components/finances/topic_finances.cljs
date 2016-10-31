@@ -160,5 +160,6 @@
 
               (om/build finances-sparklines {:finances-data sorted-finances
                                              :archive-cb #(show-archive-confirm-popover owner data)
+                                             :editing? editable?
                                              :currency currency}
                                             {:opts (merge chart-opts {:labels labels})}))))))))
