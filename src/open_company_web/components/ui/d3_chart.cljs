@@ -33,21 +33,16 @@
         data-max (max-y all-data chart-keys)
         linear-fn (.. js/d3 -scale linear)
         domain-fn (.domain linear-fn #js [0 data-max])
-        range-fn (.range linear-fn #js [0 (:chart-height options)])]
+        range-fn (.range linear-fn #js [0 (om/get-props owner :chart-height)])]
     range-fn))
 
 (defn- data-x-position
   "Given the width of the chart and an index of a data point within the displayed data set
   return the horizontal (x-axis) position of the data point."
   [chart-width i data-count]
-  (let [dot-spacer (/ (- chart-width 30) (dec show-data-points))
+  (let [dot-spacer (/ (- chart-width 30) (min (dec show-data-points) (dec data-count)))
         natural-dot-location (+ (* i dot-spacer) 15)]
-    (if (< data-count show-data-points)
-      ;; we're showing less than a full set of data points, so we need an x offset to center the chart
-      ;; (hard to explain why this calculation works, was worked out empiraclly)
-      (+ natural-dot-location (* (/ dot-spacer 2) (- show-data-points data-count)))
-      ;; we're showing a full set of data points
-      natural-dot-location)))
+    natural-dot-location))
 
 (defn- current-data 
   "Get the subset of the data that's currently being displayed on the chart."
@@ -73,8 +68,8 @@
           data-count (count chart-data)
           fill-colors (:chart-colors options)
           fill-selected-colors (:chart-selected-colors options)
-          chart-width (+ (:chart-width options) (if (:hide-nav options) 30 10))
-          chart-height (:chart-height options)
+          chart-width (+ (om/get-props owner :chart-width) (if (:hide-nav options) 30 10))
+          chart-height (om/get-props owner :chart-height)
           chart-keys (:chart-keys options)
           ; main chart node
           chart-node (-> js/d3
@@ -127,6 +122,7 @@
                           (.attr "x2" (- next-cx 2))
                           (.attr "y2" (get-y next-cy max-y))))))
                 ;; add a circle to represent the data
+
                 (-> chart-node
                     (.append "circle")
                     (.attr "class" (str "chart-dot chart-dot-" i))
@@ -184,7 +180,7 @@
   (.stopPropagation (.-event js/d3)) ; we got this!
   (let [svg-el (om/get-ref owner "d3-chart")
         d3-svg-el (.select js/d3 svg-el)
-        chart-width (+ (:chart-width options) (if (:hide-nav options) 30 10))
+        chart-width (+ (om/get-props owner :chart-width) (if (:hide-nav options) 30 10))
         selected-circles (.selectAll d3-svg-el (str "circle.chart-dot-" idx))
         all-circles (.selectAll d3-svg-el "circle")]
     
@@ -264,7 +260,7 @@
 
 ;; ===== D3 Chart Component =====
 
-(defcomponent d3-chart [{:keys [chart-data selected-metric-cb] :as data} owner {:keys [chart-width chart-height] :as options}]
+(defcomponent d3-chart [{:keys [chart-width chart-height chart-data selected-metric-cb] :as data} owner options]
 
   (init-state [_]
     (let [start (max 0 (- (count chart-data) show-data-points))
@@ -286,7 +282,7 @@
 
   (will-receive-props [_ next-props]
     (when (not= (:selected next-props) (om/get-state owner :selected))
-      (om/set-state! owner :selected (:selected next-props))))
+      (om/set-state! owner :selected (or (:selected next-props) (om/get-state owner :selected) 0))))
 
   (render-state [_ {:keys [start selected]}]
     (let [hide-chart-nav (:hide-nav options)
@@ -294,10 +290,9 @@
           labels (:labels options)
           top-label-keys (label-keys-for labels :top)
           bottom-label-keys (label-keys-for labels :bottom)
-          chart-class (str (:chart-type options) (when (:fake-chart options) " fake-chart"))
+          chart-class (str (:chart-type options) " group" (when (:fake-chart options) " fake-chart"))
           chart-top-label-class (str "chart-top-label-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))
           chart-bottom-label-class (str "chart-bottom-label-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))]
-
       (dom/div {:class chart-class}
         
         ;; Top row labels
