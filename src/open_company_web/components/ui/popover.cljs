@@ -47,7 +47,7 @@
 ;; :hide-on-click-out true if you want to remove the popover on backgorund click
 ;; :z-index-offset an offset to add to the default z-index to make sure multiple popover stack as expeceted
 ;;
-(defn add-popover-with-derivative-rum-component [component data]
+(defn add-popover-with-rum-component [component data]
   (let [container-id (:container-id data)]
     (when (.-$ js/window) ; avoid tests crash
       (let [popover-ct (js/$ (str "<div class='oc-popover-container' id='" container-id "'></div>"))
@@ -64,28 +64,6 @@
                                      :component #(om/component (component))
                                      :drv-spec (dis/drv-spec dis/app-state)
                                      :target (sel1 (str "#" container-id))})
-                       (.addClass body "no-scroll")
-                       ; add the close action
-                       (when (:hide-on-click-out data)
-                         (.click popover-ct #(hide-popover % container-id)))
-                       ; show the popover
-                       (.setTimeout js/window #(.fadeIn popover-ct 300) 0))
-                     1)))))
-
-(defn add-popover [data]
-  (let [container-id (:container-id data)]
-    (when (.-$ js/window) ; avoid tests crash
-      (let [popover-ct (js/$ (str "<div class='oc-popover-container' id='" container-id "'></div>"))
-            body (js/$ (.-body js/document))]
-        ; add the div to the body
-        (.append body popover-ct)
-        (let [z-index (or (:z-index-offset data) 0)]
-          (.css popover-ct #js {:zIndex (+ default-z-index (* z-index 3))}))
-        ; if the component has not been mounted, render it
-        (.setTimeout js/window
-                     (fn []
-                       ; render the popover component
-                       (rum/mount (component data) (sel1 (str "#" container-id)))
                        (.addClass body "no-scroll")
                        ; add the close action
                        (when (:hide-on-click-out data)
