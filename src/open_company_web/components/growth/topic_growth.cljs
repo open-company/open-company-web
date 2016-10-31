@@ -119,7 +119,7 @@
                         :overflow-x "visible"
                         :overflow-y "scroll"}}
         (dom/div {:class "group"}
-          (dom/h3 {:class "left px2 group"} "Edit Growth"))
+          (dom/h3 {:class "left px2 group"} "Edit Chart"))
 
         (om/build growth-edit {:initial-focus initial-focus
                                :new-metric? new-metric?
