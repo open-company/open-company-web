@@ -97,8 +97,6 @@
           actual-with-label (label-from-set actual-set data-key currency-symbol)
           cash? (= data-key :cash)
           chart-opts {:opts {:chart-type "unbordered-chart"
-                             :chart-height (or (:height (:chart-size options)) 100)
-                             :chart-width (:width (:chart-size options))
                              :chart-keys [data-key]
                              :interval "monthly"
                              :x-axis-labels false
@@ -133,4 +131,6 @@
                                 :selected chart-selected-idx
                                 :selected-metric-cb chart-selected-cb
                                 :circle-selected-stroke (:circle-selected-stroke data)
+                                :chart-height (:height (:chart-size data))
+                                :chart-width (:width (:chart-size data))
                                 :card-width (:card-width data)} chart-opts)))))))

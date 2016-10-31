@@ -92,8 +92,6 @@
                                                                     periods (subvec (vec (reverse sorted-metric)) idx)]
                                                                 (growth-metric-delta periods metric-info currency-symbol))}) sorted-metric))
           chart-opts {:opts {:chart-type "unbordered-chart"
-                             :chart-height (or (:height (:chart-size options)) 100)
-                             :chart-width (:width (:chart-size options))
                              :chart-keys [:value]
                              :interval interval
                              :x-axis-labels false
@@ -125,4 +123,6 @@
                                 :circle-fill (:circle-fill data)
                                 :line-stroke-width (:line-stroke-width data)
                                 :circle-selected-stroke (:circle-selected-stroke data)
+                                :chart-height (:height (:chart-size data))
+                                :chart-width (:width (:chart-size data))
                                 :card-width (:card-width data)} chart-opts)))))))
