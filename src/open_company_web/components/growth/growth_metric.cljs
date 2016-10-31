@@ -124,4 +124,5 @@
                                 :circle-stroke (:circle-stroke data)
                                 :circle-fill (:circle-fill data)
                                 :line-stroke-width (:line-stroke-width data)
-                                :circle-selected-stroke (:circle-selected-stroke data)} chart-opts)))))))
+                                :circle-selected-stroke (:circle-selected-stroke data)
+                                :card-width (:card-width data)} chart-opts)))))))

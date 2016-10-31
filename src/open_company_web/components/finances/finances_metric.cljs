@@ -132,4 +132,5 @@
                                 :line-stroke-width (:line-stroke-width data)
                                 :selected chart-selected-idx
                                 :selected-metric-cb chart-selected-cb
-                                :circle-selected-stroke (:circle-selected-stroke data)} chart-opts)))))))
+                                :circle-selected-stroke (:circle-selected-stroke data)
+                                :card-width (:card-width data)} chart-opts)))))))
