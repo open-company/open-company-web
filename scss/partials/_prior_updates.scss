@@ -1,0 +1,23 @@
+#prior-updates-dialog {
+
+  div.oc-popover {
+    text-align: left;
+
+    div.message-container {
+      text-align: center;
+    }
+
+    div.update-title {
+      margin-bottom: 0;
+    }
+
+    div.update-details {
+      font-size: 13px;
+      margin-bottom: 20px;
+
+      div.medium {
+        display: inline;
+      }
+    }
+  }
+}
