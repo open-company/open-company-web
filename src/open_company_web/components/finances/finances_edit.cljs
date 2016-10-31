@@ -7,7 +7,8 @@
             [open-company-web.router :as router]
             [open-company-web.components.ui.cell :refer (cell)]
             [open-company-web.lib.finance-utils :as finance-utils]
-            [cljs.core.async :refer (put!)]))
+            [cljs.core.async :refer (put!)]
+            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
 
 (def batch-size 5)
 
@@ -130,9 +131,11 @@
         finances-data (om/get-state owner :finances-data)
         fixed-data (if has-data? 
                       (assoc finances-data period fixed-row)
-                      (dissoc finances-data period))]
+                      (dissoc finances-data period))
+        data-on-change-cb (om/get-props owner :data-on-change-cb)]
     ;(om/set-state! owner :has-changes (or (om/get-state owner :has-changes) (not= finances-data fixed-data)))
-    (om/set-state! owner :finances-data fixed-data)))
+    (om/set-state! owner :finances-data fixed-data)
+    (data-on-change-cb fixed-data)))
 
 (defn finances-clean-row [data]
   ; a data entry is good if we have the period and one other value: cash, costs or revenue
@@ -147,41 +150,46 @@
 
 (defn- save-data [owner]
   ; (om/set-state! owner :has-changes false)
-  (dis/dispatch! [:save-topic-data "finances" {:data (finances-clean-data (om/get-state owner :finances-data))
-                                               :placeholder false}]))
+  (om/set-state! owner :has-changes? false)
+  ((om/get-props owner :data-section-on-change))
+
+  (dis/dispatch! [:foce-input {:data (finances-clean-data (om/get-state owner :finances-data))
+                               :placeholder false}]))
 
 (defn replace-row-in-data [owner row-data k v]
   "Find and replace the edited row"
+  (om/set-state! owner :has-changes? true)
   (let [new-row (update row-data k (fn[_]v))]
     (change-finances-data owner new-row)))
 
 (defn more-months [owner]
   (om/update-state! owner :stop #(+ % batch-size)))
 
-(defcomponent finances-edit [{:keys [currency editing-cb show-first-edit-tip first-edit-tip-cb] :as data} owner]
+(defcomponent finances-edit [{:keys [currency editing-cb show-first-edit-tip first-edit-tip-cb table-key] :as data} owner]
 
   (init-state [_]
     {:finances-data (:finances-data data)
+     :has-changes? false
      :stop batch-size})
 
   (will-receive-props [_ next-props]
     (om/set-state! owner :finances-data (:finances-data next-props)))
 
-  (render-state [_ {:keys [finances-data stop]}]
-
+  (render-state [_ {:keys [finances-data stop has-changes?]}]
     (let [company-slug (router/current-company-slug)]
 
       (dom/div {:class "finances"}
         (dom/div {:class "composed-section-edit finances-body edit"}
-          (dom/div {:class "table-container group"}
-            (dom/table {:class "table"}
+          (dom/div {:class "table-container my2 group"}
+            (dom/table {:class "table"
+                        :key table-key}
               (dom/thead {}
                 (dom/tr {}
                   (dom/th {} "")
                   (dom/th {} "Revenue")
                   (dom/th {} "Expenses")
                   (dom/th {} "Cash")))
-              (let [current-period (utils/current-period)]
+              (let [current-period (utils/current-finance-period)]
                 (for [idx (range stop)]
                   (let [period (finance-utils/get-past-period current-period idx)
                         has-value (contains? finances-data period)
@@ -204,9 +212,10 @@
 
           (dom/div {:class "topic-foce-footer group"}
             (dom/div {:class "topic-foce-footer-right"}
-              (dom/button {:class "btn-reset btn-outline btn-data-save"
+              (dom/button {:class "btn-reset btn-solid btn-data-save"
+                           :disabled (not has-changes?)
                            :on-click  #(do
                                         (save-data owner)
-                                        (editing-cb false))} "SAVE")
+                                        (editing-cb false))} "UPDATE")
               (dom/button {:class "btn-reset btn-outline"
                            :on-click #(editing-cb false)} "CANCEL"))))))))

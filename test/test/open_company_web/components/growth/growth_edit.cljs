@@ -15,7 +15,7 @@
 (def ^:dynamic c)
 
 (def test-atom {:initial-focus "test"
-                :growth-data [{:period "2015-10" :value 0 :slug "test"}]
+                :growth-data {"2015-10test" {:period "2015-10" :value 0 :slug "test"}}
                 :metrics {"test" {
                                   :slug "test"
                                   :name "Test"

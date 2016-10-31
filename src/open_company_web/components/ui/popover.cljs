@@ -4,6 +4,7 @@
   this component directly.
   "
   (:require [rum.core :as rum]
+            [om.core :as om :include-macros true]
             [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]))
@@ -17,13 +18,16 @@
       (.css (js/$ "body") #js {"overflow" ""})
       (let [popover-ct (js/$ (str "#" container-id))]
         (.fadeOut popover-ct 400 #(.css popover-ct #js {"display" "none"})))
+      (.removeClass (js/$ "body") "no-scroll")
       (.setTimeout js/window #(try
                                 (let [container (sel1 (str "#" container-id))
-                                      $container (js/$ container)] 
+                                      $container (js/$ container)]
                                   (rum/unmount container)
                                   (.remove $container))
                                 (catch :default e)) 1500)
       (catch :default e))))
+
+(def default-z-index 1031)
 
 ;; Options passed as a map to add-popover -
 ;;
@@ -34,28 +38,59 @@
 ;; :message textual content of the dialog
 ;; :cancel-title optional title of the secondary styled cancel button, pass as false if you only want 1 button
 ;; :cancel-cb function to call when the user clicks the cancel button, required if you provide a cancel title,
-;;            be sure to call hide-popever with the container ID
+;;            be sure to call hide-popover with the container ID
 ;; :success-title required title of the primary styled success button
 ;; :success-cb function to call when the user clicks the cancel button, required if you provide a cancel title,
-;;             be sure to call hide-popever with the container ID
+;;             be sure to call hide-popover with the container ID
+;; :hide-on-click-out true if you want to remove the popover on backgorund click
+;; :z-index-offset an offset to add to the default z-index to make sure multiple popover stack as expeceted
 ;;
-(defn add-popover [data]
+(defn add-popover-with-rum-component [component data]
   (let [container-id (:container-id data)]
     (when (.-$ js/window) ; avoid tests crash
       (let [popover-ct (js/$ (str "<div class='oc-popover-container' id='" container-id "'></div>"))
             body (js/$ (.-body js/document))]
         ; add the div to the body
         (.append body popover-ct)
+        (let [z-index (or (:z-index-offset data) 0)]
+          (.css popover-ct #js {:zIndex (+ default-z-index (* z-index 3))}))
         ; if the component has not been mounted, render it
         (.setTimeout js/window
                      (fn []
                        ; render the popover component
-                       (rum/mount (popover data) (sel1 (str "#" container-id)))
+                       (rum/mount (component data) (sel1 (str "#" container-id)))
+                       (.addClass body "no-scroll")
                        ; add the close action
-                       (.click popover-ct #(hide-popover % container-id))
+                       (when (:hide-on-click-out data)
+                         (.click popover-ct #(hide-popover % container-id)))
                        ; show the popover
                        (.setTimeout js/window #(.fadeIn popover-ct 300) 0))
                      1)))))
+
+(defn add-popover-with-om-component [component data]
+  (let [container-id (:container-id data)]
+    (when (.-$ js/window) ; avoid tests crash
+      (let [popover-ct (js/$ (str "<div class='oc-popover-container' id='" container-id "'></div>"))
+            body (js/$ (.-body js/document))]
+        ; add the div to the body
+        (.append body popover-ct)
+        (let [z-index (or (:z-index-offset data) 0)]
+          (.css popover-ct #js {:zIndex (+ default-z-index (* z-index 3))}))
+        ; if the component has not been mounted, render it
+        (.setTimeout js/window
+                     (fn []
+                       ; render the popover component
+                       (om/root component (:data data) {:target (sel1 (str "#" container-id))})
+                       (.addClass body "no-scroll")
+                       ; add the close action
+                       (when (:hide-on-click-out data)
+                         (.click popover-ct #(hide-popover % container-id)))
+                       ; show the popover
+                       (.setTimeout js/window #(.fadeIn popover-ct 300) 0))
+                     1)))))
+
+(defn add-popover [data]
+  (add-popover-with-rum-component popover data))
 
 (rum/defc popover < rum/static [{:keys [container-id
                                         height
@@ -65,7 +100,8 @@
                                         cancel-title
                                         cancel-cb
                                         success-title
-                                        success-cb]}]
+                                        success-cb
+                                        z-index-offset]}]
 
   ;; assertions of proper usage
   (assert (string? container-id) "popover container-id is not a string")
@@ -77,12 +113,20 @@
   (assert (if cancel-cb (fn? cancel-cb) true) "popover cancel-cb is not a function")
   (assert (string? success-title) "popover success-title is not a string")
   (assert (fn? success-cb) "popover success-cb is not a function")
+  (assert (if z-index-offset (number? z-index-offset) true) "z-index-offset must be a number")
 
   (let [style {}
-        w-style (if width (assoc style :width width) style)
-        h-style (if height (assoc style :height height) style)]
+        w-style (if width
+                  (assoc style :width width)
+                  style)
+        h-style (if height
+                  (assoc w-style :height height)
+                  w-style)
+        z-style (if z-index-offset
+                  (assoc h-style :zIndex (+ default-z-index (* z-index-offset 3) 1))
+                  (assoc h-style :zIndex (+ default-z-index 1)))]
 
-    [:div.oc-popover {:style h-style}
+    [:div.oc-popover {:style z-style}
       (when title
         [:div.title-container
           [:h3.title title]])

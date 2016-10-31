@@ -80,22 +80,9 @@
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
                     :ref "topic-internal"}
-        (when (or (and is-growth-finances?
-                       (utils/data-topic-has-data section topic-data))
-                   image-header)
-          (dom/div {:class (utils/class-set {:card-header true
-                                             :card-image (not is-growth-finances?)})}
-            (cond
-              (= section "finances")
-              (om/build topic-finances {:section-data (utils/fix-finances topic-data)
-                                        :section section
-                                        :currency currency} {:opts chart-opts})
-              (= section "growth")
-              (om/build topic-growth {:section-data topic-data
-                                      :section section
-                                      :currency currency} {:opts chart-opts})
-              :else
-              (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options}))))
+        (when image-header
+          (dom/div {:class "card-header card-image"}
+            (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
         ;; Topic title
         (dom/div {:class "topic-dnd-handle group"}
           (dom/div {:class "topic-title"} (:title topic-data))
@@ -127,6 +114,19 @@
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
+
+        (when (and is-growth-finances?
+                   (utils/data-topic-has-data section topic-data))
+          (dom/div {:class ""}
+            (cond
+              (= section "growth")
+              (om/build topic-growth {:section-data topic-data
+                                      :section section
+                                      :currency currency} {:opts chart-opts})
+              (= section "finances")
+              (om/build topic-finances {:section-data (utils/fix-finances topic-data)
+                                        :section section
+                                        :currency currency} {:opts chart-opts}))))
 
         (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
                       :ref "topic-body"
@@ -273,6 +273,7 @@
                                       :is-stakeholder-update (:is-stakeholder-update data)
                                       :currency currency
                                       :card-width card-width
+                                      :foce-data-editing? (:foce-data-editing? data)
                                       :read-only-company (:read-only-company data)
                                       :foce-key (:foce-key data)
                                       :foce-data (:foce-data data)

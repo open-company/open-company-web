@@ -220,6 +220,7 @@
                                :is-stakeholder-update (:is-stakeholder-update props)
                                :section-data sd
                                :card-width (:card-width props)
+                               :foce-data-editing? (:foce-data-editing? props)
                                :show-share-remove (:show-share-remove props)
                                :read-only-company (:read-only company-data)
                                :currency (:currency company-data)

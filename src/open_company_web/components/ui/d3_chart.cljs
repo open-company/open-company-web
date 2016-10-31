@@ -19,30 +19,30 @@
   (let [filtered-data (map #(select-keys % chart-keys) data)]
     (apply max (vec (flatten (map vals filtered-data))))))
 
+(defn- min-y [data chart-keys]
+  (let [filtered-data (map #(select-keys % chart-keys) data)]
+    (apply min (vec (flatten (map vals filtered-data))))))
+
 (defn- get-y [y max-y]
   (+ 10 (- max-y y)))
 
 (defn- scale [owner options]
   (let [all-data (om/get-props owner :chart-data)
         chart-keys (:chart-keys options)
+        data-min (min-y all-data chart-keys)
         data-max (max-y all-data chart-keys)
         linear-fn (.. js/d3 -scale linear)
         domain-fn (.domain linear-fn #js [0 data-max])
-        range-fn (.range linear-fn #js [0 (- (:chart-height options) 35)])]
+        range-fn (.range linear-fn #js [0 (om/get-props owner :chart-height)])]
     range-fn))
 
 (defn- data-x-position
   "Given the width of the chart and an index of a data point within the displayed data set
   return the horizontal (x-axis) position of the data point."
   [chart-width i data-count]
-  (let [dot-spacer (/ (- chart-width 20) (dec show-data-points))
+  (let [dot-spacer (/ (- chart-width 30) (min (dec show-data-points) (dec data-count)))
         natural-dot-location (+ (* i dot-spacer) 15)]
-    (if (< data-count show-data-points)
-      ;; we're showing less than a full set of data points, so we need an x offset to center the chart
-      ;; (hard to explain why this calculation works, was worked out empiraclly)
-      (+ natural-dot-location (* (/ dot-spacer 2) (- show-data-points data-count)))
-      ;; we're showing a full set of data points
-      natural-dot-location)))
+    natural-dot-location))
 
 (defn- current-data 
   "Get the subset of the data that's currently being displayed on the chart."
@@ -68,14 +68,14 @@
           data-count (count chart-data)
           fill-colors (:chart-colors options)
           fill-selected-colors (:chart-selected-colors options)
-          chart-width (:chart-width options)
-          chart-height (:chart-height options)
+          chart-width (+ (om/get-props owner :chart-width) (if (:hide-nav options) 30 10))
+          chart-height (om/get-props owner :chart-height)
           chart-keys (:chart-keys options)
           ; main chart node
           chart-node (-> js/d3
                          (.select d3-chart)
                          ; Make SVG 10px wider to give 5px on each side for month label overrun
-                         (.attr "width" (+ chart-width 10))
+                         (.attr "width" chart-width)
                          (.attr "height" chart-height)
                          (.on "click" (fn [] (.stopPropagation (.-event js/d3)))))
           scale-fn (scale owner options)
@@ -116,21 +116,24 @@
                           (.append "line")
                           (.attr "class" "chart-line")
                           (.style "stroke" (chart-key fill-colors))
-                          (.style "stroke-width" circle-stroke)
+                          (.style "stroke-width" (or (om/get-props owner :line-stroke-width) circle-stroke))
                           (.attr "x1" (+ cx 2))
                           (.attr "y1" (get-y cy max-y))
                           (.attr "x2" (- next-cx 2))
                           (.attr "y2" (get-y next-cy max-y))))))
                 ;; add a circle to represent the data
+
                 (-> chart-node
                     (.append "circle")
                     (.attr "class" (str "chart-dot chart-dot-" i))
                     (.attr "r" (if (not (chart-key data-set))
                                 0
-                                circle-radius))
+                                (or (om/get-props owner :circle-radius) circle-radius)))
                     (.attr "stroke" (chart-key fill-colors))
-                    (.attr "stroke-width" (if (= i selected) circle-selected-stroke circle-stroke))
-                    (.attr "fill" "white")
+                    (.attr "stroke-width" (if (= i selected)
+                                            (or (om/get-props owner :circle-selected-stroke) circle-selected-stroke)
+                                            (or (om/get-props owner :circle-stroke) circle-stroke)))
+                    (.attr "fill" (or (om/get-props owner :circle-fill) "white"))
                     (.attr "data-fill" (chart-key fill-colors))
                     (.attr "data-hasvalue" (chart-key data-set))
                     (.attr "data-selectedFill" (chart-key fill-selected-colors))
@@ -177,7 +180,7 @@
   (.stopPropagation (.-event js/d3)) ; we got this!
   (let [svg-el (om/get-ref owner "d3-chart")
         d3-svg-el (.select js/d3 svg-el)
-        chart-width (:chart-width options)
+        chart-width (+ (om/get-props owner :chart-width) (if (:hide-nav options) 30 10))
         selected-circles (.selectAll d3-svg-el (str "circle.chart-dot-" idx))
         all-circles (.selectAll d3-svg-el "circle")]
     
@@ -189,9 +192,9 @@
               hasvalue (.attr circle "data-hasvalue")]
           (-> circle
               (.attr "stroke" color)
-              (.attr "stroke-width" circle-stroke)
-              (.attr "fill" "white")
-              (.attr "r" (if hasvalue circle-radius 0)))))))
+              (.attr "stroke-width" (or (om/get-props owner :circle-stroke) circle-stroke))
+              (.attr "fill" (or (om/get-props owner :circle-fill) "white"))
+              (.attr "r" (if hasvalue (or (om/get-props owner :circle-radius) circle-radius) 0)))))))
     
     ;; draw the selected circles specially
     (.each selected-circles (fn [d i]
@@ -201,9 +204,9 @@
               hasvalue (.attr circle "data-hasvalue")]
           (-> circle
               (.attr "stroke" color)
-              (.attr "stroke-width" circle-selected-stroke)
-              (.attr "fill" "white")
-              (.attr "r" (if hasvalue circle-radius 0)))))))
+              (.attr "stroke-width" (or (om/get-props owner :circle-selected-stroke) circle-selected-stroke))
+              (.attr "fill" (or (om/get-props owner :circle-fill) "white"))
+              (.attr "r" (if hasvalue (or (om/get-props owner :circle-radius) circle-radius) 0)))))))
 
     ;; let the rest of the component know a (potentially) new data point is selected
     (om/set-state! owner :selected idx)))
@@ -244,7 +247,7 @@
     (dom/div {:class (str class-name (if multiple-rows? " multiple-rows"))
               :style (if center? 
                         {:text-align :center :align-items :center :justify-content :center}
-                        {:align-items :flex-start :justify-content :flex-start :padding-left "20px"})}
+                        {:align-items :flex-start :justify-content :flex-start})}
       (for [label-key label-keys]
         (dom/div {:class "chart-labels"}
           (dom/div {:class "chart-value"
@@ -257,7 +260,7 @@
 
 ;; ===== D3 Chart Component =====
 
-(defcomponent d3-chart [{:keys [chart-data] :as data} owner {:keys [chart-width chart-height] :as options}]
+(defcomponent d3-chart [{:keys [chart-width chart-height chart-data selected-metric-cb] :as data} owner options]
 
   (init-state [_]
     (let [start (max 0 (- (count chart-data) show-data-points))
@@ -266,37 +269,44 @@
        :selected (dec (count current-data))}))
 
   (did-mount [_]
-    (when-not (utils/is-test-env?)
+    (when (and (not (utils/is-test-env?)) (:show-chart options))
       (d3-render-chart owner options)))
 
   (did-update [_ old-props old-state]
-    (when-not (utils/is-test-env?)
+    (when (and (not (utils/is-test-env?)) (:show-chart options))
       (when (or (not= old-props data) (not= old-state (om/get-state owner)))
-        (d3-render-chart owner options))))
+        (d3-render-chart owner options)))
+    (when (and (fn? selected-metric-cb)
+               (not= (om/get-state owner :selected) (:selected old-state)))
+      (selected-metric-cb (om/get-state owner :selected))))
+
+  (will-receive-props [_ next-props]
+    (when (not= (:selected next-props) (om/get-state owner :selected))
+      (om/set-state! owner :selected (or (:selected next-props) (om/get-state owner :selected) 0))))
 
   (render-state [_ {:keys [start selected]}]
-
     (let [hide-chart-nav (:hide-nav options)
           selected-data-set (get (current-data owner) selected)
           labels (:labels options)
           top-label-keys (label-keys-for labels :top)
           bottom-label-keys (label-keys-for labels :bottom)
-          chart-type (:chart-type options)]
-
-      (dom/div {:class chart-type}
+          chart-class (str (:chart-type options) " group" (when (:fake-chart options) " fake-chart"))
+          chart-top-label-class (str "chart-top-label-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))
+          chart-bottom-label-class (str "chart-bottom-label-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))]
+      (dom/div {:class chart-class}
         
         ;; Top row labels
         (when (not (empty? top-label-keys))
-          (labels-for "chart-top-label-container" top-label-keys labels selected-data-set))
+          (labels-for chart-top-label-class top-label-keys labels selected-data-set))
 
         ;; Bottom row labels
         (when (not (empty? bottom-label-keys))
-          (labels-for "chart-bottom-label-container" bottom-label-keys labels selected-data-set))
+          (labels-for chart-bottom-label-class bottom-label-keys labels selected-data-set))
 
         ;; D3 Chart w/ optional nav. buttons
-        (when (> (count chart-data) 1)
-          (dom/div {:class "chart-container"
-                    :style {:width (str (+ chart-width 30) "px")
+        (when (and (> (count chart-data) 1) (:show-chart options))
+          (dom/div {:class (str "chart-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))
+                    :style {:width (str (+ chart-width (if hide-chart-nav 30 10)) "px")
                             :height (str chart-height "px")}}
             ;; Previous button
             (dom/div {:class (str "chart-prev" (when hide-chart-nav " hidden"))
@@ -309,8 +319,8 @@
             (dom/svg {:className "d3-chart"
                       :ref "d3-chart"
                       ;; either leave space for the nav (0 margin), or take up the space with 10 px of margin
-                      :style {:margin-left (str (if hide-chart-nav 10 0) "px")
-                              :margin-right (str (if hide-chart-nav 10 0) "px")}})
+                      :style {:margin-left (str (if hide-chart-nav 0 10) "px")
+                              :margin-right (str (if hide-chart-nav 0 10) "px")}})
             
             ;; Next button
             (dom/div {:class (str "chart-next" (when hide-chart-nav " hidden"))

@@ -16,7 +16,7 @@
   (let [metrics (:metrics presets)
         metric (filter #(= (s/lower (:name %)) (s/lower metric-name)) metrics)
         slug (if (empty? metric)
-               (s/slugify metric-name)
+               (s/slug metric-name)
                (:slug (first metric)))]
     (if add-noise
       (str slug "-" (get-noise))
@@ -81,6 +81,20 @@
                            (placeholder-data prev-period slug {:new true}))))]
       (vec fixed-data))))
 
+(defn fake-chart-placeholder-data [metric-metadata]
+  (let [current-period   (utils/current-growth-period (:interval metric-metadata))]
+    (loop [idx 0
+           period current-period
+           d   []]
+      (if (< idx (- columns-num 2))
+        (let [row {:slug (:slug metric-metadata)
+                   :period period
+                   :value (- 1000 (* idx 100))}]
+          (recur (inc idx)
+                 (get-past-period period 1 (:interval metric-metadata))
+                 (assoc d idx row)))
+        d))))
+
 (defn get-graph-tooltip [label prefix value suffix]
   (str label
        ": "
@@ -117,6 +131,9 @@
       :values values
       :pattern "###,###.##"
       :column-thickness "14"}))
+
+(defn metrics-as-sequence [metric-map metric-slugs]
+  (map metric-map metric-slugs))
 
 (defn get-actual [metrics]
   (some #(when (:value (metrics %)) %) (vec (range (count metrics)))))
