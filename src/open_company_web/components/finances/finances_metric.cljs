@@ -46,9 +46,11 @@
         metric-delta-percent (when metric-delta (* 100 (float (/ metric-delta prior-value))))
         formatted-metric-delta (when metric-delta-percent (format-delta metric-delta-percent))]
     ;; Format output
-    (dom/div {} 
-      (when (= data-key :cash) date)
-      (when (not= data-key :cash) formatted-metric-delta))))
+    (cond
+      (= data-key :cash)
+      (dom/div {:class "bold"} date)
+      (not= data-key :cash)
+      (dom/div {:class ""} formatted-metric-delta))))
 
 (defn- label-from-set [data-set data-key currency-symbol]
   (let [actual-val (data-key data-set)
@@ -56,7 +58,7 @@
         period (utils/get-period-string (:period data-set))
         fixed-cur-unit currency-symbol]
     (when actual-val
-      (dom/span {:class "bold domine"}
+      (dom/span {:class (str "domine" (when-not (= data-key :cash) " bold"))}
         (dom/span {:class "open-sans"} fixed-cur-unit (oc-lib/with-size-label actual-val))
         " "
         metric-name
