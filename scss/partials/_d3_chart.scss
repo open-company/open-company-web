@@ -7,6 +7,10 @@ div.composed-section {
     padding-bottom: 20px;
   }
 
+  div.unbordered-chart {
+    min-height: 36px;
+  }
+
   div.chart-container {
 
     margin: 0 auto;
@@ -84,9 +88,12 @@ div.composed-section {
         font-weight: 400;
         font-family: $oc_main_font;
         letter-spacing: 1px;
-        line-height: 1;
+        line-height: 1.5;
         font-size: 13px;
         color: $oc_gray_5;
+        white-space: nowrap;
+        overflow-y: visible;
+        overflow-x: hidden;
       }
 
       div.chart-value {
