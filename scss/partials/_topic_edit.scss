@@ -100,7 +100,7 @@ div.topic {
       }
 
       input.topic-title {
-        padding-top: 13px;
+        padding-top: 12px;
         opacity: 0.5;
         font-family: $oc_headers_font;
         font-weight: 700;
@@ -235,7 +235,7 @@ div.topic {
           display: none;
         }
 
-        p:last-child {
+        & > div:last-child, p:last-child {
           margin-bottom: 0px;
           padding-bottom: 0px;
         }
