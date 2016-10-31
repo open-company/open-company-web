@@ -19,10 +19,10 @@
   (render [_]
     (dom/div {:class "growth-sparkline sparkline group"
               :id (str "growth-sparkline-" (:slug metric-metadata))}
-      (let [center-box-width (if (responsive/is-mobile?) (- (.-clientWidth (.-body js/document)) 20 80) (- card-width 90))]
+      (let [center-box-width (if (responsive/is-mobile-size?) (- (.-clientWidth (.-body js/document)) 20 80) (- card-width 90))]
         (dom/div {:class "center-box"
                   :style {:width (str center-box-width "px")}}
-          (let [fixed-card-width (if (responsive/is-mobile?)
+          (let [fixed-card-width (if (responsive/is-mobile-size?)
                                    (.-clientWidth (.-body js/document)) ; use all the possible space on mobile
                                    card-width)
                 subsection-data {:metric-data metric-data
