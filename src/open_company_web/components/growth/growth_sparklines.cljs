@@ -10,7 +10,14 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defcomponent growth-sparkline [{:keys [metric-data metric-metadata currency archive-cb card-width] :as data} owner]
+(def editing-actions-width 15)
+
+(defcomponent growth-sparkline [{:keys [metric-data
+                                        metric-metadata
+                                        currency
+                                        archive-cb
+                                        card-width
+                                        editing?] :as data} owner]
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -19,7 +26,9 @@
   (render [_]
     (dom/div {:class "growth-sparkline sparkline group"
               :id (str "growth-sparkline-" (:slug metric-metadata))}
-      (let [center-box-width (if (responsive/is-mobile-size?) (- (.-clientWidth (.-body js/document)) 20 80) (- card-width 90))]
+      (let [center-box-width (if (responsive/is-mobile-size?)
+                               (- (.-clientWidth (.-body js/document)) 20 80 editing-actions-width)
+                               (- card-width 80 (if editing? editing-actions-width 0)))]
         (dom/div {:class "center-box"
                   :style {:width (str center-box-width "px")}}
           (let [fixed-card-width (if (responsive/is-mobile-size?)
@@ -35,11 +44,14 @@
                                  :circle-fill (occ/get-color-by-kw :oc-dark-blue)
                                  :circle-selected-stroke 5
                                  :line-stroke-width 2
-                                 :chart-size {:width (- fixed-card-width 50  ;; margin left and right
-                                                                        180 ;; max left label size of the sparkline
-                                                                         40  ;; internal padding
-                                                                         15) ;; internal spacing
-                                              :height 40}}]
+                                 :chart-size {:height 40
+                                              :width (- fixed-card-width 50      ;; margin left and right
+                                                                        180      ;; max left label size of the sparkline
+                                                                         40      ;; internal padding
+                                                                          5      ;; internal spacing
+                                                          (if editing? editing-actions-width 0))}}]
+                                                                                 ;; remove 15 more pixel
+                                                                                 ;; only in editing mode
             (om/build growth-metric subsection-data {:opts {:hide-nav true
                                                             :chart-fill-polygons false}}))))
       (dom/div {:class "actions group right"}
@@ -60,7 +72,7 @@
            :on-click #(archive-cb (:slug metric-metadata))}
           (dom/i {:class "fa fa-times"}))))))
 
-(defcomponent growth-sparklines [{:keys [growth-data growth-metrics growth-metric-slugs currency archive-cb] :as data} owner]
+(defcomponent growth-sparklines [{:keys [growth-data growth-metrics growth-metric-slugs currency archive-cb editing?] :as data} owner]
 
   (init-state [_]
     {:card-width (responsive/calc-card-width)})
@@ -76,4 +88,5 @@
                                     :metric-metadata (get growth-metrics slug)
                                     :currency currency
                                     :card-width card-width
+                                    :editing? editing?
                                     :archive-cb archive-cb})))))

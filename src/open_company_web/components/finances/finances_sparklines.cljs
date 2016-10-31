@@ -10,7 +10,17 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defcomponent finances-sparkline [{:keys [finances-data chart-selected-idx chart-selected-cb data-key currency charts-count archive-cb card-width] :as data} owner]
+(def editing-actions-width 15)
+
+(defcomponent finances-sparkline [{:keys [finances-data
+                                          chart-selected-idx
+                                          chart-selected-cb
+                                          data-key
+                                          currency
+                                          charts-count
+                                          archive-cb
+                                          card-width
+                                          editing?] :as data} owner]
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -21,8 +31,8 @@
               :id (str "finances-sparkline-" (name data-key))
               :key (name data-key)}
       (let [center-box-width (if (responsive/is-mobile-size?)
-                              (- (.-clientWidth (.-body js/document)) 20 80)
-                              (- card-width 90))]
+                              (- (.-clientWidth (.-body js/document)) 20 80 editing-actions-width)
+                              (- card-width 80 (if editing? editing-actions-width 0)))]
         (dom/div {:class "center-box"
                   :style {:width (str center-box-width "px")}}
           (let [fixed-card-width (if (responsive/is-mobile-size?)
@@ -42,12 +52,14 @@
                                  :chart-size {:height 40
                                               :width (- fixed-card-width 50     ;; margin left and right
                                                                         180     ;; max left label size of the sparkline
-                                                                         40     ;; internal padding
-                                                                         15)}}] ;; internal spacing
+                                                                         45     ;; internal padding
+                                                          (if editing? editing-actions-width 0))}}]
+                                                                                ;; remove 15 more pixels
+                                                                                ;; only in editing mode
             (om/build finances-metric subsection-data {:opts {:hide-nav true
                                                               :chart-fill-polygons false}})))))))
 
-(defcomponent finances-sparklines [{:keys [finances-data currency archive-cb] :as data} owner]
+(defcomponent finances-sparklines [{:keys [finances-data currency archive-cb editing?] :as data} owner]
 
   (init-state [_]
     {:card-width (responsive/calc-card-width)
@@ -67,7 +79,8 @@
                                           :chart-selected-idx chart-selected-idx
                                           :chart-selected-cb #(om/set-state! owner :chart-selected-idx %)
                                           :currency currency
-                                          :card-width card-width}))))
+                                          :card-width card-width
+                                          :editing? editing?}))))
       (dom/div {:class "actions group right"}
         (dom/button
           {:class "btn-reset"
