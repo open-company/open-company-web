@@ -12,6 +12,8 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]
             [open-company-web.lib.responsive :as responsive]
+            [open-company-web.components.ui.popover :as popover]
+            [open-company-web.components.prior-updates :refer (prior-updates)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -32,6 +34,12 @@
   (utils/event-stop e)
   (close-menu)
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/company-settings))))
+
+(defn prior-updates-click [e]
+  (utils/event-stop e)
+  (close-menu)
+  (popover/add-popover-with-derivative-rum-component prior-updates {:container-id "prior-updates-dialog"
+                                                                    :hide-on-click-out true}))
 
 (defn on-transition-end [owner body]
   (doto body
@@ -88,6 +96,8 @@
       (dom/li {:class "oc-title"}
         (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
           (dom/img {:src "/img/oc-wordmark-white.svg" :style {:height "25px"}})))
+      (when (jwt/jwt)
+        (dom/li {:class "menu-link"} (dom/a {:title "PRIOR UPDATES" :href "#" :on-click prior-updates-click} "PRIOR UPDATES")))
       (when (jwt/jwt)
         (dom/li {:class "menu-link"} (dom/a {:title "USER INFO" :href oc-urls/user-profile :on-click user-profile-click} "USER INFO")))
       (when (and (router/current-company-slug)
