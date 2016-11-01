@@ -294,13 +294,12 @@
           chart-top-label-class (str "chart-top-label-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))
           chart-bottom-label-class (str "chart-bottom-label-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))]
       (dom/div {:class chart-class}
-        
         ;; Top row labels
-        (when (not (empty? top-label-keys))
+        (when (not (nil? top-label-keys))
           (labels-for chart-top-label-class top-label-keys labels selected-data-set))
 
         ;; Bottom row labels
-        (when (not (empty? bottom-label-keys))
+        (when (not (nil? bottom-label-keys))
           (labels-for chart-bottom-label-class bottom-label-keys labels selected-data-set))
 
         ;; D3 Chart w/ optional nav. buttons

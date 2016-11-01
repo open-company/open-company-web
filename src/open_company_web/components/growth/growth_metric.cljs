@@ -123,7 +123,7 @@
                                          :read-only (:read-only data)})
                 :key slug
                 :on-click (:start-editing-cb data)}
-        (when (pos? (count metric-data))
+        (when (or (pos? (count metric-data)) (:name metric-info))
           (dom/div {}
             (om/build d3-chart {:chart-data fixed-sorted-metric
                                 :circle-radius (:circle-radius data)
