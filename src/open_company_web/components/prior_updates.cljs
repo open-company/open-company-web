@@ -3,8 +3,10 @@
             [cljs-time.format :as f]
             [org.martinklepsch.derivatives :as drv]
             [open-company-web.components.ui.icon :as i]
+            [open-company-web.components.ui.popover :as popover]
             [open-company-web.api :as api]
             [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
             [open-company-web.urls :as urls]))
 
@@ -19,10 +21,14 @@
     (drv/drv :jwt)
     rum/reactive
   [s]
-  
   (let [company-slug (router/current-company-slug)]
   
     [:div.oc-popover {:style {:height "450px" :width "500px" } :on-click (fn [e] (.stopPropagation e))}
+      
+      [:button {:class "absolute top-0 btn-reset" :style {:left "100%"}
+                :on-click (fn [e] (popover/hide-popover e "prior-updates-dialog"))}
+            (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"})]
+
       [:h3.m0.px2.py25.gray5.domine
         {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.1)"}}
         "Prior Updates"]
@@ -49,7 +55,9 @@
                     human-date (str month-string " " day ", " year)
                     update-slug (:slug update)
                     link (urls/stakeholder-update company-slug link-date update-slug)
-                    title (:title update)
+                    title (if (clojure.string/blank? (:title update))
+                            (str (:name (dispatcher/company-data)) " Update")
+                            (:title update))
                     author (if same-user? "You" (-> update :author :name))
                     medium (case (keyword (:medium update))
                                 :email [:div.medium "by " (i/icon :email-84 {:size 13 :class "inline"})]
