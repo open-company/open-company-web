@@ -33,7 +33,7 @@
         data-max (max-y all-data chart-keys)
         linear-fn (.. js/d3 -scale linear)
         domain-fn (.domain linear-fn #js [0 data-max])
-        range-fn (.range linear-fn #js [0 (om/get-props owner :chart-height)])]
+        range-fn (.range linear-fn #js [0 (- (om/get-props owner :chart-height) 10)])]
     range-fn))
 
 (defn- data-x-position
