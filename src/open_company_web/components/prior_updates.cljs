@@ -23,15 +23,15 @@
   [s]
   (let [company-slug (router/current-company-slug)]
   
-    [:div.oc-popover {:style {:height "450px" :width "500px" } :on-click (fn [e] (.stopPropagation e))}
+    [:div.oc-popover {:style {:height "450px" :width "500px" :padding 0} :on-click (fn [e] (.stopPropagation e))}
       
       [:button {:class "absolute top-0 btn-reset" :style {:left "100%"}
                 :on-click (fn [e] (popover/hide-popover e "prior-updates-dialog"))}
             (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"})]
 
-      [:h3.m0.px2.py25.gray5.domine
-        {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.1)"}}
-        "Prior Updates"]
+      [:h3.m0.px3.py25.gray5.domine
+       {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.1)"}}
+       "Prior Updates"]
       
       (let [updates (reverse (drv/react s :su-list))]
         (if (empty? updates)

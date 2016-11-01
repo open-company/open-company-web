@@ -34,6 +34,10 @@
 ;; Options passed as a map to add-popover -
 ;;
 ;; :container-id unique DOM ID for the container, pass the same ID hide-popover
+;; :hide-on-click-out true if you want to remove the popover on backgorund click
+;; :z-index-offset an offset to add to the default z-index to make sure multiple popover stack as expeceted
+;;
+;; The following are only for adding a popover via data, not via a component:
 ;; :height optional height for the dialog, e.g. "150px"
 ;; :width optional width for the dialog, e.g. "300px"
 ;; :title optional H3 title text for the dialog
@@ -44,8 +48,6 @@
 ;; :success-title required title of the primary styled success button
 ;; :success-cb function to call when the user clicks the cancel button, required if you provide a cancel title,
 ;;             be sure to call hide-popover with the container ID
-;; :hide-on-click-out true if you want to remove the popover on backgorund click
-;; :z-index-offset an offset to add to the default z-index to make sure multiple popover stack as expeceted
 ;;
 (defn add-popover-with-rum-component [component data]
   (let [container-id (:container-id data)]
