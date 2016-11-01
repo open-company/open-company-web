@@ -3,6 +3,7 @@
             [cljs-time.format :as f]
             [org.martinklepsch.derivatives :as drv]
             [open-company-web.components.ui.icon :as i]
+            [open-company-web.components.ui.popover :as popover]
             [open-company-web.api :as api]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
@@ -23,6 +24,11 @@
   (let [company-slug (router/current-company-slug)]
   
     [:div.oc-popover {:style {:height "450px" :width "500px" } :on-click (fn [e] (.stopPropagation e))}
+      
+      [:button {:class "absolute top-0 btn-reset" :style {:left "100%"}
+                :on-click (fn [e] (popover/hide-popover e "prior-updates-dialog"))}
+            (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"})]
+
       [:h3.m0.px2.py25.gray5.domine
         {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.1)"}}
         "Prior Updates"]
