@@ -13,6 +13,11 @@
 (def link-formatter (f/formatter "yyyy-MM-dd"))
 (def human-formatter (f/formatter "MMMM d, yyyy"))
 
+(def width 500)
+
+(defn- half-offset [pixels]
+  (str "-" (Math/round (* 0.5 pixels)) "px"))
+
 (rum/defcs prior-updates
   < {:did-mount (fn [s] 
                   (api/get-su-list) 
@@ -21,26 +26,38 @@
     (drv/drv :jwt)
     rum/reactive
   [s]
-  (let [company-slug (router/current-company-slug)]
+  (let [company-slug (router/current-company-slug)
+        updates (reverse (drv/react s :su-list))
+        none? (empty? updates)
+        height (cond ; 3 heights
+                  none? 200
+                  (<= (count updates) 3) 325
+                  :else 450)]
   
-    [:div.oc-popover {:style {:height "450px" :width "500px" :padding 0} :on-click (fn [e] (.stopPropagation e))}
+    [:div.oc-popover {:style {:height (str height "px")
+                              :width (str width "px")
+                              :padding 0
+                              :margin-left (half-offset width)
+                              :margin-top (half-offset height)}
+                      :on-click (fn [e] (.stopPropagation e))}
       
       [:button {:class "absolute top-0 btn-reset" :style {:left "100%"}
                 :on-click (fn [e] (popover/hide-popover e "prior-updates-dialog"))}
             (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"})]
 
-      [:h3.m0.px3.py25.gray5.domine
-       {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.1)"}}
-       "Prior Updates"]
-      
-      (let [updates (reverse (drv/react s :su-list))]
+      [:div {:style {:max-height (str (- height 2) "px") :overflow-y "scroll"}}
+
+        [:h3.m0.px3.py25.gray5.domine
+         {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.1)"}}
+         "Prior Updates"]
+        
         (if (empty? updates)
           
-          [:div.message-container
+          [:div.message-container.pt2
             [:p.message "There's nothing to see here."]
             [:p.message "Start sharing!"]]
 
-          [:div.update-container.px2.pt2
+          [:div.update-container.px3.pt2
             (for [update updates]
               (let [user-id (:user-id (drv/react s :jwt))
                     author-id (-> update :author :user-id)
@@ -66,4 +83,4 @@
                                 [:div.medium "a " (i/icon :link-72 {:size 13 :class "inline"})])]
                 [:div.update {:key update-slug}
                   [:div.update-title.domine [:a {:href link :target "_new"} title]]
-                  [:div.update-details.domine author " shared " medium " on " human-date]]))]))]))
+                  [:div.update-details.domine author " shared " medium " on " human-date]]))])]]))
