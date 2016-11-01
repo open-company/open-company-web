@@ -8,12 +8,13 @@
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
-            [open-company-web.urls :as urls]))
+            [open-company-web.urls :as urls]
+            [open-company-web.lib.responsive :as responsive]))
 
 (def link-formatter (f/formatter "yyyy-MM-dd"))
 (def human-formatter (f/formatter "MMMM d, yyyy"))
 
-(def width 500)
+(def desktop-width 500)
 
 (defn- half-offset [pixels]
   (str "-" (Math/round (* 0.5 pixels)) "px"))
@@ -29,11 +30,16 @@
   (let [company-slug (router/current-company-slug)
         updates (reverse (drv/react s :su-list))
         none? (empty? updates)
-        height (cond ; 3 heights
-                  none? 200
-                  (<= (count updates) 3) 325
-                  :else 450)]
-  
+        mobile? (responsive/is-mobile-size?)
+        window-height (when mobile? (.-clientHeight (.-body js/document)))
+        window-width (when mobile? (.-clientWidth (.-body js/document)))
+        width (if mobile? window-width desktop-width) ; full-width on mobile
+        right-padding (if mobile? "pr2" "pr3")
+        height (cond ; 4 possible heights
+                  mobile? window-height
+                  none? 200 ; just a message
+                  (<= (count updates) 3) 325 ; small # of updates
+                  :else 450)] ; lots of updates
     [:div.oc-popover {:style {:height (str height "px")
                               :width (str width "px")
                               :padding 0
@@ -41,15 +47,21 @@
                               :margin-top (half-offset height)}
                       :on-click (fn [e] (.stopPropagation e))}
       
-      [:button {:class "absolute top-0 btn-reset" :style {:left "100%"}
-                :on-click (fn [e] (popover/hide-popover e "prior-updates-dialog"))}
-            (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"})]
+      (when-not mobile? ; floating close X
+        [:button {:class "absolute top-0 btn-reset" :style {:left "100%"}
+                  :on-click (fn [e] (popover/hide-popover e "prior-updates-dialog"))}
+          (i/icon :simple-remove {:class "inline mr1" :stroke "4"
+                                  :color "white" :accent-color "white"})])
 
       [:div {:style {:max-height (str (- height 2) "px") :overflow-y "scroll"}}
 
-        [:h3.m0.px3.py25.gray5.domine
-         {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.1)"}}
-         "Prior Updates"]
+        [:h3.m0.pl3.py25.gray5.domine {:style {:class right-padding :border-bottom "solid 1px rgba(78, 90, 107, 0.1)"}}
+          "Prior Updates"
+          (when mobile? ; inside the header close X
+            [:button {:class "top-0 btn-reset" :style {:float "right" :padding-top "0" :margin-top "-5px"}
+                  :on-click (fn [e] (popover/hide-popover e "prior-updates-dialog"))}
+              (i/icon :simple-remove {:class "inline mr1" :stroke "4" :vertical-align "top"
+                                      :color "grey" :accent-color "grey"})])]
         
         (if (empty? updates)
           
