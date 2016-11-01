@@ -219,10 +219,11 @@
           {slug :slug interval :interval metric-name :name unit :unit description :description :as metric-info} (current-metric-info owner metric-slug)
           prefix (if (= unit "currency") (utils/get-symbol-for-currency-code currency) "")
           suffix (when (= unit "%") "%")]
-      (dom/div {:class "growth" :style {:height (str (:height data) "px")}}
+      (dom/div {:class "growth" :style {:height (str (- (:main-height data) 5) "px") :overflow "hidden"}}
         (dom/div {:class "composed-section-edit growth-body edit"
-                  :style {:height (str (- (:height data) 50) "px")
-                          :overflow-y "scroll"}}
+                  :style {:height (str (- (:main-height data) 63) "px") :overflow "scroll"}}
+          (dom/div {:class "group"}
+            (dom/h3 {:class "left pt3 pb2 px2 group"} "Edit Chart"))
 
           ;; Meta-data editing form
           (om/build growth-metric-edit {:metric-info metric-info
@@ -276,8 +277,7 @@
 
         ;; Save growth data and cancel edit buttons
         (when interval
-          (dom/div {:class "topic-foce-footer group"
-                    :style {}}
+          (dom/div {:class "topic-foce-footer group"}
             (dom/div {:class "topic-foce-footer-right"}
               (dom/button {:class "btn-reset btn-solid btn-data-save"
                            :disabled (or (not has-changes?)

@@ -100,8 +100,9 @@
                                       width
                                       height] :as data} owner options]
   (render [_]
+    (js/console.log "growth-popover height" height)
     (dom/div {:class "oc-popover-container-internal growth composed-section"
-              :style {:width "100%" :height "100vh"}}
+              :style {:width "100%" :height "100%"}}
       (dom/button {:class "close-button"
                    :on-click #(hide-popover-cb)
                    :style {:top "50%"
@@ -113,17 +114,16 @@
                 :on-click (fn [e] (.stopPropagation e))
                 :style {:width (str width "px")
                         :height (str height "px")
-                        :margin-top "-150px" ;(str "-" (/ height 2) "px")
+                        :margin-top (str "-" (/ height 2) "px")
                         :margin-left (str "-" (/ width 2) "px")
                         :text-align "center"
                         :overflow-x "visible"
                         :overflow-y "scroll"}}
-        (dom/div {:class "group"}
-          (dom/h3 {:class "left px2 group"} "Edit Chart"))
 
         (om/build growth-edit {:initial-focus initial-focus
                                :new-metric? new-metric?
                                :growth-data growth-data
+                               :main-height height
                                :metrics growth-metrics
                                :currency curency
                                :metric-slugs growth-metric-slugs
@@ -195,8 +195,8 @@
                               :growth-switch-focus-cb (partial switch-focus owner)
                               :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)
                               :data-section-on-change data-section-on-change
-                              :width 390
-                              :height 572})
+                              :width 400
+                              :height (min 577 (- (.-clientHeight (.-body js/document)) 50))})
            :z-index-offset 0
            :container-id "growth-edit"})
         (and (:foce-data-editing? prev-props)
