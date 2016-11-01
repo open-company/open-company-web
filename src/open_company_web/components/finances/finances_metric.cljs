@@ -82,7 +82,7 @@
 (defcomponent finances-metric [{:keys [finances-data data-key currency charts-count chart-selected-idx chart-selected-cb] :as data} owner options]
 
   (init-state [_]
-    {:selected-metric-idx 0
+    {:selected-metric-idx (min 3 (dec (count finances-data)))
      :fixed-sorted-metric (get-fixed-sorted-metric finances-data currency data-key)})
 
   (will-receive-props [_ next-props]

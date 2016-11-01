@@ -282,7 +282,9 @@
 
   (will-receive-props [_ next-props]
     (when (not= (:selected next-props) (om/get-state owner :selected))
-      (om/set-state! owner :selected (or (:selected next-props) (om/get-state owner :selected) 0))))
+      (om/set-state! owner :selected (or (:selected next-props)
+                                         (om/get-state owner :selected)
+                                         (dec (count (vec (take-last show-data-points chart-data))))))))
 
   (render-state [_ {:keys [start selected]}]
     (let [hide-chart-nav (:hide-nav options)

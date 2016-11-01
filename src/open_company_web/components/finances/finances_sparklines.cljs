@@ -65,7 +65,7 @@
 
   (init-state [_]
     {:card-width (responsive/calc-card-width)
-     :chart-selected-idx 0})
+     :chart-selected-idx (min 3 (dec (count finances-data)))})
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
