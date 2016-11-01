@@ -178,8 +178,11 @@
   (render-state [_ {:keys [finances-data stop has-changes?]}]
     (let [company-slug (router/current-company-slug)]
 
-      (dom/div {:class "finances"}
-        (dom/div {:class "composed-section-edit finances-body edit"}
+      (dom/div {:class "finances" :style {:height (str (- (:main-height data) 5) "px") :overflow "hidden"}}
+        (dom/div {:class "composed-section-edit finances-body edit"
+                  :style {:height (str (- (:main-height data) 63) "px") :overflow "scroll"}}
+          (dom/div {:class "group"}
+            (dom/h3 {:class "left pt3 pb2 px2 group"} "Edit Finances"))
           (dom/div {:class "table-container my2 group"}
             (dom/table {:class "table"
                         :key table-key}
@@ -208,14 +211,14 @@
                   (dom/th {:class "earlier" :col-span 2}
                     (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner)} "Earlier..."))
                   (dom/td {})
-                  (dom/td {})))))
+                  (dom/td {}))))))
 
-          (dom/div {:class "topic-foce-footer group"}
-            (dom/div {:class "topic-foce-footer-right"}
-              (dom/button {:class "btn-reset btn-solid btn-data-save"
-                           :disabled (not has-changes?)
-                           :on-click  #(do
-                                        (save-data owner)
-                                        (editing-cb false))} "UPDATE")
-              (dom/button {:class "btn-reset btn-outline"
-                           :on-click #(editing-cb false)} "CANCEL"))))))))
+        (dom/div {:class "topic-foce-footer group"}
+          (dom/div {:class "topic-foce-footer-right"}
+            (dom/button {:class "btn-reset btn-solid btn-data-save"
+                         :disabled (not has-changes?)
+                         :on-click  #(do
+                                      (save-data owner)
+                                      (editing-cb false))} "UPDATE")
+            (dom/button {:class "btn-reset btn-outline"
+                         :on-click #(editing-cb false)} "CANCEL")))))))

@@ -75,15 +75,14 @@
                         :overflow-x "visible"
                         :z-index (+ popover/default-z-index 1)
                         :overflow-y "scroll"}}
-        (dom/div {:class "group"}
-          (dom/h3 {:class "left group"} "Edit Finances"))
 
         (om/build finances-edit {:finances-data (finance-utils/finances-data-map finances-row-data)
                                  :currency currency
                                  :table-key table-key
                                  :data-on-change-cb (:finances-data-on-change data)
                                  :editing-cb (:editing-cb data)
-                                 :data-section-on-change data-section-on-change}
+                                 :data-section-on-change data-section-on-change
+                                 :main-height height}
                                 {:key (:updated-at section-data)})))))
 
 (defcomponent topic-finances [{:keys [section section-data currency editable? foce-data-editing? editing-cb table-key data-section-on-change] :as data} owner options]
@@ -107,8 +106,8 @@
                                                                                               (editing-cb false))
                                                                           :editing-cb (partial data-editing-toggle owner editing-cb)
                                                                           :data-section-on-change data-section-on-change
-                                                                          :width 390
-                                                                          :height 450})
+                                                                          :width 400
+                                                                          :height (min 450 (.-clientHeight (.-body js/document)))})
                                                        :z-index-popover 0
                                                        :container-id "finances-edit"}))
     (when (and (:foce-data-editing? prev-props)

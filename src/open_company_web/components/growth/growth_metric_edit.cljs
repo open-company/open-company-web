@@ -128,43 +128,53 @@
       (dom/div {:class "growth-metric-edit p3 group"}
 
         ;; name
-        (dom/input {:class "npt col-12 p1 mb2"
-          :type "text"
-          :value metric-name
-          :on-change (fn [e]
-                      (let [v (.. e -target -value)
-                            on-change-cb (om/get-props owner :metadata-on-change-cb)]
-                        (om/set-state! owner :metric-name v)
-                        (on-change-cb :name v)))
-          :id "mtr-name"
-          :placeholder "Chart label - a short name, e.g. DAU"})
+        (dom/div {:class "group" :style {:white-space "nowrap" :text-align "left"}}
+          (dom/label {:class "small-caps col-4 left"
+                      :style {:padding-top "3px"}} "CHART LABEL")
+          (dom/input {:class "npt col-8 mb2"
+            :type "text"
+            :value metric-name
+            :on-change (fn [e]
+                        (let [v (.. e -target -value)
+                              on-change-cb (om/get-props owner :metadata-on-change-cb)]
+                          (om/set-state! owner :metric-name v)
+                          (on-change-cb :name v)))
+            :id "mtr-name"
+            :placeholder "Chart label - a short name, e.g. DAU"}))
 
         ;; description
-        (dom/input {:class "npt col-12 p1 mb2"
-                    :type "text"
-                    :value description
-                    :placeholder "Description - e.g. Daily Active Users"
-                    :on-change (fn [e]
-                                  (let [v (.. e -target -value)
-                                        on-change-cb (om/get-props owner :metadata-on-change-cb)]
-                                    (om/set-state! owner :description v)
-                                    (on-change-cb :description v)))})
+        (dom/div {:class "group" :style {:white-space "nowrap" :text-align "left"}}
+          (dom/label {:class "small-caps col-4 left"
+                      :style {:padding-top "3px"}} "DESCRIPTION")
+          (dom/input {:class "npt col-8 p1 mb2"
+                      :type "text"
+                      :value description
+                      :placeholder "Description - e.g. Daily Active Users"
+                      :on-change (fn [e]
+                                    (let [v (.. e -target -value)
+                                          on-change-cb (om/get-props owner :metadata-on-change-cb)]
+                                      (om/set-state! owner :description v)
+                                      (on-change-cb :description v)))}))
 
         ;; interval
-        (dom/div {:class "col-5 left"}
-          (dom/select {:class "npt col-12 p1 mb2 interval"
-                       :default-value interval
-                       :id "mtr-interval"
-                       ; if there are data the interval can't be changed
-                       :disabled (and (pos? (:metric-count data))
-                                      (not (:new-metric? data)))}
-            (for [interval intervals]
-              (dom/option {:value interval} (utils/camel-case-str interval)))))
+        (dom/div {:class "group" :style {:white-space "nowrap" :text-align "left"}}
+          (dom/label {:class "small-caps col-4 left"} " ")
+          (dom/div {:class "col-5 left"}
+            (dom/select {:class "npt col-12 p1 mb2 interval"
+                         :default-value interval
+                         :id "mtr-interval"
+                         ; if there are data the interval can't be changed
+                         :disabled (and (pos? (:metric-count data))
+                                        (not (:new-metric? data)))}
+              (for [interval intervals]
+                (dom/option {:value interval} (utils/camel-case-str interval))))))
 
         ;; unit
-        (dom/div {:class "col-5 right"}
-          (dom/select {:class "npt col-12 p1 mb2 unit"
-                       :default-value (or unit "Number")
-                       :id "mtr-unit"}
-            (for [unit units]
-              (dom/option {:value (:unit unit)} (:name unit)))))))))
+        (dom/div {:class "group" :style {:white-space "nowrap" :text-align "left"}}
+          (dom/label {:class "small-caps col-4 left"} " ")
+          (dom/div {:class "col-5 left"}
+            (dom/select {:class "npt col-12 p1 mb2 unit"
+                         :default-value (or unit "Number")
+                         :id "mtr-unit"}
+              (for [unit units]
+                (dom/option {:value (:unit unit)} (:name unit))))))))))
