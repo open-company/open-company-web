@@ -13,8 +13,8 @@ div#growth-edit, div#finances-edit{
   div.oc-popover {
     padding: 0px;
     background-color: #fcfcfc;
+    overflow: hidden;
     h3 {
-      padding: 1.5rem 1rem;
       margin: 0;
       border-bottom: 1px solid rgba(78, 90, 107, 0.1);
       color: $oc_gray_5;
@@ -158,6 +158,7 @@ div.finances, div.growth {
   div.topic-foce-footer {
     margin: 0 !important;
     width: 100%;
+    border-top: 1px solid rgba(78,90,107,0.1);
 
     button.btn-outline {
       background-color: white;
