@@ -113,7 +113,7 @@
                 :on-click (fn [e] (.stopPropagation e))
                 :style {:width (str width "px")
                         :height (str height "px")
-                        :margin-top (str "-" (/ height 2) "px")
+                        :margin-top "-150px" ;(str "-" (/ height 2) "px")
                         :margin-left (str "-" (/ width 2) "px")
                         :text-align "center"
                         :overflow-x "visible"
@@ -196,7 +196,7 @@
                               :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)
                               :data-section-on-change data-section-on-change
                               :width 390
-                              :height (min 572 (.-clientHeight (.-body js/document)))})
+                              :height 572})
            :z-index-offset 0
            :container-id "growth-edit"})
         (and (:foce-data-editing? prev-props)
