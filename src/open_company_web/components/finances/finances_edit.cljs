@@ -50,7 +50,7 @@
       (dom/tbody {}
         (dom/tr {}
           (dom/th {:class "no-cell"}
-            (utils/get-period-string (:period finances-data) "monthly" [:short :skip-year]))
+            (utils/get-period-string (:period finances-data) "monthly" [:short (when needs-year :force-year)]))
           ;; revenue
           (dom/td {}
             (om/build cell {:value (:revenue finances-data)
@@ -87,14 +87,7 @@
                             :draft-cb #(change-cb :cash %)
                             :period period
                             :key :cash
-                            :tab-cb tab-cb})))
-        (when needs-year
-          (dom/tr {}
-            (dom/th {:class "no-cell year"}
-              (utils/get-year period))
-            (dom/td {:class "no-cell"})
-            (dom/td {:class "no-cell"})
-            (dom/td {:class "no-cell"})))))))
+                            :tab-cb tab-cb})))))))
 
 (defn finances-get-value [v]
   (if (js/isNaN v)
@@ -180,7 +173,10 @@
 
       (dom/div {:class "finances" :style {:height (str (- (:main-height data) 5) "px") :overflow "hidden"}}
         (dom/div {:class "composed-section-edit finances-body edit"
-                  :style {:height (str (- (:main-height data) 63) "px") :overflow "scroll"}}
+                  :style {:height (str (- (:main-height data) 63) "px")
+                          :width (str (:main-width data) "px")
+                          :overflow-y "scroll"
+                          :overflow-x "hidden"}}
           (dom/div {:class "group"}
             (dom/h3 {:class "left pt3 pb2 px2 group"} (if (zero? (count finances-data)) "Add Finances" "Edit Finances")))
           (dom/div {:class "table-container my2 group"}
@@ -189,9 +185,9 @@
               (dom/thead {}
                 (dom/tr {}
                   (dom/th {} "")
-                  (dom/th {} "Revenue")
-                  (dom/th {} "Expenses")
-                  (dom/th {} "Cash")))
+                  (dom/th {} "REVENUE")
+                  (dom/th {} "EXPENSES")
+                  (dom/th {} "CASH")))
               (let [current-period (utils/current-finance-period)]
                 (for [idx (range stop)]
                   (let [period (finance-utils/get-past-period current-period idx)
@@ -203,7 +199,7 @@
                     (om/build finances-edit-row {:cursor row-data
                                                  :next-period next-period
                                                  :is-last (= idx 0)
-                                                 :needs-year (= idx (dec stop))
+                                                 :needs-year (or (= idx 0) (= idx (dec stop)))
                                                  :currency currency
                                                  :change-cb #(replace-row-in-data owner row-data %1 %2)}))))
               (dom/tfoot {}

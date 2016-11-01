@@ -124,6 +124,7 @@
                                :new-metric? new-metric?
                                :growth-data growth-data
                                :main-height height
+                               :main-width width
                                :metrics growth-metrics
                                :currency curency
                                :metric-slugs growth-metric-slugs
