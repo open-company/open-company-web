@@ -50,13 +50,17 @@
     ;; Format output
     (dom/div {} date " " formatted-metric-delta)))
 
-(defn- label-from-set [data-set metric-name interval metric-unit currency-symbol]
+(defn- label-from-set [data-set metric-name description interval metric-unit currency-symbol]
   (let [actual-val (:value data-set)
         period (utils/get-period-string (:period data-set) interval)
         fixed-cur-unit (when (= metric-unit "currency") currency-symbol)
         unit (when (= metric-unit "%") "%")]
     (when actual-val
-      (dom/span {:class "bold domine"}
+      (dom/span {:class "bold domine"
+                 :data-toggle "tooltip"
+                 :data-container "body"
+                 :data-placement "top"
+                 :title description}
         (dom/span {:class "open-sans"}
           fixed-cur-unit (oc-lib/with-size-label actual-val) unit)
         " " metric-name))))
@@ -75,6 +79,10 @@
 
 (defcomponent growth-metric [data owner options]
 
+  (did-update [_ _ _]
+    (when-not (utils/is-test-env?)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+
   (render [_]
     (let [{:keys [slug interval] :as metric-info} (:metric-info data)
           metric-data (:metric-data data)
@@ -86,8 +94,8 @@
           metric-unit (:unit metric-info)
           period (utils/get-period-string (:period actual-set) interval)
           currency-symbol (utils/get-symbol-for-currency-code (:currency data))
-          actual-with-label (label-from-set actual-set (:name metric-info) interval metric-unit currency-symbol)
-          fixed-sorted-metric (vec (map #(merge % {:label (label-from-set % (:name metric-info) interval metric-unit currency-symbol)
+          actual-with-label (label-from-set actual-set (:name metric-info) (:description metric-info) interval metric-unit currency-symbol)
+          fixed-sorted-metric (vec (map #(merge % {:label (label-from-set % (:name metric-info) (:description metric-info) interval metric-unit currency-symbol)
                                                    :sub-label (let [idx (.indexOf (vec (map :period (reverse sorted-metric))) (:period %))
                                                                     periods (subvec (vec (reverse sorted-metric)) idx)]
                                                                 (growth-metric-delta periods metric-info currency-symbol))}) sorted-metric))

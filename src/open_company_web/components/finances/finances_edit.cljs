@@ -182,7 +182,7 @@
         (dom/div {:class "composed-section-edit finances-body edit"
                   :style {:height (str (- (:main-height data) 63) "px") :overflow "scroll"}}
           (dom/div {:class "group"}
-            (dom/h3 {:class "left pt3 pb2 px2 group"} "Edit Finances"))
+            (dom/h3 {:class "left pt3 pb2 px2 group"} (if (zero? (count finances-data)) "Add Finances" "Edit Finances")))
           (dom/div {:class "table-container my2 group"}
             (dom/table {:class "table"
                         :key table-key}
@@ -219,6 +219,6 @@
                          :disabled (not has-changes?)
                          :on-click  #(do
                                       (save-data owner)
-                                      (editing-cb false))} "UPDATE")
+                                      (editing-cb false))} (if (zero? (count finances-data)) "ADD" "UPDATE"))
             (dom/button {:class "btn-reset btn-outline"
                          :on-click #(editing-cb false)} "CANCEL")))))))

@@ -223,7 +223,7 @@
         (dom/div {:class "composed-section-edit growth-body edit"
                   :style {:height (str (- (:main-height data) 63) "px") :overflow "scroll"}}
           (dom/div {:class "group"}
-            (dom/h3 {:class "left pt3 pb2 px2 group"} "Edit Chart"))
+            (dom/h3 {:class "left pt3 pb2 px2 group"} (if new-metric? "Add Chart" "Edit Chart")))
 
           ;; Meta-data editing form
           (om/build growth-metric-edit {:metric-info metric-info
