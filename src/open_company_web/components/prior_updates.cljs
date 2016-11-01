@@ -5,6 +5,7 @@
             [open-company-web.components.ui.icon :as i]
             [open-company-web.api :as api]
             [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
             [open-company-web.urls :as urls]))
 
@@ -19,7 +20,6 @@
     (drv/drv :jwt)
     rum/reactive
   [s]
-  
   (let [company-slug (router/current-company-slug)]
   
     [:div.oc-popover {:style {:height "450px" :width "500px" } :on-click (fn [e] (.stopPropagation e))}
@@ -49,7 +49,9 @@
                     human-date (str month-string " " day ", " year)
                     update-slug (:slug update)
                     link (urls/stakeholder-update company-slug link-date update-slug)
-                    title (:title update)
+                    title (if (clojure.string/blank? (:title update))
+                            (str (:name (dispatcher/company-data)) " Update")
+                            (:title update))
                     author (if same-user? "You" (-> update :author :name))
                     medium (case (keyword (:medium update))
                                 :email [:div.medium "by " (i/icon :email-84 {:size 13 :class "inline"})]
