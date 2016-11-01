@@ -46,7 +46,7 @@
 
       (dom/tbody {}
         (dom/tr {:class "growth-edit-row"}
-          (dom/th {:class "no-cell"}
+          (dom/th {:class "no-cell small-caps"}
             period-string)
           (dom/td {}
             (when-not is-last
@@ -219,8 +219,11 @@
           {slug :slug interval :interval metric-name :name unit :unit description :description :as metric-info} (current-metric-info owner metric-slug)
           prefix (if (= unit "currency") (utils/get-symbol-for-currency-code currency) "")
           suffix (when (= unit "%") "%")]
-      (dom/div {:class "growth"}
-        (dom/div {:class "composed-section-edit growth-body edit"}
+      (dom/div {:class "growth" :style {:height (str (- (:main-height data) 5) "px") :overflow "hidden"}}
+        (dom/div {:class "composed-section-edit growth-body edit"
+                  :style {:height (str (- (:main-height data) 63) "px") :overflow "scroll"}}
+          (dom/div {:class "group"}
+            (dom/h3 {:class "left pt3 pb2 px2 group"} "Edit Chart"))
 
           ;; Meta-data editing form
           (om/build growth-metric-edit {:metric-info metric-info
@@ -238,7 +241,7 @@
             (when interval
               ;; Data editing table
               (dom/div {:class "center"}
-                (dom/div {:class "table-container my2 group"}
+                (dom/div {:class "table-container mx2 left group"}
                   (dom/table {:class "table"
                               :key (str "growth-edit-" slug)}
 
@@ -270,17 +273,17 @@
                         (dom/tr {}
                           (dom/th {:class "earlier" :col-span 2}
                             (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner data)} "Earlier..."))
-                          (dom/td {})))))))
+                          (dom/td {})))))))))
 
-            ;; Save growth data and cancel edit buttons
-            (when interval
-              (dom/div {:class "topic-foce-footer group"}
-                (dom/div {:class "topic-foce-footer-right"}
-                  (dom/button {:class "btn-reset btn-solid btn-data-save"
-                               :disabled (or (not has-changes?)
-                                              (string/blank? metric-name))
-                               :on-click  #(do
-                                            (save-data owner data new-metric?)
-                                            (editing-cb false))} (if new-metric? "ADD" "UPDATE"))
-                  (dom/button {:class "btn-reset btn-outline"
-                               :on-click #(editing-cb false)} "CANCEL"))))))))))
+        ;; Save growth data and cancel edit buttons
+        (when interval
+          (dom/div {:class "topic-foce-footer group"}
+            (dom/div {:class "topic-foce-footer-right"}
+              (dom/button {:class "btn-reset btn-solid btn-data-save"
+                           :disabled (or (not has-changes?)
+                                          (string/blank? metric-name))
+                           :on-click  #(do
+                                        (save-data owner data new-metric?)
+                                        (editing-cb false))} (if new-metric? "ADD" "UPDATE"))
+              (dom/button {:class "btn-reset btn-outline"
+                           :on-click #(editing-cb false)} "CANCEL"))))))))
