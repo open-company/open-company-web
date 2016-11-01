@@ -82,7 +82,8 @@
                                  :data-on-change-cb (:finances-data-on-change data)
                                  :editing-cb (:editing-cb data)
                                  :data-section-on-change data-section-on-change
-                                 :main-height height}
+                                 :main-height height
+                                 :main-width width}
                                 {:key (:updated-at section-data)})))))
 
 (defcomponent topic-finances [{:keys [section section-data currency editable? foce-data-editing? editing-cb table-key data-section-on-change] :as data} owner options]

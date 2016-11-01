@@ -100,7 +100,6 @@
                                       width
                                       height] :as data} owner options]
   (render [_]
-    (js/console.log "growth-popover height" height)
     (dom/div {:class "oc-popover-container-internal growth composed-section"
               :style {:width "100%" :height "100%"}}
       (dom/button {:class "close-button"
@@ -124,6 +123,7 @@
                                :new-metric? new-metric?
                                :growth-data growth-data
                                :main-height height
+                               :main-width width
                                :metrics growth-metrics
                                :currency curency
                                :metric-slugs growth-metric-slugs

@@ -32,8 +32,6 @@
           is-new (and (not (:value growth-data)) (:new growth-data))
           value (:value growth-data)
           period (:period growth-data)
-          flags [:short :skip-year]
-          period-string (utils/get-period-string period interval flags)
           cell-state (if is-new :new :display)
           tab-cb (fn [_ k]
                    (cond
@@ -42,11 +40,13 @@
                        (signal-tab next-period :value))))
           needs-year? (or (:needs-year data)
                           (and (not= interval "weekly")
-                               (= (utils/get-month period interval) "JAN")))]
+                               (= (utils/get-month period interval) "JAN")))
+          flags [:short (when needs-year? :force-year)]
+          period-string (utils/get-period-string period interval flags)]
 
       (dom/tbody {}
         (dom/tr {:class "growth-edit-row"}
-          (dom/th {:class "no-cell small-caps"}
+          (dom/th {:class "no-cell"}
             period-string)
           (dom/td {}
             (when-not is-last
@@ -61,13 +61,7 @@
                  :suffix suffix
                  :period period
                  :key :value
-                 :tab-cb tab-cb}))))
-
-        (when needs-year?
-          (dom/tr {}
-            (dom/th {:class "no-cell year"}
-              (utils/get-year period interval))
-            (dom/td {:class "no-cell"})))))))
+                 :tab-cb tab-cb}))))))))
 
 ;; ===== Growth Metric Metadata Functions =====
 
@@ -221,9 +215,12 @@
           suffix (when (= unit "%") "%")]
       (dom/div {:class "growth" :style {:height (str (- (:main-height data) 5) "px") :overflow "hidden"}}
         (dom/div {:class "composed-section-edit growth-body edit"
-                  :style {:height (str (- (:main-height data) 63) "px") :overflow "scroll"}}
+                  :style {:height (str (- (:main-height data) 63) "px")
+                          :width (str (:main-width data) "px")
+                          :overflow-y "scroll"
+                          :overflow-x "hidden"}}
           (dom/div {:class "group"}
-            (dom/h3 {:class "left pt3 pb2 px2 group"} "Edit Chart"))
+            (dom/h3 {:class "left pt3 pb2 px2 group"} (if new-metric? "Add Chart" "Edit Chart")))
 
           ;; Meta-data editing form
           (om/build growth-metric-edit {:metric-info metric-info
@@ -261,7 +258,7 @@
                           (om/build growth-edit-row {:cursor row-data
                                                      :next-period next-period
                                                      :is-last (= idx 0)
-                                                     :needs-year (= idx (dec stop))
+                                                     :needs-year (or (= idx 0) (= idx (dec stop)))
                                                      :prefix prefix
                                                      :suffix suffix
                                                      :interval interval

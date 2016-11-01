@@ -173,7 +173,8 @@
                 :cancel-cb #(hide-popover nil "archive-topic-confirm")
                 :success-title "ARCHIVE"
                 :success-cb #(let [section (dis/foce-section-key)]
-                               (dis/dispatch! [:topic-archive section]))}))
+                               (dis/dispatch! [:topic-archive section])
+                               (hide-popover nil "archive-topic-confirm"))}))
 
 (defn- add-image-tooltip [image-header]
   (if (or (not image-header) (string/blank? image-header))

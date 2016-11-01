@@ -28,28 +28,32 @@ div#growth-edit, div#finances-edit{
 
     div.table-container {
       margin: 0;
-      width: 180px;
       table {
         td .comp-cell {
-          border: 1px solid rgba(78, 90, 107, 0.1);
+          border: 1px solid rgba(78, 90, 107, 0.5);
+          width: 80px;
+        }
+
+        th, td {
+          text-align: left;
+        }
+
+        th:first-child, td:first-child {
+          width: 107px;
+          padding-left: 1.5rem;
+          font-size: 12px;
+          font-family: $oc_headers_font;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: $oc_gray_5;
         }
       }
     }
   }
 }
 
-div.finances {
-  table.table {
-    width: 100%;
-  }
-}
-
 div.growth {
-
   div.table-container {
-    margin: 0;
-    width: 180px;
-
     table.table {
       margin-top: 10px;
     }
@@ -78,15 +82,13 @@ div.finances, div.growth {
     tr {
 
       th {
-        padding: 4px 0 4px 0px;
-        font-weight: 700;
+        padding: 4px 0 4px 6px;
+        font-weight: normal;
         font-family: $oc_headers_font;
         font-size: 12px;
         line-height: 1.5;
         letter-spacing: 1px;
-        color: rgba(78,90,107, 0.75);
-        text-transform: uppercase;
-        height: 36px;
+        color: rgba(78,90,107, 1);
         vertical-align: middle;
 
         a.more {
@@ -103,21 +105,8 @@ div.finances, div.growth {
         text-align: center;
       }
 
-      td.no-cell, th.no-cell {
-        font-weight: 700;
-        font-size: 12px;
-        letter-spacing: 1px;
-        color: $oc_gray_5;
-        text-transform: uppercase;
-      }
-
-      td.no-cell {
-        font-family: $oc_main_font;
-      }
-
       th.no-cell {
         padding: 4px 0 4px 8px;
-        font-family: $oc_headers_font;
       }
 
       th.earlier {

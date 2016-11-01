@@ -129,24 +129,25 @@
 
         ;; name
         (dom/div {:class "group" :style {:white-space "nowrap" :text-align "left"}}
-          (dom/label {:class "small-caps col-4 left"
+          (dom/label {:class "small-caps col-3 mt1 left"
                       :style {:padding-top "3px"}} "CHART LABEL")
-          (dom/input {:class "npt col-8 mb2"
+          (dom/input {:class "npt col-9 p1 mb2"
             :type "text"
             :value metric-name
+            :max-length 10
             :on-change (fn [e]
                         (let [v (.. e -target -value)
                               on-change-cb (om/get-props owner :metadata-on-change-cb)]
                           (om/set-state! owner :metric-name v)
                           (on-change-cb :name v)))
             :id "mtr-name"
-            :placeholder "Chart label - a short name, e.g. DAU"}))
+            :placeholder "Short label e.g. DAU"}))
 
         ;; description
         (dom/div {:class "group" :style {:white-space "nowrap" :text-align "left"}}
-          (dom/label {:class "small-caps col-4 left"
+          (dom/label {:class "small-caps col-3 mt1 left"
                       :style {:padding-top "3px"}} "DESCRIPTION")
-          (dom/input {:class "npt col-8 p1 mb2"
+          (dom/input {:class "npt col-9 p1 mb2"
                       :type "text"
                       :value description
                       :placeholder "Description - e.g. Daily Active Users"
@@ -158,8 +159,8 @@
 
         ;; interval
         (dom/div {:class "group" :style {:white-space "nowrap" :text-align "left"}}
-          (dom/label {:class "small-caps col-4 left"} " ")
-          (dom/div {:class "col-5 left"}
+          (dom/label {:class "small-caps col-3 left"} " ")
+          (dom/div {:class "col-4 left"}
             (dom/select {:class "npt col-12 p1 mb2 interval"
                          :default-value interval
                          :id "mtr-interval"
@@ -167,12 +168,9 @@
                          :disabled (and (pos? (:metric-count data))
                                         (not (:new-metric? data)))}
               (for [interval intervals]
-                (dom/option {:value interval} (utils/camel-case-str interval))))))
-
-        ;; unit
-        (dom/div {:class "group" :style {:white-space "nowrap" :text-align "left"}}
-          (dom/label {:class "small-caps col-4 left"} " ")
-          (dom/div {:class "col-5 left"}
+                (dom/option {:value interval} (utils/camel-case-str interval)))))
+          (dom/label {:class "col-1 left"} " ")
+          (dom/div {:class "col-4 left"}
             (dom/select {:class "npt col-12 p1 mb2 unit"
                          :default-value (or unit "Number")
                          :id "mtr-unit"}

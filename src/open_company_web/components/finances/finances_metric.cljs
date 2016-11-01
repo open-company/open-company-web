@@ -82,7 +82,7 @@
 (defcomponent finances-metric [{:keys [finances-data data-key currency charts-count chart-selected-idx chart-selected-cb] :as data} owner options]
 
   (init-state [_]
-    {:selected-metric-idx 0
+    {:selected-metric-idx (min 3 (dec (count finances-data)))
      :fixed-sorted-metric (get-fixed-sorted-metric finances-data currency data-key)})
 
   (will-receive-props [_ next-props]
@@ -121,16 +121,15 @@
                 :key data-key
                 :on-click (:start-editing-cb data)}
 
-        (when (pos? (count finances-data))
-          (dom/div {}
-            (om/build d3-chart {:chart-data fixed-sorted-metric
-                                :circle-radius (:circle-radius data)
-                                :circle-stroke (:circle-stroke data)
-                                :circle-fill (:circle-fill data)
-                                :line-stroke-width (:line-stroke-width data)
-                                :selected chart-selected-idx
-                                :selected-metric-cb chart-selected-cb
-                                :circle-selected-stroke (:circle-selected-stroke data)
-                                :chart-height (:height (:chart-size data))
-                                :chart-width (:width (:chart-size data))
-                                :card-width (:card-width data)} chart-opts)))))))
+        (dom/div {}
+          (om/build d3-chart {:chart-data fixed-sorted-metric
+                              :circle-radius (:circle-radius data)
+                              :circle-stroke (:circle-stroke data)
+                              :circle-fill (:circle-fill data)
+                              :line-stroke-width (:line-stroke-width data)
+                              :selected chart-selected-idx
+                              :selected-metric-cb chart-selected-cb
+                              :circle-selected-stroke (:circle-selected-stroke data)
+                              :chart-height (:height (:chart-size data))
+                              :chart-width (:width (:chart-size data))
+                              :card-width (:card-width data)} chart-opts))))))
