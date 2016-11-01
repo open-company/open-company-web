@@ -26,13 +26,15 @@
   (render [_]
     (dom/div {:class "growth-sparkline sparkline group"
               :id (str "growth-sparkline-" (:slug metric-metadata))}
-      (let [center-box-width (if (responsive/is-mobile-size?)
-                               (- (.-clientWidth (.-body js/document)) 20 80 editing-actions-width)
+      (let [ww (.-clientWidth (.-body js/document))
+            total-card-width (if (>= ww responsive/c1-min-win-width) card-width ww)
+            center-box-width (if (responsive/is-mobile-size?)
+                               (- total-card-width 20 80 editing-actions-width)
                                (- card-width 80 (if editing? editing-actions-width 0)))]
         (dom/div {:class "center-box"
                   :style {:width (str center-box-width "px")}}
           (let [fixed-card-width (if (responsive/is-mobile-size?)
-                                   (.-clientWidth (.-body js/document)) ; use all the possible space on mobile
+                                   total-card-width ; use all the possible space on mobile
                                    card-width)
                 subsection-data {:metric-data metric-data
                                  :metric-info metric-metadata
@@ -46,7 +48,7 @@
                                  :line-stroke-width 2
                                  :chart-size {:height 40
                                               :width (- fixed-card-width 50      ;; margin left and right
-                                                                        180      ;; max left label size of the sparkline
+                                                                        190      ;; max left label size of the sparkline
                                                                          40      ;; internal padding
                                                                           5      ;; internal spacing
                                                           (if editing? editing-actions-width 0))}}]
