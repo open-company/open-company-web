@@ -26,8 +26,9 @@
     [racehub/om-bootstrap "0.6.1"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
     [com.andrewmcveigh/cljs-time "0.5.0-alpha1"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
-    [funcool/cuerdas "0.8.0"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
+    [funcool/cuerdas "2.0.0"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
     [medley "0.8.3"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
+    [defun "0.3.0-RC1"] ; defun used mostly to port some fn from oc-lib https://github.com/killme2008/defun
 
     ;; --- DO NOT UPDATE REACT, the 15.x.x code requires changes on our part
     [cljsjs/react "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages

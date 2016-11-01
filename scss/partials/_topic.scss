@@ -164,7 +164,7 @@ div.topic {
       }
 
       div.card-header{
-        margin: 0px;
+        margin: 0px 0px 5px 0px;
         padding: 0px;
         width: 100%;
         position: relative;
@@ -173,6 +173,7 @@ div.topic {
         &.card-image {
           overflow: hidden;
           padding-top: 0px;
+          border-bottom: none;
         }
 
         img {
@@ -180,7 +181,7 @@ div.topic {
         }
 
         div.section-container {
-          margin: 10px;
+          margin: 10px 10px 0px 10px;
         }
 
         div.gradient {

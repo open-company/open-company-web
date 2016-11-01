@@ -38,8 +38,8 @@
 (defn prior-updates-click [e]
   (utils/event-stop e)
   (close-menu)
-  (popover/add-popover-with-derivative-rum-component prior-updates {:container-id "prior-updates-dialog"
-                                                                    :hide-on-click-out true}))
+  (popover/add-popover-with-rum-component prior-updates {:container-id "prior-updates-dialog"
+                                                         :hide-on-click-out true}))
 
 (defn on-transition-end [owner body]
   (doto body

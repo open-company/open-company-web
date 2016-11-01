@@ -19,6 +19,7 @@ html, body {
   font-family: $oc_main_font;
   font-size: 16px;
   width: 100%;
+  color: $oc_gray_5;
 
   @include mobile(){
     overflow-x: hidden;

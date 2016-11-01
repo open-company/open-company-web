@@ -1,6 +1,4 @@
 div#section-finances.editing, div#section-growth.editing {
-  padding: 0;
-  background-color: #F3F4F5;
 
   div.metric-name {
     padding: 32px 8px 0px 30px;
@@ -15,11 +13,21 @@ div.finances {
   table.table {
     width: 100%;
   }
+  div.table-container {
+    background-color: #F3F4F5;
+  }
 }
 
 div.growth {
-  table.table {
+
+  div.table-container {
+    background-color: #F3F4F5;
+    margin: 0 auto 10px;
     width: 180px;
+
+    table.table {
+      margin-top: 10px;
+    }
   }
 }
 
@@ -74,7 +82,7 @@ div.finances, div.growth {
         font-weight: 700;
         font-size: 12px;
         letter-spacing: 1px;
-        color: rgba(78,90,107, 0.75);
+        color: $oc_gray_5;
         text-transform: uppercase;
       }
 
@@ -93,22 +101,38 @@ div.finances, div.growth {
       }
 
       td div.comp-cell {
-        opacity: 0.5;
         background-color: #ffffff;
-        padding-top: 4px;
+        padding-top: 2px;
+        padding-left: 2px;
       }
+    }
+  }
 
-      td div.comp-cell div.comp-cell-int {
-        font-weight: normal;
-        font-size: 12px;
-        letter-spacing: 1px;
-        color: $oc_gray_7;
-      }
+  div.section.new-metric-slug-placeholder.fake-chart, div.bordered-chart.fake-chart {
+    position: relative;
+
+    &:after {
+      display: block;
+      position: absolute;
+      content: "Your Chart Will Show Up Here \00000a (minimum two periods)";
+      white-space: pre;
+      width: 100%;
+      height: 100%;
+      top: 0px;
+      left: 0px;
+      background-color: rgba(243,244,245,0.8);
+      color: rgba(78,90,107,0.5);
+      font-size: 12px;
+      font-style: italic;
+      letter-spacing: 1px;
+      text-align: center;
+      padding-top: 120px;
     }
   }
 
   div.topic-foce-footer {
     margin: 0 !important;
+    width: 100%;
 
     button.btn-outline {
       background-color: white;
@@ -120,6 +144,15 @@ div.finances, div.growth {
 
       &:disabled {
         opacity: 0.2;
+      }
+    }
+
+    div.topic-foce-footer-right {
+      float: right;
+
+      button {
+        margin-left: 7px;
+        float: right;
       }
     }
   }

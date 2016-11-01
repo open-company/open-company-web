@@ -215,14 +215,13 @@
         (dis/dispatch! [:foce-save sections data-to-save])))))
 
 (defn- data-editing-cb [owner value]
-  (om/set-state! owner :data-editing? value) ; local state
-  (dis/set-foce-section-data-editing value)) ; global atom state
+  (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
 
 (defcomponent topic-edit [{:keys [show-first-edit-tip
                                   currency
                                   card-width
                                   prev-rev
-                                  next-rev]} owner options]
+                                  next-rev] :as data} owner options]
 
   (init-state [_]
     (let [topic      (dis/foce-section-key)
@@ -237,8 +236,7 @@
        :char-count-alert false
        :has-changes false
        :file-upload-state nil
-       :file-upload-progress 0
-       :data-editing? (dis/foce-section-data-editing?)}))
+       :file-upload-progress 0}))
 
   (will-receive-props [_ next-props]
     ;; update body placeholder when receiving data from API
@@ -301,7 +299,7 @@
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
                            file-upload-state file-upload-progress upload-remote-url negative-headline-char-count
-                           has-changes data-editing?]}]
+                           has-changes]}]
 
     (let [company-slug        (router/current-company-slug)
           section             (dis/foce-section-key)
@@ -327,39 +325,23 @@
       (when section
         (dom/div #js {:className "topic-foce group"
                       :ref "topic-internal"}
-          (when (or is-data?
-                    image-header)
-            (cond
-              (= section-kw :finances)
-              (om/build topic-finances {:section-data (utils/fix-finances topic-data)
-                                        :section section-kw
-                                        :currency currency
-                                        :editable? true
-                                        :editing-cb (partial data-editing-cb owner)
-                                        :initial-editing? data-editing?}
-                                        {:opts chart-opts})
-              (= section-kw :growth)
-              (om/build topic-growth {:section-data topic-data
-                                      :section section-kw
-                                      :currency currency
-                                      :editable? true
-                                      :editing-cb (partial data-editing-cb owner)
-                                      :initial-editing? data-editing?}
-                                      {:opts chart-opts})
-    
-              :else
-              (dom/div {:class (utils/class-set {:card-header true
-                                                 :card-image true})}
-                (dom/img {:src image-header
-                            :class "topic-header-img"})
-                 (dom/button {:class "btn-reset remove-header"
-                              :on-click #(do
-                                          (om/set-state! owner :has-changes true)
-                                          (dis/dispatch! [:foce-input {:image-url nil :image-height 0 :image-width 0}]))}
-                  (i/icon :simple-remove {:size 15
-                                          :stroke 4
-                                          :color "white"
-                                          :accent-color "white"})))))
+          (when (and (not is-data?)
+                     image-header)
+            (dom/div {:class "card-header card-image"}
+              (dom/img {:src image-header
+                          :class "topic-header-img"})
+               (dom/button {:class "btn-reset remove-header"
+                            :data-toggle "tooltip"
+                            :data-placement "top"
+                            :data-container "body"
+                            :title "Remove this image"
+                            :on-click #(do
+                                        (om/set-state! owner :has-changes true)
+                                        (dis/dispatch! [:foce-input {:image-url nil :image-height 0 :image-width 0}]))}
+                (i/icon :simple-remove {:size 15
+                                        :stroke 4
+                                        :color "white"
+                                        :accent-color "white"}))))
           ;; Topic title
           (dom/input {:class "topic-title"
                       :value (:title topic-data)
@@ -386,6 +368,27 @@
                                     (check-headline-count owner % false)
                                     (om/set-state! owner :char-count nil))
                         :dangerouslySetInnerHTML initial-headline})
+          (when is-data?
+            (dom/div {:class ""}
+              (cond
+                (= section-kw :growth)
+                (om/build topic-growth {:section-data topic-data
+                                        :section section-kw
+                                        :currency currency
+                                        :editable? true
+                                        :data-section-on-change #(om/set-state! owner :has-changes true)
+                                        :foce-data-editing? (:foce-data-editing? data)
+                                        :editing-cb (partial data-editing-cb owner)}
+                                        {:opts chart-opts})
+                (= section-kw :finances)
+                (om/build topic-finances {:section-data (utils/fix-finances topic-data)
+                                          :section section-kw
+                                          :currency currency
+                                          :editable? true
+                                          :data-section-on-change #(om/set-state! owner :has-changes true)
+                                          :foce-data-editing? (:foce-data-editing? data)
+                                          :editing-cb (partial data-editing-cb owner)}
+                                          {:opts chart-opts}))))
           (dom/div #js {:className "topic-body emoji-autocomplete emojiable"
                         :id (str "foce-body-" (name section))
                         :key "foce-body"
@@ -435,17 +438,20 @@
             ;                :style {:display (if (nil? file-upload-state) "block" "none")}
             ;                :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
             ;       (dom/i {:class "fa fa-code"})))
-            (when (and is-data? (not data-editing?))
+            (when (or (= is-data? :growth)
+                      (and (= is-data? :finances)
+                           (not (dis/foce-section-data-editing?))))
               (dom/button {:class "btn-reset chart-button left"
-                           :title "Add a chart"
+                           :title (if (and (= is-data? :growth)
+                                           (pos? (count (:metrics topic-data))))
+                                    "Add another chart"
+                                    "Add a chart")
                            :type "button"
                            :data-toggle "tooltip"
                            :data-container "body"
                            :data-placement "top"
-                           :style {:display (if no-data? "block" "none")}
-                           :on-click #(do
-                                        (dis/set-foce-section-data-editing true)
-                                        (om/set-state! owner :data-editing? true))}
+                           :style {:display (if (or (and (= is-data? :finances) no-data?) (= is-data? :growth)) "block" "none")}
+                           :on-click #(dis/dispatch! [:start-foce-data-editing (if (= is-data? :growth) growth-utils/new-metric-slug-placeholder :new)])}
                 (dom/i {:class "fa fa-line-chart"})))
             (when-not (:placeholder topic-data)
               (dom/button {:class "btn-reset archive-button right"
@@ -494,10 +500,10 @@
             (dom/div {:class "topic-foce-footer-right"
                       :style {:display (if (nil? file-upload-state) "block" "none")}}
               (dom/button {:class "btn-reset btn-solid"
-                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count data-editing?)
+                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count (dis/foce-section-data-editing?))
                            :on-click #(save-topic owner)} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
-                           :disabled data-editing?
+                           :disabled (dis/foce-section-data-editing?)
                            :on-click #(if (:placeholder topic-data)
                                         (dis/dispatch! [:topic-archive (name section)])
                                         (dis/dispatch! [:start-foce nil]))} "CANCEL")))

@@ -87,6 +87,7 @@
                            :new-sections (:new-sections (slug data))
                            :latest-su (dis/latest-stakeholder-update)
                            :force-edit-topic (:force-edit-topic data)
+                           :foce-data-editing? (:foce-data-editing? data)
                            :revision-updates (dis/revisions (router/current-company-slug))
                            :card-width card-width
                            :columns-num columns-num

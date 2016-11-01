@@ -1,21 +1,28 @@
 div.composed-section {
 
   div.bordered-chart {
-    border-style: solid;
-    border-width: 1px;
-    border-color: $oc_gray_2;
-    border-radius: 5px;
     margin-left: 10px;
     margin-right: 10px;
     padding-top: 20px;
     padding-bottom: 20px;
   }
 
+  div.unbordered-chart {
+    min-height: 45px;
+  }
+
   div.chart-container {
 
     margin: 0 auto;
 
+    &.chart-sparklines {
+      margin: 0;
+      float: right;
+    }
+
     svg {
+      overflow: visible;
+
       rect.hover-rect {
         cursor: pointer;
       }
@@ -23,7 +30,7 @@ div.composed-section {
       text.x-axis-label {
         font-size: 12px;
         font-weight: 700;
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         color: $oc_gray_5;
         opacity: 0.25;
       }
@@ -65,6 +72,38 @@ div.composed-section {
     div.chart-label {
       font-size: 12px;
     }
+
+    &.chart-sparklines {
+      float: left;
+      max-width: 180px;
+      overflow: hidden;
+      display: inline-block;
+
+      div.chart-labels {
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+
+      div.chart-value, div.chart-label {
+        font-weight: 400;
+        font-family: $oc_main_font;
+        letter-spacing: 1px;
+        line-height: 1.5;
+        font-size: 13px;
+        color: $oc_gray_5;
+        white-space: nowrap;
+        overflow-y: visible;
+        overflow-x: hidden;
+      }
+
+      div.chart-value {
+        margin-bottom: 0.4rem;
+      }
+
+      div.chart-label {
+        font-size: 13px;
+      }
+    }
   }
 
   div.chart-top-label-container.multiple-rows, div.chart-bottom-label-container.multiple-rows {
@@ -82,6 +121,13 @@ div.composed-section {
     div.chart-value {
       font-size: 22px;
     }
+
+    &.chart-sparklines {
+      div.chart-value {
+        font-size: 13px;
+        font-weight: 400;
+      }
+    }
   }
 
   div.chart-bottom-label-container {
@@ -90,8 +136,17 @@ div.composed-section {
     padding-bottom: 12px;
     margin-bottom: 10px;
 
-    div.chart-value {
-      font-size: 20px;
+    &.chart-sparklines {
+      padding-top: 0px;
+      padding-bottom: 0px;
+      margin-bottom: 0px;
+    }
+
+    &.chart-sparklines {
+      div.chart-value {
+        font-size: 13px;
+        font-weight: 400;
+      }
     }
   }
 

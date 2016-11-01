@@ -5,6 +5,14 @@ div.topic-body-inner{
     line-height: 1.2 !important;
   }
 }
+
+div.oc-popover h3 {
+  font-family: $oc_headers_font;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 18px;
+}
+
 div.section-container{
   div.pillbox-container.finances{
     background-color: transparent;

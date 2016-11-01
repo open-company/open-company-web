@@ -2,6 +2,7 @@
   (:require [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
+            [open-company-web.lib.oc-colors :as occ]
             [goog.string :as gstring]
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
@@ -51,7 +52,7 @@
               (placeholder-data prev-period {:new true}))))))))
 
 (defn edit-placeholder-data [initial-data]
-  (let [current-period (utils/current-period)
+  (let [current-period (utils/current-finance-period)
         last-period (if (last initial-data)
                       (:period (last initial-data))
                       (get-past-period current-period 12))
@@ -193,3 +194,28 @@
                  next-data
                  (inc idx))
           next-data)))))
+
+(defn fake-chart-placeholder-data []
+  (let [current-period   (utils/current-finance-period)]
+    (loop [idx 0
+           period current-period
+           d   []]
+      (if (< idx (- columns-num 2))
+        (let [row {:period period
+                   :cash (- (* 1000 6) (* (inc idx) 1000))
+                   :costs (- (* 100 6) (* (inc idx) 100))
+                   :revenue (* (inc idx) 200)}]
+          (recur (inc idx)
+                 (get-past-period period 1)
+                 (assoc d idx row)))
+        d))))
+
+(defn color-for-metric [k]
+  (occ/get-color-by-kw (cond (= k :revenue) :oc-green-dark
+                             (= k :costs) :red
+                             :else :oc-gray-7)))
+
+(defn finances-key-colors []
+  {:revenue (color-for-metric :revenue)
+   :costs  (color-for-metric :costs)
+   :cash  (color-for-metric :cash)})
