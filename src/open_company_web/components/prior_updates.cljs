@@ -22,7 +22,7 @@
   
   (let [company-slug (router/current-company-slug)]
   
-    [:div.oc-popover {:style {:height "450px" :width "500px"}}
+    [:div.oc-popover {:style {:height "450px" :width "500px" } :on-click (fn [e] (.stopPropagation e))}
       [:h3.m0.px2.py25.gray5.domine
         {:style {:border-bottom  "solid 1px rgba(78, 90, 107, 0.1)"}}
         "Prior Updates"]
