@@ -121,7 +121,7 @@
     (om/set-state! owner :growth-data fixed-data)
     (data-on-change-cb fixed-data)))
 
-(defn- more-months [owner data]
+(defn- ammazzati [e owner]
   (om/update-state! owner :stop #(+ % batch-size)))
 
 (defn- filter-growth-data [metric-slug growth-data]
@@ -269,7 +269,10 @@
                       (dom/tfoot {}
                         (dom/tr {}
                           (dom/th {:class "earlier" :col-span 2}
-                            (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner data)} "Earlier..."))
+                            (dom/a #js {:className "small-caps underline bold dimmed-gray"
+                                        :onClick #(ammazzati % owner)
+                              }
+                              "Earlier..."))
                           (dom/td {})))))))))
 
         ;; Save growth data and cancel edit buttons
@@ -279,8 +282,9 @@
               (dom/button {:class "btn-reset btn-solid btn-data-save"
                            :disabled (or (not has-changes?)
                                           (string/blank? metric-name))
-                           :on-click  #(do
-                                        (save-data owner data new-metric?)
-                                        (editing-cb false))} (if new-metric? "ADD" "UPDATE"))
+                           ; :on-click  #(do
+                           ;              (save-data owner data new-metric?)
+                           ;              (editing-cb false))
+                           } (if new-metric? "ADD" "UPDATE"))
               (dom/button {:class "btn-reset btn-outline"
                            :on-click #(editing-cb false)} "CANCEL"))))))))

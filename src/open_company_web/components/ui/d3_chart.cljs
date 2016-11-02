@@ -117,9 +117,9 @@
                           (.attr "class" "chart-line")
                           (.style "stroke" (chart-key fill-colors))
                           (.style "stroke-width" (or (om/get-props owner :line-stroke-width) circle-stroke))
-                          (.attr "x1" (+ cx 2))
+                          (.attr "x1" cx)
                           (.attr "y1" (get-y cy max-y))
-                          (.attr "x2" (- next-cx 2))
+                          (.attr "x2" next-cx)
                           (.attr "y2" (get-y next-cy max-y))))))
                 ;; add a circle to represent the data
 
