@@ -20,6 +20,7 @@
                                           charts-count
                                           archive-cb
                                           card-width
+                                          post-revenue?
                                           editing?] :as data} owner]
 
   (did-mount [_]
@@ -46,11 +47,7 @@
                                  :read-only true
                                  :chart-selected-idx chart-selected-idx
                                  :chart-selected-cb chart-selected-cb
-                                 :circle-radius 2
-                                 :circle-stroke 3
-                                 :circle-fill (finance-utils/color-for-metric data-key)
-                                 :circle-selected-stroke 5
-                                 :line-stroke-width 2
+                                 :post-revenue? post-revenue?
                                  :chart-size {:height 40
                                               :width (- fixed-card-width 50     ;; margin left and right
                                                                         170     ;; max left label size of the sparkline
@@ -81,6 +78,7 @@
                                           :chart-selected-idx chart-selected-idx
                                           :chart-selected-cb #(om/set-state! owner :chart-selected-idx %)
                                           :currency currency
+                                          :post-revenue? (pos? sum-revenues)
                                           :card-width card-width
                                           :editing? editing?}))))
       (dom/div {:class "actions group right"}

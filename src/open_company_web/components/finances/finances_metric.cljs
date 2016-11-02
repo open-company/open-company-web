@@ -4,7 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.oc-lib :as oc-lib]
-            [open-company-web.components.ui.d3-chart :refer (d3-chart)]
+            [open-company-web.components.ui.d3-column-chart :refer (d3-column-chart)]
             [open-company-web.lib.finance-utils :as finance-utils]
             [open-company-web.router :as router]
             [open-company-web.lib.oc-colors :as occ]
@@ -79,7 +79,13 @@
                                           periods (subvec (vec (reverse finances-data)) idx)]
                                      (finance-metric-delta periods data-key currency-symbol))}) finances-data))))
 
-(defcomponent finances-metric [{:keys [finances-data data-key currency charts-count chart-selected-idx chart-selected-cb] :as data} owner options]
+(defcomponent finances-metric [{:keys [finances-data
+                                       data-key
+                                       currency
+                                       charts-count
+                                       chart-selected-idx
+                                       chart-selected-cb
+                                       post-revenue?] :as data} owner options]
 
   (init-state [_]
     {:selected-metric-idx (min 3 (dec (count finances-data)))
@@ -97,11 +103,11 @@
           actual-with-label (label-from-set actual-set data-key currency-symbol)
           cash? (= data-key :cash)
           chart-opts {:opts {:chart-type "unbordered-chart"
-                             :chart-keys [data-key]
+                             :chart-keys (if post-revenue? [:revenue :costs] [:costs])
                              :interval "monthly"
                              :x-axis-labels false
-                             :chart-colors (finance-utils/finances-key-colors)
-                             :chart-selected-colors (finance-utils/finances-key-colors)
+                             :chart-colors (finance-utils/finances-key-colors false)
+                             :chart-selected-colors (finance-utils/finances-key-colors true)
                              :chart-fill-polygons (or (:chart-fill-polygons options) false)
                              :label-color (occ/get-color-by-kw :oc-gray-5)
                              :sub-label-color (occ/get-color-by-kw :oc-gray-5)
@@ -122,14 +128,9 @@
                 :on-click (:start-editing-cb data)}
 
         (dom/div {}
-          (om/build d3-chart {:chart-data fixed-sorted-metric
-                              :circle-radius (:circle-radius data)
-                              :circle-stroke (:circle-stroke data)
-                              :circle-fill (:circle-fill data)
-                              :line-stroke-width (:line-stroke-width data)
-                              :selected chart-selected-idx
-                              :selected-metric-cb chart-selected-cb
-                              :circle-selected-stroke (:circle-selected-stroke data)
-                              :chart-height (:height (:chart-size data))
-                              :chart-width (:width (:chart-size data))
-                              :card-width (:card-width data)} chart-opts))))))
+          (om/build d3-column-chart {:chart-data fixed-sorted-metric
+                                     :selected chart-selected-idx
+                                     :selected-metric-cb chart-selected-cb
+                                     :chart-height (:height (:chart-size data))
+                                     :chart-width (:width (:chart-size data))
+                                     :card-width (:card-width data)} chart-opts))))))
