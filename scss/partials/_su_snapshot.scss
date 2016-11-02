@@ -5,7 +5,7 @@ div.su-snapshot {
     position: relative;
     content: "";
     min-height: calc(100vh - #{$navbar_height}px);
-    background-color: $oc_gray_6;
+    background-color: $oc_gray_0;
     padding-top: 40px;
 
     div.topics-columns div.topics-column-container.columns-1 {
@@ -13,7 +13,13 @@ div.su-snapshot {
         div.topic-row {
           width: 100%;
           margin: 0px auto;
-          padding: 0px 0px 22px 0px;
+          padding: 0px 0px 11px 0px;
+
+          div.topic {
+            box-shadow: none;
+            border: 1px solid rgba(78,90,107,0.2);
+            background-color: white;
+          }
         }
       }
     }
