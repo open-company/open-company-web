@@ -5,7 +5,7 @@ div.su-snapshot {
     position: relative;
     content: "";
     min-height: calc(100vh - #{$navbar_height}px);
-    background-color: $oc_gray_0;
+    background-color: $oc_gray_8;
     padding-top: 40px;
 
     div.topics-columns div.topics-column-container.columns-1 {
@@ -68,7 +68,7 @@ div.su-snapshot {
     color: $oc_gray_5;
     font-weight: 400;
     font-family: $oc_main_font;
-    background-color: $oc_gray_0;
+    background-color: $oc_gray_8;
 
     a {
       font-family: $oc_main_font;
