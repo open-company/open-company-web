@@ -27,9 +27,6 @@
           stroke        (or stroke 2)
           size          (or size 30)
           v-align       (or vertical-align "text-bottom")]
-      (.log js/console "id:" id)
-      (.log js/console "vertical-align:" vertical-align)
-      (.log js/console "v-align:" v-align)      
       [:div {:class (str "svg-icon " class) :style {:width (str size "px") :height (str size "px")}}
         [:svg {:viewBox "0 0 16 16" :width (str size "px") :height (str size "px")
                :style {:color accent-color :stroke outline-color :strokeWidth (str stroke "px")

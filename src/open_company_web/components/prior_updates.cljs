@@ -31,6 +31,7 @@
         updates (reverse (drv/react s :su-list))
         none? (empty? updates)
         mobile? (responsive/is-mobile-size?)
+        klass (if mobile? "" "oc-popover") ; desktop is in a popover, mobile is full page
         window-height (when mobile? (.-clientHeight (.-body js/document)))
         window-width (when mobile? (.-clientWidth (.-body js/document)))
         width (if mobile? window-width desktop-width) ; full-width on mobile
@@ -39,13 +40,16 @@
                   mobile? window-height
                   none? 200 ; just a message
                   (<= (count updates) 3) 325 ; small # of updates
-                  :else 450)] ; lots of updates
-    [:div.oc-popover {:style {:height (str height "px")
-                              :width (str width "px")
-                              :padding 0
-                              :margin-left (half-offset width)
-                              :margin-top (half-offset height)}
-                      :on-click (fn [e] (.stopPropagation e))}
+                  :else 450) ; lots of updates
+        margin-left (if mobile? "0" (half-offset width)) ; desktop is centered
+        margin-top (if mobile? "0" (half-offset height))] ; desktop is centered
+
+    [:div {:class klass
+           :style {:height (str height "px")
+                   :width (str width "px")
+                   :padding 0
+                   :margin-left margin-left
+                   :margin-top margin-top}}
       
       (when-not mobile? ; floating close X
         [:button {:class "absolute top-0 btn-reset" :style {:left "100%"}
