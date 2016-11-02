@@ -33,7 +33,7 @@
         data-max (max-y all-data chart-keys)
         linear-fn (.. js/d3 -scale linear)
         domain-fn (.domain linear-fn #js [0 data-max])
-        range-fn (.range linear-fn #js [0 (om/get-props owner :chart-height)])]
+        range-fn (.range linear-fn #js [0 (- (om/get-props owner :chart-height) 10)])]
     range-fn))
 
 (defn- data-x-position
@@ -282,9 +282,13 @@
 
   (will-receive-props [_ next-props]
     (when (not= (:selected next-props) (om/get-state owner :selected))
-      (om/set-state! owner :selected (or (:selected next-props)
-                                         (om/get-state owner :selected)
-                                         (dec (count (vec (take-last show-data-points chart-data))))))))
+      (let [next-state {:selected (or (min (:selected next-props) (dec show-data-points))
+                                      (om/get-state owner :selected)
+                                      (dec (min (count (:chart-data next-props)) show-data-points)))
+                        :start (if (not= (count chart-data) (count (:chart-data next-props)))
+                                 (max 0 (- (count (:chart-data next-props)) show-data-points))
+                                 (om/get-state owner :start))}]
+        (om/update-state! owner #(merge % next-state)))))
 
   (render-state [_ {:keys [start selected]}]
     (let [hide-chart-nav (:hide-nav options)
