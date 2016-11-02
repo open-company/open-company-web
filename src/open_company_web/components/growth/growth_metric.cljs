@@ -108,7 +108,7 @@
                              :chart-fill-polygons (or (:chart-fill-polygons options) false)
                              :label-color (occ/get-color-by-kw :oc-gray-5)
                              :sub-label-color (occ/get-color-by-kw :oc-gray-5)
-                             :sparklines-class "chart-sparklines"
+                             :sparklines-class "chart-sparklines growth-sparklines"
                              :show-chart true
                              :labels {:value {:position :bottom
                                               :order 1

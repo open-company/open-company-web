@@ -11,6 +11,13 @@ div.composed-section {
     min-height: 45px;
   }
 
+  div.bar-chart {
+    div.chart-container {
+      float: left;
+      width: 100%;
+    }
+  }
+
   div.chart-container {
 
     margin: 0 auto;
@@ -75,9 +82,12 @@ div.composed-section {
 
     &.chart-sparklines {
       float: left;
-      max-width: 160px;
-      overflow: hidden;
       display: inline-block;
+      overflow: hidden;
+
+      &.growth-sparklines {
+        max-width: 160px;
+      }
 
       div.chart-labels {
         padding-left: 0px;

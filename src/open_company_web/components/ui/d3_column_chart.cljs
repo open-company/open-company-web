@@ -8,7 +8,7 @@
 
 ;; ===== Graph Layout =====
 
-(def bar-width 8)
+(def bar-width 12)
 
 (def show-data-points 4)
 (def chart-step show-data-points)
@@ -247,19 +247,12 @@
           chart-class (str (:chart-type options) " group" (when (:fake-chart options) " fake-chart"))
           chart-top-label-class (str "chart-top-label-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))
           chart-bottom-label-class (str "chart-bottom-label-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))]
-      (dom/div {:class chart-class}
-        ;; Top row labels
-        (when (not (nil? top-label-keys))
-          (labels-for chart-top-label-class top-label-keys labels selected-data-set))
-
-        ;; Bottom row labels
-        (when (not (nil? bottom-label-keys))
-          (labels-for chart-bottom-label-class bottom-label-keys labels selected-data-set))
+      (dom/div {:class (str "bar-chart " chart-class)}
 
         ;; D3 Chart w/ optional nav. buttons
         (when (and (> (count chart-data) 1) (:show-chart options))
           (dom/div {:class (str "chart-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))
-                    :style {:width (str (+ chart-width (if hide-chart-nav 30 10)) "px")
+                    :style {:width "100%"
                             :height (str chart-height "px")}}
             ;; Previous button
             (dom/div {:class (str "chart-prev" (when hide-chart-nav " hidden"))
@@ -280,4 +273,11 @@
                       :style {:paddingTop (str (- chart-height 17) "px")
                               :opacity (if (< start (- (count chart-data) show-data-points)) 1 0)}
                       :on-click #(next-data owner %)}
-              (dom/i {:class "fa fa-caret-right"}))))))))
+              (dom/i {:class "fa fa-caret-right"}))))
+        ;; Top row labels
+        (when (not (nil? top-label-keys))
+          (labels-for chart-top-label-class top-label-keys labels selected-data-set))
+
+        ;; Bottom row labels
+        (when (not (nil? bottom-label-keys))
+          (labels-for chart-bottom-label-class bottom-label-keys labels selected-data-set))))))

@@ -299,7 +299,7 @@
           chart-class (str (:chart-type options) " group" (when (:fake-chart options) " fake-chart"))
           chart-top-label-class (str "chart-top-label-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))
           chart-bottom-label-class (str "chart-bottom-label-container" (when (:sparklines-class options) (str " " (:sparklines-class options))))]
-      (dom/div {:class chart-class}
+      (dom/div {:class (str "dot-chart " chart-class)}
         ;; Top row labels
         (when (not (nil? top-label-keys))
           (labels-for chart-top-label-class top-label-keys labels selected-data-set))
