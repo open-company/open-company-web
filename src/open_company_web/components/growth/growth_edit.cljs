@@ -270,7 +270,7 @@
                         (dom/tr {}
                           (dom/th {:class "earlier" :col-span 2}
                             (dom/a #js {:className "small-caps underline bold dimmed-gray"
-                                        :onClick #(more-months % owner)} "Earlier..."))
+                                        :onClick (fn [e] (more-months e owner))} "Earlier..."))
                           (dom/td {})))))))))
 
         ;; Save growth data and cancel edit buttons
@@ -280,8 +280,9 @@
               (dom/button {:class "btn-reset btn-solid btn-data-save"
                            :disabled (or (not has-changes?)
                                           (string/blank? metric-name))
-                           :on-click  #(do
-                                        (save-data owner data new-metric?)
-                                        (editing-cb false))} (if new-metric? "ADD" "UPDATE"))
+                           :on-click  (fn []
+                                       (save-data owner data new-metric?)
+                                       (editing-cb false))}
+                (if new-metric? "ADD" "UPDATE"))
               (dom/button {:class "btn-reset btn-outline"
                            :on-click #(editing-cb false)} "CANCEL"))))))))
