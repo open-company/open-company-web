@@ -1,6 +1,5 @@
 (ns open-company-web.urls
-  (:require [open-company-web.router :as router]
-            [clojure.string :as clj-str]))
+  (:require [open-company-web.router :as router]))
 
 (defn params->query-string [m]
      (clojure.string/join "&" (for [[k v] m] (str (name k) "=" v))))
@@ -88,7 +87,15 @@
 
 (defn stakeholder-update-preview
   ([]
-    (stakeholder-update-preview (router/current-company-slug)))
+    (stakeholder-update-preview (router/current-company-slug) "link"))
+  ([share-medium]
+    (stakeholder-update-preview (router/current-company-slug) share-medium))
+  ([slug share-medium]
+    (str "/" (name slug) "/share/" (name share-medium))))
+
+(defn stakeholder-update-preview-old
+  ([]
+    (stakeholder-update-preview-old (router/current-company-slug)))
   ([slug]
     (str "/" (name slug) "/updates/preview")))
 

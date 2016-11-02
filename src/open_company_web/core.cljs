@@ -139,13 +139,14 @@
 ;; Component specific to a company
 (defn company-handler [route target component params]
   (let [slug (:slug (:params params))
+        medium (:medium (:params params))
         section (:section (:params params))
         edit?   (= route "section-edit")
         query-params (:query-params params)]
     (pre-routing query-params)
     (utils/clean-company-caches)
     ;; save the route
-    (router/set-route! (vec (remove nil? [slug (when section section) route (when edit? "edit")])) {:slug slug :section section :edit edit? :query-params query-params})
+    (router/set-route! (vec (remove nil? [slug (when section section) route (when edit? "edit")])) {:slug slug :section section :edit edit? :query-params query-params :medium medium})
     ;; load revision if needed
     (when (:as-of query-params)
       (api/load-revision {:updated-at (:as-of query-params)
@@ -274,7 +275,7 @@
     (defroute company-route-slash (str (urls/company ":slug") "/") {:as params}
       (company-handler "dashboard" target company-dashboard params))
 
-    (defroute su-snapshot-preview-route (urls/stakeholder-update-preview ":slug") {:as params}
+    (defroute su-snapshot-preview-route (urls/stakeholder-update-preview ":slug" ":medium") {:as params}
       (company-handler "su-snapshot-preview" target su-snapshot-preview params))
 
     (defroute su-list-route (urls/stakeholder-update-list ":slug") {:as params}

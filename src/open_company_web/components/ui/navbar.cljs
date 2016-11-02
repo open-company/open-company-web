@@ -21,14 +21,16 @@
     (.preventDefault e))
   (dis/toggle-menu))
 
-(defcomponent navbar [{:keys [company-data columns-num card-width latest-su link-loading email-loading slack-loading menu-open show-share-su-button] :as data} owner options]
+(defcomponent navbar [{:keys [columns-num
+                              card-width
+                              show-share-su-button] :as data} owner options]
 
   (render [_]
     (let [header-width (+ (* card-width columns-num)    ; cards width
                           (* 20 (dec columns-num))      ; cards right margin
                           (when (> columns-num 1) 60))] ; x margins if needed
       (dom/nav {:class "oc-navbar group"}
-        (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
+        (when (and (not (utils/is-test-env?)) (not (jwt/jwt)))
           (login-overlays-handler))
         (dom/div {:class "oc-navbar-header"
                   :style #js {:width (str header-width "px")}}
@@ -45,9 +47,32 @@
                   (if (jwt/jwt)
                     (dom/div {}
                       (when show-share-su-button
-                        (dom/div {:class "sharing-button-container"}
+                        (dom/div {:class "sharing-button-container dropdown"}
                           (dom/button {:class "btn-reset sharing-button right"
-                                       :disabled (not (nil? (:foce-key data)))
-                                       :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} (dom/i {:class "fa fa-share"}) " SHARE AN UPDATE")))
+                                       :aria-haspopup true
+                                       :aria-expanded false
+                                       :id "share-an-update"
+                                       :data-toggle "dropdown"
+                                       :disabled (not (nil? (:foce-key data)))}
+                            (dom/i {:class "fa fa-share"}) " SHARE AN UPDATE")
+                          (dom/div {:class "dropdown-menu"
+                                    :aria-labelledby "share-an-update"
+                                    :style {:left "0"
+                                            :top "25px"}}
+                            (dom/button {:class "btn-reset dropdown-item"
+                                         :on-click #(do
+                                                      (.preventDefault %)
+                                                      (router/nav! (oc-urls/stakeholder-update-preview :email)))}
+                              (dom/i {:class "fa fa-envelope"}) "  SHARE BY EMAIL")
+                            (dom/button {:class "btn-reset dropdown-item"
+                                         :on-click #(do
+                                                      (.preventDefault %)
+                                                      (router/nav! (oc-urls/stakeholder-update-preview :slack)))}
+                              (dom/i {:class "fa fa-slack"}) "  SHARE TO SLACK")
+                            (dom/button {:class "btn-reset dropdown-item"
+                                         :on-click #(do
+                                                      (.preventDefault %)
+                                                      (router/nav! (oc-urls/stakeholder-update-preview :link)))}
+                              (dom/i {:class "fa fa-link"}) "  SHARE A LINK"))))
                       (user-avatar (partial menu-click owner)))
                     (login-button)))))))))))

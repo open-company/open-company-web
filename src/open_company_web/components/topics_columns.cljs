@@ -216,6 +216,7 @@
                                          (om/set-state! owner :hovering nil))
                           :key (str "topic-row-" (name section-name))}
               (om/build topic {:loading (:loading company-data)
+                               :su-medium (om/get-props owner :share-medium)
                                :section section-name
                                :is-stakeholder-update (:is-stakeholder-update props)
                                :section-data sd
