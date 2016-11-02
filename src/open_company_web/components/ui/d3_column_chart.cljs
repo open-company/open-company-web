@@ -37,10 +37,8 @@
 (defn- data-x-position
   "Given the width of the chart and an index of a data point within the displayed data set
   return the horizontal (x-axis) position of the data point."
-  [chart-width i data-count]
-  (let [dot-spacer (/ (- chart-width 30) (min (dec show-data-points) (dec data-count)))
-        natural-dot-location (+ (* i dot-spacer) 15)]
-    natural-dot-location))
+  [chart-width i num-of-keys]
+    (* i (+ (* bar-width num-of-keys) (/ bar-width 2))))
 
 (defn- current-data 
   "Get the subset of the data that's currently being displayed on the chart."
@@ -87,7 +85,7 @@
             ;; for each key in the set
             (doseq [j (range (count chart-keys))]
               (let [chart-key (get chart-keys j)
-                    cx (data-x-position chart-width i data-count)
+                    cx (data-x-position chart-width i (count chart-keys))
                     cy (scale-fn (chart-key data-set))]
 
                 (-> chart-node
@@ -101,7 +99,6 @@
                     (.attr "id" (str "chart-bar-" chart-key "-" i))
                     (.attr "width" bar-width)
                     (.attr "height" (get-y cy max-y))
-                    (.attr "opacity" (if (= i selected) 1 0.5))
                     (.attr "x" (+ cx (* bar-width j)))
                     (.attr "y" (- max-y (get-y cy max-y)))
                     (.on "mouseover" #(data-select owner options i))
@@ -116,7 +113,7 @@
               (-> chart-node
                 (.append "text")
                 (.attr "class" (str "x-axis-label" (if (= i selected) " selected")))
-                (.attr "x" (- (data-x-position chart-width i data-count) 12))
+                (.attr "x" (- (data-x-position chart-width i (count chart-keys)) 12))
                 (.attr "y" (- chart-height 2))
                 (.text label))))))))
 
