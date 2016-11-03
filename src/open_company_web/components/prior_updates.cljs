@@ -20,13 +20,17 @@
 (defn- half-offset [pixels]
   (str "-" (Math/round (* 0.5 pixels)) "px"))
 
+(defn update-click [link e]
+  (utils/event-stop e)
+  (router/nav! link))
+
 (rum/defcs prior-updates
   < {:before-render (fn [s]
                       (when (and (dispatcher/company-data)
                                  (not (:su-list-loading @dispatcher/app-state))
                                  (not (get-in @dispatcher/app-state (dispatcher/su-list-key (router/current-company-slug)))))
                         (dispatcher/dispatch! [:get-su-list]))
-                    s)}
+                      s)}
     (drv/drv :su-list)
     (drv/drv :jwt)
     rum/reactive
@@ -103,7 +107,7 @@
                                 :legacy ""
                                 [:div.medium "a " (i/icon :link-72 {:size 13 :class "inline"})])
                     link-map (if mobile?
-                                {:href link}
+                                {:href link :on-click (partial update-click link)}
                                 {:href link :target (str "_update_" update-slug)})]
                 [:div.update {:key update-slug}
                   [:div.update-title.domine [:a link-map title]]
