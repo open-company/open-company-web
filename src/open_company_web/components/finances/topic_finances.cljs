@@ -123,17 +123,11 @@
                                                                   :editing foce-data-editing?})}
 
           (dom/div {:class "composed-section finances group"}
-            (let [show-placeholder-chart? (and foce-data-editing?
-                                               (< (count finances-raw-data) 2))
-                  fixed-finances-data (if show-placeholder-chart?
-                                        (finance-utils/finances-data-map (:data (utils/fix-finances {:data (finance-utils/fake-chart-placeholder-data)})))
-                                        (finance-utils/fill-gap-months finances-raw-data))
-                  sort-pred (utils/sort-by-key-pred :period)
-                  sorted-finances (sort sort-pred (vals fixed-finances-data))
+            (let [sort-pred (utils/sort-by-key-pred :period)
+                  sorted-finances (sort sort-pred finances-raw-data)
                   sum-revenues (apply + (map utils/abs (map :revenue finances-raw-data)))
                   cur-symbol (utils/get-symbol-for-currency-code currency)
                   chart-opts {:chart-type "bordered-chart"
-                              :fake-chart show-placeholder-chart?
                               :chart-height 112
                               :chart-width (:width (:chart-size options))
                               :chart-keys [:costs]
