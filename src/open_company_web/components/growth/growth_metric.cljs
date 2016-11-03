@@ -17,17 +17,17 @@
 
   ([delta]
   (let [pos (when (pos? delta) "+")]
-    (dom/span {:class "domine"}
+    (dom/span {:class "open-sans"}
       "("
-      (dom/span {:class "open-sans"}
+      (dom/span
         pos
         (if (zero? delta) "no change" (str (oc-lib/with-size-label delta) "%")))
       ")")))
 
   ([currency delta]
-    (dom/span {:class "domine"}
+    (dom/span {:class "open-sans"}
       "("
-      (dom/span {:class "open-sans"}
+      (dom/span
         (if (zero? delta) "no change" (oc-lib/with-currency currency (oc-lib/with-size-label delta) true)))
       ")")))
 
@@ -56,7 +56,7 @@
         fixed-cur-unit (when (= metric-unit "currency") currency-symbol)
         unit (when (= metric-unit "%") "%")]
     (when actual-val
-      (dom/span {:class "bold domine"
+      (dom/span {:class "bold open-sans"
                  :data-toggle "tooltip"
                  :data-container "body"
                  :data-placement "top"
@@ -108,11 +108,11 @@
                              :chart-fill-polygons (or (:chart-fill-polygons options) false)
                              :label-color (occ/get-color-by-kw :oc-gray-5)
                              :sub-label-color (occ/get-color-by-kw :oc-gray-5)
-                             :sparklines-class "chart-sparklines"
+                             :sparklines-class "chart-sparklines growth-sparklines"
                              :show-chart true
                              :labels {:value {:position :bottom
                                               :order 1
-                                              :value-presenter #(or (:label %2) "-")
+                                              :value-presenter #(or (:label %2) (dom/span {:class "bold"} (:name metric-info)))
                                               :value (occ/get-color-by-kw :oc-blue-dark) 
                                               :label-presenter #(:sub-label %2)
                                               :label-color (occ/get-color-by-kw :oc-gray-5)}}

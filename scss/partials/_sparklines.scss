@@ -4,6 +4,7 @@ div.sparklines{
   &.finances-sparklines {
     border: 1px solid transparent;
     border-radius: 8px;
+    padding: 6px 12px;
 
     div.finances-sparklines-inner {
       width: 90%;
@@ -31,11 +32,11 @@ div.sparklines{
   &.editing {
     &.finances-sparklines{
       border: 1px solid rgba(78,90,107,0.4);
-      padding: 1px;
+      padding: 6px 12px;
 
       &:hover {
         border: 2px solid rgb(249,215,72);
-        padding: 0px;
+        padding: 5px 11px;
 
         div.actions {
           display: block;

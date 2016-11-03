@@ -11,6 +11,13 @@ div.composed-section {
     min-height: 45px;
   }
 
+  div.bar-chart {
+    div.chart-container {
+      float: left;
+      width: 100%;
+    }
+  }
+
   div.chart-container {
 
     margin: 0 auto;
@@ -57,6 +64,11 @@ div.composed-section {
 
     display: flex;
 
+    &.finances-sparklines {
+      margin-top: 10px;
+      height: 78px;
+    }
+
     div.chart-labels {
       padding-left: 8px;
       padding-right: 8px;
@@ -65,7 +77,6 @@ div.composed-section {
     div.chart-value, div.chart-label {
       font-weight: 700;
       font-family: $oc_headers_font;
-      letter-spacing: 1px;
       line-height: 1.5;
     }
 
@@ -75,9 +86,12 @@ div.composed-section {
 
     &.chart-sparklines {
       float: left;
-      max-width: 160px;
-      overflow: hidden;
       display: inline-block;
+      overflow: hidden;
+
+      &.growth-sparklines {
+        max-width: 160px;
+      }
 
       div.chart-labels {
         padding-left: 0px;
@@ -86,8 +100,7 @@ div.composed-section {
 
       div.chart-value, div.chart-label {
         font-weight: 400;
-        font-family: $oc_main_font;
-        letter-spacing: 1px;
+        font-family: $oc_headers_font;
         line-height: 1.5;
         font-size: 13px;
         color: $oc_gray_5;

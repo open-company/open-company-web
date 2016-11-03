@@ -143,8 +143,6 @@
                                                {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                        :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
               (dom/div {:class "su-sp-company-header"}
-                 (dom/div {:class "group"}
-                   (dom/img {:class "company-logo" :src (:logo company-data)}))
                  (when (:title su-data)
                     (dom/div {:class "su-snapshot-title"} (:title su-data))))
               (om/build topics-columns {:columns-num 1

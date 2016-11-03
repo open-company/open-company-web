@@ -210,12 +210,12 @@
                  (assoc d idx row)))
         d))))
 
-(defn color-for-metric [k]
-  (occ/get-color-by-kw (cond (= k :revenue) :oc-green-dark
-                             (= k :costs) :red
+(defn color-for-metric [k selected]
+  (occ/get-color-by-kw (cond (= k :revenue) (if selected :oc-green-dark-1 :oc-green-dark)
+                             (= k :costs) (if selected :oc-red-dark-1 :oc-red-dark)
                              :else :oc-gray-7)))
 
-(defn finances-key-colors []
-  {:revenue (color-for-metric :revenue)
-   :costs  (color-for-metric :costs)
-   :cash  (color-for-metric :cash)})
+(defn finances-key-colors [selected]
+  {:revenue (color-for-metric :revenue selected)
+   :costs  (color-for-metric :costs selected)
+   :cash  (color-for-metric :cash selected)})
