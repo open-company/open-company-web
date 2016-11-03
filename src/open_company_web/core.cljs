@@ -162,7 +162,9 @@
                                                     ;; a subset of the company data loaded with a SU
       ;; load the company data from the API
       (api/get-company slug)
-      (swap! dis/app-state assoc :loading true))
+      (reset! dis/app-state (-> @dis/app-state
+                             (assoc :loading true)
+                             (dissoc (keyword slug)))))
     ;; render component
     (drv-root component target)))
 
