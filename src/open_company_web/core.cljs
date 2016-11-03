@@ -45,7 +45,7 @@
                 :target target}))
 
 ;; setup Sentry error reporting
-; (defonce raven (sentry/raven-setup))
+(defonce raven (sentry/raven-setup))
 
 (defn check-get-params [query-params]
   (when (contains? query-params :browser-type)
