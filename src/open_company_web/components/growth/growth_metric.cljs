@@ -17,17 +17,17 @@
 
   ([delta]
   (let [pos (when (pos? delta) "+")]
-    (dom/span {:class "domine"}
+    (dom/span {:class "open-sans"}
       "("
-      (dom/span {:class "open-sans"}
+      (dom/span
         pos
         (if (zero? delta) "no change" (str (oc-lib/with-size-label delta) "%")))
       ")")))
 
   ([currency delta]
-    (dom/span {:class "domine"}
+    (dom/span {:class "open-sans"}
       "("
-      (dom/span {:class "open-sans"}
+      (dom/span
         (if (zero? delta) "no change" (oc-lib/with-currency currency (oc-lib/with-size-label delta) true)))
       ")")))
 
@@ -56,7 +56,7 @@
         fixed-cur-unit (when (= metric-unit "currency") currency-symbol)
         unit (when (= metric-unit "%") "%")]
     (when actual-val
-      (dom/span {:class "bold domine"
+      (dom/span {:class "bold open-sans"
                  :data-toggle "tooltip"
                  :data-container "body"
                  :data-placement "top"
