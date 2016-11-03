@@ -34,18 +34,33 @@ div#growth-edit, div#finances-edit{
           width: 80px;
         }
 
-        th, td {
+        td {
           text-align: left;
         }
 
         th:first-child, td:first-child {
           width: 107px;
-          padding-left: 1.5rem;
           font-size: 12px;
           font-family: $oc_headers_font;
           line-height: 1.5;
           letter-spacing: 1px;
           color: $oc_gray_5;
+        }
+      }
+    }
+  }
+}
+
+div#finances-edit {
+  div.oc-popover {
+    div.table-container{
+      table {
+        thead tr th {
+          text-align: right;
+          padding-right: 2px;
+        }
+        tbody tr th.no-cell {
+          padding-left: 0px;
         }
       }
     }
@@ -69,14 +84,6 @@ div.finances, div.growth {
 
     * {
       border: 0px solid transparent;
-    }
-
-    thead th {
-      text-align: center;
-    }
-
-    tbody tr th {
-      text-align: right;   
     }
 
     tr {
