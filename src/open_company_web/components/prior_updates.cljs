@@ -21,15 +21,16 @@
   (str "-" (Math/round (* 0.5 pixels)) "px"))
 
 (rum/defcs prior-updates
-  < {:did-mount (fn [s]
-                  (.log js/console "API Load")
-                  (api/get-su-list) 
-                  s)}
+  < {:after-render (fn [s]
+                     (when (and (dispatcher/company-data)
+                                (not (:su-list-loading @dispatcher/app-state))
+                                (not (get-in @dispatcher/app-state (dispatcher/su-list-key (router/current-company-slug)))))
+                       (dispatcher/dispatch! [:get-su-list]))
+                   s)}
     (drv/drv :su-list)
     (drv/drv :jwt)
     rum/reactive
   [s]
-  (.log js/console "Rendering priors")
   (let [company-slug (router/current-company-slug)
         updates (reverse (drv/react s :su-list))
         none? (empty? updates)
