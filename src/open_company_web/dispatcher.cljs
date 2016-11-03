@@ -18,7 +18,8 @@
    :um-invite          [[:base] (fn [base] (:um-invite base))]
    :jwt                [[:base] (fn [base] (:jwt base))]
    :subscription       [[:base] (fn [base] (:subscription base))]
-   :show-login-overlay [[:base] (fn [base] (:show-login-overlay base))]})
+   :show-login-overlay [[:base] (fn [base] (:show-login-overlay base))]
+   :rum-popover-data [[:base] (fn [base] (:rum-popover-data base))]})
 
 ;; Action Loop =================================================================
 

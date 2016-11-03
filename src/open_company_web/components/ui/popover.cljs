@@ -3,7 +3,8 @@
   Popover dialog with one or 2 buttons. Use `add-popover` and `hide-popover` functions rather than mounting
   this component directly.
   "
-  (:require [rum.core :as rum]
+  (:require [org.martinklepsch.derivatives :as drv]
+            [rum.core :as rum]
             [om.core :as om :include-macros true]
             [dommy.core :refer-macros (sel1)]
             [open-company-web.router :as router]
@@ -25,7 +26,8 @@
                                 (let [container (sel1 (str "#" container-id))
                                       $container (js/$ container)]
                                   (rum/unmount container)
-                                  (.remove $container))
+                                  (.remove $container)
+                                  (swap! dis/app-state dissoc :rum-popover-data))
                                 (catch :default e)) 1500)
       (catch :default e))))
 
@@ -97,51 +99,58 @@
                      1)))))
 
 (defn add-popover [data]
+  (swap! dis/app-state assoc :rum-popover-data data)
   (add-popover-with-rum-component popover data))
 
-(rum/defc popover < rum/static [{:keys [container-id
-                                        height
-                                        width
-                                        title
-                                        message
-                                        cancel-title
-                                        cancel-cb
-                                        success-title
-                                        success-cb
-                                        z-index-offset]}]
+(defn assert-param [v f msg]
+  (assert (if v (f v) true) msg))
 
-  ;; assertions of proper usage
-  (assert (string? container-id) "popover container-id is not a string")
-  (assert (if height (string? height) true) "popover height is not a string")
-  (assert (if width (string? width) true) "popover width is not a string")
-  (assert (if title (string? title) true) "popover title is not a string")
-  (assert (string? message) "popover message is not a string")
-  (assert (if cancel-title (string? cancel-title) true) "popover cancel-title is not a string")
-  (assert (if cancel-cb (fn? cancel-cb) true) "popover cancel-cb is not a function")
-  (assert (string? success-title) "popover success-title is not a string")
-  (assert (fn? success-cb) "popover success-cb is not a function")
-  (assert (if z-index-offset (number? z-index-offset) true) "z-index-offset must be a number")
+(rum/defcs popover < rum/static
+                     rum/reactive
+                     (drv/drv :rum-popover-data)
+  [state]
+  (let [{:keys [container-id
+                height
+                width
+                title
+                message
+                cancel-title
+                cancel-cb
+                success-title
+                success-cb
+                z-index-offset] :as rum-popover} (drv/react state :rum-popover-data)]
+    ;; assertions of proper usage
+    (assert-param height string?  "popover height is not a string")
+    (assert-param width string? "popover width is not a string")
+    (assert-param title string? "popover title is not a string")
+    (assert-param message string? "popover message is not a string")
+    (assert-param cancel-title string? "popover cancel-title is not a string")
+    (assert-param cancel-cb fn? "popover cancel-cb is not a function")
+    (assert-param success-title string? "popover success-title is not a string")
+    (assert-param success-cb fn? "popover success-cb is not a function")
+    (assert-param z-index-offset number? "z-index-offset must be a number")
 
-  (let [style {}
-        w-style (if width
-                  (assoc style :width width)
-                  style)
-        h-style (if height
-                  (assoc w-style :height height)
-                  w-style)
-        z-style (if z-index-offset
-                  (assoc h-style :zIndex (+ default-z-index (* z-index-offset 3) 1))
-                  (assoc h-style :zIndex (+ default-z-index 1)))]
+    (let [style {}
+          w-style (if width
+                    (assoc style :width width)
+                    style)
+          h-style (if height
+                    (assoc w-style :height height)
+                    w-style)
+          z-style (if z-index-offset
+                    (assoc h-style :zIndex (+ default-z-index (* z-index-offset 3) 1))
+                    (assoc h-style :zIndex (+ default-z-index 1)))]
 
-    [:div.oc-popover {:style z-style}
-      (when title
-        [:div.title-container
-          [:h3.title title]])
-      [:div.message-container
-        [:p.message message]]
-      [:div.buttons-container
-        (when cancel-title
-          [:button.btn-reset.btn-outline.mr1.secondary-button {:on-click cancel-cb} 
-            cancel-title])
-        [:button.btn-reset.btn-solid.mr1.primary-button {:on-click success-cb} 
-          success-title]]]))
+      [:div.oc-popover {:style z-style}
+        (when title
+          [:div.title-container
+            [:h3.title title]])
+        [:div.message-container
+          [:p.message message]]
+        [:div.buttons-container
+          (when cancel-title
+            [:button.btn-reset.btn-outline.mr1.secondary-button {:on-click cancel-cb}
+              cancel-title])
+          [:button.btn-reset.btn-solid.mr1.primary-button {:on-click success-cb}
+            success-title]]])
+  ))
