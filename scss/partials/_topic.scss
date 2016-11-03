@@ -37,6 +37,7 @@ div.topic {
   transition: opacity 0.5s;
   margin-left: 4px;
   margin-right: 4px;
+  padding-bottom: 20px;
 
   &.no-foce {
     opacity: 0.5;
@@ -235,7 +236,6 @@ div.topic {
 
       div.topic-body {
         margin-top: 15px;
-        margin-bottom: 20px;
         font-weight: 400;
         color: $oc_gray_7;
         overflow: hidden;
