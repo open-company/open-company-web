@@ -21,12 +21,12 @@
   (str "-" (Math/round (* 0.5 pixels)) "px"))
 
 (rum/defcs prior-updates
-  < {:after-render (fn [s]
-                     (when (and (dispatcher/company-data)
-                                (not (:su-list-loading @dispatcher/app-state))
-                                (not (get-in @dispatcher/app-state (dispatcher/su-list-key (router/current-company-slug)))))
-                       (dispatcher/dispatch! [:get-su-list]))
-                   s)}
+  < {:before-render (fn [s]
+                      (when (and (dispatcher/company-data)
+                                 (not (:su-list-loading @dispatcher/app-state))
+                                 (not (get-in @dispatcher/app-state (dispatcher/su-list-key (router/current-company-slug)))))
+                        (dispatcher/dispatch! [:get-su-list]))
+                    s)}
     (drv/drv :su-list)
     (drv/drv :jwt)
     rum/reactive
