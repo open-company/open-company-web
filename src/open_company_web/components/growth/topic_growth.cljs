@@ -77,10 +77,10 @@
 
 (defn- show-archive-confirm-popover [owner editing-cb metric-slug]
   (add-popover {:container-id "archive-metric-confirm"
-                :message "This chart will be removed but will still appear in prior updates. Are you sure you want to archive?"
+                :message "This chart will be removed but will still appear in prior updates. Are you sure you want to remove it?"
                 :cancel-title "KEEP"
                 :cancel-cb #(hide-popover nil "archive-metric-confirm")
-                :success-title "ARCHIVE"
+                :success-title "REMOVE"
                 :z-index-offset 1
                 :success-cb #(archive-metric-cb owner editing-cb metric-slug)}))
 
