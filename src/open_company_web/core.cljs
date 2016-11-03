@@ -157,7 +157,9 @@
         ;login went bad, add the error message to the app-state
         (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
     ;; do we have the company data already?
-    (when-not (dis/company-data)
+    (when (or (not (dis/company-data))              ;; if the company data are not present
+              (not (:sections (dis/company-data)))) ;; or the section key is missing that means we have only
+                                                    ;; a subset of the company data loaded with a SU
       ;; load the company data from the API
       (api/get-company slug)
       (swap! dis/app-state assoc :loading true))
