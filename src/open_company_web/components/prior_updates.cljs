@@ -32,8 +32,8 @@
         none? (empty? updates)
         mobile? (responsive/is-mobile-size?)
         klass (if mobile? "" "oc-popover") ; desktop is in a popover, mobile is full page
-        window-height (when mobile? (.-clientHeight (.-body js/document)))
-        window-width (when mobile? (.-clientWidth (.-body js/document)))
+        window-height (when mobile? (.-clientHeight (.-documentElement js/document)))
+        window-width (when mobile? (.-clientWidth (.-documentElement js/document)))
         width (if mobile? window-width desktop-width) ; full-width on mobile
         right-padding (if mobile? "pr2" "pr3")
         height (cond ; 4 possible heights
