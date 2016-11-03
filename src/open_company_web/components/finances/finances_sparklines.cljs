@@ -112,7 +112,6 @@
               currency-symbol (utils/get-symbol-for-currency-code (:currency data))
               actual-with-label (label-from-set actual-set currency-symbol)
               ww (.-clientWidth (.-body js/document))
-              cash? false
               total-card-width (if (>= ww responsive/c1-min-win-width) card-width ww)
               fixed-card-width (if (responsive/is-mobile-size?)
                                    total-card-width ; use all the possible space on mobile
@@ -130,9 +129,9 @@
                                  :show-chart true
                                  :labels {:value {:position :bottom
                                                   :order 1
-                                                  :value-presenter (if cash? #(:sub-label %2) #(or (:label %2) "-"))
+                                                  :value-presenter #(or (:label %2) "-")
                                                   :value (occ/get-color-by-kw :oc-blue-dark)
-                                                  :label-presenter (if cash? #(or (:label %2) "-") #(:sub-label %2))
+                                                  :label-presenter #(:sub-label %2)
                                                   :label-color (occ/get-color-by-kw :oc-gray-5)}}
                                  :hide-nav true}}]
           (dom/div {:class (utils/class-set {:section true
@@ -146,8 +145,7 @@
                                          :selected chart-selected-idx
                                          :selected-metric-cb #(om/set-state! owner :chart-selected-idx %)
                                          :chart-height 80
-                                         :chart-width (:width (:chart-size data))
-                                         :card-width fixed-card-width} chart-opts)))))
+                                         :chart-width (- fixed-card-width 50 40 5)} chart-opts)))))
       (dom/div {:class "actions group right"}
         (dom/button
           {:class "btn-reset"
