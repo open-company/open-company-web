@@ -6,7 +6,13 @@ div.su-snapshot {
     content: "";
     min-height: calc(100vh - #{$navbar_height}px);
     background-color: $oc_gray_8;
-    padding-top: 40px;
+
+    @media screen and (max-width: 683px){
+      padding-top: 20px;
+    }
+    @media screen and (min-width: 684px){
+      padding-top: 40px;
+    }
 
     div.topics-columns div.topics-column-container.columns-1 {
       div.topics-column {

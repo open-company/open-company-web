@@ -8,6 +8,7 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
+            [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.navbar :refer (navbar)]
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
@@ -79,7 +80,8 @@
      :selected-metric nil
      :topic-navigation true
      :transitioning false
-     :columns-num (responsive/columns-num)})
+     :columns-num (responsive/columns-num)
+     :prior-list (:list (router/query-params))})
 
   (did-mount [_]
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))
@@ -97,9 +99,11 @@
     (when (om/get-state owner :tr-selected-topic)
       (animate-selected-topic-transition owner)))
 
-  (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning columns-num]}]
+  (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning columns-num prior-list]}]
+
     (let [company-data (dis/company-data data)
           su-data      (dis/stakeholder-update-data)
+          mobile?      (responsive/is-mobile-size?)
           card-width   (responsive/calc-card-width 1)
           ww           (.-clientWidth (sel1 js/document :body))
           total-width  (if (>= ww responsive/c1-min-win-width) (str (min ww (+ card-width 100)) "px") "auto")]
@@ -108,6 +112,14 @@
           ;; SU Snapshot
           (when company-data
             (dom/div {:class "su-sp-content"}
+
+              (when (and prior-list mobile?) ; inside the header close X
+                (dom/div {:style {:height "30px"}}
+                  (dom/button {:class "top-0 btn-reset" :style {:float "right" :padding-top "0" :margin-top "-5px"}
+                               :on-click #(router/nav! (oc-urls/stakeholder-update-list))}
+                    (i/icon :simple-remove {:class "inline mr1" :stroke "4" :vertical-align "top"
+                                            :color "grey" :accent-color "grey"}))))
+
               ;; Fullscreen topic
               (when selected-topic
                 (dom/div {:class "selected-topic-container"
