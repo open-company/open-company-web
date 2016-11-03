@@ -22,12 +22,12 @@
 
   ([delta]
   (let [pos (when (pos? delta) "+")]
-    (dom/span {:class "domine open-sans"}
+    (dom/span {:class "open-sans"}
       pos
       (if (zero? delta) "no change" (str (oc-lib/with-size-label delta) "%")))))
 
   ([currency delta]
-    (dom/span {:class "domine open-sans"}
+    (dom/span {:class "open-sans"}
       (if (zero? delta)
         "no change"
         (oc-lib/with-currency currency (oc-lib/with-size-label delta) true)))))
@@ -57,9 +57,9 @@
         period (utils/get-period-string (:period data-set) "monthly" [:force-year])
         fixed-cur-unit currency-symbol]
     (when actual-val
-      (dom/span {:class "domine"}
+      (dom/span {:class "open-sans"}
         (dom/span {:class "bold"}
-          (dom/span {:class "open-sans"} fixed-cur-unit (oc-lib/with-size-label actual-val))
+          (dom/span fixed-cur-unit (oc-lib/with-size-label actual-val))
           " "
           metric-name)
         (cond
@@ -79,7 +79,7 @@
       (dom/div {} (get-metric-label :cash period periods currency-symbol)))))
 
 (defn- label-from-set [data-set currency-symbol]
-  (dom/span {:class "domine"} (utils/get-period-string (:period data-set) "monthly" [:force-year])))
+  (dom/span {:class "open-sans bold"} (utils/get-period-string (:period data-set) "monthly" [:force-year])))
 
 (defn get-fixed-sorted-metric [finances-data currency]
   (let [currency-symbol (utils/get-symbol-for-currency-code currency)]
