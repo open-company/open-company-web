@@ -38,7 +38,7 @@
   "Given the width of the chart and an index of a data point within the displayed data set
   return the horizontal (x-axis) position of the data point."
   [chart-width i num-of-keys]
-    (* i (+ (* bar-width num-of-keys) (/ bar-width 2))))
+    (* i (+ (* bar-width num-of-keys) (* (/ bar-width 2) num-of-keys))))
 
 (defn- current-data 
   "Get the subset of the data that's currently being displayed on the chart."
@@ -98,9 +98,9 @@
                     (.attr "data-selectedFill" (chart-key fill-selected-colors))
                     (.attr "id" (str "chart-bar-" chart-key "-" i))
                     (.attr "width" bar-width)
-                    (.attr "height" (get-y cy max-y))
+                    (.attr "height" cy)
                     (.attr "x" (+ cx (* bar-width j)))
-                    (.attr "y" (- max-y (get-y cy max-y)))
+                    (.attr "y" (get-y cy max-y))
                     (.on "mouseover" #(data-select owner options i))
                     (.on "mouseout" #(data-select owner options (om/get-state owner :selected)))))))))
 
