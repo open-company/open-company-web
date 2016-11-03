@@ -165,6 +165,12 @@ Never access the app-state directly but we should always use the proper function
 This way it will be very simple to change the structure of the app-state in the future since we just need
 to change it in one place.
 
+To view the current app state at any time, run this in the JavaScript console:
+
+```
+open_company_web.dispatcher.print_app_state()
+```
+
 ### Component Tree Design
 
 The OpenCompany web app is made up of trees of Om/Rum components that start from a few top level components (company-dashboard, company-settings, user-settings, company-list, login...) and include other child components in a tree, sometimes just a few, and sometimes many.
