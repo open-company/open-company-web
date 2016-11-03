@@ -127,18 +127,18 @@
               (om/build topic-finances {:section-data (utils/fix-finances topic-data)
                                         :section section
                                         :currency currency} {:opts chart-opts}))))
-
-        (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
-                      :ref "topic-body"
-                      :dangerouslySetInnerHTML (utils/emojify truncated-body)})
+        (when-not (clojure.string/blank? topic-body)
+          (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
+                        :ref "topic-body"
+                        :dangerouslySetInnerHTML (utils/emojify truncated-body)}))
 
         ; if it's SU preview or SU show only read-more
-        (if is-stakeholder-update
-          (when (utils/exceeds-topic-body-limit topic-body)
-            (dom/div {:class "left"
-                    :style {:margin-bottom "20px"}}
-              (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic owner nil false)))))
-          (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic owner nil false)) {:opts options}))))))
+        (dom/div {:class "left"
+                  :style {:margin-top "20px"}}
+          (if is-stakeholder-update
+            (when (utils/exceeds-topic-body-limit topic-body)
+              (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic owner nil false))))
+            (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic owner nil false)) {:opts options})))))))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
