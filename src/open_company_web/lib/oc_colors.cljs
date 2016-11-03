@@ -13,7 +13,7 @@
   :oc-chart-green "#4de148"
   :oc-chart-red "#D72A46"
   ;; Greens
-  :oc-green-dark-1 "#41e538"
+  :oc-green-dark-1 "#51d34a"
   :oc-green-dark "#35bc2e"
   :oc-green-regular "#26C485" ; :green
   :oc-green-light "#4DE249" ; rgb(77,226,73)
@@ -33,7 +33,7 @@
   :oc-gray-5-3-quarter "rgba(78,90,107,0.75)"
   :oc-gray-7 "#0A0A0A"
   ;; Reds
-  :oc-red-dark-1 "#FF555E"
+  :oc-red-dark-1 "#d10022"
   :oc-red-dark "#9E001A"
   :oc-red-regular "#E04B53" ; :red
   :oc-red-light "#EC7A8D"})

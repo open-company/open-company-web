@@ -139,14 +139,14 @@
                               :chart-keys [:costs]
                               :interval "monthly"
                               :x-axis-labels true
-                              :chart-colors {:costs (occ/get-color-by-kw :oc-red-regular)
-                                             :revenue (occ/get-color-by-kw :oc-green-regular)}
-                              :chart-selected-colors {:costs (occ/get-color-by-kw :oc-red-regular)
-                                                      :revenue (occ/get-color-by-kw :oc-green-regular)}
+                              :chart-colors {:costs (occ/get-color-by-kw :oc-red-dark)
+                                             :revenue (occ/get-color-by-kw :oc-green-dark)}
+                              :chart-selected-colors {:costs (occ/get-color-by-kw :oc-red-dark)
+                                                      :revenue (occ/get-color-by-kw :oc-green-dark)}
                               :chart-fill-polygons false
                               :hide-nav (:hide-nav options)}
                   labels {:costs {:value-presenter (partial get-currency-label cur-symbol)
-                                  :value-color (occ/get-color-by-kw :oc-red-regular)
+                                  :value-color (occ/get-color-by-kw :oc-red-dark)
                                   :label-presenter (if (pos? sum-revenues) #(str "Expenses") #(str "Burn"))
                                   :label-color (occ/get-color-by-kw :oc-gray-5-3-quarter)}
                           :cash {:value-presenter (partial get-currency-label cur-symbol)
