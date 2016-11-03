@@ -183,22 +183,22 @@
         (and (not (:editing prev-state))
              (om/get-state owner :editing))
         (add-popover-with-om-component growth-popover
-          {:data (merge data {:initial-focus data-editing?
-                              :new-metric? (om/get-state owner :new-metric?)
-                              :hide-popover-cb (fn [] (editing-cb false))
-                              :growth-data (om/get-state owner :growth-data)
-                              :growth-metrics (om/get-state owner :growth-metrics)
-                              :growth-metric-slugs (om/get-state owner :growth-metric-slugs)
-                              :growth-editing-on-change-cb (partial data-editing-on-change owner)
-                              :growth-metadata-editing-on-change-cb (partial metadata-editing-on-change owner data-editing?)
-                              :growth-data-editing-toggle-cb (partial data-editing-toggle owner editing-cb)
-                              :growth-switch-focus-cb (partial switch-focus owner)
-                              :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)
-                              :data-section-on-change data-section-on-change
-                              :width 400
-                              :height (min 577 (- (.-clientHeight (.-body js/document)) 50))})
-           :z-index-offset 0
-           :container-id "growth-edit"})
+          (merge data {:initial-focus data-editing?
+                       :new-metric? (om/get-state owner :new-metric?)
+                       :hide-popover-cb (fn [] (editing-cb false))
+                       :growth-data (om/get-state owner :growth-data)
+                       :growth-metrics (om/get-state owner :growth-metrics)
+                       :growth-metric-slugs (om/get-state owner :growth-metric-slugs)
+                       :growth-editing-on-change-cb (partial data-editing-on-change owner)
+                       :growth-metadata-editing-on-change-cb (partial metadata-editing-on-change owner data-editing?)
+                       :growth-data-editing-toggle-cb (partial data-editing-toggle owner editing-cb)
+                       :growth-switch-focus-cb (partial switch-focus owner)
+                       :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)
+                       :data-section-on-change data-section-on-change
+                       :width 400
+                       :height (min 577 (- (.-clientHeight (.-body js/document)) 50))
+                       :z-index-offset 0
+                       :container-id "growth-edit"}))
         (and (:foce-data-editing? prev-props)
              (not data-editing?))
         (data-editing-toggle owner editing-cb false))))

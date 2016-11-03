@@ -87,7 +87,7 @@
         (.setTimeout js/window
                      (fn []
                        ; render the popover component
-                       (om/root component (:data data) {:target (sel1 (str "#" container-id))})
+                       (om/root component data {:target (sel1 (str "#" container-id))})
                        (.addClass body "no-scroll")
                        ; add the close action
                        (when (:hide-on-click-out data)
