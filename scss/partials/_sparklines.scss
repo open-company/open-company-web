@@ -1,10 +1,13 @@
 div.sparklines{
-  margin-top: 10px;
+
+  &.growth-sparklines {
+    margin-top: 10px;
+  }
 
   &.finances-sparklines {
     border: 1px solid transparent;
     border-radius: 8px;
-    padding: 12px;
+    padding: 0 12px 0 12px;
 
     div.finances-sparklines-inner {
       width: 90%;
