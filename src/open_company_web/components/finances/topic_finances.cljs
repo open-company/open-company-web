@@ -107,7 +107,7 @@
                                                                    :editing-cb (partial data-editing-toggle owner editing-cb)
                                                                    :data-section-on-change data-section-on-change
                                                                    :width 400
-                                                                   :height (min 380 (.-clientHeight (.-body js/document)))})
+                                                                   :height (min 380 (.-clientHeight (.-body js/document)))
                                                                    :z-index-popover 0
                                                                    :container-id "finances-edit"})))
     (when (and (:foce-data-editing? prev-props)
