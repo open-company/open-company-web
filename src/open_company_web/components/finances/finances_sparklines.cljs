@@ -97,6 +97,12 @@
      :chart-selected-idx (min 3 (dec (count finances-data)))
      :fixed-sorted-metric (get-fixed-sorted-metric finances-data currency)})
 
+  (will-receive-props [_ next-props]
+    (when (not= finances-data (:finances-data next-props))
+      (om/set-state! owner {:chart-selected-idx (min 3 (dec (count (:finances-data next-props))))
+                            :card-width (responsive/calc-card-width)
+                            :fixed-sorted-metric (get-fixed-sorted-metric (:finances-data next-props) currency)})))
+
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (events/listen js/window EventType/RESIZE #(om/set-state! owner :card-width (responsive/calc-card-width)))))
