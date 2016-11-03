@@ -64,6 +64,11 @@ div.composed-section {
 
     display: flex;
 
+    &.finances-sparklines {
+      margin-top: 10px;
+      height: 78px;
+    }
+
     div.chart-labels {
       padding-left: 8px;
       padding-right: 8px;
