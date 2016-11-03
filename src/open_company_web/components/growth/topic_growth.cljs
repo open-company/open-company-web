@@ -196,7 +196,7 @@
                               :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)
                               :data-section-on-change data-section-on-change
                               :width 400
-                              :height (min 577 (- (.-clientHeight (.-body js/document)) 50))})
+                              :height (min 507 (- (.-clientHeight (.-body js/document)) 50))})
            :z-index-offset 0
            :container-id "growth-edit"})
         (and (:foce-data-editing? prev-props)
