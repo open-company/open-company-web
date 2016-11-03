@@ -96,8 +96,9 @@
       (events/unlistenByKey (om/get-state owner :kb-listener))))
 
   (did-update [_ _ _]
-    (when (om/get-state owner :tr-selected-topic)
-      (animate-selected-topic-transition owner)))
+    (if (om/get-state owner :tr-selected-topic)
+      (animate-selected-topic-transition owner)
+      (dommy/remove-class! (sel1 [:body]) :no-scroll)))
 
   (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning columns-num prior-list]}]
 

@@ -62,7 +62,7 @@
         state (if (check-value abs-value init-value)
                 :display
                 :draft)
-        ; if the value is empty and it was empty got to the :new state
+        ; if the value is empty and it was empty go to the :new state
         state (if (and (= state :display)
                        (s/blank? abs-value))
                 :new
@@ -74,7 +74,7 @@
     (to-state owner data state)))
 
 (defn safe-parse-float [value]
-  (when-not (nil? value)
+  (when-not (clojure.string/blank? value)
     (let [cleaned-value (trim-commas value)
           float-value (js/parseFloat cleaned-value)]
       (if (js/isNaN float-value)
