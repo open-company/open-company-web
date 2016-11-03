@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [cljs-time.format :as f]
             [org.martinklepsch.derivatives :as drv]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.popover :as popover]
             [open-company-web.api :as api]
@@ -20,13 +21,15 @@
   (str "-" (Math/round (* 0.5 pixels)) "px"))
 
 (rum/defcs prior-updates
-  < {:did-mount (fn [s] 
+  < {:did-mount (fn [s]
+                  (.log js/console "API Load")
                   (api/get-su-list) 
                   s)}
     (drv/drv :su-list)
     (drv/drv :jwt)
     rum/reactive
   [s]
+  (.log js/console "Rendering priors")
   (let [company-slug (router/current-company-slug)
         updates (reverse (drv/react s :su-list))
         none? (empty? updates)
@@ -57,13 +60,13 @@
           (i/icon :simple-remove {:class "inline mr1" :stroke "4"
                                   :color "white" :accent-color "white"})])
 
-      [:div {:style {:max-height (str (- height 2) "px") :overflow-y "scroll"}}
+      [:div.prior-updates-container {:style {:max-height (str (- height 2) "px") :overflow-y "scroll"}}
 
         [:h3.m0.pl3.py25.gray5.domine {:style {:class right-padding :border-bottom "solid 1px rgba(78, 90, 107, 0.1)"}}
           "Prior Updates"
           (when mobile? ; inside the header close X
             [:button {:class "top-0 btn-reset" :style {:float "right" :padding-top "0" :margin-top "-5px"}
-                  :on-click (fn [e] (popover/hide-popover e "prior-updates-dialog"))}
+                  :on-click #(router/nav! (oc-urls/company))}
               (i/icon :simple-remove {:class "inline mr1" :stroke "4" :vertical-align "top"
                                       :color "grey" :accent-color "grey"})])]
         
@@ -96,7 +99,10 @@
                                 :email [:div.medium "by " (i/icon :email-84 {:size 13 :class "inline"})]
                                 :slack [:span "to " [:i {:class "fa fa-slack"}]]
                                 :legacy ""
-                                [:div.medium "a " (i/icon :link-72 {:size 13 :class "inline"})])]
+                                [:div.medium "a " (i/icon :link-72 {:size 13 :class "inline"})])
+                    link-map (if mobile?
+                                {:href link}
+                                {:href link :target (str "_update_" update-slug)})]
                 [:div.update {:key update-slug}
-                  [:div.update-title.domine [:a {:href link :target "_new"} title]]
+                  [:div.update-title.domine [:a link-map title]]
                   [:div.update-details.domine author " shared " medium " on " human-date]]))])]]))

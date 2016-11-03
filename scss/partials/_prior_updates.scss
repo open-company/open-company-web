@@ -1,23 +1,21 @@
-#prior-updates-dialog {
+div.prior-updates-container {
+  text-align: left;
+  background-color: white;
 
-  div.oc-popover {
-    text-align: left;
+  div.message-container {
+    text-align: center;
+  }
 
-    div.message-container {
-      text-align: center;
-    }
+  div.update-title {
+    margin-bottom: 0;
+  }
 
-    div.update-title {
-      margin-bottom: 0;
-    }
+  div.update-details {
+    font-size: 13px;
+    margin-bottom: 20px;
 
-    div.update-details {
-      font-size: 13px;
-      margin-bottom: 20px;
-
-      div.medium {
-        display: inline;
-      }
+    div.medium {
+      display: inline;
     }
   }
 }
