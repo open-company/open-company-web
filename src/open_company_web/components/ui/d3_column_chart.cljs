@@ -100,9 +100,21 @@
                     (.attr "width" bar-width)
                     (.attr "height" cy)
                     (.attr "x" (+ cx (* bar-width j)))
-                    (.attr "y" (get-y cy max-y))
-                    (.on "mouseover" #(data-select owner options i))
-                    (.on "mouseout" #(data-select owner options (om/get-state owner :selected)))))))))
+                    (.attr "y" (get-y cy max-y))))))))
+
+      ;; add the hovering rects
+      (when (> (count chart-data) 1)
+        (doseq [i (range (count chart-data))]
+          (-> chart-node
+            (.append "rect")
+            (.attr "class" "hover-rect")
+            (.attr "width" (+ (* bar-width (count chart-keys)) (/ (* bar-width (count chart-keys)) 2)))
+            (.attr "height" chart-height)
+            (.attr "x" (* i (+ (* bar-width (count chart-keys)) (/ (* bar-width (count chart-keys)) 2))))
+            (.attr "y" 0)
+            (.on "mouseover" #(data-select owner options i))
+            (.on "mouseout" #(data-select owner options (om/get-state owner :selected)))
+            (.attr "fill" "transparent"))))
 
       ;; add the x-axis labels
       (when x-axis-labels?
@@ -132,7 +144,7 @@
         d3-svg-el (.select js/d3 svg-el)
         chart-width (+ (om/get-props owner :chart-width) (if (:hide-nav options) 30 10))
         selected-bars (.selectAll d3-svg-el (str "rect.chart-bar-" idx))
-        all-bars (.selectAll d3-svg-el "rect")
+        all-bars (.selectAll d3-svg-el "rect.chart-bar")
         fill-colors (:chart-colors options)
         fill-selected-colors (:chart-selected-colors options)]
     
