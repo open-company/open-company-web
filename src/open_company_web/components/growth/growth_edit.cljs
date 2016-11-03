@@ -238,7 +238,7 @@
             (when interval
               ;; Data editing table
               (dom/div {:class "center"}
-                (dom/div {:class "table-container mx2 left group"}
+                (dom/div {:class "table-container px2 left group"}
                   (dom/table {:class "table"
                               :key (str "growth-edit-" slug)}
 
