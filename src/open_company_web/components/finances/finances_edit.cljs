@@ -179,7 +179,7 @@
                           :overflow-x "hidden"}}
           (dom/div {:class "group"}
             (dom/h3 {:class "left pt3 pb2 px2 group"} (if (zero? (count finances-data)) "Add Finances" "Edit Finances")))
-          (dom/div {:class "table-container my2 group"}
+          (dom/div {:class "table-container my2 px3 group"}
             (dom/table {:class "table"
                         :key table-key}
               (dom/thead {}
