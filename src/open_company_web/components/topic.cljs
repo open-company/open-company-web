@@ -228,6 +228,7 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
+                                                 :topic-edit is-foce
                                                  :draggable-topic (and (not (:read-only-company data)) (:pin topic-data))
                                                  :not-draggable-topic (or (:read-only-company data) (not (:pin topic-data)))
                                                  :no-foce (and foce-active (not is-foce))

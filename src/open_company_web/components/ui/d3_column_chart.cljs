@@ -210,7 +210,7 @@
                         {:align-items :flex-start :justify-content :flex-start})}
       (for [label-key label-keys]
         (dom/div {:class "chart-labels"}
-          (dom/div {:class "chart-value"
+          (dom/div {:class "chart-value py1"
                     :style {:color (get-in labels [label-key :value-color])}}
             ((get-in labels [label-key :value-presenter]) label-key data))
           (dom/div {:class "chart-label"
@@ -286,9 +286,6 @@
                               :opacity (if (< start (- (count chart-data) show-data-points)) 1 0)}
                       :on-click #(next-data owner %)}
               (dom/i {:class "fa fa-caret-right"}))))
-        ;; Top row labels
-        (when (not (nil? top-label-keys))
-          (labels-for chart-top-label-class top-label-keys labels selected-data-set))
 
         ;; Bottom row labels
         (when (not (nil? bottom-label-keys))

@@ -65,8 +65,13 @@ div.composed-section {
     display: flex;
 
     &.finances-sparklines {
-      margin-top: 10px;
-      height: 78px;
+      margin-top: 0px;
+      padding-top: 0px;
+      height: 98px;
+
+      div.chart-value {
+        margin-bottom: 0;
+      }
     }
 
     div.chart-labels {
