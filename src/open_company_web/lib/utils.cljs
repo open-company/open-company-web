@@ -290,11 +290,12 @@
     true
     false))
 
-(defn current-period []
+(defn current-finance-period []
   (let [date (js/Date.)
-        month (inc (.getMonth date))
+        fixed-date (js/Date. (.setMonth date (- (.getMonth date) 1)))
+        month (inc (.getMonth fixed-date))
         month-str (str (when (< month 10) "0") month)
-        cur-period (str (.getFullYear date) "-" month-str)]
+        cur-period (str (.getFullYear fixed-date) "-" month-str)]
     cur-period))
 
 (defn get-section-keys [company-data]
@@ -401,9 +402,9 @@
         section-data
         (((keyword section) (slug @caches/revisions)) as-of)))))
 
-(def quarterly-input-format (cljs-time-format/formatter "yyyy-MM"))
-(def monthly-input-format (cljs-time-format/formatter "yyyy-MM"))
-(def weekly-input-format (cljs-time-format/formatter "yyyy-MM-dd"))
+(def quarterly-input-format (cljs-time-format/formatter "YYYY-MM"))
+(def monthly-input-format (cljs-time-format/formatter "YYYY-MM"))
+(def weekly-input-format (cljs-time-format/formatter "YYYY-MM-dd"))
 
 (defn get-formatter [interval]
   "Get the date formatter from the interval type."
@@ -416,7 +417,9 @@
     monthly-input-format))
 
 (defn date-from-period [period & [interval]]
-  (cljs-time-format/parse (get-formatter interval) period))
+  (if period
+    (cljs-time-format/parse (get-formatter interval) period)
+    (cljs-time/now)))
 
 (defn period-from-date [date & [interval]]
   (cljs-time-format/unparse (get-formatter interval) date))
@@ -814,11 +817,10 @@
   "Remove the last p tag if it's empty."
   [body-el]
   (when-not (is-test-env?)
-    (when (pos? (count (clojure.string/trim (.text (js/$ body-el)))))
-      (while (and (= (count (clojure.string/trim (.text (.last (.find (js/$ body-el) ">p"))))) 0)
-                  (= (.-length (.find (js/$ body-el) ">p img")) 0)
-                  (pos? (.-length (.find (js/$ body-el) ">p"))))
-        (.remove (js/$ ">p:last-child" (js/$ body-el)))))))
+    (while (and (= (count (clojure.string/trim (.text (.last (.find (js/$ body-el) ">p"))))) 0)
+                (= (.-length (.find (js/$ body-el) ">p img")) 0)
+                (pos? (.-length (.find (js/$ body-el) ">p"))))
+      (.remove (js/$ ">p:last-child" (js/$ body-el))))))
 
 (defn data-topic-has-data [section section-data]
   (cond

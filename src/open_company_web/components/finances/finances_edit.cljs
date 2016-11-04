@@ -7,7 +7,8 @@
             [open-company-web.router :as router]
             [open-company-web.components.ui.cell :refer (cell)]
             [open-company-web.lib.finance-utils :as finance-utils]
-            [cljs.core.async :refer (put!)]))
+            [cljs.core.async :refer (put!)]
+            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
 
 (def batch-size 5)
 
@@ -49,7 +50,7 @@
       (dom/tbody {}
         (dom/tr {}
           (dom/th {:class "no-cell"}
-            (utils/get-period-string (:period finances-data) "monthly" [:short :skip-year]))
+            (utils/get-period-string (:period finances-data) "monthly" [:short (when needs-year :force-year)]))
           ;; revenue
           (dom/td {}
             (om/build cell {:value (:revenue finances-data)
@@ -86,14 +87,7 @@
                             :draft-cb #(change-cb :cash %)
                             :period period
                             :key :cash
-                            :tab-cb tab-cb})))
-        (when needs-year
-          (dom/tr {}
-            (dom/th {:class "no-cell year"}
-              (utils/get-year period))
-            (dom/td {:class "no-cell"})
-            (dom/td {:class "no-cell"})
-            (dom/td {:class "no-cell"})))))))
+                            :tab-cb tab-cb})))))))
 
 (defn finances-get-value [v]
   (if (js/isNaN v)
@@ -130,9 +124,11 @@
         finances-data (om/get-state owner :finances-data)
         fixed-data (if has-data? 
                       (assoc finances-data period fixed-row)
-                      (dissoc finances-data period))]
+                      (dissoc finances-data period))
+        data-on-change-cb (om/get-props owner :data-on-change-cb)]
     ;(om/set-state! owner :has-changes (or (om/get-state owner :has-changes) (not= finances-data fixed-data)))
-    (om/set-state! owner :finances-data fixed-data)))
+    (om/set-state! owner :finances-data fixed-data)
+    (data-on-change-cb fixed-data)))
 
 (defn finances-clean-row [data]
   ; a data entry is good if we have the period and one other value: cash, costs or revenue
@@ -147,41 +143,52 @@
 
 (defn- save-data [owner]
   ; (om/set-state! owner :has-changes false)
-  (dis/dispatch! [:save-topic-data "finances" {:data (finances-clean-data (om/get-state owner :finances-data))
-                                               :placeholder false}]))
+  (om/set-state! owner :has-changes? false)
+  ((om/get-props owner :data-section-on-change))
+
+  (dis/dispatch! [:foce-input {:data (finances-clean-data (om/get-state owner :finances-data))
+                               :placeholder false}]))
 
 (defn replace-row-in-data [owner row-data k v]
   "Find and replace the edited row"
+  (om/set-state! owner :has-changes? true)
   (let [new-row (update row-data k (fn[_]v))]
     (change-finances-data owner new-row)))
 
 (defn more-months [owner]
   (om/update-state! owner :stop #(+ % batch-size)))
 
-(defcomponent finances-edit [{:keys [currency editing-cb show-first-edit-tip first-edit-tip-cb] :as data} owner]
+(defcomponent finances-edit [{:keys [currency editing-cb show-first-edit-tip first-edit-tip-cb table-key] :as data} owner]
 
   (init-state [_]
     {:finances-data (:finances-data data)
+     :has-changes? false
      :stop batch-size})
 
   (will-receive-props [_ next-props]
     (om/set-state! owner :finances-data (:finances-data next-props)))
 
-  (render-state [_ {:keys [finances-data stop]}]
-
+  (render-state [_ {:keys [finances-data stop has-changes?]}]
     (let [company-slug (router/current-company-slug)]
 
-      (dom/div {:class "finances"}
-        (dom/div {:class "composed-section-edit finances-body edit"}
-          (dom/div {:class "table-container group"}
-            (dom/table {:class "table"}
+      (dom/div {:class "finances" :style {:height (str (- (:main-height data) 5) "px") :overflow "hidden"}}
+        (dom/div {:class "composed-section-edit finances-body edit"
+                  :style {:height (str (- (:main-height data) 63) "px")
+                          :width (str (:main-width data) "px")
+                          :overflow-y "scroll"
+                          :overflow-x "hidden"}}
+          (dom/div {:class "group"}
+            (dom/h3 {:class "left pt3 pb2 px2 group"} (if (zero? (count finances-data)) "Add Finances" "Edit Finances")))
+          (dom/div {:class "table-container my2 px3 group"}
+            (dom/table {:class "table"
+                        :key table-key}
               (dom/thead {}
                 (dom/tr {}
                   (dom/th {} "")
-                  (dom/th {} "Revenue")
-                  (dom/th {} "Expenses")
-                  (dom/th {} "Cash")))
-              (let [current-period (utils/current-period)]
+                  (dom/th {} "REVENUE")
+                  (dom/th {} "EXPENSES")
+                  (dom/th {} "CASH")))
+              (let [current-period (utils/current-finance-period)]
                 (for [idx (range stop)]
                   (let [period (finance-utils/get-past-period current-period idx)
                         has-value (contains? finances-data period)
@@ -192,7 +199,7 @@
                     (om/build finances-edit-row {:cursor row-data
                                                  :next-period next-period
                                                  :is-last (= idx 0)
-                                                 :needs-year (= idx (dec stop))
+                                                 :needs-year (or (= idx 0) (= idx (dec stop)))
                                                  :currency currency
                                                  :change-cb #(replace-row-in-data owner row-data %1 %2)}))))
               (dom/tfoot {}
@@ -200,13 +207,14 @@
                   (dom/th {:class "earlier" :col-span 2}
                     (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner)} "Earlier..."))
                   (dom/td {})
-                  (dom/td {})))))
+                  (dom/td {}))))))
 
-          (dom/div {:class "topic-foce-footer group"}
-            (dom/div {:class "topic-foce-footer-right"}
-              (dom/button {:class "btn-reset btn-outline btn-data-save"
-                           :on-click  #(do
-                                        (save-data owner)
-                                        (editing-cb false))} "SAVE")
-              (dom/button {:class "btn-reset btn-outline"
-                           :on-click #(editing-cb false)} "CANCEL"))))))))
+        (dom/div {:class "topic-foce-footer group"}
+          (dom/div {:class "topic-foce-footer-right"}
+            (dom/button {:class "btn-reset btn-solid btn-data-save"
+                         :disabled (not has-changes?)
+                         :on-click  #(do
+                                      (save-data owner)
+                                      (editing-cb false))} (if (zero? (count finances-data)) "ADD" "UPDATE"))
+            (dom/button {:class "btn-reset btn-outline"
+                         :on-click #(editing-cb false)} "CANCEL")))))))

@@ -80,13 +80,20 @@
         (dom/button {:class "btn-reset close-fullscreen-topic-btn"
                      :on-click #(hide-fullscreen-topic-cb)}
           (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
-        (dom/div {:class "fullscreen-topic-top-box"
-                  :style #js {:maxHeight (when-not (responsive/is-mobile?) (str (* (/ wh 100) 85) "px"))}}
+        (dom/div {:class "fullscreen-topic-top-box"}
           ;; Image
           (when (:image-url topic-data)
             (dom/div {:class "topic-header-image"}
               (dom/img {:src (:image-url topic-data)})))
           
+          ;; Title
+          (dom/div {:class "topic-title-container group"}
+            (dom/div {:class "topic-title left"} (:title topic-data)))
+
+          ;; Headline
+          (dom/div {:class "topic-headline"
+                    :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
+
           ;; Chart
           (when (or (= topic "growth") (= topic "finances"))
             (dom/div {:class "topic-growth-finances"}
@@ -95,14 +102,7 @@
                 (om/build topic-growth chart-data {:opts chart-opts})
                 (= topic "finances")
                 (om/build topic-finances chart-data {:opts chart-opts}))))
-          
-          ;; Title
-          (dom/div {:class "topic-title-container group"}
-            (dom/div {:class "topic-title left"} (:title topic-data)))
-          
-          ;; Headline
-          (dom/div {:class "topic-headline"
-                    :dangerouslySetInnerHTML (utils/emojify (:headline topic-data))})
+
           ;; Body
           (dom/div {:class (str "topic-body" (when (:placeholder topic-data) " italic"))
                   :dangerouslySetInnerHTML (utils/emojify topic-body)})

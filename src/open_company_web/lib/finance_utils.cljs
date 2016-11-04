@@ -2,6 +2,7 @@
   (:require [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
+            [open-company-web.lib.oc-colors :as occ]
             [goog.string :as gstring]
             [cljs-time.core :as t]
             [cljs-time.format :as f]))
@@ -51,7 +52,7 @@
               (placeholder-data prev-period {:new true}))))))))
 
 (defn edit-placeholder-data [initial-data]
-  (let [current-period (utils/current-period)
+  (let [current-period (utils/current-finance-period)
         last-period (if (last initial-data)
                       (:period (last initial-data))
                       (get-past-period current-period 12))
@@ -193,3 +194,13 @@
                  next-data
                  (inc idx))
           next-data)))))
+
+(defn color-for-metric [k selected]
+  (occ/get-color-by-kw (cond (= k :revenue) (if selected :oc-green-dark-1 :oc-green-dark)
+                             (= k :costs) (if selected :oc-red-dark-1 :oc-red-dark)
+                             :else :oc-gray-7)))
+
+(defn finances-key-colors [selected]
+  {:revenue (color-for-metric :revenue selected)
+   :costs  (color-for-metric :costs selected)
+   :cash  (color-for-metric :cash selected)})

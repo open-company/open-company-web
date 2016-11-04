@@ -16,7 +16,7 @@
   (let [metrics (:metrics presets)
         metric (filter #(= (s/lower (:name %)) (s/lower metric-name)) metrics)
         slug (if (empty? metric)
-               (s/slugify metric-name)
+               (s/slug metric-name)
                (:slug (first metric)))]
     (if add-noise
       (str slug "-" (get-noise))
@@ -117,6 +117,9 @@
       :values values
       :pattern "###,###.##"
       :column-thickness "14"}))
+
+(defn metrics-as-sequence [metric-map metric-slugs]
+  (map metric-map metric-slugs))
 
 (defn get-actual [metrics]
   (some #(when (:value (metrics %)) %) (vec (range (count metrics)))))

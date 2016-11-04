@@ -9,9 +9,7 @@
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.iso4217 :refer (sorted-iso4217)]
             [open-company-web.lib.growth-utils :as growth-utils]
-            [open-company-web.lib.responsive :as responsive]
-            [cuerdas.core :as s]
-            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]))
+            [open-company-web.lib.responsive :as responsive]))
 
 (def metric-defaults {
   :slug growth-utils/new-metric-slug-placeholder
@@ -19,14 +17,6 @@
   :description ""
   :unit "number"
   :interval "monthly"})
-
-(defn- show-archive-confirm-popover [owner data]
-  (add-popover {:container-id "archive-metric-confirm"
-                :message "This chart will no longer be available for new data, but prior entries will still be visible in topic history. Are you sure you want to archive?"
-                :cancel-title "KEEP"
-                :cancel-cb #(hide-popover nil "delete-metric-confirm")
-                :success-title "ARCHIVE"
-                :success-cb #((:archive-metric-cb data) (om/get-state owner :metric-slug))}))
 
 (defn- option-template [state]
   (if-not (.-id state) (.-text state))
@@ -50,26 +40,30 @@
     ; check if we are ready to initialize the widget and if we haven't aready done that
     (when (and req-libs-loaded did-mount (not select2-initialized))
       ; init unit dropdown
-      (doto (js/$ "select#mtr-unit")
+      (doto (js/$ "select#mtr-unit.unit")
         (.select2 (clj->js {"placeholder" "Metric unit"
                             "minimumResultsForSearch" -1
                             "templateResult" unit-option-template
                             "templateSelection" unit-option-template}))
         (.on "change" (fn [e]
                         (let [unit-value (.. e -target -value)
-                              slug (om/get-state owner :metric-slug)]
-                          (om/set-state! owner :unit unit-value)))))
+                              slug (om/get-state owner :metric-slug)
+                              on-change-cb (om/get-props owner :metadata-on-change-cb)]
+                          (om/set-state! owner :unit unit-value)
+                          (on-change-cb :unit unit-value)))))
 
       ; init interval dropdown
-      (doto (js/$ "select#mtr-interval")
+      (doto (js/$ "select#mtr-interval.interval")
         (.select2 (clj->js {"placeholder" "Metric interval"
                             "minimumResultsForSearch" -1
                             "templateResult" option-template
                             "templateSelection" option-template}))
         (.on "change" (fn [e]
                         (let [interval-value (.. e -target -value)
-                              slug (om/get-state owner :metric-slug)]
-                          (om/set-state! owner :interval interval-value)))))
+                              slug (om/get-state owner :metric-slug)
+                              on-change-cb (om/get-props owner :metadata-on-change-cb)]
+                          (om/set-state! owner :interval interval-value)
+                          (on-change-cb :interval interval-value)))))
 
       ; focus name
       (.focus (js/$ "input#mtr-name"))
@@ -84,28 +78,14 @@
     {:intervals (:intervals growth-defaults)
      :units (:units growth-defaults)}))
 
-(defn- save-metric-info [owner save-cb new?]
-  (let [slug (om/get-state owner :metric-slug)]
-    (save-cb slug {
-      :slug slug
-      :name (om/get-state owner :metric-name)
-      :description (om/get-state owner :description)
-      :unit (om/get-state owner :unit)
-      :interval (om/get-state owner :interval)}
-      new?)))
-
 (defcomponent growth-metric-edit [data owner options]
 
   (init-state [_]
     (let [new-metric? (:new-metric? data)
           metric-info (if new-metric? metric-defaults (:metric-info data))
-          company-currency-code (:currency options)
+          company-currency-code (:currency data)
           presets (get-presets data)
-          units (:units presets)
-          fixed-units (vec (map #(if (= (:unit %) "currency")
-                                   {:unit "currency"
-                                    :name (utils/get-symbol-for-currency-code company-currency-code)}
-                                   %) units))]
+          units (:units presets)]
       {:req-libs-loaded false
        :did-mount false
        :select2-initialized false
@@ -114,7 +94,7 @@
        :metric-name (:name metric-info)
        :description (:description metric-info)
        :unit (:unit metric-info)
-       :units fixed-units
+       :units units
        :interval (if new-metric? (:interval metric-defaults) (:interval metric-info))
        :currency company-currency-code}))
 
@@ -133,76 +113,66 @@
       (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
-  (render [_]
+  (render-state [_ {:keys [metric-slug
+                           metric-name
+                           description
+                           interval
+                           unit
+                           presets
+                           units
+                           currency]}]
     (let [all-metrics (:metrics data)
-          {:keys [metrics intervals prompt] :as presets} (om/get-state owner :presets)
-          units (om/get-state owner :units)
+          {:keys [metrics intervals prompt] :as presets} presets
           new-metric? (:new-metric? data)]
 
-      (dom/div {:class "growth-metric-edit p3"}
+      (dom/div {:class "growth-metric-edit p3 group"}
 
         ;; name
-        (dom/div {:class "small-caps bold mb1"} "Chart label")
-        (dom/input {:class "npt col-8 p1 mb2"
-          :type "text"
-          :value (om/get-state owner :metric-name)
-          :on-change (fn [e] (om/set-state! owner :metric-name (.. e -target -value)))
-                       ;(change-name owner data))
-          :id "mtr-name"
-          :placeholder "A short name, e.g. DAU"})
+        (dom/div {:class "group" :style {:white-space "nowrap" :text-align "left"}}
+          (dom/label {:class "small-caps col-3 mt1 left"
+                      :style {:padding-top "3px"}} "CHART LABEL")
+          (dom/input {:class "npt col-9 p1 mb2"
+            :type "text"
+            :value metric-name
+            :max-length 10
+            :on-change (fn [e]
+                        (let [v (.. e -target -value)
+                              on-change-cb (om/get-props owner :metadata-on-change-cb)]
+                          (om/set-state! owner :metric-name v)
+                          (on-change-cb :name v)))
+            :id "mtr-name"
+            :placeholder "Short label e.g. DAU"}))
 
         ;; description
-        (dom/div {:class "small-caps bold mb1"} "Description (Shown in tooltip)")
-        (dom/input {:class "npt col-12 p1 mb2"
-                    :type "text"
-                    :value (om/get-state owner :description)
-                    :placeholder "e.g. Daily Active Users"
-                    :on-change (fn [e] (om/set-state! owner :description (.. e -target -value)))})
+        (dom/div {:class "group" :style {:white-space "nowrap" :text-align "left"}}
+          (dom/label {:class "small-caps col-3 mt1 left"
+                      :style {:padding-top "3px"}} "DESCRIPTION")
+          (dom/input {:class "npt col-9 p1 mb2"
+                      :type "text"
+                      :value description
+                      :placeholder "Description - e.g. Daily Active Users"
+                      :on-change (fn [e]
+                                    (let [v (.. e -target -value)
+                                          on-change-cb (om/get-props owner :metadata-on-change-cb)]
+                                      (om/set-state! owner :description v)
+                                      (on-change-cb :description v)))}))
 
         ;; interval
-        (dom/div {:class "small-caps bold mb1"} "Interval")
-        (dom/select {:class "npt col-5 p1 mb2"
-                     :default-value (om/get-state owner :interval)
-                     :id "mtr-interval"
-                     ; if there are data the interval can't be changed
-                     :disabled (and (pos? (:metric-count data))
-                                    (not (:new-metric? data)))}
-          (for [interval intervals]
-            (dom/option {:value interval} (utils/camel-case-str interval))))
-
-        ;; unit
-        (dom/div {:class "small-caps bold mb1"} "Measured As")
-        (dom/select {:class "npt col-5 p1 mb2"
-                     :default-value (or (om/get-state owner :unit) "A number")
-                     :id "mtr-unit"}
-          (for [unit units]
-            (dom/option {:value (:unit unit)} (:name unit))))
-
-        (dom/div {:class "topic-foce-footer group"}
-          (dom/div {:class "topic-foce-footer-right"}
-
-            ;; next or save button
-            (dom/button {:class "btn-reset btn-outline btn-data-save"
-                         :disabled (or (s/blank? (om/get-state owner :metric-slug))
-                                       (s/blank? (om/get-state owner :metric-name))
-                                       (s/blank? (om/get-state owner :unit))
-                                       (s/blank? (om/get-state owner :interval)))
-                         :on-click #(save-metric-info owner (:save-cb data) new-metric?)}
-              (if new-metric? "NEXT" "SAVE"))
-
-            ;; cancel button
-            (dom/button {:class "btn-reset btn-outline"
-                         :on-click #((:cancel-cb data))} "CANCEL")
-
-            (when-not new-metric?
-              (dom/button {:class "btn-reset archive-button"
-                           :title "Archive this chart"
-                           :type "button"
-                           :data-toggle "tooltip"
-                           :data-container "body"
-                           :data-placement "top"
-                           :on-click #(show-archive-confirm-popover owner data)}
-                  (dom/i {:class "fa fa-archive"})))
-
-
-            ))))))
+        (dom/div {:class "group" :style {:white-space "nowrap" :text-align "left"}}
+          (dom/label {:class "small-caps col-3 left"} " ")
+          (dom/div {:class "col-4 left"}
+            (dom/select {:class "npt col-12 p1 mb2 interval"
+                         :default-value interval
+                         :id "mtr-interval"
+                         ; if there are data the interval can't be changed
+                         :disabled (and (pos? (:metric-count data))
+                                        (not (:new-metric? data)))}
+              (for [interval intervals]
+                (dom/option {:value interval} (utils/camel-case-str interval)))))
+          (dom/label {:class "col-1 left"} " ")
+          (dom/div {:class "col-4 left"}
+            (dom/select {:class "npt col-12 p1 mb2 unit"
+                         :default-value (or unit "Number")
+                         :id "mtr-unit"}
+              (for [unit units]
+                (dom/option {:value (:unit unit)} (:name unit))))))))))

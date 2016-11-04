@@ -1,4 +1,4 @@
-div.topic {
+div.topic.topic-edit {
   margin: 0px;
   padding: 0px;
   height: 100%;
@@ -144,6 +144,42 @@ div.topic {
         height: 30px;
         border-radius: 15px;
         background-color: rgba(78,90,107,0.5);
+
+        &:hover {
+          background-color: rgba(78,90,107,1.0);
+        }
+      }
+
+      button.chart-plus-button{
+        position: absolute;
+        top: 65px;
+        right: 30px;
+        transition: 230ms;
+
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 15px;
+        background-color: rgba(78,90,107,0.5);
+        padding-top: 3px;
+
+        &:hover {
+          background-color: rgba(78,90,107,1.0);
+        }
+      }
+
+      button.chart-archive-button{
+        position: absolute;
+        top: 100px;
+        right: 30px;
+        transition: 230ms;
+
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 15px;
+        background-color: rgba(78,90,107,0.5);
+        padding-top: 3px;
 
         &:hover {
           background-color: rgba(78,90,107,1.0);

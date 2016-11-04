@@ -94,8 +94,9 @@
       (events/unlistenByKey (om/get-state owner :kb-listener))))
 
   (did-update [_ _ _]
-    (when (om/get-state owner :tr-selected-topic)
-      (animate-selected-topic-transition owner)))
+    (if (om/get-state owner :tr-selected-topic)
+      (animate-selected-topic-transition owner)
+      (dommy/remove-class! (sel1 [:body]) :no-scroll)))
 
   (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning columns-num]}]
     (let [company-data (dis/company-data data)
@@ -115,7 +116,7 @@
                   (dom/div #js {:className "selected-topic"
                                 :key (str "transition-" selected-topic)
                                 :ref "selected-topic"
-                                :style #js {:opacity 1 :backgroundColor "rgba(255, 255, 255, 0.98)"}}
+                                :style #js {:opacity 1 :backgroundColor "rgba(78, 90, 107, 0.5)"}}
                     (om/build fullscreen-topic {:section selected-topic
                                                 :section-data (->> selected-topic keyword (get su-data))
                                                 :selected-metric selected-metric
@@ -143,15 +144,12 @@
                                                {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                        :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
               (dom/div {:class "su-sp-company-header"}
-                 (dom/div {:class "group"}
-                   (dom/img {:class "company-logo" :src (:logo company-data)}))
                  (when (:title su-data)
                     (dom/div {:class "su-snapshot-title"} (:title su-data))))
               (om/build topics-columns {:columns-num 1
                                         :card-width card-width
                                         :total-width total-width
                                         :content-loaded (not (:loading data))
-                                        :is-stakeholder-update true
                                         :topics (:sections su-data)
                                         :topics-data su-data
                                         :company-data company-data

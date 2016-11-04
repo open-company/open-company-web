@@ -1,9 +1,5 @@
 div.company-dashboard {
-  background-color: #fff;
-
-  @include mobile(){
-    background-color: #d9d9d9;
-  }
+  background-color: $oc_gray_8;
 
   div.login-required {
     min-height: calc(100vh - #{$footer_height}px - 41px);

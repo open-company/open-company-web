@@ -80,22 +80,9 @@
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
                     :ref "topic-internal"}
-        (when (or (and is-growth-finances?
-                       (utils/data-topic-has-data section topic-data))
-                   image-header)
-          (dom/div {:class (utils/class-set {:card-header true
-                                             :card-image (not is-growth-finances?)})}
-            (cond
-              (= section "finances")
-              (om/build topic-finances {:section-data (utils/fix-finances topic-data)
-                                        :section section
-                                        :currency currency} {:opts chart-opts})
-              (= section "growth")
-              (om/build topic-growth {:section-data topic-data
-                                      :section section
-                                      :currency currency} {:opts chart-opts})
-              :else
-              (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options}))))
+        (when image-header
+          (dom/div {:class "card-header card-image"}
+            (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
         ;; Topic title
         (dom/div {:class "topic-dnd-handle group"}
           (dom/div {:class "topic-title"} (:title topic-data))
@@ -128,17 +115,29 @@
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
 
-        (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
-                      :ref "topic-body"
-                      :dangerouslySetInnerHTML (utils/emojify truncated-body)})
+        (when (and is-growth-finances?
+                   (utils/data-topic-has-data section topic-data))
+          (dom/div {:class ""}
+            (cond
+              (= section "growth")
+              (om/build topic-growth {:section-data topic-data
+                                      :section section
+                                      :currency currency} {:opts chart-opts})
+              (= section "finances")
+              (om/build topic-finances {:section-data (utils/fix-finances topic-data)
+                                        :section section
+                                        :currency currency} {:opts chart-opts}))))
+        (when-not (clojure.string/blank? topic-body)
+          (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
+                        :ref "topic-body"
+                        :dangerouslySetInnerHTML (utils/emojify truncated-body)}))
 
         ; if it's SU preview or SU show only read-more
-        (if is-stakeholder-update
-          (when (utils/exceeds-topic-body-limit topic-body)
-            (dom/div {:class "left"
-                    :style {:margin-bottom "20px"}}
-              (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic owner nil false)))))
-          (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic owner nil false)) {:opts options}))))))
+        (dom/div {:style {:margin-top "20px"}}
+          (if is-stakeholder-update
+            (when (utils/exceeds-topic-body-limit topic-body)
+              (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic owner nil false))))
+            (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic owner nil false)) {:opts options})))))))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
@@ -228,6 +227,7 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
+                                                 :topic-edit is-foce
                                                  :draggable-topic (and (not (:read-only-company data)) (:pin topic-data))
                                                  :not-draggable-topic (or (:read-only-company data) (not (:pin topic-data)))
                                                  :no-foce (and foce-active (not is-foce))
@@ -273,6 +273,7 @@
                                       :is-stakeholder-update (:is-stakeholder-update data)
                                       :currency currency
                                       :card-width card-width
+                                      :foce-data-editing? (:foce-data-editing? data)
                                       :read-only-company (:read-only-company data)
                                       :foce-key (:foce-key data)
                                       :foce-data (:foce-data data)
