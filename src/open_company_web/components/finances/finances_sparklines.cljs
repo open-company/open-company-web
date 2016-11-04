@@ -82,13 +82,12 @@
   (dom/span {:class "open-sans bold"} (utils/get-period-string (:period data-set) "monthly" [:force-year])))
 
 (defn get-fixed-sorted-metric [finances-data currency]
-  (let [currency-symbol (utils/get-symbol-for-currency-code currency)]
+  (let [currency-symbol (utils/get-symbol-for-currency-code currency)
+        filled-finances-data (vals (finance-utils/fill-gap-months finances-data))
+        sort-pred (utils/sort-by-key-pred :period)
+        sorted-data (vec (sort sort-pred filled-finances-data))]
     (vec (map #(merge % {:label (label-from-set % currency-symbol)
-                         :sub-label (sub-label-from-set (:period %) finances-data currency-symbol)}) finances-data))))
-
-; (let [idx (.indexOf (vec (map :period (reverse finances-data))) (:period %))
-;       periods (subvec (vec (reverse finances-data)) idx)]
-;   (finance-metric-delta periods data-key currency-symbol))
+                         :sub-label (sub-label-from-set (:period %) sorted-data currency-symbol)}) sorted-data))))
 
 (defcomponent finances-sparklines [{:keys [finances-data currency archive-cb editing?] :as data} owner]
 
