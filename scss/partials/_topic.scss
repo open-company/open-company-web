@@ -27,16 +27,16 @@ div.dnd-active {
 
 div.topic {
   height: 100%;
-  background-color: $oc_white;
-  border-radius: 2px;
   text-align: left;
-  border: 0px solid transparent;
-  box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
   position: relative;
   transition: opacity 0.5s;
   margin-left: 4px;
   margin-right: 4px;
   padding-bottom: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  border: 1px solid rgba(0,0,0,.09);
+  border-radius: 3px;
+  background-color: white;
 
   &.no-foce {
     opacity: 0.5;
