@@ -128,7 +128,7 @@
                   (dom/div #js {:className "selected-topic"
                                 :key (str "transition-" selected-topic)
                                 :ref "selected-topic"
-                                :style #js {:opacity 1 :backgroundColor "rgba(255, 255, 255, 0.98)"}}
+                                :style #js {:opacity 1 :backgroundColor "rgba(78, 90, 107, 0.5)"}}
                     (om/build fullscreen-topic {:section selected-topic
                                                 :section-data (->> selected-topic keyword (get su-data))
                                                 :selected-metric selected-metric
@@ -162,7 +162,6 @@
                                         :card-width card-width
                                         :total-width total-width
                                         :content-loaded (not (:loading data))
-                                        :is-stakeholder-update true
                                         :topics (:sections su-data)
                                         :topics-data su-data
                                         :company-data company-data
