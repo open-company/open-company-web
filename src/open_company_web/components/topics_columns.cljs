@@ -311,7 +311,7 @@
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
-                    :style #js {:width total-width}
+                    :style #js {:width (if is-stakeholder-update "100%" total-width)}
                     :key columns-container-key}
             (dom/div {:class "topics-column"}
               (dom/div #js {:className "topics-column-pinned"}

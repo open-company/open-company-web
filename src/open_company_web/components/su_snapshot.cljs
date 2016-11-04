@@ -150,7 +150,6 @@
                                         :card-width card-width
                                         :total-width total-width
                                         :content-loaded (not (:loading data))
-                                        :is-stakeholder-update true
                                         :topics (:sections su-data)
                                         :topics-data su-data
                                         :company-data company-data
