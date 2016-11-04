@@ -10,11 +10,11 @@ div.su-snapshot-preview {
 }
 
 div.page.snapshot-page {
-  background-color: $oc_gray_6 !important;
+  background-color: $oc_gray_8 !important;
 }
 
 div.su-snapshot-preview {
-  background-color: $oc_gray_6;
+  background-color: $oc_gray_8;
   border-top: 4px solid $oc_yellow;
 
   div.su-snapshot-header {
@@ -77,6 +77,7 @@ div.su-snapshot-preview {
 
   div.su-sp-content {
     padding-bottom: 20px;
+    background-color: $oc_gray_8;
 
     div.su-sp-company-header {
       text-align: center;
@@ -140,7 +141,7 @@ div.su-snapshot-preview {
           width: 100%;
           border: 0px solid transparent;
           margin-bottom: 0px;
-          padding: 0px 0px 22px 0px;
+          padding: 0px 0px 12px 0px;
 
           &.hover, &:hover {
             div.share-remove-container {
@@ -173,10 +174,10 @@ div.su-snapshot-preview {
           }
 
           div.topic {
+            box-shadow: 0 1px 4px rgba(0,0,0,.04);
+            border: 1px solid rgba(0,0,0,.09);
+            border-radius: 3px;
             background-color: white;
-            border-radius: 2px;
-            border: 0px solid transparent;
-            box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
           }
         }
       }
