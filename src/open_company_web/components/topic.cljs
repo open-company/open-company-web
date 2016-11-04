@@ -133,8 +133,7 @@
                         :dangerouslySetInnerHTML (utils/emojify truncated-body)}))
 
         ; if it's SU preview or SU show only read-more
-        (dom/div {:class "left"
-                  :style {:margin-top "20px"}}
+        (dom/div {:style {:margin-top "20px"}}
           (if is-stakeholder-update
             (when (utils/exceeds-topic-body-limit topic-body)
               (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic owner nil false))))
