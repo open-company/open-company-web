@@ -153,6 +153,7 @@
           possible-sections (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
           topics-to-add (sort #(compare (title-from-section-name owner %1) (title-from-section-name owner %2)) (reduce utils/vec-dissoc possible-sections su-topics))]
       (dom/div {:class (utils/class-set {:su-snapshot-preview true
+                                         :group true
                                          :main-scroll true})}
         (when (and (seq company-data)
                    (empty? (:sections su-data)))
@@ -178,8 +179,6 @@
             (dom/div {:class "su-sp-content"
                       :key (apply str su-topics)}
               (dom/div {:class "su-sp-company-header"}
-                (dom/div {:class "company-logo-container"}
-                  (dom/img {:class "company-logo" :src (:logo company-data)}))
                 (when (:title su-data)
                   (dom/div {:class "preview-title-container"}
                     (dom/input #js {:className "preview-title"

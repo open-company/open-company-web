@@ -80,8 +80,7 @@
         (dom/button {:class "btn-reset close-fullscreen-topic-btn"
                      :on-click #(hide-fullscreen-topic-cb)}
           (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
-        (dom/div {:class "fullscreen-topic-top-box"
-                  :style #js {:maxHeight (when-not (responsive/is-mobile?) (str (* (/ wh 100) 85) "px"))}}
+        (dom/div {:class "fullscreen-topic-top-box"}
           ;; Image
           (when (:image-url topic-data)
             (dom/div {:class "topic-header-image"}
