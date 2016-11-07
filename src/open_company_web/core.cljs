@@ -21,9 +21,9 @@
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.company-settings :refer (company-settings)]
             [open-company-web.components.su-edit :refer (su-edit)]
-            [open-company-web.components.prior-updates :refer (prior-updates)]
             [open-company-web.components.su-snapshot-preview :refer (su-snapshot-preview)]
             [open-company-web.components.su-snapshot :refer (su-snapshot)]
+            [open-company-web.components.updates :refer (updates)]
             [open-company-web.components.home :refer (home)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
@@ -62,7 +62,6 @@
 (defn pre-routing [query-params]
   ; make sure the menu is closed
   (swap! router/path {})
-  (utils/after 100 #(dis/toggle-menu false))
   (if (jwt/jwt)
     (dommy/add-class! (sel1 [:body]) :small-footer)
     (dommy/remove-class! (sel1 [:body]) :small-footer))
@@ -269,9 +268,6 @@
       (swap! dis/app-state assoc :force-remove-loading true)
       (company-handler "profile" target company-settings params))
 
-    (defroute company-section-route (urls/company-section ":slug" ":section") {:as params}
-      (company-handler "section" target company-dashboard params))
-
     (defroute company-route (urls/company ":slug") {:as params}
       (company-handler "dashboard" target company-dashboard params))
 
@@ -282,7 +278,7 @@
       (company-handler "su-snapshot-preview" target su-snapshot-preview params))
 
     (defroute su-list-route (urls/stakeholder-update-list ":slug") {:as params}
-      (company-handler "su-list" target #(om/component (prior-updates)) params))
+      (company-handler "su-list" target updates params))
 
     (defroute su-edit-route (urls/stakeholder-update-edit ":slug") {:as params}
       (company-handler "su-edit" target su-edit params))
@@ -292,6 +288,9 @@
 
     (defroute stakeholder-update-section-route (urls/stakeholder-update-section ":slug" ":update-date" ":update-slug" ":section") {:as params}
       (stakeholder-update-handler target su-snapshot params))
+
+    (defroute company-section-route (urls/company-section ":slug" ":section") {:as params}
+      (company-handler "section" target company-dashboard params))
 
     (defroute not-found-route "*" []
       ;; render component
@@ -315,10 +314,10 @@
                                  company-settings-route
                                  company-route
                                  company-route-slash
-                                 company-section-route
                                  su-snapshot-preview-route
                                  su-edit-route
                                  su-list-route
+                                 company-section-route
                                  stakeholder-update-route
                                  stakeholder-update-section-route
                                  not-found-route]))
