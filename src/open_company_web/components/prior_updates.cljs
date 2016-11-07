@@ -5,7 +5,6 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.popover :as popover]
-            [open-company-web.api :as api]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
@@ -39,25 +38,10 @@
         updates (reverse (drv/react s :su-list))
         none? (empty? updates)
         mobile? (responsive/is-mobile-size?)
-        klass (if mobile? "" "oc-popover") ; desktop is in a popover, mobile is full page
-        window-height (when mobile? (.-clientHeight (.-documentElement js/document)))
-        window-width (when mobile? (.-clientWidth (.-documentElement js/document)))
-        width (if mobile? window-width desktop-width) ; full-width on mobile
-        right-padding (if mobile? "pr2" "pr3")
-        height (cond ; 4 possible heights
-                  mobile? window-height
-                  none? 200 ; just a message
-                  (<= (count updates) 3) 325 ; small # of updates
-                  :else 450) ; lots of updates
-        margin-left (if mobile? "0" (half-offset width)) ; desktop is centered
-        margin-top (if mobile? "0" (half-offset height))] ; desktop is centered
+        klass (if mobile? "" "oc-popover")] ; desktop is in a popover, mobile is full page
 
     [:div {:class klass
-           :style {:height (str height "px")
-                   :width (str width "px")
-                   :padding 0
-                   :margin-left margin-left
-                   :margin-top margin-top}}
+           :style {:padding 0}}
       
       (when-not mobile? ; floating close X
         [:button {:class "absolute top-0 btn-reset" :style {:left "100%"}
@@ -65,9 +49,9 @@
           (i/icon :simple-remove {:class "inline mr1" :stroke "4"
                                   :color "white" :accent-color "white"})])
 
-      [:div.prior-updates-container {:style {:max-height (str (- height 2) "px") :overflow-y "scroll"}}
+      [:div.prior-updates-container {}
 
-        [:h3.m0.pl3.py25.gray5.domine {:style {:class right-padding :border-bottom "solid 1px rgba(78, 90, 107, 0.1)"}}
+        [:h3.m0.gray5.domine {}
           "Prior Updates"
           (when mobile? ; inside the header close X
             [:button {:class "top-0 btn-reset" :style {:float "right" :padding-top "0" :margin-top "-5px"}
@@ -81,7 +65,7 @@
             [:p.message "There's nothing to see here."]
             [:p.message "Start sharing!"]]
 
-          [:div.update-container.px3.pt2
+          [:div.update-container.pt2
             (for [update updates]
               (let [user-id (:user-id (drv/react s :jwt))
                     author-id (-> update :author :user-id)
