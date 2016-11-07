@@ -408,7 +408,7 @@
             (dispatcher/dispatch! [:su-list {:response fixed-body :slug slug}])))))))
 
 (defn get-stakeholder-update
-  ([slug update-slug]
+  ([slug update-slug & [load-company-data]]
     (when (and slug update-slug)
       (let [update-link (str "/companies/" slug "/updates/" update-slug)]
         (api-get update-link
@@ -422,7 +422,7 @@
                   response {:slug (keyword slug)
                             :update-slug (keyword update-slug)
                             :response fixed-body}]
-              (dispatcher/dispatch! [:stakeholder-update response]))))))))
+              (dispatcher/dispatch! [:stakeholder-update response load-company-data]))))))))
 
 (defn auth-with-email [email pswd]
   (when (and email pswd)
