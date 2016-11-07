@@ -10,16 +10,14 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.icon :as i]
+            [open-company-web.components.ui.menu :refer (menu)]
             [open-company-web.components.ui.user-avatar :refer (user-avatar)]
             [open-company-web.components.ui.login-button :refer (login-button)]
             [open-company-web.components.ui.small-loading :as loading]
             [open-company-web.components.ui.company-avatar :refer (company-avatar)]
-            [open-company-web.components.ui.login-overlay :refer (login-overlays-handler)]))
-
-(defn menu-click [owner e]
-  (when e
-    (.preventDefault e))
-  (dis/toggle-menu))
+            [open-company-web.components.ui.login-overlay :refer (login-overlays-handler)]
+            [om-bootstrap.random :as r]
+            [om-bootstrap.button :as b]))
 
 (defcomponent navbar [{:keys [company-data columns-num card-width latest-su link-loading email-loading slack-loading menu-open show-share-su-button] :as data} owner options]
 
@@ -45,7 +43,7 @@
             (dom/ul {:class "nav navbar-nav navbar-right"}
               (dom/li {}
                 (if (responsive/is-mobile-size?)
-                  (dom/div {:on-click (partial menu-click owner)}
+                  (dom/div {:on-click #()}
                     (i/icon :menu-34 {}))
                   (if (jwt/jwt)
                     (dom/div {}
@@ -57,6 +55,9 @@
                                        :data-position "top"
                                        :title "Choose topics to share via email, Slack or private URL."
                                        :disabled (not (nil? (:foce-key data)))
-                                       :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} (dom/i {:class "fa fa-share"}) " SHARE AN UPDATE")))
-                      (user-avatar (partial menu-click owner)))
+                                       :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} (dom/i {:class "fa fa-share"})
+                            " SHARE AN UPDATE")))
+                      (dom/div {:class "dropdown right"}
+                        (user-avatar {:classes "btn-reset dropdown-toggle"})
+                        (om/build menu {})))
                     (login-button)))))))))))
