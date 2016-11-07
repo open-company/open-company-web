@@ -19,7 +19,7 @@
             [om-bootstrap.random :as r]
             [om-bootstrap.button :as b]))
 
-(defcomponent navbar [{:keys [company-data columns-num card-width latest-su link-loading email-loading slack-loading menu-open show-share-su-button] :as data} owner options]
+(defcomponent navbar [{:keys [company-data columns-num card-width latest-su link-loading email-loading slack-loading menu-open show-share-su-button active] :as data} owner options]
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -65,13 +65,13 @@
           (dom/div {:class "oc-navbar-separator"}))
         (dom/div {:class "oc-navbar-bottom group"
                   :style {:width (str header-width "px")}}
-          (dom/a {:class (when (utils/in? (:route @router/path) "dashboard") "active")
+          (dom/a {:class (when (= active :dashboard) "active")
                   :href (oc-urls/company)
                   :on-click #(do
                                (utils/event-stop %)
                                (router/nav! (oc-urls/company)))}
             "Dashboard")
-          (dom/a {:class (when (utils/in? (:route @router/path) "updates") "active")
+          (dom/a {:class (when (= active :priors) "active")
                   :href (oc-urls/stakeholder-update-list)
                   :on-click #(do
                                (utils/event-stop %)
