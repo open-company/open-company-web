@@ -80,9 +80,12 @@
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
                     :ref "topic-internal"}
+
+        ;; Topic image
         (when image-header
           (dom/div {:class "card-header card-image"}
             (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
+
         ;; Topic title
         (dom/div {:class "topic-dnd-handle group"}
           (dom/div {:class "topic-title"} (:title topic-data))
@@ -111,10 +114,8 @@
                       :data-toggle "tooltip"
                       :data-container "body"
                       :data-placement "top"}))))
-        ;; Topic headline
-        (when-not (clojure.string/blank? (:headline topic-data))
-          (om/build topic-headline topic-data))
 
+        ;; Topic data
         (when (and is-growth-finances?
                    (utils/data-topic-has-data section topic-data))
           (dom/div {:class ""}
@@ -127,6 +128,11 @@
               (om/build topic-finances {:section-data (utils/fix-finances topic-data)
                                         :section section
                                         :currency currency} {:opts chart-opts}))))
+        ;; Topic headline
+        (when-not (clojure.string/blank? (:headline topic-data))
+          (om/build topic-headline topic-data))
+        
+        ;; Topic body
         (when-not (clojure.string/blank? topic-body)
           (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
                         :ref "topic-body"

@@ -356,19 +356,8 @@
                                     (om/set-state! owner :has-changes true)
                                     (om/set-state! owner :char-count remaining-chars)
                                     (om/set-state! owner :char-count-alert (< remaining-chars title-alert-limit)))})
-          ;; Topic headline
-          (dom/div #js {:className "topic-headline-inner emoji-autocomplete emojiable"
-                        :id (str "foce-headline-" (name section))
-                        :key "foce-headline"
-                        :placeholder "Headline"
-                        :contentEditable true
-                        :onKeyUp   #(check-headline-count owner % true)
-                        :onKeyDown #(check-headline-count owner % true)
-                        :onFocus    #(check-headline-count owner % false)
-                        :onBlur #(do
-                                    (check-headline-count owner % false)
-                                    (om/set-state! owner :char-count nil))
-                        :dangerouslySetInnerHTML initial-headline})
+          
+          ;; Topic data
           (when is-data?
             (dom/div {:class ""}
               (cond
@@ -390,6 +379,20 @@
                                           :foce-data-editing? (:foce-data-editing? data)
                                           :editing-cb (partial data-editing-cb owner)}
                                           {:opts chart-opts}))))
+          ;; Topic headline
+          (dom/div #js {:className "topic-headline-inner emoji-autocomplete emojiable"
+                        :id (str "foce-headline-" (name section))
+                        :key "foce-headline"
+                        :placeholder "Headline"
+                        :contentEditable true
+                        :onKeyUp   #(check-headline-count owner % true)
+                        :onKeyDown #(check-headline-count owner % true)
+                        :onFocus    #(check-headline-count owner % false)
+                        :onBlur #(do
+                                    (check-headline-count owner % false)
+                                    (om/set-state! owner :char-count nil))
+                        :dangerouslySetInnerHTML initial-headline})
+          ;; Topic body
           (dom/div #js {:className "topic-body emoji-autocomplete emojiable"
                         :id (str "foce-body-" (name section))
                         :key "foce-body"
@@ -419,6 +422,8 @@
                                              body     (sel1 (str "#foce-body-" (name section)))]
                                          (not (or (= (.-activeElement js/document) headline)
                                                   (= (.-activeElement js/document) body))))}))
+
+            ;; Topic image button
             (when-not is-data?
               (dom/button {:class "btn-reset camera left"
                          :title (add-image-tooltip image-header)
@@ -429,16 +434,8 @@
                          :style {:display (if (nil? file-upload-state) "block" "none")}
                          :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
                 (dom/i {:class "fa fa-camera"})))
-            ; (when-not is-data?
-            ;   (dom/button {:class "btn-reset image-url left"
-            ;                :title "Provide an image link"
-            ;                :type "button"
-            ;                :data-toggle "tooltip"
-            ;                :data-container "body"
-            ;                :data-placement "top"
-            ;                :style {:display (if (nil? file-upload-state) "block" "none")}
-            ;                :on-click #(om/set-state! owner :file-upload-state :show-url-field)}
-            ;       (dom/i {:class "fa fa-code"})))
+
+            ;; Topic chart button
             (when (or (= is-data? :growth)
                       (and (= is-data? :finances)
                            (not (dis/foce-section-data-editing?))))
@@ -454,6 +451,8 @@
                            :style {:display (if (or (and (= is-data? :finances) no-data?) (= is-data? :growth)) "block" "none")}
                            :on-click #(dis/dispatch! [:start-foce-data-editing (if (= is-data? :growth) growth-utils/new-metric-slug-placeholder :new)])}
                 (dom/i {:class "fa fa-line-chart"})))
+
+            ;; Topic archive button
             (when-not (:placeholder topic-data)
               (dom/button {:class "btn-reset archive-button right"
                            :title "Archive this topic"
@@ -464,6 +463,8 @@
                            :style {:display (if (nil? file-upload-state) "block" "none")}
                            :on-click (partial remove-topic-click owner)}
                   (dom/i {:class "fa fa-archive"})))
+            
+            ;; Topic pin button
             (when (> (count (utils/get-section-keys (dis/company-data))) 1)
               (dom/button {:class "btn-reset pin-button right"
                            :title (pin-tooltip (:pin topic-data))
@@ -474,8 +475,12 @@
                            :style {:display (if (nil? file-upload-state) "block" "none")}
                            :on-click #(dis/dispatch! [:foce-input {:pin (not (:pin topic-data))}])}
                   (dom/i {:class (str "fa fa-thumb-tack" (if (:pin topic-data) " pinned" ""))})))
+            
+            ;; Hidden (initially) file upload progress
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
               (str file-upload-progress "%")))
+          
+          ;; Hidden (initially) file upload UI
           (dom/div {:class "topic-foce-footer group"}
             (dom/div {:class "divider"})
             (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))
