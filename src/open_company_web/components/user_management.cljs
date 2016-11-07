@@ -29,7 +29,7 @@
           "All members of your Slack organization (not guests) can authenticate as users. You can also invite users to join by email."])]
     [:div.my4.um-invite.group
       [:div.um-invite-label
-        "INVITE USER BY EMAIL ADDRESS"]
+        "INVITE USER BY EMAIL"]
         [:div
           [:div.group
             [:input.left.um-invite-field.email
