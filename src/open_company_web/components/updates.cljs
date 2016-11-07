@@ -11,7 +11,6 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.navbar :refer (navbar)]
-            [open-company-web.components.ui.small-loading :refer (small-loading)]
             [open-company-web.components.prior-updates :refer (prior-updates)]
             [open-company-web.components.topics-columns :refer (topics-columns)]))
 
@@ -73,17 +72,14 @@
                 (prior-updates))
               (dom/div {:class "updates-content-cards right"
                         :style {:width (str fixed-card-width "px")}}
-                (if su-data
-                  (om/build topics-columns {:columns-num 1
-                                            :card-width (- fixed-card-width 10) ; remove 10 padding on the right
-                                            :total-width (- fixed-card-width 10)
-                                            :content-loaded (not (:loading data))
-                                            :topics (:sections su-data)
-                                            :topics-data su-data
-                                            :company-data company-data
-                                            :hide-add-topic true})
-                  (dom/div {:class "pt3" :style {:text-align "center"}}
-                    (small-loading))))))
+                (om/build topics-columns {:columns-num 1
+                                          :card-width (- fixed-card-width 10) ; remove 10 padding on the right
+                                          :total-width (- fixed-card-width 10)
+                                          :content-loaded (not (:loading data))
+                                          :topics (:sections su-data)
+                                          :topics-data su-data
+                                          :company-data company-data
+                                          :hide-add-topic true}))))
           (om/build footer {:card-width card-width
                             :columns-num columns-num
                             :company-data company-data}))))))
