@@ -52,7 +52,7 @@
                           (dom/button {:class "btn-reset sharing-button right"
                                        :data-toggle "tooltip"
                                        :data-container "body"
-                                       :data-position "top"
+                                       :data-placement "left"
                                        :title "Choose topics to share via email, Slack or private URL."
                                        :disabled (not (nil? (:foce-key data)))
                                        :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} (dom/i {:class "fa fa-share"})
