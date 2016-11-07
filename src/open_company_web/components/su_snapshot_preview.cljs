@@ -8,7 +8,6 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
-            [open-company-web.components.ui.menu :refer (menu)]
             [open-company-web.components.ui.navbar :refer (navbar)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.ui.icon :as i]
@@ -164,7 +163,6 @@
             :desktop "This is a preview of your update. You can drag topics to reorder, and you can remove them by clicking the \"X\"."
             :css-class "large"
             :dismiss-tip-fn #(.focus (sel1 [:input#su-snapshot-preview-title]))}))
-        (om/build menu data)
         (dom/div {:class "page snapshot-page"}
           (dom/div {:class "su-snapshot-header"}
             (back-to-dashboard-btn {})

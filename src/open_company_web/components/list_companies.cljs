@@ -7,7 +7,6 @@
               [open-company-web.router :as router]
               [open-company-web.lib.utils :as utils]
               [open-company-web.lib.responsive :as responsive]
-              [open-company-web.components.ui.menu :refer (menu)]
               [open-company-web.components.ui.navbar :refer (navbar)]
               [open-company-web.components.ui.footer :refer (footer)]
               [open-company-web.components.ui.login-overlay :refer (login-overlays-handler)]))
@@ -38,7 +37,6 @@
           ;show login overlays if needed
           (when-not (utils/is-test-env?)
             (login-overlays-handler))
-          (om/build menu data)
           (dom/div {:class "page"}
             (om/build navbar {:card-width card-width
                               :sharing-mode false
