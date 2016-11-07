@@ -31,20 +31,10 @@
   (utils/event-stop e)
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/company-settings))))
 
-(defn prior-updates-click [e]
-  (utils/event-stop e)
-  (utils/after (+ utils/oc-animation-duration 100)
-    (if (responsive/is-mobile-size?)
-      #(router/nav! (oc-urls/stakeholder-update-list)) ; nav. to prior updates page
-      (popover/add-popover-with-rum-component prior-updates {:container-id "prior-updates-dialog"})))) ; popover
-
 (defcomponent menu [data owner options]
 
   (render [_]
     (dom/ul {:class "dropdown-menu" :aria-labelledby "dropdown-toggle-menu"}
-      (when (jwt/jwt)
-        (dom/li {:class "oc-menu-item"}
-          (dom/a {:title "PRIOR UPDATES" :href (oc-urls/stakeholder-update-list) :on-click prior-updates-click} "PRIOR UPDATES")))
       (when (jwt/jwt)
         (dom/li {:class "oc-menu-item"}
           (dom/a {:title "USER INFO" :href oc-urls/user-profile :on-click user-profile-click} "USER INFO")))
