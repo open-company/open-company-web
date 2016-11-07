@@ -1,4 +1,4 @@
-$avatar_size: 35;
+$avatar_size: 25;
 
 button.user-avatar-button{
   margin: 0;
@@ -11,7 +11,7 @@ button.user-avatar-button{
 
   &.no-image {
     i.fa.fa-ellipsis-v {
-      margin-top: 12px;
+      margin-top: 3px;
     }
   }
 
