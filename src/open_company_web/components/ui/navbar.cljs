@@ -43,7 +43,7 @@
             (dom/ul {:class "nav navbar-nav navbar-right"}
               (dom/li {}
                 (if (responsive/is-mobile-size?)
-                  (dom/div {:on-click #()}
+                  (dom/div {}
                     (i/icon :menu-34 {}))
                   (if (jwt/jwt)
                     (dom/div {}
