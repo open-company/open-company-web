@@ -1,13 +1,13 @@
 nav.oc-navbar {
-  position: fixed;
-  z-index: 1030;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
+  height: #{$navbar_height}px;
+  z-index: 1030;
   background-color: white;
   border-top: 4px solid $oc_yellow;
   margin: 0px;
-  height: #{$navbar_height}px;
   box-shadow: 1px 4px 4px 0 rgba(0, 0, 0, 0.2);
 
   div.su-snapshot-preview{
@@ -64,7 +64,12 @@ nav.oc-navbar {
     position: relative;
     margin: 0 auto;
     padding: 0 30px;
-    margin-top: 15px;
+    margin-top: 10px;
+
+    div.oc-navbar-separator {
+      border-bottom: 1px solid rgba(78,90,107,0.2);
+      padding-top: 10px;
+    }
 
     @media screen and (max-width: 413px){
       margin-left: 9px;
@@ -83,7 +88,7 @@ nav.oc-navbar {
       div.sharing-button-container{
         float: left;
         margin-right: 10px;
-        margin-top: 16px;
+        margin-top: 7px;
         color: #1E81C4;
         border: 0px solid transparent;
 
@@ -106,6 +111,28 @@ nav.oc-navbar {
 
       div.user-avatar {
         float: right;
+      }
+    }
+  }
+
+  div.oc-navbar-bottom {
+    backgorund-color: blue;
+    position: relative;
+    margin: 10px auto;
+    padding: 0 30px;
+
+    a {
+      font-size: 13px;
+      color: rgba(78,90,107,0.6);
+      margin-right: 10px;
+      font-family: $oc_headers_font;
+
+      &:hover {
+        color: $oc_gray_5;
+      }
+
+      &.active {
+        color: $oc_gray_5;
       }
     }
   }
