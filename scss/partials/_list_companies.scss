@@ -1,14 +1,3 @@
-body.animating div.list-companies div.page {
-  position: absolute;
-  width: 100%;
-  top: 0px;
-
-  div.navbar-offset {
-    top: #{$navbar_height}px;
-    position: absolute;
-  }
-}
-
 body.small-footer {
   div.list-companies {
     div.navbar-offset {
