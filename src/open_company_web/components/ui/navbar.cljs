@@ -71,7 +71,7 @@
                                (utils/event-stop %)
                                (router/nav! (oc-urls/company)))}
             "Dashboard")
-          (dom/a {:class (when (= active :priors) "active")
+          (dom/a {:class (when (= active :updates) "active")
                   :href (oc-urls/stakeholder-update-list)
                   :on-click #(do
                                (utils/event-stop %)
