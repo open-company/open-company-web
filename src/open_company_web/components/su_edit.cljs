@@ -172,7 +172,7 @@
                                            :navbar-offset (not (responsive/is-mobile-size?))})}
           ;; Company / user header
           (when-not (responsive/is-mobile-size?)
-            (om/build navbar data))
+            (om/build navbar (merge data {:active :priors})))
           
           (dom/div #js {:className "update-internal"
                         :ref "update-internal"}
