@@ -6,37 +6,3 @@ div.page{
   background: #fff;
   min-height: calc(100vh - #{$navbar_height}px);
 }
-
-body.animating div.page {
-  transition: transform $oc_animation_duration ease-in-out;
-  -webkit-transition: -webkit-transform $oc_animation_duration ease-in-out;
-  min-height: calc(100vh + #{$navbar_height}px);
-  top: 0px;
-  position: absolute;
-}
-
-body.animating.left div.page {
-  transform: translate3d( -200px, 0, 0 );
-  -webkit-transform: translate3d( -200px, 0, 0 );
-}
-
-body.animating.right div.page {
-  transform: translate3d( 200px, 0, 0 );
-  -webkit-transform: translate3d( 200px, 0, 0 );
-}
-
-body.menu-visible div.page {
-  right: 200px;
-  top: 0px;
-}
-
-body.animating div.footer {
-  position: absolute;
-  left: 0px;
-  width: 100%;
-}
-
-body.menu-visible:not(.animating) div.page nav{
-  left: -200px;
-  top: default;
-}
