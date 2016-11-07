@@ -98,10 +98,6 @@
 (defn force-edit-topic []
   (:force-edit-topic @app-state))
 
-(defn toggle-menu
-  ([] (swap! app-state update :menu-open not))
-  ([force?] (swap! app-state assoc :menu-open force?)))
-
 (defn save-last-company-slug []
   (swap! app-state assoc :last-slug (router/current-company-slug)))
 
