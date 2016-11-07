@@ -33,31 +33,47 @@
       (dom/nav {:class "oc-navbar group"}
         (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
           (login-overlays-handler))
-        (dom/div {:class "oc-navbar-header"
-                  :style #js {:width (str header-width "px")}}
-          (if (utils/in? (:route @router/path) "companies")
-            (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
-              (dom/img {:src "/img/oc-wordmark.svg" :style {:height "25px" :margin-top "12px"}}))
-            (om/build company-avatar data))
-          (when-not (:hide-right-menu data)
-            (dom/ul {:class "nav navbar-nav navbar-right"}
-              (dom/li {}
-                (if (responsive/is-mobile-size?)
-                  (dom/div {}
-                    (i/icon :menu-34 {}))
-                  (if (jwt/jwt)
-                    (dom/div {}
-                      (when show-share-su-button
-                        (dom/div {:class "sharing-button-container"}
-                          (dom/button {:class "btn-reset sharing-button right"
-                                       :data-toggle "tooltip"
-                                       :data-container "body"
-                                       :data-placement "left"
-                                       :title "Choose topics to share via email, Slack or private URL."
-                                       :disabled (not (nil? (:foce-key data)))
-                                       :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} (dom/i {:class "fa fa-share"})
-                            " SHARE AN UPDATE")))
-                      (dom/div {:class "dropdown right"}
-                        (user-avatar {:classes "btn-reset dropdown-toggle"})
-                        (om/build menu {})))
-                    (login-button)))))))))))
+        (dom/div {:class "oc-navbar-header group"
+                  :style {:width (str header-width "px")}}
+          (dom/div {:class "group"}
+            (if (utils/in? (:route @router/path) "companies")
+              (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
+                (dom/img {:src "/img/oc-wordmark.svg" :style {:height "25px" :margin-top "12px"}}))
+              (om/build company-avatar data))
+            (when-not (:hide-right-menu data)
+              (dom/ul {:class "nav navbar-nav navbar-right"}
+                (dom/li {}
+                  (if (responsive/is-mobile-size?)
+                    (dom/div {:class "group"}
+                      (i/icon :menu-34 {}))
+                    (if (jwt/jwt)
+                      (dom/div {:class "group"}
+                        (when show-share-su-button
+                          (dom/div {:class "sharing-button-container"}
+                            (dom/button {:class "btn-reset sharing-button right"
+                                         :data-toggle "tooltip"
+                                         :data-container "body"
+                                         :data-placement "left"
+                                         :title "Choose topics to share via email, Slack or private URL."
+                                         :disabled (not (nil? (:foce-key data)))
+                                         :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} (dom/i {:class "fa fa-share"})
+                              " SHARE AN UPDATE")))
+                        (dom/div {:class "dropdown right"}
+                          (user-avatar {:classes "btn-reset dropdown-toggle"})
+                          (om/build menu {})))
+                      (login-button)))))))
+          (dom/div {:class "oc-navbar-separator"}))
+        (dom/div {:class "oc-navbar-bottom group"
+                  :style {:width (str header-width "px")}}
+          (dom/a {:class (when (utils/in? (:route @router/path) "dashboard") "active")
+                  :href (oc-urls/company)
+                  :on-click #(do
+                               (utils/event-stop %)
+                               (router/nav! (oc-urls/company)))}
+            "Dashboard")
+          (dom/a {:class (when (utils/in? (:route @router/path) "updates") "active")
+                  :href (oc-urls/stakeholder-update-list)
+                  :on-click #(do
+                               (utils/event-stop %)
+                               (router/nav! (oc-urls/stakeholder-update-list)))}
+            "Updates"))))))
