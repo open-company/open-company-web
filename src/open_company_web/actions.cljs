@@ -154,13 +154,17 @@
       (assoc-in (dispatcher/latest-stakeholder-update-key slug) su-url)
       (dissoc :loading))))
 
-(defmethod dispatcher/action :stakeholder-update [db [_ {:keys [slug update-slug response]}]]
+(defmethod dispatcher/action :stakeholder-update [db [_ {:keys [slug update-slug response load-company-data]}]]
   (let [company-data-keys [:logo :logo-width :logo-height :name :slug :currency]
         company-data      (select-keys response company-data-keys)]
-    (-> db
-      (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
-      (assoc-in (dispatcher/company-data-key slug) (utils/fix-sections company-data))
-      (dissoc :loading))))
+    (if load-company-data
+      (-> db
+        (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
+        (assoc-in (dispatcher/company-data-key slug) (utils/fix-sections company-data))
+        (dissoc :loading))
+      (-> db
+        (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
+        (dissoc :loading)))))
 
 ;; Front of Card Edit section
 (defmethod dispatcher/action :start-foce [db [_ section-key section-data]]
