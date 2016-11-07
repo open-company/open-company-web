@@ -1,49 +1,26 @@
-ul#menu {
-  display: none;
-  position: fixed;
-  top: 0;
-  right: 0;
- 
-  width: 200px;
-  min-height: 100vh;
-  border-top: 4px solid $oc_yellow;
-  padding: 0;
-  margin: 0;
- 
-  list-style: none;
-  background: $oc_gray_5;
-  z-index: 10; /* Make sure the z-index is lower than the #page */
+ul.dropdown-menu {
+  top: 45px;
+  padding: 10px 0px 10px 10px;
 
-  li {
-    opacity: 0.75;
-  }
+  li.oc-menu-item {
+    opacity: 0.6;
 
-  li.oc-title {
-    color: white;
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0px;
-    padding-top: 40px;
-    padding-bottom: 40px;
-    padding-left: 23px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  li.menu-link{
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    &:hover {
+      background-color: transparent;
+      opacity: 0.8;
+      a {
+        background-color: transparent;
+      }
+    }
 
     a {
       display: block;
-      width: 200px;
-      height: 53px;
-      padding: 15px 23px;
-      opacity: 0.75;
       font-weight: 700;
       font-family: $oc_headers_font;
       font-size: 12px;
-      line-height: 1.5;
       letter-spacing: 1px;
-      color: #ffffff;
+      color: $oc_gray_5;
+      background-color: transparent;
     }
   }
 }

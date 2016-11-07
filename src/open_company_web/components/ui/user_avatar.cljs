@@ -20,4 +20,4 @@
         [:img.user-avatar-img
           {:src (jwt/get-key :avatar)
            :title (get-in (rum/react dis/app-state) [:jwt :real-name])}])
-      [:i.fa.fa-ellipsis-v.right]]))
+      [:i.fa.fa-ellipsis-v.right {:style {:padding-right "0"}}]]))

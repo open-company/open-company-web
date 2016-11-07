@@ -42,19 +42,21 @@
 
   (render [_]
     (dom/ul {:class "dropdown-menu" :aria-labelledby "dropdown-toggle-menu"}
-      (dom/li {}
-        (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
-          "Home"))
       (when (jwt/jwt)
-        (dom/li {} (dom/a {:title "PRIOR UPDATES" :href (oc-urls/stakeholder-update-list) :on-click prior-updates-click} "PRIOR UPDATES")))
+        (dom/li {:class "oc-menu-item"}
+          (dom/a {:title "PRIOR UPDATES" :href (oc-urls/stakeholder-update-list) :on-click prior-updates-click} "PRIOR UPDATES")))
       (when (jwt/jwt)
-        (dom/li {} (dom/a {:title "USER INFO" :href oc-urls/user-profile :on-click user-profile-click} "USER INFO")))
+        (dom/li {:class "oc-menu-item"}
+          (dom/a {:title "USER INFO" :href oc-urls/user-profile :on-click user-profile-click} "USER INFO")))
       (when (and (router/current-company-slug)
                  (not (utils/in? (:route @router/path) "profile"))
                  (not (:read-only (dis/company-data)))
                  (not (responsive/is-mobile-size?)))
-        (dom/li {} (dom/a {:title "COMPANY SETTINGS" :href (oc-urls/company-settings) :on-click company-profile-click} "COMPANY SETTINGS")))
+        (dom/li {:class "oc-menu-item"}
+          (dom/a {:title "COMPANY SETTINGS" :href (oc-urls/company-settings) :on-click company-profile-click} "COMPANY SETTINGS")))
       (when (jwt/jwt)
-        (dom/li {} (dom/a {:title "SIGN OUT" :href oc-urls/logout :on-click logout-click} "SIGN OUT")))
+        (dom/li {:class "oc-menu-item"}
+          (dom/a {:title "SIGN OUT" :href oc-urls/logout :on-click logout-click} "SIGN OUT")))
       (when-not (jwt/jwt)
-        (dom/li {} (dom/a {:title "SIGN IN / SIGN UP" :href oc-urls/login} "SIGN IN / SIGN UP"))))))
+        (dom/li {:class "oc-menu-item"}
+          (dom/a {:title "SIGN IN / SIGN UP" :href oc-urls/login} "SIGN IN / SIGN UP"))))))
