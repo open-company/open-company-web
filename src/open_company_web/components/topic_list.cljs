@@ -405,7 +405,7 @@
                                          :group true
                                          :dragging dragging
                                          :editable can-edit-secs})
-                :style {:margin-top (if selected-topic "0px" "84px")}
+                :style {:padding-top (if selected-topic "0px" "97px")}
                 :data-rerender rerender
                 :key (str "topic-list-" rerender)}
         ;; Fullscreen topic
