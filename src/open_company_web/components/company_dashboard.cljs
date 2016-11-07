@@ -13,7 +13,6 @@
             [open-company-web.caches :as caches]
             [open-company-web.components.ui.login-required :refer (login-required)]
             [open-company-web.components.ui.footer :refer (footer)]
-            [open-company-web.components.ui.menu :refer (menu)]
             [open-company-web.components.ui.navbar :refer (navbar)]
             [open-company-web.components.ui.loading :refer (loading)]
             [open-company-web.components.ui.login-overlay :refer (login-overlays-handler)]
@@ -63,7 +62,6 @@
           ;show login overlays if needed
           (when-not (utils/is-test-env?)
             (login-overlays-handler))
-          (om/build menu data)
           (if (get-in data [(keyword (router/current-company-slug)) :error])
             (dom/div {:class (str "fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
               (login-required data)
@@ -79,7 +77,8 @@
                                 :foce-key (:foce-key data)
                                 :show-share-su-button (utils/can-edit-sections? company-data)
                                 :menu-open menu-open
-                                :auth-settings (:auth-settings data)})
+                                :auth-settings (:auth-settings data)
+                                :active :dashboard})
               (om/build topic-list
                           {:loading (:loading data)
                            :content-loaded (or (:loading company-data) (:loading data))
