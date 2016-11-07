@@ -1,0 +1,38 @@
+div.updates {
+  background-color: $oc_gray_8;
+
+  div.updates-inner {
+    min-height: calc(100vh - #{$navbar_height}px + #{$top_border_height}px);
+    background-color: $oc_gray_8;
+
+    div.updates-content {
+      margin: 20px auto 10px;
+
+      div.updates-content-cards {
+        padding-right: 10px;
+
+        div.topics-column-container{
+          padding-top: 0px;
+
+          div.topics-column {
+            margin: 0;
+            max-width: 660px;
+
+            div.topic-row{
+              margin-left: 0px;
+
+              div.topic {
+                margin-left: 0px;
+                margin-right: 0px;
+              }
+            }
+          }
+        }
+      }
+
+      div.updates-content-list{
+        padding-left: 20px;
+      }
+    }
+  }
+}
