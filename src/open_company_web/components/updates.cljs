@@ -17,7 +17,7 @@
 
 (def topic-total-x-padding 20)
 (def updates-content-list-width 280)
-(def updates-content-cards-max-width 670)
+(def updates-content-cards-max-width 560)
 
 (defn load-latest-su [owner]
   (when-not (dis/latest-stakeholder-update)
@@ -56,7 +56,8 @@
           total-width-int (if (< ww card-width)
                             ww
                             (- (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
-                               20))                                                 ; the container padding
+                               20                                                   ; the container padding
+                               40))                                                 ; the distance btw the columns
           total-width  (if (>= ww responsive/c1-min-win-width)
                           (str total-width-int "px")
                           "auto")
@@ -84,7 +85,7 @@
                         :style {:width (str updates-content-list-width "px")}}
                 (dom/div {:class "center"}
                   (dom/button {:class "new-update-btn btn-reset btn-outline"
-                               :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} "SHARE A NEW UPDATE"))
+                               :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} "Share a New Update"))
                 (prior-updates selected-su true))
               (dom/div {:class "updates-content-cards right"
                         :style {:width (str fixed-card-width "px")}}
@@ -92,11 +93,14 @@
                 (om/build topics-columns {:columns-num 1
                                           :card-width (- fixed-card-width 10) ; remove 10 padding on the right
                                           :total-width (- fixed-card-width 10)
+                                          :is-stakeholder-update true
                                           :content-loaded (not (:loading data))
                                           :topics (:sections su-data)
+                                          :editable? false
                                           :topics-data su-data
                                           :company-data company-data
-                                          :hide-add-topic true}))))
+                                          :hide-add-topic true
+                                          :show-share-remove false}))))
           (om/build footer {:card-width card-width
                             :columns-num columns-num
                             :company-data company-data}))))))
