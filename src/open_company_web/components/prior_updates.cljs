@@ -33,7 +33,7 @@
     (drv/drv :su-list)
     (drv/drv :jwt)
     rum/reactive
-  [s]
+  [s current-update update-click-cb]
   (let [company-slug (router/current-company-slug)
         updates (reverse (drv/react s :su-list))
         none? (empty? updates)
@@ -50,20 +50,12 @@
                                   :color "white" :accent-color "white"})])
 
       [:div.prior-updates-container {}
-
-        [:h3.m0.gray5.domine {}
-          "Prior Updates"
-          (when mobile? ; inside the header close X
-            [:button {:class "top-0 btn-reset" :style {:float "right" :padding-top "0" :margin-top "-5px"}
-                  :on-click #(router/nav! (oc-urls/company))}
-              (i/icon :simple-remove {:class "inline mr1" :stroke "4" :vertical-align "top"
-                                      :color "grey" :accent-color "grey"})])]
         
         (if (empty? updates)
           
           [:div.message-container.pt2
-            [:p.message "There's nothing to see here."]
-            [:p.message "Start sharing!"]]
+            [:h3.message "No company updates have been shared yet."]
+            [:p.message "As updates are shared via Email, Slack and URL, they will show up here so they are always easy to find and read."]]
 
           [:div.update-container.pt2
             (for [update updates]
@@ -89,10 +81,11 @@
                                 :email [:div.medium "by " (i/icon :email-84 {:size 13 :class "inline"})]
                                 :slack [:span "to " [:i {:class "fa fa-slack"}]]
                                 :legacy ""
-                                [:div.medium "a " (i/icon :link-72 {:size 13 :class "inline"})])
-                    link-map (if mobile?
-                                {:href link :on-click (partial update-click link)}
-                                {:href link :target (str "_update_" update-slug)})]
-                [:div.update {:key update-slug}
-                  [:div.update-title.domine [:a link-map title]]
+                                [:div.medium "a " (i/icon :link-72 {:size 13 :class "inline"})])]
+                [:div.update {:key update-slug :class (when (= current-update update-slug) "active")}
+                  [:div.update-title.domine
+                    [:a {:href link :on-click #(do
+                                                 (utils/event-stop %)
+                                                 (update-click-cb update-slug))}
+                      title]]
                   [:div.update-details.domine author " shared " medium " on " human-date]]))])]]))
