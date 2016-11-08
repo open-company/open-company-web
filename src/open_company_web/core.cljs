@@ -22,6 +22,7 @@
             [open-company-web.components.company-settings :refer (company-settings)]
             [open-company-web.components.su-edit :refer (su-edit)]
             [open-company-web.components.su-snapshot-preview :refer (su-snapshot-preview)]
+            [open-company-web.components.create-update :refer (create-update)]
             [open-company-web.components.su-snapshot :refer (su-snapshot)]
             [open-company-web.components.updates :refer (updates)]
             [open-company-web.components.home :refer (home)]
@@ -276,7 +277,7 @@
       (company-handler "dashboard" target company-dashboard params))
 
     (defroute su-snapshot-preview-route (urls/stakeholder-update-preview ":slug") {:as params}
-      (company-handler "su-snapshot-preview" target su-snapshot-preview params))
+      (company-handler "su-snapshot-preview" target create-update params))
 
     (defroute su-list-route (urls/stakeholder-update-list ":slug") {:as params}
       (company-handler "su-list" target updates params))
