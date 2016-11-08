@@ -2,7 +2,12 @@ div.updates {
   background-color: $oc_gray_8;
 
   div.updates-inner {
-    min-height: calc(100vh - #{$navbar_height}px + #{$top_border_height}px);
+    @include big_web(){
+      min-height: calc(100vh - #{$navbar_height}px + #{$top_border_height}px);
+    }
+    @include mobile(){
+      min-height: calc(100vh - #{$mobile_navbar_height}px + #{$top_border_height}px);
+    }
     background-color: $oc_gray_8;
 
     div.updates-content {

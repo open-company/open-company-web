@@ -63,17 +63,18 @@
                           (om/build menu {})))
                       (login-button)))))))
           (dom/div {:class "oc-navbar-separator"}))
-        (dom/div {:class "oc-navbar-bottom group"
-                  :style {:width (str header-width "px")}}
-          (dom/a {:class (when (= active :dashboard) "active")
-                  :href (oc-urls/company)
-                  :on-click #(do
-                               (utils/event-stop %)
-                               (router/nav! (oc-urls/company)))}
-            "Dashboard")
-          (dom/a {:class (when (= active :updates) "active")
-                  :href (oc-urls/stakeholder-update-list)
-                  :on-click #(do
-                               (utils/event-stop %)
-                               (router/nav! (oc-urls/stakeholder-update-list)))}
-            "Shared Updates"))))))
+        (when-not (responsive/is-mobile-size?)
+          (dom/div {:class "oc-navbar-bottom group"
+                    :style {:width (str header-width "px")}}
+            (dom/a {:class (when (= active :dashboard) "active")
+                    :href (oc-urls/company)
+                    :on-click #(do
+                                 (utils/event-stop %)
+                                 (router/nav! (oc-urls/company)))}
+              "Dashboard")
+            (dom/a {:class (when (= active :updates) "active")
+                    :href (oc-urls/stakeholder-update-list)
+                    :on-click #(do
+                                 (utils/event-stop %)
+                                 (router/nav! (oc-urls/stakeholder-update-list)))}
+              "Shared Updates")))))))

@@ -4,14 +4,15 @@ div.su-snapshot {
   div.su-sp-content {
     position: relative;
     content: "";
-    min-height: calc(100vh - #{$navbar_height}px);
     background-color: $oc_gray_8;
 
-    @media screen and (max-width: 683px){
+    @include mobile(){
       padding-top: 20px;
+      min-height: calc(100vh - #{$mobile_navbar_height}px);
     }
-    @media screen and (min-width: 684px){
+    @include big_web(){
       padding-top: 40px;
+      min-height: calc(100vh - #{$navbar_height}px);
     }
 
     div.topics-columns div.topics-column-container.columns-1 {

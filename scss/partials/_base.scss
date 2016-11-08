@@ -122,8 +122,15 @@ span.num.red {
   background: rgba(249,215,72, 0.5);
 }
 
-.navbar-offset {
-  padding-top: #{$navbar_height}px;
+@include mobile(){
+  .navbar-offset {
+    padding-top: #{$mobile_navbar_height}px;
+  }
+}
+@include big_web(){
+  .navbar-offset {
+    padding-top: #{$navbar_height}px;
+  }
 }
 
 div#wrap {

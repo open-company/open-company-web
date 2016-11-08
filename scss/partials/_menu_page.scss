@@ -4,5 +4,10 @@ div.page{
   top: 0px !important;
  
   background: #fff;
-  min-height: calc(100vh - #{$navbar_height}px);
+  @include big_web(){
+    min-height: calc(100vh - #{$navbar_height}px);
+  }
+  @include mobile(){
+    min-height: calc(100vh - #{$mobile_navbar_height}px);
+  }
 }

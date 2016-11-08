@@ -1,7 +1,12 @@
 body.small-footer {
   div.list-companies {
     div.navbar-offset {
-      min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px + 1px);
+      @include big_web(){
+        min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px + 1px);
+      }
+      @include mobile(){
+        min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_small_height}px + 1px); 
+      }
     }
   }
 }
