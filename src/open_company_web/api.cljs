@@ -421,8 +421,9 @@
             (let [fixed-body (if success (json->cljs body) {})
                   response {:slug (keyword slug)
                             :update-slug (keyword update-slug)
-                            :response fixed-body}]
-              (dispatcher/dispatch! [:stakeholder-update response load-company-data]))))))))
+                            :response fixed-body
+                            :load-company-data load-company-data}]
+              (dispatcher/dispatch! [:stakeholder-update response]))))))))
 
 (defn auth-with-email [email pswd]
   (when (and email pswd)
