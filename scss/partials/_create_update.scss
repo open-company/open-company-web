@@ -1,0 +1,106 @@
+div.create-update {
+  background-color: $oc_gray_8;
+
+  div.create-update-inner {
+    min-height: calc(100vh - #{$footer_small_height}px);
+    background-color: $oc_gray_8;
+
+    div.create-update-content {
+      margin: 60px auto 10px;
+
+      div.create-update-content-cards {
+        padding-right: 10px;
+        margin-right: 40px;
+
+        input.create-update-content-cards-title {
+          text-align: center;
+          width: 100%;
+          margin-top: 0px;
+          padding-top: 0px;
+          margin-bottom: 25px;
+          background-color: transparent;
+          height: 30px;
+          border: none;
+          outline: none;
+
+          &:focus, &:active {
+            border: 1px solid rgba(78,90,107,0.3);
+            outline: none;            
+          }
+        }
+
+        div.topics-column-container{
+          padding-top: 0px;
+
+          div.topics-column {
+            margin: 0;
+            max-width: 660px;
+
+            div.topic-row{
+              margin-left: 0px;
+
+              div.topic {
+                margin-left: 0px;
+                margin-right: 0px;
+              }
+            }
+          }
+        }
+      }
+
+      div.create-update-content-list{
+        padding-left: 20px;
+
+        div.create-update-content-buttons {
+          margin-bottom: 30px;
+        }
+
+        div.create-update-content-cta {
+          font-family: $oc_headers_font;
+          font-weight: 600;
+          font-size: 16px;
+          color: $oc_gray_5;
+          margin-bottom: 20px;
+        }
+
+        ul.create-update-topics-list {
+          list-style-type: none;
+          width: 100%;
+          margin: 0;
+          padding: 0;
+
+          li {
+            font-family: $oc_headers_font;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: capitalize;
+            display: inline-block;
+            width: 100%;
+            padding: 3px 10px 3px 10px;
+            cursor: pointer;
+
+            &.active {
+              font-weight: 800;
+              cursor: move;
+              background-color: rgba(78,90,107,0.05);
+
+              &:after, &::after {
+                font-size: 13px;
+                font-family: FontAwesome;
+                float: right;
+                font-weight: 400;
+                color: $oc_gray_5;
+                content: "\f0c9";
+              }
+            }
+
+            &:hover {
+              background-color: rgba(78,90,107,0.05);
+              border-radius: 3;
+            }
+          }
+        }
+      }
+    }
+  }
+}
