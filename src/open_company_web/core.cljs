@@ -182,7 +182,7 @@
     ;; do we have the company data already?
     (when (not (get-in @dis/app-state su-key))
       ;; load the Stakeholder Update data from the API
-      (api/get-stakeholder-update slug update-slug)
+      (api/get-stakeholder-update slug update-slug true)
       (let [su-loading-key (conj su-key :loading)]
         (swap! dis/app-state assoc-in su-loading-key true)))
     ;; render component
