@@ -32,6 +32,13 @@ div.updates {
 
       div.updates-content-list{
         padding-left: 20px;
+
+        button.new-update-btn {
+          width: 100%;
+          border-radius: 6px;
+          font-size: 15px;
+          height: 40px;
+        }
       }
     }
   }
