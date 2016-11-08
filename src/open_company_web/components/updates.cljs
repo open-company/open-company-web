@@ -96,7 +96,6 @@
                                           :is-stakeholder-update true
                                           :content-loaded (not (:loading data))
                                           :topics (:sections su-data)
-                                          :editable? false
                                           :topics-data su-data
                                           :company-data company-data
                                           :hide-add-topic true
