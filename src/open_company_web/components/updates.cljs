@@ -5,6 +5,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [open-company-web.api :as api]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
@@ -29,9 +30,12 @@
 (defcomponent updates [data owner]
 
   (init-state [_]
-    {:columns-num (responsive/columns-num)
-     :su-list (dis/stakeholder-update-list-data)
-     :selected-su (when (router/current-stakeholder-update-slug) (router/current-stakeholder-update-slug))})
+    (let [current-update-slug (router/current-stakeholder-update-slug)]
+      (when current-update-slug
+        (api/get-stakeholder-update (router/current-company-slug) current-update-slug false))
+      {:columns-num (responsive/columns-num)
+       :su-list (dis/stakeholder-update-list-data)
+       :selected-su current-update-slug}))
 
   (will-receive-props [_ _]
     (load-latest-su owner)
@@ -79,8 +83,9 @@
               (dom/div {:class "updates-content-list group right"
                         :style {:width (str updates-content-list-width "px")}}
                 (dom/div {:class "center"}
-                  (dom/button {:class "new-update-btn btn-reset btn-outline"} "SHARE A NEW UPDATE"))
-                (prior-updates selected-su #(om/set-state! owner :selected-su %)))
+                  (dom/button {:class "new-update-btn btn-reset btn-outline"
+                               :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} "SHARE A NEW UPDATE"))
+                (prior-updates selected-su true))
               (dom/div {:class "updates-content-cards right"
                         :style {:width (str fixed-card-width "px")}}
                 (dom/h3 {:class "updates-content-cards-title"} update-title)
