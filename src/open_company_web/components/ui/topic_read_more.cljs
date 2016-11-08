@@ -11,4 +11,4 @@
     (let [topic-body (:body topic-data)]
       (when (utils/exceeds-topic-body-limit topic-body)
         (dom/button {:class "btn-reset topic-read-more"
-                     :onClick read-more-cb} "READ MORE")))))
+                     :onClick read-more-cb} "Read More")))))
