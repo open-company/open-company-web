@@ -11,13 +11,10 @@ div.company-dashboard {
     top: 0px !important;
    
     background: #fff;
-    @include big_web(){
-      min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
-    }
+    min-height: calc(100vh - #{$footer_height}px);
 
     @include mobile(){
       background-color: #d9d9d9;
-      min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_height}px);
     }
   }
 }
@@ -25,12 +22,7 @@ div.company-dashboard {
 body.small-footer {
   div.company-dashboard {
     div.page {
-      @include big_web(){
-        min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px);
-      }
-      @include mobile(){
-        min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_small_height}px);
-      }
+      min-height: calc(100vh - #{$footer_small_height}px);
     }
   }
 }

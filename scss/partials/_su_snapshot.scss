@@ -5,14 +5,13 @@ div.su-snapshot {
     position: relative;
     content: "";
     background-color: $oc_gray_8;
+    min-height: calc(100vh - #{$footer_small_height}px);
 
     @include mobile(){
       padding-top: 20px;
-      min-height: calc(100vh - #{$mobile_navbar_height}px);
     }
     @include big_web(){
       padding-top: 40px;
-      min-height: calc(100vh - #{$navbar_height}px);
     }
 
     div.topics-columns div.topics-column-container.columns-1 {

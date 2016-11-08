@@ -12,12 +12,7 @@ div.topic-list-edit-container {
 
 body.small-footer{
   div.topic-list {
-    @include big_web(){
-      min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px);
-    }
-    @include mobile(){
-      min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_small_height}px);
-    }
+    min-height: calc(100vh - #{$footer_small_height}px);
 
     &.sharing-mode {
       min-height: calc(100vh - #{$footer_small_height}px);
