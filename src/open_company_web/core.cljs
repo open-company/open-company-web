@@ -138,13 +138,14 @@
 ;; Component specific to a company
 (defn company-handler [route target component params]
   (let [slug (:slug (:params params))
+        update-slug (:update-slug (:params params))
         section (:section (:params params))
         edit?   (= route "section-edit")
         query-params (:query-params params)]
     (pre-routing query-params)
     (utils/clean-company-caches)
     ;; save the route
-    (router/set-route! (vec (remove nil? [slug (when section section) route (when edit? "edit")])) {:slug slug :section section :edit edit? :query-params query-params})
+    (router/set-route! (vec (remove nil? [slug (when section section) route (when edit? "edit")])) {:slug slug :section section :edit edit? :query-params query-params :update-slug update-slug})
     ;; load revision if needed
     (when (:as-of query-params)
       (api/load-revision {:updated-at (:as-of query-params)
@@ -280,6 +281,9 @@
     (defroute su-list-route (urls/stakeholder-update-list ":slug") {:as params}
       (company-handler "su-list" target updates params))
 
+    (defroute su-list-update-route (urls/stakeholder-update-list ":slug" ":update-slug") {:as params}
+      (company-handler "su-list" target updates params))
+
     (defroute su-edit-route (urls/stakeholder-update-edit ":slug") {:as params}
       (company-handler "su-edit" target su-edit params))
 
@@ -317,6 +321,7 @@
                                  su-snapshot-preview-route
                                  su-edit-route
                                  su-list-route
+                                 su-list-update-route
                                  company-section-route
                                  stakeholder-update-route
                                  stakeholder-update-section-route
