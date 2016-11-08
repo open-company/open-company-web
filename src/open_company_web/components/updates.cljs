@@ -24,14 +24,14 @@
           last-su (last (:stakeholder-updates su-list))]
       (when (not (om/get-state owner :selected-su))
         (om/set-state! owner :selected-su (:slug last-su))
-        (api/get-stakeholder-update (router/current-company-slug) (:slug last-su))))))
+        (api/get-stakeholder-update (router/current-company-slug) (:slug last-su) false)))))
 
 (defcomponent updates [data owner]
 
   (init-state [_]
     {:columns-num (responsive/columns-num)
      :su-list (dis/stakeholder-update-list-data)
-     :selected-su nil})
+     :selected-su (when (router/current-stakeholder-update-slug) (router/current-stakeholder-update-slug))})
 
   (will-receive-props [_ _]
     (load-latest-su owner)
@@ -43,7 +43,7 @@
 
   (did-update [_ _ prev-state]
     (when (not= (:selected-su prev-state) (om/get-state owner :selected-su))
-      (api/get-stakeholder-update (router/current-company-slug) (om/get-state owner :selected-su))))
+      (api/get-stakeholder-update (router/current-company-slug) (om/get-state owner :selected-su) false)))
 
   (render-state [_ {:keys [columns-num su-list selected-su]}]
     (let [company-data (dis/company-data data)
