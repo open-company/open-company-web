@@ -1,16 +1,33 @@
 div.prior-updates-container {
   text-align: left;
 
-  div.update-title {
-    margin-bottom: 0;
+  div.message-container {
+    h3.message {
+      font-family: $oc_headers_font;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
   }
 
-  div.update-details {
-    font-size: 13px;
-    margin-bottom: 20px;
+  div.update {
+    &.active {
+      a {
+        color: $oc_gray_5;
+      }
+    }
 
-    div.medium {
-      display: inline;
+    div.update-title {
+      margin-bottom: 0;
+    }
+
+    div.update-details {
+      font-size: 13px;
+      margin-bottom: 20px;
+
+      div.medium {
+        display: inline;
+      }
     }
   }
 }
