@@ -33,7 +33,7 @@
     (drv/drv :su-list)
     (drv/drv :jwt)
     rum/reactive
-  [s current-update update-click-cb]
+  [s current-update list-urls]
   (let [company-slug (router/current-company-slug)
         updates (reverse (drv/react s :su-list))
         none? (empty? updates)
@@ -71,7 +71,9 @@
                     link-date (str year "-" (utils/add-zero month) "-" (utils/add-zero day))
                     human-date (str month-string " " day ", " year)
                     update-slug (:slug update)
-                    link-url (urls/stakeholder-update company-slug link-date update-slug)
+                    link-url (if list-urls
+                                (urls/stakeholder-update-list company-slug update-slug)
+                                (urls/stakeholder-update company-slug link-date update-slug))
                     link (if mobile? (str link-url "?list=true") link-url)
                     title (if (clojure.string/blank? (:title update))
                             (str (:name (dispatcher/company-data)) " Update")
@@ -84,8 +86,6 @@
                                 [:div.medium "a " (i/icon :link-72 {:size 13 :class "inline"})])]
                 [:div.update {:key update-slug :class (when (= current-update update-slug) "active")}
                   [:div.update-title.domine
-                    [:a {:href link :on-click #(do
-                                                 (utils/event-stop %)
-                                                 (update-click-cb update-slug))}
+                    [:a {:href link :on-click (partial update-click link)}
                       title]]
                   [:div.update-details.domine author " shared " medium " on " human-date]]))])]]))
