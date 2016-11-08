@@ -6,10 +6,19 @@ div.updates {
     background-color: $oc_gray_8;
 
     div.updates-content {
-      margin: 20px auto 10px;
+      margin: 60px auto 10px;
 
       div.updates-content-cards {
         padding-right: 10px;
+        margin-right: 40px;
+
+        h3.updates-content-cards-title {
+          text-align: center;
+          width: 100%;
+          margin-top: 0px;
+          padding-top: 0px;
+          margin-bottom: 25px;
+        }
 
         div.topics-column-container{
           padding-top: 0px;
@@ -35,9 +44,12 @@ div.updates {
 
         button.new-update-btn {
           width: 100%;
-          border-radius: 6px;
-          font-size: 15px;
           height: 40px;
+          border-radius: 6px;
+          font-size: 14px;
+          font-family: $oc_headers_font;
+          font-weight: 400;
+          text-transform: capitalize;
         }
       }
     }
