@@ -15,15 +15,15 @@
             [open-company-web.components.topics-columns :refer (topics-columns)]))
 
 (def topic-total-x-padding 20)
-(def updates-content-list-width 380)
+(def updates-content-list-width 280)
 (def updates-content-cards-max-width 670)
 
 (defn load-latest-su [owner]
   (when-not (dis/latest-stakeholder-update)
     (let [su-list (:collection (dis/stakeholder-update-list-data))
-          last-su (first (:stakeholder-updates su-list))]
-      (when (not= (om/get-state owner :last-su) (:slug last-su))
-        (om/set-state! owner :last-su (:slug last-su))
+          last-su (last (:stakeholder-updates su-list))]
+      (when (not (om/get-state owner :selected-su))
+        (om/set-state! owner :selected-su (:slug last-su))
         (api/get-stakeholder-update (router/current-company-slug) (:slug last-su))))))
 
 (defcomponent updates [data owner]
@@ -31,7 +31,7 @@
   (init-state [_]
     {:columns-num (responsive/columns-num)
      :su-list (dis/stakeholder-update-list-data)
-     :last-su nil})
+     :selected-su nil})
 
   (will-receive-props [_ _]
     (load-latest-su owner)
@@ -41,7 +41,11 @@
     (load-latest-su owner)
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
 
-  (render-state [_ {:keys [columns-num su-list last-su]}]
+  (did-update [_ _ prev-state]
+    (when (not= (:selected-su prev-state) (om/get-state owner :selected-su))
+      (api/get-stakeholder-update (router/current-company-slug) (om/get-state owner :selected-su))))
+
+  (render-state [_ {:keys [columns-num su-list selected-su]}]
     (let [company-data (dis/company-data data)
           card-width   (responsive/calc-card-width)
           ww           (.-clientWidth (.-body js/document))
@@ -55,7 +59,12 @@
           fixed-card-width (if (>= (- total-width-int updates-content-list-width) updates-content-cards-max-width)
                               updates-content-cards-max-width
                               (- total-width-int updates-content-list-width))
-          su-data (dis/stakeholder-update-data data (:slug company-data) last-su)]
+          su-data (dis/stakeholder-update-data data (:slug company-data) selected-su)
+          update-title (if su-data
+                          (if (clojure.string/blank? (:title su-data))
+                            (str (:name (dis/company-data)) " Update")
+                            (:title su-data))
+                          "")]
       (dom/div {:class "updates main-scroll group"}
         (dom/div {:class "page"}
           (om/build navbar {:card-width card-width
@@ -69,9 +78,12 @@
                       :style {:width total-width}}
               (dom/div {:class "updates-content-list group right"
                         :style {:width (str updates-content-list-width "px")}}
-                (prior-updates))
+                (dom/div {:class "center"}
+                  (dom/button {:class "new-update-btn btn-reset btn-outline"} "SHARE A NEW UPDATE"))
+                (prior-updates selected-su #(om/set-state! owner :selected-su %)))
               (dom/div {:class "updates-content-cards right"
                         :style {:width (str fixed-card-width "px")}}
+                (dom/h3 {:class "updates-content-cards-title"} update-title)
                 (om/build topics-columns {:columns-num 1
                                           :card-width (- fixed-card-width 10) ; remove 10 padding on the right
                                           :total-width (- fixed-card-width 10)
