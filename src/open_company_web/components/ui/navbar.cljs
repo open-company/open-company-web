@@ -76,4 +76,4 @@
                   :on-click #(do
                                (utils/event-stop %)
                                (router/nav! (oc-urls/stakeholder-update-list)))}
-            "Updates"))))))
+            "Shared Updates"))))))
