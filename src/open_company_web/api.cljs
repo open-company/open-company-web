@@ -408,7 +408,7 @@
             (dispatcher/dispatch! [:su-list {:response fixed-body :slug slug}])))))))
 
 (defn get-stakeholder-update
-  ([slug update-slug & [load-company-data]]
+  ([slug update-slug load-company-data]
     (when (and slug update-slug)
       (let [update-link (str "/companies/" slug "/updates/" update-slug)]
         (api-get update-link
