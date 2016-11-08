@@ -245,8 +245,7 @@
                                                  :not-draggable-topic (or is-stakeholder-update (:read-only-company data) (not (:pin topic-data)))
                                                  :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
-                    :style #js {:width (if (responsive/is-mobile?) "auto" (str card-width "px"))
-                                :marginLeft (when (utils/in? (:route @router/path) "su-snapshot-preview") (str (/ (- window-width card-width) 2) "px"))}
+                    :style #js {:width (if (responsive/is-mobile?) "auto" (str card-width "px"))}
                     :ref "topic"
                     :data-section (name section)
                     :key (str "topic-" (name section))
