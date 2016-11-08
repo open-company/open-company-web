@@ -18,12 +18,13 @@ ul.dropdown-menu {
 
     a {
       display: block;
-      font-weight: 700;
-      font-family: $oc_headers_font;
-      font-size: 12px;
       letter-spacing: 1px;
       color: $oc_gray_5;
       background-color: transparent;
+      font-size: 14px;
+      font-family: $oc_headers_font;
+      font-weight: 400;
+      text-transform: capitalize;
     }
   }
 }

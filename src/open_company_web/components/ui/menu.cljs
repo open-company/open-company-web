@@ -37,16 +37,16 @@
     (dom/ul {:class "dropdown-menu" :aria-labelledby "dropdown-toggle-menu"}
       (when (jwt/jwt)
         (dom/li {:class "oc-menu-item"}
-          (dom/a {:title "USER INFO" :href oc-urls/user-profile :on-click user-profile-click} "USER INFO")))
+          (dom/a {:title "User Info" :href oc-urls/user-profile :on-click user-profile-click} "User Info")))
       (when (and (router/current-company-slug)
                  (not (utils/in? (:route @router/path) "profile"))
                  (not (:read-only (dis/company-data)))
                  (not (responsive/is-mobile-size?)))
         (dom/li {:class "oc-menu-item"}
-          (dom/a {:title "COMPANY SETTINGS" :href (oc-urls/company-settings) :on-click company-profile-click} "COMPANY SETTINGS")))
+          (dom/a {:title "Company Settings" :href (oc-urls/company-settings) :on-click company-profile-click} "Company Settings")))
       (when (jwt/jwt)
         (dom/li {:class "oc-menu-item"}
-          (dom/a {:title "SIGN OUT" :href oc-urls/logout :on-click logout-click} "SIGN OUT")))
+          (dom/a {:title "Sign Out" :href oc-urls/logout :on-click logout-click} "Sign Out")))
       (when-not (jwt/jwt)
         (dom/li {:class "oc-menu-item"}
-          (dom/a {:title "SIGN IN / SIGN UP" :href oc-urls/login} "SIGN IN / SIGN UP"))))))
+          (dom/a {:title "Sign In / Sign Up" :href oc-urls/login} "Sign In / Sign Up"))))))
