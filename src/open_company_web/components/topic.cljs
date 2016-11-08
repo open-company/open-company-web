@@ -81,10 +81,11 @@
                     :key (str "topic-internal-" (name section))
                     :ref "topic-internal"}
 
-        ;; Topic image
-        (when image-header
-          (dom/div {:class "card-header card-image"}
-            (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
+        ;; Topic image for dashboard
+        (when-not is-stakeholder-update
+          (when image-header
+            (dom/div {:class "card-header card-image"}
+              (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options}))))
 
         ;; Topic title
         (dom/div {:class "topic-dnd-handle group"}
@@ -131,6 +132,12 @@
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
+
+        ;; Topic image for SU
+        (when is-stakeholder-update
+          (when image-header
+            (dom/div {:class "card-header card-image"}
+              (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options}))))
         
         ;; Topic body
         (when-not (clojure.string/blank? topic-body)
@@ -217,7 +224,7 @@
           prev-rev (utils/revision-prev revisions as-of)
           next-rev (utils/revision-next revisions as-of)
           slug (keyword (router/current-company-slug))
-          all-revisions (slug @caches/revisions)
+          all-revisions (dis/revisions slug)
           revisions-list (section-kw all-revisions)
           topic-data (utils/select-section-data section-data section-kw as-of)
           rev-cb (fn [_ rev] (om/set-state! owner :transition-as-of (:updated-at rev)))
@@ -234,8 +241,8 @@
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
                                                  :topic-edit is-foce
-                                                 :draggable-topic (and (not (:read-only-company data)) (:pin topic-data))
-                                                 :not-draggable-topic (or (:read-only-company data) (not (:pin topic-data)))
+                                                 :draggable-topic (and (not is-stakeholder-update) (not (:read-only-company data)) (:pin topic-data))
+                                                 :not-draggable-topic (or is-stakeholder-update (:read-only-company data) (not (:pin topic-data)))
                                                  :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
                     :style #js {:width (if (responsive/is-mobile?) "auto" (str card-width "px"))
