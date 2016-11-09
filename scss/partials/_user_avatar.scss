@@ -1,4 +1,4 @@
-$avatar_size: 25;
+$avatar_size: 35;
 
 button.user-avatar-button{
   margin: 0;
@@ -17,7 +17,7 @@ button.user-avatar-button{
 
   &.no-image {
     i.fa.fa-ellipsis-v {
-      margin-top: 3px;
+      margin-top: 11px;
     }
   }
 
@@ -40,8 +40,8 @@ button.user-avatar-button{
   }
 
   i.fa.fa-ellipsis-v {
-    font-size: 20px;
-    margin-top: 9px;
+    font-size: 24px;
+    margin-top: 6px;
     padding-right: 10px;
     transition: 230ms;
     color: rgba(78, 90, 107, 0.8);
