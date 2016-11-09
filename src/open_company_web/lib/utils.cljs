@@ -85,104 +85,35 @@
   (vec (filter #(not= elem %) coll)))
 
 ;; TODO use goog.i18n.DateTimeFormat here
-(defn month-string [month & [flags]]
-  (let [short-month (in? flags :short)]
-    (case (.parseInt js/window month 10)
-      1 (if short-month
-             "JAN"
-             "January")
-      2 (if short-month
-             "FEB"
-             "February")
-      3 (if short-month
-             "MAR"
-             "March")
-      4 (if short-month
-             "APR"
-             "April")
-      5 (if short-month
-             "MAY"
-             "May")
-      6 (if short-month
-             "JUN"
-             "June")
-      7 (if short-month
-             "JUL"
-             "July")
-      8 (if short-month
-             "AUG"
-             "August")
-      9 (if short-month
-             "SEP"
-             "September")
-      10 (if short-month
-             "OCT"
-             "October")
-      11 (if short-month
-             "NOV"
-             "November")
-      12 (if short-month
-             "DEC"
-             "December"))))
-
-;; TODO use goog.i18n.DateTimeFormat here
 (defn month-string-int [month & [flags]]
-  (let [short-month (in? flags :short)]
-    (case month
-      1 (if short-month
-          "JAN"
-          "January")
-      2 (if short-month
-          "FEB"
-          "February")
-      3 (if short-month
-          "MAR"
-          "March")
-      4 (if short-month
-          "APR"
-          "April")
-      5 (if short-month
-          "MAY"
-          "May")
-      6 (if short-month
-          "JUN"
-          "June")
-      7 (if short-month
-          "JUL"
-          "July")
-      8 (if short-month
-          "AUG"
-          "August")
-      9 (if short-month
-          "SEP"
-          "September")
-      10 (if short-month
-          "OCT"
-          "October")
-      11 (if short-month
-          "NOV"
-          "November")
-      12 (if short-month
-          "DEC"
-          "December")
-      "")))
+  (let [short-month (in? flags :short)
+        capitalize (in? flags :capitalize)
+        uppercase (in? flags :uppercase)
+        month-string (case month
+                        1 "January"
+                        2 "February"
+                        3 "March"
+                        4 "April"
+                        5 "May"
+                        6 "June"
+                        7 "July"
+                        8 "August"
+                        9 "September"
+                        10 "October"
+                        11 "November"
+                        12 "December"
+                        "")
+        short-string (if short-month (subs month-string 0 3) month-string)
+        capitalized-string (if capitalize (gstring/capitalize short-string) short-string)
+        uppercase-string (if uppercase (gstring/uppercase capitalized-string) capitalized-string)]
+    uppercase-string))
+
+(defn month-string [month & [flags]]
+  (month-string-int (.parseInt js/window month 10) flags))
 
 ;; TODO use goog.i18n.DateTimeFormat here
 (defn month-short-string [month]
-  (case month
-    "01" "JAN"
-    "02" "FEB"
-    "03" "MAR"
-    "04" "APR"
-    "05" "MAY"
-    "06" "JUN"
-    "07" "JUL"
-    "08" "AUG"
-    "09" "SEP"
-    "10" "OCT"
-    "11" "NOV"
-    "12" "DEC"
-    ""))
+  (month-string-int (.parseInt js/window month 10) [:short :uppercase]))
 
 (defn format-value [value]
   (if (nil? value)
