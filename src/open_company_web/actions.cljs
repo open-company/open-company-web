@@ -281,9 +281,9 @@
     (assoc db :show-login-overlay show-login-overlay)))
 
 (defmethod dispatcher/action :login-with-slack
-  [db [_ simple-scope?]]
+  [db [_ primary-scope?]]
   (let [current (router/get-token)
-        slack-ref (if simple-scope? "authenticate-retry" "authenticate")
+        slack-ref (if primary-scope? "authenticate" "authenticate-retry")
         auth-url (utils/link-for (:links (:slack (:auth-settings @dispatcher/app-state))) slack-ref)]
     (when (and (not (.startsWith current oc-urls/login))
                (not (.startsWith current oc-urls/sign-up))
