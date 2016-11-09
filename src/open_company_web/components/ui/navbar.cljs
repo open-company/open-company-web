@@ -51,17 +51,24 @@
         (when-not (responsive/is-mobile-size?)
           (dom/div {:class "oc-navbar-bottom group"
                     :style {:width (str header-width "px")}}
-            (when (router/current-company-slug)
-              (dom/a {:class (when (= active :dashboard) "active")
-                      :href (oc-urls/company)
-                      :on-click #(do
-                                   (utils/event-stop %)
-                                   (router/nav! (oc-urls/company)))}
-                "Dashboard"))
-            (when (router/current-company-slug)
-              (dom/a {:class (when (= active :updates) "active")
-                      :href (oc-urls/stakeholder-update-list)
-                      :on-click #(do
-                                   (utils/event-stop %)
-                                   (router/nav! (oc-urls/stakeholder-update-list)))}
-                "Shared Updates"))))))))
+            (dom/div {:class "left"}
+              (when (router/current-company-slug)
+                (dom/a {:class (when (= active :dashboard) "active")
+                        :href (oc-urls/company)
+                        :on-click #(do
+                                     (utils/event-stop %)
+                                     (router/nav! (oc-urls/company)))}
+                  "Dashboard"))
+              (when (router/current-company-slug)
+                (dom/a {:class (when (= active :updates) "active")
+                        :href (oc-urls/stakeholder-update-list)
+                        :on-click #(do
+                                     (utils/event-stop %)
+                                     (router/nav! (oc-urls/stakeholder-update-list)))}
+                  "Updates")))
+            (dom/div {:class "right"}
+              (when show-share-su-button
+                (dom/div {:class "sharing-button-container"}
+                  (dom/a {:class "btn-reset sharing-button right"
+                          :on-click #(router/nav! (oc-urls/stakeholder-update-preview))}
+                    (dom/i {:class "fa fa-share"}) " Share an update"))))))))))

@@ -90,30 +90,6 @@ nav.oc-navbar {
       float: right;
       margin-right: 0px;
 
-      div.sharing-button-container{
-        float: left;
-        margin-right: 10px;
-        margin-top: 7px;
-        color: #1E81C4;
-        border: 0px solid transparent;
-
-        button.sharing-button {
-          font-weight: 700;
-          font-size: 0.75rem;
-          font-family: $oc_headers_font;
-          color: $oc_gray_5;
-          opacity: 0.6;
-
-          &:hover {
-            opacity: 0.8;
-          }
-
-          i.fa.fa-share {
-            margin-right: 2px;
-          }
-        }
-      }
-
       div.user-avatar {
         float: right;
       }
@@ -129,7 +105,7 @@ nav.oc-navbar {
     a {
       font-size: 14px;
       color: rgba(78,90,107,0.6);
-      margin-right: 10px;
+      margin-right: 20px;
       font-family: $oc_headers_font;
 
       &:hover {
@@ -138,6 +114,13 @@ nav.oc-navbar {
 
       &.active {
         color: $oc_gray_5;
+      }
+    }
+
+    div.right {
+      a {
+        margin-right: 0px;
+        margin-left: 20px;
       }
     }
   }
