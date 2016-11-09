@@ -10,7 +10,7 @@
   (let [has-avatar (not (clojure.string/blank? (get-in (rum/react dis/app-state) [:jwt :avatar])))]
     [:button
       {:type "button"
-       :class (str classes " user-avatar-button" (when has-avatar " no-image"))
+       :class (str classes " group user-avatar-button" (when has-avatar " no-image"))
        :id "dropdown-toggle-menu"
        :data-toggle "dropdown"
        :aria-haspopup true

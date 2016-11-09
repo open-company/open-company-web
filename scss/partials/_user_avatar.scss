@@ -2,12 +2,18 @@ $avatar_size: 25;
 
 button.user-avatar-button{
   margin: 0;
-  padding: 5px 0 5px 5px;
+  padding: 5px;
   border: 0px solid transparent;
   background-color: transparent;
   width: auto;
   height: #{$avatar_size}px;
   color: rgba(78, 90, 107, 0.5);
+  height: #{$avatar_size + 10}px;
+
+  &:hover {
+    border-radius: 3px;
+    background-color: rgba(78,90,107,0.1);
+  }
 
   &.no-image {
     i.fa.fa-ellipsis-v {
@@ -38,11 +44,12 @@ button.user-avatar-button{
     margin-top: 9px;
     padding-right: 10px;
     transition: 230ms;
+    color: rgba(78, 90, 107, 0.8);
   }
 
   &:hover {
     i.fa.fa-ellipsis-v {
-      color: rgba(78, 90, 107, 0.8);
+      color: rgba(78, 90, 107, 1);
     }
   }
 }
