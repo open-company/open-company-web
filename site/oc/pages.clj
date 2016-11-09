@@ -185,7 +185,7 @@
           ;; OpenCompany CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css?oc_deploy_key"}]
           ;; jQuery UI CSS
-          [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"}]
+          [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; Emoji One Autocomplete CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css?oc_deploy_key"}]
           ;; Google fonts Domine and OpenSans
@@ -211,7 +211,7 @@
           ;; jQuery scrollTo plugin
           [:script {:src "/lib/scrollTo/scrollTo.min.js?oc_deploy_key" :type "text/javascript"}]
           ;; jQuery UI
-          [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js" :type "text/javascript"}]
+          [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" :type "text/javascript"}]
           ;; Resolve jQuery UI and Bootstrap tooltip conflict
           [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
           ;; Bootstrap JavaScript //getf.com/
