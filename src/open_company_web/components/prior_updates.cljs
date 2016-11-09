@@ -65,7 +65,7 @@
                     month (inc (.getMonth js-date))
                     day (.getDate js-date)
                     year (.getFullYear js-date)
-                    month-string (utils/month-string-int month [:short])
+                    month-string (utils/month-string-int month [:short :capitalize])
                     link-date (str year "-" (utils/add-zero month) "-" (utils/add-zero day))
                     human-date (str month-string " " day ", " year)
                     update-slug (:slug update)
