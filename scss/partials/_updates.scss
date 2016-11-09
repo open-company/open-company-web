@@ -43,13 +43,21 @@ div.updates {
         padding-left: 20px;
 
         button.new-update-btn {
-          width: 100%;
+          width: 200px;
           height: 40px;
           border-radius: 6px;
           font-size: 14px;
           font-family: $oc_headers_font;
           font-weight: 400;
           text-transform: capitalize;
+          margin-bottom: 30px;
+          padding: 0.3rem 1rem;
+          color: rgba(78,90,107,0.6);
+
+          &:hover {
+            background-color: rgba(78,90,107,0.02);
+            color: rgba(78,90,107,0.8);
+          }
         }
       }
     }
