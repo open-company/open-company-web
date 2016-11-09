@@ -404,8 +404,8 @@
       (dom/div {:class (utils/class-set {:topic-list true
                                          :group true
                                          :dragging dragging
+                                         :navbar-offset true
                                          :editable can-edit-secs})
-                :style {:padding-top (if selected-topic "0px" "97px")}
                 :data-rerender rerender
                 :key (str "topic-list-" rerender)}
         ;; Fullscreen topic
