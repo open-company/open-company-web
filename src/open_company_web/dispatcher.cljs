@@ -5,15 +5,21 @@
 
 (defonce app-state (atom {:loading false :menu-open false :show-login-overlay false}))
 
+(defn print-app-state []
+  (js/console.log @app-state))
+
 ;; Derived Data ================================================================
 
 (defn drv-spec [db]
   {:base               [[] db]
    :su-share           [[:base] (fn [base] (:su-share base))]
+   :su-list            [[:base] (fn [base] (-> ((keyword (router/current-company-slug)) base)
+                                              :su-list :collection :stakeholder-updates))]
    :um-invite          [[:base] (fn [base] (:um-invite base))]
    :jwt                [[:base] (fn [base] (:jwt base))]
    :subscription       [[:base] (fn [base] (:subscription base))]
-   :show-login-overlay [[:base] (fn [base] (:show-login-overlay base))]})
+   :show-login-overlay [[:base] (fn [base] (:show-login-overlay base))]
+   :rum-popover-data [[:base] (fn [base] (:rum-popover-data base))]})
 
 ;; Action Loop =================================================================
 

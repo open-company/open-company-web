@@ -5,7 +5,6 @@
             [test.open-company-web.components.ui.cell]
             [test.open-company-web.components.ui.utility-components]
             [test.open-company-web.components.section-footer]
-            [test.open-company-web.components.ui.popover]
             [test.open-company-web.components.ui.headline]
             [test.open-company-web.components.ui.loading]
             [test.open-company-web.lib.utils]))
@@ -21,7 +20,6 @@
   'test.open-company-web.components.ui.cell
   'test.open-company-web.components.ui.utility-components
   'test.open-company-web.components.section-footer
-  'test.open-company-web.components.ui.popover
   'test.open-company-web.components.ui.headline
   'test.open-company-web.components.ui.loading
   'test.open-company-web.lib.utils)

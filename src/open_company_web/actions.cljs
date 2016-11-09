@@ -136,10 +136,15 @@
      (dissoc :loading))
     db))
 
+(defmethod dispatcher/action :get-su-list [db [_ {:keys [slug response]}]]
+  (api/get-su-list)
+  (assoc db :su-list-loading true))
+
 (defmethod dispatcher/action :su-list [db [_ {:keys [slug response]}]]
   (-> db
-    (assoc-in (dispatcher/su-list-key slug) response)
-    (dissoc :loading)))
+    (dissoc :loading)
+    (dissoc :su-list-loading)
+    (assoc-in (dispatcher/su-list-key slug) response)))
 
 (defmethod dispatcher/action :su-edit [db [_ {:keys [slug su-date su-slug]}]]
   (let [protocol (.. js/document -location -protocol)
