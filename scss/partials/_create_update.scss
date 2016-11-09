@@ -79,23 +79,21 @@ div.create-update {
           margin-bottom: 20px;
         }
 
-        ul.create-update-topics-list {
+        div.create-update-topics-list {
           list-style-type: none;
-          width: 100%;
+          width: 280px;
           margin: 0;
           padding: 0;
 
-          li {
+          div {
             font-family: $oc_headers_font;
             font-size: 14px;
             font-weight: 400;
             text-transform: capitalize;
-            display: inline-block;
-            width: 100%;
             padding: 3px 10px 3px 10px;
             cursor: pointer;
 
-            &.active {
+            &.oc-active {
               font-weight: 800;
               background-color: rgba(78,90,107,0.05);
 
