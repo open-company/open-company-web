@@ -88,7 +88,7 @@
                   (dom/button {:class "btn-reset btn-solid right"
                                :disabled (zero? (count su-topics))} "SHARE"))
                 (dom/div {:class "create-update-content-cta"}
-                  "Choose from the topics below to create a new update.")
+                  "Choose from the topics below to create your next update.")
                 (dom/ul {:class "create-update-topics-list"}
                   (for [topic su-topics]
                     (let [sd ((keyword topic) company-data)]
