@@ -82,10 +82,10 @@
               (dom/div {:class "create-update-content-list group right"
                         :style {:width (str updates-content-list-width "px")}}
                 (dom/div {:class "create-update-content-buttons group"}
-                  (dom/button {:class "btn-reset btn-outline left"
+                  (dom/button {:class "btn-reset btn-outline left cancel"
                                :on-click #(.back (.-history js/window))}
                     "CANCEL")
-                  (dom/button {:class "btn-reset btn-solid right"
+                  (dom/button {:class "btn-reset btn-solid right share"
                                :disabled (zero? (count su-topics))} "SHARE"))
                 (dom/div {:class "create-update-content-cta"}
                   "Choose from the topics below to create your next update.")

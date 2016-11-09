@@ -61,6 +61,14 @@ div.create-update {
 
         div.create-update-content-buttons {
           margin-bottom: 30px;
+
+          button.cancel {
+            margin-left: 0.6rem;
+          }
+
+          button.share {
+            margin-right: 0.7rem;
+          }
         }
 
         div.create-update-content-cta {
