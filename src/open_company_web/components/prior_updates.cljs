@@ -65,9 +65,10 @@
                     month (inc (.getMonth js-date))
                     day (.getDate js-date)
                     year (.getFullYear js-date)
+                    needs-year (> (- (.getTime (utils/js-date)) (.getTime js-date)) (* 1000 60 60 24 365))
                     month-string (utils/month-string-int month [:short :capitalize])
                     link-date (str year "-" (utils/add-zero month) "-" (utils/add-zero day))
-                    human-date (str month-string " " day ", " year)
+                    human-date (str month-string " " day (when needs-year (str ", " year)))
                     update-slug (:slug update)
                     link-url (if list-urls
                                 (urls/stakeholder-update-list company-slug update-slug)
