@@ -82,10 +82,9 @@
                     :ref "topic-internal"}
 
         ;; Topic image for dashboard
-        (when-not is-stakeholder-update
-          (when image-header
-            (dom/div {:class "card-header card-image"}
-              (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options}))))
+        (when image-header
+          (dom/div {:class "card-header card-image"}
+            (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
 
         ;; Topic title
         (dom/div {:class "topic-dnd-handle group"}
@@ -132,12 +131,6 @@
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
-
-        ;; Topic image for SU
-        (when is-stakeholder-update
-          (when image-header
-            (dom/div {:class "card-header card-image"}
-              (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options}))))
         
         ;; Topic body
         (when-not (clojure.string/blank? topic-body)
