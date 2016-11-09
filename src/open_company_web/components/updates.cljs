@@ -83,9 +83,6 @@
                       :style {:width total-width}}
               (dom/div {:class "updates-content-list group right"
                         :style {:width (str updates-content-list-width "px")}}
-                (dom/div {:class "center"}
-                  (dom/button {:class "new-update-btn btn-reset btn-outline"
-                               :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} "Share a New Update"))
                 (prior-updates selected-su true))
               (dom/div {:class "updates-content-cards right"
                         :style {:width (str fixed-card-width "px")}}
