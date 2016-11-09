@@ -37,11 +37,9 @@
   (let [company-slug (router/current-company-slug)
         updates (reverse (drv/react s :su-list))
         none? (empty? updates)
-        mobile? (responsive/is-mobile-size?)
-        klass (if mobile? "" "oc-popover")] ; desktop is in a popover, mobile is full page
+        mobile? (responsive/is-mobile-size?)]
 
-    [:div {:class klass
-           :style {:padding 0}}
+    [:div {:style {:padding 0}}
       
       (when-not mobile? ; floating close X
         [:button {:class "absolute top-0 btn-reset" :style {:left "100%"}
