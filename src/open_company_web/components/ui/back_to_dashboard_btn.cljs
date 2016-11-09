@@ -10,12 +10,10 @@
   (.back (.-history js/window)))
 
 (rum/defc back-to-dashboard-btn < rum/static
-  [{:keys [click-cb button-offset-left]
-    :or {click-cb   btn-clicked
-         button-offset-left (- (/ (.-clientWidth (.-body js/document)) 2) 100)}}]
+  [{:keys [click-cb]
+    :or {click-cb   btn-clicked}}]
   (assert (fn? click-cb) "back-to-dashboard callback not fn?")
-  [:div.back-to-dashboard-row.center
-   [:button.back-to-dashboard.btn-reset.btn-outline
-    {:on-click #(do (.preventDefault %) (click-cb))
-     :style {:margin-left (str button-offset-left "px")}}
+  [:div.back-to-dashboard-row.group
+   [:button.back-to-dashboard.btn-reset.btn-outline.right
+    {:on-click #(do (.preventDefault %) (click-cb))}
     (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 24 :stroke 4 :accent-color "rgba(78, 90, 107, 1.0)"})]])
