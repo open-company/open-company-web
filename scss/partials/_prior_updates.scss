@@ -11,7 +11,13 @@ div.prior-updates-container {
   }
 
   div.update {
-    &.active {
+    padding: 5px 0px 5px 10px;
+    transition: 230ms;
+    border-left: 1px solid transparent;
+    cursor: pointer;
+
+    &.active, &:hover {
+      border-left: 1px solid rgba(78,90,107,0.3);
       a {
         color: $oc_gray_5;
       }
@@ -26,7 +32,6 @@ div.prior-updates-container {
 
     div.update-details {
       font-size: 13px;
-      margin-bottom: 20px;
 
       div.medium {
         display: inline;
