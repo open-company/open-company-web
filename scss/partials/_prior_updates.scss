@@ -11,14 +11,37 @@ div.prior-updates-container {
   }
 
   div.update {
-    padding: 5px 0px 5px 10px;
+    padding: 7px 0px 7px 10px;
     transition: 230ms;
     border-left: 3px solid transparent;
     cursor: pointer;
+    border-radius: 3px;
 
     &.active, &:hover {
-      border-left: 3px solid rgba(78,90,107,0.3);
-      a {
+      background-color: rgba(78,90,107,0.1);
+    }
+
+    &.active {
+      div.update-title {
+        a {
+          color: $oc_gray_7;
+        }
+      }
+
+      div.update-details {
+        color: $oc_gray_7;
+      }
+    }
+
+    &:hover:not(.active) {
+
+      div.update-title {
+        a {
+          color: $oc_gray_5;
+        }
+      }
+
+      div.update-details {
         color: $oc_gray_5;
       }
     }
@@ -28,10 +51,14 @@ div.prior-updates-container {
       font-size: 14px;
       font-family: $oc_headers_font;
       font-weight: 400;
+      a {
+        color: rgba(78,90,107,0.8);
+      }
     }
 
     div.update-details {
       font-size: 13px;
+      color: rgba(78,90,107,0.8);
 
       div.medium {
         display: inline;
