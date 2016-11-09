@@ -67,7 +67,7 @@
                     month (inc (.getMonth js-date))
                     day (.getDate js-date)
                     year (.getFullYear js-date)
-                    month-string (utils/month-string-int month)
+                    month-string (utils/month-string-int month [:short])
                     link-date (str year "-" (utils/add-zero month) "-" (utils/add-zero day))
                     human-date (str month-string " " day ", " year)
                     update-slug (:slug update)
@@ -84,8 +84,10 @@
                                 :slack [:span "to " [:i {:class "fa fa-slack"}]]
                                 :legacy ""
                                 [:div.medium "a " (i/icon :link-72 {:size 13 :class "inline"})])]
-                [:div.update {:key update-slug :class (when (= current-update update-slug) "active")}
+                [:div.update {:key update-slug
+                              :class (when (= current-update update-slug) "active")
+                              :on-click (partial update-click link)}
                   [:div.update-title.domine
-                    [:a {:href link :on-click (partial update-click link)}
+                    [:a {:href link :on-click #(utils/event-stop %)}
                       title]]
                   [:div.update-details.domine author " shared " medium " on " human-date]]))])]]))
