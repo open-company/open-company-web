@@ -22,6 +22,14 @@ div.create-update {
           height: 30px;
           border: none;
           outline: none;
+          font-size: 24px;
+          font-family: $oc_headers_font;
+          font-weight: 500;
+          color: $oc_gray_7;
+
+          @include placeholder {
+            font-style: italic;
+          }
 
           &:focus, &:active {
             border: 1px solid rgba(78,90,107,0.3);
