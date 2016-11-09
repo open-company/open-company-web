@@ -19,12 +19,22 @@
             [om-bootstrap.random :as r]
             [om-bootstrap.button :as b]))
 
-(defcomponent navbar [{:keys [company-data columns-num card-width latest-su link-loading email-loading slack-loading menu-open show-share-su-button active] :as data} owner options]
+(defcomponent navbar [{:keys [company-data
+                              columns-num
+                              card-width
+                              latest-su
+                              link-loading
+                              email-loading
+                              slack-loading
+                              menu-open
+                              show-share-su-button
+                              active] :as data} owner options]
 
   (render [_]
     (let [header-width (+ (* card-width columns-num)    ; cards width
                           (* 20 (dec columns-num))      ; cards right margin
-                          (when (> columns-num 1) 60))] ; x margins if needed
+                          (when (> columns-num 1) 60))  ; x margins if needed
+          fixed-show-share-su-button (if (contains? data :show-share-su-button) show-share-su-button true)]
       (dom/nav {:class "oc-navbar group"}
         (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
           (login-overlays-handler))
@@ -67,7 +77,7 @@
                                      (router/nav! (oc-urls/stakeholder-update-list)))}
                   "Updates")))
             (dom/div {:class "right"}
-              (when show-share-su-button
+              (when fixed-show-share-su-button
                 (dom/div {:class "sharing-button-container"}
                   (dom/a {:class "btn-reset sharing-button right"
                           :on-click #(router/nav! (oc-urls/stakeholder-update-preview))}
