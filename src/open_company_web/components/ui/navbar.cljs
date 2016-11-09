@@ -21,11 +21,6 @@
 
 (defcomponent navbar [{:keys [company-data columns-num card-width latest-su link-loading email-loading slack-loading menu-open show-share-su-button active] :as data} owner options]
 
-  (did-mount [_]
-    (when-not (utils/is-test-env?)
-      (when-not (responsive/is-tablet-or-mobile?)
-        (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
-
   (render [_]
     (let [header-width (+ (* card-width columns-num)    ; cards width
                           (* 20 (dec columns-num))      ; cards right margin
@@ -48,16 +43,6 @@
                       (i/icon :menu-34 {}))
                     (if (jwt/jwt)
                       (dom/div {:class "group"}
-                        (when show-share-su-button
-                          (dom/div {:class "sharing-button-container"}
-                            (dom/button {:class "btn-reset sharing-button right"
-                                         :data-toggle "tooltip"
-                                         :data-container "body"
-                                         :data-placement "left"
-                                         :title "Choose topics to share via email, Slack or private URL."
-                                         :disabled (not (nil? (:foce-key data)))
-                                         :on-click #(router/nav! (oc-urls/stakeholder-update-preview))} (dom/i {:class "fa fa-share"})
-                              " SHARE AN UPDATE")))
                         (dom/div {:class "dropdown right"}
                           (user-avatar {:classes "btn-reset dropdown-toggle"})
                           (om/build menu {})))
