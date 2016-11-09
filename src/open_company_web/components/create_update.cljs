@@ -83,13 +83,12 @@
                         :style {:width (str updates-content-list-width "px")}}
                 (dom/div {:class "create-update-content-buttons group"}
                   (dom/button {:class "btn-reset btn-outline left"
-                               :on-click (fn [] (om/update-state! owner #(merge % {:su-topics (:sections (:stakeholder-update company-data))
-                                                                                   :su-title ""})))}
+                               :on-click #(.back (.-history js/window))}
                     "CANCEL")
                   (dom/button {:class "btn-reset btn-solid right"
                                :disabled (zero? (count su-topics))} "SHARE"))
                 (dom/div {:class "create-update-content-cta"}
-                  "Choose from the topics below to create your first update.")
+                  "Choose from the topics below to create a new update.")
                 (dom/ul {:class "create-update-topics-list"}
                   (for [topic su-topics]
                     (let [sd ((keyword topic) company-data)]
