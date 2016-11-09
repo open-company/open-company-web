@@ -2,6 +2,8 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer-macros (sel)]
+            [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [open-company-web.api :as api]
@@ -18,9 +20,14 @@
 (def updates-content-list-width 280)
 (def updates-content-cards-max-width 560)
 
+(defn ordered-topics-list []
+  (let [topics (sel [:div.create-update-topics-list :div.oc-active])
+        topics-list (for [topic topics] (.data (js/jQuery topic) "topic"))]
+    (vec (remove nil? topics-list))))
+
 (defn remove-pinned [data]
   (loop [topics data
-         all-keys (keys data)
+         all-keys (vec (keys data))
          idx 0]
     (if (= idx (count all-keys))
       topics
@@ -31,9 +38,21 @@
                       (assoc v :pin false)
                       v)
                     v)]
-        (recur (assoc topics k new-v)
-               all-keys
-               (inc idx))))))
+         (recur (assoc topics k new-v)
+                all-keys
+                (inc idx))))))
+
+(defn setup-sortable [owner]
+  (when-let [list-node (js/jQuery "div.create-update-topics-list")]
+    (-> list-node
+      (.sortable list-node #js {:scroll true
+                                :forcePlaceholderSize true
+                                :items ".oc-active"
+                                :stop (fn [event ui]
+                                        (when-let [dragged-item (gobj/get ui "item")]
+                                          (om/set-state! owner :su-topics (ordered-topics-list))))
+                                :axis "y"})
+      (.disableSelection))))
 
 (defcomponent create-update [data owner]
 
@@ -42,18 +61,27 @@
           su-data (:stakeholder-update company-data)]
       {:columns-num (responsive/columns-num)
        :su-topics (vec (:sections su-data))
-       :su-title ""}))
+       :su-title ""
+       :no-pinned-topics (remove-pinned (dis/company-data data))}))
 
   (will-receive-props [_ next-props]
+    (om/set-state! owner :no-pinned-topics (remove-pinned (dis/company-data next-props)))
     (when (zero? (count (om/get-state owner :su-topics)))
       (let [company-data (dis/company-data next-props)
             su-data (:stakeholder-update company-data)]
         (om/set-state! owner :su-topics (vec (:sections su-data))))))
 
   (did-mount [_]
-    (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
+    (setup-sortable owner)
+    (om/set-state! owner :resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))))
 
-  (render-state [_ {:keys [columns-num su-title su-topics]}]
+  (did-update [_ _ _]
+    (setup-sortable owner))
+
+  (will-unmount [_]
+    (events/unlistenByKey (om/get-state owner :resize-listener)))
+
+  (render-state [_ {:keys [columns-num su-title su-topics no-pinned-topics]}]
     (let [company-data (dis/company-data data)
           card-width   (responsive/calc-card-width)
           ww           (.-clientWidth (.-body js/document))
@@ -89,18 +117,23 @@
                                :disabled (zero? (count su-topics))} "SHARE"))
                 (dom/div {:class "create-update-content-cta"}
                   "Choose from the topics below to create your next update.")
-                (dom/ul {:class "create-update-topics-list"}
+                (dom/div {:class "create-update-topics-list"}
                   (for [topic su-topics]
                     (let [sd ((keyword topic) company-data)]
-                      (dom/li {:class "active"
+                      (dom/div {:class "oc-active"
+                               :data-topic topic
+                               :key topic
+                               :ref topic
                                :on-click #(om/set-state! owner :su-topics (utils/vec-dissoc su-topics topic))}
                         (:title sd))))
                   (let [all-topics (:sections company-data)
                         remaining-topics (vec (first (clojure.data/diff (set all-topics) (set su-topics))))]
                     (for [topic remaining-topics]
                       (let [sd ((keyword topic) company-data)]
-                        (dom/li {:class ""
-                                 :on-click #(om/set-state! owner :su-topics (vec (conj su-topics topic)))}
+                        (dom/div {:data-topic topic
+                                  :key topic
+                                  :ref topic
+                                  :on-click #(om/set-state! owner :su-topics (vec (conj su-topics topic)))}
                           (:title sd)))))))
               (dom/div {:class "create-update-content-cards right"
                         :style {:width (str fixed-card-width "px")}}
@@ -115,8 +148,8 @@
                                           :is-stakeholder-update true
                                           :content-loaded (not (:loading data))
                                           :topics su-topics
-                                          :topics-data (remove-pinned company-data)
-                                          :company-data (remove-pinned company-data)
+                                          :topics-data no-pinned-topics
+                                          :company-data no-pinned-topics
                                           :hide-add-topic true
                                           :show-share-remove false}))))
           (om/build footer {:card-width card-width
