@@ -144,13 +144,13 @@
         {:1 cl1
          :2 cl2}))))
 
-(defn calc-layout 
+(defn calc-layout
   "Calculate the best layout given the list of topics and the number of columns to layout to"
   [owner data]
   (if (utils/is-test-env?)
     (om/get-props owner :topics)
     (let [columns-num (:columns-num data)
-          company-data (dis/company-data)
+          company-data (:company-data data)
           show-add-topic (add-topic? owner)
           {:keys [pinned other]} (utils/get-pinned-other-keys (utils/get-section-keys company-data) company-data)
           final-layout (loop [idx 0
@@ -178,18 +178,10 @@
           share-selected?       (utils/in? share-selected-topics section-name)
           slug                  (keyword (router/current-company-slug))
           window-scroll         (.-scrollTop (.-body js/document))
-          {:keys [pinned other]} (utils/get-pinned-other-keys topics (dis/company-data))
+          {:keys [pinned other]} (utils/get-pinned-other-keys topics company-data)
           first-topic           (if (pos? (count pinned))
                                   (first pinned)
-                                  (first other))
-          hovering-topic        (om/get-state owner :hovering)
-          hovering?             (and (:is-stakeholder-update props)
-                                     (or (and (not (nil? hovering-topic))
-                                              (= section-name hovering-topic))
-                                         (and first-topic
-                                              (= section-name (name first-topic))
-                                              (nil? hovering-topic)
-                                              (<= window-scroll 188))))]
+                                  (first other))]
       (if (= section-name "add-topic")
         (at/add-topic {:column column
                        :archived-topics (mapv (comp keyword :section) (:archived company-data))
@@ -203,17 +195,10 @@
                                 #js {}
                                 #js {:width (if (responsive/is-mobile?) "auto" (str (:card-width props) "px"))})]
           (when-not (and (:read-only company-data) (:placeholder sd))
-            (dom/div #js {:className (utils/class-set {:topic-row true
-                                                       :draggable-topic (:pin sd)
-                                                       :su-dragging-topic (= (:su-dragging-topic props) section-name)
-                                                       :hover hovering?})
+            (dom/div #js {:className "topic-row"
                           :data-topic (name section-name)
                           :style topic-row-style
                           :ref section-name
-                          :onMouseOver #(when (:is-stakeholder-update props)
-                                         (om/set-state! owner :hovering section-name))
-                          :onMouseOut #(when (:is-stakeholder-update props)
-                                         (om/set-state! owner :hovering nil))
                           :key (str "topic-row-" (name section-name))}
               (om/build topic {:loading (:loading company-data)
                                :section section-name
@@ -248,14 +233,15 @@
       (om/set-state! owner :best-layout (calc-layout owner data))))
 
   (will-receive-props [_ next-props]
-    (when (or (not= (:topics next-props) (:topics data))
-              (not= (:columns-num next-props) (:columns-num data)))
+    (when (and (> (:columns-num next-props) 1)
+               (or (not= (:topics next-props) (:topics data))
+                   (not= (:columns-num next-props) (:columns-num data))))
       (om/set-state! owner :best-layout (calc-layout owner next-props))))
 
-  (render-state [_ {:keys [best-layout hovering]}]
+  (render-state [_ {:keys [best-layout]}]
     (let [show-add-topic         (add-topic? owner)
           partial-render-topic   (partial render-topic owner options)
-          {:keys [pinned other]} (utils/get-pinned-other-keys topics (dis/company-data))
+          {:keys [pinned other]} (utils/get-pinned-other-keys topics company-data)
           columns-container-key   (str (apply str pinned) (apply str other))]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
@@ -273,7 +259,7 @@
             (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
               ; get the pinned and the other topics of the current column
               (let [column (get best-layout kw)
-                    {:keys [pinned other]} (utils/get-pinned-other-keys column (dis/company-data))]
+                    {:keys [pinned other]} (utils/get-pinned-other-keys column company-data)]
                 (dom/div {:class (str "topics-column col-" (name kw))
                           :style #js {:width (str (+ card-width topic-margins) "px")}}
                   ; render the pinned topics
