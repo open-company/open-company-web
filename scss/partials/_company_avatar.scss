@@ -8,17 +8,17 @@ div.company-avatar {
   div.company-avatar-container {
 
     div.company-avatar-border {
-      width: 30px;
-      height: 30px;
+      width: 45px;
+      height: 45px;
       border: solid 1px rgba(78, 90, 107, 0.2);
-      padding: 2.5px;
+      padding: 5px;
       text-align: center;
       white-space: nowrap;
       text-align: center;
 
       img.company-avatar-img{
-        max-width: 20px;
-        max-height: 20px;
+        max-width: 35px;
+        max-height: 35px;
         vertical-align: middle;
       }
 
@@ -38,11 +38,11 @@ div.company-avatar {
 
     span.company-name {
       font-weight: 700;
-      font-size: 20px;
+      font-size: 24px;
       line-height: 1.2;
       color: $oc_gray_5;
-      margin-top: -25px;
-      margin-left: 40px;
+      margin-top: -34px;
+      margin-left: 54px;
       float: left;
     }
   }
