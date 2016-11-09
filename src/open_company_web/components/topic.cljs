@@ -71,12 +71,11 @@
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
-          truncated-body      (if (utils/is-test-env?)
+          truncated-body      (if (or (utils/is-test-env?) is-stakeholder-update)
                                 topic-body
                                 (.truncate js/$ topic-body (clj->js {:length utils/topic-body-limit :words true})))
           company-data        (dis/company-data)
           {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
-
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
                     :ref "topic-internal"}
@@ -140,9 +139,7 @@
 
         ; if it's SU preview or SU show only read-more
         (dom/div {:style {:margin-top "20px"}}
-          (if is-stakeholder-update
-            (when (utils/exceeds-topic-body-limit topic-body)
-              (om/build topic-read-more (assoc data :read-more-cb (partial fullscreen-topic owner nil false))))
+          (when-not is-stakeholder-update
             (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic owner nil false)) {:opts options})))))))
 
 (defn animate-revision-navigation [owner]
