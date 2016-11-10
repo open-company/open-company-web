@@ -112,7 +112,8 @@
                             :columns-num columns-num
                             :company-data company-data
                             :foce-key (:foce-key data)
-                            :active :updates
+                            :show-share-su-button false
+                            :active nil
                             :auth-settings (:auth-settings data)})
           (dom/div {:class "create-update-inner group navbar-offset"}
             (when show-su-dialog
