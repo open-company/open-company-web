@@ -43,7 +43,7 @@
 
   (did-mount [_]
     (load-latest-su owner)
-    (om/set-state! :resize-listener
+    (om/set-state! owner :resize-listener
       (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))))
 
   (will-unmount [_]
