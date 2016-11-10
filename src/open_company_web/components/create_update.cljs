@@ -18,7 +18,7 @@
             [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]))
 
 (def topic-total-x-padding 20)
-(def updates-content-list-width 280)
+(def updates-content-list-width 260)
 (def updates-content-cards-max-width 560)
 
 (defn ordered-topics-list []
@@ -135,7 +135,7 @@
                                :on-click #(share-clicked owner)
                                :disabled (zero? (count su-topics))} "SHARE"))
                 (dom/div {:class "create-update-content-cta"}
-                  "Choose topics you’d like to include, and arrange them in any order.")
+                  "Choose topics you’d like to include and arrange them in any order.")
                 (dom/div {:class "create-update-topics-list"
                           :key (clojure.string/join "-" su-topics)}
                   (for [topic su-topics]

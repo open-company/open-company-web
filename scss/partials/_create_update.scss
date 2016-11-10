@@ -64,11 +64,11 @@ div.create-update {
           margin-bottom: 30px;
 
           button.cancel {
-            margin-left: 0.6rem;
+            margin-left: 0;
           }
 
           button.share {
-            margin-right: 0.7rem;
+            margin-right: 0;
           }
         }
 
@@ -82,7 +82,6 @@ div.create-update {
 
         div.create-update-topics-list {
           list-style-type: none;
-          width: 280px;
           margin: 0;
           padding: 0;
 
