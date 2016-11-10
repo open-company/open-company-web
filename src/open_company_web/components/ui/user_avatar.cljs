@@ -2,17 +2,20 @@
   (:require [rum.core :as rum]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.dispatcher :as dis]
-            [open-company-web.components.ui.icon :as i]))
+            [open-company-web.components.ui.icon :as i]
+            [open-company-web.lib.responsive :as responsive]))
 
 (rum/defc user-avatar < rum/static
                         rum/reactive
-  [{:keys [classes]}]
-  (let [has-avatar (not (clojure.string/blank? (get-in (rum/react dis/app-state) [:jwt :avatar])))]
+  [{:keys [classes click-cb]}]
+  (let [has-avatar (not (clojure.string/blank? (get-in (rum/react dis/app-state) [:jwt :avatar])))
+        not-mobile? (not (responsive/is-mobile-size?))]
     [:button
       {:type "button"
        :class (str classes " group user-avatar-button" (when-not has-avatar " no-image"))
        :id "dropdown-toggle-menu"
-       :data-toggle "dropdown"
+       :data-toggle (when not-mobile? "dropdown")
+       :click-cb (when (fn? click-cb) (click-cb))
        :aria-haspopup true
        :aria-expanded false}
       (if-not has-avatar

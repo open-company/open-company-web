@@ -20,33 +20,40 @@
 
 (defn logout-click [e]
   (utils/event-stop e)
+  (utils/after 100 #(dis/dispatch! [:mobile-menu-toggle]))
   (dis/dispatch! [:logout]))
 
 (defn user-profile-click [e]
   (utils/event-stop e)
   (dis/save-last-company-slug)
+  (dis/dispatch! [:mobile-menu-toggle])
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! oc-urls/user-profile)))
 
 (defn company-profile-click [e]
   (utils/event-stop e)
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/company-settings))))
 
-(defcomponent menu [data owner options]
+(defcomponent menu [{:keys [mobile-menu-open]} owner options]
 
   (render [_]
-    (dom/ul {:class "dropdown-menu" :aria-labelledby "dropdown-toggle-menu"}
-      (when (jwt/jwt)
-        (dom/li {:class "oc-menu-item"}
-          (dom/a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile")))
-      (when (and (router/current-company-slug)
-                 (not (utils/in? (:route @router/path) "profile"))
-                 (not (:read-only (dis/company-data)))
-                 (not (responsive/is-mobile-size?)))
-        (dom/li {:class "oc-menu-item"}
-          (dom/a {:href (oc-urls/company-settings) :on-click company-profile-click} "Company Settings")))
-      (when (jwt/jwt)
-        (dom/li {:class "oc-menu-item"}
-          (dom/a {:href oc-urls/logout :on-click logout-click} "Sign Out")))
-      (when-not (jwt/jwt)
-        (dom/li {:class "oc-menu-item"}
-          (dom/a {:href oc-urls/login} "Sign In / Sign Up"))))))
+    (let [menu-classes (str "menu"
+                         (if (responsive/is-mobile-size?)
+                            (when mobile-menu-open " mobile-menu-open")
+                            " dropdown-menu"))]
+      (dom/ul {:class menu-classes
+               :aria-labelledby "dropdown-toggle-menu"}
+        (when (jwt/jwt)
+          (dom/li {:class "oc-menu-item"}
+            (dom/a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile")))
+        (when (and (router/current-company-slug)
+                   (not (utils/in? (:route @router/path) "profile"))
+                   (not (:read-only (dis/company-data)))
+                   (not (responsive/is-mobile-size?)))
+          (dom/li {:class "oc-menu-item"}
+            (dom/a {:href (oc-urls/company-settings) :on-click company-profile-click} "Company Settings")))
+        (when (jwt/jwt)
+          (dom/li {:class "oc-menu-item"}
+            (dom/a {:href oc-urls/logout :on-click logout-click} "Sign Out")))
+        (when-not (jwt/jwt)
+          (dom/li {:class "oc-menu-item"}
+            (dom/a {:href oc-urls/login} "Sign In / Sign Up")))))))

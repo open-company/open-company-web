@@ -35,9 +35,9 @@
                               link-loading
                               email-loading
                               slack-loading
-                              menu-open
                               show-share-su-button
-                              active] :as data} owner options]
+                              active
+                              mobile-menu-open] :as data} owner options]
 
   (did-mount [_]
     (scroll-listener nil)
@@ -46,7 +46,6 @@
 
   (will-unmount [_]
     (when-let [scroll-listener (om/get-state owner :scroll-listener)]
-      (js/console.log "remove scroll listener" scroll-listener)
       (events/unlistenByKey scroll-listener)))
 
   (render [_]
@@ -54,7 +53,7 @@
                           (* 20 (dec columns-num))      ; cards right margin
                           (when (> columns-num 1) 60))  ; x margins if needed
           fixed-show-share-su-button (if (contains? data :show-share-su-button) show-share-su-button true)]
-      (dom/nav {:class "oc-navbar group"}
+      (dom/nav {:class (str "oc-navbar group" (when mobile-menu-open " mobile-menu-open"))}
         (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
           (login-overlays-handler))
         (dom/div {:class "oc-navbar-header group"
@@ -68,7 +67,8 @@
               (dom/ul {:class "nav navbar-nav navbar-right"}
                 (dom/li {}
                   (if (responsive/is-mobile-size?)
-                    (dom/div {:class "group"}
+                    (dom/button {:class "btn-reset group"
+                                 :on-click #(dis/dispatch! [:mobile-menu-toggle])}
                       (i/icon :menu-34 {}))
                     (if (jwt/jwt)
                       (dom/div {:class "group"}
@@ -76,8 +76,12 @@
                           (user-avatar {:classes "btn-reset dropdown-toggle"})
                           (om/build menu {})))
                       (login-button)))))))
-          (dom/div {:class "oc-navbar-separator"}))
-        (when-not (responsive/is-mobile-size?)
+          (when-not (responsive/is-mobile-size?)
+            (dom/div {:class "oc-navbar-separator"})))
+        (if (responsive/is-mobile-size?)
+          ;; Render the menu here only on mobile so it can expand the navbar
+          (om/build menu {:mobile-menu-open mobile-menu-open})
+          ;; Render the bottom part of the navbar when not on mobile
           (dom/div {:class "oc-navbar-bottom group"
                     :style {:width (str header-width "px")}}
             (dom/div {:class "left"}

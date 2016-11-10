@@ -23,7 +23,7 @@
           (dom/span {:class "company-logo"} (first (clojure.string/upper-case (:name data)))))
         (:name data)))))
 
-(defcomponent list-companies [{:keys [menu-open] :as data} owner]
+(defcomponent list-companies [{:keys [mobile-menu-open] :as data} owner]
 
   (init-state[_]
     {:columns-num (responsive/columns-num)})
@@ -41,7 +41,7 @@
             (om/build navbar {:card-width card-width
                               :sharing-mode false
                               :columns-num columns-num
-                              :menu-open menu-open
+                              :mobile-menu-open mobile-menu-open
                               :show-share-su-button false
                               :auth-settings (:auth-settings data)})
             (dom/div {:class "navbar-offset group"}

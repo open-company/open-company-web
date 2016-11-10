@@ -31,7 +31,7 @@
         (om/update-state! owner :new-sections-requested not)
         (utils/after 1000 #(api/get-new-sections))))))
 
-(defcomponent company-dashboard [{:keys [menu-open] :as data} owner]
+(defcomponent company-dashboard [data owner]
 
   (init-state [_]
     {:navbar-editing false
@@ -76,7 +76,7 @@
                                 :columns-num columns-num
                                 :foce-key (:foce-key data)
                                 :show-share-su-button (utils/can-edit-sections? company-data)
-                                :menu-open menu-open
+                                :mobile-menu-open (:mobile-menu-open data)
                                 :auth-settings (:auth-settings data)
                                 :active :dashboard})
               (om/build topic-list

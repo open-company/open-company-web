@@ -1,12 +1,35 @@
-ul.dropdown-menu {
+ul.menu {
   top: 55px;
   padding: 10px 0px 10px 10px;
   box-shadow: 0 1px 4px rgba(0,0,0,.04);
-  border: 1px solid rgba(0,0,0,.09);
+  border: 1px solid rgba(78,90,107,0.1);
   border-radius: 3px;
+
+  @include mobile() {
+    position: relative;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    opacity: 0;
+    list-style-type: none;
+    border: none;
+    border-top: 1px solid rgba(78,90,107,0.1);
+    border-bottom: 1px solid rgba(78,90,107,0.1);
+    box-shadow: none;
+    transition: 230ms;
+    display: block;
+
+    &.mobile-menu-open {
+      opacity: 1;
+    }
+  }
 
   li.oc-menu-item {
     opacity: 0.6;
+
+    @include mobile(){
+      padding: 4px 2px;
+    }
 
     &:hover {
       background-color: transparent;

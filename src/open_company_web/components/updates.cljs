@@ -82,6 +82,7 @@
                             :company-data company-data
                             :foce-key (:foce-key data)
                             :active :updates
+                            :mobile-menu-open (:mobile-menu-open data)
                             :auth-settings (:auth-settings data)})
           (dom/div {:class "updates-inner group navbar-offset"}
             (dom/div {:class "updates-content group"

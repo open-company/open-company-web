@@ -15,6 +15,10 @@ div.list-companies {
       list-style-type: none;
       margin-top: 20px;
 
+      @include mobile(){
+        padding: 0px 20px;
+      }
+
       li {
         float: left;
         width: 380px;
@@ -22,6 +26,10 @@ div.list-companies {
         margin: 10px 10px 10px 0;
         border: 1px solid rgba(78, 90, 107, 0.5);
         box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
+
+        @include mobile() {
+          width: 100%;
+        }
 
         a {
           color: $oc_gray_5;

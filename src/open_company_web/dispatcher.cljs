@@ -3,7 +3,7 @@
             [org.martinklepsch.derivatives :as drv]
             [open-company-web.router :as router]))
 
-(defonce app-state (atom {:loading false :menu-open false :show-login-overlay false}))
+(defonce app-state (atom {:loading false :mobile-menu-open false :show-login-overlay false}))
 
 (defn print-app-state []
   (js/console.log @app-state))

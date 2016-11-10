@@ -429,3 +429,7 @@
       (cook/remove-cookie! :show-login-overlay)
       (dissoc db :show-login-overlay))
     (assoc db :collect-name-password-error status)))
+
+(defmethod dispatcher/action :mobile-menu-toggle
+  [db [_]]
+  (assoc db :mobile-menu-open (not (:mobile-menu-open db))))

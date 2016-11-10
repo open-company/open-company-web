@@ -11,11 +11,19 @@ nav.oc-navbar {
   top: 0;
   left: 0;
   width: 100%;
+  background-color: white;
+  transition: 230ms;
+
   @include big_web(){
     height: #{$navbar_height}px;
   }
   @include mobile(){
+    overflow: hidden;
     height: #{$mobile_navbar_height}px;
+
+    &.mobile-menu-open {
+      height: #{$mobile_navbar_height + $mobile_menu_height}px;
+    }
   }
   z-index: 1030;
   background-color: white;
@@ -80,7 +88,7 @@ nav.oc-navbar {
     margin-top: 10px;
 
     div.oc-navbar-separator {
-      border-bottom: 1px solid rgba(78,90,107,0.2);
+      border-bottom: 1px solid rgba(78,90,107,0.1);
       padding-top: 10px;
     }
 
