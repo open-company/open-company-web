@@ -88,7 +88,8 @@
     (setup-sortable owner))
 
   (will-unmount [_]
-    (events/unlistenByKey (om/get-state owner :resize-listener)))
+    (when-let [resize-listener (om/get-state owner :resize-listener)]
+      (events/unlistenByKey resize-listener)))
 
   (render-state [_ {:keys [columns-num su-title su-topics no-pinned-topics show-su-dialog]}]
     (let [company-data (dis/company-data data)
