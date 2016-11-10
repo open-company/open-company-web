@@ -42,6 +42,7 @@
                               :sharing-mode false
                               :columns-num columns-num
                               :menu-open menu-open
+                              :show-share-su-button false
                               :auth-settings (:auth-settings data)})
             (dom/div {:class "navbar-offset group"}
               (if (:loading data)
