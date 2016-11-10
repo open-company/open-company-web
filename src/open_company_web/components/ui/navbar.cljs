@@ -2,7 +2,10 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [rum.core :as rum]
+            [dommy.core :as dommy :refer-macros (sel1)]
+            [goog.object :as gobj]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [open-company-web.dispatcher :as dis]
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
@@ -19,6 +22,12 @@
             [om-bootstrap.random :as r]
             [om-bootstrap.button :as b]))
 
+(defn scroll-listener [e]
+  (let [body-scroll-top (gobj/get (.-body js/document) "scrollTop")]
+    (if (>= body-scroll-top 71)
+      (dommy/add-class! (sel1 [:body]) "fixed-navbar")
+      (dommy/remove-class! (sel1 [:body]) "fixed-navbar"))))
+
 (defcomponent navbar [{:keys [company-data
                               columns-num
                               card-width
@@ -29,6 +38,16 @@
                               menu-open
                               show-share-su-button
                               active] :as data} owner options]
+
+  (did-mount [_]
+    (scroll-listener nil)
+    (om/set-state! owner :scroll-listener
+      (events/listen js/window EventType/SCROLL scroll-listener)))
+
+  (will-unmount [_]
+    (when-let [scroll-listener (om/get-state owner :scroll-listener)]
+      (js/console.log "remove scroll listener" scroll-listener)
+      (events/unlistenByKey scroll-listener)))
 
   (render [_]
     (let [header-width (+ (* card-width columns-num)    ; cards width
