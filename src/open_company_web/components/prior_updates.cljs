@@ -9,7 +9,8 @@
             [open-company-web.dispatcher :as dispatcher]
             [open-company-web.lib.utils :as utils]
             [open-company-web.urls :as urls]
-            [open-company-web.lib.responsive :as responsive]))
+            [open-company-web.lib.responsive :as responsive]
+            [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]))
 
 (def link-formatter (f/formatter "yyyy-MM-dd"))
 (def human-formatter (f/formatter "MMMM d, yyyy"))
@@ -33,19 +34,19 @@
     (drv/drv :su-list)
     (drv/drv :jwt)
     rum/reactive
-  [s current-update list-urls]
+  [s standalone-component current-update]
   (let [company-slug (router/current-company-slug)
         updates (reverse (drv/react s :su-list))
         none? (empty? updates)
         mobile? (responsive/is-mobile-size?)]
 
-    [:div {:style {:padding 0}}
+    [:div.prior-updates {:style {:padding 0}}
+
+      (when standalone-component
+        (back-to-dashboard-btn))
       
-      (when-not mobile? ; floating close X
-        [:button {:class "absolute top-0 btn-reset" :style {:left "100%"}
-                  :on-click (fn [e] (popover/hide-popover e "prior-updates-dialog"))}
-          (i/icon :simple-remove {:class "inline mr1" :stroke "4"
-                                  :color "white" :accent-color "white"})])
+      (when standalone-component
+        [:h3.mobile-title "Updates"])
 
       [:div.prior-updates-container {}
         
@@ -70,9 +71,7 @@
                     link-date (str year "-" (utils/add-zero month) "-" (utils/add-zero day))
                     human-date (str month-string " " day (when needs-year (str ", " year)))
                     update-slug (:slug update)
-                    link-url (if list-urls
-                                (urls/stakeholder-update-list company-slug update-slug)
-                                (urls/stakeholder-update company-slug link-date update-slug))
+                    link-url (urls/stakeholder-update company-slug link-date update-slug)
                     link (if mobile? (str link-url "?list=true") link-url)
                     title (if (clojure.string/blank? (:title update))
                             (str (:name (dispatcher/company-data)) " Update")
@@ -85,8 +84,8 @@
                                 [:div.medium "a " (i/icon :link-72 {:size 13 :class "inline"})])]
                 [:div.update {:key update-slug
                               :class (when (= current-update update-slug) "active")
-                              :on-click (partial update-click link)}
+                              :on-click #(when-not standalone-component (update-click link %))}
                   [:div.update-title.domine
-                    [:a {:href link :on-click #(utils/event-stop %)}
+                    [:a {:href link :on-click #(when-not standalone-component (utils/event-stop %))}
                       title]]
                   [:div.update-details.domine author " shared " medium " on " human-date]]))])]]))

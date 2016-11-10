@@ -1,68 +1,91 @@
-div.prior-updates-container {
-  text-align: left;
-
-  div.message-container {
-    h3.message {
-      font-family: $oc_headers_font;
-      font-size: 16px;
-      font-weight: 700;
-      line-height: 1.5;
-    }
+div.prior-updates {
+  h3.mobile-title {
+    margin-left: 20px;
+    font-family: $oc_headers_font;
+    font-weight: 500;
+    font-size: 24px;
+    text-transform: none;
   }
 
-  div.update {
-    padding: 7px 0px 7px 10px;
-    transition: 230ms;
-    border-left: 3px solid transparent;
-    cursor: pointer;
-    border-radius: 3px;
+  div.prior-updates-container {
+    text-align: left;
 
-    &.active, &:hover {
-      background-color: rgba(78,90,107,0.1);
+    div.message-container {
+      h3.message {
+        font-family: $oc_headers_font;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.5;
+      }
     }
 
-    &.active {
-      div.update-title {
-        a {
+    div.update {
+      padding: 7px 0px 7px 10px;
+      transition: 230ms;
+      border-left: 3px solid transparent;
+      cursor: pointer;
+      border-radius: 3px;
+
+      @include mobile(){
+        padding: 7px 0px 7px 20px;
+        &.active, &:hover {
+          background-color: rgba(78,90,107,0);
+        }
+      }
+
+      &.active, &:hover {
+        background-color: rgba(78,90,107,0.1);
+      }
+
+      &.active {
+        div.update-title {
+          a {
+            color: $oc_gray_7;
+          }
+        }
+
+        div.update-details {
           color: $oc_gray_7;
         }
       }
 
-      div.update-details {
-        color: $oc_gray_7;
-      }
-    }
+      &:hover:not(.active) {
 
-    &:hover:not(.active) {
+        div.update-title {
+          a {
+            color: $oc_gray_5;
+          }
+        }
 
-      div.update-title {
-        a {
+        div.update-details {
           color: $oc_gray_5;
         }
       }
 
+      div.update-title {
+        margin-bottom: 0;
+        font-size: 14px;
+        font-family: $oc_headers_font;
+        font-weight: 400;
+
+        @include mobile() {
+          text-decoration: underline;
+        }
+
+        a {
+          color: rgba(78,90,107,0.8);
+        }
+      }
+
       div.update-details {
-        color: $oc_gray_5;
-      }
-    }
-
-    div.update-title {
-      margin-bottom: 0;
-      font-size: 14px;
-      font-family: $oc_headers_font;
-      font-weight: 400;
-      a {
+        font-size: 13px;
         color: rgba(78,90,107,0.8);
-      }
-    }
 
-    div.update-details {
-      font-size: 13px;
-      color: rgba(78,90,107,0.8);
-
-      div.medium {
-        display: inline;
+        div.medium {
+          display: inline;
+        }
       }
     }
   }
+
 }
