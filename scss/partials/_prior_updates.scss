@@ -11,6 +11,10 @@ div.prior-updates {
     text-align: left;
 
     div.message-container {
+      @include mobile() {
+        padding: 20px;
+      }
+
       h3.message {
         font-family: $oc_headers_font;
         font-size: 16px;
