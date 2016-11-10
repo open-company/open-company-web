@@ -110,11 +110,16 @@ nav.oc-navbar {
     margin: 10px auto;
     padding: 0 30px;
 
+    a.sharing-button {
+      color: $oc_blue_dark;
+    }
+
     a {
       font-size: 14px;
       color: rgba(78,90,107,0.6);
       margin-right: 20px;
       font-family: $oc_headers_font;
+      margin-top: 2px;
 
       &:hover {
         color: $oc_gray_5;
