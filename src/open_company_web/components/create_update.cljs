@@ -114,6 +114,7 @@
                             :foce-key (:foce-key data)
                             :show-share-su-button false
                             :active nil
+                            :mobile-menu-open (:mobile-menu-open data)
                             :auth-settings (:auth-settings data)})
           (dom/div {:class "create-update-inner group navbar-offset"}
             (when show-su-dialog
@@ -134,7 +135,7 @@
                                :on-click #(share-clicked owner)
                                :disabled (zero? (count su-topics))} "SHARE"))
                 (dom/div {:class "create-update-content-cta"}
-                  "Choose the topics you’d like to include in the new update.")
+                  "Choose topics you’d like to include, and arrange them in any order.")
                 (dom/div {:class "create-update-topics-list"
                           :key (clojure.string/join "-" su-topics)}
                   (for [topic su-topics]
