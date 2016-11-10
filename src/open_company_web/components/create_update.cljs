@@ -45,13 +45,13 @@
 (defn setup-sortable [owner]
   (when-let [list-node (js/jQuery "div.create-update-topics-list")]
     (-> list-node
-      (.sortable list-node #js {:scroll true
-                                :forcePlaceholderSize true
-                                :items ".oc-active"
-                                :stop (fn [event ui]
-                                        (when-let [dragged-item (gobj/get ui "item")]
-                                          (om/set-state! owner :su-topics (ordered-topics-list))))
-                                :axis "y"})
+      (.sortable #js {:scroll true
+                      :forcePlaceholderSize true
+                      :items ".oc-active"
+                      :stop (fn [event ui]
+                              (when-let [dragged-item (gobj/get ui "item")]
+                                (om/set-state! owner :su-topics (ordered-topics-list))))
+                      :axis "y"})
       (.disableSelection))))
 
 (defcomponent create-update [data owner]
@@ -116,8 +116,9 @@
                   (dom/button {:class "btn-reset btn-solid right share"
                                :disabled (zero? (count su-topics))} "SHARE"))
                 (dom/div {:class "create-update-content-cta"}
-                  "Choose from the topics below to create your next update.")
-                (dom/div {:class "create-update-topics-list"}
+                  "Choose the topics you’d like to include in the new update.")
+                (dom/div {:class "create-update-topics-list"
+                          :key (clojure.string/join "-" su-topics)}
                   (for [topic su-topics]
                     (let [sd ((keyword topic) company-data)]
                       (dom/div {:class "oc-active"
