@@ -14,7 +14,8 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.navbar :refer (navbar)]
-            [open-company-web.components.topics-columns :refer (topics-columns)]))
+            [open-company-web.components.topics-columns :refer (topics-columns)]
+            [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]))
 
 (def topic-total-x-padding 20)
 (def updates-content-list-width 280)
@@ -54,6 +55,13 @@
                       :axis "y"})
       (.disableSelection))))
 
+(defn share-clicked [owner]
+ (let [title  (om/get-state owner :su-title)
+       topics (om/get-state owner :su-topics)]
+    (api/patch-stakeholder-update {:title (or title "")
+                                   :sections topics}))
+ (om/set-state! owner :show-su-dialog :prompt))
+
 (defcomponent create-update [data owner]
 
   (init-state [_]
@@ -62,7 +70,8 @@
       {:columns-num (responsive/columns-num)
        :su-topics (vec (:sections su-data))
        :su-title ""
-       :no-pinned-topics (remove-pinned (dis/company-data data))}))
+       :no-pinned-topics (remove-pinned (dis/company-data data))
+       :show-su-dialog false}))
 
   (will-receive-props [_ next-props]
     (om/set-state! owner :no-pinned-topics (remove-pinned (dis/company-data next-props)))
@@ -81,7 +90,7 @@
   (will-unmount [_]
     (events/unlistenByKey (om/get-state owner :resize-listener)))
 
-  (render-state [_ {:keys [columns-num su-title su-topics no-pinned-topics]}]
+  (render-state [_ {:keys [columns-num su-title su-topics no-pinned-topics show-su-dialog]}]
     (let [company-data (dis/company-data data)
           card-width   (responsive/calc-card-width)
           ww           (.-clientWidth (.-body js/document))
@@ -105,6 +114,12 @@
                             :active :updates
                             :auth-settings (:auth-settings data)})
           (dom/div {:class "create-update-inner group navbar-offset"}
+            (when show-su-dialog
+              (om/build su-preview-dialog {:selected-topics su-topics
+                                           :company-data company-data
+                                           :latest-su (dis/latest-stakeholder-update)
+                                           :su-title su-title}
+                                          {:opts {:dismiss-su-preview #(om/set-state! owner :show-su-dialog false)}}))
             (dom/div {:class "create-update-content group"
                       :style {:width total-width}}
               (dom/div {:class "create-update-content-list group right"
@@ -114,6 +129,7 @@
                                :on-click #(.back (.-history js/window))}
                     "CANCEL")
                   (dom/button {:class "btn-reset btn-solid right share"
+                               :on-click #(share-clicked owner)
                                :disabled (zero? (count su-topics))} "SHARE"))
                 (dom/div {:class "create-update-content-cta"}
                   "Choose the topics you’d like to include in the new update.")
