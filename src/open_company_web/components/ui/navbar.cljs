@@ -52,7 +52,11 @@
     (let [header-width (+ (* card-width columns-num)    ; cards width
                           (* 20 (dec columns-num))      ; cards right margin
                           (when (> columns-num 1) 60))  ; x margins if needed
-          fixed-show-share-su-button (if (contains? data :show-share-su-button) show-share-su-button true)]
+          fixed-show-share-su-button (if (not (responsive/is-mobile?))
+                                       false
+                                       (if (contains? data :show-share-su-button)
+                                         show-share-su-button
+                                         true))]
       (dom/nav {:class (str "oc-navbar group" (when mobile-menu-open " mobile-menu-open"))}
         (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
           (login-overlays-handler))
