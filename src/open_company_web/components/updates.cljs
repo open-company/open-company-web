@@ -12,6 +12,7 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.navbar :refer (navbar)]
+            [open-company-web.components.su-snapshot :refer (su-snapshot)]
             [open-company-web.components.prior-updates :refer (prior-updates)]
             [open-company-web.components.topics-columns :refer (topics-columns)]))
 
@@ -89,7 +90,7 @@
                       :style {:width total-width}}
               (dom/div {:class "updates-content-list group right"
                         :style {:width (str updates-content-list-width "px")}}
-                (prior-updates selected-su true))
+                (prior-updates false selected-su))
               (dom/div {:class "updates-content-cards right"
                         :style {:width (str fixed-card-width "px")}}
                 (dom/h3 {:class "updates-content-cards-title"} update-title)
@@ -106,3 +107,23 @@
           (om/build footer {:card-width card-width
                             :columns-num columns-num
                             :company-data company-data}))))))
+
+(defcomponent updates-responsive-switcher [data owner]
+
+  (init-state [_]
+    {:mobile-size (responsive/is-mobile-size?)})
+
+  (did-mount [_]
+    (om/set-state! owner :resize-listener
+      (events/listen js/window EventType/RESIZE #(om/set-state! owner :mobile-size (responsive/is-mobile-size?)))))
+
+  (will-unmount [_]
+    (when-let [resize-listener (om/get-state owner :resize-listener)]
+      (events/unlistenByKey resize-listener)))
+
+  (render-state [_ {:keys [mobile-size]}]
+    (if mobile-size
+      (if (router/current-stakeholder-update-slug)
+        (om/build su-snapshot data)
+        (prior-updates true nil))
+      (om/build updates data))))
