@@ -23,7 +23,7 @@
             [open-company-web.components.su-edit :refer (su-edit)]
             [open-company-web.components.create-update :refer (create-update)]
             [open-company-web.components.su-snapshot :refer (su-snapshot)]
-            [open-company-web.components.updates :refer (updates)]
+            [open-company-web.components.updates :refer (updates-responsive-switcher)]
             [open-company-web.components.home :refer (home)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.page-not-found :refer (page-not-found)]
@@ -279,10 +279,10 @@
       (company-handler "su-snapshot-preview" target create-update params))
 
     (defroute su-list-route (urls/stakeholder-update-list ":slug") {:as params}
-      (company-handler "su-list" target updates params))
+      (company-handler "su-list" target updates-responsive-switcher params))
 
     (defroute su-list-update-route (urls/stakeholder-update-list ":slug" ":update-slug") {:as params}
-      (company-handler "su-list" target updates params))
+      (company-handler "su-list" target updates-responsive-switcher params))
 
     (defroute su-edit-route (urls/stakeholder-update-edit ":slug") {:as params}
       (company-handler "su-edit" target su-edit params))
