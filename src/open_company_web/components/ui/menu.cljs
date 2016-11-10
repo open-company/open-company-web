@@ -33,6 +33,16 @@
   (utils/event-stop e)
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/company-settings))))
 
+(defn dashboard-click [e]
+  (utils/event-stop e)
+  (dis/dispatch! [:mobile-menu-toggle])
+  (router/nav! (oc-urls/company)))
+
+(defn updates-click [e]
+  (utils/event-stop e)
+  (dis/dispatch! [:mobile-menu-toggle])
+  (router/nav! (oc-urls/stakeholder-update-list)))
+
 (defcomponent menu [{:keys [mobile-menu-open]} owner options]
 
   (render [_]
@@ -42,6 +52,14 @@
                             " dropdown-menu"))]
       (dom/ul {:class menu-classes
                :aria-labelledby "dropdown-toggle-menu"}
+        (when (and (responsive/is-mobile-size?)
+                   (router/current-company-slug))
+          (dom/li {:class "oc-menu-item"}
+            (dom/a {:href (oc-urls/company) :on-click dashboard-click} "Dashboard")))
+        (when (and (responsive/is-mobile-size?)
+                   (router/current-company-slug))
+          (dom/li {:class "oc-menu-item"}
+            (dom/a {:href (oc-urls/stakeholder-update-list) :on-click updates-click} "Updates")))
         (when (jwt/jwt)
           (dom/li {:class "oc-menu-item"}
             (dom/a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile")))
