@@ -10,7 +10,7 @@
     (dom/div {:class "user-profile fullscreen-page"}
       (back-to-dashboard-btn {:button-offset-left 520})
       (dom/div {:class "user-profile-internal"}
-        (dom/div {:class "user-profile-title"} "User Info")
+        (dom/div {:class "user-profile-title"} "User Profile")
         (dom/div {:class "user-profile-content group"}
           (dom/div {:class "left-column"}
             (dom/div {:class "user-profile-name-title data-title"} "NAME")
