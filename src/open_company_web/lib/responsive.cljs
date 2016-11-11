@@ -150,7 +150,7 @@
 (defn calc-update-width [columns-num]
   (let [card-width   (calc-card-width)
         ww           (.-clientWidth (.-body js/document))
-        total-card-width (total-layout-width-int card-width columns-num)
+        total-width-int (total-layout-width-int card-width columns-num)
         total-width  (str total-width-int "px")
         fixed-total-width-int (if (<= total-width-int (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width))
                                 (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width)
