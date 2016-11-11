@@ -13,6 +13,7 @@
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
+            [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.fx.Animation.EventType :as AnimationEventType]
@@ -107,19 +108,20 @@
           mobile?      (responsive/is-mobile-size?)
           card-width   (responsive/calc-card-width 1)
           ww           (.-clientWidth (sel1 js/document :body))
-          total-width  (if (>= ww responsive/c1-min-win-width) (str (min ww (+ card-width 100)) "px") "auto")]
+          total-width  (if (>= ww responsive/c1-min-win-width) (str (min ww (+ card-width 100)) "px") "auto")
+          title        (if (clojure.string/blank? (:title su-data))
+                          (str (:name company-data) " Update")
+                          (:title su-data))]
       (dom/div {:class "su-snapshot main-scroll"}
         (dom/div {:class "page"}
+
+          ; closing X
+          (when (and prior-list mobile?)
+            (back-to-dashboard-btn))
+
           ;; SU Snapshot
           (when company-data
             (dom/div {:class "su-sp-content"}
-
-              (when (and prior-list mobile?) ; inside the header close X
-                (dom/div {:style {:height "30px"}}
-                  (dom/button {:class "top-0 btn-reset" :style {:float "right" :padding-top "0" :margin-top "-5px"}
-                               :on-click #(router/nav! (oc-urls/stakeholder-update-list))}
-                    (i/icon :simple-remove {:class "inline mr1" :stroke "4" :vertical-align "top"
-                                            :color "grey" :accent-color "grey"}))))
 
               ;; Fullscreen topic
               (when selected-topic
@@ -156,8 +158,7 @@
                                                {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                        :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
               (dom/div {:class "su-sp-company-header"}
-                 (when (:title su-data)
-                    (dom/div {:class "su-snapshot-title"} (:title su-data))))
+                (dom/div {:class "su-snapshot-title"} title))
               (om/build topics-columns {:columns-num 1
                                         :card-width card-width
                                         :total-width total-width
