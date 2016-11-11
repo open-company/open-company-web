@@ -135,3 +135,28 @@
     (or (= (gobj/get js/WURFL "form_factor") "Tablet")
         (= (gobj/get js/WURFL "form_factor") "Smartphone")
         (= (gobj/get js/WURFL "form_factor") "Other Mobile"))))
+
+(def topic-total-x-padding 20)
+(def updates-content-list-width 260)
+(def updates-content-cards-right-margin 40)
+(def updates-content-cards-max-width 560)
+(def updates-content-cards-min-width 250)
+
+(defn total-layout-width-int [card-width columns-num]
+  (- (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
+     20                                                   ; the container padding
+     40))                                                 ; the distance btw the columns
+
+(defn calc-update-width [columns-num]
+  (let [card-width   (calc-card-width)
+        ww           (.-clientWidth (.-body js/document))
+        total-card-width (total-layout-width-int card-width columns-num)
+        total-width  (str total-width-int "px")
+        fixed-total-width-int (if (<= total-width-int (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width))
+                                (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width)
+                                total-width-int)
+        total-width  (str fixed-total-width-int "px")
+        fixed-card-width (if (>= (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin) updates-content-cards-max-width)
+                            updates-content-cards-max-width
+                            (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin))]
+    fixed-card-width))

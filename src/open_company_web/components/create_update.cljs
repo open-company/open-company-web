@@ -17,12 +17,6 @@
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]))
 
-(def topic-total-x-padding 20)
-(def updates-content-list-width 260)
-(def updates-content-cards-right-margin 40)
-(def updates-content-cards-max-width 560)
-(def updates-content-cards-min-width 250)
-
 (defn ordered-topics-list []
   (let [topics (sel [:div.create-update-topics-list :div.oc-active])
         topics-list (for [topic topics] (.data (js/jQuery topic) "topic"))]
@@ -74,6 +68,7 @@
     (let [company-data (dis/company-data data)
           su-data (:stakeholder-update company-data)]
       {:columns-num (responsive/columns-num)
+       :card-width (responsive/calc-card-width)
        :su-topics (vec (:sections su-data))
        :su-title (:title su-data)
        :no-pinned-topics (remove-pinned (dis/company-data data))
@@ -89,7 +84,9 @@
 
   (did-mount [_]
     (setup-sortable owner)
-    (om/set-state! owner :resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))))
+    (om/set-state! owner :resize-listener
+      (events/listen js/window EventType/RESIZE (fn [] (om/update-state! owner #(merge % {:columns-num (responsive/columns-num)
+                                                                                          :card-width (responsive/calc-card-width)}))))))
 
   (did-update [_ _ _]
     (setup-sortable owner))
@@ -98,20 +95,11 @@
     (when-let [resize-listener (om/get-state owner :resize-listener)]
       (events/unlistenByKey resize-listener)))
 
-  (render-state [_ {:keys [columns-num su-title su-topics no-pinned-topics show-su-dialog]}]
+  (render-state [_ {:keys [columns-num card-width su-title su-topics no-pinned-topics show-su-dialog]}]
     (let [company-data (dis/company-data data)
-          card-width   (responsive/calc-card-width)
-          ww           (.-clientWidth (.-body js/document))
-          total-width-int (- (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
-                             20                                                   ; the container padding
-                             40)                                                  ; the distance btw the columns
-          fixed-total-width-int (if (<= total-width-int (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width))
-                                  (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width)
-                                  total-width-int)
-          total-width  (str fixed-total-width-int "px")
-          fixed-card-width (if (>= (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin) updates-content-cards-max-width)
-                              updates-content-cards-max-width
-                              (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin))]
+          total-width-int (responsive/total-layout-width-int card-width columns-num)
+          total-width (str total-width-int "px")
+          fixed-card-width (responsive/calc-update-width columns-num)]
       (dom/div {:class "create-update main-scroll group"}
         (dom/div {:class "page"}
           (om/build navbar {:card-width card-width
@@ -132,7 +120,7 @@
             (dom/div {:class "create-update-content group"
                       :style {:width total-width}}
               (dom/div {:class "create-update-content-list group right"
-                        :style {:width (str updates-content-list-width "px")}}
+                        :style {:width (str responsive/updates-content-list-width "px")}}
                 (dom/div {:class "create-update-content-cta"}
                   "Choose topics you’d like to include and arrange them in any order.")
                 (dom/div {:class "create-update-topics-list"

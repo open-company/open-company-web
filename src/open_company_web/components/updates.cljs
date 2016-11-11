@@ -17,12 +17,6 @@
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.ui.small-loading :refer (small-loading)]))
 
-(def topic-total-x-padding 20)
-(def updates-content-list-width 260)
-(def updates-content-cards-right-margin 40)
-(def updates-content-cards-max-width 560)
-(def updates-content-cards-min-width 250)
-
 (defn load-latest-su [owner data]
   (when (and (dis/stakeholder-update-list-data data)
              (not (dis/latest-stakeholder-update data)))
@@ -46,6 +40,7 @@
       (when current-update-slug
         (api/get-stakeholder-update (router/current-company-slug) current-update-slug false))
       {:columns-num (responsive/columns-num)
+       :card-width (responsive/calc-card-width)
        :su-list (dis/stakeholder-update-list-data)
        :selected-su current-update-slug}))
 
@@ -58,7 +53,8 @@
     (load-su-list-if-needed owner data)
     (load-latest-su owner data)
     (om/set-state! owner :resize-listener
-      (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))))
+      (events/listen js/window EventType/RESIZE (fn [] (om/update-state! owner #(merge % {:columns-num (responsive/columns-num)
+                                                                                          :card-width (responsive/calc-card-width)}))))))
 
   (will-unmount [_]
     (when-let [resize-listener (om/get-state owner :resize-listener)]
@@ -68,21 +64,11 @@
     (when (not= (:selected-su prev-state) (om/get-state owner :selected-su))
       (api/get-stakeholder-update (router/current-company-slug) (om/get-state owner :selected-su) false)))
 
-  (render-state [_ {:keys [columns-num su-list selected-su]}]
+  (render-state [_ {:keys [columns-num card-width su-list selected-su]}]
     (let [company-data (dis/company-data data)
-          card-width   (responsive/calc-card-width)
-          ww           (.-clientWidth (.-body js/document))
-          total-width-int (- (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
-                             20                                                   ; the container padding
-                             40)                                                  ; the distance btw the columns
-          total-width  (str total-width-int "px")
-          fixed-total-width-int (if (<= total-width-int (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width))
-                                  (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width)
-                                  total-width-int)
-          total-width  (str fixed-total-width-int "px")
-          fixed-card-width (if (>= (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin) updates-content-cards-max-width)
-                              updates-content-cards-max-width
-                              (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin))
+          total-width-int (responsive/total-layout-width-int card-width columns-num)
+          total-width (str total-width-int "px")
+          fixed-card-width (responsive/calc-update-width columns-num)
           su-data (dis/stakeholder-update-data data (:slug company-data) selected-su)
           update-title (if su-data
                           (if (clojure.string/blank? (:title su-data))
@@ -104,7 +90,7 @@
               (dom/div {:class "updates-content group"
                         :style {:width total-width}}
                 (dom/div {:class "updates-content-list group right"
-                          :style {:width (str updates-content-list-width "px")}}
+                          :style {:width (str responsive/updates-content-list-width "px")}}
                   (prior-updates false selected-su))
                 (dom/div {:class "updates-content-cards right"
                           :style {:width (str fixed-card-width "px")}}
