@@ -18,7 +18,7 @@
 
 (def topic-total-x-padding 20)
 (def updates-content-list-width 280)
-(def updates-content-cards-right-margin 20)
+(def updates-content-cards-right-margin 40)
 (def updates-content-cards-max-width 560)
 (def updates-content-cards-min-width 350)
 
