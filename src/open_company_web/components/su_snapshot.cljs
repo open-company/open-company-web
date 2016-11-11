@@ -106,9 +106,7 @@
     (let [company-data (dis/company-data data)
           su-data      (dis/stakeholder-update-data)
           mobile?      (responsive/is-mobile-size?)
-          card-width   (responsive/calc-card-width 1)
-          ww           (.-clientWidth (sel1 js/document :body))
-          total-width  (if (>= ww responsive/c1-min-win-width) (str (min ww (+ card-width 100)) "px") "auto")
+          fixed-card-width (responsive/calc-update-width (responsive/columns-num))
           title        (if (clojure.string/blank? (:title su-data))
                           (str (:name company-data) " Update")
                           (:title su-data))]
@@ -135,7 +133,7 @@
                                                 :section-data (->> selected-topic keyword (get su-data))
                                                 :selected-metric selected-metric
                                                 :read-only true
-                                                :card-width card-width
+                                                :card-width fixed-card-width
                                                 :currency (:currency company-data)
                                                 :hide-history-navigation true
                                                 :animate (not transitioning)}
@@ -151,7 +149,7 @@
                                                 :section-data (->> tr-selected-topic keyword (get su-data))
                                                 :selected-metric selected-metric
                                                 :read-only (:read-only company-data)
-                                                :card-width card-width
+                                                :card-width fixed-card-width
                                                 :currency (:currency company-data)
                                                 :hide-history-navigation true
                                                 :animate false}
@@ -160,8 +158,8 @@
               (dom/div {:class "su-sp-company-header"}
                 (dom/div {:class "su-snapshot-title"} title))
               (om/build topics-columns {:columns-num 1
-                                        :card-width card-width
-                                        :total-width total-width
+                                        :card-width (- fixed-card-width 10)
+                                        :total-width (- fixed-card-width 10)
                                         :content-loaded (not (:loading data))
                                         :topics (:sections su-data)
                                         :topics-data su-data
