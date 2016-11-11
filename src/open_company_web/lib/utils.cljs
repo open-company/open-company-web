@@ -770,3 +770,8 @@
 
 (defn remove-tooltips []
   (.remove (js/$ "div.tooltip")))
+
+(defn complete-su-url [relative-su-url]
+  (let [protocol (.. js/document -location -protocol)
+        host     (.. js/document -location -host)]
+    (str protocol "//" host relative-su-url)))
