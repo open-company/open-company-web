@@ -315,7 +315,7 @@
                       (:share-via-slack data) :slack
                       (:share-via-link data)  :link
                       :else                   :prompt)
-     :share-link (:latest-su data)
+     :share-link (utils/complete-su-url (:latest-su data))
      :sending false
      :sent false})
 
@@ -334,7 +334,7 @@
     ; slack SU posted
     (when (and (= (om/get-state owner :share-via) :link)
                (:latest-su next-props))
-      (om/set-state! owner :share-link (:latest-su next-props)))
+      (om/set-state! owner :share-link (utils/complete-su-url (:latest-su next-props))))
     (when (and (#{:email :slack} (om/get-state owner :share-via))
                (om/get-state owner :sending)
                (not (om/get-state owner :sent)))
