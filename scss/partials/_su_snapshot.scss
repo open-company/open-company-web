@@ -1,6 +1,10 @@
 div.su-snapshot {
   border-top: 4px solid $oc_yellow;
 
+  div.back-to-dashboard-row {
+    margin-bottom: 0px;
+  }
+
   div.su-sp-content {
     position: relative;
     content: "";
