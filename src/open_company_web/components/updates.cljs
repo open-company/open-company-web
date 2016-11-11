@@ -18,7 +18,7 @@
             [open-company-web.components.ui.small-loading :refer (small-loading)]))
 
 (def topic-total-x-padding 20)
-(def updates-content-list-width 280)
+(def updates-content-list-width 260)
 (def updates-content-cards-right-margin 40)
 (def updates-content-cards-max-width 560)
 (def updates-content-cards-min-width 250)
