@@ -128,13 +128,6 @@
                       :style {:width total-width}}
               (dom/div {:class "create-update-content-list group right"
                         :style {:width (str updates-content-list-width "px")}}
-                (dom/div {:class "create-update-content-buttons group"}
-                  (dom/button {:class "btn-reset btn-outline left cancel"
-                               :on-click #(.back (.-history js/window))}
-                    "CANCEL")
-                  (dom/button {:class "btn-reset btn-solid right share"
-                               :on-click #(share-clicked owner)
-                               :disabled (zero? (count su-topics))} "SHARE"))
                 (dom/div {:class "create-update-content-cta"}
                   "Choose topics you’d like to include and arrange them in any order.")
                 (dom/div {:class "create-update-topics-list"
@@ -155,7 +148,12 @@
                                   :key topic
                                   :ref topic
                                   :on-click #(om/set-state! owner :su-topics (vec (conj su-topics topic)))}
-                          (:title sd)))))))
+                          (:title sd))))))
+                (dom/div {:class "create-update-content-buttons mt3 center group"}
+                  (dom/button {:class "btn-reset btn-solid share"
+                               :on-click #(share-clicked owner)
+                               :style {:width "180px" :height "40px"}
+                               :disabled (zero? (count su-topics))} "SHARE")))
               (dom/div {:class "create-update-content-cards right"
                         :style {:width (str fixed-card-width "px")}}
                 (dom/input {:class "create-update-content-cards-title"
