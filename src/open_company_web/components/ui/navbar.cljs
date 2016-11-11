@@ -52,7 +52,7 @@
     (let [header-width (+ (* card-width columns-num)    ; cards width
                           (* 20 (dec columns-num))      ; cards right margin
                           (when (> columns-num 1) 60))  ; x margins if needed
-          fixed-show-share-su-button (if (not (responsive/is-mobile?))
+          fixed-show-share-su-button (if (responsive/is-mobile?)
                                        false
                                        (if (contains? data :show-share-su-button)
                                          show-share-su-button
