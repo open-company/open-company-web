@@ -109,4 +109,4 @@
                 (dom/div {:class "sharing-button-container"}
                   (dom/a {:class "btn-reset sharing-button right"
                           :on-click #(router/nav! (oc-urls/stakeholder-update-preview))}
-                    (dom/i {:class "fa fa-plus"}) " New update"))))))))))
+                    "Share new update"))))))))))
