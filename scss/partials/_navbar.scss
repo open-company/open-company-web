@@ -12,12 +12,12 @@ nav.oc-navbar {
   left: 0;
   width: 100%;
   background-color: white;
-  transition: 230ms;
 
   @include big_web(){
     height: #{$navbar_height}px;
   }
   @include mobile(){
+    transition: 230ms;
     overflow: hidden;
     height: #{$mobile_navbar_height}px;
 
