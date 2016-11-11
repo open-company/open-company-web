@@ -148,8 +148,11 @@
                                             (patch-stakeholder-update owner))}
                         (:title sd))))
                   (let [all-topics (:sections company-data)
-                        remaining-topics (vec (first (clojure.data/diff (set all-topics) (set su-topics))))]
-                    (for [topic remaining-topics]
+                        remaining-topics (vec (first (clojure.data/diff (set all-topics) (set su-topics))))
+                        sorted-topics (sort #(let [sd1 ((keyword %1) company-data)
+                                                   sd2 ((keyword %2) company-data)]
+                                               (compare (:title sd1) (:title sd2))) remaining-topics)]
+                    (for [topic sorted-topics]
                       (let [sd ((keyword topic) company-data)]
                         (dom/div {:data-topic topic
                                   :key topic
