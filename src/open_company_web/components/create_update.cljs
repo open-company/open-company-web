@@ -45,6 +45,12 @@
                 all-keys
                 (inc idx))))))
 
+(defn patch-stakeholder-update [owner]
+  (let [title  (om/get-state owner :su-title)
+       topics (om/get-state owner :su-topics)]
+    (api/patch-stakeholder-update {:title (or title "")
+                                   :sections topics})))
+
 (defn setup-sortable [owner]
   (when-let [list-node (js/jQuery "div.create-update-topics-list")]
     (-> list-node
@@ -53,16 +59,14 @@
                       :items ".oc-active"
                       :stop (fn [event ui]
                               (when-let [dragged-item (gobj/get ui "item")]
-                                (om/set-state! owner :su-topics (ordered-topics-list))))
+                                (om/set-state! owner :su-topics (ordered-topics-list))
+                                (patch-stakeholder-update owner)))
                       :axis "y"})
       (.disableSelection))))
 
 (defn share-clicked [owner]
- (let [title  (om/get-state owner :su-title)
-       topics (om/get-state owner :su-topics)]
-    (api/patch-stakeholder-update {:title (or title "")
-                                   :sections topics}))
- (om/set-state! owner :show-su-dialog :prompt))
+  (patch-stakeholder-update owner)
+  (om/set-state! owner :show-su-dialog :prompt))
 
 (defcomponent create-update [data owner]
 
@@ -71,7 +75,7 @@
           su-data (:stakeholder-update company-data)]
       {:columns-num (responsive/columns-num)
        :su-topics (vec (:sections su-data))
-       :su-title ""
+       :su-title (:title su-data)
        :no-pinned-topics (remove-pinned (dis/company-data data))
        :show-su-dialog false}))
 
@@ -80,7 +84,8 @@
     (when (zero? (count (om/get-state owner :su-topics)))
       (let [company-data (dis/company-data next-props)
             su-data (:stakeholder-update company-data)]
-        (om/set-state! owner :su-topics (vec (:sections su-data))))))
+        (om/update-state! owner #(merge % {:su-topics (vec (:sections su-data))
+                                           :su-title (:title su-data)})))))
 
   (did-mount [_]
     (setup-sortable owner)
@@ -138,7 +143,9 @@
                                :data-topic topic
                                :key topic
                                :ref topic
-                               :on-click #(om/set-state! owner :su-topics (utils/vec-dissoc su-topics topic))}
+                               :on-click #(do
+                                            (om/set-state! owner :su-topics (utils/vec-dissoc su-topics topic))
+                                            (patch-stakeholder-update owner))}
                         (:title sd))))
                   (let [all-topics (:sections company-data)
                         remaining-topics (vec (first (clojure.data/diff (set all-topics) (set su-topics))))]
@@ -147,7 +154,9 @@
                         (dom/div {:data-topic topic
                                   :key topic
                                   :ref topic
-                                  :on-click #(om/set-state! owner :su-topics (vec (conj su-topics topic)))}
+                                  :on-click #(do
+                                              (om/set-state! owner :su-topics (vec (conj su-topics topic)))
+                                              (patch-stakeholder-update owner))}
                           (:title sd))))))
                 (dom/div {:class "create-update-content-buttons mt3 center group"}
                   (dom/button {:class "btn-reset btn-solid share"
@@ -160,7 +169,9 @@
                             :type "text"
                             :value su-title
                             :placeholder "Update Title"
-                            :on-change #(om/set-state! owner :su-title (.. % -target -value))})
+                            :on-change #(do
+                                          (om/set-state! owner :su-title (.. % -target -value))
+                                          (patch-stakeholder-update owner))})
                 (om/build topics-columns {:columns-num 1
                                           :card-width (- fixed-card-width 10) ; remove 10 padding on the right
                                           :total-width (- fixed-card-width 10)
