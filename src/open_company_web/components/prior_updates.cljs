@@ -24,14 +24,14 @@
   (utils/event-stop e)
   (router/nav! link))
 
+(defn load-prior-updaes-if-needed []
+  (when (and (dispatcher/company-data)
+             (not (:su-list-loading @dispatcher/app-state))
+             (not (get-in @dispatcher/app-state (dispatcher/su-list-key (router/current-company-slug)))))
+    (dispatcher/dispatch! [:get-su-list])))
+
 (rum/defcs prior-updates
-  < {:before-render (fn [s]
-                      (when (and (dispatcher/company-data)
-                                 (not (:su-list-loading @dispatcher/app-state))
-                                 (not (get-in @dispatcher/app-state (dispatcher/su-list-key (router/current-company-slug)))))
-                        (dispatcher/dispatch! [:get-su-list]))
-                      s)}
-    (drv/drv :su-list)
+  < (drv/drv :su-list)
     (drv/drv :jwt)
     rum/reactive
   [s standalone-component current-update]
@@ -39,7 +39,8 @@
         updates (reverse (drv/react s :su-list))
         none? (empty? updates)
         mobile? (responsive/is-mobile-size?)]
-
+    (when standalone-component
+      (load-prior-updaes-if-needed))
     [:div.prior-updates {:style {:padding 0}}
 
       (when standalone-component
