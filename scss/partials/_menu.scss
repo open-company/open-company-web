@@ -18,6 +18,7 @@ ul.menu {
     box-shadow: none;
     transition: 230ms;
     display: block;
+    text-align: right;
 
     &.mobile-menu-open {
       opacity: 1;
@@ -48,6 +49,11 @@ ul.menu {
       font-family: $oc_headers_font;
       font-weight: 400;
       text-transform: capitalize;
+      padding-right: 10px;
+
+      @include mobile() {
+        font-size: 16px;
+      }
     }
   }
 }
