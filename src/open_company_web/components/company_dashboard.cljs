@@ -41,6 +41,7 @@
      :columns-num (responsive/columns-num)})
 
   (did-mount [_]
+    (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
     (when-not (:read-only (dis/company-data data))
       (get-new-sections-if-needed owner))
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))

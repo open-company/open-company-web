@@ -40,9 +40,10 @@
                               mobile-menu-open] :as data} owner options]
 
   (did-mount [_]
-    (scroll-listener nil)
-    (om/set-state! owner :scroll-listener
-      (events/listen js/window EventType/SCROLL scroll-listener)))
+    (when-not (responsive/is-mobile-size?)
+      (scroll-listener nil)
+      (om/set-state! owner :scroll-listener
+        (events/listen js/window EventType/SCROLL scroll-listener))))
 
   (will-unmount [_]
     (when-let [scroll-listener (om/get-state owner :scroll-listener)]
