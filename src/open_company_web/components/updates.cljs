@@ -23,10 +23,10 @@
 (def updates-content-cards-max-width 560)
 (def updates-content-cards-min-width 250)
 
-(defn load-latest-su [owner]
-  (when (and (dis/stakeholder-update-list-data)
-             (not (dis/latest-stakeholder-update)))
-    (let [su-list (:collection (dis/stakeholder-update-list-data))
+(defn load-latest-su [owner data]
+  (when (and (dis/stakeholder-update-list-data data)
+             (not (dis/latest-stakeholder-update data)))
+    (let [su-list (:collection (dis/stakeholder-update-list-data data))
           last-su (last (:stakeholder-updates su-list))]
       (when (not (om/get-state owner :selected-su))
         (om/set-state! owner :selected-su (:slug last-su))
@@ -42,7 +42,7 @@
 
   (init-state [_]
     (load-su-list-if-needed owner data)
-    (let [current-update-slug (or (router/current-stakeholder-update-slug) (dis/latest-stakeholder-update))]
+    (let [current-update-slug (router/current-stakeholder-update-slug)]
       (when current-update-slug
         (api/get-stakeholder-update (router/current-company-slug) current-update-slug false))
       {:columns-num (responsive/columns-num)
@@ -51,12 +51,12 @@
 
   (will-receive-props [_ next-props]
     (load-su-list-if-needed owner next-props)
-    (load-latest-su owner)
+    (load-latest-su owner next-props)
     (om/update-state! owner #(merge % {:su-list (dis/stakeholder-update-list-data)})))
 
   (did-mount [_]
     (load-su-list-if-needed owner data)
-    (load-latest-su owner)
+    (load-latest-su owner data)
     (om/set-state! owner :resize-listener
       (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num)))))
 
