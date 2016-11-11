@@ -191,7 +191,8 @@
                                                 (zero? (count topics)))
                        :update-active-topics update-active-topics})
         (let [sd (->> section-name keyword (get topics-data))
-              topic-row-style (if (utils/in? (:route @router/path) "su-snapshot-preview")
+              topic-row-style (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
+                                      (utils/in? (:route @router/path) "su-list"))
                                 #js {}
                                 #js {:width (if (responsive/is-mobile?) "auto" (str (:card-width props) "px"))})]
           (when-not (and (:read-only company-data) (:placeholder sd))

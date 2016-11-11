@@ -219,7 +219,11 @@
           topic-data (utils/select-section-data section-data section-kw as-of)
           rev-cb (fn [_ rev] (om/set-state! owner :transition-as-of (:updated-at rev)))
           foce-active (not (nil? (dis/foce-section-key)))
-          is-foce (= (dis/foce-section-key) section-kw)]
+          is-foce (= (dis/foce-section-key) section-kw)
+          topic-style (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
+                                      (utils/in? (:route @router/path) "su-list"))
+                        #js {}
+                        #js {:width (if (responsive/is-mobile?) "auto" (str card-width "px"))})]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -235,7 +239,7 @@
                                                  :not-draggable-topic (or is-stakeholder-update (:read-only-company data) (not (:pin topic-data)))
                                                  :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
-                    :style #js {:width (if (responsive/is-mobile?) "auto" (str card-width "px"))}
+                    :style topic-style
                     :ref "topic"
                     :data-section (name section)
                     :key (str "topic-" (name section))
