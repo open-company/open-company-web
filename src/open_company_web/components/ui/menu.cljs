@@ -55,10 +55,6 @@
         (when (and (responsive/is-mobile-size?)
                    (router/current-company-slug))
           (dom/li {:class "oc-menu-item"}
-            (dom/a {:href (oc-urls/company) :on-click dashboard-click} "Dashboard")))
-        (when (and (responsive/is-mobile-size?)
-                   (router/current-company-slug))
-          (dom/li {:class "oc-menu-item"}
             (dom/a {:href (oc-urls/stakeholder-update-list) :on-click updates-click} "Updates")))
         (when (jwt/jwt)
           (dom/li {:class "oc-menu-item"}
