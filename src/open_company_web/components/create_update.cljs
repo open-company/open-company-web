@@ -19,7 +19,9 @@
 
 (def topic-total-x-padding 20)
 (def updates-content-list-width 260)
+(def updates-content-cards-right-margin 20)
 (def updates-content-cards-max-width 560)
+(def updates-content-cards-min-width 250)
 
 (defn ordered-topics-list []
   (let [topics (sel [:div.create-update-topics-list :div.oc-active])
@@ -95,17 +97,16 @@
     (let [company-data (dis/company-data data)
           card-width   (responsive/calc-card-width)
           ww           (.-clientWidth (.-body js/document))
-          total-width-int (if (< ww card-width)
-                            ww
-                            (- (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
-                               20                                                   ; the container padding
-                               40))                                                 ; the distance btw the columns
-          total-width  (if (>= ww responsive/c1-min-win-width)
-                          (str total-width-int "px")
-                          "auto")
-          fixed-card-width (if (>= (- total-width-int updates-content-list-width) updates-content-cards-max-width)
+          total-width-int (- (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
+                             20                                                   ; the container padding
+                             40)                                                  ; the distance btw the columns
+          fixed-total-width-int (if (<= total-width-int (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width))
+                                  (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width)
+                                  total-width-int)
+          total-width  (str fixed-total-width-int "px")
+          fixed-card-width (if (>= (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin) updates-content-cards-max-width)
                               updates-content-cards-max-width
-                              (- total-width-int updates-content-list-width))]
+                              (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin))]
       (dom/div {:class "create-update main-scroll group"}
         (dom/div {:class "page"}
           (om/build navbar {:card-width card-width
