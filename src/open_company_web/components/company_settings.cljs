@@ -266,7 +266,6 @@
       (dom/div {:class "lg-col-5 md-col-7 col-11 mx-auto mt1 mb4 settings-container group"}
         
         (dom/div {:class "settings-form-label company-settings"}
-          (dom/span {} "Company Settings")
           (when-not company-name
             (loading/small-loading)))
         
@@ -357,7 +356,7 @@
           ;; Company profile
           :else
           (dom/div {}
-            (back-to-dashboard-btn {:button-offset-left 560})
+            (back-to-dashboard-btn {:title "Company Settings"})
             (dom/div {:class "company-settings-container"}
               (om/build company-settings-form data)
               (user-management))))

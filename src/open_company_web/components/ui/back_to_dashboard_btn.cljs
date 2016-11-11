@@ -10,10 +10,12 @@
   (.back (.-history js/window)))
 
 (rum/defc back-to-dashboard-btn < rum/static
-  [{:keys [click-cb]
-    :or {click-cb   btn-clicked}}]
+  [{:keys [click-cb title]
+    :or {click-cb btn-clicked
+         title    ""}}]
   (assert (fn? click-cb) "back-to-dashboard callback not fn?")
   [:div.back-to-dashboard-row.group
+   [:h3.back-to-dashboard-title.left.mt0.mb0 title]
    [:button.back-to-dashboard.btn-reset.btn-outline.right
     {:on-click #(do (.preventDefault %) (click-cb))}
     (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 24 :stroke 4 :accent-color "rgba(78, 90, 107, 1.0)"})]])

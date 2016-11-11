@@ -43,10 +43,7 @@
     [:div.prior-updates {:style {:padding 0}}
 
       (when standalone-component
-        (back-to-dashboard-btn))
-      
-      (when standalone-component
-        [:h3.mobile-title "Updates"])
+        (back-to-dashboard-btn {:title "Updates"}))
 
       [:div.prior-updates-container {}
         
