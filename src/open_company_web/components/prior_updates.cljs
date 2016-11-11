@@ -71,6 +71,7 @@
                     link-date (str year "-" (utils/add-zero month) "-" (utils/add-zero day))
                     human-date (str month-string " " day (when needs-year (str ", " year)))
                     update-slug (:slug update)
+                    list-link (urls/stakeholder-update-list company-slug update-slug)
                     link-url (urls/stakeholder-update company-slug link-date update-slug)
                     link (if mobile? (str link-url "?list=true") link-url)
                     title (if (clojure.string/blank? (:title update))
@@ -84,8 +85,8 @@
                                 [:div.medium "a " (i/icon :link-72 {:size 13 :class "inline"})])]
                 [:div.update {:key update-slug
                               :class (when (= current-update update-slug) "active")
-                              :on-click #(when-not standalone-component (update-click link %))}
+                              :on-click #(when-not standalone-component (update-click list-link %))}
                   [:div.update-title.domine
-                    [:a {:href link :on-click #(when-not standalone-component (utils/event-stop %))}
+                    [:a {:href link :on-click #(when-not standalone-component (.preventDefault %))}
                       title]]
                   [:div.update-details.domine author " shared " medium " on " human-date]]))])]]))
