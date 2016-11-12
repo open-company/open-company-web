@@ -15,7 +15,8 @@
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.navbar :refer (navbar)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
-            [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]))
+            [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
+            [clojure.data :as cd]))
 
 (defn ordered-topics-list []
   (let [topics (sel [:div.create-update-topics-list :div.oc-active])
@@ -136,7 +137,7 @@
                                             (patch-stakeholder-update owner))}
                         (:title sd))))
                   (let [all-topics (:sections company-data)
-                        remaining-topics (vec (first (clojure.data/diff (set all-topics) (set su-topics))))
+                        remaining-topics (vec (first (cd/diff (set all-topics) (set su-topics))))
                         sorted-topics (sort #(let [sd1 ((keyword %1) company-data)
                                                    sd2 ((keyword %2) company-data)]
                                                (compare (:title sd1) (:title sd2))) remaining-topics)]
