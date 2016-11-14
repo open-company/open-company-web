@@ -11,7 +11,6 @@
             [open-company-web.components.ui.small-loading :as loading]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.ui.footer :as footer]
-            [open-company-web.components.user-management :refer (user-management)]
             [open-company-web.components.ui.login-required :refer (login-required)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
@@ -358,7 +357,6 @@
           (dom/div {}
             (back-to-dashboard-btn {:title "Company Settings"})
             (dom/div {:class "company-settings-container"}
-              (om/build company-settings-form data)
-              (user-management))))
+              (om/build company-settings-form data))))
 
         (om/build footer/footer data)))))
