@@ -102,9 +102,10 @@
               (when (router/current-company-slug)
                 (dom/a {:class (when (= active :updates) "active")
                         :href (oc-urls/stakeholder-update-list)
-                        :on-click #(do
-                                     (utils/event-stop %)
-                                     (router/nav! (oc-urls/stakeholder-update-list)))}
+                        :on-click (fn [e]
+                                    (utils/event-stop e)
+                                    (dis/dispatch! [:reset-su-list])
+                                    (utils/after 100 #(router/nav! (oc-urls/stakeholder-update-list))))}
                   "Updates")))
             (dom/div {:class "right"}
               (when fixed-show-share-su-button
