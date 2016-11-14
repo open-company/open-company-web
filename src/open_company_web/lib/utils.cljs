@@ -18,6 +18,7 @@
             [open-company-web.caches :refer (company-cache)]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.responsive :as responsive]
+            [cuerdas.core :as s]
             [cljsjs.emojione]) ; pulled in for cljsjs externs
   (:import  [goog.i18n NumberFormat]))
 
@@ -85,7 +86,12 @@
   (vec (filter #(not= elem %) coll)))
 
 ;; TODO use goog.i18n.DateTimeFormat here
-(defn month-string-int [month & [flags]]
+(defn month-string-int
+ "Return the name of the month given the integer month number. Accept flags to transform the string:
+  - :short Return only the first 3 letters of the month name: JAN
+  - :capitalize Return the capitalized name: January
+  - :uppercase Return the uppercase: JANUARY"
+  [month & [flags]]
   (let [short-month (in? flags :short)
         capitalize (in? flags :capitalize)
         uppercase (in? flags :uppercase)
@@ -104,8 +110,8 @@
                         12 "December"
                         "")
         short-string (if short-month (subs month-string 0 3) month-string)
-        capitalized-string (if capitalize (gstring/capitalize short-string) short-string)
-        uppercase-string (if uppercase (gstring/uppercase capitalized-string) capitalized-string)]
+        capitalized-string (if capitalize (s/capital short-string) short-string)
+        uppercase-string (if uppercase (s/upper capitalized-string) capitalized-string)]
     uppercase-string))
 
 (defn month-string [month & [flags]]
