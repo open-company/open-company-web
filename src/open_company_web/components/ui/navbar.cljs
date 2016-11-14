@@ -53,11 +53,13 @@
     (let [header-width (+ (* card-width columns-num)    ; cards width
                           (* 20 (dec columns-num))      ; cards right margin
                           (when (> columns-num 1) 60))  ; x margins if needed
-          fixed-show-share-su-button (if (responsive/is-mobile?)
-                                       false
-                                       (if (contains? data :show-share-su-button)
-                                         show-share-su-button
-                                         true))]
+                                                                                    ; show the new update btn if
+          fixed-show-share-su-button (and (not (responsive/is-mobile?))              ; it's not mobile
+                                          (jwt/jwt)                                  ; the user is logged in
+                                          (not (:read-only company-data))            ; it's not a read-only cmp
+                                          (if (contains? data :show-share-su-button) ; the including component
+                                            show-share-su-button                     ; wants to
+                                            true))]
       (dom/nav {:class (str "oc-navbar group" (when mobile-menu-open " mobile-menu-open"))}
         (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
           (login-overlays-handler))
