@@ -44,7 +44,7 @@
     (if (and standalone-component
              (not (dispatcher/stakeholder-update-list-data)))
       [:div.prior-updates
-        [:div.oc-loading.active [:i.fa.fa-circle-o-notch]]]
+        [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
       [:div.prior-updates {:style {:padding 0}}
 
         (when standalone-component
