@@ -164,7 +164,8 @@
                                         :topics (:sections su-data)
                                         :topics-data su-data
                                         :company-data company-data
-                                        :hide-add-topic true}
+                                        :hide-add-topic true
+                                        :is-stakeholder-update true}
                                        {:opts {:topic-click (partial topic-click owner)}})))
           (when company-data
             (dom/div {:class "su-sp-footer"} "Updates by "
