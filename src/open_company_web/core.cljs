@@ -142,13 +142,6 @@
         section (:section (:params params))
         edit?   (= route "section-edit")
         query-params (:query-params params)]
-
-    ;; reset su-list if moving from new share to su list
-    (when (= route "su-list")
-      (reset! dis/app-state (-> @dis/app-state
-                              (update-in (butlast (dis/su-list-key slug)) dissoc (last (dis/su-list-key slug)))
-                              (update-in (butlast (dis/latest-stakeholder-update-key slug)) dissoc (last (dis/latest-stakeholder-update-key slug))))))
-
     (pre-routing query-params)
     (utils/clean-company-caches)
     ;; save the route

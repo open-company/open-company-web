@@ -18,17 +18,25 @@
             [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
             [clojure.data :as cd]))
 
-(defn ordered-topics-list []
+(defn ordered-topics-list
+  "Return the list of active topics in the order the user moved them."
+  []
   (let [topics (sel [:div.create-update-topics-list :div.oc-active])
         topics-list (for [topic topics] (.data (js/jQuery topic) "topic"))]
     (vec (remove nil? topics-list))))
 
-(defn remove-pinned [data]
+(defn remove-pinned
+  "Set all pin flag to false for all sections in the company data to avoid
+   topics-columns component order them by pinned/unpinned."
+  [data]
+  ; loop through all the kyes of the passed company-data map
   (loop [topics data
          all-keys (vec (keys data))
          idx 0]
     (if (= idx (count all-keys))
+      ; if we reached the last key return the updated data
       topics
+      ; if not set false to the pin key if the examined k is for a map
       (let [k (get all-keys idx)
             v (get topics k)
             new-v (if (map? v)
@@ -36,6 +44,7 @@
                       (assoc v :pin false)
                       v)
                     v)]
+         ; loop to the next key
          (recur (assoc topics k new-v)
                 all-keys
                 (inc idx))))))
@@ -46,13 +55,16 @@
     (api/patch-stakeholder-update {:title (or title "")
                                    :sections topics})))
 
-(defn setup-sortable [owner]
+(defn setup-sortable
+  "Setup the jQuery UI Sortable on the create-update-topics-list div"
+  [owner]
   (when-let [list-node (js/jQuery "div.create-update-topics-list")]
     (-> list-node
       (.sortable #js {:scroll true
                       :forcePlaceholderSize true
                       :items ".oc-active"
                       :stop (fn [event ui]
+                              ; the user stopped ordering, save the current order
                               (when-let [dragged-item (gobj/get ui "item")]
                                 (om/set-state! owner :su-topics (ordered-topics-list))
                                 (patch-stakeholder-update owner)))
@@ -67,10 +79,13 @@
 
   (init-state [_]
     (let [company-data (dis/company-data data)
-          su-data (:stakeholder-update company-data)]
+          su-data   (:stakeholder-update company-data)
+          su-topics (if (empty? (:sections su-data))
+                        (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
+                        (utils/filter-placeholder-sections (:sections su-data) company-data))]
       {:columns-num (responsive/columns-num)
        :card-width (responsive/calc-card-width)
-       :su-topics (vec (:sections su-data))
+       :su-topics (vec su-topics)
        :su-title (:title su-data)
        :no-pinned-topics (remove-pinned (dis/company-data data))
        :show-su-dialog false}))
@@ -79,8 +94,11 @@
     (om/set-state! owner :no-pinned-topics (remove-pinned (dis/company-data next-props)))
     (when (zero? (count (om/get-state owner :su-topics)))
       (let [company-data (dis/company-data next-props)
-            su-data (:stakeholder-update company-data)]
-        (om/update-state! owner #(merge % {:su-topics (vec (:sections su-data))
+            su-data (:stakeholder-update company-data)
+            su-topics (if (empty? (:sections su-data))
+                        (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
+                        (utils/filter-placeholder-sections (:sections su-data) company-data))]
+        (om/update-state! owner #(merge % {:su-topics (vec su-topics)
                                            :su-title (:title su-data)})))))
 
   (did-mount [_]
@@ -138,9 +156,10 @@
                         (:title sd))))
                   (let [all-topics (:sections company-data)
                         remaining-topics (vec (first (cd/diff (set all-topics) (set su-topics))))
+                        filtered-topics (utils/filter-placeholder-sections remaining-topics company-data)
                         sorted-topics (sort #(let [sd1 ((keyword %1) company-data)
                                                    sd2 ((keyword %2) company-data)]
-                                               (compare (:title sd1) (:title sd2))) remaining-topics)]
+                                               (compare (:title sd1) (:title sd2))) filtered-topics)]
                     (for [topic sorted-topics]
                       (let [sd ((keyword topic) company-data)]
                         (dom/div {:data-topic topic

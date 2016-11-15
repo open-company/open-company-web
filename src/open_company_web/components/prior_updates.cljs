@@ -20,11 +20,11 @@
 (defn- half-offset [pixels]
   (str "-" (Math/round (* 0.5 pixels)) "px"))
 
-(defn update-click [link e]
+(defn- update-click [link e]
   (utils/event-stop e)
   (router/nav! link))
 
-(defn load-prior-updaes-if-needed []
+(defn load-prior-updates-if-needed []
   (when (and (dispatcher/company-data)
              (not (:su-list-loading @dispatcher/app-state))
              (not (get-in @dispatcher/app-state (dispatcher/su-list-key (router/current-company-slug)))))
@@ -40,7 +40,7 @@
         none? (empty? updates)
         mobile? (responsive/is-mobile-size?)]
     (when standalone-component
-      (load-prior-updaes-if-needed))
+      (load-prior-updates-if-needed))
     (if (and standalone-component
              (not (dispatcher/stakeholder-update-list-data)))
       [:div.prior-updates
