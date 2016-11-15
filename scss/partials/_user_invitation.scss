@@ -4,7 +4,10 @@ div.um-invitations-box {
     tr {
       th, td {
         border: none;
-        background-color: rgba(78, 90, 107, 0.05);
+      }
+
+      td {
+        border-top: 1px solid rgba(78,90,107,0.1);
       }
 
       th {
