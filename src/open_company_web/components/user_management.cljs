@@ -6,6 +6,7 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [open-company-web.urls :as oc-urls]
+            [open-company-web.api :as api]
             [open-company-web.dispatcher :as dis]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
@@ -15,7 +16,8 @@
             [open-company-web.components.user-invitation :refer (user-invitation)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]))
 
-(rum/defcs user-management < rum/static
+(rum/defcs user-management < (rum/local false ::public)
+                             (rum/local false ::has-changes)
                              rum/reactive
                              (drv/drv :company-data)
                              {:before-render (fn [s]
@@ -26,19 +28,30 @@
                              :did-mount (fn [s]
                                           (when-not (utils/is-test-env?)
                                             (dis/dispatch! [:input [:um-invite :email] ""]))
+                                          (let [public (::public s)]
+                                            (reset! public (not (not (:public (dis/company-data))))))
                                           s)}
-  [s]
+  [{:keys [::has-changes ::public] :as s}]
   [:div.user-management.lg-col-5.md-col-7.col-11.mx-auto.p3.mt4.mb4.group
     {:style {:background-color "rgba(78, 90, 107, 0.05)"}}
-    [:div
-      [:div.um-cta.pb2 "Visibility"]
-      [:input {:type "checkbox" :name "visibility" :checked (not (:public (drv/react s :company-data)))}]
-      [:p.um-p
+    [:div.group
+      [:div.vis-cta.pb2 "Visibility"]
+      [:div.vis-input-line
+        [:label {:for "private-company"} "Private - "]
+        [:input {:type "checkbox" :id "private-company" :name "visibility" :checked (not @public) :on-change #(do (reset! has-changes true) (reset! public (not @public)))}]]
+      [:p.vis-p
         "The board is private. Only people added to the board can view and edit it."]
-      [:input {:type "checkbox" :name "visibility" :checked (:public (drv/react s :company-data))}]
-      [:p.um-p
-        "The board is public and will show up in search engines like Google. Only people added to the board can edit it."]]
-    [:div
+      [:div.vis-input-line
+        [:label {:for "public-company"} "Public - "]
+        [:input {:type "checkbox" :id "public-company" :name "visibility" :checked @public :on-change #(do (reset! has-changes true) (reset! public (not @public)))}]]
+      [:p.vis-p
+        "The board is public and will show up in search engines like Google. Only people added to the board can edit it."]
+      [:button.right.btn-reset.btn-solid
+        {:disabled (not @has-changes)
+         :on-click #(do
+                      (reset! has-changes false)
+                      (api/patch-company (router/current-company-slug) {:public @public :promoted (not @public)}))} "SAVE"]]
+    [:div.mt3
       [:div.um-cta.pb2 "Users & Invitations"]
       [:div.um-description
         [:p.um-p
@@ -109,7 +122,7 @@
           ;; Company profile
           :else
           (dom/div {}
-            (back-to-dashboard-btn {:title "Visibility"})
+            (back-to-dashboard-btn {:title "Visibility & User Management"})
             (dom/div {:class "company-settings-container"}
               (user-management))))
 
