@@ -155,11 +155,14 @@
 (defmethod dispatcher/action :stakeholder-update [db [_ {:keys [slug update-slug response load-company-data]}]]
   (let [company-data-keys [:logo :logo-width :logo-height :name :slug :currency]
         company-data      (select-keys response company-data-keys)]
+    ; load-company-data is used to save the subset of company data that is returned with a stakeholder-update data
     (if load-company-data
+      ; save the company data returned with the SU data
       (-> db
         (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
         (assoc-in (dispatcher/company-data-key slug) (utils/fix-sections company-data))
         (dissoc :loading))
+      ; save only the company data
       (-> db
         (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
         (dissoc :loading)))))
@@ -434,9 +437,13 @@
 
 (defmethod dispatcher/action :reset-su-list
   [db [_]]
+  "Remove the list of SU and the latest SU link to make sure they are reloaded."
   (let [slug (router/current-company-slug)
         su-list-key (dispatcher/su-list-key slug)
         latest-su-key (dispatcher/latest-stakeholder-update-key slug)]
+    ; return the db
     (-> db
+      ; w/o the su-list
       (update-in (butlast su-list-key) dissoc (last su-list-key))
+      ; w/o the latest SU link
       (update-in (butlast latest-su-key) dissoc (last latest-su-key)))))
