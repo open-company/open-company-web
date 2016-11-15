@@ -274,7 +274,7 @@
       ; add force-remove-loading to avoid inifinte spinner if the company
       ; has no sections and the user is looking at company profile
       (swap! dis/app-state assoc :force-remove-loading true)
-      (company-handler "profile" target visibility params))
+      (company-handler "visibility" target visibility params))
 
     (defroute company-route (urls/company ":slug") {:as params}
       (company-handler "dashboard" target company-dashboard params))
