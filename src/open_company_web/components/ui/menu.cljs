@@ -33,11 +33,6 @@
   (utils/event-stop e)
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/company-settings))))
 
-(defn dashboard-click [e]
-  (utils/event-stop e)
-  (dis/dispatch! [:mobile-menu-toggle])
-  (router/nav! (oc-urls/company)))
-
 (defn updates-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
