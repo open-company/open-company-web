@@ -431,3 +431,12 @@
 (defmethod dispatcher/action :mobile-menu-toggle
   [db [_]]
   (assoc db :mobile-menu-open (not (:mobile-menu-open db))))
+
+(defmethod dispatcher/action :reset-su-list
+  [db [_]]
+  (let [slug (router/current-company-slug)
+        su-list-key (dispatcher/su-list-key slug)
+        latest-su-key (dispatcher/latest-stakeholder-update-key slug)]
+    (-> db
+      (update-in (butlast su-list-key) dissoc (last su-list-key))
+      (update-in (butlast latest-su-key) dissoc (last latest-su-key)))))

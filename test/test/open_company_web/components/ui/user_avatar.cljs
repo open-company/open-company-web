@@ -18,6 +18,6 @@
                        {:slug "test"})
     (let [c (tu/new-container!)
           _ (rum/mount (user-avatar nil) c)
-          user-avatar-node (sel1 c [:div.user-avatar])]
-      (is (not (nil? user-avatar-node)))
+          user-avatar-bt (sel1 c [:button.user-avatar-button])]
+      (is (not (nil? user-avatar-bt)))
       (tu/unmount! c))))

@@ -67,10 +67,13 @@
 
   (init-state [_]
     (let [company-data (dis/company-data data)
-          su-data (:stakeholder-update company-data)]
+          su-data   (:stakeholder-update company-data)
+          su-topics (if (empty? (:sections su-data))
+                        (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
+                        (utils/filter-placeholder-sections (:sections su-data) company-data))]
       {:columns-num (responsive/columns-num)
        :card-width (responsive/calc-card-width)
-       :su-topics (vec (:sections su-data))
+       :su-topics (vec su-topics)
        :su-title (:title su-data)
        :no-pinned-topics (remove-pinned (dis/company-data data))
        :show-su-dialog false}))
@@ -79,8 +82,11 @@
     (om/set-state! owner :no-pinned-topics (remove-pinned (dis/company-data next-props)))
     (when (zero? (count (om/get-state owner :su-topics)))
       (let [company-data (dis/company-data next-props)
-            su-data (:stakeholder-update company-data)]
-        (om/update-state! owner #(merge % {:su-topics (vec (:sections su-data))
+            su-data (:stakeholder-update company-data)
+            su-topics (if (empty? (:sections su-data))
+                        (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
+                        (utils/filter-placeholder-sections (:sections su-data) company-data))]
+        (om/update-state! owner #(merge % {:su-topics (vec su-topics)
                                            :su-title (:title su-data)})))))
 
   (did-mount [_]
@@ -138,9 +144,10 @@
                         (:title sd))))
                   (let [all-topics (:sections company-data)
                         remaining-topics (vec (first (cd/diff (set all-topics) (set su-topics))))
+                        filtered-topics (utils/filter-placeholder-sections remaining-topics company-data)
                         sorted-topics (sort #(let [sd1 ((keyword %1) company-data)
                                                    sd2 ((keyword %2) company-data)]
-                                               (compare (:title sd1) (:title sd2))) remaining-topics)]
+                                               (compare (:title sd1) (:title sd2))) filtered-topics)]
                     (for [topic sorted-topics]
                       (let [sd ((keyword topic) company-data)]
                         (dom/div {:data-topic topic

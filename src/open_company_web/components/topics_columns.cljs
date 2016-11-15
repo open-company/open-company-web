@@ -243,7 +243,11 @@
     (let [show-add-topic         (add-topic? owner)
           partial-render-topic   (partial render-topic owner options)
           {:keys [pinned other]} (utils/get-pinned-other-keys topics company-data)
-          columns-container-key   (str (apply str pinned) (apply str other))]
+          columns-container-key   (str (apply str pinned) (apply str other))
+          topics-column-conatiner-style (if (responsive/is-mobile?)
+                                          #js {:margin "0px 9px"
+                                               :width "auto"}
+                                          #js {:width total-width})]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true
@@ -254,7 +258,7 @@
           ;; render 2 or 3 column layout
           (> columns-num 1)
           (dom/div {:class "topics-column-container group"
-                    :style #js {:width total-width}
+                    :style topics-column-conatiner-style
                     :key columns-container-key}
             ; for each column key contained in best layout
             (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
@@ -298,7 +302,7 @@
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
-                    :style #js {:width (if is-stakeholder-update "100%" total-width)}
+                    :style topics-column-conatiner-style
                     :key columns-container-key}
             (dom/div {:class "topics-column"}
               (dom/div #js {:className "topics-column-pinned"}

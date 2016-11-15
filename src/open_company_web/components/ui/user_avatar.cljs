@@ -10,9 +10,9 @@
   [{:keys [classes click-cb]}]
   (let [has-avatar (not (clojure.string/blank? (get-in (rum/react dis/app-state) [:jwt :avatar])))
         not-mobile? (not (responsive/is-mobile-size?))]
-    [:button
+    [:button.user-avatar-button.group
       {:type "button"
-       :class (str classes " group user-avatar-button" (when-not has-avatar " no-image"))
+       :class (when-not has-avatar "no-image")
        :id "dropdown-toggle-menu"
        :data-toggle (when not-mobile? "dropdown")
        :click-cb (when (fn? click-cb) (click-cb))

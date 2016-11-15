@@ -18,7 +18,7 @@
 
 (def fixed-company-data (utils/fix-sections company))
 
-(def map-finances-data (finance-utils/map-placeholder-data (:data (:finances fixed-company-data))))
+(def map-finances-data (finance-utils/finances-data-map (:data (:finances fixed-company-data))))
 
 (def test-atom {
   :finances-data map-finances-data

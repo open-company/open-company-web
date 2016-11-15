@@ -76,7 +76,7 @@
                             (:title su-data))
                           "")]
       (if-not (dis/stakeholder-update-list-data data)
-        (dom/div {:id "oc-loading"})
+        (dom/div {:class "oc-loading active"} (dom/i {:class "fa fa-circle-o-notch fa-spin"}))
         (dom/div {:class "updates main-scroll group"}
           (dom/div {:class "page"}
             (om/build navbar {:card-width card-width
