@@ -353,6 +353,17 @@
     (assoc db :enumerate-users users)
     (dissoc db :enumerate-users)))
 
+(defmethod dispatcher/action :enumerate-channels
+  [db [_]]
+  (api/enumerate-channels)
+  (assoc db :enumerate-channels-requested true))
+
+(defmethod dispatcher/action :enumerate-channels/success
+  [db [_ channels]]
+  (if channels
+    (do (.log js/console "Channel list in state!") (assoc db :enumerate-channels channels))
+    (dissoc db :enumerate-channels)))
+
 (defmethod dispatcher/action :invite-by-email-change
   [db [_ email]]
   (-> db

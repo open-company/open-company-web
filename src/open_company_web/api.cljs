@@ -477,7 +477,20 @@
       (fn [{:keys [success body status]}]
         (let [fixed-body (if success (json->cljs body) {})]
           (if success
-            (dispatcher/dispatch! [:enumerate-users/success (:users (:collection fixed-body))])))))))
+            (dispatcher/dispatch! [:enumerate-users/success (-> fixed-body :collection :users)])))))))
+
+(defn enumerate-channels []
+  (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "channels" "GET")]
+    (auth-get (:href enumerate-link)
+      {:headers {
+        ; required by Chrome
+        "Access-Control-Allow-Headers" "Content-Type"
+        ; custom content type
+        "content-type" (:type enumerate-link)}}
+      (fn [{:keys [success body status]}]
+        (let [fixed-body (if success (json->cljs body) {})]
+          (if success
+            (dispatcher/dispatch! [:enumerate-channels/success (-> fixed-body :collection :channels)])))))))
 
 (defn send-invitation [email]
   (let [company-data (dispatcher/company-data)]

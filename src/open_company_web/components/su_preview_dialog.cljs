@@ -199,23 +199,37 @@
                     [:su-share :slack :note]
                     slack-notes])))
 
-(rum/defc slack-dialog < rum/static emoji-autocomplete
+(rum/defc slack-dialog < rum/static
+                         rum/reactive
+                         emoji-autocomplete
   []
   [:div
-   (modal-title "Share to Your Slack Team" :slack)
-   [:div.p3
-    [:label.block.small-caps.bold.mb2 "Your Note"]
-    [:div.npt.group
-      [:div.domine.p1.col-12.emoji-autocomplete.ta-mh.no-outline.emojiable.slack-note
-        {:content-editable true
-         :placeholder "Optional note to go with this update."
-         :on-key-down #(slack-note-did-change)
-         :on-key-up #(slack-note-did-change)}]
-      [:div.group
-        {:style {:min-height "25px"}}
-        [:div.left
-          {:style {:color "rgba(78, 90, 107, 0.5)"}}
-          (emoji-picker {:add-emoji-cb (fn [_] (slack-note-did-change))})]]]]])
+    (modal-title "Share to Slack" :slack)
+    [:div.p3
+      
+      (let [channels (or (:enumerate-channels (rum/react dis/app-state)) [])]
+        [:div
+          [:label.block.small-caps.bold.mb2 "To"]
+          [:select {:id "channel"
+                    :value "__everyone__"
+                    :on-change #(dis/dispatch! [:input [:su-share :slack :channel] (.. % -target -value)])
+                    :class "npt col-10 p1 mb3 slack-channel"}
+            [:option {:value "__everyone__"} "All full members of the Slack organization"]
+            (for [channel channels]
+              [:option {:value (:id channel) :key (:id channel)} (str "#" (:name channel))])]])
+    
+      [:label.block.small-caps.bold.mb2 "Your Note"]
+      [:div.npt.group
+        [:div.domine.p1.col-12.emoji-autocomplete.ta-mh.no-outline.emojiable.slack-note
+          {:content-editable true
+           :placeholder "Optional note to go with this update."
+           :on-key-down #(slack-note-did-change)
+           :on-key-up #(slack-note-did-change)}]
+        [:div.group
+          {:style {:min-height "25px"}}
+          [:div.left
+            {:style {:color "rgba(78, 90, 107, 0.5)"}}
+            (emoji-picker {:add-emoji-cb (fn [_] (slack-note-did-change))})]]]]])
 
 (rum/defcs link-dialog < (rum/local false ::copied)
                          (rum/local false ::clipboard)
@@ -242,6 +256,11 @@
       "Open in New Window"]]]])
 
 (rum/defc prompt-dialog < rum/static
+  {:before-render (fn [s] ; Start request for Slack channels so it'll be ready if needed
+                  (when (and (:auth-settings @dis/app-state)
+                             (not (:enumerate-channels-requested @dis/app-state)))
+                    (dis/dispatch! [:enumerate-channels]))
+                  s)}
   [prompt-cb]
   [:div
    (modal-title "Share Update" nil)
