@@ -36,16 +36,20 @@
     {:style {:background-color "rgba(78, 90, 107, 0.05)"}}
     [:div.group
       [:div.vis-cta.pb2 "Visibility"]
-      [:div.vis-input-line
-        [:label {:for "private-company"} "Private - "]
-        [:input {:type "checkbox" :id "private-company" :name "visibility" :checked (not @public) :on-change #(do (reset! has-changes true) (reset! public (not @public)))}]]
-      [:p.vis-p
-        "The board is private. Only people added to the board can view and edit it."]
-      [:div.vis-input-line
-        [:label {:for "public-company"} "Public - "]
-        [:input {:type "checkbox" :id "public-company" :name "visibility" :checked @public :on-change #(do (reset! has-changes true) (reset! public (not @public)))}]]
-      [:p.vis-p
-        "The board is public and will show up in search engines like Google. Only people added to the board can edit it."]
+      [:div.vis-input-line.group
+        [:button.btn-reset.btn-outline.left
+          {:style {:width "150px" :margin-right "20px"}
+           :on-click #(do (reset! has-changes true) (reset! public (not @public)))}
+          "Private " (when (not @public) [:i.fa.fa-check.oc-green])]
+        [:p.vis-p
+          "The board is private. Only people added to the board can view and edit it."]]
+      [:div.vis-input-line.group
+        [:button.btn-reset.btn-outline.left
+          {:style {:width "150px" :margin-right "20px"}
+           :on-click #(do (reset! has-changes true) (reset! public (not @public)))}
+          "Public " (when @public [:i.fa.fa-check.oc-green])]
+        [:p.vis-p
+          "The board is public and will show up in search engines like Google. Only people added to the board can edit it."]]
       [:button.right.btn-reset.btn-solid
         {:disabled (not @has-changes)
          :on-click #(do
