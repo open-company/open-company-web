@@ -34,6 +34,7 @@
 (def title-alert-limit 3)
 (def headline-alert-limit 10)
 (def body-max-length 500)
+(def body-alert-limit 50)
 
 (def before-unload-message "You have unsaved edits. Are you sure you want to leave this topic?")
 (def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
@@ -63,11 +64,14 @@
       (dis/dispatch! [:foce-input {:body emojied-body}]))
     (let [inner-text (.-innerText body-el)]
       (om/set-state! owner :char-count nil))
-    (when (>= (.-length (.-textContent body-el)) body-max-length)
+    (when (>= (count (.-innerText body-el)) body-max-length)
       (set! (.-innerHTML body-el) (om/get-state owner :last-body))
       (.restoreSelection js/rangy (om/get-state owner :last-selection)))
     (om/set-state! owner :last-selection (.saveSelection js/rangy js/window))
-    (om/set-state! owner :last-body (.-innerHTML body-el))))
+    (om/set-state! owner :last-body (.-innerHTML body-el))
+    (let [remaining-chars (- body-max-length (count (.-innerText body-el)))]
+      (om/set-state! owner :char-count (dec remaining-chars))
+      (om/set-state! owner :char-count-alert (< (dec remaining-chars) body-alert-limit)))))
 
 (defn- setup-edit [owner]
   (when-let* [section-kw   (keyword (om/get-props owner :section))
