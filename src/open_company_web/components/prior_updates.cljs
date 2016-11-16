@@ -38,7 +38,8 @@
   (let [company-slug (router/current-company-slug)
         updates (reverse (drv/react s :su-list))
         none? (empty? updates)
-        mobile? (responsive/is-mobile-size?)]
+        mobile? (responsive/is-mobile-size?)
+        company-data (dispatcher/company-data)]
     (when standalone-component
       (load-prior-updates-if-needed))
     (if (and standalone-component
@@ -55,8 +56,11 @@
           (if (empty? updates)
 
             [:div.message-container.pt2
-              [:h3.message "No company updates have been shared yet."]
-              [:p.message "As updates are shared via Email, Slack and URL, they will show up here so they are always easy to find and read."]]
+              [:h3.message "No company updates have been shared."]
+              [:p.message
+                (if (>= (count (utils/filter-placeholder-sections (vec (map keyword (:sections company-data))) company-data)) 2)
+                  "As updates are shared by email, Slack or URL, they show up here so they are easy to find and read."
+                  "Create a few topics on your dashboard, then you can share a company update by email, Slack or URL.")]]
 
             [:div.update-container.pt2
               (for [update updates]
