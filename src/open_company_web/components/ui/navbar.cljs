@@ -37,6 +37,7 @@
                               slack-loading
                               show-share-su-button
                               active
+                              foce-key
                               mobile-menu-open] :as data} owner options]
 
   (did-mount [_]
@@ -57,6 +58,7 @@
           fixed-show-share-su-button (and (not (responsive/is-mobile?))              ; it's not mobile
                                           (jwt/jwt)                                  ; the user is logged in
                                           (not (:read-only company-data))            ; it's not a read-only cmp
+                                          (not foce-key)                             ; is not in foce
                                           (if (contains? data :show-share-su-button) ; the including component
                                             show-share-su-button                     ; wants to
                                             true))]
@@ -92,14 +94,16 @@
           (dom/div {:class "oc-navbar-bottom group"
                     :style {:width (str header-width "px")}}
             (dom/div {:class "left"}
-              (when (router/current-company-slug)
+              (when (and (router/current-company-slug)
+                         (not foce-key))
                 (dom/a {:class (when (= active :dashboard) "active")
                         :href (oc-urls/company)
                         :on-click #(do
                                      (utils/event-stop %)
                                      (router/nav! (oc-urls/company)))}
                   "Dashboard"))
-              (when (router/current-company-slug)
+              (when (and (router/current-company-slug)
+                         (not foce-key))
                 (dom/a {:class (when (= active :updates) "active")
                         :href (oc-urls/stakeholder-update-list)
                         :on-click (fn [e]
