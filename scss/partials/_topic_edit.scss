@@ -7,7 +7,8 @@ div.topic.topic-edit {
   box-shadow: 0 1px 4px rgba(0,0,0,.04);
   border: 1px solid rgba(0,0,0,.09);
   border-radius: 3px;
-
+  margin-left: 4px;
+  margin-right: 4px;
   cursor: default;
 
   div.topic-anim{
@@ -306,6 +307,10 @@ div.topic.topic-edit {
             color: rgba(78, 90, 107, 0.5);
 
             &.char-count-alert {
+              color: rgba(240,173,78,0.5);
+            }
+
+            &.negative {
               color: rgba(215, 42, 70, 0.5);
             }
           }
