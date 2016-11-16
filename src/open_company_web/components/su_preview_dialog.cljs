@@ -258,26 +258,35 @@
 
 (rum/defc prompt-dialog < rum/static
   {:before-render (fn [s] ; Start request for Slack channels so it'll be ready if needed
-                  (when (and (:auth-settings @dis/app-state)
-                             (not (:enumerate-channels-requested @dis/app-state)))
-                    (dis/dispatch! [:enumerate-channels]))
-                  s)}
+                    (let [jwt (:jwt @dis/app-state)]
+                      ;; Decide if we should ask for Slack channels (pro-actively so they are already loaded)
+                      (when (and (= (:auth-source jwt) "slack") ; auth'd w/ Slack
+                                 (not (nil? (-> jwt :bot :token))) ; with an installed Slack bot
+                                 (:auth-settings @dis/app-state) ; know where Auth APIs are
+                                 (not (:enumerate-channels-requested @dis/app-state))) ; haven't already requested
+                        ;; Ask for public Slack channels
+                        (dis/dispatch! [:enumerate-channels])))
+                    s)}
   [prompt-cb]
-  [:div
-   (modal-title "Share Update" nil)
-   [:div.p3
-    [:div.group
-     [:button.btn-reset {:on-click #(prompt-cb :slack)}
-      [:div.circle50.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
-      [:span.left.ml1.gray5.h6 {} "SHARE TO SLACK"]]]
-    [:div.group
-     [:button.btn-reset {:on-click #(prompt-cb :email)}
-      [:div.circle50.left (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
-      [:span.left.ml1.gray5.h6 {} "SHARE BY EMAIL"]]]
-    [:div.group
-     [:button.btn-reset {:on-click #(prompt-cb :link)}
-      [:div.circle50.left (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
-      [:span.left.ml1.gray5.h6 {} "SHARE A LINK"]]]]])
+  (let [jwt (:jwt @dis/app-state)
+        slack-share? (and (= (:auth-source jwt) "slack") ; auth'd w/ Slack
+                          (not (nil? (-> jwt :bot :token))))] ; with an installed Slack bot
+    [:div
+     (modal-title "Share Update" nil)
+     [:div.p3
+      (when slack-share?
+        [:div.group
+         [:button.btn-reset {:on-click #(prompt-cb :slack)}
+          [:div.circle50.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
+          [:span.left.ml1.gray5.h6 {} "SHARE TO SLACK"]]])
+      [:div.group
+       [:button.btn-reset {:on-click #(prompt-cb :email)}
+        [:div.circle50.left (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
+        [:span.left.ml1.gray5.h6 {} "SHARE BY EMAIL"]]]
+      [:div.group
+       [:button.btn-reset {:on-click #(prompt-cb :link)}
+        [:div.circle50.left (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
+        [:span.left.ml1.gray5.h6 {} "SHARE A LINK"]]]]]))
 
 (rum/defcs modal-actions < rum/reactive (drv/drv :su-share)
   [s send-fn cancel-fn type]
