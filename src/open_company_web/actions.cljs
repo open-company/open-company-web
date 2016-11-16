@@ -364,7 +364,7 @@
 (defmethod dispatcher/action :enumerate-channels/success
   [db [_ channels]]
   (if channels
-    (do (.log js/console "Channel list in state!") (assoc db :enumerate-channels channels))
+    (assoc db :enumerate-channels channels)
     (dissoc db :enumerate-channels)))
 
 (defmethod dispatcher/action :invite-by-email-change

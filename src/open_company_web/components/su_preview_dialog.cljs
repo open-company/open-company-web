@@ -199,10 +199,11 @@
                     [:su-share :slack :note]
                     slack-notes])))
 
-(rum/defc slack-dialog < rum/static
+(rum/defcs slack-dialog < rum/static
                          rum/reactive
+                         (drv/drv :su-share)
                          emoji-autocomplete
-  []
+  [s]
   [:div
     (modal-title "Share to Slack" :slack)
     [:div.p3
@@ -211,10 +212,10 @@
         [:div
           [:label.block.small-caps.bold.mb2 "To"]
           [:select {:id "channel"
-                    :value "__everyone__"
+                    :value (or (->> (drv/react s :su-share) :slack :channel) "__everyone__")
                     :on-change #(dis/dispatch! [:input [:su-share :slack :channel] (.. % -target -value)])
-                    :class "npt col-10 p1 mb3 slack-channel"}
-            [:option {:value "__everyone__"} "All full members of the Slack organization"]
+                    :class "npt col-11 p1 mb3 slack-channel"}
+            [:option {:value "__everyone__"} "All non-guest members of your Slack organization"]
             (for [channel channels]
               [:option {:value (:id channel) :key (:id channel)} (str "#" (:name channel))])]])
     
