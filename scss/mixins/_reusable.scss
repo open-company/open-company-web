@@ -40,7 +40,7 @@
   &::-webkit-input-placeholder {@content}
   &:-moz-placeholder           {@content}
   &::-moz-placeholder          {@content}
-  &:-ms-input-placeholder      {@contentd}
+  &:-ms-input-placeholder      {@content}
 }
 
 @mixin topic_navigation($x_padding: 0px){
