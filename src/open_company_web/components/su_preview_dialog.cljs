@@ -191,7 +191,8 @@
         {:style {:min-height "25px"}}
         [:div.left
           {:style {:color "rgba(78, 90, 107, 0.5)"}}
-          (emoji-picker {:add-emoji-cb (fn [_] (email-note-did-change))})]]]]])
+          (emoji-picker {:add-emoji-cb (fn [_] (email-note-did-change))
+                         :position "top"})]]]]])
 
 (defn slack-note-did-change []
   (let [slack-notes (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.slack-note])))]
