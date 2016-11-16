@@ -733,11 +733,6 @@
 
 (def topic-body-limit 500)
 
-(defn truncated-body [body]
-  (if (is-test-env?)
-    body
-    (.truncate js/$ body (clj->js {:length topic-body-limit :words true}))))
-
 (defn exceeds-topic-body-limit [body]
   (> (count (strip-HTML-tags body)) topic-body-limit))
 
