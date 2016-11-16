@@ -225,6 +225,9 @@
           ;; Utilities
           [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js?oc_deploy_key"}]
           [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js?oc_deploy_key"}]
+          ; rangy
+          [:script {:type "text/javascript", :src "/lib/rangy/rangy-core.js?oc_deploy_key"}]
+          [:script {:type "text/javascript", :src "/lib/rangy/rangy-selectionsaverestore.js?oc_deploy_key"}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]]})
 
