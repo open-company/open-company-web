@@ -140,7 +140,7 @@
         ; if it's SU preview or SU show only read-more
         (dom/div {:style {:margin-top "20px"}}
           (when-not is-stakeholder-update
-            (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic owner nil false)) {:opts options})))))))
+            (om/build topic-attribution data {:opts options})))))))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
