@@ -59,19 +59,24 @@
   (when-let* [section-kw   (keyword (om/get-props owner :section))
               section-name (name section-kw)
               body-el      (sel1 [(str "div#foce-body-" section-name)])]
-    (om/set-state! owner :has-changes true)
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
       (dis/dispatch! [:foce-input {:body emojied-body}]))
-    (let [inner-text (.-innerText body-el)]
-      (om/set-state! owner :char-count nil))
-    (when (>= (count (.-innerText body-el)) body-max-length)
-      (set! (.-innerHTML body-el) (om/get-state owner :last-body))
-      (.restoreSelection js/rangy (om/get-state owner :last-selection)))
-    (om/set-state! owner :last-selection (.saveSelection js/rangy js/window))
-    (om/set-state! owner :last-body (.-innerHTML body-el))
-    (let [remaining-chars (- body-max-length (count (.-innerText body-el)))]
-      (om/set-state! owner :char-count (dec remaining-chars))
-      (om/set-state! owner :char-count-alert (< (dec remaining-chars) body-alert-limit)))))
+    (let [inner-text-count (count (.-innerText body-el))
+          remaining-chars (- body-max-length inner-text-count)]
+      ; restore the previous body if the new one exceeds the limit
+      ; and the count is greater than the old, if it's less we let it update
+      ; to let the user cancel content to get to the limit
+      (when (and (>= inner-text-count body-max-length)
+                 (>= inner-text-count (om/get-state owner :last-body-length)))
+        (set! (.-innerHTML body-el) (om/get-state owner :last-body))
+        (.restoreSelection js/rangy (om/get-state owner :last-selection)))
+      (om/update-state! owner #(merge % {:has-changes true
+                                         :char-count remaining-chars
+                                         :char-count-alert (< remaining-chars body-alert-limit)
+                                         :last-selection (.saveSelection js/rangy js/window)
+                                         :last-body (.-innerHTML body-el)
+                                         :last-body-length inner-text-count
+                                         :can-save? (not (neg? remaining-chars))})))))
 
 (defn- setup-edit [owner]
   (when-let* [section-kw   (keyword (om/get-props owner :section))
@@ -83,9 +88,10 @@
                   "editableInput"
                   (fn [event editable]
                     (body-on-change owner)))
-      (om/set-state! owner :body-editor body-editor)
-      (om/set-state! owner :last-selection (.saveSelection js/rangy js/window))
-      (om/set-state! owner :last-body (.-innerHTML body-el)))
+      (om/update-state! owner #(merge % {:body-editor body-editor
+                                         :last-selection (.saveSelection js/rangy js/window)
+                                         :last-body (.-innerHTML body-el)
+                                         :last-body-length (count (.-innerText body-el))})))
     (js/emojiAutocomplete)))
 
 (defn- headline-on-change [owner]
@@ -96,9 +102,9 @@
       (dis/dispatch! [:foce-input {:headline emojied-headline}])
       (let [headline-text   (.-innerText headline)
             remaining-chars (- headline-max-length (count headline-text))]
-        (om/set-state! owner :char-count remaining-chars)
-        (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))
-        (om/set-state! owner :negative-headline-char-count (neg? remaining-chars))))))
+        (om/update-state! owner #(merge % {:char-count remaining-chars
+                                           :char-count-alert (< remaining-chars headline-alert-limit)
+                                           :can-save? (not (neg? remaining-chars))}))))))
 
 (defn- check-headline-count [owner e has-changes]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
@@ -250,7 +256,8 @@
        :char-count-alert false
        :has-changes false
        :file-upload-state nil
-       :file-upload-progress 0}))
+       :file-upload-progress 0
+       :can-save? true}))
 
   (will-receive-props [_ next-props]
     ;; update body placeholder when receiving data from API
@@ -312,7 +319,7 @@
         (.focus (sel1 [:input.upload-remote-url-field])))))
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
-                           file-upload-state file-upload-progress upload-remote-url negative-headline-char-count
+                           file-upload-state file-upload-progress upload-remote-url can-save?
                            has-changes]}]
 
     (let [company-slug        (router/current-company-slug)
@@ -363,12 +370,13 @@
                       :placeholder (:name topic-data)
                       :type "text"
                       :on-blur #(om/set-state! owner :char-count nil)
-                      :on-change #(let [v (.. % -target -value)
-                                        remaining-chars (- title-max-length (count v))]
-                                    (dis/dispatch! [:foce-input {:title v}])
-                                    (om/set-state! owner :has-changes true)
-                                    (om/set-state! owner :char-count remaining-chars)
-                                    (om/set-state! owner :char-count-alert (< remaining-chars title-alert-limit)))})
+                      :on-change (fn [e]
+                                    (let [v (.. e -target -value)
+                                          remaining-chars (- title-max-length (count v))]
+                                      (dis/dispatch! [:foce-input {:title v}])
+                                      (om/update-state! owner #(merge % {:has-changes true
+                                                                         :char-count remaining-chars
+                                                                         :char-count-alert (< remaining-chars title-alert-limit)}))))})
           
           ;; Topic data
           (when is-data?
@@ -408,7 +416,7 @@
           ;; Topic body
           (dom/div #js {:className "topic-body emoji-autocomplete emojiable"
                         :id (str "foce-body-" (name section))
-                        :key "foce-body"
+                        :key (str "foce-body-" (name section))
                         :ref "topic-body"
                         :placeholder body-placeholder
                         :data-placeholder body-placeholder
@@ -515,11 +523,15 @@
                 "cancel"))
             (dom/div {:class "topic-foce-footer-left"
                       :style {:display (if (nil? file-upload-state) "block" "none")}}
-              (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
+              (dom/label {:class (utils/class-set {:char-counter true
+                                                   :char-count-alert char-count-alert
+                                                   :negative (neg? char-count)})} char-count))
             (dom/div {:class "topic-foce-footer-right"
                       :style {:display (if (nil? file-upload-state) "block" "none")}}
               (dom/button {:class "btn-reset btn-solid"
-                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count (dis/foce-section-data-editing?))
+                           :disabled (or (= file-upload-state :show-progress)
+                                         (not can-save?)
+                                         (dis/foce-section-data-editing?))
                            :on-click #(save-topic owner)} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
                            :disabled (dis/foce-section-data-editing?)
