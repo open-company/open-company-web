@@ -33,6 +33,7 @@
 (def headline-max-length 100)
 (def title-alert-limit 3)
 (def headline-alert-limit 10)
+(def body-max-length 500)
 
 (def before-unload-message "You have unsaved edits. Are you sure you want to leave this topic?")
 (def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
@@ -61,18 +62,26 @@
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
       (dis/dispatch! [:foce-input {:body emojied-body}]))
     (let [inner-text (.-innerText body-el)]
-      (om/set-state! owner :char-count nil))))
+      (om/set-state! owner :char-count nil))
+    (when (>= (.-length (.-textContent body-el)) body-max-length)
+      (set! (.-innerHTML body-el) (om/get-state owner :last-body))
+      (.restoreSelection js/rangy (om/get-state owner :last-selection)))
+    (om/set-state! owner :last-selection (.saveSelection js/rangy js/window))
+    (om/set-state! owner :last-body (.-innerHTML body-el))))
 
 (defn- setup-edit [owner]
   (when-let* [section-kw   (keyword (om/get-props owner :section))
               section-name (name section-kw)
-              body-el      (sel1 [(str "div#foce-body-" section-name)])]
+              body-id      (str "div#foce-body-" section-name)
+              body-el      (sel1 [body-id])]
     (let [body-editor      (new js/MediumEditor body-el (clj->js (utils/medium-editor-options "" false)))]
       (.subscribe body-editor
                   "editableInput"
                   (fn [event editable]
                     (body-on-change owner)))
-      (om/set-state! owner :body-editor body-editor))
+      (om/set-state! owner :body-editor body-editor)
+      (om/set-state! owner :last-selection (.saveSelection js/rangy js/window))
+      (om/set-state! owner :last-body (.-innerHTML body-el)))
     (js/emojiAutocomplete)))
 
 (defn- headline-on-change [owner]
