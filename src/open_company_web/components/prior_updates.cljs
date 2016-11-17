@@ -60,7 +60,7 @@
               [:p.message
                 (if (>= (count (utils/filter-placeholder-sections (vec (map keyword (:sections company-data))) company-data)) 2)
                   "As updates are shared by email, Slack or URL, they show up here so they are easy to find and read."
-                  "Create a few topics on your dashboard, then you can share a company update by email, Slack or URL.")]]
+                  "This is where you’ll find company updates once you’ve shared with others. Create some topics on your dashboard first, then you’ll be able to give it a try.")]]
 
             [:div.update-container.pt2
               (for [update updates]
