@@ -46,3 +46,8 @@ var location = {};
 location.reload = function(){};
 // EmojiAutocomplete
 var emojiAutocomplete = function(){};
+// Rangy
+var rangy = {};
+rangy.restoreSelection = function(){};
+rangy.removeMarkers = function(){};
+rangy.saveSelection = function(){};
