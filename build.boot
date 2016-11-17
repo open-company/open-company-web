@@ -1,21 +1,21 @@
 ;; boot show --updates
 (def cljs-deps
-  '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
-    [adzerk/boot-reload "0.4.12" :scope "test"]
-    [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
+  '[[adzerk/boot-cljs "1.7.228-2" :scope "test"]
+    [adzerk/boot-reload "0.4.13" :scope "test"]
+    [crisptrutski/boot-cljs-test "0.2.2" :scope "test"]
     [tolitius/boot-check "0.1.3" :scope "test"]
 
-    [org.clojure/clojure "1.9.0-alpha13"] ; Lisp on the JVM http://clojure.org/documentation
-    [org.clojure/clojurescript "1.9.225"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    [org.clojure/clojure "1.9.0-alpha14"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojurescript "1.9.293"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
-    [org.omcljs/om "1.0.0-alpha41" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
+    [org.omcljs/om "1.0.0-alpha47" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
 
-    [rum "0.10.6" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
+    [rum "0.10.7" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
 
     ;; Don't upgrade to 0.1.1, errors
     [org.martinklepsch/derivatives "0.1.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
 
-    [cljs-http "0.1.41"] ; HTTP for cljs https://github.com/r0man/cljs-http
+    [cljs-http "0.1.42"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/schema "1.1.3"] ; Dependency of om-tools https://github.com/Prismatic/schema
     [prismatic/plumbing "0.5.3"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [org.clojars.martinklepsch/om-tools "0.4.0-w-select"] ; Tools for Om https://github.com/plumatic/om-tools/pull/91
@@ -25,30 +25,30 @@
     [com.cognitect/transit-cljs "0.8.239"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
     [racehub/om-bootstrap "0.6.1"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
-    [com.andrewmcveigh/cljs-time "0.5.0-alpha1"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
-    [funcool/cuerdas "2.0.0"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
-    [medley "0.8.3"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
+    [com.andrewmcveigh/cljs-time "0.5.0-alpha2"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
+    [funcool/cuerdas "2.0.1"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
+    [medley "0.8.4"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [defun "0.3.0-RC1"] ; defun used mostly to port some fn from oc-lib https://github.com/killme2008/defun
 
     ;; --- DO NOT UPDATE REACT, the 15.x.x code requires changes on our part
     [cljsjs/react "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/react-dom "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
 
-    [cljsjs/raven "3.5.1-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
+    [cljsjs/raven "3.8.0-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "3.5.16-0"] ; d3 externs https://clojars.org/cljsjs/d3
     [cljsjs/medium-editor "5.15.0-1"] ; Medium editor https://clojars.org/cljsjs/medium-editor
     [cljsjs/filestack "2.4.10-0"] ; Filestack https://clojars.org/cljsjs/filestack
     [cljsjs/hammer "2.0.4-5"] ; Touch handler http://hammerjs.github.io/
-    [cljsjs/emojione "2.1.4-1"] ; Emojione http://emojione.com
-    [cljsjs/clipboard "1.5.9-0"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
+    [cljsjs/emojione "2.2.6-1"] ; Emojione http://emojione.com
+    [cljsjs/clipboard "1.5.13-0"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
     [cljsjs/emojione-picker "0.3.6-2"] ; EmojionePicker cljsjs package https://github.com/tommoor/emojione-picker
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"]
     [lockedon/if-let "0.1.0"] ; More than one binding for if/when macros https://github.com/LockedOn/if-let
 
-    [binaryage/devtools "0.8.2"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
+    [binaryage/devtools "0.8.3"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
 
     ;; ------- Deps for project repl ------------------
-    [adzerk/boot-cljs-repl   "0.3.2"] ;; latest release
+    [adzerk/boot-cljs-repl   "0.3.3"] ;; latest release
     [com.cemerick/piggieback "0.2.1"  :scope "test"]
     [weasel                  "0.7.0"  :scope "test"]
     [org.clojure/tools.nrepl "0.2.12" :scope "test"]
@@ -59,8 +59,8 @@
   '[[hiccup "1.0.5" :scope "test"]
     [perun "0.3.0" :scope "test"]
     [compojure "1.6.0-beta1" :scope "test"]
-    [pandeiro/boot-http "0.7.3" :scope "test"]
-    [deraen/boot-sass "0.2.1" :scope "test"]
+    [pandeiro/boot-http "0.7.6" :scope "test"]
+    [deraen/boot-sass "0.3.0" :scope "test"]
     [org.slf4j/slf4j-nop "1.7.21" :scope "test"]])
 
 (set-env!

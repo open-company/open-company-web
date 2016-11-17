@@ -171,19 +171,3 @@
       (if currency-text
         (str pos value-string " " currency-text)
         (str pos value-string))))))
-
-(defn float? [n]
-  (and (== (js/Number n) n)
-       (not (== (mod n 1) 0))))
-
-(defn- value-output [value]
-  (cond
-    (integer? value) (utils/format-value value)
-    (float? value) (str (utils/format-value (js/Math.floor value)) "." (last (s/split (str value) #"\.")))
-    :else "0"))
-
-(defn with-format [format-symbol value]
-  (cond
-    (= format-symbol "%") (str (value-output value) "%")
-    (not (nil? format-symbol)) (with-currency format-symbol (value-output value))
-    :else (value-output value)))
