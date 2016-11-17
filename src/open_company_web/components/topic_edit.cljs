@@ -62,21 +62,30 @@
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
       (dis/dispatch! [:foce-input {:body emojied-body}]))
     (let [inner-text-count (count (.-innerText body-el))
-          remaining-chars (- body-max-length inner-text-count)]
+          remaining-chars (- body-max-length inner-text-count)
+          last-selection (om/get-state owner :last-selection)]
       ; restore the previous body if the new one exceeds the limit
       ; and the count is greater than the old, if it's less we let it update
       ; to let the user cancel content to get to the limit
-      (when (and (>= inner-text-count body-max-length)
+      (if (and (>= inner-text-count body-max-length)
                  (>= inner-text-count (om/get-state owner :last-body-length)))
-        (set! (.-innerHTML body-el) (om/get-state owner :last-body))
-        (.restoreSelection js/rangy (om/get-state owner :last-selection)))
-      (om/update-state! owner #(merge % {:has-changes true
-                                         :char-count remaining-chars
-                                         :char-count-alert (< remaining-chars body-alert-limit)
-                                         :last-selection (.saveSelection js/rangy js/window)
-                                         :last-body (.-innerHTML body-el)
-                                         :last-body-length inner-text-count
-                                         :can-save? (not (neg? remaining-chars))})))))
+        (do
+          (set! (.-innerHTML body-el) (om/get-state owner :last-body))
+          (when last-selection
+            (.restoreSelection js/rangy last-selection)
+            (.removeMarkers js/rangy last-selection)))
+        (when last-selection
+          (.removeMarkers js/rangy last-selection)))
+      (utils/after 10 (fn []
+        (let [new-inner-text-count (count (.-innerText (sel1 [(str "div#foce-body-" section-name)])))
+              new-remaining-chars (- body-max-length inner-text-count)]
+          (om/update-state! owner #(merge % {:has-changes true
+                                             :char-count new-remaining-chars
+                                             :char-count-alert (< new-remaining-chars body-alert-limit)
+                                             :last-selection (.saveSelection js/rangy js/window)
+                                             :last-body (.-innerHTML body-el)
+                                             :last-body-length new-inner-text-count
+                                             :can-save? (not (neg? new-remaining-chars))}))))))))
 
 (defn- setup-edit [owner]
   (when-let* [section-kw   (keyword (om/get-props owner :section))
@@ -89,7 +98,6 @@
                   (fn [event editable]
                     (body-on-change owner)))
       (om/update-state! owner #(merge % {:body-editor body-editor
-                                         :last-selection (.saveSelection js/rangy js/window)
                                          :last-body (.-innerHTML body-el)
                                          :last-body-length (count (.-innerText body-el))})))
     (js/emojiAutocomplete)))
@@ -326,7 +334,6 @@
           section             (dis/foce-section-key)
           section-kw          (keyword section)
           topic-data          (dis/foce-section-data)
-          topic-body          (:body topic-data)
           gray-color          (oc-colors/get-color-by-kw :oc-gray-5)
           image-header        (:image-url topic-data)
           is-data?            (#{:growth :finances} section-kw)
@@ -418,6 +425,8 @@
                         :id (str "foce-body-" (name section))
                         :key (str "foce-body-" (name section))
                         :ref "topic-body"
+                        :role "textbox"
+                        :aria-multiline true
                         :placeholder body-placeholder
                         :data-placeholder body-placeholder
                         :contentEditable true
@@ -524,8 +533,7 @@
             (dom/div {:class "topic-foce-footer-left"
                       :style {:display (if (nil? file-upload-state) "block" "none")}}
               (dom/label {:class (utils/class-set {:char-counter true
-                                                   :char-count-alert char-count-alert
-                                                   :negative (neg? char-count)})} char-count))
+                                                   :char-count-alert char-count-alert})} char-count))
             (dom/div {:class "topic-foce-footer-right"
                       :style {:display (if (nil? file-upload-state) "block" "none")}}
               (dom/button {:class "btn-reset btn-solid"
