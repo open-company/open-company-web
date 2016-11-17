@@ -186,6 +186,7 @@
        {:content-editable true
         :on-key-down #(email-note-did-change)
         :on-key-up #(email-note-did-change)
+        :on-input #(email-note-did-change)
         :placeholder "Optional note to go with this update."}]
       [:div.group
         {:style {:min-height "25px"}}
@@ -226,7 +227,8 @@
           {:content-editable true
            :placeholder "Optional note to go with this update."
            :on-key-down #(slack-note-did-change)
-           :on-key-up #(slack-note-did-change)}]
+           :on-key-up #(slack-note-did-change)
+           :on-input #(slack-note-did-change)}]
         [:div.group
           {:style {:min-height "25px"}}
           [:div.left
