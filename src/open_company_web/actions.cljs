@@ -364,7 +364,9 @@
 (defmethod dispatcher/action :enumerate-channels/success
   [db [_ channels]]
   (if channels
-    (assoc db :enumerate-channels channels)
+    (-> db
+      (assoc :enumerate-channels channels)
+      (dissoc :enumerate-channels-requested))
     (dissoc db :enumerate-channels)))
 
 (defmethod dispatcher/action :invite-by-email-change
