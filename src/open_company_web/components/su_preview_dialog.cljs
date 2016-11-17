@@ -22,7 +22,6 @@
 (defn send-clicked [type]
   (let [post-data (get-in @dis/app-state [:su-share type])
         emojied   (update post-data :note (fnil utils/unicode-emojis ""))]
-    (dis/dispatch! [:su-share/reset])
     (api/share-stakeholder-update {type emojied})))
 
 (defn select-share-link [event]
@@ -238,6 +237,7 @@
 (rum/defcs link-dialog < (rum/local false ::copied)
                          (rum/local false ::clipboard)
                          (clipboard-mixin ".js-copy-btn")
+                         {:will-unmount (fn [s] (dis/dispatch! [:su-share/reset]) s)}
   [{:keys [::copied] :as _state} link]
   [:div
    (modal-title  "Share a Link" :link-72)
@@ -312,6 +312,7 @@
         "Send")])])
 
 (rum/defc confirmation < rum/static
+                         {:will-unmount (fn [s] (dis/dispatch! [:su-share/reset]) s)}
   [type cancel-fn]
   [:div
    (case type
@@ -321,7 +322,12 @@
     [:p.domine
      (case type
        :email "Recipients will get your update by email."
-       :slack "Members of your Slack organization will get your update.")]
+       :slack (let [ch (->> @dis/app-state :su-share :slack :channel)
+                    ch-id (filter #(= (:id %) ch) (or (:enumerate-channels @dis/app-state) []))
+                    ch-name (if (pos? (count ch-id)) (:name (first ch-id)) "__everyone__")]
+                (if (= ch-name "__everyone__")
+                  "This update has been shared with your team."
+                  (str "This update has been shared with #" ch-name "."))))]
     [:div.right-align.mt3
      [:button.btn-reset.btn-solid
       {:on-click cancel-fn}
