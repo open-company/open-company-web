@@ -36,6 +36,8 @@
                               email-loading
                               slack-loading
                               show-share-su-button
+                              create-update-share-button-cb
+                              create-update-share-button-disabled
                               active
                               mobile-menu-open] :as data} owner options]
 
@@ -50,9 +52,7 @@
       (events/unlistenByKey scroll-listener)))
 
   (render [_]
-    (let [header-width (+ (* card-width columns-num)    ; cards width
-                          (* 20 (dec columns-num))      ; cards right margin
-                          (when (> columns-num 1) 60))  ; x margins if needed
+    (let [header-width (responsive/total-layout-width-int card-width columns-num)
                                                                                     ; show the new update btn if
           fixed-show-share-su-button (and (not (responsive/is-mobile?))              ; it's not mobile
                                           (jwt/jwt)                                  ; the user is logged in
@@ -115,4 +115,9 @@
                 (dom/div {:class "sharing-button-container"}
                   (dom/a {:class "btn-reset sharing-button right"
                           :on-click #(router/nav! (oc-urls/stakeholder-update-preview))}
-                    "Share new update"))))))))))
+                    "Share new update")))
+              (when create-update-share-button-cb
+                (dom/div {:class "sharing-button-container"}
+                  (dom/button {:class "btn-reset btn-solid"
+                               :on-click create-update-share-button-cb
+                               :disabled create-update-share-button-disabled} "SHARE"))))))))))
