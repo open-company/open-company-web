@@ -69,7 +69,7 @@
           "The following people can view, edit and share information:"]
         (when (jwt/is-slack-org?)
           [:div.um-invite-label-2
-            "Members of your " [:img {:src "/img/slack_icon.png" :width 14 :height 14}] " Slack team (not guests)."])
+            "Members of your " [:img {:src "/img/Slack_Icon.png" :width 14 :height 14}] " Slack team (not guests)."])
         (when (pos? (count (:enumerate-users (rum/react dis/app-state))))
           (user-invitation (:enumerate-users (rum/react dis/app-state))))]
       (comment
