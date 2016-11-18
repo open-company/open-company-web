@@ -62,30 +62,14 @@
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
       (dis/dispatch! [:foce-input {:body emojied-body}]))
     (let [inner-text-count (count (.-innerText body-el))
-          remaining-chars (- body-max-length inner-text-count)
-          last-selection (om/get-state owner :last-selection)]
+          remaining-chars (- body-max-length inner-text-count)]
       ; restore the previous body if the new one exceeds the limit
       ; and the count is greater than the old, if it's less we let it update
       ; to let the user cancel content to get to the limit
-      (if (and (>= inner-text-count body-max-length)
-                 (>= inner-text-count (om/get-state owner :last-body-length)))
-        (do
-          (set! (.-innerHTML body-el) (om/get-state owner :last-body))
-          (when last-selection
-            (.restoreSelection js/rangy last-selection)
-            (.removeMarkers js/rangy last-selection)))
-        (when last-selection
-          (.removeMarkers js/rangy last-selection)))
-      (utils/after 10 (fn []
-        (let [new-inner-text-count (count (.-innerText (sel1 [(str "div#foce-body-" section-name)])))
-              new-remaining-chars (- body-max-length inner-text-count)]
-          (om/update-state! owner #(merge % {:has-changes true
-                                             :char-count new-remaining-chars
-                                             :char-count-alert (< new-remaining-chars body-alert-limit)
-                                             :last-selection (.saveSelection js/rangy js/window)
-                                             :last-body (.-innerHTML body-el)
-                                             :last-body-length new-inner-text-count
-                                             :can-save? (not (neg? new-remaining-chars))}))))))))
+      (om/update-state! owner #(merge % {:has-changes true
+                                         :char-count remaining-chars
+                                         :char-count-alert (< remaining-chars body-alert-limit)
+                                         :can-save? (not (neg? remaining-chars))})))))
 
 (defn- setup-edit [owner]
   (when-let* [section-kw   (keyword (om/get-props owner :section))
@@ -97,9 +81,7 @@
                   "editableInput"
                   (fn [event editable]
                     (body-on-change owner)))
-      (om/update-state! owner #(merge % {:body-editor body-editor
-                                         :last-body (.-innerHTML body-el)
-                                         :last-body-length (count (.-innerText body-el))})))
+      (om/set-state! owner :body-editor body-editor))
     (js/emojiAutocomplete)))
 
 (defn- headline-on-change [owner]
