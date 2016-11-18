@@ -265,10 +265,10 @@
 
       (utils/update-page-title (str "OpenCompany - " company-name))
 
-      (dom/div {:class "lg-col-5 md-col-7 col-11 mx-auto mt1 mb4 settings-container group"}
+      (dom/div {:class "mx-auto my4 settings-container group"}
         
-        (dom/div {:class "settings-form-label company-settings"}
-          (when-not company-name
+        (when-not company-name
+          (dom/div {:class "settings-form-label company-settings"}
             (loading/small-loading)))
         
         (dom/div {:class "settings-form p3"}
