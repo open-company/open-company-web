@@ -1,13 +1,30 @@
 div.um-invitations-box {
   color: rgba(78, 90, 107, 0.5);
   table.table {
+    margin-bottom: 0px;
     tr {
+
+      th {
+        margin: 1px;
+      }
+
+      th:last-child, td:last-child, td:last-child > div {
+        margin-left: 0px;
+        margin-right: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+
+      td:last-child {
+        text-align: right;
+      }
+
       th, td {
         border: none;
       }
 
-      td {
-        border-top: 1px solid rgba(78,90,107,0.1);
+      th {
+        border-bottom: 1px solid rgba(78,90,107,0.1);
       }
 
       th {
@@ -26,11 +43,11 @@ div.um-invitations-box {
         font-weight: 400;
         letter-spacing: 1px;
         color: $oc_gray_5;
-        padding: 3px;
+        padding: 1px;
 
         div {
           margin: 5px;
-          height: 30px;
+          height: 18px;
           padding: 0px;
           white-space: pre;
 

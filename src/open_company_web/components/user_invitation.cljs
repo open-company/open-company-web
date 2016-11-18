@@ -62,7 +62,7 @@
                                         s)}
   [invitations]
   (let [show-name? (some #(not (clojure.string/blank? (:real-name %))) invitations)]
-    [:div.my3.um-invitations-box.col-12.group
+    [:div.mt3.um-invitations-box.col-12.group
       [:table.table
         [:thead
           [:tr
