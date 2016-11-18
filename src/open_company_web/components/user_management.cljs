@@ -32,10 +32,9 @@
                                             (reset! public (not (not (:public (dis/company-data))))))
                                           s)}
   [{:keys [::has-changes ::public] :as s}]
-  [:div.user-management.lg-col-5.md-col-7.col-11.mx-auto.p3.mt4.mb4.group
-    {:style {:background-color "rgba(78, 90, 107, 0.05)"}}
-    [:div.mt3
-      [:div.my4.um-invite.group
+  [:div.user-management.mx-auto.p3.my4.group
+    [:div
+      [:div.mb3.um-invite.group
         [:div.um-invite-label
           "INVITE TEAM MEMBERS"]
           [:div
@@ -63,13 +62,14 @@
                 [:span.small-caps.red.mt1.left (str (:email (:um-invite @dis/app-state)) " is already a user.")]
                 :else
                 [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]]
-      [:div.my4.um-invite.group
+      [:div.um-invite.group
         [:div.um-invite-label
             "TEAM MEMBERS"]
         [:div.um-invite-label-2
           "The following people can view, edit and share information:"]
-        [:div.um-invite-label-2
-          "Members of your Slack team (not guests)."]
+        (when (jwt/is-slack-org?)
+          [:div.um-invite-label-2
+            "Members of your " [:img {:src "/img/slack_icon.png" :width 14 :height 14}] " Slack team (not guests)."])
         (when (pos? (count (:enumerate-users (rum/react dis/app-state))))
           (user-invitation (:enumerate-users (rum/react dis/app-state))))]
       (comment

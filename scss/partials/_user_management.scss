@@ -1,6 +1,7 @@
 div.user-management {
-  padding: 20px;
+  padding: 2rem;
   background-color: rgba(78, 90, 107, 0.05);
+  width: 560px;
 
   div.um-cta, div.vis-cta {
     font-weight: 500;
@@ -97,7 +98,7 @@ div.user-management {
     }
 
     input.um-invite-field {
-      width: 300px;
+      width: 290px;
       height: 34px;
       margin: 0px;
       padding: .5rem;
@@ -121,6 +122,8 @@ div.user-management {
 
     button.um-invite-send {
       margin-top: 3px;
+      margin-left: 20px;
+      float: left;
     }
   }
 
