@@ -34,38 +34,10 @@
   [{:keys [::has-changes ::public] :as s}]
   [:div.user-management.lg-col-5.md-col-7.col-11.mx-auto.p3.mt4.mb4.group
     {:style {:background-color "rgba(78, 90, 107, 0.05)"}}
-    [:div.group
-      [:div.vis-cta.pb2 "Visibility"]
-      [:div.vis-input-line.group
-        [:button.btn-reset.btn-outline.left
-          {:style {:width "150px" :margin-right "20px"}
-           :on-click #(do (reset! has-changes true) (reset! public (not @public)))}
-          "Private " (when (not @public) [:i.fa.fa-check.oc-green])]
-        [:p.vis-p
-          "The board is private. Only people added to the board can view and edit it."]]
-      [:div.vis-input-line.group
-        [:button.btn-reset.btn-outline.left
-          {:style {:width "150px" :margin-right "20px"}
-           :on-click #(do (reset! has-changes true) (reset! public (not @public)))}
-          "Public " (when @public [:i.fa.fa-check.oc-green])]
-        [:p.vis-p
-          "The board is public and will show up in search engines like Google. Only people added to the board can edit it."]]
-      [:button.right.btn-reset.btn-solid
-        {:disabled (not @has-changes)
-         :on-click #(do
-                      (reset! has-changes false)
-                      (api/patch-company (router/current-company-slug) {:public @public :promoted (not @public)}))} "SAVE"]]
     [:div.mt3
-      [:div.um-cta.pb2 "Users & Invitations"]
-      [:div.um-description
-        [:p.um-p
-          "Users can add and edit topics, and they can share updates with others."]
-        (when (= (jwt/get-key :auth-source) "slack")
-          [:p.um-p
-            "All members of your Slack organization (not guests) can authenticate as users. You can also invite users to join by email."])]
       [:div.my4.um-invite.group
         [:div.um-invite-label
-          "INVITE USER BY EMAIL"]
+          "INVITE TEAM MEMBERS"]
           [:div
             [:div.group
               [:input.left.um-invite-field.email
@@ -91,8 +63,15 @@
                 [:span.small-caps.red.mt1.left (str (:email (:um-invite @dis/app-state)) " is already a user.")]
                 :else
                 [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]]
-      (when (pos? (count (:enumerate-users (rum/react dis/app-state))))
-        (user-invitation (:enumerate-users (rum/react dis/app-state))))
+      [:div.my4.um-invite.group
+        [:div.um-invite-label
+            "TEAM MEMBERS"]
+        [:div.um-invite-label-2
+          "The following people can view, edit and share information:"]
+        [:div.um-invite-label-2
+          "Members of your Slack team (not guests)."]
+        (when (pos? (count (:enumerate-users (rum/react dis/app-state))))
+          (user-invitation (:enumerate-users (rum/react dis/app-state))))]
       (comment
         [:div.my2.um-byemail-container.group
           [:div.group
@@ -126,7 +105,7 @@
           ;; Company profile
           :else
           (dom/div {}
-            (back-to-dashboard-btn {:title "Visibility & User Management"})
+            (back-to-dashboard-btn {:title "Invite and Manage Team"})
             (dom/div {:class "company-settings-container"}
               (user-management))))
 
