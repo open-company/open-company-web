@@ -141,11 +141,13 @@
 (def updates-content-cards-right-margin 40)
 (def updates-content-cards-max-width 560)
 (def updates-content-cards-min-width 250)
+(def topic-list-x-padding 20)
+(def topic-border 4)
 
 (defn total-layout-width-int [card-width columns-num]
-  (- (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
-     20                                                   ; the container padding
-     40))                                                 ; the distance btw the columns
+  (+ (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
+     (* topic-list-x-padding 2)                           ; the padding around all the columns
+     (* topic-border 2)))                                 ; the remaining border around the topics
 
 (defn calc-update-width [columns-num]
   (let [card-width   (calc-card-width)
