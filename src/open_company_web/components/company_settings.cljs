@@ -73,6 +73,7 @@
     (api/patch-company slug {:name (:name company-data)
                              :slug slug
                              :currency (:currency company-data)
+                             :public (:public company-data)
                              :logo-width (js/parseInt fixed-logo-width)
                              :logo-height (js/parseInt fixed-logo-height)
                              :logo fixed-logo})))
@@ -97,7 +98,8 @@
   (let [logo             (om/get-state owner :logo)
         old-company-data (dis/company-data (om/get-props owner))
         new-company-data {:name (om/get-state owner :company-name)
-                          :currency (om/get-state owner :currency)}]
+                          :currency (om/get-state owner :currency)
+                          :public (om/get-state owner :public)}]
     (om/set-state! owner :loading true)
     ; if the log has changed
     (if (not= logo (om/get-state owner :initial-logo))
@@ -225,6 +227,7 @@
      :logo (or (:logo current-state) (:logo company-data))
      :company-name (or (:company-name current-state) (:name company-data))
      :currency (or (:currency current-state) (:currency company-data))
+     :public (:public company-data)
      :loading false
      :has-changes (or (:has-changes current-state) false)
      :show-save-successful (or (:show-save-successful current-state) false)}))
@@ -253,7 +256,7 @@
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
   (render-state [_ {company-uuid :uuid company-name :company-name logo :logo
-                    currency :currency loading :loading
+                    currency :currency public :public loading :loading
                     file-upload-state :file-upload-state upload-remote-url :upload-remote-url
                     file-upload-progress :file-upload-progress
                     show-save-successful :show-save-successful
@@ -291,7 +294,7 @@
                                                               (om/set-state! owner :logo %))})
 
           ;; Currency
-          (dom/div {:class "settings-form-input-label"} "DISPLAY FINANCE & GROWTH CHART CURRENCY AS")
+          (dom/div {:class "settings-form-input-label"} "DISPLAY CURRENCY IN CHARTS AS")
           (dom/select {:id "currency"
                        :value currency
                        :on-change #(do
@@ -305,6 +308,26 @@
                 (om/build currency-option
                           {:value (:code currency) :text label}
                           {:react-key (:code currency)}))))
+
+          ;; Visibility
+          (dom/div {:class "settings-form-input-label"} "VISIBILITY")
+          (dom/div {:class "settings-form-input visibility"}
+            (dom/div {:class "visibility-value"
+                      :on-click #(do
+                                  (om/set-state! owner :has-changes true)
+                                  (om/set-state! owner :public false))}
+              (dom/h3 {} "Private "
+                (when (not public)
+                  (dom/i {:class "fa fa-check"})))
+              (dom/p {} "Only team members can view, edit and share information."))
+            (dom/div {:class "visibility-value"
+                      :on-click #(do
+                                  (om/set-state! owner :has-changes true)
+                                  (om/set-state! owner :public true))}
+              (dom/h3 {} "Public "
+                (when public
+                  (dom/i {:class "fa fa-check"})))
+              (dom/p {} "Your information is public and will show up in search engines like Google. Only team members can edit and share information.")))
 
           ;; Save button
           (dom/div {:class "mt2 right-align group"}

@@ -23,6 +23,33 @@ div.main-company-settings {
         margin-bottom: 1rem;
       }
 
+      div.settings-form-input.visibility {
+        div.visibility-value {
+          cursor: pointer;
+          h3 {
+            font-size: 14px;
+            font-weight: 700;
+            font-family: $oc_headers_font;
+            color: rgba(78,90,107,1);
+            margin-bottom: 5px;
+
+            i.fa {
+              color: $oc_green;
+            }
+          }
+          p {
+            font-size: 12px;
+            font-weight: 400;
+            font-family: $oc_headers_font;
+            color: rgba(78,90,107,1);
+          }
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
       div.settings-form-label {
         font-size: 26px;
         line-height: 1.4;
