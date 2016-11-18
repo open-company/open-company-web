@@ -85,7 +85,7 @@
                :placeholder "your email domain without @"}]
             [:button.left.um-byemail-save.btn-reset.btn-outline "SAVE"]]])]])
 
-(defcomponent visibility [data owner]
+(defcomponent user-management-wrapper [data owner]
   (render [_]
     (let [company-data (dis/company-data data)]
 
