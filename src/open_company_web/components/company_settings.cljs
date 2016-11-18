@@ -282,9 +282,30 @@
                       :on-change #(do
                                    (om/set-state! owner :has-changes true)
                                    (om/set-state! owner :company-name (.. % -target -value)))})
+
+          ;; Visibility
+          (dom/div {:class "settings-form-input-label"} "VISIBILITY")
+          (dom/div {:class "settings-form-input visibility"}
+            (dom/div {:class "visibility-value"
+                      :on-click #(do
+                                  (om/set-state! owner :has-changes true)
+                                  (om/set-state! owner :public false))}
+              (dom/h3 {} "Private "
+                (when (not public)
+                  (dom/i {:class "fa fa-check"})))
+              (dom/p {} "Only team members can view, edit and share information."))
+            (dom/div {:class "visibility-value"
+                      :on-click #(do
+                                  (om/set-state! owner :has-changes true)
+                                  (om/set-state! owner :public true))}
+              (dom/h3 {} "Public "
+                (when public
+                  (dom/i {:class "fa fa-check"})))
+              (dom/p {} "Your information is public and will show up in search engines like Google. Only team members can edit and share information.")))
+
           ; Slug
           (dom/div {:class "settings-form-input-label"} "DASHBOARD URL")
-          (dom/div {:class "npt npt-disabled col-11 p1 mb3"} (str ls/web-server "/" (name slug)))
+          (dom/div {:class "dashboard-slug"} (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server "/" (name slug)))
 
           ;; Company logo
           (dom/div {:class "settings-form-input-label"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
@@ -308,26 +329,6 @@
                 (om/build currency-option
                           {:value (:code currency) :text label}
                           {:react-key (:code currency)}))))
-
-          ;; Visibility
-          (dom/div {:class "settings-form-input-label"} "VISIBILITY")
-          (dom/div {:class "settings-form-input visibility"}
-            (dom/div {:class "visibility-value"
-                      :on-click #(do
-                                  (om/set-state! owner :has-changes true)
-                                  (om/set-state! owner :public false))}
-              (dom/h3 {} "Private "
-                (when (not public)
-                  (dom/i {:class "fa fa-check"})))
-              (dom/p {} "Only team members can view, edit and share information."))
-            (dom/div {:class "visibility-value"
-                      :on-click #(do
-                                  (om/set-state! owner :has-changes true)
-                                  (om/set-state! owner :public true))}
-              (dom/h3 {} "Public "
-                (when public
-                  (dom/i {:class "fa fa-check"})))
-              (dom/p {} "Your information is public and will show up in search engines like Google. Only team members can edit and share information.")))
 
           ;; Save button
           (dom/div {:class "mt2 right-align group"}
