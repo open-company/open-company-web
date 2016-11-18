@@ -2,11 +2,10 @@ div.user-profile {
 
   div.user-profile-internal {
     position: relative;
+    padding: 2rem;
+
     @include big_web(){
-      width: 509px;
-      left: 50%;
-      margin-left: -254px;
-      padding-top: 0px;
+      width: 560px;
     }
     @include mobile{
       padding: 20px 20px 20px 20px;
@@ -29,7 +28,7 @@ div.user-profile {
 
     div.user-profile-disclaimer {
       @include big_web(){
-        width: 509px;
+        width: 560px;
       }
       height: 64px;
       font-size: 18px;
@@ -56,7 +55,7 @@ div.user-profile {
 
       div.left-column{
         @include big_web(){
-          width: 50%;
+          width: 70%;
           float: left;
         }
 
@@ -93,7 +92,7 @@ div.user-profile {
       div.right-column {
         @include big_web(){
           float: left;
-          width: 50%;
+          width: 30%;
           padding-left: 25px;
         }
 
