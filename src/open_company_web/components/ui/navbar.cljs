@@ -60,7 +60,10 @@
                                           (if (contains? data :show-share-su-button) ; the including component
                                             show-share-su-button                     ; wants to
                                             true))]
-      (dom/nav {:class (str "oc-navbar group" (when mobile-menu-open " mobile-menu-open"))}
+      (dom/nav {:class (utils/class-set {:oc-navbar true
+                                         :group true
+                                         :mobile-menu-open mobile-menu-open
+                                         :no-jwt (not (jwt/jwt))})}
         (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
           (login-overlays-handler))
         (dom/div {:class "oc-navbar-header group"

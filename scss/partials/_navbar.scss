@@ -21,6 +21,10 @@ nav.oc-navbar {
     overflow: hidden;
     height: #{$mobile_navbar_height}px;
 
+    &.no-jwt.mobile-menu-open {
+      height: #{$mobile_navbar_height + $mobile_menu_signout_height}px;
+    }
+
     &.mobile-menu-open {
       height: #{$mobile_navbar_height + $mobile_menu_height}px;
     }
