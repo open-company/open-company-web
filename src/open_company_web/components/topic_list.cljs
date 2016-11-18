@@ -357,12 +357,15 @@
       (when (and (:force-edit-topic next-props) (contains? company-data (keyword (:force-edit-topic next-props))))
         (om/set-state! owner :selected-topic (dispatcher/force-edit-topic)))
       ; show second tooltip if needed
-      (when (= (count no-placeholder-sections) 1)
+      (when (and (not (:read-only company-data))
+                 (= (count no-placeholder-sections) 1))
         (om/set-state! owner :show-second-add-topic-tooltip true))
       ; show share tooltip if needed
-      (when (= (count no-placeholder-sections) 2)
+      (when (and (not (:read-only company-data))
+                 (= (count no-placeholder-sections) 2))
         (om/set-state! owner :show-share-tooltip true))
-      (when (= (count (filter #(->> % keyword (get company-data) :pin) no-placeholder-sections)) 2)
+      (when (and (not (:read-only company-data))
+                 (= (count (filter #(->> % keyword (get company-data) :pin) no-placeholder-sections)) 2))
         (om/set-state! owner :show-second-pin-tip true))))
 
   (did-update [_ prev-props _]
