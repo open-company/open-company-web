@@ -21,6 +21,14 @@ div.su-preview-dialog {
       overflow-y: scroll;
       overflow-x: hidden;
       max-height: calc(100vh - 120px);
+
+      select.slack-channel {
+        -webkit-appearance: none;
+        align-items: center;
+        white-space: pre;
+        -webkit-rtl-ordering: logical;
+        cursor: default;
+      }
     }
 
     div.slack-note:empty:after, div.email-note:empty:after{

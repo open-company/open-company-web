@@ -37,6 +37,7 @@
                               slack-loading
                               show-share-su-button
                               active
+                              foce-key
                               mobile-menu-open] :as data} owner options]
 
   (did-mount [_]

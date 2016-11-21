@@ -78,6 +78,7 @@
 (defcomponent create-update [data owner]
 
   (init-state [_]
+    (dis/dispatch! [:start-foce nil])
     (let [company-data (dis/company-data data)
           su-data   (:stakeholder-update company-data)
           su-topics (if (empty? (:sections su-data))
