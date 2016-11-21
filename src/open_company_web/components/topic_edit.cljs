@@ -85,15 +85,15 @@
     (js/emojiAutocomplete)))
 
 (defn- headline-on-change [owner]
-  (om/set-state! owner :has-changes true)
-  (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
+  (when-let [headline        (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
     (let [headline-innerHTML (.-innerHTML headline)
-          emojied-headline (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+          emojied-headline   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML headline)) "__html"))
+          remaining-chars    (- headline-max-length (count (.-innerText headline)))]
       (dis/dispatch! [:foce-input {:headline emojied-headline}])
-      (let [headline-text   (.-innerText headline)
-            remaining-chars (- headline-max-length (count headline-text))]
-        (om/update-state! owner #(merge % {:char-count remaining-chars
-                                           :char-count-alert (< remaining-chars headline-alert-limit)}))))))
+      (om/update-state! owner #(merge % {:char-count remaining-chars
+                                         :char-count-alert (< remaining-chars headline-alert-limit)
+                                         :headline-exceeds (neg? remaining-chars)
+                                         :has-changes true})))))
 
 (defn- check-headline-count [owner e has-changes]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
@@ -196,12 +196,23 @@
 
 (defn- save-topic [owner]
   (let [topic           (name (dis/foce-section-key))
-        body-el         (js/$ (str "#foce-body-" (name topic)))]
-    (if (om/get-state owner :body-exceeds)
+        body-el         (js/$ (str "#foce-body-" (name topic)))
+        headline-el     (js/$ (str "#foce-headline-" (name topic)))]
+    (cond
+      ;; if the headline exceeds: focus on it with the cursor at the end, show the chart count
+      (om/get-state owner :headline-exceeds)
+      (do
+        (.focus headline-el)
+        (headline-on-change owner)
+        (utils/to-end-of-content-editable (.get headline-el 0)))
+      ;; if the body exceeds: focus on it with the cursor at the end, show the chart count
+      (om/get-state owner :body-exceeds)
       (do
         (.focus body-el)
         (body-on-change owner)
         (utils/to-end-of-content-editable (.get body-el 0)))
+      ;; body and headline have the right number of chars, moving on with save
+      :else
       (do
         (utils/remove-ending-empty-paragraph body-el)
         (let [topic-data   (dis/foce-section-data)
@@ -252,7 +263,8 @@
        :has-changes false
        :file-upload-state nil
        :file-upload-progress 0
-       :body-exceeds false}))
+       :body-exceeds false
+       :headline-exceeds false}))
 
   (will-receive-props [_ next-props]
     ;; update body placeholder when receiving data from API
@@ -315,7 +327,7 @@
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
                            file-upload-state file-upload-progress upload-remote-url body-exceeds
-                           has-changes]}]
+                           headline-exceeds has-changes]}]
 
     (let [company-slug        (router/current-company-slug)
           section             (dis/foce-section-key)
