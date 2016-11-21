@@ -108,6 +108,8 @@
     ;; add section name inside each section
     (let [updated-body (utils/fix-sections body)
           with-company-data (assoc-in db (dispatcher/company-data-key (:slug updated-body)) updated-body)]
+      ; async preload the SU list
+      (utils/after 100 #(api/get-su-list))
       (if (or (:read-only updated-body)
               (pos? (count (:sections updated-body)))
               (:force-remove-loading with-company-data))
