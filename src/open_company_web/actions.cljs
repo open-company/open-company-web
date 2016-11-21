@@ -136,24 +136,31 @@
      (dissoc :loading))
     db))
 
-(defmethod dispatcher/action :get-su-list [db [_ {:keys [slug response]}]]
+(defn- get-su-list [db]
   (api/get-su-list)
   (assoc db :su-list-loading true))
+
+(defmethod dispatcher/action :get-su-list [db [_ {:keys [slug response]}]]
+  (get-su-list db))
 
 (defmethod dispatcher/action :su-list [db [_ {:keys [slug response]}]]
   (-> db
     (dissoc :loading)
     (dissoc :su-list-loading)
+    (assoc :su-list-loaded true)
     (assoc-in (dispatcher/su-list-key slug) response)))
 
 (defmethod dispatcher/action :su-edit [db [_ {:keys [slug su-date su-slug]}]]
-  (let [su-url   (oc-urls/stakeholder-update slug (utils/su-date-from-created-at su-date) su-slug)]
+  (let [su-url   (oc-urls/stakeholder-update slug (utils/su-date-from-created-at su-date) su-slug)
+        latest-su-key (dispatcher/latest-stakeholder-update-key slug)]
     (-> db
-      (assoc-in (dispatcher/latest-stakeholder-update-key slug) su-url)
-      (dissoc :loading))))
+      (assoc-in latest-su-key su-url)
+      (dissoc :loading)
+      ; refresh the su list
+      (get-su-list))))
 
 (defmethod dispatcher/action :stakeholder-update [db [_ {:keys [slug update-slug response load-company-data]}]]
-  (let [company-data-keys [:logo :logo-width :logo-height :name :slug :currency]
+  (let [company-data-keys [:logo :logo-width :logo-height :name :slug :currency :public :promoted]
         company-data      (select-keys response company-data-keys)]
     ; load-company-data is used to save the subset of company data that is returned with a stakeholder-update data
     (if load-company-data
@@ -162,7 +169,7 @@
         (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
         (assoc-in (dispatcher/company-data-key slug) (utils/fix-sections company-data))
         (dissoc :loading))
-      ; save only the company data
+      ; save only the SU data
       (-> db
         (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
         (dissoc :loading)))))
@@ -450,13 +457,5 @@
 
 (defmethod dispatcher/action :reset-su-list
   [db [_]]
-  "Remove the list of SU and the latest SU link to make sure they are reloaded."
-  (let [slug (router/current-company-slug)
-        su-list-key (dispatcher/su-list-key slug)
-        latest-su-key (dispatcher/latest-stakeholder-update-key slug)]
-    ; return the db
-    (-> db
-      ; w/o the su-list
-      (update-in (butlast su-list-key) dissoc (last su-list-key))
-      ; w/o the latest SU link
-      (update-in (butlast latest-su-key) dissoc (last latest-su-key)))))
+  ; Reset flag to reload su list when needed
+  (dissoc db :su-list-loaded))
