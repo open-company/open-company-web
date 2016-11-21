@@ -339,7 +339,8 @@
                 (loading/small-loading)
                 "SAVE"))
             (dom/button {:class "btn-reset btn-outline right mr2"
-                         :on-click #(cancel-clicked owner)}
+                         :on-click #(cancel-clicked owner)
+                         :disabled (not has-changes)}
               "CANCEL")
             (dom/div {:style {:margin-top "5px"
                               :opacity (if show-save-successful "1" "0")}
