@@ -5,6 +5,17 @@ div.su-snapshot {
     margin-bottom: 0px;
   }
 
+  &.has-navbar {
+    div.su-sp-content {
+      @include mobile(){
+        padding-top: calc(20px + #{$mobile_navbar_height}px);
+      }
+      @include big_web(){
+        padding-top: calc(40px + #{$mobile_navbar_height}px);
+      }
+    }
+  }
+
   div.su-sp-content {
     position: relative;
     content: "";

@@ -35,6 +35,11 @@ nav.oc-navbar {
   margin: 0px;
   box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
 
+  &.su-navbar {
+    height: #{$mobile_navbar_height}px;
+    overflow: hidden;
+  }
+
   div.su-snapshot-preview{
     position: absolute;
     top: 0; left: 0; right: 0;
