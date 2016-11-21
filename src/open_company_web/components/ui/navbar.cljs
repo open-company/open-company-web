@@ -39,6 +39,7 @@
                               create-update-share-button-cb
                               create-update-share-button-disabled
                               active
+                              foce-key
                               mobile-menu-open] :as data} owner options]
 
   (did-mount [_]

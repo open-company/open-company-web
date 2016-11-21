@@ -22,7 +22,6 @@
 (defn send-clicked [type]
   (let [post-data (get-in @dis/app-state [:su-share type])
         emojied   (update post-data :note (fnil utils/unicode-emojis ""))]
-    (dis/dispatch! [:su-share/reset])
     (api/share-stakeholder-update {type emojied})))
 
 (defn select-share-link [event]
@@ -186,12 +185,14 @@
        {:content-editable true
         :on-key-down #(email-note-did-change)
         :on-key-up #(email-note-did-change)
+        :on-input #(email-note-did-change)
         :placeholder "Optional note to go with this update."}]
       [:div.group
         {:style {:min-height "25px"}}
         [:div.left
           {:style {:color "rgba(78, 90, 107, 0.5)"}}
-          (emoji-picker {:add-emoji-cb (fn [_] (email-note-did-change))})]]]]])
+          (emoji-picker {:add-emoji-cb (fn [_] (email-note-did-change))
+                         :position "top"})]]]]])
 
 (defn slack-note-did-change []
   (let [slack-notes (utils/emoji-images-to-unicode (.-innerHTML (sel1 [:div.slack-note])))]
@@ -199,27 +200,44 @@
                     [:su-share :slack :note]
                     slack-notes])))
 
-(rum/defc slack-dialog < rum/static emoji-autocomplete
-  []
+(rum/defcs slack-dialog < rum/static
+                         rum/reactive
+                         (drv/drv :su-share)
+                         emoji-autocomplete
+  [s]
   [:div
-   (modal-title "Share to Your Slack Team" :slack)
-   [:div.p3
-    [:label.block.small-caps.bold.mb2 "Your Note"]
-    [:div.npt.group
-      [:div.domine.p1.col-12.emoji-autocomplete.ta-mh.no-outline.emojiable.slack-note
-        {:content-editable true
-         :placeholder "Optional note to go with this update."
-         :on-key-down #(slack-note-did-change)
-         :on-key-up #(slack-note-did-change)}]
-      [:div.group
-        {:style {:min-height "25px"}}
-        [:div.left
-          {:style {:color "rgba(78, 90, 107, 0.5)"}}
-          (emoji-picker {:add-emoji-cb (fn [_] (slack-note-did-change))})]]]]])
+    (modal-title "Share to Slack" :slack)
+    [:div.p3
+      
+      (let [channels (or (:enumerate-channels (rum/react dis/app-state)) [])]
+        [:div
+          [:label.block.small-caps.bold.mb2 "To"]
+          [:select {:id "channel"
+                    :value (or (->> (drv/react s :su-share) :slack :channel) "__everyone__")
+                    :on-change #(dis/dispatch! [:input [:su-share :slack :channel] (.. % -target -value)])
+                    :class "npt col-11 p1 mb3 slack-channel"}
+            [:option {:value "__everyone__"} "All non-guest members of your Slack organization"]
+            (for [channel channels]
+              [:option {:value (:id channel) :key (:id channel)} (str "#" (:name channel))])]])
+    
+      [:label.block.small-caps.bold.mb2 "Your Note"]
+      [:div.npt.group
+        [:div.domine.p1.col-12.emoji-autocomplete.ta-mh.no-outline.emojiable.slack-note
+          {:content-editable true
+           :placeholder "Optional note to go with this update."
+           :on-key-down #(slack-note-did-change)
+           :on-key-up #(slack-note-did-change)
+           :on-input #(slack-note-did-change)}]
+        [:div.group
+          {:style {:min-height "25px"}}
+          [:div.left
+            {:style {:color "rgba(78, 90, 107, 0.5)"}}
+            (emoji-picker {:add-emoji-cb (fn [_] (slack-note-did-change))})]]]]])
 
 (rum/defcs link-dialog < (rum/local false ::copied)
                          (rum/local false ::clipboard)
                          (clipboard-mixin ".js-copy-btn")
+                         {:will-unmount (fn [s] (dis/dispatch! [:su-share/reset]) s)}
   [{:keys [::copied] :as _state} link]
   [:div
    (modal-title  "Share a Link" :link-72)
@@ -242,22 +260,36 @@
       "Open in New Window"]]]])
 
 (rum/defc prompt-dialog < rum/static
+  {:before-render (fn [s] ; Start request for Slack channels so it'll be ready if needed
+                    (let [jwt (:jwt @dis/app-state)]
+                      ;; Decide if we should ask for Slack channels (pro-actively so they are already loaded)
+                      (when (and (= (:auth-source jwt) "slack") ; auth'd w/ Slack
+                                 (not (nil? (-> jwt :bot :token))) ; with an installed Slack bot
+                                 (:auth-settings @dis/app-state) ; know where Auth APIs are
+                                 (not (:enumerate-channels-requested @dis/app-state))) ; haven't already requested
+                        ;; Ask for public Slack channels
+                        (dis/dispatch! [:enumerate-channels])))
+                    s)}
   [prompt-cb]
-  [:div
-   (modal-title "Share Update" nil)
-   [:div.p3
-    [:div.group
-     [:button.btn-reset {:on-click #(prompt-cb :slack)}
-      [:div.circle50.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
-      [:span.left.ml1.gray5.h6 {} "SHARE TO SLACK"]]]
-    [:div.group
-     [:button.btn-reset {:on-click #(prompt-cb :email)}
-      [:div.circle50.left (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
-      [:span.left.ml1.gray5.h6 {} "SHARE BY EMAIL"]]]
-    [:div.group
-     [:button.btn-reset {:on-click #(prompt-cb :link)}
-      [:div.circle50.left (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
-      [:span.left.ml1.gray5.h6 {} "SHARE A LINK"]]]]])
+  (let [jwt (:jwt @dis/app-state)
+        slack-share? (and (= (:auth-source jwt) "slack") ; auth'd w/ Slack
+                          (not (nil? (-> jwt :bot :token))))] ; with an installed Slack bot
+    [:div
+     (modal-title "Share Update" nil)
+     [:div.p3
+      (when slack-share?
+        [:div.group
+         [:button.btn-reset {:on-click #(prompt-cb :slack)}
+          [:div.circle50.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
+          [:span.left.ml1.gray5.h6 {} "SHARE TO SLACK"]]])
+      [:div.group
+       [:button.btn-reset {:on-click #(prompt-cb :email)}
+        [:div.circle50.left (i/icon :email-84 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
+        [:span.left.ml1.gray5.h6 {} "SHARE BY EMAIL"]]]
+      [:div.group
+       [:button.btn-reset {:on-click #(prompt-cb :link)}
+        [:div.circle50.left (i/icon :link-72 {:color "rgba(78,90,107,0.6)" :accent-color "rgba(78,90,107,0.6)" :size 20})]
+        [:span.left.ml1.gray5.h6 {} "SHARE A LINK"]]]]]))
 
 (rum/defcs modal-actions < rum/reactive (drv/drv :su-share)
   [s send-fn cancel-fn type]
@@ -280,6 +312,7 @@
         "Send")])])
 
 (rum/defc confirmation < rum/static
+                         {:will-unmount (fn [s] (dis/dispatch! [:su-share/reset]) s)}
   [type cancel-fn]
   [:div
    (case type
@@ -289,7 +322,12 @@
     [:p.domine
      (case type
        :email "Recipients will get your update by email."
-       :slack "Members of your Slack organization will get your update.")]
+       :slack (let [ch (->> @dis/app-state :su-share :slack :channel)
+                    ch-id (filter #(= (:id %) ch) (or (:enumerate-channels @dis/app-state) []))
+                    ch-name (if (pos? (count ch-id)) (:name (first ch-id)) "__everyone__")]
+                (if (= ch-name "__everyone__")
+                  "This update has been shared with your team."
+                  (str "This update has been shared with #" ch-name "."))))]
     [:div.right-align.mt3
      [:button.btn-reset.btn-solid
       {:on-click cancel-fn}

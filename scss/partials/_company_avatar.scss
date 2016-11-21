@@ -43,6 +43,11 @@ div.company-avatar {
       margin-top: -34px;
       margin-left: 54px;
       float: left;
+
+      &.no-logo {
+        margin-top: 10px;
+        margin-left: 0px;
+      }
     }
   }
 }

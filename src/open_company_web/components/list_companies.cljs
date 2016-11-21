@@ -18,9 +18,8 @@
               :on-click (fn [e]
                           (.preventDefault e)
                           (router/nav! (oc-urls/company (:slug data))))}
-        (if-not (clojure.string/blank? (:logo data))
-          (dom/img {:class "company-logo" :src (:logo data)})
-          (dom/span {:class "company-logo"} (first (clojure.string/upper-case (:name data)))))
+        (when-not (clojure.string/blank? (:logo data))
+          (dom/img {:class "company-logo" :src (:logo data)}))
         (:name data)))))
 
 (defcomponent list-companies [{:keys [mobile-menu-open] :as data} owner]

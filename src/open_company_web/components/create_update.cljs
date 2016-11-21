@@ -18,17 +18,25 @@
             [open-company-web.components.su-preview-dialog :refer (su-preview-dialog)]
             [clojure.data :as cd]))
 
-(defn ordered-topics-list []
+(defn ordered-topics-list
+  "Return the list of active topics in the order the user moved them."
+  []
   (let [topics (sel [:div.create-update-topics-list :div.oc-active])
         topics-list (for [topic topics] (.data (js/jQuery topic) "topic"))]
     (vec (remove nil? topics-list))))
 
-(defn remove-pinned [data]
+(defn remove-pinned
+  "Set all pin flag to false for all sections in the company data to avoid
+   topics-columns component order them by pinned/unpinned."
+  [data]
+  ; loop through all the kyes of the passed company-data map
   (loop [topics data
          all-keys (vec (keys data))
          idx 0]
     (if (= idx (count all-keys))
+      ; if we reached the last key return the updated data
       topics
+      ; if not set false to the pin key if the examined k is for a map
       (let [k (get all-keys idx)
             v (get topics k)
             new-v (if (map? v)
@@ -36,6 +44,7 @@
                       (assoc v :pin false)
                       v)
                     v)]
+         ; loop to the next key
          (recur (assoc topics k new-v)
                 all-keys
                 (inc idx))))))
@@ -46,13 +55,16 @@
     (api/patch-stakeholder-update {:title (or title "")
                                    :sections topics})))
 
-(defn setup-sortable [owner]
+(defn setup-sortable
+  "Setup the jQuery UI Sortable on the create-update-topics-list div"
+  [owner]
   (when-let [list-node (js/jQuery "div.create-update-topics-list")]
     (-> list-node
       (.sortable #js {:scroll true
                       :forcePlaceholderSize true
                       :items ".oc-active"
                       :stop (fn [event ui]
+                              ; the user stopped ordering, save the current order
                               (when-let [dragged-item (gobj/get ui "item")]
                                 (om/update-state! owner #(merge % {:su-topics (ordered-topics-list)
                                                                    :should-update-data false}))
@@ -67,6 +79,7 @@
 (defcomponent create-update [data owner]
 
   (init-state [_]
+    (dis/dispatch! [:start-foce nil])
     (let [company-data (dis/company-data data)
           su-data   (:stakeholder-update company-data)
           su-topics (if (empty? (:sections su-data))

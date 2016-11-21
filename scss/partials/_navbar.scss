@@ -117,7 +117,6 @@ nav.oc-navbar {
   }
 
   div.oc-navbar-bottom {
-    backgorund-color: blue;
     position: relative;
     margin: 10px auto;
     padding: 0 34px;
@@ -132,9 +131,15 @@ nav.oc-navbar {
       margin-right: 20px;
       font-family: $oc_headers_font;
       margin-top: 2px;
+      outline: none;
 
       &:hover {
         color: $oc_gray_5;
+      }
+
+      &:hover, &:active, &:focus {
+        outline: none;
+        text-decoration: none;
       }
 
       &.active {

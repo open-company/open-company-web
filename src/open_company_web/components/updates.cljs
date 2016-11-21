@@ -83,6 +83,7 @@
                               :columns-num columns-num
                               :company-data company-data
                               :foce-key (:foce-key data)
+                              :show-share-su-button (utils/can-edit-sections? company-data)
                               :active :updates
                               :mobile-menu-open (:mobile-menu-open data)
                               :auth-settings (:auth-settings data)})
@@ -118,6 +119,7 @@
 (defcomponent updates-responsive-switcher [data owner]
 
   (init-state [_]
+    (dis/dispatch! [:start-foce nil])
     {:mobile-size (responsive/is-mobile-size?)})
 
   (did-mount [_]

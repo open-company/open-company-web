@@ -20,11 +20,11 @@
 (defn- half-offset [pixels]
   (str "-" (Math/round (* 0.5 pixels)) "px"))
 
-(defn update-click [link e]
+(defn- update-click [link e]
   (utils/event-stop e)
   (router/nav! link))
 
-(defn load-prior-updaes-if-needed []
+(defn load-prior-updates-if-needed []
   (when (and (dispatcher/company-data)
              (not (:su-list-loading @dispatcher/app-state))
              (not (get-in @dispatcher/app-state (dispatcher/su-list-key (router/current-company-slug)))))
@@ -38,9 +38,10 @@
   (let [company-slug (router/current-company-slug)
         updates (reverse (drv/react s :su-list))
         none? (empty? updates)
-        mobile? (responsive/is-mobile-size?)]
+        mobile? (responsive/is-mobile-size?)
+        company-data (dispatcher/company-data)]
     (when standalone-component
-      (load-prior-updaes-if-needed))
+      (load-prior-updates-if-needed))
     (if (and standalone-component
              (not (dispatcher/stakeholder-update-list-data)))
       [:div.prior-updates
@@ -55,8 +56,11 @@
           (if (empty? updates)
 
             [:div.message-container.pt2
-              [:h3.message "No company updates have been shared yet."]
-              [:p.message "As updates are shared via Email, Slack and URL, they will show up here so they are always easy to find and read."]]
+              [:h3.message "No company updates have been shared."]
+              [:p.message
+                (if (>= (count (utils/filter-placeholder-sections (vec (map keyword (:sections company-data))) company-data)) 2)
+                  "As updates are shared by email, Slack or URL, they show up here so they are easy to find and read."
+                  "This is where you’ll find company updates once you’ve shared with others. Create some topics on your dashboard first, then you’ll be able to give it a try.")]]
 
             [:div.update-container.pt2
               (for [update updates]

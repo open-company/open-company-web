@@ -64,7 +64,8 @@
                          (events/unlistenByKey (::focusout-listener s))
                          (dissoc s ::click-listener ::focusin-listener ::focusout-listener))}
   
-  [s {:keys [add-emoji-cb]}]
+  [s {:keys [add-emoji-cb position]
+      :or {:position "bottom"}}]
   (let [visible (::visible s)
         caret-pos (::caret-pos s)
         last-active-element (::last-active-element s)
@@ -86,7 +87,7 @@
          [:i.fa.fa-smile-o]]
       [:div.picker-container.absolute
         {:style {:display (if @visible "block" "none")
-                 :top "25px"
+                 :top (if (= position "bottom") "25px" "-220px")
                  :left "0"}}
         (when-not (utils/is-test-env?)
           (react-utils/build js/EmojionePicker {:search "" :onChange (fn [emoji]
