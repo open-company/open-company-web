@@ -194,7 +194,7 @@
               topic-row-style (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
                                       (utils/in? (:route @router/path) "su-list"))
                                 #js {}
-                                #js {:width (if (responsive/is-mobile?) "auto" (str (:card-width props) "px"))})]
+                                #js {:width (if (responsive/is-mobile-size?) "auto" (str (:card-width props) "px"))})]
           (when-not (and (:read-only company-data) (:placeholder sd))
             (dom/div #js {:className "topic-row"
                           :data-topic (name section-name)
@@ -244,7 +244,7 @@
           partial-render-topic   (partial render-topic owner options)
           {:keys [pinned other]} (utils/get-pinned-other-keys topics company-data)
           columns-container-key   (str (apply str pinned) (apply str other))
-          topics-column-conatiner-style (if (responsive/is-mobile?)
+          topics-column-conatiner-style (if (responsive/is-mobile-size?)
                                           #js {:margin "0px 9px"
                                                :width "auto"}
                                           #js {:width total-width})]
