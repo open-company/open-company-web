@@ -108,9 +108,7 @@
     (setup-sortable owner)
     (om/set-state! owner :resize-listener
       (events/listen js/window EventType/RESIZE (fn [] (om/update-state! owner #(merge % {:columns-num (responsive/columns-num)
-                                                                                          :card-width (responsive/calc-card-width)})))))
-    ; preset the scroll to hide the navbar but let the user scroll back up
-    (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 71)))
+                                                                                          :card-width (responsive/calc-card-width)}))))))
 
   (did-update [_ _ _]
     (setup-sortable owner))
