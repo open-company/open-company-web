@@ -80,7 +80,7 @@
   ([data]
     (latest-stakeholder-update data (router/current-company-slug)))
   ([data company-slug]
-    (get-in data [(keyword company-slug) :latest-su])))
+    (get-in data (latest-stakeholder-update-key company-slug))))
 
 (defn stakeholder-update-list-data
   ([]

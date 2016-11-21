@@ -18,40 +18,41 @@
             [open-company-web.components.ui.small-loading :refer (small-loading)]))
 
 (defn load-latest-su [owner data]
-  (when (and (dis/stakeholder-update-list-data data)
-             (not (dis/latest-stakeholder-update data)))
+  (when (and (:su-list-loaded data)
+             (not (om/get-state owner :selected-su)))
     (let [su-list (:collection (dis/stakeholder-update-list-data data))
           last-su (last (:stakeholder-updates su-list))]
-      (when (not (om/get-state owner :selected-su))
-        (om/set-state! owner :selected-su (:slug last-su))
-        (api/get-stakeholder-update (router/current-company-slug) (:slug last-su) false)))))
+      (om/set-state! owner :selected-su (:slug last-su)))))
 
 (defn load-su-list-if-needed [owner data]
-  (when (and (dis/company-data data)
+  (when (and (dis/company-data (om/get-props owner))
              (not (:su-list-loading data))
-             (not (dis/stakeholder-update-list-data data (router/current-company-slug))))
+             (not (:su-list-loaded data))
+             (not (om/get-state owner :su-list-loading)))
+    (om/set-state! owner :su-list-loading true)
     (dis/dispatch! [:get-su-list])))
 
 (defcomponent updates [data owner]
 
   (init-state [_]
-    (load-su-list-if-needed owner data)
     (let [current-update-slug (router/current-stakeholder-update-slug)]
       (when current-update-slug
         (api/get-stakeholder-update (router/current-company-slug) current-update-slug false))
       {:columns-num (responsive/columns-num)
        :card-width (responsive/calc-card-width)
        :su-list (dis/stakeholder-update-list-data)
+       :su-list-loading false
        :selected-su current-update-slug}))
 
   (will-receive-props [_ next-props]
     (load-su-list-if-needed owner next-props)
-    (load-latest-su owner next-props)
+    (when (:su-list-loaded next-props)
+      (load-latest-su owner next-props))
     (om/update-state! owner #(merge % {:su-list (dis/stakeholder-update-list-data)})))
 
   (did-mount [_]
-    (load-su-list-if-needed owner data)
-    (load-latest-su owner data)
+    (when (:su-list-loaded data)
+      (load-latest-su owner data))
     (om/set-state! owner :resize-listener
       (events/listen js/window EventType/RESIZE (fn [] (om/update-state! owner #(merge % {:columns-num (responsive/columns-num)
                                                                                           :card-width (responsive/calc-card-width)}))))))
@@ -61,6 +62,8 @@
       (events/unlistenByKey resize-listener)))
 
   (did-update [_ _ prev-state]
+    ; if we had a selected-su and it changed let's load the new update data
+    ; if selected-su was empty there is no need to load
     (when (not= (:selected-su prev-state) (om/get-state owner :selected-su))
       (api/get-stakeholder-update (router/current-company-slug) (om/get-state owner :selected-su) false)))
 
