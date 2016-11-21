@@ -33,6 +33,8 @@
 (def headline-max-length 100)
 (def title-alert-limit 3)
 (def headline-alert-limit 10)
+(def body-max-length 500)
+(def body-alert-limit 50)
 
 (def before-unload-message "You have unsaved edits. Are you sure you want to leave this topic?")
 (def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
@@ -57,16 +59,23 @@
   (when-let* [section-kw   (keyword (om/get-props owner :section))
               section-name (name section-kw)
               body-el      (sel1 [(str "div#foce-body-" section-name)])]
-    (om/set-state! owner :has-changes true)
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
       (dis/dispatch! [:foce-input {:body emojied-body}]))
-    (let [inner-text (.-innerText body-el)]
-      (om/set-state! owner :char-count nil))))
+    (let [inner-text-count (count (.-innerText body-el))
+          remaining-chars (- body-max-length inner-text-count)]
+      ; restore the previous body if the new one exceeds the limit
+      ; and the count is greater than the old, if it's less we let it update
+      ; to let the user cancel content to get to the limit
+      (om/update-state! owner #(merge % {:has-changes true
+                                         :char-count remaining-chars
+                                         :char-count-alert (< remaining-chars body-alert-limit)
+                                         :body-exceeds (neg? remaining-chars)})))))
 
 (defn- setup-edit [owner]
   (when-let* [section-kw   (keyword (om/get-props owner :section))
               section-name (name section-kw)
-              body-el      (sel1 [(str "div#foce-body-" section-name)])]
+              body-id      (str "div#foce-body-" section-name)
+              body-el      (sel1 [body-id])]
     (let [body-editor      (new js/MediumEditor body-el (clj->js (utils/medium-editor-options "" false)))]
       (.subscribe body-editor
                   "editableInput"
@@ -76,16 +85,15 @@
     (js/emojiAutocomplete)))
 
 (defn- headline-on-change [owner]
-  (om/set-state! owner :has-changes true)
-  (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
+  (when-let [headline        (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
     (let [headline-innerHTML (.-innerHTML headline)
-          emojied-headline (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+          emojied-headline   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML headline)) "__html"))
+          remaining-chars    (- headline-max-length (count (.-innerText headline)))]
       (dis/dispatch! [:foce-input {:headline emojied-headline}])
-      (let [headline-text   (.-innerText headline)
-            remaining-chars (- headline-max-length (count headline-text))]
-        (om/set-state! owner :char-count remaining-chars)
-        (om/set-state! owner :char-count-alert (< remaining-chars headline-alert-limit))
-        (om/set-state! owner :negative-headline-char-count (neg? remaining-chars))))))
+      (om/update-state! owner #(merge % {:char-count remaining-chars
+                                         :char-count-alert (< remaining-chars headline-alert-limit)
+                                         :headline-exceeds (neg? remaining-chars)
+                                         :has-changes true})))))
 
 (defn- check-headline-count [owner e has-changes]
   (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
@@ -188,32 +196,49 @@
 
 (defn- save-topic [owner]
   (let [topic           (name (dis/foce-section-key))
-        body-el         (js/$ (str "#foce-body-" (name topic)))]
-    (utils/remove-ending-empty-paragraph body-el)
-    (let [topic-data   (dis/foce-section-data)
-          company-data (dis/company-data)
-          sections     (vec (:sections company-data))
-          fixed-body   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.html body-el)) "__html"))
-          data-to-save {:body fixed-body}]
-      (cond
-        (and (not (om/get-state owner :initially-pinned))
-             (:pin topic-data))
-        ; needs to PATCH :sections to move the topic at the top of the unpinned topics
-        (let [without-topic (utils/vec-dissoc sections topic)
-              {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
-              with-pinned-topic (let [[before after] (split-at (count pinned) without-topic)]
-                                  (vec (concat before [topic] after)))]
-          (dis/dispatch! [:foce-save with-pinned-topic data-to-save]))
-        (and (om/get-state owner :initially-pinned)
-             (not (:pin topic-data)))
-        ; needs to PATCH :sections to move the topic at the top of the unpinned topics
-        (let [without-topic (utils/vec-dissoc sections topic)
-              {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
-              with-unpinned-topic (let [[before after] (split-at (inc (count pinned)) without-topic)]
-                                  (vec (concat before [topic] after)))]
-          (dis/dispatch! [:foce-save with-unpinned-topic data-to-save]))
-        :else
-        (dis/dispatch! [:foce-save sections data-to-save])))))
+        body-el         (js/$ (str "#foce-body-" (name topic)))
+        headline-el     (js/$ (str "#foce-headline-" (name topic)))]
+    (cond
+      ;; if the headline exceeds: focus on it with the cursor at the end, show the chart count
+      (om/get-state owner :headline-exceeds)
+      (do
+        (.focus headline-el)
+        (headline-on-change owner)
+        (utils/to-end-of-content-editable (.get headline-el 0)))
+      ;; if the body exceeds: focus on it with the cursor at the end, show the chart count
+      (om/get-state owner :body-exceeds)
+      (do
+        (.focus body-el)
+        (body-on-change owner)
+        (utils/to-end-of-content-editable (.get body-el 0)))
+      ;; body and headline have the right number of chars, moving on with save
+      :else
+      (do
+        (utils/remove-ending-empty-paragraph body-el)
+        (let [topic-data   (dis/foce-section-data)
+              company-data (dis/company-data)
+              sections     (vec (:sections company-data))
+              fixed-body   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.html body-el)) "__html"))
+              data-to-save {:body fixed-body}]
+          (cond
+            (and (not (om/get-state owner :initially-pinned))
+                 (:pin topic-data))
+            ; needs to PATCH :sections to move the topic at the top of the unpinned topics
+            (let [without-topic (utils/vec-dissoc sections topic)
+                  {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
+                  with-pinned-topic (let [[before after] (split-at (count pinned) without-topic)]
+                                      (vec (concat before [topic] after)))]
+              (dis/dispatch! [:foce-save with-pinned-topic data-to-save]))
+            (and (om/get-state owner :initially-pinned)
+                 (not (:pin topic-data)))
+            ; needs to PATCH :sections to move the topic at the top of the unpinned topics
+            (let [without-topic (utils/vec-dissoc sections topic)
+                  {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
+                  with-unpinned-topic (let [[before after] (split-at (inc (count pinned)) without-topic)]
+                                      (vec (concat before [topic] after)))]
+              (dis/dispatch! [:foce-save with-unpinned-topic data-to-save]))
+            :else
+            (dis/dispatch! [:foce-save sections data-to-save])))))))
 
 (defn- data-editing-cb [owner value]
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
@@ -237,7 +262,9 @@
        :char-count-alert false
        :has-changes false
        :file-upload-state nil
-       :file-upload-progress 0}))
+       :file-upload-progress 0
+       :body-exceeds false
+       :headline-exceeds false}))
 
   (will-receive-props [_ next-props]
     ;; update body placeholder when receiving data from API
@@ -299,14 +326,13 @@
         (.focus (sel1 [:input.upload-remote-url-field])))))
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
-                           file-upload-state file-upload-progress upload-remote-url negative-headline-char-count
-                           has-changes]}]
+                           file-upload-state file-upload-progress upload-remote-url body-exceeds
+                           headline-exceeds has-changes]}]
 
     (let [company-slug        (router/current-company-slug)
           section             (dis/foce-section-key)
           section-kw          (keyword section)
           topic-data          (dis/foce-section-data)
-          topic-body          (:body topic-data)
           gray-color          (oc-colors/get-color-by-kw :oc-gray-5)
           image-header        (:image-url topic-data)
           is-data?            (#{:growth :finances} section-kw)
@@ -350,12 +376,13 @@
                       :placeholder (:name topic-data)
                       :type "text"
                       :on-blur #(om/set-state! owner :char-count nil)
-                      :on-change #(let [v (.. % -target -value)
-                                        remaining-chars (- title-max-length (count v))]
-                                    (dis/dispatch! [:foce-input {:title v}])
-                                    (om/set-state! owner :has-changes true)
-                                    (om/set-state! owner :char-count remaining-chars)
-                                    (om/set-state! owner :char-count-alert (< remaining-chars title-alert-limit)))})
+                      :on-change (fn [e]
+                                    (let [v (.. e -target -value)
+                                          remaining-chars (- title-max-length (count v))]
+                                      (dis/dispatch! [:foce-input {:title v}])
+                                      (om/update-state! owner #(merge % {:has-changes true
+                                                                         :char-count remaining-chars
+                                                                         :char-count-alert (< remaining-chars title-alert-limit)}))))})
           
           ;; Topic data
           (when is-data?
@@ -395,12 +422,13 @@
           ;; Topic body
           (dom/div #js {:className "topic-body emoji-autocomplete emojiable"
                         :id (str "foce-body-" (name section))
-                        :key "foce-body"
+                        :key (str "foce-body-" (name section))
                         :ref "topic-body"
+                        :role "textbox"
+                        :aria-multiline true
                         :placeholder body-placeholder
                         :data-placeholder body-placeholder
                         :contentEditable true
-                        :onBlur #(om/set-state! owner :char-count nil)
                         :dangerouslySetInnerHTML initial-body})
           (dom/div {:class "topic-foce-buttons group"}
             (dom/input {:id "foce-file-upload-ui--select-trigger"
@@ -502,11 +530,13 @@
                 "cancel"))
             (dom/div {:class "topic-foce-footer-left"
                       :style {:display (if (nil? file-upload-state) "block" "none")}}
-              (dom/label {:class (str "char-counter" (when char-count-alert " char-count-alert"))} char-count))
+              (dom/label {:class (utils/class-set {:char-counter true
+                                                   :char-count-alert char-count-alert})} char-count))
             (dom/div {:class "topic-foce-footer-right"
                       :style {:display (if (nil? file-upload-state) "block" "none")}}
               (dom/button {:class "btn-reset btn-solid"
-                           :disabled (or (= file-upload-state :show-progress) negative-headline-char-count (dis/foce-section-data-editing?))
+                           :disabled (or (= file-upload-state :show-progress)
+                                         (dis/foce-section-data-editing?))
                            :on-click #(save-topic owner)} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
                            :disabled (dis/foce-section-data-editing?)
