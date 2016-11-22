@@ -59,7 +59,8 @@
                                       next-rev
                                       sharing-mode
                                       read-only-company
-                                      is-stakeholder-update] :as data} owner options]
+                                      is-stakeholder-update
+                                      is-mobile?] :as data} owner options]
 
   (render [_]
     (let [section-kw          (keyword section)
@@ -71,6 +72,9 @@
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
+          truncated-body      (if (or (utils/is-test-env?) is-stakeholder-update)
+                                topic-body
+                                (.truncate js/$ topic-body (clj->js {:length utils/mobile-topic-body-limit :words true})))
           company-data        (dis/company-data)
           {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
       (dom/div #js {:className "topic-internal group"
@@ -78,16 +82,17 @@
                     :ref "topic-internal"}
 
         ;; Topic image for dashboard
-        (when image-header
+        (when (and image-header (not is-mobile?))
           (dom/div {:class "card-header card-image"}
             (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
 
         ;; Topic title
         (dom/div {:class "topic-dnd-handle group"}
-          (dom/div {:class "topic-title"} (:title topic-data))
+          (when-not is-mobile?
+            (dom/div {:class "topic-title"} (:title topic-data)))
           (when (and (not is-stakeholder-update)
                      (:pin topic-data)
-                     (not (responsive/is-mobile-size?))
+                     (not is-mobile?)
                      (responsive/can-edit?)
                      (not read-only-company))
             (dom/div {:class "pinned-topic"}
@@ -97,7 +102,7 @@
                       :data-placement "top"
                       :title (if (> (count pinned) 1) "Drag and drop to reorder" "Pinned to the top")})))
           (when (and (not is-stakeholder-update)
-                   (not (responsive/is-mobile-size?))
+                   (not is-mobile?)
                    (responsive/can-edit?)
                    (not (:read-only topic-data))
                    (not read-only-company)
@@ -112,7 +117,8 @@
                       :data-placement "top"}))))
 
         ;; Topic data
-        (when (and is-growth-finances?
+        (when (and (not is-mobile?)
+                   is-growth-finances?
                    (utils/data-topic-has-data section topic-data))
           (dom/div {:class ""}
             (cond
@@ -127,17 +133,22 @@
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
+
+        (when is-mobile?
+          (dom/div {:style {:margin-top "10px"}}
+            (om/build topic-attribution data {:opts options})))
         
         ;; Topic body
         (when-not (clojure.string/blank? topic-body)
           (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
                         :ref "topic-body"
-                        :dangerouslySetInnerHTML (utils/emojify topic-body)}))
+                        :dangerouslySetInnerHTML (utils/emojify truncated-body)}))
 
         ; if it's SU preview or SU show only read-more
-        (dom/div {:style {:margin-top "20px"}}
-          (when-not is-stakeholder-update
-            (om/build topic-attribution data {:opts options})))))))
+        (when-not is-mobile?
+          (dom/div {:style {:margin-top "20px"}}
+            (when-not is-stakeholder-update
+              (om/build topic-attribution data {:opts options}))))))))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
@@ -217,10 +228,11 @@
           rev-cb (fn [_ rev] (om/set-state! owner :transition-as-of (:updated-at rev)))
           foce-active (not (nil? (dis/foce-section-key)))
           is-foce (= (dis/foce-section-key) section-kw)
+          is-mobile? (responsive/is-mobile-size?)
           topic-style (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
                                       (utils/in? (:route @router/path) "su-list"))
                         #js {}
-                        #js {:width (if (responsive/is-mobile?) "auto" (str card-width "px"))})]
+                        #js {:width (if (responsive/window-exceeds-breakpoint) (str card-width "px") "auto")})]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
@@ -231,6 +243,7 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
+                                                 :mobile-topic is-mobile?
                                                  :topic-edit is-foce
                                                  :draggable-topic (and (not is-stakeholder-update) (not (:read-only-company data)) (:pin topic-data))
                                                  :not-draggable-topic (or is-stakeholder-update (:read-only-company data) (not (:pin topic-data)))
@@ -241,7 +254,7 @@
                     :data-section (name section)
                     :key (str "topic-" (name section))
                     :id (str "topic-" (name section))}
-        (when show-share-remove
+        (when (and show-share-remove (not is-mobile?))
           (dom/div {:class "share-remove-container"
                     :id (str "share-remove-" (name section))}
             (dom/button {:class "btn-reset share-remove"
@@ -251,7 +264,7 @@
                          :title "Remove topic from this update."
                          :on-click #(when (contains? options :share-remove-click) ((:share-remove-click options) (name section)))}
               (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.5)" :size 12 :stroke 4 :accent-color "rgba(78, 90, 107, 0.5)"}))))
-        (when show-share-remove
+        (when (and show-share-remove (not is-mobile?))
           (dom/div {:class "share-dnd-container"
                     :id (str "share-dnd-" (name section))}
             (dom/div {:class "btn-reset share-dnd"
@@ -295,6 +308,7 @@
                                           :topic-click (:topic-click options)
                                           :is-foce is-foce
                                           :foce-active foce-active
+                                          :is-mobile? is-mobile?
                                           :prev-rev prev-rev
                                           :next-rev next-rev}
                                          {:opts (merge options {:rev-click rev-cb})
@@ -312,6 +326,7 @@
                                             :sharing-mode sharing-mode
                                             :currency currency
                                             :read-only-company (:read-only-company data)
+                                            :is-mobile? is-mobile?
                                             :prev-rev tr-prev-rev
                                             :next-rev tr-next-rev}
                                            {:opts (merge options {:rev-click rev-cb})}))))))))))

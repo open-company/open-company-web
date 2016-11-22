@@ -46,6 +46,10 @@ div.topic {
     cursor: move;
   }
 
+  &.mobile-topic {
+    text-align: center;
+  }
+
   div.share-remove-container{
     width: 30px;
     height: 30px;
