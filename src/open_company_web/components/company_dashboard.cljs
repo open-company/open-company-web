@@ -38,22 +38,23 @@
      :editing-topic false
      :save-bt-active false
      :new-sections-requested false
+     :card-width (responsive/calc-card-width)
      :columns-num (responsive/columns-num)})
 
   (did-mount [_]
     (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
     (when-not (:read-only (dis/company-data data))
       (get-new-sections-if-needed owner))
-    (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
+    (events/listen js/window EventType/RESIZE (fn [_] (om/update-state! owner #(merge % {:columns-num (responsive/columns-num)
+                                                                                         :card-width (responsive/calc-card-width)})))))
 
   (will-receive-props [_ next-props]
     (when-not (:read-only (dis/company-data next-props))
       (get-new-sections-if-needed owner)))
 
-  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num] :as state}]
+  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num card-width] :as state}]
     (let [slug (keyword (router/current-company-slug))
-          company-data (dis/company-data data)
-          card-width (responsive/calc-card-width)]
+          company-data (dis/company-data data)]
       (if (:loading data)
         (dom/div {:class (utils/class-set {:company-dashboard true
                                            :main-scroll true})}
