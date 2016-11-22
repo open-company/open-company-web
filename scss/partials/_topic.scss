@@ -210,7 +210,7 @@ div.topic {
       div.topic-title {
         padding-top: 12px;
         opacity: 0.5;
-        font-size: 13px;
+        font-size: 14px;
         line-height: 1.5;
         letter-spacing: 1px;
         color: $oc_gray_5;
@@ -219,6 +219,23 @@ div.topic {
         font-weight: 700;
         float: left;
         width: auto;
+
+        @include mobile(){
+          text-transform: none;
+          opacity: 1;
+          color: $oc_gray_7;
+          text-align: center;
+          float: none;
+          font-weight: 400;
+        }
+      }
+
+      div.mobile-date {
+        margin-top: 5px;
+        font-size: 10px;
+        color: $oc_gray_7;
+        opacity: 0.6;
+        font-family: $oc_headers_font;
       }
 
       div.topic-headline-inner {
@@ -226,9 +243,15 @@ div.topic {
         font-size: 18px;
         line-height: 25px;
         color: $oc_gray_7;
+        font-family: $oc_headers_font;
 
         .emojione {
           @include emoji-size(18px);
+        }
+
+        @include mobile(){
+          padding-top: 5px;
+          font-size: 13px;
         }
       }
 
