@@ -18,6 +18,10 @@ div.updates {
           float: none;
           width: 100%;
           height: 200px;
+
+          div.oc-loading {
+            background-color: transparent;
+          }
         }
 
         h3.updates-content-cards-title {
