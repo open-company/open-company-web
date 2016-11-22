@@ -72,7 +72,7 @@
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
-          truncated-body      (if (or (utils/is-test-env?) is-stakeholder-update)
+          truncated-body      (if (or (utils/is-test-env?) is-stakeholder-update (not is-mobile?))
                                 topic-body
                                 (.truncate js/$ topic-body (clj->js {:length utils/mobile-topic-body-limit :words true})))
           company-data        (dis/company-data)
