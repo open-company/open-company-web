@@ -132,7 +132,8 @@
             (utils/time-since (:updated-at topic-data))))
 
         ;; Topic headline
-        (when-not (clojure.string/blank? (:headline topic-data))
+        (when (and (not (clojure.string/blank? (:headline topic-data)))
+                   (not is-mobile?))
           (om/build topic-headline topic-data))
         
         ;; Topic body
