@@ -72,9 +72,6 @@
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
-          truncated-body      (if (or (utils/is-test-env?) is-stakeholder-update (not is-mobile?))
-                                topic-body
-                                (.truncate js/$ topic-body (clj->js {:length utils/mobile-topic-body-limit :words true})))
           company-data        (dis/company-data)
           {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
       (dom/div #js {:className "topic-internal group"
@@ -88,8 +85,7 @@
 
         ;; Topic title
         (dom/div {:class "topic-dnd-handle group"}
-          (when-not is-mobile?
-            (dom/div {:class "topic-title"} (:title topic-data)))
+          (dom/div {:class "topic-title"} (:title topic-data))
           (when (and (not is-stakeholder-update)
                      (:pin topic-data)
                      (not is-mobile?)
@@ -130,19 +126,21 @@
               (om/build topic-finances {:section-data (utils/fix-finances topic-data)
                                         :section section
                                         :currency currency} {:opts chart-opts}))))
+        ;; Attribution for topic
+        (when is-mobile?
+          (dom/div {:class "mobile-date"}
+            (utils/time-since (:updated-at topic-data))))
+
         ;; Topic headline
         (when-not (clojure.string/blank? (:headline topic-data))
           (om/build topic-headline topic-data))
-
-        (when is-mobile?
-          (dom/div {:style {:margin-top "10px"}}
-            (om/build topic-attribution data {:opts options})))
         
         ;; Topic body
-        (when-not (clojure.string/blank? topic-body)
+        (when (and (not is-mobile?)
+                   (not (clojure.string/blank? topic-body)))
           (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
                         :ref "topic-body"
-                        :dangerouslySetInnerHTML (utils/emojify truncated-body)}))
+                        :dangerouslySetInnerHTML (utils/emojify topic-body)}))
 
         ; if it's SU preview or SU show only read-more
         (when-not is-mobile?
