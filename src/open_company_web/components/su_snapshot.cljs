@@ -114,7 +114,8 @@
                                          :main-scroll true
                                          :has-navbar (not prior-list)})}
         (dom/div {:class "page"}
-          (when-not prior-list
+          (when (and company-data
+                     (not prior-list))
             ;; Navbar
             (om/build navbar {:card-width (responsive/calc-card-width)
                               :columns-num columns-num
