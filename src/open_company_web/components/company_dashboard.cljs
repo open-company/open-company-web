@@ -60,11 +60,11 @@
           (om/build loading {:loading true}))
         (dom/div {:class (utils/class-set {:company-dashboard true
                                            :main-scroll true})}
-          ;show login overlays if needed
-          (when-not (utils/is-test-env?)
-            (login-overlays-handler))
           (if (get-in data [(keyword (router/current-company-slug)) :error])
             (dom/div {:class (str "fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
+              ;show login overlays if needed
+              (when-not (utils/is-test-env?)
+                (login-overlays-handler))
               (login-required data)
               ;;Footer
                (om/build footer {:columns-num columns-num
