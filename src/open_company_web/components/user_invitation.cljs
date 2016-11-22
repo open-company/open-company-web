@@ -70,7 +70,7 @@
             (when show-name?
               [:th "NAME"])
             [:th "STATUS"]
-            [:th "ACTIONS"]]]
+            [:th {:style {:text-align "center"}} "ACTIONS"]]]
         [:tbody
           (for [invitation (filter #(contains? % :status) invitations)]
             (rum/with-key (invite-row invitation show-name?) (str "invitation-tr-" (:href (utils/link-for (:links invitation) "self")))))]]]))
