@@ -732,6 +732,7 @@
     (cljs-time-format/unparse (cljs-time-format/formatter "yyyy-MM-dd") from-js-date)))
 
 (def topic-body-limit 500)
+(def mobile-topic-body-limit 50)
 
 (defn exceeds-topic-body-limit [body]
   (> (count (strip-HTML-tags body)) topic-body-limit))
