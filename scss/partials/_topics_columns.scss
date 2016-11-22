@@ -15,9 +15,11 @@ div.topics-columns {
     padding: 20px;
     margin: 0 auto;
 
+    @include mobile(){
+      padding: 20px 0px;
+    }
+
     div.topics-column {
-      min-width: 302px;
-      max-width: 520px;
       margin-right: 0px;
       float: left;
 
@@ -43,6 +45,10 @@ div.topics-columns {
         &.draggable-topic.dragging-topic {
           z-index: 1000;
           opacity: 0.5;
+        }
+
+        @include mobile(){
+          margin: 0px 2px 12px 2px;
         }
       }
     }
