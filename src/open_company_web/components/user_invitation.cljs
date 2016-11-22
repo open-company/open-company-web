@@ -16,7 +16,7 @@
       (when show-email?
         [:td (when-not (clojure.string/blank? (:real-name invitation)) [:div.value (:real-name invitation)])])
       [:td [:div (clojure.string/upper-case (:status invitation))]]
-      [:td
+      [:td {:style {:text-align "center"}}
         (if (:loading invitation)
           ; if it's loading show the spinner
           [:div (small-loading)]
