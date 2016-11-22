@@ -126,15 +126,15 @@
               (om/build topic-finances {:section-data (utils/fix-finances topic-data)
                                         :section section
                                         :currency currency} {:opts chart-opts}))))
+
+        ;; Topic headline
+        (when-not (clojure.string/blank? (:headline topic-data))
+          (om/build topic-headline topic-data))
+
         ;; Attribution for topic
         (when is-mobile?
           (dom/div {:class "mobile-date"}
             (utils/time-since (:updated-at topic-data))))
-
-        ;; Topic headline
-        (when (and (not (clojure.string/blank? (:headline topic-data)))
-                   (not is-mobile?))
-          (om/build topic-headline topic-data))
         
         ;; Topic body
         (when (and (not is-mobile?)

@@ -226,7 +226,8 @@ div.topic {
           color: $oc_gray_7;
           text-align: center;
           float: none;
-          font-weight: 400;
+          font-weight: 700;
+          font-size: 15px;
         }
       }
 
@@ -252,6 +253,7 @@ div.topic {
         @include mobile(){
           padding-top: 5px;
           font-size: 13px;
+          font-weight: 400;
         }
       }
 
