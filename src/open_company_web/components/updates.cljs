@@ -15,7 +15,7 @@
             [open-company-web.components.su-snapshot :refer (su-snapshot)]
             [open-company-web.components.prior-updates :refer (prior-updates)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
-            [open-company-web.components.ui.small-loading :refer (small-loading)]))
+            [open-company-web.components.ui.loading :refer (loading)]))
 
 (defn load-latest-su [owner data]
   (when (and (:su-list-loaded data)
@@ -100,8 +100,9 @@
                           :style {:width (str fixed-card-width "px")}}
                   (when (and selected-su
                              (not su-data))
-                    (dom/div {:class "center"}
-                      (small-loading)))
+                    ; if a SU was selected but the data are not loaded yet show a spinner
+                    (dom/div {:class "loading-container"}
+                      (om/build loading {:loading true})))
                   (when su-data
                     (dom/h3 {:class "updates-content-cards-title"} update-title))
                   (when su-data

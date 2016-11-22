@@ -13,6 +13,13 @@ div.updates {
         padding-right: 10px;
         margin-right: 40px;
 
+        div.loading-container {
+          position: relative;
+          float: none;
+          width: 100%;
+          height: 200px;
+        }
+
         h3.updates-content-cards-title {
           text-align: center;
           width: 100%;
