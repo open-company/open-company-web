@@ -60,8 +60,8 @@
           (om/build loading {:loading true}))
         (dom/div {:class (utils/class-set {:company-dashboard true
                                            :main-scroll true})}
-          (when (or (not (get-in data [(keyword (router/current-company-slug)) :error]))
-                    (not (utils/is-test-env?)))
+          (when (and (not (utils/is-test-env?))
+                     (not (get-in data [(keyword (router/current-company-slug)) :error])))
             ;show login overlays if needed
             (login-overlays-handler))
           (if (get-in data [(keyword (router/current-company-slug)) :error])
