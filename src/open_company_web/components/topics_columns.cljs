@@ -89,7 +89,7 @@
         (= topic "add-topic")
         add-topic-height
         (#{:finances :growth} topic-kw)
-        (let [headline-height (headline-body-height (:headline topic-data) (utils/truncated-body topic-body) card-width)
+        (let [headline-height (headline-body-height (:headline topic-data) topic-body card-width)
               start-height (data-topic-height owner topic topic-data)
               read-more    (if (clojure.string/blank? (utils/strip-HTML-tags (:body topic-data))) 0 read-more-height)]
           (+ start-height headline-height read-more))
@@ -97,7 +97,7 @@
         (let [topic-image-height      (if (:image-url topic-data)
                                         (utils/aspect-ration-image-height (:image-width topic-data) (:image-height topic-data) card-width)
                                         0)
-              headline-body-height (headline-body-height (:headline topic-data) (utils/truncated-body topic-body) card-width)
+              headline-body-height (headline-body-height (:headline topic-data) topic-body card-width)
               read-more               (if (clojure.string/blank? (utils/strip-HTML-tags (:body topic-data))) 0 read-more-height)]
           (+ topic-default-height headline-body-height topic-image-height read-more))))))
 

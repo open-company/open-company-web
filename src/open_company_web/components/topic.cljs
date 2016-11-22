@@ -71,9 +71,6 @@
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
-          truncated-body      (if (or (utils/is-test-env?) is-stakeholder-update)
-                                topic-body
-                                (.truncate js/$ topic-body (clj->js {:length utils/topic-body-limit :words true})))
           company-data        (dis/company-data)
           {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
       (dom/div #js {:className "topic-internal group"
@@ -135,12 +132,12 @@
         (when-not (clojure.string/blank? topic-body)
           (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
                         :ref "topic-body"
-                        :dangerouslySetInnerHTML (utils/emojify truncated-body)}))
+                        :dangerouslySetInnerHTML (utils/emojify topic-body)}))
 
         ; if it's SU preview or SU show only read-more
         (dom/div {:style {:margin-top "20px"}}
           (when-not is-stakeholder-update
-            (om/build topic-attribution (assoc data :read-more-cb (partial fullscreen-topic owner nil false)) {:opts options})))))))
+            (om/build topic-attribution data {:opts options})))))))
 
 (defn animate-revision-navigation [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
