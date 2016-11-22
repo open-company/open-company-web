@@ -206,6 +206,8 @@
           [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js" :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
+          ;; Truncate html string
+          [:script {:type "text/javascript" :src "/lib/truncate/jquery.truncate.js"}]
           ;; jQuery scrollTo plugin
           [:script {:src "/lib/scrollTo/scrollTo.min.js?oc_deploy_key" :type "text/javascript"}]
           ;; jQuery UI
