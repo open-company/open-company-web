@@ -112,4 +112,6 @@
                     [:div.update-title.domine
                       [:a {:href link :on-click #(when-not standalone-component (.preventDefault %))}
                         title]]
-                    [:div.update-details.domine author " shared by " medium " on " human-date]]))])]])))
+                    [:div.update-details.domine author " shared"
+                                                (when-not (empty? medium) " by ") medium
+                                                " on " human-date]]))])]])))
