@@ -17,6 +17,22 @@ div.topics-columns {
 
     @include mobile(){
       padding: 20px 0px;
+      margin: 0 8px;
+    }
+
+    @include mobile (){
+      &.tot-col-2 {
+        div.topics-column.col-1 {
+          div.topic-row {
+            margin-right: 4px;
+          }
+        }
+        div.topics-column.col-2 {
+          div.topic-row {
+            margin-left: 4px;
+          }
+        }
+      }
     }
 
     div.topics-column {
@@ -48,7 +64,7 @@ div.topics-columns {
         }
 
         @include mobile(){
-          margin: 0px 2px 12px 2px;
+          margin: 0px 0px 8px 0px;
           border-left: 0px solid transparent;
           border-right: 0px solid transparent;
         }
