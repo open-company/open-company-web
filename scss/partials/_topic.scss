@@ -47,7 +47,7 @@ div.topic {
   }
 
   &.mobile-topic {
-    text-align: center;
+    text-align: left;
   }
 
   div.share-remove-container{
@@ -154,6 +154,9 @@ div.topic {
 
       & > div{
         padding: 0px 20px;
+        @include mobile(){
+          padding: 0px 10px;
+        }
       }
 
       div.topic-header {
@@ -232,8 +235,8 @@ div.topic {
       }
 
       div.mobile-date {
-        margin-top: 5px;
-        font-size: 10px;
+        margin-top: 10px;
+        font-size: 12px;
         color: $oc_gray_7;
         opacity: 0.6;
         font-family: $oc_headers_font;
@@ -254,6 +257,7 @@ div.topic {
           padding-top: 5px;
           font-size: 13px;
           font-weight: 400;
+          line-height: normal;
         }
       }
 
