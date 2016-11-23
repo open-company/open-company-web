@@ -87,13 +87,8 @@ div.fullscreen-topic {
         z-index: 1000;
 
         @include mobile(){
-          right: 10px;
+          left: 10px;
           top: 0px;
-
-          div.svg-icon svg {
-            // color: rgba(78, 90, 107, 0.5);
-            stroke: rgba(78, 90, 107, 0.4) !important;
-          }
         }
       }
 
