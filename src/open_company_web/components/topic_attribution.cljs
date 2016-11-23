@@ -6,11 +6,6 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.topic-read-more :refer (topic-read-more)]))
 
-(defcomponent topic-close [{:keys [close-cb]} owner]
-  (render [_]
-    (dom/button {:class "btn-reset topic-close"
-                 :onClick close-cb} "CLOSE")))
-
 (defn time-ago
   [past-date]
   (let [past-js-date (utils/js-date past-date)
@@ -97,7 +92,4 @@
             (dom/i {:class "fa fa-caret-right"}))))
       (when read-more-cb
         (dom/div {:class "right"}
-          (om/build topic-read-more data)))
-      (when (and close-cb (responsive/is-mobile?))
-        (dom/div {:class "right"}
-          (om/build topic-close {:close-cb close-cb}))))))
+          (om/build topic-read-more data))))))
