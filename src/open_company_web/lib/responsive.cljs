@@ -76,21 +76,6 @@
     2 c2-min-card-delta
     1 c1-min-card-delta))
 
-(defn calc-card-width [& [force-columns]]
-  (let [columns (or force-columns (columns-num))
-        ww (win-width columns)
-        ;; get params based on columns number
-        min-win-width (get-min-win-width columns)
-        win-diff (get-win-diff columns)
-        win-card-diff (get-win-card-diff columns)
-        min-card-delta (get-min-card-delta columns)
-        ;; calculations
-        win-delta-width (- ww min-win-width)
-        perc-win-delta  (/ (* win-delta-width 100) win-diff)
-        diff-delta      (* (/ win-card-diff 100) perc-win-delta)
-        delta           (+ min-card-delta diff-delta)]
-      (/ ww delta)))
-
 (def _mobile (atom -1))
 
 (defn set-browser-type! []
@@ -111,6 +96,28 @@
  (when (neg? @_mobile)
  (set-browser-type!))
  @_mobile)
+
+(defn calc-card-width [& [force-columns]]
+  (let [columns (or force-columns (columns-num))
+        ww (.-clientWidth (.-body js/document))]
+    (if (is-mobile-size?)
+      (cond
+        (= columns 2)
+        (/ (- ww 8 8 8) 2)
+        (= columns 1)
+        (- ww 8 8))
+      (let [
+            ;; get params based on columns number
+            min-win-width (get-min-win-width columns)
+            win-diff (get-win-diff columns)
+            win-card-diff (get-win-card-diff columns)
+            min-card-delta (get-min-card-delta columns)
+            ;; calculations
+            win-delta-width (- ww min-win-width)
+            perc-win-delta  (/ (* win-delta-width 100) win-diff)
+            diff-delta      (* (/ win-card-diff 100) perc-win-delta)
+            delta           (+ min-card-delta diff-delta)]
+          (/ ww delta)))))
 
 (defn user-agent-mobile? []
   userAgent/MOBILE)
@@ -145,13 +152,12 @@
 (def updates-content-cards-max-width 560)
 (def updates-content-cards-min-width 250)
 (def topic-list-x-padding 20)
-(def mobile-topic-list-x-padding 10)
 (def topic-border 4)
 
 (defn total-layout-width-int [card-width columns-num]
   (if (is-mobile-size?)
-    (+ (* (+ card-width mobile-topic-total-x-padding) columns-num)
-       (* mobile-topic-list-x-padding 2))
+    (let [ww (.-clientWidth (.-body js/document))]
+      (- ww 8 8))
     (+ (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
        (* topic-list-x-padding 2)                           ; the padding around all the columns
        (* topic-border 2))))                                ; the remaining border around the topics
