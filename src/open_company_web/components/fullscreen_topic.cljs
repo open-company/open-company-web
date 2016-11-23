@@ -76,9 +76,12 @@
           topic-body (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))]
       (dom/div {:class "fullscreen-topic-internal group"}
         ;; Close button
-        (dom/button {:class "btn-reset close-fullscreen-topic-btn"
-                     :on-click #(hide-fullscreen-topic-cb)}
-          (dom/i {:class "fa fa-angle-left"}))
+        (dom/div {:class "fullscreen-topic-mobile-navigation"
+                  :on-click #(hide-fullscreen-topic-cb)}
+          (dom/div {:class "fullscreen-topic-mobile-navigation-title"} (:title topic-data))
+          (dom/button {:class "btn-reset close-fullscreen-topic-btn"
+                       :on-click #(hide-fullscreen-topic-cb)}
+            (dom/i {:class "fa fa-angle-left"})))
         (dom/div {:class "fullscreen-topic-top-box"}
           ;; Image
           (when (:image-url topic-data)
@@ -86,8 +89,9 @@
               (dom/img {:src (:image-url topic-data)})))
           
           ;; Title
-          (dom/div {:class "topic-title-container group"}
-            (dom/div {:class "topic-title left"} (:title topic-data)))
+          (when-not (responsive/is-mobile-size?)
+            (dom/div {:class "topic-title-container group"}
+              (dom/div {:class "topic-title left"} (:title topic-data))))
 
           ;; Headline
           (dom/div {:class "topic-headline"
