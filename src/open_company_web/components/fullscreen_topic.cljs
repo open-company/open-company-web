@@ -19,7 +19,6 @@
             [open-company-web.components.topic-attribution :refer (topic-attribution)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.ui.icon :as i]
-            [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -79,7 +78,7 @@
         ;; Close button
         (dom/button {:class "btn-reset close-fullscreen-topic-btn"
                      :on-click #(hide-fullscreen-topic-cb)}
-          (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
+          (dom/i {:class "fa fa-angle-left"}))
         (dom/div {:class "fullscreen-topic-top-box"}
           ;; Image
           (when (:image-url topic-data)
