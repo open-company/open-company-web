@@ -82,7 +82,6 @@
                                 :show-share-su-button (utils/can-edit-sections? company-data)
                                 :mobile-menu-open (:mobile-menu-open data)
                                 :auth-settings (:auth-settings data)
-                                :no-box-shadow true
                                 :active :dashboard})
               (when (responsive/is-mobile-size?)
                 (oc-switch :dashboard))

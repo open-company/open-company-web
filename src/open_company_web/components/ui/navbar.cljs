@@ -41,7 +41,6 @@
                               active
                               foce-key
                               mobile-menu-open
-                              no-box-shadow
                               su-navbar] :as data} owner options]
 
   (did-mount [_]
@@ -67,7 +66,6 @@
       (dom/nav {:class (utils/class-set {:oc-navbar true
                                          :group true
                                          :su-navbar su-navbar
-                                         :no-box-shadow no-box-shadow
                                          :mobile-menu-open mobile-menu-open
                                          :no-jwt (not (jwt/jwt))})}
         (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
