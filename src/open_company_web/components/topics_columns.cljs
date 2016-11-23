@@ -42,10 +42,10 @@
                                   "<div>"
                                     "<div class=\"topic-internal\">"
                                       (when-not (clojure.string/blank? headline)
-                                        (str "<div class=\"topic-headline-inner\" style=\"width: " (+ card-width topic-margins) "px;\">"
+                                        (str "<div class=\"topic-headline-inner\" style=\"width: " (+ card-width (if (responsive/is-mobile-size?) 0 topic-margins)) "px;\">"
                                                (utils/emojify headline true)
                                              "</div>"))
-                                      "<div class=\"topic-body\" style=\"width: " (+ card-width topic-margins) "px;\">"
+                                      "<div class=\"topic-body\" style=\"width: " (+ card-width (if (responsive/is-mobile-size?) 0 topic-margins)) "px;\">"
                                         (utils/emojify body true)
                                       "</div>"
                                     "</div>"
@@ -257,7 +257,7 @@
         (cond
           ;; render 2 or 3 column layout
           (> columns-num 1)
-          (dom/div {:class "topics-column-container group"
+          (dom/div {:class (str "topics-column-container group tot-col-" columns-num)
                     :style topics-column-conatiner-style
                     :key columns-container-key}
             ; for each column key contained in best layout
@@ -266,7 +266,7 @@
               (let [column (get best-layout kw)
                     {:keys [pinned other]} (utils/get-pinned-other-keys column company-data)]
                 (dom/div {:class (str "topics-column col-" (name kw))
-                          :style #js {:width (str (+ card-width topic-margins) "px")}}
+                          :style #js {:width (str (+ card-width (if (responsive/is-mobile-size?) 0 topic-margins)) "px")}}
                   ; render the pinned topics
                   (dom/div #js {:className "topics-column-pinned"}
                     (when (pos? (count pinned))
