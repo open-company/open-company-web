@@ -15,6 +15,7 @@
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.navbar :refer (navbar)]
             [open-company-web.components.ui.loading :refer (loading)]
+            [open-company-web.components.ui.oc-switch :refer (oc-switch)]
             [open-company-web.components.ui.login-overlay :refer (login-overlays-handler)]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
@@ -82,6 +83,8 @@
                                 :mobile-menu-open (:mobile-menu-open data)
                                 :auth-settings (:auth-settings data)
                                 :active :dashboard})
+              (when (responsive/is-mobile-size?)
+                (oc-switch :dashboard))
               (om/build topic-list
                           {:loading (:loading data)
                            :content-loaded (or (:loading company-data) (:loading data))
