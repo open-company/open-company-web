@@ -36,11 +36,12 @@
     (dom/div #js {:className (str "topic-headline-inner" (when (:placeholder data) " italic"))
                   :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
 
-(defn fullscreen-topic [owner selected-metric force-editing & [e]]
-  (when (not (om/get-props owner :foce-active))
+(defn fullscreen-topic [owner & [e]]
+  (when (and (responsive/is-mobile-size?)
+             (not (om/get-props owner :foce-active)))
     (when (and e (not= (.-tagName (.-target e)) "A"))
       (.preventDefault e))
-    ((om/get-props owner :topic-click) selected-metric force-editing)))
+    ((om/get-props owner :topic-click))))
 
 (defn start-foce-click [owner]
   (let [section-kw (keyword (om/get-props owner :section))
@@ -76,6 +77,7 @@
           {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
+                    :onClick (partial fullscreen-topic owner)
                     :ref "topic-internal"}
 
         ;; Topic image for dashboard
