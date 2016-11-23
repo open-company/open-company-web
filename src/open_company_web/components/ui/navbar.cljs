@@ -36,12 +36,16 @@
                               email-loading
                               slack-loading
                               show-share-su-button
+                              create-update-share-button-cb
+                              create-update-share-button-disabled
                               active
                               foce-key
-                              mobile-menu-open] :as data} owner options]
+                              mobile-menu-open
+                              su-navbar] :as data} owner options]
 
   (did-mount [_]
-    (when-not (responsive/is-mobile-size?)
+    (when-not (and (responsive/is-mobile-size?)
+                   (not su-navbar))
       (scroll-listener nil)
       (om/set-state! owner :scroll-listener
         (events/listen js/window EventType/SCROLL scroll-listener))))
@@ -51,9 +55,7 @@
       (events/unlistenByKey scroll-listener)))
 
   (render [_]
-    (let [header-width (+ (* card-width columns-num)    ; cards width
-                          (* 20 (dec columns-num))      ; cards right margin
-                          (when (> columns-num 1) 60))  ; x margins if needed
+    (let [header-width (responsive/total-layout-width-int card-width columns-num)
                                                                                     ; show the new update btn if
           fixed-show-share-su-button (and (not (responsive/is-mobile?))              ; it's not mobile
                                           (jwt/jwt)                                  ; the user is logged in
@@ -61,7 +63,11 @@
                                           (if (contains? data :show-share-su-button) ; the including component
                                             show-share-su-button                     ; wants to
                                             true))]
-      (dom/nav {:class (str "oc-navbar group" (when mobile-menu-open " mobile-menu-open"))}
+      (dom/nav {:class (utils/class-set {:oc-navbar true
+                                         :group true
+                                         :su-navbar su-navbar
+                                         :mobile-menu-open mobile-menu-open
+                                         :no-jwt (not (jwt/jwt))})}
         (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
           (login-overlays-handler))
         (dom/div {:class "oc-navbar-header group"
@@ -86,31 +92,37 @@
                       (login-button)))))))
           (when-not (responsive/is-mobile-size?)
             (dom/div {:class "oc-navbar-separator"})))
-        (if (responsive/is-mobile-size?)
-          ;; Render the menu here only on mobile so it can expand the navbar
-          (om/build menu {:mobile-menu-open mobile-menu-open})
-          ;; Render the bottom part of the navbar when not on mobile
-          (dom/div {:class "oc-navbar-bottom group"
-                    :style {:width (str header-width "px")}}
-            (dom/div {:class "left"}
-              (when (router/current-company-slug)
-                (dom/a {:class (when (= active :dashboard) "active")
-                        :href (oc-urls/company)
-                        :on-click #(do
-                                     (utils/event-stop %)
-                                     (router/nav! (oc-urls/company)))}
-                  "Dashboard"))
-              (when (router/current-company-slug)
-                (dom/a {:class (when (= active :updates) "active")
-                        :href (oc-urls/stakeholder-update-list)
-                        :on-click (fn [e]
-                                    (utils/event-stop e)
-                                    (dis/dispatch! [:reset-su-list])
-                                    (utils/after 100 #(router/nav! (oc-urls/stakeholder-update-list))))}
-                  "Updates")))
-            (dom/div {:class "right"}
-              (when fixed-show-share-su-button
-                (dom/div {:class "sharing-button-container"}
-                  (dom/a {:class "btn-reset sharing-button right"
-                          :on-click #(router/nav! (oc-urls/stakeholder-update-preview))}
-                    "Share new update"))))))))))
+        (when-not su-navbar
+          (if (responsive/is-mobile-size?)
+            ;; Render the menu here only on mobile so it can expand the navbar
+            (om/build menu {:mobile-menu-open mobile-menu-open})
+            ;; Render the bottom part of the navbar when not on mobile
+            (dom/div {:class "oc-navbar-bottom group"
+                      :style {:width (str header-width "px")}}
+              (dom/div {:class "left"}
+                (when (router/current-company-slug)
+                  (dom/a {:class (when (= active :dashboard) "active")
+                          :href (oc-urls/company)
+                          :on-click #(do
+                                       (utils/event-stop %)
+                                       (router/nav! (oc-urls/company)))}
+                    "Dashboard"))
+                (when (router/current-company-slug)
+                  (dom/a {:class (when (= active :updates) "active")
+                          :href (oc-urls/stakeholder-update-list)
+                          :on-click (fn [e]
+                                      (utils/event-stop e)
+                                      (dis/dispatch! [:reset-su-list])
+                                      (utils/after 100 #(router/nav! (oc-urls/stakeholder-update-list))))}
+                    "Updates")))
+              (dom/div {:class "right"}
+                (when fixed-show-share-su-button
+                  (dom/div {:class "sharing-button-container"}
+                    (dom/a {:class "btn-reset sharing-button right"
+                            :on-click #(router/nav! (oc-urls/stakeholder-update-preview))}
+                      "Share new update")))
+                (when create-update-share-button-cb
+                  (dom/div {:class "sharing-button-container"}
+                    (dom/button {:class "btn-reset btn-solid"
+                                 :on-click create-update-share-button-cb
+                                 :disabled create-update-share-button-disabled} "SHARE")))))))))))

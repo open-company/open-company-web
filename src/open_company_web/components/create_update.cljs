@@ -66,7 +66,8 @@
                       :stop (fn [event ui]
                               ; the user stopped ordering, save the current order
                               (when-let [dragged-item (gobj/get ui "item")]
-                                (om/set-state! owner :su-topics (ordered-topics-list))
+                                (om/update-state! owner #(merge % {:su-topics (ordered-topics-list)
+                                                                   :should-update-data false}))
                                 (patch-stakeholder-update owner)))
                       :axis "y"})
       (.disableSelection))))
@@ -88,15 +89,16 @@
        :card-width (responsive/calc-card-width)
        :su-topics (vec su-topics)
        :su-title (:title su-data)
+       :should-update-data true
        :no-pinned-topics (remove-pinned (dis/company-data data))
        :show-su-dialog false}))
 
   (will-receive-props [_ next-props]
     (om/set-state! owner :no-pinned-topics (remove-pinned (dis/company-data next-props)))
-    (when (zero? (count (om/get-state owner :su-topics)))
+    (when (om/get-state owner :should-update-data)
       (let [company-data (dis/company-data next-props)
             su-data (:stakeholder-update company-data)
-            su-topics (if (empty? (:sections su-data))
+            su-topics (if (and (not (contains? su-data :sections)) (empty? (:sections su-data)))
                         (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
                         (utils/filter-placeholder-sections (:sections su-data) company-data))]
         (om/update-state! owner #(merge % {:su-topics (vec su-topics)
@@ -127,6 +129,8 @@
                             :company-data company-data
                             :foce-key (:foce-key data)
                             :show-share-su-button false
+                            :create-update-share-button-cb #(share-clicked owner)
+                            :create-update-share-button-disabled (zero? (count su-topics))
                             :active nil
                             :mobile-menu-open (:mobile-menu-open data)
                             :auth-settings (:auth-settings data)})
@@ -142,7 +146,7 @@
               (dom/div {:class "create-update-content-list group right"
                         :style {:width (str responsive/updates-content-list-width "px")}}
                 (dom/div {:class "create-update-content-cta"}
-                  "Choose topics you’d like to include and arrange them in any order.")
+                  "Choose the topics you'd like to share and arrange them in any order.")
                 (dom/div {:class "create-update-topics-list"
                           :key (clojure.string/join "-" su-topics)}
                   (for [topic su-topics]
@@ -151,8 +155,9 @@
                                :data-topic topic
                                :key topic
                                :ref topic
-                               :on-click #(do
-                                            (om/set-state! owner :su-topics (utils/vec-dissoc su-topics topic))
+                               :on-click (fn [_]
+                                            (om/update-state! owner #(merge % {:su-topics (utils/vec-dissoc su-topics topic)
+                                                                               :should-update-data false}))
                                             (patch-stakeholder-update owner))}
                         (:title sd))))
                   (let [all-topics (:sections company-data)
@@ -166,23 +171,20 @@
                         (dom/div {:data-topic topic
                                   :key topic
                                   :ref topic
-                                  :on-click #(do
-                                              (om/set-state! owner :su-topics (vec (conj su-topics topic)))
+                                  :on-click (fn [_]
+                                              (om/update-state! owner #(merge % {:su-topics (vec (conj su-topics topic))
+                                                                                 :should-update-data false}))
                                               (patch-stakeholder-update owner))}
-                          (:title sd))))))
-                (dom/div {:class "create-update-content-buttons mt3 center group"}
-                  (dom/button {:class "btn-reset btn-solid share"
-                               :on-click #(share-clicked owner)
-                               :style {:width "180px" :height "40px"}
-                               :disabled (zero? (count su-topics))} "SHARE")))
+                          (:title sd)))))))
               (dom/div {:class "create-update-content-cards right"
                         :style {:width (str fixed-card-width "px")}}
                 (dom/input {:class "create-update-content-cards-title"
                             :type "text"
                             :value su-title
                             :placeholder "Update Title"
-                            :on-change #(do
-                                          (om/set-state! owner :su-title (.. % -target -value))
+                            :on-change (fn [e]
+                                          (om/update-state! owner #(merge % {:su-title (.. e -target -value)
+                                                                             :should-update-data false}))
                                           (patch-stakeholder-update owner))})
                 (om/build topics-columns {:columns-num 1
                                           :card-width (- fixed-card-width 10) ; remove 10 padding on the right

@@ -1,6 +1,6 @@
 ul.menu {
   top: 55px;
-  padding: 10px 0px 10px 10px;
+  padding: 10px 20px;
   box-shadow: 0 1px 4px rgba(0,0,0,.04);
   border: 1px solid rgba(78,90,107,0.1);
   border-radius: 3px;
@@ -26,7 +26,7 @@ ul.menu {
   }
 
   li.oc-menu-item {
-    opacity: 0.6;
+    opacity: 0.9;
 
     @include mobile(){
       padding: 4px;
@@ -34,7 +34,7 @@ ul.menu {
 
     &:hover {
       background-color: transparent;
-      opacity: 0.8;
+      opacity: 1;
       a {
         background-color: transparent;
       }
@@ -48,8 +48,8 @@ ul.menu {
       font-size: 14px;
       font-family: $oc_headers_font;
       font-weight: 400;
-      text-transform: capitalize;
-      padding-right: 10px;
+      text-transform: none;
+      padding: 0px;
 
       @include mobile() {
         font-size: 22px;

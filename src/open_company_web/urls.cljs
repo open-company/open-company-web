@@ -68,6 +68,13 @@
   ([slug]
     (str (company-settings slug) "/logo")))
 
+(defn company-settings-um
+  "Company profile url"
+  ([]
+    (company-settings-um (router/current-company-slug)))
+  ([slug]
+    (str (company-settings slug) "/user-management")))
+
 (defn company-section
   "Section url"
   ([] (company-section (router/current-company-slug) (router/current-section)))

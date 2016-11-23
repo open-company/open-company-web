@@ -11,7 +11,6 @@
             [open-company-web.components.ui.small-loading :as loading]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.ui.footer :as footer]
-            [open-company-web.components.user-management :refer (user-management)]
             [open-company-web.components.ui.login-required :refer (login-required)]
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
@@ -74,6 +73,7 @@
     (api/patch-company slug {:name (:name company-data)
                              :slug slug
                              :currency (:currency company-data)
+                             :public (:public company-data)
                              :logo-width (js/parseInt fixed-logo-width)
                              :logo-height (js/parseInt fixed-logo-height)
                              :logo fixed-logo})))
@@ -98,7 +98,8 @@
   (let [logo             (om/get-state owner :logo)
         old-company-data (dis/company-data (om/get-props owner))
         new-company-data {:name (om/get-state owner :company-name)
-                          :currency (om/get-state owner :currency)}]
+                          :currency (om/get-state owner :currency)
+                          :public (om/get-state owner :public)}]
     (om/set-state! owner :loading true)
     ; if the log has changed
     (if (not= logo (om/get-state owner :initial-logo))
@@ -226,6 +227,7 @@
      :logo (or (:logo current-state) (:logo company-data))
      :company-name (or (:company-name current-state) (:name company-data))
      :currency (or (:currency current-state) (:currency company-data))
+     :public (:public company-data)
      :loading false
      :has-changes (or (:has-changes current-state) false)
      :show-save-successful (or (:show-save-successful current-state) false)}))
@@ -254,7 +256,7 @@
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
   (render-state [_ {company-uuid :uuid company-name :company-name logo :logo
-                    currency :currency loading :loading
+                    currency :currency public :public loading :loading
                     file-upload-state :file-upload-state upload-remote-url :upload-remote-url
                     file-upload-progress :file-upload-progress
                     show-save-successful :show-save-successful
@@ -263,10 +265,10 @@
 
       (utils/update-page-title (str "OpenCompany - " company-name))
 
-      (dom/div {:class "lg-col-5 md-col-7 col-11 mx-auto mt1 mb4 settings-container group"}
+      (dom/div {:class "mx-auto my4 settings-container group"}
         
-        (dom/div {:class "settings-form-label company-settings"}
-          (when-not company-name
+        (when-not company-name
+          (dom/div {:class "settings-form-label company-settings"}
             (loading/small-loading)))
         
         (dom/div {:class "settings-form p3"}
@@ -280,9 +282,30 @@
                       :on-change #(do
                                    (om/set-state! owner :has-changes true)
                                    (om/set-state! owner :company-name (.. % -target -value)))})
+
+          ;; Visibility
+          (dom/div {:class "settings-form-input-label"} "VISIBILITY")
+          (dom/div {:class "settings-form-input visibility"}
+            (dom/div {:class "visibility-value"
+                      :on-click #(do
+                                  (om/set-state! owner :has-changes true)
+                                  (om/set-state! owner :public false))}
+              (dom/h3 {} "Private "
+                (when (not public)
+                  (dom/i {:class "fa fa-check"})))
+              (dom/p {} "Only team members can view, edit and share information."))
+            (dom/div {:class "visibility-value"
+                      :on-click #(do
+                                  (om/set-state! owner :has-changes true)
+                                  (om/set-state! owner :public true))}
+              (dom/h3 {} "Public "
+                (when public
+                  (dom/i {:class "fa fa-check"})))
+              (dom/p {} "Your information is public and will show up in search engines like Google. Only team members can edit and share information.")))
+
           ; Slug
           (dom/div {:class "settings-form-input-label"} "DASHBOARD URL")
-          (dom/div {:class "npt npt-disabled col-11 p1 mb3"} (str ls/web-server "/" (name slug)))
+          (dom/div {:class "dashboard-slug"} (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server "/" (name slug)))
 
           ;; Company logo
           (dom/div {:class "settings-form-input-label"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
@@ -292,7 +315,7 @@
                                                               (om/set-state! owner :logo %))})
 
           ;; Currency
-          (dom/div {:class "settings-form-input-label"} "DISPLAY FINANCE & GROWTH CHART CURRENCY AS")
+          (dom/div {:class "settings-form-input-label"} "DISPLAY CURRENCY IN CHARTS AS")
           (dom/select {:id "currency"
                        :value currency
                        :on-change #(do
@@ -316,7 +339,8 @@
                 (loading/small-loading)
                 "SAVE"))
             (dom/button {:class "btn-reset btn-outline right mr2"
-                         :on-click #(cancel-clicked owner)}
+                         :on-click #(cancel-clicked owner)
+                         :disabled (not has-changes)}
               "CANCEL")
             (dom/div {:style {:margin-top "5px"
                               :opacity (if show-save-successful "1" "0")}
@@ -358,7 +382,6 @@
           (dom/div {}
             (back-to-dashboard-btn {:title "Company Settings"})
             (dom/div {:class "company-settings-container"}
-              (om/build company-settings-form data)
-              (user-management))))
+              (om/build company-settings-form data))))
 
         (om/build footer/footer data)))))

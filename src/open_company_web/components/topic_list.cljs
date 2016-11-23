@@ -357,12 +357,15 @@
       (when (and (:force-edit-topic next-props) (contains? company-data (keyword (:force-edit-topic next-props))))
         (om/set-state! owner :selected-topic (dispatcher/force-edit-topic)))
       ; show second tooltip if needed
-      (when (= (count no-placeholder-sections) 1)
+      (when (and (not (:read-only company-data))
+                 (= (count no-placeholder-sections) 1))
         (om/set-state! owner :show-second-add-topic-tooltip true))
       ; show share tooltip if needed
-      (when (= (count no-placeholder-sections) 2)
+      (when (and (not (:read-only company-data))
+                 (= (count no-placeholder-sections) 2))
         (om/set-state! owner :show-share-tooltip true))
-      (when (= (count (filter #(->> % keyword (get company-data) :pin) no-placeholder-sections)) 2)
+      (when (and (not (:read-only company-data))
+                 (= (count (filter #(->> % keyword (get company-data) :pin) no-placeholder-sections)) 2))
         (om/set-state! owner :show-second-pin-tip true))))
 
   (did-update [_ prev-props _]
@@ -396,10 +399,10 @@
           card-width      (:card-width data)
           columns-num     (:columns-num data)
           ww              (.-clientWidth (sel1 js/document :body))
-          total-width     (case columns-num
-                            3 (str (+ (* card-width 3) (* card-x-margins 3) (* columns-layout-padding 2) 1) "px")
-                            2 (str (+ (* card-width 2) (* card-x-margins 2) (* columns-layout-padding 2) 1) "px")
-                            1 (if (>= ww responsive/c1-min-win-width) (str card-width "px") "auto"))
+          total-width     (if (and (= columns-num 1)
+                                   (< ww responsive/c1-min-win-width))
+                            "auto"
+                            (str (responsive/total-layout-width-int card-width columns-num) "px"))
           can-edit-secs   (utils/can-edit-sections? company-data)]
       (dom/div {:class (utils/class-set {:topic-list true
                                          :group true

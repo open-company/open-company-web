@@ -110,8 +110,21 @@
           title        (if (clojure.string/blank? (:title su-data))
                           (str (:name company-data) " Update")
                           (:title su-data))]
-      (dom/div {:class "su-snapshot main-scroll"}
+      (dom/div {:class (utils/class-set {:su-snapshot true
+                                         :main-scroll true
+                                         :has-navbar (not prior-list)})}
         (dom/div {:class "page"}
+          (when (and company-data
+                     (not prior-list))
+            ;; Navbar
+            (om/build navbar {:card-width (responsive/calc-card-width)
+                              :columns-num columns-num
+                              :company-data company-data
+                              :foce-key nil
+                              :show-share-su-button false
+                              :mobile-menu-open false
+                              :su-navbar true
+                              :hide-right-menu true}))
 
           ; closing X
           (when (and prior-list mobile?)

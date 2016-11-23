@@ -20,6 +20,7 @@
             [open-company-web.components.company-logo-setup :refer (company-logo-setup)]
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.company-settings :refer (company-settings)]
+            [open-company-web.components.user-management :refer (user-management-wrapper)]
             [open-company-web.components.su-edit :refer (su-edit)]
             [open-company-web.components.create-update :refer (create-update)]
             [open-company-web.components.su-snapshot :refer (su-snapshot)]
@@ -269,6 +270,12 @@
       (swap! dis/app-state assoc :force-remove-loading true)
       (company-handler "profile" target company-settings params))
 
+    (defroute company-settings-um-route (urls/company-settings-um ":slug") {:as params}
+      ; add force-remove-loading to avoid inifinte spinner if the company
+      ; has no sections and the user is looking at company profile
+      (swap! dis/app-state assoc :force-remove-loading true)
+      (company-handler "user-management" target user-management-wrapper params))
+
     (defroute company-route (urls/company ":slug") {:as params}
       (company-handler "dashboard" target company-dashboard params))
 
@@ -316,6 +323,7 @@
                                  logout-route
                                  user-profile-route
                                  company-settings-route
+                                 company-settings-um-route
                                  company-route
                                  company-route-slash
                                  create-update-route

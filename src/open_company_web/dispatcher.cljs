@@ -20,7 +20,9 @@
    :jwt                [[:base] (fn [base] (:jwt base))]
    :subscription       [[:base] (fn [base] (:subscription base))]
    :show-login-overlay [[:base] (fn [base] (:show-login-overlay base))]
-   :rum-popover-data [[:base] (fn [base] (:rum-popover-data base))]})
+   :rum-popover-data   [[:base] (fn [base] (:rum-popover-data base))]
+   :company-data       [[:base] (fn [base] (when (router/current-company-slug)
+                                             (-> ((keyword (router/current-company-slug)) base) :company-data)))]})
 
 ;; Action Loop =================================================================
 
@@ -78,7 +80,7 @@
   ([data]
     (latest-stakeholder-update data (router/current-company-slug)))
   ([data company-slug]
-    (get-in data [(keyword company-slug) :latest-su])))
+    (get-in data (latest-stakeholder-update-key company-slug))))
 
 (defn stakeholder-update-list-data
   ([]

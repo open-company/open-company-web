@@ -2,11 +2,12 @@ div.create-update {
   background-color: $oc_gray_8;
 
   div.create-update-inner {
-    min-height: calc(100vh - #{$footer_small_height}px);
+    min-height: calc(100vh - #{$footer_small_height}px + 71px);
     background-color: $oc_gray_8;
 
     div.create-update-content {
       margin: 58px auto 10px;
+      padding: 0 34px;
 
       div.create-update-content-cards {
         padding-right: 10px;

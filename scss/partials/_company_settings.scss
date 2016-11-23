@@ -4,7 +4,7 @@ body.small-footer {
   div.main-company-settings {
     div.company-settings-container {
       /* 138px is the total height above and below the settings */
-      min-height: calc(100vh - 138px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px + 1px);
+      min-height: calc(100vh - 115px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px + 1px);
     }
   }
 }
@@ -12,15 +12,56 @@ body.small-footer {
 div.main-company-settings {
   div.company-settings-container {
     div.settings-container {
+      width: 580px;
 
       div.settings-form-input-label {
         font-family: $oc_headers_font;
         font-weight: 700;
-        font-size: 12px;
+        font-size: 14px;
         line-height: 1.5;
         letter-spacing: 1px;
         color: #4E5A6B;
-        margin-bottom: 1rem;
+        margin-bottom: 0.6rem;
+      }
+
+      div.settings-form-input.visibility {
+        margin-bottom: 2rem;
+
+        div.visibility-value {
+          cursor: pointer;
+          h3 {
+            font-size: 14px;
+            font-weight: 400;
+            font-family: $oc_headers_font;
+            color: rgba(78,90,107,1);
+            margin-bottom: 5px;
+            margin-top: 0px;
+
+            i.fa {
+              color: $oc_green;
+            }
+          }
+          p {
+            font-size: 14px;
+            font-weight: 400;
+            font-family: $oc_headers_font;
+            color: rgba(78,90,107,1);
+          }
+
+          &:hover {
+            h3{
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+
+      div.dashboard-slug {
+        font-size: 14px;
+        font-weight: 400;
+        font-family: $oc_headers_font;
+        color: rgba(78,90,107,1);
+        margin-bottom: 2rem;
       }
 
       div.settings-form-label {

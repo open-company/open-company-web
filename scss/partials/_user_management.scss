@@ -1,5 +1,9 @@
 div.user-management {
-  div.um-cta {
+  padding: 2rem;
+  background-color: rgba(78, 90, 107, 0.05);
+  width: 580px;
+
+  div.um-cta, div.vis-cta {
     font-weight: 500;
     font-family: $oc_main_font;
     font-size: 24px;
@@ -7,24 +11,53 @@ div.user-management {
     color: $oc_gray_5;
   }
 
+  div.vis-input-line, div.vis-input-line label {
+    font-size: 18px;
+    line-height: 1.8;
+    color: $oc_gray_5;
+    margin-bottom: 5px;
+    font-weight: 400;
+  }
+
+  div.vis-input-line label {
+    cursor: pointer;
+  }
+
+  p.vis-p {
+    font-size: 14px;
+    line-height: 1.8;
+    color: $oc_gray_5;
+    margin-bottom: 15px;
+    font-weight: 400;
+  }
+
   div.um-description {
     p.um-p {
       font-size: 18px;
       line-height: 1.8;
       color: $oc_gray_5;
-      margin-top: 32px;
+      margin-bottom: 32px;
       font-weight: 400;
     }
   }
 
   div.um-invite {
     div.um-invite-label {
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 700;
       line-height: 1.5;
       letter-spacing: 1px;
       color: $oc_gray_5;
       font-family: $oc_headers_font;
+      margin: 0px 0px 1rem;
+      padding: 0px;
+    }
+
+    div.um-invite-label-2 {
+      font-size: 14px;
+      font-weight: 400;
+      color: $oc_gray_5;
+      font-family: $oc_main_font;
       margin: 0px 0px 1rem;
       padding: 0px;
     }
@@ -65,7 +98,7 @@ div.user-management {
     }
 
     input.um-invite-field {
-      width: 340px;
+      width: 290px;
       height: 34px;
       margin: 0px;
       padding: .5rem;
@@ -89,6 +122,8 @@ div.user-management {
 
     button.um-invite-send {
       margin-top: 3px;
+      margin-left: 20px;
+      float: left;
     }
   }
 
@@ -106,7 +141,7 @@ div.user-management {
     span.um-byemail-anyone-span {
       font-family: $oc_headers_font;
       font-weight: 400;
-      font-size: 12px;
+      font-size: 14px;
       line-height: 1.5;
       letter-spacing: 1px;
       color: $oc_gray_5;

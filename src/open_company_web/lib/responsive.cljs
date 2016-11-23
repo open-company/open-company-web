@@ -139,15 +139,26 @@
         (= (gobj/get js/WURFL "form_factor") "Other Mobile"))))
 
 (def topic-total-x-padding 20)
+(def mobile-topic-total-x-padding 4)
 (def updates-content-list-width 280)
 (def updates-content-cards-right-margin 40)
 (def updates-content-cards-max-width 560)
 (def updates-content-cards-min-width 250)
+(def topic-list-x-padding 20)
+(def mobile-topic-list-x-padding 10)
+(def topic-border 4)
 
 (defn total-layout-width-int [card-width columns-num]
-  (- (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
-     (if (is-mobile?) 20 10)                              ; the container padding
-     (if (is-mobile?) 40 0)))                             ; the distance btw the columns on big web
+  (if (is-mobile-size?)
+    (+ (* (+ card-width mobile-topic-total-x-padding) columns-num)
+       (* mobile-topic-list-x-padding 2))
+    (+ (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
+       (* topic-list-x-padding 2)                           ; the padding around all the columns
+       (* topic-border 2))))                                ; the remaining border around the topics
+
+; (- (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
+;      (if (is-mobile?) 20 10)                              ; the container padding
+;      (if (is-mobile?) 40 0)))                             ; the distance btw the columns on big web
 
 (defn calc-update-width [columns-num]
   (let [card-width   (calc-card-width)

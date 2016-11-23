@@ -7,10 +7,22 @@ div.updates {
 
     div.updates-content {
       margin: 60px auto 10px;
+      padding: 0 34px;
 
       div.updates-content-cards {
         padding-right: 10px;
         margin-right: 40px;
+
+        div.loading-container {
+          position: relative;
+          float: none;
+          width: 100%;
+          height: 200px;
+
+          div.oc-loading {
+            background-color: transparent;
+          }
+        }
 
         h3.updates-content-cards-title {
           text-align: center;

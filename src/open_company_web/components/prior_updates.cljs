@@ -27,7 +27,7 @@
 (defn load-prior-updates-if-needed []
   (when (and (dispatcher/company-data)
              (not (:su-list-loading @dispatcher/app-state))
-             (not (get-in @dispatcher/app-state (dispatcher/su-list-key (router/current-company-slug)))))
+             (not (:su-list-loaded @dispatcher/app-state)))
     (dispatcher/dispatch! [:get-su-list])))
 
 (rum/defcs prior-updates
