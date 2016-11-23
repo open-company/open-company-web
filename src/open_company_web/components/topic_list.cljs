@@ -407,7 +407,6 @@
       (dom/div {:class (utils/class-set {:topic-list true
                                          :group true
                                          :dragging dragging
-                                         :navbar-offset true
                                          :editable can-edit-secs})
                 :data-rerender rerender
                 :key (str "topic-list-" rerender)}
