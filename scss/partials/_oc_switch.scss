@@ -3,15 +3,16 @@ div.oc-switch {
   padding-top: 69px;
   box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
   position: relative;
+  background-color: white;
 
-  button {
+
+  div.oc-switch-btn {
     width: 50%;
     height: 69px;
-    font-size: 18px;
-    font-family: $oc_headers_font;
-    text-transform: capitalize;
-    font-weight: 400;
     color: $oc_gray_5;
+    padding-top: 20px;
+    text-align: center;
+    background-color: white;
 
     &.dashboard {
       float: left;
@@ -21,10 +22,19 @@ div.oc-switch {
       float: right;
     }
 
-    &.active {
-      font-weight: 800;
-      text-decoration: underline;
-      text-decoration-color: $oc_yellow;
+    button {
+      font-size: 20px;
+      font-family: $oc_headers_font;
+      text-transform: capitalize;
+      // font-weight: 800;
+      padding: 0;
+      margin: 0;
+      border-bottom: 4px solid transparent;
+
+      &.active {
+        // font-weight: 800;
+        border-bottom: 4px solid $oc_yellow;
+      }
     }
   }
 }

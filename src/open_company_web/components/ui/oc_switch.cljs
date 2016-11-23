@@ -6,9 +6,13 @@
 (rum/defc oc-switch
   [active]
   [:div.oc-switch.group
-    [:button.dashboard {:class (when (= active :dashboard) "active")
-                        :on-click #(router/nav! (oc-urls/company))}
-      "Dashboard"]
-    [:button.updates {:class (when (= active :updates) "active")
-                      :on-click #(router/nav! (oc-urls/stakeholder-update-list))}
-      "Updates"]])
+    [:div.oc-switch-btn.dashboard
+      [:button.btn-reset
+        {:class (when (= active :dashboard) "active")
+         :on-click #(router/nav! (oc-urls/company))}
+        "Dashboard"]]
+    [:div.oc-switch-btn.updates
+      [:button.btn-reset
+        {:class (when (= active :updates) "active")
+         :on-click #(router/nav! (oc-urls/stakeholder-update-list))}
+        "Updates"]]])
