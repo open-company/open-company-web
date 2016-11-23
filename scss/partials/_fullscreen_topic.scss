@@ -75,7 +75,7 @@ div.fullscreen-topic {
       }
 
       div.fullscreen-topic-mobile-navigation{
-        position: fixed;
+        position: absolute;
         top: 0px;
         left: 0px;
         height: #{$mobile_navbar_height}px;
