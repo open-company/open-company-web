@@ -69,26 +69,46 @@ div.fullscreen-topic {
         height: 100%;
         width: 100%;
         margin-top: 0px;
-        padding-top: 30px;
+        padding-top: #{$mobile_navbar_height}px;
         margin-bottom: 0px;
         padding-bottom: 0px;
       }
 
-      button.close-fullscreen-topic-btn {
-        position: absolute;
+      div.fullscreen-topic-mobile-navigation{
+        position: fixed;
         top: 0px;
-        right: -30px;
-        width: 30px;
-        height: 30px;
-        font-weight: 400;
-        font-family: $oc_headers_font;
-        font-size: 25px;
-        color: rgba(78, 90, 107, 0.4);
+        left: 0px;
+        height: #{$mobile_navbar_height}px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
+        background-color: white;
+        border-top: 4px solid $oc_yellow;
         z-index: 1000;
 
-        @include mobile(){
-          left: 10px;
+        div.fullscreen-topic-mobile-navigation-title {
+          color: $oc_gray_7;
+          font-weight: 400;
+          font-family: $oc_headers_font;
+          font-size: 25px;
+          padding-top: 16px;
+        }
+
+        button.close-fullscreen-topic-btn {
+          position: absolute;
           top: 0px;
+          right: -30px;
+          width: 30px;
+          height: 30px;
+          font-weight: 400;
+          font-family: $oc_headers_font;
+          font-size: 28px;
+          color: $oc_gray_7;
+
+          @include mobile(){
+            left: 8px;
+            top: 12px;
+          }
         }
       }
 
@@ -98,6 +118,10 @@ div.fullscreen-topic {
         position: relative;
         overflow-y: visible;
 
+        @include mobile(){
+          padding-bottom: 20px;
+        }
+
         div.topic-header-image {
           text-align: center;
 
@@ -106,11 +130,6 @@ div.fullscreen-topic {
             border-top-left-radius: 2px;
             border-top-right-radius: 2px;
           }
-        }
-
-        button.mobile-close {
-          margin-top: -35px;
-          float: right;
         }
 
         div.topic-title-container{
