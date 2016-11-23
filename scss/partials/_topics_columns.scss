@@ -49,6 +49,8 @@ div.topics-columns {
 
         @include mobile(){
           margin: 0px 2px 12px 2px;
+          border-left: 0px solid transparent;
+          border-right: 0px solid transparent;
         }
       }
     }
