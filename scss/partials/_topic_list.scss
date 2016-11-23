@@ -1,15 +1,3 @@
-$topic_box_width: 344;
-$topic_box_height: 170;
-$topic_box_padding: 10;
-
-div.topic-list-edit-container {
-  padding-bottom: 10px;
-
-  @include mobile(){
-    margin-top: 92px;
-  }
-}
-
 body.small-footer{
   div.topic-list {
     min-height: calc(100vh - #{$footer_small_height}px);
