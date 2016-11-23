@@ -13,7 +13,6 @@
             [open-company-web.lib.cookies :as cook]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.popover :as popover]
-            [open-company-web.components.prior-updates :refer (prior-updates)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [om-bootstrap.button :as b]))
@@ -51,10 +50,6 @@
                             " dropdown-menu"))]
       (dom/ul {:class menu-classes
                :aria-labelledby "dropdown-toggle-menu"}
-        (when (and (responsive/is-mobile-size?)
-                   (router/current-company-slug))
-          (dom/li {:class "oc-menu-item"}
-            (dom/a {:href (oc-urls/stakeholder-update-list) :on-click updates-click} "Updates")))
         (when (jwt/jwt)
           (dom/li {:class "oc-menu-item"}
             (dom/a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile")))
