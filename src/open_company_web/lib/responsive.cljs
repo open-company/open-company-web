@@ -108,7 +108,7 @@
  @_mobile)
 
 (defn mobile-dashboard-card-width [& [force-columns]]
-  (let [columns (or force-columns (columns-num))
+  (let [columns (or force-columns (dashboard-columns-num))
         ww (.-clientWidth (.-body js/document))]
     (cond
       (= columns 2)
