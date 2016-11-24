@@ -1,3 +1,36 @@
+div.mobile-company-dashboard{
+  div.topics-columns {
+    div.topics-column-container {
+      padding: 20px 0px;
+      margin: 0 8px;
+
+      div.topics-column {
+        min-width: initial;
+        max-width: initial;
+
+        div.topic-row {
+          margin: 0px 0px 8px 0px;
+          border-left: 0px solid transparent;
+          border-right: 0px solid transparent;
+        }
+      }
+
+      &.tot-col-2 {
+        div.topics-column.col-1 {
+          div.topic-row {
+            margin-right: 4px;
+          }
+        }
+        div.topics-column.col-2 {
+          div.topic-row {
+            margin-left: 4px;
+          }
+        }
+      }
+    }
+  }
+}
+
 div.topics-columns {
   padding: 0;
   width: 100%;
@@ -15,27 +48,9 @@ div.topics-columns {
     padding: 20px;
     margin: 0 auto;
 
-    @include mobile(){
-      padding: 20px 0px;
-      margin: 0 8px;
-    }
-
-    @include mobile (){
-      &.tot-col-2 {
-        div.topics-column.col-1 {
-          div.topic-row {
-            margin-right: 4px;
-          }
-        }
-        div.topics-column.col-2 {
-          div.topic-row {
-            margin-left: 4px;
-          }
-        }
-      }
-    }
-
     div.topics-column {
+      min-width: 302px;
+      max-width: 520px;
       margin-right: 0px;
       float: left;
 
@@ -43,7 +58,7 @@ div.topics-columns {
         margin-right: 0px;
       }
 
-      div.topic-row{
+      div.topic-row {
         height: auto;
         margin: 0px 6px 22px 6px;
         padding: 0px;
@@ -61,12 +76,6 @@ div.topics-columns {
         &.draggable-topic.dragging-topic {
           z-index: 1000;
           opacity: 0.5;
-        }
-
-        @include mobile(){
-          margin: 0px 0px 8px 0px;
-          border-left: 0px solid transparent;
-          border-right: 0px solid transparent;
         }
       }
     }
