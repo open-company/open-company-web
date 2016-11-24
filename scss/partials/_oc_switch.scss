@@ -1,39 +1,33 @@
 div.oc-switch {
   width: 100%;
-  padding-top: 59px;
+  padding-top: 69px;
   box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
   position: relative;
   background-color: white;
 
 
   div.oc-switch-btn {
-    width: 50%;
-    height: 59px;
-    color: $oc_gray_5;
-    padding-top: 30px;
+    margin-left: 8px;
+    height: 39px;
+    padding-top: 10px;
     text-align: center;
     background-color: white;
-
-    &.dashboard {
-      float: left;
-    }
-
-    &.updates {
-      float: right;
-    }
+    float: left;
 
     button {
-      font-size: 18px;
+      font-size: 14px;
       font-family: $oc_headers_font;
-      text-transform: capitalize;
+      font-weight: 400;
       padding: 0;
       margin: 0;
-      border-bottom: 4px solid transparent;
       padding-left: 10px;
       padding-right: 10px;
+      color: $oc_gray_7;
+      opacity: 0.6;
 
       &.active {
-        border-bottom: 4px solid $oc_yellow;
+        font-weight: 600;
+        opacity: 1;
       }
     }
   }
