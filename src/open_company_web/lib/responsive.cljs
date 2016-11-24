@@ -13,7 +13,7 @@
 (defn window-exceeds-breakpoint []
   (> (.-clientWidth (.-body js/document)) mobile-2-columns-breakpoint))
 
-(defn mobile-columns-num []
+(defn dashboard-columns-num []
   (let [win-width (.-clientWidth (.-body js/document))]
     (cond
       (>= win-width 1012)
