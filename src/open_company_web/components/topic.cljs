@@ -83,7 +83,9 @@
                     :ref "topic-internal"}
 
         ;; Topic image for dashboard
-        (when (and image-header (not is-dashboard?))
+        (when (and image-header
+                   (or (not is-mobile?)
+                       (not is-dashboard?)))
           (dom/div {:class "card-header card-image"}
             (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
 
@@ -92,7 +94,8 @@
           (dom/div {:class "topic-title"} (:title topic-data))
           (when (and (not is-stakeholder-update)
                      (:pin topic-data)
-                     (not is-mobile?)
+                     (or (not is-mobile?)
+                         (not is-dashboard?))
                      (responsive/can-edit?)
                      (not read-only-company))
             (dom/div {:class "pinned-topic"}
@@ -102,7 +105,8 @@
                       :data-placement "top"
                       :title (if (> (count pinned) 1) "Drag and drop to reorder" "Pinned to the top")})))
           (when (and (not is-stakeholder-update)
-                     (not is-mobile?)
+                     (or (not is-mobile?)
+                         (not is-dashboard?))
                      (responsive/can-edit?)
                      (not (:read-only topic-data))
                      (not read-only-company)
@@ -117,7 +121,8 @@
                       :data-placement "top"}))))
 
         ;; Topic data
-        (when (and (not is-dashboard?)
+        (when (and (or (not is-dashboard?)
+                       (not is-mobile?))
                    is-growth-finances?
                    (utils/data-topic-has-data section topic-data))
           (dom/div {:class ""}
@@ -143,14 +148,16 @@
             (utils/time-since (:updated-at topic-data))))
         
         ;; Topic body
-        (when (and (not is-dashboard?)
+        (when (and (or (not is-dashboard?)
+                       (not is-mobile?))
                    (not (clojure.string/blank? topic-body)))
           (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
                         :ref "topic-body"
                         :dangerouslySetInnerHTML (utils/emojify topic-body)}))
 
         ; if it's SU preview or SU show only read-more
-        (when (not is-dashboard?)
+        (when (or (not is-dashboard?)
+                  (not is-mobile?))
           (dom/div {:style {:margin-top "20px"}}
             (when-not is-stakeholder-update
               (om/build topic-attribution data {:opts options}))))))))
