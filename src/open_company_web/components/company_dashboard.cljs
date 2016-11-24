@@ -39,7 +39,9 @@
      :editing-topic false
      :save-bt-active false
      :new-sections-requested false
-     :card-width (responsive/calc-card-width)
+     :card-width (if (responsive/is-mobile-size?)
+                   (responsive/mobile-dashboard-card-width)
+                   (responsive/calc-card-width))
      :columns-num (responsive/columns-num)})
 
   (did-mount [_]
@@ -47,7 +49,9 @@
     (when-not (:read-only (dis/company-data data))
       (get-new-sections-if-needed owner))
     (events/listen js/window EventType/RESIZE (fn [_] (om/update-state! owner #(merge % {:columns-num (responsive/columns-num)
-                                                                                         :card-width (responsive/calc-card-width)})))))
+                                                                                         :card-width (if (responsive/is-mobile-size?)
+                                                                                                       (responsive/mobile-dashboard-card-width)
+                                                                                                       (responsive/calc-card-width))})))))
 
   (will-receive-props [_ next-props]
     (when-not (:read-only (dis/company-data next-props))
@@ -61,6 +65,7 @@
                                            :main-scroll true})}
           (om/build loading {:loading true}))
         (dom/div {:class (utils/class-set {:company-dashboard true
+                                           :mobile-company-dashboard (responsive/is-mobile-size?)
                                            :main-scroll true})}
           (when (and (not (utils/is-test-env?))
                      (get-in data [(keyword (router/current-company-slug)) :error]))
