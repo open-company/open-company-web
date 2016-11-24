@@ -15,6 +15,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.cookies :as cook]
             [open-company-web.lib.raven :as sentry]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [open-company-web.components.company-editor :refer (company-editor)]
             [open-company-web.components.company-logo-setup :refer (company-logo-setup)]
@@ -289,7 +290,9 @@
       (company-handler "su-list" target updates-responsive-switcher params))
 
     (defroute su-list-update-route (urls/stakeholder-update-list ":slug" ":update-slug") {:as params}
-      (company-handler "su-list" target updates-responsive-switcher params))
+      (if (responsive/is-mobile-size?)
+        (stakeholder-update-handler target su-snapshot params)
+        (company-handler "su-list" target updates-responsive-switcher params)))
 
     (defroute su-edit-route (urls/stakeholder-update-edit ":slug") {:as params}
       (company-handler "su-edit" target su-edit params))
