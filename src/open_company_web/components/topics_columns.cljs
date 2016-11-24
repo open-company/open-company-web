@@ -192,10 +192,17 @@
                                                 (zero? (count topics)))
                        :update-active-topics update-active-topics})
         (let [sd (->> section-name keyword (get topics-data))
+              is-dashboard? (utils/in? (:route @router/path) "dashboard")
               topic-row-style (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
                                       (utils/in? (:route @router/path) "su-list"))
                                 #js {}
-                                #js {:width (if (responsive/window-exceeds-breakpoint) (str (:card-width props) "px") "auto")})]
+                                #js {:width (if is-dashboard?
+                                              (if (responsive/window-exceeds-breakpoint)
+                                                (str (:card-width props) "px")
+                                                "auto")
+                                              (if (responsive/is-mobile-size?)
+                                                "auto"
+                                                (str (:card-width props) "px")))})]
           (when-not (and (:read-only company-data) (:placeholder sd))
             (dom/div #js {:className "topic-row"
                           :data-topic (name section-name)
@@ -245,10 +252,16 @@
           partial-render-topic   (partial render-topic owner options)
           {:keys [pinned other]} (utils/get-pinned-other-keys topics company-data)
           columns-container-key   (str (apply str pinned) (apply str other))
-          topics-column-conatiner-style (if (responsive/window-exceeds-breakpoint)
-                                          #js {:width total-width}
-                                          #js {:margin "0px 9px"
-                                               :width "auto"})]
+          is-dashboard? (utils/in? (:route @router/path) "dashboard")
+          topics-column-conatiner-style (if is-dashboard?
+                                          (if (responsive/window-exceeds-breakpoint)
+                                            #js {:width total-width}
+                                            #js {:margin "0px 9px"
+                                                 :width "auto"})
+                                          (if (responsive/is-mobile-size?)
+                                            #js {:margin "0px 9px"
+                                                 :width "auto"}
+                                            #js {:width total-width}))]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true
@@ -258,7 +271,12 @@
         (cond
           ;; render 2 or 3 column layout
           (> columns-num 1)
-          (dom/div {:class (str "topics-column-container group tot-col-" columns-num)
+          (dom/div {:class (utils/class-set {:topics-column-container true
+                                             :group true
+                                             :tot-col-3 (and is-dashboard?
+                                                             (= columns-num 3))
+                                             :tot-col-2 (and is-dashboard?
+                                                             (= columns-num 2))})
                     :style topics-column-conatiner-style
                     :key columns-container-key}
             ; for each column key contained in best layout
