@@ -236,7 +236,8 @@
           is-dashboard? (utils/in? (:route @router/path) "dashboard")
           is-mobile? (responsive/is-mobile-size?)
           topic-style (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
-                                      (utils/in? (:route @router/path) "su-list"))
+                              (utils/in? (:route @router/path) "su-snapshot")
+                              (utils/in? (:route @router/path) "su-list"))
                         #js {}
                         #js {:width (if (responsive/window-exceeds-breakpoint) (str card-width "px") "auto")})]
       ;; preload previous revision
