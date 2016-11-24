@@ -35,6 +35,7 @@
 (def read-more-height 15)
 
 (def topic-margins 20)
+(def mobile-topic-margins 4)
 
 (defn headline-body-height [headline body card-width]
   (let [$headline (js/$ (str "<div class=\"topic\">"
@@ -42,10 +43,10 @@
                                   "<div>"
                                     "<div class=\"topic-internal\">"
                                       (when-not (clojure.string/blank? headline)
-                                        (str "<div class=\"topic-headline-inner\" style=\"width: " (+ card-width (if (responsive/is-mobile-size?) 0 topic-margins)) "px;\">"
+                                        (str "<div class=\"topic-headline-inner\" style=\"width: " (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px;\">"
                                                (utils/emojify headline true)
                                              "</div>"))
-                                      "<div class=\"topic-body\" style=\"width: " (+ card-width (if (responsive/is-mobile-size?) 0 topic-margins)) "px;\">"
+                                      "<div class=\"topic-body\" style=\"width: " (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px;\">"
                                         (utils/emojify body true)
                                       "</div>"
                                     "</div>"
@@ -266,7 +267,7 @@
               (let [column (get best-layout kw)
                     {:keys [pinned other]} (utils/get-pinned-other-keys column company-data)]
                 (dom/div {:class (str "topics-column col-" (name kw))
-                          :style #js {:width (str (+ card-width (if (responsive/is-mobile-size?) 0 topic-margins)) "px")}}
+                          :style #js {:width (str (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px")}}
                   ; render the pinned topics
                   (dom/div #js {:className "topics-column-pinned"}
                     (when (pos? (count pinned))
