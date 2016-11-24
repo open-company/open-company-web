@@ -77,7 +77,6 @@
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
           company-data        (dis/company-data)
           {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
-      (js/console.log "topic-internal is-mobile" is-mobile? "is-dashboard" is-dashboard?)
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
                     :onClick (partial fullscreen-topic owner)
@@ -121,7 +120,6 @@
         (when (and (not is-dashboard?)
                    is-growth-finances?
                    (utils/data-topic-has-data section topic-data))
-          (js/console.log "topic-internal data charts")
           (dom/div {:class ""}
             (cond
               (= section "growth")
