@@ -12,6 +12,7 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.navbar :refer (navbar)]
+            [open-company-web.components.ui.oc-switch :refer (oc-switch)]
             [open-company-web.components.su-snapshot :refer (su-snapshot)]
             [open-company-web.components.prior-updates :refer (prior-updates)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
@@ -78,65 +79,65 @@
                             (str (:name (dis/company-data)) " Update")
                             (:title su-data))
                           "")]
-      (if-not (dis/stakeholder-update-list-data data)
-        (dom/div {:class "oc-loading active"} (dom/i {:class "fa fa-circle-o-notch fa-spin"}))
-        (dom/div {:class "updates main-scroll group"}
-          (dom/div {:class "page"}
-            (om/build navbar {:card-width card-width
-                              :columns-num columns-num
-                              :company-data company-data
-                              :foce-key (:foce-key data)
-                              :show-share-su-button (utils/can-edit-sections? company-data)
-                              :active :updates
-                              :mobile-menu-open (:mobile-menu-open data)
-                              :auth-settings (:auth-settings data)})
-            (dom/div {:class "updates-inner group navbar-offset"}
-              (dom/div {:class "updates-content group"
-                        :style {:width total-width}}
-                (dom/div {:class "updates-content-list group right"
-                          :style {:width (str responsive/updates-content-list-width "px")}}
-                  (prior-updates false selected-su))
-                (dom/div {:class "updates-content-cards right"
-                          :style {:width (str fixed-card-width "px")}}
-                  (when (and selected-su
-                             (not su-data))
-                    ; if a SU was selected but the data are not loaded yet show a spinner
-                    (dom/div {:class "loading-container"}
-                      (om/build loading {:loading true})))
-                  (when su-data
-                    (dom/h3 {:class "updates-content-cards-title"} update-title))
-                  (when su-data
-                    (om/build topics-columns {:columns-num 1
-                                              :card-width (- fixed-card-width 10) ; remove 10 padding on the right
-                                              :total-width (- fixed-card-width 10)
-                                              :is-stakeholder-update true
-                                              :content-loaded (not (:loading data))
-                                              :topics (:sections su-data)
-                                              :topics-data su-data
-                                              :company-data company-data
-                                              :hide-add-topic true
-                                              :show-share-remove false})))))
-            (om/build footer {:card-width card-width
-                              :columns-num columns-num
-                              :company-data company-data})))))))
+      (dom/div {:class "updates-inner group navbar-offset"}
+        (dom/div {:class "updates-content group"
+                  :style {:width total-width}}
+          (dom/div {:class "updates-content-list group right"
+                    :style {:width (str responsive/updates-content-list-width "px")}}
+            (prior-updates false selected-su))
+          (dom/div {:class "updates-content-cards right"
+                    :style {:width (str fixed-card-width "px")}}
+            (when (and selected-su
+                       (not su-data))
+              ; if a SU was selected but the data are not loaded yet show a spinner
+              (dom/div {:class "loading-container"}
+                (om/build loading {:loading true})))
+            (when su-data
+              (dom/h3 {:class "updates-content-cards-title"} update-title))
+            (when su-data
+              (om/build topics-columns {:columns-num 1
+                                        :card-width (- fixed-card-width 10) ; remove 10 padding on the right
+                                        :total-width (- fixed-card-width 10)
+                                        :is-stakeholder-update true
+                                        :content-loaded (not (:loading data))
+                                        :topics (:sections su-data)
+                                        :topics-data su-data
+                                        :company-data company-data
+                                        :hide-add-topic true
+                                        :show-share-remove false}))))))))
 
 (defcomponent updates-responsive-switcher [data owner]
 
   (init-state [_]
     (dis/dispatch! [:start-foce nil])
-    {:mobile-size (responsive/is-mobile-size?)})
+    {:columns-num (responsive/columns-num)
+     :card-width (responsive/calc-card-width)})
 
   (did-mount [_]
     (om/set-state! owner :resize-listener
-      (events/listen js/window EventType/RESIZE #(om/set-state! owner :mobile-size (responsive/is-mobile-size?)))))
+      (events/listen js/window EventType/RESIZE (fn [_] (om/update-state! owner #(merge % {:columns-num (responsive/columns-num)
+                                                                                           :card-width (responsive/calc-card-width)}))))))
 
   (will-unmount [_]
     (when-let [resize-listener (om/get-state owner :resize-listener)]
       (events/unlistenByKey resize-listener)))
 
-  (render-state [_ {:keys [mobile-size]}]
-    (if mobile-size
-      (if (router/current-stakeholder-update-slug)
-        (om/build su-snapshot data)
-        (prior-updates true nil))
-      (om/build updates data))))
+  (render-state [_ {:keys [columns-num card-width]}]
+    (let [company-data (dis/company-data data)]
+      (if-not (dis/stakeholder-update-list-data data)
+        (dom/div {:class "oc-loading active"} (dom/i {:class "fa fa-circle-o-notch fa-spin"}))
+        (dom/div {:class "updates main-scroll group"}
+          (dom/div {:class "page"}
+            (om/build navbar (merge data {:card-width card-width
+                                          :columns-num columns-num
+                                          :company-data company-data
+                                          :show-share-su-button (utils/can-edit-sections? company-data)
+                                          :active :updates}))
+            (when (responsive/is-mobile-size?)
+              (oc-switch :updates))
+            (if (responsive/is-mobile-size?)
+              (prior-updates true nil)
+              (om/build updates data)))
+          (om/build footer {:card-width card-width
+                      :columns-num columns-num
+                      :company-data company-data}))))))
