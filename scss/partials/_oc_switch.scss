@@ -1,6 +1,6 @@
 div.oc-switch {
   width: 100%;
-  padding-top: 69px;
+  padding-top: #{$mobile_navbar_height}px;
   box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
   position: relative;
   background-color: white;
@@ -8,7 +8,7 @@ div.oc-switch {
 
   div.oc-switch-btn {
     margin-left: 8px;
-    height: 39px;
+    height: #{$oc_switch_height}px;
     padding-top: 10px;
     text-align: center;
     background-color: white;
