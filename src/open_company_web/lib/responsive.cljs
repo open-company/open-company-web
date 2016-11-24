@@ -13,12 +13,22 @@
 (defn window-exceeds-breakpoint []
   (> (.-clientWidth (.-body js/document)) mobile-2-columns-breakpoint))
 
-(defn columns-num []
+(defn mobile-columns-num []
   (let [win-width (.-clientWidth (.-body js/document))]
     (cond
       (>= win-width 1012)
       3
       (>= win-width mobile-2-columns-breakpoint)
+      2
+      :else
+      1)))
+
+(defn columns-num []
+  (let [win-width (.-clientWidth (.-body js/document))]
+    (cond
+      (>= win-width 1012)
+      3
+      (>= win-width 684)
       2
       :else
       1)))
