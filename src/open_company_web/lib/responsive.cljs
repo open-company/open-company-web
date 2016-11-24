@@ -97,27 +97,29 @@
  (set-browser-type!))
  @_mobile)
 
-(defn calc-card-width [& [force-columns]]
+(defn mobile-dashboard-card-width [& [force-columns]]
   (let [columns (or force-columns (columns-num))
         ww (.-clientWidth (.-body js/document))]
-    (if (is-mobile-size?)
-      (cond
-        (= columns 2)
-        (/ (- ww 8 8 8) 2)
-        (= columns 1)
-        (- ww 8 8))
-      (let [
-            ;; get params based on columns number
-            min-win-width (get-min-win-width columns)
-            win-diff (get-win-diff columns)
-            win-card-diff (get-win-card-diff columns)
-            min-card-delta (get-min-card-delta columns)
-            ;; calculations
-            win-delta-width (- ww min-win-width)
-            perc-win-delta  (/ (* win-delta-width 100) win-diff)
-            diff-delta      (* (/ win-card-diff 100) perc-win-delta)
-            delta           (+ min-card-delta diff-delta)]
-          (/ ww delta)))))
+    (cond
+      (= columns 2)
+      (/ (- ww 8 8 8) 2)
+      (= columns 1)
+      (- ww 8 8))))
+
+(defn calc-card-width [& [force-columns]]
+  (let [columns (or force-columns (columns-num))
+        ww (.-clientWidth (.-body js/document))
+        ;; get params based on columns number
+        min-win-width (get-min-win-width columns)
+        win-diff (get-win-diff columns)
+        win-card-diff (get-win-card-diff columns)
+        min-card-delta (get-min-card-delta columns)
+        ;; calculations
+        win-delta-width (- ww min-win-width)
+        perc-win-delta  (/ (* win-delta-width 100) win-diff)
+        diff-delta      (* (/ win-card-diff 100) perc-win-delta)
+        delta           (+ min-card-delta diff-delta)]
+      (/ ww delta)))
 
 (defn user-agent-mobile? []
   userAgent/MOBILE)
