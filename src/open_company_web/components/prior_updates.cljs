@@ -44,13 +44,9 @@
       (load-prior-updates-if-needed))
     (if (and standalone-component
              (not (dispatcher/stakeholder-update-list-data)))
-      [:div.prior-updates {:class (if standalone-component "standalone" "")}
+      [:div.prior-updates
         [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
-      [:div.prior-updates {:class (if standalone-component "standalone" "")
-                           :style {:padding 0}}
-
-        (when standalone-component
-          (back-to-dashboard-btn {:title "Updates"}))
+      [:div.prior-updates {:style {:padding 0}}
 
         [:div.prior-updates-container {}
           
