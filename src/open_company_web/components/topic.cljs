@@ -56,12 +56,14 @@
                                       section
                                       currency
                                       card-width
+                                      columns-num
                                       prev-rev
                                       next-rev
                                       sharing-mode
                                       read-only-company
                                       is-stakeholder-update
-                                      is-mobile?] :as data} owner options]
+                                      is-mobile?
+                                      is-dashboard?] :as data} owner options]
 
   (render [_]
     (let [section-kw          (keyword section)
@@ -75,13 +77,14 @@
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
           company-data        (dis/company-data)
           {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
+      (js/console.log "topic-internal is-mobile" is-mobile? "is-dashboard" is-dashboard?)
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
                     :onClick (partial fullscreen-topic owner)
                     :ref "topic-internal"}
 
         ;; Topic image for dashboard
-        (when (and image-header (not is-mobile?))
+        (when (and image-header (not is-dashboard?))
           (dom/div {:class "card-header card-image"}
             (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
 
@@ -100,12 +103,12 @@
                       :data-placement "top"
                       :title (if (> (count pinned) 1) "Drag and drop to reorder" "Pinned to the top")})))
           (when (and (not is-stakeholder-update)
-                   (not is-mobile?)
-                   (responsive/can-edit?)
-                   (not (:read-only topic-data))
-                   (not read-only-company)
-                   (not sharing-mode)
-                   (not (:foce-active data)))
+                     (not is-mobile?)
+                     (responsive/can-edit?)
+                     (not (:read-only topic-data))
+                     (not read-only-company)
+                     (not sharing-mode)
+                     (not (:foce-active data)))
             (dom/button {:class (str "topic-pencil-button btn-reset")
                          :on-click #(pencil-click owner %)}
               (dom/i {:class "fa fa-pencil"
@@ -115,14 +118,17 @@
                       :data-placement "top"}))))
 
         ;; Topic data
-        (when (and (not is-mobile?)
+        (when (and (not is-dashboard?)
                    is-growth-finances?
                    (utils/data-topic-has-data section topic-data))
+          (js/console.log "topic-internal data charts")
           (dom/div {:class ""}
             (cond
               (= section "growth")
               (om/build topic-growth {:section-data topic-data
                                       :section section
+                                      :card-width card-width
+                                      :columns-num columns-num
                                       :currency currency} {:opts chart-opts})
               (= section "finances")
               (om/build topic-finances {:section-data (utils/fix-finances topic-data)
@@ -134,19 +140,19 @@
           (om/build topic-headline topic-data))
 
         ;; Attribution for topic
-        (when is-mobile?
+        (when (and is-mobile? is-dashboard?)
           (dom/div {:class "mobile-date"}
             (utils/time-since (:updated-at topic-data))))
         
         ;; Topic body
-        (when (and (not is-mobile?)
+        (when (and (not is-dashboard?)
                    (not (clojure.string/blank? topic-body)))
           (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
                         :ref "topic-body"
                         :dangerouslySetInnerHTML (utils/emojify topic-body)}))
 
         ; if it's SU preview or SU show only read-more
-        (when-not is-mobile?
+        (when (not is-dashboard?)
           (dom/div {:style {:margin-top "20px"}}
             (when-not is-stakeholder-update
               (om/build topic-attribution data {:opts options}))))))))
@@ -229,6 +235,7 @@
           rev-cb (fn [_ rev] (om/set-state! owner :transition-as-of (:updated-at rev)))
           foce-active (not (nil? (dis/foce-section-key)))
           is-foce (= (dis/foce-section-key) section-kw)
+          is-dashboard? (utils/in? (:route @router/path) "dashboard")
           is-mobile? (responsive/is-mobile-size?)
           topic-style (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
                                       (utils/in? (:route @router/path) "su-list"))
@@ -244,7 +251,7 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
-                                                 :mobile-topic is-mobile?
+                                                 :mobile-dashboard-topic (and is-mobile? is-dashboard?)
                                                  :topic-edit is-foce
                                                  :draggable-topic (and (not is-stakeholder-update) (not (:read-only-company data)) (:pin topic-data))
                                                  :not-draggable-topic (or is-stakeholder-update (:read-only-company data) (not (:pin topic-data)))
@@ -310,6 +317,7 @@
                                           :is-foce is-foce
                                           :foce-active foce-active
                                           :is-mobile? is-mobile?
+                                          :is-dashboard? is-dashboard?
                                           :prev-rev prev-rev
                                           :next-rev next-rev}
                                          {:opts (merge options {:rev-click rev-cb})
@@ -328,6 +336,7 @@
                                             :currency currency
                                             :read-only-company (:read-only-company data)
                                             :is-mobile? is-mobile?
+                                            :is-dashboard? is-dashboard?
                                             :prev-rev tr-prev-rev
                                             :next-rev tr-next-rev}
                                            {:opts (merge options {:rev-click rev-cb})}))))))))))
