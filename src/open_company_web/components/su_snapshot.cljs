@@ -106,7 +106,7 @@
     (let [company-data (dis/company-data data)
           su-data      (dis/stakeholder-update-data)
           mobile?      (responsive/is-mobile-size?)
-          fixed-card-width (responsive/calc-card-width 1)
+          fixed-card-width (responsive/calc-update-width (responsive/columns-num))
           title        (if (clojure.string/blank? (:title su-data))
                           (str (:name company-data) " Update")
                           (:title su-data))]
