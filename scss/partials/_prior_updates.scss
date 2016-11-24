@@ -1,5 +1,9 @@
 div.prior-updates {
 
+  @include mobile(){
+    min-height: calc(100vh - #{$mobile_navbar_height}px - #{$oc_switch_height}px - #{$footer_small_height}px);
+  }
+
   h3.mobile-title {
     margin-left: 20px;
     font-family: $oc_headers_font;
