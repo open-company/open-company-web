@@ -81,9 +81,9 @@
               (dom/ul {:class "nav navbar-nav navbar-right"}
                 (dom/li {}
                   (if (responsive/is-mobile-size?)
-                    (dom/button {:class "btn-reset group"
+                    (dom/button {:class "btn-reset mobile-menu group"
                                  :on-click #(dis/dispatch! [:mobile-menu-toggle])}
-                      (i/icon :menu-34 {}))
+                      (dom/i {:class "fa fa-ellipsis-v"}))
                     (if (jwt/jwt)
                       (dom/div {:class "group"}
                         (dom/div {:class "dropdown right"}
