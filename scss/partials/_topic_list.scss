@@ -9,8 +9,6 @@ body.small-footer{
 }
 
 div.topic-list{
-  position: relative;
-  content: "";
   padding-bottom: 20px;
   min-height: calc(100vh - #{$footer_height}px);
   background-color: $oc_gray_8;
