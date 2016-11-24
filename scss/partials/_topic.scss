@@ -48,6 +48,8 @@ div.topic {
 
   &.mobile-topic {
     text-align: left;
+    margin-left: 0px;
+    margin-right: 0px;
   }
 
   div.share-remove-container{
@@ -235,6 +237,7 @@ div.topic {
       }
 
       div.mobile-date {
+        text-align: center;
         margin-top: 10px;
         font-size: 12px;
         color: $oc_gray_7;
