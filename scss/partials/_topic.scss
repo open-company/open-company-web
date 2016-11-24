@@ -46,10 +46,48 @@ div.topic {
     cursor: move;
   }
 
-  &.mobile-topic {
+  &.mobile-dashboard-topic {
     text-align: left;
     margin-left: 0px;
     margin-right: 0px;
+
+    div.topic-internal {
+      * > div {
+        padding: 0px 10px;
+      }
+
+      div.topic-title {
+        font-size: 14px;
+        text-transform: none;
+        opacity: 1;
+        color: $oc_gray_7;
+        text-align: center;
+        float: none;
+        font-weight: 700;
+        font-size: 15px;
+      }
+
+      div.mobile-date {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 12px;
+        color: $oc_gray_7;
+        opacity: 0.6;
+        font-family: $oc_headers_font;
+      }
+
+      div.topic-headline-inner {
+        font-family: $oc_headers_font;
+        padding-top: 5px;
+        font-size: 13px;
+        font-weight: 400;
+        line-height: normal;
+
+        .emojione {
+          @include emoji-size(13px);
+        }
+      }
+    }
   }
 
   div.share-remove-container{
@@ -156,9 +194,6 @@ div.topic {
 
       & > div{
         padding: 0px 20px;
-        @include mobile(){
-          padding: 0px 10px;
-        }
       }
 
       div.topic-header {
@@ -215,7 +250,7 @@ div.topic {
       div.topic-title {
         padding-top: 12px;
         opacity: 0.5;
-        font-size: 14px;
+        font-size: 13px;
         line-height: 1.5;
         letter-spacing: 1px;
         color: $oc_gray_5;
@@ -224,25 +259,6 @@ div.topic {
         font-weight: 700;
         float: left;
         width: auto;
-
-        @include mobile(){
-          text-transform: none;
-          opacity: 1;
-          color: $oc_gray_7;
-          text-align: center;
-          float: none;
-          font-weight: 700;
-          font-size: 15px;
-        }
-      }
-
-      div.mobile-date {
-        text-align: center;
-        margin-top: 10px;
-        font-size: 12px;
-        color: $oc_gray_7;
-        opacity: 0.6;
-        font-family: $oc_headers_font;
       }
 
       div.topic-headline-inner {
@@ -250,21 +266,9 @@ div.topic {
         font-size: 18px;
         line-height: 25px;
         color: $oc_gray_7;
-        font-family: $oc_headers_font;
 
         .emojione {
           @include emoji-size(18px);
-        }
-
-        @include mobile(){
-          padding-top: 5px;
-          font-size: 13px;
-          font-weight: 400;
-          line-height: normal;
-
-          .emojione {
-            @include emoji-size(13px);
-          }
         }
       }
 
