@@ -35,7 +35,7 @@
 (def read-more-height 15)
 
 (def topic-margins 20)
-(def mobile-topic-margins 4)
+(def mobile-topic-margins 3)
 
 (defn headline-body-height [headline body card-width]
   (let [$headline (js/$ (str "<div class=\"topic\">"
