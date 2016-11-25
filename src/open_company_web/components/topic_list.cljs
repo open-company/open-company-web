@@ -472,14 +472,6 @@
              :once-only false
              :mobile false
              :desktop (str "Hi " (jwt/get-key :name) ", welcome to OpenCompany! Choose a topic to get started.")}))
-
-        ;; Mobile only welcome
-        (when (and show-add-topic-tip (nil? (:show-login-overlay data)))
-          (onboard-tip
-            {:id (str "welcome-" company-slug "-mobile")
-             :once-only false
-             :mobile (str "Hi " (jwt/get-key :name) ", your dashboard can be viewed after it's been created on a desktop browser.")
-             :desktop false}))
         
         ;; After 1st topic
         (when (and show-second-add-topic-tooltip (not selected-topic))                   
