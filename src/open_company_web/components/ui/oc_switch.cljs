@@ -7,12 +7,12 @@
   [active]
   [:div.oc-switch.group
     [:div.oc-switch-btn.dashboard
+      {:on-click #(router/nav! (oc-urls/company))}
       [:button.btn-reset
-        {:class (when (= active :dashboard) "active")
-         :on-click #(router/nav! (oc-urls/company))}
+        {:class (when (= active :dashboard) "active")}
         "Dashboard"]]
     [:div.oc-switch-btn.updates
+      {:on-click #(router/nav! (oc-urls/stakeholder-update-list))}
       [:button.btn-reset
-        {:class (when (= active :updates) "active")
-         :on-click #(router/nav! (oc-urls/stakeholder-update-list))}
+        {:class (when (= active :updates) "active")}
         "Updates"]]])
