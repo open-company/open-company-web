@@ -61,7 +61,7 @@
         (dom/div {:class (utils/class-set {:company-dashboard true
                                            :main-scroll true})}
           (when (and (not (utils/is-test-env?))
-                     (not (get-in data [(keyword (router/current-company-slug)) :error])))
+                     (get-in data [(keyword (router/current-company-slug)) :error]))
             ;show login overlays if needed
             (login-overlays-handler))
           (if (get-in data [(keyword (router/current-company-slug)) :error])
