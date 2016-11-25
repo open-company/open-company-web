@@ -148,8 +148,26 @@
 (defn calc-layout
   "Calculate the best layout given the list of topics and the number of columns to layout to"
   [owner data]
-  (if (utils/is-test-env?)
+  (cond
+    ; avoid to crash tests
+    (utils/is-test-env?)
     (om/get-props owner :topics)
+    ; for mobile just layout the sections in :sections order
+    ; w/o caring about the height it might be
+    (responsive/is-mobile-size?)
+    (let [sections (:sections (:company-data data))]
+      (loop [idx 0
+             layout {:1 [] :2 []}]
+        (if (= idx (count sections))
+          layout
+          (let [topic (get sections idx)]
+            (recur (inc idx)
+                   (if (even? idx)
+                      (assoc layout :1 (conj (:1 layout) topic))
+                      (assoc layout :2 (conj (:2 layout) topic))))))))
+    ; on big web guess what the topic height will be and layout the topics in
+    ; the best order possible
+    :else
     (let [columns-num (:columns-num data)
           company-data (:company-data data)
           show-add-topic (add-topic? owner)
