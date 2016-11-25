@@ -84,6 +84,7 @@ div.prior-updates {
           @include mobile(){
             color: $oc_gray_7;
             text-decoration: underline;
+            font-size: 15px;
           }
         }
       }
