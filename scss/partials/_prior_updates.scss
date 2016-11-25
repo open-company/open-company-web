@@ -77,12 +77,14 @@ div.prior-updates {
         font-family: $oc_headers_font;
         font-weight: 400;
 
-        @include mobile() {
-          text-decoration: underline;
-        }
-
         a {
-          color: rgba(78,90,107,0.8);
+          @inlcude big_web(){
+            color: rgba(78,90,107,0.8);
+          }
+          @include mobile(){
+            color: $oc_gray_7;
+            text-decoration: underline;
+          }
         }
       }
 
