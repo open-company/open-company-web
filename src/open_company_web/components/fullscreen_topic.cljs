@@ -83,6 +83,7 @@
                        :on-click #(hide-fullscreen-topic-cb)}
             (dom/i {:class "fa fa-angle-left"})))
         (dom/div {:class "fullscreen-topic-top-box"}
+          (dom/div {:class "fullscreen-topic-top-box-overflow"}
           ;; Image
           (when (:image-url topic-data)
             (dom/div {:class "topic-header-image"}
@@ -113,7 +114,7 @@
           ;; Attribution
           (when (and (not hide-history-navigation)
                      (not (:placeholder topic-data)))
-            (om/build topic-attribution (assoc data :close-cb #(hide-fullscreen-topic-cb)) {:opts options})))))))
+            (om/build topic-attribution (assoc data :close-cb #(hide-fullscreen-topic-cb)) {:opts options}))))))))
 
 (defn- hide-fullscreen-topic [owner options & [force-fullscreen-dismiss]]
   (utils/enable-scroll)

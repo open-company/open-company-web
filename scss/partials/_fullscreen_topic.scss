@@ -75,7 +75,7 @@ div.fullscreen-topic {
       }
 
       div.fullscreen-topic-mobile-navigation{
-        position: absolute;
+        position: fixed;
         top: 0px;
         left: 0px;
         height: #{$mobile_navbar_height}px;
@@ -120,73 +120,78 @@ div.fullscreen-topic {
 
         @include mobile(){
           padding-bottom: 20px;
+          height: calc(100vh - #{$mobile_navbar_height}px - 4px);
+          overflow-y: scroll;
         }
 
-        div.topic-header-image {
-          text-align: center;
+        div.fullscreen-topic-top-box-overflow {
 
-          img {
-            width: 100%;
-            border-top-left-radius: 2px;
-            border-top-right-radius: 2px;
+          div.topic-header-image {
+            text-align: center;
+
+            img {
+              width: 100%;
+              border-top-left-radius: 2px;
+              border-top-right-radius: 2px;
+            }
           }
-        }
 
-        div.topic-title-container{
-          padding: 17px #{$lightbox_side_padding}px 0px;
+          div.topic-title-container{
+            padding: 17px #{$lightbox_side_padding}px 0px;
 
-          div.topic-title {
-            opacity: 0.5;
+            div.topic-title {
+              opacity: 0.5;
+              font-family: $oc_headers_font;
+              font-weight: 700;
+              font-size: 13px;
+              line-height: 1.5;
+              letter-spacing: 1px;
+              color: $oc_gray_5;
+              text-transform: uppercase;
+              margin: 0px;
+            }
+          }
+
+          div.topic-headline {
+            margin-top: 18px;
             font-family: $oc_headers_font;
-            font-weight: 700;
-            font-size: 13px;
-            line-height: 1.5;
-            letter-spacing: 1px;
-            color: $oc_gray_5;
-            text-transform: uppercase;
-            margin: 0px;
+            font-size: 18px;
+            line-height: 25px;
+            color: $oc_gray_7;
+            padding: 0px #{$lightbox_side_padding}px;
+
+            .emojione {
+              @include emoji-size(#{$lightbox_side_padding}px);
+            }
+          }
+
+          div.topic-snippet{
+            @include rich-editor-body($oc_gray_7);
+            line-height: 1.8;
+            font-size: 18px;
+            margin-top: 12px !important;
+            padding: 0px #{$lightbox_side_padding}px !important;
+          }
+
+          div.topic-growth-finances{
+            margin-top: 20px;
+            padding: 0px #{$lightbox_side_padding}px;
           }
         }
 
-        div.topic-headline {
-          margin-top: 18px;
-          font-family: $oc_headers_font;
-          font-size: 18px;
-          line-height: 25px;
-          color: $oc_gray_7;
-          padding: 0px #{$lightbox_side_padding}px;
-
-          .emojione {
-            @include emoji-size(#{$lightbox_side_padding}px);
-          }
-        }
-
-        div.topic-snippet{
-          @include rich-editor-body($oc_gray_7);
+        div.topic-body{
+          @include rich-editor-body($oc_gray_7, 14px);
+          margin-top: 21px !important;
+          margin-bottom: 20px !important;
           line-height: 1.8;
-          font-size: 18px;
-          margin-top: 12px !important;
+          font-size: 14px;
           padding: 0px #{$lightbox_side_padding}px !important;
+          overflow-wrap: break-word;
         }
 
-        div.topic-growth-finances{
-          margin-top: 20px;
+        div.topic-attribution-container {
           padding: 0px #{$lightbox_side_padding}px;
         }
-      }
-
-      div.topic-body{
-        @include rich-editor-body($oc_gray_7, 14px);
-        margin-top: 21px !important;
-        margin-bottom: 20px !important;
-        line-height: 1.8;
-        font-size: 14px;
-        padding: 0px #{$lightbox_side_padding}px !important;
-        overflow-wrap: break-word;
-      }
-
-      div.topic-attribution-container {
-        padding: 0px #{$lightbox_side_padding}px;
       }
     }
   }
