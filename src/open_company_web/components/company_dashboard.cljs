@@ -90,7 +90,7 @@
                                 :active :dashboard})
               (when (responsive/is-mobile-size?)
                 (oc-switch :dashboard))
-              (if (empty? (:sections company-data))
+              (if (and (empty? (:sections company-data)) (responsive/is-mobile-size?))
                 (dom/div {:class "empty-dashboard"}
                   (dom/h3 {:class "empty-dashboard-title"}
                     "No topics have been created.")
