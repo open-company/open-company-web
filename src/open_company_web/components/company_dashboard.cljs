@@ -90,20 +90,27 @@
                                 :active :dashboard})
               (when (responsive/is-mobile-size?)
                 (oc-switch :dashboard))
-              (om/build topic-list
-                          {:loading (:loading data)
-                           :content-loaded (or (:loading company-data) (:loading data))
-                           :company-data company-data
-                           :new-sections (:new-sections (slug data))
-                           :latest-su (dis/latest-stakeholder-update)
-                           :force-edit-topic (:force-edit-topic data)
-                           :foce-data-editing? (:foce-data-editing? data)
-                           :revision-updates (dis/revisions (router/current-company-slug))
-                           :card-width card-width
-                           :columns-num columns-num
-                           :show-login-overlay (:show-login-overlay data)
-                           :foce-key (:foce-key data)
-                           :foce-data (:foce-data data)})
+              (if (empty? (:sections company-data))
+                (dom/div {:class "empty-dashboard"}
+                  (dom/h3 {:class "empty-dashboard-title"}
+                    "No topics have been created.")
+                  (when-not (:read-only company-data)
+                    (dom/p {:class "empty-dashboard-msg"}
+                      (str "Hi" (when (jwt/jwt) (str " " (jwt/get-key :name))) ", your dashboard can be viewed after it's been created on a desktop browser."))))
+                (om/build topic-list
+                            {:loading (:loading data)
+                             :content-loaded (or (:loading company-data) (:loading data))
+                             :company-data company-data
+                             :new-sections (:new-sections (slug data))
+                             :latest-su (dis/latest-stakeholder-update)
+                             :force-edit-topic (:force-edit-topic data)
+                             :foce-data-editing? (:foce-data-editing? data)
+                             :revision-updates (dis/revisions (router/current-company-slug))
+                             :card-width card-width
+                             :columns-num columns-num
+                             :show-login-overlay (:show-login-overlay data)
+                             :foce-key (:foce-key data)
+                             :foce-data (:foce-data data)}))
               ;;Footer
               (om/build footer {:columns-num columns-num
                                 :card-width card-width}))))))))
