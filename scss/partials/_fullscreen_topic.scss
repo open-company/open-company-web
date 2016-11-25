@@ -99,6 +99,12 @@ div.fullscreen-topic {
           font-family: $oc_headers_font;
           font-size: 25px;
           padding-top: 16px;
+          overflow: hidden;
+          text-overflow: ellipse;
+          width: 80%;
+          position: absolute;
+          left: 50%;
+          margin-left: -40%;
         }
 
         button.close-fullscreen-topic-btn {
