@@ -109,6 +109,8 @@
   width: $size;
   height: $size;
   font-size: $size;
+  min-width: initial;
+  min-height: initial;
 }
 
 @mixin rich-editor-body($text_color: #444444, $font_size: 18px){
