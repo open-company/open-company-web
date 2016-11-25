@@ -12,13 +12,17 @@ div.fullscreen-topic {
     opacity: 0;
   }
 
+  @inlcude mobile(){
+    overflow-y: hidden;
+  }
+
   div.fullscreen-topic-transition{
     position: relative;
     height: auto;
 
     @include mobile(){
       height: 100% !important;
-      overflow-y: visible;
+      overflow-y: hidden;
     }
 
     div.fullscreen-topic-as-of {
@@ -26,7 +30,7 @@ div.fullscreen-topic {
 
       @include mobile(){
         height: 100% !important;
-        overflow-y: visible;
+        overflow-y: hidden;
       }
     }
 
@@ -36,9 +40,10 @@ div.fullscreen-topic {
       left: 0;
       height: auto;
       width: 100vw;
+
       @include mobile(){
         height: 100% !important;
-        overflow-y: visible;
+        overflow-y: hidden;
       }
     }
 
@@ -64,7 +69,7 @@ div.fullscreen-topic {
       }
 
       @include mobile(){
-        overflow-y: visible;
+        overflow-y: hidden;
         overflow-x: hidden;
         height: 100%;
         width: 100%;
@@ -84,7 +89,7 @@ div.fullscreen-topic {
         box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
         background-color: white;
         border-top: 4px solid $oc_yellow;
-        z-index: 1000;
+        z-index: 1034;
 
         div.fullscreen-topic-mobile-navigation-title {
           color: $oc_gray_7;
@@ -122,9 +127,11 @@ div.fullscreen-topic {
           padding-bottom: 20px;
           height: calc(100vh - #{$mobile_navbar_height}px - 4px);
           overflow-y: scroll;
+          z-index: 1033;
         }
 
         div.fullscreen-topic-top-box-overflow {
+          height: auto;
 
           div.topic-header-image {
             text-align: center;
