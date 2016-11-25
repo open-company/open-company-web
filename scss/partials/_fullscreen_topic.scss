@@ -6,15 +6,17 @@ div.fullscreen-topic {
   background-color: transparent;
   overflow-x: hidden;
   overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
 
   &.initial {
     opacity: 0;
   }
 
-  @inlcude mobile(){
+  @include mobile(){
     overflow-y: hidden;
+    text-align: center;
   }
+
+  -webkit-overflow-scrolling: touch;
 
   div.fullscreen-topic-transition{
     position: relative;

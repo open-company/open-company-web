@@ -8,6 +8,23 @@ body.small-footer{
   }
 }
 
+body.fullscreen-topic {
+  @include mobile() {
+    div.topic-list{
+      overflow: hidden;
+      div.selected-topic-container{
+        overflow: hidden;
+        div.selected-topic {
+          overflow: hidden;
+        }
+      }
+      div.topics-columns {
+        overflow: hidden;
+      }
+    }
+  }
+}
+
 div.topic-list{
   padding-bottom: 20px;
   min-height: calc(100vh - #{$footer_height}px);

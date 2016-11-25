@@ -7,7 +7,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [dommy.core :refer-macros (sel1)]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [open-company-web.api :as api]
             [open-company-web.caches :as cache]
             [open-company-web.urls :as oc-urls]
@@ -27,6 +27,7 @@
 
 (defn- show-fullscreen-topic [owner]
   (utils/disable-scroll)
+  (dommy/add-class! (sel1 [:body]) :fullscreen-topic)
   (.play
     (new Fade (om/get-ref owner "fullscreen-topic") 0 1 utils/oc-animation-duration)))
 
@@ -121,7 +122,9 @@
   (let [fade-out (new Fade (sel1 :div.fullscreen-topic) 1 0 utils/oc-animation-duration)]
     (doto fade-out
       (.listen AnimationEventType/FINISH
-        #((:close-overlay-cb options)))
+        #(do
+           ((:close-overlay-cb options))
+           (dommy/remove-class! (sel1 [:body]) :fullscreen-topic)))
       (.play))))
 
 (defn- esc-listener [owner options e]

@@ -39,3 +39,14 @@ body.small-footer {
     }
   }
 }
+
+body.fullscreen-topic {
+  @include mobile(){
+    div.company-dashboard {
+      overflow: hidden;
+      div.page {
+        overflow: hidden;
+      }
+    }
+  }
+}
