@@ -1,8 +1,43 @@
 div.su-snapshot {
   border-top: 4px solid $oc_yellow;
+  padding-top: #{$mobile_navbar_height}px;
 
-  div.back-to-dashboard-row {
-    margin-bottom: 0px;
+  div.su-mobile-navigation{
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    height: #{$mobile_navbar_height}px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
+    background-color: white;
+    border-top: 4px solid $oc_yellow;
+    z-index: 1034;
+
+    div.su-mobile-navigation-title {
+      color: $oc_gray_7;
+      font-weight: 400;
+      font-family: $oc_headers_font;
+      font-size: 25px;
+      padding-top: 16px;
+    }
+
+    button.close-su-btn {
+      position: absolute;
+      top: 0px;
+      right: -30px;
+      width: 30px;
+      height: 30px;
+      font-weight: 400;
+      font-family: $oc_headers_font;
+      font-size: 28px;
+      color: $oc_gray_7;
+
+      @include mobile(){
+        left: 8px;
+        top: 12px;
+      }
+    }
   }
 
   &.has-navbar {

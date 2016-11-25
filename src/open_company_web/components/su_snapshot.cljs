@@ -128,7 +128,11 @@
 
           ; closing X
           (when (and prior-list mobile?)
-            (back-to-dashboard-btn))
+            (dom/div {:class "su-mobile-navigation"
+                      :on-click #(.back (.-history js/window))}
+              (dom/div {:class "su-mobile-navigation-title"} (str (:name company-data) "'s Update"))
+              (dom/button {:class "btn-reset close-su-btn"}
+                (dom/i {:class "fa fa-angle-left"}))))
 
           ;; SU Snapshot
           (when company-data
