@@ -121,12 +121,19 @@ nav.oc-navbar {
 
       button.mobile-menu {
         font-size: 24px;
-        padding: 0 20px 0px 20px;
-        margin-top: -2px;
+        padding: 3px 20px 3px 20px;
+        margin-top: 0px;
         border-radius: 4px;
 
         &:active {
           background-color: rgba(78,90,107,0.3);
+        }
+
+        div.vertical-ellipses {
+          background: $oc_gray_5;
+          width: 8px;
+          height: 24px;
+          -webkit-mask: url("/img/vert-ellipsis.svg") center / contain no-repeat;
         }
       }
     }

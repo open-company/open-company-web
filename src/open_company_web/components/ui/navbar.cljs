@@ -83,7 +83,8 @@
                   (if (responsive/is-mobile-size?)
                     (dom/button {:class "btn-reset mobile-menu group"
                                  :on-click #(dis/dispatch! [:mobile-menu-toggle])}
-                      (dom/img {:src "/img/vert-ellipsis.svg" :width 8}))
+                      ; (dom/img {:src "/img/vert-ellipsis.svg" :width 8})
+                      (dom/div {:class "vertical-ellipses"}))
                     (if (jwt/jwt)
                       (dom/div {:class "group"}
                         (dom/div {:class "dropdown right"}
