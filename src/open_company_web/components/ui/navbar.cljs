@@ -28,6 +28,16 @@
       (dommy/add-class! (sel1 [:body]) "fixed-navbar")
       (dommy/remove-class! (sel1 [:body]) "fixed-navbar"))))
 
+(defn- share-new-tooltip []
+  (if (utils/slack-share?)
+    "Select topics to share by Slack, email or link."
+    "Select topics to share by email or link."))
+
+(defn- share-tooltip []
+  (if (utils/slack-share?)
+    "Share this update by Slack, email or link."
+    "Share this update by email or link."))
+
 (defcomponent navbar [{:keys [company-data
                               columns-num
                               card-width
@@ -48,7 +58,11 @@
                    (not su-navbar))
       (scroll-listener nil)
       (om/set-state! owner :scroll-listener
-        (events/listen js/window EventType/SCROLL scroll-listener))))
+        (events/listen js/window EventType/SCROLL scroll-listener)))
+
+    (when-not (and (responsive/is-tablet-or-mobile?)
+                   (not su-navbar))
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (will-unmount [_]
     (when-let [scroll-listener (om/get-state owner :scroll-listener)]
@@ -119,10 +133,18 @@
                 (when fixed-show-share-su-button
                   (dom/div {:class "sharing-button-container"}
                     (dom/a {:class "btn-reset sharing-button right"
+                            :title (share-new-tooltip)
+                            :data-toggle "tooltip"
+                            :data-container "body"
+                            :data-placement "left"
                             :on-click #(router/nav! (oc-urls/stakeholder-update-preview))}
                       "Share new update")))
                 (when create-update-share-button-cb
                   (dom/div {:class "sharing-button-container"}
                     (dom/button {:class "btn-reset btn-solid"
+                                 :title (share-tooltip)
+                                 :data-toggle "tooltip"
+                                 :data-container "body"
+                                 :data-placement "left"
                                  :on-click create-update-share-button-cb
                                  :disabled create-update-share-button-disabled} "SHARE")))))))))))
