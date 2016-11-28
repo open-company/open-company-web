@@ -139,7 +139,9 @@
                                         :currency currency} {:opts chart-opts}))))
 
         ;; Topic headline
-        (when-not (clojure.string/blank? (:headline topic-data))
+        (when (and (or (not is-dashboard?)
+                       (not is-mobile?))
+                   (not (clojure.string/blank? (:headline topic-data))))
           (om/build topic-headline topic-data))
 
         ;; Attribution for topic
