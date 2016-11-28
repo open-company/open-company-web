@@ -116,7 +116,7 @@
               period (utils/get-period-string (:period actual-set) "monthly" [:force-year])
               currency-symbol (utils/get-symbol-for-currency-code (:currency data))
               actual-with-label (label-from-set actual-set currency-symbol)
-              ww (.-clientWidth (.-body js/document))
+              ww (responsive/ww)
               total-card-width (if (>= ww responsive/c1-min-win-width) card-width ww)
               fixed-card-width (if (responsive/is-mobile-size?)
                                    total-card-width ; use all the possible space on mobile

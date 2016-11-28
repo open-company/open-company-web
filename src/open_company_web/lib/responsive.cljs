@@ -10,11 +10,17 @@
 
 (def mobile-2-columns-breakpoint 320)
 
+(defn ww []
+  (when (and js/document
+             (.-body js/document)
+             (.-clientWidth (.-body js/document)))
+    (.-clientWidth (.-body js/document))))
+
 (defn window-exceeds-breakpoint []
-  (> (.-clientWidth (.-body js/document)) mobile-2-columns-breakpoint))
+  (> (ww) mobile-2-columns-breakpoint))
 
 (defn dashboard-columns-num []
-  (let [win-width (.-clientWidth (.-body js/document))]
+  (let [win-width (ww)]
     (cond
       (>= win-width 1012)
       3
@@ -24,7 +30,7 @@
       1)))
 
 (defn columns-num []
-  (let [win-width (.-clientWidth (.-body js/document))]
+  (let [win-width (ww)]
     (cond
       (>= win-width 1012)
       3
@@ -42,7 +48,7 @@
 
 ;; 2 Columns
 (def c2-max-win-width 1011) (def c2-max-card-width 420)
-(def c2-padding (if (> (.-clientWidth (.-body js/document)) big-web-min-width) 80 60))
+(def c2-padding (if (> (ww) big-web-min-width) 80 60))
 (def c2-min-win-width mobile-2-columns-breakpoint) (def c2-min-card-width (/ (- mobile-2-columns-breakpoint c2-padding) 2))
 (def c2-win-card-diff (- (/ c2-max-win-width c2-max-card-width) (/ c2-min-win-width c2-min-card-width)))
 (def c2-win-diff (- c2-max-win-width c2-min-win-width))
@@ -56,11 +62,11 @@
 (def c1-min-card-delta (/ c1-min-win-width c1-min-card-width))
 
 (defn win-width [columns]
-  (let [ww (.-clientWidth (sel1 js/document :body))]
+  (let [win-width (ww)]
     (case columns
-      3 (max (min ww c3-max-win-width) c3-min-win-width)
-      2 (max (min ww c2-max-win-width) c2-min-win-width)
-      1 (max (min ww c1-max-win-width) c1-min-win-width))))
+      3 (max (min win-width c3-max-win-width) c3-min-win-width)
+      2 (max (min win-width c2-max-win-width) c2-min-win-width)
+      1 (max (min win-width c1-max-win-width) c1-min-win-width))))
 
 (defn get-min-win-width [columns]
   (case columns
@@ -91,7 +97,7 @@
 (defn set-browser-type! []
   (let [force-mobile-cookie (cook/get-cookie :force-browser-type)
         is-big-web (if (.-body js/document)
-                     (>= (.-clientWidth (.-body js/document)) big-web-min-width)
+                     (>= (ww) big-web-min-width)
                      true) ; to not break tests
         fixed-browser-type (if (nil? force-mobile-cookie)
                             (not is-big-web)
@@ -109,27 +115,27 @@
 
 (defn mobile-dashboard-card-width [& [force-columns]]
   (let [columns (or force-columns (dashboard-columns-num))
-        ww (.-clientWidth (.-body js/document))]
+        win-width (ww)]
     (cond
       (= columns 2)
-      (/ (- ww 8 8 8) 2)
+      (/ (- win-width 8 8 8) 2)
       (= columns 1)
-      (- ww 8 8))))
+      (- win-width 8 8))))
 
 (defn calc-card-width [& [force-columns]]
   (let [columns (or force-columns (columns-num))
-        ww (.-clientWidth (.-body js/document))
+        win-width (ww)
         ;; get params based on columns number
         min-win-width (get-min-win-width columns)
         win-diff (get-win-diff columns)
         win-card-diff (get-win-card-diff columns)
         min-card-delta (get-min-card-delta columns)
         ;; calculations
-        win-delta-width (- ww min-win-width)
+        win-delta-width (- win-width min-win-width)
         perc-win-delta  (/ (* win-delta-width 100) win-diff)
         diff-delta      (* (/ win-card-diff 100) perc-win-delta)
         delta           (+ min-card-delta diff-delta)]
-      (/ ww delta)))
+      (/ win-width delta)))
 
 (defn user-agent-mobile? []
   userAgent/MOBILE)
@@ -144,10 +150,10 @@
   (not (user-agent-mobile?)))
 
 (defn fullscreen-topic-width [card-width]
-  (let [ww (.-clientWidth (sel1 js/document :body))]
-    (if (> ww big-web-min-width)
+  (let [win-width (ww)]
+    (if (> win-width big-web-min-width)
       big-web-min-width
-      (min card-width ww))))
+      (min card-width win-width))))
 
 (defn is-tablet-or-mobile? []
   ;; check if it's test env, can't import utils to avoid circular dependencies
@@ -168,8 +174,8 @@
 
 (defn total-layout-width-int [card-width columns-num]
   (if (is-mobile-size?)
-    (let [ww (.-clientWidth (.-body js/document))]
-      (- ww 8 8))
+    (let [win-width (ww)]
+      (- win-width 8 8))
     (+ (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
        (* topic-list-x-padding 2)                           ; the padding around all the columns
        (* topic-border 2))))                                ; the remaining border around the topics
@@ -180,7 +186,6 @@
 
 (defn calc-update-width [columns-num]
   (let [card-width   (calc-card-width)
-        ww           (.-clientWidth (.-body js/document))
         total-width-int (total-layout-width-int card-width columns-num)
         total-width  (str total-width-int "px")
         fixed-total-width-int (if (<= total-width-int (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width))

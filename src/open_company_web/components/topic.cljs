@@ -207,7 +207,7 @@
   (init-state [_]
     {:as-of (:updated-at section-data)
      :actual-as-of (:updated-at section-data)
-     :window-width (.-clientWidth (.-body js/document))
+     :window-width (responsive/ww)
      :transition-as-of nil})
 
   (did-mount [_]
@@ -215,7 +215,7 @@
       ; initialize bootstrap tooltips
       (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
-      (events/listen js/window EventType/RESIZE #(om/set-state! owner :window-width (.-clientWidth (.-body js/document))))))
+      (events/listen js/window EventType/RESIZE #(om/set-state! owner :window-width (responsive/ww)))))
 
   (will-update [_ next-props _]
     (let [new-as-of (:updated-at (:section-data next-props))

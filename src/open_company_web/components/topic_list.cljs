@@ -399,7 +399,7 @@
           company-topics  (vec (map keyword (:sections company-data)))
           card-width      (:card-width data)
           columns-num     (:columns-num data)
-          ww              (.-clientWidth (sel1 js/document :body))
+          ww              (responsive/ww)
           total-width     (if (and (= columns-num 1)
                                    (< ww responsive/c1-min-win-width))
                             "auto"

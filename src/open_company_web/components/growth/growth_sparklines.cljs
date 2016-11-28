@@ -26,7 +26,7 @@
   (render [_]
     (dom/div {:class "growth-sparkline sparkline group"
               :id (str "growth-sparkline-" (:slug metric-metadata))}
-      (let [ww (.-clientWidth (.-body js/document))
+      (let [ww (responsive/ww)
             total-card-width (if (>= ww responsive/c1-min-win-width) card-width ww)
             center-box-width (if (responsive/is-mobile-size?)
                                (- total-card-width 20 80 editing-actions-width)
