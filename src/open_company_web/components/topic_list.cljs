@@ -20,6 +20,7 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
+            [open-company-web.components.topics-mobile-layout :refer (topics-mobile-layout)]
             [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [goog.events :as events]
             [goog.object :as gobj]
@@ -444,24 +445,26 @@
                                          {:opts {:close-overlay-cb #(close-overlay-cb owner)
                                                  :topic-navigation #(om/set-state! owner :topic-navigation %)}})))))
         ;; Topics list columns
-        (om/build topics-columns {:columns-num columns-num
-                                  :card-width card-width
-                                  :selected-metric selected-metric
-                                  :total-width total-width
-                                  :content-loaded (:content-loaded data)
-                                  :loading (:loading data)
-                                  :topics company-topics
-                                  :foce-data-editing? (:foce-data-editing? data)
-                                  :new-sections (:new-sections data)
-                                  :company-data company-data
-                                  :topics-data company-data
-                                  :foce-key (:foce-key data)
-                                  :foce-data (:foce-data data)
-                                  :share-selected-topics share-selected-topics
-                                  :show-first-edit-tip (show-first-edit-tip? company-data company-topics)}
-                                 {:opts {:topic-click (partial topic-click owner)
-                                         :update-active-topics (partial update-active-topics owner)}})
-        
+        (let [comp-data {:columns-num columns-num
+                         :card-width card-width
+                         :selected-metric selected-metric
+                         :total-width total-width
+                         :content-loaded (:content-loaded data)
+                         :loading (:loading data)
+                         :topics company-topics
+                         :foce-data-editing? (:foce-data-editing? data)
+                         :new-sections (:new-sections data)
+                         :company-data company-data
+                         :topics-data company-data
+                         :foce-key (:foce-key data)
+                         :foce-data (:foce-data data)
+                         :share-selected-topics share-selected-topics
+                         :show-first-edit-tip (show-first-edit-tip? company-data company-topics)}
+              comp-opts {:opts {:topic-click (partial topic-click owner)
+                                :update-active-topics (partial update-active-topics owner)}}
+              sub-component (if (responsive/is-mobile-size?) topics-mobile-layout topics-columns)]
+          (om/build sub-component comp-data comp-opts))
+
         ;; Onboarding tooltips
         
         ;; Desktop only welcom
