@@ -139,9 +139,7 @@
                                         :currency currency} {:opts chart-opts}))))
 
         ;; Topic headline
-        (when (and (or (not (responsive/is-mobile-size?))
-                       (and (responsive/is-mobile-size?)
-                            (:poc1-headline @dis/app-state)))
+        (when (and (or (not is-mobile?) (not is-dashboard?))
                    (not (clojure.string/blank? (:headline topic-data))))
           (om/build topic-headline topic-data))
 
@@ -264,8 +262,6 @@
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
                                                  :mobile-dashboard-topic (and is-mobile? is-dashboard?)
-                                                 :show-headline (:poc1-headline @dis/app-state)
-                                                 :align-center (= (:poc1-alignment @dis/app-state) "center")
                                                  :topic-edit is-foce
                                                  :draggable-topic (and (not (responsive/is-mobile-size?)) (not is-stakeholder-update) (not (:read-only-company data)) (:pin topic-data))
                                                  :not-draggable-topic (or is-stakeholder-update (:read-only-company data) (not (:pin topic-data)))

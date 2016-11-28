@@ -45,9 +45,6 @@
   (dis/dispatch! [:mobile-menu-toggle])
   (router/nav! (oc-urls/stakeholder-update-list)))
 
-(defn poc-switch [k v]
-  (reset! dis/app-state (assoc @dis/app-state k v)))
-
 (defcomponent menu [{:keys [mobile-menu-open]} owner options]
 
   (render [_]
@@ -57,16 +54,6 @@
                             " dropdown-menu"))]
       (dom/ul {:class menu-classes
                :aria-labelledby "dropdown-toggle-menu"}
-        (when (= (jwt/get-key :org-id) "slack-T06SBMH60")
-          (dom/li {:class "oc-menu-item"}
-            (dom/a {:href "#" :on-click #(poc-switch :poc1-headline (not (:poc1-headline @dis/app-state)))}
-              "PoC #1 Headline: "
-              (dom/i {:class (str "fa fa-" (if (:poc1-headline @dis/app-state) "check-" "") "square-o")}))))
-        (when (= (jwt/get-key :org-id) "slack-T06SBMH60")
-          (dom/li {:class "oc-menu-item"}
-            (dom/a {:href "#" :on-click #(poc-switch :poc1-alignment (if (= (:poc1-alignment @dis/app-state) "left") "center" "left"))}
-              "PoC #1 Justify: "
-              (dom/i {:class (str "fa " (if (= (:poc1-alignment @dis/app-state) "left") "fa-align-left" "fa-align-center"))}))))
         (when (jwt/jwt)
           (dom/li {:class "oc-menu-item"}
             (dom/a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile")))

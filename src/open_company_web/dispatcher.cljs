@@ -5,9 +5,7 @@
 
 (defonce app-state (atom {:loading false
                           :mobile-menu-open false
-                          :show-login-overlay false
-                          :poc1-headline false
-                          :poc1-alignment "left"}))
+                          :show-login-overlay false}))
 
 (defn print-app-state []
   (js/console.log @app-state))

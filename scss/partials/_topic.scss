@@ -47,17 +47,13 @@ div.topic {
   }
 
   &.mobile-dashboard-topic {
-    text-align: left;
+    text-align: center;
     margin-left: 0px;
     margin-right: 0px;
     width: 100%;
     display: flex;
     flex-direction: column;
     width: 100%;
-
-    &.align-center {
-      text-align: center;
-    }
 
     &.show-headline {
       div.topic-anim {
