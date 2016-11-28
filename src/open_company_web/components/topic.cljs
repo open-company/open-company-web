@@ -33,7 +33,7 @@
 
 (defcomponent topic-headline [data owner]
   (render [_]
-    (dom/div #js {:className (str "topic-headline-inner" (when (:placeholder data) " italic"))
+    (dom/div #js {:className (str "topic-headline-inner group" (when (:placeholder data) " italic"))
                   :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
 
 (defn fullscreen-topic [owner & [e]]
@@ -139,8 +139,9 @@
                                         :currency currency} {:opts chart-opts}))))
 
         ;; Topic headline
-        (when (and (or (not is-dashboard?)
-                       (not is-mobile?))
+        (when (and (or (not (responsive/is-mobile-size?))
+                       (and (responsive/is-mobile-size?)
+                            (:poc1-headline @dis/app-state)))
                    (not (clojure.string/blank? (:headline topic-data))))
           (om/build topic-headline topic-data))
 
@@ -246,7 +247,8 @@
           is-mobile? (responsive/is-mobile-size?)
           topic-style (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
                               (utils/in? (:route @router/path) "su-snapshot")
-                              (utils/in? (:route @router/path) "su-list"))
+                              (utils/in? (:route @router/path) "su-list")
+                              (responsive/is-mobile-size?))
                         #js {}
                         #js {:width (if (responsive/window-exceeds-breakpoint) (str card-width "px") "auto")})]
       ;; preload previous revision
@@ -260,6 +262,8 @@
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
                                                  :mobile-dashboard-topic (and is-mobile? is-dashboard?)
+                                                 :show-headline (:poc1-headline @dis/app-state)
+                                                 :align-center (= (:poc1-alignment @dis/app-state) "center")
                                                  :topic-edit is-foce
                                                  :draggable-topic (and (not (responsive/is-mobile-size?)) (not is-stakeholder-update) (not (:read-only-company data)) (:pin topic-data))
                                                  :not-draggable-topic (or is-stakeholder-update (:read-only-company data) (not (:pin topic-data)))
@@ -294,7 +298,7 @@
                       :ref "topic-anim"}
           (dom/div #js {:className "topic-as-of group"
                         :key (str "cur-" as-of)
-                        :style #js {:opacity 1 :width "100%" :height "auto"}}
+                        :style #js {:opacity 1 :width "100%"}}
             (dom/div #js {:className "topic-cur-as-of"
                           :ref "cur-topic"
                           :style #js {:opacity 1}}
