@@ -26,7 +26,7 @@ nav.oc-navbar {
     }
 
     &.mobile-menu-open {
-      height: #{$mobile_navbar_height + $mobile_menu_height}px;
+      height: #{$mobile_navbar_height + ($mobile_menu_item_height * $mobile_menu_items_num)}px;
     }
   }
   z-index: 1030;
