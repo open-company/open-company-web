@@ -13,7 +13,6 @@ div.fullscreen-topic {
 
   @include mobile(){
     overflow-y: hidden;
-    text-align: center;
   }
 
   -webkit-overflow-scrolling: touch;
