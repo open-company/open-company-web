@@ -261,7 +261,7 @@
                                                  :group true
                                                  :mobile-dashboard-topic (and is-mobile? is-dashboard?)
                                                  :topic-edit is-foce
-                                                 :draggable-topic (and (not is-stakeholder-update) (not (:read-only-company data)) (:pin topic-data))
+                                                 :draggable-topic (and (not (responsive/is-mobile-size?)) (not is-stakeholder-update) (not (:read-only-company data)) (:pin topic-data))
                                                  :not-draggable-topic (or is-stakeholder-update (:read-only-company data) (not (:pin topic-data)))
                                                  :no-foce (and foce-active (not is-foce))
                                                  :sharing-selected (and sharing-mode share-selected)})
