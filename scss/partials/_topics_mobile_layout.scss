@@ -1,0 +1,50 @@
+div.topics-mobile-layout {
+  margin-top: 22px;
+  display: flex;
+  // flex-direction: row;
+  flex-wrap: wrap;
+  // justify-content: space-around; // try also flex-start to justify to left
+  //                                // and set margin and padding by our self.
+
+  div.topics-mobile-item {
+    margin-bottom: 8px;
+    margin-left: 8px;
+    display: flex;
+    width: 100%;
+
+    div.topic {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+
+      div.topic-anim {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        div.topic-as-of {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+
+          div.topic-cur-as-of {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+
+            div.topic-internal {
+              height: 100%;
+              display: flex;
+              flex-direction: column;
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+}
