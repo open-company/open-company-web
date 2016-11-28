@@ -24,6 +24,7 @@
 
 (defn companies-click [e]
   (utils/event-stop e)
+  (dis/dispatch! [:mobile-menu-toggle])
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! oc-urls/companies)))
 
 (defn user-profile-click [e]
