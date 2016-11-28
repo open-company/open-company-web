@@ -203,7 +203,8 @@
                              share-selected
                              archived-topics
                              show-share-remove
-                             is-stakeholder-update] :as data} owner options]
+                             is-stakeholder-update
+                             topic-flex-num] :as data} owner options]
 
   (init-state [_]
     {:as-of (:updated-at section-data)
@@ -245,12 +246,13 @@
           is-foce (= (dis/foce-section-key) section-kw)
           is-dashboard? (utils/in? (:route @router/path) "dashboard")
           is-mobile? (responsive/is-mobile-size?)
-          topic-style (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
-                              (utils/in? (:route @router/path) "su-snapshot")
-                              (utils/in? (:route @router/path) "su-list")
-                              (responsive/is-mobile-size?))
-                        #js {}
-                        #js {:width (if (responsive/window-exceeds-breakpoint) (str card-width "px") "auto")})]
+          with-order (if (contains? data :topic-flex-num) {:order topic-flex-num} {})
+          topic-style (clj->js (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
+                                       (utils/in? (:route @router/path) "su-snapshot")
+                                       (utils/in? (:route @router/path) "su-list")
+                                       (responsive/is-mobile-size?))
+                                 with-order
+                                 (merge with-order {:width (if (responsive/window-exceeds-breakpoint) (str card-width "px") "auto")})))]
       ;; preload previous revision
       (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))

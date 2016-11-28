@@ -24,8 +24,9 @@
                                             is-stakeholder-update] :as data} owner options]
   (render [_]
     (dom/div {:class "topics-mobile-layout"}
-      (for [section-kw topics
-            :let [section-name (name section-kw)
+      (for [idx (range (count topics))
+            :let [section-kw (get topics idx)
+                  section-name (name section-kw)
                   sd (->> section-name keyword (get company-data))
                   topic-data {:loading (:loading company-data)
                               :section section-name
@@ -37,7 +38,8 @@
                               :read-only-company (:read-only company-data)
                               :currency (:currency company-data)
                               :foce-key foce-key
-                              :foce-data foce-data}
+                              :foce-data foce-data
+                              :topic-flex-num idx}
                   topic-opts {:opts {:section-name section-name
                                      :share-remove-click (:share-remove-click options)
                                      :topic-click (partial (:topic-click options) section-name)}}]]
