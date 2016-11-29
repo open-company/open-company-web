@@ -70,6 +70,19 @@ div.topic {
           width: 100%;
         }
 
+        div.topic-title {    
+          text-transform: none;   
+          opacity: 1;   
+          color: $oc_gray_7;    
+          float: none;    
+          font-weight: 700;   
+          font-size: 15px;    
+          padding-left: 0px;    
+          padding-right: 0px;   
+          margin-left: 0px;   
+          margin-right: 0px;    
+        }
+
         div.mobile-date {
           margin-top: 5px;
           font-size: 12px;
