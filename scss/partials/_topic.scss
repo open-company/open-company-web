@@ -42,10 +42,6 @@ div.topic {
     opacity: 0.5;
   }
 
-  &.draggable-topic div.topic-dnd-handle {
-    cursor: move;
-  }
-
   &.mobile-dashboard-topic {
     text-align: center;
     margin-left: 0px;
@@ -58,10 +54,6 @@ div.topic {
     &.show-headline {
       div.topic-anim {
         div.topic-internal {
-          div.topic-dnd-handle {
-            flex: 0 1 auto;
-          }
-
           div.topic-headline-inner {
             flex: 1 0 auto;
           }
@@ -76,23 +68,6 @@ div.topic {
         & > div {
           padding: 0px 10px;
           width: 100%;
-        }
-
-        div.topic-dnd-handle {
-          flex: 1 0 auto;
-
-          div.topic-title {
-            text-transform: none;
-            opacity: 1;
-            color: $oc_gray_7;
-            float: none;
-            font-weight: 700;
-            font-size: 15px;
-            padding-left: 0px;
-            padding-right: 0px;
-            margin-left: 0px;
-            margin-right: 0px;
-          }
         }
 
         div.mobile-date {

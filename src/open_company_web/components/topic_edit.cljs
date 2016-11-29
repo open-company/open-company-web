@@ -189,11 +189,6 @@
     "Add an image"
     "Replace image"))
 
-(defn- pin-tooltip [pinned]
-  (if pinned
-    "Unpin this topic"
-    "Pin this topic"))
-
 (defn- save-topic [owner]
   (let [topic           (name (dis/foce-section-key))
         body-el         (js/$ (str "#foce-body-" (name topic)))
@@ -305,17 +300,12 @@
             image-header      (:image-url topic-data)
             add-image-tooltip (add-image-tooltip image-header)
             add-image-el      (js/$ (gdom/getElementByClass "camera"))
-            pin-image         (js/$ (gdom/getElementByClass "pin-button"))
             add-chart-el      (js/$ (gdom/getElementByClass "chart-button"))]
         (doto add-image-el
           (.tooltip "hide")
           (.attr "data-original-title" add-image-tooltip)
           (.tooltip "fixTitle")
           (.tooltip "hide"))
-        (doto pin-image
-          (.tooltip "hide")
-          (.attr "data-original-title" (pin-tooltip (:pin topic-data)))
-          (.tooltip "fixTitle"))
         (doto add-chart-el
           (.tooltip "fixTitle")
           (.tooltip "hide"))))
@@ -491,18 +481,6 @@
                            :style {:display (if (nil? file-upload-state) "block" "none")}
                            :on-click (partial remove-topic-click owner)}
                   (dom/i {:class "fa fa-archive"})))
-            
-            ;; Topic pin button
-            (when (> (count (utils/get-section-keys (dis/company-data))) 1)
-              (dom/button {:class "btn-reset pin-button right"
-                           :title (pin-tooltip (:pin topic-data))
-                           :type "button"
-                           :data-toggle "tooltip"
-                           :data-container "body"
-                           :data-placement "top"
-                           :style {:display (if (nil? file-upload-state) "block" "none")}
-                           :on-click #(dis/dispatch! [:foce-input {:pin (not (:pin topic-data))}])}
-                  (dom/i {:class (str "fa fa-thumb-tack" (if (:pin topic-data) " pinned" ""))})))
             
             ;; Hidden (initially) file upload progress
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}

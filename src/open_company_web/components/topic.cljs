@@ -90,20 +90,8 @@
             (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
 
         ;; Topic title
-        (dom/div {:class "topic-dnd-handle group"}
+        (dom/div {:class "group"}
           (dom/div {:class "topic-title"} (:title topic-data))
-          (when (and (not is-stakeholder-update)
-                     (:pin topic-data)
-                     (or (not is-mobile?)
-                         (not is-dashboard?))
-                     (responsive/can-edit?)
-                     (not read-only-company))
-            (dom/div {:class "pinned-topic"}
-              (dom/i {:class "fa fa-thumb-tack"
-                      :data-toggle "tooltip"
-                      :data-container "body"
-                      :data-placement "top"
-                      :title (if (> (count pinned) 1) "Drag and drop to reorder" "Pinned to the top")})))
           (when (and (not is-stakeholder-update)
                      (or (not is-mobile?)
                          (not is-dashboard?))
