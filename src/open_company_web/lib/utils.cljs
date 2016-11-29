@@ -11,6 +11,7 @@
             [goog.string :as gstring]
             [goog.i18n.NumberFormat :as nf]
             [goog.object :as gobj]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.router :as router]
             [open-company-web.caches :as caches]
             [open-company-web.lib.cookies :as cook]
@@ -776,3 +777,8 @@
   (let [protocol (.. js/document -location -protocol)
         host     (.. js/document -location -host)]
     (str protocol "//" host relative-su-url)))
+
+(defn slack-share? []
+  (if-let [jwt (:jwt @dis/app-state)]
+    (and (= (:auth-source jwt) "slack") ; auth'd w/ Slack
+         (not (nil? (-> jwt :bot :token)))))) ; with an installed Slack bot
