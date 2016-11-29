@@ -59,10 +59,10 @@
       (scroll-listener nil)
       (om/set-state! owner :scroll-listener
         (events/listen js/window EventType/SCROLL scroll-listener)))
-
-    (when-not (and (responsive/is-tablet-or-mobile?)
-                   (not su-navbar))
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+    (when-not (utils/is-test-env?)
+      (when-not (and (responsive/is-tablet-or-mobile?)
+                     (not su-navbar))
+        (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
   (will-unmount [_]
     (when-let [scroll-listener (om/get-state owner :scroll-listener)]
