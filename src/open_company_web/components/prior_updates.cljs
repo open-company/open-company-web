@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [cljs-time.format :as f]
             [org.martinklepsch.derivatives :as drv]
+            [defun.core :refer (defun-)]
             [open-company-web.urls :as oc-urls]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.popover :as popover]
@@ -29,6 +30,26 @@
              (not (:su-list-loading @dispatcher/app-state))
              (not (:su-list-loaded @dispatcher/app-state)))
     (dispatcher/dispatch! [:get-su-list])))
+
+(defun- medium-for
+  ;; one possible initial case, just one medium
+  ([medium :guard string?] (medium-for [medium] []))
+
+  ;; another possible initial case, multiple mediums
+  ([mediums :guard sequential?] (medium-for mediums []))
+
+  ;; completion case
+  ([mediums :guard empty? html] html)
+
+  ;; progress cases
+  ([mediums :guard #(= "email" (first %)) html] 
+    (medium-for (rest mediums) (conj html [:div.medium (i/icon :email-84 {:size 13 :class "inline"})])))
+  ([mediums :guard #(= "slack" (first %)) html] 
+    (medium-for (rest mediums) (conj html [:div.medium [:i {:class "fa fa-slack"}]])))
+  ([mediums :guard #(= "link" (first %)) html] 
+    (medium-for (rest mediums) (conj html [:div.medium (i/icon :link-72 {:size 13 :class "inline"})])))
+  ([mediums html] ; legacy, unknown?
+    (medium-for (rest mediums) html)))
 
 (rum/defcs prior-updates
   < (drv/drv :su-list)
@@ -82,15 +103,13 @@
                               (str (:name (dispatcher/company-data)) " Update")
                               (:title update))
                       author (if same-user? "You" (-> update :author :name))
-                      medium (case (keyword (:medium update))
-                                  :email [:div.medium "by " (i/icon :email-84 {:size 13 :class "inline"})]
-                                  :slack [:span "to " [:i {:class "fa fa-slack"}]]
-                                  :legacy ""
-                                  [:div.medium "a " (i/icon :link-72 {:size 13 :class "inline"})])]
+                      medium (medium-for (:medium update))]
                   [:div.update {:key update-slug
                                 :class (when (= current-update update-slug) "active")
                                 :on-click #(when-not standalone-component (update-click list-link %))}
                     [:div.update-title.domine
                       [:a {:href link :on-click #(when-not standalone-component (.preventDefault %))}
                         title]]
-                    [:div.update-details.domine author " shared " medium " on " human-date]]))])]])))
+                    [:div.update-details.domine author " shared"
+                                                (when-not (empty? medium) " by ") medium
+                                                " on " human-date]]))])]])))
