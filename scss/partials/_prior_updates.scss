@@ -78,7 +78,7 @@ div.prior-updates {
         font-weight: 400;
 
         a {
-          @inlcude big_web(){
+          @include big_web(){
             color: rgba(78,90,107,0.8);
           }
           @include mobile(){
