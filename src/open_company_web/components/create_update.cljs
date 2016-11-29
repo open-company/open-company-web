@@ -146,7 +146,7 @@
               (dom/div {:class "create-update-content-list group right"
                         :style {:width (str responsive/updates-content-list-width "px")}}
                 (dom/div {:class "create-update-content-cta"}
-                  "Choose the topics you'd like to share and arrange them in any order.")
+                  "Click the topics you'd like to share and arrange them in any order.")
                 (dom/div {:class "create-update-topics-list"
                           :key (clojure.string/join "-" su-topics)}
                   (for [topic su-topics]
