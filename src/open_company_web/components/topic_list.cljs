@@ -491,12 +491,4 @@
              :once-only true
              :mobile false
              :desktop "It's easy to share information with your employees, investors and customers. Click on \"SHARE AN UPDATE\" above to try it."
-             :css-class "large"}))
-
-        ;; After 2nd topic is pinned show tooltip
-        (when (and show-second-pin-tip (not selected-topic))
-          (onboard-tip
-            {:id (str "second-pin-" company-slug)
-             :once-only true
-             :mobile false
-             :desktop "YOU CAN DRAG AND DROP PINNED ITEMS TO REORDER THEM"}))))))
+             :css-class "large"}))))))
