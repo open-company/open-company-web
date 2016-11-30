@@ -3,7 +3,6 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1 sel)]
-            [cuerdas.core :as s]
             [open-company-web.api :as api]
             [open-company-web.router :as router]
             [open-company-web.lib.responsive :as responsive]))
@@ -28,7 +27,6 @@
                       :items ".left-topics-list-item"
                       :stop (fn [event ui]
                               (let [topics-list (ordered-topics-list)]
-                                (js/console.log "new-order:" topics-list)
                                 (om/set-state! owner :topics topics-list)
                                 (patch-company topics-list)))
                       :axis "y"})
@@ -58,4 +56,4 @@
               :let [sd (->> topic keyword (get company-data))]]
           (dom/div {:class "left-topics-list-item"
                     :data-topic (name topic)}
-            (s/capital (:title sd))))))))
+            (:title sd)))))))
