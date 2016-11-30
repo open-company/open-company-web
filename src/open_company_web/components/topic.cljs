@@ -36,13 +36,6 @@
     (dom/div #js {:className (str "topic-headline-inner group" (when (:placeholder data) " italic"))
                   :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
 
-(defn fullscreen-topic [owner & [e]]
-  (when (and (responsive/is-mobile-size?)
-             (not (om/get-props owner :foce-active)))
-    (when (and e (not= (.-tagName (.-target e)) "A"))
-      (.preventDefault e))
-    ((om/get-props owner :topic-click))))
-
 (defn start-foce-click [owner]
   (let [section-kw (keyword (om/get-props owner :section))
         company-data (dis/company-data)
@@ -63,7 +56,9 @@
                                       read-only-company
                                       is-stakeholder-update
                                       is-mobile?
-                                      is-dashboard?] :as data} owner options]
+                                      is-dashboard?
+                                      foce-active
+                                      topic-click] :as data} owner options]
 
   (render [_]
     (let [section-kw          (keyword section)
@@ -79,7 +74,15 @@
           {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
-                    :onClick (partial fullscreen-topic owner)
+                    :onClick #(do
+                                (js/console.log "topic-internal/click"(responsive/is-mobile-size?)
+                                                                         (not foce-active)
+                                                                         (not is-stakeholder-update))
+                                (when (and (responsive/is-mobile-size?)
+                                                                         (not foce-active)
+                                                                         (not is-stakeholder-update))
+                                                                (.preventDefault %)
+                                                                (topic-click)))
                     :ref "topic-internal"}
 
         ;; Topic image for dashboard
@@ -99,7 +102,7 @@
                      (not (:read-only topic-data))
                      (not read-only-company)
                      (not sharing-mode)
-                     (not (:foce-active data)))
+                     (not foce-active))
             (dom/button {:class (str "topic-pencil-button btn-reset")
                          :on-click #(pencil-click owner %)}
               (dom/i {:class "fa fa-pencil"
