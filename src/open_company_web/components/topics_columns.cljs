@@ -8,7 +8,8 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
-            [open-company-web.components.add-topic :as at]))
+            [open-company-web.components.add-topic :as at]
+            [open-company-web.components.bw-topics-list :refer (bw-topics-list)]))
 
 ;; Calc best topics layout based on heights
 
@@ -236,7 +237,7 @@
   (render-state [_ {:keys [best-layout]}]
     (let [show-add-topic        (add-topic? owner)
           partial-render-topic  (partial render-topic owner options)
-          columns-container-key (apply str (or best-layout topics))
+          columns-container-key (apply str topics)
           is-dashboard? (utils/in? (:route @router/path) "dashboard")
           topics-column-conatiner-style (if is-dashboard?
                                           (if (responsive/window-exceeds-breakpoint)
@@ -263,6 +264,7 @@
                                                              (= columns-num 2))})
                     :style topics-column-conatiner-style
                     :key columns-container-key}
+            (om/build bw-topics-list data)
             ; for each column key contained in best layout
             (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
               (let [column (get best-layout kw)]
