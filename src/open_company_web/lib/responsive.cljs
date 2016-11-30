@@ -19,35 +19,16 @@
 (defn window-exceeds-breakpoint []
   (> (ww) mobile-2-columns-breakpoint))
 
-(defn dashboard-columns-num []
-  (let [win-width (ww)]
-    (cond
-      (>= win-width 1012)
-      3
-      (>= win-width mobile-2-columns-breakpoint)
-      2
-      :else
-      1)))
-
-(defn columns-num []
-  (let [win-width (ww)]
-    (cond
-      (>= win-width 1012)
-      3
-      (>= win-width 684)
-      2
-      :else
-      1)))
-
 ;; 3 Columns
-(def c3-max-win-width 1800) (def c3-max-card-width 350)
-(def c3-min-win-width 1060) (def c3-min-card-width 302)
+; (def c3-max-win-width 1900) (def c3-max-card-width 350)
+(def c3-max-win-width 1270) (def c3-max-card-width 340)
+(def c3-min-win-width 1060) (def c3-min-card-width 300)
 (def c3-win-card-diff (- (/ c3-max-win-width c3-max-card-width) (/ c3-min-win-width c3-min-card-width)))
 (def c3-win-diff (- c3-max-win-width c3-min-win-width))
 (def c3-min-card-delta (/ c3-min-win-width c3-min-card-width))
 
 ;; 2 Columns
-(def c2-max-win-width 1059) (def c2-max-card-width 420)
+(def c2-max-win-width 1059) (def c2-max-card-width 410)
 (def c2-padding (if (> (ww) big-web-min-width) 80 60))
 (def c2-min-win-width mobile-2-columns-breakpoint) (def c2-min-card-width (/ (- mobile-2-columns-breakpoint c2-padding) 2))
 (def c2-win-card-diff (- (/ c2-max-win-width c2-max-card-width) (/ c2-min-win-width c2-min-card-width)))
@@ -60,6 +41,27 @@
 (def c1-win-card-diff (- (/ c1-max-win-width c1-max-card-width) (/ c1-min-win-width c1-min-card-width)))
 (def c1-win-diff (- c1-max-win-width c1-min-win-width))
 (def c1-min-card-delta (/ c1-min-win-width c1-min-card-width))
+
+
+(defn dashboard-columns-num []
+  (let [win-width (ww)]
+    (cond
+      (>= win-width c3-min-win-width)
+      3
+      (>= win-width mobile-2-columns-breakpoint)
+      2
+      :else
+      1)))
+
+(defn columns-num []
+  (let [win-width (ww)]
+    (cond
+      (>= win-width c3-min-win-width)
+      3
+      (>= win-width big-web-min-width)
+      2
+      :else
+      1)))
 
 (defn win-width [columns]
   (let [win-width (ww)]
@@ -122,21 +124,6 @@
       (= columns 1)
       (- win-width 8 8))))
 
-(defn calc-card-width [& [force-columns]]
-  (let [columns (or force-columns (columns-num))
-        win-width (ww)
-        ;; get params based on columns number
-        min-win-width (get-min-win-width columns)
-        win-diff (get-win-diff columns)
-        win-card-diff (get-win-card-diff columns)
-        min-card-delta (get-min-card-delta columns)
-        ;; calculations
-        win-delta-width (- win-width min-win-width)
-        perc-win-delta  (/ (* win-delta-width 100) win-diff)
-        diff-delta      (* (/ win-card-diff 100) perc-win-delta)
-        delta           (+ min-card-delta diff-delta)]
-      (/ win-width delta)))
-
 (defn user-agent-mobile? []
   userAgent/MOBILE)
 
@@ -144,6 +131,41 @@
   "Check if it's mobile based on UserAgent or screen size."
   []
   (or (is-mobile-size?) (user-agent-mobile?)))
+
+(def topic-list-x-padding 20)
+(def topic-total-x-padding 20)
+(def left-topics-list-width 150)
+
+(defn calc-card-width [& [force-columns]]
+  (let [win-width (ww)
+        columns (or force-columns (columns-num))]
+    (if-not (is-mobile-size?)
+      (cond
+        (= columns 3)
+        (min (/ (- win-width
+                   (* topic-list-x-padding 2)
+                   (* topic-total-x-padding 3)
+                   left-topics-list-width)
+                3)
+             420)
+        (= columns 2)
+        (max (/ (- win-width
+                   (* topic-list-x-padding 2)
+                   (* topic-total-x-padding 2)
+                   left-topics-list-width)
+                2)
+             10))
+      (let [;; get params based on columns number
+            min-win-width (get-min-win-width columns)
+            win-diff (get-win-diff columns)
+            win-card-diff (get-win-card-diff columns)
+            min-card-delta (get-min-card-delta columns)
+            ;; calculations
+            win-delta-width (- win-width min-win-width)
+            perc-win-delta  (/ (* win-delta-width 100) win-diff)
+            diff-delta      (* (/ win-card-diff 100) perc-win-delta)
+            delta           (+ min-card-delta diff-delta)]
+          (/ win-width delta)))))
 
 (defn can-edit? []
   "Check if it's mobile based only on the UserAgent"
@@ -163,15 +185,11 @@
         (= (gobj/get js/WURFL "form_factor") "Smartphone")
         (= (gobj/get js/WURFL "form_factor") "Other Mobile"))))
 
-(def topic-total-x-padding 20)
 (def mobile-topic-total-x-padding 4)
 (def updates-content-list-width 280)
 (def updates-content-cards-right-margin 40)
 (def updates-content-cards-max-width 560)
 (def updates-content-cards-min-width 250)
-(def topic-list-x-padding 20)
-(def topic-border 4)
-(def left-topics-list-width 150)
 
 (defn total-layout-width-int [card-width columns-num]
   (if (is-mobile-size?)
@@ -179,7 +197,6 @@
       (- win-width 8 8))
     (+ (* (+ card-width topic-total-x-padding) columns-num)    ; width of each column plus
        (* topic-list-x-padding 2)                              ; the padding around all the columns
-       (* topic-border 2)                                      ; the remaining border around the topics
        (if (is-tablet-or-mobile?) 0 left-topics-list-width)))) ; the left side panel with the topics list
 
 ; (- (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
