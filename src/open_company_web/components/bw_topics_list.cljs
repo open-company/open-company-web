@@ -49,8 +49,10 @@
   (render [_]
     (dom/div {:class "left-topics-list group" :style {:width (str responsive/left-topics-list-width "px")}}
       (dom/div {:class "left-topics-list-top group"}
-        (dom/h3 {:class "left-topics-list-top-title left"} "FRONT PAGE")
-        (dom/button {:class "left-topics-list-top-title btn-reset right"} "+"))
+        (dom/h3 {:class "left-topics-list-top-title left"} "TOPICS")
+        ; Temp comment this waiting for add topic to work properly
+        ; (dom/button {:class "left-topics-list-top-title btn-reset right"} "+")
+        )
       (dom/div {:class "left-topics-list-items group"}
         (for [topic (:sections company-data)
               :let [sd (->> topic keyword (get company-data))]]

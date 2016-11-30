@@ -7,24 +7,32 @@ div.left-topics-list {
       font-family: $oc_headers_font;
       font-size: 14px;
       font-weight: 600;
-      line-height: 1.43;
+      line-height: 1.5;
       color: $oc_gray_7;
-      padding: 0;
+      padding: 0 0 0 5px;
       margin: 0;
     }
   }
 
   div.left-topics-list-items{
+    cursor: pointer;
+
     div.left-topics-list-item {
       font-size: 14px;
       font-family: $oc_headers_font;
       font-weight: normal;
       color: $oc_gray_7;
-      line-height: 1.43;
-      cursor: move;
+      line-height: 1.5;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
+      border-radius:4px;
+      padding: 0 2px 0 5px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(78,90,107,0.1);
+      }
     }
   }
 }
