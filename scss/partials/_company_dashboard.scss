@@ -15,6 +15,7 @@ div.company-dashboard {
 
     @include mobile(){
       background-color: $oc_gray_8;
+      padding-top: #{$mobile_navbar_height}px;
     }
 
     div.empty-dashboard {
