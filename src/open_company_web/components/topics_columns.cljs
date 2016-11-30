@@ -116,32 +116,14 @@
       (= min-height thrd-clmn)
       :3)))
 
-(defn get-pinned-layout
-  "Return the layout of the pinned topics only on 3 or 2 columns depending on the
-  current screen width."
-  [pinned-topics columns-num]
-  (if (= columns-num 3)
-    (loop [idx 3
-           cl1 (vec (remove nil? [(first pinned-topics)]))
-           cl2 (vec (remove nil? [(second pinned-topics)]))
-           cl3 (vec (remove nil? [(get pinned-topics 2)]))]
-      (if (<= idx (count pinned-topics))
-        (recur (+ idx 3)
-               (vec (remove nil? (conj cl1 (get pinned-topics idx))))
-               (vec (remove nil? (conj cl2 (get pinned-topics (inc idx)))))
-               (vec (remove nil? (conj cl3 (get pinned-topics (+ idx 2))))))
-        {:1 cl1
-         :2 cl2
-         :3 cl3}))
-    (loop [idx 2
-           cl1 (vec (remove nil? [(first pinned-topics)]))
-           cl2 (vec (remove nil? [(second pinned-topics)]))]
-      (if (<= idx (count pinned-topics))
-        (recur (+ idx 2)
-               (vec (remove nil? (conj cl1 (get pinned-topics idx))))
-               (vec (remove nil? (conj cl2 (get pinned-topics (inc idx))))))
-        {:1 cl1
-         :2 cl2}))))
+(defn get-initial-layout [columns-num]
+  (cond
+    ; 2 columns empty layout
+    (= columns-num 2)
+    {:1 [] :2 []}
+    ; 3 columns empty layout
+    (= columns-num 3)
+    {:1 [] :2 [] :3 []}))
 
 (defn calc-layout
   "Calculate the best layout given the list of topics and the number of columns to layout to"
@@ -169,13 +151,13 @@
     (let [columns-num (:columns-num data)
           company-data (:company-data data)
           show-add-topic (add-topic? owner)
-          {:keys [pinned other]} (utils/get-pinned-other-keys (utils/get-section-keys company-data) company-data)
+          topics-list (:topics data)
           final-layout (loop [idx 0
-                              layout (get-pinned-layout pinned columns-num)]
+                              layout (get-initial-layout columns-num)]
                           (let [shortest-column (get-shortest-column owner data layout)
-                                new-column (conj (get layout shortest-column) (get other idx))
+                                new-column (conj (get layout shortest-column) (get topics-list idx))
                                 new-layout (assoc layout shortest-column new-column)]
-                            (if (<= (inc idx) (count other))
+                            (if (<= (inc idx) (count topics-list))
                               (recur (inc idx)
                                      new-layout)
                               new-layout)))
@@ -191,11 +173,7 @@
           topic-click           (or (:topic-click options) identity)
           update-active-topics  (or (:update-active-topics options) identity)
           slug                  (keyword (router/current-company-slug))
-          window-scroll         (.-scrollTop (.-body js/document))
-          {:keys [pinned other]} (utils/get-pinned-other-keys topics company-data)
-          first-topic           (if (pos? (count pinned))
-                                  (first pinned)
-                                  (first other))]
+          window-scroll         (.-scrollTop (.-body js/document))]
       (if (= section-name "add-topic")
         (at/add-topic {:column column
                        :archived-topics (mapv (comp keyword :section) (:archived company-data))
@@ -256,10 +234,9 @@
       (om/set-state! owner :best-layout (calc-layout owner next-props))))
 
   (render-state [_ {:keys [best-layout]}]
-    (let [show-add-topic         (add-topic? owner)
-          partial-render-topic   (partial render-topic owner options)
-          {:keys [pinned other]} (utils/get-pinned-other-keys topics company-data)
-          columns-container-key   (str (apply str pinned) (apply str other))
+    (let [show-add-topic        (add-topic? owner)
+          partial-render-topic  (partial render-topic owner options)
+          columns-container-key (apply str (or best-layout topics))
           is-dashboard? (utils/in? (:route @router/path) "dashboard")
           topics-column-conatiner-style (if is-dashboard?
                                           (if (responsive/window-exceeds-breakpoint)
@@ -288,54 +265,39 @@
                     :key columns-container-key}
             ; for each column key contained in best layout
             (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
-              ; get the pinned and the other topics of the current column
-              (let [column (get best-layout kw)
-                    {:keys [pinned other]} (utils/get-pinned-other-keys column company-data)]
+              (let [column (get best-layout kw)]
                 (dom/div {:class (str "topics-column col-" (name kw))
                           :style #js {:width (str (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px")}}
-                  ; render the pinned topics
-                  (dom/div #js {:className "topics-column-pinned"}
-                    (when (pos? (count pinned))
-                      (for [idx (range (count pinned))
-                            :let [section-kw (get pinned idx)
-                                  section-name (name section-kw)]]
-                        (partial-render-topic section-name
-                                              (when (= section-name "add-topic") (int (name kw)))))))
-                  ; render the other topics
-                  (dom/div #js {:className "topics-column-other"}
-                    (when (pos? (count other))
-                      (for [idx (range (count other))
-                            :let [section-kw (get other idx)
-                                  section-name (name section-kw)]]
-                        (partial-render-topic section-name
-                                              (when (= section-name "add-topic") (int (name kw))))))
-                    ; render the add topic in the correct column
-                    (when (and show-add-topic
-                               (= kw :1)
-                               (= (count topics) 0))
-                      (partial-render-topic "add-topic" 1))
-                    (when (and show-add-topic
-                               (= kw :2)
-                               (or (and (= (count topics) 1)
-                                        (= columns-num 3))
-                                   (and (>= (count topics) 1)
-                                        (= columns-num 2))))
-                      (partial-render-topic "add-topic" 2))
-                    (when (and show-add-topic
-                               (= kw :3)
-                               (>= (count topics) 2))
-                      (partial-render-topic "add-topic" 3)))))))
+                  ; render the topics
+                  (when (pos? (count column))
+                    (for [idx (range (count column))
+                          :let [section-kw (get column idx)
+                                section-name (name section-kw)]]
+                      (partial-render-topic section-name
+                                            (when (= section-name "add-topic") (int (name kw))))))
+                  ; render the add topic in the correct column
+                  (when (and show-add-topic
+                             (= kw :1)
+                             (= (count topics) 0))
+                    (partial-render-topic "add-topic" 1))
+                  (when (and show-add-topic
+                             (= kw :2)
+                             (or (and (= (count topics) 1)
+                                      (= columns-num 3))
+                                 (and (>= (count topics) 1)
+                                      (= columns-num 2))))
+                    (partial-render-topic "add-topic" 2))
+                  (when (and show-add-topic
+                             (= kw :3)
+                             (>= (count topics) 2))
+                    (partial-render-topic "add-topic" 3))))))
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
                     :style topics-column-conatiner-style
                     :key columns-container-key}
             (dom/div {:class "topics-column"}
-              (dom/div #js {:className "topics-column-pinned"}
-                (for [section pinned]
-                  (partial-render-topic (name section))))
-              (dom/div #js {:className "topics-column-other"}
-                (for [section other]
-                  (partial-render-topic (name section)))
-                (when show-add-topic
-                  (partial-render-topic "add-topic" 1))))))))))
+              (for [section topics]
+                (partial-render-topic (name section)))
+              (when show-add-topic
+                (partial-render-topic "add-topic" 1)))))))))

@@ -240,22 +240,6 @@
   "Get the section names, as a vector of keywords."
   (vec (map keyword (:sections company-data))))
 
-(defn get-pinned-other-keys
-  "Get a map that split the given list of topics in pinned and non pinned topics"
-  [sections company-data]
-  (loop [pinned []
-         unpinned sections
-         idx 0]
-    (if (<= idx (count sections))
-      (let [sec (get sections idx)
-            sec-data (->> sec keyword (get company-data))
-            is-pinned (:pin sec-data)
-            next-pinned (if is-pinned (vec (conj pinned sec)) pinned)
-            next-unpinned (if is-pinned (vec (vec-dissoc unpinned sec)) unpinned)]
-        (recur next-pinned next-unpinned (inc idx)))
-      {:pinned pinned
-       :other unpinned})))
-
 (defn link-for
   ([links rel] (some #(when (= (:rel %) rel) %) links))
   ([links rel method] (some #(when (and (= (:method %) method) (= (:rel %) rel)) %) links)))
