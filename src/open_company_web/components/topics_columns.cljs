@@ -267,33 +267,34 @@
             (when-not (responsive/is-tablet-or-mobile?)
               (om/build bw-topics-list data))
             ; for each column key contained in best layout
-            (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
-              (let [column (get best-layout kw)]
-                (dom/div {:class (str "topics-column col-" (name kw))
-                          :style #js {:width (str (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px")}}
-                  ; render the topics
-                  (when (pos? (count column))
-                    (for [idx (range (count column))
-                          :let [section-kw (get column idx)
-                                section-name (name section-kw)]]
-                      (partial-render-topic section-name
-                                            (when (= section-name "add-topic") (int (name kw))))))
-                  ; render the add topic in the correct column
-                  (when (and show-add-topic
-                             (= kw :1)
-                             (= (count topics) 0))
-                    (partial-render-topic "add-topic" 1))
-                  (when (and show-add-topic
-                             (= kw :2)
-                             (or (and (= (count topics) 1)
-                                      (= columns-num 3))
-                                 (and (>= (count topics) 1)
-                                      (= columns-num 2))))
-                    (partial-render-topic "add-topic" 2))
-                  (when (and show-add-topic
-                             (= kw :3)
-                             (>= (count topics) 2))
-                    (partial-render-topic "add-topic" 3))))))
+            (dom/div {:class "right" :style {:width (str (- (int total-width) responsive/left-topics-list-width) "px")}}
+              (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
+                (let [column (get best-layout kw)]
+                  (dom/div {:class (str "topics-column col-" (name kw))
+                            :style #js {:width (str (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px")}}
+                    ; render the topics
+                    (when (pos? (count column))
+                      (for [idx (range (count column))
+                            :let [section-kw (get column idx)
+                                  section-name (name section-kw)]]
+                        (partial-render-topic section-name
+                                              (when (= section-name "add-topic") (int (name kw))))))
+                    ; render the add topic in the correct column
+                    (when (and show-add-topic
+                               (= kw :1)
+                               (= (count topics) 0))
+                      (partial-render-topic "add-topic" 1))
+                    (when (and show-add-topic
+                               (= kw :2)
+                               (or (and (= (count topics) 1)
+                                        (= columns-num 3))
+                                   (and (>= (count topics) 1)
+                                        (= columns-num 2))))
+                      (partial-render-topic "add-topic" 2))
+                    (when (and show-add-topic
+                               (= kw :3)
+                               (>= (count topics) 2))
+                      (partial-render-topic "add-topic" 3)))))))
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
