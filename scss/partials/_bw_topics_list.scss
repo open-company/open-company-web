@@ -1,0 +1,30 @@
+div.left-topics-list {
+  float: left;
+  padding-left: 13px;
+
+  div.left-topics-list-top{
+    .left-topics-list-top-title {
+      font-family: $oc_headers_font;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.43;
+      color: $oc_gray_7;
+      padding: 0;
+      margin: 0;
+    }
+  }
+
+  div.left-topics-list-items{
+    div.left-topics-list-item {
+      font-size: 14px;
+      font-family: $oc_headers_font;
+      font-weight: normal;
+      color: $oc_gray_7;
+      line-height: 1.43;
+      cursor: move;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+}
