@@ -40,14 +40,14 @@
       1)))
 
 ;; 3 Columns
-(def c3-max-win-width 1800) (def c3-max-card-width 420)
-(def c3-min-win-width 1012) (def c3-min-card-width 302)
+(def c3-max-win-width 1800) (def c3-max-card-width 350)
+(def c3-min-win-width 1060) (def c3-min-card-width 302)
 (def c3-win-card-diff (- (/ c3-max-win-width c3-max-card-width) (/ c3-min-win-width c3-min-card-width)))
 (def c3-win-diff (- c3-max-win-width c3-min-win-width))
 (def c3-min-card-delta (/ c3-min-win-width c3-min-card-width))
 
 ;; 2 Columns
-(def c2-max-win-width 1011) (def c2-max-card-width 420)
+(def c2-max-win-width 1059) (def c2-max-card-width 420)
 (def c2-padding (if (> (ww) big-web-min-width) 80 60))
 (def c2-min-win-width mobile-2-columns-breakpoint) (def c2-min-card-width (/ (- mobile-2-columns-breakpoint c2-padding) 2))
 (def c2-win-card-diff (- (/ c2-max-win-width c2-max-card-width) (/ c2-min-win-width c2-min-card-width)))
@@ -171,14 +171,16 @@
 (def updates-content-cards-min-width 250)
 (def topic-list-x-padding 20)
 (def topic-border 4)
+(def left-topics-list-width 150)
 
 (defn total-layout-width-int [card-width columns-num]
   (if (is-mobile-size?)
     (let [win-width (ww)]
       (- win-width 8 8))
-    (+ (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
+    (+ (* (+ card-width topic-total-x-padding) columns-num) ; width of each column plus
        (* topic-list-x-padding 2)                           ; the padding around all the columns
-       (* topic-border 2))))                                ; the remaining border around the topics
+       (* topic-border 2)                                   ; the remaining border around the topics
+       left-topics-list-width)))                            ; the left side panel with the topics list
 
 ; (- (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
 ;      (if (is-mobile?) 20 10)                              ; the container padding
