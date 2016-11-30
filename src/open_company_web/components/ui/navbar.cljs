@@ -76,7 +76,9 @@
                                           (not (:read-only company-data))            ; it's not a read-only cmp
                                           (if (contains? data :show-share-su-button) ; the including component
                                             show-share-su-button                     ; wants to
-                                            true))]
+                                            true))
+          should-show-left-links (and (router/current-company-slug)
+                                      (pos? (:count (utils/link-for (:links company-data) "stakeholder-updates"))))]
       (dom/nav {:class (utils/class-set {:oc-navbar true
                                          :group true
                                          :su-navbar su-navbar
@@ -115,14 +117,14 @@
             (dom/div {:class "oc-navbar-bottom group"
                       :style {:width (str header-width "px")}}
               (dom/div {:class "left"}
-                (when (router/current-company-slug)
+                (when should-show-left-links
                   (dom/a {:class (when (= active :dashboard) "active")
                           :href (oc-urls/company)
                           :on-click #(do
                                        (utils/event-stop %)
                                        (router/nav! (oc-urls/company)))}
                     "Dashboard"))
-                (when (router/current-company-slug)
+                (when should-show-left-links
                   (dom/a {:class (when (= active :updates) "active")
                           :href (oc-urls/stakeholder-update-list)
                           :on-click (fn [e]
