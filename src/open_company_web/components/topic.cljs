@@ -74,15 +74,11 @@
           {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
-                    :onClick #(do
-                                (js/console.log "topic-internal/click"(responsive/is-mobile-size?)
-                                                                         (not foce-active)
-                                                                         (not is-stakeholder-update))
-                                (when (and (responsive/is-mobile-size?)
-                                                                         (not foce-active)
-                                                                         (not is-stakeholder-update))
-                                                                (.preventDefault %)
-                                                                (topic-click)))
+                    :onClick #(when (and (responsive/is-mobile-size?)
+                                         (not foce-active)
+                                         (not is-stakeholder-update))
+                                (.preventDefault %)
+                                (topic-click))
                     :ref "topic-internal"}
 
         ;; Topic image for dashboard
