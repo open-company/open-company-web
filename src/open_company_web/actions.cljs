@@ -154,10 +154,15 @@
 
 (defmethod dispatcher/action :su-edit [db [_ {:keys [slug su-date su-slug]}]]
   (let [su-url   (oc-urls/stakeholder-update slug (utils/su-date-from-created-at su-date) su-slug)
-        latest-su-key (dispatcher/latest-stakeholder-update-key slug)]
+        latest-su-key (dispatcher/latest-stakeholder-update-key slug)
+        company-data-links (:links (dispatcher/company-data))
+        updates-list-link (utils/link-for company-data-links "stakeholder-updates")
+        updated-link (assoc updates-list-link :count (inc (:count updates-list-link)))
+        new-links (conj (utils/vec-dissoc company-data-links updates-list-link) updated-link)]
     (-> db
       (assoc-in latest-su-key su-url)
       (dissoc :loading)
+      (assoc-in (conj (dispatcher/company-data-key slug) :links) new-links)
       ; refresh the su list
       (get-su-list))))
 
