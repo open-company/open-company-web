@@ -2,7 +2,6 @@
   (:require [doo.runner :refer-macros [doo-tests]]
             [test.open-company-web.components.company-settings]
             [test.open-company-web.components.company-editor]
-            [test.open-company-web.components.ui.revisions-navigator]
             [test.open-company-web.components.ui.company-avatar]
             [test.open-company-web.components.ui.user-avatar]
             [test.open-company-web.components.user-profile]
@@ -23,7 +22,6 @@
 (doo-tests
   'test.open-company-web.components.company-settings
   'test.open-company-web.components.company-editor
-  'test.open-company-web.components.ui.revisions-navigator
   'test.open-company-web.components.ui.company-avatar
   'test.open-company-web.components.ui.user-avatar
   'test.open-company-web.components.user-profile

@@ -27,7 +27,6 @@
             [open-company-web.components.updates :refer (updates-responsive-switcher)]
             [open-company-web.components.home :refer (home)]
             [open-company-web.components.list-companies :refer (list-companies)]
-            [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
             [open-company-web.components.login :refer (login)]
             [open-company-web.components.ui.loading :refer (loading)]
