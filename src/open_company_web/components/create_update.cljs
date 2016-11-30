@@ -194,8 +194,7 @@
                                           :topics su-topics
                                           :topics-data no-pinned-topics
                                           :company-data no-pinned-topics
-                                          :hide-add-topic true
-                                          :show-share-remove false}))))
+                                          :hide-add-topic true}))))
           (om/build footer {:card-width card-width
                             :columns-num columns-num
                             :company-data company-data}))))))

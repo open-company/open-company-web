@@ -215,25 +215,7 @@
               sections     (vec (:sections company-data))
               fixed-body   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.html body-el)) "__html"))
               data-to-save {:body fixed-body}]
-          (cond
-            (and (not (om/get-state owner :initially-pinned))
-                 (:pin topic-data))
-            ; needs to PATCH :sections to move the topic at the top of the unpinned topics
-            (let [without-topic (utils/vec-dissoc sections topic)
-                  {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
-                  with-pinned-topic (let [[before after] (split-at (count pinned) without-topic)]
-                                      (vec (concat before [topic] after)))]
-              (dis/dispatch! [:foce-save with-pinned-topic data-to-save]))
-            (and (om/get-state owner :initially-pinned)
-                 (not (:pin topic-data)))
-            ; needs to PATCH :sections to move the topic at the top of the unpinned topics
-            (let [without-topic (utils/vec-dissoc sections topic)
-                  {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
-                  with-unpinned-topic (let [[before after] (split-at (inc (count pinned)) without-topic)]
-                                      (vec (concat before [topic] after)))]
-              (dis/dispatch! [:foce-save with-unpinned-topic data-to-save]))
-            :else
-            (dis/dispatch! [:foce-save sections data-to-save])))))))
+          (dis/dispatch! [:foce-save sections data-to-save]))))))
 
 (defn- data-editing-cb [owner value]
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
@@ -252,7 +234,6 @@
       {:initial-headline (utils/emojify (:headline topic-data))
        :body-placeholder (or (:body-placeholder topic-data) "")
        :initial-body  (utils/emojify (if (and (:placeholder topic-data) (not has-data?)) "" body))
-       :initially-pinned (:pin topic-data)
        :char-count nil
        :char-count-alert false
        :has-changes false

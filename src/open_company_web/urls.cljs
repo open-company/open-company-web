@@ -101,12 +101,6 @@
   ([slug]
     (str "/" (name slug) "/updates/preview")))
 
-(defn stakeholder-update-edit
-  ([]
-    (stakeholder-update-edit (router/current-company-slug)))
-  ([slug]
-    (str "/" (name slug) "/updates/edit")))
-
 (defn stakeholder-update
   ([]
     (stakeholder-update (router/current-company-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug)))
@@ -114,11 +108,3 @@
     (stakeholder-update (router/current-company-slug) update-date update-slug))
   ([slug update-date update-slug]
     (str "/" (name slug) "/updates/" (name update-date) "/" (name update-slug))))
-
-(defn stakeholder-update-section
-  ([]
-    (stakeholder-update-section (router/current-company-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug) (router/current-section)))
-  ([update-date update-slug section]
-    (stakeholder-update-section (router/current-company-slug) update-date update-slug section))
-  ([slug update-date update-slug section]
-    (str (stakeholder-update slug update-date update-slug) "/" (name section))))

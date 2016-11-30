@@ -15,11 +15,9 @@
 (defn add-topic? [owner]
   (let [data (om/get-props owner)
         company-data (:company-data data)
-        sharing-mode (om/get-props owner :sharing-mode)
         foce-active  (dis/foce-section-key)]
     (and (not (:hide-add-topic data))
          (responsive/can-edit?)
-         (not sharing-mode)
          (not (:read-only company-data))
          (not foce-active))))
 
@@ -187,14 +185,11 @@
 (defn render-topic [owner options section-name & [column]]
   (when section-name
     (let [props                 (om/get-props owner)
-          sharing-mode          (:sharing-mode props)
-          share-selected-topics (:share-selected-topics props)
           company-data          (:company-data props)
           topics-data           (:topics-data props)
           topics                (:topics props)
           topic-click           (or (:topic-click options) identity)
           update-active-topics  (or (:update-active-topics options) identity)
-          share-selected?       (utils/in? share-selected-topics section-name)
           slug                  (keyword (router/current-company-slug))
           window-scroll         (.-scrollTop (.-body js/document))
           {:keys [pinned other]} (utils/get-pinned-other-keys topics company-data)
@@ -233,20 +228,15 @@
                                :section-data sd
                                :card-width (:card-width props)
                                :foce-data-editing? (:foce-data-editing? props)
-                               :show-share-remove (:show-share-remove props)
                                :read-only-company (:read-only company-data)
                                :currency (:currency company-data)
-                               :sharing-mode sharing-mode
                                :foce-key (:foce-key props)
                                :foce-data (:foce-data props)
-                               :share-selected share-selected?
                                :show-first-edit-tip (:show-first-edit-tip props)}
                                {:opts {:section-name section-name
-                                       :share-remove-click (:share-remove-click options)
                                        :topic-click (partial topic-click section-name)}}))))))))
 
 (defcomponent topics-columns [{:keys [columns-num
-                                      sharing-mode
                                       content-loaded
                                       total-width
                                       card-width
@@ -283,7 +273,6 @@
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true
-                                         :sharing-mode sharing-mode
                                          :group true
                                          :content-loaded content-loaded})}
         (cond

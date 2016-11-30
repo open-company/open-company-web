@@ -38,7 +38,6 @@
             (login-overlays-handler))
           (dom/div {:class "page"}
             (om/build navbar {:card-width card-width
-                              :sharing-mode false
                               :columns-num columns-num
                               :mobile-menu-open mobile-menu-open
                               :show-share-su-button false

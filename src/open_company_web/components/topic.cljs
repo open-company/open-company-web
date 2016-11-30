@@ -59,7 +59,6 @@
                                       columns-num
                                       prev-rev
                                       next-rev
-                                      sharing-mode
                                       read-only-company
                                       is-stakeholder-update
                                       is-mobile?
@@ -75,8 +74,7 @@
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
-          company-data        (dis/company-data)
-          {:keys [pinned]}        (utils/get-pinned-other-keys (:sections company-data) company-data)]
+          company-data        (dis/company-data)]
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
                     :onClick (partial fullscreen-topic owner)
@@ -98,7 +96,6 @@
                      (responsive/can-edit?)
                      (not (:read-only topic-data))
                      (not read-only-company)
-                     (not sharing-mode)
                      (not (:foce-active data)))
             (dom/button {:class (str "topic-pencil-button btn-reset")
                          :on-click #(pencil-click owner %)}
@@ -185,10 +182,7 @@
                              currency
                              column
                              card-width
-                             sharing-mode
-                             share-selected
                              archived-topics
-                             show-share-remove
                              is-stakeholder-update
                              topic-flex-num] :as data} owner options]
 
@@ -251,34 +245,12 @@
                                                  :group true
                                                  :mobile-dashboard-topic (and is-mobile? is-dashboard?)
                                                  :topic-edit is-foce
-                                                 :draggable-topic (and (not (responsive/is-mobile-size?)) (not is-stakeholder-update) (not (:read-only-company data)) (:pin topic-data))
-                                                 :not-draggable-topic (or is-stakeholder-update (:read-only-company data) (not (:pin topic-data)))
-                                                 :no-foce (and foce-active (not is-foce))
-                                                 :sharing-selected (and sharing-mode share-selected)})
+                                                 :no-foce (and foce-active (not is-foce))})
                     :style topic-style
                     :ref "topic"
                     :data-section (name section)
                     :key (str "topic-" (name section))
                     :id (str "topic-" (name section))}
-        (when (and show-share-remove (not is-mobile?))
-          (dom/div {:class "share-remove-container"
-                    :id (str "share-remove-" (name section))}
-            (dom/button {:class "btn-reset share-remove"
-                         :data-toggle "tooltip"
-                         :data-container "body"
-                         :data-placement "top"
-                         :title "Remove topic from this update."
-                         :on-click #(when (contains? options :share-remove-click) ((:share-remove-click options) (name section)))}
-              (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.5)" :size 12 :stroke 4 :accent-color "rgba(78, 90, 107, 0.5)"}))))
-        (when (and show-share-remove (not is-mobile?))
-          (dom/div {:class "share-dnd-container"
-                    :id (str "share-dnd-" (name section))}
-            (dom/div {:class "btn-reset share-dnd"
-                      :data-toggle "tooltip"
-                      :data-container "body"
-                      :data-placement "bottom"
-                      :title "Drag and drop topic to reorder."}
-              (dom/i {:class "fa fa-arrows"}))))
         (dom/div #js {:className "topic-anim group"
                       :key (str "topic-anim-" as-of "-" transition-as-of)
                       :ref "topic-anim"}
@@ -291,7 +263,6 @@
               (if is-foce
                 (om/build topic-edit {:section section
                                       :topic-data topic-data
-                                      :sharing-mode sharing-mode
                                       :is-stakeholder-update (:is-stakeholder-update data)
                                       :currency currency
                                       :card-width card-width
@@ -306,7 +277,6 @@
                                       :key (str "topic-foce-" section)})
                 (om/build topic-internal {:section section
                                           :topic-data topic-data
-                                          :sharing-mode sharing-mode
                                           :is-stakeholder-update (:is-stakeholder-update data)
                                           :currency currency
                                           :card-width card-width
@@ -330,7 +300,6 @@
                       tr-next-rev (utils/revision-next revisions transition-as-of)]
                   (om/build topic-internal {:section section
                                             :topic-data tr-topic-data
-                                            :sharing-mode sharing-mode
                                             :currency currency
                                             :read-only-company (:read-only-company data)
                                             :is-mobile? is-mobile?

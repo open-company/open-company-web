@@ -103,8 +103,7 @@
                                         :topics (:sections su-data)
                                         :topics-data su-data
                                         :company-data company-data
-                                        :hide-add-topic true
-                                        :show-share-remove false}))))))))
+                                        :hide-add-topic true}))))))))
 
 (defcomponent updates-responsive-switcher [data owner]
 
