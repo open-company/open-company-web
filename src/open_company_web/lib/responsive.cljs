@@ -177,10 +177,10 @@
   (if (is-mobile-size?)
     (let [win-width (ww)]
       (- win-width 8 8))
-    (+ (* (+ card-width topic-total-x-padding) columns-num) ; width of each column plus
-       (* topic-list-x-padding 2)                           ; the padding around all the columns
-       (* topic-border 2)                                   ; the remaining border around the topics
-       left-topics-list-width)))                            ; the left side panel with the topics list
+    (+ (* (+ card-width topic-total-x-padding) columns-num)    ; width of each column plus
+       (* topic-list-x-padding 2)                              ; the padding around all the columns
+       (* topic-border 2)                                      ; the remaining border around the topics
+       (if (is-tablet-or-mobile?) 0 left-topics-list-width)))) ; the left side panel with the topics list
 
 ; (- (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
 ;      (if (is-mobile?) 20 10)                              ; the container padding
