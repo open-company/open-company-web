@@ -264,7 +264,8 @@
                                                              (= columns-num 2))})
                     :style topics-column-conatiner-style
                     :key columns-container-key}
-            (om/build bw-topics-list data)
+            (when-not (responsive/is-tablet-or-mobile?)
+              (om/build bw-topics-list data))
             ; for each column key contained in best layout
             (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
               (let [column (get best-layout kw)]
