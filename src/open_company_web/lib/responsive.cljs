@@ -2,7 +2,9 @@
   (:require [dommy.core :refer-macros (sel1)]
             [open-company-web.lib.cookies :as cook]
             [goog.object :as gobj]
-            [goog.userAgent :as userAgent]))
+            [goog.userAgent :as userAgent]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]))
 
 (def big-web-min-width 684)
 ; 2 columns 302 * 2 = 604 diff: 80 |30|col1|20|col2|30|
@@ -109,7 +111,7 @@
                  (* topic-total-x-padding 2)
                  (if (is-tablet-or-mobile?) 0 left-topics-list-width))
               2)
-           230))))
+           208))))
 
 (defn can-edit? []
   "Check if it's mobile based only on the UserAgent"
@@ -151,3 +153,6 @@
                             updates-content-cards-max-width
                             (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin))]
     fixed-card-width))
+
+(when (not (not (.-_phantom js/window)))
+  (events/listen js/window EventType/RESIZE #(set-browser-type!)))
