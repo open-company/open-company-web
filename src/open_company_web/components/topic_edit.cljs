@@ -19,7 +19,6 @@
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
-            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.components.ui.popover :refer (add-popover hide-popover)]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [goog.dom :as gdom]
@@ -220,8 +219,7 @@
 (defn- data-editing-cb [owner value]
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
 
-(defcomponent topic-edit [{:keys [show-first-edit-tip
-                                  currency
+(defcomponent topic-edit [{:keys [currency
                                   card-width
                                   prev-rev
                                   next-rev] :as data} owner options]
@@ -501,29 +499,4 @@
                            :disabled (dis/foce-section-data-editing?)
                            :on-click #(if (:placeholder topic-data)
                                         (dis/dispatch! [:topic-archive (name section)])
-                                        (dis/dispatch! [:start-foce nil]))} "CANCEL")))
-
-        ;; Onboarding toolips
-        (when (and show-first-edit-tip (not is-data?))
-          (onboard-tip
-            {:id (str "content-topic-add-" company-slug)
-             :once-only true
-             :mobile false
-             :desktop "What would you like to say? You can add text, emoji and images."
-             :dismiss-tip-fn focus-headline}))
-
-        (when (and (= section-kw :growth) no-data?)
-          (onboard-tip
-            {:id (str "growth-topic-add-" company-slug)
-             :once-only true
-             :mobile false
-             :desktop "Add simple charts to share company performance."
-             :dismiss-tip-fn focus-headline}))
-
-        (when (and (= section-kw :finances) no-data?)
-          (onboard-tip
-            {:id (str "finance-topic-add-" company-slug)
-             :once-only true
-             :mobile false
-             :desktop "Add a chart to share revenue, expenses and cash."
-             :dismiss-tip-fn focus-headline})))))))
+                                        (dis/dispatch! [:start-foce nil]))} "CANCEL"))))))))
