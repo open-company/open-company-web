@@ -89,7 +89,8 @@
                                 :mobile-menu-open (:mobile-menu-open data)
                                 :auth-settings (:auth-settings data)
                                 :active :dashboard})
-              (when (responsive/is-mobile-size?)
+              (when (and (responsive/is-mobile-size?)
+                         (pos? (:count (utils/link-for (:links company-data) "stakeholder-updates"))))
                 (oc-switch :dashboard))
               (if (and (empty? (:sections company-data)) (responsive/is-mobile-size?))
                 (dom/div {:class "empty-dashboard"}
