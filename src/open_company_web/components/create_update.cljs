@@ -126,11 +126,11 @@
                           :key (clojure.string/join "-" su-topics)}
                   (for [topic su-topics]
                     (let [sd ((keyword topic) company-data)]
-                      (dom/div {:class "oc-active"
-                               :data-topic topic
-                               :key topic
-                               :ref topic
-                               :on-click (fn [_]
+                      (dom/div {:class "create-update-topics-list-item oc-active"
+                                :data-topic topic
+                                :key topic
+                                :ref topic
+                                :on-click (fn [_]
                                             (om/update-state! owner #(merge % {:su-topics (utils/vec-dissoc su-topics topic)
                                                                                :should-update-data false}))
                                             (patch-stakeholder-update owner))}
@@ -143,7 +143,8 @@
                                                (compare (:title sd1) (:title sd2))) filtered-topics)]
                     (for [topic sorted-topics]
                       (let [sd ((keyword topic) company-data)]
-                        (dom/div {:data-topic topic
+                        (dom/div {:class "create-update-topics-list-item"
+                                  :data-topic topic
                                   :key topic
                                   :ref topic
                                   :on-click (fn [_]
@@ -162,8 +163,8 @@
                                                                              :should-update-data false}))
                                           (patch-stakeholder-update owner))})
                 (om/build topics-columns {:columns-num 1
-                                          :card-width (- fixed-card-width 10) ; remove 10 padding on the right
-                                          :total-width (- fixed-card-width 10)
+                                          :card-width (- fixed-card-width 60) ; remove 60 padding around it
+                                          :total-width (- fixed-card-width 60)
                                           :is-stakeholder-update true
                                           :content-loaded (not (:loading data))
                                           :topics su-topics

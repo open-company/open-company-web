@@ -6,12 +6,13 @@ div.create-update {
     background-color: $oc_gray_8;
 
     div.create-update-content {
-      margin: 58px auto 10px;
+      margin: 55px auto 55px;
       padding: 0 34px;
 
       div.create-update-content-cards {
-        padding-right: 10px;
-        margin-right: 40px;
+        padding: 20px 30px;
+        margin-right: 50px;
+        background-color: white;
 
         input.create-update-content-cards-title {
           text-align: center;
@@ -43,14 +44,25 @@ div.create-update {
 
           div.topics-column {
             margin: 0;
-            max-width: 660px;
+            max-width: initial;
+            background-color: white;
 
             div.topic-row{
               margin-left: 0px;
+              margin-right: 0px;
 
               div.topic {
                 margin-left: 0px;
                 margin-right: 0px;
+                border: none;
+                box-shadow: none;
+                border-bottom: 1px solid rgba(78,90,107,0.1);
+              }
+
+              &:last-child {
+                div.topic {
+                  border-bottom: 0px solid rgba(78,90,107,0.1);
+                }
               }
             }
           }
@@ -59,7 +71,7 @@ div.create-update {
 
       div.create-update-content-list{
         padding-left: 20px;
-        margin-top: 3.4rem;
+        margin-top: 84px;
 
         div.create-update-content-buttons {
           margin-bottom: 30px;
@@ -86,17 +98,20 @@ div.create-update {
           margin: 0;
           padding: 0;
 
-          div {
+          div.create-update-topics-list-item {
             font-family: $oc_headers_font;
             font-size: 14px;
             font-weight: 400;
             text-transform: capitalize;
             padding: 3px 10px 3px 10px;
             cursor: pointer;
+            margin-bottom: 2px;
 
             &.oc-active {
               font-weight: 800;
               background-color: rgba(78,90,107,0.05);
+              border: 1px solid rgba(78,90,107,0.2);
+              border-radius: 2px;
 
               &:after, &::after {
                 font-size: 13px;
