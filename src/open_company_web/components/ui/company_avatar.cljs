@@ -33,10 +33,10 @@
                               (when should-show-link
                                 (router/nav! company-home)))}
             (dom/div {:class "company-avatar-container group"}
-              (when-not (clojure.string/blank? company-logo)
-                (dom/div {:class "company-avatar-border"}
-                  (dom/span {:class "helper"})
-                  (dom/img {:src company-logo
-                            :class "company-avatar-img"
-                            :title company-name})))
+              ; (when-not (clojure.string/blank? company-logo)
+              ;   (dom/div {:class "company-avatar-border"}
+              ;     (dom/span {:class "helper"})
+              ;     (dom/img {:src company-logo
+              ;               :class "company-avatar-img"
+              ;               :title company-name})))
               (dom/span {:class (str "company-name " (when (clojure.string/blank? company-logo) "no-logo"))} company-name))))))))
