@@ -39,6 +39,7 @@
           (dom/div {:class "page"}
             (om/build navbar {:card-width card-width
                               :columns-num columns-num
+                              :header-width (responsive/total-layout-width-int card-width columns-num)
                               :mobile-menu-open mobile-menu-open
                               :show-share-su-button false
                               :auth-settings (:auth-settings data)})
@@ -49,5 +50,4 @@
                   (dom/ul {:class "companies"}
                     (om/build-all list-page-item company-list))
                   (dom/h2 "No companies found."))))
-            (om/build footer {:card-width card-width
-                              :columns-num columns-num})))))))
+            (om/build footer {:footer-width (responsive/total-layout-width-int card-width columns-num)})))))))

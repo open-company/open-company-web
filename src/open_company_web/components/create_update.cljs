@@ -93,13 +93,14 @@
 
   (render-state [_ {:keys [columns-num card-width su-title su-topics show-su-dialog]}]
     (let [company-data (dis/company-data data)
-          total-width-int (responsive/total-layout-width-int card-width columns-num)
+          total-width-int (min responsive/updates-max-total-width (responsive/total-layout-width-int card-width columns-num))
           total-width (str total-width-int "px")
           fixed-card-width (responsive/calc-update-width columns-num)]
       (dom/div {:class "create-update main-scroll group"}
         (dom/div {:class "page"}
           (om/build navbar {:card-width card-width
                             :columns-num columns-num
+                            :header-width total-width-int
                             :company-data company-data
                             :foce-key (:foce-key data)
                             :show-share-su-button false
@@ -169,6 +170,4 @@
                                           :topics-data company-data
                                           :company-data company-data
                                           :hide-add-topic true}))))
-          (om/build footer {:card-width card-width
-                            :columns-num columns-num
-                            :company-data company-data}))))))
+          (om/build footer {:footer-width total-width-int}))))))

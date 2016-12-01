@@ -26,5 +26,4 @@
           (when-not (:loading data)
             (dom/div {:class "home-internal"})
             (om/build footer {:su-preview false
-                              :card-width card-width
-                              :columns-num columns-num})))))))
+                              :footer-width (responsive/total-layout-width-int card-width columns-num)})))))))

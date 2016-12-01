@@ -51,6 +51,7 @@
                               active
                               foce-key
                               mobile-menu-open
+                              header-width
                               su-navbar] :as data} owner options]
 
   (did-mount [_]
@@ -69,9 +70,7 @@
       (events/unlistenByKey scroll-listener)))
 
   (render [_]
-    (let [header-width (responsive/total-layout-width-int card-width columns-num)
-                                                                                    ; show the new update btn if
-          fixed-show-share-su-button (and (not (responsive/is-mobile?))              ; it's not mobile
+    (let [fixed-show-share-su-button (and (not (responsive/is-mobile?))              ; it's not mobile
                                           (jwt/jwt)                                  ; the user is logged in
                                           (not (:read-only company-data))            ; it's not a read-only cmp
                                           (if (contains? data :show-share-su-button) ; the including component

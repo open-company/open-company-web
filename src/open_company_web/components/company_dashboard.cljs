@@ -59,7 +59,8 @@
 
   (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num card-width] :as state}]
     (let [slug (keyword (router/current-company-slug))
-          company-data (dis/company-data data)]
+          company-data (dis/company-data data)
+          total-width-int (responsive/total-layout-width-int card-width columns-num)]
       (if (:loading data)
         (dom/div {:class (utils/class-set {:company-dashboard true
                                            :main-scroll true})}
@@ -75,13 +76,13 @@
             (dom/div {:class (str "fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
               (login-required data)
               ;;Footer
-               (om/build footer {:columns-num columns-num
-                                 :card-width card-width}))
+               (om/build footer {:footer-width total-width-int}))
             (dom/div {:class "page"}
               ;; Navbar
               (om/build navbar {:save-bt-active save-bt-active
                                 :company-data company-data
                                 :card-width card-width
+                                :header-width total-width-int
                                 :columns-num columns-num
                                 :foce-key (:foce-key data)
                                 :show-share-su-button (utils/can-edit-sections? company-data)
@@ -112,5 +113,4 @@
                              :foce-key (:foce-key data)
                              :foce-data (:foce-data data)}))
               ;;Footer
-              (om/build footer {:columns-num columns-num
-                                :card-width card-width}))))))))
+              (om/build footer {:footer-width total-width-int}))))))))

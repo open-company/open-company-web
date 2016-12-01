@@ -106,7 +106,8 @@
           fixed-card-width (responsive/calc-update-width (responsive/columns-num))
           title        (if (clojure.string/blank? (:title su-data))
                           (str (:name company-data) " Update")
-                          (:title su-data))]
+                          (:title su-data))
+          card-width   (responsive/calc-card-width)]
       (dom/div {:class (utils/class-set {:su-snapshot true
                                          :main-scroll true
                                          :has-navbar (not prior-list)})}
@@ -114,7 +115,8 @@
           (when (and company-data
                      (not prior-list))
             ;; Navbar
-            (om/build navbar {:card-width (responsive/calc-card-width)
+            (om/build navbar {:card-width card-width
+                              :header-width (responsive/total-layout-width-int card-width columns-num)
                               :columns-num columns-num
                               :company-data company-data
                               :foce-key nil

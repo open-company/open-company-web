@@ -11,6 +11,7 @@
             [open-company-web.router :as router]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.jwt :as jwt]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.footer :as footer]
             [open-company-web.components.ui.login-required :refer (login-required)]
             [open-company-web.components.user-invitation :refer (user-invitation)]
@@ -109,4 +110,6 @@
             (dom/div {:class "company-settings-container"}
               (user-management))))
 
-        (om/build footer/footer data)))))
+        (let [columns-num (responsive/columns-num)
+              card-width (responsive/calc-card-width)]
+         (om/build footer/footer (assoc data :footer-width (responsive/total-layout-width-int card-width columns-num))))))))

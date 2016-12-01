@@ -70,7 +70,7 @@
 
   (render-state [_ {:keys [columns-num card-width su-list selected-su]}]
     (let [company-data (dis/company-data data)
-          total-width-int (responsive/total-layout-width-int card-width columns-num)
+          total-width-int (:total-width-int data)
           total-width (str total-width-int "px")
           fixed-card-width (responsive/calc-update-width columns-num)
           su-data (dis/stakeholder-update-data data (:slug company-data) selected-su)
@@ -122,13 +122,15 @@
       (events/unlistenByKey resize-listener)))
 
   (render-state [_ {:keys [columns-num card-width]}]
-    (let [company-data (dis/company-data data)]
+    (let [company-data (dis/company-data data)
+          total-width-int (min responsive/updates-max-total-width (responsive/total-layout-width-int card-width columns-num))]
       (if-not (dis/stakeholder-update-list-data data)
         (dom/div {:class "oc-loading active"} (dom/i {:class "fa fa-circle-o-notch fa-spin"}))
         (dom/div {:class "updates main-scroll group"}
           (dom/div {:class "page"}
             (om/build navbar (merge data {:card-width card-width
                                           :columns-num columns-num
+                                          :header-width total-width-int
                                           :company-data company-data
                                           :show-share-su-button (utils/can-edit-sections? company-data)
                                           :active :updates}))
@@ -136,7 +138,5 @@
               (oc-switch :updates))
             (if (responsive/is-mobile-size?)
               (prior-updates true nil)
-              (om/build updates data)))
-          (om/build footer {:card-width card-width
-                      :columns-num columns-num
-                      :company-data company-data}))))))
+              (om/build updates (merge data {:total-width-int total-width-int}))))
+          (om/build footer {:footer-width total-width-int}))))))
