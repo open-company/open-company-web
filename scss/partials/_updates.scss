@@ -1,6 +1,10 @@
 div.updates {
   background-color: $oc_gray_8;
 
+  @include mobile(){
+    padding-top: #{$mobile_navbar_height}px;
+  }
+
   div.updates-inner {
     min-height: calc(100vh - #{$footer_small_height}px);
     background-color: $oc_gray_8;
