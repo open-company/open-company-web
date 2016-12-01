@@ -96,8 +96,8 @@
               (dom/h3 {:class "updates-content-cards-title"} update-title))
             (when su-data
               (om/build topics-columns {:columns-num 1
-                                        :card-width (- fixed-card-width 10) ; remove 10 padding on the right
-                                        :total-width (- fixed-card-width 10)
+                                        :card-width (- fixed-card-width 60) ; remove 60 padding
+                                        :total-width (- fixed-card-width 60)
                                         :is-stakeholder-update true
                                         :content-loaded (not (:loading data))
                                         :topics (:sections su-data)
