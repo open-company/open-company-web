@@ -31,6 +31,14 @@ div.topic-list{
   }
 }
 
+div.company-dashboard.small-navbar {
+  div.topic-list{
+    @include big_web(){
+      padding-top: #{$mobile_navbar_height}px;
+    }
+  }
+}
+
 div.selected-topic-container{
   background-color: rgba(78, 90, 107, 0.5);
   width: 100%;

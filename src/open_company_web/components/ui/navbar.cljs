@@ -52,7 +52,8 @@
                               foce-key
                               mobile-menu-open
                               header-width
-                              su-navbar] :as data} owner options]
+                              su-navbar
+                              show-navigation-bar] :as data} owner options]
 
   (did-mount [_]
     (when-not (and (responsive/is-mobile-size?)
@@ -77,10 +78,10 @@
                                             show-share-su-button                     ; wants to
                                             true))
           should-show-left-links (and (router/current-company-slug)
-                                      (pos? (:count (utils/link-for (:links company-data) "stakeholder-updates"))))]
+                                      show-navigation-bar)]
       (dom/nav {:class (utils/class-set {:oc-navbar true
                                          :group true
-                                         :su-navbar su-navbar
+                                         :small-navbar (or su-navbar (not show-navigation-bar))
                                          :mobile-menu-open mobile-menu-open
                                          :no-jwt (not (jwt/jwt))})}
         (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
@@ -113,40 +114,41 @@
             ;; Render the menu here only on mobile so it can expand the navbar
             (om/build menu {:mobile-menu-open mobile-menu-open})
             ;; Render the bottom part of the navbar when not on mobile
-            (dom/div {:class "oc-navbar-bottom group"
-                      :style {:width (str header-width "px")}}
-              (dom/div {:class "left"}
-                (when should-show-left-links
-                  (dom/a {:class (when (= active :dashboard) "active")
-                          :href (oc-urls/company)
-                          :on-click #(do
-                                       (utils/event-stop %)
-                                       (router/nav! (oc-urls/company)))}
-                    "Dashboard"))
-                (when should-show-left-links
-                  (dom/a {:class (when (= active :updates) "active")
-                          :href (oc-urls/stakeholder-update-list)
-                          :on-click (fn [e]
-                                      (utils/event-stop e)
-                                      (dis/dispatch! [:reset-su-list])
-                                      (utils/after 100 #(router/nav! (oc-urls/stakeholder-update-list))))}
-                    "Updates")))
-              (dom/div {:class "right"}
-                (when fixed-show-share-su-button
-                  (dom/div {:class "sharing-button-container"}
-                    (dom/a {:class "btn-reset sharing-button right"
-                            :title (share-new-tooltip)
-                            :data-toggle "tooltip"
-                            :data-container "body"
-                            :data-placement "left"
-                            :on-click #(router/nav! (oc-urls/stakeholder-update-preview))}
-                      "Share new update")))
-                (when create-update-share-button-cb
-                  (dom/div {:class "sharing-button-container"}
-                    (dom/button {:class "btn-reset btn-solid"
-                                 :title (share-tooltip)
-                                 :data-toggle "tooltip"
-                                 :data-container "body"
-                                 :data-placement "left"
-                                 :on-click create-update-share-button-cb
-                                 :disabled create-update-share-button-disabled} "SHARE")))))))))))
+            (when show-navigation-bar
+              (dom/div {:class "oc-navbar-bottom group"
+                        :style {:width (str header-width "px")}}
+                (dom/div {:class "left"}
+                  (when should-show-left-links
+                    (dom/a {:class (when (= active :dashboard) "active")
+                            :href (oc-urls/company)
+                            :on-click #(do
+                                         (utils/event-stop %)
+                                         (router/nav! (oc-urls/company)))}
+                      "Dashboard"))
+                  (when should-show-left-links
+                    (dom/a {:class (when (= active :updates) "active")
+                            :href (oc-urls/stakeholder-update-list)
+                            :on-click (fn [e]
+                                        (utils/event-stop e)
+                                        (dis/dispatch! [:reset-su-list])
+                                        (utils/after 100 #(router/nav! (oc-urls/stakeholder-update-list))))}
+                      "Updates")))
+                (dom/div {:class "right"}
+                  (when fixed-show-share-su-button
+                    (dom/div {:class "sharing-button-container"}
+                      (dom/a {:class "btn-reset sharing-button right"
+                              :title (share-new-tooltip)
+                              :data-toggle "tooltip"
+                              :data-container "body"
+                              :data-placement "left"
+                              :on-click #(router/nav! (oc-urls/stakeholder-update-preview))}
+                        "Share new update")))
+                  (when create-update-share-button-cb
+                    (dom/div {:class "sharing-button-container"}
+                      (dom/button {:class "btn-reset btn-solid"
+                                   :title (share-tooltip)
+                                   :data-toggle "tooltip"
+                                   :data-container "body"
+                                   :data-placement "left"
+                                   :on-click create-update-share-button-cb
+                                   :disabled create-update-share-button-disabled} "SHARE"))))))))))))
