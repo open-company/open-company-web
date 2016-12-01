@@ -110,6 +110,7 @@
           card-width   (responsive/calc-card-width)]
       (dom/div {:class (utils/class-set {:su-snapshot true
                                          :main-scroll true
+                                         :group true
                                          :has-navbar (not prior-list)})}
         (dom/div {:class "page"}
           (when (and company-data
@@ -135,7 +136,8 @@
 
           ;; SU Snapshot
           (when company-data
-            (dom/div {:class "su-sp-content"}
+            (dom/div {:class "su-sp-content"
+                       :style {:width (str fixed-card-width "px")}}
 
               ;; Fullscreen topic
               (when selected-topic
@@ -174,15 +176,14 @@
               (dom/div {:class "su-sp-company-header"}
                 (dom/div {:class "su-snapshot-title"} title))
               (om/build topics-columns {:columns-num 1
-                                        :card-width (- fixed-card-width 10)
-                                        :total-width (- fixed-card-width 10)
+                                        :card-width (- fixed-card-width 60)
+                                        :total-width (- fixed-card-width 60)
                                         :content-loaded (not (:loading data))
                                         :topics (:sections su-data)
                                         :topics-data su-data
                                         :company-data company-data
                                         :hide-add-topic true
                                         :is-stakeholder-update true}
-                                       {:opts {:topic-click (partial topic-click owner)}})))
-          (when company-data
-            (dom/div {:class "su-sp-footer"} "Updates by "
-              (dom/a {:href "https://opencompany.com"} "OpenCompany"))))))))
+                                       {:opts {:topic-click (partial topic-click owner)}})
+              (dom/div {:class "su-sp-footer"} "Updates by "
+                (dom/a {:href "https://opencompany.com"} "OpenCompany")))))))))
