@@ -96,6 +96,10 @@ nav.oc-navbar {
     padding: 0 34px;
     margin-top: 10px;
 
+    div.oc-navbar-header-container{
+      height: 45px;
+    }
+
     div.oc-navbar-separator {
       border-bottom: 1px solid rgba(78,90,107,0.1);
       padding-top: 10px;
