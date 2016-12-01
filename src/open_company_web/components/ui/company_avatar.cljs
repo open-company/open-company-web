@@ -20,9 +20,11 @@
             is-profile-page (utils/in? (:route @router/path) "profile")
             read-only-company (:read-only company-data)
             company-logo (:logo company-data)
-            should-show-link (if (:su-navbar data)
+            su-navbar (:su-navbar data)
+            should-show-link (if su-navbar
                                   (utils/link-for (:links (dis/stakeholder-update-data)) "company" "GET")
                                   true)
+            show-company-avatar? (and su-navbar (not (clojure.string/blank? company-logo)))
             company-home (if should-show-link (oc-urls/company) "")]
         (dom/div {:class (utils/class-set {:company-avatar true
                                            :navbar-brand (:navbar-brand data)})}
@@ -33,10 +35,10 @@
                               (when should-show-link
                                 (router/nav! company-home)))}
             (dom/div {:class "company-avatar-container group"}
-              ; (when-not (clojure.string/blank? company-logo)
-              ;   (dom/div {:class "company-avatar-border"}
-              ;     (dom/span {:class "helper"})
-              ;     (dom/img {:src company-logo
-              ;               :class "company-avatar-img"
-              ;               :title company-name})))
-              (dom/span {:class (str "company-name " (when (clojure.string/blank? company-logo) "no-logo"))} company-name))))))))
+              (when show-company-avatar?
+                (dom/div {:class "company-avatar-border"}
+                  (dom/span {:class "helper"})
+                  (dom/img {:src company-logo
+                            :class "company-avatar-img"
+                            :title company-name})))
+              (dom/span {:class (str "company-name " (when-not show-company-avatar? "no-logo"))} company-name))))))))
