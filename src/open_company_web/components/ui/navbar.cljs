@@ -86,7 +86,7 @@
           (login-overlays-handler))
         (dom/div {:class "oc-navbar-header group"
                   :style {:width (str header-width "px")}}
-          (dom/div {:class "group"}
+          (dom/div {:class "oc-navbar-header-container group"}
             (if (utils/in? (:route @router/path) "companies")
               (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
                 (dom/img {:src "/img/oc-wordmark.svg" :style {:height "25px" :margin-top "12px"}}))
