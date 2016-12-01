@@ -134,38 +134,26 @@
 
 (def topic-list-x-padding 20)
 (def topic-total-x-padding 20)
-(def left-topics-list-width 150)
+(def left-topics-list-width 210)
 
 (defn calc-card-width [& [force-columns]]
   (let [win-width (ww)
         columns (or force-columns (columns-num))]
-    (if-not (is-mobile-size?)
-      (cond
-        (= columns 3)
-        (min (/ (- win-width
-                   (* topic-list-x-padding 2)
-                   (* topic-total-x-padding 3)
-                   left-topics-list-width)
-                3)
-             420)
-        (= columns 2)
-        (max (/ (- win-width
-                   (* topic-list-x-padding 2)
-                   (* topic-total-x-padding 2)
-                   left-topics-list-width)
-                2)
-             10))
-      (let [;; get params based on columns number
-            min-win-width (get-min-win-width columns)
-            win-diff (get-win-diff columns)
-            win-card-diff (get-win-card-diff columns)
-            min-card-delta (get-min-card-delta columns)
-            ;; calculations
-            win-delta-width (- win-width min-win-width)
-            perc-win-delta  (/ (* win-delta-width 100) win-diff)
-            diff-delta      (* (/ win-card-diff 100) perc-win-delta)
-            delta           (+ min-card-delta diff-delta)]
-          (/ win-width delta)))))
+    (cond
+      (= columns 3)
+      (min (/ (- win-width
+                 (* topic-list-x-padding 2)
+                 (* topic-total-x-padding 3)
+                 left-topics-list-width)
+              3)
+           420)
+      (= columns 2)
+      (max (/ (- win-width
+                 (* topic-list-x-padding 2)
+                 (* topic-total-x-padding 2)
+                 left-topics-list-width)
+              2)
+           230))))
 
 (defn can-edit? []
   "Check if it's mobile based only on the UserAgent"
