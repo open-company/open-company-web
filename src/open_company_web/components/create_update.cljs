@@ -93,7 +93,7 @@
 
   (render-state [_ {:keys [columns-num card-width su-title su-topics show-su-dialog]}]
     (let [company-data (dis/company-data data)
-          total-width-int (min responsive/updates-max-total-width (responsive/total-layout-width-int card-width columns-num))
+          total-width-int (responsive/total-layout-width-int card-width columns-num)
           total-width (str total-width-int "px")
           fixed-card-width (responsive/calc-update-width columns-num)]
       (dom/div {:class "create-update main-scroll group"}

@@ -123,7 +123,7 @@
 
   (render-state [_ {:keys [columns-num card-width]}]
     (let [company-data (dis/company-data data)
-          total-width-int (min responsive/updates-max-total-width (responsive/total-layout-width-int card-width columns-num))]
+          total-width-int (responsive/total-layout-width-int card-width columns-num)]
       (if-not (dis/stakeholder-update-list-data data)
         (dom/div {:class "oc-loading active"} (dom/i {:class "fa fa-circle-o-notch fa-spin"}))
         (dom/div {:class "updates main-scroll group"}
