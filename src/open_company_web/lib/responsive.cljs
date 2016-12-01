@@ -9,6 +9,9 @@
 ; 1 column 420 diff: 263: |131|420|131|
 
 (def mobile-2-columns-breakpoint 320)
+;; 3 Columns
+(def c3-min-win-width 1024)
+(def c1-min-win-width 414)
 
 (defn ww []
   (when (and js/document
@@ -18,30 +21,6 @@
 
 (defn window-exceeds-breakpoint []
   (> (ww) mobile-2-columns-breakpoint))
-
-;; 3 Columns
-; (def c3-max-win-width 1900) (def c3-max-card-width 350)
-(def c3-max-win-width 1270) (def c3-max-card-width 340)
-(def c3-min-win-width 1060) (def c3-min-card-width 300)
-(def c3-win-card-diff (- (/ c3-max-win-width c3-max-card-width) (/ c3-min-win-width c3-min-card-width)))
-(def c3-win-diff (- c3-max-win-width c3-min-win-width))
-(def c3-min-card-delta (/ c3-min-win-width c3-min-card-width))
-
-;; 2 Columns
-(def c2-max-win-width 1059) (def c2-max-card-width 410)
-(def c2-padding (if (> (ww) big-web-min-width) 80 60))
-(def c2-min-win-width mobile-2-columns-breakpoint) (def c2-min-card-width (/ (- mobile-2-columns-breakpoint c2-padding) 2))
-(def c2-win-card-diff (- (/ c2-max-win-width c2-max-card-width) (/ c2-min-win-width c2-min-card-width)))
-(def c2-win-diff (- c2-max-win-width c2-min-win-width))
-(def c2-min-card-delta (/ c2-min-win-width c2-min-card-width))
-
-;; 1 Columns
-(def c1-max-win-width (dec mobile-2-columns-breakpoint)) (def c1-max-card-width (- (dec mobile-2-columns-breakpoint) 263))
-(def c1-min-win-width 414) (def c1-min-card-width 396)
-(def c1-win-card-diff (- (/ c1-max-win-width c1-max-card-width) (/ c1-min-win-width c1-min-card-width)))
-(def c1-win-diff (- c1-max-win-width c1-min-win-width))
-(def c1-min-card-delta (/ c1-min-win-width c1-min-card-width))
-
 
 (defn dashboard-columns-num []
   (let [win-width (ww)]
@@ -62,37 +41,6 @@
       2
       :else
       1)))
-
-(defn win-width [columns]
-  (let [win-width (ww)]
-    (case columns
-      3 (max (min win-width c3-max-win-width) c3-min-win-width)
-      2 (max (min win-width c2-max-win-width) c2-min-win-width)
-      1 (max (min win-width c1-max-win-width) c1-min-win-width))))
-
-(defn get-min-win-width [columns]
-  (case columns
-    3 c3-min-win-width
-    2 c2-min-win-width
-    1 c1-min-win-width))
-
-(defn get-win-diff [columns]
-  (case columns
-    3 c3-win-diff
-    2 c2-win-diff
-    1 c1-win-diff))
-
-(defn get-win-card-diff [columns]
-  (case columns
-    3 c3-win-card-diff
-    2 c2-win-card-diff
-    1 c1-win-card-diff))
-
-(defn get-min-card-delta [columns]
-  (case columns
-    3 c3-min-card-delta
-    2 c2-min-card-delta
-    1 c1-min-card-delta))
 
 (def _mobile (atom -1))
 
@@ -134,7 +82,15 @@
 
 (def topic-list-x-padding 20)
 (def topic-total-x-padding 20)
-(def left-topics-list-width 210)
+(def left-topics-list-width 185)
+
+(defn is-tablet-or-mobile? []
+  ;; check if it's test env, can't import utils to avoid circular dependencies
+  (if (not (not (.-_phantom js/window)))
+    false
+    (or (= (gobj/get js/WURFL "form_factor") "Tablet")
+        (= (gobj/get js/WURFL "form_factor") "Smartphone")
+        (= (gobj/get js/WURFL "form_factor") "Other Mobile"))))
 
 (defn calc-card-width [& [force-columns]]
   (let [win-width (ww)
@@ -144,14 +100,14 @@
       (min (/ (- win-width
                  (* topic-list-x-padding 2)
                  (* topic-total-x-padding 3)
-                 left-topics-list-width)
+                 (if (is-tablet-or-mobile?) 0 left-topics-list-width))
               3)
            420)
       (= columns 2)
       (max (/ (- win-width
                  (* topic-list-x-padding 2)
                  (* topic-total-x-padding 2)
-                 left-topics-list-width)
+                 (if (is-tablet-or-mobile?) 0 left-topics-list-width))
               2)
            230))))
 
@@ -164,14 +120,6 @@
     (if (> win-width big-web-min-width)
       big-web-min-width
       (min card-width win-width))))
-
-(defn is-tablet-or-mobile? []
-  ;; check if it's test env, can't import utils to avoid circular dependencies
-  (if (not (not (.-_phantom js/window)))
-    false
-    (or (= (gobj/get js/WURFL "form_factor") "Tablet")
-        (= (gobj/get js/WURFL "form_factor") "Smartphone")
-        (= (gobj/get js/WURFL "form_factor") "Other Mobile"))))
 
 (def mobile-topic-total-x-padding 4)
 (def updates-content-list-width 280)
