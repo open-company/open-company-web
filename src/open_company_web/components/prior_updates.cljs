@@ -81,7 +81,7 @@
                     "As updates are shared by email, Slack or URL, they show up here so they are easy to find and read."
                     "This is where you’ll find company updates once you’ve shared with others. Create some topics on your dashboard first, then you’ll be able to give it a try.")])]
 
-            [:div.update-container.pt2
+            [:div.update-container
               (for [update updates]
                 (let [user-id (:user-id (drv/react s :jwt))
                       author-id (-> update :author :user-id)

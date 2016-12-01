@@ -14,6 +14,11 @@ div.prior-updates {
 
   div.prior-updates-container {
     text-align: left;
+    padding-top: 0px;
+
+    @include mobile() {
+      padding-top: 1rem;
+    }
 
     div.message-container {
       @include mobile() {
