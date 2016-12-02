@@ -175,7 +175,8 @@
           topic-click           (or (:topic-click options) identity)
           update-active-topics  (or (:update-active-topics options) identity)
           slug                  (keyword (router/current-company-slug))
-          window-scroll         (.-scrollTop (.-body js/document))]
+          window-scroll         (.-scrollTop (.-body js/document))
+          is-dashboard          (:is-dashboard props)]
       (if (= section-name "add-topic")
         (at/add-topic {:column column
                        :archived-topics (mapv (comp keyword :section) (:archived company-data))
@@ -185,11 +186,10 @@
                                                 (zero? (count topics)))
                        :update-active-topics update-active-topics})
         (let [sd (->> section-name keyword (get topics-data))
-              is-dashboard? (utils/in? (:route @router/path) "dashboard")
               topic-row-style (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
                                       (utils/in? (:route @router/path) "su-list"))
                                 #js {}
-                                #js {:width (if is-dashboard?
+                                #js {:width (if is-dashboard
                                               (if (responsive/window-exceeds-breakpoint)
                                                 (str (:card-width props) "px")
                                                 "auto")
@@ -211,7 +211,8 @@
                                :read-only-company (:read-only company-data)
                                :currency (:currency company-data)
                                :foce-key (:foce-key props)
-                               :foce-data (:foce-data props)}
+                               :foce-data (:foce-data props)
+                               :is-dashboard is-dashboard}
                                {:opts {:section-name section-name
                                        :topic-click (partial topic-click section-name)}}))))))))
 
@@ -222,11 +223,8 @@
                                       topics
                                       company-data
                                       topics-data
+                                      is-dashboard
                                       is-stakeholder-update] :as data} owner options]
-
-  (init-state [_]
-    {:best-layout nil
-     :selected-topic-view (router/current-section)})
 
   (did-mount [_]
     (when (> columns-num 1)
@@ -238,12 +236,12 @@
                    (not= (:columns-num next-props) (:columns-num data))))
       (om/set-state! owner :best-layout (calc-layout owner next-props))))
 
-  (render-state [_ {:keys [best-layout selected-topic-view]}]
-    (let [show-add-topic        (add-topic? owner)
+  (render-state [_ {:keys [best-layout]}]
+    (let [selected-topic-view   (:selected-topic-view data)
+          show-add-topic        (add-topic? owner)
           partial-render-topic  (partial render-topic owner options)
           columns-container-key (apply str topics)
-          is-dashboard? (utils/in? (:route @router/path) "dashboard")
-          topics-column-conatiner-style (if is-dashboard?
+          topics-column-conatiner-style (if is-dashboard
                                           (if (responsive/window-exceeds-breakpoint)
                                             #js {:width total-width}
                                             #js {:margin "0px 9px"
@@ -262,20 +260,21 @@
           (> columns-num 1)
           (dom/div {:class (utils/class-set {:topics-column-container true
                                              :group true
-                                             :tot-col-3 (and is-dashboard?
+                                             :tot-col-3 (and is-dashboard
                                                              (= columns-num 3))
-                                             :tot-col-2 (and is-dashboard?
+                                             :tot-col-2 (and is-dashboard
                                                              (= columns-num 2))})
                     :style topics-column-conatiner-style
                     :key columns-container-key}
             (when-not (responsive/is-tablet-or-mobile?)
-              (om/build bw-topics-list (assoc data :selected-topic-view-cb #(om/set-state! owner :selected-topic-view %))))
-            (if (and (not (responsive/is-tablet-or-mobile?))
+              (om/build bw-topics-list data))
+            (if (and is-dashboard
+                     (not (responsive/is-tablet-or-mobile?))
                      selected-topic-view)
-              (om/build topic-view {:topic-name selected-topic-view
-                                    :card-width card-width
+              (om/build topic-view {:card-width card-width
                                     :columns-num columns-num
-                                    :company-data company-data})
+                                    :company-data company-data
+                                    :selected-topic-view selected-topic-view})
               ; for each column key contained in best layout
               (dom/div {:class "right" :style {:width (str (- (int total-width) responsive/left-topics-list-width) "px")}}
                 (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
