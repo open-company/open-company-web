@@ -12,10 +12,22 @@ div.topic-view {
     padding: 20px 0px;
     float: left;
 
-    div.topic {
-      border: none;
-      box-shadow: none;
-      float: left;
+    div.revision-container{
+      margin: 20px 0px;
+
+      hr.separator-line {
+        margin: 20px 0px;
+        padding: 0;
+        height: 1px;
+        background-color: rgba(78,90,107,0.2);
+      }
+
+      div.topic {
+        border: none;
+        box-shadow: none;
+        float: left;
+        background-color: transparent;
+      }
     }
   }
 }
