@@ -218,7 +218,7 @@
           next-rev (utils/revision-next revisions as-of)
           slug (keyword (router/current-company-slug))
           all-revisions (dis/revisions slug)
-          revisions-list (section-kw all-revisions)
+          revisions-list (get all-revisions section-kw {})
           topic-data (utils/select-section-data section-data section-kw as-of)
           rev-cb (fn [_ rev] (om/set-state! owner :transition-as-of (:updated-at rev)))
           foce-active (not (nil? (dis/foce-section-key)))
@@ -270,8 +270,7 @@
                                       :foce-key (:foce-key data)
                                       :foce-data (:foce-data data)
                                       :prev-rev prev-rev
-                                      :next-rev next-rev
-                                      :show-first-edit-tip (:show-first-edit-tip data)}
+                                      :next-rev next-rev}
                                      {:opts (merge options {:rev-click rev-cb})
                                       :key (str "topic-foce-" section)})
                 (om/build topic-internal {:section section
