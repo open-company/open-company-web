@@ -199,7 +199,8 @@
                                             :revisions-cache
                                             :title-placeholder
                                             :body-placeholder
-                                            :oc-editing)
+                                            :oc-editing
+                                            :revisions-data)
           json-data (cljs->json section-data)
           section-link (utils/link-for links "update" "PUT")]
       (api-put (:href section-link)
@@ -240,7 +241,7 @@
           section-kw (keyword section)
           company-data (dispatcher/company-data)
           section-data (get company-data section-kw)
-          clean-partial-section-data (dissoc partial-section-data :as-of :icon :section)
+          clean-partial-section-data (dissoc partial-section-data :as-of :icon :section :revisions-data)
           json-data (cljs->json clean-partial-section-data)
           partial-update-link (utils/link-for (:links section-data) "partial-update" "PATCH")]
       (api-patch (:href partial-update-link)
@@ -280,7 +281,7 @@
   (when finances-data
     (let [links (:links finances-data)
           slug (router/current-company-slug)
-          data {:data (map #(dissoc % :burn-rate :runway :value :new :read-only) (:data finances-data))}
+          data {:data (map #(dissoc % :burn-rate :runway :value :new :read-only :revisions-data) (:data finances-data))}
           json-data (cljs->json data)
           finances-link (utils/link-for links "partial-update" "PATCH")]
       (api-patch (:href finances-link)
@@ -571,3 +572,15 @@
             (update-jwt-cookie! body)
             (dispatcher/dispatch! [:jwt (j/get-contents)]))
           (utils/after 100 #(dispatcher/dispatch! [:collect-name-pswd-finish status])))))))
+
+(defn load-revisions [slug topic revisions-link]
+  (when (and topic revisions-link)
+    (api-get (:href revisions-link)
+      {:headers {
+        ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type, Authorization"
+          ; custom content type
+          "content-type" (:type revisions-link)
+          "accept" (:type revisions-link)}}
+      (fn [{:keys [status body success]}]
+        (dispatcher/dispatch! [:revisions-loaded {:slug slug :topic topic :revisions (if success (json->cljs body) {})}])))))
