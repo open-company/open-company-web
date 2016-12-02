@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]))
 
@@ -31,4 +32,6 @@
         (when (= (get-in data [:jwt :auth-source]) "slack")
           (dom/div {:class "user-profile-disclaimer"}
             "User information is from your Slack account.")))
-      (om/build footer data))))
+      (let [columns-num (responsive/columns-num)
+            card-width (responsive/calc-card-width)]
+        (om/build footer (assoc data :footer-width (responsive/total-layout-width-int card-width columns-num)))))))

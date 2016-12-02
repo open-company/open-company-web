@@ -1,30 +1,3 @@
-$bd_color: rgba(217,217,217,0.8); //#d9d9d9; //rgba(249, 215, 72, 0.5);
-
-div.topics-columns.sharing-mode {
-  div.topic {
-    opacity: 0.5;
-    border: 4px solid $bd_color;
-    box-shadow: none;
-
-    &:hover {
-      opacity: 1;
-      border: 4px solid $bd_color;
-      box-shadow: none;
-    }
-
-    &.sharing-selected {
-      opacity: 1;
-      border: 4px solid $oc_yellow;
-    }
-  }
-}
-
-div.dnd-active {
-  div.topic:not(.draggable-topic) {
-    opacity: 0.2;
-  }
-}
-
 div.topic {
   height: 100%;
   text-align: left;
@@ -110,59 +83,6 @@ div.topic {
     }
   }
 
-  div.share-remove-container{
-    width: 30px;
-    height: 30px;
-    position: absolute;
-    top: 0;
-    right: -35px;
-    display: none;
-
-    button.share-remove {
-      width: 30px;
-      height: 30px;
-      border-radius: 15px;
-      background-color: white;
-      border: 1px solid rgba(78, 90, 107, 0.5);
-
-      div.svg-icon {
-        padding-left: 2px;
-        margin-top: -14px;
-      }
-    }
-
-    div.tooltip div.tooltip-inner {
-      white-space: nowrap !important;
-    }
-  }
-
-  div.share-dnd-container{
-    width: 30px;
-    height: 30px;
-    position: absolute;
-    top: 35px;
-    right: -35px;
-    display: none;
-
-    div.share-dnd {
-      width: 30px;
-      height: 30px;
-      border-radius: 15px;
-      background-color: white;
-      padding: 3px 8.5px;
-      border: 1px solid rgba(78, 90, 107, 0.5);
-
-      i.fa {
-        font-size: 12px;
-        color: rgba(78, 90, 107, 0.5);
-      }
-    }
-
-    div.tooltip div.tooltip-inner {
-      white-space: nowrap !important;
-    }
-  }
-
   div.topic-anim{
     position: relative;
     height: auto;
@@ -201,15 +121,6 @@ div.topic {
         &:hover {
           color: rgba(78,90,107,1);
         }
-      }
-
-      div.pinned-topic{
-        font-size: 12px;
-        float: left;
-        z-index: 100;
-        margin-top: 14px;
-        color: rgba(78, 90, 107, 0.5);
-        margin-left: 5px;
       }
 
       & > div{

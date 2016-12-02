@@ -25,30 +25,6 @@
         topics-list (for [topic topics] (.data (js/jQuery topic) "topic"))]
     (vec (remove nil? topics-list))))
 
-(defn remove-pinned
-  "Set all pin flag to false for all sections in the company data to avoid
-   topics-columns component order them by pinned/unpinned."
-  [data]
-  ; loop through all the kyes of the passed company-data map
-  (loop [topics data
-         all-keys (vec (keys data))
-         idx 0]
-    (if (= idx (count all-keys))
-      ; if we reached the last key return the updated data
-      topics
-      ; if not set false to the pin key if the examined k is for a map
-      (let [k (get all-keys idx)
-            v (get topics k)
-            new-v (if (map? v)
-                    (if (contains? v :pin)
-                      (assoc v :pin false)
-                      v)
-                    v)]
-         ; loop to the next key
-         (recur (assoc topics k new-v)
-                all-keys
-                (inc idx))))))
-
 (defn patch-stakeholder-update [owner]
   (let [title  (om/get-state owner :su-title)
        topics (om/get-state owner :su-topics)]
@@ -90,11 +66,9 @@
        :su-topics (vec su-topics)
        :su-title (:title su-data)
        :should-update-data true
-       :no-pinned-topics (remove-pinned (dis/company-data data))
        :show-su-dialog false}))
 
   (will-receive-props [_ next-props]
-    (om/set-state! owner :no-pinned-topics (remove-pinned (dis/company-data next-props)))
     (when (om/get-state owner :should-update-data)
       (let [company-data (dis/company-data next-props)
             su-data (:stakeholder-update company-data)
@@ -117,7 +91,7 @@
     (when-let [resize-listener (om/get-state owner :resize-listener)]
       (events/unlistenByKey resize-listener)))
 
-  (render-state [_ {:keys [columns-num card-width su-title su-topics no-pinned-topics show-su-dialog]}]
+  (render-state [_ {:keys [columns-num card-width su-title su-topics show-su-dialog]}]
     (let [company-data (dis/company-data data)
           total-width-int (responsive/total-layout-width-int card-width columns-num)
           total-width (str total-width-int "px")
@@ -126,12 +100,14 @@
         (dom/div {:class "page"}
           (om/build navbar {:card-width card-width
                             :columns-num columns-num
+                            :header-width total-width-int
                             :company-data company-data
                             :foce-key (:foce-key data)
                             :show-share-su-button false
                             :create-update-share-button-cb #(share-clicked owner)
                             :create-update-share-button-disabled (zero? (count su-topics))
                             :active nil
+                            :show-navigation-bar (utils/company-has-topics? company-data)
                             :mobile-menu-open (:mobile-menu-open data)
                             :auth-settings (:auth-settings data)})
           (dom/div {:class "create-update-inner group navbar-offset"}
@@ -192,10 +168,7 @@
                                           :is-stakeholder-update true
                                           :content-loaded (not (:loading data))
                                           :topics su-topics
-                                          :topics-data no-pinned-topics
-                                          :company-data no-pinned-topics
-                                          :hide-add-topic true
-                                          :show-share-remove false}))))
-          (om/build footer {:card-width card-width
-                            :columns-num columns-num
-                            :company-data company-data}))))))
+                                          :topics-data company-data
+                                          :company-data company-data
+                                          :hide-add-topic true}))))
+          (om/build footer {:footer-width total-width-int}))))))

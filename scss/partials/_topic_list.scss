@@ -1,8 +1,6 @@
-body.small-footer{
-  div.topic-list {
-    min-height: calc(100vh - #{$footer_small_height}px);
-
-    &.sharing-mode {
+@include big_web(){
+  body.small-footer{
+    div.topic-list {
       min-height: calc(100vh - #{$footer_small_height}px);
     }
   }
@@ -33,11 +31,13 @@ div.topic-list{
   @include big_web(){
     padding-top: #{$navbar_height}px;
   }
+}
 
-  div.sharing-button-container {
-    height: 30px;
-    margin: 0 auto;
-    padding: 29px;
+div.company-dashboard.small-navbar {
+  div.topic-list{
+    @include big_web(){
+      padding-top: #{$mobile_navbar_height}px;
+    }
   }
 }
 

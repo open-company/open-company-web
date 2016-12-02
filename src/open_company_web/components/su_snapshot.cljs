@@ -23,13 +23,11 @@
 (defn close-overlay-cb [owner]
   (om/set-state! owner :transitioning false)
   (om/set-state! owner :selected-topic nil)
-  (om/set-state! owner :selected-metric nil)
-  (.pushState js/history nil "Stakeholder update" (oc-urls/stakeholder-update (router/current-company-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug))))
+  (om/set-state! owner :selected-metric nil))
 
 (defn topic-click [owner topic selected-metric]
   (om/set-state! owner :selected-topic topic)
-  (om/set-state! owner :selected-metric selected-metric)
-  (.pushState js/history nil (name topic) (oc-urls/stakeholder-update-section  (router/current-company-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug) topic)))
+  (om/set-state! owner :selected-metric selected-metric))
 
 (defn switch-topic [owner is-left?]
   (when (and (om/get-state owner :topic-navigation)
@@ -59,7 +57,6 @@
 (defn animation-finished [owner]
   (let [cur-state (om/get-state owner)
         new-topic (:tr-selected-topic cur-state)]
-    (.pushState js/history nil (name new-topic) (oc-urls/stakeholder-update-section (router/current-company-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug) new-topic))
     (om/set-state! owner (merge cur-state {:selected-topic (:tr-selected-topic cur-state)
                                            :transitioning true
                                            :tr-selected-topic nil}))))
@@ -109,7 +106,8 @@
           fixed-card-width (responsive/calc-update-width (responsive/columns-num))
           title        (if (clojure.string/blank? (:title su-data))
                           (str (:name company-data) " Update")
-                          (:title su-data))]
+                          (:title su-data))
+          card-width   (responsive/calc-card-width)]
       (dom/div {:class (utils/class-set {:su-snapshot true
                                          :main-scroll true
                                          :has-navbar (not prior-list)})}
@@ -117,7 +115,8 @@
           (when (and company-data
                      (not prior-list))
             ;; Navbar
-            (om/build navbar {:card-width (responsive/calc-card-width)
+            (om/build navbar {:card-width card-width
+                              :header-width (responsive/total-layout-width-int card-width columns-num)
                               :columns-num columns-num
                               :company-data company-data
                               :foce-key nil

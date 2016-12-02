@@ -8,10 +8,9 @@
 
 (defcomponent login [data owner]
   (render [_]
-    (let [card-width  (responsive/calc-card-width)]
+    (let [columns-num (responsive/columns-num)
+          card-width  (responsive/calc-card-width)]
       (dom/div {:class "login fullscreen-page"}
         (dom/div {:class "login-internal"}
           (login-required data))
-        (om/build footer {:su-preview false
-                          :card-width card-width
-                          :columns-num (responsive/columns-num)})))))
+        (om/build footer {:footer-width (responsive/total-layout-width-int card-width columns-num)})))))

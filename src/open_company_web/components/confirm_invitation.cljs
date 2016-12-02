@@ -57,5 +57,6 @@
           (dom/img {:src "/img/oc-logo-gold.png"})
           (dom/div {:class "confirm-invitation-p group"}
             (dom/p {:class ""} "OpenCompany makes it easy to see the big picture. Companies are stronger when everyone knows what matters most."))))
-      (om/build footer {:columns-num (responsive/columns-num)
-                        :card-width (responsive/calc-card-width)}))))
+      (let [columns-num (responsive/columns-num)
+            card-width (responsive/calc-card-width)]
+        (om/build footer {:footer-width (responsive/total-layout-width-int card-width columns-num)})))))

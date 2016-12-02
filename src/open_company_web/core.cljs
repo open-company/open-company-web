@@ -22,13 +22,11 @@
             [open-company-web.components.company-dashboard :refer (company-dashboard)]
             [open-company-web.components.company-settings :refer (company-settings)]
             [open-company-web.components.user-management :refer (user-management-wrapper)]
-            [open-company-web.components.su-edit :refer (su-edit)]
             [open-company-web.components.create-update :refer (create-update)]
             [open-company-web.components.su-snapshot :refer (su-snapshot)]
             [open-company-web.components.updates :refer (updates-responsive-switcher)]
             [open-company-web.components.home :refer (home)]
             [open-company-web.components.list-companies :refer (list-companies)]
-            [open-company-web.components.page-not-found :refer (page-not-found)]
             [open-company-web.components.user-profile :refer (user-profile)]
             [open-company-web.components.login :refer (login)]
             [open-company-web.components.ui.loading :refer (loading)]
@@ -294,13 +292,7 @@
         (stakeholder-update-handler target su-snapshot params)
         (company-handler "su-list" target updates-responsive-switcher params)))
 
-    (defroute su-edit-route (urls/stakeholder-update-edit ":slug") {:as params}
-      (company-handler "su-edit" target su-edit params))
-
     (defroute stakeholder-update-route (urls/stakeholder-update ":slug" ":update-date" ":update-slug") {:as params}
-      (stakeholder-update-handler target su-snapshot params))
-
-    (defroute stakeholder-update-section-route (urls/stakeholder-update-section ":slug" ":update-date" ":update-slug" ":section") {:as params}
       (stakeholder-update-handler target su-snapshot params))
 
     (defroute company-section-route (urls/company-section ":slug" ":section") {:as params}
@@ -330,12 +322,10 @@
                                  company-route
                                  company-route-slash
                                  create-update-route
-                                 su-edit-route
                                  su-list-route
                                  su-list-update-route
                                  company-section-route
                                  stakeholder-update-route
-                                 stakeholder-update-section-route
                                  not-found-route]))
 
     (defn handle-url-change [e]

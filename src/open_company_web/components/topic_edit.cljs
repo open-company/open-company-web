@@ -19,7 +19,6 @@
             [open-company-web.components.ui.icon :as i]
             [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
-            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [open-company-web.components.ui.popover :refer (add-popover hide-popover)]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [goog.dom :as gdom]
@@ -215,31 +214,12 @@
               sections     (vec (:sections company-data))
               fixed-body   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.html body-el)) "__html"))
               data-to-save {:body fixed-body}]
-          (cond
-            (and (not (om/get-state owner :initially-pinned))
-                 (:pin topic-data))
-            ; needs to PATCH :sections to move the topic at the top of the unpinned topics
-            (let [without-topic (utils/vec-dissoc sections topic)
-                  {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
-                  with-pinned-topic (let [[before after] (split-at (count pinned) without-topic)]
-                                      (vec (concat before [topic] after)))]
-              (dis/dispatch! [:foce-save with-pinned-topic data-to-save]))
-            (and (om/get-state owner :initially-pinned)
-                 (not (:pin topic-data)))
-            ; needs to PATCH :sections to move the topic at the top of the unpinned topics
-            (let [without-topic (utils/vec-dissoc sections topic)
-                  {:keys [pinned other]} (utils/get-pinned-other-keys without-topic company-data)
-                  with-unpinned-topic (let [[before after] (split-at (inc (count pinned)) without-topic)]
-                                      (vec (concat before [topic] after)))]
-              (dis/dispatch! [:foce-save with-unpinned-topic data-to-save]))
-            :else
-            (dis/dispatch! [:foce-save sections data-to-save])))))))
+          (dis/dispatch! [:foce-save sections data-to-save]))))))
 
 (defn- data-editing-cb [owner value]
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
 
-(defcomponent topic-edit [{:keys [show-first-edit-tip
-                                  currency
+(defcomponent topic-edit [{:keys [currency
                                   card-width
                                   prev-rev
                                   next-rev] :as data} owner options]
@@ -252,7 +232,6 @@
       {:initial-headline (utils/emojify (:headline topic-data))
        :body-placeholder (or (:body-placeholder topic-data) "")
        :initial-body  (utils/emojify (if (and (:placeholder topic-data) (not has-data?)) "" body))
-       :initially-pinned (:pin topic-data)
        :char-count nil
        :char-count-alert false
        :has-changes false
@@ -520,29 +499,4 @@
                            :disabled (dis/foce-section-data-editing?)
                            :on-click #(if (:placeholder topic-data)
                                         (dis/dispatch! [:topic-archive (name section)])
-                                        (dis/dispatch! [:start-foce nil]))} "CANCEL")))
-
-        ;; Onboarding toolips
-        (when (and show-first-edit-tip (not is-data?))
-          (onboard-tip
-            {:id (str "content-topic-add-" company-slug)
-             :once-only true
-             :mobile false
-             :desktop "What would you like to say? You can add text, emoji and images."
-             :dismiss-tip-fn focus-headline}))
-
-        (when (and (= section-kw :growth) no-data?)
-          (onboard-tip
-            {:id (str "growth-topic-add-" company-slug)
-             :once-only true
-             :mobile false
-             :desktop "Add simple charts to share company performance."
-             :dismiss-tip-fn focus-headline}))
-
-        (when (and (= section-kw :finances) no-data?)
-          (onboard-tip
-            {:id (str "finance-topic-add-" company-slug)
-             :once-only true
-             :mobile false
-             :desktop "Add a chart to share revenue, expenses and cash."
-             :dismiss-tip-fn focus-headline})))))))
+                                        (dis/dispatch! [:start-foce nil]))} "CANCEL"))))))))

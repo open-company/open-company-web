@@ -335,25 +335,6 @@ div.topic.topic-edit {
           }
         }
 
-        button.pin-button {
-          opacity: 1;
-          color: rgba(78, 90, 107, 0.5);
-
-          &:hover {
-            color: rgba(78, 90, 107, 1);
-          }
-
-          i {
-            &:not(.pinned) {
-              transform: rotate(0deg);
-            }
-
-            &.pinned {
-              transform: rotate(25deg);
-            }
-          }
-        }
-
         span.file-upload-progress {
           margin-top: 7px;
           padding-bottom: 0px;

@@ -59,13 +59,15 @@
 
   (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num card-width] :as state}]
     (let [slug (keyword (router/current-company-slug))
-          company-data (dis/company-data data)]
+          company-data (dis/company-data data)
+          total-width-int (responsive/total-layout-width-int card-width columns-num)]
       (if (:loading data)
         (dom/div {:class (utils/class-set {:company-dashboard true
                                            :main-scroll true})}
           (om/build loading {:loading true}))
         (dom/div {:class (utils/class-set {:company-dashboard true
                                            :mobile-company-dashboard (responsive/is-mobile-size?)
+                                           :small-navbar (not (utils/company-has-topics? company-data))
                                            :main-scroll true})}
           (when (and (not (utils/is-test-env?))
                      (get-in data [(keyword (router/current-company-slug)) :error]))
@@ -75,21 +77,22 @@
             (dom/div {:class (str "fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
               (login-required data)
               ;;Footer
-               (om/build footer {:columns-num columns-num
-                                 :card-width card-width}))
+               (om/build footer {:footer-width total-width-int}))
             (dom/div {:class "page"}
               ;; Navbar
               (om/build navbar {:save-bt-active save-bt-active
                                 :company-data company-data
                                 :card-width card-width
+                                :header-width total-width-int
                                 :columns-num columns-num
                                 :foce-key (:foce-key data)
                                 :show-share-su-button (utils/can-edit-sections? company-data)
                                 :mobile-menu-open (:mobile-menu-open data)
                                 :auth-settings (:auth-settings data)
-                                :active :dashboard})
+                                :active :dashboard
+                                :show-navigation-bar (utils/company-has-topics? company-data)})
               (when (and (responsive/is-mobile-size?)
-                         (pos? (:count (utils/link-for (:links company-data) "stakeholder-updates"))))
+                         (utils/company-has-topics? company-data))
                 (oc-switch :dashboard))
               (if (and (empty? (:sections company-data)) (responsive/is-mobile-size?))
                 (dom/div {:class "empty-dashboard"}
@@ -113,5 +116,4 @@
                              :foce-key (:foce-key data)
                              :foce-data (:foce-data data)}))
               ;;Footer
-              (om/build footer {:columns-num columns-num
-                                :card-width card-width}))))))))
+              (om/build footer {:footer-width total-width-int}))))))))

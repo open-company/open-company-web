@@ -8,18 +8,17 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
-            [open-company-web.components.add-topic :as at]))
+            [open-company-web.components.add-topic :as at]
+            [open-company-web.components.bw-topics-list :refer (bw-topics-list)]))
 
 ;; Calc best topics layout based on heights
 
 (defn add-topic? [owner]
   (let [data (om/get-props owner)
         company-data (:company-data data)
-        sharing-mode (om/get-props owner :sharing-mode)
         foce-active  (dis/foce-section-key)]
     (and (not (:hide-add-topic data))
          (responsive/can-edit?)
-         (not sharing-mode)
          (not (:read-only company-data))
          (not foce-active))))
 
@@ -118,32 +117,14 @@
       (= min-height thrd-clmn)
       :3)))
 
-(defn get-pinned-layout
-  "Return the layout of the pinned topics only on 3 or 2 columns depending on the
-  current screen width."
-  [pinned-topics columns-num]
-  (if (= columns-num 3)
-    (loop [idx 3
-           cl1 (vec (remove nil? [(first pinned-topics)]))
-           cl2 (vec (remove nil? [(second pinned-topics)]))
-           cl3 (vec (remove nil? [(get pinned-topics 2)]))]
-      (if (<= idx (count pinned-topics))
-        (recur (+ idx 3)
-               (vec (remove nil? (conj cl1 (get pinned-topics idx))))
-               (vec (remove nil? (conj cl2 (get pinned-topics (inc idx)))))
-               (vec (remove nil? (conj cl3 (get pinned-topics (+ idx 2))))))
-        {:1 cl1
-         :2 cl2
-         :3 cl3}))
-    (loop [idx 2
-           cl1 (vec (remove nil? [(first pinned-topics)]))
-           cl2 (vec (remove nil? [(second pinned-topics)]))]
-      (if (<= idx (count pinned-topics))
-        (recur (+ idx 2)
-               (vec (remove nil? (conj cl1 (get pinned-topics idx))))
-               (vec (remove nil? (conj cl2 (get pinned-topics (inc idx))))))
-        {:1 cl1
-         :2 cl2}))))
+(defn get-initial-layout [columns-num]
+  (cond
+    ; 2 columns empty layout
+    (= columns-num 2)
+    {:1 [] :2 []}
+    ; 3 columns empty layout
+    (= columns-num 3)
+    {:1 [] :2 [] :3 []}))
 
 (defn calc-layout
   "Calculate the best layout given the list of topics and the number of columns to layout to"
@@ -171,13 +152,13 @@
     (let [columns-num (:columns-num data)
           company-data (:company-data data)
           show-add-topic (add-topic? owner)
-          {:keys [pinned other]} (utils/get-pinned-other-keys (utils/get-section-keys company-data) company-data)
+          topics-list (:topics data)
           final-layout (loop [idx 0
-                              layout (get-pinned-layout pinned columns-num)]
+                              layout (get-initial-layout columns-num)]
                           (let [shortest-column (get-shortest-column owner data layout)
-                                new-column (conj (get layout shortest-column) (get other idx))
+                                new-column (conj (get layout shortest-column) (get topics-list idx))
                                 new-layout (assoc layout shortest-column new-column)]
-                            (if (<= (inc idx) (count other))
+                            (if (<= (inc idx) (count topics-list))
                               (recur (inc idx)
                                      new-layout)
                               new-layout)))
@@ -187,20 +168,13 @@
 (defn render-topic [owner options section-name & [column]]
   (when section-name
     (let [props                 (om/get-props owner)
-          sharing-mode          (:sharing-mode props)
-          share-selected-topics (:share-selected-topics props)
           company-data          (:company-data props)
           topics-data           (:topics-data props)
           topics                (:topics props)
           topic-click           (or (:topic-click options) identity)
           update-active-topics  (or (:update-active-topics options) identity)
-          share-selected?       (utils/in? share-selected-topics section-name)
           slug                  (keyword (router/current-company-slug))
-          window-scroll         (.-scrollTop (.-body js/document))
-          {:keys [pinned other]} (utils/get-pinned-other-keys topics company-data)
-          first-topic           (if (pos? (count pinned))
-                                  (first pinned)
-                                  (first other))]
+          window-scroll         (.-scrollTop (.-body js/document))]
       (if (= section-name "add-topic")
         (at/add-topic {:column column
                        :archived-topics (mapv (comp keyword :section) (:archived company-data))
@@ -233,20 +207,15 @@
                                :section-data sd
                                :card-width (:card-width props)
                                :foce-data-editing? (:foce-data-editing? props)
-                               :show-share-remove (:show-share-remove props)
                                :read-only-company (:read-only company-data)
                                :currency (:currency company-data)
-                               :sharing-mode sharing-mode
                                :foce-key (:foce-key props)
                                :foce-data (:foce-data props)
-                               :share-selected share-selected?
                                :show-first-edit-tip (:show-first-edit-tip props)}
                                {:opts {:section-name section-name
-                                       :share-remove-click (:share-remove-click options)
                                        :topic-click (partial topic-click section-name)}}))))))))
 
 (defcomponent topics-columns [{:keys [columns-num
-                                      sharing-mode
                                       content-loaded
                                       total-width
                                       card-width
@@ -266,10 +235,9 @@
       (om/set-state! owner :best-layout (calc-layout owner next-props))))
 
   (render-state [_ {:keys [best-layout]}]
-    (let [show-add-topic         (add-topic? owner)
-          partial-render-topic   (partial render-topic owner options)
-          {:keys [pinned other]} (utils/get-pinned-other-keys topics company-data)
-          columns-container-key   (str (apply str pinned) (apply str other))
+    (let [show-add-topic        (add-topic? owner)
+          partial-render-topic  (partial render-topic owner options)
+          columns-container-key (apply str topics)
           is-dashboard? (utils/in? (:route @router/path) "dashboard")
           topics-column-conatiner-style (if is-dashboard?
                                           (if (responsive/window-exceeds-breakpoint)
@@ -283,7 +251,6 @@
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true
-                                         :sharing-mode sharing-mode
                                          :group true
                                          :content-loaded content-loaded})}
         (cond
@@ -297,26 +264,18 @@
                                                              (= columns-num 2))})
                     :style topics-column-conatiner-style
                     :key columns-container-key}
+            (when-not (responsive/is-tablet-or-mobile?)
+              (om/build bw-topics-list data))
             ; for each column key contained in best layout
-            (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
-              ; get the pinned and the other topics of the current column
-              (let [column (get best-layout kw)
-                    {:keys [pinned other]} (utils/get-pinned-other-keys column company-data)]
-                (dom/div {:class (str "topics-column col-" (name kw))
-                          :style #js {:width (str (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px")}}
-                  ; render the pinned topics
-                  (dom/div #js {:className "topics-column-pinned"}
-                    (when (pos? (count pinned))
-                      (for [idx (range (count pinned))
-                            :let [section-kw (get pinned idx)
-                                  section-name (name section-kw)]]
-                        (partial-render-topic section-name
-                                              (when (= section-name "add-topic") (int (name kw)))))))
-                  ; render the other topics
-                  (dom/div #js {:className "topics-column-other"}
-                    (when (pos? (count other))
-                      (for [idx (range (count other))
-                            :let [section-kw (get other idx)
+            (dom/div {:class "right" :style {:width (str (- (int total-width) responsive/left-topics-list-width) "px")}}
+              (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
+                (let [column (get best-layout kw)]
+                  (dom/div {:class (str "topics-column col-" (name kw))
+                            :style #js {:width (str (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px")}}
+                    ; render the topics
+                    (when (pos? (count column))
+                      (for [idx (range (count column))
+                            :let [section-kw (get column idx)
                                   section-name (name section-kw)]]
                         (partial-render-topic section-name
                                               (when (= section-name "add-topic") (int (name kw))))))
@@ -342,11 +301,7 @@
                     :style topics-column-conatiner-style
                     :key columns-container-key}
             (dom/div {:class "topics-column"}
-              (dom/div #js {:className "topics-column-pinned"}
-                (for [section pinned]
-                  (partial-render-topic (name section))))
-              (dom/div #js {:className "topics-column-other"}
-                (for [section other]
-                  (partial-render-topic (name section)))
-                (when show-add-topic
-                  (partial-render-topic "add-topic" 1))))))))))
+              (for [section topics]
+                (partial-render-topic (name section)))
+              (when show-add-topic
+                (partial-render-topic "add-topic" 1)))))))))

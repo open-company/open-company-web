@@ -33,6 +33,14 @@ div.company-dashboard {
   }
 }
 
+div.company-dashboard.small-navbar {
+  div.page {
+    div.empty-dashboard {
+      min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_small_height}px - #{$top_border_height}px + 24px);
+    }
+  }
+}
+
 body.small-footer {
   div.company-dashboard {
     div.page {

@@ -384,4 +384,7 @@
             (dom/div {:class "company-settings-container"}
               (om/build company-settings-form data))))
 
-        (om/build footer/footer data)))))
+        (let [columns-num (responsive/columns-num)
+              card-width (responsive/calc-card-width)
+              footer-width (responsive/total-layout-width-int card-width columns-num)]
+          (om/build footer/footer (assoc data :footer-width footer-width)))))))

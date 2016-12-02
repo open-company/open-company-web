@@ -35,9 +35,8 @@ nav.oc-navbar {
   margin: 0px;
   box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
 
-  &.su-navbar {
+  &.small-navbar:not(.mobile-menu-open) {
     height: #{$mobile_navbar_height}px;
-    overflow: hidden;
   }
 
   div.su-snapshot-preview{
@@ -93,8 +92,12 @@ nav.oc-navbar {
   div.oc-navbar-header {
     position: relative;
     margin: 0 auto;
-    padding: 0 34px;
+    padding: 0 28px;
     margin-top: 10px;
+
+    div.oc-navbar-header-container{
+      height: 45px;
+    }
 
     div.oc-navbar-separator {
       border-bottom: 1px solid rgba(78,90,107,0.1);
@@ -142,7 +145,7 @@ nav.oc-navbar {
   div.oc-navbar-bottom {
     position: relative;
     margin: 10px auto;
-    padding: 0 34px;
+    padding: 0 28px;
 
     a.sharing-button {
       color: $oc_blue_dark;

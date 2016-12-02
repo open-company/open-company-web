@@ -76,5 +76,6 @@
             (dom/button {:class "btn-reset btn-outline right mr1"
                          :on-click #(router/nav! oc-urls/home)}
                         (dom/label {:class (str "mt1" (when loading " ml2"))} "SKIP"))))
-      (om/build footer {:columns-num (responsive/columns-num)
-                        :card-width (responsive/calc-card-width)}))))
+      (let [columns-num (responsive/columns-num)
+            card-width (responsive/calc-card-width)]
+        (om/build footer {:footer-width (responsive/total-layout-width-int card-width columns-num)})))))

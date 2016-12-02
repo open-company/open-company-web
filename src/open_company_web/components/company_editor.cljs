@@ -55,5 +55,6 @@
                         (when loading
                           (loading/small-loading {:class "left mt1"}))
                         (dom/label {:class (str "mt1" (when loading " ml2"))} "NEXT →"))))
-      (om/build footer {:columns-num (responsive/columns-num)
-                        :card-width (responsive/calc-card-width)}))))
+      (let [columns-num (responsive/columns-num)
+            card-width (responsive/calc-card-width)]
+        (om/build footer {:footer-width (responsive/total-layout-width-int card-width columns-num)})))))
