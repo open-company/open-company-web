@@ -55,7 +55,7 @@
                                       read-only-company
                                       is-stakeholder-update
                                       is-mobile?
-                                      is-dashboard?
+                                      is-dashboard
                                       foce-active
                                       topic-click] :as data} owner options]
 
@@ -82,7 +82,7 @@
         ;; Topic image for dashboard
         (when (and image-header
                    (or (not is-mobile?)
-                       (not is-dashboard?)))
+                       (not is-dashboard)))
           (dom/div {:class "card-header card-image"}
             (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
 
@@ -91,7 +91,7 @@
           (dom/div {:class "topic-title"} (:title topic-data))
           (when (and (not is-stakeholder-update)
                      (or (not is-mobile?)
-                         (not is-dashboard?))
+                         (not is-dashboard))
                      (responsive/can-edit?)
                      (not (:read-only topic-data))
                      (not read-only-company)
@@ -105,7 +105,7 @@
                       :data-placement "top"}))))
 
         ;; Topic data
-        (when (and (or (not is-dashboard?)
+        (when (and (or (not is-dashboard)
                        (not is-mobile?))
                    is-growth-finances?
                    (utils/data-topic-has-data section topic-data))
@@ -123,17 +123,17 @@
                                         :currency currency} {:opts chart-opts}))))
 
         ;; Topic headline
-        (when (and (or (not is-mobile?) (not is-dashboard?))
+        (when (and (or (not is-mobile?) (not is-dashboard))
                    (not (clojure.string/blank? (:headline topic-data))))
           (om/build topic-headline topic-data))
 
         ;; Attribution for topic
-        (when (and is-mobile? is-dashboard?)
+        (when (and is-mobile? is-dashboard)
           (dom/div {:class "mobile-date"}
             (utils/time-since (:updated-at topic-data))))
         
         ;; Topic body
-        (when (and (or (not is-dashboard?)
+        (when (and (or (not is-dashboard)
                        (not is-mobile?))
                    (not (clojure.string/blank? topic-body)))
           (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
@@ -141,7 +141,7 @@
                         :dangerouslySetInnerHTML (utils/emojify topic-body)}))
 
         ; if it's SU preview or SU show only read-more
-        (when (or (not is-dashboard?)
+        (when (or (not is-dashboard)
                   (not is-mobile?))
           (dom/div {:style {:margin-top "20px"}}
             (when-not is-stakeholder-update
@@ -183,6 +183,8 @@
                              card-width
                              archived-topics
                              is-stakeholder-update
+                             is-dashboard
+                             is-topic-view
                              topic-flex-num] :as data} owner options]
 
   (init-state [_]
@@ -223,7 +225,6 @@
           rev-cb (fn [_ rev] (om/set-state! owner :transition-as-of (:updated-at rev)))
           foce-active (not (nil? (dis/foce-section-key)))
           is-foce (= (dis/foce-section-key) section-kw)
-          is-dashboard? (utils/in? (:route @router/path) "dashboard")
           is-mobile? (responsive/is-mobile-size?)
           with-order (if (contains? data :topic-flex-num) {:order topic-flex-num} {})
           topic-style (clj->js (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
@@ -242,9 +243,14 @@
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
-                                                 :mobile-dashboard-topic (and is-mobile? is-dashboard?)
+                                                 :mobile-dashboard-topic (and is-mobile? is-dashboard)
                                                  :topic-edit is-foce
+                                                 :dashboard-topic is-dashboard
                                                  :no-foce (and foce-active (not is-foce))})
+                    :onClick (fn []
+                                (when (and (not (responsive/is-mobile-size?))
+                                           is-dashboard)
+                                  (dis/dispatch! [:select-topic-view section])))
                     :style topic-style
                     :ref "topic"
                     :data-section (name section)
@@ -283,7 +289,7 @@
                                           :is-foce is-foce
                                           :foce-active foce-active
                                           :is-mobile? is-mobile?
-                                          :is-dashboard? is-dashboard?
+                                          :is-dashboard is-dashboard
                                           :prev-rev prev-rev
                                           :next-rev next-rev}
                                          {:opts (merge options {:rev-click rev-cb})
@@ -301,7 +307,7 @@
                                             :currency currency
                                             :read-only-company (:read-only-company data)
                                             :is-mobile? is-mobile?
-                                            :is-dashboard? is-dashboard?
+                                            :is-dashboard is-dashboard
                                             :prev-rev tr-prev-rev
                                             :next-rev tr-next-rev}
                                            {:opts (merge options {:rev-click rev-cb})}))))))))))

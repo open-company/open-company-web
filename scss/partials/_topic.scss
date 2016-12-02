@@ -11,6 +11,53 @@ div.topic {
   border-radius: 3px;
   background-color: white;
 
+  &.dashboard-topic {
+    padding-bottom: 8px;
+    border-bottom: 4px solid transparent;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid transparent;
+
+    div.topic-anim {
+      div.topic-internal {
+        & > div{
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        div.card-header.card-image {
+          overflow: visible;
+          img {
+            width: calc(100% + 8px);
+            height: calc(100% + 4px);
+            margin-left: -4px;
+            margin-top: -4px;
+            z-index: 1000;
+          }
+        }
+
+        div.topic-title {
+          padding-top: 8px;
+        }
+      }
+    }
+
+    &:hover{
+      border-top: 4px solid $oc_yellow;
+      border-bottom: 4px solid $oc_yellow;
+      border-left: 4px solid $oc_yellow;
+      border-right: 4px solid $oc_yellow;
+
+      div.topic-anim {
+        div.topic-internal {
+          div.card-header.card-image {
+            overflow: hidden;
+          }
+        }
+      }
+    }
+  }
+
   &.no-foce {
     opacity: 0.5;
   }
@@ -100,12 +147,6 @@ div.topic {
 
     div.topic-internal{
       position: relative;
-
-      &:hover {
-        button.topic-pencil-button {
-          opacity: 1;
-        }
-      }
 
       button.topic-pencil-button {
         width: 30px;
