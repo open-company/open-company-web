@@ -73,6 +73,7 @@
               (dom/span {:data-toggle "tooltip"
                          :data-placement "right"
                          :data-container "body"
+                         :key (str "tt-attrib-" (:name (:author topic-data)) (:updated-at topic-data))
                          :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
                 " · " (utils/time-since (:updated-at topic-data))))))
 
@@ -133,6 +134,12 @@
       (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
       (events/listen js/window EventType/RESIZE #(om/set-state! owner :window-width (responsive/ww)))))
+
+  (did-update [_ _ _]
+    (when-not (utils/is-test-env?)
+      ; initialize bootstrap tooltips
+      (when-not (responsive/is-tablet-or-mobile?)
+        (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
   (render-state [_ {:keys [editing as-of window-width] :as state}]
     (let [section-kw (keyword section)
