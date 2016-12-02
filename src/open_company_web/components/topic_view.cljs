@@ -37,18 +37,19 @@
 
   (render [_]
     (let [topic-view-width (responsive/topic-view-width card-width columns-num)
+          topic-card-width (responsive/calc-update-width columns-num)
           topic-data (->> selected-topic-view keyword (get company-data))
           revisions (rest (:revisions-data topic-data))]
       (dom/div {:class "topic-view"
-                :style {:width (str card-width "px")
-                        :margin-right (str (max 0 (- topic-view-width card-width 50)) "px")}
+                :style {:width (str topic-card-width "px")
+                        :margin-right (str (max 0 (- topic-view-width topic-card-width 50)) "px")}
                 :key (str "topic-view-inner-" selected-topic-view)}
         (dom/div {:class "topic-view-internal"
-                  :style {:width (str card-width "px")}}
+                  :style {:width (str topic-card-width "px")}}
           (dom/div {:class "revision-container group"}
             (om/build topic {:section selected-topic-view
                              :section-data topic-data
-                             :card-width (- card-width 60)
+                             :card-width (- topic-card-width 60)
                              :foce-data-editing? (:foce-data-editing? data)
                              :read-only-company (:read-only company-data)
                              :currency (:currency company-data)
@@ -58,10 +59,10 @@
             (when rev
               (dom/div {:class "revision-container group"}
                 (dom/hr {:class "separator-line"
-                         :style {:width (str (- card-width 60) "px")}})
+                         :style {:width (str (- topic-card-width 60) "px")}})
                 (om/build topic {:section selected-topic-view
                                  :section-data rev
-                                 :card-width (- card-width 60)
+                                 :card-width (- topic-card-width 60)
                                  :foce-data-editing? (:foce-data-editing? data)
                                  :read-only-company (:read-only company-data)
                                  :currency (:currency company-data)
