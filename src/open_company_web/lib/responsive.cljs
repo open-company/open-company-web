@@ -155,5 +155,5 @@
                             (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin))]
     fixed-card-width))
 
-(when (not (not (.-_phantom js/window)))
+(when (not (.-_phantom js/window))
   (events/listen js/window EventType/RESIZE #(set-browser-type!)))

@@ -133,6 +133,7 @@
                                           :header-width total-width-int
                                           :company-data company-data
                                           :show-share-su-button (utils/can-edit-sections? company-data)
+                                          :show-navigation-bar (utils/company-has-topics? company-data)
                                           :active :updates}))
             (when (responsive/is-mobile-size?)
               (oc-switch :updates))

@@ -107,6 +107,7 @@
                             :create-update-share-button-cb #(share-clicked owner)
                             :create-update-share-button-disabled (zero? (count su-topics))
                             :active nil
+                            :show-navigation-bar (utils/company-has-topics? company-data)
                             :mobile-menu-open (:mobile-menu-open data)
                             :auth-settings (:auth-settings data)})
           (dom/div {:class "create-update-inner group navbar-offset"}

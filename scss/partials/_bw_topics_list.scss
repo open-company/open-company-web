@@ -38,17 +38,20 @@ div.left-topics-list {
       padding: 0 5px 0 5px;
       cursor: pointer;
 
-      &:hover {
-        background-color: rgba(78,90,107,0.1);
+      &.dnd {
 
-        &:after, &::after {
-          font-size: 14px;
-          font-family: FontAwesome;
-          float: right;
-          font-weight: 400;
-          color: $oc_gray_5;
-          content: "\f0c9";
-          cursor: move;
+        &:hover {
+          background-color: rgba(78,90,107,0.1);
+
+          &:after, &::after {
+            font-size: 14px;
+            font-family: FontAwesome;
+            float: right;
+            font-weight: 400;
+            color: $oc_gray_5;
+            content: "\f0c9";
+            cursor: move;
+          }
         }
       }
     }

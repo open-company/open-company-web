@@ -21,7 +21,6 @@
             [open-company-web.components.fullscreen-topic :refer (fullscreen-topic)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
             [open-company-web.components.topics-mobile-layout :refer (topics-mobile-layout)]
-            [open-company-web.components.ui.onboard-tip :refer (onboard-tip)]
             [goog.events :as events]
             [goog.object :as gobj]
             [goog.events.EventType :as EventType]
@@ -115,38 +114,12 @@
     (.play (new Slide tr-selected-topic #js [(if left? (* width -1) width) 0] #js [0 0] utils/oc-animation-duration))
     (.play (new Fade tr-selected-topic 0 1 utils/oc-animation-duration))))
 
-;; ===== Onboarding Tips =====
-
-(defn- show-add-topic-tip?
-  "Show initial welcome tooltip to a r/w user with no topics."
-  [company-data active-topics]
-  (when (and (jwt/jwt) (not (:read-only company-data)))
-    (let [all-topics (get-topics company-data active-topics)]
-      (empty? all-topics))))
-
-(defn- show-first-edit-tip?
-  "Show first edit tooltip to a r/w user if there is only one content section (not data),
-  and it is a placeholder section."
-  [company-data company-topics]
-  (when (and (jwt/jwt) (not (:read-only company-data)))
-    (let [filtered-topics (filter #(and (not= % :growth) (not= % :finances)) company-topics)]
-      (and (= (count filtered-topics) 1)
-           (->> filtered-topics first keyword (get company-data) :placeholder)))))
-
-(defn- show-data-first-edit-tip? [company-data selected-topic]
-  "Show data first edit tooltip to a r/w user if the selected topic is a data topic,
-  and it is a placeholder section."
-  (when (and (jwt/jwt) (not (:read-only company-data)))
-    (when (or (= selected-topic "growth") (= selected-topic "finances"))
-      (:placeholder (company-data (keyword selected-topic))))))
-
 ;; ===== Topic List Component =====
 
 (defn- get-state [owner data current-state]
   ; get internal component state
   (let [company-data (:company-data data)
         active-topics (apply merge (map #(hash-map (keyword %) (->> % keyword (get company-data))) (get-active-topics company-data)))
-        show-add-topic-tip (show-add-topic-tip? company-data active-topics)
         selected-topic (if (nil? current-state) (router/current-section) (:selected-topic current-state))]
     {; initial active topics to check with the updated active topics
      :initial-active-topics active-topics
@@ -165,13 +138,7 @@
      ; transitioning btw fullscreen topics
      :transitioning false
      ; redirect the user to the updates preview page
-     :redirect-to-preview (or (:redirect-to-preview current-state) false)
-     ; remember if add topic tooltip was shown
-     :show-add-topic-tip show-add-topic-tip
-     ; remember if second add topic tooltip was shown
-     :show-second-add-topic-tooltip (or (:show-second-add-topic-tooltip current-state) false)
-     ; showremember if share tooltip was shown
-     :show-share-tooltip (or (:show-share-tooltip current-state) false)}))
+     :redirect-to-preview (or (:redirect-to-preview current-state) false)}))
 
 ;; -------------------------------------------------
 
@@ -214,15 +181,7 @@
           topics                  (vec (:sections company-data))
           no-placeholder-sections (utils/filter-placeholder-sections topics company-data)]
       (when (and (:force-edit-topic next-props) (contains? company-data (keyword (:force-edit-topic next-props))))
-        (om/set-state! owner :selected-topic (dispatcher/force-edit-topic)))
-      ; show second tooltip if needed
-      (when (and (not (:read-only company-data))
-                 (= (count no-placeholder-sections) 1))
-        (om/set-state! owner :show-second-add-topic-tooltip true))
-      ; show share tooltip if needed
-      (when (and (not (:read-only company-data))
-                 (= (count no-placeholder-sections) 2))
-        (om/set-state! owner :show-share-tooltip true))))
+        (om/set-state! owner :selected-topic (dispatcher/force-edit-topic)))))
 
   (did-update [_ prev-props _]
     (when-not (utils/is-test-env?)
@@ -235,9 +194,6 @@
                            tr-selected-topic
                            transitioning
                            redirect-to-preview
-                           show-add-topic-tip
-                           show-second-add-topic-tooltip
-                           show-share-tooltip
                            rerender]}]
     (let [company-slug    (router/current-company-slug)
           company-data    (:company-data data)
@@ -301,37 +257,8 @@
                          :company-data company-data
                          :topics-data company-data
                          :foce-key (:foce-key data)
-                         :foce-data (:foce-data data)
-                         :show-first-edit-tip (show-first-edit-tip? company-data company-topics)}
+                         :foce-data (:foce-data data)}
               comp-opts {:opts {:topic-click (partial topic-click owner)
                                 :update-active-topics (partial update-active-topics owner)}}
               sub-component (if (responsive/is-mobile-size?) topics-mobile-layout topics-columns)]
-          (om/build sub-component comp-data comp-opts))
-
-        ;; Onboarding tooltips
-        
-        ;; Desktop only welcom
-        (when (and show-add-topic-tip (not selected-topic) (nil? (:show-login-overlay data)))
-
-          (onboard-tip
-            {:id (str "welcome-" company-slug "-desktop")
-             :once-only false
-             :mobile false
-             :desktop (str "Hi " (jwt/get-key :name) ", welcome to OpenCompany! Choose a topic to get started.")}))
-        
-        ;; After 1st topic
-        (when (and show-second-add-topic-tooltip (not selected-topic))                   
-          (onboard-tip
-            {:id (str "first-topic-" company-slug)
-             :once-only true
-             :mobile false
-             :desktop "Add another topic and you'll see how quickly the big picture comes together."}))
-
-        ;; After 2nd topic
-        (when (and show-share-tooltip (not selected-topic))
-          (onboard-tip
-            {:id (str "second-topic-" company-slug)
-             :once-only true
-             :mobile false
-             :desktop "It's easy to share information with your employees, investors and customers. Click on \"SHARE AN UPDATE\" above to try it."
-             :css-class "large"}))))))
+          (om/build sub-component comp-data comp-opts))))))

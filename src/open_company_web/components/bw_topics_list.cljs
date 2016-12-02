@@ -5,6 +5,7 @@
             [dommy.core :refer-macros (sel1 sel)]
             [open-company-web.api :as api]
             [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.lib.responsive :as responsive]))
 
 (defn patch-company [topics-list]
@@ -32,17 +33,22 @@
                       :axis "y"})
       (.disableSelection))))
 
+(defn can-dnd? []
+  (not (:read-only (dis/company-data))))
+
 (defcomponent bw-topics-list [{:keys [company-data card-width] :as data} owner options]
 
   (init-state [_]
     {:topics (:sections company-data)})
 
   (did-mount [_]
-    (setup-sortable owner))
+    (when (can-dnd?)
+      (setup-sortable owner)))
 
   (did-update [_ _ _]
     (om/set-state! owner :topics (:sections company-data))
-    (setup-sortable owner))
+    (when (can-dnd?)
+      (setup-sortable owner)))
 
   (render [_]
     (dom/div {:class "left-topics-list group" :style {:width (str responsive/left-topics-list-width "px")}}
@@ -54,6 +60,6 @@
       (dom/div {:class "left-topics-list-items group"}
         (for [topic (:sections company-data)
               :let [sd (->> topic keyword (get company-data))]]
-          (dom/div {:class "left-topics-list-item"
+          (dom/div {:class (str "left-topics-list-item " (when (can-dnd?) "dnd"))
                     :data-topic (name topic)}
             (:title sd)))))))
