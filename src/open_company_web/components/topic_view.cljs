@@ -11,14 +11,16 @@
                                   company-data] :as data} owner options]
   (render [_]
     (let [topic-view-width (responsive/topic-view-width card-width columns-num)
+          card-width (responsive/calc-update-width columns-num)
           topic-data (->> selected-topic-view keyword (get company-data))]
       (dom/div {:class "topic-view"
-                :style {:width (str (- topic-view-width 20) "px")}}
+                :style {:width (str (+ card-width 40) "px")
+                        :margin-right (str (max 0 (- topic-view-width (+ card-width 40) 40)) "px")}}
         (dom/div {:class "topic-view-internal"
                   :style {:width (str card-width "px")}}
           (om/build topic {:section selected-topic-view
                            :section-data topic-data
-                           :card-width (- topic-view-width 180)
+                           :card-width card-width
                            :foce-data-editing? (:foce-data-editing? data)
                            :read-only-company (:read-only company-data)
                            :currency (:currency company-data)
