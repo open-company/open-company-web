@@ -63,7 +63,9 @@
               :let [sd (->> topic keyword (get company-data))]]
           (dom/div {:class (utils/class-set {:left-topics-list-item true
                                              :dnd (can-dnd?)
+                                             :group true
                                              :selected (= selected-topic-view topic)})
                     :data-topic (name topic)
                     :on-click #(dis/dispatch! [:select-topic-view (name topic)])}
-            (:title sd)))))))
+            (dom/div {:class "internal"}
+              (:title sd))))))))
