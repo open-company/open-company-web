@@ -70,13 +70,19 @@
                                         :foce-data foce-data}
                                        {:opts options
                                         :key (str "topic-foce-" selected-topic-view)}))
-                (dom/div {:class "fake-textarea-internal"
-                          :on-click #(dis/dispatch! [:start-foce (keyword selected-topic-view) {:section (keyword selected-topic-view)
-                                                                                                :title (s/capital selected-topic-view)
-                                                                                                :body-placeholder (str "Write something new about " (s/capital selected-topic-view) ".")
-                                                                                                :headline ""}])
-                          :style {:width (str (- topic-card-width 100) "px")}}
-                  "Write something new about " (s/capital selected-topic-view) "."))))
+                (let [section-kw (keyword selected-topic-view)
+                      initial-data {:section section-kw
+                                    :title (s/capital selected-topic-view)
+                                    :body-placeholder (str "Write something new about " (s/capital selected-topic-view) ".")
+                                    :data (when (contains? topic-data :data) (:data topic-data))
+                                    :metrics (when (contains? topic-data :metrics) (:metrics topic-data))
+                                    :headline ""}
+                      with-data (if (#{:growth :finances} section-kw) (assoc initial-data :data (:data topic-data)) initial-data)
+                      with-metrics (if (= :growth section-kw) (assoc with-data :metrics (:metrics topic-data)) with-data)]
+                  (dom/div {:class "fake-textarea-internal"
+                            :on-click #(dis/dispatch! [:start-foce section-kw with-metrics])
+                            :style {:width (str (- topic-card-width 100) "px")}}
+                    "Write something new about " (s/capital selected-topic-view) ".")))))
           (dom/div {:class "revision-container group"}
             (when-not (:read-only company-data)
               (dom/hr {:class "separator-line"
