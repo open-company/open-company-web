@@ -37,7 +37,6 @@
 
   (render [_]
     (let [topic-view-width (responsive/topic-view-width card-width columns-num)
-          card-width (responsive/calc-update-width columns-num)
           topic-data (->> selected-topic-view keyword (get company-data))
           revisions (rest (:revisions-data topic-data))]
       (dom/div {:class "topic-view"
