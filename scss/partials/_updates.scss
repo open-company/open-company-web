@@ -16,7 +16,10 @@ div.updates {
       div.updates-content-cards {
         padding: 20px 30px;
         margin-right: 50px;
-        background-color: white;
+
+        &.has-content {
+          background-color: white;
+        }
 
         div.loading-container {
           position: relative;

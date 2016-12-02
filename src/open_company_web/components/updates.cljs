@@ -85,7 +85,7 @@
           (dom/div {:class "updates-content-list group right"
                     :style {:width (str responsive/updates-content-list-width "px")}}
             (prior-updates false selected-su))
-          (dom/div {:class "updates-content-cards right"
+          (dom/div {:class (str "updates-content-cards right" (when su-data " has-content"))
                     :style {:width (str fixed-card-width "px")}}
             (when (and selected-su
                        (not su-data))
