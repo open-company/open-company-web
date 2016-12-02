@@ -1,6 +1,8 @@
-body.small-footer{
-  div.topic-list {
-    min-height: calc(100vh - #{$footer_small_height}px);
+@include big_web(){
+  body.small-footer{
+    div.topic-list {
+      min-height: calc(100vh - #{$footer_small_height}px);
+    }
   }
 }
 
