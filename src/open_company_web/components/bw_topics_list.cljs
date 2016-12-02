@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1 sel)]
             [open-company-web.api :as api]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
@@ -54,7 +55,8 @@
   (render [_]
     (dom/div {:class "left-topics-list group" :style {:width (str responsive/left-topics-list-width "px")}}
       (dom/div {:class "left-topics-list-top group"}
-        (dom/h3 {:class "left-topics-list-top-title left"} "TOPICS")
+        (dom/h3 {:class "left-topics-list-top-title left"
+                 :on-click #(router/nav! (oc-urls/company))} "TOPICS")
         ; Temp comment this waiting for add topic to work properly
         ; (dom/button {:class "left-topics-list-top-title btn-reset right"} "+")
         )
