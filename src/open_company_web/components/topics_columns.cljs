@@ -39,16 +39,14 @@
 
 (defn headline-body-height [headline body card-width]
   (let [$headline (js/$ (str "<div class=\"topic\">"
-                                "<div class=\"topic-anim\">"
-                                  "<div>"
-                                    "<div class=\"topic-internal\">"
-                                      (when-not (clojure.string/blank? headline)
-                                        (str "<div class=\"topic-headline-inner\" style=\"width: " (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px;\">"
-                                               (utils/emojify headline true)
-                                             "</div>"))
-                                      "<div class=\"topic-body\" style=\"width: " (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px;\">"
-                                        (utils/emojify body true)
-                                      "</div>"
+                                "<div>"
+                                  "<div class=\"topic-internal\">"
+                                    (when-not (clojure.string/blank? headline)
+                                      (str "<div class=\"topic-headline-inner\" style=\"width: " (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px;\">"
+                                             (utils/emojify headline true)
+                                           "</div>"))
+                                    "<div class=\"topic-body\" style=\"width: " (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px;\">"
+                                      (utils/emojify body true)
                                     "</div>"
                                   "</div>"
                                 "</div>"
