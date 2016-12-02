@@ -36,7 +36,7 @@
 (defn can-dnd? []
   (not (:read-only (dis/company-data))))
 
-(defcomponent bw-topics-list [{:keys [company-data card-width] :as data} owner options]
+(defcomponent bw-topics-list [{:keys [company-data card-width selected-topic-view-cb] :as data} owner options]
 
   (init-state [_]
     {:topics (:sections company-data)})
@@ -61,5 +61,6 @@
         (for [topic (:sections company-data)
               :let [sd (->> topic keyword (get company-data))]]
           (dom/div {:class (str "left-topics-list-item " (when (can-dnd?) "dnd"))
-                    :data-topic (name topic)}
+                    :data-topic (name topic)
+                    :on-click #(selected-topic-view-cb (name topic))}
             (:title sd)))))))
