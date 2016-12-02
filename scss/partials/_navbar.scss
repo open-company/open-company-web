@@ -35,7 +35,7 @@ nav.oc-navbar {
   margin: 0px;
   box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
 
-  &.small-navbar {
+  &.small-navbar:not(.mobile-menu-open) {
     height: #{$mobile_navbar_height}px;
     overflow: hidden;
   }
