@@ -37,7 +37,6 @@ nav.oc-navbar {
 
   &.small-navbar:not(.mobile-menu-open) {
     height: #{$mobile_navbar_height}px;
-    overflow: hidden;
   }
 
   div.su-snapshot-preview{
