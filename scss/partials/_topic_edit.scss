@@ -11,374 +11,364 @@ div.topic.topic-edit {
   margin-right: 4px;
   cursor: default;
 
-  div.topic-anim{
+  div.topic-foce {
     position: relative;
     height: auto;
 
-    & > div.topic-tr-as-of {
-      position: absolute;
-      top: 0;
-      left: 0;
+    & > div.section-container {
+      padding: 20px 10px 0 10px;
     }
 
-    div.topic-foce {
+    & > div, & > input{
+      padding: 0px 20px;
+    }
+
+    div.topic-header {
+
+      .topic-image {
+        width: 30px;
+        height: 30px;
+        float: left;
+      }
+
+      svg path, svg polygon {
+        fill: #8b8a8a;
+      }
+    }
+
+    div.card-header{
+      margin: 0px;
+      padding: 0px;
+      width: 100%;
       position: relative;
+      padding-top: 10px;
 
-      & > div.section-container {
-        padding: 20px 10px 0 10px;
+      &.card-image {
+        overflow: hidden;
+        padding-top: 0px;
       }
 
-      & > div, & > input{
-        padding: 0px 20px;
-      }
+      button.remove-header {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        opacity: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: 15px;
+        background-color: $oc_gray_5;
 
-      div.topic-header {
-
-        .topic-image {
-          width: 30px;
-          height: 30px;
-          float: left;
+        div.svg-icon {
+          margin-top: -8px;
+          margin-left: 2px;
         }
-
-        svg path, svg polygon {
-          fill: #8b8a8a;
-        }
-      }
-
-      div.card-header{
-        margin: 0px;
-        padding: 0px;
-        width: 100%;
-        position: relative;
-        padding-top: 10px;
-
-        &.card-image {
-          overflow: hidden;
-          padding-top: 0px;
-        }
-
-        button.remove-header {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          opacity: 0;
-          width: 30px;
-          height: 30px;
-          border-radius: 15px;
-          background-color: $oc_gray_5;
-
-          div.svg-icon {
-            margin-top: -8px;
-            margin-left: 2px;
-          }
-        }
-
-        &:hover {
-          button.remove-header {
-            opacity: 0.8;
-          }
-        }
-
-        img {
-          width:100%;
-        }
-
-        div.gradient {
-          position:absolute;
-          z-index:2;
-          right:0; bottom:0; left:0px;
-          width: 100%;
-          height: 20px; /* adjust it to your needs */
-          background: url(data:image/svg+xml;base64,alotofcodehere);
-          background: -moz-linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(255,255,255,1) 70%);
-          background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(70%,rgba(255,255,255,1)));
-          background: -webkit-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
-          background: -o-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
-          background: -ms-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
-          background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
-          pointer-events: none;
-        }
-      }
-
-      input.topic-title {
-        padding-top: 12px;
-        opacity: 0.5;
-        font-family: $oc_headers_font;
-        font-weight: 700;
-        font-size: 13px;
-        line-height: 1.5;
-        letter-spacing: 1px;
-        color: $oc_gray_5;
-        text-transform: uppercase;
-        border: none;
-        outline: none;
-        cursor: text;
-        width: 100%;
       }
 
       &:hover {
-        button.topic-pencil-button {
-          opacity: 0.5;
+        button.remove-header {
+          opacity: 0.8;
         }
       }
 
-      button.topic-pencil-button{
-        position: absolute;
-        top: 5px;
-        right: 10px;
-        opacity: 0;
-        transition: 230ms;
+      img {
+        width:100%;
+      }
+
+      div.gradient {
+        position:absolute;
+        z-index:2;
+        right:0; bottom:0; left:0px;
+        width: 100%;
+        height: 20px; /* adjust it to your needs */
+        background: url(data:image/svg+xml;base64,alotofcodehere);
+        background: -moz-linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(255,255,255,1) 70%);
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(70%,rgba(255,255,255,1)));
+        background: -webkit-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+        background: -o-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+        background: -ms-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+        background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 70%);
+        pointer-events: none;
+      }
+    }
+
+    input.topic-title {
+      padding-top: 12px;
+      opacity: 0.5;
+      font-family: $oc_headers_font;
+      font-weight: 700;
+      font-size: 13px;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      color: $oc_gray_5;
+      text-transform: uppercase;
+      border: none;
+      outline: none;
+      cursor: text;
+      width: 100%;
+    }
+
+    &:hover {
+      button.topic-pencil-button {
+        opacity: 0.5;
+      }
+    }
+
+    button.topic-pencil-button{
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      opacity: 0;
+      transition: 230ms;
+
+      &:hover {
+        color: rgba(78,90,107,1);
+      }
+    }
+
+    button.chart-pencil-button{
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      transition: 230ms;
+
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 15px;
+      background-color: rgba(78,90,107,0.5);
+
+      &:hover {
+        background-color: rgba(78,90,107,1.0);
+      }
+    }
+
+    button.chart-plus-button{
+      position: absolute;
+      top: 65px;
+      right: 30px;
+      transition: 230ms;
+
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 15px;
+      background-color: rgba(78,90,107,0.5);
+      padding-top: 3px;
+
+      &:hover {
+        background-color: rgba(78,90,107,1.0);
+      }
+    }
+
+    button.chart-archive-button{
+      position: absolute;
+      top: 100px;
+      right: 30px;
+      transition: 230ms;
+
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 15px;
+      background-color: rgba(78,90,107,0.5);
+      padding-top: 3px;
+
+      &:hover {
+        background-color: rgba(78,90,107,1.0);
+      }
+    }
+
+    div.topic-headline-inner {
+      padding-top: 14px;
+      font-size: 18px;
+      line-height: 25px;
+      color: $oc_gray_7;
+      outline: none;
+      border: none;
+      cursor: text;
+
+      &:empty:after {
+        content: attr(placeholder);
+        display: block;
+        font-size: 18px;
+        line-height: 1.2;
+        color: $oc_gray_7;
+        font-style: italic;
+        font-family: $oc_main_font;
+        opacity: 0.5;
+      }
+
+      &:active {
+        outline: none;
+      }
+
+      .emojione {
+        @include emoji-size(18px);
+      }
+    }
+
+    div.hidden-topic-body {
+      display: none;
+      padding: 0px;
+      margin: 0px;
+      opacity: 0;
+    }
+
+    div.topic-body {
+      margin-top: 15px;
+      margin-bottom: 10px;
+      color: $oc_gray_7;
+      overflow: hidden;
+      font-weight: 400;
+      cursor: text;
+      min-height: 20px;
+      font-size: 14px;
+      line-height: 22px;
+      min-height: 110px;
+
+      &:after {
+        font-size: 14px;
+        line-height: 22px;
+        color: $oc_gray_7;
+        font-style: italic;
+        font-family: $oc_main_font;
+        font-weight: 400;
+        opacity: 0.5;
+        margin-top: 0px;
+        padding-top: 0px;
+      }
+
+      .emojione {
+        @include emoji-size(14px);
+      }
+
+      *{
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 22px;
+      }
+
+      b{
+        font-weight: 700;
+      }
+
+      a {
+        text-decoration: none;
+        pointer-events: none;
+        box-shadow: inset 0 -1px 0 $oc_gray_7;
+        font-weight: normal;
+      }
+
+      img:not(.emojione){
+        display: none;
+      }
+
+      & > div:last-child, p:last-child {
+        margin-bottom: 0px;
+        padding-bottom: 0px;
+      }
+    }
+
+    div.topic-foce-footer {
+      width: 100%;
+
+      div.upload-remote-url-container{
+        width: 100%;
+
+        input.upload-remote-url-field {
+          height: 32px;
+          margin-top: 1px;
+          padding-left: 3px;
+          outline: none;
+          border: 1px solid rgba(78, 90, 107, 0.5);
+        }
+      }
+
+      div.topic-foce-footer-left {
+        float: left;
+        height: 41px;
+
+        label.char-counter {
+          font-weight: 700;
+          font-family: $oc_headers_font;
+          font-size: 12px;
+          line-height: 1.5;
+          letter-spacing: 1px;
+          color: rgba(78, 90, 107, 0.5);
+
+          &.char-count-alert {
+            color: rgba(215, 42, 70, 0.9);
+          }
+        }
+      }
+
+      div.topic-foce-footer-right {
+        float: right;
+
+        button {
+          margin-left: 7px;
+          float: right;
+        }
+      }
+    }
+
+    div.topic-foce-buttons {
+      margin-top: 25px;
+      height: 31px;
+
+      div.type-picker{
+        font-size: 12px;
+        padding-top: 6px;
+
+        a {
+          color: black;
+          text-decoration: underline;
+        }
+      }
+
+      span.file-upload-progress {
+        margin-top: 7px;
+        padding-bottom: 0px;
+        margin-bottom: 0px;
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: rgba(78, 90, 107, 0.5);
+        display: block;
+        width: 38px;
+      }
+
+      button {
+        margin-bottom: 5px;
+        color: rgba(78, 90, 107, 0.5);
+        font-size: 15px;
 
         &:hover {
           color: rgba(78,90,107,1);
         }
       }
 
-      button.chart-pencil-button{
-        position: absolute;
-        top: 30px;
-        right: 30px;
-        transition: 230ms;
-
-        color: white;
-        width: 30px;
-        height: 30px;
-        border-radius: 15px;
-        background-color: rgba(78,90,107,0.5);
-
-        &:hover {
-          background-color: rgba(78,90,107,1.0);
-        }
+      button.left {
+        margin-right: 7px;
       }
 
-      button.chart-plus-button{
-        position: absolute;
-        top: 65px;
-        right: 30px;
-        transition: 230ms;
-
-        color: white;
-        width: 30px;
-        height: 30px;
-        border-radius: 15px;
-        background-color: rgba(78,90,107,0.5);
-        padding-top: 3px;
-
-        &:hover {
-          background-color: rgba(78,90,107,1.0);
-        }
+      button.right{
+        margin-left: 7px;
       }
+    }
 
-      button.chart-archive-button{
-        position: absolute;
-        top: 100px;
-        right: 30px;
-        transition: 230ms;
+    div.topic-foce-footer {
+      margin-top: 10px;
+      margin-bottom: 20px;
+      height: 63px;
 
-        color: white;
-        width: 30px;
-        height: 30px;
-        border-radius: 15px;
-        background-color: rgba(78,90,107,0.5);
-        padding-top: 3px;
-
-        &:hover {
-          background-color: rgba(78,90,107,1.0);
-        }
-      }
-
-      div.topic-headline-inner {
-        padding-top: 14px;
-        font-size: 18px;
-        line-height: 25px;
-        color: $oc_gray_7;
-        outline: none;
-        border: none;
-        cursor: text;
-
-        &:empty:after {
-          content: attr(placeholder);
-          display: block;
-          font-size: 18px;
-          line-height: 1.2;
-          color: $oc_gray_7;
-          font-style: italic;
-          font-family: $oc_main_font;
-          opacity: 0.5;
-        }
-
-        &:active {
-          outline: none;
-        }
-
-        .emojione {
-          @include emoji-size(18px);
-        }
-      }
-
-      div.hidden-topic-body {
-        display: none;
-        padding: 0px;
-        margin: 0px;
-        opacity: 0;
-      }
-
-      div.topic-body {
-        margin-top: 15px;
-        margin-bottom: 10px;
-        color: $oc_gray_7;
-        overflow: hidden;
-        font-weight: 400;
-        cursor: text;
-        min-height: 20px;
-        font-size: 14px;
-        line-height: 22px;
-        min-height: 110px;
-
-        &:after {
-          font-size: 14px;
-          line-height: 22px;
-          color: $oc_gray_7;
-          font-style: italic;
-          font-family: $oc_main_font;
-          font-weight: 400;
-          opacity: 0.5;
-          margin-top: 0px;
-          padding-top: 0px;
-        }
-
-        .emojione {
-          @include emoji-size(14px);
-        }
-
-        *{
-          font-weight: 400;
-          font-size: 14px;
-          line-height: 22px;
-        }
-
-        b{
-          font-weight: 700;
-        }
-
-        a {
-          text-decoration: none;
-          pointer-events: none;
-          box-shadow: inset 0 -1px 0 $oc_gray_7;
-          font-weight: normal;
-        }
-
-        img:not(.emojione){
-          display: none;
-        }
-
-        & > div:last-child, p:last-child {
-          margin-bottom: 0px;
-          padding-bottom: 0px;
-        }
-      }
-
-      div.topic-foce-footer {
-        width: 100%;
-
-        div.upload-remote-url-container{
-          width: 100%;
-
-          input.upload-remote-url-field {
-            height: 32px;
-            margin-top: 1px;
-            padding-left: 3px;
-            outline: none;
-            border: 1px solid rgba(78, 90, 107, 0.5);
-          }
-        }
-
-        div.topic-foce-footer-left {
-          float: left;
-          height: 41px;
-
-          label.char-counter {
-            font-weight: 700;
-            font-family: $oc_headers_font;
-            font-size: 12px;
-            line-height: 1.5;
-            letter-spacing: 1px;
-            color: rgba(78, 90, 107, 0.5);
-
-            &.char-count-alert {
-              color: rgba(215, 42, 70, 0.9);
-            }
-          }
-        }
-
-        div.topic-foce-footer-right {
-          float: right;
-
-          button {
-            margin-left: 7px;
-            float: right;
-          }
-        }
-      }
-
-      div.topic-foce-buttons {
-        margin-top: 25px;
-        height: 31px;
-
-        div.type-picker{
-          font-size: 12px;
-          padding-top: 6px;
-
-          a {
-            color: black;
-            text-decoration: underline;
-          }
-        }
-
-        span.file-upload-progress {
-          margin-top: 7px;
-          padding-bottom: 0px;
-          margin-bottom: 0px;
-          font-size: 12px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: rgba(78, 90, 107, 0.5);
-          display: block;
-          width: 38px;
-        }
-
-        button {
-          margin-bottom: 5px;
-          color: rgba(78, 90, 107, 0.5);
-          font-size: 15px;
-
-          &:hover {
-            color: rgba(78,90,107,1);
-          }
-        }
-
-        button.left {
-          margin-right: 7px;
-        }
-
-        button.right{
-          margin-left: 7px;
-        }
-      }
-
-      div.topic-foce-footer {
-        margin-top: 10px;
+      div.divider {
+        width: calc(100% + 40px);
+        margin-left: -20px;
+        height: 2px;
+        opacity: 0.1;
+        border: solid 1px rgba(78, 90, 107, 0.5);
         margin-bottom: 20px;
-        height: 63px;
-
-        div.divider {
-          width: calc(100% + 40px);
-          margin-left: -20px;
-          height: 2px;
-          opacity: 0.1;
-          border: solid 1px rgba(78, 90, 107, 0.5);
-          margin-bottom: 20px;
-        }
       }
     }
   }
