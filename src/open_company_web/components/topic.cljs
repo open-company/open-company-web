@@ -2,28 +2,15 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
-            [dommy.core :refer-macros (sel1)]
-            [open-company-web.api :as api]
-            [open-company-web.caches :as caches]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
-            [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.oc-colors :as oc-colors]
             [open-company-web.lib.responsive :as responsive]
-            [open-company-web.lib.growth-utils :as growth-utils]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
-            [open-company-web.components.topic-edit :refer (topic-edit)]
-            [open-company-web.components.topic-attribution :refer (topic-attribution)]
-            [open-company-web.components.ui.icon :as i]
-            [open-company-web.components.ui.topic-read-more :refer (topic-read-more)]
-            [goog.fx.dom :refer (Fade)]
-            [goog.fx.dom :refer (Resize)]
-            [goog.fx.Animation.EventType :as AnimationEventType]
             [goog.events.EventType :as EventType]
             [goog.events :as events]
-            [goog.style :as gstyle]
             [cljsjs.react.dom]))
 
 (defcomponent topic-image-header [{:keys [image-header image-size]} owner options]
@@ -80,7 +67,9 @@
         (dom/div {:class "group"}
           (dom/div {:class "topic-title"}
             (:title topic-data)
-            (when is-topic-view
+            (when (or is-topic-view
+                      (and (not is-mobile?)
+                           is-dashboard))
               (dom/span {:data-toggle "tooltip"
                          :data-placement "right"
                          :data-container "body"
@@ -121,15 +110,7 @@
                    (not (clojure.string/blank? topic-body)))
           (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
                         :ref "topic-body"
-                        :dangerouslySetInnerHTML (utils/emojify topic-body)}))
-
-        ; if it's SU preview or SU show only read-more
-        (when (and (not is-topic-view)
-                   (or (not is-dashboard)
-                       (not is-mobile?)))
-          (dom/div {:style {:margin-top "20px"}}
-            (when-not is-stakeholder-update
-              (om/build topic-attribution data {:opts options}))))))))
+                        :dangerouslySetInnerHTML (utils/emojify topic-body)}))))))
 
 (defcomponent topic [{:keys [active-topics
                              section-data
@@ -181,29 +162,17 @@
                     :data-section (name section)
                     :key (str "topic-" (name section))
                     :id (str "topic-" (name section))}
-        (if is-foce
-          (om/build topic-edit {:section section
-                                :topic-data section-data
-                                :is-stakeholder-update (:is-stakeholder-update data)
-                                :currency currency
-                                :card-width card-width
-                                :foce-data-editing? (:foce-data-editing? data)
-                                :read-only-company (:read-only-company data)
-                                :foce-key (:foce-key data)
-                                :foce-data (:foce-data data)}
-                               {:opts options
-                                :key (str "topic-foce-" section)})
-          (om/build topic-internal {:section section
-                                    :topic-data section-data
-                                    :is-stakeholder-update (:is-stakeholder-update data)
-                                    :currency currency
-                                    :card-width card-width
-                                    :read-only-company (:read-only-company data)
-                                    :topic-click (:topic-click options)
-                                    :is-foce is-foce
-                                    :foce-active foce-active
-                                    :is-mobile? is-mobile?
-                                    :is-dashboard is-dashboard
-                                    :is-topic-view is-topic-view}
-                                   {:opts options
-                                    :key (str "topic-" section)}))))))
+        (om/build topic-internal {:section section
+                                  :topic-data section-data
+                                  :is-stakeholder-update (:is-stakeholder-update data)
+                                  :currency currency
+                                  :card-width card-width
+                                  :read-only-company (:read-only-company data)
+                                  :topic-click (:topic-click options)
+                                  :is-foce is-foce
+                                  :foce-active foce-active
+                                  :is-mobile? is-mobile?
+                                  :is-dashboard is-dashboard
+                                  :is-topic-view is-topic-view}
+                                 {:opts options
+                                  :key (str "topic-" section)})))))
