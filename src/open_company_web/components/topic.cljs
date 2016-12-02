@@ -36,22 +36,11 @@
     (dom/div #js {:className (str "topic-headline-inner group" (when (:placeholder data) " italic"))
                   :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
 
-(defn start-foce-click [owner]
-  (let [section-kw (keyword (om/get-props owner :section))
-        company-data (dis/company-data)
-        section-data (get company-data section-kw)]
-    (dis/dispatch! [:start-foce section-kw section-data])))
-
-(defn pencil-click [owner e]
-  (start-foce-click owner))
-
 (defcomponent topic-internal [{:keys [topic-data
                                       section
                                       currency
                                       card-width
                                       columns-num
-                                      prev-rev
-                                      next-rev
                                       read-only-company
                                       is-stakeholder-update
                                       is-mobile?
@@ -96,21 +85,7 @@
                          :data-placement "right"
                          :data-container "body"
                          :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
-                " · " (utils/time-since (:updated-at topic-data)))))
-          (when (and (not is-stakeholder-update)
-                     (or (not is-mobile?)
-                         (not is-dashboard))
-                     (responsive/can-edit?)
-                     (not (:read-only topic-data))
-                     (not read-only-company)
-                     (not foce-active))
-            (dom/button {:class (str "topic-pencil-button btn-reset")
-                         :on-click #(pencil-click owner %)}
-              (dom/i {:class "fa fa-pencil"
-                      :title "Edit"
-                      :data-toggle "tooltip"
-                      :data-container "body"
-                      :data-placement "top"}))))
+                " · " (utils/time-since (:updated-at topic-data))))))
 
         ;; Topic data
         (when (and (or (not is-dashboard)
@@ -156,34 +131,6 @@
             (when-not is-stakeholder-update
               (om/build topic-attribution data {:opts options}))))))))
 
-(defn animate-revision-navigation [owner]
-  (let [cur-topic (om/get-ref owner "cur-topic")
-        tr-topic (om/get-ref owner "tr-topic")
-        current-state (om/get-state owner)
-        anim-duration utils/oc-animation-duration
-        appear-animation (Fade. tr-topic 0 1 anim-duration)
-        cur-size (js/getComputedStyle cur-topic)
-        tr-size (js/getComputedStyle tr-topic)
-        topic (om/get-ref owner "topic-anim")
-        topic-size (js/getComputedStyle topic)]
-    ; resize the light box
-    (.play (Resize. topic
-                    #js [(js/parseFloat (.-width topic-size)) (js/parseFloat (.-height cur-size))]
-                    #js [(js/parseFloat (.-width topic-size)) (js/parseFloat (.-height tr-size))]
-                    anim-duration))
-    ; make the current topic disappear
-    (.play (Fade. cur-topic 1 0 anim-duration))
-    ; appear the new topic
-    (doto appear-animation
-      (events/listen
-        AnimationEventType/FINISH
-        (fn []
-          (om/set-state! owner (merge current-state
-                                      {:as-of (:transition-as-of current-state)
-                                       :transition-as-of nil}))
-          (utils/after 100 #(utils/remove-tooltips))))
-      (.play))))
-
 (defcomponent topic [{:keys [active-topics
                              section-data
                              section
@@ -197,10 +144,7 @@
                              topic-flex-num] :as data} owner options]
 
   (init-state [_]
-    {:as-of (:updated-at section-data)
-     :actual-as-of (:updated-at section-data)
-     :window-width (responsive/ww)
-     :transition-as-of nil})
+    {:window-width (responsive/ww)})
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -209,29 +153,9 @@
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
       (events/listen js/window EventType/RESIZE #(om/set-state! owner :window-width (responsive/ww)))))
 
-  (will-update [_ next-props _]
-    (let [new-as-of (:updated-at (:section-data next-props))
-          current-as-of (om/get-state owner :as-of)
-          old-as-of (:updated-at section-data)]
-      (when (and (not= old-as-of new-as-of)
-                 (not= current-as-of new-as-of))
-        (om/set-state! owner :as-of new-as-of)
-        (om/set-state! owner :actual-as-of new-as-of))))
-
-  (did-update [_ prev-props _]
-    (when (om/get-state owner :transition-as-of)
-      (animate-revision-navigation owner)))
-
-  (render-state [_ {:keys [editing as-of actual-as-of transition-as-of window-width] :as state}]
+  (render-state [_ {:keys [editing as-of window-width] :as state}]
     (let [section-kw (keyword section)
-          revisions (utils/sort-revisions (:revisions section-data))
-          prev-rev (utils/revision-prev revisions as-of)
-          next-rev (utils/revision-next revisions as-of)
           slug (keyword (router/current-company-slug))
-          all-revisions (dis/revisions slug)
-          revisions-list (get all-revisions section-kw {})
-          topic-data (utils/select-section-data section-data section-kw as-of)
-          rev-cb (fn [_ rev] (om/set-state! owner :transition-as-of (:updated-at rev)))
           foce-active (not (nil? (dis/foce-section-key)))
           is-foce (= (dis/foce-section-key) section-kw)
           is-mobile? (responsive/is-mobile-size?)
@@ -257,60 +181,29 @@
                     :data-section (name section)
                     :key (str "topic-" (name section))
                     :id (str "topic-" (name section))}
-        (dom/div #js {:className "topic-anim group"
-                      :key (str "topic-anim-" as-of "-" transition-as-of)
-                      :ref "topic-anim"}
-          (dom/div #js {:className "topic-as-of group"
-                        :key (str "cur-" as-of)
-                        :style #js {:opacity 1 :width "100%"}}
-            (dom/div #js {:className "topic-cur-as-of"
-                          :ref "cur-topic"
-                          :style #js {:opacity 1}}
-              (if is-foce
-                (om/build topic-edit {:section section
-                                      :topic-data topic-data
-                                      :is-stakeholder-update (:is-stakeholder-update data)
-                                      :currency currency
-                                      :card-width card-width
-                                      :foce-data-editing? (:foce-data-editing? data)
-                                      :read-only-company (:read-only-company data)
-                                      :foce-key (:foce-key data)
-                                      :foce-data (:foce-data data)
-                                      :prev-rev prev-rev
-                                      :next-rev next-rev}
-                                     {:opts (merge options {:rev-click rev-cb})
-                                      :key (str "topic-foce-" section)})
-                (om/build topic-internal {:section section
-                                          :topic-data topic-data
-                                          :is-stakeholder-update (:is-stakeholder-update data)
-                                          :currency currency
-                                          :card-width card-width
-                                          :read-only-company (:read-only-company data)
-                                          :topic-click (:topic-click options)
-                                          :is-foce is-foce
-                                          :foce-active foce-active
-                                          :is-mobile? is-mobile?
-                                          :is-dashboard is-dashboard
-                                          :is-topic-view is-topic-view
-                                          :prev-rev prev-rev
-                                          :next-rev next-rev}
-                                         {:opts (merge options {:rev-click rev-cb})
-                                          :key (str "topic-" section)})))
-            (when transition-as-of
-              (dom/div #js {:className "topic-tr-as-of group"
-                            :ref "tr-topic"
-                            :key (str "tr-" transition-as-of "-expanded")
-                            :style #js {:opacity 1}}
-                (let [tr-topic-data (utils/select-section-data section-data section-kw transition-as-of)
-                      tr-prev-rev (utils/revision-prev revisions transition-as-of)
-                      tr-next-rev (utils/revision-next revisions transition-as-of)]
-                  (om/build topic-internal {:section section
-                                            :topic-data tr-topic-data
-                                            :currency currency
-                                            :read-only-company (:read-only-company data)
-                                            :is-mobile? is-mobile?
-                                            :is-dashboard is-dashboard
-                                            :is-topic-view is-topic-view
-                                            :prev-rev tr-prev-rev
-                                            :next-rev tr-next-rev}
-                                           {:opts (merge options {:rev-click rev-cb})}))))))))))
+        (if is-foce
+          (om/build topic-edit {:section section
+                                :topic-data section-data
+                                :is-stakeholder-update (:is-stakeholder-update data)
+                                :currency currency
+                                :card-width card-width
+                                :foce-data-editing? (:foce-data-editing? data)
+                                :read-only-company (:read-only-company data)
+                                :foce-key (:foce-key data)
+                                :foce-data (:foce-data data)}
+                               {:opts options
+                                :key (str "topic-foce-" section)})
+          (om/build topic-internal {:section section
+                                    :topic-data section-data
+                                    :is-stakeholder-update (:is-stakeholder-update data)
+                                    :currency currency
+                                    :card-width card-width
+                                    :read-only-company (:read-only-company data)
+                                    :topic-click (:topic-click options)
+                                    :is-foce is-foce
+                                    :foce-active foce-active
+                                    :is-mobile? is-mobile?
+                                    :is-dashboard is-dashboard
+                                    :is-topic-view is-topic-view}
+                                   {:opts options
+                                    :key (str "topic-" section)}))))))
