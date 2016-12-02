@@ -84,7 +84,6 @@
             (om/build topic {:section selected-topic-view
                              :section-data topic-data
                              :card-width (- topic-card-width 60)
-                             :foce-data-editing? (:foce-data-editing? data)
                              :read-only-company (:read-only company-data)
                              :currency (:currency company-data)
                              :is-topic-view true}
@@ -97,7 +96,6 @@
                 (om/build topic {:section selected-topic-view
                                  :section-data rev
                                  :card-width (- topic-card-width 60)
-                                 :foce-data-editing? (:foce-data-editing? data)
                                  :read-only-company (:read-only company-data)
                                  :currency (:currency company-data)
                                  :is-topic-view true}
