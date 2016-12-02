@@ -92,7 +92,7 @@
                                 :active :dashboard
                                 :show-navigation-bar (utils/company-has-topics? company-data)})
               (when (and (responsive/is-mobile-size?)
-                         (pos? (:count (utils/link-for (:links company-data) "stakeholder-updates"))))
+                         (utils/company-has-topics? company-data))
                 (oc-switch :dashboard))
               (if (and (empty? (:sections company-data)) (responsive/is-mobile-size?))
                 (dom/div {:class "empty-dashboard"}
