@@ -257,7 +257,9 @@
                          :company-data company-data
                          :topics-data company-data
                          :foce-key (:foce-key data)
-                         :foce-data (:foce-data data)}
+                         :foce-data (:foce-data data)
+                         :selected-topic-view (:selected-topic-view data)
+                         :is-dashboard (:is-dashboard data)}
               comp-opts {:opts {:topic-click (partial topic-click owner)
                                 :update-active-topics (partial update-active-topics owner)}}
               sub-component (if (responsive/is-mobile-size?) topics-mobile-layout topics-columns)]
