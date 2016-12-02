@@ -730,6 +730,10 @@
          (not (:read-only company-data))
          (>= (count (filter-placeholder-sections company-topics company-data)) min-no-placeholder-section-enable-share))))
 
+(defn company-has-topics? [company-data]
+  (let [company-topics (vec (map keyword (:sections company-data)))]
+    (pos? (count (filter-placeholder-sections company-topics company-data)))))
+
 (defn remove-ending-empty-paragraph
   "Remove the last p tag if it's empty."
   [body-el]

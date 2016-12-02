@@ -67,7 +67,7 @@
           (om/build loading {:loading true}))
         (dom/div {:class (utils/class-set {:company-dashboard true
                                            :mobile-company-dashboard (responsive/is-mobile-size?)
-                                           :small-navbar (not (utils/can-edit-sections? company-data))
+                                           :small-navbar (not (utils/company-has-topics? company-data))
                                            :main-scroll true})}
           (when (and (not (utils/is-test-env?))
                      (get-in data [(keyword (router/current-company-slug)) :error]))
@@ -90,7 +90,7 @@
                                 :mobile-menu-open (:mobile-menu-open data)
                                 :auth-settings (:auth-settings data)
                                 :active :dashboard
-                                :show-navigation-bar (utils/can-edit-sections? company-data)})
+                                :show-navigation-bar (utils/company-has-topics? company-data)})
               (when (and (responsive/is-mobile-size?)
                          (pos? (:count (utils/link-for (:links company-data) "stakeholder-updates"))))
                 (oc-switch :dashboard))
