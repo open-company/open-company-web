@@ -12,11 +12,11 @@ div.topic {
   background-color: white;
 
   &.dashboard-topic {
-    padding-bottom: 8px;
-    border-bottom: 4px solid transparent;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 4px solid transparent;
+    padding-bottom: 10px;
+    border-bottom: 2px solid transparent;
+    border-left: 2px solid transparent;
+    border-right: 2px solid transparent;
+    border-top: 2px solid transparent;
 
     div.topic-anim {
       div.topic-internal {
@@ -28,10 +28,10 @@ div.topic {
         div.card-header.card-image {
           overflow: visible;
           img {
-            width: calc(100% + 8px);
-            height: calc(100% + 4px);
-            margin-left: -4px;
-            margin-top: -4px;
+            width: calc(100% + 4px);
+            height: calc(100% + 2px);
+            margin-left: -2px;
+            margin-top: -2px;
             z-index: 1000;
           }
         }
@@ -43,10 +43,10 @@ div.topic {
     }
 
     &:hover{
-      border-top: 4px solid $oc_yellow;
-      border-bottom: 4px solid $oc_yellow;
-      border-left: 4px solid $oc_yellow;
-      border-right: 4px solid $oc_yellow;
+      border-top: 2px solid $oc_yellow;
+      border-bottom: 2px solid $oc_yellow;
+      border-left: 2px solid $oc_yellow;
+      border-right: 2px solid $oc_yellow;
 
       div.topic-anim {
         div.topic-internal {
