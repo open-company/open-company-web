@@ -114,6 +114,8 @@
                              :columns-num columns-num
                              :show-login-overlay (:show-login-overlay data)
                              :foce-key (:foce-key data)
-                             :foce-data (:foce-data data)}))
+                             :foce-data (:foce-data data)
+                             :selected-topic-view (:selected-topic-view data)
+                             :is-dashboard true}))
               ;;Footer
               (om/build footer {:footer-width total-width-int}))))))))
