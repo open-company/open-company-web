@@ -12,7 +12,7 @@
         not-mobile? (not (responsive/is-mobile-size?))]
     [:button.user-avatar-button.group
       {:type "button"
-       :class (when-not has-avatar "no-image")
+       :class (str classes (when-not has-avatar " no-image"))
        :id "dropdown-toggle-menu"
        :data-toggle (when not-mobile? "dropdown")
        :click-cb (when (fn? click-cb) (click-cb))
