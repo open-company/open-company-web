@@ -38,10 +38,14 @@ div.left-topics-list {
       padding: 0 5px 0 5px;
       cursor: pointer;
 
+      &.selected {
+        background-color: rgba(78,90,107,0.1);
+      }
+
       &.dnd {
 
         &:hover {
-          background-color: rgba(78,90,107,0.1);
+          background-color: rgba(78,90,107,0.2);
 
           &:after, &::after {
             font-size: 14px;
