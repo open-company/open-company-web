@@ -165,6 +165,9 @@
       (reset! dis/app-state (-> @dis/app-state
                              (assoc :loading true)
                              (dissoc (keyword slug)))))
+    (if section
+      (reset! dis/app-state (assoc @dis/app-state :selected-topic-view section))
+      (reset! dis/app-state (dissoc @dis/app-state :selected-topic-view)))
     ;; render component
     (drv-root component target)))
 
