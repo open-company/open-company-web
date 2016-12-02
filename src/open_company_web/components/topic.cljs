@@ -56,6 +56,7 @@
                                       is-stakeholder-update
                                       is-mobile?
                                       is-dashboard
+                                      is-topic-view
                                       foce-active
                                       topic-click] :as data} owner options]
 
@@ -88,7 +89,14 @@
 
         ;; Topic title
         (dom/div {:class "group"}
-          (dom/div {:class "topic-title"} (:title topic-data))
+          (dom/div {:class "topic-title"}
+            (:title topic-data)
+            (when is-topic-view
+              (dom/span {:data-toggle "tooltip"
+                         :data-placement "right"
+                         :data-container "body"
+                         :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
+                " · " (utils/time-since (:updated-at topic-data)))))
           (when (and (not is-stakeholder-update)
                      (or (not is-mobile?)
                          (not is-dashboard))
@@ -141,8 +149,9 @@
                         :dangerouslySetInnerHTML (utils/emojify topic-body)}))
 
         ; if it's SU preview or SU show only read-more
-        (when (or (not is-dashboard)
-                  (not is-mobile?))
+        (when (and (not is-topic-view)
+                   (or (not is-dashboard)
+                       (not is-mobile?)))
           (dom/div {:style {:margin-top "20px"}}
             (when-not is-stakeholder-update
               (om/build topic-attribution data {:opts options}))))))))
@@ -233,14 +242,6 @@
                                        (responsive/is-mobile-size?))
                                  with-order
                                  (merge with-order {:width (if (responsive/window-exceeds-breakpoint) (str card-width "px") "auto")})))]
-      ;; preload previous revision
-      (when (and prev-rev (not (contains? revisions-list (:updated-at prev-rev))))
-        (api/load-revision prev-rev slug section-kw))
-      ;; preload next revision as it can be that it's missing (ie: user jumped to the first rev then went forward)
-      (when (and (not= (:updated-at next-rev) actual-as-of)
-                  next-rev
-                  (not (contains? revisions-list (:updated-at next-rev))))
-        (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
                                                  :mobile-dashboard-topic (and is-mobile? is-dashboard)
@@ -290,6 +291,7 @@
                                           :foce-active foce-active
                                           :is-mobile? is-mobile?
                                           :is-dashboard is-dashboard
+                                          :is-topic-view is-topic-view
                                           :prev-rev prev-rev
                                           :next-rev next-rev}
                                          {:opts (merge options {:rev-click rev-cb})
@@ -308,6 +310,7 @@
                                             :read-only-company (:read-only-company data)
                                             :is-mobile? is-mobile?
                                             :is-dashboard is-dashboard
+                                            :is-topic-view is-topic-view
                                             :prev-rev tr-prev-rev
                                             :next-rev tr-next-rev}
                                            {:opts (merge options {:rev-click rev-cb})}))))))))))
