@@ -5,9 +5,12 @@
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.api :as api]
             [open-company-web.router :as router]
+            [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
-            [open-company-web.components.topic :refer (topic)]))
+            [open-company-web.components.topic :refer (topic)]
+            [open-company-web.components.topic-edit :refer (topic-edit)]
+            [cuerdas.core :as s]))
 
 (defn load-revisions-if-needed [owner]
   (when (not (om/get-state owner :revisions-requested))
@@ -21,7 +24,10 @@
 (defcomponent topic-view [{:keys [card-width
                                   columns-num
                                   selected-topic-view
-                                  company-data] :as data} owner options]
+                                  company-data
+                                  foce-key
+                                  foce-data
+                                  foce-data-editing?] :as data} owner options]
   (init-state [_]
     {:revisions-requested false})
 
@@ -46,7 +52,28 @@
                 :key (str "topic-view-inner-" selected-topic-view)}
         (dom/div {:class "topic-view-internal"
                   :style {:width (str topic-card-width "px")}}
+          (dom/div {:class "fake-textarea"}
+            (if foce-key
+              (dom/div {:class "topic topic-edit"
+                        :style {:width (str (- topic-card-width 60) "px")}}
+                (om/build topic-edit {:section selected-topic-view
+                                      :topic-data topic-data
+                                      :is-stakeholder-update false
+                                      :currency (:currency company-data)
+                                      :card-width (- card-width 60)
+                                      :foce-data-editing? foce-data-editing?
+                                      :read-only-company (:read-only-company data)
+                                      :foce-key foce-key
+                                      :foce-data foce-data}
+                                     {:opts options
+                                      :key (str "topic-foce-" selected-topic-view)}))
+              (dom/div {:class "fake-textarea-internal"
+                        :on-click #(dis/dispatch! [:start-foce (keyword selected-topic-view) {:title "" :body-placeholder (str "Write something new about " (s/capital selected-topic-view) ".") :data [] :headline ""}])
+                        :style {:width (str (- topic-card-width 100) "px")}}
+                "Write something new about " (s/capital selected-topic-view) ".")))
           (dom/div {:class "revision-container group"}
+            (dom/hr {:class "separator-line"
+                     :style {:width (str (- topic-card-width 100) "px")}})
             (om/build topic {:section selected-topic-view
                              :section-data topic-data
                              :card-width (- topic-card-width 60)

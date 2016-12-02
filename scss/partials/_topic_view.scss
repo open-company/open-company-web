@@ -12,6 +12,30 @@ div.topic-view {
     padding: 20px 0px;
     float: left;
 
+    div.fake-textarea {
+      padding: 20px;
+
+      div.topic {
+        border: none;
+        box-shadow: none;
+        float: left;
+        background-color: transparent;
+      }
+
+      div.fake-textarea-internal {
+        cursor: text;
+        border: 1px solid rgba(78,90,107,0.2);
+        border-radius: 8px;
+        height: 46px;
+        color: rgba(78,90,107,0.4);
+        padding: 12px;
+        font-weight: 400;
+        font-family: $oc_headers_font;
+        font-size: 14px;
+        font-style: italic;
+      }
+    }
+
     div.revision-container{
       margin: 20px 0px;
 
