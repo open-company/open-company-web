@@ -272,6 +272,9 @@
               (om/build topic-view {:card-width card-width
                                     :columns-num columns-num
                                     :company-data company-data
+                                    :foce-key (:foce-key data)
+                                    :foce-data (:foce-data data)
+                                    :foce-data-editing? (:foce-data-editing? data)
                                     :selected-topic-view selected-topic-view})
               ; for each column key contained in best layout
               (dom/div {:class "right" :style {:width (str (- (int total-width) responsive/left-topics-list-width) "px")}}
