@@ -484,3 +484,7 @@
        topic
        (oc-urls/company-section (router/current-company-slug) topic))
       (assoc db :selected-topic-view topic))))
+
+(defmethod dispatcher/action :revisions-loaded
+  [db [_ {:keys [slug topic revisions]}]]
+  (assoc-in db (concat (dispatcher/company-data-key slug) [(keyword topic) :revisions-data]) (:revisions (:collection revisions))))
