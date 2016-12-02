@@ -35,7 +35,10 @@
     (load-revisions-if-needed owner))
 
   (will-update [_ next-props _]
-    (when (not= (:selected-topic-view next-props) selected-topic-view)
+    (when (or (not= (:selected-topic-view next-props) selected-topic-view)
+              (and (nil? (:foce-key next-props))
+                   (not (nil? foce-data))))
+      (js/console.log "Reload revisions")
       (om/set-state! owner :revisions-requested false)))
 
   (did-update [_ _ _]
@@ -52,28 +55,32 @@
                 :key (str "topic-view-inner-" selected-topic-view)}
         (dom/div {:class "topic-view-internal"
                   :style {:width (str topic-card-width "px")}}
-          (dom/div {:class "fake-textarea"}
-            (if foce-key
-              (dom/div {:class "topic topic-edit"
-                        :style {:width (str (- topic-card-width 60) "px")}}
-                (om/build topic-edit {:section selected-topic-view
-                                      :topic-data topic-data
-                                      :is-stakeholder-update false
-                                      :currency (:currency company-data)
-                                      :card-width (- card-width 60)
-                                      :foce-data-editing? foce-data-editing?
-                                      :read-only-company (:read-only-company data)
-                                      :foce-key foce-key
-                                      :foce-data foce-data}
-                                     {:opts options
-                                      :key (str "topic-foce-" selected-topic-view)}))
-              (dom/div {:class "fake-textarea-internal"
-                        :on-click #(dis/dispatch! [:start-foce (keyword selected-topic-view) {:title "" :body-placeholder (str "Write something new about " (s/capital selected-topic-view) ".") :data [] :headline ""}])
-                        :style {:width (str (- topic-card-width 100) "px")}}
-                "Write something new about " (s/capital selected-topic-view) ".")))
+          (when-not (:read-only company-data)
+            (dom/div {:class "fake-textarea"}
+              (if foce-key
+                (dom/div {:class "topic topic-edit"
+                          :style {:width (str (- topic-card-width 120) "px")}}
+                  (om/build topic-edit {:section selected-topic-view
+                                        :topic-data topic-data
+                                        :is-stakeholder-update false
+                                        :currency (:currency company-data)
+                                        :card-width (- topic-card-width 120)
+                                        :foce-data-editing? foce-data-editing?
+                                        :foce-key foce-key
+                                        :foce-data foce-data}
+                                       {:opts options
+                                        :key (str "topic-foce-" selected-topic-view)}))
+                (dom/div {:class "fake-textarea-internal"
+                          :on-click #(dis/dispatch! [:start-foce (keyword selected-topic-view) {:section (keyword selected-topic-view)
+                                                                                                :title (s/capital selected-topic-view)
+                                                                                                :body-placeholder (str "Write something new about " (s/capital selected-topic-view) ".")
+                                                                                                :headline ""}])
+                          :style {:width (str (- topic-card-width 100) "px")}}
+                  "Write something new about " (s/capital selected-topic-view) "."))))
           (dom/div {:class "revision-container group"}
-            (dom/hr {:class "separator-line"
-                     :style {:width (str (- topic-card-width 100) "px")}})
+            (when-not (:read-only company-data)
+              (dom/hr {:class "separator-line"
+                       :style {:width (str (- topic-card-width 100) "px")}}))
             (om/build topic {:section selected-topic-view
                              :section-data topic-data
                              :card-width (- topic-card-width 60)
