@@ -14,13 +14,13 @@
           card-width (responsive/calc-update-width columns-num)
           topic-data (->> selected-topic-view keyword (get company-data))]
       (dom/div {:class "topic-view"
-                :style {:width (str (+ card-width 40) "px")
-                        :margin-right (str (max 0 (- topic-view-width (+ card-width 40) 40)) "px")}}
+                :style {:width (str card-width "px")
+                        :margin-right (str (max 0 (- topic-view-width card-width 50)) "px")}}
         (dom/div {:class "topic-view-internal"
                   :style {:width (str card-width "px")}}
           (om/build topic {:section selected-topic-view
                            :section-data topic-data
-                           :card-width card-width
+                           :card-width (- card-width 60)
                            :foce-data-editing? (:foce-data-editing? data)
                            :read-only-company (:read-only company-data)
                            :currency (:currency company-data)
