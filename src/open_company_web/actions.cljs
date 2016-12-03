@@ -468,24 +468,6 @@
   ; Reset flag to reload su list when needed
   (dissoc db :su-list-loaded))
 
-(defmethod dispatcher/action :select-topic-view
-  [db [_ topic]]
-  (if (= topic (:selected-topic-view db))
-    (do
-      (.pushState
-       js/history
-       nil
-       (router/current-company-slug)
-       (oc-urls/company (router/current-company-slug)))
-      (dissoc db :selected-topic-view))
-    (do
-      (.pushState
-       js/history
-       nil
-       topic
-       (oc-urls/company-section (router/current-company-slug) topic))
-      (assoc db :selected-topic-view topic))))
-
 (defmethod dispatcher/action :revisions-loaded
   [db [_ {:keys [slug topic revisions]}]]
   (assoc-in db (concat (dispatcher/company-data-key slug) [(keyword topic) :revisions-data]) (:revisions (:collection revisions))))
