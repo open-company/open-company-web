@@ -189,7 +189,8 @@
     (-> db
         (assoc :foce-key section-key) ; which topic is being FoCE
         (assoc :foce-data section-data) ; map of the in progress edits of the topic data
-        (assoc :foce-data-editing? false)) ; is the data portion of the topic (e.g. finance, growth) being edited
+        (assoc :foce-data-editing? false) ; is the data portion of the topic (e.g. finance, growth) being edited
+        (dissoc :show-add-topic)) ; remove the add topic view
     (-> db
         (dissoc :foce-key)
         (dissoc :foce-data)
@@ -471,3 +472,13 @@
 (defmethod dispatcher/action :revisions-loaded
   [db [_ {:keys [slug topic revisions]}]]
   (assoc-in db (concat (dispatcher/company-data-key slug) [(keyword topic) :revisions-data]) (:revisions (:collection revisions))))
+
+((defmethod dispatcher/action :show-add-topic
+  [db [_ active]]
+  (if active
+    (do
+      (utils/after 100 #(router/nav! (oc-urls/company)))
+      (-> db
+        (assoc :show-add-topic true)
+        (dissoc :selected-topic-view)))
+    (dissoc db :show-add-topic))))
