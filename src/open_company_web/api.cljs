@@ -183,24 +183,25 @@
       (let [body (if (:success response) (:body response) false)]
         (dispatcher/dispatch! [:auth-settings body])))))
 
+(def section-private-keys [:section
+                           :revisions
+                           :author
+                           :links
+                           :loading
+                           :as-of
+                           :read-only
+                           :revisions-cache
+                           :title-placeholder
+                           :body-placeholder
+                           :oc-editing
+                           :revisions-data])
+
 (defn save-or-create-section [section-data]
   (when section-data
     (let [links (:links section-data)
           slug (router/current-company-slug)
           section (keyword (:section section-data))
-          section-data (dissoc section-data :section
-                                            :revisions
-                                            :updated-at
-                                            :author
-                                            :links
-                                            :loading
-                                            :as-of
-                                            :read-only
-                                            :revisions-cache
-                                            :title-placeholder
-                                            :body-placeholder
-                                            :oc-editing
-                                            :revisions-data)
+          section-data (apply dissoc section-data section-private-keys)
           json-data (cljs->json section-data)
           section-link (utils/link-for links "update" "PUT")]
       (api-put (:href section-link)
@@ -233,17 +234,15 @@
   "PATCH a section, dispatching the results with a `:section` action, merging the response first with
   the optional preserve map argument."
 
-  ([section partial-section-data] (partial-update-section section partial-section-data {}))
+  ([section section-data] (partial-update-section section section-data {}))
   
-  ([section partial-section-data preserve]
-  (when (and section partial-section-data)
+  ([section section-data preserve]
+  (when (and section section-data)
     (let [slug (keyword (router/current-company-slug))
           section-kw (keyword section)
-          company-data (dispatcher/company-data)
-          section-data (get company-data section-kw)
-          clean-partial-section-data (dissoc partial-section-data :as-of :icon :section :revisions-data)
-          json-data (cljs->json clean-partial-section-data)
-          partial-update-link (utils/link-for (:links section-data) "partial-update" "PATCH")]
+          partial-update-link (utils/link-for (:links section-data) "partial-update" "PATCH")
+          cleaned-section-data (apply dissoc section-data section-private-keys)
+          json-data (cljs->json cleaned-section-data)]
       (api-patch (:href partial-update-link)
         { :json-params json-data
           :headers {
