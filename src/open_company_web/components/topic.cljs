@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
@@ -189,7 +190,7 @@
                     :onClick (fn []
                                 (when (and (not (responsive/is-mobile-size?))
                                            is-dashboard)
-                                  (dis/dispatch! [:select-topic-view section])))
+                                  (router/nav! (oc-urls/company-section (router/current-company-slug) section))))
                     :style topic-style
                     :ref "topic"
                     :data-section (name section)
