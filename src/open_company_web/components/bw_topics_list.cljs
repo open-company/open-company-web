@@ -68,6 +68,6 @@
                                              :group true
                                              :selected (= selected-topic-view topic)})
                     :data-topic (name topic)
-                    :on-click #(dis/dispatch! [:select-topic-view (name topic)])}
+                    :on-click #(router/nav! (oc-urls/company-section (router/current-company-slug) (name topic)))}
             (dom/div {:class "internal"}
               (:title sd))))))))
