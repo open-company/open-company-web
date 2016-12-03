@@ -35,20 +35,20 @@
     (load-revisions-if-needed owner))
 
   (will-update [_ next-props _]
-    (when (or (not= (:selected-topic-view next-props) selected-topic-view)
-              (and (nil? (:foce-key next-props))
-                   (not (nil? foce-data))))
-      (js/console.log "Reload revisions")
+    (when (not= (:selected-topic-view next-props) selected-topic-view)
       (om/set-state! owner :revisions-requested false)))
 
   (did-update [_ _ _]
     (load-revisions-if-needed owner))
 
   (render [_]
-    (let [topic-view-width (responsive/topic-view-width card-width columns-num)
+    (let [section-kw (keyword selected-topic-view)
+          topic-view-width (responsive/topic-view-width card-width columns-num)
           topic-card-width (responsive/calc-update-width columns-num)
           topic-data (->> selected-topic-view keyword (get company-data))
-          revisions (rest (:revisions-data topic-data))]
+          revisions (:revisions-data topic-data)
+          is-new-foce (and (= foce-key section-kw) (nil? (:updated-at foce-data)))
+          is-another-foce (and (not (nil? foce-key)) (not (nil? (:updated-at foce-data))))]
       (dom/div {:class "topic-view"
                 :style {:width (str topic-card-width "px")
                         :margin-right (str (max 0 (- topic-view-width topic-card-width 50)) "px")}
@@ -56,8 +56,8 @@
         (dom/div {:class "topic-view-internal"
                   :style {:width (str topic-card-width "px")}}
           (when-not (:read-only company-data)
-            (dom/div {:class "fake-textarea"}
-              (if foce-key
+            (dom/div {:class (str "fake-textarea " (when is-another-foce "disabled"))}
+              (if is-new-foce
                 (dom/div {:class "topic topic-edit"
                           :style {:width (str (- topic-card-width 120) "px")}}
                   (om/build topic-edit {:section selected-topic-view
@@ -65,35 +65,43 @@
                                         :is-stakeholder-update false
                                         :currency (:currency company-data)
                                         :card-width (- topic-card-width 120)
+                                        :is-topic-view true
                                         :foce-data-editing? foce-data-editing?
                                         :foce-key foce-key
                                         :foce-data foce-data}
                                        {:opts options
-                                        :key (str "topic-foce-" selected-topic-view)}))
-                (let [section-kw (keyword selected-topic-view)
-                      initial-data {:section section-kw
+                                        :key (str "topic-foce-" selected-topic-view "-new")}))
+                (let [initial-data {:section section-kw
                                     :title (s/capital selected-topic-view)
                                     :body-placeholder (str "Write something new about " (s/capital selected-topic-view) ".")
                                     :data (when (contains? topic-data :data) (:data topic-data))
                                     :metrics (when (contains? topic-data :metrics) (:metrics topic-data))
-                                    :headline ""}
+                                    :headline ""
+                                    :links (:links topic-data)}
                       with-data (if (#{:growth :finances} section-kw) (assoc initial-data :data (:data topic-data)) initial-data)
                       with-metrics (if (= :growth section-kw) (assoc with-data :metrics (:metrics topic-data)) with-data)]
                   (dom/div {:class "fake-textarea-internal"
                             :on-click #(dis/dispatch! [:start-foce section-kw with-metrics])
                             :style {:width (str (- topic-card-width 100) "px")}}
                     "Write something new about " (s/capital selected-topic-view) ".")))))
-          (dom/div {:class "revision-container group"}
-            (when-not (:read-only company-data)
-              (dom/hr {:class "separator-line"
-                       :style {:width (str (- topic-card-width 100) "px")}}))
-            (om/build topic {:section selected-topic-view
-                             :section-data topic-data
-                             :card-width (- topic-card-width 60)
-                             :read-only-company (:read-only company-data)
-                             :currency (:currency company-data)
-                             :is-topic-view true}
-                             {:opts {:section-name selected-topic-view}}))
+          ;; Render the topic from the company data only until the revisions are loaded.
+          (when-not revisions
+            (dom/div {:class "revision-container group"}
+              (when-not (:read-only company-data)
+                (dom/hr {:class "separator-line"
+                         :style {:width (str (- topic-card-width 80) "px")}}))
+              (om/build topic {:section selected-topic-view
+                               :section-data topic-data
+                               :card-width (- topic-card-width 60)
+                               :is-stakeholder-update false
+                               :read-only-company (:read-only company-data)
+                               :currency (:currency company-data)
+                               :is-topic-view true
+                               :foce-data-editing? foce-data-editing?
+                               :foce-key foce-key
+                               :foce-data foce-data
+                               :show-editing false}
+                               {:opts {:section-name selected-topic-view}})))
           (for [rev revisions]
             (when rev
               (dom/div {:class "revision-container group"}
@@ -102,7 +110,13 @@
                 (om/build topic {:section selected-topic-view
                                  :section-data rev
                                  :card-width (- topic-card-width 60)
+                                 :is-stakeholder-update false
                                  :read-only-company (:read-only company-data)
                                  :currency (:currency company-data)
-                                 :is-topic-view true}
-                                 {:opts {:section-name selected-topic-view}})))))))))
+                                 :is-topic-view true
+                                 :foce-data-editing? foce-data-editing?
+                                 :foce-key foce-key
+                                 :foce-data foce-data
+                                 :show-editing true}
+                                 {:opts {:section-name selected-topic-view}
+                                  :key (str "topic-" (when foce-key "foce-") selected-topic-view "-" (:updated-at rev))})))))))))
