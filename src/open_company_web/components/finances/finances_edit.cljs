@@ -158,7 +158,7 @@
 (defn more-months [owner]
   (om/update-state! owner :stop #(+ % batch-size)))
 
-(defcomponent finances-edit [{:keys [currency editing-cb show-first-edit-tip first-edit-tip-cb table-key] :as data} owner]
+(defcomponent finances-edit [{:keys [currency editing-cb table-key] :as data} owner]
 
   (init-state [_]
     {:finances-data (:finances-data data)

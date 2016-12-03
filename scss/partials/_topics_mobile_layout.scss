@@ -17,32 +17,11 @@ div.topics-mobile-layout {
       flex-direction: column;
       width: 100%;
 
-      div.topic-anim {
+      div.topic-internal {
         // height: 100%;
         display: flex;
         flex-direction: column;
         width: 100%;
-
-        div.topic-as-of {
-          // height: 100%;
-          display: flex;
-          flex-direction: column;
-          width: 100%;
-
-          div.topic-cur-as-of {
-            // height: 100%;
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-
-            div.topic-internal {
-              // height: 100%;
-              display: flex;
-              flex-direction: column;
-              width: 100%;
-            }
-          }
-        }
       }
     }
   }

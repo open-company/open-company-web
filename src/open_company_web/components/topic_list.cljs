@@ -120,7 +120,7 @@
   ; get internal component state
   (let [company-data (:company-data data)
         active-topics (apply merge (map #(hash-map (keyword %) (->> % keyword (get company-data))) (get-active-topics company-data)))
-        selected-topic (if (nil? current-state) (router/current-section) (:selected-topic current-state))]
+        selected-topic (when current-state (:selected-topic current-state))]
     {; initial active topics to check with the updated active topics
      :initial-active-topics active-topics
      ; actual active topics possibly changed by the user
@@ -257,7 +257,9 @@
                          :company-data company-data
                          :topics-data company-data
                          :foce-key (:foce-key data)
-                         :foce-data (:foce-data data)}
+                         :foce-data (:foce-data data)
+                         :selected-topic-view (:selected-topic-view data)
+                         :is-dashboard (:is-dashboard data)}
               comp-opts {:opts {:topic-click (partial topic-click owner)
                                 :update-active-topics (partial update-active-topics owner)}}
               sub-component (if (responsive/is-mobile-size?) topics-mobile-layout topics-columns)]

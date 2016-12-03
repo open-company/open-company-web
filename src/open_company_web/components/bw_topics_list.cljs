@@ -4,8 +4,10 @@
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1 sel)]
             [open-company-web.api :as api]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
+            [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]))
 
 (defn patch-company [topics-list]
@@ -36,7 +38,7 @@
 (defn can-dnd? []
   (not (:read-only (dis/company-data))))
 
-(defcomponent bw-topics-list [{:keys [company-data card-width] :as data} owner options]
+(defcomponent bw-topics-list [{:keys [company-data card-width selected-topic-view] :as data} owner options]
 
   (init-state [_]
     {:topics (:sections company-data)})
@@ -53,13 +55,19 @@
   (render [_]
     (dom/div {:class "left-topics-list group" :style {:width (str responsive/left-topics-list-width "px")}}
       (dom/div {:class "left-topics-list-top group"}
-        (dom/h3 {:class "left-topics-list-top-title left"} "TOPICS")
+        (dom/h3 {:class "left-topics-list-top-title left"
+                 :on-click #(router/nav! (oc-urls/company))} "TOPICS")
         ; Temp comment this waiting for add topic to work properly
         ; (dom/button {:class "left-topics-list-top-title btn-reset right"} "+")
         )
       (dom/div {:class "left-topics-list-items group"}
         (for [topic (:sections company-data)
               :let [sd (->> topic keyword (get company-data))]]
-          (dom/div {:class (str "left-topics-list-item " (when (can-dnd?) "dnd"))
-                    :data-topic (name topic)}
-            (:title sd)))))))
+          (dom/div {:class (utils/class-set {:left-topics-list-item true
+                                             :dnd (can-dnd?)
+                                             :group true
+                                             :selected (= selected-topic-view topic)})
+                    :data-topic (name topic)
+                    :on-click #(router/nav! (oc-urls/company-section (router/current-company-slug) (name topic)))}
+            (dom/div {:class "internal"}
+              (:title sd))))))))

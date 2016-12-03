@@ -96,10 +96,12 @@
       next-db)
     db))
 
-(defmethod dispatcher/action :section [db [_ body]]
+(defmethod dispatcher/action :section [db [_ {:keys [slug section body]}]]
+  ;; Refresh section revisions
+  (utils/after 500 #(api/load-revisions slug section (utils/link-for (:links body) "revisions")))
   (if body
-    (let [fixed-section (utils/fix-section (:body body) (:section body))]
-      (assoc-in db (dispatcher/company-section-key (:slug body) (:section body)) fixed-section))
+    (let [fixed-section (utils/fix-section body section)]
+      (assoc-in db (dispatcher/company-section-key slug section) fixed-section))
     db))
 
 (defmethod dispatcher/action :company [db [_ {:keys [slug success status body]}]]
@@ -228,19 +230,18 @@
   (let [slug (keyword (router/current-company-slug))
         topic (:foce-key db)
         topic-data (merge (:foce-data db) (if (map? topic-data) topic-data {}))
-        is-data-topic (#{:finances :growth} (keyword topic))
         body (:body topic-data)
         with-fixed-headline (assoc topic-data :headline (utils/emoji-images-to-unicode (:headline topic-data)))
-        with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))
-        old-section-data (get (dispatcher/company-data db slug) (keyword topic))
-        new-data (dissoc (merge old-section-data with-fixed-body) :placeholder)]
-    (api/patch-sections new-sections new-data (:section (:foce-data db)))
+        with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))]
+    ;; PUT if we don't have an :updated-at in the topic data, PATCH else
+    (if (utils/link-for (:links with-fixed-body) "partial-update" "PATCH")
+      (api/partial-update-section topic with-fixed-body)
+      (api/save-or-create-section with-fixed-body))
     (-> db
         (dissoc :foce-key)
         (dissoc :foce-data)
         (dissoc :foce-data-editing?)
-        (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) new-data)
-        (assoc-in (conj (dispatcher/company-data-key slug) :sections) new-sections))))
+        (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) with-fixed-body))))
 
 (defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
   (if topic
@@ -466,3 +467,7 @@
   [db [_]]
   ; Reset flag to reload su list when needed
   (dissoc db :su-list-loaded))
+
+(defmethod dispatcher/action :revisions-loaded
+  [db [_ {:keys [slug topic revisions]}]]
+  (assoc-in db (concat (dispatcher/company-data-key slug) [(keyword topic) :revisions-data]) (:revisions (:collection revisions))))

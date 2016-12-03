@@ -43,9 +43,7 @@
 (defcomponent topic-attribution [{:keys [topic-data
                                          section
                                          read-more-cb
-                                         close-cb
-                                         prev-rev
-                                         next-rev] :as data} owner options]
+                                         close-cb] :as data} owner options]
 
   (init-state [_]
     {:force-update 0
@@ -66,30 +64,12 @@
   (render-state [_ {:keys [force-update]}]
     (dom/div {:class "topic-attribution-container group"}
       (dom/div {:class "topic-navigation"}
-        (when (and (not (responsive/is-tablet-or-mobile?)) prev-rev)
-          (dom/button {:class "topic-navigation-button earlier-update"
-                       :title "View prior update"
-                       :type "button"
-                       :data-toggle "tooltip"
-                       :data-container "body"
-                       :data-placement "top"
-                       :on-click #(when prev-rev ((:rev-click options) % prev-rev))}
-            (dom/i {:class "fa fa-caret-left"})))
         (dom/div {:class "topic-attribution"
                 :data-toggle (when-not (responsive/is-mobile-size?) "tooltip")
                 :data-container "body"
                 :data-placement "top"
                 :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
-        (time-ago (:updated-at topic-data)))
-        (when (and (not (responsive/is-tablet-or-mobile?)) next-rev)
-          (dom/button {:class "topic-navigation-button later-update"
-                       :title "View next update"
-                       :type "button"
-                       :data-toggle "tooltip"
-                       :data-container "body"
-                       :data-placement "top"
-                       :on-click #(when next-rev ((:rev-click options) % next-rev))}
-            (dom/i {:class "fa fa-caret-right"}))))
+        (time-ago (:updated-at topic-data))))
       (when read-more-cb
         (dom/div {:class "right"}
           (om/build topic-read-more data))))))
