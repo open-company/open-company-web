@@ -32,6 +32,7 @@
     {:revisions-requested false})
 
   (did-mount [_]
+    (dis/dispatch! [:show-add-topic false])
     (load-revisions-if-needed owner))
 
   (will-update [_ next-props _]
@@ -71,21 +72,16 @@
                                         :foce-data foce-data}
                                        {:opts options
                                         :key (str "topic-foce-" selected-topic-view "-new")}))
-                (let [initial-data {:section section-kw
-                                    :title (s/capital selected-topic-view)
-                                    :body-placeholder (str "Write something new about " (s/capital selected-topic-view) ".")
-                                    :data (when (contains? topic-data :data) (:data topic-data))
-                                    :metrics (when (contains? topic-data :metrics) (:metrics topic-data))
-                                    :headline ""
-                                    :links (:links topic-data)}
+                (let [initial-data (utils/new-section-initial-data selected-topic-view selected-topic-view topic-data)
                       with-data (if (#{:growth :finances} section-kw) (assoc initial-data :data (:data topic-data)) initial-data)
                       with-metrics (if (= :growth section-kw) (assoc with-data :metrics (:metrics topic-data)) with-data)]
                   (dom/div {:class "fake-textarea-internal"
                             :on-click #(dis/dispatch! [:start-foce section-kw with-metrics])
                             :style {:width (str (- topic-card-width 100) "px")}}
-                    "Write something new about " (s/capital selected-topic-view) ".")))))
+                    (utils/new-section-body-placeholder selected-topic-view))))))
           ;; Render the topic from the company data only until the revisions are loaded.
-          (when-not revisions
+          (when (and (not revisions)
+                     (not (:placeholder topic-data)))
             (dom/div {:class "revision-container group"}
               (when-not (:read-only company-data)
                 (dom/hr {:class "separator-line"
