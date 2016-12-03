@@ -1,30 +1,16 @@
-div.topic.add-topic {
-  height: 94.5px;
+div.add-topic {
   border-radius: 2px;
-  background-color: rgba(244, 244, 244 , 0.2);
-  border: solid 1px rgba(78, 90, 107, 0.2);
-  text-align: center;
-  position: relative;
-  box-shadow: none;
-  font-weight: 700;
+  background-color: white;
+  border: 1px solid rgba(78, 90, 107, 0.2);
+  text-align: left;
+  font-weight: normal;
   font-family: $oc_headers_font;
   cursor: pointer;
   margin: 0 10px;
-
-  &:hover {
-    background-color: #ffffff;
-    transition: background-color 0.2s;
-
-    div.topic-title {
-      opacity: 1;
-      transition: opacity 0.2;
-    }
-  }
-
-  &.active {
-    background-color: #ffffff;
-    border: 1px solid rgba(78, 90, 107, 0.8);
-  }
+  width: 500px;
+  float: right;
+  box-shadow:  1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
+  padding: 20px;
 
   div.topic-title {
     font-weight: 700;
