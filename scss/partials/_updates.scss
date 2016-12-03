@@ -10,12 +10,16 @@ div.updates {
     background-color: $oc_gray_8;
 
     div.updates-content {
-      margin: 60px auto 10px;
+      margin: 55px auto 55px;
       padding: 0 34px;
 
       div.updates-content-cards {
-        padding-right: 10px;
-        margin-right: 40px;
+        padding: 20px 30px;
+        margin-right: 50px;
+
+        &.has-content {
+          background-color: white;
+        }
 
         div.loading-container {
           position: relative;
@@ -45,14 +49,25 @@ div.updates {
 
           div.topics-column {
             margin: 0;
-            max-width: 660px;
+            max-width: initial;
+            background-color: white;
 
             div.topic-row{
               margin-left: 0px;
+              margin-right: 0px;
 
               div.topic {
                 margin-left: 0px;
                 margin-right: 0px;
+                border: none;
+                box-shadow: none;
+                border-bottom: 1px solid rgba(78,90,107,0.1);
+              }
+
+              &:last-child {
+                div.topic {
+                  border-bottom: 0px solid rgba(78,90,107,0.1);
+                }
               }
             }
           }
@@ -61,7 +76,7 @@ div.updates {
 
       div.updates-content-list{
         padding-left: 20px;
-        padding-top: 2.2rem;
+        padding-top: 84px;
       }
     }
   }

@@ -1,4 +1,5 @@
 div.su-snapshot {
+  background-color: $oc_gray_8;
   @include big_web(){
     border-top: 4px solid $oc_yellow;
   }
@@ -57,8 +58,8 @@ div.su-snapshot {
       @include mobile(){
         padding-top: calc(20px + #{$mobile_navbar_height}px);
       }
-      @include big_web(){
-        padding-top: calc(40px + #{$mobile_navbar_height}px);
+      @include big_web() {
+        margin-top: calc(55px + #{$mobile_navbar_height}px); 
       }
     }
   }
@@ -66,14 +67,13 @@ div.su-snapshot {
   div.su-sp-content {
     position: relative;
     content: "";
-    background-color: $oc_gray_8;
     min-height: calc(100vh - #{$footer_small_height}px);
+    margin: 50px auto;
+    padding: 20px 30px;
+    background-color: white;
 
     @include mobile(){
       padding-top: 20px;
-    }
-    @include big_web(){
-      padding-top: 40px;
     }
 
     div.topics-columns div.topics-column-container.columns-1 {
@@ -88,6 +88,7 @@ div.su-snapshot {
 
     div.su-sp-company-header {
       text-align: center;
+      padding: 0px 0px 25px;
 
       div {
         margin-top: 10px;
@@ -112,32 +113,49 @@ div.su-snapshot {
       }
     }
 
-    div.su-snapshot-subtitle {
-      width: 100%;
-      text-align: center;
-      font-size: 12px;
-      line-height: 2.7;
-      color: $oc_gray_5;
-      margin-top: 0px;
-      padding-bottom: 30px;
+    div.topics-column-container{
+      padding-top: 0px;
+
+      div.topics-column {
+        margin: 0;
+        max-width: initial;
+        background-color: white;
+
+        div.topic-row{
+          margin-left: 0px;
+          margin-right: 0px;
+
+          div.topic {
+            margin-left: 0px;
+            margin-right: 0px;
+            border: none;
+            box-shadow: none;
+            border-bottom: 1px solid rgba(78,90,107,0.1);
+          }
+
+          &:last-child {
+            div.topic {
+              border-bottom: 0px solid rgba(78,90,107,0.1);
+            }
+          }
+        }
+      }
     }
-  }
 
-  div.su-sp-footer {
-    background: #f9f9f9;
-    text-align: center;
-    padding-top: 26px;
-    padding-bottom: 38px;
-    font-size: 15px;
-    color: $oc_gray_5;
-    font-weight: 400;
-    font-family: $oc_main_font;
-    background-color: $oc_gray_8;
-
-    a {
-      font-family: $oc_main_font;
-      text-decoration: underline;
+    div.su-sp-footer {
+      text-align: center;
+      padding-top: 26px;
+      padding-bottom: 38px;
+      font-size: 15px;
       color: $oc_gray_5;
+      font-weight: 400;
+      font-family: $oc_main_font;
+
+      a {
+        font-family: $oc_main_font;
+        text-decoration: underline;
+        color: $oc_gray_5;
+      }
     }
   }
 }
