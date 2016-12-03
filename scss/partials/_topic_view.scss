@@ -15,6 +15,10 @@ div.topic-view {
     div.fake-textarea {
       padding: 20px;
 
+      &.disabled {
+        opacity: 0.4;
+      }
+
       div.topic {
         border: none;
         box-shadow: none;
