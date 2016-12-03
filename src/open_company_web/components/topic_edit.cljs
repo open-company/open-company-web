@@ -498,5 +498,7 @@
               (dom/button {:class "btn-reset btn-outline"
                            :disabled (dis/foce-section-data-editing?)
                            :on-click #(if (:placeholder topic-data)
-                                        (dis/dispatch! [:topic-archive (name section)])
+                                        (do
+                                          (dis/dispatch! [:topic-archive (name section)])
+                                          (utils/after 1 (fn [] (router/nav! (oc-urls/company)))))
                                         (dis/dispatch! [:start-foce nil]))} "CANCEL"))))))))
