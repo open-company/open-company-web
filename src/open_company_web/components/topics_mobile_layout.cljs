@@ -20,6 +20,7 @@
                                             topics-data
                                             foce-key
                                             foce-data
+                                            is-dashboard
                                             is-stakeholder-update] :as data} owner options]
   (render [_]
     (dom/div {:class "topics-mobile-layout"}
@@ -37,6 +38,7 @@
                               :currency (:currency company-data)
                               :foce-key foce-key
                               :foce-data foce-data
+                              :is-dashboard is-dashboard
                               :topic-flex-num idx}
                   topic-opts {:opts {:section-name section-name
                                      :topic-click (partial (:topic-click options) section-name)}}]]

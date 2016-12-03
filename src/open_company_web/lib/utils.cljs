@@ -770,3 +770,18 @@
   (if-let [jwt (:jwt @dis/app-state)]
     (and (= (:auth-source jwt) "slack") ; auth'd w/ Slack
          (not (nil? (-> jwt :bot :token)))))) ; with an installed Slack bot
+
+(defn new-section-body-placeholder [topic]
+  (str "Write something new about " (s/capital (name topic)) "."))
+
+(defn new-section-initial-data [section title & [old-section-data]]
+  (let [section-kw (keyword section)
+        section-name (name section)]
+    {:section section-kw
+     :title (s/upper title)
+     :body-placeholder (new-section-body-placeholder section-name)
+     :data (when (and old-section-data (contains? old-section-data :data)) (:data old-section-data))
+     :metrics (when (and old-section-data (contains? old-section-data :metrics)) (:metrics old-section-data))
+     :headline ""
+     :placeholder true
+     :links (:links old-section-data)}))

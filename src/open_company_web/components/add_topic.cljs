@@ -1,7 +1,6 @@
 (ns open-company-web.components.add-topic
   (:require [rum.core :as rum]
-            [clojure.set :as cs]
-            [clojure.string :as string]
+            [org.martinklepsch.derivatives :as drv]
             [open-company-web.lib.utils :as utils]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
@@ -26,7 +25,7 @@
 (rum/defcs custom-topic-input
   < (rum/local "" ::topic-title)
   [s submit-fn]
-  (let [add-disabled (string/blank? @(::topic-title s))]
+  (let [add-disabled (clojure.string/blank? @(::topic-title s))]
     [:div.mt1.flex
      [:input.npt.mr1.p1.flex-auto
       {:type "text",
@@ -52,22 +51,25 @@
         chunk-size (inc (quot (count items) 2))]
     (partition-all chunk-size items)))
 
-(rum/defcs add-topic
-  < (rum/local false ::expanded?)
-  [s {:keys [active-topics archived-topics column update-active-topics initially-expanded]}]
-  (if (or @(::expanded? s) initially-expanded)
-    (let [all-sections (into {} (for [s (get-all-sections)]
-                                  [(keyword (:section s)) s]))
-          slug (keyword (router/current-company-slug))
-          topic-order (map keyword (:new-section-order (get @caches/new-sections slug)))
-          inactive-not-archived (filterv (complement (cs/union (set active-topics) (set archived-topics)))
-                                         topic-order)
-          chunked (chunk-topics inactive-not-archived archived-topics)]
-      [:div.card.p--card.m--card
+(rum/defcs add-topic < (drv/drv :company-data)
+                       rum/static
+                       rum/reactive
+  [s update-active-topics-cb]
+  (let [company-data (drv/react s :company-data)
+        active-topics (vec (map keyword (:sections company-data)))
+        archived-topics (:archived company-data)
+        all-sections (into {} (for [s (get-all-sections)]
+                                [(keyword (:section s)) s]))
+        slug (keyword (router/current-company-slug))
+        topic-order (map keyword (:new-section-order (get @caches/new-sections slug)))
+        inactive-not-archived (filterv (complement (clojure.set/union (set active-topics) (set archived-topics)))
+                                       topic-order)
+        chunked (chunk-topics inactive-not-archived archived-topics)]
+      [:div.add-topic.group
        [:div.open-sans.small-caps.bold.mb2.gray5
         [:span.mr1 "Suggested Topics"]
         [:span.dimmed-gray.btn-reset.right
-         {:on-click #(reset! (::expanded? s) false)}
+         {:on-click #(dis/dispatch! [:show-add-topic false])}
           (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})]]
        [:div.mxn2.clearfix
         (for [col chunked]
@@ -79,15 +81,10 @@
                (let [topic-full (get all-sections topic)]
                  [:div.mb1.btn-reset.yellow-line-hover-child
                   {:key topic
-                   :on-click #(do (update-active-topics (:section topic-full))
-                                  (reset! (::expanded? s) false))}
+                   :on-click #(update-active-topics-cb (:section topic-full))}
                   [:span.child
                    (str (:title topic-full) (when (#{:finances :growth} topic) " "))
                    (when (#{:finances :growth} topic)
                       [:i.fa.fa-line-chart])
                    (:section-name topic-full)]])))])]
-       (custom-topic-input #(do (update-active-topics %1 %2 %3)
-                                (reset! (::expanded? s) false)))])
-    [:div.topic.group.add-topic
-     {:on-click #(reset! (::expanded? s) true)}
-     [:div.topic-title.small-caps "+ Add Topic"]]))
+       (custom-topic-input #(update-active-topics-cb %1 %2))]))

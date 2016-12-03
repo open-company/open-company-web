@@ -32,26 +32,10 @@
 
 ;; ===== Utility functions =====
 
-(defn- get-active-topics [company-data]
-  (:sections company-data))
-
 (defn- get-topics [company-data active-topics]
   (map keyword active-topics))
 
 ;; ===== Events =====
-
-(defn- update-active-topics [owner new-topic & [section-data]]
-  (let [company-data (om/get-props owner :company-data)
-        old-topics (get-active-topics company-data)
-        new-topics (concat old-topics [new-topic])
-        new-topic-kw (keyword new-topic)]
-    (if section-data
-      (dispatcher/dispatch! [:start-foce new-topic-kw (or section-data {:section new-topic :placeholder true :body-placeholder "What would you like to say about this?"})])
-      (when-not (some #(= (:section %) (name new-topic)) (:archived (dispatcher/company-data)))
-        (om/set-state! owner :new-topic-foce new-topic-kw)))
-    (if section-data
-      (api/patch-sections new-topics section-data new-topic)
-      (api/patch-sections new-topics))))
 
 (defn- topic-click [owner topic selected-metric & [force-edit]]
   (let [company-slug (router/current-company-slug)]
@@ -119,8 +103,8 @@
 (defn- get-state [owner data current-state]
   ; get internal component state
   (let [company-data (:company-data data)
-        active-topics (apply merge (map #(hash-map (keyword %) (->> % keyword (get company-data))) (get-active-topics company-data)))
-        selected-topic (if (nil? current-state) (router/current-section) (:selected-topic current-state))]
+        active-topics (apply merge (map #(hash-map (keyword %) (->> % keyword (get company-data))) (:sections company-data)))
+        selected-topic (when current-state (:selected-topic current-state))]
     {; initial active topics to check with the updated active topics
      :initial-active-topics active-topics
      ; actual active topics possibly changed by the user
@@ -257,8 +241,10 @@
                          :company-data company-data
                          :topics-data company-data
                          :foce-key (:foce-key data)
-                         :foce-data (:foce-data data)}
-              comp-opts {:opts {:topic-click (partial topic-click owner)
-                                :update-active-topics (partial update-active-topics owner)}}
+                         :foce-data (:foce-data data)
+                         :show-add-topic (:show-add-topic data)
+                         :selected-topic-view (:selected-topic-view data)
+                         :is-dashboard (:is-dashboard data)}
+              comp-opts {:opts {:topic-click (partial topic-click owner)}}
               sub-component (if (responsive/is-mobile-size?) topics-mobile-layout topics-columns)]
           (om/build sub-component comp-data comp-opts))))))

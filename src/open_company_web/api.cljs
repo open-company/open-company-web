@@ -183,23 +183,25 @@
       (let [body (if (:success response) (:body response) false)]
         (dispatcher/dispatch! [:auth-settings body])))))
 
+(def section-private-keys [:section
+                           :revisions
+                           :author
+                           :links
+                           :loading
+                           :as-of
+                           :read-only
+                           :revisions-cache
+                           :title-placeholder
+                           :body-placeholder
+                           :oc-editing
+                           :revisions-data])
+
 (defn save-or-create-section [section-data]
   (when section-data
     (let [links (:links section-data)
           slug (router/current-company-slug)
           section (keyword (:section section-data))
-          section-data (dissoc section-data :section
-                                            :revisions
-                                            :updated-at
-                                            :author
-                                            :links
-                                            :loading
-                                            :as-of
-                                            :read-only
-                                            :revisions-cache
-                                            :title-placeholder
-                                            :body-placeholder
-                                            :oc-editing)
+          section-data (apply dissoc section-data section-private-keys)
           json-data (cljs->json section-data)
           section-link (utils/link-for links "update" "PUT")]
       (api-put (:href section-link)
@@ -232,17 +234,15 @@
   "PATCH a section, dispatching the results with a `:section` action, merging the response first with
   the optional preserve map argument."
 
-  ([section partial-section-data] (partial-update-section section partial-section-data {}))
+  ([section section-data] (partial-update-section section section-data {}))
   
-  ([section partial-section-data preserve]
-  (when (and section partial-section-data)
+  ([section section-data preserve]
+  (when (and section section-data)
     (let [slug (keyword (router/current-company-slug))
           section-kw (keyword section)
-          company-data (dispatcher/company-data)
-          section-data (get company-data section-kw)
-          clean-partial-section-data (dissoc partial-section-data :as-of :icon :section)
-          json-data (cljs->json clean-partial-section-data)
-          partial-update-link (utils/link-for (:links section-data) "partial-update" "PATCH")]
+          partial-update-link (utils/link-for (:links section-data) "partial-update" "PATCH")
+          cleaned-section-data (apply dissoc section-data section-private-keys)
+          json-data (cljs->json cleaned-section-data)]
       (api-patch (:href partial-update-link)
         { :json-params json-data
           :headers {
@@ -280,7 +280,7 @@
   (when finances-data
     (let [links (:links finances-data)
           slug (router/current-company-slug)
-          data {:data (map #(dissoc % :burn-rate :runway :value :new :read-only) (:data finances-data))}
+          data {:data (map #(dissoc % :burn-rate :runway :value :new :read-only :revisions-data) (:data finances-data))}
           json-data (cljs->json data)
           finances-link (utils/link-for links "partial-update" "PATCH")]
       (api-patch (:href finances-link)
@@ -571,3 +571,15 @@
             (update-jwt-cookie! body)
             (dispatcher/dispatch! [:jwt (j/get-contents)]))
           (utils/after 100 #(dispatcher/dispatch! [:collect-name-pswd-finish status])))))))
+
+(defn load-revisions [slug topic revisions-link]
+  (when (and topic revisions-link)
+    (api-get (:href revisions-link)
+      {:headers {
+        ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type, Authorization"
+          ; custom content type
+          "content-type" (:type revisions-link)
+          "accept" (:type revisions-link)}}
+      (fn [{:keys [status body success]}]
+        (dispatcher/dispatch! [:revisions-loaded {:slug slug :topic topic :revisions (if success (json->cljs body) {})}])))))
