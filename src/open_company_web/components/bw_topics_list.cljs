@@ -57,9 +57,8 @@
       (dom/div {:class "left-topics-list-top group"}
         (dom/h3 {:class "left-topics-list-top-title left"
                  :on-click #(router/nav! (oc-urls/company))} "TOPICS")
-        ; Temp comment this waiting for add topic to work properly
-        ; (dom/button {:class "left-topics-list-top-title btn-reset right"} "+")
-        )
+        (dom/button {:class "left-topics-list-top-title btn-reset right"
+                     :on-click #(dis/dispatch! [:show-add-topic true])} "+"))
       (dom/div {:class "left-topics-list-items group"}
         (for [topic (:sections company-data)
               :let [sd (->> topic keyword (get company-data))]]
@@ -68,6 +67,8 @@
                                              :group true
                                              :selected (= selected-topic-view topic)})
                     :data-topic (name topic)
+                    :key (str "bw-topic-list-" (name topic))
                     :on-click #(router/nav! (oc-urls/company-section (router/current-company-slug) (name topic)))}
-            (dom/div {:class "internal"}
+            (dom/div {:class "internal"
+                      :key (str "bw-topic-list-" (name topic) "-internal")}
               (:title sd))))))))
