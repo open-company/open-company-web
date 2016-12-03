@@ -125,6 +125,12 @@ div.topic {
     position: relative;
     height: auto;
 
+    &:hover {
+      button.topic-pencil-button {
+        opacity: 1;
+      }
+    }
+
     button.topic-pencil-button {
       width: 30px;
       height: 20px;

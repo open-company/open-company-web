@@ -7,6 +7,7 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.oc-colors :as oc-colors]
             [open-company-web.lib.responsive :as responsive]
+            [open-company-web.components.topic-edit :refer (topic-edit)]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [goog.events.EventType :as EventType]
@@ -23,6 +24,11 @@
     (dom/div #js {:className (str "topic-headline-inner group" (when (:placeholder data) " italic"))
                   :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
 
+(defn start-foce-click [owner]
+  (let [section-kw (keyword (om/get-props owner :section))
+        section-data (om/get-props owner :topic-data)]
+    (dis/dispatch! [:start-foce section-kw section-data])))
+
 (defcomponent topic-internal [{:keys [topic-data
                                       section
                                       currency
@@ -34,7 +40,8 @@
                                       is-dashboard
                                       is-topic-view
                                       foce-active
-                                      topic-click] :as data} owner options]
+                                      topic-click
+                                      show-editing] :as data} owner options]
 
   (render [_]
     (let [section-kw          (keyword section)
@@ -71,11 +78,26 @@
                       (and (not is-mobile?)
                            is-dashboard))
               (dom/span {:data-toggle "tooltip"
-                         :data-placement "right"
+                         :data-placement "top"
                          :data-container "body"
                          :key (str "tt-attrib-" (:name (:author topic-data)) (:updated-at topic-data))
                          :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
-                " · " (utils/time-since (:updated-at topic-data))))))
+                " · " (utils/time-since (:updated-at topic-data)))))
+          (when (and show-editing
+                     (not is-stakeholder-update)
+                     (or (not is-mobile?)
+                         (not is-dashboard))
+                     (responsive/can-edit?)
+                     (not (:read-only topic-data))
+                     (not read-only-company)
+                     (not foce-active))
+            (dom/button {:class (str "topic-pencil-button btn-reset")
+                         :on-click #(start-foce-click owner)}
+              (dom/i {:class "fa fa-pencil"
+                      :title "Edit"
+                      :data-toggle "tooltip"
+                      :data-container "body"
+                      :data-placement "top"}))))
 
         ;; Topic data
         (when (and (or (not is-dashboard)
@@ -123,6 +145,10 @@
                              is-stakeholder-update
                              is-dashboard
                              is-topic-view
+                             foce-key
+                             foce-data
+                             foce-data-editing?
+                             show-editing
                              topic-flex-num] :as data} owner options]
 
   (init-state [_]
@@ -144,8 +170,8 @@
   (render-state [_ {:keys [editing as-of window-width] :as state}]
     (let [section-kw (keyword section)
           slug (keyword (router/current-company-slug))
-          foce-active (not (nil? (dis/foce-section-key)))
-          is-foce (= (dis/foce-section-key) section-kw)
+          foce-active (not (nil? foce-key))
+          is-current-foce (and (= foce-key section-kw) (= (:updated-at foce-data) (:updated-at section-data)))
           is-mobile? (responsive/is-mobile-size?)
           with-order (if (contains? data :topic-flex-num) {:order topic-flex-num} {})
           topic-style (clj->js (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
@@ -157,9 +183,9 @@
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
                                                  :mobile-dashboard-topic (and is-mobile? is-dashboard)
-                                                 :topic-edit is-foce
+                                                 :topic-edit is-current-foce
                                                  :dashboard-topic is-dashboard
-                                                 :no-foce (and foce-active (not is-foce))})
+                                                 :no-foce (and foce-active (not is-current-foce))})
                     :onClick (fn []
                                 (when (and (not (responsive/is-mobile-size?))
                                            is-dashboard)
@@ -167,19 +193,31 @@
                     :style topic-style
                     :ref "topic"
                     :data-section (name section)
-                    :key (str "topic-" (name section))
-                    :id (str "topic-" (name section))}
-        (om/build topic-internal {:section section
-                                  :topic-data section-data
-                                  :is-stakeholder-update (:is-stakeholder-update data)
-                                  :currency currency
-                                  :card-width card-width
-                                  :read-only-company (:read-only-company data)
-                                  :topic-click (:topic-click options)
-                                  :is-foce is-foce
-                                  :foce-active foce-active
-                                  :is-mobile? is-mobile?
-                                  :is-dashboard is-dashboard
-                                  :is-topic-view is-topic-view}
-                                 {:opts options
-                                  :key (str "topic-" section)})))))
+                    :key (str "topic-" (when is-current-foce "foce-") (name section) "-" (:updated-at section-data))
+                    :id (str "topic-" (name section) "-" (:updated-at section-data))}
+        (if is-current-foce
+          (om/build topic-edit {:section section
+                                :topic-data section-data
+                                :is-stakeholder-update is-stakeholder-update
+                                :currency currency
+                                :card-width card-width
+                                :foce-data-editing? foce-data-editing?
+                                :read-only-company (:read-only-company data)
+                                :foce-key foce-key
+                                :foce-data foce-data}
+                               {:opts options
+                                :key (str "topic-foce-" section "-" (:updated-at section-data))})
+          (om/build topic-internal {:section section
+                                    :topic-data section-data
+                                    :is-stakeholder-update (:is-stakeholder-update data)
+                                    :currency currency
+                                    :card-width card-width
+                                    :read-only-company (:read-only-company data)
+                                    :topic-click (:topic-click options)
+                                    :foce-active foce-active
+                                    :is-mobile? is-mobile?
+                                    :is-dashboard is-dashboard
+                                    :is-topic-view is-topic-view
+                                    :show-editing show-editing}
+                                   {:opts options
+                                    :key (str "topic-" section)}))))))
