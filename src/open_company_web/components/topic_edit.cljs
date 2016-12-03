@@ -266,8 +266,8 @@
       (setup-edit owner)
       (utils/after 100 #(focus-headline))
       (reset! prevent-route-dispatch true)
-      (let [win-location (.-location js/window)
-            current-token (oc-urls/company (router/current-company-slug))
+      (let [loc (.-location js/window)
+            current-token (str (.-pathname loc) (.-search loc) (.-hash loc))
             listener (events/listen @router/history HistoryEventType/NAVIGATE
                       (partial handle-navigate-event current-token owner))]
         (om/set-state! owner :history-listener-id listener))))
