@@ -81,7 +81,7 @@
                (let [topic-full (get all-sections topic)]
                  [:div.mb1.btn-reset.yellow-line-hover-child
                   {:key topic
-                   :on-click #(update-active-topics-cb (:section topic-full))}
+                   :on-click #(update-active-topics-cb (:section topic-full) {:title (:title topic-full) :section (:section topic-full) :placeholder true})}
                   [:span.child
                    (str (:title topic-full) (when (#{:finances :growth} topic) " "))
                    (when (#{:finances :growth} topic)
