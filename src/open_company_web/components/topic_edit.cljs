@@ -181,6 +181,7 @@
                 :success-title "ARCHIVE"
                 :success-cb #(let [section (dis/foce-section-key)]
                                (dis/dispatch! [:topic-archive section])
+                               (utils/after 1 (fn [] (router/nav! (oc-urls/company))))
                                (hide-popover nil "archive-topic-confirm"))}))
 
 (defn- add-image-tooltip [image-header]
@@ -497,7 +498,7 @@
                            :on-click #(save-topic owner)} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
                            :disabled (dis/foce-section-data-editing?)
-                           :on-click #(if (:placeholder topic-data)
+                           :on-click #(if (:new topic-data)
                                         (do
                                           (dis/dispatch! [:topic-archive (name section)])
                                           (utils/after 1 (fn [] (router/nav! (oc-urls/company)))))
