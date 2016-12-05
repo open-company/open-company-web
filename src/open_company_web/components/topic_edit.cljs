@@ -476,6 +476,7 @@
                       :style {:display (if (nil? file-upload-state) "block" "none")}}
               (dom/button {:class "btn-reset btn-solid"
                            :disabled (or (= file-upload-state :show-progress)
+                                         (not has-changes)
                                          (dis/foce-section-data-editing?))
                            :on-click #(save-topic owner)} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
