@@ -53,7 +53,7 @@
                                  :circle-selected-stroke 5
                                  :line-stroke-width 2
                                  :chart-size {:height 40
-                                              :width (max 30 (min 150 chart-width))}}]
+                                              :width (max 30 (min 100 chart-width))}}]
             (om/build growth-metric subsection-data {:opts {:hide-nav true
                                                             :chart-fill-polygons false}}))))
       (dom/div {:class "actions group right"}
