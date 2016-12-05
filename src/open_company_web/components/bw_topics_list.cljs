@@ -56,7 +56,9 @@
     (dom/div {:class "left-topics-list group" :style {:width (str responsive/left-topics-list-width "px")}}
       (dom/div {:class "left-topics-list-top group"}
         (dom/h3 {:class "left-topics-list-top-title left"
-                 :on-click #(router/nav! (oc-urls/company))} "TOPICS")
+                 :on-click #(do
+                              (dis/dispatch! [:show-add-topic false])
+                              (router/nav! (oc-urls/company)))} "TOPICS")
         (when-not show-add-topic
           (dom/button {:class "left-topics-list-top-title btn-reset right"
                        :on-click #(dis/dispatch! [:show-add-topic true])} "+")))
