@@ -86,7 +86,7 @@
                                  :main-width width}
                                 {:key (:updated-at section-data)})))))
 
-(defcomponent topic-finances [{:keys [section section-data currency editable? foce-data-editing? editing-cb table-key data-section-on-change] :as data} owner options]
+(defcomponent topic-finances [{:keys [section section-data currency editable? foce-data-editing? editing-cb table-key data-section-on-change card-width columns-num] :as data} owner options]
 
   (init-state [_]
     {:finances-raw-data (:data section-data)
@@ -153,6 +153,8 @@
 
               (om/build finances-sparklines {:finances-data sorted-finances
                                              :archive-cb #(show-archive-confirm-popover owner data)
+                                             :card-width card-width
+                                             :columns-num columns-num
                                              :editing? editable?
                                              :currency currency}
                                             {:opts (merge chart-opts {:labels labels})}))))))))

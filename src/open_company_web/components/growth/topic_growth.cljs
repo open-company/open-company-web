@@ -164,7 +164,7 @@
         new-metrics (assoc metrics (if (= k :slug) v focus) new-metric)]
     (om/set-state! owner :growth-metrics new-metrics)))
 
-(defcomponent topic-growth [{:keys [section section-data currency editable? foce-data-editing? editing-cb data-section-on-change] :as data} owner options]
+(defcomponent topic-growth [{:keys [section section-data currency editable? foce-data-editing? editing-cb data-section-on-change card-width columns-num] :as data} owner options]
 
   (init-state [_]
     (get-state owner data true))
@@ -220,6 +220,8 @@
               (om/build growth-sparklines {:growth-data growth-data
                                            :growth-metrics growth-metrics
                                            :growth-metric-slugs growth-metric-slugs
+                                           :card-width card-width
+                                           :columns-num columns-num
                                            :editing? editable?
                                            :currency currency
                                            :archive-cb (partial show-archive-confirm-popover owner editing-cb)}))))))))
