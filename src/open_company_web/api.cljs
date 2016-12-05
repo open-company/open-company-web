@@ -194,7 +194,9 @@
                            :title-placeholder
                            :body-placeholder
                            :oc-editing
-                           :revisions-data])
+                           :revisions-data
+                           :new
+                           :placeholder])
 
 (defn save-or-create-section [section-data]
   (when section-data
