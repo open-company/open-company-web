@@ -187,6 +187,7 @@
                                      :topic-click (partial topic-click section-name)}})))))))
 
 (defn- update-active-topics [owner new-topic section-data]
+  (dis/dispatch! [:show-add-topic false])
   (let [company-data (om/get-props owner :company-data)
         old-topics (:sections company-data)
         new-topics (conj old-topics new-topic)
