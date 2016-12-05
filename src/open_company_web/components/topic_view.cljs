@@ -77,7 +77,7 @@
                   (dom/div {:class "fake-textarea-internal"
                             :on-click #(dis/dispatch! [:start-foce section-kw with-metrics])
                             :style {:width (str (- topic-card-width 100) "px")}}
-                    (utils/new-section-body-placeholder))))))
+                    "Write something new here...")))))
           ;; Render the topic from the company data only until the revisions are loaded.
           (when (and (not revisions)
                      (not (:placeholder topic-data)))
