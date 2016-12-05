@@ -229,7 +229,8 @@
         (utils/after 10 #(router/nav! (oc-urls/company-section (router/current-company-slug) new-section)))
         (utils/after 60 #(dis/dispatch! [:start-foce
                                           new-section
-                                          (assoc foce-section-data :new true)])))
+                                          (merge foce-section-data {:new true
+                                                                    :body-placeholder (utils/new-section-body-placeholder)})])))
       (om/set-state! owner :start-foce nil)))
 
   (render-state [_ {:keys [best-layout]}]
