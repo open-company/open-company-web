@@ -68,14 +68,14 @@ div.left-topics-list {
           background-color: rgba(78,90,107,0.1);
 
           &:after, &::after {
-            font-size: 18px;
+            font-size: 13px;
             font-family: FontAwesome;
             font-weight: 400;
             color: $oc_gray_5;
             content: "\f0c9";
             cursor: move;
-            margin-top: -23px;
-            margin-left: 128px;
+            margin-top: -20px;
+            margin-left: 130px;
             opacity: 0.7;
           }
         }
