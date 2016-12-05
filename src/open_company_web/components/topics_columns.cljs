@@ -273,7 +273,7 @@
                         :style {:margin-right (str (- topic-view-width 560) "px")}}
                 (add-topic (partial update-active-topics owner)))
               (and is-dashboard
-                   (not (responsive/is-tablet-or-mobile?))
+                   (not (responsive/is-mobile-size?))
                    selected-topic-view)
               (om/build topic-view {:card-width card-width
                                     :columns-num columns-num
