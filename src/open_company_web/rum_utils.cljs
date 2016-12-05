@@ -2,11 +2,10 @@
   (:require [org.martinklepsch.derivatives :as drv]
             [rum.core :as rum]
             [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]))
 
-(let [get-k ":derivatives/get"
-      release-k ":derivatives/release"]
+(let [get-k ":org.martinklepsch.derivatives/get"
+      release-k ":org.martinklepsch.derivatives/release"]
   (defn om-derivatives [mngr]
     (->> {:childContextTypes {get-k js/React.PropTypes.func
                               release-k js/React.PropTypes.func}
@@ -24,4 +23,4 @@
   (om/root component
            state
            {:target target
-            :descriptor (om-derivatives (drv/derivatives-manager drv-spec))}))
+            :descriptor (om-derivatives (drv/derivatives-pool drv-spec))}))
