@@ -11,7 +11,7 @@ div.topic {
   border-radius: 3px;
   background-color: white;
 
-  &.dashboard-topic {
+  &.dashboard-topic.no-tablet {
     padding-bottom: 10px;
     border-bottom: 2px solid transparent;
     border-left: 2px solid transparent;
