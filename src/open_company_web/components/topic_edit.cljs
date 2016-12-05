@@ -443,18 +443,6 @@
                            :style {:display (if (or (and (= is-data? :finances) no-data?) (= is-data? :growth)) "block" "none")}
                            :on-click #(dis/dispatch! [:start-foce-data-editing (if (= is-data? :growth) growth-utils/new-metric-slug-placeholder :new)])}
                 (dom/i {:class "fa fa-line-chart"})))
-
-            ;; Topic archive button
-            (when-not (:placeholder topic-data)
-              (dom/button {:class "btn-reset archive-button right"
-                           :title "Archive this topic"
-                           :type "button"
-                           :data-toggle "tooltip"
-                           :data-container "body"
-                           :data-placement "top"
-                           :style {:display (if (nil? file-upload-state) "block" "none")}
-                           :on-click (partial remove-topic-click owner)}
-                  (dom/i {:class "fa fa-archive"})))
             
             ;; Hidden (initially) file upload progress
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
@@ -496,4 +484,15 @@
                                         (do
                                           (dis/dispatch! [:topic-archive (name section)])
                                           (utils/after 1 (fn [] (router/nav! (oc-urls/company)))))
-                                        (dis/dispatch! [:start-foce nil]))} "CANCEL"))))))))
+                                        (dis/dispatch! [:start-foce nil]))} "CANCEL")
+              ;; Topic archive button
+            (when-not (:new topic-data)
+              (dom/button {:class "btn-reset archive-button right"
+                           :title "Archive this topic"
+                           :type "button"
+                           :data-toggle "tooltip"
+                           :data-container "body"
+                           :data-placement "top"
+                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :on-click (partial remove-topic-click owner)}
+                  (dom/i {:class "fa fa-archive"}))))))))))
