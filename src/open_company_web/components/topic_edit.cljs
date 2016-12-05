@@ -49,13 +49,14 @@
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
 (defn- force-hide-placeholder [owner]
+  (js/console.log "force-hide-placeholder")
   (let [editor       (om/get-state owner :body-editor)
-        section-name (name (om/get-props owner :section))
+        section-name (name (:section (dis/foce-section-data)))
         body-el      (sel1 [(str "div#foce-body-" section-name)])]
     (utils/medium-editor-hide-placeholder editor body-el)))
 
 (defn body-on-change [owner]
-  (when-let* [section-kw   (keyword (om/get-props owner :section))
+  (when-let* [section-kw   (keyword (:section (dis/foce-section-data)))
               section-name (name section-kw)
               body-el      (sel1 [(str "div#foce-body-" section-name)])]
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
@@ -71,7 +72,7 @@
                                          :body-exceeds (neg? remaining-chars)})))))
 
 (defn- setup-edit [owner]
-  (when-let* [section-kw   (keyword (om/get-props owner :section))
+  (when-let* [section-kw   (keyword (:section (dis/foce-section-data)))
               section-name (name section-kw)
               body-id      (str "div#foce-body-" section-name)
               body-el      (sel1 [body-id])]
@@ -240,13 +241,6 @@
        :file-upload-progress 0
        :body-exceeds false
        :headline-exceeds false}))
-
-  (will-receive-props [_ next-props]
-    ;; update body placeholder when receiving data from API
-    (let [topic        (dis/foce-section-key)
-          company-data (dis/company-data)
-          topic-data   (get company-data (keyword topic))]
-      (om/set-state! owner :body-placeholder (or (:body-placeholder topic-data) ""))))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
