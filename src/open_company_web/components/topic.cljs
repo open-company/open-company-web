@@ -64,6 +64,14 @@
                                 (topic-click))
                     :ref "topic-internal"}
 
+        ;; Topic image for dashboard
+        (when (and image-header
+                   (or (not is-mobile?)
+                       (not is-dashboard))
+                   (not is-topic-view))
+          (dom/div {:class "card-header card-image"}
+            (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
+
         ;; Topic title
         (dom/div {:class "group"}
           (dom/div {:class "topic-title"}
@@ -94,14 +102,13 @@
                       :data-placement "top"}))))
 
         ;; Topic headline
-        (when (and (or (not is-mobile?) (not is-dashboard))
+        (when (and is-topic-view
                    (not (clojure.string/blank? (:headline topic-data))))
           (om/build topic-headline topic-data))
 
         ;; Topic image for dashboard
         (when (and image-header
-                   (or (not is-mobile?)
-                       (not is-dashboard)))
+                   is-topic-view)
           (dom/div {:class "card-header card-image"}
             (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
 
@@ -124,6 +131,12 @@
                                         :card-width card-width
                                         :columns-num columns-num
                                         :currency currency} {:opts chart-opts}))))
+
+        ;; Topic headline
+        (when (and (or (not is-mobile?) (not is-dashboard))
+                   (not is-topic-view)
+                   (not (clojure.string/blank? (:headline topic-data))))
+          (om/build topic-headline topic-data))
 
         ;; Attribution for topic
         (when (and is-mobile? is-dashboard)
