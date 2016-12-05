@@ -29,13 +29,19 @@
       (let [ww (responsive/ww)
             total-card-width (if (>= ww responsive/c1-min-win-width) card-width ww)
             center-box-width (if (responsive/is-mobile-size?)
-                               (- total-card-width 20 80 editing-actions-width)
+                               (- total-card-width 20 80)
                                (- card-width 80 (if editing? editing-actions-width 0)))]
         (dom/div {:class "center-box"
                   :style {:width (str center-box-width "px")}}
           (let [fixed-card-width (if (responsive/is-mobile-size?)
                                    total-card-width ; use all the possible space on mobile
                                    card-width)
+                chart-width (- fixed-card-width
+                               50                                     ;; margin left and right
+                               190                                    ;; max left label size of the sparkline
+                               40                                     ;; internal padding
+                               5                                      ;; internal spacing
+                               (if editing? editing-actions-width 0)) ;; remove 15 more pixel only in editing mode
                 subsection-data {:metric-data metric-data
                                  :metric-info metric-metadata
                                  :currency currency
@@ -47,13 +53,7 @@
                                  :circle-selected-stroke 5
                                  :line-stroke-width 2
                                  :chart-size {:height 40
-                                              :width (- fixed-card-width 50      ;; margin left and right
-                                                                        190      ;; max left label size of the sparkline
-                                                                         40      ;; internal padding
-                                                                          5      ;; internal spacing
-                                                          (if editing? editing-actions-width 0))}}]
-                                                                                 ;; remove 15 more pixel
-                                                                                 ;; only in editing mode
+                                              :width (max 30 (min 150 chart-width))}}]
             (om/build growth-metric subsection-data {:opts {:hide-nav true
                                                             :chart-fill-polygons false}}))))
       (dom/div {:class "actions group right"}
@@ -74,16 +74,9 @@
            :on-click #(archive-cb (:slug metric-metadata))}
           (dom/i {:class "fa fa-times"}))))))
 
-(defcomponent growth-sparklines [{:keys [growth-data growth-metrics growth-metric-slugs currency archive-cb editing?] :as data} owner]
+(defcomponent growth-sparklines [{:keys [growth-data growth-metrics growth-metric-slugs currency archive-cb editing? card-width columns-num] :as data} owner]
 
-  (init-state [_]
-    {:card-width (responsive/calc-card-width)})
-
-  (did-mount [_]
-    (when-not (utils/is-test-env?)
-      (events/listen js/window EventType/RESIZE #(om/set-state! owner :card-width (responsive/calc-card-width)))))
-
-  (render-state [_ {:keys [card-width]}]
+  (render [_]
     (dom/div {:class (str "growth-sparklines sparklines" (when (= (dis/foce-section-key) :growth) " editing"))}
       (for [slug growth-metric-slugs]
         (om/build growth-sparkline {:metric-data (filter #(= (keyword (:slug %)) (keyword slug)) (vals growth-data))
