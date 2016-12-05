@@ -116,6 +116,8 @@
               (= section "finances")
               (om/build topic-finances {:section-data (utils/fix-finances topic-data)
                                         :section section
+                                        :card-width card-width
+                                        :columns-num columns-num
                                         :currency currency} {:opts chart-opts}))))
 
         ;; Topic headline
