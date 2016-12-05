@@ -186,6 +186,7 @@
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
                                                  :mobile-dashboard-topic (and is-mobile? is-dashboard)
+                                                 :no-tablet (not (responsive/is-tablet-or-mobile?))
                                                  :topic-edit is-current-foce
                                                  :dashboard-topic is-dashboard
                                                  :no-foce (and foce-active (not is-current-foce))})
