@@ -771,17 +771,22 @@
     (and (= (:auth-source jwt) "slack") ; auth'd w/ Slack
          (not (nil? (-> jwt :bot :token)))))) ; with an installed Slack bot
 
-(defn new-section-body-placeholder [topic]
-  (str "Write something new about " (s/capital (name topic)) "."))
+(defn new-section-body-placeholder []
+  "Post something new.")
 
-(defn new-section-initial-data [section title & [old-section-data]]
-  (let [section-kw (keyword section)
-        section-name (name section)]
-    {:section section-kw
-     :title (s/upper title)
-     :body-placeholder (new-section-body-placeholder section-name)
-     :data (when (and old-section-data (contains? old-section-data :data)) (:data old-section-data))
-     :metrics (when (and old-section-data (contains? old-section-data :metrics)) (:metrics old-section-data))
-     :headline ""
-     :placeholder true
-     :links (:links old-section-data)}))
+(defn new-section-initial-data [section title old-section-data]
+  (let [section-name (name section)
+        initial-data {:section section-name
+                      :title title
+                      :body-placeholder (new-section-body-placeholder)
+                      :headline ""
+                      :body ""
+                      :placeholder true
+                      :links (:links old-section-data)}
+        with-data (if (and old-section-data (contains? old-section-data :data))
+                    (assoc initial-data :data (:data old-section-data))
+                    initial-data)
+        with-metrics (if (and old-section-data (contains? old-section-data :metrics))
+                       (assoc with-data :metrics (:metrics old-section-data))
+                       with-data)]
+    with-metrics))
