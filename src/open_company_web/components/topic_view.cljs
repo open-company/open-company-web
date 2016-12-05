@@ -61,9 +61,7 @@
               (if is-new-foce
                 (dom/div {:class "topic topic-edit"
                           :style {:width (str (- topic-card-width 120) "px")}}
-                  (om/build topic-edit {:section selected-topic-view
-                                        :topic-data topic-data
-                                        :is-stakeholder-update false
+                  (om/build topic-edit {:is-stakeholder-update false
                                         :currency (:currency company-data)
                                         :card-width (- topic-card-width 120)
                                         :is-topic-view true
@@ -72,13 +70,13 @@
                                         :foce-data foce-data}
                                        {:opts options
                                         :key (str "topic-foce-" selected-topic-view "-new")}))
-                (let [initial-data (utils/new-section-initial-data selected-topic-view selected-topic-view topic-data)
+                (let [initial-data (utils/new-section-initial-data selected-topic-view (:title topic-data) topic-data)
                       with-data (if (#{:growth :finances} section-kw) (assoc initial-data :data (:data topic-data)) initial-data)
                       with-metrics (if (= :growth section-kw) (assoc with-data :metrics (:metrics topic-data)) with-data)]
                   (dom/div {:class "fake-textarea-internal"
                             :on-click #(dis/dispatch! [:start-foce section-kw with-metrics])
                             :style {:width (str (- topic-card-width 100) "px")}}
-                    (utils/new-section-body-placeholder selected-topic-view))))))
+                    (utils/new-section-body-placeholder))))))
           ;; Render the topic from the company data only until the revisions are loaded.
           (when (and (not revisions)
                      (not (:placeholder topic-data)))
