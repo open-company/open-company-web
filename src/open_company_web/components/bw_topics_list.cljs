@@ -38,7 +38,7 @@
 (defn can-dnd? []
   (not (:read-only (dis/company-data))))
 
-(defcomponent bw-topics-list [{:keys [company-data card-width selected-topic-view] :as data} owner options]
+(defcomponent bw-topics-list [{:keys [company-data card-width selected-topic-view show-add-topic] :as data} owner options]
 
   (init-state [_]
     {:topics (:sections company-data)})
@@ -57,8 +57,9 @@
       (dom/div {:class "left-topics-list-top group"}
         (dom/h3 {:class "left-topics-list-top-title left"
                  :on-click #(router/nav! (oc-urls/company))} "TOPICS")
-        (dom/button {:class "left-topics-list-top-title btn-reset right"
-                     :on-click #(dis/dispatch! [:show-add-topic true])} "+"))
+        (when-not show-add-topic
+          (dom/button {:class "left-topics-list-top-title btn-reset right"
+                       :on-click #(dis/dispatch! [:show-add-topic true])} "+")))
       (dom/div {:class "left-topics-list-items group"}
         (for [topic (:sections company-data)
               :let [sd (->> topic keyword (get company-data))]]
