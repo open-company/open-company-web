@@ -56,7 +56,8 @@
                 :key (str "topic-view-inner-" selected-topic-view)}
         (dom/div {:class "topic-view-internal"
                   :style {:width (str topic-card-width "px")}}
-          (when-not (:read-only company-data)
+          (when (and (not (:read-only company-data))
+                     (not (responsive/is-tablet-or-mobile?)))
             (dom/div {:class (str "fake-textarea " (when is-another-foce "disabled"))}
               (if is-new-foce
                 (dom/div {:class "topic topic-edit"
@@ -81,7 +82,8 @@
           (when (and (not revisions)
                      (not (:placeholder topic-data)))
             (dom/div {:class "revision-container group"}
-              (when-not (:read-only company-data)
+              (when (and (not (:read-only company-data))
+                         (not (responsive/is-tablet-or-mobile?)))
                 (dom/hr {:class "separator-line"
                          :style {:width (str (- topic-card-width 80) "px")}}))
               (om/build topic {:section selected-topic-view
@@ -96,11 +98,15 @@
                                :foce-data foce-data
                                :show-editing false}
                                {:opts {:section-name selected-topic-view}})))
-          (for [rev revisions]
+          (for [idx (range (count revisions))
+                :let [rev (get revisions idx)]]
             (when rev
               (dom/div {:class "revision-container group"}
-                (dom/hr {:class "separator-line"
-                         :style {:width (str (- topic-card-width 60) "px")}})
+                (when-not (and (= idx 0)
+                               (or (responsive/is-tablet-or-mobile?)
+                                   (:read-only company-data)))
+                  (dom/hr {:class "separator-line"
+                           :style {:width (str (- topic-card-width 60) "px")}}))
                 (om/build topic {:section selected-topic-view
                                  :section-data rev
                                  :card-width (- topic-card-width 60)
