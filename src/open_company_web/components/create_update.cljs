@@ -119,7 +119,7 @@
                                           {:opts {:dismiss-su-preview #(om/set-state! owner :show-su-dialog false)}}))
             (dom/div {:class "create-update-content group"
                       :style {:width total-width}}
-              (dom/div {:class "create-update-content-list group right"
+              (dom/div {:class "create-update-content-list group left"
                         :style {:width (str responsive/updates-content-list-width "px")}}
                 (dom/div {:class "create-update-content-cta"}
                   "Click the topics you'd like to share and arrange them in any order.")
@@ -153,7 +153,7 @@
                                                                                  :should-update-data false}))
                                               (patch-stakeholder-update owner))}
                           (:title sd)))))))
-              (dom/div {:class "create-update-content-cards right"
+              (dom/div {:class "create-update-content-cards left"
                         :style {:width (str fixed-card-width "px")}}
                 (dom/input {:class "create-update-content-cards-title"
                             :type "text"
