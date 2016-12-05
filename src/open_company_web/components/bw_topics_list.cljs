@@ -67,6 +67,7 @@
                                              :dnd (can-dnd?)
                                              :group true
                                              :selected (= selected-topic-view topic)})
+                    :style {:width (str (- responsive/left-topics-list-width 5) "px")}
                     :data-topic (name topic)
                     :key (str "bw-topic-list-" (name topic))
                     :on-click #(router/nav! (oc-urls/company-section (router/current-company-slug) (name topic)))}

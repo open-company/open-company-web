@@ -158,7 +158,7 @@
                 (dom/input {:class "create-update-content-cards-title"
                             :type "text"
                             :value su-title
-                            :placeholder "Update Title"
+                            :placeholder "Title"
                             :on-change (fn [e]
                                           (om/update-state! owner #(merge % {:su-title (.. e -target -value)
                                                                              :should-update-data false}))
