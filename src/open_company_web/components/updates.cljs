@@ -82,10 +82,10 @@
       (dom/div {:class "updates-inner group navbar-offset"}
         (dom/div {:class "updates-content group"
                   :style {:width total-width}}
-          (dom/div {:class "updates-content-list group right"
+          (dom/div {:class "updates-content-list group left"
                     :style {:width (str responsive/updates-content-list-width "px")}}
             (prior-updates false selected-su))
-          (dom/div {:class (str "updates-content-cards right" (when su-data " has-content"))
+          (dom/div {:class (str "updates-content-cards left" (when su-data " has-content"))
                     :style {:width (str fixed-card-width "px")}}
             (when (and selected-su
                        (not su-data))
