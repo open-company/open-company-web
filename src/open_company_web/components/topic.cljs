@@ -101,16 +101,16 @@
                       :data-container "body"
                       :data-placement "top"}))))
 
-        ;; Topic headline
-        (when (and is-topic-view
-                   (not (clojure.string/blank? (:headline topic-data))))
-          (om/build topic-headline topic-data))
-
         ;; Topic image for dashboard
         (when (and image-header
                    is-topic-view)
           (dom/div {:class "card-header card-image"}
             (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
+
+        ;; Topic headline
+        (when (and is-topic-view
+                   (not (clojure.string/blank? (:headline topic-data))))
+          (om/build topic-headline topic-data))
 
         ;; Topic data
         (when (and (or (not is-dashboard)
