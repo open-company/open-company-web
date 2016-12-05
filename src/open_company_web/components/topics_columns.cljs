@@ -1,4 +1,5 @@
 (ns open-company-web.components.topics-columns
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -147,16 +148,6 @@
           clean-layout (apply merge (for [[k v] final-layout] {k (vec (remove nil? v))}))]
       clean-layout)))
 
-(defn- update-active-topics [owner new-topic & [section-data]]
-  (let [company-data (om/get-props owner :company-data)
-        old-topics (:sections company-data)
-        new-topics (conj old-topics new-topic)
-        new-topic-kw (keyword new-topic)]
-    (om/set-state! owner :start-foce {:section new-topic-kw :section-data section-data})
-    (if section-data
-      (api/patch-sections new-topics section-data new-topic)
-      (api/patch-sections new-topics))))
-
 (defn render-topic [owner options section-name & [column]]
   (when section-name
     (let [props                 (om/get-props owner)
@@ -195,6 +186,16 @@
                              {:opts {:section-name section-name
                                      :topic-click (partial topic-click section-name)}})))))))
 
+(defn- update-active-topics [owner new-topic section-data]
+  (let [company-data (om/get-props owner :company-data)
+        old-topics (:sections company-data)
+        new-topics (conj old-topics new-topic)
+        new-topic-kw (keyword new-topic)]
+    (om/set-state! owner :start-foce {:section new-topic-kw :title (:title section-data)})
+    (if (s/starts-with? new-topic "custom-")
+      (api/patch-sections new-topics section-data new-topic)
+      (api/patch-sections new-topics))))
+
 (defcomponent topics-columns [{:keys [columns-num
                                       content-loaded
                                       total-width
@@ -215,18 +216,20 @@
                (or (not= (:topics next-props) (:topics data))
                    (not= (:columns-num next-props) (:columns-num data))))
       (om/set-state! owner :best-layout (calc-layout owner next-props)))
-    (when-let [start-foce (om/get-state owner :start-foce)]
+    (when-let* [start-foce (om/get-state owner :start-foce)
+                new-section (:section start-foce)
+                new-section-data (get company-data new-section)]
       ; A new section was added, switch the topic-view when the add section is finished
       ; and enable FoCE
-      (let [new-section (:section start-foce)
-            new-section-data (:section-data start-foce)]
+      (let [new-title (:title start-foce)
+            foce-section-data (utils/new-section-initial-data
+                               new-section
+                               new-title
+                               new-section-data)]
         (utils/after 10 #(router/nav! (oc-urls/company-section (router/current-company-slug) new-section)))
         (utils/after 60 #(dis/dispatch! [:start-foce
-                                          (:section start-foce)
-                                          (utils/new-section-initial-data
-                                           new-section
-                                           (if (and new-section-data (contains? new-section-data :title)) (:title new-section-data) new-section)
-                                           new-section-data)])))
+                                          new-section
+                                          (assoc foce-section-data :new true)])))
       (om/set-state! owner :start-foce nil)))
 
   (render-state [_ {:keys [best-layout]}]
