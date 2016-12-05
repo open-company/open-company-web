@@ -68,9 +68,11 @@ div.su-snapshot {
     position: relative;
     content: "";
     min-height: calc(100vh - #{$footer_small_height}px);
-    margin: 50px auto;
-    padding: 20px 30px;
     background-color: white;
+    @include big_web(){
+      margin: 50px auto;
+      padding: 20px 30px;
+    }
 
     @include mobile(){
       padding-top: 20px;
