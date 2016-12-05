@@ -780,7 +780,6 @@
                       :title title
                       :body-placeholder (new-section-body-placeholder)
                       :headline ""
-                      :body ""
                       :placeholder true
                       :links (:links old-section-data)}
         with-data (if (and old-section-data (contains? old-section-data :data))
