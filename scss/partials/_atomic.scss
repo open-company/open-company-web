@@ -133,6 +133,14 @@
   color: $oc_gray_5;
 }
 
+.all-caps {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
 // colors
 // .{color} - color: {color}
 // .bg-{color} - background-color: {color}

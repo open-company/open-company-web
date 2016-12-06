@@ -58,19 +58,19 @@
         archived-topics (:archived company-data)
         all-sections (into {} (for [s (get-all-sections)]
                                 [(keyword (:section s)) s]))
-        categories (get-categories)]
+        categories (get-categories)
+        show-archived (pos? (count (:archived company-data)))]
       [:div.add-topic.group
-       [:div.open-sans.small-caps.bold.mb2.gray5
-        [:span.mr1 "Suggested Topics"]
-        [:span.dimmed-gray.btn-reset.right
+       [:span.dimmed-gray.btn-reset.right
          {:on-click #(dis/dispatch! [:show-add-topic false])}
-          (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})]]
+         (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})]
        [:div.mxn2.clearfix
         ;; column 1
-        [:div.col.col-4.px2
+        [:div.col.px2
+          {:class (if show-archived "col-4" "col-6")}
           (for [cat (:1 categories)]
             [:div
-              [:span.block.open-sans.small-caps.bold.mb1.mt2
+              [:span.block.mb1.mt2.all-caps
                 {:key (str "col-" (:name cat))}
                 (str (:name cat) (when (:icon cat) " "))
                 (when (:icon cat)
@@ -86,10 +86,11 @@
                                (update-active-topics-cb (:section section-data) {:title (:title section-data) :section (:section section-data) :placeholder true}))}
                   [:span.child (:title section-data)]])])]
         ;; column 2
-        [:div.col.col-4.px2
+        [:div.col.px2
+          {:class (if show-archived "col-4" "col-5")}
           (for [cat (:2 categories)]
             [:div
-              [:span.block.open-sans.small-caps.bold.mb1.mt2wh
+              [:span.block.mb1.mt2.all-caps
                 {:key (str "col-" (:name cat))}
                 (str (:name cat) (when (:icon cat) " "))
                 (when (:icon cat)
@@ -105,9 +106,10 @@
                                (update-active-topics-cb (:section section-data) {:title (:title section-data) :section (:section section-data) :placeholder true}))}
                   [:span.child (:title section-data)]])])]
         ;; column 3 - archived only
-        (if (pos? (count (:archived company-data)))
+        (if show-archived
           [:div.col.col-4.px2
-            [:span.block.open-sans.small-caps.bold.mb1.mt2
+            {:style {:margin-top "-16px"}}
+            [:span.block.mb1.mt2.all-caps
               {:key (str "col-archived")}
               "Archived"]
             (for [sec (:archived company-data)
