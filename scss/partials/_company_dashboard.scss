@@ -5,6 +5,14 @@ div.company-dashboard {
     min-height: calc(100vh - #{$footer_height}px - 41px);
   }
 
+  &.selected-topic-view {
+    div.page{
+      @include mobile(){
+        padding-top: 0px;
+      }
+    }
+  }
+
   div.page{
     position: relative; /* Set the position property so z-index will apply */
     z-index: 20; /* Make sure this is higher than #menu */
