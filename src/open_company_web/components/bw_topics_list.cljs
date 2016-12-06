@@ -62,7 +62,11 @@
         (when (and (not show-add-topic)
                    (not (:read-only company-data)))
           (dom/button {:class "left-topics-list-top-title btn-reset right"
-                       :on-click #(dis/dispatch! [:show-add-topic true])}
+                       :on-click #(dis/dispatch! [:show-add-topic true])
+                       :title "Add a topic"
+                       :data-placement "top"
+                       :data-toggle "tooltip"
+                       :data-container "body"}
             (dom/i {:class "fa fa-plus-circle"}))))
       (dom/div {:class (str "left-topics-list-items group" (when (:read-only company-data) " read-only"))}
         (for [topic (:sections company-data)
