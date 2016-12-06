@@ -129,6 +129,7 @@
 (def updates-content-cards-max-width 560)
 (def updates-content-cards-min-width 250)
 (def updates-max-total-width 1152)
+(def updates-list-breakpoint 958)
 
 (defn total-layout-width-int [card-width columns-num]
   (if (is-mobile-size?)
